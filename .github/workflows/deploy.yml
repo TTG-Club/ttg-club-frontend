@@ -24,11 +24,9 @@ jobs:
     name: Lint application
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
 
@@ -36,10 +34,6 @@ jobs:
         run: npm ci
 
       - name: Lint application
-        env:
-          TEST_ONE: github.event
-          TEST_TWO: inputs
-          TEST_THREE: github.event.inputs
         run: npm run lint:fix
 
   deploy-dev:
