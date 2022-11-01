@@ -1,0 +1,60 @@
+name: Deploy TTG Club Frontend
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+  workflow_dispatch:
+
+permissions:
+  deployments: write
+  contents: read
+  pages: write
+  actions: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.action }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint application
+        env:
+          TEST_ONE: github.event
+          TEST_TWO: inputs
+          TEST_THREE: github.event.inputs
+        run: npm run lint:fix
+
+  deploy-dev:
+    name: Deploy application
+    if: github.event_name != 'workflow_dispatch'
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+          script: |-
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'ttg-club-backend',
+              workflow_id: 'docker-deploy.yml',
+              ref: "${{ github.ref_name }}"
+            })
