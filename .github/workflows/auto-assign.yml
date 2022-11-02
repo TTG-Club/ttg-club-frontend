@@ -15,5 +15,3 @@ jobs:
           skipKeywords: wip, draft
           addReviewers: true
           addAssignees: 'author'
-          numberOfReviewers: 1
-          numberOfAssignees: 1
