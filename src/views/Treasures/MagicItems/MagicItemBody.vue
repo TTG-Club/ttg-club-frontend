@@ -31,7 +31,7 @@
                 </span>
             </p>
 
-            <p>
+            <p v-if="magicItem.cost">
                 <b>Стоимость по <span
                     v-tippy="'Руководство Мастера'"
                 >DMG</span>:</b> <span>{{ magicItem.cost.dmg }}</span>
