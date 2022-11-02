@@ -95,13 +95,13 @@
         }),
         computed: {
             topBarLeftString() {
-                let str = `${ upperFirst(this.magicItem.type.name) }, ${ this.magicItem.rarity.name }`;
+                let detail = '';
 
                 if (this.magicItem.detailType?.length) {
-                    str += ` (${ this.magicItem.detailType.join(', ') })`;
+                    detail = ` (${ this.magicItem.detailType.join(', ') })`;
                 }
 
-                return str;
+                return `${ upperFirst(this.magicItem.type.name) }${ detail }, ${ this.magicItem.rarity.name }`;
             }
         },
         methods: {
