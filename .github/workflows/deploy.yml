@@ -3,7 +3,6 @@ name: Deploy TTG Club Frontend
 on:
   push:
     branches:
-      - main
       - dev
 
   workflow_dispatch:
@@ -36,7 +35,7 @@ jobs:
       - name: Lint application
         run: npm run lint:fix
 
-  deploy-dev:
+  deploy:
     name: Deploy application
     if: github.event_name != 'workflow_dispatch'
     needs: lint
