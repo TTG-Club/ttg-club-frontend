@@ -16,8 +16,6 @@ on:
 
   workflow_call:
 
-  workflow_dispatch:
-
 permissions:
   deployments: write
   contents: read
@@ -26,7 +24,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: lint-${{ github.ref }}-${{ github.action }}-${{ github.workflow }}-${{ github.run_id }}
+  group: lint-frontend-${{ github.repository }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -35,6 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          repository: TTG-Club/ttg-club-frontend
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-node@v3
         with:
