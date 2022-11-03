@@ -41,13 +41,18 @@ jobs:
         with:
           node-version: 16
 
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+
       - name: Cache node modules
-        id: cache-npm
+        id: npm-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-node-modules
+          cache-name: npm-cache
         with:
-          path: ~/.npm
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -55,7 +60,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install dependencies
-        if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        if: ${{ steps.npm-cache.outputs.cache-hit != 'true' }}
         run: npm ci
 
       - name: Lint application
