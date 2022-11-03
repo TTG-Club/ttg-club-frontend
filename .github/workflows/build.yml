@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  workflow_call:
+
+permissions:
+  deployments: write
+  contents: read
+  pages: write
+  actions: write
+  id-token: write
+
+concurrency:
+  group: build-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint Workflow
+    uses: ./.github/workflows/lint.yml
+
+  build:
+    name: Build Job
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: TTG-Club/ttg-club-frontend
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Develop
+        env:
+          VUE_APP_DEV: ${{ github.ref_name == 'dev' && 'true' || 'false' }}
+        run: npm run build:${{ github.ref_name == 'dev' && 'dev' || 'prod' }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: front-app-${{ github.run_id }}
+          path: ./dist
+          retention-days: 1
+          if-no-files-found: error
