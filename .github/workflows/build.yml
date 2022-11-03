@@ -1,0 +1,54 @@
+name: Deploy TTG Club Frontend
+
+on:
+  workflow_call:
+
+permissions:
+  deployments: write
+  contents: read
+  pages: write
+  actions: write
+  id-token: write
+
+concurrency:
+  group: deploy-frontend-${{ github.repository }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yml
+
+  build:
+    name: Build frontend
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: TTG-Club/ttg-club-frontend
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Dev application
+        if: ${{ github.ref_name == 'dev' }}
+        env:
+          VUE_APP_DEV: true
+        run: npm run build:dev
+
+      - name: Build Prod application
+        if: ${{ github.ref_name == 'main' }}
+        run: npm run build:prod
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: front-app-${{ github.run_id }}
+          path: ./dist
+          retention-days: 1
+          if-no-files-found: error
