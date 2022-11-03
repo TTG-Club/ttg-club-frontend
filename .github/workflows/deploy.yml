@@ -16,16 +16,16 @@ permissions:
   id-token: write
 
 concurrency:
-  group: ${{ github.ref }}-${{ github.action }}-${{ github.workflow }}-${{ github.run_id }}
+  group: deploy-${{ github.ref }}-${{ github.action }}-${{ github.workflow }}-${{ github.run_id }}
   cancel-in-progress: true
 
 jobs:
   lint:
-    name: Lint application
+    name: Lint
     uses: ./.github/workflows/lint.yml
 
   deploy:
-    name: Deploy application
+    name: Deploy
     needs: lint
     runs-on: ubuntu-latest
     steps:
