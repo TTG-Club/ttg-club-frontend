@@ -11,16 +11,16 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deploy-frontend-${{ github.repository }}-${{ github.ref_name }}
+  group: build-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   lint:
-    name: Lint
+    name: Lint Workflow
     uses: ./.github/workflows/lint.yml
 
   build:
-    name: Build frontend
+    name: Build Job
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -36,13 +36,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build Dev application
+      - name: Build Develop
         if: ${{ github.ref_name == 'dev' }}
         env:
           VUE_APP_DEV: true
         run: npm run build:dev
 
-      - name: Build Prod application
+      - name: Build Production
         if: ${{ github.ref_name == 'main' }}
         run: npm run build:prod
 

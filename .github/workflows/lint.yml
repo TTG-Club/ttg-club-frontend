@@ -24,12 +24,12 @@ permissions:
   id-token: write
 
 concurrency:
-  group: lint-frontend-${{ github.repository }}-${{ github.ref_name }}
+  group: lint-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   lint:
-    name: Lint Check
+    name: Lint Job
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
