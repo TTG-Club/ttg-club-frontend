@@ -1,4 +1,4 @@
-name: Lint TTG Club Frontend
+name: Lint
 
 on:
   pull_request:

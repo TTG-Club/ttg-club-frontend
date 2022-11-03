@@ -1,4 +1,4 @@
-name: Deploy TTG Club Frontend
+name: Build
 
 on:
   workflow_call:
