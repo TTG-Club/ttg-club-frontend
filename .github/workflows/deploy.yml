@@ -24,7 +24,7 @@ jobs:
     name: Lint application
     uses: ./.github/workflows/lint.yml
 
-  deploy-dev:
+  deploy:
     name: Deploy application
     needs: lint
     runs-on: ubuntu-latest
