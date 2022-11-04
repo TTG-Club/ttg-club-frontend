@@ -97,11 +97,12 @@ ul {
   color: var(--text-color);
   padding-left: 24px;
   margin: 0 0 12px 0;
+  line-height: var(--main-line-height);
 }
 
+ol li,
 ul li {
-  line-height: 20px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 strong,
