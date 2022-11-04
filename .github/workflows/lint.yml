@@ -6,9 +6,6 @@ on:
       - opened
       - edited
       - reopened
-      - ready_for_review
-      - unlocked
-      - review_requested
 
     branches:
       - main
@@ -30,7 +27,7 @@ concurrency:
 jobs:
   lint-pr:
     name: Lint PR Job
-    if: ${{ github.event_name != 'workflow_call' }}
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -45,7 +42,7 @@ jobs:
 
   lint:
     name: Lint Job
-    if: ${{ github.event_name == 'workflow_call' }}
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
