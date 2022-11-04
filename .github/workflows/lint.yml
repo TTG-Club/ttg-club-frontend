@@ -28,18 +28,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  lint-merge:
     name: Lint Job
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        if: ${{ github.event_name == 'workflow_call' }}
+
+      - uses: actions/setup-node@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint application
+        run: npm run lint:fix
+
+  lint:
+    name: Lint Job
+    if: ${{ github.event_name != 'workflow_call' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
         with:
           repository: TTG-Club/ttg-club-frontend
           ref: ${{ github.ref_name }}
-
-      - uses: actions/checkout@v3
-        if: ${{ github.event_name != 'workflow_call' }}
 
       - uses: actions/setup-node@v3
         with:
