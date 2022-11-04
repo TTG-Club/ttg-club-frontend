@@ -4,12 +4,15 @@ on:
   pull_request:
     types:
       - opened
-      - edited
       - reopened
 
     branches:
       - main
       - dev
+
+  push:
+    branches:
+      - refs/pull/:prNumber/merge
 
   workflow_call:
 
