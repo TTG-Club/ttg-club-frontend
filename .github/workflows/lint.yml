@@ -28,9 +28,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-merge:
-    name: Lint Job
-    if: ${{ github.event_name == 'workflow_call' }}
+  lint-pr:
+    name: Lint PR Job
+    if: ${{ github.event_name != 'workflow_call' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -45,7 +45,7 @@ jobs:
 
   lint:
     name: Lint Job
-    if: ${{ github.event_name != 'workflow_call' }}
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
