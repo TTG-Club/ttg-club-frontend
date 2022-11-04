@@ -63,6 +63,7 @@
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
 
+    // TODO: Доделать рандом характеристик
     export default defineComponent({
         components: {
             UiSelect,
