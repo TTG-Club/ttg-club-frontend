@@ -92,18 +92,18 @@ p {
   }
 }
 
-  ol,
-  ul {
-    color: var(--text-color);
-    padding-left: 24px;
-    margin: 0 0 12px 0;
-    line-height: var(--main-line-height);
-  }
+ol,
+ul {
+  color: var(--text-color);
+  padding-left: 24px;
+  margin: 0 0 12px 0;
+  line-height: var(--main-line-height);
+}
 
-  ol li,
-  ul li {
-    margin-bottom: 8px;
-  }
+ol li,
+ul li {
+  margin-bottom: 8px;
+}
 
 strong,
 b {
