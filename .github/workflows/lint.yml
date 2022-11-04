@@ -33,9 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        if: ${{ github.event_name == 'workflow_call' }}
         with:
           repository: TTG-Club/ttg-club-frontend
           ref: ${{ github.ref_name }}
+
+      - uses: actions/checkout@v3
+        if: ${{ github.event_name != 'workflow_call' }}
 
       - uses: actions/setup-node@v3
         with:
