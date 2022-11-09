@@ -349,7 +349,7 @@ module.exports = {
         'no-extra-semi': 'error',
 
         // Vue rules
-        'vue/max-len': [1, 120],
+        'vue/max-len': 'off',
         'vue/match-component-file-name': [
             'error',
             {
@@ -399,6 +399,8 @@ module.exports = {
                     'double',
                     'single'
                 ],
+                'max-len': 'off',
+                'vue/max-len': [1, 120],
                 'vue/html-indent': ['error', 4],
                 'vue/valid-v-slot': 'off',
                 'vue/max-attributes-per-line': [

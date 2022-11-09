@@ -29,9 +29,13 @@ module.exports = defineConfig({
         }
     },
     configureWebpack: {
+        optimization: {
+            moduleIds: 'deterministic',
+            runtimeChunk: 'single'
+        },
         output: {
             filename: 'js/[name].js',
-            chunkFilename: 'js/[name].[fullhash].js'
+            chunkFilename: 'js/[name].[chunkhash].js'
         }
     },
     chainWebpack: config => {
@@ -85,7 +89,7 @@ module.exports = defineConfig({
         extract: process.env.VUE_SERVE !== 'true'
             ? {
                 filename: 'css/[name].css',
-                chunkFilename: 'css/[name].[fullhash].css'
+                chunkFilename: 'css/[name].[chunkhash].css'
             }
             : false,
         loaderOptions: {
