@@ -511,7 +511,7 @@
         }
 
         &__select {
-            ::v-deep(.dnd5club-select) {
+            ::v-deep(.ui-select) {
                 .multiselect {
                     border-width: 0 0 1px 0;
                     border-radius: 0;

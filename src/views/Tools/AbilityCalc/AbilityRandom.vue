@@ -17,15 +17,24 @@
                     <ui-select
                         v-for="(roll, index) in rolls"
                         :key="index"
-                        class="ability-random__choose_item"
+                        class="ability-random__select"
                         label="name"
                         track-by="key"
-                        :options="getFilteredOptions"
-                        :model-value="roll.name"
-                        @select="onSelect($event, index)"
+                        :options="abilities"
+                        :model-value="roll"
+                        allow-empty
+                        @remove="onRemove(index)"
+                        @select="onSelect($event.key, index)"
                     >
                         <template #left-slot>
                             {{ roll.value }}
+                        </template>
+
+                        <template #option="{ option }">
+                            <span
+                                class="ability-random__select_option"
+                                :class="{ 'is-selected': isSelected(option.key) }"
+                            >{{ option.name }}</span>
                         </template>
 
                         <template #placeholder>
@@ -36,16 +45,22 @@
             </div>
         </div>
 
-        <div class="ability-random__row">
+        <div
+            v-if="isDev"
+            class="ability-random__row"
+        >
             {{ abilities }}
         </div>
 
-        <div class="ability-random__row">
+        <div
+            v-if="isDev"
+            class="ability-random__row"
+        >
             {{ rolls }}
         </div>
 
         <div class="ability-random__row">
-            <ability-table :specifications="rolls"/>
+            <ability-table :rolls="rolls"/>
         </div>
     </div>
 </template>
@@ -56,12 +71,15 @@
         defineComponent, ref
     } from "vue";
     import { useToast } from "vue-toastification";
+    import orderBy from 'lodash/orderBy';
+    import reverse from 'lodash/reverse';
     import UiButton from "@/components/form/UiButton.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
     import { AbilityName, AbilityKey } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
+    import { useIsDev } from '@/common/helpers/isDev';
 
     // TODO: Доделать рандом характеристик
     export default defineComponent({
@@ -75,37 +93,6 @@
             const { getFormattedModifier } = useAbilityTransforms();
             const toast = useToast();
 
-            const abilities = ref<{
-                name: AbilityName,
-                key: AbilityKey,
-            }[]>([
-
-                {
-                    name: AbilityName.STRENGTH,
-                    key: AbilityKey.STRENGTH
-                },
-                {
-                    name: AbilityName.DEXTERITY,
-                    key: AbilityKey.DEXTERITY
-                },
-                {
-                    name: AbilityName.CONSTITUTION,
-                    key: AbilityKey.CONSTITUTION
-                },
-                {
-                    name: AbilityName.INTELLIGENCE,
-                    key: AbilityKey.INTELLIGENCE
-                },
-                {
-                    name: AbilityName.WISDOM,
-                    key: AbilityKey.WISDOM
-                },
-                {
-                    name: AbilityName.CHARISMA,
-                    key: AbilityKey.CHARISMA
-                }
-            ]);
-
             const rolls = ref<{
                 name: AbilityName | null,
                 key: AbilityKey | null,
@@ -114,40 +101,69 @@
 
             const tryRoll = () => {
                 try {
-                    rolls.value = [];
+                    const rolled = [];
 
                     for (let i = 0; i < 6; i++) {
                         const roll = doRoll({
                             formula: '4d6kh3'
                         });
 
-                        rolls.value.push({
+                        rolled.push({
                             name: null,
                             key: null,
                             value: Number(roll.value)
                         });
                     }
+
+                    rolls.value = reverse(orderBy(rolled, ['value']));
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка... попробуй еще раз');
                 }
             };
 
-            const getFilteredOptions = computed(() => abilities.value.filter(item => (
-                !rolls.value.map(roll => roll.key).includes(item.key)
-            )));
+            const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
 
-            const onSelect = (e: {name: AbilityName, key: AbilityKey}, index: number) => {
-                rolls.value[index].name = e.name;
-                rolls.value[index].key = e.key;
+            const onSelect = (key: AbilityKey | null, index: number) => {
+                const setValue = (value: typeof key, i: number) => {
+                    rolls.value[i].key = value;
+
+                    rolls.value[i].name = value
+                        ? AbilityName[value]
+                        : null;
+                };
+
+                for (let i = 0; i < 6; i++) {
+                    if (i === index) {
+                        setValue(key, i);
+
+                        continue;
+                    }
+
+                    if (rolls.value[i].key === key) {
+                        setValue(null, i);
+                    }
+                }
+            };
+
+            const onRemove = (index: number) => {
+                rolls.value[index].key = null;
+                rolls.value[index].name = null;
             };
 
             return {
-                abilities,
+                isDev: useIsDev(),
+                abilities: computed(() => Object
+                    .keys(AbilityKey)
+                    .map(key => ({
+                        key,
+                        name: AbilityName[key as AbilityKey]
+                    }))),
                 tryRoll,
                 rolls,
                 getFormattedModifier,
-                getFilteredOptions,
-                onSelect
+                isSelected,
+                onSelect,
+                onRemove
             };
         }
     });
@@ -176,8 +192,21 @@
         }
 
         &__select {
+            ::v-deep(.multiselect__option) {
+                padding: 0;
+            }
+
             &_placeholder {
                 display: flex;
+            }
+
+            &_option {
+                padding: 12px;
+
+                &.is-selected {
+                    background: var(--primary-select);
+                    color: var(--text-b-color);
+                }
             }
 
             &_roll {

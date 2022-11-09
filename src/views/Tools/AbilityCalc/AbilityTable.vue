@@ -1,85 +1,69 @@
 <template>
     <div class="ability-table">
-        <table
-            v-for="(block, key) in specifications"
+        <div class="ability-table__col is-aside">
+            <div class="ability-table__row">
+                Хар-ка
+            </div>
+
+            <div class="ability-table__row">
+                Значение
+            </div>
+
+            <div class="ability-table__row">
+                Бон. расы
+            </div>
+
+            <div class="ability-table__row">
+                Модиф.
+            </div>
+
+            <div class="ability-table__row">
+                Итого
+            </div>
+        </div>
+
+        <div
+            v-for="(ability, key) in abilities"
             :key="key"
-            class="ability-table__block"
+            class="ability-table__col"
         >
-            <thead class="ability-table__head">
-                <tr>
-                    <td class="ability-table__name">
-                        {{ block.name }}
-                    </td>
+            <div class="ability-table__row is-ability">
+                {{ ability.shortName }}
+            </div>
 
-                    <td class="ability-table__value">
-                        <svg-icon/>
-                    </td>
-                </tr>
-            </thead>
+            <div class="ability-table__row">
+                {{ ability.value }}
+            </div>
 
-            <tbody class="ability-table__body">
-                <tr class="ability-table__row">
-                    <td class="ability-table__name">
-                        Характеристика
-                    </td>
+            <div class="ability-table__row">
+                0
+            </div>
 
-                    <td class="ability-table__value">
-                        {{ block.value }}
-                    </td>
-                </tr>
+            <div class="ability-table__row">
+                {{ ability.modifier }}
+            </div>
 
-                <tr class="ability-table__row">
-                    <td class="ability-table__name">
-                        Значение
-                    </td>
-
-                    <td class="ability-table__value">
-                        {{ block.value }}
-                    </td>
-                </tr>
-
-                <tr class="ability-table__row">
-                    <td class="ability-table__name">
-                        Бонус от расы
-                    </td>
-
-                    <td class="ability-table__value">
-                        {{ block.value }}
-                    </td>
-                </tr>
-
-                <tr class="ability-table__row">
-                    <td class="ability-table__name">
-                        Модификатор
-                    </td>
-
-                    <td class="ability-table__value">
-                        {{ block.value }}
-                    </td>
-                </tr>
-
-                <tr class="ability-table__row">
-                    <td class="ability-table__name">
-                        Итого
-                    </td>
-
-                    <td class="ability-table__value">
-                        {{ block.value }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="ability-table__row">
+                {{ ability.result }}
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
     import type { PropType } from 'vue';
-    import { defineComponent } from "vue";
-    import type { AbilityName, AbilityKey } from "@/views/Tools/AbilityCalc/AbilityEnum";
+    import {
+        computed,
+        defineComponent
+    } from 'vue';
+    import {
+        AbilityName, AbilityKey, AbilityShortName
+    } from '@/views/Tools/AbilityCalc/AbilityEnum';
+    import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({
         props: {
-            specifications: {
+            rolls: {
                 type: Object as PropType<{
                     name: AbilityName | null,
                     key: AbilityKey | null,
@@ -87,6 +71,48 @@
                 }[]>,
                 required: true
             }
+        },
+        setup(props) {
+            const { getFormattedModifier } = useAbilityTransforms();
+
+            const abilities = computed({
+                get: () => Object.values(AbilityKey)
+                    .map((key: AbilityKey) => {
+                        const value = props.rolls.find(roll => roll.key === key)?.value || '-';
+
+                        const modifier = typeof value === 'number'
+                            ? getFormattedModifier(value)
+                            : '-';
+
+                        const obj = {
+                            key,
+                            modifier,
+                            value,
+                            name: AbilityName[key],
+                            shortName: AbilityShortName[key],
+                            raceBonus: 0
+                        };
+
+                        return {
+                            ...obj,
+                            result: computed(() => (
+                                typeof obj.value === 'number'
+                                    ? obj.value + obj.raceBonus
+                                    : obj.raceBonus
+                            ))
+                        };
+                    }),
+                set: v => {
+                    console.log(v);
+                }
+            });
+
+            return {
+                AbilityKey,
+                AbilityShortName,
+
+                abilities
+            };
         }
     });
 </script>
@@ -94,34 +120,32 @@
 <style lang="scss" scoped>
     .ability-table {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 2fr repeat(6, 1fr);
         gap: 24px;
 
-        &__block {
+        &__col {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
             overflow: hidden;
-            border-radius: 8px;
-            background-color: var(--bg-main);
-            border: 1px solid var(--border);
-            border-collapse: collapse;
-        }
+            border-radius: 6px;
+            padding: 12px 0;
 
-        &__body {
-        }
-
-        &__row {
-            & + & {
-                border-top: 1px solid var(--border);
+            &:not(.is-aside) {
+                padding: 12px 22px;
+                align-items: center;
+                background-color: var(--bg-table-row);
             }
         }
 
-        &__name,
-        &__value {
-        }
-
-        &__value {
-            width: 70px;
-            font-weight: 600;
+        &__row {
             font-size: var(--h4-font-size);
+            line-height: var(--h4-line-height);
+            color: var(--text-b-color);
+
+            &.is-ability {
+                text-transform: uppercase;
+            }
         }
     }
 </style>

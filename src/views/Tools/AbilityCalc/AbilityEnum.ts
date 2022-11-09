@@ -17,6 +17,15 @@ export enum AbilityShortName {
 }
 
 export enum AbilityKey {
+    STRENGTH = 'STRENGTH',
+    DEXTERITY = 'DEXTERITY',
+    CONSTITUTION = 'CONSTITUTION',
+    INTELLIGENCE = 'INTELLIGENCE',
+    WISDOM = 'WISDOM',
+    CHARISMA = 'CHARISMA'
+}
+
+export enum AbilityShortKey {
     STRENGTH = 'str',
     DEXTERITY = 'dex',
     CONSTITUTION = 'con',
@@ -27,5 +36,7 @@ export enum AbilityKey {
 
 export default {
     AbilityName,
-    AbilityKey
+    AbilityShortName,
+    AbilityKey,
+    AbilityShortKey
 };
