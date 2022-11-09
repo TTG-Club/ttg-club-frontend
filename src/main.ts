@@ -3,7 +3,7 @@ import { createPinia } from 'pinia';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import VueTippy from 'vue-tippy';
 import VueLazyload from 'vue-lazyload';
-import Toast, { useToast } from 'vue-toastification';
+import Toast, { createToastInterface, useToast } from 'vue-toastification';
 import vfmPlugin from 'vue-final-modal';
 import { useDayjs } from '@/common/composition/useDayjs';
 import isDev, { useIsDev } from '@/common/helpers/isDev';
@@ -24,10 +24,19 @@ app.config.globalProperties.$dayjs = useDayjs();
 
 const pinia = createPinia();
 
+const toastInstance = createToastInterface({
+    timeout: 1700,
+    closeButton: IconToastClose,
+    showCloseButtonOnHover: true,
+    maxToasts: 6,
+    newestOnTop: true
+});
+
 pinia.use(({ store }) => {
     /* eslint-disable no-param-reassign */
     store.$http = new HTTPService();
     store.$isDev = isDev;
+    store.$toast = toastInstance;
     /* eslint-enable no-param-reassign */
 });
 
@@ -38,13 +47,7 @@ app.use(pinia)
     .use(VueLazyload, {
         preLoad: 1.7
     })
-    .use(Toast, {
-        timeout: 1700,
-        closeButton: IconToastClose,
-        showCloseButtonOnHover: true,
-        maxToasts: 6,
-        newestOnTop: true
-    })
+    .use(Toast, toastInstance)
     .use(vfmPlugin, {
         key: '$vfm',
         componentName: 'VueFinalModal',

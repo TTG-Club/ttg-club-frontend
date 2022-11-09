@@ -1,6 +1,8 @@
 <template>
     <div class="custom-bookmark-button__wrapper">
         <ui-button
+            v-if="groups?.length"
+            ref="trigger"
             v-tippy="{ content: 'Добавить в закладки' }"
             class="custom-bookmark-button"
             type-link-filled
@@ -14,23 +16,22 @@
             />
         </ui-button>
 
-        <on-click-outside @trigger="isOpen = false">
+        <div
+            v-if="isOpen"
+            ref="submenu"
+            class="custom-bookmark-button__submenu"
+        >
             <div
-                v-if="isOpen"
-                class="custom-bookmark-button__submenu"
+                v-for="(group, key) in groups"
+                :key="key"
+                class="custom-bookmark-button__group"
+                :class="{ 'is-saved': isSaved(group.uuid) }"
+                @click.left.exact.prevent="updateBookmark(group.uuid)"
+                @dblclick.prevent.stop
             >
-                <div
-                    v-for="(group, key) in groups"
-                    :key="key"
-                    class="custom-bookmark-button__group"
-                    :class="{ 'is-saved': isSaved(group.uuid) }"
-                    @click.left.exact.prevent="updateBookmark(group.uuid)"
-                    @dblclick.prevent.stop
-                >
-                    {{ group.name }}
-                </div>
+                {{ group.name }}
             </div>
-        </on-click-outside>
+        </div>
     </div>
 </template>
 
@@ -40,16 +41,15 @@
         defineComponent, ref, toRefs
     } from "vue";
     import { useRoute } from "vue-router";
-    import { OnClickOutside } from "@vueuse/components";
     import { useToast } from "vue-toastification";
+    import { onClickOutside } from '@vueuse/core';
     import errorHandler from "@/common/helpers/errorHandler";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
     import UiButton from "@/components/form/UiButton";
 
     export default defineComponent({
         components: {
-            UiButton,
-            OnClickOutside
+            UiButton
         },
         props: {
             name: {
@@ -136,7 +136,22 @@
                 }
             }
 
+            const submenu = ref(null);
+            const trigger = ref(null);
+
+            onClickOutside(
+                submenu,
+                () => {
+                    isOpen.value = false;
+                },
+                {
+                    ignore: [trigger]
+                }
+            );
+
             return {
+                submenu,
+                trigger,
                 bookmarkName,
                 isOpen,
                 isSaved,
