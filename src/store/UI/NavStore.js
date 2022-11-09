@@ -112,6 +112,7 @@ export const useNavStore = defineStore('NavStore', {
 
                         // {
                         //     label: 'Калькулятор характеристик',
+                        //     isDev: true
                         //     url: '/tools/ability-calc'
                         // }
                     ]
@@ -178,7 +179,7 @@ export const useNavStore = defineStore('NavStore', {
                         },
                         {
                             label: 'Наш бот для Telegram',
-                            url: 'https://t.me/dnd5club_bot',
+                            url: 'https://t.me/ttg_club_bot',
                             external: true
                         },
                         {
