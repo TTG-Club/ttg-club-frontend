@@ -40,6 +40,7 @@
     import UiSwitch from "@/components/form/UiSwitch.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import AbilityRandom from "@/views/Tools/AbilityCalc/AbilityRandom.vue";
+    import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
 
     type TCalcTab = {
         id: string
@@ -68,7 +69,7 @@
                 {
                     id: 'standard',
                     name: 'Стандартный набор',
-                    component: shallowRef(AbilityRandom)
+                    component: shallowRef(AbilityArray)
                 }
             ];
 
