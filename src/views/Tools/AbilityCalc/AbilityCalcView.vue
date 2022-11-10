@@ -22,10 +22,15 @@
                 v-if="!!component"
                 class="ability-calc__row"
             >
-                <component
-                    :is="component"
-                    v-if="component"
-                />
+                <transition
+                    name="fade"
+                    mode="out-in"
+                >
+                    <component
+                        :is="component"
+                        v-if="component"
+                    />
+                </transition>
             </div>
         </template>
     </page-layout>
@@ -40,6 +45,8 @@
     import UiSwitch from "@/components/form/UiSwitch.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import AbilityRandom from "@/views/Tools/AbilityCalc/AbilityRandom.vue";
+    import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
+    import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
 
     type TCalcTab = {
         id: string
@@ -63,12 +70,12 @@
                 {
                     id: 'point-buy',
                     name: '«Покупка» значений',
-                    component: shallowRef(AbilityRandom)
+                    component: shallowRef(AbilityPointBuy)
                 },
                 {
                     id: 'standard',
                     name: 'Стандартный набор',
-                    component: shallowRef(AbilityRandom)
+                    component: shallowRef(AbilityArray)
                 }
             ];
 

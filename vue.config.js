@@ -28,16 +28,6 @@ module.exports = defineConfig({
             }
         }
     },
-    configureWebpack: {
-        optimization: {
-            moduleIds: 'deterministic',
-            runtimeChunk: 'single'
-        },
-        output: {
-            filename: 'js/[name].js',
-            chunkFilename: 'js/[name].[chunkhash].js'
-        }
-    },
     chainWebpack: config => {
         const removeHTML = () => {
             config.plugins.delete('html');
@@ -48,6 +38,11 @@ module.exports = defineConfig({
         if (!['serve', 'gh-pages'].includes(process.env.BUILD_TARGET)) {
             removeHTML();
         }
+
+        config.optimization.runtimeChunk('single');
+
+        config.output.filename('js/[name].js');
+        config.output.chunkFilename('js/[name].[chunkhash].js');
 
         config.module
             .rule('svg')
@@ -86,7 +81,7 @@ module.exports = defineConfig({
             .end();
     },
     css: {
-        extract: process.env.VUE_SERVE !== 'true'
+        extract: process.env.BUILD_TARGET !== 'serve'
             ? {
                 filename: 'css/[name].css',
                 chunkFilename: 'css/[name].[chunkhash].css'

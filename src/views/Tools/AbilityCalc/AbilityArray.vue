@@ -1,23 +1,15 @@
 <template>
-    <div class="ability-random">
-        <div class="ability-random__row">
-            <div class="ability-random__controls">
-                <ui-button
-                    class="button"
-                    is-large
-                    @click.left.exact.prevent="tryRoll"
-                >
-                    {{ rolls.length ? 'Перебросить' : 'Бросить кубики' }}
-                </ui-button>
-
+    <div class="ability-array">
+        <div class="ability-array__row">
+            <div class="ability-array__controls">
                 <div
                     v-if="rolls.length"
-                    class="ability-random__choose"
+                    class="ability-array__choose"
                 >
                     <ui-select
                         v-for="(roll, index) in rolls"
                         :key="index"
-                        class="ability-random__select"
+                        class="ability-array__select"
                         label="name"
                         track-by="key"
                         :options="abilities"
@@ -32,7 +24,7 @@
 
                         <template #option="{ option }">
                             <span
-                                class="ability-random__select_option"
+                                class="ability-array__select_option"
                                 :class="{ 'is-selected': isSelected(option.key) }"
                             >{{ option.name }}</span>
                         </template>
@@ -45,7 +37,7 @@
             </div>
         </div>
 
-        <div class="ability-random__row">
+        <div class="ability-array__row">
             <ability-table :rolls="rolls"/>
         </div>
     </div>
@@ -56,12 +48,7 @@
         computed,
         defineComponent, ref
     } from "vue";
-    import { useToast } from "vue-toastification";
-    import orderBy from 'lodash/orderBy';
-    import reverse from 'lodash/reverse';
-    import UiButton from "@/components/form/UiButton.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
-    import { useDiceRoller } from "@/common/composition/useDiceRoller";
     import { AbilityName, AbilityKey } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
@@ -70,41 +57,47 @@
     export default defineComponent({
         components: {
             UiSelect,
-            AbilityTable,
-            UiButton
+            AbilityTable
         },
         setup() {
-            const { doRoll } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
-            const toast = useToast();
 
             const rolls = ref<{
                 name: AbilityName | null,
                 key: AbilityKey | null,
                 value: number
-            }[]>([]);
-
-            const tryRoll = () => {
-                try {
-                    const rolled = [];
-
-                    for (let i = 0; i < 6; i++) {
-                        const roll = doRoll({
-                            formula: '4d6kh3'
-                        });
-
-                        rolled.push({
-                            name: null,
-                            key: null,
-                            value: Number(roll.value)
-                        });
-                    }
-
-                    rolls.value = reverse(orderBy(rolled, ['value']));
-                } catch (err) {
-                    toast.error('Произошла какая-то ошибка... попробуй еще раз');
+            }[]>([
+                {
+                    name: null,
+                    key: null,
+                    value: 15
+                },
+                {
+                    name: null,
+                    key: null,
+                    value: 14
+                },
+                {
+                    name: null,
+                    key: null,
+                    value: 13
+                },
+                {
+                    name: null,
+                    key: null,
+                    value: 12
+                },
+                {
+                    name: null,
+                    key: null,
+                    value: 10
+                },
+                {
+                    name: null,
+                    key: null,
+                    value: 8
                 }
-            };
+            ]);
 
             const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
 
@@ -143,7 +136,6 @@
                         key,
                         name: AbilityName[key as AbilityKey]
                     }))),
-                tryRoll,
                 rolls,
                 getFormattedModifier,
                 isSelected,
@@ -155,7 +147,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .ability-random {
+    .ability-array {
         &__row {
             & + & {
                 margin-top: 40px;
@@ -170,7 +162,6 @@
 
         &__choose {
             flex: 1 1 auto;
-            margin-left: 16px;
             display: grid;
             gap: 16px;
             grid-template-columns: 1fr 1fr 1fr;
