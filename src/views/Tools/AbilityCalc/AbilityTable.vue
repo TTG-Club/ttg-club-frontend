@@ -32,7 +32,7 @@
                     {{ ability.shortName }}
                 </div>
 
-                <div class="ability-table__row is-value">
+                <div class="ability-table__row">
                     {{ ability.value }}
                 </div>
 
@@ -207,34 +207,6 @@
 
             &.is-ability {
                 text-transform: uppercase;
-            }
-
-            &.is-value {
-                position: relative;
-            }
-
-            &--value {
-                width: 100%;
-                text-align: center;
-            }
-
-            &--control {
-                @include css_anim();
-
-                position: absolute;
-                width: 24px;
-                height: 24px;
-                padding: 4px;
-
-                &.is-left {
-                    left: 0;
-                    transform: translateX(-100%);
-                }
-
-                &.is-right {
-                    right: 0;
-                    transform: translateX(100%);
-                }
             }
         }
     }
