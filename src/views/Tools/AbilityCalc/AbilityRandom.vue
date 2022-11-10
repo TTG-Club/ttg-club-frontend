@@ -45,20 +45,6 @@
             </div>
         </div>
 
-        <div
-            v-if="isDev"
-            class="ability-random__row"
-        >
-            {{ abilities }}
-        </div>
-
-        <div
-            v-if="isDev"
-            class="ability-random__row"
-        >
-            {{ rolls }}
-        </div>
-
         <div class="ability-random__row">
             <ability-table :rolls="rolls"/>
         </div>
@@ -81,7 +67,6 @@
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
     import { useIsDev } from '@/common/helpers/isDev';
 
-    // TODO: Доделать рандом характеристик
     export default defineComponent({
         components: {
             UiSelect,
@@ -132,7 +117,7 @@
                         : null;
                 };
 
-                for (let i = 0; i < 6; i++) {
+                for (let i = 0; i < rolls.value.length; i++) {
                     if (i === index) {
                         setValue(key, i);
 

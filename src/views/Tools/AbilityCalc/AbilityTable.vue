@@ -1,23 +1,23 @@
 <template>
     <div class="ability-table">
         <div class="ability-table__col is-aside">
-            <div class="ability-table__row">
+            <div class="ability-table__row is-aside">
                 Хар-ка
             </div>
 
-            <div class="ability-table__row">
+            <div class="ability-table__row is-aside">
                 Значение
             </div>
 
-            <div class="ability-table__row">
+            <div class="ability-table__row is-aside">
                 Бон. расы
             </div>
 
-            <div class="ability-table__row">
+            <div class="ability-table__row is-aside">
                 Модиф.
             </div>
 
-            <div class="ability-table__row">
+            <div class="ability-table__row is-aside">
                 Итого
             </div>
         </div>
@@ -32,37 +32,45 @@
             </div>
 
             <div class="ability-table__row is-value">
-                <button
+                <ui-button
                     v-if="useValueModifying && ability.value > 0"
-                    type="button"
                     class="ability-table__row--control is-left"
+                    type="button"
+                    is-small
+                    is-icon
+                    :disabled="ability.value <= 8"
+                    @click.left.prevent.exact="$emit('decrement', ability.key)"
                 >
                     <svg-icon
                         icon-name="minus"
                         :stroke-enable="false"
                         fill-enable
                     />
-                </button>
+                </ui-button>
 
                 <div class="ability-table__row--value">
                     {{ ability.value }}
                 </div>
 
-                <button
+                <ui-button
                     v-if="useValueModifying && ability.value > 0"
-                    type="button"
                     class="ability-table__row--control is-right"
+                    type="button"
+                    is-small
+                    is-icon
+                    :disabled="disableValueIncrement || ability.value >= 15"
+                    @click.left.prevent.exact="$emit('increment', ability.key)"
                 >
                     <svg-icon
                         icon-name="plus"
                         :stroke-enable="false"
                         fill-enable
                     />
-                </button>
+                </ui-button>
             </div>
 
             <div class="ability-table__row">
-                0
+                {{ ability.raceBonus }}
             </div>
 
             <div class="ability-table__row">
@@ -87,9 +95,11 @@
     } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiButton from '@/components/form/UiButton.vue';
 
     export default defineComponent({
         components: {
+            UiButton,
             SvgIcon
         },
         props: {
@@ -97,11 +107,16 @@
                 type: Object as PropType<{
                     name: AbilityName | null,
                     key: AbilityKey | null,
-                    value: number
+                    value: number,
+                    raceBonus?: number
                 }[]>,
                 required: true
             },
             useValueModifying: {
+                type: Boolean,
+                default: false
+            },
+            disableValueIncrement: {
                 type: Boolean,
                 default: false
             }
@@ -109,37 +124,58 @@
         setup(props) {
             const { getFormattedModifier } = useAbilityTransforms();
 
-            const abilities = computed({
-                get: () => Object.values(AbilityKey)
-                    .map((key: AbilityKey) => {
-                        const value = props.rolls.find(roll => roll.key === key)?.value || '-';
+            const abilities = computed(() => Object.values(AbilityKey)
+                .map((key: AbilityKey) => {
+                    const roll = props.rolls.find(item => item.key === key);
 
-                        const modifier = typeof value === 'number'
-                            ? getFormattedModifier(value)
-                            : '-';
+                    const getValue = () => {
+                        if (typeof roll?.value !== 'number') {
+                            return '-';
+                        }
 
-                        const obj = {
-                            key,
-                            modifier,
-                            value,
-                            name: AbilityName[key],
-                            shortName: AbilityShortName[key],
-                            raceBonus: 0
-                        };
+                        return roll.value;
+                    };
 
-                        return {
-                            ...obj,
-                            result: computed(() => (
-                                typeof obj.value === 'number'
-                                    ? obj.value + obj.raceBonus
-                                    : obj.raceBonus
-                            ))
-                        };
-                    }),
-                set: v => {
-                    console.log(v);
-                }
-            });
+                    const getModifier = () => {
+                        if (typeof roll?.value !== 'number') {
+                            return '-';
+                        }
+
+                        return getFormattedModifier(roll.value);
+                    };
+
+                    const getRaceBonus = () => {
+                        if (typeof roll?.raceBonus !== 'number') {
+                            return '-';
+                        }
+
+                        return roll.raceBonus;
+                    };
+
+                    const getResult = () => {
+                        let result = 0;
+
+                        if (typeof roll?.value === 'number') {
+                            result += roll.value;
+                        }
+
+                        if (typeof roll?.raceBonus === 'number') {
+                            result += roll.raceBonus;
+                        }
+
+                        return result;
+                    };
+
+                    return {
+                        key,
+                        name: AbilityName[key],
+                        shortName: AbilityShortName[key],
+                        value: getValue(),
+                        modifier: getModifier(),
+                        raceBonus: getRaceBonus(),
+                        result: getResult()
+                    };
+                }));
 
             return {
                 AbilityKey,
@@ -174,14 +210,16 @@
         }
 
         &__row {
-            font-size: var(--h4-font-size);
-            line-height: var(--h4-line-height);
+            font-size: 20px;
+            line-height: 27px;
             color: var(--text-b-color);
             width: 100%;
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
+
+            &:not(.is-aside) {
+                justify-content: center;
+            }
 
             &.is-ability {
                 text-transform: uppercase;
@@ -189,12 +227,11 @@
 
             &.is-value {
                 position: relative;
-                display: flex;
-                align-items: center;
             }
 
             &--value {
                 width: 100%;
+                text-align: center;
             }
 
             &--control {
@@ -203,11 +240,7 @@
                 position: absolute;
                 width: 24px;
                 height: 24px;
-                background-color: var(--primary);
-                color: var(--text-btn-color);
-                border-radius: 4px;
                 padding: 4px;
-                cursor: pointer;
 
                 &.is-left {
                     left: 0;
@@ -217,14 +250,6 @@
                 &.is-right {
                     right: 0;
                     transform: translateX(100%);
-                }
-
-                &:hover {
-                    background-color: var(--primary-hover);
-                }
-
-                &:active {
-                    background-color: var(--primary-active);
                 }
             }
         }

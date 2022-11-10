@@ -1,15 +1,15 @@
 <template>
-    <div class="ability-random">
-        <div class="ability-random__row">
-            <div class="ability-random__controls">
+    <div class="ability-array">
+        <div class="ability-array__row">
+            <div class="ability-array__controls">
                 <div
                     v-if="rolls.length"
-                    class="ability-random__choose"
+                    class="ability-array__choose"
                 >
                     <ui-select
                         v-for="(roll, index) in rolls"
                         :key="index"
-                        class="ability-random__select"
+                        class="ability-array__select"
                         label="name"
                         track-by="key"
                         :options="abilities"
@@ -24,7 +24,7 @@
 
                         <template #option="{ option }">
                             <span
-                                class="ability-random__select_option"
+                                class="ability-array__select_option"
                                 :class="{ 'is-selected': isSelected(option.key) }"
                             >{{ option.name }}</span>
                         </template>
@@ -37,21 +37,7 @@
             </div>
         </div>
 
-        <div
-            v-if="isDev"
-            class="ability-random__row"
-        >
-            {{ abilities }}
-        </div>
-
-        <div
-            v-if="isDev"
-            class="ability-random__row"
-        >
-            {{ rolls }}
-        </div>
-
-        <div class="ability-random__row">
+        <div class="ability-array__row">
             <ability-table :rolls="rolls"/>
         </div>
     </div>
@@ -68,7 +54,6 @@
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
     import { useIsDev } from '@/common/helpers/isDev';
 
-    // TODO: Доделать рандом характеристик
     export default defineComponent({
         components: {
             UiSelect,
@@ -125,7 +110,7 @@
                         : null;
                 };
 
-                for (let i = 0; i < 6; i++) {
+                for (let i = 0; i < rolls.value.length; i++) {
                     if (i === index) {
                         setValue(key, i);
 
@@ -162,7 +147,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .ability-random {
+    .ability-array {
         &__row {
             & + & {
                 margin-top: 40px;
