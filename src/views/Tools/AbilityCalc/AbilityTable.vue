@@ -22,63 +22,65 @@
             </div>
         </div>
 
-        <div
-            v-for="(ability, key) in abilities"
-            :key="key"
-            class="ability-table__col"
-        >
-            <div class="ability-table__row is-ability">
-                {{ ability.shortName }}
-            </div>
-
-            <div class="ability-table__row is-value">
-                <ui-button
-                    v-if="useValueModifying && ability.value > 0"
-                    class="ability-table__row--control is-left"
-                    type="button"
-                    is-small
-                    is-icon
-                    :disabled="ability.value <= 8"
-                    @click.left.prevent.exact="$emit('decrement', ability.key)"
-                >
-                    <svg-icon
-                        icon-name="minus"
-                        :stroke-enable="false"
-                        fill-enable
-                    />
-                </ui-button>
-
-                <div class="ability-table__row--value">
-                    {{ ability.value }}
+        <div class="ability-table__body">
+            <div
+                v-for="(ability, key) in abilities"
+                :key="key"
+                class="ability-table__col"
+            >
+                <div class="ability-table__row is-ability">
+                    {{ ability.shortName }}
                 </div>
 
-                <ui-button
-                    v-if="useValueModifying && ability.value > 0"
-                    class="ability-table__row--control is-right"
-                    type="button"
-                    is-small
-                    is-icon
-                    :disabled="disableValueIncrement || ability.value >= 15"
-                    @click.left.prevent.exact="$emit('increment', ability.key)"
-                >
-                    <svg-icon
-                        icon-name="plus"
-                        :stroke-enable="false"
-                        fill-enable
-                    />
-                </ui-button>
-            </div>
+                <div class="ability-table__row is-value">
+                    <ui-button
+                        v-if="useValueModifying && ability.value > 0"
+                        class="ability-table__row--control is-left"
+                        type="button"
+                        is-small
+                        is-icon
+                        :disabled="ability.value <= 8"
+                        @click.left.prevent.exact="$emit('decrement', ability.key)"
+                    >
+                        <svg-icon
+                            icon-name="minus"
+                            :stroke-enable="false"
+                            fill-enable
+                        />
+                    </ui-button>
 
-            <div class="ability-table__row">
-                {{ ability.raceBonus }}
-            </div>
+                    <div class="ability-table__row--value">
+                        {{ ability.value }}
+                    </div>
 
-            <div class="ability-table__row">
-                {{ ability.modifier }}
-            </div>
+                    <ui-button
+                        v-if="useValueModifying && ability.value > 0"
+                        class="ability-table__row--control is-right"
+                        type="button"
+                        is-small
+                        is-icon
+                        :disabled="disableValueIncrement || ability.value >= 15"
+                        @click.left.prevent.exact="$emit('increment', ability.key)"
+                    >
+                        <svg-icon
+                            icon-name="plus"
+                            :stroke-enable="false"
+                            fill-enable
+                        />
+                    </ui-button>
+                </div>
 
-            <div class="ability-table__row">
-                {{ ability.result }}
+                <div class="ability-table__row">
+                    {{ ability.raceBonus }}
+                </div>
+
+                <div class="ability-table__row">
+                    {{ ability.modifier }}
+                </div>
+
+                <div class="ability-table__row">
+                    {{ ability.result }}
+                </div>
             </div>
         </div>
     </div>
@@ -189,10 +191,28 @@
 
 <style lang="scss" scoped>
     .ability-table {
+        width: 100%;
         display: grid;
-        grid-template-columns: 2fr repeat(6, 1fr);
-        gap: 24px;
+        grid-template-columns: 1fr 4fr;
+        gap: 12px;
         cursor: default;
+
+        @include media-max($xl) {
+            display: flex;
+        }
+
+        &__body {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(6, 1fr);
+
+            @include media-max($xl) {
+                grid-template-columns: initial;
+                display: flex;
+                flex: 1 1 auto;
+                overflow: auto;
+            }
+        }
 
         &__col {
             display: flex;
@@ -202,10 +222,22 @@
             border-radius: 6px;
             padding: 12px 0;
 
+            @include media-max($xl) {
+                width: 112px;
+            }
+
+            &.is-aside {
+                flex-shrink: 0;
+            }
+
             &:not(.is-aside) {
                 padding: 12px 24px;
                 align-items: center;
                 background-color: var(--bg-table-row);
+
+                @include media-max($xl) {
+                    width: 86px;
+                }
             }
         }
 
