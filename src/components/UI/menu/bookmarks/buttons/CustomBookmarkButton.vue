@@ -46,6 +46,7 @@
     import errorHandler from "@/common/helpers/errorHandler";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
     import UiButton from "@/components/form/UiButton";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
     export default defineComponent({
         components: {
@@ -63,7 +64,7 @@
         },
         setup(props) {
             const { name: bookmarkName } = toRefs(props);
-            const toast = useToast();
+            const toast = useToast(ToastEventBus);
             const bookmarksStore = useCustomBookmarkStore();
             const route = useRoute();
 

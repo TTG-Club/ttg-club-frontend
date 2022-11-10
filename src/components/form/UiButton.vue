@@ -73,7 +73,6 @@
                 default: false
             }
         },
-
         setup(props) {
             const type = computed(() => {
                 if (props.typeLink) {

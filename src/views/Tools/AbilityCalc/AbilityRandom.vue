@@ -49,8 +49,7 @@
 
 <script lang="ts">
     import {
-        computed,
-        defineComponent, ref
+        computed, defineComponent, ref
     } from "vue";
     import { useToast } from "vue-toastification";
     import orderBy from 'lodash/orderBy';
@@ -58,9 +57,10 @@
     import UiButton from "@/components/form/UiButton.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
-    import { AbilityName, AbilityKey } from '@/views/Tools/AbilityCalc/AbilityEnum';
+    import { AbilityKey, AbilityName } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
     export default defineComponent({
         components: {
@@ -69,9 +69,9 @@
             UiButton
         },
         setup() {
-            const { doRoll } = useDiceRoller();
+            const toast = useToast(ToastEventBus);
+            const { doRoll, notifyResult } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
-            const toast = useToast();
 
             const rolls = ref<{
                 name: AbilityName | null,
@@ -86,6 +86,14 @@
                     for (let i = 0; i < 6; i++) {
                         const roll = doRoll({
                             formula: '4d6kh3'
+                        });
+
+                        notifyResult({
+                            roll,
+                            label: `Бросок №${ i + 1 }`,
+                            toastOptions: {
+                                timeout: 5000 + 1000 * i
+                            }
                         });
 
                         rolled.push({

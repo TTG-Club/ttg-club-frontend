@@ -25,6 +25,7 @@
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
     import { useUserStore } from "@/store/UI/UserStore";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
     export default defineComponent({
         components: {
@@ -42,7 +43,7 @@
         },
         setup(props) {
             const route = useRoute();
-            const toast = useToast();
+            const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();

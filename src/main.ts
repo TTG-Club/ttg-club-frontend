@@ -3,40 +3,27 @@ import { createPinia } from 'pinia';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import VueTippy from 'vue-tippy';
 import VueLazyload from 'vue-lazyload';
-import Toast, { createToastInterface, useToast } from 'vue-toastification';
+import Toast from 'vue-toastification';
 import vfmPlugin from 'vue-final-modal';
-import { useDayjs } from '@/common/composition/useDayjs';
-import isDev, { useIsDev } from '@/common/helpers/isDev';
+import isDev from '@/common/helpers/isDev';
 import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import VueTippyConfig from '@/common/utils/VueTippyConfig';
+import { ToastOptions } from '@/common/utils/ToastConfig';
 import App from '@/App.vue';
-import IconToastClose from '@/components/UI/icons/IconToastClose.vue';
 import router from './router';
 import '@/assets/styles/index.scss';
 
 const app = createApp(App);
 
 app.config.globalProperties.$http = new HTTPService();
-app.config.globalProperties.$isDev = useIsDev();
-app.config.globalProperties.$toast = useToast();
-app.config.globalProperties.$dayjs = useDayjs();
 
 const pinia = createPinia();
-
-const toastInstance = createToastInterface({
-    timeout: 1700,
-    closeButton: IconToastClose,
-    showCloseButtonOnHover: true,
-    maxToasts: 6,
-    newestOnTop: true
-});
 
 pinia.use(({ store }) => {
     /* eslint-disable no-param-reassign */
     store.$http = new HTTPService();
     store.$isDev = isDev;
-    store.$toast = toastInstance;
     /* eslint-enable no-param-reassign */
 });
 
@@ -47,7 +34,7 @@ app.use(pinia)
     .use(VueLazyload, {
         preLoad: 1.7
     })
-    .use(Toast, toastInstance)
+    .use(Toast, ToastOptions)
     .use(vfmPlugin, {
         key: '$vfm',
         componentName: 'VueFinalModal',
