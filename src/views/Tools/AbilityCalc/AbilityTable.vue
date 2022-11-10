@@ -33,41 +33,7 @@
                 </div>
 
                 <div class="ability-table__row is-value">
-                    <ui-button
-                        v-if="useValueModifying && ability.value > 0"
-                        class="ability-table__row--control is-left"
-                        type="button"
-                        is-small
-                        is-icon
-                        :disabled="ability.value <= 8"
-                        @click.left.prevent.exact="$emit('decrement', ability.key)"
-                    >
-                        <svg-icon
-                            icon-name="minus"
-                            :stroke-enable="false"
-                            fill-enable
-                        />
-                    </ui-button>
-
-                    <div class="ability-table__row--value">
-                        {{ ability.value }}
-                    </div>
-
-                    <ui-button
-                        v-if="useValueModifying && ability.value > 0"
-                        class="ability-table__row--control is-right"
-                        type="button"
-                        is-small
-                        is-icon
-                        :disabled="disableValueIncrement || ability.value >= 15"
-                        @click.left.prevent.exact="$emit('increment', ability.key)"
-                    >
-                        <svg-icon
-                            icon-name="plus"
-                            :stroke-enable="false"
-                            fill-enable
-                        />
-                    </ui-button>
+                    {{ ability.value }}
                 </div>
 
                 <div class="ability-table__row">
@@ -96,14 +62,8 @@
         AbilityName, AbilityKey, AbilityShortName
     } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
-    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiButton from '@/components/form/UiButton.vue';
 
     export default defineComponent({
-        components: {
-            UiButton,
-            SvgIcon
-        },
         props: {
             rolls: {
                 type: Object as PropType<{
@@ -113,14 +73,6 @@
                     raceBonus?: number
                 }[]>,
                 required: true
-            },
-            useValueModifying: {
-                type: Boolean,
-                default: false
-            },
-            disableValueIncrement: {
-                type: Boolean,
-                default: false
             }
         },
         setup(props) {

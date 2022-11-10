@@ -1,53 +1,49 @@
 <template>
     <div class="ability-random">
-        <div class="ability-random__row">
-            <div class="ability-random__controls">
-                <ui-button
-                    class="button"
-                    is-large
-                    @click.left.exact.prevent="tryRoll"
+        <div class="ability-random__controls">
+            <ui-button
+                class="button"
+                is-large
+                @click.left.exact.prevent="tryRoll"
+            >
+                {{ rolls.length ? 'Перебросить' : 'Бросить кубики' }}
+            </ui-button>
+
+            <div
+                v-if="rolls.length"
+                class="ability-random__choose"
+            >
+                <ui-select
+                    v-for="(roll, index) in rolls"
+                    :key="index"
+                    class="ability-random__select"
+                    label="name"
+                    track-by="key"
+                    :options="abilities"
+                    :model-value="roll"
+                    allow-empty
+                    @remove="onRemove(index)"
+                    @select="onSelect($event.key, index)"
                 >
-                    {{ rolls.length ? 'Перебросить' : 'Бросить кубики' }}
-                </ui-button>
+                    <template #left-slot>
+                        {{ roll.value }}
+                    </template>
 
-                <div
-                    v-if="rolls.length"
-                    class="ability-random__choose"
-                >
-                    <ui-select
-                        v-for="(roll, index) in rolls"
-                        :key="index"
-                        class="ability-random__select"
-                        label="name"
-                        track-by="key"
-                        :options="abilities"
-                        :model-value="roll"
-                        allow-empty
-                        @remove="onRemove(index)"
-                        @select="onSelect($event.key, index)"
-                    >
-                        <template #left-slot>
-                            {{ roll.value }}
-                        </template>
+                    <template #option="{ option }">
+                        <span
+                            class="ability-random__select_option"
+                            :class="{ 'is-selected': isSelected(option.key) }"
+                        >{{ option.name }}</span>
+                    </template>
 
-                        <template #option="{ option }">
-                            <span
-                                class="ability-random__select_option"
-                                :class="{ 'is-selected': isSelected(option.key) }"
-                            >{{ option.name }}</span>
-                        </template>
-
-                        <template #placeholder>
-                            Выбрать хар-ку
-                        </template>
-                    </ui-select>
-                </div>
+                    <template #placeholder>
+                        Выбрать хар-ку
+                    </template>
+                </ui-select>
             </div>
         </div>
 
-        <div class="ability-random__row">
-            <ability-table :rolls="rolls"/>
-        </div>
+        <ability-table :rolls="rolls"/>
     </div>
 </template>
 
@@ -65,7 +61,6 @@
     import { AbilityName, AbilityKey } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
-    import { useIsDev } from '@/common/helpers/isDev';
 
     export default defineComponent({
         components: {
@@ -136,7 +131,6 @@
             };
 
             return {
-                isDev: useIsDev(),
                 abilities: computed(() => Object
                     .keys(AbilityKey)
                     .map(key => ({
@@ -156,12 +150,6 @@
 
 <style lang="scss" scoped>
     .ability-random {
-        &__row {
-            & + & {
-                margin-top: 40px;
-            }
-        }
-
         &__controls {
             display: flex;
             justify-content: center;
@@ -197,6 +185,10 @@
             &_roll {
 
             }
+        }
+
+        .ability-table {
+            margin-top: 40px;
         }
     }
 </style>

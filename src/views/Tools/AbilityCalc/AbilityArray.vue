@@ -1,45 +1,39 @@
 <template>
     <div class="ability-array">
-        <div class="ability-array__row">
-            <div class="ability-array__controls">
-                <div
-                    v-if="rolls.length"
-                    class="ability-array__choose"
-                >
-                    <ui-select
-                        v-for="(roll, index) in rolls"
-                        :key="index"
-                        class="ability-array__select"
-                        label="name"
-                        track-by="key"
-                        :options="abilities"
-                        :model-value="roll"
-                        allow-empty
-                        @remove="onRemove(index)"
-                        @select="onSelect($event.key, index)"
-                    >
-                        <template #left-slot>
-                            {{ roll.value }}
-                        </template>
+        <div
+            v-if="rolls.length"
+            class="ability-array__controls"
+        >
+            <ui-select
+                v-for="(roll, index) in rolls"
+                :key="index"
+                class="ability-array__select"
+                label="name"
+                track-by="key"
+                :options="abilities"
+                :model-value="roll"
+                allow-empty
+                @remove="onRemove(index)"
+                @select="onSelect($event.key, index)"
+            >
+                <template #left-slot>
+                    {{ roll.value }}
+                </template>
 
-                        <template #option="{ option }">
-                            <span
-                                class="ability-array__select_option"
-                                :class="{ 'is-selected': isSelected(option.key) }"
-                            >{{ option.name }}</span>
-                        </template>
+                <template #option="{ option }">
+                    <span
+                        class="ability-array__select_option"
+                        :class="{ 'is-selected': isSelected(option.key) }"
+                    >{{ option.name }}</span>
+                </template>
 
-                        <template #placeholder>
-                            Выбрать хар-ку
-                        </template>
-                    </ui-select>
-                </div>
-            </div>
+                <template #placeholder>
+                    Выбрать хар-ку
+                </template>
+            </ui-select>
         </div>
 
-        <div class="ability-array__row">
-            <ability-table :rolls="rolls"/>
-        </div>
+        <ability-table :rolls="rolls"/>
     </div>
 </template>
 
@@ -52,7 +46,6 @@
     import { AbilityName, AbilityKey } from '@/views/Tools/AbilityCalc/AbilityEnum';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
-    import { useIsDev } from '@/common/helpers/isDev';
 
     export default defineComponent({
         components: {
@@ -129,7 +122,6 @@
             };
 
             return {
-                isDev: useIsDev(),
                 abilities: computed(() => Object
                     .keys(AbilityKey)
                     .map(key => ({
@@ -148,19 +140,7 @@
 
 <style lang="scss" scoped>
     .ability-array {
-        &__row {
-            & + & {
-                margin-top: 40px;
-            }
-        }
-
         &__controls {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        &__choose {
             flex: 1 1 auto;
             display: grid;
             gap: 16px;
@@ -188,6 +168,10 @@
             &_roll {
 
             }
+        }
+
+        .ability-table {
+            margin-top: 40px;
         }
     }
 </style>
