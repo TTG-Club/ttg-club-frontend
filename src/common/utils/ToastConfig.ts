@@ -33,7 +33,6 @@ export const ToastOptions: PluginOptions = {
     closeButton: IconToastClose,
     showCloseButtonOnHover: true,
     newestOnTop: true,
-    eventBus: ToastEventBus,
     filterBeforeCreate,
     filterToasts,
     maxToasts

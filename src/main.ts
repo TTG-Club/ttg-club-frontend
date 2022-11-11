@@ -9,7 +9,7 @@ import isDev from '@/common/helpers/isDev';
 import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import VueTippyConfig from '@/common/utils/VueTippyConfig';
-import { ToastOptions } from '@/common/utils/ToastConfig';
+import { ToastEventBus, ToastOptions } from '@/common/utils/ToastConfig';
 import App from '@/App.vue';
 import router from './router';
 import '@/assets/styles/index.scss';
@@ -34,7 +34,10 @@ app.use(pinia)
     .use(VueLazyload, {
         preLoad: 1.7
     })
-    .use(Toast, ToastOptions)
+    .use(Toast, {
+        ...ToastOptions,
+        eventBus: ToastEventBus
+    })
     .use(vfmPlugin, {
         key: '$vfm',
         componentName: 'VueFinalModal',
