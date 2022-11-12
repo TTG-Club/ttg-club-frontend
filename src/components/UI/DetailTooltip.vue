@@ -21,9 +21,9 @@
 
 <script>
     import cloneDeep from "lodash/cloneDeep";
-    import vTippyConfig from '@/common/utils/VueTippyConfig';
-    import SpellBody from "@/views/Spells/SpellBody.vue";
     import errorHandler from "@/common/helpers/errorHandler";
+    import { DefaultTippyProps } from '@/common/utils/TippyConfig';
+    import SpellBody from "@/views/Spells/SpellBody.vue";
     import ScreenBody from "@/views/Screens/ScreenBody.vue";
     import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
     import ArmorBody from "@/views/Inventory/Armors/ArmorBody.vue";
@@ -54,7 +54,7 @@
         }),
         computed: {
             tippyConfig() {
-                const config = cloneDeep(vTippyConfig.defaultProps);
+                const config = cloneDeep(DefaultTippyProps);
 
                 config.onShow = () => this.getContent();
 

@@ -143,7 +143,7 @@
         :imgs="race.images"
         :index="gallery.index"
         :visible="gallery.show"
-        :teleport="'body'"
+        teleport="body"
         loop
         move-disabled
         scroll-disabled
