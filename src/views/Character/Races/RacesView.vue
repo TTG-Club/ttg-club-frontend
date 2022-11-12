@@ -24,9 +24,9 @@
     import {
         mapActions, mapState
     } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useRacesStore } from "@/store/Character/RacesStore";
-    import RaceLink from "@/views/Character/Races/RaceLink";
+    import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

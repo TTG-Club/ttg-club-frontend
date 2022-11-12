@@ -33,10 +33,10 @@
     import { shallowRef } from "vue";
     import sortBy from "lodash/sortBy";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
     import { useBooksStore } from "@/store/Wiki/BooksStore";
-    import BookLink from "@/views/Wiki/Books/BookLink";
+    import BookLink from "@/views/Wiki/Books/BookLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

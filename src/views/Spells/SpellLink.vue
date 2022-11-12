@@ -113,8 +113,8 @@
     import { mapActions, mapState } from "pinia";
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
     import { useSpellsStore } from "@/store/Spells/SpellsStore";
-    import SpellBody from "@/views/Spells/SpellBody";
-    import BaseModal from "@/components/UI/modals/BaseModal";
+    import SpellBody from "@/views/Spells/SpellBody.vue";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
 
     export default {

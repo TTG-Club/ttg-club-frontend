@@ -31,10 +31,10 @@
     import { shallowRef } from "vue";
     import sortBy from "lodash/sortBy";
     import { mapState } from "pinia";
-    import TabLayout from "@/components/content/TabLayout";
-    import ContentLayout from "@/components/content/ContentLayout";
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
     import { useWeaponsStore } from "@/store/Inventory/WeaponsStore";
-    import WeaponLink from "@/views/Inventory/Weapons/WeaponLink";
+    import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

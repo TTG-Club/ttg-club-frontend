@@ -23,10 +23,10 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader";
-    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
+    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody.vue";
     import { useMagicItemsStore } from "@/store/Treasures/MagicItemsStore";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

@@ -267,18 +267,18 @@
     import mean from "lodash/mean";
     import throttle from "lodash/throttle";
     import { mapState } from "pinia";
-    import ContentLayout from "@/components/content/ContentLayout";
-    import UiSelect from "@/components/form/UiSelect";
-    import SectionHeader from "@/components/UI/SectionHeader";
-    import UiCheckbox from "@/components/form/UiCheckbox";
-    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody";
-    import SpellBody from "@/views/Spells/SpellBody";
-    import TreasureItem from "@/views/Treasures/Treasures/TreasureItem";
-    import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
+    import UiSelect from "@/components/form/UiSelect.vue";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
+    import UiCheckbox from "@/components/form/UiCheckbox.vue";
+    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody.vue";
+    import SpellBody from "@/views/Spells/SpellBody.vue";
+    import TreasureItem from "@/views/Treasures/Treasures/TreasureItem.vue";
+    import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
-    import UiButton from "@/components/form/UiButton";
+    import UiButton from "@/components/form/UiButton.vue";
 
     export default {
         name: "TreasuryView",

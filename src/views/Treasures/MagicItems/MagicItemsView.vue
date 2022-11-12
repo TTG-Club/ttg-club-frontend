@@ -20,11 +20,11 @@
 <script>
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import CreatureLink from "@/views/Bestiary/CreatureLink";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import CreatureLink from "@/views/Bestiary/CreatureLink.vue";
     import { useMagicItemsStore } from "@/store/Treasures/MagicItemsStore";
-    import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink";
+    import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

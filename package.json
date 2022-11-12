@@ -8,7 +8,6 @@
     "build:dev": "vue-cli-service build --mode=develop",
     "build:prod": "vue-cli-service build",
     "build:analyze": "vue-cli-service build --report-json",
-    "build:gh-pages": "cross-env BUILD_TARGET=gh-pages vue-cli-service build --mode=develop",
     "lint:js": "eslint --ext .ts,.js,.vue ./src",
     "lint:fix": "eslint --ext .ts,.js,.vue ./src --fix",
     "analyze": "webpack-bundle-analyzer ./dist/report.json ./dist --mode server"
@@ -40,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
+    "@types/js-cookie": "^3.0.2",
     "@types/lodash": "^4.14.188",
     "@types/vuelidate": "^0.7.15",
     "@typescript-eslint/eslint-plugin": "^5.4.0",

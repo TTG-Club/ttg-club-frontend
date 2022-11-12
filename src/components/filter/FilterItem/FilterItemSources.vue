@@ -81,8 +81,8 @@
 
 <script>
     import cloneDeep from 'lodash/cloneDeep';
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
-    import UiCheckbox from '@/components/form/UiCheckbox';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiCheckbox from '@/components/form/UiCheckbox.vue';
 
     export default {
         name: 'FilterItemSources',

@@ -56,7 +56,7 @@
     import AbilityTable from '@/views/Tools/AbilityCalc/AbilityTable.vue';
     import {
         AbilityKey, AbilityName, AbilityShortName
-    } from '@/views/Tools/AbilityCalc/AbilityEnum';
+    } from '@/common/enum/AbilityEnum';
     import UiButton from '@/components/form/UiButton.vue';
     import UiSelect from '@/components/form/UiSelect.vue';
     import { usePluralize } from '@/common/composition/usePluralize';

@@ -24,11 +24,11 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from '@/components/UI/SectionHeader';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
     import errorHandler from "@/common/helpers/errorHandler";
     import { useItemsStore } from "@/store/Inventory/ItemsStore";
-    import ItemBody from "@/views/Inventory/Items/ItemBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

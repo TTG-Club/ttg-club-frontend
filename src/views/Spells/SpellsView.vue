@@ -21,9 +21,9 @@
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
     import { useSpellsStore } from '@/store/Spells/SpellsStore';
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import SpellLink from "@/views/Spells/SpellLink";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import SpellLink from "@/views/Spells/SpellLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

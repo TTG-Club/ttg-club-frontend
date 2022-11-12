@@ -99,11 +99,11 @@
     import {
         computed, defineComponent, onBeforeMount, ref
     } from "vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import CustomBookmarkGroup from "@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup";
-    import UiInput from "@/components/form/UiInput";
-    import UiButton from "@/components/form/UiButton";
+    import CustomBookmarkGroup from "@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup.vue";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiButton from "@/components/form/UiButton.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default defineComponent({

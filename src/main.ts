@@ -10,7 +10,7 @@ import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import VueTippyConfig from '@/common/utils/VueTippyConfig';
 import { ToastEventBus, ToastOptions } from '@/common/utils/ToastConfig';
-import App from '@/App.vue';
+import App from '@/App';
 import router from './router';
 import '@/assets/styles/index.scss';
 

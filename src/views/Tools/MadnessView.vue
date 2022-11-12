@@ -75,12 +75,12 @@
 <script>
     import throttle from 'lodash/throttle';
     import { reactive } from "vue";
-    import ContentLayout from "@/components/content/ContentLayout";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import UiCheckbox from "@/components/form/UiCheckbox";
-    import RawContent from "@/components/content/RawContent";
-    import UiInput from "@/components/form/UiInput";
-    import UiButton from "@/components/form/UiButton";
+    import UiCheckbox from "@/components/form/UiCheckbox.vue";
+    import RawContent from "@/components/content/RawContent.vue";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiButton from "@/components/form/UiButton.vue";
 
     export default {
         name: "MadnessView",

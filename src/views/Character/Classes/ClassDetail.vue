@@ -126,15 +126,15 @@
     import isArray from "lodash/isArray";
     import sortBy from "lodash/sortBy";
     import groupBy from "lodash/groupBy";
-    import SectionHeader from '@/components/UI/SectionHeader';
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useClassesStore } from '@/store/Character/ClassesStore';
-    import UiSelect from '@/components/form/UiSelect';
-    import SpellsView from "@/views/Spells/SpellsView";
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import SpellsView from "@/views/Spells/SpellsView.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import OptionsView from "@/views/Character/Options/OptionsView";
-    import RawContent from "@/components/content/RawContent";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import OptionsView from "@/views/Character/Options/OptionsView.vue";
+    import RawContent from "@/components/content/RawContent.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

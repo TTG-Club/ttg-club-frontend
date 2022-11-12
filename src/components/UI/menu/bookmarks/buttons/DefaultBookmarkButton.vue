@@ -21,7 +21,7 @@
         computed, defineComponent, ref
     } from "vue";
     import { useToast } from "vue-toastification";
-    import UiButton from "@/components/form/UiButton";
+    import UiButton from "@/components/form/UiButton.vue";
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
     import { useUserStore } from "@/store/UI/UserStore";

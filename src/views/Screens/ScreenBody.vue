@@ -23,8 +23,8 @@
 </template>
 
 <script>
-    import DetailTopBar from "@/components/UI/DetailTopBar";
-    import RawContent from "@/components/content/RawContent";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from "@/components/content/RawContent.vue";
 
     export default {
         name: "ScreenBody",

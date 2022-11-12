@@ -132,7 +132,7 @@
 
 <script>
     import { RouterLink } from 'vue-router';
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {
         name: 'ClassLink',

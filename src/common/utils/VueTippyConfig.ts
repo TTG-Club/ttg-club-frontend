@@ -24,10 +24,11 @@ const options: TippyPluginOptions = {
         // @ts-ignore
         onShow(instance) {
             const ref = instance.reference;
+            const attr = ref.getAttribute('data-tippy-url');
 
             let canShow = false;
 
-            if (ref.getAttribute('data-tippy-url')) {
+            if (attr) {
                 canShow = true;
             }
 
@@ -41,8 +42,8 @@ const options: TippyPluginOptions = {
 
             const http = new HTTPService();
 
-            if (ref.getAttribute('data-tippy-url')) {
-                http.rawGet(ref.getAttribute('data-tippy-url'))
+            if (attr) {
+                http.rawGet(attr)
                     .then(res => {
                         if (res.status !== 200) {
                             errorHandler(res.statusText);

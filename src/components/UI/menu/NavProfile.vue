@@ -82,13 +82,13 @@
 
 <script>
     import { computed, ref } from "vue";
-    import AuthModal from "@/components/UI/modals/AuthModal";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
+    import AuthModal from "@/components/UI/modals/AuthModal.vue";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
     import { useUserStore } from "@/store/UI/UserStore";
-    import NavPopover from "@/components/UI/menu/NavPopover";
-    import LoginView from "@/components/account/LoginView";
-    import RegistrationView from "@/components/account/RegistrationView";
-    import ChangePasswordView from "@/components/account/ChangePasswordView";
+    import NavPopover from "@/components/UI/menu/NavPopover.vue";
+    import LoginView from "@/components/account/LoginView.vue";
+    import RegistrationView from "@/components/account/RegistrationView.vue";
+    import ChangePasswordView from "@/components/account/ChangePasswordView.vue";
 
     export default {
         name: "NavProfile",

@@ -50,8 +50,8 @@
     import { RouterLink } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
     import { useOptionsStore } from "@/store/Character/OptionsStore";
-    import BaseModal from "@/components/UI/modals/BaseModal";
-    import OptionBody from "@/views/Character/Options/OptionBody";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import OptionBody from "@/views/Character/Options/OptionBody.vue";
 
     export default {
         name: 'OptionLink',

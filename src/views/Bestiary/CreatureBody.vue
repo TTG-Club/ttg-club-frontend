@@ -346,10 +346,7 @@
             </div>
 
             <div v-if="creature.lair?.action">
-                <h4
-                    class="header_separator"
-                    th:if="*{lair.action}"
-                >
+                <h4 class="header_separator">
                     <span>Действия логова:</span>
                 </h4>
 
@@ -357,10 +354,7 @@
             </div>
 
             <div v-if="creature.lair?.effect">
-                <h4
-                    class="header_separator"
-                    th:if="*{lair.effect}"
-                >
+                <h4 class="header_separator">
                     <span>Региональные эффекты:</span>
                 </h4>
 
@@ -436,10 +430,10 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent";
-    import DetailTopBar from "@/components/UI/DetailTopBar";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
-    import DiceRoller from "@/components/UI/DiceRoller";
+    import RawContent from "@/components/content/RawContent.vue";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import DiceRoller from "@/components/UI/DiceRoller.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
 
     export default {

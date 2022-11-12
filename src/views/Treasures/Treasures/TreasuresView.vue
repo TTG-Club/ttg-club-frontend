@@ -17,10 +17,10 @@
 
 <script>
     import { shallowRef } from "vue";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
     import { useTreasuresStore } from "@/store/Treasures/TreasuresStore";
-    import TreasureItem from "@/views/Treasures/Treasures/TreasureItem";
+    import TreasureItem from "@/views/Treasures/Treasures/TreasureItem.vue";
 
     export default {
         name: 'TreasuresView',

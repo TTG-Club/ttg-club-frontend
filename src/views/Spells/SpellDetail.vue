@@ -24,10 +24,10 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
     import { useSpellsStore } from "@/store/Spells/SpellsStore";
-    import SpellBody from "@/views/Spells/SpellBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import SpellBody from "@/views/Spells/SpellBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

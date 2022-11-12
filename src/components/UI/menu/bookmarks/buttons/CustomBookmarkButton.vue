@@ -45,7 +45,7 @@
     import { onClickOutside } from '@vueuse/core';
     import errorHandler from "@/common/helpers/errorHandler";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import UiButton from "@/components/form/UiButton";
+    import UiButton from "@/components/form/UiButton.vue";
     import { ToastEventBus } from "@/common/utils/ToastConfig";
 
     export default defineComponent({
