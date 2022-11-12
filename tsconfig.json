@@ -49,7 +49,7 @@
       "./node_modules/@types"
     ],
     "types": [
-      "webpack-env",
+      "webpack-env"
     ],
     "useDefineForClassFields": true
   },
