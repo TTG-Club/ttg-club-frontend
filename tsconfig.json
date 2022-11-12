@@ -50,7 +50,6 @@
     ],
     "types": [
       "webpack-env",
-      "vue-final-modal"
     ],
     "useDefineForClassFields": true
   },
