@@ -8,7 +8,6 @@
     "build:dev": "vue-cli-service build --mode=develop",
     "build:prod": "vue-cli-service build",
     "build:analyze": "vue-cli-service build --report-json",
-    "build:gh-pages": "cross-env BUILD_TARGET=gh-pages vue-cli-service build --mode=develop",
     "lint:js": "eslint --ext .ts,.js,.vue ./src",
     "lint:fix": "eslint --ext .ts,.js,.vue ./src --fix",
     "analyze": "webpack-bundle-analyzer ./dist/report.json ./dist --mode server"
@@ -31,15 +30,16 @@
     "vue": "^3.2.41",
     "vue-easy-lightbox": "^1.9.0",
     "vue-final-modal": "^3.4.4",
-    "vue-lazyload": "^3.0.0-rc.2",
     "vue-multiselect": "^3.0.0-alpha.2",
     "vue-router": "^4.1.5",
     "vue-tippy": "^6.0.0-alpha.65",
     "vue-toastification": "^2.0.0-rc.5",
+    "vue3-lazyload": "^0.3.6",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
+    "@types/js-cookie": "^3.0.2",
     "@types/lodash": "^4.14.188",
     "@types/vuelidate": "^0.7.15",
     "@typescript-eslint/eslint-plugin": "^5.4.0",

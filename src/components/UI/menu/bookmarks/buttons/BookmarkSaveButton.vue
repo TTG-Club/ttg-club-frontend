@@ -10,8 +10,8 @@
 <script>
     import { defineComponent } from "vue";
     import { storeToRefs } from "pinia";
-    import DefaultBookmarkButton from "@/components/UI/menu/bookmarks/buttons/DefaultBookmarkButton";
-    import CustomBookmarkButton from "@/components/UI/menu/bookmarks/buttons/CustomBookmarkButton";
+    import DefaultBookmarkButton from "@/components/UI/menu/bookmarks/buttons/DefaultBookmarkButton.vue";
+    import CustomBookmarkButton from "@/components/UI/menu/bookmarks/buttons/CustomBookmarkButton.vue";
     import { useUserStore } from "@/store/UI/UserStore";
 
     export default defineComponent({

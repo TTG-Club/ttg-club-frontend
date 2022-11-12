@@ -3,7 +3,7 @@ import HTTPService from '@/common/services/HTTPService';
 
 const http = new HTTPService();
 
-async function defineRawComponent(template, url) {
+async function defineRawComponent(template: string, url: string) {
     if (!template && !url) {
         throw new Error('URL and template is not defined');
     }

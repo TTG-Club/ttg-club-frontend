@@ -44,6 +44,8 @@
     "strictPropertyInitialization": true,
     "target": "esnext",
     "typeRoots": [
+      "./env.d.ts",
+      "./src/shims-vue.d.ts",
       "./node_modules/@types"
     ],
     "types": [
@@ -57,6 +59,7 @@
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",

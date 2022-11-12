@@ -20,10 +20,10 @@
 <script>
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
     import { useBestiaryStore } from "@/store/Bestiary/BestiaryStore";
-    import CreatureLink from "@/views/Bestiary/CreatureLink";
+    import CreatureLink from "@/views/Bestiary/CreatureLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

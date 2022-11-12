@@ -31,10 +31,10 @@
     import { shallowRef } from "vue";
     import sortBy from "lodash/sortBy";
     import { mapState } from "pinia";
-    import TabLayout from "@/components/content/TabLayout";
-    import ContentLayout from "@/components/content/ContentLayout";
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
     import { useArmorsStore } from "@/store/Inventory/ArmorsStore";
-    import ArmorLink from "@/views/Inventory/Armors/ArmorLink";
+    import ArmorLink from "@/views/Inventory/Armors/ArmorLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

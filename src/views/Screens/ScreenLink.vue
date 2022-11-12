@@ -47,9 +47,9 @@
 <script>
     import { RouterLink } from "vue-router";
     import { mapActions } from "pinia";
-    import RawContent from "@/components/content/RawContent";
-    import BaseModal from "@/components/UI/modals/BaseModal";
-    import ScreenBody from "@/views/Screens/ScreenBody";
+    import RawContent from "@/components/content/RawContent.vue";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import ScreenBody from "@/views/Screens/ScreenBody.vue";
     import { useScreensStore } from "@/store/Screens/ScreensStore";
 
     export default {

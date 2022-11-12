@@ -105,12 +105,12 @@
         computed, defineComponent, onBeforeMount, ref
     } from "vue";
     import draggableComponent from 'vuedraggable';
-    import UiInput from "@/components/form/UiInput";
-    import UiButton from "@/components/form/UiButton";
-    import CustomBookmarkCategory from "@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiButton from "@/components/form/UiButton.vue";
+    import CustomBookmarkCategory from "@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
     import { useUIStore } from "@/store/UI/UIStore";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
 
     export default defineComponent({
         components: {

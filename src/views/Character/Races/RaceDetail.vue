@@ -24,11 +24,11 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from '@/components/UI/SectionHeader';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
     import { useRacesStore } from '@/store/Character/RacesStore';
     import errorHandler from "@/common/helpers/errorHandler";
-    import RaceBody from "@/views/Character/Races/RaceBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import RaceBody from "@/views/Character/Races/RaceBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

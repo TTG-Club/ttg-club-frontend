@@ -100,12 +100,12 @@
 <script>
     import cloneDeep from "lodash/cloneDeep";
     import debounce from "lodash/debounce";
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
-    import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources';
-    import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
+    import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
     import FilterService from "@/common/services/FilterService";
     import errorHandler from "@/common/helpers/errorHandler";
-    import BaseModal from "@/components/UI/modals/BaseModal";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
 
     export default {
         name: 'ListFilter',

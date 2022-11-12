@@ -2,9 +2,6 @@ const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
 
 module.exports = defineConfig({
-    publicPath: process.env.BUILD_TARGET === 'gh-pages'
-        ? '/ttg-club-frontend/'
-        : '/',
     outputDir: process.env.BUILD_PATH || './dist/',
     filenameHashing: false,
     runtimeCompiler: true,
@@ -35,7 +32,7 @@ module.exports = defineConfig({
             config.plugins.delete('prefetch');
         };
 
-        if (!['serve', 'gh-pages'].includes(process.env.BUILD_TARGET)) {
+        if (process.env.BUILD_TARGET !== 'serve') {
             removeHTML();
         }
 

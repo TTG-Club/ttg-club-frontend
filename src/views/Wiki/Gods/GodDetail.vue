@@ -23,10 +23,10 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
     import { useGodsStore } from "@/store/Wiki/GodsStore";
-    import GodBody from "@/views/Wiki/Gods/GodBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import GodBody from "@/views/Wiki/Gods/GodBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

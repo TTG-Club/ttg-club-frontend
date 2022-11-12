@@ -73,12 +73,12 @@
 <script>
     import { reactive } from "vue";
     import throttle from "lodash/throttle";
-    import ContentLayout from "@/components/content/ContentLayout";
-    import UiCheckbox from "@/components/form/UiCheckbox";
-    import RawContent from "@/components/content/RawContent";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
+    import UiCheckbox from "@/components/form/UiCheckbox.vue";
+    import RawContent from "@/components/content/RawContent.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import UiInput from "@/components/form/UiInput";
-    import UiButton from "@/components/form/UiButton";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiButton from "@/components/form/UiButton.vue";
 
     export default {
         name: "WildMagicView",

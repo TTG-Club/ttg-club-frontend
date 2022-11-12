@@ -29,9 +29,9 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent";
-    import DetailTopBar from "@/components/UI/DetailTopBar";
-    import ClassSquare from "@/components/UI/ClassSquare";
+    import RawContent from "@/components/content/RawContent.vue";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import ClassSquare from "@/components/UI/ClassSquare.vue";
 
     export default {
         name: "OptionBody",

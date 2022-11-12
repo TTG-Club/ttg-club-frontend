@@ -20,9 +20,9 @@
 <script>
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import GodLink from "@/views/Wiki/Gods/GodLink";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import GodLink from "@/views/Wiki/Gods/GodLink.vue";
     import { useGodsStore } from "@/store/Wiki/GodsStore";
     import { useUIStore } from "@/store/UI/UIStore";
 

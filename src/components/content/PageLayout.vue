@@ -50,7 +50,7 @@
 
 <script>
     import { computed, defineComponent } from "vue";
-    import SocialLinks from "@/components/content/SocialLinks";
+    import SocialLinks from "@/components/content/SocialLinks.vue";
     import { useDayjs } from "@/common/composition/useDayjs";
     import { useUIStore } from "@/store/UI/UIStore";
 

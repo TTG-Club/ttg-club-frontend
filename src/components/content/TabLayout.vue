@@ -40,7 +40,7 @@
         useInfiniteScroll, useResizeObserver
     } from "@vueuse/core";
     import FilterService from "@/common/services/FilterService";
-    import ListFilter from "@/components/filter/ListFilter";
+    import ListFilter from "@/components/filter/ListFilter.vue";
 
     export default {
         name: 'TabLayout',

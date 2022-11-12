@@ -24,10 +24,10 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader";
-    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
+    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody.vue";
     import { useWeaponsStore } from "@/store/Inventory/WeaponsStore";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

@@ -22,7 +22,7 @@
 <script>
     import sortBy from "lodash/sortBy";
     import groupBy from "lodash/groupBy";
-    import ScreenLink from "@/views/Screens/ScreenLink";
+    import ScreenLink from "@/views/Screens/ScreenLink.vue";
 
     export default {
         name: "ScreensGroup",

@@ -73,9 +73,9 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent";
-    import DiceRoller from "@/components/UI/DiceRoller";
-    import DetailTopBar from "@/components/UI/DetailTopBar";
+    import RawContent from "@/components/content/RawContent.vue";
+    import DiceRoller from "@/components/UI/DiceRoller.vue";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
 
     export default {
         name: "WeaponBody",

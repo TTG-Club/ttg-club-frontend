@@ -23,11 +23,11 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from '@/components/UI/SectionHeader';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
     import errorHandler from "@/common/helpers/errorHandler";
     import { useBooksStore } from "@/store/Wiki/BooksStore";
-    import BookBody from "@/views/Wiki/Books/BookBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import BookBody from "@/views/Wiki/Books/BookBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

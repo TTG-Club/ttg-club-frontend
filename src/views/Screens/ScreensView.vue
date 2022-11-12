@@ -31,7 +31,7 @@
     import {
         mapActions, mapState
     } from "pinia";
-    import ContentLayout from "@/components/content/ContentLayout";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
     import { useScreensStore } from "@/store/Screens/ScreensStore";
     import { useUIStore } from "@/store/UI/UIStore";
 

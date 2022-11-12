@@ -149,9 +149,9 @@
 </template>
 
 <script>
-    import ClassSquare from "@/components/UI/ClassSquare";
-    import DetailTopBar from "@/components/UI/DetailTopBar";
-    import RawContent from "@/components/content/RawContent";
+    import ClassSquare from "@/components/UI/ClassSquare.vue";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from "@/components/content/RawContent.vue";
 
     export default {
         name: "SpellBody",

@@ -64,7 +64,7 @@
     import { mapState } from "pinia";
     import { ref } from "vue";
     import { useUIStore } from '@/store/UI/UIStore';
-    import ListFilter from "@/components/filter/ListFilter";
+    import ListFilter from "@/components/filter/ListFilter.vue";
     import FilterService from "@/common/services/FilterService";
 
     export default {
