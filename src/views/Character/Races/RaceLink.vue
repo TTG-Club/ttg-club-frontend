@@ -129,7 +129,7 @@
     import sortBy from 'lodash/sortBy';
     import groupBy from 'lodash/groupBy';
     import isArray from 'lodash/isArray';
-    import type { RaceLink } from '@/types/Character/race';
+    import type { RaceLink } from '@/types/Character/Races';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from "@/store/UI/UIStore";
     import { AbilityType } from '@/enums/Tools/AbilityCalcEnum';
