@@ -8,6 +8,13 @@
         </template>
 
         <template #default>
+            <div
+                v-if="isDev"
+                class="ability-calc__row"
+            >
+                <ability-races/>
+            </div>
+
             <div class="ability-calc__row">
                 <ui-switch
                     v-model="currentTab"
@@ -47,6 +54,8 @@
     import AbilityRandom from "@/views/Tools/AbilityCalc/AbilityRandom.vue";
     import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
     import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
+    import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces.vue';
+    import { useIsDev } from '@/common/helpers/isDev';
 
     type TCalcTab = {
         id: string
@@ -56,6 +65,7 @@
 
     export default defineComponent({
         components: {
+            AbilityRaces,
             AbilityTable,
             PageLayout,
             UiSwitch
@@ -90,7 +100,8 @@
             return {
                 tabs,
                 currentTab,
-                component
+                component,
+                isDev: useIsDev()
             };
         }
     });

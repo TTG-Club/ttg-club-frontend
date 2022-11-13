@@ -34,9 +34,17 @@ export enum AbilityShortKey {
     CHARISMA = 'cha'
 }
 
-export default {
-    AbilityName,
-    AbilityShortName,
-    AbilityKey,
-    AbilityShortKey
-};
+export enum AbilityType {
+    CHOICE = 'к другой',
+    ONE = 'к одной',
+    CHOICE_UNIQUE = 'к 2 другим',
+    CHOICE_DOUBLE = '+2 и +1 / +1 к трем',
+    ALL = '+1 к каждой'
+}
+
+export type Ability = {
+    key: AbilityKey;
+    shortKey: AbilityShortKey;
+    name: AbilityName;
+    shortName: AbilityShortName;
+}

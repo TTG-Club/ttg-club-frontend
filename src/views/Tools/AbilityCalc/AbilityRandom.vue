@@ -57,7 +57,7 @@
     import UiButton from "@/components/form/UiButton.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
-    import { AbilityKey, AbilityName } from '@/common/enum/AbilityEnum';
+    import { AbilityKey, AbilityName } from '@/enums/Tools/AbilityCalcEnum';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
     import { ToastEventBus } from "@/common/utils/ToastConfig";

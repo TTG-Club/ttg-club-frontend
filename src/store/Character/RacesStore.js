@@ -1,7 +1,4 @@
 import { defineStore } from 'pinia';
-import sortBy from 'lodash/sortBy';
-import groupBy from 'lodash/groupBy';
-import isArray from 'lodash/isArray';
 import errorHandler from '@/common/helpers/errorHandler';
 import FilterService from '@/common/services/FilterService';
 
@@ -91,24 +88,7 @@ export const useRacesStore = defineStore('RacesStore', {
 
                 this.controllers.racesQuery = undefined;
 
-                const getSubraces = list => sortBy(
-                    Object.values(groupBy(list, o => o.type.name))
-                        .map(value => ({
-                            name: value[0].type,
-                            list: value
-                        })),
-                    [o => o.name.order]
-                );
-
-                return data.map(value => {
-                    const res = value;
-
-                    if (isArray(value.subraces)) {
-                        res.subraces = getSubraces(value.subraces);
-                    }
-
-                    return res;
-                });
+                return data;
             } catch (err) {
                 errorHandler(err);
 
