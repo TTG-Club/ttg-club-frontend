@@ -2,34 +2,34 @@ import type {
     AbilityName, AbilityShortName, AbilityType
 } from '@/enums/Tools/AbilityCalcEnum';
 
-export type RaceAbility = {
+export type TRaceAbility = {
     key: AbilityType
     name: AbilityName
     shortName: AbilityShortName
     value: number
 };
 
-export type RaceName = {
+export type TRaceName = {
     rus: string
     eng: string
 };
 
-export type RaceSource = {
+export type TRaceSource = {
     shortName: string
     name: string
 }
 
-export type RaceType = {
+export type TRaceType = {
     name: string
     order: number
 }
 
-export type RaceLink = {
-    name: RaceName
+export type TRaceLink = {
+    name: TRaceName
     image: string
-    source: RaceSource
-    type: RaceType
+    source: TRaceSource
+    type: TRaceType
     url: string
-    abilities: Array<RaceAbility>
-    subraces?: Array<RaceLink>
+    abilities: Array<TRaceAbility>
+    subraces?: Array<TRaceLink>
 }

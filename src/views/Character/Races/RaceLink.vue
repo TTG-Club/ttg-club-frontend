@@ -59,7 +59,7 @@
                     </a>
 
                     <button
-                        v-if="hasSubRaces"
+                        v-if="!isAbilityCalc && hasSubRaces"
                         v-tippy="{ content: 'Разновидности', placement: 'left' }"
                         :class="{ 'is-active': submenu }"
                         class="link-item-expand__toggle"
@@ -75,7 +75,7 @@
                 </div>
 
                 <div
-                    v-if="hasSubRaces"
+                    v-if="!isAbilityCalc && hasSubRaces"
                     v-show="submenu"
                     class="link-item-expand__arch-list"
                 >
@@ -126,13 +126,11 @@
     import {
         useLink, useRoute, useRouter
     } from 'vue-router';
-    import sortBy from 'lodash/sortBy';
-    import groupBy from 'lodash/groupBy';
-    import isArray from 'lodash/isArray';
-    import type { RaceLink } from '@/types/Character/Races';
+    import type { TRaceLink } from '@/types/Character/Races';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from "@/store/UI/UIStore";
     import { AbilityType } from '@/enums/Tools/AbilityCalcEnum';
+    import { useRacesStore } from '@/store/Character/RacesStore';
 
     export default defineComponent({
         components: { SvgIcon },
@@ -143,15 +141,20 @@
                 required: true
             },
             raceItem: {
-                type: Object as PropType<RaceLink>,
+                type: Object as PropType<TRaceLink>,
                 required: true
+            },
+            isAbilityCalc: {
+                type: Boolean,
+                default: false
             }
         },
-        setup(props) {
+        setup(props, { emit }) {
             const route = useRoute();
             const router = useRouter();
             const { isActive, navigate } = useLink(props);
             const uiStore = useUIStore();
+            const racesStore = useRacesStore();
             const submenu = ref(false);
 
             const abilities = computed(() => {
@@ -175,21 +178,14 @@
             });
 
             const subRaces = computed(() => {
-                if (isArray(props.raceItem.subraces)) {
-                    return sortBy(
-                        Object.values(groupBy(props.raceItem.subraces, o => o.type.name))
-                            .map(value => ({
-                                name: value[0].type,
-                                list: value
-                            })),
-                        [o => o.name.order]
-                    );
+                if (props.isAbilityCalc) {
+                    return null;
                 }
 
-                return [];
+                return racesStore.subRaces(props.raceItem);
             });
 
-            const hasSubRaces = computed(() => !!subRaces.value.length);
+            const hasSubRaces = computed(() => !!subRaces.value);
 
             const parentClassList = computed(() => ({
                 'router-link-active': isActive.value
@@ -200,9 +196,15 @@
             }));
 
             const selectRace = async () => {
-                submenu.value = true;
+                if (!props.isAbilityCalc) {
+                    submenu.value = true;
 
-                await navigate();
+                    await navigate();
+
+                    return;
+                }
+
+                emit('select', props.raceItem);
             };
 
             return {

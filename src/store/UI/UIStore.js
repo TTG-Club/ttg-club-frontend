@@ -6,7 +6,6 @@ import {
 } from '@/common/const/UI';
 import errorHandler from '@/common/helpers/errorHandler';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useUIStore = defineStore('UIStore', {
     state: () => ({
         theme: '',

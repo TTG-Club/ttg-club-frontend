@@ -108,10 +108,6 @@ export default class FilterService {
         return params;
     }
 
-    /**
-     * @param {{dbName: string, url: string, storeName: string, storeKey: string}} options
-     * @returns {Promise<void>}
-     */
     async init(options) {
         const opts = {
             dbName: undefined,

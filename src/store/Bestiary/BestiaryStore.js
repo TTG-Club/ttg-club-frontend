@@ -5,7 +5,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'bestiary';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useBestiaryStore = defineStore('BestiaryStore', {
     state: () => ({
         bestiary: [],

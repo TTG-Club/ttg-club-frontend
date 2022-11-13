@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useScreensStore = defineStore('ScreensStore', {
     state: () => ({
         screens: [],

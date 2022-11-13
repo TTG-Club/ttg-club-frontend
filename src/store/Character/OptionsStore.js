@@ -5,7 +5,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'options';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useOptionsStore = defineStore('OptionsStore', {
     state: () => ({
         options: [],

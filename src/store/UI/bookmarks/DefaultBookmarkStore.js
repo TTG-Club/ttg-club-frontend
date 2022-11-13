@@ -7,7 +7,6 @@ import sortBy from 'lodash/sortBy';
 import errorHandler from '@/common/helpers/errorHandler';
 import { DB_NAME } from '@/common/const/UI';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
     state: () => ({
         bookmarks: [],
