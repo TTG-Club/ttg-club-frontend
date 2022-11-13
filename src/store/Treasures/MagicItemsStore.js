@@ -5,7 +5,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'items';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useMagicItemsStore = defineStore('MagicItemsStore', {
     state: () => ({
         items: [],

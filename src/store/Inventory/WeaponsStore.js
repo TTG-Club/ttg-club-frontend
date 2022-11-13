@@ -4,7 +4,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'weapons';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useWeaponsStore = defineStore('WeaponsStore', {
     state: () => ({
         weapons: [],

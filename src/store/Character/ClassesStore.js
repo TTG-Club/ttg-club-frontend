@@ -7,7 +7,6 @@ import FilterService from '@/common/services/FilterService';
 
 const DB_NAME = 'classes';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useClassesStore = defineStore('ClassesStore', {
     state: () => ({
         classes: [],

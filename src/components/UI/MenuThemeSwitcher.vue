@@ -13,7 +13,7 @@
 
 <script>
     import { computed } from "vue";
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from '@/store/UI/UIStore';
 
     export default {

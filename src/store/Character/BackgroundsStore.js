@@ -4,7 +4,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'backgrounds';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useBackgroundsStore = defineStore('BackgroundsStore', {
     state: () => ({
         backgrounds: [],

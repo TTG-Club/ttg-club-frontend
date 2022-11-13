@@ -67,12 +67,12 @@
 <script>
     import { defineComponent, reactive } from 'vue';
     import throttle from "lodash/throttle";
-    import ContentLayout from "@/components/content/ContentLayout";
-    import RawContent from "@/components/content/RawContent";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
+    import RawContent from "@/components/content/RawContent.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import FieldInput from "@/components/form/FieldType/FieldInput";
-    import FormButton from "@/components/form/FormButton";
-    import FieldCheckbox from "@/components/form/FieldType/FieldCheckbox";
+    import FieldInput from "@/components/form/FieldType/FieldInput.vue";
+    import FormButton from "@/components/form/FormButton.vue";
+    import FieldCheckbox from "@/components/form/FieldType/FieldCheckbox.vue";
 
     export default defineComponent({
         components: {

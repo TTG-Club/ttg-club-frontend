@@ -8,14 +8,16 @@ import type {
     MathFunctionRoll,
     RollBase
 } from 'dice-roller-parser';
+import type { VNode } from 'vue';
+import type { ToastOptions } from 'vue-toastification/dist/types/types';
 import { DiceRoller } from 'dice-roller-parser';
 import { POSITION, useToast } from 'vue-toastification';
-import type { VNode } from 'vue';
 import { h } from 'vue';
+import { ToastEventBus } from '@/common/utils/ToastConfig';
 
 export function useDiceRoller() {
     const roller = new DiceRoller();
-    const toast = useToast();
+    const toast = useToast(ToastEventBus);
 
     /* eslint-disable no-use-before-define */
     const doRender = (roll: RollBase): VNode => {
@@ -364,21 +366,26 @@ export function useDiceRoller() {
     const notifyResult = ({
         roll,
         label,
-        type
+        type,
+        toastOptions
     }: {
         roll: RollBase
         label?: string
-        type?: 'advantage' | 'disadvantage'
+        type?: 'advantage' | 'disadvantage',
+        toastOptions?: ToastOptions
     }) => {
+        const toastOpts: ToastOptions = {
+            position: POSITION.BOTTOM_RIGHT,
+            timeout: 5000,
+            icon: false,
+            ...toastOptions
+        };
+
         toast(getRendered({
             roll,
             label,
             type
-        }), {
-            position: POSITION.BOTTOM_RIGHT,
-            timeout: 5000,
-            icon: false
-        });
+        }), toastOpts);
     };
 
     return {

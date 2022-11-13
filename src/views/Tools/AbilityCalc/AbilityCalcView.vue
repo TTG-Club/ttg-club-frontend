@@ -8,6 +8,13 @@
         </template>
 
         <template #default>
+            <div
+                v-if="isDev"
+                class="ability-calc__row"
+            >
+                <ability-races/>
+            </div>
+
             <div class="ability-calc__row">
                 <ui-switch
                     v-model="currentTab"
@@ -22,10 +29,15 @@
                 v-if="!!component"
                 class="ability-calc__row"
             >
-                <component
-                    :is="component"
-                    v-if="component"
-                />
+                <transition
+                    name="fade"
+                    mode="out-in"
+                >
+                    <component
+                        :is="component"
+                        v-if="component"
+                    />
+                </transition>
             </div>
         </template>
     </page-layout>
@@ -40,6 +52,10 @@
     import UiSwitch from "@/components/form/UiSwitch.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import AbilityRandom from "@/views/Tools/AbilityCalc/AbilityRandom.vue";
+    import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
+    import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
+    import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces.vue';
+    import { useIsDev } from '@/common/helpers/isDev';
 
     type TCalcTab = {
         id: string
@@ -49,6 +65,7 @@
 
     export default defineComponent({
         components: {
+            AbilityRaces,
             AbilityTable,
             PageLayout,
             UiSwitch
@@ -63,12 +80,12 @@
                 {
                     id: 'point-buy',
                     name: '«Покупка» значений',
-                    component: shallowRef(AbilityRandom)
+                    component: shallowRef(AbilityPointBuy)
                 },
                 {
                     id: 'standard',
                     name: 'Стандартный набор',
-                    component: shallowRef(AbilityRandom)
+                    component: shallowRef(AbilityArray)
                 }
             ];
 
@@ -83,7 +100,8 @@
             return {
                 tabs,
                 currentTab,
-                component
+                component,
+                isDev: useIsDev()
             };
         }
     });

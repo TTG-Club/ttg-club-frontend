@@ -6,7 +6,7 @@
 
 <script>
     import { defineComponent } from "vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
 
     export default defineComponent({
         components: {

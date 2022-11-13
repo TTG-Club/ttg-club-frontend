@@ -1,6 +1,6 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
+        v-slot="{ href }"
         v-bind="$props"
         :to="{ path: raceItem.url }"
         custom
@@ -8,7 +8,7 @@
         <div
             ref="raceItem"
             class="link-item-expand"
-            :class="getParentClasses(isActive)"
+            :class="parentClassList"
             v-bind="$attrs"
         >
             <div class="link-item-expand__content">
@@ -24,7 +24,7 @@
                     <a
                         :href="href"
                         class="link-item-expand__link"
-                        @click.left.prevent.exact="selectRace(navigate)"
+                        @click.left.prevent.exact="selectRace"
                     >
 
                         <span class="link-item-expand__body">
@@ -59,24 +59,28 @@
                     </a>
 
                     <button
-                        v-if="hasSubraces"
+                        v-if="!isAbilityCalc && hasSubRaces"
                         v-tippy="{ content: 'Разновидности', placement: 'left' }"
                         :class="{ 'is-active': submenu }"
                         class="link-item-expand__toggle"
                         type="button"
-                        @click.left.exact.prevent="toggleSubrace"
+                        @click.left.exact.prevent="submenu = !submenu"
                     >
-                        <svg-icon :icon-name="submenu ? 'minus' : 'plus'"/>
+                        <svg-icon
+                            :icon-name="submenu ? 'minus' : 'plus'"
+                            :stroke-enable="false"
+                            fill-enable
+                        />
                     </button>
                 </div>
 
                 <div
-                    v-if="hasSubraces"
+                    v-if="!isAbilityCalc && hasSubRaces"
                     v-show="submenu"
                     class="link-item-expand__arch-list"
                 >
                     <div
-                        v-for="(group, groupKey) in raceItem.subraces"
+                        v-for="(group, groupKey) in subRaces"
                         :key="groupKey"
                         class="link-item-expand__arch-type"
                     >
@@ -86,21 +90,21 @@
 
                         <div class="link-item-expand__arch-type_items">
                             <router-link
-                                v-for="(subrace, subraceKey) in group.list"
-                                :key="subraceKey"
-                                :to="{ path: subrace.url }"
+                                v-for="(subRace, subRaceKey) in group.list"
+                                :key="subRaceKey"
+                                :to="{ path: subRace.url }"
                                 class="link-item-expand__arch-item"
                             >
-                                <span class="link-item-expand__arch-item_name">{{ subrace.name.rus }}</span>
+                                <span class="link-item-expand__arch-item_name">{{ subRace.name.rus }}</span>
 
                                 <span class="link-item-expand__arch-item_book">
-                                    <span v-tippy="{ content: subrace.source.name }">
-                                        {{ subrace.source.shortName }}
+                                    <span v-tippy="{ content: subRace.source.name }">
+                                        {{ subRace.source.shortName }}
                                     </span>
 
                                     /
 
-                                    <span>{{ subrace.name.eng }}</span>
+                                    <span>{{ subRace.name.eng }}</span>
                                 </span>
                             </router-link>
                         </div>
@@ -111,74 +115,108 @@
     </router-link>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
-    import { mapState } from "pinia";
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
+<script lang="ts">
+    import type { PropType } from 'vue';
+    import type {
+        RouteLocationPathRaw
+    } from 'vue-router';
+    import {
+        computed, defineComponent, ref
+    } from 'vue';
+    import {
+        useLink, useRoute, useRouter
+    } from 'vue-router';
+    import type { TRaceLink } from '@/types/Character/Races';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from "@/store/UI/UIStore";
+    import { AbilityType } from '@/enums/Tools/AbilityCalcEnum';
+    import { useRacesStore } from '@/store/Character/RacesStore';
 
-    export default {
-        name: 'RaceLink',
+    export default defineComponent({
         components: { SvgIcon },
         inheritAttrs: false,
         props: {
-            raceItem: {
-                type: Object,
-                default: () => null,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
                 required: true
             },
-            ...RouterLink.props
-        },
-        data() {
-            return {
-                submenu: false
-            };
-        },
-        computed: {
-            ...mapState(useUIStore, ['fullscreen']),
-
-            hasSubraces() {
-                return !!this.raceItem?.subraces?.length;
+            raceItem: {
+                type: Object as PropType<TRaceLink>,
+                required: true
             },
+            isAbilityCalc: {
+                type: Boolean,
+                default: false
+            }
+        },
+        setup(props, { emit }) {
+            const route = useRoute();
+            const router = useRouter();
+            const { isActive, navigate } = useLink(props);
+            const uiStore = useUIStore();
+            const racesStore = useRacesStore();
+            const submenu = ref(false);
 
-            abilities() {
-                if (!this.raceItem.abilities?.length) {
+            const abilities = computed(() => {
+                if (!props.raceItem.abilities.length) {
                     return '';
                 }
 
-                const abilities = [];
+                if (props.raceItem.abilities.length === 6) {
+                    return AbilityType.ALL;
+                }
 
-                for (const ability of this.raceItem.abilities) {
-                    abilities.push(ability.value
+                const abilitiesList = [];
+
+                for (const ability of props.raceItem.abilities) {
+                    abilitiesList.push(ability.value
                         ? `${ ability.shortName } ${ ability.value > 0 ? `+${ ability.value }` : ability.value }`
                         : ability.name);
                 }
 
-                return abilities.join(', ');
-            }
-        },
-        methods: {
-            getParentClasses(isActive) {
-                return {
-                    'router-link-active': isActive
-                        || this.$route.params.raceName === this.$router.resolve(this.raceItem.url)?.params?.raceName,
-                    'is-selected': this.$route.name === 'raceDetail',
-                    'is-green': this.raceItem.type?.name.toLowerCase() === 'homebrew',
-                    'is-fullscreen': this.fullscreen
-                };
-            },
+                return abilitiesList.join(', ');
+            });
 
-            toggleSubrace() {
-                this.submenu = !this.submenu;
-            },
+            const subRaces = computed(() => {
+                if (props.isAbilityCalc) {
+                    return null;
+                }
 
-            selectRace(callback) {
-                this.submenu = true;
+                return racesStore.subRaces(props.raceItem);
+            });
 
-                callback();
-            }
+            const hasSubRaces = computed(() => !!subRaces.value);
+
+            const parentClassList = computed(() => ({
+                'router-link-active': isActive.value
+                    || route.params.raceName === router.resolve(props.raceItem.url).params.raceName,
+                'is-selected': route.name === 'raceDetail',
+                'is-green': props.raceItem.type.name.toLowerCase() === 'homebrew',
+                'is-fullscreen': uiStore.fullscreen
+            }));
+
+            const selectRace = async () => {
+                if (!props.isAbilityCalc) {
+                    submenu.value = true;
+
+                    await navigate();
+
+                    return;
+                }
+
+                emit('select', props.raceItem);
+            };
+
+            return {
+                submenu,
+                abilities,
+                subRaces,
+                hasSubRaces,
+                parentClassList,
+                selectRace
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

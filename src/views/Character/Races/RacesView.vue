@@ -3,15 +3,14 @@
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="racesQuery"
+        @update="onRacesQuery"
     >
         <div
-            ref="races"
             class="race-items"
             :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
         >
             <race-link
-                v-for="race in getRaces"
+                v-for="race in races"
                 :key="race.url"
                 :race-item="race"
                 :to="{ path: race.url }"
@@ -20,16 +19,18 @@
     </content-layout>
 </template>
 
-<script>
+<script lang="ts">
+    import { storeToRefs } from 'pinia';
     import {
-        mapActions, mapState
-    } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
+        computed, defineComponent, onBeforeUnmount
+    } from 'vue';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useRacesStore } from "@/store/Character/RacesStore";
-    import RaceLink from "@/views/Character/Races/RaceLink";
+    import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
-    export default {
+    export default defineComponent({
         name: 'RacesView',
         components: {
             RaceLink,
@@ -43,41 +44,42 @@
 
             next();
         },
-        computed: {
-            ...mapState(useUIStore, ['isMobile', 'fullscreen']),
-            ...mapState(useRacesStore, ['getRaces', 'getFilter']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const racesStore = useRacesStore();
 
-            filter() {
-                return this.getFilter || undefined;
-            },
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
+            const { races, filter } = storeToRefs(racesStore);
 
-            showRightSide() {
-                return this.$route.name === 'raceDetail';
-            }
-        },
-        beforeUnmount() {
-            this.clearStore();
-        },
-        methods: {
-            ...mapActions(useRacesStore, [
-                'initFilter',
-                'initRaces',
-                'clearStore'
-            ]),
+            const onRacesQuery = async () => {
+                await racesStore.initRaces();
+            };
 
-            async racesQuery() {
-                await this.initRaces();
-            },
+            const onSearch = async () => {
+                await racesStore.initRaces();
 
-            async onSearch() {
-                await this.racesQuery();
-
-                if (this.getRaces.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.getRaces[0].url });
+                if (races.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: races.value[0].url });
                 }
-            }
+            };
+
+            onBeforeUnmount(() => {
+                racesStore.clearStore();
+            });
+
+            return {
+                isMobile,
+                fullscreen,
+                races,
+                filter,
+                showRightSide: computed(() => route.name === 'raceDetail'),
+                onRacesQuery,
+                onSearch
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

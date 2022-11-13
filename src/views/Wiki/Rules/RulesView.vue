@@ -20,10 +20,10 @@
 <script>
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
     import { useRulesStore } from "@/store/Wiki/RulesStore";
-    import RuleLink from "@/views/Wiki/Rules/RuleLink";
+    import RuleLink from "@/views/Wiki/Rules/RuleLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

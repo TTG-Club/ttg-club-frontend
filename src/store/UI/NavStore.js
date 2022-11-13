@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useNavStore = defineStore('NavStore', {
     state: () => ({
         items: [],
@@ -108,13 +107,11 @@ export const useNavStore = defineStore('NavStore', {
                         {
                             label: 'Безумие',
                             url: '/tools/madness'
+                        },
+                        {
+                            label: 'Калькулятор характеристик',
+                            url: '/tools/ability-calc'
                         }
-
-                        // {
-                        //     label: 'Калькулятор характеристик',
-                        //     isDev: true
-                        //     url: '/tools/ability-calc'
-                        // }
                     ]
                 },
                 {

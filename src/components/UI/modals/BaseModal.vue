@@ -105,10 +105,10 @@
 </template>
 <script>
     import { mapActions, mapState } from "pinia";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
-    import UiButton from "@/components/form/UiButton";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import UiButton from "@/components/form/UiButton.vue";
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
-    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton";
+    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue";
 
     export default {
         name: "BaseModal",

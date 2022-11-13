@@ -5,7 +5,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'rules';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useRulesStore = defineStore('RulesStore', {
     state: () => ({
         rules: [],

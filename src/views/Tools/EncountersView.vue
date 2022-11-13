@@ -100,13 +100,13 @@
 <script>
     import throttle from 'lodash/throttle';
     import { reactive } from "vue";
-    import ContentLayout from "@/components/content/ContentLayout";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import RawContent from "@/components/content/RawContent";
-    import UiSelect from "@/components/form/UiSelect";
-    import UiButton from "@/components/form/UiButton";
-    import BaseModal from "@/components/UI/modals/BaseModal";
-    import RollTable from "@/components/UI/RollTable";
+    import RawContent from "@/components/content/RawContent.vue";
+    import UiSelect from "@/components/form/UiSelect.vue";
+    import UiButton from "@/components/form/UiButton.vue";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import RollTable from "@/components/UI/RollTable.vue";
 
     export default {
         name: "EncountersView",

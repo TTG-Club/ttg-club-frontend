@@ -143,7 +143,7 @@
         :imgs="race.images"
         :index="gallery.index"
         :visible="gallery.show"
-        :teleport="'body'"
+        teleport="body"
         loop
         move-disabled
         scroll-disabled
@@ -155,8 +155,8 @@
 
 <script>
     import sortBy from "lodash/sortBy";
-    import RawContent from "@/components/content/RawContent";
-    import DetailTopBar from "@/components/UI/DetailTopBar";
+    import RawContent from "@/components/content/RawContent.vue";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
 
     export default {
         name: "RaceBody",

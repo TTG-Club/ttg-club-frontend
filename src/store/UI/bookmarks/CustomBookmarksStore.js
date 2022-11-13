@@ -10,7 +10,6 @@ const signals = {
     delete: undefined
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
     state: () => ({
         bookmarks: [],

@@ -19,10 +19,10 @@
 <script>
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
     import { useBackgroundsStore } from "@/store/Character/BackgroundsStore";
-    import BackgroundLink from "@/views/Character/Backgrounds/BackgroundLink";
+    import BackgroundLink from "@/views/Character/Backgrounds/BackgroundLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

@@ -20,9 +20,9 @@
 <script>
     import { shallowRef } from "vue";
     import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import ItemLink from "@/views/Inventory/Items/ItemLink";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import ItemLink from "@/views/Inventory/Items/ItemLink.vue";
     import { useItemsStore } from "@/store/Inventory/ItemsStore";
     import { useUIStore } from "@/store/UI/UIStore";
 

@@ -55,7 +55,7 @@
         :imgs="magicItem.images"
         :index="gallery.index"
         :visible="gallery.show"
-        :teleport="'body'"
+        teleport="body"
         loop
         move-disabled
         scroll-disabled
@@ -67,8 +67,8 @@
 
 <script>
     import upperFirst from "lodash/upperFirst";
-    import RawContent from "@/components/content/RawContent";
-    import DetailTopBar from "@/components/UI/DetailTopBar";
+    import RawContent from "@/components/content/RawContent.vue";
+    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
 
     export default {
         name: "MagicItemBody",

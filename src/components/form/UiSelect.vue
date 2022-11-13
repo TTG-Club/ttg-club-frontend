@@ -1,8 +1,8 @@
 <template>
-    <div class="dnd5club-select">
+    <div class="ui-select">
         <div
             v-if="$slots['left-slot']"
-            class="dnd5club-select__slot is-left"
+            class="ui-select__slot is-left"
         >
             <slot name="left-slot"/>
         </div>
@@ -92,7 +92,7 @@
 <script>
     import Multiselect from 'vue-multiselect';
     import { defineComponent } from "vue";
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
         components: {
@@ -255,8 +255,229 @@
     });
 </script>
 
-<style lang="scss">
-    .dnd5club-select {
+<style lang="scss" scoped>
+    :deep(.multiselect) {
+        @include css_anim();
+
+        box-sizing: border-box;
+        outline: none;
+        appearance: none;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: row-reverse;
+        background: var(--bg-sub-menu);
+        cursor: pointer;
+        min-height: 38px;
+        border: {
+            width: 1px;
+            style: solid;
+            color: var(--border);
+            radius: 8px;
+        };
+
+        .multiselect {
+            &:after,
+            &:before {
+                box-sizing: border-box;
+                outline: none;
+                appearance: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            *,
+            *:before,
+            *:after {
+                box-sizing: border-box;
+                outline: none;
+                appearance: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            &__tags {
+                color: var(--text-color);
+                font-size: var(--main-font-size);
+                line-height: var(--main-line-height);
+                background: transparent;
+                min-height: 38px;
+                width: 100%;
+                padding: 0;
+                border: 0;
+            }
+
+            &__select {
+                @include css_anim();
+
+                width: 38px;
+                height: 100%;
+                padding: 11px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: static;
+                flex-shrink: 0;
+                top: initial;
+                right: initial;
+
+                &:hover {
+                    background-color: var(--hover);
+                }
+
+                &:before {
+                    display: none;
+                }
+
+                svg {
+                    @include css_anim();
+
+                    color: var(--primary);
+                }
+            }
+
+            &__spinner {
+                width: 38px;
+                height: calc(100% - 2px);
+                background: var(--bg-secondary);
+                right: 0;
+
+                &:before,
+                &:after {
+                    border-color: var(--primary) transparent transparent;
+                }
+            }
+
+            &__input {
+                cursor: text;
+            }
+
+            &__single,
+            &__tags-wrap,
+            &__placeholder {
+                padding: 7px 12px 0 12px;
+                min-height: 100%;
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                background: transparent;
+                color: var(--text-color);
+                font-size: var(--main-font-size);
+                line-height: var(--main-line-height);
+
+                &::placeholder {
+                    color: var(--text-color);
+                    font-size: var(--main-font-size);
+                    line-height: var(--main-line-height);
+                }
+            }
+
+            &__content {
+                width: 100%;
+
+                &-wrapper {
+                    background: var(--bg-secondary);
+                    color: var(--text-color);
+                    font-size: var(--main-font-size);
+                    line-height: var(--main-line-height);
+                    top: 100%;
+                    left: -1px;
+                    width: calc(100% + 2px);
+                    border: {
+                        width: 0 1px 1px 1px;
+                        style: solid;
+                        color: var(--border);
+                        radius: 0 0 8px 8px;
+                    };
+                }
+            }
+
+            &__option {
+                background: var(--bg-secondary);
+                color: var(--text-color);
+                width: 100%;
+
+                span {
+                    white-space: break-spaces;
+                    width: 100%;
+                    display: block;
+                }
+
+                &--group {
+                    background: var(--bg-sub-menu);
+                    color: var(--text-color);
+                    font-weight: 600;
+                }
+
+                &--disabled {
+                    background: var(--bg-sub-menu) !important;
+                    color: var(--text-color) !important;
+                }
+
+                &--highlight {
+                    background: var(--primary-hover);
+                    color: var(--text-btn-color);
+
+                    &:after {
+                        background: transparent;
+                    }
+                }
+
+                &--selected {
+                    font-weight: 400;
+                    color: var(--text-btn-color);
+                    background: var(--primary-active);
+
+                    &.multiselect {
+                        &__option {
+                            &--highlight {
+                                color: var(--text-btn-color);
+                                background: var(--primary-hover);
+                            }
+                        }
+                    }
+                }
+            }
+
+            &__element {
+                width: 100%;
+                margin-bottom: initial;
+                line-height: initial;
+            }
+
+            &:hover,
+            &:focus-within {
+                @include css_anim();
+
+                border-color: var(--primary-active);
+
+                .multiselect {
+                    &__content {
+                        &-wrapper {
+                            border-color: var(--primary-active);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    :deep(.multiselect--active) {
+        border-radius: 8px 8px 0 0;
+
+        .multiselect {
+            &__placeholder {
+                display: inline-block;
+            }
+
+            &__select {
+                transform: none;
+
+                svg {
+                    transform: rotate(-180deg);
+                }
+            }
+        }
+    }
+
+    .ui-select {
         display: flex;
 
         &__slot {

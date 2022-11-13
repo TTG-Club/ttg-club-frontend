@@ -45,8 +45,8 @@
     } from "pinia";
     import isArray from "lodash/isArray";
     import { useUIStore } from "@/store/UI/UIStore";
-    import ClassLink from "@/views/Character/Classes/ClassLink";
-    import ContentLayout from '@/components/content/ContentLayout';
+    import ClassLink from "@/views/Character/Classes/ClassLink.vue";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useClassesStore } from '@/store/Character/ClassesStore';
 
     export default {

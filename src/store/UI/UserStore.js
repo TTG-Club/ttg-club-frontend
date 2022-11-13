@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
 import { USER_TOKEN_COOKIE } from '@/common/const/UI';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useUserStore = defineStore('UserStore', {
     state: () => ({
         user: undefined,

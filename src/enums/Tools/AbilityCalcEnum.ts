@@ -17,6 +17,15 @@ export enum AbilityShortName {
 }
 
 export enum AbilityKey {
+    STRENGTH = 'STRENGTH',
+    DEXTERITY = 'DEXTERITY',
+    CONSTITUTION = 'CONSTITUTION',
+    INTELLIGENCE = 'INTELLIGENCE',
+    WISDOM = 'WISDOM',
+    CHARISMA = 'CHARISMA'
+}
+
+export enum AbilityShortKey {
     STRENGTH = 'str',
     DEXTERITY = 'dex',
     CONSTITUTION = 'con',
@@ -25,7 +34,17 @@ export enum AbilityKey {
     CHARISMA = 'cha'
 }
 
-export default {
-    AbilityName,
-    AbilityKey
-};
+export enum AbilityType {
+    CHOICE = 'к другой',
+    ONE = 'к одной',
+    CHOICE_UNIQUE = 'к 2 другим',
+    CHOICE_DOUBLE = '+2 и +1 / +1 к трем',
+    ALL = '+1 к каждой'
+}
+
+export type Ability = {
+    key: AbilityKey;
+    shortKey: AbilityShortKey;
+    name: AbilityName;
+    shortName: AbilityShortName;
+}

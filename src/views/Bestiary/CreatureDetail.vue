@@ -25,10 +25,10 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
     import { useBestiaryStore } from "@/store/Bestiary/BestiaryStore";
-    import CreatureBody from "@/views/Bestiary/CreatureBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import CreatureBody from "@/views/Bestiary/CreatureBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

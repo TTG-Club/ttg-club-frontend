@@ -23,11 +23,11 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from '@/components/UI/SectionHeader';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
     import errorHandler from "@/common/helpers/errorHandler";
     import { useRulesStore } from "@/store/Wiki/RulesStore";
-    import RuleBody from "@/views/Wiki/Rules/RuleBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import RuleBody from "@/views/Wiki/Rules/RuleBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {

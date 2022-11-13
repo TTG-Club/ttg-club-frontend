@@ -4,7 +4,6 @@ import errorHandler from '@/common/helpers/errorHandler';
 
 const DB_NAME = 'traits';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useTraitsStore = defineStore('TraitsStore', {
     state: () => ({
         traits: [],
