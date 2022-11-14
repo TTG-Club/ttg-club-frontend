@@ -54,7 +54,7 @@
                     </template>
 
                     <template #option="{ option }">
-                        <span v-if="option?.group">{{ option.group.name }}</span>
+                        <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
 
                         <span
                             v-else
@@ -126,6 +126,7 @@
     import isArray from "lodash/isArray";
     import sortBy from "lodash/sortBy";
     import groupBy from "lodash/groupBy";
+    import { h } from 'vue';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useClassesStore } from '@/store/Character/ClassesStore';

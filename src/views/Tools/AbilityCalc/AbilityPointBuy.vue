@@ -34,12 +34,16 @@
                         {{ String(roll.shortName).toUpperCase() }}
                     </template>
 
-                    <template #option="{ option }">
-                        {{ getLabel(roll, option) }}
+                    <template #singleLabel>
+                        {{ roll.value || 'Выбрать значение' }}
                     </template>
 
                     <template #placeholder>
-                        {{ roll.value }}
+                        Выбрать значение
+                    </template>
+
+                    <template #option="{ option }">
+                        {{ getLabel(roll, option) }}
                     </template>
                 </ui-select>
             </div>

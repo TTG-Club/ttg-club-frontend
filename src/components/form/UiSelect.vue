@@ -3,9 +3,7 @@
         <div
             v-if="$slots['left-slot']"
             class="ui-select__slot is-left"
-        >
-            <slot name="left-slot"/>
-        </div>
+        />
 
         <multiselect
             v-bind="$props"
@@ -58,8 +56,31 @@
                     </div>
                 </slot>
             </template>
-            <template #singleLabel>
-                <slot name="singleLabel"/>
+            <template #singleLabel="{ option }">
+                <div class="ui-select__slotted">
+                    <div
+                        v-if="$slots['left-slot']"
+                        class="ui-select__slotted--left"
+                    >
+                        <slot name="left-slot"/>
+                    </div>
+
+                    <div class="ui-select__slotted--body">
+                        <span v-if="!$slots.singleLabel">{{ option[label] }}</span>
+
+                        <slot
+                            v-else
+                            name="singleLabel"
+                        />
+                    </div>
+
+                    <div
+                        v-if="$slots['right-slot']"
+                        class="ui-select__slotted--right"
+                    >
+                        <slot name="right-slot"/>
+                    </div>
+                </div>
             </template>
             <template #placeholder>
                 <slot name="placeholder">
@@ -101,13 +122,8 @@
         },
         props: {
             modelValue: {
-                type: [
-                    Number,
-                    String,
-                    Object,
-                    Array
-                ],
-                default: ''
+                type: [Object, Array],
+                default: null
             },
             name: {
                 type: String,
@@ -302,6 +318,8 @@
                 width: 100%;
                 padding: 0;
                 border: 0;
+                overflow: hidden;
+                border-radius: 8px 0 0 8px;
             }
 
             &__select {
@@ -352,7 +370,6 @@
             &__single,
             &__tags-wrap,
             &__placeholder {
-                padding: 7px 12px 0 12px;
                 min-height: 100%;
                 width: 100%;
                 margin: 0;
@@ -367,6 +384,15 @@
                     font-size: var(--main-font-size);
                     line-height: var(--main-line-height);
                 }
+            }
+
+            &__single {
+                padding: 0;
+            }
+
+            &__tags-wrap,
+            &__placeholder {
+                padding: 7px 12px 0 12px;
             }
 
             &__content {
@@ -474,28 +500,34 @@
                     transform: rotate(-180deg);
                 }
             }
+
+            &__tags {
+                border-radius: 8px 0 0 0;
+            }
         }
     }
 
     .ui-select {
-        display: flex;
-
-        &__slot {
-            padding: 8px;
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            color: var(--text-color);
-            font-size: var(--main-font-size);
-            line-height: var(--main-line-height);
+        &__slotted {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            flex-shrink: 0;
-            font-weight: 600;
 
-            &.is-left {
-                margin-right: 8px;
+            &--left,
+            &--right {
+                padding: 8px;
+                background-color: var(--border);
+                color: var(--text-color);
+                font-size: var(--main-font-size);
+                line-height: calc(var(--main-line-height) + 1px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                font-weight: 600;
+                min-width: 40px;
+            }
+
+            &--body {
+                padding: 8px;
             }
         }
     }
