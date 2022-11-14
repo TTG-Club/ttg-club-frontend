@@ -1,4 +1,4 @@
-import type { FilterQueryParams } from '@/common/composition/types/filter';
+import type { FilterQueryParams } from '@/common/composition/useFilter';
 
 export type ListQuery = {
     page?: number

@@ -100,7 +100,7 @@
 <script lang="ts">
     import cloneDeep from "lodash/cloneDeep";
     import {
-        computed, defineComponent, onBeforeUnmount, ref
+        computed, defineComponent, ref
     } from 'vue';
     import type {
         PropType
@@ -113,7 +113,7 @@
     import BaseModal from "@/components/UI/modals/BaseModal.vue";
     import type {
         Filter, FilterComposable, FilterGroup, FilterItem
-    } from '@/common/composition/types/filter';
+    } from '@/common/composition/useFilter';
 
     export default defineComponent({
         name: 'ListFilter',

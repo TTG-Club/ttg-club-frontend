@@ -44,7 +44,7 @@
         defineComponent, onMounted, ref
     } from 'vue';
     import ListFilter from "@/components/filter/ListFilter.vue";
-    import type { FilterComposable } from '@/common/composition/types/filter';
+    import type { FilterComposable } from '@/common/composition/useFilter';
 
     export default defineComponent({
         name: 'TabLayout',

@@ -1,11 +1,55 @@
-import { computed, ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
+import {
+    computed, ref
+} from 'vue';
 import localforage from 'localforage';
 import cloneDeep from 'lodash/cloneDeep';
 import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
-import type {
-    Filter, FilterComposable, FilterGroup, FilterItem, FilterOptions, FilterQueryParams
-} from '@/common/composition/types/filter';
+
+export type FilterItem = {
+    label: string
+    key: string
+    default: boolean
+    value?: boolean
+    tooltip?: string
+}
+
+export type FilterGroup = {
+    name: string
+    key: string
+    expand?: boolean
+    hidden?: boolean
+    type?: string
+    values: Array<FilterItem>
+}
+
+export type Filter = {
+    sources?: Array<FilterGroup>
+    other: Array<FilterGroup>
+}
+
+export type FilterOptions = {
+    url: string
+    dbName: string
+    storeName?: string | 'filters'
+    storeKey?: string | 'core'
+}
+
+export type FilterQueryParams = {
+    [key: string]: Array<string>
+}
+
+export type FilterComposable = {
+    filter: Ref<Filter | Array<FilterGroup> | undefined>
+    search: Ref<string>
+    isCustomized: ComputedRef<boolean>
+    queryParams: ComputedRef<FilterQueryParams>
+    initFilter: (options: FilterOptions) => Promise<void>
+    saveFilter: (filterEdited: Filter | Array<FilterGroup>) => Promise<void>
+    resetFilter: () => Promise<Filter | Array<FilterGroup> | undefined>
+    updateSearch: (searchStr: string) => string
+}
 
 export function useFilter(): FilterComposable {
     const http = useAxios();
