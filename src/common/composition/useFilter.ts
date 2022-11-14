@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
 import type {
-    Filter, FilterComposable, FilterGroup, FilterItem
+    Filter, FilterComposable, FilterGroup, FilterItem, FilterOptions, FilterQueryParams
 } from '@/common/composition/types/filter';
 
 export function useFilter(): FilterComposable {
@@ -42,9 +42,7 @@ export function useFilter(): FilterComposable {
     });
 
     const queryParams = computed(() => {
-        const params: {
-            [key: string]: Array<string>
-        } = {};
+        const params: FilterQueryParams = {};
 
         const setGroupToParams = (group: FilterGroup) => {
             params[group.key] = group.values
@@ -94,11 +92,15 @@ export function useFilter(): FilterComposable {
         const copy = cloneDeep(filterDefault);
         const saved: Filter | Array<FilterGroup> | null = await store.value.getItem(storeKey.value);
 
+        if (!saved) {
+            return copy;
+        }
+
         const copyIsNewType = (Array.isArray(copy) && !Array.isArray(saved))
             || (!Array.isArray(copy) && Array.isArray(saved));
 
         const getRestoredValue = (value: FilterItem, key: string) => {
-            if (!saved || copyIsNewType) {
+            if (copyIsNewType) {
                 return value.default;
             }
 
@@ -172,7 +174,7 @@ export function useFilter(): FilterComposable {
     const saveFilter = async (filterEdited: Filter | Array<FilterGroup>) => {
         await store.value.ready();
 
-        const clone = cloneDeep(filterEdited);
+        filter.value = filterEdited;
 
         if (!isCustomized.value) {
             await store.value.removeItem(storeKey.value);
@@ -180,7 +182,7 @@ export function useFilter(): FilterComposable {
             return;
         }
 
-        await store.value.setItem(storeKey.value, clone);
+        await store.value.setItem(storeKey.value, cloneDeep(filterEdited));
     };
 
     const resetFilter = async () => {
@@ -241,12 +243,7 @@ export function useFilter(): FilterComposable {
         return initialFilter;
     };
 
-    const initFilter = async (options?: {
-        url: string
-        dbName: string
-        storeName?: string | 'filters'
-        storeKey?: string | 'core'
-    }) => {
+    const initFilter = async (options?: FilterOptions) => {
         const opts = {
             dbName: undefined,
             url: undefined,

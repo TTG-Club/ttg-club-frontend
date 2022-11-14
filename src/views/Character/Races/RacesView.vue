@@ -25,10 +25,14 @@
         computed, defineComponent, onBeforeUnmount
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
+    import { tryOnBeforeMount } from '@vueuse/core';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useRacesStore } from "@/store/Character/RacesStore";
     import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { RaceFilterDefaults } from '@/enums/Character/RacesEnum';
+    import type { ListQuery } from '@/types/DefaultTypes';
 
     export default defineComponent({
         name: 'RacesView',
@@ -36,34 +40,50 @@
             RaceLink,
             ContentLayout
         },
-        async beforeRouteEnter(to, from, next) {
-            const store = useRacesStore();
-
-            await store.initFilter();
-            await store.initRaces();
-
-            next();
-        },
         setup() {
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const racesStore = useRacesStore();
-
             const { isMobile, fullscreen } = storeToRefs(uiStore);
-            const { races, filter } = storeToRefs(racesStore);
+
+            const racesStore = useRacesStore();
+            const { races } = storeToRefs(racesStore);
+
+            const filter = useFilter();
+
+            const initFilter = async () => {
+                await filter.initFilter({
+                    dbName: RaceFilterDefaults.dbName,
+                    url: RaceFilterDefaults.url
+                });
+            };
+
+            const initRaces = async () => {
+                const options: ListQuery = {};
+
+                if (filter.isCustomized.value) {
+                    options.filter = filter.queryParams.value;
+                }
+
+                await racesStore.initRaces(options);
+            };
 
             const onRacesQuery = async () => {
-                await racesStore.initRaces();
+                await initRaces();
             };
 
             const onSearch = async () => {
-                await racesStore.initRaces();
+                await initRaces();
 
                 if (races.value.length === 1 && !isMobile.value) {
                     await router.push({ path: races.value[0].url });
                 }
             };
+
+            tryOnBeforeMount(async () => {
+                await initFilter();
+                await initRaces();
+            });
 
             onBeforeUnmount(() => {
                 racesStore.clearStore();
@@ -76,7 +96,8 @@
                 filter,
                 showRightSide: computed(() => route.name === 'raceDetail'),
                 onRacesQuery,
-                onSearch
+                onSearch,
+                initFilter
             };
         }
     });

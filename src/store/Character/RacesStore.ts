@@ -6,28 +6,11 @@ import { computed, ref } from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import type { TRaceLink } from '@/views/Character/Races/Races';
 import { useAxios } from '@/common/composition/useAxios';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'races';
-
-type TQuery = {
-    page?: number
-    limit?: number
-    filter?: any
-    search?: {
-        exact?: boolean
-        value?: string
-    },
-    order?: Array<{
-        field: string
-        direction: 'asc' | 'desc'
-    }>
-}
+import type { ListQuery } from '@/types/DefaultTypes';
 
 export const useRacesStore = defineStore('RacesStore', () => {
     const http = useAxios();
     const races = ref<Array<TRaceLink>>([]);
-    const filter = useFilter();
 
     const config = ref<{
         page: number
@@ -84,33 +67,7 @@ export const useRacesStore = defineStore('RacesStore', () => {
         clearConfig();
     };
 
-    const initFilter = async (storeKey?: string, url?: string) => {
-        try {
-            const filterOptions: {
-                dbName: typeof DB_NAME
-                url: '/filters/races' | string
-                storeKey?: string
-                storeName?: string
-            } = {
-                dbName: DB_NAME,
-                url: '/filters/races'
-            };
-
-            if (storeKey) {
-                filterOptions.storeKey = storeKey;
-            }
-
-            if (url) {
-                filterOptions.url = url;
-            }
-
-            await filter.initFilter(filterOptions);
-        } catch (err) {
-            errorHandler(err);
-        }
-    };
-
-    const racesQuery = async (options?: TQuery) => {
+    const racesQuery = async (options?: ListQuery) => {
         try {
             if (controllers.value.racesQuery) {
                 controllers.value.racesQuery.abort();
@@ -123,14 +80,15 @@ export const useRacesStore = defineStore('RacesStore', () => {
                 limit: -1,
                 search: {
                     exact: false,
-                    value: filter.search.value || ''
+                    value: ''
                 },
                 order: [
                     {
                         field: 'name',
                         direction: 'asc'
                     }
-                ]
+                ],
+                ...options
             };
 
             if (options) {
@@ -149,46 +107,14 @@ export const useRacesStore = defineStore('RacesStore', () => {
         }
     };
 
-    const initRaces = async (url?: string) => {
-        clearConfig();
+    const initRaces = async (options?: ListQuery) => {
+        races.value = await racesQuery({
+            ...options,
+            page: 0,
+            limit: -1
+        });
 
-        if (url) {
-            config.value.url = url;
-        }
-
-        const configObj: TQuery = {
-            page: config.value.page,
-            limit: config.value.limit
-        };
-
-        if (filter.isCustomized.value) {
-            configObj.filter = filter.queryParams.value;
-        }
-
-        races.value = await racesQuery(configObj);
         config.value.end = races.value.length < config.value.limit;
-    };
-
-    const nextPage = async () => {
-        if (config.value.end) {
-            return;
-        }
-
-        const configObj: TQuery = {
-            page: config.value.page + 1,
-            limit: config.value.limit
-        };
-
-        if (filter.isCustomized.value) {
-            configObj.filter = filter.queryParams.value;
-        }
-
-        const racesList = await racesQuery(configObj);
-
-        config.value.page = configObj.page as number;
-        config.value.end = racesList.length < config.value.limit;
-
-        races.value.push(...racesList);
     };
 
     const raceInfoQuery = async (url: string) => {
@@ -213,15 +139,12 @@ export const useRacesStore = defineStore('RacesStore', () => {
 
     return {
         races,
-        filter,
 
         race,
         subRaces,
 
-        initFilter,
         racesQuery,
         initRaces,
-        nextPage,
         raceInfoQuery,
         clearRaces,
         clearConfig,

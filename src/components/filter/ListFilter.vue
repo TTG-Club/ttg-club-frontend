@@ -99,13 +99,13 @@
 
 <script lang="ts">
     import cloneDeep from "lodash/cloneDeep";
-    import debounce from "lodash/debounce";
     import {
         computed, defineComponent, onBeforeUnmount, ref
     } from 'vue';
     import type {
         PropType
     } from 'vue';
+    import { useDebounceFn } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
     import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
@@ -145,11 +145,11 @@
         setup(props, { emit }) {
             const showed = ref(false);
 
-            const emitSearch = debounce(value => {
+            const emitSearch = useDebounceFn(value => {
                 emit('search', value);
             }, 500);
 
-            const emitFilter = debounce(() => {
+            const emitFilter = useDebounceFn(() => {
                 emit('update');
             }, 500);
 
@@ -162,10 +162,9 @@
                 }
             });
 
-            const filter = computed({
-                // @ts-ignore
-                get: (): Filter | Array<FilterGroup> | undefined => props.filterInstance.filter,
-                set: async (value: Filter | Array<FilterGroup> | undefined) => {
+            const filter = computed<Filter | Array<FilterGroup> | undefined>({
+                get: () => props.filterInstance.filter.value,
+                set: async value => {
                     try {
                         if (!value) {
                             return;
@@ -206,13 +205,17 @@
             });
 
             const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
-            const isFilterCustomized = computed(() => props.filterInstance.isCustomized);
+            const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
 
             const setSourcesValue = (value: Array<FilterGroup>) => {
+                if (!filter.value || Array.isArray(filter.value)) {
+                    return;
+                }
+
                 filter.value = {
                     ...filter.value,
                     sources: value
-                } as Filter;
+                };
             };
 
             const setOtherValue = (value: Array<FilterItem>, key: string) => {
@@ -231,20 +234,6 @@
 
                 emitFilter();
             };
-
-            const cancelEmits = () => {
-                if (typeof emitSearch?.cancel === "function") {
-                    emitSearch.cancel();
-                }
-
-                if (typeof emitFilter?.cancel === "function") {
-                    emitFilter.cancel();
-                }
-            };
-
-            onBeforeUnmount(() => {
-                cancelEmits();
-            });
 
             return {
                 showed,
