@@ -1,17 +1,16 @@
 <template>
     <content-layout
-        :filter-instance="classesStore.filter"
+        :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="classesQuery"
     >
         <div
-            ref="classes"
             class="class-items"
             :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
         >
             <div
-                v-for="(group, groupKey) in classes"
+                v-for="(group, groupKey) in sortedClasses"
                 :key="groupKey"
                 class="class-items__group"
             >
@@ -26,7 +25,7 @@
                     <class-link
                         v-for="el in group.list"
                         :key="el.url"
-                        :after-search="!!search"
+                        :after-search="!!filter.search"
                         :class-item="el"
                         :to="{ path: el.url }"
                     />
@@ -36,100 +35,80 @@
     </content-layout>
 </template>
 
-<script>
-    import sortBy from "lodash/sortBy";
-    import groupBy from "lodash/groupBy";
-    import debounce from "lodash/debounce";
+<script lang="ts">
+    import { useRoute } from 'vue-router';
     import {
-        mapActions, mapState
-    } from "pinia";
-    import isArray from "lodash/isArray";
+        computed, defineComponent, onBeforeUnmount
+    } from 'vue';
+    import { tryOnBeforeMount, useDebounceFn } from '@vueuse/core';
+    import { storeToRefs } from 'pinia';
     import { useUIStore } from "@/store/UI/UIStore";
     import ClassLink from "@/views/Character/Classes/ClassLink.vue";
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useClassesStore } from '@/store/Character/ClassesStore';
+    import { useFilter } from '@/common/composition/useFilter';
+    import { ClassesFilterDefaults } from '@/enums/Character/ClassesEnum';
+    import type { ListQuery } from '@/types/DefaultTypes';
 
-    export default {
+    export default defineComponent({
         name: 'ClassesView',
         components: {
             ClassLink,
             ContentLayout
         },
-        async beforeRouteEnter(to, from, next) {
-            const store = useClassesStore();
+        setup() {
+            const uiStore = useUIStore();
+            const classesStore = useClassesStore();
+            const route = useRoute();
+            const filter = useFilter();
 
-            await store.initFilter();
-            await store.initClasses();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
+            const { sortedClasses } = storeToRefs(classesStore);
 
-            next();
-        },
-        data: () => ({
-            search: '',
-            classesStore: useClassesStore()
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile', 'fullscreen']),
+            const initFilter = async () => {
+                await filter.initFilter({
+                    dbName: ClassesFilterDefaults.dbName,
+                    url: ClassesFilterDefaults.url
+                });
+            };
 
-            classes() {
-                const classes = this.classesStore.classes || [];
+            const classesQuery = async () => {
+                const options: ListQuery = {
+                    search: {
+                        exact: false,
+                        value: filter.search.value
+                    }
+                };
 
-                if (!classes?.length) {
-                    return [];
+                if (filter.isCustomized.value) {
+                    options.filter = filter.queryParams.value;
                 }
 
-                const groups = sortBy(
-                    Object.values(groupBy(
-                        classes.filter(item => 'group' in item),
-                        o => o.group.name
-                    )).map(list => ({
-                        group: list[0].group,
-                        list: sortBy(list, [o => o.name.rus])
-                    })),
-                    [o => o.group.order]
-                );
+                await classesStore.classesQuery(options);
+            };
 
-                const sorted = [
-                    {
-                        list: sortBy(classes.filter(item => !('group' in item)), [o => o.name.rus])
-                    }
-                ];
+            tryOnBeforeMount(async () => {
+                await initFilter();
+                await classesQuery();
+            });
 
-                if (isArray(groups) && groups.length) {
-                    for (let i = 0; i < groups.length; i++) {
-                        sorted.push(groups[i]);
-                    }
-                }
+            onBeforeUnmount(() => {
+                classesStore.clearStore();
+            });
 
-                return sorted;
-            },
-
-            showRightSide() {
-                return this.$route.name === 'classDetail';
-            }
-        },
-        beforeUnmount() {
-            this.clearStore();
-        },
-        methods: {
-            ...mapActions(useClassesStore, [
-                'initFilter',
-                'initClasses',
-                'nextPage',
-                'clearStore'
-            ]),
-
-            async classesQuery() {
-                await this.initClasses();
-            },
-
-            // eslint-disable-next-line func-names
-            onSearch: debounce(async function(e) {
-                await this.classesQuery();
-
-                this.search = e;
-            }, 300)
+            return {
+                isMobile,
+                fullscreen,
+                sortedClasses,
+                showRightSide: computed(() => route.name === 'classDetail'),
+                onSearch: useDebounceFn(async () => {
+                    await classesQuery();
+                }, 300),
+                filter,
+                classesQuery
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

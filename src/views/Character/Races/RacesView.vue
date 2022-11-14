@@ -59,7 +59,12 @@
             };
 
             const initRaces = async () => {
-                const options: ListQuery = {};
+                const options: ListQuery = {
+                    search: {
+                        exact: false,
+                        value: filter.search.value
+                    }
+                };
 
                 if (filter.isCustomized.value) {
                     options.filter = filter.queryParams.value;

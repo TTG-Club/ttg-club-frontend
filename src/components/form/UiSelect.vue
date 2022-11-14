@@ -108,15 +108,17 @@
 </template>
 
 <script>
-    import Multiselect from 'vue-multiselect';
+    import Multiselect, { multiselectMixin } from 'vue-multiselect';
     import { defineComponent } from "vue";
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
+    // TODO: Создать свой селект компонент
     export default defineComponent({
         components: {
             Multiselect,
             SvgIcon
         },
+        mixins: [multiselectMixin],
         props: {
             modelValue: {
                 type: [
@@ -242,33 +244,6 @@
             'tag'
         ],
         methods: {
-            isEmpty(opt) {
-                if (opt === 0) return false;
-                if (Array.isArray(opt) && opt.length === 0) return true;
-
-                return !opt;
-            },
-
-            customLabel(option, label) {
-                if (this.isEmpty(option)) return '';
-
-                return label ? option[label] : option;
-            },
-
-            getOptionLabel(option) {
-                if (this.isEmpty(option)) return '';
-
-                if (option.isTag) return option.label;
-
-                if (option.$isLabel) return option.$groupLabel;
-
-                const label = this.customLabel(option, this.label);
-
-                if (this.isEmpty(label)) return '';
-
-                return label;
-            },
-
             onUpdate(event) {
                 this.$emit('update:model-value', event);
             },
