@@ -1,7 +1,7 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="booksStore.filter"
         :show-right-side="showRightSide"
         @search="booksQuery"
         @update="booksQuery"
@@ -54,11 +54,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             booksStore: useBooksStore(),
@@ -70,19 +67,15 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.booksStore.getFilter || undefined;
-            },
-
             books() {
                 const books = [];
                 const types = [];
 
-                if (!this.booksStore.getBooks) {
+                if (!this.booksStore.books) {
                     return books;
                 }
 
-                for (const book of this.booksStore.getBooks) {
+                for (const book of this.booksStore.books) {
                     if (types.find(obj => obj.name === book.type.name)) {
                         continue;
                     }
@@ -93,7 +86,7 @@
                 for (const type of sortBy(types, [o => o.order])) {
                     books.push({
                         name: type.name,
-                        list: this.booksStore.getBooks.filter(book => book.type.name === type.name)
+                        list: this.booksStore.books.filter(book => book.type.name === type.name)
                     });
                 }
 
@@ -115,13 +108,8 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
@@ -139,7 +127,7 @@
             },
 
             async init() {
-                await this.booksStore.initFilter(this.storeKey, this.customFilter);
+                await this.booksStore.initFilter(this.storeKey);
                 await this.booksStore.initBooks();
             },
 

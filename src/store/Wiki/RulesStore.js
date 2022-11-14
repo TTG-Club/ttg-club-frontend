@@ -1,40 +1,28 @@
 import { defineStore } from 'pinia';
-import cloneDeep from 'lodash/cloneDeep';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'rules';
 
 export const useRulesStore = defineStore('RulesStore', {
     state: () => ({
         rules: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
             end: false,
             url: '/rules'
         },
-        customFilter: undefined,
         controllers: {
             rulesQuery: undefined,
             ruleInfoQuery: undefined
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getRules: state => state.rules
-    },
-
     actions: {
-        async initFilter(storeKey, customFilter) {
+        async initFilter(storeKey) {
             try {
-                this.clearFilter();
-                this.clearCustomFilter();
-
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/rules'
@@ -44,12 +32,7 @@ export const useRulesStore = defineStore('RulesStore', {
                     filterOptions.storeKey = storeKey;
                 }
 
-                if (customFilter) {
-                    filterOptions.customFilter = customFilter;
-                    this.customFilter = cloneDeep(customFilter);
-                }
-
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -78,7 +61,7 @@ export const useRulesStore = defineStore('RulesStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -88,10 +71,6 @@ export const useRulesStore = defineStore('RulesStore', {
                     ],
                     ...options
                 };
-
-                if (this.customFilter) {
-                    apiOptions.customFilter = this.customFilter;
-                }
 
                 const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.rulesQuery.signal);
 
@@ -117,8 +96,8 @@ export const useRulesStore = defineStore('RulesStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const rules = await this.rulesQuery(config);
@@ -137,8 +116,8 @@ export const useRulesStore = defineStore('RulesStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const rules = await this.rulesQuery(config);
@@ -173,14 +152,6 @@ export const useRulesStore = defineStore('RulesStore', {
             this.rules = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
-        clearCustomFilter() {
-            this.customFilter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -192,7 +163,6 @@ export const useRulesStore = defineStore('RulesStore', {
 
         clearStore() {
             this.clearRules();
-            this.clearFilter();
             this.clearConfig();
         }
     }

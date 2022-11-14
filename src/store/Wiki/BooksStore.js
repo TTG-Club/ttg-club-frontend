@@ -1,40 +1,28 @@
 import { defineStore } from 'pinia';
-import cloneDeep from 'lodash/cloneDeep';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'books';
 
 export const useBooksStore = defineStore('BooksStore', {
     state: () => ({
         books: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
             end: false,
             url: '/books'
         },
-        customFilter: undefined,
         controllers: {
             booksQuery: undefined,
             bookInfoQuery: undefined
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getBooks: state => state.books
-    },
-
     actions: {
-        async initFilter(storeKey, customFilter) {
+        async initFilter(storeKey) {
             try {
-                this.clearFilter();
-                this.clearCustomFilter();
-
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/books'
@@ -44,12 +32,7 @@ export const useBooksStore = defineStore('BooksStore', {
                     filterOptions.storeKey = storeKey;
                 }
 
-                if (customFilter) {
-                    filterOptions.customFilter = customFilter;
-                    this.customFilter = cloneDeep(customFilter);
-                }
-
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -78,7 +61,7 @@ export const useBooksStore = defineStore('BooksStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -88,10 +71,6 @@ export const useBooksStore = defineStore('BooksStore', {
                     ],
                     ...options
                 };
-
-                if (this.customFilter) {
-                    apiOptions.customFilter = this.customFilter;
-                }
 
                 const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.booksQuery.signal);
 
@@ -117,8 +96,8 @@ export const useBooksStore = defineStore('BooksStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const books = await this.booksQuery(config);
@@ -137,8 +116,8 @@ export const useBooksStore = defineStore('BooksStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const books = await this.booksQuery(config);
@@ -173,14 +152,6 @@ export const useBooksStore = defineStore('BooksStore', {
             this.books = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
-        clearCustomFilter() {
-            this.customFilter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -192,7 +163,6 @@ export const useBooksStore = defineStore('BooksStore', {
 
         clearStore() {
             this.clearBooks();
-            this.clearFilter();
             this.clearConfig();
         }
     }

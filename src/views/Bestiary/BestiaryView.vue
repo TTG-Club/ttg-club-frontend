@@ -1,14 +1,14 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="bestiaryStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="bestiaryQuery"
         @list-end="nextPage"
     >
         <creature-link
-            v-for="creature in bestiary"
+            v-for="creature in bestiaryStore.bestiary"
             :key="creature.url"
             :creature="creature"
             :in-tab="inTab"
@@ -41,10 +41,6 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
         },
         data: () => ({
@@ -56,14 +52,6 @@
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
-
-            filter() {
-                return this.bestiaryStore.getFilter || undefined;
-            },
-
-            bestiary() {
-                return this.bestiaryStore.getBestiary || [];
-            },
 
             showRightSide() {
                 return this.$route.name === 'creatureDetail';
@@ -80,18 +68,12 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
         },
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.bestiary.length && this.$route.name === 'bestiary') {
+            if (!this.isMobile && this.bestiaryStore.bestiary.length && this.$route.name === 'bestiary') {
                 await this.$router.push({ path: this.bestiary[0].url });
             }
         },
@@ -100,7 +82,7 @@
         },
         methods: {
             async init() {
-                await this.bestiaryStore.initFilter(this.storeKey, this.customFilter);
+                await this.bestiaryStore.initFilter(this.storeKey);
                 await this.bestiaryStore.initBestiary();
             },
 
@@ -115,8 +97,8 @@
             async onSearch() {
                 await this.bestiaryStore.initBestiary();
 
-                if (this.bestiary.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.bestiary[0].url });
+                if (this.bestiaryStore.bestiary.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.bestiaryStore.bestiary[0].url });
                 }
             }
         }

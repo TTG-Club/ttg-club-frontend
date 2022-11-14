@@ -1,6 +1,6 @@
 <template>
     <content-layout
-        :filter-instance="filter"
+        :filter-instance="classesStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="classesQuery"
@@ -64,18 +64,14 @@
             next();
         },
         data: () => ({
-            search: ''
+            search: '',
+            classesStore: useClassesStore()
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile', 'fullscreen']),
-            ...mapState(useClassesStore, ['getClasses', 'getFilter']),
-
-            filter() {
-                return this.getFilter || undefined;
-            },
 
             classes() {
-                const classes = this.getClasses || [];
+                const classes = this.classesStore.classes || [];
 
                 if (!classes?.length) {
                     return [];

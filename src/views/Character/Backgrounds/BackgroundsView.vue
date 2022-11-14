@@ -1,13 +1,13 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="backgroundsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="backgroundsQuery"
     >
         <background-link
-            v-for="background in backgrounds"
+            v-for="background in backgroundsStore.backgrounds"
             :key="background.url"
             :background-item="background"
             :in-tab="inTab"
@@ -52,14 +52,6 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.backgroundsStore.getFilter || undefined;
-            },
-
-            backgrounds() {
-                return this.backgroundsStore.getBackgrounds || [];
-            },
-
             showRightSide() {
                 return this.$route.name === 'backgroundDetail';
             },
@@ -74,8 +66,8 @@
             await this.backgroundsStore.initFilter(this.storeKey);
             await this.backgroundsStore.initBackgrounds();
 
-            if (!this.isMobile && this.backgrounds.length && this.$route.name === 'backgrounds') {
-                await this.$router.push({ path: this.backgrounds[0].url });
+            if (!this.isMobile && this.backgroundsStore.backgrounds.length && this.$route.name === 'backgrounds') {
+                await this.$router.push({ path: this.backgroundsStore.backgrounds[0].url });
             }
         },
         beforeUnmount() {
@@ -89,8 +81,8 @@
             async onSearch() {
                 this.backgroundsQuery();
 
-                if (this.backgrounds.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.backgrounds[0].url });
+                if (this.backgroundsStore.backgrounds.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.backgroundsStore.backgrounds[0].url });
                 }
             }
         }

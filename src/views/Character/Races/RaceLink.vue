@@ -126,7 +126,7 @@
     import {
         useLink, useRoute, useRouter
     } from 'vue-router';
-    import type { TRaceLink } from '@/types/Character/Races';
+    import type { TRaceLink } from '@/views/Character/Races/Races';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from "@/store/UI/UIStore";
     import { AbilityType } from '@/enums/Tools/AbilityCalcEnum';

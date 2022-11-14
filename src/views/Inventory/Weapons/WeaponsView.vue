@@ -1,7 +1,7 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="weaponsStore.filter"
         :show-right-side="showRightSide"
         @search="weaponsQuery"
         @update="weaponsQuery"
@@ -48,11 +48,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             weaponsStore: useWeaponsStore(),
@@ -64,19 +61,15 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.weaponsStore.getFilter || undefined;
-            },
-
             weapons() {
                 const weapons = [];
                 const types = [];
 
-                if (!this.weaponsStore.getWeapons) {
+                if (!this.weaponsStore.weapons) {
                     return weapons;
                 }
 
-                for (const weapon of this.weaponsStore.getWeapons) {
+                for (const weapon of this.weaponsStore.weapons) {
                     if (types.find(obj => obj.name === weapon.type.name)) {
                         continue;
                     }
@@ -87,7 +80,7 @@
                 for (const type of sortBy(types, [o => o.order])) {
                     weapons.push({
                         name: type.name,
-                        list: this.weaponsStore.getWeapons.filter(weapon => weapon.type.name === type.name)
+                        list: this.weaponsStore.weapons.filter(weapon => weapon.type.name === type.name)
                     });
                 }
 
@@ -109,19 +102,14 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.weapons[0]?.list?.length && this.$route.name === 'weapons') {
-                await this.$router.push({ path: this.weapons[0].list[0].url });
+            if (!this.isMobile && this.weaponsStore.weapons[0]?.list?.length && this.$route.name === 'weapons') {
+                await this.$router.push({ path: this.weaponsStore.weapons[0].list[0].url });
             }
         },
         beforeUnmount() {
@@ -129,7 +117,7 @@
         },
         methods: {
             async init() {
-                await this.weaponsStore.initFilter(this.storeKey, this.customFilter);
+                await this.weaponsStore.initFilter(this.storeKey);
                 await this.weaponsStore.initWeapons();
             },
 

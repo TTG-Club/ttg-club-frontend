@@ -3,14 +3,14 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import isArray from 'lodash/isArray';
 import errorHandler from '@/common/helpers/errorHandler';
-import FilterService from '@/common/services/FilterService';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'classes';
 
 export const useClassesStore = defineStore('ClassesStore', {
     state: () => ({
         classes: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             url: '/classes'
@@ -21,16 +21,9 @@ export const useClassesStore = defineStore('ClassesStore', {
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getClasses: state => state.classes
-    },
-
     actions: {
         async initFilter(storeKey, url) {
             try {
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/classes'
@@ -44,7 +37,7 @@ export const useClassesStore = defineStore('ClassesStore', {
                     filterOptions.url = url;
                 }
 
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -73,7 +66,7 @@ export const useClassesStore = defineStore('ClassesStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -129,8 +122,8 @@ export const useClassesStore = defineStore('ClassesStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             this.classes = await this.classesQuery(config);
@@ -146,7 +139,7 @@ export const useClassesStore = defineStore('ClassesStore', {
 
                 const { data } = await this.$http.post(
                     url,
-                    { filter: this.filter.getQueryParams },
+                    { filter: this.filter.queryParams.value },
                     this.controllers.classInfoQuery.signal
                 );
 
@@ -178,10 +171,6 @@ export const useClassesStore = defineStore('ClassesStore', {
             this.classes = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -191,7 +180,6 @@ export const useClassesStore = defineStore('ClassesStore', {
 
         clearStore() {
             this.clearClasses();
-            this.clearFilter();
             this.clearConfig();
         }
     }

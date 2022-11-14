@@ -46,58 +46,48 @@ export default class HTTPService {
         });
     }
 
-    get(url: AxiosRequestConfig['url'], params: AxiosRequestConfig['params']) {
-        const config = {
+    get(url: AxiosRequestConfig['url'], params?: AxiosRequestConfig['params']) {
+        return this.instance({
             url,
             params,
             method: 'get'
-        };
-
-        return this.instance(config);
+        });
     }
 
-    post(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
+    post(url: AxiosRequestConfig['url'], data?: AxiosRequestConfig['data'], signal = new AbortController().signal) {
+        return this.instance({
             url,
             data,
             signal,
             method: 'post'
-        };
-
-        return this.instance(config);
+        });
     }
 
-    put(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
+    put(url: AxiosRequestConfig['url'], data?: AxiosRequestConfig['data'], signal = new AbortController().signal) {
+        return this.instance({
             url,
             data,
             signal,
             method: 'put'
-        };
-
-        return this.instance(config);
+        });
     }
 
-    patch(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
+    patch(url: AxiosRequestConfig['url'], data?: AxiosRequestConfig['data'], signal = new AbortController().signal) {
+        return this.instance({
             url,
             data,
             signal,
             method: 'patch'
-        };
-
-        return this.instance(config);
+        });
     }
 
-    delete(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
+    delete(url: AxiosRequestConfig['url'], data?: AxiosRequestConfig['data'], signal = new AbortController().signal) {
+        return this.instance({
             url,
             data,
             signal,
             method: 'delete'
-        };
-
-        return this.instance(config);
+        });
     }
 
     rawGet(url: AxiosRequestConfig['url'], params?: AxiosRequestConfig['params']) {

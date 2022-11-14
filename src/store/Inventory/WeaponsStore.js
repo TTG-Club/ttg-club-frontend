@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'weapons';
 
 export const useWeaponsStore = defineStore('WeaponsStore', {
     state: () => ({
         weapons: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             url: '/weapons'
@@ -18,16 +18,9 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getWeapons: state => state.weapons
-    },
-
     actions: {
         async initFilter(storeKey, url) {
             try {
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/weapons'
@@ -41,7 +34,7 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
                     filterOptions.url = url;
                 }
 
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -70,7 +63,7 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -108,8 +101,8 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
                 page: this.config.page
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             this.weapons = await this.weaponsQuery(config);
@@ -139,10 +132,6 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
             this.weapons = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -152,7 +141,6 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
 
         clearStore() {
             this.clearWeapons();
-            this.clearFilter();
             this.clearConfig();
         }
     }

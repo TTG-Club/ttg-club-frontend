@@ -178,7 +178,7 @@
             ...mapState(useUIStore, ['isMobile']),
 
             classes() {
-                return this.classesStore.getClasses || [];
+                return this.classesStore.classes || [];
             },
 
             getStoreKey() {
@@ -187,7 +187,7 @@
             },
 
             getClassesBooks() {
-                return this.classesStore.getFilter?.getQueryParams?.book || undefined;
+                return this.classesStore.filter?.queryParams.value?.book || undefined;
             },
 
             currentSelectArchetype() {

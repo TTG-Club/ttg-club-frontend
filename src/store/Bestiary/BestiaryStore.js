@@ -1,40 +1,28 @@
 import { defineStore } from 'pinia';
-import cloneDeep from 'lodash/cloneDeep';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'bestiary';
 
 export const useBestiaryStore = defineStore('BestiaryStore', {
     state: () => ({
         bestiary: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
             end: false,
             url: '/bestiary'
         },
-        customFilter: undefined,
         controllers: {
             bestiaryQuery: undefined,
             creatureInfoQuery: undefined
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getBestiary: state => state.bestiary
-    },
-
     actions: {
-        async initFilter(storeKey, customFilter) {
+        async initFilter(storeKey) {
             try {
-                this.clearFilter();
-                this.clearCustomFilter();
-
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/bestiary'
@@ -44,27 +32,12 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
                     filterOptions.storeKey = storeKey;
                 }
 
-                if (customFilter) {
-                    filterOptions.customFilter = customFilter;
-                    this.customFilter = cloneDeep(customFilter);
-                }
-
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
         },
 
-        /**
-         * @param {{}} options
-         * @param {number} options.page
-         * @param {number} options.limit
-         * @param {object} options.filter
-         * @param {boolean} options.search.exact
-         * @param {string} options.search.value
-         * @param {{field: string, direction: 'asc' | 'desc'}[]} options.order
-         * @returns {Promise<*[]>}
-         */
         async bestiaryQuery(options = {}) {
             try {
                 if (this.controllers.bestiaryQuery) {
@@ -78,7 +51,7 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -92,10 +65,6 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
                     ],
                     ...options
                 };
-
-                if (this.customFilter) {
-                    apiOptions.customFilter = this.customFilter;
-                }
 
                 const resp = await this.$http.post(
                     this.config.url,
@@ -125,8 +94,8 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const bestiary = await this.bestiaryQuery(config);
@@ -145,8 +114,8 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const bestiary = await this.bestiaryQuery(config);
@@ -181,14 +150,6 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
             this.bestiary = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
-        clearCustomFilter() {
-            this.customFilter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -200,7 +161,6 @@ export const useBestiaryStore = defineStore('BestiaryStore', {
 
         clearStore() {
             this.clearBestiary();
-            this.clearFilter();
             this.clearConfig();
         }
     }

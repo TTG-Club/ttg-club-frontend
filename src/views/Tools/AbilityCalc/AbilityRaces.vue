@@ -14,7 +14,7 @@
 <script lang="ts">
     import { defineComponent, onMounted } from 'vue';
     import { storeToRefs } from 'pinia';
-    import type { TRaceLink } from '@/types/Character/Races';
+    import type { TRaceLink } from '@/views/Character/Races/Races';
     import { useRacesStore } from '@/store/Character/RacesStore';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
 

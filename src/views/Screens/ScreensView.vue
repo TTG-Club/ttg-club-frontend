@@ -1,6 +1,5 @@
 <template>
     <content-layout
-        :filter-instance="getFilter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @list-end="nextPage"
@@ -10,7 +9,7 @@
             :class="{ 'is-selected': showRightSide }"
         >
             <router-link
-                v-for="screen in getScreens"
+                v-for="screen in screensStore.screens"
                 :key="screen.url"
                 class="screen-item"
                 :to="screen.url"
@@ -38,16 +37,17 @@
     export default {
         name: "ScreensView",
         components: { ContentLayout },
+        data: () => ({
+            screensStore: useScreensStore()
+        }),
         computed: {
             ...mapState(useUIStore, ['isMobile', 'fullscreen']),
-            ...mapState(useScreensStore, ['getScreens', 'getFilter']),
 
             showRightSide() {
                 return this.$route.name === 'screenDetail';
             }
         },
         async mounted() {
-            await this.initFilter();
             await this.initScreens();
         },
         beforeUnmount() {
@@ -55,7 +55,6 @@
         },
         methods: {
             ...mapActions(useScreensStore, [
-                'initFilter',
                 'initScreens',
                 'nextPage',
                 'clearStore'
@@ -68,8 +67,8 @@
             async onSearch() {
                 await this.screensQuery();
 
-                if (this.getScreens.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.getScreens[0].url });
+                if (this.screensStore.screens.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.screensStore.screens[0].url });
                 }
             }
         }

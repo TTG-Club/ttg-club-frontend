@@ -1,14 +1,14 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="godsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="godsQuery"
         @list-end="nextPage"
     >
         <god-link
-            v-for="god in gods"
+            v-for="god in godsStore.gods"
             :key="god.url"
             :god="god"
             :in-tab="inTab"
@@ -41,11 +41,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             godsStore: useGodsStore(),
@@ -56,14 +53,6 @@
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
-
-            filter() {
-                return this.godsStore.getFilter || undefined;
-            },
-
-            gods() {
-                return this.godsStore.getGods || [];
-            },
 
             showRightSide() {
                 return this.$route.name === 'godDetail';
@@ -80,19 +69,14 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.gods.length && this.$route.name === 'gods') {
-                await this.$router.push({ path: this.gods[0].url });
+            if (!this.isMobile && this.godsStore.gods.length && this.$route.name === 'gods') {
+                await this.$router.push({ path: this.godsStore.gods[0].url });
             }
         },
         beforeUnmount() {
@@ -100,7 +84,7 @@
         },
         methods: {
             async init() {
-                await this.godsStore.initFilter(this.storeKey, this.customFilter);
+                await this.godsStore.initFilter(this.storeKey);
                 await this.godsStore.initGods();
             },
 
@@ -115,8 +99,8 @@
             async onSearch() {
                 await this.godsQuery();
 
-                if (this.gods.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.gods[0].url });
+                if (this.godsStore.gods.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.godsStore.gods[0].url });
                 }
             }
         }

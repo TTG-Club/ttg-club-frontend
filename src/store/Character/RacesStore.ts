@@ -3,10 +3,10 @@ import isArray from 'lodash/isArray';
 import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import { computed, ref } from 'vue';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
-import type { TRaceLink } from '@/types/Character/Races';
+import type { TRaceLink } from '@/views/Character/Races/Races';
 import { useAxios } from '@/common/composition/useAxios';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'races';
 
@@ -27,7 +27,7 @@ type TQuery = {
 export const useRacesStore = defineStore('RacesStore', () => {
     const http = useAxios();
     const races = ref<Array<TRaceLink>>([]);
-    const filter = ref<FilterService | undefined>(undefined);
+    const filter = useFilter();
 
     const config = ref<{
         page: number
@@ -70,10 +70,6 @@ export const useRacesStore = defineStore('RacesStore', () => {
         races.value = [];
     };
 
-    const clearFilter = () => {
-        filter.value = undefined;
-    };
-
     const clearConfig = () => {
         config.value = {
             page: 0,
@@ -85,14 +81,11 @@ export const useRacesStore = defineStore('RacesStore', () => {
 
     const clearStore = () => {
         clearRaces();
-        clearFilter();
         clearConfig();
     };
 
     const initFilter = async (storeKey?: string, url?: string) => {
         try {
-            filter.value = new FilterService();
-
             const filterOptions: {
                 dbName: typeof DB_NAME
                 url: '/filters/races' | string
@@ -111,7 +104,7 @@ export const useRacesStore = defineStore('RacesStore', () => {
                 filterOptions.url = url;
             }
 
-            await filter.value.init(filterOptions);
+            await filter.initFilter(filterOptions);
         } catch (err) {
             errorHandler(err);
         }
@@ -130,7 +123,7 @@ export const useRacesStore = defineStore('RacesStore', () => {
                 limit: -1,
                 search: {
                     exact: false,
-                    value: filter.value?.getSearchState || ''
+                    value: filter.search.value || ''
                 },
                 order: [
                     {
@@ -168,8 +161,8 @@ export const useRacesStore = defineStore('RacesStore', () => {
             limit: config.value.limit
         };
 
-        if (filter.value && filter.value.isCustomized) {
-            configObj.filter = filter.value.getQueryParams;
+        if (filter.isCustomized.value) {
+            configObj.filter = filter.queryParams.value;
         }
 
         races.value = await racesQuery(configObj);
@@ -186,8 +179,8 @@ export const useRacesStore = defineStore('RacesStore', () => {
             limit: config.value.limit
         };
 
-        if (filter.value && filter.value.isCustomized) {
-            configObj.filter = filter.value.getQueryParams;
+        if (filter.isCustomized.value) {
+            configObj.filter = filter.queryParams.value;
         }
 
         const racesList = await racesQuery(configObj);
@@ -231,7 +224,6 @@ export const useRacesStore = defineStore('RacesStore', () => {
         nextPage,
         raceInfoQuery,
         clearRaces,
-        clearFilter,
         clearConfig,
         clearStore
     };

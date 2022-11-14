@@ -1,14 +1,14 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="spellsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="spellsQuery"
         @list-end="nextPage"
     >
         <spell-link
-            v-for="spell in spells"
+            v-for="spell in spellsStore.spells"
             :key="spell.url"
             :in-tab="inTab"
             :spell="spell"
@@ -61,14 +61,6 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.spellsStore.getFilter || undefined;
-            },
-
-            spells() {
-                return this.spellsStore.getSpells || [];
-            },
-
             showRightSide() {
                 return this.$route.name === 'spellDetail';
             },
@@ -80,7 +72,10 @@
             },
 
             useAutoOpenFirst() {
-                return !this.isMobile && !!this.spells.length && this.$route.name === 'spells' && !this.inTab;
+                return !this.isMobile
+                    && !!this.spellsStore.spells.length
+                    && this.$route.name === 'spells'
+                    && !this.inTab;
             }
         },
         watch: {
@@ -105,7 +100,7 @@
             await this.init();
 
             if (this.useAutoOpenFirst) {
-                await this.$router.push({ path: this.spells[0].url });
+                await this.$router.push({ path: this.spellsStore.spells[0].url });
             }
         },
         beforeUnmount() {
@@ -128,8 +123,8 @@
             async onSearch() {
                 await this.spellsStore.initSpells(this.books);
 
-                if (this.spells.length === 1 && this.useAutoOpenFirst) {
-                    await this.$router.push({ path: this.spells[0].url });
+                if (this.spellsStore.spells.length === 1 && this.useAutoOpenFirst) {
+                    await this.$router.push({ path: this.spellsStore.spells[0].url });
                 }
             }
         }

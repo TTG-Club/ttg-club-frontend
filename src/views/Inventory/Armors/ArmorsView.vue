@@ -48,11 +48,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             armorsStore: useArmorsStore(),
@@ -64,19 +61,15 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.armorsStore.getFilter || undefined;
-            },
-
             armors() {
                 const armors = [];
                 const types = [];
 
-                if (!this.armorsStore.getArmors) {
+                if (!this.armorsStore.armors) {
                     return armors;
                 }
 
-                for (const armor of this.armorsStore.getArmors) {
+                for (const armor of this.armorsStore.armors) {
                     if (types.find(obj => obj.name === armor.type.name)) {
                         continue;
                     }
@@ -87,7 +80,7 @@
                 for (const type of sortBy(types, [o => o.order])) {
                     armors.push({
                         name: type.name,
-                        list: this.armorsStore.getArmors.filter(armor => armor.type.name === type.name)
+                        list: this.armorsStore.armors.filter(armor => armor.type.name === type.name)
                     });
                 }
 
@@ -109,13 +102,8 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
@@ -129,7 +117,7 @@
         },
         methods: {
             async init() {
-                await this.armorsStore.initFilter(this.storeKey, this.customFilter);
+                await this.armorsStore.initFilter(this.storeKey);
                 await this.armorsStore.initArmors();
             },
 

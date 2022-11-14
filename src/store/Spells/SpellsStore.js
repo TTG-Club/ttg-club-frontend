@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
 import isArray from 'lodash/isArray';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'spells';
 
 export const useSpellsStore = defineStore('SpellsStore', {
     state: () => ({
         spells: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -21,19 +21,9 @@ export const useSpellsStore = defineStore('SpellsStore', {
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getSpells: state => state.spells
-    },
-
     actions: {
         async initFilter(storeKey, url) {
             try {
-                this.clearFilter();
-                this.clearCustomFilter();
-
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: url || '/filters/spells'
@@ -43,7 +33,7 @@ export const useSpellsStore = defineStore('SpellsStore', {
                     filterOptions.storeKey = storeKey;
                 }
 
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -72,7 +62,7 @@ export const useSpellsStore = defineStore('SpellsStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -111,8 +101,8 @@ export const useSpellsStore = defineStore('SpellsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             if (isArray(books) && books.length) {
@@ -135,8 +125,8 @@ export const useSpellsStore = defineStore('SpellsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             if (isArray(books) && books.length) {
@@ -175,14 +165,6 @@ export const useSpellsStore = defineStore('SpellsStore', {
             this.spells = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
-        clearCustomFilter() {
-            this.customFilter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -194,7 +176,6 @@ export const useSpellsStore = defineStore('SpellsStore', {
 
         clearStore() {
             this.clearSpells();
-            this.clearFilter();
             this.clearConfig();
         }
     }

@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'armors';
 
 export const useArmorsStore = defineStore('ArmorsStore', {
     state: () => ({
         armors: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             url: '/armors'
@@ -18,16 +18,9 @@ export const useArmorsStore = defineStore('ArmorsStore', {
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getArmors: state => state.armors
-    },
-
     actions: {
         async initFilter(storeKey, url) {
             try {
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/armors'
@@ -41,7 +34,7 @@ export const useArmorsStore = defineStore('ArmorsStore', {
                     filterOptions.url = url;
                 }
 
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -70,7 +63,7 @@ export const useArmorsStore = defineStore('ArmorsStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -108,8 +101,8 @@ export const useArmorsStore = defineStore('ArmorsStore', {
                 page: this.config.page
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             this.armors = await this.armorsQuery(config);
@@ -139,10 +132,6 @@ export const useArmorsStore = defineStore('ArmorsStore', {
             this.armors = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -152,7 +141,6 @@ export const useArmorsStore = defineStore('ArmorsStore', {
 
         clearStore() {
             this.clearArmors();
-            this.clearFilter();
             this.clearConfig();
         }
     }

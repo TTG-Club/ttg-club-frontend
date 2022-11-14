@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
 import isArray from 'lodash/isArray';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'options';
 
 export const useOptionsStore = defineStore('OptionsStore', {
     state: () => ({
         options: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             limit: -1,
@@ -21,19 +21,9 @@ export const useOptionsStore = defineStore('OptionsStore', {
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getOptions: state => state.options
-    },
-
     actions: {
         async initFilter(storeKey, url) {
             try {
-                this.clearFilter();
-                this.clearCustomFilter();
-
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: url || '/filters/options'
@@ -43,7 +33,7 @@ export const useOptionsStore = defineStore('OptionsStore', {
                     filterOptions.storeKey = storeKey;
                 }
 
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -72,7 +62,7 @@ export const useOptionsStore = defineStore('OptionsStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -107,8 +97,8 @@ export const useOptionsStore = defineStore('OptionsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             if (isArray(books) && books.length) {
@@ -131,8 +121,8 @@ export const useOptionsStore = defineStore('OptionsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const options = await this.optionsQuery(config);
@@ -167,14 +157,6 @@ export const useOptionsStore = defineStore('OptionsStore', {
             this.options = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
-        clearCustomFilter() {
-            this.customFilter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -186,7 +168,6 @@ export const useOptionsStore = defineStore('OptionsStore', {
 
         clearStore() {
             this.clearOptions();
-            this.clearFilter();
             this.clearConfig();
         }
     }

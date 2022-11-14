@@ -1,13 +1,13 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="optionsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="optionsQuery"
     >
         <option-link
-            v-for="option in options"
+            v-for="option in optionsStore.options"
             :key="option.url"
             :in-tab="inTab"
             :option-item="option"
@@ -60,14 +60,6 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.optionsStore.getFilter || undefined;
-            },
-
-            options() {
-                return this.optionsStore.getOptions || [];
-            },
-
             showRightSide() {
                 return this.$route.name === 'optionDetail';
             },
@@ -79,7 +71,10 @@
             },
 
             useAutoOpenFirst() {
-                return !this.isMobile && !!this.options.length && this.$route.name === 'options' && !this.inTab;
+                return !this.isMobile
+                    && !!this.optionsStore.options.length
+                    && this.$route.name === 'options'
+                    && !this.inTab;
             }
         },
         watch: {
@@ -103,8 +98,8 @@
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.options.length && this.$route.name === 'options' && !this.inTab) {
-                await this.$router.push({ path: this.options[0].url });
+            if (!this.isMobile && this.optionsStore.options.length && this.$route.name === 'options' && !this.inTab) {
+                await this.$router.push({ path: this.optionsStore.options[0].url });
             }
         },
         beforeUnmount() {
@@ -123,8 +118,8 @@
             async onSearch() {
                 await this.optionsQuery();
 
-                if (this.options.length === 1 && this.useAutoOpenFirst) {
-                    await this.$router.push({ path: this.options[0].url });
+                if (this.optionsStore.options.length === 1 && this.useAutoOpenFirst) {
+                    await this.$router.push({ path: this.optionsStore.options[0].url });
                 }
             }
         }

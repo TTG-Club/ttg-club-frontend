@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
 
 export const useScreensStore = defineStore('ScreensStore', {
     state: () => ({
         screens: [],
-        filter: undefined,
         config: {
             page: 0,
             limit: 70,
@@ -18,16 +16,7 @@ export const useScreensStore = defineStore('ScreensStore', {
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getScreens: state => state.screens
-    },
-
     actions: {
-        initFilter() {
-            this.filter = new FilterService();
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -51,7 +40,7 @@ export const useScreensStore = defineStore('ScreensStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -94,10 +83,6 @@ export const useScreensStore = defineStore('ScreensStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
-            }
-
             const screens = await this.screensQuery(config);
 
             this.screens = screens;
@@ -113,10 +98,6 @@ export const useScreensStore = defineStore('ScreensStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
-            }
 
             const screens = await this.screensQuery(config);
 
@@ -150,10 +131,6 @@ export const useScreensStore = defineStore('ScreensStore', {
             this.screens = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -165,7 +142,6 @@ export const useScreensStore = defineStore('ScreensStore', {
 
         clearStore() {
             this.clearScreens();
-            this.clearFilter();
             this.clearConfig();
         }
     }

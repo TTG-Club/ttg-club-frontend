@@ -1,14 +1,14 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="itemsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="itemsQuery"
         @list-end="nextPage"
     >
         <item-link
-            v-for="item in items"
+            v-for="item in itemsStore.items"
             :key="item.url"
             :in-tab="inTab"
             :item-item="item"
@@ -41,11 +41,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             itemsStore: useItemsStore(),
@@ -56,14 +53,6 @@
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
-
-            filter() {
-                return this.itemsStore.getFilter || undefined;
-            },
-
-            items() {
-                return this.itemsStore.getItems || [];
-            },
 
             showRightSide() {
                 return this.$route.name === 'itemDetail';
@@ -80,19 +69,14 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.items.length && this.$route.name === 'items') {
-                await this.$router.push({ path: this.items[0].url });
+            if (!this.isMobile && this.itemsStore.items.length && this.$route.name === 'items') {
+                await this.$router.push({ path: this.itemsStore.items[0].url });
             }
         },
         beforeUnmount() {
@@ -104,7 +88,7 @@
             },
 
             async init() {
-                await this.itemsStore.initFilter(this.storeKey, this.customFilter);
+                await this.itemsStore.initFilter(this.storeKey);
                 await this.itemsStore.initItems();
             },
 
@@ -115,8 +99,8 @@
             async onSearch() {
                 await this.itemsQuery();
 
-                if (this.items.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.items[0].url });
+                if (this.itemsStore.items.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.itemsStore.items[0].url });
                 }
             }
         }

@@ -41,11 +41,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             rulesStore: useRulesStore(),
@@ -56,14 +53,6 @@
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
-
-            filter() {
-                return this.rulesStore.getFilter || undefined;
-            },
-
-            rules() {
-                return this.rulesStore.getRules || [];
-            },
 
             showRightSide() {
                 return this.$route.name === 'ruleDetail';
@@ -80,19 +69,14 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.rules.length && this.$route.name === 'rules') {
-                await this.$router.push({ path: this.rules[0].url });
+            if (!this.isMobile && this.rulesStore.rules.length && this.$route.name === 'rules') {
+                await this.$router.push({ path: this.rulesStore.rules[0].url });
             }
         },
         beforeUnmount() {
@@ -104,7 +88,7 @@
             },
 
             async init() {
-                await this.rulesStore.initFilter(this.storeKey, this.customFilter);
+                await this.rulesStore.initFilter(this.storeKey);
                 await this.rulesStore.initRules();
             },
 
@@ -115,8 +99,8 @@
             async onSearch() {
                 await this.rulesQuery();
 
-                if (this.rules.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.rules[0].url });
+                if (this.rulesStore.rules.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.rulesStore.rules[0].url });
                 }
             }
         }

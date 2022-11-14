@@ -1,13 +1,13 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="treasuresStore.filter"
         @search="treasuresQuery"
         @update="treasuresQuery"
         @list-end="nextPage"
     >
         <treasure-item
-            v-for="(treasure, key) in treasures"
+            v-for="(treasure, key) in treasuresStore.treasures"
             :key="treasure.name.eng + key"
             :in-tab="inTab"
             :treasure="treasure"
@@ -37,11 +37,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             treasuresStore: useTreasuresStore(),
@@ -51,13 +48,6 @@
             }
         }),
         computed: {
-            filter() {
-                return this.treasuresStore.getFilter || undefined;
-            },
-
-            treasures() {
-                return this.treasuresStore.getTreasures || [];
-            },
 
             layout() {
                 return this.inTab
@@ -70,13 +60,8 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
@@ -86,7 +71,7 @@
         },
         methods: {
             async init() {
-                await this.treasuresStore.initFilter(this.storeKey, this.customFilter);
+                await this.treasuresStore.initFilter(this.storeKey);
                 await this.treasuresStore.initTreasures();
             },
 

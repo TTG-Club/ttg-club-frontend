@@ -1,14 +1,14 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="magicItemsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="magicItemsQuery"
         @list-end="nextPage"
     >
         <magic-item-link
-            v-for="item in magicItems"
+            v-for="item in magicItemsStore.items"
             :key="item.url"
             :in-tab="inTab"
             :magic-item="item"
@@ -43,11 +43,8 @@
             storeKey: {
                 type: String,
                 default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
             }
+
         },
         data: () => ({
             magicItemsStore: useMagicItemsStore(),
@@ -58,14 +55,6 @@
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
-
-            filter() {
-                return this.magicItemsStore.getFilter || undefined;
-            },
-
-            magicItems() {
-                return this.magicItemsStore.getItems || [];
-            },
 
             showRightSide() {
                 return this.$route.name === 'magicItemDetail';
@@ -82,19 +71,14 @@
                 async handler() {
                     await this.init();
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
-                }
             }
+
         },
         async mounted() {
             await this.init();
 
-            if (!this.isMobile && this.magicItems.length && this.$route.name === 'magicItems') {
-                await this.$router.push({ path: this.magicItems[0].url });
+            if (!this.isMobile && this.magicItemsStore.items.length && this.$route.name === 'magicItems') {
+                await this.$router.push({ path: this.magicItemsStore.items[0].url });
             }
         },
         beforeUnmount() {
@@ -102,7 +86,7 @@
         },
         methods: {
             async init() {
-                await this.magicItemsStore.initFilter(this.storeKey, this.customFilter);
+                await this.magicItemsStore.initFilter(this.storeKey);
                 await this.magicItemsStore.initItems();
             },
 
@@ -117,8 +101,8 @@
             async onSearch() {
                 await this.magicItemsQuery();
 
-                if (this.magicItems.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.magicItems[0].url });
+                if (this.magicItemsStore.items.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.magicItemsStore.items[0].url });
                 }
             }
         }

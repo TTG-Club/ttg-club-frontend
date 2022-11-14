@@ -1,40 +1,28 @@
 import { defineStore } from 'pinia';
-import cloneDeep from 'lodash/cloneDeep';
-import FilterService from '@/common/services/FilterService';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useFilter } from '@/common/composition/useFilter';
 
 const DB_NAME = 'items';
 
 export const useMagicItemsStore = defineStore('MagicItemsStore', {
     state: () => ({
         items: [],
-        filter: undefined,
+        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
             end: false,
             url: '/items/magic'
         },
-        customFilter: undefined,
         controllers: {
             itemsQuery: undefined,
             itemInfoQuery: undefined
         }
     }),
 
-    getters: {
-        getFilter: state => state.filter,
-        getItems: state => state.items
-    },
-
     actions: {
-        async initFilter(storeKey, customFilter) {
+        async initFilter(storeKey) {
             try {
-                this.clearFilter();
-                this.clearCustomFilter();
-
-                this.filter = new FilterService();
-
                 const filterOptions = {
                     dbName: DB_NAME,
                     url: '/filters/items/magic'
@@ -44,12 +32,7 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                     filterOptions.storeKey = storeKey;
                 }
 
-                if (customFilter) {
-                    filterOptions.customFilter = customFilter;
-                    this.customFilter = cloneDeep(customFilter);
-                }
-
-                await this.filter.init(filterOptions);
+                await this.filter.initFilter(filterOptions);
             } catch (err) {
                 errorHandler(err);
             }
@@ -78,7 +61,7 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                     limit: -1,
                     search: {
                         exact: false,
-                        value: this.filter?.getSearchState || ''
+                        value: this.filter.search || ''
                     },
                     order: [
                         {
@@ -92,10 +75,6 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                     ],
                     ...options
                 };
-
-                if (this.customFilter) {
-                    apiOptions.customFilter = this.customFilter;
-                }
 
                 const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.itemsQuery.signal);
 
@@ -121,8 +100,8 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const items = await this.itemsQuery(config);
@@ -141,8 +120,8 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter && this.filter.isCustomized) {
-                config.filter = this.filter.getQueryParams;
+            if (this.filter.isCustomized.value) {
+                config.filter = this.filter.queryParams.value;
             }
 
             const items = await this.itemsQuery(config);
@@ -177,14 +156,6 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
             this.items = [];
         },
 
-        clearFilter() {
-            this.filter = undefined;
-        },
-
-        clearCustomFilter() {
-            this.customFilter = undefined;
-        },
-
         clearConfig() {
             this.config = {
                 page: 0,
@@ -196,7 +167,6 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
 
         clearStore() {
             this.clearItems();
-            this.clearFilter();
             this.clearConfig();
         }
     }

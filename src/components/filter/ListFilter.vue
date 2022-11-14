@@ -97,17 +97,25 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
     import cloneDeep from "lodash/cloneDeep";
     import debounce from "lodash/debounce";
+    import {
+        computed, defineComponent, onBeforeUnmount, ref
+    } from 'vue';
+    import type {
+        PropType
+    } from 'vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
     import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
-    import FilterService from "@/common/services/FilterService";
     import errorHandler from "@/common/helpers/errorHandler";
     import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import type {
+        Filter, FilterComposable, FilterGroup, FilterItem
+    } from '@/common/composition/types/filter';
 
-    export default {
+    export default defineComponent({
         name: 'ListFilter',
         components: {
             BaseModal,
@@ -117,8 +125,7 @@
         },
         props: {
             filterInstance: {
-                type: FilterService,
-                default: undefined,
+                type: Object as PropType<FilterComposable>,
                 required: true
             },
             inTab: {
@@ -135,118 +142,125 @@
             'search',
             'update'
         ],
-        data: () => ({
-            showed: false
-        }),
-        computed: {
-            search: {
+        setup(props, { emit }) {
+            const showed = ref(false);
+
+            const emitSearch = debounce(value => {
+                emit('search', value);
+            }, 500);
+
+            const emitFilter = debounce(() => {
+                emit('update');
+            }, 500);
+
+            const search = computed({
                 get() {
-                    return this.filterInstance?.getSearchState || '';
+                    return props.filterInstance.search.value;
                 },
+                set(value: string) {
+                    emitSearch(props.filterInstance.updateSearch(value));
+                }
+            });
 
-                async set(value) {
+            const filter = computed({
+                // @ts-ignore
+                get: (): Filter | Array<FilterGroup> | undefined => props.filterInstance.filter,
+                set: async (value: Filter | Array<FilterGroup> | undefined) => {
                     try {
-                        await this.filterInstance.updateSearch(value);
+                        if (!value) {
+                            return;
+                        }
 
-                        this.emitSearch(value);
+                        await props.filterInstance.saveFilter(value);
+
+                        emitFilter();
                     } catch (err) {
                         errorHandler(err);
                     }
                 }
-            },
+            });
 
-            filter: {
-                get() {
-                    return this.filterInstance?.getFilterState || undefined;
-                },
-
-                async set(value) {
-                    try {
-                        await this.filterInstance.save(value);
-
-                        this.emitFilter();
-                    } catch (err) {
-                        errorHandler(err);
+            const otherFilters = computed({
+                get(): Array<FilterGroup> {
+                    if (Array.isArray(filter.value)) {
+                        return filter.value;
                     }
-                }
-            },
 
-            otherFiltered() {
-                return this.otherFilters.filter(filter => !filter.hidden);
-            },
-
-            otherFilters: {
-                get() {
-                    return this.filter?.other || this.filter || [];
+                    return filter.value?.other || [];
                 },
 
-                set(value) {
-                    if (this.filter?.other) {
-                        this.filter = {
-                            ...this.filter,
-                            other: value
-                        };
+                set(value: Array<FilterGroup>) {
+                    if (Array.isArray(filter.value)) {
+                        filter.value = value;
 
                         return;
                     }
 
-                    this.filter = value;
+                    if (filter.value?.other) {
+                        filter.value = {
+                            ...filter.value,
+                            other: value as Array<FilterGroup>
+                        };
+                    }
                 }
-            },
+            });
 
-            isFilterCustomized() {
-                return this.filterInstance.isCustomized;
-            }
-        },
-        beforeUnmount() {
-            this.cancelEmits();
-        },
-        methods: {
-            setSourcesValue(value) {
-                this.filter = {
-                    ...this.filter,
+            const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
+            const isFilterCustomized = computed(() => props.filterInstance.isCustomized);
+
+            const setSourcesValue = (value: Array<FilterGroup>) => {
+                filter.value = {
+                    ...filter.value,
                     sources: value
-                };
-            },
+                } as Filter;
+            };
 
-            setOtherValue(value, key) {
-                const otherFilters = cloneDeep(this.otherFilters);
-                const index = otherFilters.findIndex(filter => filter.key === key);
+            const setOtherValue = (value: Array<FilterItem>, key: string) => {
+                const otherFiltersCopy = cloneDeep(otherFilters.value);
+                const index = otherFiltersCopy.findIndex(group => group.key === key);
 
                 if (index > -1) {
-                    otherFilters[index].values = value;
+                    otherFiltersCopy[index].values = value;
 
-                    this.otherFilters = otherFilters;
+                    otherFilters.value = otherFiltersCopy;
                 }
-            },
+            };
 
-            async resetFilter() {
-                await this.filterInstance.reset();
+            const resetFilter = async () => {
+                await props.filterInstance.resetFilter();
 
-                this.emitFilter();
-            },
+                emitFilter();
+            };
 
-            // eslint-disable-next-line func-names
-            emitSearch: debounce(function(value) {
-                this.$emit('search', value);
-            }, 500),
-
-            // eslint-disable-next-line func-names
-            emitFilter: debounce(function() {
-                this.$emit('update');
-            }, 500),
-
-            cancelEmits() {
-                if (typeof this.emitSearch?.cancel === "function") {
-                    this.emitSearch.cancel();
+            const cancelEmits = () => {
+                if (typeof emitSearch?.cancel === "function") {
+                    emitSearch.cancel();
                 }
 
-                if (typeof this.emitFilter?.cancel === "function") {
-                    this.emitFilter.cancel();
+                if (typeof emitFilter?.cancel === "function") {
+                    emitFilter.cancel();
                 }
-            }
+            };
+
+            onBeforeUnmount(() => {
+                cancelEmits();
+            });
+
+            return {
+                showed,
+
+                search,
+                filter,
+                otherFilters,
+                otherFiltered,
+                isFilterCustomized,
+
+                setSourcesValue,
+                setOtherValue,
+                resetFilter
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

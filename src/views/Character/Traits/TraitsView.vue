@@ -1,13 +1,13 @@
 <template>
     <component
         :is="layout"
-        :filter-instance="filter"
+        :filter-instance="traitsStore.filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="traitsQuery"
     >
         <trait-link
-            v-for="trait in traits"
+            v-for="trait in traitsStore.traits"
             :key="trait.url"
             :in-tab="inTab"
             :to="{ path: trait.url }"
@@ -52,14 +52,6 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            filter() {
-                return this.traitsStore.getFilter || undefined;
-            },
-
-            traits() {
-                return this.traitsStore.getTraits || [];
-            },
-
             showRightSide() {
                 return this.$route.name === 'traitDetail';
             },
@@ -74,8 +66,8 @@
             await this.traitsStore.initFilter(this.storeKey);
             await this.traitsStore.initTraits();
 
-            if (!this.isMobile && this.traits.length && this.$route.name === 'traits') {
-                await this.$router.push({ path: this.traits[0].url });
+            if (!this.isMobile && this.traitsStore.traits.length && this.$route.name === 'traits') {
+                await this.$router.push({ path: this.traitsStore.traits[0].url });
             }
         },
         beforeUnmount() {
@@ -89,8 +81,8 @@
             async onSearch() {
                 await this.traitsQuery();
 
-                if (this.traits.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.traits[0].url });
+                if (this.traitsStore.traits.length === 1 && !this.isMobile) {
+                    await this.$router.push({ path: this.traitsStore.traits[0].url });
                 }
             }
         }
