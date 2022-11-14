@@ -136,15 +136,11 @@ export function useFilter(): FilterComposable {
         const copy = cloneDeep(filterDefault);
         const saved: Filter | Array<FilterGroup> | null = await store.value.getItem(storeKey.value);
 
-        if (!saved) {
-            return copy;
-        }
-
         const copyIsNewType = (Array.isArray(copy) && !Array.isArray(saved))
             || (!Array.isArray(copy) && Array.isArray(saved));
 
         const getRestoredValue = (value: FilterItem, key: string) => {
-            if (copyIsNewType) {
+            if (!saved || copyIsNewType) {
                 return value.default;
             }
 
