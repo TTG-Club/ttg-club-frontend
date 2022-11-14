@@ -66,12 +66,9 @@
                     </div>
 
                     <div class="ui-select__slotted--body">
-                        <span v-if="!$slots.singleLabel">{{ getOptionLabel(option) }}</span>
-
-                        <slot
-                            v-else
-                            name="singleLabel"
-                        />
+                        <slot name="singleLabel">
+                            {{ getOptionLabel(option) }}
+                        </slot>
                     </div>
 
                     <div
@@ -358,7 +355,9 @@
                 @include css_anim();
 
                 width: 38px;
-                height: 100%;
+                min-height: 100%;
+                max-height: 100%;
+                height: initial;
                 padding: 11px;
                 display: flex;
                 align-items: center;
@@ -367,6 +366,7 @@
                 flex-shrink: 0;
                 top: initial;
                 right: initial;
+                border-radius: 0 8px 8px 0;
 
                 &:hover {
                     background-color: var(--hover);
@@ -526,6 +526,7 @@
             }
 
             &__select {
+                border-radius: 0 8px 0 0;
                 transform: none;
 
                 svg {
@@ -555,7 +556,7 @@
                 justify-content: center;
                 flex-shrink: 0;
                 font-weight: 600;
-                min-width: 40px;
+                min-width: 38px;
             }
 
             &--body {
