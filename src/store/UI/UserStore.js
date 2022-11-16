@@ -24,7 +24,10 @@ export const useUserStore = defineStore('UserStore', {
                     return Promise.reject(new Error('All fields are required to fill'));
                 }
 
-                const resp = await this.$http.post('/auth/signup', body);
+                const resp = await this.$http.post({
+                    url: '/auth/signup',
+                    payload: body
+                });
 
                 switch (resp.status) {
                     case 200:
@@ -54,7 +57,10 @@ export const useUserStore = defineStore('UserStore', {
                     return Promise.reject(new Error('All fields are required to fill'));
                 }
 
-                const resp = await this.$http.post('/auth/signin', config);
+                const resp = await this.$http.post({
+                    url: '/auth/signin',
+                    payload: config
+                });
 
                 switch (resp.status) {
                     case 200:
@@ -84,7 +90,10 @@ export const useUserStore = defineStore('UserStore', {
 
         async resetPassword(email) {
             try {
-                const resp = await this.$http.get('/auth/change/password', { email });
+                const resp = await this.$http.get({
+                    url: '/auth/change/password',
+                    payload: { email }
+                });
 
                 switch (resp.status) {
                     case 200:
@@ -103,7 +112,10 @@ export const useUserStore = defineStore('UserStore', {
             password: ''
         }) {
             try {
-                const resp = await this.$http.post('/auth/change/password', payload);
+                const resp = await this.$http.post({
+                    url: '/auth/change/password',
+                    payload
+                });
 
                 switch (resp.status) {
                     case 200:
@@ -118,7 +130,7 @@ export const useUserStore = defineStore('UserStore', {
 
         async logout() {
             try {
-                const resp = await this.$http.post('/auth/signout');
+                const resp = await this.$http.post({ url: '/auth/signout' });
 
                 switch (resp.status) {
                     case 200:
@@ -150,7 +162,9 @@ export const useUserStore = defineStore('UserStore', {
 
         async getUserInfo() {
             try {
-                const resp = await this.$http.get('/user/info');
+                const resp = await this.$http.get({
+                    url: '/user/info'
+                });
 
                 switch (resp.status) {
                     case 200:
@@ -168,7 +182,9 @@ export const useUserStore = defineStore('UserStore', {
 
         async getUserStatus() {
             try {
-                const resp = await this.$http.get('/user/status');
+                const resp = await this.$http.get({
+                    url: '/user/status'
+                });
 
                 if (resp.status !== 200 || !resp.data) {
                     this.clearUser();

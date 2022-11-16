@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'traits';
 
 export const useTraitsStore = defineStore('TraitsStore', {
     state: () => ({
         traits: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: -1,
@@ -21,27 +17,6 @@ export const useTraitsStore = defineStore('TraitsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey, url) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/traits'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                if (url) {
-                    filterOptions.url = url;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -76,11 +51,11 @@ export const useTraitsStore = defineStore('TraitsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.traitsQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.traitsQuery.signal
+                });
 
                 this.controllers.traitsQuery = undefined;
 
@@ -104,10 +79,6 @@ export const useTraitsStore = defineStore('TraitsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const traits = await this.traitsQuery(config);
 
             this.traits = traits;
@@ -123,10 +94,6 @@ export const useTraitsStore = defineStore('TraitsStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const traits = await this.traitsQuery(config);
 
@@ -144,7 +111,10 @@ export const useTraitsStore = defineStore('TraitsStore', {
 
                 this.controllers.traitInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.traitInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.traitInfoQuery.signal
+                });
 
                 this.controllers.traitInfoQuery = undefined;
 

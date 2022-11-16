@@ -84,12 +84,6 @@
                 default: undefined
             }
         },
-        emits: [
-            'list-end',
-            'update',
-            'search',
-            'resize'
-        ],
         setup(props, { emit }) {
             const uiStore = useUIStore();
             const { isMobile, fullscreen } = storeToRefs(uiStore);

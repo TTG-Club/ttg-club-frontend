@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'rules';
 
 export const useRulesStore = defineStore('RulesStore', {
     state: () => ({
         rules: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -21,23 +17,6 @@ export const useRulesStore = defineStore('RulesStore', {
     }),
 
     actions: {
-        async initFilter(storeKey) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/rules'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -72,7 +51,11 @@ export const useRulesStore = defineStore('RulesStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.rulesQuery.signal);
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.rulesQuery.signal
+                });
 
                 this.controllers.rulesQuery = undefined;
 
@@ -96,10 +79,6 @@ export const useRulesStore = defineStore('RulesStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const rules = await this.rulesQuery(config);
 
             this.rules = rules;
@@ -115,10 +94,6 @@ export const useRulesStore = defineStore('RulesStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const rules = await this.rulesQuery(config);
 
@@ -136,7 +111,10 @@ export const useRulesStore = defineStore('RulesStore', {
 
                 this.controllers.ruleInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.ruleInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.ruleInfoQuery.signal
+                });
 
                 this.controllers.ruleInfoQuery = undefined;
 

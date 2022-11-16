@@ -6,6 +6,8 @@ import localforage from 'localforage';
 import cloneDeep from 'lodash/cloneDeep';
 import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
+import type { SearchComposable, SearchConfig } from '@/common/composition/useSearch';
+import { useSearch } from '@/common/composition/useSearch';
 
 export type FilterItem = {
     label: string
@@ -29,10 +31,10 @@ export type Filter = {
     other: Array<FilterGroup>
 }
 
-export type FilterOptions = {
+export type FilterConfig = {
     url: string
+    search?: SearchConfig
     dbName: string
-    storeName?: string | 'filters'
     storeKey?: string | 'core'
 }
 
@@ -42,25 +44,30 @@ export type FilterQueryParams = {
 
 export type FilterComposable = {
     filter: Ref<Filter | Array<FilterGroup> | undefined>
-    search: Ref<string>
+    search: SearchComposable
     isCustomized: ComputedRef<boolean>
     queryParams: ComputedRef<FilterQueryParams>
-    initFilter: (options: FilterOptions) => Promise<void>
+    initFilter: () => Promise<void>
     saveFilter: (filterEdited: Filter | Array<FilterGroup>) => Promise<void>
     resetFilter: () => Promise<Filter | Array<FilterGroup> | undefined>
-    updateSearch: (searchStr: string) => string
 }
 
-export function useFilter(): FilterComposable {
+export function useFilter(config: FilterConfig): FilterComposable {
     const http = useAxios();
     const filter = ref<Filter | Array<FilterGroup> | undefined>(undefined);
-    const search = ref<string>('');
-    const storeKey = ref<string>('filters');
+    const { url, dbName } = config;
+    const storeName = 'filters';
+    const storeKey = config.storeKey || 'core';
 
-    const store = ref<LocalForage>(localforage.createInstance({
-        name: 'default',
-        storeName: 'filters'
-    }));
+    const search = useSearch({
+        initial: config.search?.initial || '',
+        exact: !!config.search?.exact
+    });
+
+    const store = localforage.createInstance({
+        name: dbName,
+        storeName
+    });
 
     const isCustomized = computed(() => {
         if (!filter.value) {
@@ -88,6 +95,10 @@ export function useFilter(): FilterComposable {
     const queryParams = computed(() => {
         const params: FilterQueryParams = {};
 
+        if (!filter.value) {
+            return params;
+        }
+
         const setGroupToParams = (group: FilterGroup) => {
             params[group.key] = group.values
                 .filter((val: FilterItem) => val.value)
@@ -95,14 +106,12 @@ export function useFilter(): FilterComposable {
         };
 
         if (Array.isArray(filter.value)) {
-            for (const group of filter.value as Array<FilterGroup>) {
+            for (const group of filter.value) {
                 setGroupToParams(group);
             }
         }
 
-        for (const entry of Object.entries(filter.value as Filter)) {
-            const [key, group] = entry;
-
+        for (const [key, group] of Object.entries(filter.value)) {
             if (key === 'sources') {
                 params.book = [];
 
@@ -131,10 +140,10 @@ export function useFilter(): FilterComposable {
         let restoredFilter: Filter | Array<FilterGroup>;
         let filterKey: keyof Filter;
 
-        await store.value.ready();
+        await store.ready();
 
         const copy = cloneDeep(filterDefault);
-        const saved: Filter | Array<FilterGroup> | null = await store.value.getItem(storeKey.value);
+        const saved: Filter | Array<FilterGroup> | null = await store.getItem(storeKey);
 
         const copyIsNewType = (Array.isArray(copy) && !Array.isArray(saved))
             || (!Array.isArray(copy) && Array.isArray(saved));
@@ -208,28 +217,30 @@ export function useFilter(): FilterComposable {
             }
         }
 
-        return restoredFilter;
+        return Promise.resolve(restoredFilter);
     };
 
     const saveFilter = async (filterEdited: Filter | Array<FilterGroup>) => {
-        await store.value.ready();
+        await store.ready();
 
         filter.value = filterEdited;
 
         if (!isCustomized.value) {
-            await store.value.removeItem(storeKey.value);
+            await store.removeItem(storeKey);
 
-            return;
+            return Promise.resolve();
         }
 
-        await store.value.setItem(storeKey.value, cloneDeep(filterEdited));
+        await store.setItem(storeKey, cloneDeep(filterEdited));
+
+        return Promise.resolve();
     };
 
     const resetFilter = async () => {
-        await store.value.ready();
+        await store.ready();
 
         if (!filter.value) {
-            return filter.value;
+            return Promise.resolve(filter.value);
         }
 
         const copy: Filter | Array<FilterGroup> = cloneDeep(filter.value);
@@ -263,7 +274,7 @@ export function useFilter(): FilterComposable {
 
             await saveFilter(initialFilter);
 
-            return initialFilter;
+            return Promise.resolve(initialFilter);
         }
 
         initialFilter = {} as Filter;
@@ -280,26 +291,11 @@ export function useFilter(): FilterComposable {
 
         await saveFilter(initialFilter);
 
-        return initialFilter;
+        return Promise.resolve(initialFilter);
     };
 
-    const initFilter = async (options?: FilterOptions) => {
-        const opts = {
-            dbName: undefined,
-            url: undefined,
-            storeName: 'filters',
-            storeKey: 'core',
-            ...options
-        };
-
+    const initFilter = async () => {
         try {
-            storeKey.value = opts.storeKey;
-
-            store.value = localforage.createInstance({
-                name: opts.dbName,
-                storeName: opts.storeName
-            });
-
             const setStore = async (filterDefault: Filter | Array<FilterGroup>) => {
                 const restored = await getRestored(filterDefault);
 
@@ -309,25 +305,23 @@ export function useFilter(): FilterComposable {
 
                 filter.value = restored;
 
-                await store.value.setItem(storeKey.value, restored);
+                await store.setItem(storeKey, restored);
             };
 
-            const resp = await http.post(opts.url);
+            const resp = await http.post({ url });
 
             if (!resp.data || resp.status !== 200) {
-                return;
+                return Promise.reject();
             }
 
             await setStore(resp.data);
+
+            return Promise.resolve();
         } catch (err) {
             errorHandler(err);
+
+            return Promise.reject(err);
         }
-    };
-
-    const updateSearch = (searchStr = ''): string => {
-        search.value = searchStr;
-
-        return search.value;
     };
 
     return {
@@ -339,7 +333,6 @@ export function useFilter(): FilterComposable {
 
         initFilter,
         saveFilter,
-        resetFilter,
-        updateSearch
+        resetFilter
     };
 }

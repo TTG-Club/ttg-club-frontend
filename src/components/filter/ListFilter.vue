@@ -131,17 +131,8 @@
             inTab: {
                 type: Boolean,
                 default: false
-            },
-            exactSearch: {
-                type: Boolean,
-                default: false
             }
         },
-        emits: [
-            'clear-filter',
-            'search',
-            'update'
-        ],
         setup(props, { emit }) {
             const showed = ref(false);
 
@@ -155,10 +146,10 @@
 
             const search = computed({
                 get() {
-                    return props.filterInstance.search.value;
+                    return props.filterInstance.search.value.value;
                 },
                 set(value: string) {
-                    emitSearch(props.filterInstance.updateSearch(value));
+                    emitSearch(props.filterInstance.search.updateSearch(value));
                 }
             });
 

@@ -55,11 +55,6 @@
                 default: undefined
             }
         },
-        emits: [
-            'list-end',
-            'search',
-            'update'
-        ],
         setup(props, { emit }) {
             const dropdownHeight = ref(0);
 

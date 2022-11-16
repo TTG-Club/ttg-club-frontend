@@ -2,8 +2,8 @@
     <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
-        @search="onSearch"
-        @update="classesQuery"
+        @search="initPages"
+        @update="initPages"
     >
         <div
             class="class-items"
@@ -25,7 +25,7 @@
                     <class-link
                         v-for="el in group.list"
                         :key="el.url"
-                        :after-search="!!filter.search"
+                        :after-search="!!filter.search.value"
                         :class-item="el"
                         :to="{ path: el.url }"
                     />
@@ -38,9 +38,8 @@
 <script lang="ts">
     import { useRoute } from 'vue-router';
     import {
-        computed, defineComponent, onBeforeUnmount
+        computed, defineComponent, onBeforeMount
     } from 'vue';
-    import { tryOnBeforeMount, useDebounceFn } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import { useUIStore } from "@/store/UI/UIStore";
     import ClassLink from "@/views/Character/Classes/ClassLink.vue";
@@ -48,7 +47,7 @@
     import { useClassesStore } from '@/store/Character/ClassesStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { ClassesFilterDefaults } from '@/enums/Character/ClassesEnum';
-    import type { ListQuery } from '@/types/DefaultTypes';
+    import usePagination from '@/common/composition/usePagination';
 
     export default defineComponent({
         name: 'ClassesView',
@@ -60,40 +59,29 @@
             const uiStore = useUIStore();
             const classesStore = useClassesStore();
             const route = useRoute();
-            const filter = useFilter();
+
+            const filter = useFilter({
+                dbName: ClassesFilterDefaults.dbName,
+                url: ClassesFilterDefaults.url
+            });
 
             const { isMobile, fullscreen } = storeToRefs(uiStore);
             const { sortedClasses } = storeToRefs(classesStore);
 
-            const initFilter = async () => {
-                await filter.initFilter({
-                    dbName: ClassesFilterDefaults.dbName,
-                    url: ClassesFilterDefaults.url
-                });
-            };
-
-            const classesQuery = async () => {
-                const options: ListQuery = {
-                    search: {
-                        exact: false,
-                        value: filter.search.value
-                    }
-                };
-
-                if (filter.isCustomized.value) {
-                    options.filter = filter.queryParams.value;
-                }
-
-                await classesStore.classesQuery(options);
-            };
-
-            tryOnBeforeMount(async () => {
-                await initFilter();
-                await classesQuery();
+            const { initPages } = usePagination({
+                url: '/classes',
+                loadFn: classesStore.classesQuery,
+                limit: -1,
+                filter: {
+                    isCustomized: filter.isCustomized.value,
+                    value: filter.queryParams.value
+                },
+                search: filter.search
             });
 
-            onBeforeUnmount(() => {
-                classesStore.clearStore();
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
             });
 
             return {
@@ -101,11 +89,8 @@
                 fullscreen,
                 sortedClasses,
                 showRightSide: computed(() => route.name === 'classDetail'),
-                onSearch: useDebounceFn(async () => {
-                    await classesQuery();
-                }, 300),
                 filter,
-                classesQuery
+                initPages
             };
         }
     });

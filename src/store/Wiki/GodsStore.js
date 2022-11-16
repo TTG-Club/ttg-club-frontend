@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'gods';
 
 export const useGodsStore = defineStore('GodsStore', {
     state: () => ({
         gods: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -21,23 +17,6 @@ export const useGodsStore = defineStore('GodsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/gods'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -72,7 +51,11 @@ export const useGodsStore = defineStore('GodsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.godsQuery.signal);
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.godsQuery.signal
+                });
 
                 this.controllers.godsQuery = undefined;
 
@@ -96,10 +79,6 @@ export const useGodsStore = defineStore('GodsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const gods = await this.godsQuery(config);
 
             this.gods = gods;
@@ -115,10 +94,6 @@ export const useGodsStore = defineStore('GodsStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const gods = await this.godsQuery(config);
 
@@ -136,7 +111,10 @@ export const useGodsStore = defineStore('GodsStore', {
 
                 this.controllers.godInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.godInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.godInfoQuery.signal
+                });
 
                 this.controllers.godInfoQuery = undefined;
 

@@ -1,14 +1,10 @@
 import { defineStore } from 'pinia';
 import isArray from 'lodash/isArray';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'spells';
 
 export const useSpellsStore = defineStore('SpellsStore', {
     state: () => ({
         spells: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -22,23 +18,6 @@ export const useSpellsStore = defineStore('SpellsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey, url) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: url || '/filters/spells'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -77,11 +56,11 @@ export const useSpellsStore = defineStore('SpellsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.spellsQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.spellsQuery.signal
+                });
 
                 this.controllers.spellsQuery = undefined;
 
@@ -100,10 +79,6 @@ export const useSpellsStore = defineStore('SpellsStore', {
                 page: this.config.page,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             if (isArray(books) && books.length) {
                 config.filter.book = books;
@@ -125,10 +100,6 @@ export const useSpellsStore = defineStore('SpellsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             if (isArray(books) && books.length) {
                 config.filter.book = books;
             }
@@ -149,7 +120,10 @@ export const useSpellsStore = defineStore('SpellsStore', {
 
                 this.controllers.spellInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.spellInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.spellInfoQuery.signal
+                });
 
                 this.controllers.spellInfoQuery = undefined;
 

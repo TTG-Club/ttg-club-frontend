@@ -55,11 +55,11 @@ export const useScreensStore = defineStore('ScreensStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.screensQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.screensQuery.signal
+                });
 
                 this.controllers.screensQuery = undefined;
 
@@ -115,7 +115,10 @@ export const useScreensStore = defineStore('ScreensStore', {
 
                 this.controllers.screenInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.screenInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.screenInfoQuery.signal
+                });
 
                 this.controllers.screenInfoQuery = undefined;
 

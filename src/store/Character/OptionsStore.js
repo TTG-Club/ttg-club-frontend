@@ -1,14 +1,10 @@
 import { defineStore } from 'pinia';
 import isArray from 'lodash/isArray';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'options';
 
 export const useOptionsStore = defineStore('OptionsStore', {
     state: () => ({
         options: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: -1,
@@ -22,23 +18,6 @@ export const useOptionsStore = defineStore('OptionsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey, url) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: url || '/filters/options'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -73,11 +52,11 @@ export const useOptionsStore = defineStore('OptionsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.optionsQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.optionsQuery.signal
+                });
 
                 this.controllers.optionsQuery = undefined;
 
@@ -96,10 +75,6 @@ export const useOptionsStore = defineStore('OptionsStore', {
                 page: this.config.page,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             if (isArray(books) && books.length) {
                 config.filter.book = books;
@@ -121,10 +96,6 @@ export const useOptionsStore = defineStore('OptionsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const options = await this.optionsQuery(config);
 
             this.config.page = config.page;
@@ -141,7 +112,10 @@ export const useOptionsStore = defineStore('OptionsStore', {
 
                 this.controllers.optionInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.optionInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.optionInfoQuery.signal
+                });
 
                 this.controllers.optionInfoQuery = undefined;
 

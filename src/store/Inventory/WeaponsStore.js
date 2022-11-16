@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'weapons';
 
 export const useWeaponsStore = defineStore('WeaponsStore', {
     state: () => ({
         weapons: [],
-        filter: useFilter(),
         config: {
             page: 0,
             url: '/weapons'
@@ -19,27 +15,6 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey, url) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/weapons'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                if (url) {
-                    filterOptions.url = url;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -74,11 +49,11 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.weaponsQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.weaponsQuery.signal
+                });
 
                 this.controllers.weaponsQuery = undefined;
 
@@ -101,10 +76,6 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
                 page: this.config.page
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             this.weapons = await this.weaponsQuery(config);
         },
 
@@ -116,7 +87,10 @@ export const useWeaponsStore = defineStore('WeaponsStore', {
 
                 this.controllers.weaponInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.weaponInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.weaponInfoQuery.signal
+                });
 
                 this.controllers.weaponInfoQuery = undefined;
 

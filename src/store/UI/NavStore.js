@@ -191,7 +191,9 @@ export const useNavStore = defineStore('NavStore', {
 
         async getMetaByURL(url) {
             try {
-                const resp = await this.$http.get(`/meta${ url }`);
+                const resp = await this.$http.get({
+                    url: `/meta${ url }`
+                });
 
                 if (resp.status === 200) {
                     this.meta = resp.data;

@@ -244,7 +244,9 @@
         methods: {
             async getLevels() {
                 try {
-                    const resp = await this.$http.get('/tools/trader');
+                    const resp = await this.$http.get({
+                        url: '/tools/trader'
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);
@@ -271,7 +273,11 @@
                     persuasion: this.form.persuasion || 1
                 };
 
-                this.$http.post('/tools/trader', options, this.controllers.list.signal)
+                this.$http.post({
+                    url: '/tools/trader',
+                    payload: options,
+                    signal: this.controllers.list.signal
+                })
                     .then(res => {
                         if (res.status !== 200) {
                             errorHandler(res.statusText);
@@ -316,7 +322,11 @@
                     this.controllers.detail = new AbortController();
 
                     const item = this.groupedResults[index];
-                    const resMagicItem = await this.$http.post(item.url, null, this.controllers.detail.signal);
+
+                    const resMagicItem = await this.$http.post({
+                        url: item.url,
+                        signal: this.controllers.detail.signal
+                    });
 
                     if (resMagicItem.status !== 200) {
                         this.error = true;
@@ -331,7 +341,10 @@
                     this.controllers.detail = new AbortController();
 
                     if (item.spell?.url) {
-                        const resSpell = await this.$http.post(item.spell.url, null, this.controllers.detail.signal);
+                        const resSpell = await this.$http.post({
+                            url: item.spell.url,
+                            signal: this.controllers.detail.signal
+                        });
 
                         if (resSpell.status !== 200) {
                             this.error = true;

@@ -4,28 +4,17 @@ import isArray from 'lodash/isArray';
 import { computed, ref } from 'vue';
 import groupBy from 'lodash/groupBy';
 import errorHandler from '@/common/helpers/errorHandler';
-import type { ListQuery } from '@/types/DefaultTypes';
 import { useAxios } from '@/common/composition/useAxios';
 import type {
     TClassItem, TClassLink, TClassArchetype, TClassArchetypeList, TClassList
 } from '@/views/Character/Classes/Classes';
+import type { RequestConfig } from '@/common/services/HTTPService';
 
 export const useClassesStore = defineStore('ClassesStore', () => {
     const http = useAxios();
     const classes = ref<Array<TClassLink>>([]);
 
-    const config = ref({
-        page: 0,
-        url: '/classes'
-    });
-
-    const controllers = ref<{
-        classesQuery?: AbortController
-        classInfoQuery?: AbortController
-    }>({
-        classesQuery: undefined,
-        classInfoQuery: undefined
-    });
+    let abortController: AbortController | null = null;
 
     const sortedClasses = computed((): Array<TClassList> => {
         if (!classes.value?.length) {
@@ -74,53 +63,10 @@ export const useClassesStore = defineStore('ClassesStore', () => {
         return getGroupClasses();
     });
 
-    const clearClasses = () => {
-        classes.value = [];
-    };
-
-    const clearConfig = () => {
-        config.value = {
-            page: 0,
-            url: '/classes'
-        };
-    };
-
-    const clearStore = () => {
-        clearClasses();
-        clearConfig();
-    };
-
-    const classesQuery = async (options?: ListQuery) => {
+    const classesQuery = async (options: RequestConfig) => {
         try {
-            if (controllers.value.classesQuery) {
-                controllers.value.classesQuery.abort();
-            }
+            const { data } = await http.post(options);
 
-            controllers.value.classesQuery = new AbortController();
-
-            const apiOptions = {
-                search: {
-                    exact: false,
-                    value: ''
-                },
-                order: [
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ],
-                ...options,
-                page: 0,
-                limit: -1
-            };
-
-            const { data } = await http.post(
-                config.value.url,
-                apiOptions,
-                controllers.value.classesQuery.signal
-            );
-
-            controllers.value.classesQuery = undefined;
             classes.value = data;
 
             return data;
@@ -132,20 +78,17 @@ export const useClassesStore = defineStore('ClassesStore', () => {
     };
 
     const classInfoQuery = async (url: string) => {
+        if (abortController) {
+            abortController.abort();
+        }
+
         try {
-            if (controllers.value.classInfoQuery) {
-                controllers.value.classInfoQuery.abort();
-            }
+            abortController = new AbortController();
 
-            controllers.value.classInfoQuery = new AbortController();
-
-            const { data } = await http.post(
+            const { data } = await http.post({
                 url,
-                {},
-                controllers.value.classInfoQuery.signal
-            );
-
-            controllers.value.classInfoQuery = undefined;
+                signal: abortController.signal
+            });
 
             let images: Array<string> = [];
 
@@ -166,6 +109,8 @@ export const useClassesStore = defineStore('ClassesStore', () => {
             errorHandler(err);
 
             return undefined;
+        } finally {
+            abortController = null;
         }
     };
 
@@ -174,7 +119,6 @@ export const useClassesStore = defineStore('ClassesStore', () => {
         sortedClasses,
 
         classesQuery,
-        classInfoQuery,
-        clearStore
+        classInfoQuery
     };
 });

@@ -1,106 +1,101 @@
 <template>
-    <component
-        :is="layout"
-        :filter-instance="bestiaryStore.filter"
+    <content-layout
+        :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="bestiaryQuery"
+        @update="initPages"
         @list-end="nextPage"
     >
         <creature-link
-            v-for="creature in bestiaryStore.bestiary"
+            v-for="creature in bestiary"
             :key="creature.url"
             :creature="creature"
-            :in-tab="inTab"
             :to="{ path: creature.url }"
         />
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TabLayout from "@/components/content/TabLayout.vue";
     import { useBestiaryStore } from "@/store/Bestiary/BestiaryStore";
     import CreatureLink from "@/views/Bestiary/CreatureLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { BestiaryFilterDefaults } from '@/enums/Character/BestiaryEnum';
+    import usePagination from '@/common/composition/usePagination';
 
-    export default {
+    export default defineComponent({
         name: 'BestiaryView',
         components: {
             CreatureLink,
-            TabLayout,
             ContentLayout
         },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            }
-        },
-        data: () => ({
-            bestiaryStore: useBestiaryStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile } = storeToRefs(uiStore);
 
-            showRightSide() {
-                return this.$route.name === 'creatureDetail';
-            },
+            const bestiaryStore = useBestiaryStore();
+            const { bestiary } = storeToRefs(bestiaryStore);
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+            const filter = useFilter({
+                url: BestiaryFilterDefaults.url,
+                dbName: BestiaryFilterDefaults.dbName
+            });
+
+            const { initPages, nextPage } = usePagination({
+                url: '/bestiary',
+                loadFn: bestiaryStore.bestiaryQuery,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'exp',
+                        direction: 'asc'
+                    },
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
+
+            const onSearch = async () => {
+                await initPages();
+
+                if (!isMobile && bestiaryStore.bestiary.length) {
+                    await router.push({ path: bestiaryStore.bestiary[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            };
 
-            if (!this.isMobile && this.bestiaryStore.bestiary.length && this.$route.name === 'bestiary') {
-                await this.$router.push({ path: this.bestiary[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.bestiaryStore.clearStore();
-        },
-        methods: {
-            async init() {
-                await this.bestiaryStore.initFilter(this.storeKey);
-                await this.bestiaryStore.initBestiary();
-            },
+            onBeforeMount(async () => {
+                await filter.initFilter();
 
-            async bestiaryQuery() {
-                await this.bestiaryStore.initBestiary();
-            },
+                await initPages();
 
-            async nextPage() {
-                await this.bestiaryStore.nextPage();
-            },
-
-            async onSearch() {
-                await this.bestiaryStore.initBestiary();
-
-                if (this.bestiaryStore.bestiary.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.bestiaryStore.bestiary[0].url });
+                if (!isMobile && bestiaryStore.bestiary.length && route.name === 'bestiary') {
+                    await router.push({ path: bestiaryStore.bestiary[0].url });
                 }
-            }
+            });
+
+            return {
+                isMobile,
+                showRightSide: computed(() => route.name === 'creatureDetail'),
+                filter,
+                bestiary,
+                initPages,
+                nextPage,
+                onSearch
+            };
         }
-    };
+    });
 </script>

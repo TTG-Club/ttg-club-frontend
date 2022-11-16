@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'backgrounds';
 
 export const useBackgroundsStore = defineStore('BackgroundsStore', {
     state: () => ({
         backgrounds: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: -1,
@@ -21,27 +17,6 @@ export const useBackgroundsStore = defineStore('BackgroundsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey, url) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/backgrounds'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                if (url) {
-                    filterOptions.url = url;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -76,11 +51,11 @@ export const useBackgroundsStore = defineStore('BackgroundsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.backgroundsQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.backgroundsQuery.signal
+                });
 
                 this.controllers.backgroundsQuery = undefined;
 
@@ -104,10 +79,6 @@ export const useBackgroundsStore = defineStore('BackgroundsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const backgrounds = await this.backgroundsQuery(config);
 
             this.backgrounds = backgrounds;
@@ -123,10 +94,6 @@ export const useBackgroundsStore = defineStore('BackgroundsStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const backgrounds = await this.backgroundsQuery(config);
 
@@ -144,7 +111,10 @@ export const useBackgroundsStore = defineStore('BackgroundsStore', {
 
                 this.controllers.backgroundInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.backgroundInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.backgroundInfoQuery.signal
+                });
 
                 this.controllers.backgroundInfoQuery = undefined;
 

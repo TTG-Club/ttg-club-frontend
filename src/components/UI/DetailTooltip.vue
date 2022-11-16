@@ -115,7 +115,7 @@
                     return false;
                 }
 
-                const res = await this.$http.post(url);
+                const res = await this.$http.post({ url });
 
                 if (res.status !== 200) {
                     errorHandler(res.statusText);

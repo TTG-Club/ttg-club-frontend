@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'treasures';
 
 export const useTreasuresStore = defineStore('TreasuresStore', {
     state: () => ({
         treasures: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -21,23 +17,6 @@ export const useTreasuresStore = defineStore('TreasuresStore', {
     }),
 
     actions: {
-        async initFilter(storeKey) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/treasures'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -76,11 +55,11 @@ export const useTreasuresStore = defineStore('TreasuresStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(
-                    this.config.url,
-                    apiOptions,
-                    this.controllers.treasuresQuery.signal
-                );
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.treasuresQuery.signal
+                });
 
                 this.controllers.treasuresQuery = undefined;
 
@@ -104,10 +83,6 @@ export const useTreasuresStore = defineStore('TreasuresStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const treasures = await this.treasuresQuery(config);
 
             this.treasures = treasures;
@@ -123,10 +98,6 @@ export const useTreasuresStore = defineStore('TreasuresStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const treasures = await this.treasuresQuery(config);
 

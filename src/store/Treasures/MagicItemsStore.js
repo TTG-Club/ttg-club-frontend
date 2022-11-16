@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'items';
 
 export const useMagicItemsStore = defineStore('MagicItemsStore', {
     state: () => ({
         items: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -21,23 +17,6 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
     }),
 
     actions: {
-        async initFilter(storeKey) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/items/magic'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -76,7 +55,11 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.itemsQuery.signal);
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.itemsQuery.signal
+                });
 
                 this.controllers.itemsQuery = undefined;
 
@@ -100,10 +83,6 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const items = await this.itemsQuery(config);
 
             this.items = items;
@@ -119,10 +98,6 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const items = await this.itemsQuery(config);
 
@@ -140,7 +115,10 @@ export const useMagicItemsStore = defineStore('MagicItemsStore', {
 
                 this.controllers.itemInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.itemInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.itemInfoQuery.signal
+                });
 
                 this.controllers.itemInfoQuery = undefined;
 

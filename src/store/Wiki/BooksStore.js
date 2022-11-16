@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import errorHandler from '@/common/helpers/errorHandler';
-import { useFilter } from '@/common/composition/useFilter';
-
-const DB_NAME = 'books';
 
 export const useBooksStore = defineStore('BooksStore', {
     state: () => ({
         books: [],
-        filter: useFilter(),
         config: {
             page: 0,
             limit: 70,
@@ -21,23 +17,6 @@ export const useBooksStore = defineStore('BooksStore', {
     }),
 
     actions: {
-        async initFilter(storeKey) {
-            try {
-                const filterOptions = {
-                    dbName: DB_NAME,
-                    url: '/filters/books'
-                };
-
-                if (storeKey) {
-                    filterOptions.storeKey = storeKey;
-                }
-
-                await this.filter.initFilter(filterOptions);
-            } catch (err) {
-                errorHandler(err);
-            }
-        },
-
         /**
          * @param {{}} options
          * @param {number} options.page
@@ -72,7 +51,11 @@ export const useBooksStore = defineStore('BooksStore', {
                     ...options
                 };
 
-                const { data } = await this.$http.post(this.config.url, apiOptions, this.controllers.booksQuery.signal);
+                const { data } = await this.$http.post({
+                    url: this.config.url,
+                    payload: apiOptions,
+                    signal: this.controllers.booksQuery.signal
+                });
 
                 this.controllers.booksQuery = undefined;
 
@@ -96,10 +79,6 @@ export const useBooksStore = defineStore('BooksStore', {
                 limit: this.config.limit
             };
 
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
-
             const books = await this.booksQuery(config);
 
             this.books = books;
@@ -115,10 +94,6 @@ export const useBooksStore = defineStore('BooksStore', {
                 page: this.config.page + 1,
                 limit: this.config.limit
             };
-
-            if (this.filter.isCustomized.value) {
-                config.filter = this.filter.queryParams.value;
-            }
 
             const books = await this.booksQuery(config);
 
@@ -136,7 +111,10 @@ export const useBooksStore = defineStore('BooksStore', {
 
                 this.controllers.bookInfoQuery = new AbortController();
 
-                const resp = await this.$http.post(url, {}, this.controllers.bookInfoQuery.signal);
+                const resp = await this.$http.post({
+                    url,
+                    signal: this.controllers.bookInfoQuery.signal
+                });
 
                 this.controllers.bookInfoQuery = undefined;
 

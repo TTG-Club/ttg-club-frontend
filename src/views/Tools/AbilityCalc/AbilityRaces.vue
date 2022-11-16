@@ -25,7 +25,7 @@
             const { races } = storeToRefs(racesStore);
 
             onMounted(async () => {
-                await racesStore.initRaces();
+                await racesStore.racesQuery();
             });
 
             const onSelect = (e: TRaceLink) => {
