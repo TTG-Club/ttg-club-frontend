@@ -41,13 +41,17 @@
         computed, defineComponent, onBeforeMount
     } from 'vue';
     import { storeToRefs } from 'pinia';
+    import sortBy from 'lodash/sortBy';
+    import groupBy from 'lodash/groupBy';
     import { useUIStore } from "@/store/UI/UIStore";
     import ClassLink from "@/views/Character/Classes/ClassLink.vue";
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import { useClassesStore } from '@/store/Character/ClassesStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { ClassesFilterDefaults } from '@/enums/Character/ClassesEnum';
     import usePagination from '@/common/composition/usePagination';
+    import type {
+        TClassArchetype, TClassArchetypeList, TClassItem, TClassList
+    } from '@/views/Character/Classes/Classes';
 
     export default defineComponent({
         name: 'ClassesView',
@@ -57,7 +61,6 @@
         },
         setup() {
             const uiStore = useUIStore();
-            const classesStore = useClassesStore();
             const route = useRoute();
 
             const filter = useFilter({
@@ -66,17 +69,62 @@
             });
 
             const { isMobile, fullscreen } = storeToRefs(uiStore);
-            const { sortedClasses } = storeToRefs(classesStore);
 
-            const { initPages } = usePagination({
+            const { initPages, items: classes } = usePagination({
                 url: '/classes',
-                loadFn: classesStore.classesQuery,
                 limit: -1,
                 filter: {
-                    isCustomized: filter.isCustomized.value,
-                    value: filter.queryParams.value
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
                 },
                 search: filter.search
+            });
+
+            const sortedClasses = computed((): Array<TClassList> => {
+                if (!classes.value?.length) {
+                    return [];
+                }
+
+                const getGroupArchetypes = (list: Array<TClassArchetype>): Array<TClassArchetypeList> => sortBy(
+                    Object.values(groupBy(list, o => o.type.name))
+                        .map(value => ({
+                            name: value[0].type,
+                            list: value
+                        })),
+                    [o => o.name.order]
+                );
+
+                const getGroupClasses = (): Array<TClassList> => {
+                    const newClasses: Array<TClassItem> = classes.value.map(classItem => ({
+                        ...classItem,
+                        archetypes: getGroupArchetypes(classItem.archetypes)
+                    }));
+
+                    const defaultGroup: TClassList = {
+                        list: sortBy(
+                            newClasses.filter(item => !('group' in item)),
+                            [o => o.name.rus]
+                        )
+                    };
+
+                    const mapped: Array<TClassList> = sortBy(
+                        Object.values(groupBy(
+                            newClasses.filter((item: TClassItem) => 'group' in item),
+                            [(o: TClassItem) => o.group!.name]
+                        ) as {[key: string]: Array<TClassItem>}).map(classList => ({
+                            group: classList[0].group!,
+                            list: sortBy(
+                                classList,
+                                [o => o.name.rus]
+                            )
+                        })),
+                        [o => o.group!.order]
+                    );
+
+                    return [defaultGroup, ...mapped];
+                };
+
+                return getGroupClasses();
             });
 
             onBeforeMount(async () => {

@@ -26,7 +26,6 @@
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import { useRacesStore } from "@/store/Character/RacesStore";
     import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
@@ -45,21 +44,17 @@
             const uiStore = useUIStore();
             const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            const racesStore = useRacesStore();
-            const { races } = storeToRefs(racesStore);
-
             const filter = useFilter({
                 dbName: RaceFilterDefaults.dbName,
                 url: RaceFilterDefaults.url
             });
 
-            const { initPages } = usePagination({
+            const { initPages, items: races } = usePagination({
                 url: '/races',
                 limit: -1,
-                loadFn: racesStore.racesQuery,
                 filter: {
-                    isCustomized: filter.isCustomized.value,
-                    value: filter.queryParams.value
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
                 },
                 search: filter.search,
                 order: [

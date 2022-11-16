@@ -22,7 +22,6 @@
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import { useBestiaryStore } from "@/store/Bestiary/BestiaryStore";
     import CreatureLink from "@/views/Bestiary/CreatureLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
@@ -41,17 +40,15 @@
             const uiStore = useUIStore();
             const { isMobile } = storeToRefs(uiStore);
 
-            const bestiaryStore = useBestiaryStore();
-            const { bestiary } = storeToRefs(bestiaryStore);
-
             const filter = useFilter({
                 url: BestiaryFilterDefaults.url,
                 dbName: BestiaryFilterDefaults.dbName
             });
 
-            const { initPages, nextPage } = usePagination({
+            const {
+                initPages, nextPage, items: bestiary
+            } = usePagination({
                 url: '/bestiary',
-                loadFn: bestiaryStore.bestiaryQuery,
                 filter: {
                     isCustomized: filter.isCustomized,
                     value: filter.queryParams
@@ -72,8 +69,8 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (!isMobile && bestiaryStore.bestiary.length) {
-                    await router.push({ path: bestiaryStore.bestiary[0].url });
+                if (!isMobile.value && bestiary.value.length) {
+                    await router.push({ path: bestiary.value[0].url });
                 }
             };
 
@@ -82,8 +79,8 @@
 
                 await initPages();
 
-                if (!isMobile && bestiaryStore.bestiary.length && route.name === 'bestiary') {
-                    await router.push({ path: bestiaryStore.bestiary[0].url });
+                if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
+                    await router.push({ path: bestiary.value[0].url });
                 }
             });
 

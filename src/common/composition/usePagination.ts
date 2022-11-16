@@ -3,9 +3,10 @@ import {
 } from 'vue';
 import type { MaybeRef } from '@vueuse/core';
 import type { FilterQueryParams } from '@/common/composition/useFilter';
-import type { RequestConfig } from '@/common/services/HTTPService';
 import { useIsDev } from '@/common/helpers/isDev';
 import errorHandler from '@/common/helpers/errorHandler';
+import { useAxios } from '@/common/composition/useAxios';
+import type { RequestConfig } from '@/common/services/HTTPService';
 
 export type PaginationSearch = {
     value: MaybeRef<string>
@@ -36,22 +37,23 @@ export type PaginationFilter = {
 
 export type PaginationConfig = {
     url: MaybeRef<string>
-    loadFn: (config: RequestConfig, nextPage: boolean) => Promise<any>
     page?: MaybeRef<number>
     limit?: MaybeRef<number>
     search?: MaybeRef<PaginationSearch>
     order?: MaybeRef<PaginationOrder>
-    filter?: MaybeRef<PaginationFilter>,
+    filter?: MaybeRef<PaginationFilter>
 }
 
 export default function usePagination(config: PaginationConfig) {
     let abortController: AbortController | null;
 
+    const http = useAxios();
     const isDev = useIsDev();
 
     const isLoading = ref(false);
     const isFirstLoad = ref(true);
 
+    const items = ref<Array<any>>([]);
     const page = ref(unref(config.page) || 0);
     const limit = computed(() => unref(config.limit) || 70);
     const isEnd = ref(false);
@@ -100,15 +102,23 @@ export default function usePagination(config: PaginationConfig) {
         abortController = new AbortController();
 
         try {
-            const apiConfig = {
+            const apiConfig: RequestConfig = {
                 url: unref(config.url),
                 payload: unref(payload),
                 signal: abortController.signal
             };
 
-            const items = await config.loadFn(apiConfig, nextPage);
+            const resp = await http.post(apiConfig);
 
-            isEnd.value = limit.value === -1 || (Array.isArray(items) && (items.length < limit.value));
+            if (nextPage) {
+                items.value.push(...resp.data);
+            }
+
+            if (!nextPage) {
+                items.value = resp.data;
+            }
+
+            isEnd.value = limit.value === -1 || (Array.isArray(items.value) && (items.value.length < limit.value));
 
             return Promise.resolve();
         } catch (err: any) {
@@ -149,6 +159,7 @@ export default function usePagination(config: PaginationConfig) {
         isLoading,
         isFirstLoad,
         isEnd,
+        items,
         page,
         limit,
         payload,
