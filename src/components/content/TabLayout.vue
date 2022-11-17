@@ -47,7 +47,7 @@
     import type { FilterComposable } from '@/common/composition/useFilter';
 
     export default defineComponent({
-        name: 'TabLayout',
+
         components: { ListFilter },
         props: {
             filterInstance: {

@@ -26,7 +26,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'BackgroundsView',
+
         components: {
             BackgroundLink,
             TabLayout,

@@ -90,7 +90,7 @@
                 <spells-view
                     v-else-if="currentTab?.type === 'spells'"
                     :filter-url="currentTab.url"
-                    :books="getClassesBooks"
+                    :query-params="providedQueryParams"
                     :store-key="getStoreKey"
                     in-tab
                 />
@@ -98,7 +98,7 @@
                 <options-view
                     v-else-if="currentTab?.type === 'options'"
                     :filter-url="currentTab.url"
-                    :books="getClassesBooks"
+                    :query-params="providedQueryParams"
                     :store-key="getStoreKey"
                     in-tab
                 />
@@ -126,6 +126,7 @@
     import isArray from "lodash/isArray";
     import sortBy from "lodash/sortBy";
     import groupBy from "lodash/groupBy";
+    import { resolveUnref } from '@vueuse/core';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useClassesStore } from '@/store/Character/ClassesStore';
@@ -138,7 +139,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'ClassDetail',
+
         components: {
             ContentDetail,
             RawContent,
@@ -148,10 +149,15 @@
             SvgIcon,
             SectionHeader
         },
+        inject: {
+            queryParams: {
+                default: undefined
+            }
+        },
         async beforeRouteUpdate(to, from, next) {
             this.removeScrollListeners();
 
-            await this.loadNewClass(to.path);
+            await this.classInfoQuery(to.path);
 
             next();
         },
@@ -172,10 +178,15 @@
             gallery: {
                 show: false,
                 index: null
-            }
+            },
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
+
+            providedQueryParams() {
+                return this.queryParams();
+            },
 
             classes() {
                 return this.classesStore.classes || [];
@@ -184,10 +195,6 @@
             getStoreKey() {
                 return `${ this.currentClass.name.eng + this.currentTab.type + this.currentTab.order }`
                     .replaceAll(' ', '');
-            },
-
-            getClassesBooks() {
-                return this.classesStore.filter?.queryParams.value?.book || undefined;
             },
 
             currentSelectArchetype() {
@@ -224,7 +231,7 @@
             }
         },
         async mounted() {
-            await this.loadNewClass(this.$route.path);
+            await this.classInfoQuery(this.$route.path);
 
             this.$emit('scroll-to-active');
         },
@@ -232,27 +239,34 @@
             this.removeScrollListeners();
         },
         methods: {
-            async loadNewClass(url) {
+            async classInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
+
                 try {
                     this.error = false;
                     this.loading = true;
-                    this.currentTab = undefined;
-                    this.tabs = [];
+                    this.abortController = new AbortController();
 
-                    this.images = {
-                        show: false,
-                        index: 0
-                    };
+                    const resp = await this.$http.post({
+                        url,
+                        payload: {
+                            filter: resolveUnref(this.queryParams)
+                        },
+                        signal: this.abortController.signal
+                    });
 
-                    const loadedClass = await this.classesStore.classInfoQuery(url);
+                    await this.initTabs(resp.data);
 
-                    await this.initTabs(loadedClass);
-
-                    this.currentClass = loadedClass;
-
-                    this.loading = false;
+                    this.currentClass = resp.data;
                 } catch (err) {
+                    errorHandler(err);
+
                     this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
             },
 

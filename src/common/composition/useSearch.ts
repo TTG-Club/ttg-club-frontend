@@ -1,20 +1,22 @@
-import { ref } from 'vue';
-import type { Ref } from 'vue';
+import {
+    computed, ref, unref
+} from 'vue';
+import type { Ref, ComputedRef } from 'vue';
+import type { MaybeRef } from '@vueuse/core';
 
 export type SearchConfig = {
     initial?: string
-    exact?: boolean
+    exact?: MaybeRef<boolean>
 }
 
 export type SearchComposable = {
     value: Ref<string>
-    exact: Ref<boolean>
+    exact: ComputedRef<boolean>
     updateSearch: (newValue: string) => string
 }
 
 export function useSearch(config?: SearchConfig): SearchComposable {
     const value = ref(config?.initial || '');
-    const exact = ref(!!config?.exact);
 
     const updateSearch = (newValue: string) => {
         value.value = newValue;
@@ -24,7 +26,7 @@ export function useSearch(config?: SearchConfig): SearchComposable {
 
     return {
         value,
-        exact,
+        exact: computed(() => !!unref(config?.exact)),
 
         updateSearch
     };

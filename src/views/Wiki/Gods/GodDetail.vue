@@ -30,7 +30,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'GodDetail',
+
         components: {
             ContentDetail,
             GodBody,

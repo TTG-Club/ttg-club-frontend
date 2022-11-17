@@ -38,7 +38,7 @@
 
 <script>
     export default {
-        name: 'TreasureItem',
+
         props: {
             treasure: {
                 type: Object,

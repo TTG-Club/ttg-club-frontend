@@ -28,7 +28,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'MagicItemsView',
+
         components: {
             MagicItemLink,
             CreatureLink,

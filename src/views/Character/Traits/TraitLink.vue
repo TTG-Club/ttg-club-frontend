@@ -1,91 +1,41 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
         :to="{ path: traitItem.url }"
-        custom
-        v-bind="$props"
+        :class="{ 'is-green': traitItem?.homebrew }"
+        class="link-item"
     >
-        <a
-            ref="traitItem"
-            :class="getClassList(isActive)"
-            :href="href"
-            class="link-item"
-            v-bind="$attrs"
-            @click.left.exact.prevent="navigate()"
-        >
-            <div class="link-item__content">
-                <div class="link-item__body">
-                    <div class="link-item__row">
-                        <div class="link-item__name">
-                            <div class="link-item__name--rus">
-                                {{ traitItem.name.rus }}
-                            </div>
-
-                            <div class="link-item__name--eng">
-                                [{{ traitItem.name.eng }}]
-                            </div>
+        <div class="link-item__content">
+            <div class="link-item__body">
+                <div class="link-item__row">
+                    <div class="link-item__name">
+                        <div class="link-item__name--rus">
+                            {{ traitItem.name.rus }}
                         </div>
-                    </div>
 
-                    <div class="link-item__row">
-                        <div class="link-item__requirements">
-                            {{ traitItem.requirements }}
+                        <div class="link-item__name--eng">
+                            [{{ traitItem.name.eng }}]
                         </div>
                     </div>
                 </div>
+
+                <div class="link-item__row">
+                    <div class="link-item__requirements">
+                        {{ traitItem.requirements }}
+                    </div>
+                </div>
             </div>
-        </a>
+        </div>
     </router-link>
 </template>
 
 <script>
-    import { RouterLink } from 'vue-router';
-    import { useTraitsStore } from "@/store/Character/TraitsStore";
-
     export default {
-        name: 'TraitLink',
+
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
             traitItem: {
                 type: Object,
-                default: () => ({})
-            },
-            inTab: {
-                type: Boolean,
-                default: false
-            }
-        },
-        data: () => ({
-            traitsStore: useTraitsStore(),
-            trait: {
-                show: false,
-                data: undefined
-            }
-        }),
-        methods: {
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-trait-selected': this.$route.name === 'traitDetail',
-                    'is-green': this.traitItem?.homebrew
-                };
-            },
-
-            clickHandler(callback) {
-                if (!this.inTab) {
-                    callback();
-
-                    return;
-                }
-
-                this.traitsStore.traitInfoQuery(this.traitItem.url)
-                    .then(spell => {
-                        this.trait = {
-                            show: true,
-                            data: spell
-                        };
-                    });
+                required: true
             }
         }
     };

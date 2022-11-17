@@ -1,7 +1,4 @@
 import { defineStore } from 'pinia';
-import isArray from 'lodash/isArray';
-import sortBy from 'lodash/sortBy';
-import groupBy from 'lodash/groupBy';
 import { computed, ref } from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import type { TRaceLink } from '@/views/Character/Races/Races';
@@ -15,21 +12,6 @@ export const useRacesStore = defineStore('RacesStore', () => {
     let abortController: AbortController | null;
 
     const race = computed(() => (url: TRaceLink['url']) => races.value.find(item => item.url === url));
-
-    const subRaces = computed(() => (raceItem: TRaceLink) => {
-        if (isArray(raceItem.subraces)) {
-            return sortBy(
-                Object.values(groupBy(raceItem.subraces, o => o.type.name))
-                    .map(value => ({
-                        name: value[0].type,
-                        list: value
-                    })),
-                [o => o.name.order]
-            );
-        }
-
-        return null;
-    });
 
     const clearStore = () => {
         races.value = [];
@@ -78,7 +60,6 @@ export const useRacesStore = defineStore('RacesStore', () => {
         races,
 
         race,
-        subRaces,
 
         racesQuery,
         raceInfoQuery,

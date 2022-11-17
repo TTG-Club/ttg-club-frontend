@@ -30,7 +30,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'MagicItemDetail',
+
         components: {
             ContentDetail,
             MagicItemBody,

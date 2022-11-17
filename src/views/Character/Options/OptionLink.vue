@@ -1,17 +1,16 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
         :to="{ path: optionItem.url }"
         custom
         v-bind="$props"
     >
         <a
             ref="optionItem"
-            :class="getClassList(isActive)"
+            :class="classList"
             :href="href"
             class="link-item"
             v-bind="$attrs"
-            @click.left.exact.prevent="clickHandler(navigate)"
+            @click.left.exact.prevent="clickHandler"
         >
             <div class="link-item__content">
                 <div class="link-item__body">
@@ -46,15 +45,20 @@
     </base-modal>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
+<script lang="ts">
+    import type { RouteLocationPathRaw } from 'vue-router';
+    import type { PropType } from 'vue';
+    import {
+        computed, defineComponent, ref
+    } from 'vue';
+    import { useLink } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import { useOptionsStore } from "@/store/Character/OptionsStore";
     import BaseModal from "@/components/UI/modals/BaseModal.vue";
     import OptionBody from "@/views/Character/Options/OptionBody.vue";
+    import { useAxios } from '@/common/composition/useAxios';
 
-    export default {
-        name: 'OptionLink',
+    export default defineComponent({
+
         components: {
             OptionBody,
             BaseModal
@@ -64,7 +68,10 @@
         },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             optionItem: {
                 type: Object,
                 default: () => ({})
@@ -74,49 +81,59 @@
                 default: false
             }
         },
-        data: () => ({
-            optionsStore: useOptionsStore(),
-            modal: {
+        setup(props) {
+            const http = useAxios();
+
+            const {
+                navigate, isActive, href
+            } = useLink(props);
+
+            const modal = ref({
                 show: false,
                 data: undefined
-            }
-        }),
-        computed: {
-            bookmarkObj() {
-                return {
-                    url: this.optionItem.url,
-                    name: this.optionItem.name.rus
-                };
-            }
-        },
-        methods: {
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-option-selected': this.$route.name === 'optionDetail',
-                    'is-green': this.optionItem?.homebrew
-                };
-            },
+            });
 
-            async clickHandler(callback) {
-                if (!this.inTab) {
-                    callback();
+            const bookmarkObj = computed(() => ({
+                url: props.optionItem.url,
+                name: props.optionItem.name.rus
+            }));
+
+            const classList = computed(() => ({
+                'router-link-active': isActive.value,
+                'is-green': props.optionItem?.homebrew
+            }));
+
+            const clickHandler = async () => {
+                if (!props.inTab) {
+                    await navigate();
 
                     return;
                 }
 
                 try {
-                    if (!this.modal.data) {
-                        this.modal.data = await this.optionsStore.optionInfoQuery(this.optionItem.url);
+                    if (!modal.value.data) {
+                        const resp = await http.post({
+                            url: props.optionItem.url
+                        });
+
+                        modal.value.data = resp.data;
                     }
 
-                    this.modal.show = true;
+                    modal.value.show = true;
                 } catch (err) {
                     console.error(err);
                 }
-            }
+            };
+
+            return {
+                href,
+                modal,
+                bookmarkObj,
+                classList,
+                clickHandler
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss"/>

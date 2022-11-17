@@ -116,7 +116,7 @@
     } from '@/common/composition/useFilter';
 
     export default defineComponent({
-        name: 'ListFilter',
+
         components: {
             BaseModal,
             FilterItemCheckboxes,

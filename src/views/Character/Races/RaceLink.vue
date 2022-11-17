@@ -126,11 +126,13 @@
     import {
         useLink, useRoute, useRouter
     } from 'vue-router';
+    import isArray from 'lodash/isArray';
+    import sortBy from 'lodash/sortBy';
+    import groupBy from 'lodash/groupBy';
     import type { TRaceLink } from '@/views/Character/Races/Races';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from "@/store/UI/UIStore";
     import { AbilityType } from '@/enums/Tools/AbilityCalcEnum';
-    import { useRacesStore } from '@/store/Character/RacesStore';
 
     export default defineComponent({
         components: { SvgIcon },
@@ -154,7 +156,6 @@
             const router = useRouter();
             const { isActive, navigate } = useLink(props);
             const uiStore = useUIStore();
-            const racesStore = useRacesStore();
             const submenu = ref(false);
 
             const abilities = computed(() => {
@@ -182,7 +183,18 @@
                     return null;
                 }
 
-                return racesStore.subRaces(props.raceItem);
+                if (isArray(props.raceItem.subraces)) {
+                    return sortBy(
+                        Object.values(groupBy(props.raceItem.subraces, o => o.type.name))
+                            .map(value => ({
+                                name: value[0].type,
+                                list: value
+                            })),
+                        [o => o.name.order]
+                    );
+                }
+
+                return null;
             });
 
             const hasSubRaces = computed(() => !!subRaces.value);

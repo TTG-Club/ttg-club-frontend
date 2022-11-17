@@ -118,7 +118,7 @@
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
 
     export default {
-        name: 'SpellLink',
+
         components: {
             BaseModal,
             SpellBody

@@ -45,7 +45,7 @@
     import { useGodsStore } from "@/store/Wiki/GodsStore";
 
     export default {
-        name: 'GodLink',
+
         directives: {
             CapitalizeFirst
         },

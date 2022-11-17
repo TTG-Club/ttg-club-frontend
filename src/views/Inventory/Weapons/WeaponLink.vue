@@ -81,7 +81,7 @@
     import { RouterLink } from "vue-router";
 
     export default {
-        name: 'WeaponLink',
+
         props: {
             weapon: {
                 type: Object,

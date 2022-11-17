@@ -27,7 +27,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'ItemsView',
+
         components: {
             ItemLink,
             TabLayout,

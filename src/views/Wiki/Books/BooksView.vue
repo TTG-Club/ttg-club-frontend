@@ -40,7 +40,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'BooksView',
+
         components: {
             BookLink,
             TabLayout,

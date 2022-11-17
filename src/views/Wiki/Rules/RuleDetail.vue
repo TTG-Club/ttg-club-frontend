@@ -31,7 +31,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'RuleDetail',
+
         components: {
             ContentDetail,
             RuleBody,

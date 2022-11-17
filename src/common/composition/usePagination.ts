@@ -1,7 +1,8 @@
 import {
     computed, ref, unref
 } from 'vue';
-import type { MaybeRef } from '@vueuse/core';
+import type { MaybeComputedRef, MaybeRef } from '@vueuse/core';
+import { resolveUnref } from '@vueuse/core';
 import type { FilterQueryParams } from '@/common/composition/useFilter';
 import { useIsDev } from '@/common/helpers/isDev';
 import errorHandler from '@/common/helpers/errorHandler';
@@ -31,8 +32,8 @@ export type PaginationQuery = {
 }
 
 export type PaginationFilter = {
-    isCustomized: MaybeRef<boolean>
-    value: MaybeRef<FilterQueryParams>
+    isCustomized: MaybeRef<boolean> | MaybeComputedRef<boolean>
+    value: MaybeRef<FilterQueryParams> | MaybeComputedRef<FilterQueryParams>
 }
 
 export type PaginationConfig = {
@@ -79,8 +80,8 @@ export default function usePagination(config: PaginationConfig) {
 
         const filter = unref(config.filter);
 
-        if (filter && unref(filter.isCustomized)) {
-            request.filter = unref(filter.value);
+        if (filter && resolveUnref(filter.isCustomized)) {
+            request.filter = resolveUnref(filter.value);
         }
 
         return request;
@@ -146,7 +147,7 @@ export default function usePagination(config: PaginationConfig) {
     };
 
     const nextPage = async () => {
-        if (isEnd.value) {
+        if (limit.value === -1 || isEnd.value) {
             return;
         }
 

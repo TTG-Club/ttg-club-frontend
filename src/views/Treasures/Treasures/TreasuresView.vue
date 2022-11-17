@@ -23,7 +23,7 @@
     import TreasureItem from "@/views/Treasures/Treasures/TreasureItem.vue";
 
     export default {
-        name: 'TreasuresView',
+
         components: {
             TreasureItem,
             TabLayout,

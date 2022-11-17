@@ -1,9 +1,10 @@
 import type { ComputedRef, Ref } from 'vue';
 import {
-    computed, ref
+    computed, ref, unref, watch
 } from 'vue';
 import localforage from 'localforage';
 import cloneDeep from 'lodash/cloneDeep';
+import type { MaybeRef } from '@vueuse/core';
 import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
 import type { SearchComposable, SearchConfig } from '@/common/composition/useSearch';
@@ -32,10 +33,10 @@ export type Filter = {
 }
 
 export type FilterConfig = {
-    url: string
+    url: MaybeRef<string>
     search?: SearchConfig
-    dbName: string
-    storeKey?: string | 'core'
+    dbName: MaybeRef<string>
+    storeKey?: MaybeRef<string | 'core'>
 }
 
 export type FilterQueryParams = {
@@ -55,19 +56,28 @@ export type FilterComposable = {
 export function useFilter(config: FilterConfig): FilterComposable {
     const http = useAxios();
     const filter = ref<Filter | Array<FilterGroup> | undefined>(undefined);
-    const { url, dbName } = config;
+
+    const url = computed(() => unref(config.url));
+    const dbName = computed(() => unref(config.dbName));
+    const storeKey = computed(() => unref(config.storeKey) || 'core');
     const storeName = 'filters';
-    const storeKey = config.storeKey || 'core';
 
     const search = useSearch({
         initial: config.search?.initial || '',
         exact: !!config.search?.exact
     });
 
-    const store = localforage.createInstance({
-        name: dbName,
+    const store = ref<LocalForage>(localforage.createInstance({
+        name: unref(dbName),
         storeName
-    });
+    }));
+
+    const setStoreInstance = () => {
+        store.value = localforage.createInstance({
+            name: unref(dbName),
+            storeName
+        });
+    };
 
     const isCustomized = computed(() => {
         if (!filter.value) {
@@ -140,10 +150,10 @@ export function useFilter(config: FilterConfig): FilterComposable {
         let restoredFilter: Filter | Array<FilterGroup>;
         let filterKey: keyof Filter;
 
-        await store.ready();
+        await store.value.ready();
 
         const copy = cloneDeep(filterDefault);
-        const saved: Filter | Array<FilterGroup> | null = await store.getItem(storeKey);
+        const saved: Filter | Array<FilterGroup> | null = await store.value.getItem(unref(storeKey));
 
         const copyIsNewType = (Array.isArray(copy) && !Array.isArray(saved))
             || (!Array.isArray(copy) && Array.isArray(saved));
@@ -221,23 +231,23 @@ export function useFilter(config: FilterConfig): FilterComposable {
     };
 
     const saveFilter = async (filterEdited: Filter | Array<FilterGroup>) => {
-        await store.ready();
+        await store.value.ready();
 
         filter.value = filterEdited;
 
         if (!isCustomized.value) {
-            await store.removeItem(storeKey);
+            await store.value.removeItem(unref(storeKey));
 
             return Promise.resolve();
         }
 
-        await store.setItem(storeKey, cloneDeep(filterEdited));
+        await store.value.setItem(unref(storeKey), cloneDeep(filterEdited));
 
         return Promise.resolve();
     };
 
     const resetFilter = async () => {
-        await store.ready();
+        await store.value.ready();
 
         if (!filter.value) {
             return Promise.resolve(filter.value);
@@ -305,10 +315,10 @@ export function useFilter(config: FilterConfig): FilterComposable {
 
                 filter.value = restored;
 
-                await store.setItem(storeKey, restored);
+                await store.value.setItem(unref(storeKey), restored);
             };
 
-            const resp = await http.post({ url });
+            const resp = await http.post({ url: unref(url) });
 
             if (!resp.data || resp.status !== 200) {
                 return Promise.reject();
@@ -323,6 +333,21 @@ export function useFilter(config: FilterConfig): FilterComposable {
             return Promise.reject(err);
         }
     };
+
+    watch(
+        [
+            url,
+            dbName,
+            storeKey
+        ],
+        async () => {
+            setStoreInstance();
+            await initFilter();
+
+            search.value.value = '';
+        },
+        { immediate: true }
+    );
 
     return {
         filter,

@@ -105,7 +105,7 @@
     import { ToastEventBus } from "@/common/utils/ToastConfig";
 
     export default defineComponent({
-        name: 'RegistrationView',
+
         components: {
             UiInput,
             UiButton

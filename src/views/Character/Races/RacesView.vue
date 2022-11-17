@@ -33,7 +33,7 @@
     import usePagination from '@/common/composition/usePagination';
 
     export default defineComponent({
-        name: 'RacesView',
+
         components: {
             RaceLink,
             ContentLayout

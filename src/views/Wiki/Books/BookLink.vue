@@ -38,7 +38,7 @@
     import { useBooksStore } from "@/store/Wiki/BooksStore";
 
     export default {
-        name: 'BookLink',
+
         directives: {
             CapitalizeFirst
         },

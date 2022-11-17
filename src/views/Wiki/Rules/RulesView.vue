@@ -27,7 +27,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'RulesView',
+
         components: {
             RuleLink,
             TabLayout,

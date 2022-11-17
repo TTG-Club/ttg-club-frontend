@@ -1,10 +1,11 @@
 import {
     createRouter, createWebHistory
 } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 import { useNavStore } from '@/store/UI/NavStore';
 
 /* eslint-disable max-len,vue/max-len */
-const routes = [
+const routes: Readonly<RouteRecordRaw[]> = [
     {
         name: 'classes',
         path: '/classes',

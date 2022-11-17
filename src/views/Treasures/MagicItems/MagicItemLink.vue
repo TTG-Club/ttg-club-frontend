@@ -69,7 +69,7 @@
     import { useMagicItemsStore } from "@/store/Treasures/MagicItemsStore";
 
     export default {
-        name: 'MagicItemLink',
+
         directives: {
             CapitalizeFirst
         },

@@ -36,7 +36,7 @@
     import ScreensGroup from "@/views/Screens/ScreensGroup.vue";
 
     export default {
-        name: 'ScreenDetail',
+
         components: {
             ScreensGroup,
             ScreenBody,

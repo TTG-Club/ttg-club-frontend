@@ -38,7 +38,7 @@
 <script lang="ts">
     import { useRoute } from 'vue-router';
     import {
-        computed, defineComponent, onBeforeMount
+        computed, defineComponent, onBeforeMount, provide
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import sortBy from 'lodash/sortBy';
@@ -54,7 +54,7 @@
     } from '@/views/Character/Classes/Classes';
 
     export default defineComponent({
-        name: 'ClassesView',
+
         components: {
             ClassLink,
             ContentLayout
@@ -126,6 +126,8 @@
 
                 return getGroupClasses();
             });
+
+            provide('queryParams', () => filter.queryParams.value);
 
             onBeforeMount(async () => {
                 await filter.initFilter();

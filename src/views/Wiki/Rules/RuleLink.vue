@@ -38,7 +38,7 @@
     import { useRulesStore } from "@/store/Wiki/RulesStore";
 
     export default {
-        name: 'RuleLink',
+
         directives: {
             CapitalizeFirst
         },

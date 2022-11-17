@@ -29,7 +29,7 @@
     import usePagination from '@/common/composition/usePagination';
 
     export default defineComponent({
-        name: 'BestiaryView',
+
         components: {
             CreatureLink,
             ContentLayout

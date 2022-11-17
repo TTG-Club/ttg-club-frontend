@@ -32,7 +32,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'ItemDetail',
+
         components: {
             ContentDetail,
             ItemBody,

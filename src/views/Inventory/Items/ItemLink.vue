@@ -38,7 +38,7 @@
     import { useItemsStore } from "@/store/Inventory/ItemsStore";
 
     export default {
-        name: 'ItemLink',
+
         directives: {
             CapitalizeFirst
         },

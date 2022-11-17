@@ -59,7 +59,7 @@
     import UiCheckbox from '@/components/form/UiCheckbox.vue';
 
     export default {
-        name: 'FilterItemCheckboxes',
+
         components: {
             UiCheckbox,
             SvgIcon
