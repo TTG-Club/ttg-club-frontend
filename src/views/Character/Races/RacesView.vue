@@ -29,8 +29,8 @@
     import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
-    import { RaceFilterDefaults } from '@/enums/Character/RacesEnum';
     import usePagination from '@/common/composition/usePagination';
+    import { RaceFilterDefaults } from '@/types/Races.types';
 
     export default defineComponent({
 

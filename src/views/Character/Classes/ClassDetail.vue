@@ -131,7 +131,7 @@
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useClassesStore } from '@/store/Character/ClassesStore';
     import UiSelect from '@/components/form/UiSelect.vue';
-    import SpellsView from "@/views/Spells/SpellsView.vue";
+    import SpellsView from "@/views/Character/Spells/SpellsView.vue";
     import errorHandler from "@/common/helpers/errorHandler";
     import OptionsView from "@/views/Character/Options/OptionsView.vue";
     import RawContent from "@/components/content/RawContent.vue";

@@ -58,7 +58,6 @@
     import { useAxios } from '@/common/composition/useAxios';
 
     export default defineComponent({
-
         components: {
             OptionBody,
             BaseModal

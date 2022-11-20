@@ -69,12 +69,12 @@ const routes: Readonly<RouteRecordRaw[]> = [
     {
         name: 'spells',
         path: '/spells',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Spells' */ '@/views/Spells/SpellsView.vue'),
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Character' */ '@/views/Character/Spells/SpellsView.vue'),
         children: [
             {
                 name: 'spellDetail',
                 path: ':spellName',
-                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Spells' */ '@/views/Spells/SpellDetail.vue')
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Character' */ '@/views/Character/Spells/SpellDetail.vue')
             }
         ]
     },

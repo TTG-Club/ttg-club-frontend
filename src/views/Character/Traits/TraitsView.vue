@@ -25,7 +25,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
     import usePagination from '@/common/composition/usePagination';
-    import { TraitsFilterDefaults } from '@/enums/Character/TraitsEnum';
+    import { TraitsFilterDefaults } from '@/types/Traits.types';
 
     export default defineComponent({
         components: {

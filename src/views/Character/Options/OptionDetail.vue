@@ -31,7 +31,6 @@
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-
         components: {
             ContentDetail,
             OptionBody,

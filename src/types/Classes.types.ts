@@ -47,3 +47,8 @@ export type TClassList = {
     list: Array<TClassItem>
     group?: TClassGroup
 }
+
+export enum ClassesFilterDefaults {
+    dbName = 'classes',
+    url = '/filters/classes'
+}

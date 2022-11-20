@@ -16,3 +16,8 @@ export type TBestiaryLink = {
     url: string;
     source: TSource;
 }
+
+export enum BestiaryFilterDefaults {
+    dbName = 'bestiary',
+    url = '/filters/bestiary'
+}

@@ -23,7 +23,7 @@
     import cloneDeep from "lodash/cloneDeep";
     import errorHandler from "@/common/helpers/errorHandler";
     import { DefaultTippyProps } from '@/common/utils/TippyConfig';
-    import SpellBody from "@/views/Spells/SpellBody.vue";
+    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
     import ScreenBody from "@/views/Screens/ScreenBody.vue";
     import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
     import ArmorBody from "@/views/Inventory/Armors/ArmorBody.vue";

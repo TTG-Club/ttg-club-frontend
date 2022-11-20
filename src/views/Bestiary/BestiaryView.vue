@@ -25,8 +25,8 @@
     import CreatureLink from "@/views/Bestiary/CreatureLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
-    import { BestiaryFilterDefaults } from '@/enums/Character/BestiaryEnum';
     import usePagination from '@/common/composition/usePagination';
+    import { BestiaryFilterDefaults } from '@/types/Bestiary.types';
 
     export default defineComponent({
 

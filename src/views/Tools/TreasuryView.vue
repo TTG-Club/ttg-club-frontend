@@ -272,7 +272,7 @@
     import SectionHeader from "@/components/UI/SectionHeader.vue";
     import UiCheckbox from "@/components/form/UiCheckbox.vue";
     import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody.vue";
-    import SpellBody from "@/views/Spells/SpellBody.vue";
+    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
     import TreasureItem from "@/views/Treasures/Treasures/TreasureItem.vue";
     import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink.vue";
     import errorHandler from "@/common/helpers/errorHandler";

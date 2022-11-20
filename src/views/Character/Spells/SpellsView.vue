@@ -5,13 +5,14 @@
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="initPages"
+        @list-end="nextPage"
     >
-        <option-link
-            v-for="option in options"
-            :key="option.url"
+        <spell-link
+            v-for="spell in spells"
+            :key="spell.url"
             :in-tab="inTab"
-            :option-item="option"
-            :to="{ path: option.url }"
+            :spell="spell"
+            :to="{ path: spell.url }"
         />
     </component>
 </template>
@@ -20,21 +21,21 @@
     import {
         computed, defineComponent, onBeforeMount, watch
     } from 'vue';
-    import type { PropType } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
-    import type { FilterQueryParams } from '@/common/composition/useFilter';
+    import type { PropType } from 'vue';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import TabLayout from "@/components/content/TabLayout.vue";
-    import OptionLink from "@/views/Character/Options/OptionLink.vue";
+    import SpellLink from "@/views/Character/Spells/SpellLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import type { FilterQueryParams } from '@/common/composition/useFilter';
     import { useFilter } from '@/common/composition/useFilter';
     import usePagination from '@/common/composition/usePagination';
-    import { OptionsFilterDefaults } from '@/types/Options.types';
+    import { SpellsFilterDefaults } from '@/types/Spells.types';
 
     export default defineComponent({
         components: {
-            OptionLink,
+            SpellLink,
             TabLayout,
             ContentLayout
         },
@@ -69,9 +70,9 @@
             ));
 
             const filter = useFilter({
-                dbName: OptionsFilterDefaults.dbName,
+                dbName: SpellsFilterDefaults.dbName,
                 storeKey: props.storeKey,
-                url: props.filterUrl || OptionsFilterDefaults.url
+                url: props.filterUrl || SpellsFilterDefaults.url
             });
 
             const isCustomized = computed(() => !!props.queryParams || filter.isCustomized.value);
@@ -87,15 +88,21 @@
                 return filter.queryParams.value;
             });
 
-            const { initPages, items: options } = usePagination({
-                url: '/options',
-                limit: -1,
+            const {
+                initPages, nextPage, items: spells
+            } = usePagination({
+                url: '/spells',
+                limit: 70,
                 filter: {
                     isCustomized,
                     value: queryParams
                 },
                 search: filter.search,
                 order: [
+                    {
+                        field: 'level',
+                        direction: 'asc'
+                    },
                     {
                         field: 'name',
                         direction: 'asc'
@@ -106,8 +113,8 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (options.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: options.value[0].url });
+                if (spells.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: spells.value[0].url });
                 }
             };
 
@@ -115,8 +122,8 @@
                 await filter.initFilter();
                 await initPages();
 
-                if (!isMobile.value && options.value.length && route.name === 'options') {
-                    await router.push({ path: options.value[0].url });
+                if (!isMobile.value && spells.value.length && route.name === 'spells') {
+                    await router.push({ path: spells.value[0].url });
                 }
             });
 
@@ -133,10 +140,11 @@
                 layout,
                 isMobile,
                 fullscreen,
-                options,
+                spells,
                 filter,
-                showRightSide: computed(() => route.name === 'optionDetail'),
+                showRightSide: computed(() => route.name === 'spellDetail'),
                 initPages,
+                nextPage,
                 onSearch
             };
         }

@@ -33,3 +33,8 @@ export type TRaceLink = {
     abilities: Array<TRaceAbility>
     subraces?: Array<TRaceLink>
 }
+
+export enum RaceFilterDefaults {
+    dbName = 'races',
+    url = '/filters/races'
+}

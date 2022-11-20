@@ -1,17 +1,16 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
         :to="{ path: spell.url }"
         custom
         v-bind="$props"
     >
         <a
             ref="spell"
-            :class="getClassList(isActive)"
+            :class="classList"
             :href="href"
             class="link-item"
             v-bind="$attrs"
-            @click.left.exact.prevent="clickHandler(navigate)"
+            @click.left.exact.prevent="clickHandler"
         >
             <div class="link-item__content">
                 <div
@@ -94,41 +93,46 @@
     </router-link>
 
     <base-modal
-        v-if="spellModal.data"
-        v-model="spellModal.show"
+        v-if="modal.data"
+        v-model="modal.show"
         :bookmark="bookmarkObj"
     >
         <template #title>
-            {{ spellModal.data.name.rus }}
+            {{ modal.data.name.rus }}
         </template>
 
         <template #default>
-            <spell-body :spell="spellModal.data"/>
+            <spell-body :spell="modal.data"/>
         </template>
     </base-modal>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
-    import { mapActions, mapState } from "pinia";
+<script lang="ts">
+    import type { RouteLocationPathRaw } from 'vue-router';
+    import type { PropType } from 'vue';
+    import {
+        computed, defineComponent, ref
+    } from 'vue';
+    import { useLink } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import { useSpellsStore } from "@/store/Spells/SpellsStore";
-    import SpellBody from "@/views/Spells/SpellBody.vue";
     import BaseModal from "@/components/UI/modals/BaseModal.vue";
-    import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
+    import { useAxios } from '@/common/composition/useAxios';
+    import SpellBody from '@/views/Character/Spells/SpellBody.vue';
 
-    export default {
-
+    export default defineComponent({
         components: {
-            BaseModal,
-            SpellBody
+            SpellBody,
+            BaseModal
         },
         directives: {
             CapitalizeFirst
         },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             spell: {
                 type: Object,
                 default: () => ({})
@@ -138,63 +142,63 @@
                 default: false
             }
         },
-        data: () => ({
-            spellsStore: useSpellsStore(),
-            spellModal: {
+        setup(props) {
+            const http = useAxios();
+
+            const {
+                navigate, isActive, href
+            } = useLink(props);
+
+            const modal = ref({
                 show: false,
                 data: undefined
-            }
-        }),
-        computed: {
-            ...mapState(useDefaultBookmarkStore, ['isBookmarkSaved']),
+            });
 
-            hasComponents() {
-                const { spell } = this;
+            const bookmarkObj = computed(() => ({
+                url: props.spell.url,
+                name: props.spell.name.rus
+            }));
 
-                return spell?.components?.v || spell?.components?.s || !!spell?.components?.m;
-            },
+            const classList = computed(() => ({
+                'router-link-active': isActive.value,
+                'is-green': props.spell?.source?.homebrew
+            }));
 
-            bookmarkObj() {
-                return {
-                    url: this.spell.url,
-                    name: this.spell.name.rus
-                };
-            }
-        },
-        methods: {
-            ...mapActions(useDefaultBookmarkStore, ['updateBookmark']),
-
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-green': this.spell?.source?.homebrew,
-                    'in-tab': this.inTab
-                };
-            },
-
-            async clickHandler(callback) {
-                if (!this.inTab) {
-                    callback();
+            const clickHandler = async () => {
+                if (!props.inTab) {
+                    await navigate();
 
                     return;
                 }
 
                 try {
-                    if (!this.spellModal.data) {
-                        this.spellModal.data = await this.spellsStore.spellInfoQuery(this.spell.url);
+                    if (!modal.value.data) {
+                        const resp = await http.post({
+                            url: props.spell.url
+                        });
+
+                        modal.value.data = resp.data;
                     }
 
-                    this.spellModal.show = true;
+                    modal.value.show = true;
                 } catch (err) {
                     console.error(err);
                 }
-            }
+            };
+
+            return {
+                href,
+                modal,
+                bookmarkObj,
+                classList,
+                clickHandler
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>
-    @import "../../assets/styles/modules/link-item";
+    @import "../../../assets/styles/modules/link-item";
 
     .link-item {
         &__lvl {

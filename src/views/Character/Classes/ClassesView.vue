@@ -47,11 +47,11 @@
     import ClassLink from "@/views/Character/Classes/ClassLink.vue";
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useFilter } from '@/common/composition/useFilter';
-    import { ClassesFilterDefaults } from '@/enums/Character/ClassesEnum';
     import usePagination from '@/common/composition/usePagination';
     import type {
         TClassArchetype, TClassArchetypeList, TClassItem, TClassList
-    } from '@/views/Character/Classes/Classes';
+    } from '@/types/Classes.types';
+    import { ClassesFilterDefaults } from '@/types/Classes.types';
 
     export default defineComponent({
 

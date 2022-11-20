@@ -9,7 +9,7 @@
                 :title="creature?.name?.rus || ''"
                 bookmark
                 print
-                @close="close"
+                @close="onClose"
                 @export-foundry="exportFoundry"
             />
         </template>
@@ -23,74 +23,97 @@
     </content-detail>
 </template>
 
-<script>
-    import { mapState } from "pinia";
+<script lang="ts">
+    import { storeToRefs } from 'pinia';
+    import {
+        defineComponent, onBeforeMount, ref
+    } from 'vue';
+    import {
+        onBeforeRouteUpdate, useRoute, useRouter
+    } from 'vue-router';
     import SectionHeader from "@/components/UI/SectionHeader.vue";
     import CreatureBody from "@/views/Bestiary/CreatureBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import errorHandler from '@/common/helpers/errorHandler';
+    import { useAxios } from '@/common/composition/useAxios';
 
-    export default {
-
+    export default defineComponent({
         components: {
             ContentDetail,
             CreatureBody,
             SectionHeader
         },
-        async beforeRouteUpdate(to, from, next) {
-            await this.creatureInfoQuery(to.path);
+        setup() {
+            const http = useAxios();
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { fullscreen, isMobile } = storeToRefs(uiStore);
+            const creature = ref(undefined);
+            const loading = ref(true);
+            const error = ref(false);
+            const abortController = ref<AbortController | null>(null);
 
-            next();
-        },
-        data: () => ({
-            creature: undefined,
-            loading: true,
-            error: false,
-            abortController: null
-        }),
-        computed: {
-            ...mapState(useUIStore, ['fullscreen', 'isMobile'])
-        },
-        async mounted() {
-            await this.creatureInfoQuery(this.$route.path);
-        },
-        methods: {
-            close() {
-                this.$router.push({ name: 'bestiary' });
-            },
+            const exportFoundry = () => {
+                if (!creature.value) return;
 
-            async creatureInfoQuery(url) {
-                if (this.abortController) {
-                    this.abortController.abort();
+                // TODO: Закончить типизацию
+                // @ts-ignore
+                window.open(`/api/fvtt/v1/bestiary/${ creature.value.id }`, '_self');
+            };
+
+            const creatureInfoQuery = async (url: string) => {
+                if (abortController.value) {
+                    abortController.value.abort();
                 }
 
                 try {
-                    this.error = false;
-                    this.loading = true;
-                    this.abortController = new AbortController();
+                    error.value = false;
+                    loading.value = true;
+                    abortController.value = new AbortController();
 
-                    const resp = await this.$http.post({
+                    const resp = await http.post({
                         url,
-                        signal: this.abortController.signal
+                        signal: abortController.value.signal
                     });
 
-                    this.creature = resp.data;
+                    creature.value = resp.data;
                 } catch (err) {
                     errorHandler(err);
 
-                    this.error = true;
+                    error.value = true;
                 } finally {
-                    this.loading = false;
-                    this.abortController = null;
+                    loading.value = false;
+                    abortController.value = null;
                 }
-            },
+            };
 
-            exportFoundry() {
-                window.open(`/api/fvtt/v1/bestiary/${ this.creature.id }`, '_self');
-            }
+            const onClose = () => {
+                router.push({ name: 'bestiary' });
+            };
+
+            onBeforeMount(async () => {
+                await creatureInfoQuery(route.path);
+            });
+
+            onBeforeRouteUpdate(async (to, from, next) => {
+                await creatureInfoQuery(to.path);
+
+                next();
+            });
+
+            return {
+                creature,
+                fullscreen,
+                isMobile,
+                loading,
+                error,
+                exportFoundry,
+                onClose
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

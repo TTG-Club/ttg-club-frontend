@@ -25,10 +25,10 @@
 <script>
     import { mapState } from "pinia";
     import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import { useSpellsStore } from "@/store/Spells/SpellsStore";
-    import SpellBody from "@/views/Spells/SpellBody.vue";
+    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import errorHandler from '@/common/helpers/errorHandler';
 
     export default {
 
@@ -38,38 +38,51 @@
             SectionHeader
         },
         async beforeRouteUpdate(to, from, next) {
-            await this.loadNewSpell(to.path);
+            await this.spellInfoQuery(to.path);
 
             next();
         },
         data: () => ({
-            spellsStore: useSpellsStore(),
             spell: undefined,
-            loading: true,
-            error: false
+            loading: false,
+            error: false,
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewSpell(this.$route.path);
+            await this.spellInfoQuery(this.$route.path);
         },
         methods: {
-            close() {
-                this.$router.push({ name: 'spells' });
-            },
+            async spellInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
 
-            async loadNewSpell(url) {
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.spell = await this.spellsStore.spellInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.spell = resp.data;
                 } catch (err) {
+                    errorHandler(err);
+
                     this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
+            },
+
+            close() {
+                this.$router.push({ name: 'spells' });
             }
         }
     };
