@@ -13,11 +13,10 @@
     </content-layout>
 </template>
 
-<script>
+<script lang="ts">
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
     import { storeToRefs } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import TreasureItem from "@/views/Inventory/Treasures/TreasureItem.vue";
@@ -32,8 +31,6 @@
             ContentLayout
         },
         setup() {
-            const route = useRoute();
-            const router = useRouter();
             const uiStore = useUIStore();
             const { isMobile, fullscreen } = storeToRefs(uiStore);
 
@@ -66,19 +63,11 @@
 
             const onSearch = async () => {
                 await initPages();
-
-                if (treasures.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: treasures.value[0].url });
-                }
             };
 
             onBeforeMount(async () => {
                 await filter.initFilter();
                 await initPages();
-
-                if (!isMobile.value && treasures.value.length && route.name === 'treasures') {
-                    await router.push({ path: treasures.value[0].url });
-                }
             });
 
             return {
@@ -86,7 +75,6 @@
                 fullscreen,
                 treasures,
                 filter,
-                showRightSide: computed(() => route.name === 'treasureDetail'),
                 initPages,
                 nextPage,
                 onSearch
