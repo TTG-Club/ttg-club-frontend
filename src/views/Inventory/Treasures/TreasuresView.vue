@@ -14,9 +14,7 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
+    import { defineComponent, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import TreasureItem from "@/views/Inventory/Treasures/TreasureItem.vue";
