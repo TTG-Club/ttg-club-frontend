@@ -1,6 +1,5 @@
 <template>
     <router-link
-        v-slot="{ href }"
         :to="{ path: screen.url }"
         custom
         v-bind="$props"
@@ -9,7 +8,7 @@
             v-bind="$attrs"
             :href="href"
             class="screen-link"
-            @click.left.exact.prevent="clickHandler(screen.url)"
+            @click.left.exact.prevent="clickHandler"
         >
             <div class="screen-link__icon">
                 <raw-content :template="screen.icon"/>
@@ -44,16 +43,20 @@
     </base-modal>
 </template>
 
-<script>
-    import { RouterLink } from "vue-router";
-    import { mapActions } from "pinia";
+<script lang="ts">
+    import type { RouteLocationPathRaw } from 'vue-router';
+    import type { PropType } from 'vue';
+    import {
+        computed, defineComponent, ref
+    } from 'vue';
+    import { useLink } from 'vue-router';
     import RawContent from "@/components/content/RawContent.vue";
     import BaseModal from "@/components/UI/modals/BaseModal.vue";
     import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
-    import { useScreensStore } from "@/store/Screens/ScreensStore";
+    import errorHandler from '@/common/helpers/errorHandler';
+    import { useAxios } from '@/common/composition/useAxios';
 
-    export default {
-        name: "ScreenLink",
+    export default defineComponent({
         components: {
             ScreenBody,
             BaseModal,
@@ -61,43 +64,80 @@
         },
         inheritAttrs: false,
         props: {
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             screen: {
                 type: Object,
                 default: () => ({}),
                 required: true
-            },
-            ...RouterLink.props
+            }
         },
-        data: () => ({
-            modal: {
+        setup(props) {
+            const http = useAxios();
+            const { href } = useLink(props);
+
+            const modal = ref({
                 data: undefined,
                 show: false
-            }
-        }),
-        computed: {
-            bookmarkObj() {
-                return {
-                    url: this.screen.url,
-                    name: this.screen.name.rus
-                };
-            }
-        },
-        methods: {
-            ...mapActions(useScreensStore, ['screenInfoQuery']),
+            });
 
-            async clickHandler(url) {
+            const error = ref(false);
+            const loading = ref(false);
+            const abortController = ref<AbortController | null>(null);
+
+            const screenInfoQuery = async () => {
+                if (abortController.value) {
+                    abortController.value.abort();
+                }
+
                 try {
-                    if (!this.modal.data) {
-                        this.modal.data = await this.screenInfoQuery(url);
+                    error.value = false;
+                    loading.value = true;
+                    abortController.value = new AbortController();
+
+                    const resp = await http.post({
+                        url: href.value,
+                        signal: abortController.value.signal
+                    });
+
+                    return resp.data;
+                } catch (err) {
+                    errorHandler(err);
+
+                    error.value = true;
+
+                    return undefined;
+                } finally {
+                    loading.value = false;
+                    abortController.value = null;
+                }
+            };
+
+            const clickHandler = async () => {
+                try {
+                    if (!modal.value.data) {
+                        modal.value.data = await screenInfoQuery();
                     }
 
-                    this.modal.show = true;
+                    modal.value.show = true;
                 } catch (err) {
-                    console.error(err);
+                    errorHandler(err);
                 }
-            }
+            };
+
+            return {
+                href,
+                modal,
+                bookmarkObj: computed(() => ({
+                    url: props.screen.url,
+                    name: props.screen.name.rus
+                })),
+                clickHandler
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

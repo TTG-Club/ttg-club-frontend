@@ -1,5 +1,6 @@
 <template>
     <content-layout
+        :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
         @list-end="nextPage"
@@ -9,7 +10,7 @@
             :class="{ 'is-selected': showRightSide }"
         >
             <router-link
-                v-for="screen in screensStore.screens"
+                v-for="screen in screens"
                 :key="screen.url"
                 class="screen-item"
                 :to="screen.url"
@@ -26,53 +27,80 @@
     </content-layout>
 </template>
 
-<script>
+<script lang="ts">
+    import { storeToRefs } from 'pinia';
     import {
-        mapActions, mapState
-    } from "pinia";
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from "@/components/content/ContentLayout.vue";
-    import { useScreensStore } from "@/store/Screens/ScreensStore";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { ScreensFilterDefaults } from '@/types/Workshop/Screens.types';
 
-    export default {
-        name: "ScreensView",
-        components: { ContentLayout },
-        data: () => ({
-            screensStore: useScreensStore()
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile', 'fullscreen']),
-
-            showRightSide() {
-                return this.$route.name === 'screenDetail';
-            }
+    export default defineComponent({
+        components: {
+            ContentLayout
         },
-        async mounted() {
-            await this.initScreens();
-        },
-        beforeUnmount() {
-            this.clearStore();
-        },
-        methods: {
-            ...mapActions(useScreensStore, [
-                'initScreens',
-                'nextPage',
-                'clearStore'
-            ]),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            async screensQuery() {
-                await this.initScreens();
-            },
+            const filter = useFilter({
+                dbName: ScreensFilterDefaults.dbName,
+                url: ScreensFilterDefaults.url,
+                disabled: true
+            });
 
-            async onSearch() {
-                await this.screensQuery();
+            const {
+                initPages, nextPage, items: screens
+            } = usePagination({
+                url: '/screens',
+                limit: 70,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'ordering',
+                        direction: 'asc'
+                    },
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-                if (this.screensStore.screens.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.screensStore.screens[0].url });
+            const onSearch = async () => {
+                await initPages();
+
+                if (screens.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: screens.value[0].url });
                 }
-            }
+            };
+
+            onBeforeMount(async () => {
+                await initPages();
+            });
+
+            return {
+                isMobile,
+                fullscreen,
+                screens,
+                filter,
+                showRightSide: computed(() => route.name === 'screenDetail'),
+                initPages,
+                nextPage,
+                onSearch
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>
