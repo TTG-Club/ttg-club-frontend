@@ -1,7 +1,7 @@
 <template>
     <div
         ref="treasure"
-        :class="{ 'is-green': treasure?.source?.homebrew, 'in-tab': inTab }"
+        :class="{ 'is-green': treasure?.source?.homebrew }"
         class="link-item"
     >
         <div class="link-item__content">

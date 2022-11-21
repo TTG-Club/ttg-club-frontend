@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, onMounted } from 'vue';
+    import { defineComponent } from 'vue';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
 
     // import { storeToRefs } from 'pinia';
