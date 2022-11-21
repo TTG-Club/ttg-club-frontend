@@ -24,12 +24,12 @@
     import errorHandler from "@/common/helpers/errorHandler";
     import { DefaultTippyProps } from '@/common/utils/TippyConfig';
     import SpellBody from "@/views/Character/Spells/SpellBody.vue";
-    import ScreenBody from "@/views/Screens/ScreenBody.vue";
+    import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
     import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
     import ArmorBody from "@/views/Inventory/Armors/ArmorBody.vue";
     import WeaponBody from "@/views/Inventory/Weapons/WeaponBody.vue";
-    import CreatureBody from "@/views/Bestiary/CreatureBody.vue";
-    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody.vue";
+    import CreatureBody from "@/views/Workshop/Bestiary/CreatureBody.vue";
+    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
     import OptionBody from "@/views/Character/Options/OptionBody.vue";
     import TraitBody from "@/views/Character/Traits/TraitBody.vue";
     import GodBody from "@/views/Wiki/Gods/GodBody.vue";

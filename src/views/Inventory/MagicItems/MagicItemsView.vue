@@ -4,38 +4,33 @@
         :show-right-side="showRightSide"
         @search="onSearch"
         @update="initPages"
+        @list-end="nextPage"
     >
-        <div
-            class="race-items"
-            :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
-        >
-            <race-link
-                v-for="race in races"
-                :key="race.url"
-                :race-item="race"
-                :to="{ path: race.url }"
-            />
-        </div>
+        <magic-item-link
+            v-for="item in items"
+            :key="item.url"
+            :magic-item="item"
+            :to="{ path: item.url }"
+        />
     </content-layout>
 </template>
 
-<script lang="ts">
-    import { storeToRefs } from 'pinia';
+<script>
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
+    import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import RaceLink from "@/views/Character/Races/RaceLink.vue";
+    import MagicItemLink from "@/views/Inventory/MagicItems/MagicItemLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
+    import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
     import { usePagination } from '@/common/composition/usePagination';
-    import { RaceFilterDefaults } from '@/types/Character/Races.types';
 
     export default defineComponent({
-
         components: {
-            RaceLink,
+            MagicItemLink,
             ContentLayout
         },
         setup() {
@@ -45,19 +40,25 @@
             const { isMobile, fullscreen } = storeToRefs(uiStore);
 
             const filter = useFilter({
-                dbName: RaceFilterDefaults.dbName,
-                url: RaceFilterDefaults.url
+                dbName: MagicItemsFilterDefaults.dbName,
+                url: MagicItemsFilterDefaults.url
             });
 
-            const { initPages, items: races } = usePagination({
-                url: '/races',
-                limit: -1,
+            const {
+                initPages, nextPage, items
+            } = usePagination({
+                url: '/items/magic',
+                limit: 70,
                 filter: {
                     isCustomized: filter.isCustomized,
                     value: filter.queryParams
                 },
                 search: filter.search,
                 order: [
+                    {
+                        field: 'rarity',
+                        direction: 'asc'
+                    },
                     {
                         field: 'name',
                         direction: 'asc'
@@ -68,54 +69,30 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (races.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: races.value[0].url });
+                if (items.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: items.value[0].url });
                 }
             };
 
             onBeforeMount(async () => {
                 await filter.initFilter();
                 await initPages();
+
+                if (!isMobile.value && items.value.length && route.name === 'magicItems') {
+                    await router.push({ path: items.value[0].url });
+                }
             });
 
             return {
                 isMobile,
                 fullscreen,
-                races,
+                items,
                 filter,
-                showRightSide: computed(() => route.name === 'raceDetail'),
+                showRightSide: computed(() => route.name === 'magicItemDetail'),
                 initPages,
+                nextPage,
                 onSearch
             };
         }
     });
 </script>
-
-<style lang="scss" scoped>
-    .race-items {
-        width: 100%;
-        padding: 0;
-        display: grid;
-        grid-gap: 16px;
-        align-items: start;
-        grid-template-columns: repeat(1, 1fr);
-
-        @include media-min($sm) {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        @include media-min($lg) {
-            grid-template-columns: repeat(4, 1fr);
-        }
-
-        @include media-min($xxl) {
-            grid-template-columns: repeat(5, 1fr);
-        }
-
-        &.is-selected {
-            @include media-min($sm) {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    }
-</style>

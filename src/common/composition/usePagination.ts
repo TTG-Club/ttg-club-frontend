@@ -45,7 +45,7 @@ export type PaginationConfig = {
     filter?: MaybeRef<PaginationFilter>
 }
 
-export default function usePagination(config: PaginationConfig) {
+export function usePagination(config: PaginationConfig) {
     let abortController: AbortController | null;
 
     const http = useAxios();

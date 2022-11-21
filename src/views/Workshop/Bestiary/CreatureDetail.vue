@@ -32,7 +32,7 @@
         onBeforeRouteUpdate, useRoute, useRouter
     } from 'vue-router';
     import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import CreatureBody from "@/views/Bestiary/CreatureBody.vue";
+    import CreatureBody from "@/views/Workshop/Bestiary/CreatureBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import errorHandler from '@/common/helpers/errorHandler';

@@ -1,54 +1,52 @@
 <template>
     <content-layout
         :filter-instance="filter"
-        :show-right-side="showRightSide"
         @search="onSearch"
         @update="initPages"
         @list-end="nextPage"
     >
-        <creature-link
-            v-for="creature in bestiary"
-            :key="creature.url"
-            :creature="creature"
-            :to="{ path: creature.url }"
+        <treasure-item
+            v-for="(treasure, key) in treasures"
+            :key="treasure.name.eng + key"
+            :treasure="treasure"
         />
     </content-layout>
 </template>
 
-<script lang="ts">
+<script>
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
+    import { storeToRefs } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import CreatureLink from "@/views/Bestiary/CreatureLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import TreasureItem from "@/views/Inventory/Treasures/TreasureItem.vue";
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
-    import usePagination from '@/common/composition/usePagination';
-    import { BestiaryFilterDefaults } from '@/types/Bestiary.types';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
 
     export default defineComponent({
-
         components: {
-            CreatureLink,
+            TreasureItem,
             ContentLayout
         },
         setup() {
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile } = storeToRefs(uiStore);
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
             const filter = useFilter({
-                url: BestiaryFilterDefaults.url,
-                dbName: BestiaryFilterDefaults.dbName
+                dbName: TreasuresFilterDefaults.dbName,
+                url: TreasuresFilterDefaults.url
             });
 
             const {
-                initPages, nextPage, items: bestiary
+                initPages, nextPage, items: treasures
             } = usePagination({
-                url: '/bestiary',
+                url: '/treasures',
+                limit: 70,
                 filter: {
                     isCustomized: filter.isCustomized,
                     value: filter.queryParams
@@ -56,7 +54,7 @@
                 search: filter.search,
                 order: [
                     {
-                        field: 'exp',
+                        field: 'cost',
                         direction: 'asc'
                     },
                     {
@@ -69,26 +67,26 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (!isMobile.value && bestiary.value.length) {
-                    await router.push({ path: bestiary.value[0].url });
+                if (treasures.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: treasures.value[0].url });
                 }
             };
 
             onBeforeMount(async () => {
                 await filter.initFilter();
-
                 await initPages();
 
-                if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
-                    await router.push({ path: bestiary.value[0].url });
+                if (!isMobile.value && treasures.value.length && route.name === 'treasures') {
+                    await router.push({ path: treasures.value[0].url });
                 }
             });
 
             return {
                 isMobile,
-                showRightSide: computed(() => route.name === 'creatureDetail'),
+                fullscreen,
+                treasures,
                 filter,
-                bestiary,
+                showRightSide: computed(() => route.name === 'treasureDetail'),
                 initPages,
                 nextPage,
                 onSearch

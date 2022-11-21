@@ -30,8 +30,8 @@
     import { useUIStore } from "@/store/UI/UIStore";
     import type { FilterQueryParams } from '@/common/composition/useFilter';
     import { useFilter } from '@/common/composition/useFilter';
-    import usePagination from '@/common/composition/usePagination';
-    import { SpellsFilterDefaults } from '@/types/Spells.types';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
 
     export default defineComponent({
         components: {

@@ -1,17 +1,15 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
         :to="{ path: magicItem.url }"
         custom
         v-bind="$props"
     >
         <a
-            ref="magicItem"
-            :class="getClassList(isActive)"
+            :class="classList"
             :href="href"
             class="link-item"
             v-bind="$attrs"
-            @click.left.exact.prevent="clickHandler(navigate)"
+            @click.left.exact.prevent="clickHandler"
         >
             <div class="link-item__content">
                 <div
@@ -63,55 +61,63 @@
     </router-link>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
+<script lang="ts">
+    import {
+        useLink
+    } from 'vue-router';
+    import {
+        computed, defineComponent
+    } from 'vue';
+    import type { PropType } from 'vue';
+    import type { RouteLocationPathRaw } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import { useMagicItemsStore } from "@/store/Treasures/MagicItemsStore";
 
-    export default {
-
+    export default defineComponent({
         directives: {
             CapitalizeFirst
         },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             magicItem: {
                 type: Object,
                 default: () => ({})
-            },
-            inTab: {
-                type: Boolean,
-                default: false
             },
             inTools: {
                 type: Boolean,
                 default: false
             }
         },
-        data: () => ({
-            magicItemsStore: useMagicItemsStore()
-        }),
-        methods: {
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-green': this.magicItem?.source?.homebrew,
-                    'in-tab': this.inTab
-                };
-            },
+        setup(props, { emit }) {
+            const {
+                navigate, isActive, href
+            } = useLink(props);
 
-            clickHandler(callback) {
-                if (this.inTools) {
-                    this.$emit('select-item');
+            const classList = computed(() => ({
+                'router-link-active': isActive.value,
+                'is-green': props.magicItem?.source?.homebrew
+            }));
+
+            const clickHandler = () => {
+                if (props.inTools) {
+                    emit('select-item');
 
                     return;
                 }
 
-                callback();
-            }
+                navigate();
+            };
+
+            return {
+                href,
+                classList,
+                clickHandler
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

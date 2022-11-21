@@ -43,10 +43,6 @@
             treasure: {
                 type: Object,
                 default: () => ({})
-            },
-            inTab: {
-                type: Boolean,
-                default: false
             }
         }
     };

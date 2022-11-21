@@ -6,55 +6,59 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <item-link
-            v-for="item in items"
-            :key="item.url"
-            :item="item"
-            :to="{ path: item.url }"
+        <creature-link
+            v-for="creature in bestiary"
+            :key="creature.url"
+            :creature="creature"
+            :to="{ path: creature.url }"
         />
     </content-layout>
 </template>
 
-<script>
+<script lang="ts">
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import ItemLink from "@/views/Inventory/Items/ItemLink.vue";
+    import CreatureLink from "@/views/Workshop/Bestiary/CreatureLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
-    import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
     import { usePagination } from '@/common/composition/usePagination';
+    import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
 
     export default defineComponent({
+
         components: {
-            ItemLink,
+            CreatureLink,
             ContentLayout
         },
         setup() {
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+            const { isMobile } = storeToRefs(uiStore);
 
             const filter = useFilter({
-                dbName: ItemsFilterDefaults.dbName,
-                url: ItemsFilterDefaults.url
+                url: BestiaryFilterDefaults.url,
+                dbName: BestiaryFilterDefaults.dbName
             });
 
             const {
-                initPages, nextPage, items
+                initPages, nextPage, items: bestiary
             } = usePagination({
-                url: '/items',
-                limit: 70,
+                url: '/bestiary',
                 filter: {
                     isCustomized: filter.isCustomized,
                     value: filter.queryParams
                 },
                 search: filter.search,
                 order: [
+                    {
+                        field: 'exp',
+                        direction: 'asc'
+                    },
                     {
                         field: 'name',
                         direction: 'asc'
@@ -65,26 +69,26 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (items.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: items.value[0].url });
+                if (!isMobile.value && bestiary.value.length) {
+                    await router.push({ path: bestiary.value[0].url });
                 }
             };
 
             onBeforeMount(async () => {
                 await filter.initFilter();
+
                 await initPages();
 
-                if (!isMobile.value && items.value.length && route.name === 'items') {
-                    await router.push({ path: items.value[0].url });
+                if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
+                    await router.push({ path: bestiary.value[0].url });
                 }
             });
 
             return {
                 isMobile,
-                fullscreen,
-                items,
+                showRightSide: computed(() => route.name === 'creatureDetail'),
                 filter,
-                showRightSide: computed(() => route.name === 'itemDetail'),
+                bestiary,
                 initPages,
                 nextPage,
                 onSearch

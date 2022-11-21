@@ -29,8 +29,8 @@
     import OptionLink from "@/views/Character/Options/OptionLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
-    import usePagination from '@/common/composition/usePagination';
-    import { OptionsFilterDefaults } from '@/types/Options.types';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { OptionsFilterDefaults } from '@/types/Character/Options.types';
 
     export default defineComponent({
         components: {

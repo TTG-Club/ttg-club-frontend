@@ -49,7 +49,7 @@
     import { mapActions } from "pinia";
     import RawContent from "@/components/content/RawContent.vue";
     import BaseModal from "@/components/UI/modals/BaseModal.vue";
-    import ScreenBody from "@/views/Screens/ScreenBody.vue";
+    import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
     import { useScreensStore } from "@/store/Screens/ScreensStore";
 
     export default {

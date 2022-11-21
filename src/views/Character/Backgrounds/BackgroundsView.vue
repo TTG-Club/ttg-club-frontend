@@ -24,8 +24,8 @@
     import BackgroundLink from "@/views/Character/Backgrounds/BackgroundLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
-    import usePagination from '@/common/composition/usePagination';
-    import { BackgroundsFilterDefaults } from '@/types/Backgrounds.types';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
 
     export default defineComponent({
         components: {

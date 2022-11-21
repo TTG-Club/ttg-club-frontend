@@ -4,7 +4,7 @@ import isArray from 'lodash/isArray';
 import { ref } from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
-import type { TClassLink } from '@/types/Classes.types';
+import type { TClassLink } from '@/types/Character/Classes.types';
 import type { RequestConfig } from '@/common/services/HTTPService';
 
 export const useClassesStore = defineStore('ClassesStore', () => {

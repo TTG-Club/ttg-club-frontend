@@ -1,26 +1,21 @@
 <template>
-    <content-detail class="screen-detail">
+    <content-detail class="magic-item-detail">
         <template #fixed>
             <section-header
-                :title="screen?.name?.rus || ''"
-                :subtitle="screen?.name?.eng || ''"
+                :close-on-desktop="fullscreen"
                 :copy="!error && !loading"
                 :fullscreen="!isMobile"
+                :subtitle="magicItem?.name?.eng || ''"
+                :title="magicItem?.name?.rus || ''"
                 bookmark
-                close-on-desktop
                 @close="close"
             />
         </template>
 
         <template #default>
-            <screens-group
-                v-if="screen?.chields?.length"
-                :child-list="screen.chields"
-            />
-
-            <screen-body
-                v-else-if="screen"
-                :screen="screen"
+            <magic-item-body
+                v-if="magicItem"
+                :magic-item="magicItem"
             />
         </template>
     </content-detail>
@@ -29,60 +24,70 @@
 <script>
     import { mapState } from "pinia";
     import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import { useScreensStore } from "@/store/Screens/ScreensStore";
+    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
-    import ScreenBody from "@/views/Screens/ScreenBody.vue";
-    import ScreensGroup from "@/views/Screens/ScreensGroup.vue";
+    import errorHandler from '@/common/helpers/errorHandler';
 
     export default {
-
         components: {
-            ScreensGroup,
-            ScreenBody,
             ContentDetail,
+            MagicItemBody,
             SectionHeader
         },
         async beforeRouteUpdate(to, from, next) {
-            await this.loadNewScreen(to.path);
+            await this.magicItemInfoQuery(to.path);
 
             next();
         },
         data: () => ({
-            screensStore: useScreensStore(),
-            screen: undefined,
-            loading: true,
-            error: false
+            magicItem: undefined,
+            loading: false,
+            error: false,
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewScreen(this.$route.path);
+            await this.magicItemInfoQuery(this.$route.path);
         },
         methods: {
-            close() {
-                this.$router.push({ name: 'screens' });
-            },
+            async magicItemInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
 
-            async loadNewScreen(url) {
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.screen = await this.screensStore.screenInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.magicItem = resp.data;
                 } catch (err) {
+                    errorHandler(err);
+
                     this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
+            },
+
+            close() {
+                this.$router.push({ name: 'magicItems' });
             }
         }
     };
 </script>
 
 <style lang="scss" scoped>
-    .screen-detail {
+    .magic-item-detail {
         overflow: hidden;
         width: 100%;
         height: 100%;
