@@ -25,50 +25,59 @@
 <script>
     import { mapState } from "pinia";
     import SectionHeader from '@/components/UI/SectionHeader.vue';
-    import { useTraitsStore } from '@/store/Character/TraitsStore';
     import errorHandler from "@/common/helpers/errorHandler";
     import TraitBody from "@/views/Character/Traits/TraitBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'TraitDetail',
+
         components: {
             ContentDetail,
             TraitBody,
             SectionHeader
         },
         async beforeRouteUpdate(to, from, next) {
-            await this.loadNewTrait(to.path);
+            await this.traitInfoQuery(to.path);
 
             next();
         },
         data: () => ({
-            traitStore: useTraitsStore(),
             trait: undefined,
             loading: false,
-            error: false
+            error: false,
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewTrait(this.$route.path);
+            await this.traitInfoQuery(this.$route.path);
         },
         methods: {
-            async loadNewTrait(url) {
+            async traitInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
+
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.trait = await this.traitStore.traitInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.trait = resp.data;
                 } catch (err) {
-                    this.loading = false;
-                    this.error = true;
-
                     errorHandler(err);
+
+                    this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
             },
 

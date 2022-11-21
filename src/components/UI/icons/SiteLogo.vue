@@ -38,7 +38,7 @@
 
 <script>
     export default {
-        name: 'SiteLogo',
+
         props: {
             size: {
                 type: [String, Number],

@@ -3,7 +3,7 @@
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="onRacesQuery"
+        @update="initPages"
     >
         <div
             class="race-items"
@@ -22,51 +22,60 @@
 <script lang="ts">
     import { storeToRefs } from 'pinia';
     import {
-        computed, defineComponent, onBeforeUnmount
+        computed, defineComponent, onBeforeMount
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import { useRacesStore } from "@/store/Character/RacesStore";
     import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { RaceFilterDefaults } from '@/types/Character/Races.types';
 
     export default defineComponent({
-        name: 'RacesView',
+
         components: {
             RaceLink,
             ContentLayout
-        },
-        async beforeRouteEnter(to, from, next) {
-            const store = useRacesStore();
-
-            await store.initFilter();
-            await store.initRaces();
-
-            next();
         },
         setup() {
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const racesStore = useRacesStore();
-
             const { isMobile, fullscreen } = storeToRefs(uiStore);
-            const { races, filter } = storeToRefs(racesStore);
 
-            const onRacesQuery = async () => {
-                await racesStore.initRaces();
-            };
+            const filter = useFilter({
+                dbName: RaceFilterDefaults.dbName,
+                url: RaceFilterDefaults.url
+            });
+
+            const { initPages, items: races } = usePagination({
+                url: '/races',
+                limit: -1,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
             const onSearch = async () => {
-                await racesStore.initRaces();
+                await initPages();
 
                 if (races.value.length === 1 && !isMobile.value) {
                     await router.push({ path: races.value[0].url });
                 }
             };
 
-            onBeforeUnmount(() => {
-                racesStore.clearStore();
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
             });
 
             return {
@@ -75,7 +84,7 @@
                 races,
                 filter,
                 showRightSide: computed(() => route.name === 'raceDetail'),
-                onRacesQuery,
+                initPages,
                 onSearch
             };
         }

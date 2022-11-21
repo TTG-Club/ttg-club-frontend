@@ -4,6 +4,12 @@ import Cookies from 'js-cookie';
 import { USER_TOKEN_COOKIE } from '@/common/const/UI';
 import { useUserStore } from '@/store/UI/UserStore';
 
+export type RequestConfig = {
+    url: AxiosRequestConfig['url'],
+    payload?: AxiosRequestConfig['params'] | AxiosRequestConfig['data'],
+    signal?: AbortSignal
+}
+
 export default class HTTPService {
     protected instance: AxiosInstance;
 
@@ -46,65 +52,57 @@ export default class HTTPService {
         });
     }
 
-    get(url: AxiosRequestConfig['url'], params: AxiosRequestConfig['params']) {
-        const config = {
-            url,
-            params,
-            method: 'get'
-        };
-
-        return this.instance(config);
+    get(config: RequestConfig) {
+        return this.instance({
+            method: 'get',
+            url: config.url,
+            params: config.payload,
+            signal: config.signal
+        });
     }
 
-    post(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
-            url,
-            data,
-            signal,
-            method: 'post'
-        };
-
-        return this.instance(config);
+    post(config: RequestConfig) {
+        return this.instance({
+            method: 'post',
+            url: config.url,
+            data: config.payload,
+            signal: config.signal
+        });
     }
 
-    put(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
-            url,
-            data,
-            signal,
-            method: 'put'
-        };
-
-        return this.instance(config);
+    put(config: RequestConfig) {
+        return this.instance({
+            method: 'put',
+            url: config.url,
+            data: config.payload,
+            signal: config.signal
+        });
     }
 
-    patch(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
-            url,
-            data,
-            signal,
-            method: 'patch'
-        };
-
-        return this.instance(config);
+    patch(config: RequestConfig) {
+        return this.instance({
+            method: 'patch',
+            url: config.url,
+            data: config.payload,
+            signal: config.signal
+        });
     }
 
-    delete(url: AxiosRequestConfig['url'], data: AxiosRequestConfig['data'], signal = new AbortController().signal) {
-        const config = {
-            url,
-            data,
-            signal,
-            method: 'delete'
-        };
-
-        return this.instance(config);
+    delete(config: RequestConfig) {
+        return this.instance({
+            method: 'delete',
+            url: config.url,
+            data: config.payload,
+            signal: config.signal
+        });
     }
 
-    rawGet(url: AxiosRequestConfig['url'], params?: AxiosRequestConfig['params']) {
+    rawGet(config: RequestConfig) {
         return this.instanceRaw({
-            url,
-            params,
-            method: 'get'
+            method: 'get',
+            url: config.url,
+            params: config.payload,
+            signal: config.signal
         });
     }
 }

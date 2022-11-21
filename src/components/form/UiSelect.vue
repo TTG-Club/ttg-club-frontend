@@ -3,9 +3,7 @@
         <div
             v-if="$slots['left-slot']"
             class="ui-select__slot is-left"
-        >
-            <slot name="left-slot"/>
-        </div>
+        />
 
         <multiselect
             v-bind="$props"
@@ -58,8 +56,28 @@
                     </div>
                 </slot>
             </template>
-            <template #singleLabel>
-                <slot name="singleLabel"/>
+            <template #singleLabel="{ option }">
+                <div class="ui-select__slotted">
+                    <div
+                        v-if="$slots['left-slot']"
+                        class="ui-select__slotted--left"
+                    >
+                        <slot name="left-slot"/>
+                    </div>
+
+                    <div class="ui-select__slotted--body">
+                        <slot name="singleLabel">
+                            {{ getOptionLabel(option) }}
+                        </slot>
+                    </div>
+
+                    <div
+                        v-if="$slots['right-slot']"
+                        class="ui-select__slotted--right"
+                    >
+                        <slot name="right-slot"/>
+                    </div>
+                </div>
             </template>
             <template #placeholder>
                 <slot name="placeholder">
@@ -90,15 +108,17 @@
 </template>
 
 <script>
-    import Multiselect from 'vue-multiselect';
+    import Multiselect, { multiselectMixin } from 'vue-multiselect';
     import { defineComponent } from "vue";
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
+    // TODO: Создать свой селект компонент
     export default defineComponent({
         components: {
             Multiselect,
             SvgIcon
         },
+        mixins: [multiselectMixin],
         props: {
             modelValue: {
                 type: [
@@ -302,13 +322,17 @@
                 width: 100%;
                 padding: 0;
                 border: 0;
+                overflow: hidden;
+                border-radius: 8px 0 0 8px;
             }
 
             &__select {
                 @include css_anim();
 
                 width: 38px;
-                height: 100%;
+                min-height: 100%;
+                max-height: 100%;
+                height: initial;
                 padding: 11px;
                 display: flex;
                 align-items: center;
@@ -317,6 +341,7 @@
                 flex-shrink: 0;
                 top: initial;
                 right: initial;
+                border-radius: 0 8px 8px 0;
 
                 &:hover {
                     background-color: var(--hover);
@@ -352,7 +377,6 @@
             &__single,
             &__tags-wrap,
             &__placeholder {
-                padding: 7px 12px 0 12px;
                 min-height: 100%;
                 width: 100%;
                 margin: 0;
@@ -367,6 +391,15 @@
                     font-size: var(--main-font-size);
                     line-height: var(--main-line-height);
                 }
+            }
+
+            &__single {
+                padding: 0;
+            }
+
+            &__tags-wrap,
+            &__placeholder {
+                padding: 7px 12px 0 12px;
             }
 
             &__content {
@@ -468,34 +501,41 @@
             }
 
             &__select {
+                border-radius: 0 8px 0 0;
                 transform: none;
 
                 svg {
                     transform: rotate(-180deg);
                 }
             }
+
+            &__tags {
+                border-radius: 8px 0 0 0;
+            }
         }
     }
 
     .ui-select {
-        display: flex;
-
-        &__slot {
-            padding: 8px;
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            color: var(--text-color);
-            font-size: var(--main-font-size);
-            line-height: var(--main-line-height);
+        &__slotted {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            flex-shrink: 0;
-            font-weight: 600;
 
-            &.is-left {
-                margin-right: 8px;
+            &--left,
+            &--right {
+                padding: 8px;
+                background-color: var(--border);
+                color: var(--text-color);
+                font-size: var(--main-font-size);
+                line-height: calc(var(--main-line-height) + 1px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                font-weight: 600;
+                min-width: 38px;
+            }
+
+            &--body {
+                padding: 8px;
             }
         }
     }

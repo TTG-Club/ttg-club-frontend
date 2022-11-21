@@ -26,7 +26,3 @@ export function usePluralize() {
         getPlural
     };
 }
-
-export default {
-    usePluralize
-};

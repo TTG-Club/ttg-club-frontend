@@ -20,15 +20,19 @@
                     {{ roll.value }}
                 </template>
 
+                <template #singleLabel>
+                    {{ roll.name || 'Выбрать хар-ку' }}
+                </template>
+
+                <template #placeholder>
+                    Выбрать хар-ку
+                </template>
+
                 <template #option="{ option }">
                     <span
                         class="ability-array__select_option"
                         :class="{ 'is-selected': isSelected(option.key) }"
                     >{{ option.name }}</span>
-                </template>
-
-                <template #placeholder>
-                    Выбрать хар-ку
                 </template>
             </ui-select>
         </div>

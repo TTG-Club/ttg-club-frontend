@@ -1,10 +1,11 @@
 import {
     createRouter, createWebHistory
 } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 import { useNavStore } from '@/store/UI/NavStore';
 
 /* eslint-disable max-len,vue/max-len */
-const routes = [
+const routes: Readonly<RouteRecordRaw[]> = [
     {
         name: 'classes',
         path: '/classes',
@@ -68,12 +69,12 @@ const routes = [
     {
         name: 'spells',
         path: '/spells',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Spells' */ '@/views/Spells/SpellsView.vue'),
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Character' */ '@/views/Character/Spells/SpellsView.vue'),
         children: [
             {
                 name: 'spellDetail',
                 path: ':spellName',
-                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Spells' */ '@/views/Spells/SpellDetail.vue')
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Character' */ '@/views/Character/Spells/SpellDetail.vue')
             }
         ]
     },
@@ -104,12 +105,12 @@ const routes = [
     {
         name: 'magicItems',
         path: '/items/magic',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Treasures' */ '@/views/Treasures/MagicItems/MagicItemsView.vue'),
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Inventory' */ '@/views/Inventory/MagicItems/MagicItemsView.vue'),
         children: [
             {
                 name: 'magicItemDetail',
                 path: ':magicItemName',
-                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Treasures' */ '@/views/Treasures/MagicItems/MagicItemDetail.vue')
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Inventory' */ '@/views/Inventory/MagicItems/MagicItemDetail.vue')
             }
         ]
     },
@@ -126,14 +127,31 @@ const routes = [
         ]
     },
     {
+        name: 'treasures',
+        path: '/treasures',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Inventory' */ '@/views/Inventory/Treasures/TreasuresView.vue')
+    },
+    {
         name: 'bestiary',
         path: '/bestiary',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Bestiary' */ '@/views/Bestiary/BestiaryView.vue'),
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Workshop' */ '@/views/Workshop/Bestiary/BestiaryView.vue'),
         children: [
             {
                 name: 'creatureDetail',
                 path: ':creatureName',
-                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Bestiary' */ '@/views/Bestiary/CreatureDetail.vue')
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Workshop' */ '@/views/Workshop/Bestiary/CreatureDetail.vue')
+            }
+        ]
+    },
+    {
+        name: 'screens',
+        path: '/screens',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Workshop' */ '@/views/Workshop/Screens/ScreensView.vue'),
+        children: [
+            {
+                name: 'screenDetail',
+                path: ':screenName',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Workshop' */ '@/views/Workshop/Screens/ScreenDetail.vue')
             }
         ]
     },
@@ -172,23 +190,6 @@ const routes = [
                 component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Wiki' */ '@/views/Wiki/Books/BookDetail.vue')
             }
         ]
-    },
-    {
-        name: 'screens',
-        path: '/screens',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Screens' */ '@/views/Screens/ScreensView.vue'),
-        children: [
-            {
-                name: 'screenDetail',
-                path: ':screenName',
-                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Screens' */ '@/views/Screens/ScreenDetail.vue')
-            }
-        ]
-    },
-    {
-        name: 'treasures',
-        path: '/treasures',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Treasures' */ '@/views/Treasures/Treasures/TreasuresView.vue')
     },
     {
         name: 'trader',

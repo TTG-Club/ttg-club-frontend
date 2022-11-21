@@ -12,7 +12,9 @@ async function defineRawComponent(template: string, url: string) {
         let html = template;
 
         if (!html && !template) {
-            const { data } = await http.rawGet(url);
+            const { data } = await http.rawGet({
+                url
+            });
 
             html = data;
         }

@@ -9,7 +9,7 @@
 
         <template #default>
             <div
-                v-if="isDev"
+                v-if="isDev && false"
                 class="ability-calc__row"
             >
                 <ability-races/>

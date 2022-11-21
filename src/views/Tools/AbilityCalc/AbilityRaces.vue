@@ -12,31 +12,32 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, onMounted } from 'vue';
-    import { storeToRefs } from 'pinia';
-    import type { TRaceLink } from '@/types/Character/Races';
-    import { useRacesStore } from '@/store/Character/RacesStore';
+    import { defineComponent } from 'vue';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
+
+    // import { storeToRefs } from 'pinia';
+    // import type { TRaceLink } from '@/types/Races.types';
+    // import { useRacesStore } from '@/store/Character/RacesStore';
 
     export default defineComponent({
         components: { RaceLink },
         setup() {
-            const racesStore = useRacesStore();
-            const { races } = storeToRefs(racesStore);
-
-            onMounted(async () => {
-                await racesStore.initRaces();
-            });
-
-            const onSelect = (e: TRaceLink) => {
-                // eslint-disable-next-line no-console
-                console.log(racesStore.race(e.url));
-            };
-
-            return {
-                races,
-                onSelect
-            };
+            // const racesStore = useRacesStore();
+            // const { races } = storeToRefs(racesStore);
+            //
+            // onMounted(async () => {
+            //     await racesStore.racesQuery();
+            // });
+            //
+            // const onSelect = (e: TRaceLink) => {
+            //     // eslint-disable-next-line no-console
+            //     console.log(racesStore.race(e.url));
+            // };
+            //
+            // return {
+            //     races,
+            //     onSelect
+            // };
         }
     });
 </script>

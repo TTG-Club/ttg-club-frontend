@@ -1,10 +1,9 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
-        @search="booksQuery"
-        @update="booksQuery"
+        @search="onSearch"
+        @update="initPages"
         @list-end="nextPage"
     >
         <div
@@ -21,68 +20,72 @@
                     v-for="book in group.list"
                     :key="book.url"
                     :book="book"
-                    :in-tab="inTab"
                     :to="{ path: book.url }"
                 />
             </div>
         </div>
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
     import sortBy from "lodash/sortBy";
-    import { mapState } from "pinia";
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TabLayout from "@/components/content/TabLayout.vue";
-    import { useBooksStore } from "@/store/Wiki/BooksStore";
     import BookLink from "@/views/Wiki/Books/BookLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { BooksFilterDefaults } from '@/types/Wiki/Books.types';
 
-    export default {
-        name: 'BooksView',
+    export default defineComponent({
         components: {
             BookLink,
-            TabLayout,
             ContentLayout
         },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
-            }
-        },
-        data: () => ({
-            booksStore: useBooksStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.booksStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: BooksFilterDefaults.dbName,
+                url: BooksFilterDefaults.url,
+                disabled: true
+            });
 
-            books() {
-                const books = [];
-                const types = [];
+            const {
+                initPages, nextPage, items
+            } = usePagination({
+                url: '/books',
+                limit: 70,
+                search: filter.search,
+                order: [
+                    {
+                        field: 'year',
+                        direction: 'asc'
+                    },
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-                if (!this.booksStore.getBooks) {
-                    return books;
+            // TODO: Доделать типизацию
+            const books = computed(() => {
+                const bookList: any[] = [];
+                const types: any[] = [];
+
+                if (!items.value) {
+                    return bookList;
                 }
 
-                for (const book of this.booksStore.getBooks) {
+                for (const book of items.value) {
                     if (types.find(obj => obj.name === book.type.name)) {
                         continue;
                     }
@@ -91,61 +94,41 @@
                 }
 
                 for (const type of sortBy(types, [o => o.order])) {
-                    books.push({
+                    bookList.push({
                         name: type.name,
-                        list: this.booksStore.getBooks.filter(book => book.type.name === type.name)
+                        list: items.value.filter(book => book.type.name === type.name)
                     });
                 }
 
-                return books;
-            },
+                return bookList;
+            });
 
-            showRightSide() {
-                return this.$route.name === 'bookDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+                if (books.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: books.value[0].list[0].url });
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await initPages();
+
+                if (!isMobile.value && books.value.length && route.name === 'books') {
+                    await router.push({ path: books.value[0].list[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.books.length && this.$route.name === 'books') {
-                await this.$router.push({ path: this.books[0]?.list[0]?.url });
-            }
-        },
-        beforeUnmount() {
-            this.booksStore.clearStore();
-        },
-        methods: {
-            async booksQuery() {
-                await this.booksStore.initBooks();
-            },
-
-            async init() {
-                await this.booksStore.initFilter(this.storeKey, this.customFilter);
-                await this.booksStore.initBooks();
-            },
-
-            async nextPage() {
-                await this.booksStore.nextPage();
-            }
+            return {
+                isMobile,
+                fullscreen,
+                books,
+                filter,
+                showRightSide: computed(() => route.name === 'bookDetail'),
+                initPages,
+                nextPage,
+                onSearch
+            };
         }
-    };
+    });
 </script>

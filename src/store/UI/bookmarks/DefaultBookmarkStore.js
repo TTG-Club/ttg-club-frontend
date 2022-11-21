@@ -254,7 +254,9 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
 
         async getCategories() {
             try {
-                const resp = await this.$http.get('/bookmarks/categories');
+                const resp = await this.$http.get({
+                    url: '/bookmarks/categories'
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);
@@ -283,8 +285,11 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
 
         async getCategoryByURL(url) {
             try {
-                const resp = await this.$http.get('/bookmarks/category', {
-                    url: encodeURIComponent(url)
+                const resp = await this.$http.get({
+                    url: '/bookmarks/category',
+                    payload: {
+                        url: encodeURIComponent(url)
+                    }
                 });
 
                 if (resp.status !== 200) {
@@ -299,7 +304,10 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
 
         async getCategoryByCode(code) {
             try {
-                const resp = await this.$http.get('/bookmarks/category', { code });
+                const resp = await this.$http.get({
+                    url: '/bookmarks/category',
+                    payload: { code }
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);

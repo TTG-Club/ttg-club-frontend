@@ -1,13 +1,12 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
         :to="{ path: god.url }"
         custom
         v-bind="$props"
     >
         <a
             ref="god"
-            :class="getClassList(isActive)"
+            :class="classList"
             :href="href"
             class="link-item"
             v-bind="$attrs"
@@ -39,41 +38,43 @@
     </router-link>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
+<script lang="ts">
+    import type { RouteLocationPathRaw } from 'vue-router';
+    import type { PropType } from 'vue';
+    import { useLink } from 'vue-router';
+    import { computed, defineComponent } from 'vue';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import { useGodsStore } from "@/store/Wiki/GodsStore";
 
-    export default {
-        name: 'GodLink',
+    export default defineComponent({
         directives: {
             CapitalizeFirst
         },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             god: {
                 type: Object,
                 default: () => ({})
-            },
-            inTab: {
-                type: Boolean,
-                default: false
             }
         },
-        data: () => ({
-            godsStore: useGodsStore()
-        }),
-        methods: {
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-green': this.god?.source?.homebrew,
-                    'in-tab': this.inTab
-                };
-            }
+        setup(props) {
+            const {
+                isActive, href, navigate
+            } = useLink(props);
+
+            return {
+                href,
+                navigate,
+                classList: computed(() => ({
+                    'router-link-active': isActive.value,
+                    'is-green': props.god?.homebrew
+                }))
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

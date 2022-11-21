@@ -4,7 +4,7 @@ import VueEasyLightbox from 'vue-easy-lightbox';
 import VueTippy from 'vue-tippy';
 import VueLazyLoad from 'vue3-lazyload';
 import Toast from 'vue-toastification';
-import vfmPlugin from 'vue-final-modal';
+import { vfmPlugin } from 'vue-final-modal';
 import isDev from '@/common/helpers/isDev';
 import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';

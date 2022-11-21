@@ -130,16 +130,20 @@
     </router-link>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
+<script lang="ts">
+    import type { RouteLocationPathRaw } from 'vue-router';
+    import { defineComponent } from 'vue';
+    import type { PropType } from 'vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-    export default {
-        name: 'ClassLink',
+    export default defineComponent({
         components: { SvgIcon },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             classItem: {
                 type: Object,
                 default: () => null,
@@ -178,7 +182,7 @@
             });
         },
         methods: {
-            getClassList(isActive) {
+            getClassList(isActive: any) {
                 return {
                     'router-link-active': isActive
                         || this.$route.params.className === this.$router.resolve(this.classItem.url)?.params?.className,
@@ -191,13 +195,13 @@
                 this.submenu = !this.submenu;
             },
 
-            selectClass(callback) {
+            selectClass(callback: () => void) {
                 this.submenu = true;
 
                 callback();
             }
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item-expand.scss"></style>
