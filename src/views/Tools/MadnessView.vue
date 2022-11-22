@@ -103,7 +103,9 @@
         methods: {
             async getTables() {
                 try {
-                    const resp = await this.$http.get('/tools/madness');
+                    const resp = await this.$http.get({
+                        url: '/tools/madness'
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);
@@ -139,7 +141,11 @@
                         options.type = type.value;
                     }
 
-                    const resp = await this.$http.post('/tools/madness', options, this.controller.signal);
+                    const resp = await this.$http.post({
+                        url: '/tools/madness',
+                        payload: options,
+                        signal: this.controller.signal
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);

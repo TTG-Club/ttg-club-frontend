@@ -1,98 +1,96 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="traitsQuery"
+        @update="initPages"
     >
         <trait-link
             v-for="trait in traits"
             :key="trait.url"
-            :in-tab="inTab"
             :to="{ path: trait.url }"
             :trait-item="trait"
         />
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TabLayout from "@/components/content/TabLayout.vue";
-    import { useTraitsStore } from "@/store/Character/TraitsStore";
     import TraitLink from "@/views/Character/Traits/TraitLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
 
-    export default {
-        name: 'TraitsView',
+    export default defineComponent({
         components: {
             TraitLink,
-            TabLayout,
             ContentLayout
         },
         props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
             storeKey: {
                 type: String,
                 default: ''
             }
         },
-        data: () => ({
-            traitsStore: useTraitsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.traitsStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: TraitsFilterDefaults.dbName,
+                url: TraitsFilterDefaults.url
+            });
 
-            traits() {
-                return this.traitsStore.getTraits || [];
-            },
+            const { initPages, items: traits } = usePagination({
+                url: '/traits',
+                limit: -1,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-            showRightSide() {
-                return this.$route.name === 'traitDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        async mounted() {
-            await this.traitsStore.initFilter(this.storeKey);
-            await this.traitsStore.initTraits();
-
-            if (!this.isMobile && this.traits.length && this.$route.name === 'traits') {
-                await this.$router.push({ path: this.traits[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.traitsStore.clearStore();
-        },
-        methods: {
-            async traitsQuery() {
-                await this.traitsStore.initTraits();
-            },
-
-            async onSearch() {
-                await this.traitsQuery();
-
-                if (this.traits.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.traits[0].url });
+                if (traits.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: traits.value[0].url });
                 }
-            }
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && traits.value.length && route.name === 'traits') {
+                    await router.push({ path: traits.value[0].url });
+                }
+            });
+
+            return {
+                isMobile,
+                fullscreen,
+                traits,
+                filter,
+                showRightSide: computed(() => route.name === 'traitDetail'),
+                initPages,
+                onSearch
+            };
         }
-    };
+    });
 </script>

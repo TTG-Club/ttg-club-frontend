@@ -14,12 +14,12 @@ const isDev = useIsDev();
 
 const checkExist = async (value: string, type: 'username' | 'email') => {
     try {
-        const resp = await http.post(
-            '/auth/exist',
-            {
+        const resp = await http.post({
+            url: '/auth/exist',
+            payload: {
                 [type]: value
             }
-        );
+        });
 
         if (resp.status !== 200 && isDev) {
             errorHandler(resp.statusText);

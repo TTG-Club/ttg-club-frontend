@@ -43,7 +43,9 @@ export const DefaultTippyProps: DefaultProps = {
         const http = new HTTPService();
 
         if (attr) {
-            http.rawGet(attr)
+            http.rawGet({
+                url: attr
+            })
                 .then(res => {
                     if (res.status !== 200) {
                         errorHandler(res.statusText);

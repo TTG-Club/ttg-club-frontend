@@ -1,124 +1,94 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="itemsQuery"
+        @update="initPages"
         @list-end="nextPage"
     >
         <item-link
             v-for="item in items"
             :key="item.url"
-            :in-tab="inTab"
-            :item-item="item"
+            :item="item"
             :to="{ path: item.url }"
         />
-    </component>
+    </content-layout>
 </template>
 
 <script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TabLayout from "@/components/content/TabLayout.vue";
     import ItemLink from "@/views/Inventory/Items/ItemLink.vue";
-    import { useItemsStore } from "@/store/Inventory/ItemsStore";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
+    import { usePagination } from '@/common/composition/usePagination';
 
-    export default {
-        name: 'ItemsView',
+    export default defineComponent({
         components: {
             ItemLink,
-            TabLayout,
             ContentLayout
         },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
-            }
-        },
-        data: () => ({
-            itemsStore: useItemsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.itemsStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: ItemsFilterDefaults.dbName,
+                url: ItemsFilterDefaults.url
+            });
 
-            items() {
-                return this.itemsStore.getItems || [];
-            },
+            const {
+                initPages, nextPage, items
+            } = usePagination({
+                url: '/items',
+                limit: 70,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-            showRightSide() {
-                return this.$route.name === 'itemDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+                if (items.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: items.value[0].url });
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && items.value.length && route.name === 'items') {
+                    await router.push({ path: items.value[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.items.length && this.$route.name === 'items') {
-                await this.$router.push({ path: this.items[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.itemsStore.clearStore();
-        },
-        methods: {
-            async itemsQuery() {
-                await this.itemsStore.initItems();
-            },
-
-            async init() {
-                await this.itemsStore.initFilter(this.storeKey, this.customFilter);
-                await this.itemsStore.initItems();
-            },
-
-            async nextPage() {
-                await this.itemsStore.nextPage();
-            },
-
-            async onSearch() {
-                await this.itemsQuery();
-
-                if (this.items.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.items[0].url });
-                }
-            }
+            return {
+                isMobile,
+                fullscreen,
+                items,
+                filter,
+                showRightSide: computed(() => route.name === 'itemDetail'),
+                initPages,
+                nextPage,
+                onSearch
+            };
         }
-    };
+    });
 </script>

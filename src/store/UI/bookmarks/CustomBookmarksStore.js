@@ -90,7 +90,9 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
     actions: {
         async queryGetBookmarks() {
             try {
-                const resp = await this.$http.get('/bookmarks');
+                const resp = await this.$http.get({
+                    url: '/bookmarks'
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);
@@ -116,7 +118,11 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
 
                 signals.add = new AbortController();
 
-                const resp = await this.$http.post('/bookmarks', cloneDeep(bookmark), signals.add.signal);
+                const resp = await this.$http.post({
+                    url: '/bookmarks',
+                    payload: cloneDeep(bookmark),
+                    signal: signals.add.signal
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);
@@ -144,7 +150,11 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
 
                 signals.add = new AbortController();
 
-                const resp = await this.$http.put('/bookmarks', cloneDeep(bookmark), signals.add.signal);
+                const resp = await this.$http.put({
+                    url: '/bookmarks',
+                    payload: cloneDeep(bookmark),
+                    signal: signals.add.signal
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);
@@ -172,7 +182,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
 
                 signals.delete = new AbortController();
 
-                const resp = await this.$http.delete(`/bookmarks/${ uuid }`, {}, signals.delete.signal);
+                const resp = await this.$http.delete({
+                    url: `/bookmarks/${ uuid }`,
+                    signal: signals.delete.signal
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);
@@ -236,8 +249,11 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
 
         async getCategoryByURL(url) {
             try {
-                const resp = await this.$http.get('/bookmarks/category', {
-                    url: encodeURIComponent(url)
+                const resp = await this.$http.get({
+                    url: '/bookmarks/category',
+                    payload: {
+                        url: encodeURIComponent(url)
+                    }
                 });
 
                 if (resp.status !== 200) {
@@ -252,7 +268,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
 
         async getCategoryByCode(code) {
             try {
-                const resp = await this.$http.get('/bookmarks/category', { code });
+                const resp = await this.$http.get({
+                    url: '/bookmarks/category',
+                    payload: { code }
+                });
 
                 if (resp.status !== 200) {
                     return Promise.reject(resp.statusText);

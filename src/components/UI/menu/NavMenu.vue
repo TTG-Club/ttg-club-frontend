@@ -115,8 +115,6 @@
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgressURLs = ref([]);
 
-            navStore.setNavItems();
-
             const isSaved = url => {
                 if (userStore.isAuthenticated) {
                     return customBookmarkStore.isBookmarkSavedInDefault(url);
@@ -154,7 +152,7 @@
                 menu,
                 isSaved,
                 updateBookmark,
-                navItems: navStore.getNavItems
+                navItems: navStore.showedNavItems
             };
         }
     });

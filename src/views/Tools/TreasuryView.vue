@@ -271,10 +271,10 @@
     import UiSelect from "@/components/form/UiSelect.vue";
     import SectionHeader from "@/components/UI/SectionHeader.vue";
     import UiCheckbox from "@/components/form/UiCheckbox.vue";
-    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody.vue";
-    import SpellBody from "@/views/Spells/SpellBody.vue";
-    import TreasureItem from "@/views/Treasures/Treasures/TreasureItem.vue";
-    import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink.vue";
+    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
+    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
+    import TreasureItem from "@/views/Inventory/Treasures/TreasureItem.vue";
+    import MagicItemLink from "@/views/Inventory/MagicItems/MagicItemLink.vue";
     import errorHandler from "@/common/helpers/errorHandler";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
@@ -417,7 +417,11 @@
                     cr: this.form.cr || 1
                 };
 
-                this.$http.post('/tools/treasury', options, this.controllers.list.signal)
+                this.$http.post({
+                    url: '/tools/treasury',
+                    payload: options,
+                    signal: this.controllers.list.signal
+                })
                     .then(res => {
                         if (res.status !== 200) {
                             errorHandler(res.statusText);
@@ -462,7 +466,11 @@
                     this.controllers.detail = new AbortController();
 
                     const item = this.groupedResult[group][index];
-                    const resMagicItem = await this.$http.post(item.url, null, this.controllers.detail.signal);
+
+                    const resMagicItem = await this.$http.post({
+                        url: item.url,
+                        signal: this.controllers.detail.signal
+                    });
 
                     if (resMagicItem.status !== 200) {
                         this.error = true;
@@ -477,7 +485,10 @@
                     this.controllers.detail = new AbortController();
 
                     if (item.spell?.url) {
-                        const resSpell = await this.$http.post(item.spell.url, null, this.controllers.detail.signal);
+                        const resSpell = await this.$http.post({
+                            url: item.spell.url,
+                            signal: this.controllers.detail.signal
+                        });
 
                         if (resSpell.status !== 200) {
                             this.error = true;

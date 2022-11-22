@@ -26,49 +26,57 @@
     import { mapState } from "pinia";
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import errorHandler from "@/common/helpers/errorHandler";
-    import { useItemsStore } from "@/store/Inventory/ItemsStore";
     import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'ItemDetail',
         components: {
             ContentDetail,
             ItemBody,
             SectionHeader
         },
         async beforeRouteUpdate(to, from, next) {
-            await this.loadNewItem(to.path);
+            await this.itemInfoQuery(to.path);
 
             next();
         },
         data: () => ({
-            itemStore: useItemsStore(),
             item: undefined,
             loading: false,
-            error: false
+            error: false,
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewItem(this.$route.path);
+            await this.itemInfoQuery(this.$route.path);
         },
         methods: {
-            async loadNewItem(url) {
+            async itemInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
+
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.item = await this.itemStore.itemInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.item = resp.data;
                 } catch (err) {
-                    this.loading = false;
-                    this.error = true;
-
                     errorHandler(err);
+
+                    this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
             },
 

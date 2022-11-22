@@ -25,15 +25,19 @@
                     @remove="onRemove(index)"
                     @select="onSelect($event.key, index)"
                 >
-                    <template #left-slot>
-                        {{ roll.value }}
-                    </template>
-
                     <template #option="{ option }">
                         <span
                             class="ability-random__select_option"
                             :class="{ 'is-selected': isSelected(option.key) }"
                         >{{ option.name }}</span>
+                    </template>
+
+                    <template #left-slot>
+                        {{ roll.value }}
+                    </template>
+
+                    <template #singleLabel>
+                        {{ roll.name || 'Выбрать хар-ку' }}
                     </template>
 
                     <template #placeholder>

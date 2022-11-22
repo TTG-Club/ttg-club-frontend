@@ -25,23 +25,16 @@
 <script>
     import { mapState } from "pinia";
     import SectionHeader from '@/components/UI/SectionHeader.vue';
-    import { useRacesStore } from '@/store/Character/RacesStore';
     import errorHandler from "@/common/helpers/errorHandler";
     import RaceBody from "@/views/Character/Races/RaceBody.vue";
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'RaceDetail',
         components: {
             ContentDetail,
             RaceBody,
             SectionHeader
-        },
-        async beforeRouteUpdate(to, from, next) {
-            await this.loadNewRace(to.path);
-
-            next();
         },
         beforeRouteLeave(to, from) {
             if (to.name !== 'races') {
@@ -50,34 +43,49 @@
 
             this.$emit('scroll-to-last-active', from.path);
         },
+        async beforeRouteUpdate(to, from, next) {
+            await this.raceInfoQuery(to.path);
+
+            next();
+        },
         data: () => ({
-            raceStore: useRacesStore(),
             race: undefined,
             loading: false,
-            error: false
+            error: false,
+            abortController: null
         }),
         computed: {
-            ...mapState(useUIStore, ['isMobile'])
+            ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewRace(this.$route.path);
+            await this.raceInfoQuery(this.$route.path);
 
             this.$emit('scroll-to-active');
         },
         methods: {
-            async loadNewRace(url) {
+            async raceInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
+
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.race = await this.raceStore.raceInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.race = resp.data;
                 } catch (err) {
-                    this.loading = false;
-                    this.error = true;
-
                     errorHandler(err);
+
+                    this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
             },
 
