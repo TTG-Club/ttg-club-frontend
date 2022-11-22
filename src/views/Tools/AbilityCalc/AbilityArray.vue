@@ -47,7 +47,7 @@
         defineComponent, ref
     } from "vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
-    import { AbilityName, AbilityKey } from '@/enums/Tools/AbilityCalcEnum';
+    import { AbilityName, AbilityKey } from '@/types/Tools/AbilityCalc.types';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
 

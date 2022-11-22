@@ -53,8 +53,7 @@
 
             const filter = useFilter({
                 dbName: ArmorsFilterDefaults.dbName,
-                url: ArmorsFilterDefaults.url,
-                disabled: true
+                url: ArmorsFilterDefaults.url
             });
 
             const { initPages, items } = usePagination({

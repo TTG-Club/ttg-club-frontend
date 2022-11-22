@@ -1,10 +1,5 @@
 <template>
     <div class="ui-select">
-        <div
-            v-if="$slots['left-slot']"
-            class="ui-select__slot is-left"
-        />
-
         <multiselect
             v-bind="$props"
             @close="onClose"

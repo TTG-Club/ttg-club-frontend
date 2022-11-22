@@ -51,8 +51,7 @@
 
             const filter = useFilter({
                 dbName: ScreensFilterDefaults.dbName,
-                url: ScreensFilterDefaults.url,
-                disabled: true
+                url: ScreensFilterDefaults.url
             });
 
             const {

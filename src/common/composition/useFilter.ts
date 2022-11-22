@@ -36,7 +36,6 @@ export type FilterConfig = {
     search?: SearchConfig
     dbName: MaybeRef<string>
     storeKey?: MaybeRef<string | 'core'>
-    disabled?: MaybeRef<boolean>
 }
 
 export type FilterQueryParams = {
@@ -57,8 +56,6 @@ export function useFilter(config: FilterConfig): FilterComposable {
     const http = useAxios();
     const filter = ref<Filter | Array<FilterGroup> | undefined>(undefined);
 
-    const isDisabled = computed(() => unref(config.disabled) || false);
-
     const url = computed(() => unref(config.url));
     const dbName = computed(() => unref(config.dbName));
     const storeKey = computed(() => unref(config.storeKey) || 'core');
@@ -75,10 +72,6 @@ export function useFilter(config: FilterConfig): FilterComposable {
     }));
 
     const setStoreInstance = () => {
-        if (isDisabled.value) {
-            return;
-        }
-
         store.value = localforage.createInstance({
             name: unref(dbName),
             storeName
@@ -311,10 +304,6 @@ export function useFilter(config: FilterConfig): FilterComposable {
     };
 
     const initFilter = async () => {
-        if (isDisabled.value) {
-            return Promise.resolve();
-        }
-
         try {
             const setStore = async (filterDefault: Filter | Array<FilterGroup>) => {
                 const restored = await getRestored(filterDefault);

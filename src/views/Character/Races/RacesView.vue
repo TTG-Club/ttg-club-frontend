@@ -30,7 +30,7 @@
     import { useUIStore } from "@/store/UI/UIStore";
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
-    import { RaceFilterDefaults } from '@/types/Character/Races.types';
+    import { RacesFilterDefaults } from '@/types/Character/Races.types';
 
     export default defineComponent({
 
@@ -45,8 +45,8 @@
             const { isMobile, fullscreen } = storeToRefs(uiStore);
 
             const filter = useFilter({
-                dbName: RaceFilterDefaults.dbName,
-                url: RaceFilterDefaults.url
+                dbName: RacesFilterDefaults.dbName,
+                url: RacesFilterDefaults.url
             });
 
             const { initPages, items: races } = usePagination({
