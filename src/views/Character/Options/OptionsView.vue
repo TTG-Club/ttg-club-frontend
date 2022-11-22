@@ -69,8 +69,8 @@
 
             const filter = useFilter({
                 dbName: OptionsFilterDefaults.dbName,
-                storeKey: props.storeKey,
-                url: props.filterUrl || OptionsFilterDefaults.url
+                storeKey: computed(() => props.storeKey),
+                url: computed(() => props.filterUrl || OptionsFilterDefaults.url)
             });
 
             const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
@@ -86,9 +86,11 @@
                 return filter.queryParams.value;
             });
 
-            const { initPages, items: options } = usePagination({
+            const {
+                initPages, resetPages, items: options
+            } = usePagination({
                 url: '/options',
-                limit: -1,
+                limit: 70,
                 filter: {
                     isCustomized,
                     value: queryParams
@@ -120,8 +122,16 @@
             });
 
             watch(
-                () => props.queryBooks,
-                initPages,
+                [
+                    () => props.queryBooks,
+                    () => props.filterUrl,
+                    () => props.storeKey
+                ],
+                async () => {
+                    await resetPages();
+                    await filter.initFilter();
+                    await initPages();
+                },
                 {
                     deep: true
                 }

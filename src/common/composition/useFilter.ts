@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
 import {
-    computed, ref, unref, watch
+    computed, ref, unref
 } from 'vue';
 import localforage from 'localforage';
 import cloneDeep from 'lodash/cloneDeep';
@@ -334,6 +334,9 @@ export function useFilter(config: FilterConfig): FilterComposable {
                 return Promise.reject();
             }
 
+            setStoreInstance();
+            search.value.value = config.search?.initial || '';
+
             await setStore(resp.data);
 
             return Promise.resolve();
@@ -341,21 +344,6 @@ export function useFilter(config: FilterConfig): FilterComposable {
             return Promise.reject(err);
         }
     };
-
-    watch(
-        [
-            url,
-            dbName,
-            storeKey
-        ],
-        async () => {
-            setStoreInstance();
-            await initFilter();
-
-            search.value.value = '';
-        },
-        { immediate: true }
-    );
 
     return {
         filter,

@@ -70,8 +70,8 @@
 
             const filter = useFilter({
                 dbName: SpellsFilterDefaults.dbName,
-                storeKey: props.storeKey,
-                url: props.filterUrl || SpellsFilterDefaults.url
+                storeKey: computed(() => props.storeKey),
+                url: computed(() => props.filterUrl || SpellsFilterDefaults.url)
             });
 
             const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
@@ -88,7 +88,7 @@
             });
 
             const {
-                initPages, nextPage, items: spells
+                initPages, nextPage, resetPages, items: spells
             } = usePagination({
                 url: '/spells',
                 limit: 70,
@@ -127,8 +127,16 @@
             });
 
             watch(
-                () => props.queryBooks,
-                initPages,
+                [
+                    () => props.queryBooks,
+                    () => props.filterUrl,
+                    () => props.storeKey
+                ],
+                async () => {
+                    await resetPages();
+                    await filter.initFilter();
+                    await initPages();
+                },
                 {
                     deep: true
                 }

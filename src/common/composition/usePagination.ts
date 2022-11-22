@@ -57,7 +57,7 @@ export function usePagination(config: PaginationConfig) {
     const items = ref<Array<any>>([]);
     const page = ref(unref(config.page) || 0);
     const limit = computed(() => unref(config.limit) || 70);
-    const isEnd = ref(false);
+    const isEnd = ref(unref(config.limit) === -1 || false);
 
     const payload = computed((): PaginationQuery => {
         const request: PaginationQuery = {
@@ -119,7 +119,7 @@ export function usePagination(config: PaginationConfig) {
                 items.value = resp.data;
             }
 
-            isEnd.value = limit.value === -1 || (Array.isArray(items.value) && (items.value.length < limit.value));
+            isEnd.value = Array.isArray(items.value) && (items.value.length < limit.value);
 
             return Promise.resolve();
         } catch (err: any) {
@@ -156,6 +156,17 @@ export function usePagination(config: PaginationConfig) {
         await load(true);
     };
 
+    const resetPages = () => {
+        page.value = 0;
+        isFirstLoad.value = true;
+        items.value = [];
+        isEnd.value = false;
+
+        abortController = null;
+
+        return Promise.resolve();
+    };
+
     return {
         isLoading,
         isFirstLoad,
@@ -166,6 +177,7 @@ export function usePagination(config: PaginationConfig) {
         payload,
         abort,
         initPages,
-        nextPage
+        nextPage,
+        resetPages
     };
 }
