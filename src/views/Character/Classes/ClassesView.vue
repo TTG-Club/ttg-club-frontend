@@ -127,7 +127,7 @@
                 return getGroupClasses();
             });
 
-            provide('queryParams', () => filter.queryParams.value);
+            provide('queryBooks', () => filter.queryParams.value.book || []);
 
             onBeforeMount(async () => {
                 await filter.initFilter();

@@ -28,7 +28,6 @@
     import TabLayout from "@/components/content/TabLayout.vue";
     import SpellLink from "@/views/Character/Spells/SpellLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
-    import type { FilterQueryParams } from '@/common/composition/useFilter';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
@@ -52,8 +51,8 @@
                 type: String,
                 default: undefined
             },
-            queryParams: {
-                type: Object as PropType<FilterQueryParams>,
+            queryBooks: {
+                type: Array as PropType<Array<string>>,
                 default: undefined
             }
         },
@@ -75,13 +74,13 @@
                 url: props.filterUrl || SpellsFilterDefaults.url
             });
 
-            const isCustomized = computed(() => !!props.queryParams || filter.isCustomized.value);
+            const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
             const queryParams = computed(() => {
-                if (props.queryParams) {
+                if (props.queryBooks) {
                     return {
                         ...filter.queryParams.value,
-                        ...props.queryParams
+                        book: props.queryBooks
                     };
                 }
 
@@ -128,11 +127,10 @@
             });
 
             watch(
-                () => props.queryParams,
+                () => props.queryBooks,
                 initPages,
                 {
-                    deep: true,
-                    immediate: true
+                    deep: true
                 }
             );
 

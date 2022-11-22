@@ -90,7 +90,7 @@
                 <spells-view
                     v-else-if="currentTab?.type === 'spells'"
                     :filter-url="currentTab.url"
-                    :query-params="providedQueryParams"
+                    :query-books="providedQueryBooks"
                     :store-key="getStoreKey"
                     in-tab
                 />
@@ -98,7 +98,7 @@
                 <options-view
                     v-else-if="currentTab?.type === 'options'"
                     :filter-url="currentTab.url"
-                    :query-params="providedQueryParams"
+                    :query-books="providedQueryBooks"
                     :store-key="getStoreKey"
                     in-tab
                 />
@@ -150,7 +150,7 @@
             SectionHeader
         },
         inject: {
-            queryParams: {
+            queryBooks: {
                 default: undefined
             }
         },
@@ -184,8 +184,8 @@
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            providedQueryParams() {
-                return this.queryParams();
+            providedQueryBooks() {
+                return this.queryBooks();
             },
 
             classes() {
@@ -252,7 +252,9 @@
                     const resp = await this.$http.post({
                         url,
                         payload: {
-                            filter: resolveUnref(this.queryParams)
+                            filter: {
+                                book: resolveUnref(this.queryBooks)
+                            }
                         },
                         signal: this.abortController.signal
                     });

@@ -23,7 +23,6 @@
     import type { PropType } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
-    import type { FilterQueryParams } from '@/common/composition/useFilter';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import TabLayout from "@/components/content/TabLayout.vue";
     import OptionLink from "@/views/Character/Options/OptionLink.vue";
@@ -51,8 +50,8 @@
                 type: String,
                 default: undefined
             },
-            queryParams: {
-                type: Object as PropType<FilterQueryParams>,
+            queryBooks: {
+                type: Array as PropType<Array<string>>,
                 default: undefined
             }
         },
@@ -74,13 +73,13 @@
                 url: props.filterUrl || OptionsFilterDefaults.url
             });
 
-            const isCustomized = computed(() => !!props.queryParams || filter.isCustomized.value);
+            const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
             const queryParams = computed(() => {
-                if (props.queryParams) {
+                if (props.queryBooks) {
                     return {
                         ...filter.queryParams.value,
-                        ...props.queryParams
+                        book: props.queryBooks
                     };
                 }
 
@@ -121,11 +120,10 @@
             });
 
             watch(
-                () => props.queryParams,
+                () => props.queryBooks,
                 initPages,
                 {
-                    deep: true,
-                    immediate: true
+                    deep: true
                 }
             );
 
