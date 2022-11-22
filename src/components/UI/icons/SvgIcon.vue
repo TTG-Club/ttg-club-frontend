@@ -15,7 +15,6 @@
     import '@/common/utils/SvgRequire';
 
     export default {
-        name: 'SvgIcon',
         props: {
             iconName: {
                 type: [String, Function],

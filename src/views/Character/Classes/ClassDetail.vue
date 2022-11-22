@@ -54,7 +54,7 @@
                     </template>
 
                     <template #option="{ option }">
-                        <span v-if="option?.group">{{ option.group.name }}</span>
+                        <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
 
                         <span
                             v-else
@@ -90,7 +90,7 @@
                 <spells-view
                     v-else-if="currentTab?.type === 'spells'"
                     :filter-url="currentTab.url"
-                    :books="getClassesBooks"
+                    :query-books="providedQueryBooks"
                     :store-key="getStoreKey"
                     in-tab
                 />
@@ -98,7 +98,7 @@
                 <options-view
                     v-else-if="currentTab?.type === 'options'"
                     :filter-url="currentTab.url"
-                    :books="getClassesBooks"
+                    :query-books="providedQueryBooks"
                     :store-key="getStoreKey"
                     in-tab
                 />
@@ -109,7 +109,7 @@
                 :imgs="currentClass?.images"
                 :index="gallery.index"
                 :visible="gallery.show"
-                :teleport="'body'"
+                teleport="body"
                 loop
                 move-disabled
                 scroll-disabled
@@ -126,19 +126,20 @@
     import isArray from "lodash/isArray";
     import sortBy from "lodash/sortBy";
     import groupBy from "lodash/groupBy";
-    import SectionHeader from '@/components/UI/SectionHeader';
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
-    import { useClassesStore } from '@/store/Character/ClassesStore';
-    import UiSelect from '@/components/form/UiSelect';
-    import SpellsView from "@/views/Spells/SpellsView";
+    import { resolveUnref } from '@vueuse/core';
+    import cloneDeep from 'lodash/cloneDeep';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import SpellsView from "@/views/Character/Spells/SpellsView.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import OptionsView from "@/views/Character/Options/OptionsView";
-    import RawContent from "@/components/content/RawContent";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import OptionsView from "@/views/Character/Options/OptionsView.vue";
+    import RawContent from "@/components/content/RawContent.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'ClassDetail',
+
         components: {
             ContentDetail,
             RawContent,
@@ -148,10 +149,15 @@
             SvgIcon,
             SectionHeader
         },
+        inject: {
+            queryBooks: {
+                default: undefined
+            }
+        },
         async beforeRouteUpdate(to, from, next) {
             this.removeScrollListeners();
 
-            await this.loadNewClass(to.path);
+            await this.classInfoQuery(to.path);
 
             next();
         },
@@ -163,7 +169,6 @@
             this.$emit('scroll-to-last-active', from.path);
         },
         data: () => ({
-            classesStore: useClassesStore(),
             loading: true,
             error: false,
             currentClass: undefined,
@@ -172,22 +177,19 @@
             gallery: {
                 show: false,
                 index: null
-            }
+            },
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['isMobile']),
 
-            classes() {
-                return this.classesStore.getClasses || [];
+            providedQueryBooks() {
+                return this.queryBooks();
             },
 
             getStoreKey() {
                 return `${ this.currentClass.name.eng + this.currentTab.type + this.currentTab.order }`
                     .replaceAll(' ', '');
-            },
-
-            getClassesBooks() {
-                return this.classesStore.getFilter?.getQueryParams?.book || undefined;
             },
 
             currentSelectArchetype() {
@@ -201,8 +203,7 @@
                     }
                 }
 
-                // Костыль, чтоб закрывалось при нажатии на селект
-                return selected || `--- ${ this.currentClass?.archetypeName } ---`;
+                return selected;
             },
 
             currentArchetypes() {
@@ -224,7 +225,7 @@
             }
         },
         async mounted() {
-            await this.loadNewClass(this.$route.path);
+            await this.classInfoQuery(this.$route.path);
 
             this.$emit('scroll-to-active');
         },
@@ -232,32 +233,57 @@
             this.removeScrollListeners();
         },
         methods: {
-            async loadNewClass(url) {
+            async classInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
+
                 try {
                     this.error = false;
                     this.loading = true;
-                    this.currentTab = undefined;
-                    this.tabs = [];
+                    this.abortController = new AbortController();
 
-                    this.images = {
-                        show: false,
-                        index: 0
-                    };
+                    const resp = await this.$http.post({
+                        url,
+                        payload: {
+                            filter: {
+                                book: resolveUnref(this.queryBooks)
+                            }
+                        },
+                        signal: this.abortController.signal
+                    });
 
-                    const loadedClass = await this.classesStore.classInfoQuery(url);
+                    const classInfo = this.getUpdatedClass(resp.data);
 
-                    await this.initTabs(loadedClass);
+                    await this.initTabs(classInfo);
 
-                    this.currentClass = loadedClass;
-
-                    this.loading = false;
+                    this.currentClass = classInfo;
                 } catch (err) {
+                    errorHandler(err);
+
                     this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
             },
 
+            getUpdatedClass(classInfo) {
+                const updatedClass = cloneDeep(classInfo);
+
+                if (!updatedClass.images || !Array.isArray(updatedClass.images)) {
+                    updatedClass.images = [];
+                }
+
+                if (!updatedClass.images.length && updatedClass.image) {
+                    updatedClass.images.unshift(updatedClass.image);
+                }
+
+                return updatedClass;
+            },
+
             async initTabs(loadedClass) {
-                this.tabs = loadedClass.tabs;
+                this.tabs = sortBy(loadedClass.tabs, ['order']);
 
                 if (isArray(loadedClass.images) && loadedClass.images?.length) {
                     this.tabs.push({
@@ -511,7 +537,7 @@
         }
 
         &__select {
-            ::v-deep(.dnd5club-select) {
+            ::v-deep(.ui-select) {
                 .multiselect {
                     border-width: 0 0 1px 0;
                     border-radius: 0;
@@ -525,6 +551,11 @@
                                 width: 0 0 1px 0;
                             }
                         }
+                    }
+
+                    &__tags,
+                    &__select {
+                        border-radius: 0;
                     }
 
                     &:hover,

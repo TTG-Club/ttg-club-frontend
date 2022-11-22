@@ -136,18 +136,18 @@
     import throttle from 'lodash/throttle';
     import groupBy from "lodash/groupBy";
     import { mapState } from "pinia";
-    import ContentLayout from "@/components/content/ContentLayout";
-    import UiSelect from "@/components/form/UiSelect";
-    import SectionHeader from "@/components/UI/SectionHeader";
-    import UiCheckbox from "@/components/form/UiCheckbox";
-    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody";
-    import SpellBody from "@/views/Spells/SpellBody";
-    import MagicItemLink from "@/views/Treasures/MagicItems/MagicItemLink";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
+    import UiSelect from "@/components/form/UiSelect.vue";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
+    import UiCheckbox from "@/components/form/UiCheckbox.vue";
+    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
+    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
+    import MagicItemLink from "@/views/Inventory/MagicItems/MagicItemLink.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
-    import UiInput from "@/components/form/UiInput";
-    import UiButton from "@/components/form/UiButton";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiButton from "@/components/form/UiButton.vue";
 
     export default {
         name: "TraderView",
@@ -244,7 +244,9 @@
         methods: {
             async getLevels() {
                 try {
-                    const resp = await this.$http.get('/tools/trader');
+                    const resp = await this.$http.get({
+                        url: '/tools/trader'
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);
@@ -271,7 +273,11 @@
                     persuasion: this.form.persuasion || 1
                 };
 
-                this.$http.post('/tools/trader', options, this.controllers.list.signal)
+                this.$http.post({
+                    url: '/tools/trader',
+                    payload: options,
+                    signal: this.controllers.list.signal
+                })
                     .then(res => {
                         if (res.status !== 200) {
                             errorHandler(res.statusText);
@@ -316,7 +322,11 @@
                     this.controllers.detail = new AbortController();
 
                     const item = this.groupedResults[index];
-                    const resMagicItem = await this.$http.post(item.url, null, this.controllers.detail.signal);
+
+                    const resMagicItem = await this.$http.post({
+                        url: item.url,
+                        signal: this.controllers.detail.signal
+                    });
 
                     if (resMagicItem.status !== 200) {
                         this.error = true;
@@ -331,7 +341,10 @@
                     this.controllers.detail = new AbortController();
 
                     if (item.spell?.url) {
-                        const resSpell = await this.$http.post(item.spell.url, null, this.controllers.detail.signal);
+                        const resSpell = await this.$http.post({
+                            url: item.spell.url,
+                            signal: this.controllers.detail.signal
+                        });
 
                         if (resSpell.status !== 200) {
                             this.error = true;

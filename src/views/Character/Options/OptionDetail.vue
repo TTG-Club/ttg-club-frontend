@@ -24,51 +24,59 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from '@/components/UI/SectionHeader';
-    import { useOptionsStore } from '@/store/Character/OptionsStore';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
     import errorHandler from "@/common/helpers/errorHandler";
-    import OptionBody from "@/views/Character/Options/OptionBody";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import OptionBody from "@/views/Character/Options/OptionBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
 
     export default {
-        name: 'OptionDetail',
         components: {
             ContentDetail,
             OptionBody,
             SectionHeader
         },
         async beforeRouteUpdate(to, from, next) {
-            await this.loadNewOption(to.path);
+            await this.optionInfoQuery(to.path);
 
             next();
         },
         data: () => ({
-            optionStore: useOptionsStore(),
             option: undefined,
             loading: false,
-            error: false
+            error: false,
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewOption(this.$route.path);
+            await this.optionInfoQuery(this.$route.path);
         },
         methods: {
-            async loadNewOption(url) {
+            async optionInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
+
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.option = await this.optionStore.optionInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.option = resp.data;
                 } catch (err) {
-                    this.loading = false;
-                    this.error = true;
-
                     errorHandler(err);
+
+                    this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
             },
 

@@ -3,15 +3,14 @@
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="racesQuery"
+        @update="initPages"
     >
         <div
-            ref="races"
             class="race-items"
             :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
         >
             <race-link
-                v-for="race in getRaces"
+                v-for="race in races"
                 :key="race.url"
                 :race-item="race"
                 :to="{ path: race.url }"
@@ -20,64 +19,76 @@
     </content-layout>
 </template>
 
-<script>
+<script lang="ts">
+    import { storeToRefs } from 'pinia';
     import {
-        mapActions, mapState
-    } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import { useRacesStore } from "@/store/Character/RacesStore";
-    import RaceLink from "@/views/Character/Races/RaceLink";
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import RaceLink from "@/views/Character/Races/RaceLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { RacesFilterDefaults } from '@/types/Character/Races.types';
 
-    export default {
-        name: 'RacesView',
+    export default defineComponent({
+
         components: {
             RaceLink,
             ContentLayout
         },
-        async beforeRouteEnter(to, from, next) {
-            const store = useRacesStore();
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            await store.initFilter();
-            await store.initRaces();
+            const filter = useFilter({
+                dbName: RacesFilterDefaults.dbName,
+                url: RacesFilterDefaults.url
+            });
 
-            next();
-        },
-        computed: {
-            ...mapState(useUIStore, ['isMobile', 'fullscreen']),
-            ...mapState(useRacesStore, ['getRaces', 'getFilter']),
+            const { initPages, items: races } = usePagination({
+                url: '/races',
+                limit: -1,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-            filter() {
-                return this.getFilter || undefined;
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            showRightSide() {
-                return this.$route.name === 'raceDetail';
-            }
-        },
-        beforeUnmount() {
-            this.clearStore();
-        },
-        methods: {
-            ...mapActions(useRacesStore, [
-                'initFilter',
-                'initRaces',
-                'clearStore'
-            ]),
-
-            async racesQuery() {
-                await this.initRaces();
-            },
-
-            async onSearch() {
-                await this.racesQuery();
-
-                if (this.getRaces.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.getRaces[0].url });
+                if (races.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: races.value[0].url });
                 }
-            }
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+            });
+
+            return {
+                isMobile,
+                fullscreen,
+                races,
+                filter,
+                showRightSide: computed(() => route.name === 'raceDetail'),
+                initPages,
+                onSearch
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

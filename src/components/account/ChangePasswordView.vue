@@ -85,8 +85,8 @@
         computed, defineComponent, reactive, ref
     } from "vue";
     import { useToast } from "vue-toastification";
-    import UiButton from "@/components/form/UiButton";
-    import UiInput from "@/components/form/UiInput";
+    import UiButton from "@/components/form/UiButton.vue";
+    import UiInput from "@/components/form/UiInput.vue";
     import { useUserStore } from "@/store/UI/UserStore";
     import {
         validateEmailFormat,
@@ -97,6 +97,7 @@
         validatePwdUpperCase,
         validateRequired, validateUsernameSpecialChars
     } from "@/common/helpers/authChecks";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
     export default defineComponent({
         components: {
@@ -111,7 +112,7 @@
         },
         emits: ['close', 'switch:auth'],
         setup(props, { emit }) {
-            const toast = useToast();
+            const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
             const success = ref(false);
             const inProgress = ref(false);

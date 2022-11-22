@@ -59,16 +59,20 @@
     </div>
 </template>
 
-<script>
-    import { useInfiniteScroll, useResizeObserver } from "@vueuse/core";
-    import { mapState } from "pinia";
-    import { ref } from "vue";
+<script lang="ts">
+    import type { PropType } from 'vue';
+    import {
+        useEventListener, useInfiniteScroll, useResizeObserver
+    } from '@vueuse/core';
+    import { storeToRefs } from 'pinia';
+    import {
+        defineComponent, nextTick, onMounted, ref
+    } from 'vue';
     import { useUIStore } from '@/store/UI/UIStore';
-    import ListFilter from "@/components/filter/ListFilter";
-    import FilterService from "@/common/services/FilterService";
+    import ListFilter from "@/components/filter/ListFilter.vue";
+    import type { FilterComposable } from '@/common/composition/useFilter';
 
-    export default {
-        name: 'ContentLayout',
+    export default defineComponent({
         components: { ListFilter },
         props: {
             showRightSide: {
@@ -76,95 +80,44 @@
                 default: false
             },
             filterInstance: {
-                type: FilterService,
+                type: Object as PropType<FilterComposable>,
                 default: undefined
             }
         },
-        emits: [
-            'list-end',
-            'update',
-            'search',
-            'resize'
-        ],
-        data: () => ({
-            shadow: false
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile', 'fullscreen'])
-        },
-        mounted() {
-            const scrollEl = document.getElementById('dnd5club');
+        setup(props, { emit }) {
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
+            const scrollEl = ref(document.getElementById('dnd5club'));
+            const container = ref<HTMLDivElement | null>(null);
+            const items = ref<HTMLDivElement | null>(null);
+            const shadow = ref(false);
 
-            useInfiniteScroll(
-                ref(scrollEl),
-                () => {
-                    this.$emit('list-end');
-                },
-                { distance: 1080 }
-            );
-
-            scrollEl.addEventListener('scroll', this.scrollHandler);
-
-            useResizeObserver(scrollEl, this.scrollHandler);
-        },
-        beforeUnmount() {
-            const scrollEl = document.getElementById('dnd5club');
-
-            scrollEl.removeEventListener('scroll', this.scrollHandler);
-        },
-        methods: {
-            scrollToLastActive(url) {
-                if (this.isMobile) {
-                    return;
-                }
-
-                const { items } = this.$refs;
-
-                if (!items) {
-                    return;
-                }
-
-                const link = items.querySelector(`[href="${ url }"]`)?.closest('.link-item-expand');
-
-                if (!link) {
-                    return;
-                }
-
-                setTimeout(() => {
-                    this.$nextTick(() => {
-                        this.scrollToActive(link);
-                    });
-                }, 350);
-            },
-
-            scrollToActive(oldLink) {
-                if (this.isMobile) {
+            const scrollToActive = (oldLink: Element) => {
+                if (isMobile.value) {
                     return;
                 }
 
                 if (document.readyState !== "complete") {
-                    this.scrollToActive(oldLink);
+                    scrollToActive(oldLink);
 
                     return;
                 }
 
-                const { items } = this.$refs;
-
-                if (!items) {
+                if (!items.value) {
                     return;
                 }
 
-                const link = oldLink || items.querySelector('.router-link-active');
+                const link = oldLink || items.value.querySelector('.router-link-active');
 
                 if (!link) {
                     return;
                 }
 
-                this.$nextTick(() => {
+                nextTick(() => {
                     const scrollBody = document.getElementById('dnd5club');
                     const rect = link.getBoundingClientRect();
 
-                    if (!rect?.top && rect?.top !== 0) {
+                    if (!scrollBody || !rect?.top && rect?.top !== 0) {
                         return;
                     }
 
@@ -173,20 +126,65 @@
                         behavior: "smooth"
                     });
                 });
-            },
+            };
 
-            scrollHandler() {
-                this.toggleShadow();
-            },
+            const scrollToLastActive = (url: string) => {
+                if (isMobile.value) {
+                    return;
+                }
 
-            toggleShadow() {
-                const scrollEl = document.getElementById('dnd5club');
-                const container = document.getElementById('container');
+                if (!items.value) {
+                    return;
+                }
 
-                this.shadow = scrollEl.scrollTop + scrollEl.offsetHeight < container.offsetHeight - 24;
-            }
+                const link = items.value.querySelector(`[href="${ url }"]`)?.closest('.link-item-expand');
+
+                if (!link) {
+                    return;
+                }
+
+                setTimeout(() => {
+                    nextTick(() => {
+                        scrollToActive(link);
+                    });
+                }, 350);
+            };
+
+            const toggleShadow = () => {
+                if (!scrollEl.value || !container.value) {
+                    return;
+                }
+
+                shadow.value
+                    = scrollEl.value.scrollTop + scrollEl.value.offsetHeight < container.value.offsetHeight - 24;
+            };
+
+            const scrollHandler = () => {
+                toggleShadow();
+            };
+
+            onMounted(() => {
+                useInfiniteScroll(
+                    ref(scrollEl),
+                    () => {
+                        emit('list-end');
+                    },
+                    { distance: 1080 }
+                );
+
+                useEventListener(scrollEl, 'scroll', scrollHandler);
+                useResizeObserver(scrollEl, scrollHandler);
+            });
+
+            return {
+                isMobile,
+                fullscreen,
+                shadow,
+                scrollToActive,
+                scrollToLastActive
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

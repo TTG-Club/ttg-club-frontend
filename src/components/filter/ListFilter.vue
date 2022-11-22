@@ -97,18 +97,26 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
     import cloneDeep from "lodash/cloneDeep";
-    import debounce from "lodash/debounce";
-    import SvgIcon from '@/components/UI/icons/SvgIcon';
-    import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources';
-    import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes';
-    import FilterService from "@/common/services/FilterService";
+    import {
+        computed, defineComponent, ref
+    } from 'vue';
+    import type {
+        PropType
+    } from 'vue';
+    import { useDebounceFn } from '@vueuse/core';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
+    import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
     import errorHandler from "@/common/helpers/errorHandler";
-    import BaseModal from "@/components/UI/modals/BaseModal";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import type {
+        Filter, FilterComposable, FilterGroup, FilterItem
+    } from '@/common/composition/useFilter';
 
-    export default {
-        name: 'ListFilter',
+    export default defineComponent({
+
         components: {
             BaseModal,
             FilterItemCheckboxes,
@@ -117,136 +125,122 @@
         },
         props: {
             filterInstance: {
-                type: FilterService,
-                default: undefined,
+                type: Object as PropType<FilterComposable>,
                 required: true
             },
             inTab: {
                 type: Boolean,
                 default: false
-            },
-            exactSearch: {
-                type: Boolean,
-                default: false
             }
         },
-        emits: [
-            'clear-filter',
-            'search',
-            'update'
-        ],
-        data: () => ({
-            showed: false
-        }),
-        computed: {
-            search: {
+        setup(props, { emit }) {
+            const showed = ref(false);
+
+            const emitSearch = useDebounceFn(value => {
+                emit('search', value);
+            }, 500);
+
+            const emitFilter = useDebounceFn(() => {
+                emit('update');
+            }, 500);
+
+            const search = computed({
                 get() {
-                    return this.filterInstance?.getSearchState || '';
+                    return props.filterInstance.search.value.value;
                 },
+                set(value: string) {
+                    emitSearch(props.filterInstance.search.updateSearch(value));
+                }
+            });
 
-                async set(value) {
+            const filter = computed<Filter | Array<FilterGroup> | undefined>({
+                get: () => props.filterInstance.filter.value,
+                set: async value => {
                     try {
-                        await this.filterInstance.updateSearch(value);
+                        if (!value) {
+                            return;
+                        }
 
-                        this.emitSearch(value);
+                        await props.filterInstance.saveFilter(value);
+
+                        emitFilter();
                     } catch (err) {
                         errorHandler(err);
                     }
                 }
-            },
+            });
 
-            filter: {
-                get() {
-                    return this.filterInstance?.getFilterState || undefined;
-                },
-
-                async set(value) {
-                    try {
-                        await this.filterInstance.save(value);
-
-                        this.emitFilter();
-                    } catch (err) {
-                        errorHandler(err);
+            const otherFilters = computed({
+                get(): Array<FilterGroup> {
+                    if (Array.isArray(filter.value)) {
+                        return filter.value;
                     }
-                }
-            },
 
-            otherFiltered() {
-                return this.otherFilters.filter(filter => !filter.hidden);
-            },
-
-            otherFilters: {
-                get() {
-                    return this.filter?.other || this.filter || [];
+                    return filter.value?.other || [];
                 },
 
-                set(value) {
-                    if (this.filter?.other) {
-                        this.filter = {
-                            ...this.filter,
-                            other: value
-                        };
+                set(value: Array<FilterGroup>) {
+                    if (Array.isArray(filter.value)) {
+                        filter.value = value;
 
                         return;
                     }
 
-                    this.filter = value;
+                    if (filter.value?.other) {
+                        filter.value = {
+                            ...filter.value,
+                            other: value as Array<FilterGroup>
+                        };
+                    }
                 }
-            },
+            });
 
-            isFilterCustomized() {
-                return this.filterInstance.isCustomized;
-            }
-        },
-        beforeUnmount() {
-            this.cancelEmits();
-        },
-        methods: {
-            setSourcesValue(value) {
-                this.filter = {
-                    ...this.filter,
+            const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
+            const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
+
+            const setSourcesValue = (value: Array<FilterGroup>) => {
+                if (!filter.value || Array.isArray(filter.value)) {
+                    return;
+                }
+
+                filter.value = {
+                    ...filter.value,
                     sources: value
                 };
-            },
+            };
 
-            setOtherValue(value, key) {
-                const otherFilters = cloneDeep(this.otherFilters);
-                const index = otherFilters.findIndex(filter => filter.key === key);
+            const setOtherValue = (value: Array<FilterItem>, key: string) => {
+                const otherFiltersCopy = cloneDeep(otherFilters.value);
+                const index = otherFiltersCopy.findIndex(group => group.key === key);
 
                 if (index > -1) {
-                    otherFilters[index].values = value;
+                    otherFiltersCopy[index].values = value;
 
-                    this.otherFilters = otherFilters;
+                    otherFilters.value = otherFiltersCopy;
                 }
-            },
+            };
 
-            async resetFilter() {
-                await this.filterInstance.reset();
+            const resetFilter = async () => {
+                await props.filterInstance.resetFilter();
 
-                this.emitFilter();
-            },
+                emitFilter();
+            };
 
-            // eslint-disable-next-line func-names
-            emitSearch: debounce(function(value) {
-                this.$emit('search', value);
-            }, 500),
+            return {
+                showed,
 
-            // eslint-disable-next-line func-names
-            emitFilter: debounce(function() {
-                this.$emit('update');
-            }, 500),
+                search,
+                filter,
+                otherFilters,
+                otherFiltered,
+                isFilterCustomized,
 
-            cancelEmits() {
-                if (typeof this.emitSearch?.cancel === "function") {
-                    this.emitSearch.cancel();
-                }
-
-                if (typeof this.emitFilter?.cancel === "function") {
-                    this.emitFilter.cancel();
-                }
-            }
+                setSourcesValue,
+                setOtherValue,
+                resetFilter
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

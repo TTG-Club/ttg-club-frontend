@@ -14,12 +14,14 @@
 
 <script lang="ts">
     import { useToast } from "vue-toastification";
-    import { computed, ref } from "vue";
+    import {
+        computed, defineComponent, ref
+    } from "vue";
     import { useIsDev } from "@/common/helpers/isDev";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
-    export default {
-        name: "DiceRoller",
+    export default defineComponent({
         props: {
             formula: {
                 type: String,
@@ -43,12 +45,9 @@
                 default: false
             }
         },
-
-        // TODO: Решить проблему с props в Typescript
-        // @ts-ignore
         setup(props) {
             const isDev = useIsDev();
-            const toast = useToast();
+            const toast = useToast(ToastEventBus);
             const { doRoll, notifyResult } = useDiceRoller();
             const error = ref(false);
 
@@ -102,7 +101,7 @@
                 classes
             };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

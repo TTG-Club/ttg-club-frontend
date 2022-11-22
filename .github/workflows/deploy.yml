@@ -1,4 +1,4 @@
-name: Deploy TTG Club Frontend
+name: Deploy
 
 on:
   push:
@@ -14,16 +14,21 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deploy-frontend-${{ github.repository }}-${{ github.ref_name }}
+  group: deploy-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
-  deploy-dev:
-    name: Deploy Develop
-    if: ${{ github.ref_name == 'dev' }}
-    uses: ttg-club/ttg-club-backend/.github/workflows/docker-deploy.yml@dev
-
-  deploy-prod:
-    name: Deploy Production
-    if: ${{ github.ref_name == 'main' }}
-    uses: ttg-club/ttg-club-backend/.github/workflows/docker-deploy.yml@main
+  dispatch-deploy:
+    name: Dispatch Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+          script: |-
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: 'ttg-club-backend',
+              workflow_id: 'docker-deploy.yml',
+              ref: "${{ github.ref_name }}"
+            })

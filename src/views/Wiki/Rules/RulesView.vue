@@ -1,124 +1,94 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="rulesQuery"
+        @update="initPages"
         @list-end="nextPage"
     >
         <rule-link
             v-for="rule in rules"
             :key="rule.url"
-            :in-tab="inTab"
             :rule="rule"
             :to="{ path: rule.url }"
         />
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import { useRulesStore } from "@/store/Wiki/RulesStore";
-    import RuleLink from "@/views/Wiki/Rules/RuleLink";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import RuleLink from "@/views/Wiki/Rules/RuleLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
 
-    export default {
-        name: 'RulesView',
+    export default defineComponent({
         components: {
             RuleLink,
-            TabLayout,
             ContentLayout
         },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
-            }
-        },
-        data: () => ({
-            rulesStore: useRulesStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.rulesStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: RulesFilterDefaults.dbName,
+                url: RulesFilterDefaults.url
+            });
 
-            rules() {
-                return this.rulesStore.getRules || [];
-            },
+            const {
+                initPages, nextPage, items: rules
+            } = usePagination({
+                url: '/rules',
+                limit: 70,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-            showRightSide() {
-                return this.$route.name === 'ruleDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+                if (rules.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: rules.value[0].url });
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && rules.value.length && route.name === 'rules') {
+                    await router.push({ path: rules.value[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.rules.length && this.$route.name === 'rules') {
-                await this.$router.push({ path: this.rules[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.rulesStore.clearStore();
-        },
-        methods: {
-            async rulesQuery() {
-                await this.rulesStore.initRules();
-            },
-
-            async init() {
-                await this.rulesStore.initFilter(this.storeKey, this.customFilter);
-                await this.rulesStore.initRules();
-            },
-
-            async nextPage() {
-                await this.rulesStore.nextPage();
-            },
-
-            async onSearch() {
-                await this.rulesQuery();
-
-                if (this.rules.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.rules[0].url });
-                }
-            }
+            return {
+                isMobile,
+                fullscreen,
+                rules,
+                filter,
+                showRightSide: computed(() => route.name === 'ruleDetail'),
+                initPages,
+                nextPage,
+                onSearch
+            };
         }
-    };
+    });
 </script>

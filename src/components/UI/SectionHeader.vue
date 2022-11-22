@@ -94,14 +94,17 @@
     </div>
 </template>
 
-<script lang="jsx">
+<script lang="tsx">
     import { useClipboard } from "@vueuse/core";
+    import { computed, defineComponent } from "vue";
+    import { useRoute } from "vue-router";
+    import { useToast } from "vue-toastification";
     import { useUIStore } from '@/store/UI/UIStore';
-    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton";
-    import UiButton from "@/components/form/UiButton";
+    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue";
+    import UiButton from "@/components/form/UiButton.vue";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
-    export default {
-        name: 'SectionHeader',
+    export default defineComponent({
         components: {
             UiButton,
             BookmarkSaveButton
@@ -148,44 +151,33 @@
                 default: null
             }
         },
-        data: () => ({
-            uiStore: useUIStore(),
-            clipboard: useClipboard()
-        }),
-        computed: {
-            hasOptionalControls() {
-                return !!this.bookmark || !!this.print || !!this.onExportFoundry;
-            },
+        setup(props) {
+            const route = useRoute();
+            const uiStore = useUIStore();
+            const clipboard = useClipboard();
+            const toast = useToast(ToastEventBus);
 
-            hasMainControls() {
-                return !!this.onClose || !!this.fullscreen;
-            },
+            const hasOptionalControls = computed(() => !!props.bookmark || !!props.print || !!props.onExportFoundry);
+            const hasMainControls = computed(() => !!props.onClose || !!props.fullscreen);
+            const hasControls = computed(() => hasOptionalControls.value || hasMainControls.value);
+            const urlForCopy = computed(() => window.location.origin + route.path);
 
-            hasControls() {
-                return !!this.hasOptionalControls || !!this.hasMainControls;
-            },
-
-            urlForCopy() {
-                return window.location.origin + this.$route.path;
-            },
-
-            closeAvailable() {
-                if (!this.uiStore.isMobile) {
-                    return this.closeOnDesktop;
+            const closeAvailable = computed(() => {
+                if (!uiStore.isMobile) {
+                    return props.closeOnDesktop;
                 }
 
-                return this.onClose;
-            }
-        },
-        methods: {
-            copyText() {
-                if (!this.clipboard.isSupported) {
-                    this.$toast.error('Ваш браузер не поддерживает копирование');
+                return props.onClose;
+            });
+
+            const copyText = () => {
+                if (!clipboard.isSupported) {
+                    toast.error('Ваш браузер не поддерживает копирование');
                 }
 
-                this.clipboard.copy(this.urlForCopy)
-                    .then(() => this.$toast('Ссылка успешно скопирована'))
-                    .catch(() => this.$toast.error((
+                clipboard.copy(urlForCopy.value)
+                    .then(() => toast('Ссылка успешно скопирована'))
+                    .catch(() => toast.error((
                       <span>
                         Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем
                         <a
@@ -197,13 +189,24 @@
                         </a>
                       </span>
                     )));
-            },
+            };
 
-            openPrintWindow() {
+            const openPrintWindow = () => {
                 window.print();
-            }
+            };
+
+            return {
+                uiStore,
+                hasControls,
+                hasOptionalControls,
+                hasMainControls,
+                urlForCopy,
+                closeAvailable,
+                copyText,
+                openPrintWindow
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

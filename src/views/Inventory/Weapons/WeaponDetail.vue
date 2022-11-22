@@ -24,52 +24,64 @@
 
 <script>
     import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader";
-    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody";
-    import { useWeaponsStore } from "@/store/Inventory/WeaponsStore";
-    import ContentDetail from "@/components/content/ContentDetail";
+    import SectionHeader from "@/components/UI/SectionHeader.vue";
+    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody.vue";
+    import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import errorHandler from '@/common/helpers/errorHandler';
 
     export default {
-        name: "WeaponDetail",
         components: {
             ContentDetail,
             WeaponBody,
             SectionHeader
         },
         async beforeRouteUpdate(to, from, next) {
-            await this.loadNewWeapon(to.path);
+            await this.weaponInfoQuery(to.path);
 
             next();
         },
         data: () => ({
-            weaponsStore: useWeaponsStore(),
             weapon: undefined,
-            loading: true,
-            error: false
+            loading: false,
+            error: false,
+            abortController: null
         }),
         computed: {
             ...mapState(useUIStore, ['fullscreen', 'isMobile'])
         },
         async mounted() {
-            await this.loadNewWeapon(this.$route.path);
+            await this.weaponInfoQuery(this.$route.path);
         },
         methods: {
-            close() {
-                this.$router.push({ name: 'weapons' });
-            },
+            async weaponInfoQuery(url) {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
 
-            async loadNewWeapon(url) {
                 try {
                     this.error = false;
                     this.loading = true;
+                    this.abortController = new AbortController();
 
-                    this.weapon = await this.weaponsStore.weaponInfoQuery(url);
+                    const resp = await this.$http.post({
+                        url,
+                        signal: this.abortController.signal
+                    });
 
-                    this.loading = false;
+                    this.weapon = resp.data;
                 } catch (err) {
+                    errorHandler(err);
+
                     this.error = true;
+                } finally {
+                    this.loading = false;
+                    this.abortController = null;
                 }
+            },
+
+            close() {
+                this.$router.push({ name: 'weapons' });
             }
         }
     };

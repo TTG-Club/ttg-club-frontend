@@ -80,12 +80,15 @@
     </form>
 </template>
 
-<script>
-    import { mapActions } from "pinia";
+<script lang="ts">
+    import {
+        defineComponent, reactive, ref
+    } from "vue";
     import useVuelidate from "@vuelidate/core";
     import { helpers, sameAs } from "@vuelidate/validators";
-    import UiInput from "@/components/form/UiInput";
-    import UiButton from "@/components/form/UiButton";
+    import { useToast } from "vue-toastification";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiButton from "@/components/form/UiButton.vue";
     import {
         validateEmailExist,
         validateEmailFormat,
@@ -99,76 +102,25 @@
         validateUsernameSpecialChars
     } from "@/common/helpers/authChecks";
     import { useUserStore } from "@/store/UI/UserStore";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
-    export default {
-        name: 'RegistrationView',
+    export default defineComponent({
+
         components: {
             UiInput,
             UiButton
         },
-        setup: () => ({
-            v$: useVuelidate()
-        }),
-        data: () => ({
-            username: '',
-            email: '',
-            password: '',
-            repeat: '',
-            success: false,
-            inProgress: false
-        }),
-        methods: {
-            ...mapActions(useUserStore, ['registration', 'authorization']),
+        setup(props, { emit }) {
+            const userStore = useUserStore();
+            const toast = useToast(ToastEventBus);
+            const username = ref('');
+            const email = ref('');
+            const password = ref('');
+            const repeat = ref('');
+            const success = ref(false);
+            const inProgress = ref(false);
 
-            successHandler() {
-                this.success = true;
-
-                this.$toast.success("Вы успешно зарегистрировались!");
-                this.$emit('close');
-            },
-
-            onError(text) {
-                this.$toast.error(text);
-            },
-
-            async onSubmit() {
-                this.inProgress = true;
-
-                await this.v$.$reset();
-
-                const result = await this.v$.$validate();
-
-                if (!result) {
-                    this.onError("Проверьте правильность заполнения полей");
-
-                    this.inProgress = false;
-
-                    return;
-                }
-
-                try {
-                    await this.registration({
-                        username: this.username.trim(),
-                        email: this.email.trim(),
-                        password: this.password.trim()
-                    });
-
-                    await this.authorization({
-                        usernameOrEmail: this.username.trim(),
-                        password: this.password.trim(),
-                        remember: false
-                    });
-
-                    this.successHandler();
-                } catch (err) {
-                    this.onError('Неизвестная ошибка');
-                } finally {
-                    this.inProgress = false;
-                }
-            }
-        },
-        validations() {
-            return {
+            const rules = reactive({
                 username: {
                     required: validateRequired(),
                     minLength: validateMinLength(5),
@@ -190,9 +142,66 @@
                 },
                 repeat: {
                     required: validateRequired(),
-                    sameAs: helpers.withMessage('Пароли не совпадают', sameAs(this.password))
+                    sameAs: helpers.withMessage('Пароли не совпадают', sameAs(password))
+                }
+            });
+
+            const v$ = useVuelidate(rules, {
+                username,
+                email,
+                password,
+                repeat
+            });
+
+            const successHandler = () => {
+                success.value = true;
+
+                toast.success("Вы успешно зарегистрировались!");
+                emit('close');
+            };
+
+            const onSubmit = async () => {
+                inProgress.value = true;
+
+                await v$.value.$reset();
+
+                const result = await v$.value.$validate();
+
+                if (!result) {
+                    toast.error("Проверьте правильность заполнения полей");
+
+                    inProgress.value = false;
+
+                    return;
+                }
+
+                try {
+                    await userStore.registration({
+                        username: username.value.trim(),
+                        email: email.value.trim(),
+                        password: password.value.trim()
+                    });
+
+                    await userStore.authorization({
+                        usernameOrEmail: username.value.trim(),
+                        password: password.value.trim(),
+                        remember: false
+                    });
+
+                    successHandler();
+                } catch (err) {
+                    toast.error('Неизвестная ошибка');
+                } finally {
+                    inProgress.value = false;
                 }
             };
+
+            return {
+                v$,
+                success,
+                inProgress,
+                onSubmit
+            };
         }
-    };
+    });
 </script>

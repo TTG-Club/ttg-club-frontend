@@ -21,18 +21,18 @@
 
 <script>
     import cloneDeep from "lodash/cloneDeep";
-    import vTippyConfig from '@/common/utils/VueTippyConfig';
-    import SpellBody from "@/views/Spells/SpellBody";
     import errorHandler from "@/common/helpers/errorHandler";
-    import ScreenBody from "@/views/Screens/ScreenBody";
-    import ItemBody from "@/views/Inventory/Items/ItemBody";
-    import ArmorBody from "@/views/Inventory/Armors/ArmorBody";
-    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody";
-    import CreatureBody from "@/views/Bestiary/CreatureBody";
-    import MagicItemBody from "@/views/Treasures/MagicItems/MagicItemBody";
-    import OptionBody from "@/views/Character/Options/OptionBody";
-    import TraitBody from "@/views/Character/Traits/TraitBody";
-    import GodBody from "@/views/Wiki/Gods/GodBody";
+    import { DefaultTippyProps } from '@/common/utils/TippyConfig';
+    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
+    import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
+    import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
+    import ArmorBody from "@/views/Inventory/Armors/ArmorBody.vue";
+    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody.vue";
+    import CreatureBody from "@/views/Workshop/Bestiary/CreatureBody.vue";
+    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
+    import OptionBody from "@/views/Character/Options/OptionBody.vue";
+    import TraitBody from "@/views/Character/Traits/TraitBody.vue";
+    import GodBody from "@/views/Wiki/Gods/GodBody.vue";
 
     export default {
         name: "DetailTooltip",
@@ -54,7 +54,7 @@
         }),
         computed: {
             tippyConfig() {
-                const config = cloneDeep(vTippyConfig.defaultProps);
+                const config = cloneDeep(DefaultTippyProps);
 
                 config.onShow = () => this.getContent();
 
@@ -115,7 +115,7 @@
                     return false;
                 }
 
-                const res = await this.$http.post(url);
+                const res = await this.$http.post({ url });
 
                 if (res.status !== 200) {
                     errorHandler(res.statusText);

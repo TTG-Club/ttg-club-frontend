@@ -4,7 +4,7 @@
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="optionsQuery"
+        @update="initPages"
     >
         <option-link
             v-for="option in options"
@@ -16,17 +16,22 @@
     </component>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import { useOptionsStore } from "@/store/Character/OptionsStore";
-    import OptionLink from "@/views/Character/Options/OptionLink";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount, watch
+    } from 'vue';
+    import type { PropType } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import TabLayout from "@/components/content/TabLayout.vue";
+    import OptionLink from "@/views/Character/Options/OptionLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { OptionsFilterDefaults } from '@/types/Character/Options.types';
 
-    export default {
-        name: 'OptionsView',
+    export default defineComponent({
         components: {
             OptionLink,
             TabLayout,
@@ -42,91 +47,106 @@
                 default: ''
             },
             filterUrl: {
-                type: [String, undefined],
+                type: String,
                 default: undefined
             },
-            books: {
-                type: [Array, undefined],
+            queryBooks: {
+                type: Array as PropType<Array<string>>,
                 default: undefined
             }
         },
-        data: () => ({
-            optionsStore: useOptionsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup(props) {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.optionsStore.getFilter || undefined;
-            },
+            const layout = computed(() => (
+                props.inTab
+                    ? TabLayout
+                    : ContentLayout
+            ));
 
-            options() {
-                return this.optionsStore.getOptions || [];
-            },
+            const filter = useFilter({
+                dbName: OptionsFilterDefaults.dbName,
+                storeKey: computed(() => props.storeKey),
+                url: computed(() => props.filterUrl || OptionsFilterDefaults.url)
+            });
 
-            showRightSide() {
-                return this.$route.name === 'optionDetail';
-            },
+            const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            },
-
-            useAutoOpenFirst() {
-                return !this.isMobile && !!this.options.length && this.$route.name === 'options' && !this.inTab;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+            const queryParams = computed(() => {
+                if (props.queryBooks) {
+                    return {
+                        ...filter.queryParams.value,
+                        book: props.queryBooks
+                    };
                 }
-            },
-            filterUrl: {
-                async handler() {
-                    await this.init();
+
+                return filter.queryParams.value;
+            });
+
+            const {
+                initPages, resetPages, items: options
+            } = usePagination({
+                url: '/options',
+                limit: 70,
+                filter: {
+                    isCustomized,
+                    value: queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
+
+            const onSearch = async () => {
+                await initPages();
+
+                if (options.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: options.value[0].url });
                 }
-            },
-            books: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && options.value.length && route.name === 'options') {
+                    await router.push({ path: options.value[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.options.length && this.$route.name === 'options' && !this.inTab) {
-                await this.$router.push({ path: this.options[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.optionsStore.clearStore();
-        },
-        methods: {
-            async optionsQuery() {
-                await this.optionsStore.initOptions(this.books);
-            },
-
-            async init() {
-                await this.optionsStore.initFilter(this.storeKey, this.filterUrl);
-                await this.optionsStore.initOptions(this.books);
-            },
-
-            async onSearch() {
-                await this.optionsQuery();
-
-                if (this.options.length === 1 && this.useAutoOpenFirst) {
-                    await this.$router.push({ path: this.options[0].url });
+            watch(
+                [
+                    () => props.queryBooks,
+                    () => props.filterUrl,
+                    () => props.storeKey
+                ],
+                async () => {
+                    await resetPages();
+                    await filter.initFilter();
+                    await initPages();
+                },
+                {
+                    deep: true
                 }
-            }
+            );
+
+            return {
+                layout,
+                isMobile,
+                fullscreen,
+                options,
+                filter,
+                showRightSide: computed(() => route.name === 'optionDetail'),
+                initPages,
+                onSearch
+            };
         }
-    };
+    });
 </script>

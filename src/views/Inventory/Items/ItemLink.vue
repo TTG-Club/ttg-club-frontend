@@ -1,13 +1,12 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
-        :to="{ path: itemItem.url }"
+        :to="{ path: item.url }"
         custom
         v-bind="$props"
     >
         <a
             ref="itemItem"
-            :class="getClassList(isActive)"
+            :class="classList"
             :href="href"
             class="link-item"
             v-bind="$attrs"
@@ -18,11 +17,11 @@
                     <div class="link-item__row">
                         <div class="link-item__name">
                             <div class="link-item__name--rus">
-                                {{ itemItem.name.rus }}
+                                {{ item.name.rus }}
                             </div>
 
                             <div class="link-item__name--eng">
-                                [{{ itemItem.name.eng }}]
+                                [{{ item.name.eng }}]
                             </div>
                         </div>
                     </div>
@@ -32,61 +31,45 @@
     </router-link>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
+<script lang="ts">
+    import type { RouteLocationPathRaw } from 'vue-router';
+    import { useLink } from 'vue-router';
+    import { computed, defineComponent } from 'vue';
+    import type { PropType } from 'vue';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import { useItemsStore } from "@/store/Inventory/ItemsStore";
 
-    export default {
-        name: 'ItemLink',
+    export default defineComponent({
         directives: {
             CapitalizeFirst
         },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
-            itemItem: {
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
+            item: {
                 type: Object,
                 default: () => ({})
-            },
-            inTab: {
-                type: Boolean,
-                default: false
             }
         },
-        data: () => ({
-            itemsStore: useItemsStore(),
-            item: {
-                show: false,
-                data: undefined
-            }
-        }),
-        methods: {
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-item-selected': this.$route.name === 'itemDetail',
-                    'is-green': this.itemItem?.homebrew
-                };
-            },
+        setup(props) {
+            const {
+                navigate, isActive, href
+            } = useLink(props);
 
-            clickHandler(callback) {
-                if (!this.inTab) {
-                    callback();
+            const classList = computed(() => ({
+                'router-link-active': isActive.value,
+                'is-green': props.item?.homebrew
+            }));
 
-                    return;
-                }
-
-                this.itemsStore.itemInfoQuery(this.itemItem.url)
-                    .then(spell => {
-                        this.item = {
-                            show: true,
-                            data: spell
-                        };
-                    });
-            }
+            return {
+                href,
+                classList,
+                navigate
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss"/>

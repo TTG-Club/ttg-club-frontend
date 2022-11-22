@@ -100,13 +100,13 @@
 <script>
     import throttle from 'lodash/throttle';
     import { reactive } from "vue";
-    import ContentLayout from "@/components/content/ContentLayout";
+    import ContentLayout from "@/components/content/ContentLayout.vue";
     import errorHandler from "@/common/helpers/errorHandler";
-    import RawContent from "@/components/content/RawContent";
-    import UiSelect from "@/components/form/UiSelect";
-    import UiButton from "@/components/form/UiButton";
-    import BaseModal from "@/components/UI/modals/BaseModal";
-    import RollTable from "@/components/UI/RollTable";
+    import RawContent from "@/components/content/RawContent.vue";
+    import UiSelect from "@/components/form/UiSelect.vue";
+    import UiButton from "@/components/form/UiButton.vue";
+    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import RollTable from "@/components/UI/RollTable.vue";
 
     export default {
         name: "EncountersView",
@@ -171,7 +171,9 @@
         methods: {
             async getOptions() {
                 try {
-                    const resp = await this.$http.get('/tools/encounters');
+                    const resp = await this.$http.get({
+                        url: '/tools/encounters'
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);
@@ -205,7 +207,11 @@
                         options[key] = value;
                     }
 
-                    const resp = await this.$http.post('/tools/encounters', options, this.controller.signal);
+                    const resp = await this.$http.post({
+                        url: '/tools/encounters',
+                        payload: options,
+                        signal: this.controller.signal
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);
@@ -229,11 +235,11 @@
                 this.controller = new AbortController();
 
                 try {
-                    const resp = await this.$http.post(
-                        '/tools/encounters/table',
-                        this.form,
-                        this.controller.signal
-                    );
+                    const resp = await this.$http.post({
+                        url: '/tools/encounters/table',
+                        payload: this.form,
+                        signal: this.controller.signal
+                    });
 
                     if (resp.status !== 200) {
                         errorHandler(resp.statusText);

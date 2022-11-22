@@ -94,9 +94,9 @@
     import { defineComponent, ref } from "vue";
     import { useNavStore } from "@/store/UI/NavStore";
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
-    import NavPopover from "@/components/UI/menu/NavPopover";
-    import SvgIcon from "@/components/UI/icons/SvgIcon";
-    import SiteLogo from "@/components/UI/icons/SiteLogo";
+    import NavPopover from "@/components/UI/menu/NavPopover.vue";
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import SiteLogo from "@/components/UI/icons/SiteLogo.vue";
     import { useUserStore } from "@/store/UI/UserStore";
     import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
 
@@ -114,8 +114,6 @@
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgressURLs = ref([]);
-
-            navStore.setNavItems();
 
             const isSaved = url => {
                 if (userStore.isAuthenticated) {
@@ -154,7 +152,7 @@
                 menu,
                 isSaved,
                 updateBookmark,
-                navItems: navStore.getNavItems
+                navItems: navStore.showedNavItems
             };
         }
     });

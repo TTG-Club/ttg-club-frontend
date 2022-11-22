@@ -53,6 +53,7 @@ module.exports = {
         'import/no-extraneous-dependencies': [0],
         'import/no-unresolved': [0],
         'import/no-webpack-loader-syntax': [0],
+        'import/prefer-default-export': [0],
         'indent': [
             2,
             4,
@@ -349,7 +350,7 @@ module.exports = {
         'no-extra-semi': 'error',
 
         // Vue rules
-        'vue/max-len': [1, 120],
+        'vue/max-len': 'off',
         'vue/match-component-file-name': [
             'error',
             {
@@ -399,6 +400,8 @@ module.exports = {
                     'double',
                     'single'
                 ],
+                'max-len': 'off',
+                'vue/max-len': [1, 120],
                 'vue/html-indent': ['error', 4],
                 'vue/valid-v-slot': 'off',
                 'vue/max-attributes-per-line': [

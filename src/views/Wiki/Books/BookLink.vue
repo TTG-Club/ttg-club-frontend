@@ -1,13 +1,12 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
         :to="{ path: book.url }"
         custom
         v-bind="$props"
     >
         <a
             ref="bookItem"
-            :class="getClassList(isActive)"
+            :class="classList"
             :href="href"
             class="link-item"
             v-bind="$attrs"
@@ -32,61 +31,43 @@
     </router-link>
 </template>
 
-<script>
-    import { RouterLink } from 'vue-router';
+<script lang="ts">
+    import { useLink } from 'vue-router';
+    import { computed, defineComponent } from 'vue';
+    import type { PropType } from 'vue';
+    import type { RouteLocationPathRaw } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import { useBooksStore } from "@/store/Wiki/BooksStore";
 
-    export default {
-        name: 'BookLink',
+    export default defineComponent({
         directives: {
             CapitalizeFirst
         },
         inheritAttrs: false,
         props: {
-            ...RouterLink.props,
+            to: {
+                type: Object as PropType<RouteLocationPathRaw>,
+                required: true
+            },
             book: {
                 type: Object,
                 default: () => ({})
-            },
-            inTab: {
-                type: Boolean,
-                default: false
             }
         },
-        data: () => ({
-            booksStore: useBooksStore(),
-            modal: {
-                show: false,
-                data: undefined
-            }
-        }),
-        methods: {
-            getClassList(isActive) {
-                return {
-                    'router-link-active': isActive,
-                    'is-book-selected': this.$route.name === 'bookDetail',
-                    'is-green': this.book?.homebrew
-                };
-            },
+        setup(props) {
+            const {
+                isActive, href, navigate
+            } = useLink(props);
 
-            clickHandler(callback) {
-                if (!this.inTab) {
-                    callback();
-
-                    return;
-                }
-
-                this.booksStore.bookInfoQuery(this.book.url)
-                    .then(spell => {
-                        this.modal = {
-                            show: true,
-                            data: spell
-                        };
-                    });
-            }
+            return {
+                href,
+                navigate,
+                classList: computed(() => ({
+                    'router-link-active': isActive.value,
+                    'is-green': props.book?.source?.homebrew
+                }))
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss"/>

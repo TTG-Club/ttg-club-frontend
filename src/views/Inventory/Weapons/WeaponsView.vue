@@ -1,10 +1,9 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
-        @search="weaponsQuery"
-        @update="weaponsQuery"
+        @search="onSearch"
+        @update="initPages"
     >
         <div
             v-for="(group, groupKey) in weapons"
@@ -24,124 +23,110 @@
                 />
             </div>
         </div>
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
     import sortBy from "lodash/sortBy";
-    import { mapState } from "pinia";
-    import TabLayout from "@/components/content/TabLayout";
-    import ContentLayout from "@/components/content/ContentLayout";
-    import { useWeaponsStore } from "@/store/Inventory/WeaponsStore";
-    import WeaponLink from "@/views/Inventory/Weapons/WeaponLink";
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from "@/components/content/ContentLayout.vue";
+    import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.types';
+    import { usePagination } from '@/common/composition/usePagination';
 
-    export default {
-        name: "WeaponsView",
-        components: { WeaponLink },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
-            }
+    export default defineComponent({
+        components: {
+            WeaponLink,
+            ContentLayout
         },
-        data: () => ({
-            weaponsStore: useWeaponsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.weaponsStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: WeaponsFilterDefaults.dbName,
+                url: WeaponsFilterDefaults.url
+            });
 
-            weapons() {
-                const weapons = [];
-                const types = [];
+            const { initPages, items } = usePagination({
+                url: '/weapons',
+                limit: -1,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-                if (!this.weaponsStore.getWeapons) {
-                    return weapons;
+            // TODO: Доделать типизацию
+            const weapons = computed(() => {
+                const list: any = [];
+                const types: any = [];
+
+                if (!items.value) {
+                    return list;
                 }
 
-                for (const weapon of this.weaponsStore.getWeapons) {
-                    if (types.find(obj => obj.name === weapon.type.name)) {
+                for (const armor of items.value) {
+                    if (types.find((obj: any) => obj.name === armor.type.name)) {
                         continue;
                     }
 
-                    types.push(weapon.type);
+                    types.push(armor.type);
                 }
 
                 for (const type of sortBy(types, [o => o.order])) {
-                    weapons.push({
+                    list.push({
                         name: type.name,
-                        list: this.weaponsStore.getWeapons.filter(weapon => weapon.type.name === type.name)
+                        list: items.value.filter(armor => armor.type.name === type.name)
                     });
                 }
 
-                return weapons;
-            },
+                return list;
+            });
 
-            showRightSide() {
-                return this.$route.name === 'weaponDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+                if (weapons.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: weapons.value[0].list[0].url });
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && weapons.value.length && route.name === 'weapons') {
+                    await router.push({ path: weapons.value[0].list[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.weapons[0]?.list?.length && this.$route.name === 'weapons') {
-                await this.$router.push({ path: this.weapons[0].list[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.weaponsStore.clearStore();
-        },
-        methods: {
-            async init() {
-                await this.weaponsStore.initFilter(this.storeKey, this.customFilter);
-                await this.weaponsStore.initWeapons();
-            },
-
-            async weaponsQuery() {
-                await this.weaponsStore.initWeapons();
-            },
-
-            async nextPage() {
-                await this.weaponsStore.nextPage();
-            }
+            return {
+                isMobile,
+                fullscreen,
+                weapons,
+                filter,
+                showRightSide: computed(() => route.name === 'weaponDetail'),
+                initPages,
+                onSearch
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

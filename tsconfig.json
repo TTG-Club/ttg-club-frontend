@@ -10,6 +10,8 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "isolatedModules": true,
     "jsx": "preserve",
     "lib": [
       "esnext",
@@ -20,7 +22,6 @@
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
-    "incremental": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -32,7 +33,6 @@
     },
     "preserveConstEnums": true,
     "preserveValueImports": true,
-    "isolatedModules": true,
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
@@ -44,6 +44,8 @@
     "strictPropertyInitialization": true,
     "target": "esnext",
     "typeRoots": [
+      "./env.d.ts",
+      "./src/shims-vue.d.ts",
       "./node_modules/@types"
     ],
     "types": [
@@ -56,11 +58,11 @@
   ],
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
-    "vue.config.*",
-    "src/**/*.js",
     "src/**/*.ts",
-    "src/**/*.jsx",
+    "src/**/*.d.ts",
     "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
     "src/**/*.vue",
     "src/**/*.json"
   ]

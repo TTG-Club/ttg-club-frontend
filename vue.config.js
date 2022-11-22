@@ -2,9 +2,6 @@ const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
 
 module.exports = defineConfig({
-    publicPath: process.env.BUILD_TARGET === 'gh-pages'
-        ? '/ttg-club-frontend/'
-        : '/',
     outputDir: process.env.BUILD_PATH || './dist/',
     filenameHashing: false,
     runtimeCompiler: true,
@@ -28,12 +25,6 @@ module.exports = defineConfig({
             }
         }
     },
-    configureWebpack: {
-        output: {
-            filename: 'js/[name].js',
-            chunkFilename: 'js/[name].[fullhash].js'
-        }
-    },
     chainWebpack: config => {
         const removeHTML = () => {
             config.plugins.delete('html');
@@ -41,9 +32,14 @@ module.exports = defineConfig({
             config.plugins.delete('prefetch');
         };
 
-        if (!['serve', 'gh-pages'].includes(process.env.BUILD_TARGET)) {
+        if (process.env.BUILD_TARGET !== 'serve') {
             removeHTML();
         }
+
+        config.optimization.runtimeChunk('single');
+
+        config.output.filename('js/[name].js');
+        config.output.chunkFilename('js/[name].[chunkhash].js');
 
         config.module
             .rule('svg')
@@ -82,10 +78,10 @@ module.exports = defineConfig({
             .end();
     },
     css: {
-        extract: process.env.VUE_SERVE !== 'true'
+        extract: process.env.BUILD_TARGET !== 'serve'
             ? {
                 filename: 'css/[name].css',
-                chunkFilename: 'css/[name].[fullhash].css'
+                chunkFilename: 'css/[name].[chunkhash].css'
             }
             : false,
         loaderOptions: {

@@ -67,13 +67,16 @@
     </form>
 </template>
 
-<script>
-    import { mapActions } from "pinia";
-    import useVuelidate from "@vuelidate/core/dist/index.esm";
+<script lang="ts">
+    import useVuelidate from "@vuelidate/core";
     import { helpers, or } from "@vuelidate/validators";
-    import UiInput from "@/components/form/UiInput";
-    import UiCheckbox from "@/components/form/UiCheckbox";
-    import UiButton from "@/components/form/UiButton";
+    import {
+        defineComponent, reactive, ref
+    } from "vue";
+    import { useToast } from "vue-toastification";
+    import UiInput from "@/components/form/UiInput.vue";
+    import UiCheckbox from "@/components/form/UiCheckbox.vue";
+    import UiButton from "@/components/form/UiButton.vue";
     import { useUserStore } from "@/store/UI/UserStore";
     import {
         validateEmailFormat,
@@ -81,87 +84,24 @@
         validateRequired,
         validateUsernameSpecialChars
     } from "@/common/helpers/authChecks";
+    import { ToastEventBus } from "@/common/utils/ToastConfig";
 
-    export default {
-        name: 'LoginView',
+    export default defineComponent({
         components: {
             UiButton,
             UiCheckbox,
             UiInput
         },
-        setup: () => ({
-            v$: useVuelidate()
-        }),
-        data: () => ({
-            usernameOrEmail: '',
-            password: '',
-            remember: true,
-            inProgress: false,
-            success: false
-        }),
-        methods: {
-            ...mapActions(useUserStore, ['authorization']),
+        setup(props, { emit }) {
+            const userStore = useUserStore();
+            const toast = useToast(ToastEventBus);
+            const usernameOrEmail = ref('');
+            const password = ref('');
+            const remember = ref(true);
+            const success = ref(false);
+            const inProgress = ref(false);
 
-            successHandler() {
-                this.success = true;
-
-                this.$toast.success("Вы успешно авторизовались!");
-                this.$emit('close');
-            },
-
-            onError(text) {
-                this.$toast.error(text);
-            },
-
-            async onSubmit() {
-                this.inProgress = true;
-
-                await this.v$.$reset();
-
-                const result = await this.v$.$validate();
-
-                if (this.success || !result) {
-                    this.onError("Проверьте правильность заполнения полей");
-
-                    this.inProgress = false;
-
-                    return;
-                }
-
-                try {
-                    await this.authorization({
-                        usernameOrEmail: this.usernameOrEmail.trim(),
-                        password: this.password.trim(),
-                        remember: this.remember
-                    });
-
-                    this.successHandler();
-                } catch (err) {
-                    const { response } = err;
-
-                    if (!response?.status) {
-                        this.onError('Неизвестная ошибка');
-
-                        return;
-                    }
-
-                    switch (response.status) {
-                        case 401:
-                            this.onError('Неверный логин или пароль');
-
-                            break;
-                        default:
-                            this.onError('Неизвестная ошибка');
-
-                            break;
-                    }
-                } finally {
-                    this.inProgress = false;
-                }
-            }
-        },
-        validations() {
-            return {
+            const rules = reactive({
                 usernameOrEmail: {
                     required: validateRequired(),
                     format: helpers.withMessage(
@@ -176,7 +116,75 @@
                     required: validateRequired(),
                     format: validatePwdSpecial()
                 }
+            });
+
+            const v$ = useVuelidate(rules, {
+                usernameOrEmail,
+                password,
+                remember
+            });
+
+            const successHandler = () => {
+                success.value = true;
+
+                toast.success("Вы успешно авторизовались!");
+                emit('close');
+            };
+
+            const onSubmit = async () => {
+                inProgress.value = true;
+
+                await v$.value.$reset();
+
+                const result = await v$.value.$validate();
+
+                if (success.value || !result) {
+                    toast.error("Проверьте правильность заполнения полей");
+
+                    inProgress.value = false;
+
+                    return;
+                }
+
+                try {
+                    await userStore.authorization({
+                        usernameOrEmail: usernameOrEmail.value.trim(),
+                        password: password.value.trim(),
+                        remember: remember.value
+                    });
+
+                    successHandler();
+                } catch (err: any) {
+                    if (!err?.response?.status) {
+                        toast.error('Неизвестная ошибка');
+
+                        return;
+                    }
+
+                    switch (err.response.status) {
+                        case 401:
+                            toast.error('Неверный логин или пароль');
+
+                            break;
+                        default:
+                            toast.error('Неизвестная ошибка');
+
+                            break;
+                    }
+                } finally {
+                    inProgress.value = false;
+                }
+            };
+
+            return {
+                v$,
+                usernameOrEmail,
+                password,
+                remember,
+                success,
+                inProgress,
+                onSubmit
             };
         }
-    };
+    });
 </script>

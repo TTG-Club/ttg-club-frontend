@@ -35,51 +35,55 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
     import {
         useInfiniteScroll, useResizeObserver
     } from "@vueuse/core";
-    import FilterService from "@/common/services/FilterService";
-    import ListFilter from "@/components/filter/ListFilter";
+    import type { PropType } from 'vue';
+    import {
+        defineComponent, onMounted, ref
+    } from 'vue';
+    import ListFilter from "@/components/filter/ListFilter.vue";
+    import type { FilterComposable } from '@/common/composition/useFilter';
 
-    export default {
-        name: 'TabLayout',
+    export default defineComponent({
+
         components: { ListFilter },
         props: {
             filterInstance: {
-                type: FilterService,
+                type: Object as PropType<FilterComposable>,
                 default: undefined
             }
         },
-        emits: [
-            'list-end',
-            'search',
-            'update'
-        ],
-        data: () => ({
-            dropdownHeight: 0,
-            filterInstalled: false
-        }),
-        mounted() {
-            useInfiniteScroll(
-                this.$refs.items,
-                () => {
-                    this.$emit('list-end');
-                },
-                { distance: 1080 }
-            );
+        setup(props, { emit }) {
+            const dropdownHeight = ref(0);
 
-            useResizeObserver(this.$refs.items, this.calcDropdownHeight);
-        },
-        methods: {
-            calcDropdownHeight(entries) {
-                const entry = entries[0];
-                const { height } = entry.contentRect;
+            const items = ref<HTMLDivElement | null>(null);
 
-                this.dropdownHeight = height || 0;
-            }
+            onMounted(() => {
+                useInfiniteScroll(
+                    items,
+                    () => {
+                        emit('list-end');
+                    },
+                    { distance: 1080 }
+                );
+
+                useResizeObserver(items, entries => {
+                    if (Array.isArray(entries) && entries.length) {
+                        const entry = entries[0];
+                        const { height } = entry.contentRect;
+
+                        dropdownHeight.value = height || 0;
+                    }
+                });
+            });
+
+            return {
+                dropdownHeight
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

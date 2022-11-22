@@ -1,98 +1,90 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="backgroundsQuery"
+        @update="initPages"
     >
         <background-link
             v-for="background in backgrounds"
             :key="background.url"
             :background-item="background"
-            :in-tab="inTab"
             :to="{ path: background.url }"
         />
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import { useBackgroundsStore } from "@/store/Character/BackgroundsStore";
-    import BackgroundLink from "@/views/Character/Backgrounds/BackgroundLink";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import BackgroundLink from "@/views/Character/Backgrounds/BackgroundLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
 
-    export default {
-        name: 'BackgroundsView',
+    export default defineComponent({
         components: {
             BackgroundLink,
-            TabLayout,
             ContentLayout
         },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            }
-        },
-        data: () => ({
-            backgroundsStore: useBackgroundsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.backgroundsStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: BackgroundsFilterDefaults.dbName,
+                url: BackgroundsFilterDefaults.url
+            });
 
-            backgrounds() {
-                return this.backgroundsStore.getBackgrounds || [];
-            },
+            const { initPages, items: backgrounds } = usePagination({
+                url: '/backgrounds',
+                limit: -1,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-            showRightSide() {
-                return this.$route.name === 'backgroundDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        async mounted() {
-            await this.backgroundsStore.initFilter(this.storeKey);
-            await this.backgroundsStore.initBackgrounds();
-
-            if (!this.isMobile && this.backgrounds.length && this.$route.name === 'backgrounds') {
-                await this.$router.push({ path: this.backgrounds[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.backgroundsStore.clearStore();
-        },
-        methods: {
-            async backgroundsQuery() {
-                await this.backgroundsStore.initBackgrounds();
-            },
-
-            async onSearch() {
-                this.backgroundsQuery();
-
-                if (this.backgrounds.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.backgrounds[0].url });
+                if (backgrounds.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: backgrounds.value[0].url });
                 }
-            }
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && backgrounds.value.length && route.name === 'backgrounds') {
+                    await router.push({ path: backgrounds.value[0].url });
+                }
+            });
+
+            return {
+                isMobile,
+                fullscreen,
+                backgrounds,
+                filter,
+                showRightSide: computed(() => route.name === 'backgroundDetail'),
+                initPages,
+                onSearch
+            };
         }
-    };
+    });
 </script>

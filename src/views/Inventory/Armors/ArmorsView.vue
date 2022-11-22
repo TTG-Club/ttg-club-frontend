@@ -1,10 +1,9 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="armorsQuery"
+        @update="initPages"
     >
         <div
             v-for="(group, groupKey) in armors"
@@ -24,60 +23,62 @@
                 />
             </div>
         </div>
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
     import sortBy from "lodash/sortBy";
-    import { mapState } from "pinia";
-    import TabLayout from "@/components/content/TabLayout";
-    import ContentLayout from "@/components/content/ContentLayout";
-    import { useArmorsStore } from "@/store/Inventory/ArmorsStore";
-    import ArmorLink from "@/views/Inventory/Armors/ArmorLink";
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from "@/components/content/ContentLayout.vue";
+    import ArmorLink from "@/views/Inventory/Armors/ArmorLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
+    import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
 
-    export default {
-        name: "ArmorsView",
-        components: { ArmorLink },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
-            }
+    export default defineComponent({
+        components: {
+            ArmorLink,
+            ContentLayout
         },
-        data: () => ({
-            armorsStore: useArmorsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.armorsStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: ArmorsFilterDefaults.dbName,
+                url: ArmorsFilterDefaults.url
+            });
 
-            armors() {
-                const armors = [];
-                const types = [];
+            const { initPages, items } = usePagination({
+                url: '/armors',
+                limit: -1,
+                search: filter.search,
+                order: [
+                    {
+                        field: 'AC',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-                if (!this.armorsStore.getArmors) {
-                    return armors;
+            // TODO: Доделать типизацию
+            const armors = computed(() => {
+                const list: any = [];
+                const types: any = [];
+
+                if (!items.value) {
+                    return list;
                 }
 
-                for (const armor of this.armorsStore.getArmors) {
-                    if (types.find(obj => obj.name === armor.type.name)) {
+                for (const armor of items.value) {
+                    if (types.find((obj: any) => obj.name === armor.type.name)) {
                         continue;
                     }
 
@@ -85,73 +86,40 @@
                 }
 
                 for (const type of sortBy(types, [o => o.order])) {
-                    armors.push({
+                    list.push({
                         name: type.name,
-                        list: this.armorsStore.getArmors.filter(armor => armor.type.name === type.name)
+                        list: items.value.filter(armor => armor.type.name === type.name)
                     });
                 }
 
-                return armors;
-            },
+                return list;
+            });
 
-            showRightSide() {
-                return this.$route.name === 'armorDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+                if (armors.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: armors.value[0].list[0].url });
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await initPages();
+
+                if (!isMobile.value && armors.value.length && route.name === 'armors') {
+                    await router.push({ path: armors.value[0].list[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.armors[0]?.list?.length && this.$route.name === 'armors') {
-                await this.$router.push({ path: this.armors[0].list[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.armorsStore.clearStore();
-        },
-        methods: {
-            async init() {
-                await this.armorsStore.initFilter(this.storeKey, this.customFilter);
-                await this.armorsStore.initArmors();
-            },
-
-            async armorsQuery() {
-                await this.armorsStore.initArmors();
-            },
-
-            async nextPage() {
-                await this.armorsStore.nextPage();
-            },
-
-            async onSearch() {
-                this.armorsQuery();
-
-                if (this.armors.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.armors[0].url });
-                }
-            }
+            return {
+                isMobile,
+                fullscreen,
+                armors,
+                filter,
+                showRightSide: computed(() => route.name === 'armorDetail'),
+                initPages,
+                onSearch
+            };
         }
-    };
+    });
 </script>
-
-<style lang="scss" scoped>
-
-</style>

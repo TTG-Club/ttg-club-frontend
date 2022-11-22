@@ -1,124 +1,94 @@
 <template>
-    <component
-        :is="layout"
+    <content-layout
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
-        @update="godsQuery"
+        @update="initPages"
         @list-end="nextPage"
     >
         <god-link
             v-for="god in gods"
             :key="god.url"
             :god="god"
-            :in-tab="inTab"
             :to="{ path: god.url }"
         />
-    </component>
+    </content-layout>
 </template>
 
-<script>
-    import { shallowRef } from "vue";
-    import { mapState } from "pinia";
-    import ContentLayout from '@/components/content/ContentLayout';
-    import TabLayout from "@/components/content/TabLayout";
-    import GodLink from "@/views/Wiki/Gods/GodLink";
-    import { useGodsStore } from "@/store/Wiki/GodsStore";
+<script lang="ts">
+    import {
+        computed, defineComponent, onBeforeMount
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import GodLink from "@/views/Wiki/Gods/GodLink.vue";
     import { useUIStore } from "@/store/UI/UIStore";
+    import { GodsFilterDefaults } from '@/types/Wiki/Gods.types';
+    import { useFilter } from '@/common/composition/useFilter';
+    import { usePagination } from '@/common/composition/usePagination';
 
-    export default {
-        name: 'GodsView',
+    export default defineComponent({
         components: {
             GodLink,
-            TabLayout,
             ContentLayout
         },
-        props: {
-            inTab: {
-                type: Boolean,
-                default: false
-            },
-            storeKey: {
-                type: String,
-                default: ''
-            },
-            customFilter: {
-                type: Object,
-                default: undefined
-            }
-        },
-        data: () => ({
-            godsStore: useGodsStore(),
-            layoutComponents: {
-                tab: shallowRef(TabLayout),
-                content: shallowRef(ContentLayout)
-            }
-        }),
-        computed: {
-            ...mapState(useUIStore, ['isMobile']),
+        setup() {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-            filter() {
-                return this.godsStore.getFilter || undefined;
-            },
+            const filter = useFilter({
+                dbName: GodsFilterDefaults.dbName,
+                url: GodsFilterDefaults.url
+            });
 
-            gods() {
-                return this.godsStore.getGods || [];
-            },
+            const {
+                initPages, nextPage, items: gods
+            } = usePagination({
+                url: '/gods',
+                limit: 70,
+                filter: {
+                    isCustomized: filter.isCustomized,
+                    value: filter.queryParams
+                },
+                search: filter.search,
+                order: [
+                    {
+                        field: 'name',
+                        direction: 'asc'
+                    }
+                ]
+            });
 
-            showRightSide() {
-                return this.$route.name === 'godDetail';
-            },
+            const onSearch = async () => {
+                await initPages();
 
-            layout() {
-                return this.inTab
-                    ? this.layoutComponents.tab
-                    : this.layoutComponents.content;
-            }
-        },
-        watch: {
-            storeKey: {
-                async handler() {
-                    await this.init();
+                if (gods.value.length === 1 && !isMobile.value) {
+                    await router.push({ path: gods.value[0].url });
                 }
-            },
-            customFilter: {
-                deep: true,
-                async handler() {
-                    await this.init();
+            };
+
+            onBeforeMount(async () => {
+                await filter.initFilter();
+                await initPages();
+
+                if (!isMobile.value && gods.value.length && route.name === 'gods') {
+                    await router.push({ path: gods.value[0].url });
                 }
-            }
-        },
-        async mounted() {
-            await this.init();
+            });
 
-            if (!this.isMobile && this.gods.length && this.$route.name === 'gods') {
-                await this.$router.push({ path: this.gods[0].url });
-            }
-        },
-        beforeUnmount() {
-            this.godsStore.clearStore();
-        },
-        methods: {
-            async init() {
-                await this.godsStore.initFilter(this.storeKey, this.customFilter);
-                await this.godsStore.initGods();
-            },
-
-            async godsQuery() {
-                await this.godsStore.initGods();
-            },
-
-            async nextPage() {
-                await this.godsStore.nextPage();
-            },
-
-            async onSearch() {
-                await this.godsQuery();
-
-                if (this.gods.length === 1 && !this.isMobile) {
-                    await this.$router.push({ path: this.gods[0].url });
-                }
-            }
+            return {
+                isMobile,
+                fullscreen,
+                gods,
+                filter,
+                showRightSide: computed(() => route.name === 'godDetail'),
+                initPages,
+                nextPage,
+                onSearch
+            };
         }
-    };
+    });
 </script>

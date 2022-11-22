@@ -1,4 +1,4 @@
-name: Deploy TTG Club Frontend
+name: Build
 
 on:
   workflow_call:
@@ -11,16 +11,16 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deploy-frontend-${{ github.repository }}-${{ github.ref_name }}
+  group: build-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   lint:
-    name: Lint
+    name: Lint Workflow
     uses: ./.github/workflows/lint.yml
 
   build:
-    name: Build frontend
+    name: Build Job
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -32,19 +32,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Build Dev application
-        if: ${{ github.ref_name == 'dev' }}
+      - name: Build
         env:
-          VUE_APP_DEV: true
-        run: npm run build:dev
-
-      - name: Build Prod application
-        if: ${{ github.ref_name == 'main' }}
-        run: npm run build:prod
+          VUE_APP_DEV: ${{ github.ref_name == 'dev' && 'true' || 'false' }}
+        run: npm run build:${{ github.ref_name == 'dev' && 'dev' || 'prod' }}
 
       - uses: actions/upload-artifact@v3
         with:
