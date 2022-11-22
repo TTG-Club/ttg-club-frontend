@@ -1,6 +1,7 @@
 <template>
     <svg
         class="site-logo"
+        :style="{ width: currentSize, height: currentSize }"
         fill="none"
         viewBox="0 0 1000 1000"
         xmlns="http://www.w3.org/2000/svg"
@@ -62,53 +63,30 @@
     </svg>
 </template>
 
-<script>
-    export default {
+<script lang="ts">
+    import { computed, defineComponent } from 'vue';
 
+    export default defineComponent({
         props: {
             size: {
-                type: [String, Number],
+                type: Number,
                 default: undefined
             }
         },
-        data: () => ({
-            actualSize: undefined
-        }),
-        computed: {
-            computedSize() {
-                if (!this.size) {
-                    return "100%";
-                }
-
-                switch (typeof this.size) {
-                    case "string":
-                        return this.size.endsWith('px') || this.size.endsWith('%')
-                            ? this.size
-                            : `${ this.size }px`;
-
-                    case "number":
-                        return `${ this.size }px`;
-
-                    default:
-                        return "100%";
-                }
-            }
-        },
-        watch: {
-            computedSize() {
-                this.actualSize = this.computedSize;
-            }
-        },
-        beforeMount() {
-            this.actualSize = this.computedSize;
+        setup(props) {
+            return {
+                currentSize: computed(() => (
+                    props.size
+                        ? `${ props.size }px`
+                        : '100%'
+                ))
+            };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>
     .site-logo {
-        width: v-bind(actualSize);
-        height: 100%;
         overflow: hidden;
         flex-shrink: 0;
         display: block;
