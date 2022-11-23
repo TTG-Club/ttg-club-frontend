@@ -54,8 +54,7 @@
 
             const filter = useFilter({
                 dbName: BooksFilterDefaults.dbName,
-                url: BooksFilterDefaults.url,
-                disabled: true
+                url: BooksFilterDefaults.url
             });
 
             const {

@@ -60,7 +60,7 @@
     } from 'vue';
     import {
         AbilityName, AbilityKey, AbilityShortName
-    } from '@/enums/Tools/AbilityCalcEnum';
+    } from '@/types/Tools/AbilityCalc.types';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({

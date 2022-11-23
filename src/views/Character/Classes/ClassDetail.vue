@@ -127,9 +127,9 @@
     import sortBy from "lodash/sortBy";
     import groupBy from "lodash/groupBy";
     import { resolveUnref } from '@vueuse/core';
+    import cloneDeep from 'lodash/cloneDeep';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import { useClassesStore } from '@/store/Character/ClassesStore';
     import UiSelect from '@/components/form/UiSelect.vue';
     import SpellsView from "@/views/Character/Spells/SpellsView.vue";
     import errorHandler from "@/common/helpers/errorHandler";
@@ -169,7 +169,6 @@
             this.$emit('scroll-to-last-active', from.path);
         },
         data: () => ({
-            classesStore: useClassesStore(),
             loading: true,
             error: false,
             currentClass: undefined,
@@ -188,10 +187,6 @@
                 return this.queryBooks();
             },
 
-            classes() {
-                return this.classesStore.classes || [];
-            },
-
             getStoreKey() {
                 return `${ this.currentClass.name.eng + this.currentTab.type + this.currentTab.order }`
                     .replaceAll(' ', '');
@@ -208,8 +203,7 @@
                     }
                 }
 
-                // Костыль, чтоб закрывалось при нажатии на селект
-                return selected || `--- ${ this.currentClass?.archetypeName } ---`;
+                return selected;
             },
 
             currentArchetypes() {
@@ -259,9 +253,11 @@
                         signal: this.abortController.signal
                     });
 
-                    await this.initTabs(resp.data);
+                    const classInfo = this.getUpdatedClass(resp.data);
 
-                    this.currentClass = resp.data;
+                    await this.initTabs(classInfo);
+
+                    this.currentClass = classInfo;
                 } catch (err) {
                     errorHandler(err);
 
@@ -272,8 +268,22 @@
                 }
             },
 
+            getUpdatedClass(classInfo) {
+                const updatedClass = cloneDeep(classInfo);
+
+                if (!updatedClass.images || !Array.isArray(updatedClass.images)) {
+                    updatedClass.images = [];
+                }
+
+                if (!updatedClass.images.length && updatedClass.image) {
+                    updatedClass.images.unshift(updatedClass.image);
+                }
+
+                return updatedClass;
+            },
+
             async initTabs(loadedClass) {
-                this.tabs = loadedClass.tabs;
+                this.tabs = sortBy(loadedClass.tabs, ['order']);
 
                 if (isArray(loadedClass.images) && loadedClass.images?.length) {
                     this.tabs.push({
@@ -541,6 +551,11 @@
                                 width: 0 0 1px 0;
                             }
                         }
+                    }
+
+                    &__tags,
+                    &__select {
+                        border-radius: 0;
                     }
 
                     &:hover,

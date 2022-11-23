@@ -1,6 +1,6 @@
 import type {
     AbilityName, AbilityShortName, AbilityType
-} from '@/enums/Tools/AbilityCalcEnum';
+} from '@/types/Tools/AbilityCalc.types';
 
 export type TRaceAbility = {
     key: AbilityType
@@ -34,7 +34,7 @@ export type TRaceLink = {
     subraces?: Array<TRaceLink>
 }
 
-export enum RaceFilterDefaults {
+export enum RacesFilterDefaults {
     dbName = 'races',
     url = '/filters/races'
 }

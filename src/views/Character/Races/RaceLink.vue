@@ -132,7 +132,7 @@
     import type { TRaceLink } from '@/types/Character/Races.types';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from "@/store/UI/UIStore";
-    import { AbilityType } from '@/enums/Tools/AbilityCalcEnum';
+    import { AbilityType } from '@/types/Tools/AbilityCalc.types';
 
     export default defineComponent({
         components: { SvgIcon },
