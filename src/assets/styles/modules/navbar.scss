@@ -5,7 +5,7 @@
   right: 0;
   height: 56px;
   width: 100%;
-  background: var(--bg-liner-menu);
+  // background: var(--bg-liner-menu);
   position: fixed;
   z-index: 100;
   pointer-events: none;
@@ -78,7 +78,7 @@
     width: 100%;
     padding: 0 24px;
     justify-content: space-between;
-    background: var(--bg-liner-menu);
+    // background: var(--bg-liner-menu);
 
     @media (max-width: 1200px) {
       padding: 0 16px;
