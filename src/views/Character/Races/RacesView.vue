@@ -22,7 +22,7 @@
 <script lang="ts">
     import { storeToRefs } from 'pinia';
     import {
-        computed, defineComponent, onBeforeMount
+        defineComponent, nextTick, onBeforeMount, ref, watch
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -43,6 +43,7 @@
             const router = useRouter();
             const uiStore = useUIStore();
             const { isMobile, fullscreen } = storeToRefs(uiStore);
+            const showRightSide = ref(false);
 
             const filter = useFilter({
                 dbName: RacesFilterDefaults.dbName,
@@ -65,6 +66,16 @@
                 ]
             });
 
+            watch(
+                [races, () => route.name],
+                () => {
+                    nextTick(() => {
+                        showRightSide.value = !!races.value.length && route.name === 'raceDetail';
+                    });
+                },
+                { flush: 'post' }
+            );
+
             const onSearch = async () => {
                 await initPages();
 
@@ -83,7 +94,7 @@
                 fullscreen,
                 races,
                 filter,
-                showRightSide: computed(() => route.name === 'raceDetail'),
+                showRightSide,
                 initPages,
                 onSearch
             };
