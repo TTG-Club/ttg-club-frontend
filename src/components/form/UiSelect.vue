@@ -1,5 +1,12 @@
 <template>
     <div class="ui-select">
+        <div
+            v-if="$slots.label"
+            class="ui-select__label"
+        >
+            <slot name="label"/>
+        </div>
+
         <multiselect
             v-bind="$props"
             @close="onClose"
@@ -57,11 +64,17 @@
                         v-if="$slots['left-slot']"
                         class="ui-select__slotted--left"
                     >
-                        <slot name="left-slot"/>
+                        <slot
+                            name="left-slot"
+                            :option="option"
+                        />
                     </div>
 
                     <div class="ui-select__slotted--body">
-                        <slot name="singleLabel">
+                        <slot
+                            name="singleLabel"
+                            :option="option"
+                        >
                             {{ getOptionLabel(option) }}
                         </slot>
                     </div>
@@ -70,7 +83,10 @@
                         v-if="$slots['right-slot']"
                         class="ui-select__slotted--right"
                     >
-                        <slot name="right-slot"/>
+                        <slot
+                            name="right-slot"
+                            :option="option"
+                        />
                     </div>
                 </div>
             </template>
@@ -511,6 +527,11 @@
     }
 
     .ui-select {
+        &__label {
+            margin-bottom: 8px;
+            padding: 0 8px;
+        }
+
         &__slotted {
             display: flex;
 

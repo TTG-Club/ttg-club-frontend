@@ -42,6 +42,24 @@ export enum AbilityType {
     ALL = '+1 к каждой'
 }
 
+export enum AbilityTypeKey {
+    CHOICE = 'CHOICE',
+    ONE = 'ONE',
+    CHOICE_UNIQUE = 'CHOICE_UNIQUE',
+    CHOICE_DOUBLE = 'CHOICE_DOUBLE',
+    ALL = 'ALL'
+}
+
+export enum AbilityChoiceDouble {
+    FOR_THREE = '+1 к трем',
+    FOR_TWO = '+2 и +1'
+}
+
+export enum AbilityChoiceDoubleKey {
+    FOR_THREE = 'FOR_THREE',
+    FOR_TWO = 'FOR_TWO'
+}
+
 export type Ability = {
     key: AbilityKey;
     shortKey: AbilityShortKey;
