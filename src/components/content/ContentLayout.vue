@@ -33,7 +33,7 @@
                 </div>
 
                 <div
-                    ref="items"
+                    ref="leftSide"
                     :class="{ 'is-shadow': shadow || (showRightSide && fullscreen) }"
                     class="content-layout__side--left_body"
                 >
@@ -66,7 +66,7 @@
     } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import {
-        defineComponent, nextTick, onMounted, ref
+        defineComponent, onMounted, ref
     } from 'vue';
     import { useUIStore } from '@/store/UI/UIStore';
     import ListFilter from "@/components/filter/ListFilter.vue";
@@ -89,42 +89,33 @@
             const { isMobile, fullscreen } = storeToRefs(uiStore);
             const scrollEl = ref(document.getElementById('dnd5club'));
             const container = ref<HTMLDivElement | null>(null);
-            const items = ref<HTMLDivElement | null>(null);
+            const leftSide = ref<HTMLDivElement | null>(null);
             const shadow = ref(false);
 
-            const scrollToActive = (oldLink: Element) => {
+            const scrollToActive = (oldLink?: Element) => {
                 if (isMobile.value) {
                     return;
                 }
 
-                if (document.readyState !== "complete") {
-                    scrollToActive(oldLink);
-
+                if (!leftSide.value) {
                     return;
                 }
 
-                if (!items.value) {
-                    return;
-                }
-
-                const link = oldLink || items.value.querySelector('.router-link-active');
+                const link = oldLink || leftSide.value.querySelector('.router-link-active');
 
                 if (!link) {
                     return;
                 }
 
-                nextTick(() => {
-                    const scrollBody = document.getElementById('dnd5club');
-                    const rect = link.getBoundingClientRect();
+                const rect = link.getBoundingClientRect();
 
-                    if (!scrollBody || !rect?.top && rect?.top !== 0) {
-                        return;
-                    }
+                if (!scrollEl.value || !rect?.top && rect?.top !== 0) {
+                    return;
+                }
 
-                    scrollBody.scroll({
-                        top: rect.top - 112 + scrollBody.scrollTop,
-                        behavior: "smooth"
-                    });
+                scrollEl.value.scroll({
+                    top: rect.top - 112 + scrollEl.value.scrollTop,
+                    behavior: "smooth"
                 });
             };
 
@@ -133,20 +124,18 @@
                     return;
                 }
 
-                if (!items.value) {
+                if (!leftSide.value) {
                     return;
                 }
 
-                const link = items.value.querySelector(`[href="${ url }"]`)?.closest('.link-item-expand');
+                const link = leftSide.value.querySelector(`[href="${ url }"]`)?.closest('.link-item-expand');
 
                 if (!link) {
                     return;
                 }
 
                 setTimeout(() => {
-                    nextTick(() => {
-                        scrollToActive(link);
-                    });
+                    scrollToActive(link);
                 }, 350);
             };
 
@@ -180,6 +169,8 @@
                 isMobile,
                 fullscreen,
                 shadow,
+                leftSide,
+                container,
                 scrollToActive,
                 scrollToLastActive
             };

@@ -38,7 +38,7 @@
 <script lang="ts">
     import { useRoute } from 'vue-router';
     import {
-        computed, defineComponent, onBeforeMount, provide
+        computed, defineComponent, nextTick, onBeforeMount, provide, ref, watch
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import sortBy from 'lodash/sortBy';
@@ -62,6 +62,7 @@
         setup() {
             const uiStore = useUIStore();
             const route = useRoute();
+            const showRightSide = ref(false);
 
             const filter = useFilter({
                 dbName: ClassesFilterDefaults.dbName,
@@ -79,6 +80,16 @@
                 },
                 search: filter.search
             });
+
+            watch(
+                [classes, () => route.name],
+                () => {
+                    nextTick(() => {
+                        showRightSide.value = !!classes.value.length && route.name === 'classDetail';
+                    });
+                },
+                { flush: 'post' }
+            );
 
             const sortedClasses = computed((): Array<TClassList> => {
                 if (!classes.value?.length) {
@@ -138,7 +149,7 @@
                 isMobile,
                 fullscreen,
                 sortedClasses,
-                showRightSide: computed(() => route.name === 'classDetail'),
+                showRightSide,
                 filter,
                 initPages
             };
