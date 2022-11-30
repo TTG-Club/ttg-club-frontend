@@ -9,14 +9,16 @@
   z-index: 100;
   pointer-events: none;
 
-  &::before {
+  &:before {
+    @include css_anim();
+
     position: absolute;
     z-index: -1;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    background: var(--bg-liner-menu);
+    background-color: var(--bg-liner-menu);
     content: "";
     pointer-events: none;
   }
@@ -128,6 +130,28 @@
         @include media-max($md) {
           display: none;
         }
+      }
+    }
+  }
+
+  &.is-scrolled {
+    &:before {
+      background-color: var(--primary);
+    }
+
+    .navbar {
+      &__link {
+        color: var(--text-b-color)
+      }
+
+      &__btn {
+        color: var(--text-b-color);
+      }
+    }
+
+    .hamburger {
+      .line {
+        background-color: var(--text-b-color);
       }
     }
   }
