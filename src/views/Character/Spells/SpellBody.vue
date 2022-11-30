@@ -110,7 +110,7 @@
                 v-if="spell.races?.length"
                 class="spell_stat_block_bottom"
             >
-                <p>Расы:</p>
+                <p>Расы и происхождения:</p>
 
                 <div>
                     <span
