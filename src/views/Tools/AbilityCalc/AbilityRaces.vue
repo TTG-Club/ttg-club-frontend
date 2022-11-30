@@ -20,10 +20,13 @@
                 </button>
             </div>
 
-            <div class="ability-races__sub-race">
+            <div
+                v-if="subRaces?.length || isChoiceDouble"
+                class="ability-races__sub-race"
+            >
                 <ui-select
                     v-if="subRaces?.length"
-                    v-model="subRace"
+                    v-model="selectedSubRace"
                     track-by="url"
                     :options="subRaces"
                 >
@@ -122,10 +125,10 @@
             RaceLink,
             SvgIcon
         },
-        setup() {
+        setup(props, { emit }) {
             const opened = ref(false);
             const selectedRace = ref<TRaceLink | null>(null);
-            const subRace = ref<TRaceLink | null>(null);
+            const selectedSubRace = ref<TRaceLink | null>(null);
 
             const selectedChoiceDouble = ref<{
                 key: keyof typeof AbilityChoiceDouble
@@ -173,12 +176,13 @@
             });
 
             const onSelect = (race: TRaceLink) => {
+                opened.value = false;
                 selectedRace.value = race;
             };
 
             const onDeselect = () => {
                 selectedRace.value = null;
-                subRace.value = null;
+                selectedSubRace.value = null;
                 selectedChoiceDouble.value = null;
             };
 
@@ -189,7 +193,7 @@
                 selectedRace,
                 isChoiceDouble,
                 subRaces,
-                subRace,
+                selectedSubRace,
                 choiceDouble,
                 selectedChoiceDouble,
                 onSelect,

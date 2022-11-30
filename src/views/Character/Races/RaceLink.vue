@@ -235,14 +235,22 @@
     @import "../../../assets/styles/modules/link-item-expand";
 
     .link-item-expand {
-        &__body {
-            &_row {
-                &:first-child {
-                    margin-bottom: 20px;
+        &__main {
+            height: 122px;
 
-                    @include media-min($sm) {
-                        margin-bottom: 110px;
-                    }
+            @include media-min($sm) {
+                height: 210px;
+            }
+        }
+
+        &__body {
+            height: 100%;
+
+            &_row {
+                margin: 0;
+
+                & + & {
+                    margin-top: auto;
                 }
             }
         }
