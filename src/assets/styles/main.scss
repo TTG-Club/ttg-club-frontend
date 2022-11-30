@@ -537,6 +537,15 @@
   }
 }
 
+.tippy-content{
+  .scores {
+    &__stats {
+      max-width: calc(33% - 8px);
+      flex: 1 0 calc(33% - 8px);
+    }
+  }
+}
+
 .weapons-group,
 .books-group,
 .armors-group {
