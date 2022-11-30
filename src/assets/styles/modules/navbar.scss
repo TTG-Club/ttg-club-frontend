@@ -18,7 +18,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: var(--bg-liner-menu);
+    background: var(--bg-liner-menu);
     content: "";
     pointer-events: none;
   }
@@ -136,23 +136,7 @@
 
   &.is-scrolled {
     &:before {
-      background-color: var(--primary);
-    }
-
-    .navbar {
-      &__link {
-        color: var(--text-b-color)
-      }
-
-      &__btn {
-        color: var(--text-b-color);
-      }
-    }
-
-    .hamburger {
-      .line {
-        background-color: var(--text-b-color);
-      }
+      background: var(--bg-liner-menu-scroll);
     }
   }
 }
