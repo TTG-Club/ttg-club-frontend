@@ -280,6 +280,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: normal;
 
             @media (max-width: 1200px) {
                 margin-top: 4px;

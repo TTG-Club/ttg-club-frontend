@@ -9,7 +9,9 @@
   z-index: 100;
   pointer-events: none;
 
-  &::before {
+  &:before {
+    @include css_anim();
+
     position: absolute;
     z-index: -1;
     top: 0;
@@ -129,6 +131,12 @@
           display: none;
         }
       }
+    }
+  }
+
+  &.is-scrolled {
+    &:before {
+      background: var(--bg-liner-menu-scroll);
     }
   }
 }

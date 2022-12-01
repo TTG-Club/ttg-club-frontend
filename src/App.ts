@@ -11,7 +11,6 @@ export default defineComponent({
         await this.initUser();
     },
     async mounted() {
-        await this.initWindowSize();
         await this.initTheme();
     },
     methods: {
@@ -30,12 +29,6 @@ export default defineComponent({
                 name: this.uiStore.getCookieTheme(),
                 avoidHtmlUpdate
             });
-        },
-
-        async initWindowSize() {
-            this.uiStore.watchWindowSize();
-
-            await this.uiStore.setFullscreenState(false);
         },
 
         async initUser() {
