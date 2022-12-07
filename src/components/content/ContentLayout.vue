@@ -181,6 +181,7 @@
 <style lang="scss" scoped>
     .content-layout {
         width: 100%;
+        max-width: var(--max-content);
 
         &__body {
             width: 100%;
@@ -254,7 +255,7 @@
 
             &--right {
                 display: block;
-                top: 56px;
+                top: 0px;
                 right: 0;
                 width: calc(60% - 24px);
                 height: calc(var(--max-vh) - 56px - 24px);
@@ -295,9 +296,7 @@
         &__filter {
             flex-shrink: 0;
             position: sticky;
-            margin-top: -56px;
             top: 0;
-            padding-top: 56px;
             z-index: 12;
             pointer-events: none;
             background: linear-gradient(

@@ -99,7 +99,8 @@ body,
 }
 
 #dnd5club {
-  overflow: auto;
+  display: flex;
+  flex-flow: column;
 }
 
 button {
