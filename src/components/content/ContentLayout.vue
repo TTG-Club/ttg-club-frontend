@@ -302,9 +302,9 @@
             background: linear-gradient(
                     180deg,
                     var(--bg-main) 0,
-                    var(--bg-main) 88px,
-                    var(--bg-main) 88px,
-                    transparent 124px
+                    var(--bg-main) 28px,
+                    var(--bg-main) 48px,
+                    transparent 68px
             );
 
             &_body {
