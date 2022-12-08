@@ -254,7 +254,7 @@
                 width: 100%;
                 display: flex;
                 border-radius: 6px;
-                font-size: calc(var(--main-font-size) + 0px);
+                font-size: var(--main-font-size);
 
                 @media (max-width: 550px) {
                     font-size: calc(var(--main-font-size) + 2px);

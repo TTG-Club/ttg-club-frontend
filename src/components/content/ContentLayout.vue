@@ -66,7 +66,7 @@
     } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import {
-        defineComponent, onMounted, ref
+        defineComponent, ref
     } from 'vue';
     import { useUIStore } from '@/store/UI/UIStore';
     import ListFilter from "@/components/filter/ListFilter.vue";
@@ -86,8 +86,11 @@
         },
         setup(props, { emit }) {
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
-            const scrollEl = ref(document.getElementById('dnd5club'));
+
+            const {
+                isMobile, fullscreen, bodyElement
+            } = storeToRefs(uiStore);
+
             const container = ref<HTMLDivElement | null>(null);
             const leftSide = ref<HTMLDivElement | null>(null);
             const shadow = ref(false);
@@ -109,12 +112,12 @@
 
                 const rect = link.getBoundingClientRect();
 
-                if (!scrollEl.value || !rect?.top && rect?.top !== 0) {
+                if (!bodyElement.value || !rect?.top && rect?.top !== 0) {
                     return;
                 }
 
-                scrollEl.value.scroll({
-                    top: rect.top - 112 + scrollEl.value.scrollTop,
+                bodyElement.value.scroll({
+                    top: rect.top + uiStore.bodyScroll.y,
                     behavior: "smooth"
                 });
             };
@@ -140,30 +143,28 @@
             };
 
             const toggleShadow = () => {
-                if (!scrollEl.value || !container.value) {
+                if (!bodyElement.value || !container.value) {
                     return;
                 }
 
                 shadow.value
-                    = scrollEl.value.scrollTop + scrollEl.value.offsetHeight < container.value.offsetHeight - 24;
+                    = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
             };
 
             const scrollHandler = () => {
                 toggleShadow();
             };
 
-            onMounted(() => {
-                useInfiniteScroll(
-                    ref(scrollEl),
-                    () => {
-                        emit('list-end');
-                    },
-                    { distance: 1080 }
-                );
+            useInfiniteScroll(
+                bodyElement,
+                () => {
+                    emit('list-end');
+                },
+                { distance: 1080 }
+            );
 
-                useEventListener(scrollEl, 'scroll', scrollHandler);
-                useResizeObserver(scrollEl, scrollHandler);
-            });
+            useEventListener(bodyElement, 'scroll', scrollHandler);
+            useResizeObserver(bodyElement, scrollHandler);
 
             return {
                 isMobile,
@@ -181,6 +182,8 @@
 <style lang="scss" scoped>
     .content-layout {
         width: 100%;
+        max-width: var(--max-content);
+        margin: 0 auto;
 
         &__body {
             width: 100%;
@@ -222,8 +225,6 @@
                 }
 
                 &_body {
-                    margin-bottom: -24px;
-
                     &:after {
                         content: '';
                         display: block;
@@ -254,7 +255,7 @@
 
             &--right {
                 display: block;
-                top: 56px;
+                top: 0;
                 right: 0;
                 width: calc(60% - 24px);
                 height: calc(var(--max-vh) - 56px - 24px);
@@ -295,17 +296,15 @@
         &__filter {
             flex-shrink: 0;
             position: sticky;
-            margin-top: -56px;
             top: 0;
-            padding-top: 56px;
             z-index: 12;
             pointer-events: none;
             background: linear-gradient(
                     180deg,
                     var(--bg-main) 0,
-                    var(--bg-main) 88px,
-                    var(--bg-main) 88px,
-                    transparent 124px
+                    var(--bg-main) 28px,
+                    var(--bg-main) 48px,
+                    transparent 68px
             );
 
             &_body {

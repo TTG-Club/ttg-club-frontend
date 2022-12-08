@@ -38,18 +38,25 @@
 
 .container {
   width: 100%;
-  max-width: var(--max-content);
+  height: var(--max-vh);
   position: relative;
   margin: auto;
-  padding: 56px 0 24px 0;
+  padding: 0;
+  overflow: auto;
 
   @media (max-width: 1400px) {
-    padding: 56px 24px 24px 24px;
+    padding: 0 24px 0 24px;
   }
 
   @media (max-width: 1200px) {
-    padding: 56px 16px 16px 16px;
+    padding: 0 16px 0 16px;
   }
+}
+
+.main_page_wrapper {
+  width: 100%;
+  max-width: var(--max-content);
+  margin: 0 auto;
 }
 
 .main_block {
@@ -452,7 +459,7 @@
       img {
         position: relative;
         left: 50%;
-        top: 0%;
+        top: 0;
         height: 100%;
         width: 100%;
         transform: translate(-50%, 0%);
@@ -559,6 +566,10 @@
     margin-bottom: 12px;
     border-radius: 8px;
     color: var(--text-btn-color);
+  }
+
+  &+& {
+    margin-top: 12px;
   }
 }
 
