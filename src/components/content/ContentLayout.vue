@@ -348,7 +348,7 @@
 
         &__side--left_fixed {
             position: sticky;
-            top: 56px;
+            top: 0;
             z-index: 3;
         }
     }
