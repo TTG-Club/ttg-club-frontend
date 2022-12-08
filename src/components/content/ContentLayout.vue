@@ -223,8 +223,6 @@
                 }
 
                 &_body {
-                    margin-bottom: -24px;
-
                     &:after {
                         content: '';
                         display: block;

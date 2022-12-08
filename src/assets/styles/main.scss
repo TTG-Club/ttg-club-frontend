@@ -568,6 +568,10 @@
     border-radius: 8px;
     color: var(--text-btn-color);
   }
+
+  &+& {
+    margin-top: 12px;
+  }
 }
 
 .content-padding {
