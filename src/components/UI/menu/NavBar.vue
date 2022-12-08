@@ -1,8 +1,5 @@
 <template>
-    <div
-        class="navbar"
-        :class="{ 'is-scrolled': isScrolled }"
-    >
+    <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
                 <nav-menu/>
@@ -36,12 +33,11 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent } from 'vue';
+    import { defineComponent } from 'vue';
     import MenuThemeSwitcher from '@/components/UI/MenuThemeSwitcher.vue';
     import NavProfile from "@/components/UI/menu/NavProfile.vue";
     import NavBookmarks from "@/components/UI/menu/bookmarks/NavBookmarks.vue";
     import NavMenu from "@/components/UI/menu/NavMenu.vue";
-    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         name: "NavBar",
@@ -56,13 +52,6 @@
                 type: String,
                 default: ''
             }
-        },
-        setup() {
-            const uiStore = useUIStore();
-
-            return {
-                isScrolled: computed(() => uiStore.bodyScroll.y > 0)
-            };
         }
     });
 </script>

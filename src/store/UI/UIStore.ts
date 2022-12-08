@@ -13,7 +13,15 @@ import errorHandler from '@/common/helpers/errorHandler';
 export const useUIStore = defineStore('UIStore', () => {
     const theme = ref('');
     const fullscreen = ref(false);
-    const bodyElement = ref<HTMLElement | null>(document.getElementById('dnd5club'));
+    const bodyElement = ref<HTMLElement | null>(document.getElementById('container'));
+
+    const bodyElementWatcher = setInterval(() => {
+        bodyElement.value = document.getElementById('container');
+
+        if (bodyElement.value) {
+            clearInterval(bodyElementWatcher);
+        }
+    });
 
     const windowSize = useWindowSize();
     const bodyScroll = useScroll(bodyElement);
