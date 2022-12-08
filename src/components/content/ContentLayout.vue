@@ -350,6 +350,10 @@
             position: sticky;
             top: 0;
             z-index: 3;
+
+            @media (max-width: 600px) {
+                top: 16px;
+            }
         }
     }
 </style>
