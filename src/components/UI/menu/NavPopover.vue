@@ -111,43 +111,43 @@
             background-color: var(--bg-secondary);
             overflow: auto;
             border-radius: 8px;
-            box-shadow: 0 0 27px #0006;
+            box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
             transform-origin: top right;
             z-index: 111;
             position: absolute;
             top: 0;
-            left: initial;
+            left: 0;
             right: 0;
-            max-width: 800px;
+            max-width: 1170px;
             max-height: calc(var(--max-vh) / 100 * 90);
 
-            @media (max-width: 800px) {
-                max-width: 550px;
+            @media (max-width: 1200px) {
+                max-width: calc(100vw / 100 * 90);
             }
 
-            @media (max-width: 550px) {
+            @media (max-width: 600px) {
                 position: fixed;
-                width: calc(100vw - 16px);
-                max-height: calc(var(--max-vh) - 16px);
+                width: 100vw;
+                max-width: 100%;
+                max-height: calc(var(--max-vh) - 76px);
                 left: 8px;
-                top: 56px;
+                top: 8px;
+                right: 8px;
             }
 
             &.is-left {
                 transform-origin: top left;
-                left: 0;
-                right: initial;
+
+                @media (max-width: 600px) {
+                    transform-origin: bottom left;
+                }
             }
 
             &.is-menu {
                 width: 100vw;
 
-                @media (max-width: 550px) {
-                    position: absolute;
-                    top: 0;
-                    width: calc(100vw - 16px);
-                    height: calc(var(--max-vh) - 16px);
-                    max-height: calc(var(--max-vh) - 16px);
+                @media (max-width: 600px) {
+                    width: auto;
                 }
             }
         }
@@ -168,6 +168,25 @@
 
         &-enter-active, &-leave-active {
             @include css_anim($time: .25s, $style: cubic-bezier(0.215, 0.61, 0.355, 1));
+        }
+    }
+
+    .navbar__header_right {
+        .nav-popover {
+            &__body {
+                top:42px;
+                left: initial;
+                right: 0;
+
+                @media (max-width: 600px) {
+                    top: auto;
+                    left: 8px;
+                    right: 8px;
+                    width: auto;
+                    bottom: 68px;
+                    transform-origin: bottom right;
+                }
+            }
         }
     }
 </style>
