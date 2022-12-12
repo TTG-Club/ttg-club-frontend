@@ -101,7 +101,7 @@
             &--center {
                 flex: 1 1 620px;
                 max-width: 620px;
-                margin: auto;
+                margin:0 auto;
                 border-radius: 12px;
 
                 @include media-min($lg) {
