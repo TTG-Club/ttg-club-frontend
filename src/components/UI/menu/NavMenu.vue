@@ -237,6 +237,23 @@
                 font-size: inherit;
                 font-weight: normal;
                 width: 100%;
+                position: relative;
+                align-items: center;
+
+                .nav-menu__group_label {
+                    background: var(--bg-secondary);
+                    align-items: center;
+
+                    &::after {
+                        content: '';
+                        width: 100%;
+                        height: 1px;
+                        background-color: var(--text-g-color);
+                        position: relative;
+                        left: 8px;
+                        top: 0;
+                    }
+                }
             }
 
             &_icon {
