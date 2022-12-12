@@ -118,8 +118,8 @@
 
         background-color: var(--primary);
         color: var(--text-btn-color);
-        border-radius: 6px;
-        padding: 12px;
+        border-radius: 8px;
+        padding: 9px 12px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;

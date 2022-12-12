@@ -12,7 +12,7 @@
     }
   }
 
-  @media (max-width: 550px) {
+  @media (max-width: 600px) {
     width: 100%;
   }
 
@@ -151,7 +151,7 @@
         &:not(.is-active) {
           opacity: 0;
 
-          @media (max-width: 550px) {
+          @media (max-width: 600px) {
             opacity: 1;
           }
         }
@@ -249,7 +249,7 @@
           &:not(.is-active) {
             opacity: 0;
 
-            @media (max-width: 550px) {
+            @media (max-width: 600px) {
               opacity: 1;
             }
           }
@@ -345,7 +345,7 @@
         &:not(.is-active) {
           opacity: 0;
 
-          @media (max-width: 550px) {
+          @media (max-width: 600px) {
             opacity: 1;
           }
         }

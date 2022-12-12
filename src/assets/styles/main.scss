@@ -638,11 +638,6 @@
     gap: 16px 16px;
   }
 
-  // &__colum {
-  //   display: flex;
-  //   flex-direction: column;
-  // }
-
   .label {
     margin-bottom: 8px;
     display: flex;
@@ -659,6 +654,10 @@
     height: 70px;
     background-color: var(--bg-main);
     z-index: -1;
+  }
+
+  @media (max-width: 600px) {
+    margin-bottom: 32px;
   }
 }
 

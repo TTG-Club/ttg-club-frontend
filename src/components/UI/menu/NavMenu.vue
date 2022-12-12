@@ -40,15 +40,15 @@
                         class="nav-menu__group"
                     >
                         <div class="nav-menu__group_label">
+                            <div class="nav-menu__group_label">
+                                {{ group.label }}
+                            </div>
+
                             <div
                                 v-if="group.icon"
                                 class="nav-menu__group_icon"
                             >
                                 <svg-icon :icon-name="group.icon"/>
-                            </div>
-
-                            <div class="nav-menu__group_label">
-                                {{ group.label }}
                             </div>
                         </div>
 
@@ -58,6 +58,12 @@
                                 :key="link.url"
                                 class="nav-menu__link"
                             >
+                                <a
+                                    :href="link.url"
+                                    :target="link.external ? '_blank' : '_self'"
+                                    class="nav-menu__link_label"
+                                >{{ link.label }}</a>
+
                                 <div
                                     class="nav-menu__link_icon only-hover"
                                     :class="{ 'is-active': isSaved(link.url) }"
@@ -73,12 +79,6 @@
                                         fill-enable
                                     />
                                 </div>
-
-                                <a
-                                    :href="link.url"
-                                    :target="link.external ? '_blank' : '_self'"
-                                    class="nav-menu__link_label"
-                                >{{ link.label }}</a>
                             </div>
                         </div>
                     </div>
@@ -160,15 +160,15 @@
     .nav-menu {
         padding: 16px 16px 8px 16px;
 
-        @media (max-width: 550px) {
-            padding: 16px 8px 0 40px;
-        }
-
         &__header {
             padding: 32px 16px 16px 16px;
             border-bottom: 1px solid var(--hover);
             display: flex;
             align-items: center;
+
+            @media (max-width: 600px) {
+                padding: 16px 16px 16px 16px;
+            }
         }
 
         &__logo {
@@ -176,6 +176,11 @@
             width: 80px;
             height: 80px;
             flex-shrink: 0;
+
+            @media (max-width: 600px) {
+                width: 60px;
+                height: 60px;
+            }
         }
 
         &__info {
@@ -203,7 +208,11 @@
             padding: 8px 8px 0 8px;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 48px;
+
+            @media (max-width: 600px) {
+                gap: 0px;
+            }
         }
 
         &__links {
@@ -216,17 +225,35 @@
             width: 240px;
             margin: 8px 0;
 
-            @media (max-width: 550px) {
+            @media (max-width: 600px) {
                 width: 100%;
             }
 
             &_label {
-                padding: 8px 20px 4px 8px;
+                padding: 8px 8px 4px 8px;
                 display: flex;
                 opacity: 0.8;
                 color: var(--text-g-color);
                 font-size: inherit;
                 font-weight: normal;
+                width: 100%;
+                position: relative;
+                align-items: center;
+
+                .nav-menu__group_label {
+                    background: var(--bg-secondary);
+                    align-items: center;
+
+                    &::after {
+                        content: '';
+                        width: 100%;
+                        height: 1px;
+                        background-color: var(--text-g-color);
+                        position: relative;
+                        left: 8px;
+                        top: 0;
+                    }
+                }
             }
 
             &_icon {
@@ -253,10 +280,6 @@
                 display: flex;
                 border-radius: 6px;
                 font-size: var(--main-font-size);
-
-                @media (max-width: 550px) {
-                    font-size: calc(var(--main-font-size) + 2px);
-                }
             }
 
             &_icon {

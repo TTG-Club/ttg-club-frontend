@@ -123,7 +123,7 @@ export const useNavStore = defineStore('NavStore', () => {
             ]
         },
         {
-            label: 'База знаний',
+            label: 'База знаний',
             icon: 'menu-wiki',
             links: [
                 {

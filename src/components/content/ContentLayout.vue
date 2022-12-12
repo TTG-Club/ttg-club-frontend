@@ -276,6 +276,11 @@
                     border-bottom-right-radius: 0;
                 }
 
+                @media (max-width: 600px) {
+                    top: 0;
+                    border-radius: 0;
+                }
+
                 &.is-fullscreen {
                     width: var(--max-content);
                     max-width: var(--max-content);
@@ -328,12 +333,27 @@
                     pointer-events: auto;
                 }
             }
+
+            @media (max-width: 600px) {
+                padding-top: 16px;
+                background: linear-gradient(
+                    180deg,
+                    var(--bg-main) 0,
+                    var(--bg-main) 38px,
+                    var(--bg-main) 58px,
+                    transparent 78px
+                    )
+            }
         }
 
         &__side--left_fixed {
             position: sticky;
             top: 0;
             z-index: 3;
+
+            @media (max-width: 600px) {
+                top: 16px;
+            }
         }
     }
 </style>

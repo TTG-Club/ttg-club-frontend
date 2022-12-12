@@ -101,6 +101,10 @@ body,
 #dnd5club {
   display: flex;
   flex-flow: column;
+
+  @media (max-width: 600px) {
+    flex-flow: column-reverse;
+  }
 }
 
 button {
