@@ -1,13 +1,11 @@
 <template>
     <nav-popover
-        :model-value="menu"
+        v-model="menu"
         is-menu
         is-left
-        @close="menu = false"
     >
-        <template #trigger="{ setRef, isActive }">
+        <template #trigger="{ isActive }">
             <div
-                :ref="el => setRef(el)"
                 :class="{ 'is-active': isActive }"
                 class="navbar__btn hamburger"
                 @click.left.exact.prevent="menu = !menu"
