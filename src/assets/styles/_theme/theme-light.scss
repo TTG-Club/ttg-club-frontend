@@ -18,7 +18,8 @@
   --bg-table-list: #ebe7d9;
   --bg-liner-main-page: linear-gradient(to right, #ebe6d7, transparent);
   --bg-liner-list: linear-gradient(to right, var(--bg-table-list), transparent);
-  --bg-liner-menu: linear-gradient(to bottom, #40404045, transparent);
+  --bg-liner-menu: linear-gradient(to bottom, #C7C5BD, transparent);
+  --bg-liner-menu-scroll: linear-gradient(to bottom, #C7C5BD, var(--bg-main));
   --bg-liner-divider: linear-gradient(to right, var(--primary), var(--hover));
   --text-color: #404040;
   --text-color-active: #922610;
@@ -44,9 +45,6 @@
   --very_rare: #e770ff;
   --legendary: #d1d900;
   --artifact: #ff8900;
-
-  /********* IMG BG *********/
-  --bg-img-main: url("/img/light/bg-main.webp");
 
   /********* SCROLL *********/
   --background-color-thumb: rgba(0, 0, 0, 0.6);

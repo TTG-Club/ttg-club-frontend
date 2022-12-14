@@ -1,15 +1,15 @@
 .navbar {
   display: flex;
-  top: 0;
-  left: 0;
-  right: 0;
   height: 56px;
+  min-height: 56px;
   width: 100%;
-  position: fixed;
+  position: relative;
   z-index: 100;
   pointer-events: none;
 
-  &::before {
+  &:before {
+    @include css_anim();
+
     position: absolute;
     z-index: -1;
     top: 0;
@@ -19,6 +19,11 @@
     background: var(--bg-liner-menu);
     content: "";
     pointer-events: none;
+
+    @media (max-width: 600px) {
+      background: var(--bg-main);
+      border-top: 1px solid var(--border);
+    }
   }
 
   &__btn {

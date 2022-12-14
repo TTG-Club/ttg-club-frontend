@@ -1,8 +1,7 @@
 <template>
     <nav-popover v-model="popover">
-        <template #trigger="{ setRef, isActive }">
+        <template #trigger="{ isActive }">
             <div
-                :ref="el => setRef(el)"
                 class="navbar__btn"
                 :class="{ 'is-active': isActive }"
                 @click.left.exact.prevent="clickHandler"
@@ -222,6 +221,9 @@
 
 <style lang="scss" scoped>
     .nav-profile {
+        width: 100vw;
+        max-width: 260px;
+
         &__line {
             @include css_anim();
 
@@ -254,6 +256,10 @@
             &:hover {
                 background-color: var(--bg-sub-menu);
             }
+        }
+
+        @media (max-width: 600px) {
+            max-width: 100%;
         }
     }
 </style>

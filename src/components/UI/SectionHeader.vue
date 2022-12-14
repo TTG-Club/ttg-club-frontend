@@ -75,7 +75,7 @@
                     }"
                     class="section-header__control--main is-only-desktop"
                     type="button"
-                    @click.left.exact.prevent.stop="uiStore.setFullscreenState(!uiStore.fullscreen)"
+                    @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
                 >
                     <svg-icon :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"/>
                 </button>
@@ -280,6 +280,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: normal;
 
             @media (max-width: 1200px) {
                 margin-top: 4px;

@@ -2,7 +2,7 @@ const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
 
 module.exports = defineConfig({
-    outputDir: process.env.BUILD_PATH || './dist/',
+    outputDir: process.env.VUE_APP_BUILD_PATH || './dist/',
     filenameHashing: false,
     runtimeCompiler: true,
     productionSourceMap: true,
@@ -14,8 +14,10 @@ module.exports = defineConfig({
                 changeOrigin: true,
                 ws: false,
                 secure: false,
+                onProxyReq(req) {
+                    req.setHeader('origin', process.env.VUE_APP_API_URL || 'http://localhost:8080');
+                },
                 /* eslint-disable consistent-return */
-                // @ts-ignore
                 bypass(req) {
                     if (req.headers.accept.indexOf('html') !== -1) {
                         return '/index.html';

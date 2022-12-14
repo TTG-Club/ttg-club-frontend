@@ -1,181 +1,107 @@
 <template>
-    <div
-        class="nav-popover__trigger"
-        :class="{ 'is-active': show.layer }"
-    >
-        <slot
-            :set-ref="setTrigger"
-            :is-active="show.layer"
-            name="trigger"
-        />
-    </div>
-
-    <transition
-        name="fade"
-        mode="out-in"
-        @after-enter="show.body = true"
-    >
+    <div class="nav-popover">
         <div
-            v-if="show.layer"
-            class="nav-popover"
-            @click.left.exact.self.prevent="emitClose"
+            class="nav-popover__trigger"
+            :class="{ 'is-active': isShow }"
         >
-            <div
-                ref="body"
-                class="nav-popover__wrapper"
-                :style="position"
-            >
-                <transition
-                    name="nav-popover-animation"
-                    :class="{ 'is-left': isLeft }"
-                    @after-leave="show.layer = false"
-                >
-                    <div
-                        v-if="show.body"
-                        class="nav-popover__body"
-                        :style="{ maxHeight }"
-                    >
-                        <slot
-                            name="default"
-                            :close="emitClose"
-                        />
-                    </div>
-                </transition>
-            </div>
+            <slot
+                :is-active="isShow"
+                name="trigger"
+            />
         </div>
-    </transition>
+
+        <transition name="fade">
+            <div
+                v-if="isShow"
+                class="nav-popover__bg"
+                @click.left.exact.self.prevent.stop="onClose"
+            />
+        </transition>
+
+        <transition name="nav-popover-animation">
+            <div
+                v-if="isShow"
+                :class="classes"
+                class="nav-popover__body"
+            >
+                <slot
+                    name="default"
+                    :close="onClose"
+                />
+            </div>
+        </transition>
+    </div>
 </template>
 
-<script setup>
-    import { useElementBounding } from "@vueuse/core";
+<script lang="ts">
     import {
-        reactive, ref, watch
-    } from "vue";
+        computed, defineComponent
+    } from 'vue';
+    import { useVModel } from '@vueuse/core';
 
-    let rectTrigger;
-
-    const emit = defineEmits(['update:model-value', 'close']);
-
-    const props = defineProps({
-        modelValue: {
-            type: Boolean,
-            default: false
+    export default defineComponent({
+        props: {
+            modelValue: {
+                type: Boolean,
+                default: false
+            },
+            isMenu: {
+                type: Boolean,
+                default: false
+            },
+            isLeft: {
+                type: Boolean,
+                default: false
+            }
         },
-        isMenu: {
-            type: Boolean,
-            default: false
-        },
-        isLeft: {
-            type: Boolean,
-            default: false
+        setup(props, { emit }) {
+            const isShow = useVModel(props, 'modelValue');
+
+            return {
+                isShow,
+
+                classes: computed(() => ({
+                    'is-left': props.isLeft,
+                    'is-menu': props.isMenu
+                })),
+
+                onClose: () => {
+                    isShow.value = false;
+
+                    emit('close');
+                }
+            };
         }
     });
-
-    const body = ref(null);
-
-    const show = reactive({
-        layer: false,
-        body: false
-    });
-
-    const rectBody = useElementBounding(body);
-    const position = reactive({});
-    const maxHeight = ref('calc(var(--max-vh) / 100 * 90)');
-
-    function setPosition() {
-        rectBody.update();
-
-        if (!rectTrigger) {
-            return;
-        }
-
-        if (!props.isMenu) {
-            maxHeight.value = `calc(var(--max-vh) - ${ rectTrigger.bottom.value + 4 }px - 8px)`;
-        }
-
-        position.top = `${ props.isMenu ? rectTrigger.top.value : rectTrigger.bottom.value + 4 }px`;
-        position.height = maxHeight.value;
-        position.maxHeight = maxHeight.value;
-
-        if (props.isLeft) {
-            position.left = `${ rectTrigger.left.value }px`;
-        }
-
-        if (!props.isLeft) {
-            position.left = `${ rectTrigger.right.value - rectBody.width.value }px`;
-        }
-    }
-
-    function setTrigger(el) {
-        rectTrigger = useElementBounding(el);
-
-        setPosition();
-    }
-
-    function emitClose() {
-        emit('update:model-value', false);
-        emit('close');
-    }
-
-    watch(
-        () => props.modelValue,
-        value => {
-            if (value) {
-                show.layer = true;
-            }
-
-            if (!value) {
-                show.body = false;
-            }
-        }
-    );
-
-    watch(
-        [
-            () => rectTrigger?.top,
-            () => rectTrigger?.left,
-            () => rectBody?.width
-        ],
-        setPosition
-    );
 </script>
 
 <style lang="scss" scoped>
     .nav-popover {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: var(--max-vh);
-        background-color: var(--bg-light-main);
-        transform: translate3d(0, 0, 0);
-        z-index: 110;
-        cursor: pointer;
+        position: relative;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
 
         &__trigger {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
             &.is-active {
                 z-index: 120;
             }
         }
 
-        &__wrapper {
-            max-width: 800px;
-            z-index: 111;
-            position: relative;
-            display: inline-block;
-            pointer-events: none;
-
-            @media (max-width: 800px) {
-                max-width: 550px;
-            }
-
-            @media (max-width: 550px) {
-                max-width: none;
-                max-height: none;
-                width: calc(100% - 16px);
-                height: calc(100% - 16px);
-                left: 8px !important;
-            }
+        &__bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: var(--max-vh);
+            background-color: var(--bg-light-main);
+            transform: translate3d(0, 0, 0);
+            z-index: 110;
+            cursor: pointer;
         }
 
         &__body {
@@ -185,16 +111,44 @@
             background-color: var(--bg-secondary);
             overflow: auto;
             border-radius: 8px;
-            box-shadow: 0 0 27px #0006;
+            box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
             transform-origin: top right;
-            max-width: 100%;
+            z-index: 111;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            max-width: 1170px;
+            max-height: calc(var(--max-vh) / 100 * 90);
+
+            @media (max-width: 1200px) {
+                max-width: calc(100vw / 100 * 90);
+            }
+
+            @media (max-width: 600px) {
+                position: fixed;
+                width: 100vw;
+                max-width: 100%;
+                max-height: calc(var(--max-vh) - 76px);
+                left: 8px;
+                top: 8px;
+                right: 8px;
+            }
 
             &.is-left {
                 transform-origin: top left;
+
+                @media (max-width: 600px) {
+                    transform-origin: bottom left;
+                }
             }
 
-            @media (max-width: 550px) {
-                width: 100%;
+            &.is-menu {
+                width: 100vw;
+
+                @media (max-width: 600px) {
+                    width: auto;
+                }
             }
         }
     }
@@ -214,6 +168,25 @@
 
         &-enter-active, &-leave-active {
             @include css_anim($time: .25s, $style: cubic-bezier(0.215, 0.61, 0.355, 1));
+        }
+    }
+
+    .navbar__header_right {
+        .nav-popover {
+            &__body {
+                top:42px;
+                left: initial;
+                right: 0;
+
+                @media (max-width: 600px) {
+                    top: auto;
+                    left: 8px;
+                    right: 8px;
+                    width: auto;
+                    bottom: 68px;
+                    transform-origin: bottom right;
+                }
+            }
         }
     }
 </style>

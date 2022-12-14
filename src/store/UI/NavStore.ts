@@ -30,7 +30,7 @@ export const useNavStore = defineStore('NavStore', () => {
                     url: '/classes'
                 },
                 {
-                    label: 'Расы',
+                    label: 'Расы и происхождения',
                     url: '/races'
                 },
                 {
@@ -123,7 +123,7 @@ export const useNavStore = defineStore('NavStore', () => {
             ]
         },
         {
-            label: 'База знаний',
+            label: 'База знаний',
             icon: 'menu-wiki',
             links: [
                 {
