@@ -215,10 +215,18 @@
                 text-transform: uppercase;
             }
 
-            &:not(.is-aside):last-child {
+            &:not(.is-aside):nth-child(4) {
                 background-color: var(--bg-table-row);
                 margin: 0 auto;
-                max-width: 50px;
+                max-width: 40px;
+                border-radius: 8px;
+            }
+
+            &:not(.is-aside):last-child {
+                background-color: var(--primary);
+                color: var(--text-btn-color);
+                margin: 0 auto;
+                max-width: 40px;
                 border-radius: 8px;
             }
         }
