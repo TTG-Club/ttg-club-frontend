@@ -84,6 +84,8 @@
             const { doRoll, notifyResult } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
 
+            emit('update:model-value', []);
+
             const tryRoll = () => {
                 try {
                     const rolled = [];

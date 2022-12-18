@@ -199,6 +199,7 @@
     import {
         computed, defineComponent, onBeforeMount, ref, watch
     } from 'vue';
+    import cloneDeep from 'lodash/cloneDeep';
     import type { TRaceLink } from '@/types/Character/Races.types';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
     import { usePagination } from '@/common/composition/usePagination';
@@ -233,10 +234,7 @@
                 label: AbilityChoiceDouble
             } | null>(null);
 
-            const {
-                initPages,
-                items: races
-            } = usePagination({
+            const { initPages, items } = usePagination({
                 url: '/races',
                 limit: -1,
                 order: [
@@ -246,6 +244,20 @@
                     }
                 ]
             });
+
+            const races = computed(() => items.value.map((race: TRaceLink) => {
+                if (items.value.filter((item: TRaceLink) => race.name.rus === item.name.rus).length >= 2) {
+                    return {
+                        ...race,
+                        name: {
+                            ...race.name,
+                            rus: `${ race.name.rus } (${ race.source.shortName })`
+                        }
+                    };
+                }
+
+                return race;
+            }));
 
             const subRaces = computed(() => selectedRace.value?.subraces || []);
 
@@ -359,7 +371,13 @@
             };
 
             const onSelectRace = (race: TRaceLink | null) => {
-                selectedRace.value = race;
+                const value = cloneDeep(race);
+
+                if (value) {
+                    value.name.rus = value.name.rus.replace(/\(.+\)$/i, '');
+                }
+
+                selectedRace.value = value;
 
                 onSelectSubRace(null);
             };
