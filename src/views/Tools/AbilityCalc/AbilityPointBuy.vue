@@ -255,6 +255,11 @@
             display: grid;
             gap: 16px;
             grid-template-columns: 1fr 1fr 1fr;
+
+            @media (max-width: 576px) {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         &__select {
@@ -268,7 +273,12 @@
         }
 
         .ability-table {
-            margin-top: 40px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 16px;
         }
     }
 </style>
