@@ -96,6 +96,11 @@ export const useNavStore = defineStore('NavStore', () => {
             icon: 'menu-tools',
             links: [
                 {
+                    label: 'Калькулятор характеристик',
+                    inDev: true,
+                    url: '/tools/ability-calc'
+                },
+                {
                     label: 'Торговец',
                     url: '/tools/trader'
                 },
@@ -114,11 +119,6 @@ export const useNavStore = defineStore('NavStore', () => {
                 {
                     label: 'Безумие',
                     url: '/tools/madness'
-                },
-                {
-                    label: 'Калькулятор характеристик',
-                    inDev: true,
-                    url: '/tools/ability-calc'
                 }
             ]
         },
