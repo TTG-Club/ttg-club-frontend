@@ -51,10 +51,9 @@
 
 <script lang="ts">
     import {
-        computed, defineComponent
+        computed, defineComponent, onActivated, ref
     } from 'vue';
     import type { PropType } from 'vue';
-    import cloneDeep from 'lodash/cloneDeep';
     import {
         AbilityKey, AbilityName, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
@@ -112,7 +111,7 @@
                 }
             ];
 
-            emit('update:model-value', [
+            const rolls = ref<Array<AbilityRoll>>([
                 {
                     shortName: AbilityShortName.STRENGTH,
                     name: AbilityName.STRENGTH,
@@ -151,7 +150,13 @@
                 }
             ]);
 
-            const sum = computed(() => props.modelValue
+            emit('update:model-value', rolls.value);
+
+            onActivated(() => {
+                emit('update:model-value', rolls.value);
+            });
+
+            const sum = computed(() => rolls.value
                 .reduce((partialSum, roll) => {
                     const costItem = cost.find(item => item.key === roll.value);
 
@@ -164,7 +169,7 @@
 
             const options = computed(() => cost.filter(item => (sum.value + item.value <= 27)));
 
-            const getLabel = (roll: typeof props.modelValue[number], option: typeof cost[number]) => {
+            const getLabel = (roll: typeof rolls.value[number], option: typeof cost[number]) => {
                 let result = `${ option.key }`;
 
                 const costItem = cost.find(item => item.key === roll.value);
@@ -190,13 +195,11 @@
             };
 
             const onReset = () => {
-                const rolls = cloneDeep(props.modelValue);
-
-                for (let i = 0; i < rolls.length; i++) {
-                    rolls[i].value = 8;
+                for (let i = 0; i < rolls.value.length; i++) {
+                    rolls.value[i].value = 8;
                 }
 
-                emit('update:model-value', rolls);
+                emit('update:model-value', rolls.value);
             };
 
             return {

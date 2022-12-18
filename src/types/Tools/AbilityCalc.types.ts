@@ -64,7 +64,7 @@ export type AbilityRoll = {
     key: AbilityKey | null
     name: AbilityName | null
     value: number
-    shortName: AbilityShortName
+    shortName: AbilityShortName | null
     raceBonus?: number
 }
 

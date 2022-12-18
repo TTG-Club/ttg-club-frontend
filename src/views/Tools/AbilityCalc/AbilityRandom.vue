@@ -49,7 +49,7 @@
 
 <script lang="ts">
     import {
-        computed, defineComponent
+        computed, defineComponent, onActivated, ref
     } from 'vue';
     import type {
         PropType
@@ -57,7 +57,6 @@
     import { useToast } from "vue-toastification";
     import orderBy from 'lodash/orderBy';
     import reverse from 'lodash/reverse';
-    import cloneDeep from 'lodash/cloneDeep';
     import UiButton from "@/components/form/UiButton.vue";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
     import {
@@ -84,7 +83,13 @@
             const { doRoll, notifyResult } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
 
-            emit('update:model-value', []);
+            const rolls = ref<Array<AbilityRoll>>([]);
+
+            emit('update:model-value', rolls.value);
+
+            onActivated(() => {
+                emit('update:model-value', rolls.value);
+            });
 
             const tryRoll = () => {
                 try {
@@ -106,51 +111,50 @@
                         rolled.push({
                             name: null,
                             key: null,
+                            shortName: null,
                             value: Number(roll.value)
                         });
                     }
 
-                    emit('update:model-value', reverse(orderBy(rolled, ['value'])));
+                    rolls.value = reverse(orderBy(rolled, ['value']));
+
+                    emit('update:model-value', rolls.value);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка... попробуй еще раз');
                 }
             };
 
-            const isSelected = (key: AbilityKey) => props.modelValue.find(roll => roll.key === key);
+            const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
 
             const onSelect = (key: AbilityKey | null, index: number) => {
-                const rolls = cloneDeep(props.modelValue);
-
                 const setValue = (value: typeof key, i: number) => {
-                    rolls[i].key = value;
+                    rolls.value[i].key = value;
 
-                    rolls[i].name = value
+                    rolls.value[i].name = value
                         ? AbilityName[value]
                         : null;
                 };
 
-                for (let i = 0; i < rolls.length; i++) {
+                for (let i = 0; i < rolls.value.length; i++) {
                     if (i === index) {
                         setValue(key, i);
 
                         continue;
                     }
 
-                    if (rolls[i].key === key) {
+                    if (rolls.value[i].key === key) {
                         setValue(null, i);
                     }
                 }
 
-                emit('update:model-value', rolls);
+                emit('update:model-value', rolls.value);
             };
 
             const onRemove = (index: number) => {
-                const rolls = cloneDeep(props.modelValue);
+                rolls.value[index].key = null;
+                rolls.value[index].name = null;
 
-                rolls[index].key = null;
-                rolls[index].name = null;
-
-                emit('update:model-value', rolls);
+                emit('update:model-value', rolls.value);
             };
 
             return {

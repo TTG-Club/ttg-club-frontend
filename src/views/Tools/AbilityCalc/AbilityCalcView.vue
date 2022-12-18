@@ -25,12 +25,13 @@
                 name="fade"
                 mode="out-in"
             >
-                <component
-                    :is="component"
-                    v-if="!!component"
-                    v-model="rolls"
-                    class="ability-calc__row"
-                />
+                <keep-alive v-if="!!component">
+                    <component
+                        :is="component"
+                        v-model="rolls"
+                        class="ability-calc__row"
+                    />
+                </keep-alive>
             </transition>
 
             <ability-table
