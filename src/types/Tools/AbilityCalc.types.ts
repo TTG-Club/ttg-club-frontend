@@ -60,9 +60,15 @@ export enum AbilityChoiceDoubleKey {
     FOR_TWO = 'FOR_TWO'
 }
 
-export type Ability = {
-    key: AbilityKey;
-    shortKey: AbilityShortKey;
-    name: AbilityName;
-    shortName: AbilityShortName;
+export type AbilityRoll = {
+    key: AbilityKey | null
+    name: AbilityName | null
+    value: number
+    shortName: AbilityShortName
+    raceBonus?: number
+}
+
+export type ChoiceDouble = {
+    key: AbilityChoiceDoubleKey
+    label: AbilityChoiceDouble
 }

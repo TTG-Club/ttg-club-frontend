@@ -21,6 +21,7 @@
                 <slot
                     :option="option"
                     :search="search"
+                    class="is-selected"
                     name="option"
                 />
             </template>
@@ -70,7 +71,10 @@
                         />
                     </div>
 
-                    <div class="ui-select__slotted--body">
+                    <div
+                        class="ui-select__slotted--body"
+                        :class="{ 'is-wrap-disabled': isWrapDisabled }"
+                    >
                         <slot
                             name="singleLabel"
                             :option="option"
@@ -91,9 +95,30 @@
                 </div>
             </template>
             <template #placeholder>
-                <slot name="placeholder">
-                    Выбери что-нибудь
-                </slot>
+                <div class="ui-select__slotted">
+                    <div
+                        v-if="$slots['left-slot']"
+                        class="ui-select__slotted--left"
+                    >
+                        <slot name="left-slot"/>
+                    </div>
+
+                    <div
+                        class="ui-select__slotted--body"
+                        :class="{ 'is-wrap-disabled': isWrapDisabled }"
+                    >
+                        <slot name="placeholder">
+                            Выбери что-нибудь
+                        </slot>
+                    </div>
+
+                    <div
+                        v-if="$slots['right-slot']"
+                        class="ui-select__slotted--right"
+                    >
+                        <slot name="right-slot"/>
+                    </div>
+                </div>
             </template>
             <template #limit>
                 <slot name="limit">
@@ -131,34 +156,10 @@
         },
         mixins: [multiselectMixin],
         props: {
-            modelValue: {
-                type: [
-                    Number,
-                    String,
-                    Object,
-                    Array
-                ],
-                default: ''
-            },
+            ...Multiselect.props,
             name: {
                 type: String,
                 default: 'select'
-            },
-            options: {
-                type: Array,
-                required: true
-            },
-            multiple: {
-                type: Boolean,
-                default: false
-            },
-            label: {
-                type: String,
-                default: 'label'
-            },
-            inputLabel: {
-                type: String,
-                default: ''
             },
             placeholder: {
                 type: String,
@@ -172,33 +173,9 @@
                 type: Boolean,
                 default: false
             },
-            taggable: {
-                type: Boolean,
-                default: false
-            },
-            preserveSearch: {
-                type: Boolean,
-                default: false
-            },
-            internalSearch: {
-                type: Boolean,
-                default: true
-            },
-            clearOnSelect: {
-                type: Boolean,
-                default: true
-            },
             required: {
                 type: Boolean,
                 default: false
-            },
-            trackBy: {
-                type: String,
-                default: ''
-            },
-            optionsLimit: {
-                type: Number,
-                default: 1000
             },
             iconBlock: {
                 type: String,
@@ -207,14 +184,6 @@
             allowEmpty: {
                 type: Boolean,
                 default: false
-            },
-            groupValues: {
-                type: String,
-                default: ''
-            },
-            groupLabel: {
-                type: String,
-                default: ''
             },
             selectGroupLabel: {
                 type: String,
@@ -236,11 +205,11 @@
                 type: String,
                 default: ''
             },
-            groupSelect: {
+            disabled: {
                 type: Boolean,
                 default: false
             },
-            preselectFirst: {
+            isWrapDisabled: {
                 type: Boolean,
                 default: false
             }
@@ -383,12 +352,18 @@
 
             &__input {
                 cursor: text;
+                background: transparent;
+                border: 0;
+                height: 100%;
+                margin: 0;
+                padding: 8px;
             }
 
             &__single,
             &__tags-wrap,
             &__placeholder {
-                min-height: 100%;
+                min-width: 38px;
+                height: 100%;
                 width: 100%;
                 margin: 0;
                 border-radius: 0;
@@ -404,12 +379,12 @@
                 }
             }
 
-            &__single {
+            &__single,
+            &__placeholder {
                 padding: 0;
             }
 
-            &__tags-wrap,
-            &__placeholder {
+            &__tags-wrap {
                 padding: 7px 12px 0 12px;
             }
 
@@ -534,6 +509,8 @@
 
         &__slotted {
             display: flex;
+            height: 100%;
+            min-height: 38px;
 
             &--left,
             &--right {
@@ -552,6 +529,16 @@
 
             &--body {
                 padding: 8px;
+                height: 100%;
+                min-width: 38px;
+
+                &.is-wrap-disabled {
+                    white-space: nowrap;
+                    width: 100%;
+                    display: block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
         }
     }

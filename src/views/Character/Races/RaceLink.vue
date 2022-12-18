@@ -151,10 +151,14 @@
                 default: false
             }
         },
-        setup(props, { emit }) {
+        setup(props) {
             const route = useRoute();
             const router = useRouter();
-            const { isActive, navigate } = useLink(props);
+
+            const {
+                isActive, navigate, href
+            } = useLink(props);
+
             const uiStore = useUIStore();
             const submenu = ref(false);
 
@@ -204,7 +208,8 @@
                     || route.params.raceName === router.resolve(props.raceItem.url).params.raceName,
                 'is-selected': route.name === 'raceDetail',
                 'is-green': props.raceItem.type.name.toLowerCase() === 'homebrew',
-                'is-fullscreen': uiStore.fullscreen
+                'is-fullscreen': uiStore.fullscreen,
+                'is-ability-calc': props.isAbilityCalc
             }));
 
             const selectRace = async () => {
@@ -216,7 +221,7 @@
                     return;
                 }
 
-                emit('select', props.raceItem);
+                window.open(href.value, '_blank')?.focus();
             };
 
             return {
@@ -251,6 +256,20 @@
 
                 & + & {
                     margin-top: auto;
+                }
+            }
+        }
+
+        &.is-ability-calc {
+            height: 100%;
+
+            .link-item-expand {
+                &__content {
+                    height: 100%;
+                }
+
+                &__main {
+                    height: 100%;
                 }
             }
         }
