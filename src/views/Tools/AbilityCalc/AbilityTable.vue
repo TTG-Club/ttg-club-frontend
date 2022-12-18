@@ -157,12 +157,14 @@
             display: grid;
             gap: 12px;
             grid-template-columns: repeat(6, 1fr);
+            padding-bottom: 16px;
 
             @include media-max($xl) {
                 grid-template-columns: initial;
                 display: flex;
                 flex: 1 1 auto;
                 overflow: auto;
+                justify-content: space-between;
             }
         }
 
@@ -171,30 +173,34 @@
             flex-direction: column;
             gap: 18px;
             overflow: hidden;
-            border-radius: 6px;
+            border-radius: 16px;
             padding: 12px 0;
 
             @include media-max($xl) {
                 width: 112px;
             }
 
+            @media (max-width: 768px) {
+                width: 100%;
+                padding: 12px 0;
+            }
+
             &.is-aside {
                 flex-shrink: 0;
+
+                @media (max-width: 768px) {
+                    display: none;
+                }
             }
 
             &:not(.is-aside) {
-                padding: 12px 24px;
                 align-items: center;
-                background-color: var(--bg-table-row);
-
-                @include media-max($xl) {
-                    width: 86px;
-                }
+                background-color: var(--bg-secondary);
             }
         }
 
         &__row {
-            font-size: 20px;
+            font-size: var(--h5-font-size);
             line-height: 27px;
             color: var(--text-b-color);
             width: 100%;
@@ -207,6 +213,13 @@
 
             &.is-ability {
                 text-transform: uppercase;
+            }
+
+            &:not(.is-aside):last-child {
+                background-color: var(--bg-table-row);
+                margin: 0 auto;
+                max-width: 50px;
+                border-radius: 8px;
             }
         }
     }

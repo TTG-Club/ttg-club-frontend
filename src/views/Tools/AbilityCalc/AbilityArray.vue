@@ -186,7 +186,12 @@
         }
 
         .ability-table {
-            margin-top: 40px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 768px) {
+            display: flex;
+            flex-direction: column;
         }
     }
 </style>
