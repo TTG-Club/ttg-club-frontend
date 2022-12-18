@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="ability-table__row">
-                    {{ ability.raceBonus }}
+                    {{ getRaceBonus({ key: ability.key }) }}
                 </div>
 
                 <div class="ability-table__row">
@@ -61,22 +61,45 @@
     import {
         AbilityName, AbilityKey, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
+    import type {
+        AbilityRoll
+    } from '@/types/Tools/AbilityCalc.types';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({
         props: {
             rolls: {
-                type: Object as PropType<{
-                    name: AbilityName | null,
-                    key: AbilityKey | null,
-                    value: number,
-                    raceBonus?: number
-                }[]>,
+                type: Object as PropType<Array<AbilityRoll>>,
+                required: true
+            },
+            raceBonuses: {
+                type: Array as PropType<Array<AbilityRoll>>,
                 required: true
             }
         },
         setup(props) {
             const { getFormattedModifier } = useAbilityTransforms();
+
+            const getRaceBonus = (payload: {
+                roll?: AbilityRoll
+                key?: AbilityKey
+            }) => {
+                let bonus: number | undefined;
+
+                if (payload.key) {
+                    bonus = props.raceBonuses.find(item => item.key === payload.key)?.value;
+                }
+
+                if (payload.roll) {
+                    bonus = props.raceBonuses.find(item => item.key === payload.roll?.key)?.value;
+                }
+
+                if (!bonus) {
+                    return '−';
+                }
+
+                return Math.abs(bonus);
+            };
 
             const abilities = computed(() => Object.values(AbilityKey)
                 .map((key: AbilityKey) => {
@@ -84,26 +107,18 @@
 
                     const getValue = () => {
                         if (typeof roll?.value !== 'number') {
-                            return '-';
+                            return '−';
                         }
 
                         return roll.value;
                     };
 
-                    const getModifier = () => {
+                    const getWithModifier = () => {
                         if (typeof roll?.value !== 'number') {
-                            return '-';
+                            return '−';
                         }
 
                         return getFormattedModifier(roll.value);
-                    };
-
-                    const getRaceBonus = () => {
-                        if (typeof roll?.raceBonus !== 'number') {
-                            return '-';
-                        }
-
-                        return roll.raceBonus;
                     };
 
                     const getResult = () => {
@@ -125,8 +140,8 @@
                         name: AbilityName[key],
                         shortName: AbilityShortName[key],
                         value: getValue(),
-                        modifier: getModifier(),
-                        raceBonus: getRaceBonus(),
+                        modifier: getWithModifier(),
+                        raceBonus: getRaceBonus({ roll }),
                         result: getResult()
                     };
                 }));
@@ -135,7 +150,9 @@
                 AbilityKey,
                 AbilityShortName,
 
-                abilities
+                abilities,
+
+                getRaceBonus
             };
         }
     });

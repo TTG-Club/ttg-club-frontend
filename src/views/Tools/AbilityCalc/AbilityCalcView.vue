@@ -8,37 +8,37 @@
         </template>
 
         <template #default>
-            <div
-                v-if="isDev && false"
+            <ability-races
+                v-if="isDev"
+                v-model="raceBonuses"
                 class="ability-calc__row"
-            >
-                <ability-races/>
-            </div>
+            />
 
-            <div class="ability-calc__row">
-                <ui-switch
-                    v-model="currentTab"
-                    :options="tabs"
-                    class="ability-calc__tabs"
-                    pre-select-first
-                    use-full-width
+            <ui-switch
+                v-model="currentTab"
+                :options="tabs"
+                class="ability-calc__row"
+                pre-select-first
+                use-full-width
+            />
+
+            <transition
+                name="fade"
+                mode="out-in"
+            >
+                <component
+                    :is="component"
+                    v-if="!!component"
+                    v-model="rolls"
+                    class="ability-calc__row"
                 />
-            </div>
+            </transition>
 
-            <div
-                v-if="!!component"
+            <ability-table
                 class="ability-calc__row"
-            >
-                <transition
-                    name="fade"
-                    mode="out-in"
-                >
-                    <component
-                        :is="component"
-                        v-if="component"
-                    />
-                </transition>
-            </div>
+                :rolls="rolls"
+                :race-bonuses="raceBonuses"
+            />
         </template>
     </page-layout>
 </template>
@@ -47,15 +47,16 @@
     import type { Component } from "vue";
     import {
         computed, defineComponent, ref, shallowRef
-    } from "vue";
+    } from 'vue';
     import PageLayout from "@/components/content/PageLayout.vue";
     import UiSwitch from "@/components/form/UiSwitch.vue";
     import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import AbilityRandom from "@/views/Tools/AbilityCalc/AbilityRandom.vue";
     import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
     import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
-    import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces.vue';
+    import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces/AbilityRaces.vue';
     import { useIsDev } from '@/common/helpers/isDev';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
 
     type TCalcTab = {
         id: string
@@ -89,11 +90,11 @@
                 }
             ];
 
-            const currentTab = ref({
-                id: 'random',
-                name: 'Случайный набор',
-                component: shallowRef(AbilityRandom)
-            });
+            const raceBonuses = ref<Array<AbilityRoll>>([]);
+
+            const currentTab = ref(tabs[0]);
+
+            const rolls = ref<Array<AbilityRoll>>([]);
 
             const component = computed(() => currentTab.value?.component || null);
 
@@ -101,6 +102,8 @@
                 tabs,
                 currentTab,
                 component,
+                rolls,
+                raceBonuses,
                 isDev: useIsDev()
             };
         }

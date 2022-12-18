@@ -1,11 +1,11 @@
 import type {
-    AbilityName, AbilityShortName, AbilityType
+    AbilityName, AbilityShortName, AbilityType, AbilityKey, AbilityTypeKey
 } from '@/types/Tools/AbilityCalc.types';
 
 export type TRaceAbility = {
-    key: AbilityType
-    name: AbilityName
-    shortName: AbilityShortName
+    key: AbilityKey | AbilityTypeKey
+    name: AbilityName | AbilityType
+    shortName: AbilityShortName | AbilityType
     value: number
 };
 

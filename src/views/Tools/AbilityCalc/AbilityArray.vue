@@ -1,69 +1,68 @@
 <template>
-    <div class="ability-array">
-        <div
-            v-if="rolls.length"
-            class="ability-array__controls"
+    <div
+        v-if="modelValue.length"
+        class="ability-array"
+    >
+        <ui-select
+            v-for="(roll, index) in modelValue"
+            :key="index"
+            class="ability-array__select"
+            label="name"
+            track-by="key"
+            :options="abilities"
+            :model-value="roll"
+            allow-empty
+            @remove="onRemove(index)"
+            @select="onSelect($event.key, index)"
         >
-            <ui-select
-                v-for="(roll, index) in rolls"
-                :key="index"
-                class="ability-array__select"
-                label="name"
-                track-by="key"
-                :options="abilities"
-                :model-value="roll"
-                allow-empty
-                @remove="onRemove(index)"
-                @select="onSelect($event.key, index)"
-            >
-                <template #left-slot>
-                    {{ roll.value }}
-                </template>
+            <template #left-slot>
+                {{ roll.value }}
+            </template>
 
-                <template #singleLabel>
-                    {{ roll.name || 'Выбрать хар-ку' }}
-                </template>
+            <template #singleLabel>
+                {{ roll.name || 'Выбрать хар-ку' }}
+            </template>
 
-                <template #placeholder>
-                    Выбрать хар-ку
-                </template>
+            <template #placeholder>
+                Выбрать хар-ку
+            </template>
 
-                <template #option="{ option }">
-                    <span
-                        class="ability-array__select_option"
-                        :class="{ 'is-selected': isSelected(option.key) }"
-                    >{{ option.name }}</span>
-                </template>
-            </ui-select>
-        </div>
-
-        <ability-table :rolls="rolls"/>
+            <template #option="{ option }">
+                <span
+                    class="ability-array__select_option"
+                    :class="{ 'is-selected': isSelected(option.key) }"
+                >{{ option.name }}</span>
+            </template>
+        </ui-select>
     </div>
 </template>
 
 <script lang="ts">
     import {
         computed,
-        defineComponent, ref
-    } from "vue";
-    import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
+        defineComponent
+    } from 'vue';
+    import type { PropType } from 'vue';
+    import cloneDeep from 'lodash/cloneDeep';
     import { AbilityName, AbilityKey } from '@/types/Tools/AbilityCalc.types';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
 
     export default defineComponent({
         components: {
-            UiSelect,
-            AbilityTable
+            UiSelect
         },
-        setup() {
+        props: {
+            modelValue: {
+                type: Array as PropType<Array<AbilityRoll>>,
+                required: true
+            }
+        },
+        setup(props, { emit }) {
             const { getFormattedModifier } = useAbilityTransforms();
 
-            const rolls = ref<{
-                name: AbilityName | null,
-                key: AbilityKey | null,
-                value: number
-            }[]>([
+            emit('update:model-value', [
                 {
                     name: null,
                     key: null,
@@ -96,33 +95,41 @@
                 }
             ]);
 
-            const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
+            const isSelected = (key: AbilityKey) => props.modelValue.find(roll => roll.key === key);
 
             const onSelect = (key: AbilityKey | null, index: number) => {
-                const setValue = (value: typeof key, i: number) => {
-                    rolls.value[i].key = value;
+                const rolls = cloneDeep(props.modelValue);
 
-                    rolls.value[i].name = value
+                const setValue = (value: typeof key, i: number) => {
+                    rolls[i].key = value;
+
+                    rolls[i].name = value
                         ? AbilityName[value]
                         : null;
                 };
 
-                for (let i = 0; i < rolls.value.length; i++) {
+                for (let i = 0; i < rolls.length; i++) {
                     if (i === index) {
                         setValue(key, i);
 
                         continue;
                     }
 
-                    if (rolls.value[i].key === key) {
+                    if (rolls[i].key === key) {
                         setValue(null, i);
                     }
                 }
+
+                emit('update:model-value', rolls);
             };
 
             const onRemove = (index: number) => {
-                rolls.value[index].key = null;
-                rolls.value[index].name = null;
+                const rolls = cloneDeep(props.modelValue);
+
+                rolls[index].key = null;
+                rolls[index].name = null;
+
+                emit('update:model-value', rolls);
             };
 
             return {
@@ -132,7 +139,6 @@
                         key,
                         name: AbilityName[key as AbilityKey]
                     }))),
-                rolls,
                 getFormattedModifier,
                 isSelected,
                 onSelect,
@@ -144,12 +150,10 @@
 
 <style lang="scss" scoped>
     .ability-array {
-        &__controls {
-            flex: 1 1 auto;
-            display: grid;
-            gap: 16px;
-            grid-template-columns: 1fr 1fr 1fr;
-        }
+        flex: 1 1 auto;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr 1fr 1fr;
 
         &__select {
             ::v-deep(.multiselect__option) {
