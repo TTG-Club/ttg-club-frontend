@@ -246,17 +246,26 @@
             });
 
             const races = computed(() => items.value.map((race: TRaceLink) => {
-                if (items.value.filter((item: TRaceLink) => race.name.rus === item.name.rus).length >= 2) {
+                const raceItem = cloneDeep(race);
+
+                if (raceItem.subraces?.length) {
+                    raceItem.subraces = raceItem.subraces.map(item => ({
+                        ...item,
+                        image: raceItem.image
+                    }));
+                }
+
+                if (items.value.filter((item: TRaceLink) => raceItem.name.rus === item.name.rus).length >= 2) {
                     return {
-                        ...race,
+                        ...raceItem,
                         name: {
-                            ...race.name,
-                            rus: `${ race.name.rus } (${ race.source.shortName })`
+                            ...raceItem.name,
+                            rus: `${ raceItem.name.rus } (${ raceItem.source.shortName })`
                         }
                     };
                 }
 
-                return race;
+                return raceItem;
             }));
 
             const subRaces = computed(() => selectedRace.value?.subraces || []);
