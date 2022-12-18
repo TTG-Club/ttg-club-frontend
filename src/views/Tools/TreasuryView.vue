@@ -20,57 +20,58 @@
                     </ui-select>
                 </div>
 
-                <div class="tools_settings__row">
-                    <h5 class="label">
-                        Настройки предметов:
-                    </h5>
-                    <div class="tools_settings__colum">
-                        <div class="row">
-                            <div>
-                                <ui-checkbox
-                                    :model-value="form.coins"
-                                    type="toggle"
-                                    @update:model-value="form.coins = $event"
-                                >
-                                    Монеты
-                                </ui-checkbox>
-                            </div>
-                            <div class="tools_settings__row">
-                                <ui-checkbox
-                                    :model-value="form.magicItem"
-                                    type="toggle"
-                                    @update:model-value="form.magicItem = $event"
-                                >
-                                    Магические предметы
-                                </ui-checkbox>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div>
-                                <ui-checkbox
-                                    :model-value="form.scroll"
-                                    type="toggle"
-                                    @update:model-value="form.scroll = $event"
-                                >
-                                    Свитки
-                                </ui-checkbox>
-                            </div>
-                            <div class="tools_settings__row">
-                                <ui-checkbox
-                                    :model-value="form.trinket"
-                                    type="toggle"
-                                    @update:model-value="form.trinket = $event"
-                                >
-                                    Безделушки
-                                </ui-checkbox>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <transition-group name="fade">
                     <template v-if="settings.opened">
+                        <div class="tools_settings__row">
+                            <h5 class="label">
+                                Настройки предметов:
+                            </h5>
+                            <div class="tools_settings__colum">
+                                <div class="row">
+                                    <div>
+                                        <ui-checkbox
+                                            :model-value="form.coins"
+                                            type="toggle"
+                                            @update:model-value="form.coins = $event"
+                                        >
+                                            Монеты
+                                        </ui-checkbox>
+                                    </div>
+                                    <div class="tools_settings__row">
+                                        <ui-checkbox
+                                            :model-value="form.magicItem"
+                                            type="toggle"
+                                            @update:model-value="form.magicItem = $event"
+                                        >
+                                            Магические предметы
+                                        </ui-checkbox>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div>
+                                        <ui-checkbox
+                                            :model-value="form.scroll"
+                                            type="toggle"
+                                            @update:model-value="form.scroll = $event"
+                                        >
+                                            Свитки
+                                        </ui-checkbox>
+                                    </div>
+                                    <div class="tools_settings__row">
+                                        <ui-checkbox
+                                            :model-value="form.trinket"
+                                            type="toggle"
+                                            @update:model-value="form.trinket = $event"
+                                        >
+                                            Безделушки
+                                        </ui-checkbox>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <hr class="hr_main">
+
                         <div class="tools_settings__row">
                             <h5 class="label">
                                 Настройки вида:
