@@ -9,7 +9,6 @@
 
         <template #default>
             <ability-races
-                v-if="isDev"
                 v-model="raceBonuses"
                 class="ability-calc__row"
             />
@@ -55,7 +54,6 @@
     import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
     import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
     import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces/AbilityRaces.vue';
-    import { useIsDev } from '@/common/helpers/isDev';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
 
     type TCalcTab = {
@@ -103,8 +101,7 @@
                 currentTab,
                 component,
                 rolls,
-                raceBonuses,
-                isDev: useIsDev()
+                raceBonuses
             };
         }
     });
