@@ -93,9 +93,9 @@
                     };
 
                     const getRaceBonus = () => {
-                        const bonus = props.raceBonuses.find(item => item.key === roll?.key)?.value;
+                        const bonus = props.raceBonuses.find(item => item.key === key)?.value;
 
-                        if (!bonus) {
+                        if (!bonus && bonus !== 0) {
                             return '−';
                         }
 
