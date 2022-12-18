@@ -8,7 +8,7 @@
                 v-if="!checkInstance"
                 class="ability-races__race--empty"
             >
-                Выбери расу
+                Раса не выбрана
             </span>
 
             <race-link
@@ -437,14 +437,16 @@
 
 <style lang="scss" scoped>
     .ability-races {
-        display: grid;
+        display: flex;
         gap: 32px;
-        grid-template-columns: 270px auto;
+        // grid-template-columns: 270px auto;
 
         &__race {
             @include css_anim();
 
             width: 100%;
+            max-width: 270px;
+            height: 136px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -465,6 +467,10 @@
                     color: var(--primary);
                 };
             }
+
+            @media (max-width: 991px) {
+                max-width: 100%;
+            }
         }
 
         &__fields {
@@ -475,6 +481,14 @@
 
             .ui-select {
                 width: calc(100% / 3 - 24px * 2 / 3);
+
+                @media (max-width: 576px) {
+                    width: 100%;
+                }
+            }
+
+            @media (max-width: 576px) {
+                gap: 16px 24px;
             }
         }
 
@@ -498,6 +512,10 @@
                     }
                 }
             }
+        }
+
+        @media (max-width: 991px) {
+            flex-direction: column;
         }
     }
 </style>
