@@ -43,7 +43,6 @@
         defineComponent, onActivated, ref
     } from 'vue';
     import type { PropType } from 'vue';
-    import cloneDeep from 'lodash/cloneDeep';
     import { AbilityName, AbilityKey } from '@/types/Tools/AbilityCalc.types';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import UiSelect from "@/components/form/UiSelect.vue";
