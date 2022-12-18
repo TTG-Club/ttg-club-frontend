@@ -1,10 +1,10 @@
 export enum AbilityName {
-    STRENGTH = 'сила',
-    DEXTERITY = 'ловкость',
-    CONSTITUTION = 'телосложение',
-    INTELLIGENCE = 'интеллект',
-    WISDOM = 'мудрость',
-    CHARISMA = 'харизма'
+    STRENGTH = 'Сила',
+    DEXTERITY = 'Ловкость',
+    CONSTITUTION = 'Телосложение',
+    INTELLIGENCE = 'Интеллект',
+    WISDOM = 'Мудрость',
+    CHARISMA = 'Харизма'
 }
 
 export enum AbilityShortName {

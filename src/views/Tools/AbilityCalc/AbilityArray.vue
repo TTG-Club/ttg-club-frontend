@@ -172,11 +172,19 @@
             }
 
             &_option {
-                padding: 12px;
+                padding: 12px 12px 12px 28px;
 
                 &.is-selected {
-                    background: var(--primary-select);
-                    color: var(--text-b-color);
+                    &::before {
+                        content: "";
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        background-color: var(--primary);
+                        position: absolute;
+                        top: calc(50% - 5px);
+                        left: 10px;
+                    }
                 }
             }
 

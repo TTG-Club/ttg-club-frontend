@@ -397,6 +397,7 @@
                     font-size: var(--main-font-size);
                     line-height: var(--main-line-height);
                     top: 100%;
+                    bottom: auto;
                     left: -1px;
                     width: calc(100% + 2px);
                     border: {
@@ -409,7 +410,7 @@
             }
 
             &__option {
-                background: var(--bg-secondary);
+                // background: var(--bg-secondary);
                 color: var(--text-color);
                 width: 100%;
 
@@ -426,13 +427,12 @@
                 }
 
                 &--disabled {
-                    background: var(--bg-sub-menu) !important;
-                    color: var(--text-color) !important;
+                    background: var(--hover) !important;
                 }
 
                 &--highlight {
-                    background: var(--primary-hover);
-                    color: var(--text-btn-color);
+                    background: var(--hover);
+                    color: var(--text-color);
 
                     &:after {
                         background: transparent;
@@ -441,8 +441,8 @@
 
                 &--selected {
                     font-weight: 400;
-                    color: var(--text-btn-color);
-                    background: var(--primary-active);
+                    color: var(--text-color-active);
+                    background: var(--hover);
 
                     &.multiselect {
                         &__option {
