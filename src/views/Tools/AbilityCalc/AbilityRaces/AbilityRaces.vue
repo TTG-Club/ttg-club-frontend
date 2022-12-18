@@ -499,10 +499,18 @@
                 .ability-races {
                     &__select {
                         &_option {
+                            padding: 12px 12px 12px 28px;
                             &.is-used {
-                                padding: 12px;
-                                background: var(--primary-select);
-                                color: var(--text-b-color);
+                                &::before {
+                                    content: "";
+                                    width: 10px;
+                                    height: 10px;
+                                    border-radius: 50%;
+                                    background-color: var(--primary);
+                                    position: absolute;
+                                    top: calc(50% - 5px);
+                                    left: 10px;
+                                }
 
                                 &:hover {
                                     color: var(--text-btn-color);

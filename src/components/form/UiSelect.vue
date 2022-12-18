@@ -410,9 +410,9 @@
             }
 
             &__option {
-                // background: var(--bg-secondary);
                 color: var(--text-color);
                 width: 100%;
+                padding: 12px 12px 12px 28px;
 
                 span {
                     white-space: break-spaces;
