@@ -36,12 +36,12 @@
                 <div class="nav-menu__body">
                     <div
                         v-for="(group, groupKey) in navItems"
-                        :key="group.label + groupKey"
+                        :key="group.name + groupKey"
                         class="nav-menu__group"
                     >
                         <div class="nav-menu__group_label">
                             <div class="nav-menu__group_label">
-                                {{ group.label }}
+                                {{ group.name }}
                             </div>
 
                             <div
@@ -54,7 +54,7 @@
 
                         <div class="nav-menu__links">
                             <div
-                                v-for="link in group.links"
+                                v-for="link in group.children"
                                 :key="link.url"
                                 class="nav-menu__link"
                             >
@@ -62,12 +62,12 @@
                                     :href="link.url"
                                     :target="link.external ? '_blank' : '_self'"
                                     class="nav-menu__link_label"
-                                >{{ link.label }}</a>
+                                >{{ link.name }}</a>
 
                                 <div
                                     class="nav-menu__link_icon only-hover"
                                     :class="{ 'is-active': isSaved(link.url) }"
-                                    @click.left.exact.stop.prevent="updateBookmark(link.url, link.label)"
+                                    @click.left.exact.stop.prevent="updateBookmark(link.url, link.name)"
                                     @dblclick.prevent.stop
                                 >
                                     <svg-icon
@@ -90,6 +90,8 @@
 
 <script>
     import { defineComponent, ref } from "vue";
+    import { tryOnBeforeMount } from '@vueuse/core';
+    import { storeToRefs } from 'pinia';
     import { useNavStore } from "@/store/UI/NavStore";
     import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
     import NavPopover from "@/components/UI/menu/NavPopover.vue";
@@ -112,6 +114,11 @@
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgressURLs = ref([]);
+            const { navItems } = storeToRefs(navStore);
+
+            tryOnBeforeMount(async () => {
+                navItems.value = await navStore.getNavItems();
+            });
 
             const isSaved = url => {
                 if (userStore.isAuthenticated) {
@@ -148,9 +155,9 @@
 
             return {
                 menu,
+                navItems,
                 isSaved,
-                updateBookmark,
-                navItems: navStore.showedNavItems
+                updateBookmark
             };
         }
     });
