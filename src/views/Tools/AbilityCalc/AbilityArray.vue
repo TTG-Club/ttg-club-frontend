@@ -1,100 +1,110 @@
 <template>
-    <div class="ability-array">
-        <div
-            v-if="rolls.length"
-            class="ability-array__controls"
+    <div
+        v-if="modelValue.length"
+        class="ability-array"
+    >
+        <ui-select
+            v-for="(roll, index) in modelValue"
+            :key="index"
+            class="ability-array__select"
+            label="name"
+            track-by="key"
+            :options="abilities"
+            :model-value="roll"
+            allow-empty
+            @remove="onRemove(index)"
+            @select="onSelect($event.key, index)"
         >
-            <ui-select
-                v-for="(roll, index) in rolls"
-                :key="index"
-                class="ability-array__select"
-                label="name"
-                track-by="key"
-                :options="abilities"
-                :model-value="roll"
-                allow-empty
-                @remove="onRemove(index)"
-                @select="onSelect($event.key, index)"
-            >
-                <template #left-slot>
-                    {{ roll.value }}
-                </template>
+            <template #left-slot>
+                {{ roll.value }}
+            </template>
 
-                <template #singleLabel>
-                    {{ roll.name || 'Выбрать хар-ку' }}
-                </template>
+            <template #singleLabel>
+                {{ roll.name || 'Выбрать хар-ку' }}
+            </template>
 
-                <template #placeholder>
-                    Выбрать хар-ку
-                </template>
+            <template #placeholder>
+                Выбрать хар-ку
+            </template>
 
-                <template #option="{ option }">
-                    <span
-                        class="ability-array__select_option"
-                        :class="{ 'is-selected': isSelected(option.key) }"
-                    >{{ option.name }}</span>
-                </template>
-            </ui-select>
-        </div>
-
-        <ability-table :rolls="rolls"/>
+            <template #option="{ option }">
+                <span
+                    class="ability-array__select_option"
+                    :class="{ 'is-selected': isSelected(option.key) }"
+                >{{ option.name }}</span>
+            </template>
+        </ui-select>
     </div>
 </template>
 
 <script lang="ts">
     import {
         computed,
-        defineComponent, ref
-    } from "vue";
-    import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
+        defineComponent, onActivated, ref
+    } from 'vue';
+    import type { PropType } from 'vue';
     import { AbilityName, AbilityKey } from '@/types/Tools/AbilityCalc.types';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
 
     export default defineComponent({
         components: {
-            UiSelect,
-            AbilityTable
+            UiSelect
         },
-        setup() {
+        props: {
+            modelValue: {
+                type: Array as PropType<Array<AbilityRoll>>,
+                required: true
+            }
+        },
+        setup(props, { emit }) {
             const { getFormattedModifier } = useAbilityTransforms();
 
-            const rolls = ref<{
-                name: AbilityName | null,
-                key: AbilityKey | null,
-                value: number
-            }[]>([
+            const rolls = ref<Array<AbilityRoll>>([
                 {
                     name: null,
                     key: null,
+                    shortName: null,
                     value: 15
                 },
                 {
                     name: null,
                     key: null,
+                    shortName: null,
                     value: 14
                 },
                 {
                     name: null,
                     key: null,
+                    shortName: null,
                     value: 13
                 },
                 {
                     name: null,
                     key: null,
+                    shortName: null,
                     value: 12
                 },
                 {
                     name: null,
                     key: null,
+                    shortName: null,
                     value: 10
                 },
                 {
                     name: null,
                     key: null,
+                    shortName: null,
                     value: 8
                 }
             ]);
+
+            emit('update:model-value', rolls.value);
+
+            onActivated(() => {
+                emit('update:model-value', rolls.value);
+            });
 
             const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
 
@@ -118,11 +128,15 @@
                         setValue(null, i);
                     }
                 }
+
+                emit('update:model-value', rolls.value);
             };
 
             const onRemove = (index: number) => {
                 rolls.value[index].key = null;
                 rolls.value[index].name = null;
+
+                emit('update:model-value', rolls.value);
             };
 
             return {
@@ -132,7 +146,6 @@
                         key,
                         name: AbilityName[key as AbilityKey]
                     }))),
-                rolls,
                 getFormattedModifier,
                 isSelected,
                 onSelect,
@@ -144,12 +157,10 @@
 
 <style lang="scss" scoped>
     .ability-array {
-        &__controls {
-            flex: 1 1 auto;
-            display: grid;
-            gap: 16px;
-            grid-template-columns: 1fr 1fr 1fr;
-        }
+        flex: 1 1 auto;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr 1fr 1fr;
 
         &__select {
             ::v-deep(.multiselect__option) {
@@ -161,11 +172,19 @@
             }
 
             &_option {
-                padding: 12px;
+                padding: 12px 12px 12px 28px;
 
                 &.is-selected {
-                    background: var(--primary-select);
-                    color: var(--text-b-color);
+                    &::before {
+                        content: "";
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        background-color: var(--primary);
+                        position: absolute;
+                        top: calc(50% - 5px);
+                        left: 10px;
+                    }
                 }
             }
 
@@ -175,7 +194,12 @@
         }
 
         .ability-table {
-            margin-top: 40px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 768px) {
+            display: flex;
+            flex-direction: column;
         }
     }
 </style>

@@ -5,7 +5,6 @@
     >
         <ui-group-button
             :use-full-width="useFullWidth"
-            :is-vertical="isMobile"
         >
             <ui-button
                 v-for="(option, index) in options"
@@ -115,6 +114,18 @@
                 color: var(--text-btn-color);
                 cursor: not-allowed;
                 opacity: .6;
+            }
+        }
+        .ui-group-button {
+
+            button {
+                @media (max-width: 576px) {
+                    border-radius: 0;
+                }
+            }
+
+            @media (max-width: 576px) {
+                flex-direction: column;
             }
         }
     }

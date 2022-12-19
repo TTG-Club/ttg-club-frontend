@@ -61,17 +61,19 @@
     import {
         AbilityName, AbilityKey, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
+    import type {
+        AbilityRoll
+    } from '@/types/Tools/AbilityCalc.types';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({
         props: {
             rolls: {
-                type: Object as PropType<{
-                    name: AbilityName | null,
-                    key: AbilityKey | null,
-                    value: number,
-                    raceBonus?: number
-                }[]>,
+                type: Array as PropType<Array<AbilityRoll>>,
+                required: true
+            },
+            raceBonuses: {
+                type: Array as PropType<Array<AbilityRoll>>,
                 required: true
             }
         },
@@ -84,26 +86,20 @@
 
                     const getValue = () => {
                         if (typeof roll?.value !== 'number') {
-                            return '-';
+                            return '−';
                         }
 
                         return roll.value;
                     };
 
-                    const getModifier = () => {
-                        if (typeof roll?.value !== 'number') {
-                            return '-';
-                        }
-
-                        return getFormattedModifier(roll.value);
-                    };
-
                     const getRaceBonus = () => {
-                        if (typeof roll?.raceBonus !== 'number') {
-                            return '-';
+                        const bonus = props.raceBonuses.find(item => item.key === key)?.value;
+
+                        if (!bonus && bonus !== 0) {
+                            return '−';
                         }
 
-                        return roll.raceBonus;
+                        return bonus;
                     };
 
                     const getResult = () => {
@@ -113,21 +109,25 @@
                             result += roll.value;
                         }
 
-                        if (typeof roll?.raceBonus === 'number') {
-                            result += roll.raceBonus;
+                        const raceBonus = getRaceBonus();
+
+                        if (typeof raceBonus === 'number') {
+                            result += raceBonus;
                         }
 
                         return result;
                     };
+
+                    const getModifier = () => getFormattedModifier(getResult());
 
                     return {
                         key,
                         name: AbilityName[key],
                         shortName: AbilityShortName[key],
                         value: getValue(),
-                        modifier: getModifier(),
                         raceBonus: getRaceBonus(),
-                        result: getResult()
+                        result: getResult(),
+                        modifier: getModifier()
                     };
                 }));
 
@@ -157,12 +157,14 @@
             display: grid;
             gap: 12px;
             grid-template-columns: repeat(6, 1fr);
+            padding-bottom: 16px;
 
             @include media-max($xl) {
                 grid-template-columns: initial;
                 display: flex;
                 flex: 1 1 auto;
                 overflow: auto;
+                justify-content: space-between;
             }
         }
 
@@ -171,30 +173,34 @@
             flex-direction: column;
             gap: 18px;
             overflow: hidden;
-            border-radius: 6px;
+            border-radius: 16px;
             padding: 12px 0;
 
             @include media-max($xl) {
                 width: 112px;
             }
 
+            @media (max-width: 768px) {
+                width: 100%;
+                padding: 12px 0;
+            }
+
             &.is-aside {
                 flex-shrink: 0;
+
+                @media (max-width: 768px) {
+                    display: none;
+                }
             }
 
             &:not(.is-aside) {
-                padding: 12px 24px;
                 align-items: center;
-                background-color: var(--bg-table-row);
-
-                @include media-max($xl) {
-                    width: 86px;
-                }
+                background-color: var(--bg-secondary);
             }
         }
 
         &__row {
-            font-size: 20px;
+            font-size: var(--h5-font-size);
             line-height: 27px;
             color: var(--text-b-color);
             width: 100%;
@@ -207,6 +213,21 @@
 
             &.is-ability {
                 text-transform: uppercase;
+            }
+
+            &:not(.is-aside):nth-child(4) {
+                background-color: var(--bg-table-row);
+                margin: 0 auto;
+                max-width: 40px;
+                border-radius: 8px;
+            }
+
+            &:not(.is-aside):last-child {
+                background-color: var(--primary);
+                color: var(--text-btn-color);
+                margin: 0 auto;
+                max-width: 40px;
+                border-radius: 8px;
             }
         }
     }

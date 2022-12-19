@@ -13,7 +13,15 @@ import errorHandler from '@/common/helpers/errorHandler';
 export const useUIStore = defineStore('UIStore', () => {
     const theme = ref('');
     const fullscreen = ref(false);
-    const bodyElement = ref<HTMLElement | null>(document.getElementById('dnd5club'));
+    const bodyElement = ref<HTMLElement | null>(document.getElementById('container'));
+
+    const bodyElementWatcher = setInterval(() => {
+        bodyElement.value = document.getElementById('container');
+
+        if (bodyElement.value) {
+            clearInterval(bodyElementWatcher);
+        }
+    });
 
     const windowSize = useWindowSize();
     const bodyScroll = useScroll(bodyElement);
@@ -107,6 +115,31 @@ export const useUIStore = defineStore('UIStore', () => {
         }
     };
 
+    const updateFullscreen = async (payload: boolean) => {
+        try {
+            await store.ready();
+            await store.setItem(FULLSCREEN_DB_KEY, payload);
+
+            fullscreen.value = payload;
+
+            return Promise.resolve();
+        } catch (err) {
+            errorHandler(err);
+
+            return Promise.reject(err);
+        }
+    };
+
+    const toggleFullscreen = async () => {
+        if (fullscreen.value) {
+            await updateFullscreen(false);
+
+            return;
+        }
+
+        await updateFullscreen(true);
+    };
+
     watch(
         windowSize.height,
         value => {
@@ -129,6 +162,8 @@ export const useUIStore = defineStore('UIStore', () => {
         getCookieTheme,
         removeOldTheme,
         setTheme,
-        setFullscreenState
+        setFullscreenState,
+        updateFullscreen,
+        toggleFullscreen
     };
 });

@@ -1,87 +1,106 @@
 <template>
     <div class="ability-random">
-        <div class="ability-random__controls">
+        <div class="ability-random__blocks">
+            <div class="ability-random__block">
+                Сумма: {{ sum }}
+            </div>
+
             <ui-button
-                class="button"
-                is-large
+                class="ability-random__block is-btn"
+                is-small
+                use-full-width
                 @click.left.exact.prevent="tryRoll"
             >
-                {{ rolls.length ? 'Перебросить' : 'Бросить кубики' }}
+                {{ modelValue.length ? 'Перебросить' : 'Бросить кубики' }}
             </ui-button>
-
-            <div
-                v-if="rolls.length"
-                class="ability-random__choose"
-            >
-                <ui-select
-                    v-for="(roll, index) in rolls"
-                    :key="index"
-                    class="ability-random__select"
-                    label="name"
-                    track-by="key"
-                    :options="abilities"
-                    :model-value="roll"
-                    allow-empty
-                    @remove="onRemove(index)"
-                    @select="onSelect($event.key, index)"
-                >
-                    <template #option="{ option }">
-                        <span
-                            class="ability-random__select_option"
-                            :class="{ 'is-selected': isSelected(option.key) }"
-                        >{{ option.name }}</span>
-                    </template>
-
-                    <template #left-slot>
-                        {{ roll.value }}
-                    </template>
-
-                    <template #singleLabel>
-                        {{ roll.name || 'Выбрать хар-ку' }}
-                    </template>
-
-                    <template #placeholder>
-                        Выбрать хар-ку
-                    </template>
-                </ui-select>
-            </div>
         </div>
 
-        <ability-table :rolls="rolls"/>
+        <div
+            v-if="modelValue.length"
+            class="ability-random__choose"
+        >
+            <ui-select
+                v-for="(roll, index) in modelValue"
+                :key="index"
+                class="ability-random__select"
+                label="name"
+                track-by="key"
+                :options="abilities"
+                :model-value="roll"
+                allow-empty
+                @remove="onRemove(index)"
+                @select="onSelect($event.key, index)"
+            >
+                <template #option="{ option }">
+                    <span
+                        class="ability-random__select_option"
+                        :class="{ 'is-selected': isSelected(option.key) }"
+                    >{{ option.name }}</span>
+                </template>
+
+                <template #left-slot>
+                    {{ roll.value }}
+                </template>
+
+                <template #singleLabel>
+                    {{ roll.name || 'Выбрать хар-ку' }}
+                </template>
+
+                <template #placeholder>
+                    Выбрать хар-ку
+                </template>
+            </ui-select>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
     import {
-        computed, defineComponent, ref
-    } from "vue";
+        computed, defineComponent, onActivated, ref
+    } from 'vue';
+    import type {
+        PropType
+    } from 'vue';
     import { useToast } from "vue-toastification";
     import orderBy from 'lodash/orderBy';
     import reverse from 'lodash/reverse';
+    import { storeToRefs } from 'pinia';
     import UiButton from "@/components/form/UiButton.vue";
-    import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
-    import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
+    import {
+        AbilityKey, AbilityName
+    } from '@/types/Tools/AbilityCalc.types';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
     import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         components: {
             UiSelect,
-            AbilityTable,
             UiButton
         },
-        setup() {
+        props: {
+            modelValue: {
+                type: Array as PropType<Array<AbilityRoll>>,
+                required: true
+            }
+        },
+        setup(props, { emit }) {
             const toast = useToast(ToastEventBus);
+            const uiStore = useUIStore();
+            const { isMobile } = storeToRefs(uiStore);
             const { doRoll, notifyResult } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
 
-            const rolls = ref<{
-                name: AbilityName | null,
-                key: AbilityKey | null,
-                value: number
-            }[]>([]);
+            const rolls = ref<Array<AbilityRoll>>([]);
+
+            emit('update:model-value', rolls.value);
+
+            onActivated(() => {
+                emit('update:model-value', rolls.value);
+            });
 
             const tryRoll = () => {
                 try {
@@ -92,22 +111,27 @@
                             formula: '4d6kh3'
                         });
 
-                        notifyResult({
-                            roll,
-                            label: `Бросок №${ i + 1 }`,
-                            toastOptions: {
-                                timeout: 5000 + 1000 * i
-                            }
-                        });
+                        if (!isMobile.value) {
+                            notifyResult({
+                                roll,
+                                label: `Бросок №${ i + 1 }`,
+                                toastOptions: {
+                                    timeout: 5000 + 1000 * i
+                                }
+                            });
+                        }
 
                         rolled.push({
                             name: null,
                             key: null,
+                            shortName: null,
                             value: Number(roll.value)
                         });
                     }
 
                     rolls.value = reverse(orderBy(rolled, ['value']));
+
+                    emit('update:model-value', rolls.value);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка... попробуй еще раз');
                 }
@@ -135,11 +159,15 @@
                         setValue(null, i);
                     }
                 }
+
+                emit('update:model-value', rolls.value);
             };
 
             const onRemove = (index: number) => {
                 rolls.value[index].key = null;
                 rolls.value[index].name = null;
+
+                emit('update:model-value', rolls.value);
             };
 
             return {
@@ -149,8 +177,18 @@
                         key,
                         name: AbilityName[key as AbilityKey]
                     }))),
+                sum: computed(() => {
+                    let result = 0;
+
+                    for (const roll of rolls.value) {
+                        if (roll.value) {
+                            result += roll.value;
+                        }
+                    }
+
+                    return result;
+                }),
                 tryRoll,
-                rolls,
                 getFormattedModifier,
                 isSelected,
                 onSelect,
@@ -162,10 +200,35 @@
 
 <style lang="scss" scoped>
     .ability-random {
-        &__controls {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        &__blocks {
+            min-width: 124px;
+            gap: 16px;
             display: flex;
+            align-items: center;
             justify-content: center;
-            width: 100%;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        &__block {
+            flex: 1 1 auto;
+
+            &:not(.is-btn) {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg-table-list);
+                border-radius: 6px;
+                padding: 8px;
+                color: var(--text-b-color);
+                font-size: var(--main-font-size);
+                line-height: calc(var(--main-line-height) - 1px);
+            }
         }
 
         &__choose {
@@ -174,6 +237,15 @@
             display: grid;
             gap: 16px;
             grid-template-columns: 1fr 1fr 1fr;
+
+            @media (max-width: 768px) {
+                margin-left: 0;
+            }
+
+            @media (max-width: 576px) {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         &__select {
@@ -186,11 +258,19 @@
             }
 
             &_option {
-                padding: 12px;
+                padding: 12px 12px 12px 28px;
 
                 &.is-selected {
-                    background: var(--primary-select);
-                    color: var(--text-b-color);
+                    &::before {
+                        content: "";
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        background-color: var(--primary);
+                        position: absolute;
+                        top: calc(50% - 5px);
+                        left: 10px;
+                    }
                 }
             }
 
@@ -200,7 +280,12 @@
         }
 
         .ability-table {
-            margin-top: 40px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 16px;
         }
     }
 </style>

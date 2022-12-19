@@ -19,17 +19,19 @@
                     <slot name="title"/>
                 </h1>
 
-                <h3
+                <h4
                     v-if="$slots.subtitle"
                     class="page-layout__subtitle"
                 >
                     <slot name="subtitle"/>
-                </h3>
+                </h4>
 
-                <time
-                    v-if="dateTimeFormatted"
-                    :datetime="dateTime"
-                >{{ dateTimeFormatted }}</time>
+                <h5>
+                    <time
+                        v-if="dateTimeFormatted"
+                        :datetime="dateTime"
+                    >{{ dateTimeFormatted }}</time>
+                </h5>
             </div>
 
             <slot/>
@@ -101,7 +103,7 @@
             &--center {
                 flex: 1 1 620px;
                 max-width: 620px;
-                margin: auto;
+                margin:0 auto;
                 border-radius: 12px;
 
                 @include media-min($lg) {
@@ -119,6 +121,10 @@
             padding: 8px 0 16px 0;
             border-bottom: 1px solid var(--border);
             margin-bottom: 16px;
+
+            @media (max-width: 600px) {
+                padding: 16px 0 16px 0;
+            }
         }
 
         &__title {
@@ -130,6 +136,10 @@
         &__subtitle {
             margin-top: 0;
             line-height: normal;
+
+            @media (max-width: 600px) {
+                font-size: calc(var(--h4-font-size) - 2px);
+            }
         }
 
         &__socials {

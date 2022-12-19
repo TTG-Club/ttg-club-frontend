@@ -118,8 +118,8 @@
 
         background-color: var(--primary);
         color: var(--text-btn-color);
-        border-radius: 6px;
-        padding: 12px;
+        border-radius: 8px;
+        padding: 9px 12px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -165,8 +165,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             flex-shrink: 0;
 
             &.is-left,
@@ -175,11 +175,11 @@
             }
 
             &.is-left {
-                margin-right: 12px;
+                margin-right: 8px;
             }
 
             &.is-right {
-                margin-left: 12px;
+                margin-left: 8px;
             }
         }
 

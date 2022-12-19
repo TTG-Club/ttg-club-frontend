@@ -99,7 +99,12 @@ body,
 }
 
 #dnd5club {
-  overflow: auto;
+  display: flex;
+  flex-flow: column;
+
+  @media (max-width: 600px) {
+    flex-flow: column-reverse;
+  }
 }
 
 button {

@@ -1,8 +1,7 @@
 <template>
     <nav-popover v-model="opened">
-        <template #trigger="{ setRef, isActive }">
+        <template #trigger="{ isActive }">
             <div
-                :ref="el => setRef(el)"
                 class="navbar__btn"
                 :class="{ 'is-active': isActive }"
                 @click.left.exact.prevent="clickHandler"

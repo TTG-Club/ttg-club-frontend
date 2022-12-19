@@ -20,116 +20,132 @@
                     </ui-select>
                 </div>
 
-                <div class="tools_settings__row">
-                    <h5 class="label">
-                        Настройки предметов:
-                    </h5>
-                    <div class="tools_settings__colum">
-                        <div class="row">
-                            <div>
-                                <ui-checkbox
-                                    :model-value="form.coins"
-                                    type="toggle"
-                                    @update:model-value="form.coins = $event"
-                                >
-                                    Монеты
-                                </ui-checkbox>
-                            </div>
-                            <div class="tools_settings__row">
-                                <ui-checkbox
-                                    :model-value="form.magicItem"
-                                    type="toggle"
-                                    @update:model-value="form.magicItem = $event"
-                                >
-                                    Магические предметы
-                                </ui-checkbox>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div>
-                                <ui-checkbox
-                                    :model-value="form.scroll"
-                                    type="toggle"
-                                    @update:model-value="form.scroll = $event"
-                                >
-                                    Свитки
-                                </ui-checkbox>
-                            </div>
-                            <div class="tools_settings__row">
-                                <ui-checkbox
-                                    :model-value="form.trinket"
-                                    type="toggle"
-                                    @update:model-value="form.trinket = $event"
-                                >
-                                    Безделушки
-                                </ui-checkbox>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="hr_main">
-                <div class="tools_settings__row">
-                    <h5 class="label">
-                        Настройки вида:
-                    </h5>
-                    <div class="tools_settings__colum">
-                        <div class="row">
-                            <div>
-                                <ui-checkbox
-                                    :model-value="form.art"
-                                    type="toggle"
-                                    @update:model-value="form.art = $event"
-                                >
-                                    Предметы искусства
-                                </ui-checkbox>
-                            </div>
-                            <div class="tools_settings__row">
-                                <ui-checkbox
-                                    :model-value="form.gem"
-                                    type="toggle"
-                                    @update:model-value="form.gem = $event"
-                                >
-                                    Драгоценные камни
-                                </ui-checkbox>
-                            </div>
-                            <div class="tools_settings__row">
-                                <ui-checkbox
-                                    :model-value="form.unique"
-                                    type="toggle"
-                                    @update:model-value="form.unique = $event"
-                                >
-                                    Только уникальные
-                                </ui-checkbox>
+                <transition-group name="fade">
+                    <template v-if="settings.opened">
+                        <div class="tools_settings__row">
+                            <h5 class="label">
+                                Настройки предметов:
+                            </h5>
+                            <div class="tools_settings__colum">
+                                <div class="row">
+                                    <div>
+                                        <ui-checkbox
+                                            :model-value="form.coins"
+                                            type="toggle"
+                                            @update:model-value="form.coins = $event"
+                                        >
+                                            Монеты
+                                        </ui-checkbox>
+                                    </div>
+                                    <div class="tools_settings__row">
+                                        <ui-checkbox
+                                            :model-value="form.magicItem"
+                                            type="toggle"
+                                            @update:model-value="form.magicItem = $event"
+                                        >
+                                            Магические предметы
+                                        </ui-checkbox>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div>
+                                        <ui-checkbox
+                                            :model-value="form.scroll"
+                                            type="toggle"
+                                            @update:model-value="form.scroll = $event"
+                                        >
+                                            Свитки
+                                        </ui-checkbox>
+                                    </div>
+                                    <div class="tools_settings__row">
+                                        <ui-checkbox
+                                            :model-value="form.trinket"
+                                            type="toggle"
+                                            @update:model-value="form.trinket = $event"
+                                        >
+                                            Безделушки
+                                        </ui-checkbox>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div>
-                                <ui-checkbox
-                                    :model-value="
-                                        settings.grouping"
-                                    type="toggle"
-                                    @update:model-value="settings.grouping = $event"
-                                >
-                                    Группировать одинаковые
-                                </ui-checkbox>
-                            </div>
-                            <div
-                                class="tools_settings__row"
-                            >
-                                <ui-checkbox
-                                    :model-value="settings.max"
-                                    type="toggle"
-                                    @update:model-value="settings.max = $event"
-                                >
-                                    {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
-                                </ui-checkbox>
+
+                        <hr class="hr_main">
+
+                        <div class="tools_settings__row">
+                            <h5 class="label">
+                                Настройки вида:
+                            </h5>
+                            <div class="tools_settings__colum">
+                                <div class="row">
+                                    <div>
+                                        <ui-checkbox
+                                            :model-value="form.art"
+                                            type="toggle"
+                                            @update:model-value="form.art = $event"
+                                        >
+                                            Предметы искусства
+                                        </ui-checkbox>
+                                    </div>
+                                    <div class="tools_settings__row">
+                                        <ui-checkbox
+                                            :model-value="form.gem"
+                                            type="toggle"
+                                            @update:model-value="form.gem = $event"
+                                        >
+                                            Драгоценные камни
+                                        </ui-checkbox>
+                                    </div>
+                                    <div class="tools_settings__row">
+                                        <ui-checkbox
+                                            :model-value="form.unique"
+                                            type="toggle"
+                                            @update:model-value="form.unique = $event"
+                                        >
+                                            Только уникальные
+                                        </ui-checkbox>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div>
+                                        <ui-checkbox
+                                            :model-value="settings.grouping"
+                                            type="toggle"
+                                            @update:model-value="settings.grouping = $event"
+                                        >
+                                            Группировать одинаковые
+                                        </ui-checkbox>
+                                    </div>
+                                    <div
+                                        class="tools_settings__row"
+                                    >
+                                        <ui-checkbox
+                                            :model-value="settings.max"
+                                            type="toggle"
+                                            @update:model-value="settings.max = $event"
+                                        >
+                                            {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
+                                        </ui-checkbox>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </transition-group>
+
                 <div class="tools_settings__row btn-wrapper">
                     <ui-button @click.left.exact.prevent="sendForm">
-                        Создать сокровищницу
+                        Создать
+                    </ui-button>
+
+                    <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
+                        <template #icon-left>
+                            <svg-icon :icon-name="settings.opened ? 'show-pass' : 'hide-pass'"/>
+                        </template>
+
+                        <template #default>
+                            Настройки
+                        </template>
                     </ui-button>
                 </div>
             </form>
@@ -279,6 +295,7 @@
     import ContentDetail from "@/components/content/ContentDetail.vue";
     import { useUIStore } from "@/store/UI/UIStore";
     import UiButton from "@/components/form/UiButton.vue";
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {
         name: "TreasuryView",
@@ -292,7 +309,8 @@
             SectionHeader,
             UiSelect,
             ContentLayout,
-            UiButton
+            UiButton,
+            SvgIcon
         },
         data: () => ({
             crList: [
@@ -325,7 +343,8 @@
             },
             settings: {
                 grouping: true,
-                max: false
+                max: false,
+                opened: false
             },
             result: {},
             detailCard: {
@@ -533,6 +552,10 @@
     .tools_settings {
         &__row {
             margin-top: 12px;
+
+            &.btn-wrapper {
+                display: flex;
+            }
         }
     }
 </style>

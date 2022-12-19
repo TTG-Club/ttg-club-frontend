@@ -1,66 +1,63 @@
 <template>
     <div class="ability-point-buy">
-        <div class="ability-point-buy__body">
-            <div class="ability-point-buy__blocks">
-                <div class="ability-point-buy__block">
-                    Очков: {{ 27 - sum }} / 27
-                </div>
-
-                <ui-button
-                    class="ability-point-buy__block is-btn"
-                    is-small
-                    use-full-width
-                    @click.left.exact.prevent="onReset"
-                >
-                    Сбросить
-                </ui-button>
+        <div class="ability-point-buy__blocks">
+            <div class="ability-point-buy__block">
+                Очков: {{ 27 - sum }} / 27
             </div>
 
-            <div
-                v-if="rolls.length"
-                class="ability-point-buy__controls"
+            <ui-button
+                class="ability-point-buy__block is-btn"
+                is-small
+                use-full-width
+                @click.left.exact.prevent="onReset"
             >
-                <ui-select
-                    v-for="(roll, index) in rolls"
-                    :key="index"
-                    class="ability-point-buy__select"
-                    label="value"
-                    track-by="key"
-                    :options="options"
-                    :model-value="roll"
-                    @select="roll.value = $event.key"
-                >
-                    <template #left-slot>
-                        {{ String(roll.shortName).toUpperCase() }}
-                    </template>
-
-                    <template #singleLabel>
-                        {{ roll.value || 'Выбрать значение' }}
-                    </template>
-
-                    <template #placeholder>
-                        Выбрать значение
-                    </template>
-
-                    <template #option="{ option }">
-                        {{ getLabel(roll, option) }}
-                    </template>
-                </ui-select>
-            </div>
+                Сбросить
+            </ui-button>
         </div>
 
-        <ability-table :rolls="rolls"/>
+        <div
+            v-if="modelValue.length"
+            class="ability-point-buy__controls"
+        >
+            <ui-select
+                v-for="(roll, index) in modelValue"
+                :key="index"
+                class="ability-point-buy__select"
+                label="value"
+                track-by="key"
+                :options="options"
+                :model-value="roll"
+                @select="roll.value = $event.key"
+            >
+                <template #left-slot>
+                    {{ String(roll.shortName).toUpperCase() }}
+                </template>
+
+                <template #singleLabel>
+                    {{ roll.value || 'Выбрать значение' }}
+                </template>
+
+                <template #placeholder>
+                    Выбрать значение
+                </template>
+
+                <template #option="{ option }">
+                    {{ getLabel(roll, option) }}
+                </template>
+            </ui-select>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
     import {
-        computed, defineComponent, ref
+        computed, defineComponent, onActivated, ref
     } from 'vue';
-    import AbilityTable from '@/views/Tools/AbilityCalc/AbilityTable.vue';
+    import type { PropType } from 'vue';
     import {
         AbilityKey, AbilityName, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import UiButton from '@/components/form/UiButton.vue';
     import UiSelect from '@/components/form/UiSelect.vue';
     import { usePluralize } from '@/common/composition/usePluralize';
@@ -68,10 +65,15 @@
     export default defineComponent({
         components: {
             UiSelect,
-            UiButton,
-            AbilityTable
+            UiButton
         },
-        setup() {
+        props: {
+            modelValue: {
+                type: Array as PropType<Array<AbilityRoll>>,
+                required: true
+            }
+        },
+        setup(props, { emit }) {
             const { getPlural } = usePluralize();
 
             const cost = [
@@ -109,12 +111,7 @@
                 }
             ];
 
-            const rolls = ref<{
-                shortName: AbilityShortName | null,
-                name: AbilityName | null,
-                key: AbilityKey | null,
-                value: number
-            }[]>([
+            const rolls = ref<Array<AbilityRoll>>([
                 {
                     shortName: AbilityShortName.STRENGTH,
                     name: AbilityName.STRENGTH,
@@ -152,6 +149,12 @@
                     value: 8
                 }
             ]);
+
+            emit('update:model-value', rolls.value);
+
+            onActivated(() => {
+                emit('update:model-value', rolls.value);
+            });
 
             const sum = computed(() => rolls.value
                 .reduce((partialSum, roll) => {
@@ -195,6 +198,8 @@
                 for (let i = 0; i < rolls.value.length; i++) {
                     rolls.value[i].value = 8;
                 }
+
+                emit('update:model-value', rolls.value);
             };
 
             return {
@@ -205,7 +210,6 @@
                         name: AbilityName[key as AbilityKey]
                     }))),
                 sum,
-                rolls,
                 options,
                 getLabel,
                 onReset
@@ -216,10 +220,8 @@
 
 <style lang="scss" scoped>
     .ability-point-buy {
-        &__body {
-            display: flex;
-            gap: 32px;
-        }
+        display: flex;
+        gap: 32px;
 
         &__blocks {
             min-width: 124px;
@@ -253,6 +255,11 @@
             display: grid;
             gap: 16px;
             grid-template-columns: 1fr 1fr 1fr;
+
+            @media (max-width: 576px) {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         &__select {
@@ -266,7 +273,12 @@
         }
 
         .ability-table {
-            margin-top: 40px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 16px;
         }
     }
 </style>
