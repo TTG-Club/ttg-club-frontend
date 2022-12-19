@@ -97,7 +97,6 @@ export const useNavStore = defineStore('NavStore', () => {
             links: [
                 {
                     label: 'Калькулятор характеристик',
-                    inDev: true,
                     url: '/tools/ability-calc'
                 },
                 {
