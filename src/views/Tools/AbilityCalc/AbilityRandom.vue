@@ -64,6 +64,7 @@
     import { useToast } from "vue-toastification";
     import orderBy from 'lodash/orderBy';
     import reverse from 'lodash/reverse';
+    import { storeToRefs } from 'pinia';
     import UiButton from "@/components/form/UiButton.vue";
     import { useDiceRoller } from "@/common/composition/useDiceRoller";
     import {
@@ -73,6 +74,7 @@
     import UiSelect from "@/components/form/UiSelect.vue";
     import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
     import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         components: {
@@ -87,7 +89,9 @@
         },
         setup(props, { emit }) {
             const toast = useToast(ToastEventBus);
-            const { doRoll } = useDiceRoller();
+            const uiStore = useUIStore();
+            const { isMobile } = storeToRefs(uiStore);
+            const { doRoll, notifyResult } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
 
             const rolls = ref<Array<AbilityRoll>>([]);
@@ -106,6 +110,16 @@
                         const roll = doRoll({
                             formula: '4d6kh3'
                         });
+
+                        if (!isMobile.value) {
+                            notifyResult({
+                                roll,
+                                label: `Бросок №${ i + 1 }`,
+                                toastOptions: {
+                                    timeout: 5000 + 1000 * i
+                                }
+                            });
+                        }
 
                         rolled.push({
                             name: null,
