@@ -190,6 +190,8 @@
             box-shadow: 0 5px 30px #00000038;
             right: 0;
             z-index: 1;
+            max-height: calc(16px + 30px * 4); // padding + 4 elements
+            overflow: auto;
         }
 
         &__group {
@@ -203,6 +205,8 @@
             overflow: hidden;
             width: 100%;
             text-overflow: ellipsis;
+            line-height: 18px;
+            font-size: 14px;
 
             &.is-saved {
                 background-color: var(--primary-select);
