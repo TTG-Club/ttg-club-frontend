@@ -33,7 +33,10 @@
                     </div>
                 </div>
 
-                <div class="nav-menu__body">
+                <div
+                    v-if="navItems.length"
+                    class="nav-menu__body"
+                >
                     <div
                         v-for="(group, groupKey) in navItems"
                         :key="group.name + groupKey"
@@ -169,7 +172,6 @@
 
         &__header {
             padding: 32px 16px 16px 16px;
-            border-bottom: 1px solid var(--hover);
             display: flex;
             align-items: center;
 
@@ -216,9 +218,10 @@
             display: flex;
             flex-wrap: wrap;
             gap: 48px;
+            border-top: 1px solid var(--hover);
 
             @media (max-width: 600px) {
-                gap: 0px;
+                gap: 0;
             }
         }
 
