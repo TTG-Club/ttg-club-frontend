@@ -200,6 +200,7 @@
         computed, defineComponent, onBeforeMount, ref, watch
     } from 'vue';
     import cloneDeep from 'lodash/cloneDeep';
+    import reverse from 'lodash/reverse';
     import type { TRaceLink } from '@/types/Character/Races.types';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
     import { usePagination } from '@/common/composition/usePagination';
@@ -270,11 +271,12 @@
 
             const subRaces = computed(() => selectedRace.value?.subraces || []);
 
-            const choiceDouble = ref<Array<ChoiceDouble>>(Object.entries(AbilityChoiceDouble)
+            const choiceDouble = computed((): Array<ChoiceDouble> => reverse(Object
+                .entries(AbilityChoiceDouble)
                 .map(entry => ({
                     key: entry[0] as AbilityChoiceDoubleKey,
                     label: entry[1] as AbilityChoiceDouble
-                })));
+                }))));
 
             const getIsChoiceDouble = (race: TRaceLink) => (
                 race.abilities.length === 1
@@ -376,7 +378,7 @@
             const onSelectSubRace = (subRace: TRaceLink | null) => {
                 selectedSubRace.value = subRace;
 
-                onSelectChoiceDouble(null);
+                onSelectChoiceDouble(isChoiceDouble.value ? choiceDouble.value[0] : null);
             };
 
             const onSelectRace = (race: TRaceLink | null) => {
@@ -441,6 +443,10 @@
         gap: 32px;
         // grid-template-columns: 270px auto;
 
+        @media (max-width: 991px) {
+            flex-direction: column;
+        }
+
         &__race {
             @include css_anim();
 
@@ -493,13 +499,14 @@
         }
 
         &__select {
-            ::v-deep(.multiselect__option--selected) {
+            ::v-deep(.multiselect__option) {
                 padding: 0;
 
                 .ability-races {
                     &__select {
                         &_option {
                             padding: 12px 12px 12px 28px;
+
                             &.is-used {
                                 &::before {
                                     content: "";
@@ -520,10 +527,6 @@
                     }
                 }
             }
-        }
-
-        @media (max-width: 991px) {
-            flex-direction: column;
         }
     }
 </style>

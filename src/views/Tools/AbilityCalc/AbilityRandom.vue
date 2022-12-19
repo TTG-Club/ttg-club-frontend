@@ -1,12 +1,19 @@
 <template>
     <div class="ability-random">
-        <ui-button
-            class="button"
-            is-large
-            @click.left.exact.prevent="tryRoll"
-        >
-            {{ modelValue.length ? 'Перебросить' : 'Бросить кубики' }}
-        </ui-button>
+        <div class="ability-random__blocks">
+            <div class="ability-random__block">
+                Сумма: {{ sum }}
+            </div>
+
+            <ui-button
+                class="ability-random__block is-btn"
+                is-small
+                use-full-width
+                @click.left.exact.prevent="tryRoll"
+            >
+                {{ modelValue.length ? 'Перебросить' : 'Бросить кубики' }}
+            </ui-button>
+        </div>
 
         <div
             v-if="modelValue.length"
@@ -80,7 +87,7 @@
         },
         setup(props, { emit }) {
             const toast = useToast(ToastEventBus);
-            const { doRoll, notifyResult } = useDiceRoller();
+            const { doRoll } = useDiceRoller();
             const { getFormattedModifier } = useAbilityTransforms();
 
             const rolls = ref<Array<AbilityRoll>>([]);
@@ -98,14 +105,6 @@
                     for (let i = 0; i < 6; i++) {
                         const roll = doRoll({
                             formula: '4d6kh3'
-                        });
-
-                        notifyResult({
-                            roll,
-                            label: `Бросок №${ i + 1 }`,
-                            toastOptions: {
-                                timeout: 5000 + 1000 * i
-                            }
                         });
 
                         rolled.push({
@@ -164,6 +163,17 @@
                         key,
                         name: AbilityName[key as AbilityKey]
                     }))),
+                sum: computed(() => {
+                    let result = 0;
+
+                    for (const roll of rolls.value) {
+                        if (roll.value) {
+                            result += roll.value;
+                        }
+                    }
+
+                    return result;
+                }),
                 tryRoll,
                 getFormattedModifier,
                 isSelected,
@@ -180,6 +190,33 @@
         justify-content: center;
         width: 100%;
 
+        &__blocks {
+            min-width: 124px;
+            gap: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        &__block {
+            flex: 1 1 auto;
+
+            &:not(.is-btn) {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg-table-list);
+                border-radius: 6px;
+                padding: 8px;
+                color: var(--text-b-color);
+                font-size: var(--main-font-size);
+                line-height: calc(var(--main-line-height) - 1px);
+            }
+        }
+
         &__choose {
             flex: 1 1 auto;
             margin-left: 16px;
@@ -188,7 +225,7 @@
             grid-template-columns: 1fr 1fr 1fr;
 
             @media (max-width: 768px) {
-                margin-left: 0px;
+                margin-left: 0;
             }
 
             @media (max-width: 576px) {
