@@ -1,8 +1,40 @@
-<script>
-    import { h } from 'vue';
+<template>
+    <table class="roll-table">
+        <thead>
+            <th
+                v-for="(th, key) in table.thead"
+                :key="key"
+            >
+                <raw-content
+                    tag="span"
+                    :template="th"
+                />
+            </th>
+        </thead>
+
+        <tr
+            v-for="(tr, key) in table.tbody"
+            :key="key"
+        >
+            <component
+                :is="!index ? 'th' : 'td'"
+                v-for="(td, index) in tr"
+                :key="index"
+            >
+                <raw-content
+                    tag="span"
+                    :template="td"
+                />
+            </component>
+        </tr>
+    </table>
+</template>
+
+<script lang="ts">
+    import { defineComponent } from 'vue';
     import RawContent from "@/components/content/RawContent.vue";
 
-    export default {
+    export default defineComponent({
         name: "RollTable",
         components: { RawContent },
         props: {
@@ -11,56 +43,8 @@
                 default: undefined,
                 required: true
             }
-        },
-        render() {
-            return h(
-                'table',
-                {
-                    class: 'roll-table'
-                },
-                [
-                    h(
-                        'thead',
-                        null,
-                        h(
-                            'tr',
-                            null,
-                            this.table.thead.map(th => h(
-                                'th',
-                                null,
-                                h(
-                                    RawContent,
-                                    {
-                                        tag: 'span',
-                                        template: th
-                                    }
-                                )
-                            ))
-                        )
-                    ),
-                    h(
-                        'tbody',
-                        null,
-                        this.table.tbody.map(tr => h(
-                            'tr',
-                            null,
-                            tr.map((td, index) => h(
-                                !index ? 'th' : 'td',
-                                null,
-                                h(
-                                    RawContent,
-                                    {
-                                        tag: 'span',
-                                        template: td
-                                    }
-                                )
-                            ))
-                        ))
-                    )
-                ]
-            );
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>

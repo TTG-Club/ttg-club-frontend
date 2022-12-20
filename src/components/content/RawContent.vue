@@ -1,10 +1,19 @@
-<script>
-    import {
-        h, shallowRef
-    } from "vue";
-    import defineRawComponent from "@/common/utils/DefineRawComponent";
+<template>
+    <component :is="tag">
+        <component :is="component"/>
+    </component>
+</template>
 
-    export default {
+<script lang="ts">
+    import {
+        computed,
+        defineComponent,
+        nextTick, onBeforeUnmount, ref, watch
+    } from 'vue';
+    import { useAxios } from '@/common/composition/useAxios';
+
+    // eslint-disable-next-line vue/one-component-per-file
+    export default defineComponent({
         name: "RawContent",
         props: {
             template: {
@@ -20,64 +29,82 @@
                 default: 'div'
             }
         },
-        data: () => ({
-            component: undefined,
-            error: false,
-            loading: true
-        }),
-        watch: {
-            async template() {
-                await this.initComponent();
-            },
+        setup(props, { emit }) {
+            const http = useAxios();
+            const templateString = ref<string | null>(null);
+            const error = ref(false);
+            const loading = ref(true);
 
-            async url() {
-                await this.initComponent();
-            }
-        },
-        async mounted() {
-            await this.initComponent();
-        },
-        beforeUnmount() {
-            this.$emit('before-unmount');
-        },
-        methods: {
-            async initComponent() {
-                try {
-                    this.error = false;
-                    this.loading = true;
-
-                    const component = await defineRawComponent(this.template, this.url);
-
-                    this.component = shallowRef(component);
-                    this.loading = false;
-
-                    this.$nextTick(() => {
-                        this.$emit('loaded');
-                    });
-                } catch (err) {
-                    this.error = true;
-                    this.loading = false;
+            const initComponent = async () => {
+                if (!props.template && !props.url) {
+                    throw new Error('URL and template is not defined');
                 }
-            }
-        },
-        render() {
-            let inner = '';
 
-            if (this.component) {
-                inner = h(this.component);
-            }
+                try {
+                    error.value = false;
+                    loading.value = true;
 
-            if (this.error || (!this.loading && !this.component)) {
-                inner = 'Ошибка...';
-            }
+                    templateString.value = props.template || '';
 
-            if (this.loading && !this.error) {
-                inner = 'Загрузка...';
-            }
+                    if (!templateString.value && !props.template) {
+                        const { data } = await http.rawGet({
+                            url: props.url
+                        });
 
-            return (
-                h(this.tag, { class: 'raw-content' }, inner)
+                        templateString.value = data;
+                    }
+
+                    loading.value = false;
+
+                    nextTick(() => {
+                        emit('loaded');
+                    });
+
+                    return Promise.resolve();
+                } catch (err) {
+                    error.value = true;
+                    loading.value = false;
+
+                    return Promise.reject(err);
+                }
+            };
+
+            const component = computed(() => {
+                let inner = '';
+
+                if (templateString.value) {
+                    inner = templateString.value;
+                }
+
+                if (error.value || (!loading.value && !templateString.value)) {
+                    inner = 'Ошибка...';
+                }
+
+                if (loading.value && !error.value) {
+                    inner = 'Загрузка...';
+                }
+
+                // eslint-disable-next-line vue/one-component-per-file
+                return defineComponent({ template: inner });
+            });
+
+            watch(
+                [() => props.template, () => props.url],
+                async () => {
+                    await initComponent();
+                },
+                {
+                    immediate: true
+                }
             );
+
+            onBeforeUnmount(() => {
+                emit('before-unmount');
+            });
+
+            return {
+                component
+            };
         }
-    };
+    });
 </script>
