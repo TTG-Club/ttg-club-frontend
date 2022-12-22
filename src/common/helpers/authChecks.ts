@@ -99,8 +99,8 @@ export const validatePwdNumber = () => helpers.withMessage(
 );
 
 export const validatePwdSpecial = () => helpers.withMessage(
-    'Допустимые спец. символы: ! @ # $ % ^ & * _',
-    value => !(/[^\w!@#$%^&*]+/g).test(value as string)
+    'Допустимые спец. символы: ! @ # $ % ^ & * _ -',
+    value => !(/[^\w\-!@#$%^&*]+/g).test(value as string)
 );
 
 export const validateMinLength = (number: number) => helpers.withMessage(
