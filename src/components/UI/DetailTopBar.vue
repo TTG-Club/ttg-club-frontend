@@ -59,8 +59,10 @@
 <style lang="scss" scoped>
     .row_info {
         display: flex;
-        padding: 12px 24px 12px 24px;
+        padding: 12px;
         justify-content: space-between;
+        border-radius: 8px;
+        margin: 8px 24px 0 24px;
 
         .left_info {
             font-style: italic;
@@ -69,12 +71,11 @@
 
         &.bg_grey {
             background: var(--bg-sub-menu);
-            border-bottom: 1px solid var(--border);
         }
 
         @media (max-width: 1200px) {
-            padding: 12px 16px 12px 16px;
             flex-direction: column;
+            margin: 8px 16px 0 16px;
 
             span {
                 &:nth-child(n + 2) {

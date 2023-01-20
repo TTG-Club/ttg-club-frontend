@@ -51,7 +51,11 @@
                     type-link-filled
                     @click.left.exact.prevent.stop="openPrintWindow"
                 >
-                    <svg-icon icon-name="print" />
+                    <svg-icon
+                        icon-name="print"
+                        :stroke-enable="false"
+                        fill-enable
+                    />
                 </ui-button>
 
                 <ui-button
@@ -81,7 +85,11 @@
                     type="button"
                     @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
                 >
-                    <svg-icon :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'" />
+                    <svg-icon
+                        :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
+                        :stroke-enable="false"
+                        fill-enable
+                    />
                 </button>
 
                 <button
@@ -91,7 +99,11 @@
                     type="button"
                     @click.left.exact.prevent.stop="$emit('close')"
                 >
-                    <svg-icon icon-name="close" />
+                    <svg-icon
+                        icon-name="close"
+                        :stroke-enable="false"
+                        fill-enable
+                    />
                 </button>
             </div>
         </div>
@@ -106,12 +118,14 @@
     import { useUIStore } from '@/store/UI/UIStore';
     import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
     import UiButton from '@/components/form/UiButton.vue';
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
     import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
             UiButton,
-            BookmarkSaveButton
+            BookmarkSaveButton,
+            SvgIcon
         },
         props: {
             title: {
@@ -232,8 +246,6 @@
         justify-content: flex-end;
         flex-wrap: nowrap;
         flex-shrink: 0;
-        background-color: var(--bg-sub-menu);
-        border-bottom: 1px solid var(--border);
 
         &__body {
             padding: 0 16px;
@@ -307,16 +319,14 @@
             display: flex;
             align-items: center;
             flex-shrink: 0;
+            margin-top: -16px;
+            margin-right: 12px;
 
             &--main,
             &--optional {
                 display: flex;
                 align-items: center;
                 flex-shrink: 0;
-            }
-
-            &--optional {
-                padding-right: 8px;
             }
         }
 
@@ -343,8 +353,8 @@
                 flex-shrink: 0;
                 cursor: pointer;
                 color: var(--primary);
-                width: 73px;
-                height: 72px;
+                padding: 6px;
+                border-radius: 8px;
 
                 @include media-min($md) {
                     &:hover {
@@ -355,11 +365,12 @@
             }
 
             &--main {
-                background-color: var(--bg-secondary);
-                border-left: 1px solid var(--border);
-                height: 72px;
-                padding: 24px;
-                flex: 1 0 72px;
+                flex: 1 0;
+
+                svg {
+                    width: 24px;
+                    height: 24px;
+                }
             }
 
             &--optional {

@@ -119,7 +119,7 @@
         background-color: var(--primary);
         color: var(--text-btn-color);
         border-radius: 8px;
-        padding: 9px 12px;
+        padding: 6px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -165,8 +165,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             flex-shrink: 0;
 
             &.is-left,
@@ -262,7 +262,7 @@
 
             @include media-min($xl) {
                 &:hover {
-                    background-color: var(--hover);
+                    background-color: var(--primary-hover);
                     color: var(--text-btn-color);
                 }
 
