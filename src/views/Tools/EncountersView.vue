@@ -75,7 +75,7 @@
                 <br>
 
                 <div>
-                    <raw-content :template="item.description"/>
+                    <raw-content :template="item.description" />
                 </div>
             </div>
         </template>
@@ -91,7 +91,7 @@
 
         <template #default>
             <div class="content-padding">
-                <roll-table :table="table.data"/>
+                <roll-table :table="table.data" />
             </div>
         </template>
     </base-modal>
@@ -99,17 +99,17 @@
 
 <script>
     import throttle from 'lodash/throttle';
-    import { reactive } from "vue";
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import RawContent from "@/components/content/RawContent.vue";
-    import UiSelect from "@/components/form/UiSelect.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import BaseModal from "@/components/UI/modals/BaseModal.vue";
-    import RollTable from "@/components/UI/RollTable.vue";
+    import { reactive } from 'vue';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import RawContent from '@/components/content/RawContent.vue';
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import BaseModal from '@/components/UI/modals/BaseModal.vue';
+    import RollTable from '@/components/UI/RollTable.vue';
 
     export default {
-        name: "EncountersView",
+        name: 'EncountersView',
         components: {
             RollTable,
             BaseModal,

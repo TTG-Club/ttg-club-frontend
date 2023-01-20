@@ -20,7 +20,8 @@ export const useUserStore = defineStore('UserStore', {
             email: ''
         }) {
             try {
-                if (Object.values(body).find(item => !item)) {
+                if (Object.values(body)
+                    .find(item => !item)) {
                     return Promise.reject(new Error('All fields are required to fill'));
                 }
 
@@ -53,7 +54,8 @@ export const useUserStore = defineStore('UserStore', {
                     ...body
                 };
 
-                if (Object.values(body).find(item => !item)) {
+                if (Object.values(body)
+                    .find(item => !item)) {
                     return Promise.reject(new Error('All fields are required to fill'));
                 }
 

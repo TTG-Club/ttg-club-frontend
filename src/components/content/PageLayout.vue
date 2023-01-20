@@ -4,7 +4,7 @@
             v-if="$slots.left && !isMobile"
             class="page-layout__side--left"
         >
-            <slot name="left"/>
+            <slot name="left" />
         </div>
 
         <div class="page-layout__side--center">
@@ -16,28 +16,29 @@
                     v-if="$slots.title"
                     class="page-layout__title"
                 >
-                    <slot name="title"/>
+                    <slot name="title" />
                 </h1>
 
                 <h4
                     v-if="$slots.subtitle"
                     class="page-layout__subtitle"
                 >
-                    <slot name="subtitle"/>
+                    <slot name="subtitle" />
                 </h4>
 
                 <h5>
                     <time
                         v-if="dateTimeFormatted"
                         :datetime="dateTime"
-                    >{{ dateTimeFormatted }}</time>
+                    >{{ dateTimeFormatted }}
+                    </time>
                 </h5>
             </div>
 
-            <slot/>
+            <slot />
 
             <div class="page-layout__socials">
-                <social-links v-if="useSocialLinks"/>
+                <social-links v-if="useSocialLinks" />
             </div>
         </div>
 
@@ -45,16 +46,16 @@
             v-if="$slots.right && !isMobile"
             class="page-layout__side--right"
         >
-            <slot name="right"/>
+            <slot name="right" />
         </div>
     </div>
 </template>
 
 <script>
-    import { computed, defineComponent } from "vue";
-    import SocialLinks from "@/components/content/SocialLinks.vue";
-    import { useDayjs } from "@/common/composition/useDayjs";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import { computed, defineComponent } from 'vue';
+    import SocialLinks from '@/components/content/SocialLinks.vue';
+    import { useDayjs } from '@/common/composition/useDayjs';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         components: { SocialLinks },
@@ -103,7 +104,7 @@
             &--center {
                 flex: 1 1 620px;
                 max-width: 620px;
-                margin:0 auto;
+                margin: 0 auto;
                 border-radius: 12px;
 
                 @include media-min($lg) {

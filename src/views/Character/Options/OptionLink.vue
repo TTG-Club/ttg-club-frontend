@@ -40,21 +40,21 @@
         </template>
 
         <template #default>
-            <option-body :option="modal.data"/>
+            <option-body :option="modal.data" />
         </template>
     </base-modal>
 </template>
 
 <script lang="ts">
     import type { RouteLocationPathRaw } from 'vue-router';
+    import { useLink } from 'vue-router';
     import type { PropType } from 'vue';
     import {
         computed, defineComponent, ref
     } from 'vue';
-    import { useLink } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import BaseModal from "@/components/UI/modals/BaseModal.vue";
-    import OptionBody from "@/views/Character/Options/OptionBody.vue";
+    import BaseModal from '@/components/UI/modals/BaseModal.vue';
+    import OptionBody from '@/views/Character/Options/OptionBody.vue';
     import { useAxios } from '@/common/composition/useAxios';
 
     export default defineComponent({
@@ -84,7 +84,9 @@
             const http = useAxios();
 
             const {
-                navigate, isActive, href
+                navigate,
+                isActive,
+                href
             } = useLink(props);
 
             const modal = ref({
@@ -135,4 +137,4 @@
     });
 </script>
 
-<style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss"/>
+<style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss" />

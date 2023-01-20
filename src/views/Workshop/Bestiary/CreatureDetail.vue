@@ -31,10 +31,10 @@
     import {
         onBeforeRouteUpdate, useRoute, useRouter
     } from 'vue-router';
-    import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import CreatureBody from "@/views/Workshop/Bestiary/CreatureBody.vue";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import CreatureBody from '@/views/Workshop/Bestiary/CreatureBody.vue';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import errorHandler from '@/common/helpers/errorHandler';
     import { useAxios } from '@/common/composition/useAxios';
 
@@ -49,7 +49,12 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { fullscreen, isMobile } = storeToRefs(uiStore);
+
+            const {
+                fullscreen,
+                isMobile
+            } = storeToRefs(uiStore);
+
             const creature = ref(undefined);
             const loading = ref(true);
             const error = ref(false);

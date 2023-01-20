@@ -2,10 +2,10 @@
     <content-detail class="screen-detail">
         <template #fixed>
             <section-header
-                :title="screen?.name?.rus || ''"
-                :subtitle="screen?.name?.eng || ''"
                 :copy="!error && !loading"
                 :fullscreen="!isMobile"
+                :subtitle="screen?.name?.eng || ''"
+                :title="screen?.name?.rus || ''"
                 bookmark
                 close-on-desktop
                 @close="close"
@@ -27,12 +27,12 @@
 </template>
 
 <script>
-    import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
-    import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
-    import ScreensGroup from "@/views/Workshop/Screens/ScreensGroup.vue";
+    import { mapState } from 'pinia';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
+    import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
+    import ScreensGroup from '@/views/Workshop/Screens/ScreensGroup.vue';
     import errorHandler from '@/common/helpers/errorHandler';
 
     export default {

@@ -102,20 +102,20 @@
         </template>
 
         <template #default>
-            <spell-body :spell="modal.data"/>
+            <spell-body :spell="modal.data" />
         </template>
     </base-modal>
 </template>
 
 <script lang="ts">
     import type { RouteLocationPathRaw } from 'vue-router';
+    import { useLink } from 'vue-router';
     import type { PropType } from 'vue';
     import {
         computed, defineComponent, ref
     } from 'vue';
-    import { useLink } from 'vue-router';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import BaseModal from '@/components/UI/modals/BaseModal.vue';
     import { useAxios } from '@/common/composition/useAxios';
     import SpellBody from '@/views/Character/Spells/SpellBody.vue';
 
@@ -146,7 +146,9 @@
             const http = useAxios();
 
             const {
-                navigate, isActive, href
+                navigate,
+                isActive,
+                href
             } = useLink(props);
 
             const modal = ref({

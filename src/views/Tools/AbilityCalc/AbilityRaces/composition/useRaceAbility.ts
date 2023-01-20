@@ -1,11 +1,9 @@
-import {
-    computed, ref
-} from 'vue';
 import type { ComputedRef, Ref } from 'vue';
+import { computed, ref } from 'vue';
+import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
 import {
     AbilityChoiceDouble, AbilityChoiceDoubleKey, AbilityTypeKey
 } from '@/types/Tools/AbilityCalc.types';
-import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
 import type { TRaceLink } from '@/types/Character/Races.types';
 
 type TConfig = {
@@ -19,7 +17,9 @@ type TConfig = {
 
 export function useRaceAbility(config: TConfig) {
     const {
-        isChoiceDouble, selectedChoiceDouble, checkInstance
+        isChoiceDouble,
+        selectedChoiceDouble,
+        checkInstance
     } = config;
 
     // First

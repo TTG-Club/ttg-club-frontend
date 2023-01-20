@@ -5,7 +5,7 @@
 .video-container {
   overflow: hidden;
   position: relative;
-  width:100%;
+  width: 100%;
 
   &::after {
     padding-top: 56.25%;
@@ -544,7 +544,7 @@
   }
 }
 
-.tippy-content{
+.tippy-content {
   .scores {
     &__stats {
       max-width: calc(33% - 8px);
@@ -568,7 +568,7 @@
     color: var(--text-btn-color);
   }
 
-  &+& {
+  & + & {
     margin-top: 12px;
   }
 }

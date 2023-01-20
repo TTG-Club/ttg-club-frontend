@@ -17,16 +17,16 @@
 </template>
 
 <script lang="ts">
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, onBeforeMount, watch
     } from 'vue';
-    import type { PropType } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TabLayout from "@/components/content/TabLayout.vue";
-    import OptionLink from "@/views/Character/Options/OptionLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import TabLayout from '@/components/content/TabLayout.vue';
+    import OptionLink from '@/views/Character/Options/OptionLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { OptionsFilterDefaults } from '@/types/Character/Options.types';
@@ -59,7 +59,11 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const layout = computed(() => (
                 props.inTab
@@ -87,7 +91,9 @@
             });
 
             const {
-                initPages, resetPages, items: options
+                initPages,
+                resetPages,
+                items: options
             } = usePagination({
                 url: '/options',
                 limit: 70,

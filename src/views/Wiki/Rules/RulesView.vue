@@ -22,8 +22,8 @@
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import RuleLink from "@/views/Wiki/Rules/RuleLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import RuleLink from '@/views/Wiki/Rules/RuleLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
@@ -37,7 +37,11 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: RulesFilterDefaults.dbName,
@@ -45,7 +49,9 @@
             });
 
             const {
-                initPages, nextPage, items: rules
+                initPages,
+                nextPage,
+                items: rules
             } = usePagination({
                 url: '/rules',
                 limit: 70,

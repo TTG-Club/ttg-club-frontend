@@ -6,14 +6,14 @@
         @list-end="nextPage"
     >
         <div
-            class="screen-items"
             :class="{ 'is-selected': showRightSide }"
+            class="screen-items"
         >
             <router-link
                 v-for="screen in screens"
                 :key="screen.url"
-                class="screen-item"
                 :to="screen.url"
+                class="screen-item"
             >
                 <div class="screen-item__name--rus">
                     {{ screen.name.rus }}
@@ -33,8 +33,8 @@
         computed, defineComponent, onBeforeMount
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { ScreensFilterDefaults } from '@/types/Workshop/Screens.types';
@@ -47,7 +47,11 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: ScreensFilterDefaults.dbName,
@@ -55,7 +59,9 @@
             });
 
             const {
-                initPages, nextPage, items: screens
+                initPages,
+                nextPage,
+                items: screens
             } = usePagination({
                 url: '/screens',
                 limit: 70,

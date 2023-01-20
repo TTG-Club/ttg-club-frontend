@@ -9,7 +9,7 @@
     >
         <div class="base-modal__header">
             <div class="base-modal__title">
-                <slot name="title"/>
+                <slot name="title" />
             </div>
 
             <bookmark-save-button
@@ -20,18 +20,18 @@
 
             <ui-button
                 class="base-modal__close"
-                type-link
                 is-icon
+                type-link
                 @click.left.exact.prevent="close"
             >
-                <svg-icon icon-name="close"/>
+                <svg-icon icon-name="close" />
             </ui-button>
         </div>
 
         <div class="base-modal__content">
             <div class="base-modal__safe">
                 <div class="base-modal__body">
-                    <slot :params="params"/>
+                    <slot :params="params" />
                 </div>
             </div>
         </div>
@@ -104,14 +104,14 @@
     </vue-final-modal>
 </template>
 <script>
-    import { mapActions, mapState } from "pinia";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
-    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue";
+    import { mapActions, mapState } from 'pinia';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
 
     export default {
-        name: "BaseModal",
+        name: 'BaseModal',
         components: {
             BookmarkSaveButton,
             UiButton,

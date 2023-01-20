@@ -19,7 +19,7 @@
                     type="button"
                     @click.self.left.exact.prevent.stop="toggleBlock"
                 >
-                    <svg-icon icon-name="arrow-stroke"/>
+                    <svg-icon icon-name="arrow-stroke" />
                 </button>
             </div>
 
@@ -30,14 +30,14 @@
                 type="button"
                 @click.left.exact.prevent="resetValues"
             >
-                <svg-icon icon-name="close"/>
+                <svg-icon icon-name="close" />
             </button>
         </div>
 
         <div
             v-if="opened"
-            class="filter-item__body"
             :class="{ 'is-toggle': type === 'toggle' }"
+            class="filter-item__body"
         >
             <ui-checkbox
                 v-for="(checkbox, checkboxKey) in modelValue"
@@ -133,8 +133,8 @@
                 this.opened = !this.opened;
 
                 this.$refs.filterItem.scrollIntoView({
-                    behavior: "smooth",
-                    block: "nearest"
+                    behavior: 'smooth',
+                    block: 'nearest'
                 });
             }
         }

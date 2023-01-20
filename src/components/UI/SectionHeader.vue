@@ -13,7 +13,7 @@
                     class="section-header__title--copy"
                     @click.left.exact.prevent.stop="copyText"
                 >
-                    <svg-icon icon-name="copy"/>
+                    <svg-icon icon-name="copy" />
                 </a>
             </div>
 
@@ -43,22 +43,22 @@
                     v-if="print"
                     v-tippy="{ content: 'Открыть окно печати' }"
                     class="section-header__control--optional is-only-desktop"
-                    type-link-filled
                     is-icon
+                    type-link-filled
                     @click.left.exact.prevent.stop="openPrintWindow"
                 >
-                    <svg-icon icon-name="print"/>
+                    <svg-icon icon-name="print" />
                 </ui-button>
 
                 <ui-button
                     v-if="onExportFoundry"
                     v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
                     class="section-header__control--optional is-only-desktop"
-                    type-link-filled
                     is-icon
+                    type-link-filled
                     @click.left.exact.prevent.stop="$emit('exportFoundry')"
                 >
-                    <svg-icon icon-name="export-foundry"/>
+                    <svg-icon icon-name="export-foundry" />
                 </ui-button>
             </div>
 
@@ -77,7 +77,7 @@
                     type="button"
                     @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
                 >
-                    <svg-icon :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"/>
+                    <svg-icon :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'" />
                 </button>
 
                 <button
@@ -87,7 +87,7 @@
                     type="button"
                     @click.left.exact.prevent.stop="$emit('close')"
                 >
-                    <svg-icon icon-name="close"/>
+                    <svg-icon icon-name="close" />
                 </button>
             </div>
         </div>
@@ -95,14 +95,14 @@
 </template>
 
 <script lang="tsx">
-    import { useClipboard } from "@vueuse/core";
-    import { computed, defineComponent } from "vue";
-    import { useRoute } from "vue-router";
-    import { useToast } from "vue-toastification";
+    import { useClipboard } from '@vueuse/core';
+    import { computed, defineComponent } from 'vue';
+    import { useRoute } from 'vue-router';
+    import { useToast } from 'vue-toastification';
     import { useUIStore } from '@/store/UI/UIStore';
-    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {

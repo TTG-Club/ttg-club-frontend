@@ -2,14 +2,14 @@
     <nav-popover v-model="popover">
         <template #trigger="{ isActive }">
             <div
-                class="navbar__btn"
                 :class="{ 'is-active': isActive }"
+                class="navbar__btn"
                 @click.left.exact.prevent="clickHandler"
             >
                 <svg-icon
+                    :icon-name="isAuthenticated ? 'profile' : 'profile-outline'"
                     :stroke-enable="false"
                     fill-enable
-                    :icon-name="isAuthenticated ? 'profile' : 'profile-outline'"
                 />
             </div>
         </template>
@@ -26,8 +26,8 @@
                 </div>
 
                 <a
-                    href="#"
                     class="nav-profile__line"
+                    href="#"
                     @click.left.exact.prevent="modal = 'change-password'"
                 >
                     <span class="nav-profile__line_body">
@@ -36,8 +36,8 @@
                 </a>
 
                 <a
-                    href="#"
                     class="nav-profile__line"
+                    href="#"
                     @click.left.exact.prevent="userLogout"
                 >
                     <span class="nav-profile__line_body">
@@ -46,9 +46,9 @@
 
                     <span class="nav-profile__line_icon">
                         <svg-icon
-                            icon-name="logout"
                             :stroke-enable="false"
                             fill-enable
+                            icon-name="logout"
                         />
                     </span>
                 </a>
@@ -69,10 +69,10 @@
             >
                 <component
                     :is="modalComponent"
+                    @close="closeModal"
                     @switch:auth="modal = 'login'"
                     @switch:reg="modal = 'reg'"
                     @switch:change-password="modal = 'change-password'"
-                    @close="closeModal"
                 />
             </transition>
         </template>
@@ -80,17 +80,17 @@
 </template>
 
 <script>
-    import { computed, ref } from "vue";
-    import AuthModal from "@/components/UI/modals/AuthModal.vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import { useUserStore } from "@/store/UI/UserStore";
-    import NavPopover from "@/components/UI/menu/NavPopover.vue";
-    import LoginView from "@/components/account/LoginView.vue";
-    import RegistrationView from "@/components/account/RegistrationView.vue";
-    import ChangePasswordView from "@/components/account/ChangePasswordView.vue";
+    import { computed, ref } from 'vue';
+    import AuthModal from '@/components/UI/modals/AuthModal.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import { useUserStore } from '@/store/UI/UserStore';
+    import NavPopover from '@/components/UI/menu/NavPopover.vue';
+    import LoginView from '@/components/account/LoginView.vue';
+    import RegistrationView from '@/components/account/RegistrationView.vue';
+    import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
 
     export default {
-        name: "NavProfile",
+        name: 'NavProfile',
         components: {
             NavPopover,
             AuthModal,

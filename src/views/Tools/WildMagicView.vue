@@ -12,15 +12,16 @@
 
                             <ui-input
                                 v-model="count"
-                                class="form-control select"
-                                placeholder="Количеств"
-                                is-number
                                 :min="1"
+                                class="form-control select"
+                                is-number
+                                placeholder="Количеств"
                             />
                         </div>
 
                         <div class="row">
                             <span class="label">Источники:</span>
+
                             <div class="checkbox-group">
                                 <ui-checkbox
                                     v-for="(source, key) in tables"
@@ -56,7 +57,7 @@
                 class="wild-magic-item"
             >
                 <div class="wild-magic-item__body">
-                    <raw-content :template="item.description"/>
+                    <raw-content :template="item.description" />
                 </div>
 
                 <div
@@ -71,17 +72,17 @@
 </template>
 
 <script>
-    import { reactive } from "vue";
-    import throttle from "lodash/throttle";
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import UiCheckbox from "@/components/form/UiCheckbox.vue";
-    import RawContent from "@/components/content/RawContent.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiButton from "@/components/form/UiButton.vue";
+    import { reactive } from 'vue';
+    import throttle from 'lodash/throttle';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import RawContent from '@/components/content/RawContent.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/form/UiButton.vue';
 
     export default {
-        name: "WildMagicView",
+        name: 'WildMagicView',
         components: {
             RawContent,
             UiCheckbox,

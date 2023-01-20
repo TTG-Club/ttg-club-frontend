@@ -1,18 +1,18 @@
 <template>
     <div class="content-detail">
         <div class="content-detail__fixed">
-            <slot name="fixed"/>
+            <slot name="fixed" />
         </div>
 
         <div class="content-detail__body">
-            <slot name="default"/>
+            <slot name="default" />
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        name: "ContentDetail"
+        name: 'ContentDetail'
     };
 </script>
 

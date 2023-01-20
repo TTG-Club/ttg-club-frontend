@@ -18,7 +18,7 @@
                     type="button"
                     @click.self.left.exact.prevent="opened = !opened"
                 >
-                    <svg-icon icon-name="arrow-stroke"/>
+                    <svg-icon icon-name="arrow-stroke" />
                 </button>
             </div>
 
@@ -29,7 +29,7 @@
                 type="button"
                 @click.left.exact.prevent="resetSources"
             >
-                <svg-icon icon-name="close"/>
+                <svg-icon icon-name="close" />
             </button>
         </div>
 

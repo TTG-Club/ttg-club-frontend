@@ -1,7 +1,7 @@
+import type { ComputedRef, Ref } from 'vue';
 import {
     computed, ref, unref
 } from 'vue';
-import type { Ref, ComputedRef } from 'vue';
 import type { MaybeRef } from '@vueuse/core';
 
 export type SearchConfig = {

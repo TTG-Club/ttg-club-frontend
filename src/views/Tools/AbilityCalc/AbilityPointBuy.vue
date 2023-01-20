@@ -22,15 +22,18 @@
             <ui-select
                 v-for="(roll, index) in modelValue"
                 :key="index"
+                :model-value="roll"
+                :options="options"
                 class="ability-point-buy__select"
                 label="value"
                 track-by="key"
-                :options="options"
-                :model-value="roll"
                 @select="roll.value = $event.key"
             >
                 <template #left-slot>
-                    {{ String(roll.shortName).toUpperCase() }}
+                    {{
+                        String(roll.shortName)
+                            .toUpperCase()
+                    }}
                 </template>
 
                 <template #singleLabel>
@@ -50,14 +53,14 @@
 </template>
 
 <script lang="ts">
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, onActivated, ref
     } from 'vue';
-    import type { PropType } from 'vue';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import {
         AbilityKey, AbilityName, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
-    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import UiButton from '@/components/form/UiButton.vue';
     import UiSelect from '@/components/form/UiSelect.vue';
     import { usePluralize } from '@/common/composition/usePluralize';

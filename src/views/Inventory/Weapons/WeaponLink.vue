@@ -77,14 +77,10 @@
 </template>
 
 <script lang="ts">
-    import {
-        useLink
-    } from 'vue-router';
-    import {
-        computed, defineComponent
-    } from 'vue';
-    import type { PropType } from 'vue';
     import type { RouteLocationPathRaw } from 'vue-router';
+    import { useLink } from 'vue-router';
+    import type { PropType } from 'vue';
+    import { computed, defineComponent } from 'vue';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
 
     export default defineComponent({
@@ -104,7 +100,9 @@
         },
         setup(props) {
             const {
-                navigate, isActive, href
+                navigate,
+                isActive,
+                href
             } = useLink(props);
 
             const classList = computed(() => ({
@@ -121,4 +119,4 @@
     });
 </script>
 
-<style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss"/>
+<style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss" />

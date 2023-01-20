@@ -5,19 +5,19 @@
         @submit.prevent="onSubmit"
     >
         <div
-            class="form__row"
             :class="{ 'is-hidden': isOnlyPassword }"
+            class="form__row"
         >
             <ui-input
                 v-model.trim="v$.email.$model"
-                placeholder="Электронный адрес"
-                required
                 :autocomplete="isOnlyPassword ? 'username' : 'email'"
+                :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
                 autocapitalize="off"
                 autocorrect="off"
-                :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
-                @input="v$.email.$reset()"
+                placeholder="Электронный адрес"
+                required
                 @blur="v$.email.$touch()"
+                @input="v$.email.$reset()"
             />
         </div>
 
@@ -27,15 +27,15 @@
         >
             <ui-input
                 v-model.trim="v$.password.$model"
-                placeholder="Новый пароль"
-                is-password
-                required
-                autocomplete="new-password"
-                autocapitalize="off"
-                autocorrect="off"
                 :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
-                @input="v$.password.$reset()"
+                autocapitalize="off"
+                autocomplete="new-password"
+                autocorrect="off"
+                is-password
+                placeholder="Новый пароль"
+                required
                 @blur="v$.password.$touch()"
+                @input="v$.password.$reset()"
             />
         </div>
 
@@ -45,15 +45,15 @@
         >
             <ui-input
                 v-model.trim="v$.repeat.$model"
-                placeholder="Повторите пароль"
-                is-password
-                required
-                autocomplete="new-password"
-                autocapitalize="off"
-                autocorrect="off"
                 :error-text="v$.repeat.$dirty ? v$.repeat.$errors?.[0]?.$message : ''"
-                @input="v$.repeat.$reset()"
+                autocapitalize="off"
+                autocomplete="new-password"
+                autocorrect="off"
+                is-password
+                placeholder="Повторите пароль"
+                required
                 @blur="v$.repeat.$touch()"
+                @input="v$.repeat.$reset()"
             />
         </div>
 
@@ -77,17 +77,17 @@
 </template>
 
 <script>
-    import useVuelidate from "@vuelidate/core";
+    import useVuelidate from '@vuelidate/core';
     import {
         helpers, or, sameAs
-    } from "@vuelidate/validators";
+    } from '@vuelidate/validators';
     import {
         computed, defineComponent, reactive, ref
-    } from "vue";
-    import { useToast } from "vue-toastification";
-    import UiButton from "@/components/form/UiButton.vue";
-    import UiInput from "@/components/form/UiInput.vue";
-    import { useUserStore } from "@/store/UI/UserStore";
+    } from 'vue';
+    import { useToast } from 'vue-toastification';
+    import UiButton from '@/components/form/UiButton.vue';
+    import UiInput from '@/components/form/UiInput.vue';
+    import { useUserStore } from '@/store/UI/UserStore';
     import {
         validateEmailFormat,
         validateMinLength,
@@ -95,9 +95,10 @@
         validatePwdNumber,
         validatePwdSpecial,
         validatePwdUpperCase,
-        validateRequired, validateUsernameSpecialChars
-    } from "@/common/helpers/authChecks";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+        validateRequired,
+        validateUsernameSpecialChars
+    } from '@/common/helpers/authChecks';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -107,7 +108,7 @@
         props: {
             token: {
                 type: String,
-                default: ""
+                default: ''
             }
         },
         emits: ['close', 'switch:auth'],
@@ -172,7 +173,7 @@
 
                         await userStore.changePassword(payload);
 
-                        toast.success("Пароль успешно изменен!", {
+                        toast.success('Пароль успешно изменен!', {
                             onClose: () => {
                                 if (!props.token) {
                                     return;
@@ -193,7 +194,7 @@
                 try {
                     await userStore.resetPassword(state.email);
 
-                    toast.success("Ссылка для изменения пароля отправлена на указанный e-mail");
+                    toast.success('Ссылка для изменения пароля отправлена на указанный e-mail');
 
                     emit('close');
 

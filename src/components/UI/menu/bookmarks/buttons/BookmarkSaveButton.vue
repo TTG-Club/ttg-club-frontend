@@ -1,5 +1,5 @@
 <template>
-    <default-bookmark-button v-bind="$props"/>
+    <default-bookmark-button v-bind="$props" />
 
     <custom-bookmark-button
         v-if="isAuthenticated"
@@ -8,11 +8,11 @@
 </template>
 
 <script>
-    import { defineComponent } from "vue";
-    import { storeToRefs } from "pinia";
-    import DefaultBookmarkButton from "@/components/UI/menu/bookmarks/buttons/DefaultBookmarkButton.vue";
-    import CustomBookmarkButton from "@/components/UI/menu/bookmarks/buttons/CustomBookmarkButton.vue";
-    import { useUserStore } from "@/store/UI/UserStore";
+    import { defineComponent } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import DefaultBookmarkButton from '@/components/UI/menu/bookmarks/buttons/DefaultBookmarkButton.vue';
+    import CustomBookmarkButton from '@/components/UI/menu/bookmarks/buttons/CustomBookmarkButton.vue';
+    import { useUserStore } from '@/store/UI/UserStore';
 
     export default defineComponent({
         components: {

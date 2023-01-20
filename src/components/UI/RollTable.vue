@@ -6,8 +6,8 @@
                 :key="key"
             >
                 <raw-content
-                    tag="span"
                     :template="th"
+                    tag="span"
                 />
             </th>
         </thead>
@@ -22,8 +22,8 @@
                 :key="index"
             >
                 <raw-content
-                    tag="span"
                     :template="td"
+                    tag="span"
                 />
             </component>
         </tr>
@@ -32,10 +32,10 @@
 
 <script lang="ts">
     import { defineComponent } from 'vue';
-    import RawContent from "@/components/content/RawContent.vue";
+    import RawContent from '@/components/content/RawContent.vue';
 
     export default defineComponent({
-        name: "RollTable",
+        name: 'RollTable',
         components: { RawContent },
         props: {
             table: {

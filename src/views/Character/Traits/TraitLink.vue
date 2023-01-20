@@ -1,7 +1,7 @@
 <template>
     <router-link
-        :to="{ path: traitItem.url }"
         :class="{ 'is-green': traitItem?.homebrew }"
+        :to="{ path: traitItem.url }"
         class="link-item"
     >
         <div class="link-item__content">

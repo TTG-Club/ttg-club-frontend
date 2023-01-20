@@ -9,34 +9,34 @@
             v-if="$slots['icon-left']"
             class="ui-button__icon is-left"
         >
-            <slot name="icon-left"/>
+            <slot name="icon-left" />
         </span>
 
         <span
             v-if="isIcon"
             class="ui-button__icon"
         >
-            <slot name="default"/>
+            <slot name="default" />
         </span>
 
         <span
             v-else
             class="ui-button__text"
         >
-            <slot name="default"/>
+            <slot name="default" />
         </span>
 
         <span
             v-if="$slots['icon-right']"
             class="ui-button__icon is-right"
         >
-            <slot name="icon-right"/>
+            <slot name="icon-right" />
         </span>
     </button>
 </template>
 
 <script>
-    import { computed, defineComponent } from "vue";
+    import { computed, defineComponent } from 'vue';
 
     export default defineComponent({
         props: {

@@ -17,7 +17,9 @@ const filterBeforeCreate = (
         return toast;
     }
 
-    const toastsForDelete = orderBy(toasts, ['id']).slice(0, Math.abs(maxToasts - toasts.length + 1));
+    const toastsForDelete = orderBy(toasts, ['id'])
+        .slice(0, Math.abs(maxToasts - toasts.length + 1));
+
     const toastComposition = useToast(ToastEventBus);
 
     for (const toastForDelete of toastsForDelete) {

@@ -40,8 +40,8 @@
 
 <script lang="ts">
     import type { RouteLocationPathRaw } from 'vue-router';
-    import type { PropType } from 'vue';
     import { useLink } from 'vue-router';
+    import type { PropType } from 'vue';
     import { computed, defineComponent } from 'vue';
     import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
 
@@ -62,7 +62,9 @@
         },
         setup(props) {
             const {
-                isActive, href, navigate
+                isActive,
+                href,
+                navigate
             } = useLink(props);
 
             return {

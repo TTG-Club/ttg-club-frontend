@@ -1,5 +1,9 @@
 import type {
-    AbilityName, AbilityShortName, AbilityType, AbilityKey, AbilityTypeKey
+    AbilityKey,
+    AbilityName,
+    AbilityShortName,
+    AbilityType,
+    AbilityTypeKey
 } from '@/types/Tools/AbilityCalc.types';
 
 export type TRaceAbility = {

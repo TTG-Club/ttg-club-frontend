@@ -1,8 +1,8 @@
 <template>
     <div
         v-if="screen"
-        class="screen-body"
         :class="{ 'in-tooltip': inTooltip }"
+        class="screen-body"
     >
         <detail-top-bar :source="screen.source">
             <template
@@ -23,11 +23,11 @@
 </template>
 
 <script>
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
-    import RawContent from "@/components/content/RawContent.vue";
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import RawContent from '@/components/content/RawContent.vue';
 
     export default {
-        name: "ScreenBody",
+        name: 'ScreenBody',
         components: {
             RawContent,
             DetailTopBar

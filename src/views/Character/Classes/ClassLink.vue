@@ -18,7 +18,7 @@
                     class="link-item-expand__content__img-bg"
                 >
 
-                <div class="link-item-expand__content__gradient"/>
+                <div class="link-item-expand__content__gradient" />
 
                 <div class="link-item-expand__main">
                     <a
@@ -78,15 +78,15 @@
                     >
                         <svg-icon
                             :icon-name="submenu ? 'minus' : 'plus'"
-                            fill-enable
                             :stroke-enable="false"
+                            fill-enable
                         />
                     </button>
                 </div>
 
                 <transition
-                    name="fade"
                     mode="out-in"
+                    name="fade"
                 >
                     <div
                         v-if="hasArchetypes"
@@ -132,8 +132,8 @@
 
 <script lang="ts">
     import type { RouteLocationPathRaw } from 'vue-router';
-    import { defineComponent } from 'vue';
     import type { PropType } from 'vue';
+    import { defineComponent } from 'vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
