@@ -76,6 +76,7 @@
 
 <script>
     import upperFirst from 'lodash/upperFirst';
+    import { DiceRoller } from 'dice-roller-parser';
     import RawContent from '@/components/content/RawContent.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
@@ -83,7 +84,8 @@
         name: 'MagicItemBody',
         components: {
             DetailTopBar,
-            RawContent
+            RawContent,
+            DiceRoller
         },
         props: {
             magicItem: {
