@@ -13,30 +13,6 @@
             />
 
             <div
-                v-if="tabs.length"
-                class="class-detail__tabs"
-            >
-                <div
-                    v-for="(tab, tabKey) in tabs"
-                    :key="tabKey"
-                    :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
-                    class="class-detail__tab"
-                    @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
-                >
-                    <div class="class-detail__tab_icon">
-                        <svg-icon :icon-name="`tab-${tab.type}`" />
-                    </div>
-
-                    <div
-                        v-if="tab.name"
-                        class="class-detail__tab_name"
-                    >
-                        {{ tab.name }}
-                    </div>
-                </div>
-            </div>
-
-            <div
                 v-if="isMobile && currentTab?.type === 'traits' && currentArchetypes.length"
                 class="class-detail__select"
             >
