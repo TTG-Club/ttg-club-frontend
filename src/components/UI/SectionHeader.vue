@@ -2,7 +2,10 @@
     <div class="section-header">
         <div class="section-header__body">
             <div class="section-header__title">
-                <div class="section-header__title--text">
+                <div
+                    class="section-header__title--text"
+                    @click.left.exact.prevent.stop="copyText(title)"
+                >
                     {{ title }}
                 </div>
 
@@ -11,7 +14,7 @@
                     v-tippy="{ content: 'Скопировать ссылку' }"
                     :href="urlForCopy"
                     class="section-header__title--copy"
-                    @click.left.exact.prevent.stop="copyText"
+                    @click.left.exact.prevent.stop="copyURL"
                 >
                     <svg-icon icon-name="copy" />
                 </a>
@@ -20,6 +23,7 @@
             <div
                 v-if="subtitle"
                 class="section-header__subtitle"
+                @click.left.exact.prevent.stop="copyText(subtitle)"
             >
                 {{ subtitle }}
             </div>
@@ -170,12 +174,12 @@
                 return props.onClose;
             });
 
-            const copyText = () => {
+            const copyURL = (text?: string) => {
                 if (!clipboard.isSupported) {
                     toast.error('Ваш браузер не поддерживает копирование');
                 }
 
-                clipboard.copy(urlForCopy.value)
+                clipboard.copy(text ?? urlForCopy.value)
                     .then(() => toast('Ссылка успешно скопирована'))
                     .catch(() => toast.error((
                       <span>
@@ -191,6 +195,14 @@
                     )));
             };
 
+            const copyText = (text?: string) => {
+                if (!text) {
+                    return;
+                }
+
+                clipboard.copy(text);
+            };
+
             const openPrintWindow = () => {
                 window.print();
             };
@@ -203,6 +215,7 @@
                 urlForCopy,
                 closeAvailable,
                 copyText,
+                copyURL,
                 openPrintWindow
             };
         }
@@ -244,6 +257,7 @@
                 position: relative;
                 color: var(--text-color-title);
                 font-weight: 400;
+                cursor: pointer;
             }
 
             &--copy {
@@ -281,6 +295,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             line-height: normal;
+            cursor: pointer;
 
             @media (max-width: 1200px) {
                 margin-top: 4px;
