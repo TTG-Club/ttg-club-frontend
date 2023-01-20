@@ -174,12 +174,12 @@
                 return props.onClose;
             });
 
-            const copyURL = (text?: string) => {
+            const copyURL = () => {
                 if (!clipboard.isSupported) {
                     toast.error('Ваш браузер не поддерживает копирование');
                 }
 
-                clipboard.copy(text ?? urlForCopy.value)
+                clipboard.copy(urlForCopy.value)
                     .then(() => toast('Ссылка успешно скопирована'))
                     .catch(() => toast.error((
                       <span>
@@ -200,7 +200,8 @@
                     return;
                 }
 
-                clipboard.copy(text);
+                clipboard.copy(text)
+                    .then(() => toast('Текст скопирован'));
             };
 
             const openPrintWindow = () => {
