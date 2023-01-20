@@ -1,14 +1,14 @@
 <template>
     <router-link
         v-slot="{ href }"
-        v-bind="$props"
         :to="{ path: raceItem.url }"
         custom
+        v-bind="$props"
     >
         <div
             ref="raceItem"
-            class="link-item-expand"
             :class="parentClassList"
+            class="link-item-expand"
             v-bind="$attrs"
         >
             <div class="link-item-expand__content">
@@ -18,7 +18,7 @@
                     class="link-item-expand__content__img-bg"
                 >
 
-                <div class="link-item-expand__content__gradient"/>
+                <div class="link-item-expand__content__gradient" />
 
                 <div class="link-item-expand__main">
                     <a
@@ -117,12 +117,10 @@
 
 <script lang="ts">
     import type { PropType } from 'vue';
-    import type {
-        RouteLocationPathRaw
-    } from 'vue-router';
     import {
         computed, defineComponent, ref
     } from 'vue';
+    import type { RouteLocationPathRaw } from 'vue-router';
     import {
         useLink, useRoute, useRouter
     } from 'vue-router';
@@ -131,7 +129,7 @@
     import groupBy from 'lodash/groupBy';
     import type { TRaceLink } from '@/types/Character/Races.types';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import { useUIStore } from "@/store/UI/UIStore";
+    import { useUIStore } from '@/store/UI/UIStore';
     import { AbilityType } from '@/types/Tools/AbilityCalc.types';
 
     export default defineComponent({
@@ -156,7 +154,9 @@
             const router = useRouter();
 
             const {
-                isActive, navigate, href
+                isActive,
+                navigate,
+                href
             } = useLink(props);
 
             const uiStore = useUIStore();
@@ -221,7 +221,8 @@
                     return;
                 }
 
-                window.open(href.value, '_blank')?.focus();
+                window.open(href.value, '_blank')
+                    ?.focus();
             };
 
             return {

@@ -1,7 +1,7 @@
 <template>
     <router-link
-        :to="{ path: backgroundItem.url }"
         :class="{ 'is-green': backgroundItem?.homebrew }"
+        :to="{ path: backgroundItem.url }"
         class="link-item"
     >
         <div class="link-item__content">
@@ -39,4 +39,4 @@
     };
 </script>
 
-<style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss"/>
+<style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss" />

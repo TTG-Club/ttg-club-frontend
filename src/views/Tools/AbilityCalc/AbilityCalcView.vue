@@ -1,7 +1,7 @@
 <template>
     <page-layout
-        class="ability-calc"
         :use-social-links="false"
+        class="ability-calc"
     >
         <template #title>
             Калькулятор характеристик
@@ -22,8 +22,8 @@
             />
 
             <transition
-                name="fade"
                 mode="out-in"
+                name="fade"
             >
                 <keep-alive v-if="!!component">
                     <component
@@ -35,23 +35,23 @@
             </transition>
 
             <ability-table
-                class="ability-calc__row"
-                :rolls="rolls"
                 :race-bonuses="raceBonuses"
+                :rolls="rolls"
+                class="ability-calc__row"
             />
         </template>
     </page-layout>
 </template>
 
 <script lang="ts">
-    import type { Component } from "vue";
+    import type { Component } from 'vue';
     import {
         computed, defineComponent, ref, shallowRef
     } from 'vue';
-    import PageLayout from "@/components/content/PageLayout.vue";
-    import UiSwitch from "@/components/form/UiSwitch.vue";
-    import AbilityTable from "@/views/Tools/AbilityCalc/AbilityTable.vue";
-    import AbilityRandom from "@/views/Tools/AbilityCalc/AbilityRandom.vue";
+    import PageLayout from '@/components/content/PageLayout.vue';
+    import UiSwitch from '@/components/form/UiSwitch.vue';
+    import AbilityTable from '@/views/Tools/AbilityCalc/AbilityTable.vue';
+    import AbilityRandom from '@/views/Tools/AbilityCalc/AbilityRandom.vue';
     import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
     import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
     import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces/AbilityRaces.vue';

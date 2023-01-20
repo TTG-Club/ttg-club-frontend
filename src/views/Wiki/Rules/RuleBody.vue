@@ -15,11 +15,11 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "RuleBody",
+        name: 'RuleBody',
         components: {
             DetailTopBar,
             RawContent

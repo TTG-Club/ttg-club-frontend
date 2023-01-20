@@ -29,21 +29,19 @@
             class="tab-layout__items"
         >
             <div class="tab-layout__items--inner">
-                <slot name="default"/>
+                <slot name="default" />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {
-        useInfiniteScroll, useResizeObserver
-    } from "@vueuse/core";
+    import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
     import type { PropType } from 'vue';
     import {
         defineComponent, onMounted, ref
     } from 'vue';
-    import ListFilter from "@/components/filter/ListFilter.vue";
+    import ListFilter from '@/components/filter/ListFilter.vue';
     import type { FilterComposable } from '@/common/composition/useFilter';
 
     export default defineComponent({

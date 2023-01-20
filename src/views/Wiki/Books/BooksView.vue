@@ -31,12 +31,12 @@
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import sortBy from "lodash/sortBy";
+    import sortBy from 'lodash/sortBy';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import BookLink from "@/views/Wiki/Books/BookLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import BookLink from '@/views/Wiki/Books/BookLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { BooksFilterDefaults } from '@/types/Wiki/Books.types';
@@ -50,7 +50,11 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: BooksFilterDefaults.dbName,
@@ -58,7 +62,9 @@
             });
 
             const {
-                initPages, nextPage, items
+                initPages,
+                nextPage,
+                items
             } = usePagination({
                 url: '/books',
                 limit: 70,

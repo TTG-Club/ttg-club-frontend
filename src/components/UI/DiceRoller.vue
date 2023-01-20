@@ -13,13 +13,13 @@
 </template>
 
 <script lang="ts">
-    import { useToast } from "vue-toastification";
+    import { useToast } from 'vue-toastification';
     import {
         computed, defineComponent, ref
-    } from "vue";
-    import { useIsDev } from "@/common/helpers/isDev";
-    import { useDiceRoller } from "@/common/composition/useDiceRoller";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    } from 'vue';
+    import { useIsDev } from '@/common/helpers/isDev';
+    import { useDiceRoller } from '@/common/composition/useDiceRoller';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         props: {
@@ -48,7 +48,12 @@
         setup(props) {
             const isDev = useIsDev();
             const toast = useToast(ToastEventBus);
-            const { doRoll, notifyResult } = useDiceRoller();
+
+            const {
+                doRoll,
+                notifyResult
+            } = useDiceRoller();
+
             const error = ref(false);
 
             const classByType = computed(() => {

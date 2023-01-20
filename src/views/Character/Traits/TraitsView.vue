@@ -21,8 +21,8 @@
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TraitLink from "@/views/Character/Traits/TraitLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import TraitLink from '@/views/Character/Traits/TraitLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
@@ -42,14 +42,21 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: TraitsFilterDefaults.dbName,
                 url: TraitsFilterDefaults.url
             });
 
-            const { initPages, items: traits } = usePagination({
+            const {
+                initPages,
+                items: traits
+            } = usePagination({
                 url: '/traits',
                 limit: -1,
                 filter: {

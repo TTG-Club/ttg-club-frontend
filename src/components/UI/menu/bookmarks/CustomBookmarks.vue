@@ -11,12 +11,12 @@
             <ui-button
                 v-if="isMobile"
                 v-tippy="{ content: 'Перейти в режим редактирования' }"
-                is-small
-                is-icon
                 :type-link-filled="!isEdit"
+                is-icon
+                is-small
                 @click.left.exact.prevent="isEdit = !isEdit"
             >
-                <svg-icon icon-name="edit"/>
+                <svg-icon icon-name="edit" />
             </ui-button>
 
             <label
@@ -24,7 +24,7 @@
                 class="bookmarks__search"
             >
                 <span class="bookmarks__search--icon">
-                    <svg-icon icon-name="search"/>
+                    <svg-icon icon-name="search" />
                 </span>
             </label>
         </div>
@@ -37,8 +37,8 @@
                     v-for="(group, groupKey) in bookmarks"
                     :key="group.uuid + groupKey"
                     :group="group"
-                    :is-first="!groupKey"
                     :is-edit="isEdit"
+                    :is-first="!groupKey"
                 />
 
                 <div
@@ -47,42 +47,42 @@
                 >
                     <ui-input
                         v-model="newGroupName"
-                        placeholder="Название группы"
                         autofocus
+                        placeholder="Название группы"
                         @keyup.enter.exact.prevent="createGroup"
                     />
 
                     <ui-button
-                        type-link-filled
-                        is-small
                         is-icon
+                        is-small
+                        type-link-filled
                         @click.left.exact.prevent="createGroup"
                     >
-                        <svg-icon icon-name="check"/>
+                        <svg-icon icon-name="check" />
                     </ui-button>
 
                     <ui-button
-                        type-link-filled
-                        is-small
                         is-icon
+                        is-small
+                        type-link-filled
                         @click.left.exact.prevent="disableGroupCreating"
                     >
-                        <svg-icon icon-name="close"/>
+                        <svg-icon icon-name="close" />
                     </ui-button>
                 </div>
 
                 <ui-button
                     v-else
                     class="bookmarks__new"
-                    type-link-filled
                     is-small
+                    type-link-filled
                     @click.left.exact.prevent="enableGroupCreating"
                 >
                     <template #icon-left>
                         <svg-icon
-                            icon-name="plus"
                             :stroke-enable="false"
                             fill-enable
+                            icon-name="plus"
                         />
                     </template>
 
@@ -98,16 +98,16 @@
 <script>
     import {
         computed, defineComponent, onBeforeMount, ref
-    } from "vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import CustomBookmarkGroup from "@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup.vue";
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    } from 'vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import CustomBookmarkGroup from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup.vue';
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
-        name: "CustomBookmarks",
+        name: 'CustomBookmarks',
         components: {
             UiButton,
             UiInput,

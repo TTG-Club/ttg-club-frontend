@@ -1,8 +1,8 @@
 <template>
     <div
         v-if="spell"
-        class="spell_wrapper spell-body"
         :class="{ 'in-tooltip': inTooltip }"
+        class="spell_wrapper spell-body"
     >
         <detail-top-bar
             :bg-grey="false"
@@ -59,13 +59,15 @@
 
         <div class="content-padding">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <raw-content :template="spell.description"/>
+            <raw-content :template="spell.description" />
 
             <p v-if="spell.upper">
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <strong>На более высоких уровнях: </strong> <raw-content
-                    tag="span"
+                <strong>На более высоких уровнях: </strong>
+
+                <raw-content
                     :template="spell.upper"
+                    tag="span"
                 />
             </p>
 
@@ -106,6 +108,7 @@
                     </span>
                 </div>
             </div>
+
             <div
                 v-if="spell.races?.length"
                 class="spell_stat_block_bottom"
@@ -125,6 +128,7 @@
                     </span>
                 </div>
             </div>
+
             <div
                 v-if="spell.backgrounds?.length"
                 class="spell_stat_block_bottom"
@@ -149,12 +153,12 @@
 </template>
 
 <script>
-    import ClassSquare from "@/components/UI/ClassSquare.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
-    import RawContent from "@/components/content/RawContent.vue";
+    import ClassSquare from '@/components/UI/ClassSquare.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import RawContent from '@/components/content/RawContent.vue';
 
     export default {
-        name: "SpellBody",
+        name: 'SpellBody',
         components: {
             RawContent,
             DetailTopBar,

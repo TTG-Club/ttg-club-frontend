@@ -5,13 +5,13 @@
         v-bind="$props"
     >
         <a
-            v-bind="$attrs"
             :href="href"
             class="screen-link"
+            v-bind="$attrs"
             @click.left.exact.prevent="clickHandler"
         >
             <div class="screen-link__icon">
-                <raw-content :template="screen.icon"/>
+                <raw-content :template="screen.icon" />
             </div>
 
             <div class="screen-link__body">
@@ -22,7 +22,9 @@
                 <div class="screen-link__desc">
                     <span v-tippy="{ content: screen.source.name }">{{
                         screen.source.shortName
-                    }}</span> / <span>{{ screen.name.eng }}</span>
+                    }}</span>
+
+                    / <span>{{ screen.name.eng }}</span>
                 </div>
             </div>
         </a>
@@ -38,21 +40,21 @@
         </template>
 
         <template #default>
-            <screen-body :screen="modal.data"/>
+            <screen-body :screen="modal.data" />
         </template>
     </base-modal>
 </template>
 
 <script lang="ts">
     import type { RouteLocationPathRaw } from 'vue-router';
+    import { useLink } from 'vue-router';
     import type { PropType } from 'vue';
     import {
         computed, defineComponent, ref
     } from 'vue';
-    import { useLink } from 'vue-router';
-    import RawContent from "@/components/content/RawContent.vue";
-    import BaseModal from "@/components/UI/modals/BaseModal.vue";
-    import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import BaseModal from '@/components/UI/modals/BaseModal.vue';
+    import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
     import errorHandler from '@/common/helpers/errorHandler';
     import { useAxios } from '@/common/composition/useAxios';
 

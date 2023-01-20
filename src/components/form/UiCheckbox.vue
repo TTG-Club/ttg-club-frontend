@@ -7,7 +7,7 @@
         @click.left.exact.prevent="value = !value"
     >
         <div class="ui-checkbox__label">
-            <slot/>
+            <slot />
         </div>
     </div>
 
@@ -17,19 +17,19 @@
         class="ui-checkbox ui-checkbox--toggle"
         @click.left.exact.prevent="value = !value"
     >
-        <div class="ui-checkbox__faker"/>
+        <div class="ui-checkbox__faker" />
 
         <div
             v-if="$slots.default"
             class="ui-checkbox__label"
         >
-            <slot/>
+            <slot />
         </div>
     </div>
 </template>
 
 <script>
-    import { defineComponent } from "vue";
+    import { defineComponent } from 'vue';
 
     export default defineComponent({
         props: {

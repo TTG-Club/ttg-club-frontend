@@ -21,6 +21,7 @@
 
                         <div class="row">
                             <span class="label">Виды безумия:</span>
+
                             <div>
                                 <ui-checkbox
                                     v-for="(type, key) in types"
@@ -65,7 +66,7 @@
                 <br>
 
                 <div>
-                    <raw-content :template="item.description"/>
+                    <raw-content :template="item.description" />
                 </div>
             </div>
         </template>
@@ -74,16 +75,16 @@
 
 <script>
     import throttle from 'lodash/throttle';
-    import { reactive } from "vue";
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import UiCheckbox from "@/components/form/UiCheckbox.vue";
-    import RawContent from "@/components/content/RawContent.vue";
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiButton from "@/components/form/UiButton.vue";
+    import { reactive } from 'vue';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import RawContent from '@/components/content/RawContent.vue';
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/form/UiButton.vue';
 
     export default {
-        name: "MadnessView",
+        name: 'MadnessView',
         components: {
             RawContent,
             UiCheckbox,

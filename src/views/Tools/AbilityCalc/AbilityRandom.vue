@@ -22,19 +22,19 @@
             <ui-select
                 v-for="(roll, index) in modelValue"
                 :key="index"
+                :model-value="roll"
+                :options="abilities"
+                allow-empty
                 class="ability-random__select"
                 label="name"
                 track-by="key"
-                :options="abilities"
-                :model-value="roll"
-                allow-empty
                 @remove="onRemove(index)"
                 @select="onSelect($event.key, index)"
             >
                 <template #option="{ option }">
                     <span
-                        class="ability-random__select_option"
                         :class="{ 'is-selected': isSelected(option.key) }"
+                        class="ability-random__select_option"
                     >{{ option.name }}</span>
                 </template>
 
@@ -55,25 +55,21 @@
 </template>
 
 <script lang="ts">
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, onActivated, ref
     } from 'vue';
-    import type {
-        PropType
-    } from 'vue';
-    import { useToast } from "vue-toastification";
+    import { useToast } from 'vue-toastification';
     import orderBy from 'lodash/orderBy';
     import reverse from 'lodash/reverse';
     import { storeToRefs } from 'pinia';
-    import UiButton from "@/components/form/UiButton.vue";
-    import { useDiceRoller } from "@/common/composition/useDiceRoller";
-    import {
-        AbilityKey, AbilityName
-    } from '@/types/Tools/AbilityCalc.types';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { useDiceRoller } from '@/common/composition/useDiceRoller';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
-    import UiSelect from "@/components/form/UiSelect.vue";
-    import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
     import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
@@ -91,7 +87,12 @@
             const toast = useToast(ToastEventBus);
             const uiStore = useUIStore();
             const { isMobile } = storeToRefs(uiStore);
-            const { doRoll, notifyResult } = useDiceRoller();
+
+            const {
+                doRoll,
+                notifyResult
+            } = useDiceRoller();
+
             const { getFormattedModifier } = useAbilityTransforms();
 
             const rolls = ref<Array<AbilityRoll>>([]);

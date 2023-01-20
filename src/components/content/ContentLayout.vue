@@ -9,7 +9,10 @@
             class="content-layout__body"
         >
             <div
-                :class="{ 'is-fullscreen': fullscreen, 'is-showed-right-side': showRightSide }"
+                :class="{
+                    'is-fullscreen': fullscreen,
+                    'is-showed-right-side': showRightSide,
+                }"
                 class="content-layout__side--left"
             >
                 <div
@@ -29,7 +32,7 @@
                     v-if="$slots.fixed"
                     class="content-layout__side--left_fixed"
                 >
-                    <slot name="fixed"/>
+                    <slot name="fixed" />
                 </div>
 
                 <div
@@ -37,7 +40,7 @@
                     :class="{ 'is-shadow': shadow || (showRightSide && fullscreen) }"
                     class="content-layout__side--left_body"
                 >
-                    <slot name="default"/>
+                    <slot name="default" />
                 </div>
             </div>
 
@@ -53,7 +56,7 @@
                     @scroll-to-last-active="scrollToLastActive"
                 />
 
-                <slot name="right-side"/>
+                <slot name="right-side" />
             </div>
         </div>
     </div>
@@ -61,15 +64,14 @@
 
 <script lang="ts">
     import type { PropType } from 'vue';
+    import { defineComponent, ref } from 'vue';
     import {
-        useEventListener, useInfiniteScroll, useResizeObserver
+        useEventListener,
+        useInfiniteScroll, useResizeObserver
     } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
-    import {
-        defineComponent, ref
-    } from 'vue';
     import { useUIStore } from '@/store/UI/UIStore';
-    import ListFilter from "@/components/filter/ListFilter.vue";
+    import ListFilter from '@/components/filter/ListFilter.vue';
     import type { FilterComposable } from '@/common/composition/useFilter';
 
     export default defineComponent({
@@ -88,7 +90,9 @@
             const uiStore = useUIStore();
 
             const {
-                isMobile, fullscreen, bodyElement
+                isMobile,
+                fullscreen,
+                bodyElement
             } = storeToRefs(uiStore);
 
             const container = ref<HTMLDivElement | null>(null);
@@ -118,7 +122,7 @@
 
                 bodyElement.value.scroll({
                     top: rect.top + uiStore.bodyScroll.y,
-                    behavior: "smooth"
+                    behavior: 'smooth'
                 });
             };
 
@@ -131,7 +135,8 @@
                     return;
                 }
 
-                const link = leftSide.value.querySelector(`[href="${ url }"]`)?.closest('.link-item-expand');
+                const link = leftSide.value.querySelector(`[href="${ url }"]`)
+                    ?.closest('.link-item-expand');
 
                 if (!link) {
                     return;
@@ -337,12 +342,12 @@
             @media (max-width: 600px) {
                 padding-top: 16px;
                 background: linear-gradient(
-                    180deg,
-                    var(--bg-main) 0,
-                    var(--bg-main) 38px,
-                    var(--bg-main) 58px,
-                    transparent 78px
-                    )
+                        180deg,
+                        var(--bg-main) 0,
+                        var(--bg-main) 38px,
+                        var(--bg-main) 58px,
+                        transparent 78px
+                )
             }
         }
 

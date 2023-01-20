@@ -1,20 +1,18 @@
 <template>
     <component :is="tag">
-        <component :is="component"/>
+        <component :is="component" />
     </component>
 </template>
 
 <script lang="ts">
     import {
-        computed,
-        defineComponent,
-        nextTick, onBeforeUnmount, ref, watch
+        computed, defineComponent, nextTick, onBeforeUnmount, ref, watch
     } from 'vue';
     import { useAxios } from '@/common/composition/useAxios';
 
     // eslint-disable-next-line vue/one-component-per-file
     export default defineComponent({
-        name: "RawContent",
+        name: 'RawContent',
         props: {
             template: {
                 type: String,

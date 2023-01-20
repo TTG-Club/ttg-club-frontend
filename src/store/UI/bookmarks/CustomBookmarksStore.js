@@ -284,7 +284,9 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
         },
 
         async getCategoryInGroup({
-            url, category, groupUUID
+            url,
+            category,
+            groupUUID
         }) {
             try {
                 let cat;
@@ -340,7 +342,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
             }
         },
 
-        async getSavedBookmarkInGroup({ url, groupUUID }) {
+        async getSavedBookmarkInGroup({
+            url,
+            groupUUID
+        }) {
             let bookmarks;
 
             try {

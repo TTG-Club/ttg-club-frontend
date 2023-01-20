@@ -26,6 +26,7 @@
                             <h5 class="label">
                                 Настройки предметов:
                             </h5>
+
                             <div class="tools_settings__colum">
                                 <div class="row">
                                     <div>
@@ -37,6 +38,7 @@
                                             Монеты
                                         </ui-checkbox>
                                     </div>
+
                                     <div class="tools_settings__row">
                                         <ui-checkbox
                                             :model-value="form.magicItem"
@@ -47,6 +49,7 @@
                                         </ui-checkbox>
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div>
                                         <ui-checkbox
@@ -57,6 +60,7 @@
                                             Свитки
                                         </ui-checkbox>
                                     </div>
+
                                     <div class="tools_settings__row">
                                         <ui-checkbox
                                             :model-value="form.trinket"
@@ -76,6 +80,7 @@
                             <h5 class="label">
                                 Настройки вида:
                             </h5>
+
                             <div class="tools_settings__colum">
                                 <div class="row">
                                     <div>
@@ -87,6 +92,7 @@
                                             Предметы искусства
                                         </ui-checkbox>
                                     </div>
+
                                     <div class="tools_settings__row">
                                         <ui-checkbox
                                             :model-value="form.gem"
@@ -96,6 +102,7 @@
                                             Драгоценные камни
                                         </ui-checkbox>
                                     </div>
+
                                     <div class="tools_settings__row">
                                         <ui-checkbox
                                             :model-value="form.unique"
@@ -106,6 +113,7 @@
                                         </ui-checkbox>
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div>
                                         <ui-checkbox
@@ -116,6 +124,7 @@
                                             Группировать одинаковые
                                         </ui-checkbox>
                                     </div>
+
                                     <div
                                         class="tools_settings__row"
                                     >
@@ -140,7 +149,7 @@
 
                     <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
                         <template #icon-left>
-                            <svg-icon :icon-name="settings.opened ? 'show-pass' : 'hide-pass'"/>
+                            <svg-icon :icon-name="settings.opened ? 'show-pass' : 'hide-pass'" />
                         </template>
 
                         <template #default>
@@ -175,7 +184,7 @@
                         v-else
                         class="treasury__content"
                     >
-                        <magic-item-body :magic-item="detailCard.item"/>
+                        <magic-item-body :magic-item="detailCard.item" />
 
                         <spell-body
                             v-if="detailCard.spell"
@@ -199,9 +208,13 @@
                     <tbody>
                         <tr>
                             <td>{{ groupedResult.coins.copper || 0 }} мм</td>
+
                             <td>{{ groupedResult.coins.silver || 0 }} см</td>
+
                             <td>{{ groupedResult.coins.electrum || 0 }} эм</td>
+
                             <td>{{ groupedResult.coins.gold || 0 }} зм</td>
+
                             <td>{{ groupedResult.coins.platinum || 0 }} пм</td>
                         </tr>
                     </tbody>
@@ -276,29 +289,29 @@
 </template>
 
 <script>
-    import { reactive } from "vue";
-    import sortedUniq from "lodash/sortedUniq";
-    import groupBy from "lodash/groupBy";
-    import max from "lodash/max";
-    import mean from "lodash/mean";
-    import throttle from "lodash/throttle";
-    import { mapState } from "pinia";
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import UiSelect from "@/components/form/UiSelect.vue";
-    import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import UiCheckbox from "@/components/form/UiCheckbox.vue";
-    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
-    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
-    import TreasureItem from "@/views/Inventory/Treasures/TreasureItem.vue";
-    import MagicItemLink from "@/views/Inventory/MagicItems/MagicItemLink.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
-    import UiButton from "@/components/form/UiButton.vue";
+    import { reactive } from 'vue';
+    import sortedUniq from 'lodash/sortedUniq';
+    import groupBy from 'lodash/groupBy';
+    import max from 'lodash/max';
+    import mean from 'lodash/mean';
+    import throttle from 'lodash/throttle';
+    import { mapState } from 'pinia';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
+    import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+    import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
+    import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
+    import UiButton from '@/components/form/UiButton.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {
-        name: "TreasuryView",
+        name: 'TreasuryView',
         components: {
             ContentDetail,
             MagicItemLink,

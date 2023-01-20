@@ -92,13 +92,14 @@ export function useFilter(config: FilterConfig): FilterComposable {
             return filter.value.some(group => isGroupCustomized(group));
         }
 
-        return Object.values(filter.value).some(value => {
-            if (!Array.isArray(value)) {
-                return false;
-            }
+        return Object.values(filter.value)
+            .some(value => {
+                if (!Array.isArray(value)) {
+                    return false;
+                }
 
-            return value.some(group => isGroupCustomized(group));
-        });
+                return value.some(group => isGroupCustomized(group));
+            });
     });
 
     const queryParams = computed(() => {

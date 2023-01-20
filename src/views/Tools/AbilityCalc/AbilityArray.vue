@@ -6,12 +6,12 @@
         <ui-select
             v-for="(roll, index) in modelValue"
             :key="index"
+            :model-value="roll"
+            :options="abilities"
+            allow-empty
             class="ability-array__select"
             label="name"
             track-by="key"
-            :options="abilities"
-            :model-value="roll"
-            allow-empty
             @remove="onRemove(index)"
             @select="onSelect($event.key, index)"
         >
@@ -29,8 +29,8 @@
 
             <template #option="{ option }">
                 <span
-                    class="ability-array__select_option"
                     :class="{ 'is-selected': isSelected(option.key) }"
+                    class="ability-array__select_option"
                 >{{ option.name }}</span>
             </template>
         </ui-select>
@@ -38,15 +38,14 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed,
-        defineComponent, onActivated, ref
-    } from 'vue';
     import type { PropType } from 'vue';
-    import { AbilityName, AbilityKey } from '@/types/Tools/AbilityCalc.types';
+    import {
+        computed, defineComponent, onActivated, ref
+    } from 'vue';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
-    import UiSelect from "@/components/form/UiSelect.vue";
-    import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
+    import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({
         components: {

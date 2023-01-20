@@ -8,11 +8,11 @@
                     v-tippy="{
                         content: 'Больше возможностей.',
                     }"
+                    class="bookmarks__info--info"
                     href="/bookmarks_info"
                     target="_blank"
-                    class="bookmarks__info--info"
                 >
-                    <svg-icon icon-name="menu-question"/>
+                    <svg-icon icon-name="menu-question" />
                 </a>
             </div>
         </div>
@@ -52,7 +52,7 @@
                                         class="bookmarks__item_icon only-hover is-right"
                                         @click.left.exact.prevent="defaultBookmarkStore.removeBookmark(bookmark.url)"
                                     >
-                                        <svg-icon icon-name="close"/>
+                                        <svg-icon icon-name="close" />
                                     </div>
                                 </div>
 
@@ -92,10 +92,10 @@
 </template>
 
 <script>
-    import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
+    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
 
     export default {
-        name: "DefaultBookmarks",
+        name: 'DefaultBookmarks',
         data: () => ({
             defaultBookmarkStore: useDefaultBookmarkStore()
         }),

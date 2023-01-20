@@ -30,12 +30,12 @@
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import sortBy from "lodash/sortBy";
+    import sortBy from 'lodash/sortBy';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import ArmorLink from "@/views/Inventory/Armors/ArmorLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import ArmorLink from '@/views/Inventory/Armors/ArmorLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
@@ -49,14 +49,21 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: ArmorsFilterDefaults.dbName,
                 url: ArmorsFilterDefaults.url
             });
 
-            const { initPages, items } = usePagination({
+            const {
+                initPages,
+                items
+            } = usePagination({
                 url: '/armors',
                 limit: -1,
                 search: filter.search,

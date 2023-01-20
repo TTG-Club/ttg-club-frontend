@@ -6,17 +6,17 @@
         />
 
         <div class="background-body__desc content-padding">
-            <raw-content :url="background?.url"/>
+            <raw-content :url="background?.url" />
         </div>
     </div>
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "BackgroundBody",
+        name: 'BackgroundBody',
         components: {
             DetailTopBar,
             RawContent

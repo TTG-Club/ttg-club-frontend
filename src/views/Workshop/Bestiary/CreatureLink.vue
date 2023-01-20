@@ -1,8 +1,8 @@
 <template>
     <router-link
+        :class="{ 'is-green': creature?.source?.homebrew }"
         :to="{ path: creature.url }"
         class="link-item"
-        :class="{ 'is-green': creature?.source?.homebrew }"
     >
         <div class="link-item__content">
             <div class="link-item__rating">

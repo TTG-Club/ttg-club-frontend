@@ -17,7 +17,7 @@
     import { defineComponent, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TreasureItem from "@/views/Inventory/Treasures/TreasureItem.vue";
+    import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
     import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
@@ -30,7 +30,11 @@
         },
         setup() {
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: TreasuresFilterDefaults.dbName,
@@ -38,7 +42,9 @@
             });
 
             const {
-                initPages, nextPage, items: treasures
+                initPages,
+                nextPage,
+                items: treasures
             } = usePagination({
                 url: '/treasures',
                 limit: 70,
