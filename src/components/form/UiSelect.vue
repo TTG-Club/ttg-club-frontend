@@ -515,7 +515,7 @@
             &--left,
             &--right {
                 padding: 8px;
-                background-color: var(--border);
+                background-color: var(--primary);
                 color: var(--text-color);
                 font-size: var(--main-font-size);
                 line-height: calc(var(--main-line-height) + 1px);

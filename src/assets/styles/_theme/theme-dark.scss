@@ -2,8 +2,8 @@
   --bg-transparent: #ffffff00;
   --bg-light-main: rgba(19, 26, 32, 0.3);
   --bg-main: #131A20;
-  --bg-secondary: #252B32;
-  --bg-sub-menu: #293137;
+  --bg-secondary: #172026;
+  --bg-sub-menu: #1D282F;
   --bg-dice: #88aef9;
   --bg-homebrew: #5d7e17;
   --bg-homebrew-gradient: linear-gradient(50deg, var(--bg-table-list), var(--bg-homebrew) 240%);
@@ -21,7 +21,7 @@
   --bg-liner-menu: linear-gradient(to bottom, #0D1217, transparent);
   --bg-liner-menu-scroll: linear-gradient(to bottom, #0D1217, var(--bg-main));
   --bg-liner-divider: linear-gradient(to right, var(--primary), var(--hover));
-  --text-color: #ffffff99;
+  --text-color: hsl(205 10% 75%);
   --text-color-active: #fff;
   --text-color-title: #fff;
   --text-b-color: #fff;
@@ -30,7 +30,7 @@
   --text-a-color: #34bb3e;
   --text-btn-color: #f8f8f8;
   --text-print-color: #000;
-  --link-color: #88aef9;
+  --link-color: #4B9AD2;
   --hover: rgba(255, 255, 255, 0.05);
   --bg-table-row: rgba(255, 255, 255, 0.03);
   --border: #35393D;

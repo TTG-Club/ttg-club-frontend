@@ -13,30 +13,6 @@
             />
 
             <div
-                v-if="tabs.length"
-                class="class-detail__tabs"
-            >
-                <div
-                    v-for="(tab, tabKey) in tabs"
-                    :key="tabKey"
-                    :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
-                    class="class-detail__tab"
-                    @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
-                >
-                    <div class="class-detail__tab_icon">
-                        <svg-icon :icon-name="`tab-${tab.type}`"/>
-                    </div>
-
-                    <div
-                        v-if="tab.name"
-                        class="class-detail__tab_name"
-                    >
-                        {{ tab.name }}
-                    </div>
-                </div>
-            </div>
-
-            <div
                 v-if="isMobile && currentTab?.type === 'traits' && currentArchetypes.length"
                 class="class-detail__select"
             >
@@ -62,6 +38,33 @@
                         >{{ option.name }}</span>
                     </template>
                 </ui-select>
+            </div>
+
+            <div
+                v-if="tabs.length"
+                class="class-detail__tabs"
+            >
+                <div
+                    v-for="(tab, tabKey) in tabs"
+                    :key="tabKey"
+                    :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
+                    class="class-detail__tab"
+                    @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
+                >
+                    <div
+                        v-if="!tab.name"
+                        class="class-detail__tab_icon"
+                    >
+                        <svg-icon :icon-name="`tab-${tab.type}`"/>
+                    </div>
+
+                    <div
+                        v-else
+                        class="class-detail__tab_name"
+                    >
+                        {{ tab.name }}
+                    </div>
+                </div>
             </div>
         </template>
 
@@ -288,6 +291,7 @@
                 if (isArray(loadedClass.images) && loadedClass.images?.length) {
                     this.tabs.push({
                         type: 'images',
+                        name: 'Галерея',
                         order: this.tabs.length,
                         callback: this.showGallery
                     });
@@ -454,11 +458,13 @@
             display: flex;
             width: 100%;
             flex-shrink: 0;
-            border: {
-                width: 0 0 1px;
-                style: solid;
-                color: var(--border);
-            };
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 16px 16px;
+
+            @include media-min($xl) {
+                padding: 16px 24px;
+            }
         }
 
         &__tab {
@@ -467,18 +473,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 24px;
+            padding: 0 16px;
             cursor: pointer;
-            height: 46px;
-            flex: 1 1 100%;
+            height: 34px;
             min-width: fit-content;
+            border: 1px solid var(--border);
+            border-radius: 8px;
 
             &.is-only-icon {
                 flex: 1 0 fit-content;
-            }
-
-            & + & {
-                border-left: 1px solid var(--border);
             }
 
             &_icon {
@@ -493,17 +496,8 @@
 
             &_name {
                 color: var(--text-color);
-                margin-left: 16px;
                 white-space: nowrap;
                 font-size: var(--main-font-size);
-
-                @include media-max(800px) {
-                    display: none;
-                }
-
-                @include media-max(380px) {
-                    margin-left: 8px;
-                }
             }
 
             @include media-min($md) {
@@ -526,30 +520,19 @@
                     }
                 }
             }
-
-            @include media-max(1300px) {
-                padding: 0 16px;
-            }
-
-            @include media-max(380px) {
-                padding: 0 8px;
-            }
         }
 
         &__select {
             ::v-deep(.ui-select) {
                 .multiselect {
-                    border-width: 0 0 1px 0;
-                    border-radius: 0;
+                    margin: 8px 16px 0 16px;
+                    width: auto;
 
                     &__content {
                         &-wrapper {
                             width: 100%;
                             left: 0;
-                            border: {
-                                radius: 0;
-                                width: 0 0 1px 0;
-                            }
+                            background-color: var(--bg-sub-menu);
                         }
                     }
 
@@ -591,7 +574,11 @@
             overflow: auto;
 
             &--inner {
-                padding: 24px;
+                padding: 0px 16px;
+
+                @include media-min($xl) {
+                    padding: 0px 24px;
+                }
             }
         }
 
