@@ -577,7 +577,7 @@
   padding: 16px;
 
   @include media-min($xl) {
-    padding: 24px;
+    padding: 16px 24px;
   }
 }
 
