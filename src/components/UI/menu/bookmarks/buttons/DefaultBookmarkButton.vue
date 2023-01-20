@@ -2,8 +2,8 @@
     <ui-button
         v-tippy="{ content: 'Добавить в закладки' }"
         class="default-bookmark-button"
-        type-link-filled
         is-icon
+        type-link-filled
         @click.left.exact.prevent.stop="updateBookmark"
         @dblclick.prevent.stop
     >
@@ -16,16 +16,16 @@
 </template>
 
 <script>
-    import { useRoute } from "vue-router";
+    import { useRoute } from 'vue-router';
     import {
         computed, defineComponent, ref
-    } from "vue";
-    import { useToast } from "vue-toastification";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import { useUserStore } from "@/store/UI/UserStore";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    } from 'vue';
+    import { useToast } from 'vue-toastification';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useUserStore } from '@/store/UI/UserStore';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -50,7 +50,7 @@
             const inProgress = ref(false);
 
             const bookmarkUrl = computed(() => (
-                typeof props.url === "string" && props.url !== ''
+                typeof props.url === 'string' && props.url !== ''
                     ? props.url
                     : route.path
             ));

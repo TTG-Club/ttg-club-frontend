@@ -8,18 +8,18 @@
         </span>
 
         <span
-            class="ui-input__control"
             :class="{ 'is-error': errorText }"
+            class="ui-input__control"
         >
             <input
-                v-bind="attrs"
                 ref="input"
                 v-model="value"
                 :autocomplete="inputAutocomplete"
                 :placeholder="placeholder"
-                :type="inputType"
                 :spellcheck="false"
+                :type="inputType"
                 class="ui-input__input"
+                v-bind="attrs"
                 @blur="$emit('blur')"
             >
 
@@ -46,8 +46,8 @@
 </template>
 
 <script>
-    import { defineComponent } from "vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import { defineComponent } from 'vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
         components: {
@@ -147,7 +147,7 @@
                 switch (typeof this.autocomplete) {
                     case 'boolean':
                         return this.autocomplete ? 'on' : 'off';
-                    case "string":
+                    case 'string':
                         return this.autocomplete;
 
                     default:

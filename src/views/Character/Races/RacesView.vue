@@ -6,8 +6,8 @@
         @update="initPages"
     >
         <div
-            class="race-items"
             :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
+            class="race-items"
         >
             <race-link
                 v-for="race in races"
@@ -26,8 +26,8 @@
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import RaceLink from "@/views/Character/Races/RaceLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import RaceLink from '@/views/Character/Races/RaceLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { RacesFilterDefaults } from '@/types/Character/Races.types';
@@ -42,7 +42,12 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
+
             const showRightSide = ref(false);
 
             const filter = useFilter({
@@ -50,7 +55,10 @@
                 url: RacesFilterDefaults.url
             });
 
-            const { initPages, items: races } = usePagination({
+            const {
+                initPages,
+                items: races
+            } = usePagination({
                 url: '/races',
                 limit: -1,
                 filter: {

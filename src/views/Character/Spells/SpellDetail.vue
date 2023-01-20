@@ -23,11 +23,11 @@
 </template>
 
 <script>
-    import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import { mapState } from 'pinia';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import errorHandler from '@/common/helpers/errorHandler';
 
     export default {

@@ -23,27 +23,39 @@
             </div>
 
             <p>
-                <b>Мировоззрение:</b> <span>{{ god.alignment }}</span>
+                <b>Мировоззрение:</b>
+
+                <span>{{ god.alignment }}</span>
             </p>
 
             <p>
-                <b>Ранг:</b> <span>{{ god.rank }}</span>
+                <b>Ранг:</b>
+
+                <span>{{ god.rank }}</span>
             </p>
 
             <p v-if="god.titles?.length">
-                <b>Титулы:</b> <span>{{ god.titles.join(', ') }}</span>
+                <b>Титулы:</b>
+
+                <span>{{ god.titles.join(', ') }}</span>
             </p>
 
             <p>
-                <b>Символ:</b> <span>{{ god.symbol }}</span>
+                <b>Символ:</b>
+
+                <span>{{ god.symbol }}</span>
             </p>
 
             <p v-if="god.domains?.length">
-                <b>Домены:</b> <span>{{ god.domains.join(', ') }}</span>
+                <b>Домены:</b>
+
+                <span>{{ god.domains.join(', ') }}</span>
             </p>
 
             <p v-if="god.panteons?.length">
-                <b>Пантеон:</b> <span>{{ god.panteons.join(', ') }}</span>
+                <b>Пантеон:</b>
+
+                <span>{{ god.panteons.join(', ') }}</span>
             </p>
 
             <raw-content
@@ -57,23 +69,23 @@
             :imgs="god.images"
             :index="gallery.index"
             :visible="gallery.show"
-            teleport="body"
             loop
             move-disabled
             scroll-disabled
+            teleport="body"
             @hide="gallery.show = false"
         >
-            <template #toolbar/>
+            <template #toolbar />
         </vue-easy-lightbox>
     </div>
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "GodBody",
+        name: 'GodBody',
         components: {
             DetailTopBar,
             RawContent

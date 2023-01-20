@@ -6,8 +6,8 @@
         @update="initPages"
     >
         <div
-            class="class-items"
             :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
+            class="class-items"
         >
             <div
                 v-for="(group, groupKey) in sortedClasses"
@@ -43,8 +43,8 @@
     import { storeToRefs } from 'pinia';
     import sortBy from 'lodash/sortBy';
     import groupBy from 'lodash/groupBy';
-    import { useUIStore } from "@/store/UI/UIStore";
-    import ClassLink from "@/views/Character/Classes/ClassLink.vue";
+    import { useUIStore } from '@/store/UI/UIStore';
+    import ClassLink from '@/views/Character/Classes/ClassLink.vue';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
@@ -69,9 +69,15 @@
                 url: ClassesFilterDefaults.url
             });
 
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
-            const { initPages, items: classes } = usePagination({
+            const {
+                initPages,
+                items: classes
+            } = usePagination({
                 url: '/classes',
                 limit: -1,
                 filter: {
@@ -122,13 +128,14 @@
                         Object.values(groupBy(
                             newClasses.filter((item: TClassItem) => 'group' in item),
                             [(o: TClassItem) => o.group!.name]
-                        ) as {[key: string]: Array<TClassItem>}).map(classList => ({
-                            group: classList[0].group!,
-                            list: sortBy(
-                                classList,
-                                [o => o.name.rus]
-                            )
-                        })),
+                        ) as { [key: string]: Array<TClassItem> })
+                            .map(classList => ({
+                                group: classList[0].group!,
+                                list: sortBy(
+                                    classList,
+                                    [o => o.name.rus]
+                                )
+                            })),
                         [o => o.group!.order]
                     );
 

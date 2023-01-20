@@ -20,12 +20,12 @@
 </template>
 
 <script>
-    import sortBy from "lodash/sortBy";
-    import groupBy from "lodash/groupBy";
-    import ScreenLink from "@/views/Workshop/Screens/ScreenLink.vue";
+    import sortBy from 'lodash/sortBy';
+    import groupBy from 'lodash/groupBy';
+    import ScreenLink from '@/views/Workshop/Screens/ScreenLink.vue';
 
     export default {
-        name: "ScreensGroup",
+        name: 'ScreensGroup',
         components: {
             ScreenLink
         },
@@ -43,10 +43,11 @@
                     Object.values(groupBy(
                         this.childList.filter(item => item.group),
                         o => o.group
-                    )).map(list => ({
-                        name: list[0].group,
-                        list: sortBy(list, [o => o.order, o => o.name.rus])
-                    })),
+                    ))
+                        .map(list => ({
+                            name: list[0].group,
+                            list: sortBy(list, [o => o.order, o => o.name.rus])
+                        })),
                     [o => o.group]
                 );
 

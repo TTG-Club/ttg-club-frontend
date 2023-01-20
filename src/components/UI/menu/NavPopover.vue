@@ -1,8 +1,8 @@
 <template>
     <div class="nav-popover">
         <div
-            class="nav-popover__trigger"
             :class="{ 'is-active': isShow }"
+            class="nav-popover__trigger"
         >
             <slot
                 :is-active="isShow"
@@ -25,8 +25,8 @@
                 class="nav-popover__body"
             >
                 <slot
-                    name="default"
                     :close="onClose"
+                    name="default"
                 />
             </div>
         </transition>
@@ -34,9 +34,7 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed, defineComponent
-    } from 'vue';
+    import { computed, defineComponent } from 'vue';
     import { useVModel } from '@vueuse/core';
 
     export default defineComponent({
@@ -174,7 +172,7 @@
     .navbar__header_right {
         .nav-popover {
             &__body {
-                top:42px;
+                top: 42px;
                 left: initial;
                 right: 0;
 

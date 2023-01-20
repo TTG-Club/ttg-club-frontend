@@ -7,6 +7,7 @@
             >
                 <div class="tools_settings__row">
                     <span class="label">Расы:</span>
+
                     <field-checkbox
                         v-for="(source, key) in tables"
                         :key="key"
@@ -24,10 +25,10 @@
 
                     <field-input
                         v-model="count"
-                        class="form-control select"
-                        placeholder="Количеств"
-                        is-number
                         :min="1"
+                        class="form-control select"
+                        is-number
+                        placeholder="Количеств"
                     />
                 </div>
 
@@ -50,7 +51,7 @@
                 class="wild-magic-item"
             >
                 <div class="wild-magic-item__body">
-                    <raw-content :template="item.description"/>
+                    <raw-content :template="item.description" />
                 </div>
 
                 <div
@@ -66,13 +67,13 @@
 
 <script>
     import { defineComponent, reactive } from 'vue';
-    import throttle from "lodash/throttle";
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import RawContent from "@/components/content/RawContent.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import FieldInput from "@/components/form/FieldType/FieldInput.vue";
-    import FormButton from "@/components/form/FormButton.vue";
-    import FieldCheckbox from "@/components/form/FieldType/FieldCheckbox.vue";
+    import throttle from 'lodash/throttle';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import RawContent from '@/components/content/RawContent.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import FieldInput from '@/components/form/FieldType/FieldInput.vue';
+    import FormButton from '@/components/form/FormButton.vue';
+    import FieldCheckbox from '@/components/form/FieldType/FieldCheckbox.vue';
 
     export default defineComponent({
         components: {

@@ -1,8 +1,8 @@
 <template>
     <div class="ability-races">
         <div
-            class="ability-races__race"
             :class="{ 'is-empty': !checkInstance }"
+            class="ability-races__race"
         >
             <span
                 v-if="!checkInstance"
@@ -21,13 +21,13 @@
 
         <div class="ability-races__fields">
             <ui-select
-                allow-empty
-                searchable
-                track-by="url"
                 :custom-label="({ name: { rus } }) => rus"
                 :disabled="!races?.length"
                 :model-value="selectedRace"
                 :options="races"
+                allow-empty
+                searchable
+                track-by="url"
                 @remove="onSelectRace"
                 @select="onSelectRace"
             >
@@ -49,12 +49,12 @@
             </ui-select>
 
             <ui-select
+                :disabled="!subRaces?.length"
                 :model-value="selectedSubRace"
-                track-by="url"
+                :options="subRaces"
                 allow-empty
                 is-wrap-disabled
-                :options="subRaces"
-                :disabled="!subRaces?.length"
+                track-by="url"
                 @select="onSelectSubRace"
             >
                 <template #label>
@@ -75,11 +75,11 @@
             </ui-select>
 
             <ui-select
+                :disabled="!isChoiceDouble"
                 :model-value="selectedChoiceDouble"
                 :options="choiceDouble"
-                :disabled="!isChoiceDouble"
-                track-by="key"
                 label="label"
+                track-by="key"
                 @select="onSelectChoiceDouble"
             >
                 <template #label>
@@ -88,15 +88,15 @@
             </ui-select>
 
             <ui-select
+                :disabled="isFirstDisabled"
                 :model-value="firstValue"
+                :options="abilities"
+                allow-empty
+                class="ability-races__select"
+                clear-on-select
+                is-wrap-disabled
                 label="name"
                 track-by="key"
-                class="ability-races__select"
-                :options="abilities"
-                :disabled="isFirstDisabled"
-                clear-on-select
-                allow-empty
-                is-wrap-disabled
                 @remove="onFirstSelect"
                 @select="onFirstSelect"
             >
@@ -117,21 +117,21 @@
 
                 <template #option="{ option }">
                     <span
-                        class="ability-races__select_option"
                         :class="{ 'is-used': isAbilitySelected(option.key) }"
+                        class="ability-races__select_option"
                     >{{ option.name }}</span>
                 </template>
             </ui-select>
 
             <ui-select
+                :disabled="isSecondDisabled"
                 :model-value="secondValue"
-                label="name"
-                track-by="key"
-                class="ability-races__select"
                 :options="abilities"
                 allow-empty
+                class="ability-races__select"
                 is-wrap-disabled
-                :disabled="isSecondDisabled"
+                label="name"
+                track-by="key"
                 @select="onSecondSelect"
             >
                 <template
@@ -151,21 +151,21 @@
 
                 <template #option="{ option }">
                     <span
-                        class="ability-races__select_option"
                         :class="{ 'is-used': isAbilitySelected(option.key) }"
+                        class="ability-races__select_option"
                     >{{ option.name }}</span>
                 </template>
             </ui-select>
 
             <ui-select
+                :disabled="isThirdDisabled"
                 :model-value="thirdValue"
-                label="name"
-                track-by="key"
-                class="ability-races__select"
                 :options="abilities"
                 allow-empty
+                class="ability-races__select"
                 is-wrap-disabled
-                :disabled="isThirdDisabled"
+                label="name"
+                track-by="key"
                 @select="onThirdSelect"
             >
                 <template
@@ -185,8 +185,8 @@
 
                 <template #option="{ option }">
                     <span
-                        class="ability-races__select_option"
                         :class="{ 'is-used': isAbilitySelected(option.key) }"
+                        class="ability-races__select_option"
                     >{{ option.name }}</span>
                 </template>
             </ui-select>
@@ -235,7 +235,10 @@
                 label: AbilityChoiceDouble
             } | null>(null);
 
-            const { initPages, items } = usePagination({
+            const {
+                initPages,
+                items
+            } = usePagination({
                 url: '/races',
                 limit: -1,
                 order: [
@@ -336,7 +339,8 @@
                     !isChoiceDouble.value
                     && checkInstance.value?.abilities.length
                     && !checkInstance.value?.abilities.find(ability => (
-                        Object.values(AbilityTypeKey).includes(ability.key as AbilityTypeKey)
+                        Object.values(AbilityTypeKey)
+                            .includes(ability.key as AbilityTypeKey)
                         && ability.key !== AbilityTypeKey.ALL
                     ))) {
                     emit('update:model-value', checkInstance.value?.abilities);
@@ -346,7 +350,8 @@
 
                 const value = [
                     ...checkInstance.value?.abilities.filter(ability => (
-                        !Object.values(AbilityTypeKey).includes(ability.key as AbilityTypeKey)
+                        !Object.values(AbilityTypeKey)
+                            .includes(ability.key as AbilityTypeKey)
                         || ability.key === AbilityTypeKey.ALL
                     )) as Array<AbilityRoll>
                 ];

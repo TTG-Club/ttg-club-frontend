@@ -7,10 +7,10 @@
         >
             <div
                 v-if="!isMobile || (isMobile && isEdit)"
-                class="bookmarks__cat_label_icon is-left js-drag-category"
                 :class="{ 'only-hover': !isMobile }"
+                class="bookmarks__cat_label_icon is-left js-drag-category"
             >
-                <svg-icon icon-name="sandwich"/>
+                <svg-icon icon-name="sandwich" />
             </div>
 
             <div class="bookmarks__cat_label_name">
@@ -19,24 +19,24 @@
 
             <div
                 v-if="!isMobile || (isMobile && isEdit)"
-                class="bookmarks__cat_label_icon is-right"
                 :class="{ 'only-hover': !isMobile }"
+                class="bookmarks__cat_label_icon is-right"
                 @click.left.exact.prevent="removeBookmark(category.uuid)"
             >
-                <svg-icon icon-name="close"/>
+                <svg-icon icon-name="close" />
             </div>
         </div>
 
         <draggable
-            tag="div"
-            class="bookmarks__cat_body"
             :model-value="category.children"
-            item-key="uuid"
-            handle=".js-drag-bookmark"
-            group="bookmarks"
-            ghost-class="bookmarks__item_ghost"
             chosen-class="bookmarks__item_chosen"
+            class="bookmarks__cat_body"
             drag-class="bookmarks__item_drag"
+            ghost-class="bookmarks__item_ghost"
+            group="bookmarks"
+            handle=".js-drag-bookmark"
+            item-key="uuid"
+            tag="div"
             @change="onChangeHandler"
         >
             <template #item="{ element: bookmark }">
@@ -46,10 +46,10 @@
                 >
                     <div
                         v-if="!isMobile || (isMobile && isEdit)"
-                        class="bookmarks__cat_label_icon is-left js-drag-bookmark"
                         :class="{ 'only-hover': !isMobile }"
+                        class="bookmarks__cat_label_icon is-left js-drag-bookmark"
                     >
-                        <svg-icon icon-name="sandwich"/>
+                        <svg-icon icon-name="sandwich" />
                     </div>
 
                     <a
@@ -59,11 +59,11 @@
 
                     <div
                         v-if="!isMobile || (isMobile && isEdit)"
-                        class="bookmarks__item_icon is-right"
                         :class="{ 'only-hover': !isMobile }"
+                        class="bookmarks__item_icon is-right"
                         @click.left.exact.prevent="removeBookmark(bookmark.uuid)"
                     >
-                        <svg-icon icon-name="close"/>
+                        <svg-icon icon-name="close" />
                     </div>
                 </div>
             </template>
@@ -72,11 +72,11 @@
 </template>
 
 <script>
-    import { computed, defineComponent } from "vue";
-    import draggableComponent from "vuedraggable";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import { useUIStore } from "@/store/UI/UIStore";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import { computed, defineComponent } from 'vue';
+    import draggableComponent from 'vuedraggable';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useUIStore } from '@/store/UI/UIStore';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
         components: {
@@ -129,7 +129,10 @@
             }
 
             async function onChangeHandler(e) {
-                const { added, moved } = e;
+                const {
+                    added,
+                    moved
+                } = e;
 
                 await updateBookmark(added || moved);
             }

@@ -21,8 +21,8 @@
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import BackgroundLink from "@/views/Character/Backgrounds/BackgroundLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import BackgroundLink from '@/views/Character/Backgrounds/BackgroundLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
@@ -36,14 +36,21 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: BackgroundsFilterDefaults.dbName,
                 url: BackgroundsFilterDefaults.url
             });
 
-            const { initPages, items: backgrounds } = usePagination({
+            const {
+                initPages,
+                items: backgrounds
+            } = usePagination({
                 url: '/backgrounds',
                 limit: -1,
                 filter: {

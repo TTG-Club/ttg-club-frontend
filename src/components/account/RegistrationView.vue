@@ -7,58 +7,58 @@
         <div class="form__row">
             <ui-input
                 v-model.trim="v$.username.$model"
-                placeholder="Имя пользователя"
-                autocomplete="username"
-                autocapitalize="off"
-                autocorrect="off"
-                required
                 :error-text="v$.username.$dirty ? v$.username.$errors?.[0]?.$message : ''"
-                @input="v$.username.$reset()"
+                autocapitalize="off"
+                autocomplete="username"
+                autocorrect="off"
+                placeholder="Имя пользователя"
+                required
                 @blur="v$.username.$touch()"
+                @input="v$.username.$reset()"
             />
         </div>
 
         <div class="form__row">
             <ui-input
                 v-model.trim="v$.email.$model"
+                :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
+                autocapitalize="off"
+                autocomplete="email"
+                autocorrect="off"
                 placeholder="Электронный адрес"
                 required
-                autocomplete="email"
-                autocapitalize="off"
-                autocorrect="off"
-                :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
-                @input="v$.email.$reset()"
                 @blur="v$.email.$touch()"
+                @input="v$.email.$reset()"
             />
         </div>
 
         <div class="form__row">
             <ui-input
                 v-model.trim="v$.password.$model"
-                placeholder="Пароль"
-                is-password
-                required
-                autocomplete="new-password"
-                autocapitalize="off"
-                autocorrect="off"
                 :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
-                @input="v$.password.$reset()"
+                autocapitalize="off"
+                autocomplete="new-password"
+                autocorrect="off"
+                is-password
+                placeholder="Пароль"
+                required
                 @blur="v$.password.$touch()"
+                @input="v$.password.$reset()"
             />
         </div>
 
         <div class="form__row">
             <ui-input
                 v-model.trim="v$.repeat.$model"
-                placeholder="Повторите пароль"
-                is-password
-                required
-                autocomplete="new-password"
-                autocapitalize="off"
-                autocorrect="off"
                 :error-text="v$.repeat.$dirty ? v$.repeat.$errors?.[0]?.$message : ''"
-                @input="v$.repeat.$reset()"
+                autocapitalize="off"
+                autocomplete="new-password"
+                autocorrect="off"
+                is-password
+                placeholder="Повторите пароль"
+                required
                 @blur="v$.repeat.$touch()"
+                @input="v$.repeat.$reset()"
             />
         </div>
 
@@ -83,12 +83,12 @@
 <script lang="ts">
     import {
         defineComponent, reactive, ref
-    } from "vue";
-    import useVuelidate from "@vuelidate/core";
-    import { helpers, sameAs } from "@vuelidate/validators";
-    import { useToast } from "vue-toastification";
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiButton from "@/components/form/UiButton.vue";
+    } from 'vue';
+    import useVuelidate from '@vuelidate/core';
+    import { helpers, sameAs } from '@vuelidate/validators';
+    import { useToast } from 'vue-toastification';
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/form/UiButton.vue';
     import {
         validateEmailExist,
         validateEmailFormat,
@@ -100,9 +100,9 @@
         validateRequired,
         validateUsernameExist,
         validateUsernameSpecialChars
-    } from "@/common/helpers/authChecks";
-    import { useUserStore } from "@/store/UI/UserStore";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    } from '@/common/helpers/authChecks';
+    import { useUserStore } from '@/store/UI/UserStore';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
 
@@ -156,7 +156,7 @@
             const successHandler = () => {
                 success.value = true;
 
-                toast.success("Вы успешно зарегистрировались!");
+                toast.success('Вы успешно зарегистрировались!');
                 emit('close');
             };
 
@@ -168,7 +168,7 @@
                 const result = await v$.value.$validate();
 
                 if (!result) {
-                    toast.error("Проверьте правильность заполнения полей");
+                    toast.error('Проверьте правильность заполнения полей');
 
                     inProgress.value = false;
 

@@ -6,7 +6,7 @@
         />
 
         <div class="option-body__desc content-padding">
-            <raw-content :template="option?.description"/>
+            <raw-content :template="option?.description" />
 
             <div
                 v-if="option?.classes?.length"
@@ -29,12 +29,12 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
-    import ClassSquare from "@/components/UI/ClassSquare.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import ClassSquare from '@/components/UI/ClassSquare.vue';
 
     export default {
-        name: "OptionBody",
+        name: 'OptionBody',
         components: {
             ClassSquare,
             DetailTopBar,

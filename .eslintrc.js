@@ -1,3 +1,6 @@
+/* eslint-env node */
+require('@rushstack/eslint-patch/modern-module-resolution');
+
 module.exports = {
     root: true,
 
@@ -178,7 +181,7 @@ module.exports = {
                 position: 'above'
             }
         ],
-        'linebreak-style': 'off',
+        'linebreak-style': ['error', 'unix'],
         'lines-around-comment': [
             'error',
             {
@@ -387,7 +390,25 @@ module.exports = {
         'vuejs-accessibility/mouse-events-have-key-events': 'off',
         'vuejs-accessibility/label-has-for': 'off',
         'vuejs-accessibility/no-autofocus': 'off',
-        'vue/require-explicit-emits': 'off'
+        'vue/require-explicit-emits': 'off',
+        'vue/padding-line-between-tags': [
+            'error',
+            [
+                {
+                    blankLine: 'always',
+                    prev: '*',
+                    next: '*'
+                }
+            ]
+        ],
+        'vue/html-closing-bracket-spacing': [
+            'error',
+            {
+                startTag: 'never',
+                endTag: 'never',
+                selfClosingTag: 'always'
+            }
+        ]
     },
 
     overrides: [
@@ -395,22 +416,7 @@ module.exports = {
             files: ['*.vue'],
             rules: {
                 'indent': 'off',
-                'quotes': [
-                    0,
-                    'double',
-                    'single'
-                ],
-                'max-len': 'off',
-                'vue/max-len': [1, 120],
                 'vue/html-indent': ['error', 4],
-                'vue/valid-v-slot': 'off',
-                'vue/max-attributes-per-line': [
-                    'error',
-                    {
-                        singleline: 1,
-                        multiline: 1
-                    }
-                ],
                 'vue/script-indent': [
                     'error',
                     4,
@@ -419,10 +425,19 @@ module.exports = {
                         switchCase: 1
                     }
                 ],
-                'vue/html-closing-bracket-spacing': [
+                'quotes': [
+                    0,
+                    'double',
+                    'single'
+                ],
+                'max-len': 'off',
+                'vue/max-len': [1, 120],
+                'vue/valid-v-slot': 'off',
+                'vue/max-attributes-per-line': [
                     'error',
                     {
-                        selfClosingTag: 'never'
+                        singleline: 1,
+                        multiline: 1
                     }
                 ]
             }

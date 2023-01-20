@@ -2,7 +2,10 @@
     <div class="section-header">
         <div class="section-header__body">
             <div class="section-header__title">
-                <div class="section-header__title--text">
+                <div
+                    class="section-header__title--text"
+                    @click.left.exact.prevent.stop="copyText(title)"
+                >
                     {{ title }}
                 </div>
 
@@ -11,15 +14,16 @@
                     v-tippy="{ content: 'Скопировать ссылку' }"
                     :href="urlForCopy"
                     class="section-header__title--copy"
-                    @click.left.exact.prevent.stop="copyText"
+                    @click.left.exact.prevent.stop="copyURL"
                 >
-                    <svg-icon icon-name="copy"/>
+                    <svg-icon icon-name="copy" />
                 </a>
             </div>
 
             <div
                 v-if="subtitle"
                 class="section-header__subtitle"
+                @click.left.exact.prevent.stop="copyText(subtitle)"
             >
                 {{ subtitle }}
             </div>
@@ -43,8 +47,8 @@
                     v-if="print"
                     v-tippy="{ content: 'Открыть окно печати' }"
                     class="section-header__control--optional is-only-desktop"
-                    type-link-filled
                     is-icon
+                    type-link-filled
                     @click.left.exact.prevent.stop="openPrintWindow"
                 >
                     <svg-icon
@@ -58,11 +62,11 @@
                     v-if="onExportFoundry"
                     v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
                     class="section-header__control--optional is-only-desktop"
-                    type-link-filled
                     is-icon
+                    type-link-filled
                     @click.left.exact.prevent.stop="$emit('exportFoundry')"
                 >
-                    <svg-icon icon-name="export-foundry"/>
+                    <svg-icon icon-name="export-foundry" />
                 </ui-button>
             </div>
 
@@ -107,15 +111,15 @@
 </template>
 
 <script lang="tsx">
-    import { useClipboard } from "@vueuse/core";
-    import { computed, defineComponent } from "vue";
-    import { useRoute } from "vue-router";
-    import { useToast } from "vue-toastification";
+    import { useClipboard } from '@vueuse/core';
+    import { computed, defineComponent } from 'vue';
+    import { useRoute } from 'vue-router';
+    import { useToast } from 'vue-toastification';
     import { useUIStore } from '@/store/UI/UIStore';
-    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue";
-    import UiButton from "@/components/form/UiButton.vue";
+    import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+    import UiButton from '@/components/form/UiButton.vue';
     import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -184,7 +188,7 @@
                 return props.onClose;
             });
 
-            const copyText = () => {
+            const copyURL = () => {
                 if (!clipboard.isSupported) {
                     toast.error('Ваш браузер не поддерживает копирование');
                 }
@@ -205,6 +209,15 @@
                     )));
             };
 
+            const copyText = (text?: string) => {
+                if (!text) {
+                    return;
+                }
+
+                clipboard.copy(text)
+                    .then(() => toast('Текст скопирован'));
+            };
+
             const openPrintWindow = () => {
                 window.print();
             };
@@ -217,6 +230,7 @@
                 urlForCopy,
                 closeAvailable,
                 copyText,
+                copyURL,
                 openPrintWindow
             };
         }
@@ -256,6 +270,7 @@
                 position: relative;
                 color: var(--text-color-title);
                 font-weight: 400;
+                cursor: pointer;
             }
 
             &--copy {
@@ -293,6 +308,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             line-height: normal;
+            cursor: pointer;
 
             @media (max-width: 1200px) {
                 margin-top: 4px;

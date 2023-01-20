@@ -1,8 +1,8 @@
 <template>
     <nav-popover
         v-model="menu"
-        is-menu
         is-left
+        is-menu
     >
         <template #trigger="{ isActive }">
             <div
@@ -10,9 +10,11 @@
                 class="navbar__btn hamburger"
                 @click.left.exact.prevent="menu = !menu"
             >
-                <span class="line"/>
-                <span class="line"/>
-                <span class="line"/>
+                <span class="line" />
+
+                <span class="line" />
+
+                <span class="line" />
             </div>
         </template>
 
@@ -23,7 +25,7 @@
                         class="nav-menu__logo"
                         href="/"
                     >
-                        <site-logo/>
+                        <site-logo />
                     </a>
 
                     <div class="nav-menu__info">
@@ -51,7 +53,7 @@
                                 v-if="group.icon"
                                 class="nav-menu__group_icon"
                             >
-                                <svg-icon :icon-name="group.icon"/>
+                                <svg-icon :icon-name="group.icon" />
                             </div>
                         </div>
 
@@ -68,8 +70,8 @@
                                 >{{ link.name }}</a>
 
                                 <div
-                                    class="nav-menu__link_icon only-hover"
                                     :class="{ 'is-active': isSaved(link.url) }"
+                                    class="nav-menu__link_icon only-hover"
                                     @click.left.exact.stop.prevent="updateBookmark(link.url, link.name)"
                                     @dblclick.prevent.stop
                                 >
@@ -92,19 +94,19 @@
 </template>
 
 <script>
-    import { defineComponent, ref } from "vue";
+    import { defineComponent, ref } from 'vue';
     import { tryOnBeforeMount } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
-    import { useNavStore } from "@/store/UI/NavStore";
-    import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
-    import NavPopover from "@/components/UI/menu/NavPopover.vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import SiteLogo from "@/components/UI/icons/SiteLogo.vue";
-    import { useUserStore } from "@/store/UI/UserStore";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
+    import { useNavStore } from '@/store/UI/NavStore';
+    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import NavPopover from '@/components/UI/menu/NavPopover.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
+    import { useUserStore } from '@/store/UI/UserStore';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
 
     export default defineComponent({
-        name: "NavMenu",
+        name: 'NavMenu',
         components: {
             NavPopover,
             SvgIcon,

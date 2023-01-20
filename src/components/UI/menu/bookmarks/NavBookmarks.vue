@@ -2,8 +2,8 @@
     <nav-popover v-model="opened">
         <template #trigger="{ isActive }">
             <div
-                class="navbar__btn"
                 :class="{ 'is-active': isActive }"
+                class="navbar__btn"
                 @click.left.exact.prevent="clickHandler"
             >
                 <svg-icon
@@ -16,9 +16,9 @@
 
         <template #default>
             <div class="nav-bookmarks">
-                <default-bookmarks v-if="!isAuthenticated"/>
+                <default-bookmarks v-if="!isAuthenticated" />
 
-                <custom-bookmarks v-else/>
+                <custom-bookmarks v-else />
             </div>
         </template>
     </nav-popover>
@@ -26,21 +26,19 @@
 
 <script>
     import {
-        computed,
-        onBeforeMount,
-        ref, watch
-    } from "vue";
-    import { storeToRefs } from "pinia";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import NavPopover from "@/components/UI/menu/NavPopover.vue";
-    import DefaultBookmarks from "@/components/UI/menu/bookmarks/DefaultBookmarks.vue";
-    import CustomBookmarks from "@/components/UI/menu/bookmarks/CustomBookmarks.vue";
-    import { useUserStore } from "@/store/UI/UserStore";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import { useDefaultBookmarkStore } from "@/store/UI/bookmarks/DefaultBookmarkStore";
+        computed, onBeforeMount, ref, watch
+    } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import NavPopover from '@/components/UI/menu/NavPopover.vue';
+    import DefaultBookmarks from '@/components/UI/menu/bookmarks/DefaultBookmarks.vue';
+    import CustomBookmarks from '@/components/UI/menu/bookmarks/CustomBookmarks.vue';
+    import { useUserStore } from '@/store/UI/UserStore';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
 
     export default {
-        name: "NavBookmarks",
+        name: 'NavBookmarks',
         components: {
             CustomBookmarks,
             DefaultBookmarks,

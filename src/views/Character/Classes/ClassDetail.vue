@@ -6,11 +6,35 @@
                 :subtitle="currentClass?.name?.eng || ''"
                 :title="currentClass?.name?.rus || ''"
                 bookmark
-                print
-                fullscreen
                 close-on-desktop
+                fullscreen
+                print
                 @close="close"
             />
+
+            <div
+                v-if="tabs.length"
+                class="class-detail__tabs"
+            >
+                <div
+                    v-for="(tab, tabKey) in tabs"
+                    :key="tabKey"
+                    :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
+                    class="class-detail__tab"
+                    @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
+                >
+                    <div class="class-detail__tab_icon">
+                        <svg-icon :icon-name="`tab-${tab.type}`" />
+                    </div>
+
+                    <div
+                        v-if="tab.name"
+                        class="class-detail__tab_name"
+                    >
+                        {{ tab.name }}
+                    </div>
+                </div>
+            </div>
 
             <div
                 v-if="isMobile && currentTab?.type === 'traits' && currentArchetypes.length"
@@ -55,7 +79,7 @@
                         v-if="!tab.name"
                         class="class-detail__tab_icon"
                     >
-                        <svg-icon :icon-name="`tab-${tab.type}`"/>
+                        <svg-icon :icon-name="`tab-${tab.type}`" />
                     </div>
 
                     <div
@@ -112,34 +136,34 @@
                 :imgs="currentClass?.images"
                 :index="gallery.index"
                 :visible="gallery.show"
-                teleport="body"
                 loop
                 move-disabled
                 scroll-disabled
+                teleport="body"
                 @hide="gallery.show = false"
             >
-                <template #toolbar/>
+                <template #toolbar />
             </vue-easy-lightbox>
         </template>
     </content-detail>
 </template>
 
 <script>
-    import { mapState } from "pinia";
-    import isArray from "lodash/isArray";
-    import sortBy from "lodash/sortBy";
-    import groupBy from "lodash/groupBy";
+    import { mapState } from 'pinia';
+    import isArray from 'lodash/isArray';
+    import sortBy from 'lodash/sortBy';
+    import groupBy from 'lodash/groupBy';
     import { resolveUnref } from '@vueuse/core';
     import cloneDeep from 'lodash/cloneDeep';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiSelect from '@/components/form/UiSelect.vue';
-    import SpellsView from "@/views/Character/Spells/SpellsView.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import OptionsView from "@/views/Character/Options/OptionsView.vue";
-    import RawContent from "@/components/content/RawContent.vue";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import SpellsView from '@/views/Character/Spells/SpellsView.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import OptionsView from '@/views/Character/Options/OptionsView.vue';
+    import RawContent from '@/components/content/RawContent.vue';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default {
 
@@ -323,7 +347,8 @@
             },
 
             async clickTabHandler({
-                index, callback
+                index,
+                callback
             }) {
                 if (typeof callback === 'function') {
                     callback();
@@ -348,7 +373,7 @@
 
                     this.$refs.classBody.scroll({
                         top: section.getBoundingClientRect().top - 119 - 56,
-                        behavior: "smooth"
+                        behavior: 'smooth'
                     });
                 }
 
@@ -395,7 +420,7 @@
 
                 this.$refs.classBody.scroll({
                     top: section.getBoundingClientRect().top - 119 - 56,
-                    behavior: "smooth"
+                    behavior: 'smooth'
                 });
             },
 
@@ -574,10 +599,10 @@
             overflow: auto;
 
             &--inner {
-                padding: 0px 16px;
+                padding: 0 16px;
 
                 @include media-min($xl) {
-                    padding: 0px 24px;
+                    padding: 0 24px;
                 }
             }
         }

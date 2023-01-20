@@ -12,8 +12,8 @@
                 :key="index"
                 :href="link.url"
                 class="social-links__link"
-                target="_blank"
                 rel="noopener noreferrer"
+                target="_blank"
             >
                 <svg-icon
                     :icon-name="link.icon"
@@ -26,8 +26,8 @@
 </template>
 
 <script>
-    import { defineComponent } from "vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import { defineComponent } from 'vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
         components: {

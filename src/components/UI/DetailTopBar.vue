@@ -9,11 +9,12 @@
         >
             {{ left }}
         </span>
+
         <span
             v-else
             class="left_info"
         >
-            <slot name="left"/>
+            <slot name="left" />
         </span>
 
         <span v-if="source">
@@ -30,14 +31,14 @@
         </span>
 
         <span v-else-if="$slots.default">
-            <slot/>
+            <slot />
         </span>
     </div>
 </template>
 
 <script>
     export default {
-        name: "DetailTopBar",
+        name: 'DetailTopBar',
         props: {
             left: {
                 type: String,

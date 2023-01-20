@@ -1,11 +1,11 @@
 <template>
     <tippy
-        v-bind="tippyConfig"
         ref="tooltip"
         theme="dnd5club no-padding"
+        v-bind="tippyConfig"
     >
         <template #default>
-            <slot name="default"/>
+            <slot name="default" />
         </template>
 
         <template #content>
@@ -20,22 +20,22 @@
 </template>
 
 <script>
-    import cloneDeep from "lodash/cloneDeep";
-    import errorHandler from "@/common/helpers/errorHandler";
+    import cloneDeep from 'lodash/cloneDeep';
+    import errorHandler from '@/common/helpers/errorHandler';
     import { DefaultTippyProps } from '@/common/utils/TippyConfig';
-    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
-    import ScreenBody from "@/views/Workshop/Screens/ScreenBody.vue";
-    import ItemBody from "@/views/Inventory/Items/ItemBody.vue";
-    import ArmorBody from "@/views/Inventory/Armors/ArmorBody.vue";
-    import WeaponBody from "@/views/Inventory/Weapons/WeaponBody.vue";
-    import CreatureBody from "@/views/Workshop/Bestiary/CreatureBody.vue";
-    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
-    import OptionBody from "@/views/Character/Options/OptionBody.vue";
-    import TraitBody from "@/views/Character/Traits/TraitBody.vue";
-    import GodBody from "@/views/Wiki/Gods/GodBody.vue";
+    import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+    import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
+    import ItemBody from '@/views/Inventory/Items/ItemBody.vue';
+    import ArmorBody from '@/views/Inventory/Armors/ArmorBody.vue';
+    import WeaponBody from '@/views/Inventory/Weapons/WeaponBody.vue';
+    import CreatureBody from '@/views/Workshop/Bestiary/CreatureBody.vue';
+    import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
+    import OptionBody from '@/views/Character/Options/OptionBody.vue';
+    import TraitBody from '@/views/Character/Traits/TraitBody.vue';
+    import GodBody from '@/views/Wiki/Gods/GodBody.vue';
 
     export default {
-        name: "DetailTooltip",
+        name: 'DetailTooltip',
         components: { SpellBody },
         props: {
             url: {
@@ -106,7 +106,9 @@
                     return true;
                 }
 
-                const link = this.$slots.default().find(node => node.props.href);
+                const link = this.$slots.default()
+                    .find(node => node.props.href);
+
                 const url = this.url || link?.props?.href;
 
                 if (!url?.length) {
