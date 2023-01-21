@@ -121,7 +121,7 @@
                 }
 
                 bodyElement.value.scroll({
-                    top: rect.top + uiStore.bodyScroll.y,
+                    top: rect.top + uiStore.bodyScroll.y - 68 - 52,
                     behavior: 'smooth'
                 });
             };
