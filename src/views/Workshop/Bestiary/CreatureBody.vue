@@ -1,8 +1,8 @@
 <template>
     <div
         v-if="creature"
-        class="creature_wrapper creature-body bestiary"
         :class="{ 'in-tooltip': inTooltip }"
+        class="creature_wrapper creature-body bestiary"
     >
         <detail-top-bar
             :left="topBarLeftString"
@@ -72,6 +72,7 @@
                             v-tippy="'Сила'"
                         >СИЛ</strong>
                     </h4>
+
                     <p>
                         <dice-roller
                             :formula="getAbilityFormula(creature.ability.str)"
@@ -88,6 +89,7 @@
                             v-tippy="'Ловкость'"
                         >ЛОВ</strong>
                     </h4>
+
                     <p>
                         <dice-roller
                             :formula="getAbilityFormula(creature.ability.dex)"
@@ -104,6 +106,7 @@
                             v-tippy="'Телосложение'"
                         >ТЕЛ</strong>
                     </h4>
+
                     <p>
                         <dice-roller
                             :formula="getAbilityFormula(creature.ability.con)"
@@ -120,6 +123,7 @@
                             v-tippy="'Интеллект'"
                         >ИНТ</strong>
                     </h4>
+
                     <p>
                         <dice-roller
                             :formula="getAbilityFormula(creature.ability.int)"
@@ -136,6 +140,7 @@
                             v-tippy="'Мудрость'"
                         >МДР</strong>
                     </h4>
+
                     <p>
                         <dice-roller
                             :formula="getAbilityFormula(creature.ability.wiz)"
@@ -152,6 +157,7 @@
                             v-tippy="'Харизма'"
                         >ХАР</strong>
                     </h4>
+
                     <p>
                         <dice-roller
                             :formula="getAbilityFormula(creature.ability.cha)"
@@ -166,31 +172,41 @@
             <div class="beast_info">
                 <p v-if="savingThrows.length">
                     <strong>Спасброски </strong>
+
                     <span
                         v-for="(savingThrow, key) in savingThrows"
                         :key="key"
                     >
-                        <span>{{ savingThrow.label }}&nbsp;</span><dice-roller
+                        <span>{{ savingThrow.label }}&nbsp;</span>
+
+                        <dice-roller
                             :formula="savingThrow.formula"
                             :label="`Спасбросок ${ savingThrow.name }`"
                         >
                             {{ savingThrow.value }}
-                        </dice-roller><span v-if="key < savingThrows.length - 1">, </span>
+                        </dice-roller>
+
+                        <span v-if="key < savingThrows.length - 1">, </span>
                     </span>
                 </p>
 
                 <p v-if="skills.length">
                     <strong>Навыки </strong>
+
                     <span
                         v-for="(skill, key) in skills"
                         :key="key"
                     >
-                        <span>{{ skill.label }}&nbsp;</span><dice-roller
+                        <span>{{ skill.label }}&nbsp;</span>
+
+                        <dice-roller
                             :formula="skill.formula"
                             :label="`Проверка навыка ${ skill.label }`"
                         >
                             {{ skill.value }}
-                        </dice-roller><span v-if="key < skills.length - 1">, </span>
+                        </dice-roller>
+
+                        <span v-if="key < skills.length - 1">, </span>
                     </span>
                 </p>
 
@@ -199,16 +215,19 @@
 
                     <span>{{ getIterableStr(creature.damageVulnerabilities) }}</span>
                 </p>
+
                 <p v-if="creature.damageResistances">
                     <strong>Сопротивление к урону </strong>
 
                     <span>{{ getIterableStr(creature.damageResistances) }}</span>
                 </p>
+
                 <p v-if="creature.damageImmunities">
                     <strong>Иммунитет к урону </strong>
 
                     <span>{{ getIterableStr(creature.damageImmunities) }}</span>
                 </p>
+
                 <p v-if="creature.conditionImmunities">
                     <strong>Иммунитет к состояниям </strong>
 
@@ -216,7 +235,9 @@
                 </p>
 
                 <p v-if="senses">
-                    <strong>Чувства </strong> <span>{{ senses }}</span>
+                    <strong>Чувства </strong>
+
+                    <span>{{ senses }}</span>
                 </p>
 
                 <p>
@@ -231,10 +252,12 @@
                     <span>{{ challengeRating }}</span>
                 </p>
             </div>
+
             <div v-if="creature.feats?.length">
                 <h4 class="header_separator">
                     <span>Способности</span>
                 </h4>
+
                 <div
                     v-for="(feat, key) in creature.feats"
                     :key="key"
@@ -242,14 +265,16 @@
                     <span class="bestiary_h5">
                         <h5>{{ feat.name }}</h5>
 
-                        <raw-content :template="feat.value"/>
+                        <raw-content :template="feat.value" />
                     </span>
                 </div>
             </div>
+
             <div v-if="creature.actions?.length">
                 <h4 class="header_separator">
                     <span>Действия</span>
                 </h4>
+
                 <div
                     v-for="(action, key) in creature.actions"
                     :key="key"
@@ -257,14 +282,16 @@
                     <span class="bestiary_h5">
                         <h5>{{ action.name }}</h5>
 
-                        <raw-content :template="action.value"/>
+                        <raw-content :template="action.value" />
                     </span>
                 </div>
             </div>
+
             <div v-if="creature.bonusActions?.length">
                 <h4 class="header_separator">
                     <span>Бонусные действия</span>
                 </h4>
+
                 <div
                     v-for="(bonus, key) in creature.bonusActions"
                     :key="key"
@@ -272,14 +299,16 @@
                     <span class="bestiary_h5">
                         <h5>{{ bonus.name }}</h5>
 
-                        <raw-content :template="bonus.value"/>
+                        <raw-content :template="bonus.value" />
                     </span>
                 </div>
             </div>
+
             <div v-if="creature.reactions?.length">
                 <h4 class="header_separator">
                     <span>Реакции</span>
                 </h4>
+
                 <div
                     v-for="(reaction, key) in creature.reactions"
                     :key="key"
@@ -287,10 +316,11 @@
                     <span class="bestiary_h5">
                         <h5>{{ reaction.name }}</h5>
 
-                        <raw-content :template="reaction.value"/>
+                        <raw-content :template="reaction.value" />
                     </span>
                 </div>
             </div>
+
             <div v-if="creature.legendary?.list?.length">
                 <h4 class="header_separator">
                     <span>Легендарные Действия</span>
@@ -306,7 +336,7 @@
                 </p>
 
                 <p v-else>
-                    <raw-content :template="creature.legendary.description"/>
+                    <raw-content :template="creature.legendary.description" />
                 </p>
 
                 <div
@@ -316,7 +346,7 @@
                     <span class="bestiary_h5">
                         <h5>{{ action.name }}</h5>
 
-                        <raw-content :template="action.value"/>
+                        <raw-content :template="action.value" />
                     </span>
                 </div>
             </div>
@@ -325,6 +355,7 @@
                 <h4 class="header_separator">
                     <span>Мифические действия</span>
                 </h4>
+
                 <div
                     v-for="(mystical, key) in creature.mysticalActions"
                     :key="key"
@@ -332,7 +363,7 @@
                     <span class="bestiary_h5">
                         <h5>{{ mystical.name }}</h5>
 
-                        <raw-content :template="mystical.value"/>
+                        <raw-content :template="mystical.value" />
                     </span>
                 </div>
             </div>
@@ -342,7 +373,7 @@
                     <span>Логово</span>
                 </h4>
 
-                <raw-content :template="creature.lair.description"/>
+                <raw-content :template="creature.lair.description" />
             </div>
 
             <div v-if="creature.lair?.action">
@@ -350,7 +381,7 @@
                     <span>Действия логова:</span>
                 </h4>
 
-                <raw-content :template="creature.lair.action"/>
+                <raw-content :template="creature.lair.action" />
             </div>
 
             <div v-if="creature.lair?.effect">
@@ -358,7 +389,7 @@
                     <span>Региональные эффекты:</span>
                 </h4>
 
-                <raw-content :template="creature.lair.effect"/>
+                <raw-content :template="creature.lair.effect" />
             </div>
 
             <div v-if="creature.environment?.length">
@@ -403,24 +434,24 @@
         :imgs="creature.images"
         :index="gallery.index"
         :visible="gallery.show"
-        teleport="body"
         loop
         move-disabled
         scroll-disabled
+        teleport="body"
         @hide="gallery.show = false"
     >
         <template #toolbar>
             <div class="vel-toolbar">
                 <button
-                    type="button"
                     aria-label="hide-bg button"
                     class="toolbar-btn"
+                    type="button"
                     @click.left.exact.prevent="setGalleryBgMode(!gallery.hideBg)"
                 >
                     <svg-icon
-                        class="vel-icon icon"
                         :icon-name="gallery.hideBg ? 'light-theme' : 'dark-theme'"
                         :stroke-enable="false"
+                        class="vel-icon icon"
                         fill-enable
                     />
                 </button>
@@ -430,14 +461,14 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-    import DiceRoller from "@/components/UI/DiceRoller.vue";
-    import { useAbilityTransforms } from "@/common/composition/useAbilityTransforms";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import DiceRoller from '@/components/UI/DiceRoller.vue';
+    import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default {
-        name: "CreatureBody",
+        name: 'CreatureBody',
         components: {
             DetailTopBar,
             RawContent,

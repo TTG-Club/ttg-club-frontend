@@ -1,17 +1,17 @@
 <template>
     <div
-        class="bookmarks__group"
         :class="{ 'is-active': isOpened(group.uuid) }"
+        class="bookmarks__group"
     >
         <div
             class="bookmarks__group_head"
             @click.left.exact.prevent="toggleGroup(group.uuid)"
         >
             <div
-                class="bookmarks__group_icon"
                 :class="{ 'is-active': isOpened(group.uuid) }"
+                class="bookmarks__group_icon"
             >
-                <svg-icon icon-name="arrow-stroke"/>
+                <svg-icon icon-name="arrow-stroke" />
             </div>
 
             <div class="bookmarks__group_label">
@@ -21,24 +21,24 @@
             <div
                 v-if="isOpened(group.uuid) && group.order > -1"
                 v-tippy="{ content: 'Добавить категорию' }"
-                class="bookmarks__group_icon is-right"
                 :class="{ 'only-hover': !isMobile }"
+                class="bookmarks__group_icon is-right"
                 @click.left.exact.prevent.stop="enableCategoryCreating"
             >
                 <svg-icon
-                    icon-name="plus"
                     :stroke-enable="false"
                     fill-enable
+                    icon-name="plus"
                 />
             </div>
 
             <div
                 v-if="!isMobile || (isMobile && isEdit)"
-                class="bookmarks__group_icon is-right"
                 :class="{ 'only-hover': !isMobile }"
+                class="bookmarks__group_icon is-right"
                 @click.left.exact.prevent.stop="removeBookmark(group.uuid)"
             >
-                <svg-icon icon-name="close"/>
+                <svg-icon icon-name="close" />
             </div>
         </div>
 
@@ -47,14 +47,14 @@
             class="bookmarks__group_body"
         >
             <draggable
-                tag="div"
                 :model-value="group.children"
-                item-key="uuid"
-                handle=".js-drag-category"
-                group="category"
-                ghost-class="bookmarks__cat_ghost"
                 chosen-class="bookmarks__cat_chosen"
                 drag-class="bookmarks__cat_drag"
+                ghost-class="bookmarks__cat_ghost"
+                group="category"
+                handle=".js-drag-category"
+                item-key="uuid"
+                tag="div"
                 @change="onChangeHandler"
             >
                 <template #item="{ element: category }">
@@ -73,27 +73,27 @@
             >
                 <ui-input
                     v-model="newCategoryName"
-                    placeholder="Название категории"
                     autofocus
+                    placeholder="Название категории"
                     @keyup.enter.exact.prevent="createCategory"
                 />
 
                 <ui-button
-                    type-link-filled
-                    is-small
                     is-icon
+                    is-small
+                    type-link-filled
                     @click.left.exact.prevent="createCategory"
                 >
-                    <svg-icon icon-name="check"/>
+                    <svg-icon icon-name="check" />
                 </ui-button>
 
                 <ui-button
-                    type-link-filled
-                    is-small
                     is-icon
+                    is-small
+                    type-link-filled
                     @click.left.exact.prevent="disableCategoryCreating"
                 >
-                    <svg-icon icon-name="close"/>
+                    <svg-icon icon-name="close" />
                 </ui-button>
             </div>
         </div>
@@ -103,14 +103,14 @@
 <script>
     import {
         computed, defineComponent, onBeforeMount, ref
-    } from "vue";
+    } from 'vue';
     import draggableComponent from 'vuedraggable';
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import CustomBookmarkCategory from "@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import { useUIStore } from "@/store/UI/UIStore";
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import CustomBookmarkCategory from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useUIStore } from '@/store/UI/UIStore';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
         components: {
@@ -168,7 +168,10 @@
                 }
 
                 const {
-                    element: { uuid, name },
+                    element: {
+                        uuid,
+                        name
+                    },
                     newIndex: order
                 } = change;
 
@@ -181,7 +184,10 @@
             }
 
             async function onChangeHandler(e) {
-                const { added, moved } = e;
+                const {
+                    added,
+                    moved
+                } = e;
 
                 await updateBookmark(added || moved);
             }

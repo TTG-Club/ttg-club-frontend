@@ -2,7 +2,10 @@
     <div class="section-header">
         <div class="section-header__body">
             <div class="section-header__title">
-                <div class="section-header__title--text">
+                <div
+                    class="section-header__title--text"
+                    @click.left.exact.prevent.stop="copyText(title)"
+                >
                     {{ title }}
                 </div>
 
@@ -11,15 +14,16 @@
                     v-tippy="{ content: 'Скопировать ссылку' }"
                     :href="urlForCopy"
                     class="section-header__title--copy"
-                    @click.left.exact.prevent.stop="copyText"
+                    @click.left.exact.prevent.stop="copyURL"
                 >
-                    <svg-icon icon-name="copy"/>
+                    <svg-icon icon-name="copy" />
                 </a>
             </div>
 
             <div
                 v-if="subtitle"
                 class="section-header__subtitle"
+                @click.left.exact.prevent.stop="copyText(subtitle)"
             >
                 {{ subtitle }}
             </div>
@@ -29,85 +33,91 @@
             v-if="hasControls"
             class="section-header__controls"
         >
-            <div
-                v-if="hasOptionalControls"
-                class="section-header__controls--optional"
+            <bookmark-save-button
+                v-if="bookmark"
+                :name="title"
+                :url="url"
+            />
+
+            <ui-button
+                v-if="print"
+                v-tippy="{ content: 'Открыть окно печати' }"
+                class="section-header__control is-only-desktop"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="openPrintWindow"
             >
-                <bookmark-save-button
-                    v-if="bookmark"
-                    :name="title"
-                    :url="url"
+                <svg-icon
+                    icon-name="print"
+                    :stroke-enable="false"
+                    fill-enable
                 />
+            </ui-button>
 
-                <ui-button
-                    v-if="print"
-                    v-tippy="{ content: 'Открыть окно печати' }"
-                    class="section-header__control--optional is-only-desktop"
-                    type-link-filled
-                    is-icon
-                    @click.left.exact.prevent.stop="openPrintWindow"
-                >
-                    <svg-icon icon-name="print"/>
-                </ui-button>
-
-                <ui-button
-                    v-if="onExportFoundry"
-                    v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
-                    class="section-header__control--optional is-only-desktop"
-                    type-link-filled
-                    is-icon
-                    @click.left.exact.prevent.stop="$emit('exportFoundry')"
-                >
-                    <svg-icon icon-name="export-foundry"/>
-                </ui-button>
-            </div>
-
-            <div
-                v-if="hasMainControls"
-                class="section-header__controls--main"
+            <ui-button
+                v-if="onExportFoundry"
+                v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
+                class="section-header__control is-only-desktop"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="$emit('exportFoundry')"
             >
-                <button
-                    v-if="fullscreen"
-                    v-tippy="{
-                        content: uiStore.fullscreen
-                            ? 'Свернуть окно'
-                            : 'Развернуть окно',
-                    }"
-                    class="section-header__control--main is-only-desktop"
-                    type="button"
-                    @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
-                >
-                    <svg-icon :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"/>
-                </button>
+                <svg-icon icon-name="export-foundry" />
+            </ui-button>
 
-                <button
-                    v-if="closeAvailable"
-                    v-tippy="{ content: 'Закрыть' }"
-                    class="section-header__control--main"
-                    type="button"
-                    @click.left.exact.prevent.stop="$emit('close')"
-                >
-                    <svg-icon icon-name="close"/>
-                </button>
-            </div>
+            <ui-button
+                v-if="fullscreen"
+                v-tippy="{
+                    content: uiStore.fullscreen
+                        ? 'Свернуть окно'
+                        : 'Развернуть окно',
+                }"
+                class="section-header__control is-only-desktop"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
+            >
+                <svg-icon
+                    :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
+                    :stroke-enable="false"
+                    fill-enable
+                />
+            </ui-button>
+
+            <ui-button
+                v-if="closeAvailable"
+                v-tippy="{ content: 'Закрыть' }"
+                class="section-header__control"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="$emit('close')"
+            >
+                <svg-icon
+                    icon-name="close"
+                    :stroke-enable="false"
+                    fill-enable
+                />
+            </ui-button>
         </div>
     </div>
 </template>
 
 <script lang="tsx">
-    import { useClipboard } from "@vueuse/core";
-    import { computed, defineComponent } from "vue";
-    import { useRoute } from "vue-router";
-    import { useToast } from "vue-toastification";
+    import { useClipboard } from '@vueuse/core';
+    import { computed, defineComponent } from 'vue';
+    import { useRoute } from 'vue-router';
+    import { useToast } from 'vue-toastification';
     import { useUIStore } from '@/store/UI/UIStore';
-    import BookmarkSaveButton from "@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
             UiButton,
-            BookmarkSaveButton
+            BookmarkSaveButton,
+            SvgIcon
         },
         props: {
             title: {
@@ -156,11 +166,13 @@
             const uiStore = useUIStore();
             const clipboard = useClipboard();
             const toast = useToast(ToastEventBus);
-
-            const hasOptionalControls = computed(() => !!props.bookmark || !!props.print || !!props.onExportFoundry);
-            const hasMainControls = computed(() => !!props.onClose || !!props.fullscreen);
-            const hasControls = computed(() => hasOptionalControls.value || hasMainControls.value);
             const urlForCopy = computed(() => window.location.origin + route.path);
+
+            const hasControls = computed(() => !!props.bookmark
+                || !!props.print
+                || !!props.onExportFoundry
+                || !!props.onClose
+                || !!props.fullscreen);
 
             const closeAvailable = computed(() => {
                 if (!uiStore.isMobile) {
@@ -170,7 +182,7 @@
                 return props.onClose;
             });
 
-            const copyText = () => {
+            const copyURL = () => {
                 if (!clipboard.isSupported) {
                     toast.error('Ваш браузер не поддерживает копирование');
                 }
@@ -191,6 +203,15 @@
                     )));
             };
 
+            const copyText = (text?: string) => {
+                if (!text) {
+                    return;
+                }
+
+                clipboard.copy(text)
+                    .then(() => toast('Текст скопирован'));
+            };
+
             const openPrintWindow = () => {
                 window.print();
             };
@@ -198,11 +219,10 @@
             return {
                 uiStore,
                 hasControls,
-                hasOptionalControls,
-                hasMainControls,
                 urlForCopy,
                 closeAvailable,
                 copyText,
+                copyURL,
                 openPrintWindow
             };
         }
@@ -212,23 +232,21 @@
 <style lang="scss" scoped>
     .section-header {
         width: 100%;
-        height: 72px;
         display: flex;
-        align-items: center;
         justify-content: flex-end;
+        align-items: flex-start;
         flex-wrap: nowrap;
         flex-shrink: 0;
-        background-color: var(--bg-sub-menu);
-        border-bottom: 1px solid var(--border);
+        padding: 12px 8px 8px 16px;
+
+        @include media-min($xl) {
+            padding: 12px 16px 16px 24px;
+        }
 
         &__body {
-            padding: 0 16px;
             flex: 1;
             min-width: 0;
-
-            @media (min-width: 1200px) {
-                padding-left: 24px;
-            }
+            padding-right: 8px;
         }
 
         &__title {
@@ -244,6 +262,7 @@
                 position: relative;
                 color: var(--text-color-title);
                 font-weight: 400;
+                cursor: pointer;
             }
 
             &--copy {
@@ -281,6 +300,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             line-height: normal;
+            cursor: pointer;
 
             @media (max-width: 1200px) {
                 margin-top: 4px;
@@ -289,67 +309,40 @@
 
         &__controls {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             flex-shrink: 0;
-
-            &--main,
-            &--optional {
-                display: flex;
-                align-items: center;
-                flex-shrink: 0;
-            }
-
-            &--optional {
-                padding-right: 8px;
-            }
         }
 
         &__control {
-            &--main,
-            &--optional {
-                &.is-only-desktop {
-                    display: none;
+            @include css_anim();
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 6px;
+            border-radius: 8px;
+
+            @include media-min($md) {
+                &:hover {
+                    background-color: var(--primary-hover);
+                    color: var(--text-btn-color);
                 }
+            }
+
+            &.is-only-desktop {
+                display: none;
 
                 @include media-min($lg) {
-                    &.is-only-desktop {
-                        display: flex;
-                    }
+                    display: flex;
                 }
             }
 
-            &--main {
-                @include css_anim();
-
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-shrink: 0;
-                cursor: pointer;
-                color: var(--primary);
-                width: 73px;
-                height: 72px;
-
-                @include media-min($md) {
-                    &:hover {
-                        background-color: var(--primary-hover);
-                        color: var(--text-btn-color);
-                    }
-                }
-            }
-
-            &--main {
-                background-color: var(--bg-secondary);
-                border-left: 1px solid var(--border);
-                height: 72px;
-                padding: 24px;
-                flex: 1 0 72px;
-            }
-
-            &--optional {
-                & + & {
-                    margin-left: 8px;
-                }
+            svg {
+                width: 24px;
+                height: 24px;
             }
         }
     }

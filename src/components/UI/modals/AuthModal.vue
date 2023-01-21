@@ -15,11 +15,11 @@
         <div class="auth-reg-modal__content">
             <ui-button
                 class="auth-reg-modal__close"
-                type-link
                 is-icon
+                type-link
                 @click.left.exact.prevent="$emit('close')"
             >
-                <svg-icon icon-name="close"/>
+                <svg-icon icon-name="close" />
             </ui-button>
 
             <div class="auth-reg-modal__body">
@@ -27,8 +27,8 @@
 
                 <div class="auth-reg-modal__form">
                     <slot
-                        name="default"
                         :close="close"
+                        name="default"
                     />
                 </div>
             </div>
@@ -37,8 +37,8 @@
 </template>
 
 <script>
-    import { defineComponent } from "vue";
-    import UiButton from "@/components/form/UiButton.vue";
+    import { defineComponent } from 'vue';
+    import UiButton from '@/components/form/UiButton.vue';
 
     export default defineComponent({
         components: { UiButton },

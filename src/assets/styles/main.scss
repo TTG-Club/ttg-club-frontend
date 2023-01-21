@@ -5,7 +5,7 @@
 .video-container {
   overflow: hidden;
   position: relative;
-  width:100%;
+  width: 100%;
 
   &::after {
     padding-top: 56.25%;
@@ -348,7 +348,10 @@
   display: flex;
   flex-wrap: wrap;
   background: var(--bg-sub-menu);
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 16px 16px 0 16px;
+  overflow: hidden;
 
   .block {
     flex: 1 0 calc(33% - 49px);
@@ -356,6 +359,8 @@
     border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     padding: 10px 24px;
+    margin-bottom: -1px;
+    margin-right: -1px;
 
     p {
       margin: 0 0 4px 0;
@@ -383,6 +388,10 @@
       min-width: calc(50% - 49px);
       padding: 10px 16px;
     }
+  }
+
+  @include media-min($xl) {
+    margin: 16px 24px 0 24px;
   }
 }
 
@@ -544,7 +553,7 @@
   }
 }
 
-.tippy-content{
+.tippy-content {
   .scores {
     &__stats {
       max-width: calc(33% - 8px);
@@ -568,7 +577,7 @@
     color: var(--text-btn-color);
   }
 
-  &+& {
+  & + & {
     margin-top: 12px;
   }
 }
@@ -577,7 +586,7 @@
   padding: 16px;
 
   @include media-min($xl) {
-    padding: 24px;
+    padding: 16px 24px;
   }
 }
 

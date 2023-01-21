@@ -8,11 +8,11 @@ import type {
     MathFunctionRoll,
     RollBase
 } from 'dice-roller-parser';
-import type { VNode } from 'vue';
-import type { ToastOptions } from 'vue-toastification/dist/types/types';
 import { DiceRoller } from 'dice-roller-parser';
-import { POSITION, useToast } from 'vue-toastification';
+import type { VNode } from 'vue';
 import { h } from 'vue';
+import type { ToastOptions } from 'vue-toastification/dist/types/types';
+import { POSITION, useToast } from 'vue-toastification';
 import { ToastEventBus } from '@/common/utils/ToastConfig';
 
 export function useDiceRoller() {

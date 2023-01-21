@@ -28,8 +28,8 @@
                             <ui-input
                                 v-model="form.persuasion"
                                 class="form-control select"
-                                placeholder="Харизма (Убеждение)"
                                 is-number
+                                placeholder="Харизма (Убеждение)"
                             />
                         </div>
                     </div>
@@ -108,7 +108,7 @@
                             :spell="detailCard.spell"
                         />
 
-                        <magic-item-body :magic-item="detailCard.item"/>
+                        <magic-item-body :magic-item="detailCard.item" />
                     </div>
                 </template>
             </content-detail>
@@ -129,28 +129,28 @@
 </template>
 
 <script>
-    import { reactive } from "vue";
+    import { reactive } from 'vue';
     import max from 'lodash/max';
     import mean from 'lodash/mean';
     import sortedUniq from 'lodash/sortedUniq';
     import throttle from 'lodash/throttle';
-    import groupBy from "lodash/groupBy";
-    import { mapState } from "pinia";
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import UiSelect from "@/components/form/UiSelect.vue";
-    import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import UiCheckbox from "@/components/form/UiCheckbox.vue";
-    import MagicItemBody from "@/views/Inventory/MagicItems/MagicItemBody.vue";
-    import SpellBody from "@/views/Character/Spells/SpellBody.vue";
-    import MagicItemLink from "@/views/Inventory/MagicItems/MagicItemLink.vue";
-    import errorHandler from "@/common/helpers/errorHandler";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiButton from "@/components/form/UiButton.vue";
+    import groupBy from 'lodash/groupBy';
+    import { mapState } from 'pinia';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import UiSelect from '@/components/form/UiSelect.vue';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
+    import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+    import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
+    import errorHandler from '@/common/helpers/errorHandler';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/form/UiButton.vue';
 
     export default {
-        name: "TraderView",
+        name: 'TraderView',
         components: {
             UiButton,
             UiInput,

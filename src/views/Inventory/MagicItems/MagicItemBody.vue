@@ -1,8 +1,8 @@
 <template>
     <div
         v-if="magicItem"
-        class="magic-item_wrapper magic-item-body bestiary"
         :class="{ 'in-tooltip': inTooltip }"
+        class="magic-item_wrapper magic-item-body bestiary"
     >
         <detail-top-bar
             :left="topBarLeftString"
@@ -24,23 +24,32 @@
             </div>
 
             <p>
-                <b>Настройка:</b> <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
+                <b>Настройка: </b>
+
+                <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
 
                 <span v-if="magicItem.detailCustamization?.length">
-                    ({{ magicItem.detailCustamization.join(', ').toLowerCase() }})
+                    ({{
+                        magicItem.detailCustamization.join(', ')
+                            .toLowerCase()
+                    }})
                 </span>
             </p>
 
             <p v-if="magicItem.cost">
                 <b>Стоимость по <span
                     v-tippy="'Руководство Мастера'"
-                >DMG</span>:</b> <span>{{ magicItem.cost.dmg }}</span>
+                >DMG</span>: </b>
+
+                <span>{{ magicItem.cost.dmg }}</span>
 
                 <br>
 
                 <b>Стоимость по <span
                     v-tippy="'Руководство Зантара обо всем'"
-                >XGE</span>:</b> <span><dice-roller :formula="magicItem.cost.xge"/></span> зм.
+                >XGE</span>: </b>
+
+                <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
             </p>
 
             <raw-content
@@ -55,26 +64,28 @@
         :imgs="magicItem.images"
         :index="gallery.index"
         :visible="gallery.show"
-        teleport="body"
         loop
         move-disabled
         scroll-disabled
+        teleport="body"
         @hide="gallery.show = false"
     >
-        <template #toolbar/>
+        <template #toolbar />
     </vue-easy-lightbox>
 </template>
 
 <script>
-    import upperFirst from "lodash/upperFirst";
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import upperFirst from 'lodash/upperFirst';
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import DiceRoller from '@/components/UI/DiceRoller.vue';
 
     export default {
-        name: "MagicItemBody",
+        name: 'MagicItemBody',
         components: {
             DetailTopBar,
-            RawContent
+            RawContent,
+            DiceRoller
         },
         props: {
             magicItem: {

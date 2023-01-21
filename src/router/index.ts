@@ -1,7 +1,5 @@
-import {
-    createRouter, createWebHistory
-} from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import { useNavStore } from '@/store/UI/NavStore';
 
 /* eslint-disable max-len,vue/max-len */

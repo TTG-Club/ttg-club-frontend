@@ -149,7 +149,7 @@ summary.header_separator + .caption_text {
 blockquote {
   font-family: 'Neucha', cursive;
   padding: 16px 16px 16px 16px;
-  background-color: var(--bg-blockquote);
+  background-color: var(--hover);
   border-radius: 16px;
   margin-bottom: 32px;
   margin-top: 32px;
@@ -393,6 +393,7 @@ table.dataTable.no-footer {
 
 .table-responsive {
   overflow-x: auto;
+  border-radius: 8px;
 }
 
 .table-responsive .simplebar-content {
@@ -442,6 +443,7 @@ table td:last-child {
 table.dnd5_table {
   height: 100%;
   margin-bottom: 0;
+  border-radius: 8px;
 }
 
 .table-responsive.class {
@@ -451,8 +453,8 @@ table.dnd5_table {
 
 @media (max-width: 1200px) {
   .table-responsive.class {
-    margin-left: -16px;
-    margin-right: -16px;
+    margin-left: 0;
+    margin-right: 0;
     margin-top: 30px;
   }
 

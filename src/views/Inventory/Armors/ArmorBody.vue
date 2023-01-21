@@ -1,8 +1,8 @@
 <template>
     <div
         v-if="armor"
-        class="armor-body"
         :class="{ 'in-tooltip': inTooltip }"
+        class="armor-body"
     >
         <detail-top-bar
             :bg-grey="false"
@@ -58,11 +58,11 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "ArmorBody",
+        name: 'ArmorBody',
         components: {
             DetailTopBar,
             RawContent

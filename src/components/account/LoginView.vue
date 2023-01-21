@@ -7,29 +7,29 @@
         <div class="form__row">
             <ui-input
                 v-model.trim="v$.usernameOrEmail.$model"
-                placeholder="Логин или электронная почта"
-                autocomplete="username"
-                autocapitalize="off"
-                autocorrect="off"
-                required
                 :error-text="v$.usernameOrEmail.$dirty ? v$.usernameOrEmail.$errors?.[0]?.$message : ''"
-                @input="v$.usernameOrEmail.$reset()"
+                autocapitalize="off"
+                autocomplete="username"
+                autocorrect="off"
+                placeholder="Логин или электронная почта"
+                required
                 @blur="v$.usernameOrEmail.$touch()"
+                @input="v$.usernameOrEmail.$reset()"
             />
         </div>
 
         <div class="form__row">
             <ui-input
                 v-model.trim="v$.password.$model"
-                placeholder="Пароль"
-                is-password
-                required
-                autocomplete="current-password"
-                autocapitalize="off"
-                autocorrect="off"
                 :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
-                @input="v$.password.$reset()"
+                autocapitalize="off"
+                autocomplete="current-password"
+                autocorrect="off"
+                is-password
+                placeholder="Пароль"
+                required
                 @blur="v$.password.$touch()"
+                @input="v$.password.$reset()"
             />
         </div>
 
@@ -68,23 +68,23 @@
 </template>
 
 <script lang="ts">
-    import useVuelidate from "@vuelidate/core";
-    import { helpers, or } from "@vuelidate/validators";
+    import useVuelidate from '@vuelidate/core';
+    import { helpers, or } from '@vuelidate/validators';
     import {
         defineComponent, reactive, ref
-    } from "vue";
-    import { useToast } from "vue-toastification";
-    import UiInput from "@/components/form/UiInput.vue";
-    import UiCheckbox from "@/components/form/UiCheckbox.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { useUserStore } from "@/store/UI/UserStore";
+    } from 'vue';
+    import { useToast } from 'vue-toastification';
+    import UiInput from '@/components/form/UiInput.vue';
+    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { useUserStore } from '@/store/UI/UserStore';
     import {
         validateEmailFormat,
         validatePwdSpecial,
         validateRequired,
         validateUsernameSpecialChars
-    } from "@/common/helpers/authChecks";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    } from '@/common/helpers/authChecks';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -127,7 +127,7 @@
             const successHandler = () => {
                 success.value = true;
 
-                toast.success("Вы успешно авторизовались!");
+                toast.success('Вы успешно авторизовались!');
                 emit('close');
             };
 
@@ -139,7 +139,7 @@
                 const result = await v$.value.$validate();
 
                 if (success.value || !result) {
-                    toast.error("Проверьте правильность заполнения полей");
+                    toast.error('Проверьте правильность заполнения полей');
 
                     inProgress.value = false;
 

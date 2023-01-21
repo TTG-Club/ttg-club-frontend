@@ -6,17 +6,17 @@
         />
 
         <div class="trait-body__desc content-padding">
-            <raw-content :template="trait?.description"/>
+            <raw-content :template="trait?.description" />
         </div>
     </div>
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "TraitBody",
+        name: 'TraitBody',
         components: {
             DetailTopBar,
             RawContent
@@ -30,15 +30,3 @@
         }
     };
 </script>
-
-<style lang="scss" scoped>
-::v-deep(.row_info) {
-    span {
-
-        &:last-child {
-            min-width: 220px;
-            text-align: right;
-        }
-    }
-}
-</style>

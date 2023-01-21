@@ -7,8 +7,8 @@
                 :subtitle="armor?.name?.eng"
                 :title="armor?.name?.rus"
                 bookmark
-                print
                 copy
+                print
                 @close="close"
             />
         </template>
@@ -23,11 +23,11 @@
 </template>
 
 <script>
-    import { mapState } from "pinia";
-    import SectionHeader from "@/components/UI/SectionHeader.vue";
-    import ArmorBody from "@/views/Inventory/Armors/ArmorBody.vue";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import { mapState } from 'pinia';
+    import SectionHeader from '@/components/UI/SectionHeader.vue';
+    import ArmorBody from '@/views/Inventory/Armors/ArmorBody.vue';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import errorHandler from '@/common/helpers/errorHandler';
 
     export default {

@@ -4,7 +4,7 @@
             v-if="$slots.label"
             class="ui-select__label"
         >
-            <slot name="label"/>
+            <slot name="label" />
         </div>
 
         <multiselect
@@ -25,40 +25,47 @@
                     name="option"
                 />
             </template>
+
             <template #maxElements>
                 <slot name="maxElements">
                     Ты выбрал максимальное количество
                 </slot>
             </template>
+
             <template #noResult>
                 <slot name="noResult">
                     Боги не знают ответа на твой запрос
                 </slot>
             </template>
+
             <template #noOptions>
                 <slot name="noOptions">
                     Не всегда есть выбор
                 </slot>
             </template>
+
             <template #beforeList>
-                <slot name="beforeList"/>
+                <slot name="beforeList" />
             </template>
+
             <template #afterList>
-                <slot name="afterList"/>
+                <slot name="afterList" />
             </template>
+
             <template #caret="{ toggle }">
                 <slot
-                    name="caret"
                     :toggle="toggle"
+                    name="caret"
                 >
                     <div
                         class="multiselect__select"
                         @mousedown.left.exact.prevent.stop="toggle()"
                     >
-                        <svg-icon icon-name="arrow-stroke"/>
+                        <svg-icon icon-name="arrow-stroke" />
                     </div>
                 </slot>
             </template>
+
             <template #singleLabel="{ option }">
                 <div class="ui-select__slotted">
                     <div
@@ -66,18 +73,18 @@
                         class="ui-select__slotted--left"
                     >
                         <slot
-                            name="left-slot"
                             :option="option"
+                            name="left-slot"
                         />
                     </div>
 
                     <div
-                        class="ui-select__slotted--body"
                         :class="{ 'is-wrap-disabled': isWrapDisabled }"
+                        class="ui-select__slotted--body"
                     >
                         <slot
-                            name="singleLabel"
                             :option="option"
+                            name="singleLabel"
                         >
                             {{ getOptionLabel(option) }}
                         </slot>
@@ -88,24 +95,25 @@
                         class="ui-select__slotted--right"
                     >
                         <slot
-                            name="right-slot"
                             :option="option"
+                            name="right-slot"
                         />
                     </div>
                 </div>
             </template>
+
             <template #placeholder>
                 <div class="ui-select__slotted">
                     <div
                         v-if="$slots['left-slot']"
                         class="ui-select__slotted--left"
                     >
-                        <slot name="left-slot"/>
+                        <slot name="left-slot" />
                     </div>
 
                     <div
-                        class="ui-select__slotted--body"
                         :class="{ 'is-wrap-disabled': isWrapDisabled }"
+                        class="ui-select__slotted--body"
                     >
                         <slot name="placeholder">
                             Выбери что-нибудь
@@ -116,21 +124,24 @@
                         v-if="$slots['right-slot']"
                         class="ui-select__slotted--right"
                     >
-                        <slot name="right-slot"/>
+                        <slot name="right-slot" />
                     </div>
                 </div>
             </template>
+
             <template #limit>
                 <slot name="limit">
                     Ты выбрал слишком много
                 </slot>
             </template>
+
             <template #clear="{ search }">
                 <slot
                     :search="search"
                     name="clear"
                 />
             </template>
+
             <template #tag="{ option, search, remove }">
                 <slot
                     :option="option"
@@ -145,7 +156,7 @@
 
 <script>
     import Multiselect, { multiselectMixin } from 'vue-multiselect';
-    import { defineComponent } from "vue";
+    import { defineComponent } from 'vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     // TODO: Создать свой селект компонент
@@ -515,8 +526,8 @@
             &--left,
             &--right {
                 padding: 8px;
-                background-color: var(--border);
-                color: var(--text-color);
+                background-color: var(--primary);
+                color: var(--text-btn-color);
                 font-size: var(--main-font-size);
                 line-height: calc(var(--main-line-height) + 1px);
                 display: flex;

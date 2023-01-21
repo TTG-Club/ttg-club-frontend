@@ -22,8 +22,8 @@
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import GodLink from "@/views/Wiki/Gods/GodLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import GodLink from '@/views/Wiki/Gods/GodLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { GodsFilterDefaults } from '@/types/Wiki/Gods.types';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
@@ -37,7 +37,11 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: GodsFilterDefaults.dbName,
@@ -45,7 +49,9 @@
             });
 
             const {
-                initPages, nextPage, items: gods
+                initPages,
+                nextPage,
+                items: gods
             } = usePagination({
                 url: '/gods',
                 limit: 70,

@@ -14,10 +14,10 @@
 </template>
 
 <script>
-    import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {
-        name: "ClassSquare",
+        name: 'ClassSquare',
         components: {
             SvgIcon
         },

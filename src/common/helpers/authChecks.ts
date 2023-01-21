@@ -1,9 +1,5 @@
 import {
-    helpers,
-    email,
-    required,
-    maxLength,
-    minLength
+    email, helpers, maxLength, minLength, required
 } from '@vuelidate/validators';
 import errorHandler from '@/common/helpers/errorHandler';
 import HTTPService from '@/common/services/HTTPService';

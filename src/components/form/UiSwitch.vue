@@ -1,7 +1,7 @@
 <template>
     <div
-        class="ui-switch"
         :class="{ 'is-full-width': useFullWidth }"
+        class="ui-switch"
     >
         <ui-group-button
             :use-full-width="useFullWidth"
@@ -21,10 +21,10 @@
 <script>
     import {
         computed, defineComponent, onBeforeMount
-    } from "vue";
-    import UiGroupButton from "@/components/form/UiGroupButton.vue";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    } from 'vue';
+    import UiGroupButton from '@/components/form/UiGroupButton.vue';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         components: {
@@ -116,6 +116,7 @@
                 opacity: .6;
             }
         }
+
         .ui-group-button {
 
             button {

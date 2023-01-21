@@ -5,14 +5,14 @@
             ref="trigger"
             v-tippy="{ content: 'Добавить в закладки' }"
             class="custom-bookmark-button"
-            type-link-filled
             is-icon
+            type-link-filled
             @click.left.exact.prevent.stop="toggleSubmenu"
         >
             <svg-icon
-                icon-name="arrow-2"
                 :stroke-enable="false"
                 fill-enable
+                icon-name="arrow-2"
             />
         </ui-button>
 
@@ -24,8 +24,8 @@
             <div
                 v-for="(group, key) in groups"
                 :key="key"
-                class="custom-bookmark-button__group"
                 :class="{ 'is-saved': isSaved(group.uuid) }"
+                class="custom-bookmark-button__group"
                 @click.left.exact.prevent="updateBookmark(group.uuid)"
                 @dblclick.prevent.stop
             >
@@ -37,16 +37,15 @@
 
 <script>
     import {
-        computed,
-        defineComponent, ref, toRefs
-    } from "vue";
-    import { useRoute } from "vue-router";
-    import { useToast } from "vue-toastification";
+        computed, defineComponent, ref, toRefs
+    } from 'vue';
+    import { useRoute } from 'vue-router';
+    import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
-    import errorHandler from "@/common/helpers/errorHandler";
-    import { useCustomBookmarkStore } from "@/store/UI/bookmarks/CustomBookmarksStore";
-    import UiButton from "@/components/form/UiButton.vue";
-    import { ToastEventBus } from "@/common/utils/ToastConfig";
+    import errorHandler from '@/common/helpers/errorHandler';
+    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import UiButton from '@/components/form/UiButton.vue';
+    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -69,7 +68,7 @@
             const route = useRoute();
 
             const bookmarkUrl = computed(() => (
-                typeof props.url === "string" && props.url !== ''
+                typeof props.url === 'string' && props.url !== ''
                     ? props.url
                     : route.path
             ));
@@ -170,9 +169,9 @@
         z-index: 1;
         margin: 0 !important;
         width: 18px;
-        padding: 12px 0;
 
         &__wrapper {
+            height: 100%;
             margin-left: -4px;
             position: relative;
         }
@@ -200,7 +199,6 @@
             cursor: pointer;
             min-width: 100px;
             max-width: 260px;
-
             white-space: nowrap;
             overflow: hidden;
             width: 100%;

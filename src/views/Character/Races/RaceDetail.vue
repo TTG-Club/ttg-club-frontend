@@ -6,9 +6,9 @@
                 :subtitle="race?.name?.eng || ''"
                 :title="race?.name?.rus || ''"
                 bookmark
-                print
-                fullscreen
                 close-on-desktop
+                fullscreen
+                print
                 @close="close"
             />
         </template>
@@ -23,12 +23,12 @@
 </template>
 
 <script>
-    import { mapState } from "pinia";
+    import { mapState } from 'pinia';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
-    import errorHandler from "@/common/helpers/errorHandler";
-    import RaceBody from "@/views/Character/Races/RaceBody.vue";
-    import ContentDetail from "@/components/content/ContentDetail.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import errorHandler from '@/common/helpers/errorHandler';
+    import RaceBody from '@/views/Character/Races/RaceBody.vue';
+    import ContentDetail from '@/components/content/ContentDetail.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default {
         components: {

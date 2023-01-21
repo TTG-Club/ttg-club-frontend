@@ -24,7 +24,7 @@
     overflow: hidden;
     width: 100%;
     position: relative;
-    mask-image: radial-gradient(white, black); // Не удалять, это фикс для Safari, чтобы не вылазили углы картинки
+    isolation: isolate;
 
     &__img-bg {
       @include css_anim($item: transform, $time: .6s);
@@ -35,7 +35,6 @@
       pointer-events: none;
       opacity: 1;
       width: 50%;
-      transform: translateZ(1px); // Не удалять, чтобы не было мерцания при ховере
       transform-origin: top right 1px;
 
       @include media-min($lg) {
@@ -59,7 +58,6 @@
       opacity: 1;
       height: 100%;
       width: 100%;
-      transform: translateZ(2px); // Не удалять, чтобы не было мерцания при ховере
       transform-origin: 0 0 2px;
     }
   }
@@ -254,7 +252,7 @@
       .link-item-expand {
         &__content {
           &__img-bg {
-            transform: scale(1.03) translateZ(1px); // Не удалять, чтобы не было мерцания при ховере
+            transform: scale(1.03); // Не удалять, чтобы не было мерцания при ховере
           }
         }
       }

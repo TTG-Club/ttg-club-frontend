@@ -1,8 +1,8 @@
 <template>
     <div
         v-if="weapon"
-        class="weapon-body"
         :class="{ 'in-tooltip': inTooltip }"
+        class="weapon-body"
     >
         <detail-top-bar
             :bg-grey="false"
@@ -20,9 +20,13 @@
             <div class="block">
                 <p>Урон: </p>
 
-                <dice-roller :formula="weapon.damage.dice">
-                    {{ weapon.damage.dice }}
-                </dice-roller> <span>{{ weapon.damage.type }}</span>
+                <span>
+                    <dice-roller :formula="weapon.damage.dice">
+                        {{ weapon.damage.dice }}
+                    </dice-roller>
+
+                    <span>&nbsp;{{ weapon.damage.type }}</span>
+                </span>
             </div>
 
             <div class="block">
@@ -66,19 +70,20 @@
 
             <p v-if="weapon.special">
                 <strong>Особое свойство:</strong>
-                <raw-content :template="weapon.special"/>
+
+                <raw-content :template="weapon.special" />
             </p>
         </div>
     </div>
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DiceRoller from "@/components/UI/DiceRoller.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DiceRoller from '@/components/UI/DiceRoller.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "WeaponBody",
+        name: 'WeaponBody',
         components: {
             DetailTopBar,
             DiceRoller,

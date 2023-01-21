@@ -1,7 +1,7 @@
 <template>
     <div
-        class="item-body"
         :class="{ 'in-tooltip': inTooltip }"
+        class="item-body"
     >
         <detail-top-bar
             :left="categoriesString"
@@ -30,11 +30,11 @@
 </template>
 
 <script>
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "ItemBody",
+        name: 'ItemBody',
         components: {
             DetailTopBar,
             RawContent

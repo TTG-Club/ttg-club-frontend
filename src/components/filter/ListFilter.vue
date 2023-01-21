@@ -1,13 +1,13 @@
 <template>
-    <div class="filter">
-        <div
-            :class="{ 'in-tab': inTab }"
-            class="filter__body"
-        >
+    <div
+        class="filter"
+        :class="{ 'in-tab': inTab }"
+    >
+        <div class="filter__body">
             <div class="filter__search">
                 <label class="filter__search_field">
                     <span class="filter__search_field_icon">
-                        <svg-icon icon-name="search"/>
+                        <svg-icon icon-name="search" />
                     </span>
 
                     <input
@@ -26,7 +26,7 @@
                     type="button"
                     @click.left.exact.prevent="search = ''"
                 >
-                    <svg-icon icon-name="close"/>
+                    <svg-icon icon-name="close" />
                 </button>
             </div>
 
@@ -54,7 +54,7 @@
                 type="button"
                 @click.left.exact.prevent="resetFilter"
             >
-                <svg-icon icon-name="clear-filter"/>
+                <svg-icon icon-name="clear-filter" />
             </button>
         </div>
 
@@ -78,9 +78,9 @@
                         <filter-item-checkboxes
                             v-for="(block, blockKey) in otherFiltered"
                             :key="blockKey"
+                            :expand="block.expand"
                             :model-value="block.values"
                             :name="block.name"
-                            :expand="block.expand"
                             :type="block.type || 'crumb'"
                             @update:model-value="setOtherValue($event, block.key)"
                         />
@@ -98,19 +98,17 @@
 </template>
 
 <script lang="ts">
-    import cloneDeep from "lodash/cloneDeep";
+    import cloneDeep from 'lodash/cloneDeep';
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, ref
-    } from 'vue';
-    import type {
-        PropType
     } from 'vue';
     import { useDebounceFn } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
     import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
-    import errorHandler from "@/common/helpers/errorHandler";
-    import BaseModal from "@/components/UI/modals/BaseModal.vue";
+    import errorHandler from '@/common/helpers/errorHandler';
+    import BaseModal from '@/components/UI/modals/BaseModal.vue';
     import type {
         Filter, FilterComposable, FilterGroup, FilterItem
     } from '@/common/composition/useFilter';
@@ -255,15 +253,6 @@
             background-color: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 12px;
-
-            &.in-tab {
-                border: {
-                    radius: 0;
-                    left: 0;
-                    top: 0;
-                    right: 0;
-                }
-            }
         }
 
         &__search {
@@ -387,6 +376,21 @@
 
             &_body {
                 padding: 16px;
+            }
+        }
+
+        &.in-tab {
+            padding: 0 16px;
+
+            .filter {
+                &__body {
+                    border-radius: 8px;
+                    background-color: var(--bg-sub-menu);
+                }
+            }
+
+            @include media-min($xl) {
+                padding: 0 24px;
             }
         }
     }

@@ -1,18 +1,18 @@
 <template>
     <div
-        class="ui-group-button"
         :class="{
             'is-vertical': isVertical,
             'is-reverse': isReverse,
             'is-full-width': useFullWidth,
         }"
+        class="ui-group-button"
     >
-        <slot/>
+        <slot />
     </div>
 </template>
 
 <script>
-    import { defineComponent } from "vue";
+    import { defineComponent } from 'vue';
 
     export default defineComponent({
         props: {

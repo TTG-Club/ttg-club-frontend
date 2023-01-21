@@ -9,34 +9,34 @@
             v-if="$slots['icon-left']"
             class="ui-button__icon is-left"
         >
-            <slot name="icon-left"/>
+            <slot name="icon-left" />
         </span>
 
         <span
             v-if="isIcon"
             class="ui-button__icon"
         >
-            <slot name="default"/>
+            <slot name="default" />
         </span>
 
         <span
             v-else
             class="ui-button__text"
         >
-            <slot name="default"/>
+            <slot name="default" />
         </span>
 
         <span
             v-if="$slots['icon-right']"
             class="ui-button__icon is-right"
         >
-            <slot name="icon-right"/>
+            <slot name="icon-right" />
         </span>
     </button>
 </template>
 
 <script>
-    import { computed, defineComponent } from "vue";
+    import { computed, defineComponent } from 'vue';
 
     export default defineComponent({
         props: {
@@ -119,7 +119,7 @@
         background-color: var(--primary);
         color: var(--text-btn-color);
         border-radius: 8px;
-        padding: 9px 12px;
+        padding: 6px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -128,10 +128,6 @@
         flex-shrink: 0;
         font-size: var(--main-font-size);
         line-height: calc(var(--main-line-height) - 1px);
-
-        & + & {
-            margin-left: 16px;
-        }
 
         @include media-min($xl) {
             &:hover {
@@ -165,8 +161,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             flex-shrink: 0;
 
             &.is-left,
@@ -262,7 +258,7 @@
 
             @include media-min($xl) {
                 &:hover {
-                    background-color: var(--hover);
+                    background-color: var(--primary-hover);
                     color: var(--text-btn-color);
                 }
 

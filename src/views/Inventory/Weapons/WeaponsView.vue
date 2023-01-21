@@ -30,12 +30,12 @@
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import sortBy from "lodash/sortBy";
+    import sortBy from 'lodash/sortBy';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from "@/components/content/ContentLayout.vue";
-    import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import WeaponLink from '@/views/Inventory/Weapons/WeaponLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.types';
     import { usePagination } from '@/common/composition/usePagination';
@@ -49,14 +49,21 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const filter = useFilter({
                 dbName: WeaponsFilterDefaults.dbName,
                 url: WeaponsFilterDefaults.url
             });
 
-            const { initPages, items } = usePagination({
+            const {
+                initPages,
+                items
+            } = usePagination({
                 url: '/weapons',
                 limit: -1,
                 filter: {

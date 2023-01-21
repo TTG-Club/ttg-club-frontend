@@ -18,16 +18,16 @@
 </template>
 
 <script lang="ts">
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, onBeforeMount, watch
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
-    import type { PropType } from 'vue';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TabLayout from "@/components/content/TabLayout.vue";
-    import SpellLink from "@/views/Character/Spells/SpellLink.vue";
-    import { useUIStore } from "@/store/UI/UIStore";
+    import TabLayout from '@/components/content/TabLayout.vue';
+    import SpellLink from '@/views/Character/Spells/SpellLink.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
@@ -60,7 +60,11 @@
             const route = useRoute();
             const router = useRouter();
             const uiStore = useUIStore();
-            const { isMobile, fullscreen } = storeToRefs(uiStore);
+
+            const {
+                isMobile,
+                fullscreen
+            } = storeToRefs(uiStore);
 
             const layout = computed(() => (
                 props.inTab
@@ -88,7 +92,10 @@
             });
 
             const {
-                initPages, nextPage, resetPages, items: spells
+                initPages,
+                nextPage,
+                resetPages,
+                items: spells
             } = usePagination({
                 url: '/spells',
                 limit: 70,

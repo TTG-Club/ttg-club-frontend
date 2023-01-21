@@ -54,15 +54,10 @@
 
 <script lang="ts">
     import type { PropType } from 'vue';
+    import { computed, defineComponent } from 'vue';
+    import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import {
-        computed,
-        defineComponent
-    } from 'vue';
-    import {
-        AbilityName, AbilityKey, AbilityShortName
-    } from '@/types/Tools/AbilityCalc.types';
-    import type {
-        AbilityRoll
+        AbilityKey, AbilityName, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 

@@ -28,6 +28,7 @@
 
                     <p>{{ race.type || '' }}</p>
                 </div>
+
                 <div class="scores__stats">
                     <h4>
                         <strong
@@ -39,22 +40,27 @@
                         {{ abilities }}
                     </p>
                 </div>
+
                 <div class="scores__stats">
                     <h4>
                         <strong
                             v-tippy="'Размер'"
                         >РАЗ</strong>
                     </h4>
+
                     <p>{{ race.size }}</p>
                 </div>
+
                 <div class="scores__stats">
                     <h4>
                         <strong
                             v-tippy="'Скорость'"
                         >СКР</strong>
                     </h4>
+
                     <p>{{ speed }}</p>
                 </div>
+
                 <div
                     v-if="race.darkvision"
                     class="scores__stats"
@@ -64,6 +70,7 @@
                             v-tippy="'Темное зрение'"
                         >ТЗ</strong>
                     </h4>
+
                     <p>{{ `${ race.darkvision } фт.` }}</p>
                 </div>
             </div>
@@ -110,7 +117,9 @@
                     class="spoiler feet_show"
                 >
                     <summary class="h4 header_separator">
-                        <span>{{ subrace.name.rus }}</span> <span>{{ subrace.source.shortName }}</span>
+                        <span>{{ subrace.name.rus }}</span>
+
+                        <span>{{ subrace.source.shortName }}</span>
                     </summary>
 
                     <div class="content">
@@ -143,23 +152,23 @@
         :imgs="race.images"
         :index="gallery.index"
         :visible="gallery.show"
-        teleport="body"
         loop
         move-disabled
         scroll-disabled
+        teleport="body"
         @hide="gallery.show = false"
     >
-        <template #toolbar/>
+        <template #toolbar />
     </vue-easy-lightbox>
 </template>
 
 <script>
-    import sortBy from "lodash/sortBy";
-    import RawContent from "@/components/content/RawContent.vue";
-    import DetailTopBar from "@/components/UI/DetailTopBar.vue";
+    import sortBy from 'lodash/sortBy';
+    import RawContent from '@/components/content/RawContent.vue';
+    import DetailTopBar from '@/components/UI/DetailTopBar.vue';
 
     export default {
-        name: "RaceBody",
+        name: 'RaceBody',
         components: {
             DetailTopBar,
             RawContent
