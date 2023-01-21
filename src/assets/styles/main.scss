@@ -350,7 +350,7 @@
   background: var(--bg-sub-menu);
   border: 1px solid var(--border);
   border-radius: 8px;
-  margin: 16px 24px 0 24px;
+  margin: 16px 16px 0 16px;
   overflow: hidden;
 
   .block {
@@ -388,6 +388,10 @@
       min-width: calc(50% - 49px);
       padding: 10px 16px;
     }
+  }
+
+  @include media-min($xl) {
+    margin: 16px 24px 0 24px;
   }
 }
 

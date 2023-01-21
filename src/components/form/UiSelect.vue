@@ -527,7 +527,7 @@
             &--right {
                 padding: 8px;
                 background-color: var(--primary);
-                color: var(--text-color);
+                color: var(--text-btn-color);
                 font-size: var(--main-font-size);
                 line-height: calc(var(--main-line-height) + 1px);
                 display: flex;
