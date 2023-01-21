@@ -129,10 +129,6 @@
         font-size: var(--main-font-size);
         line-height: calc(var(--main-line-height) - 1px);
 
-        & + & {
-            margin-left: 16px;
-        }
-
         @include media-min($xl) {
             &:hover {
                 @include css_anim();
