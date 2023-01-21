@@ -123,6 +123,10 @@
 
             &--inner {
                 padding: 24px;
+
+                @media (max-width: 1200px) {
+                    padding: 16px;
+                }
             }
         }
     }
