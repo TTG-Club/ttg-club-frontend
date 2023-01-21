@@ -349,6 +349,7 @@
   flex-wrap: wrap;
   background: var(--bg-sub-menu);
   border-top: 1px solid var(--border);
+  margin-top: 16px;
 
   .block {
     flex: 1 0 calc(33% - 49px);

@@ -63,6 +63,7 @@
         justify-content: space-between;
         border-radius: 8px;
         margin: 8px 24px 0 24px;
+        background: var(--bg-sub-menu);
 
         .left_info {
             font-style: italic;
