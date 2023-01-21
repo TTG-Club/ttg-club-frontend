@@ -46,3 +46,11 @@
         data: () => ({})
     };
 </script>
+
+<style lang="scss" scoped>
+    .screen-body {
+        .row_info {
+            margin-top: 16px;
+        }
+    }
+</style>
