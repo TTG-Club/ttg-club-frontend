@@ -24,7 +24,7 @@
             </div>
 
             <p>
-                <b>Настройка:</b>
+                <b>Настройка: </b>
 
                 <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
 
@@ -39,7 +39,7 @@
             <p v-if="magicItem.cost">
                 <b>Стоимость по <span
                     v-tippy="'Руководство Мастера'"
-                >DMG</span>:</b>
+                >DMG</span>: </b>
 
                 <span>{{ magicItem.cost.dmg }}</span>
 
@@ -47,7 +47,7 @@
 
                 <b>Стоимость по <span
                     v-tippy="'Руководство Зантара обо всем'"
-                >XGE</span>:</b>
+                >XGE</span>: </b>
 
                 <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
             </p>
@@ -76,9 +76,9 @@
 
 <script>
     import upperFirst from 'lodash/upperFirst';
-    import { DiceRoller } from 'dice-roller-parser';
     import RawContent from '@/components/content/RawContent.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import DiceRoller from '@/components/UI/DiceRoller.vue';
 
     export default {
         name: 'MagicItemBody',

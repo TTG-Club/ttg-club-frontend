@@ -62,7 +62,7 @@
         padding: 12px;
         justify-content: space-between;
         border-radius: 8px;
-        margin: 16px 24px 0 24px;
+        margin: 0 24px;
         background: var(--bg-sub-menu);
 
         .left_info {
@@ -76,7 +76,7 @@
 
         @media (max-width: 1200px) {
             flex-direction: column;
-            margin: 8px 16px 0 16px;
+            margin: 0 16px;
 
             span {
                 &:nth-child(n + 2) {

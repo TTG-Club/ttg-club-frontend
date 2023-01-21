@@ -13,7 +13,7 @@
             />
 
             <div
-                v-if="isMobile && currentTab?.type === 'traits' && currentArchetypes.length"
+                v-if="isMobile && currentArchetypes.length"
                 class="class-detail__select"
             >
                 <ui-select
@@ -461,10 +461,10 @@
             flex-shrink: 0;
             flex-wrap: wrap;
             gap: 8px;
-            padding: 16px 16px;
+            padding: 8px 16px;
 
             @include media-min($xl) {
-                padding: 16px 24px;
+                padding: 0 24px 16px 24px;
             }
         }
 
@@ -526,7 +526,7 @@
         &__select {
             ::v-deep(.ui-select) {
                 .multiselect {
-                    margin: 8px 16px 0 16px;
+                    margin: 0 16px;
                     width: auto;
 
                     &__content {

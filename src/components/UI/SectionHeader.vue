@@ -237,10 +237,16 @@
         align-items: flex-start;
         flex-wrap: nowrap;
         flex-shrink: 0;
-        padding: 12px 12px 0 24px;
+        padding: 12px 8px 8px 16px;
+
+        @include media-min($xl) {
+            padding: 12px 16px 16px 24px;
+        }
 
         &__body {
-            flex: 1 1 auto;
+            flex: 1;
+            min-width: 0;
+            padding-right: 8px;
         }
 
         &__title {
