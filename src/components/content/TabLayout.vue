@@ -96,6 +96,11 @@
         &__filter {
             flex-shrink: 0;
             position: relative;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin: 0 24px;
+            overflow: hidden;
+            background-color: var(--bg-sub-menu);
 
             &_dropdown {
                 position: absolute;
