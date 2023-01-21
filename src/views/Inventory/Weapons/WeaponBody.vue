@@ -20,11 +20,13 @@
             <div class="block">
                 <p>Урон: </p>
 
-                <dice-roller :formula="weapon.damage.dice">
-                    {{ weapon.damage.dice }}
-                </dice-roller>
+                <span>
+                    <dice-roller :formula="weapon.damage.dice">
+                        {{ weapon.damage.dice }}
+                    </dice-roller>
 
-                <span>{{ weapon.damage.type }}</span>
+                    <span>&nbsp;{{ weapon.damage.type }}</span>
+                </span>
             </div>
 
             <div class="block">
