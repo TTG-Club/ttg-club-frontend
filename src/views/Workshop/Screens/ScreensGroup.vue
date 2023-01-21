@@ -68,17 +68,23 @@
 
         &__name {
             background: var(--hover);
-            text-align: center;
+            // text-align: center;
             line-height: 50px;
             font-size: var(--h4-font-size);
             font-weight: 300;
             color: var(--text-color-title);
             font-family: 'Lora';
+            margin: 16px 16px 0 16px;
+            border-radius: 8px;
+            padding: 0 16px;
         }
 
         &__list {
             width: 100%;
             display: grid;
+            row-gap: 8px;
+            column-gap: 8px;
+            padding: 8px 16px;
             grid-template-columns: repeat(1, 1fr);
 
             @include media-min($sm) {
