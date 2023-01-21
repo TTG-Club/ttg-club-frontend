@@ -1,13 +1,13 @@
 <template>
     <router-link
-        v-slot="{ href, navigate, isActive }"
+        v-slot="{ href }"
         :to="{ path: classItem.url }"
         custom
         v-bind="$props"
     >
         <div
             ref="classItem"
-            :class="getClassList(isActive)"
+            :class="getClassList"
             class="link-item-expand"
             v-bind="$attrs"
         >
@@ -24,7 +24,7 @@
                     <a
                         :href="href"
                         class="link-item-expand__link"
-                        @click.left.prevent.exact="selectClass(navigate)"
+                        @click.left.prevent.exact="selectClass"
                     >
 
                         <span class="link-item-expand__body">
@@ -133,8 +133,14 @@
 <script lang="ts">
     import type { RouteLocationPathRaw } from 'vue-router';
     import type { PropType } from 'vue';
-    import { defineComponent } from 'vue';
+    import {
+        computed, defineComponent, nextTick, onMounted, ref, watch
+    } from 'vue';
+    import {
+        useLink, useRoute, useRouter
+    } from 'vue-router';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         components: { SvgIcon },
@@ -154,52 +160,58 @@
                 default: false
             }
         },
-        data() {
-            return {
-                submenu: false
+        setup(props) {
+            const route = useRoute();
+            const router = useRouter();
+            const uiStore = useUIStore();
+            const { isActive, navigate } = useLink(props);
+
+            const submenu = ref(false);
+
+            const getClassList = computed(() => ({
+                'router-link-active': isActive.value
+                    || route.params.className === router.resolve(props.classItem.url)?.params?.className,
+                'is-selected': route.name === 'classDetail',
+                'is-green': props.classItem?.source?.homebrew
+            }));
+
+            const hasArchetypes = computed(() => !!props.classItem?.archetypes?.length);
+
+            const toggleArch = () => {
+                submenu.value = !submenu.value;
             };
-        },
-        computed: {
-            hasArchetypes() {
-                return !!this.classItem?.archetypes?.length;
-            }
-        },
-        watch: {
-            afterSearch(value) {
+
+            const selectClass = () => {
+                if (!uiStore.isMobile) {
+                    submenu.value = true;
+                }
+
+                navigate();
+            };
+
+            onMounted(() => {
+                nextTick(() => {
+                    submenu.value = route.params.className === router.resolve(props.classItem.url)?.params?.className;
+                });
+            });
+
+            watch(() => props.afterSearch, value => {
                 if (value) {
-                    this.submenu = this.afterSearch;
+                    submenu.value = value;
 
                     return;
                 }
 
-                this.submenu = false;
-            }
-        },
-        mounted() {
-            this.$nextTick(() => {
-                this.submenu = this.$route.params.className === this.$router.resolve(this.classItem.url)
-                    ?.params?.className;
+                submenu.value = false;
             });
-        },
-        methods: {
-            getClassList(isActive: any) {
-                return {
-                    'router-link-active': isActive
-                        || this.$route.params.className === this.$router.resolve(this.classItem.url)?.params?.className,
-                    'is-selected': this.$route.name === 'classDetail',
-                    'is-green': this.classItem?.source?.homebrew
-                };
-            },
 
-            toggleArch() {
-                this.submenu = !this.submenu;
-            },
-
-            selectClass(callback: () => void) {
-                this.submenu = true;
-
-                callback();
-            }
+            return {
+                submenu,
+                getClassList,
+                hasArchetypes,
+                toggleArch,
+                selectClass
+            };
         }
     });
 </script>
