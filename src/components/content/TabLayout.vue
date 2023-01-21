@@ -122,10 +122,10 @@
             overflow: auto;
 
             &--inner {
-                padding: 24px;
+                padding: 16px;
 
-                @media (max-width: 1200px) {
-                    padding: 16px;
+                @include media-min($xl) {
+                    padding: 24px;
                 }
             }
         }
