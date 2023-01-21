@@ -1,9 +1,9 @@
 <template>
-    <div class="filter">
-        <div
-            :class="{ 'in-tab': inTab }"
-            class="filter__body"
-        >
+    <div
+        class="filter"
+        :class="{ 'in-tab': inTab }"
+    >
+        <div class="filter__body">
             <div class="filter__search">
                 <label class="filter__search_field">
                     <span class="filter__search_field_icon">
@@ -253,15 +253,6 @@
             background-color: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 12px;
-
-            &.in-tab {
-                border: {
-                    radius: 0;
-                    left: 0;
-                    top: 0;
-                    right: 0;
-                }
-            }
         }
 
         &__search {
@@ -385,6 +376,17 @@
 
             &_body {
                 padding: 16px;
+            }
+        }
+
+        &.in-tab {
+            padding: 0 24px;
+
+            .filter {
+                &__body {
+                    border-radius: 8px;
+                    background-color: var(--bg-sub-menu);
+                }
             }
         }
     }
