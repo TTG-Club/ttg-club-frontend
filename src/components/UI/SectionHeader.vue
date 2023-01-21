@@ -33,79 +33,71 @@
             v-if="hasControls"
             class="section-header__controls"
         >
-            <div
-                v-if="hasOptionalControls"
-                class="section-header__controls--optional"
+            <bookmark-save-button
+                v-if="bookmark"
+                :name="title"
+                :url="url"
+            />
+
+            <ui-button
+                v-if="print"
+                v-tippy="{ content: 'Открыть окно печати' }"
+                class="section-header__control is-only-desktop"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="openPrintWindow"
             >
-                <bookmark-save-button
-                    v-if="bookmark"
-                    :name="title"
-                    :url="url"
+                <svg-icon
+                    icon-name="print"
+                    :stroke-enable="false"
+                    fill-enable
                 />
+            </ui-button>
 
-                <ui-button
-                    v-if="print"
-                    v-tippy="{ content: 'Открыть окно печати' }"
-                    class="section-header__control--optional is-only-desktop"
-                    is-icon
-                    type-link-filled
-                    @click.left.exact.prevent.stop="openPrintWindow"
-                >
-                    <svg-icon
-                        icon-name="print"
-                        :stroke-enable="false"
-                        fill-enable
-                    />
-                </ui-button>
-
-                <ui-button
-                    v-if="onExportFoundry"
-                    v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
-                    class="section-header__control--optional is-only-desktop"
-                    is-icon
-                    type-link-filled
-                    @click.left.exact.prevent.stop="$emit('exportFoundry')"
-                >
-                    <svg-icon icon-name="export-foundry" />
-                </ui-button>
-            </div>
-
-            <div
-                v-if="hasMainControls"
-                class="section-header__controls--main"
+            <ui-button
+                v-if="onExportFoundry"
+                v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
+                class="section-header__control is-only-desktop"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="$emit('exportFoundry')"
             >
-                <button
-                    v-if="fullscreen"
-                    v-tippy="{
-                        content: uiStore.fullscreen
-                            ? 'Свернуть окно'
-                            : 'Развернуть окно',
-                    }"
-                    class="section-header__control--main is-only-desktop"
-                    type="button"
-                    @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
-                >
-                    <svg-icon
-                        :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
-                        :stroke-enable="false"
-                        fill-enable
-                    />
-                </button>
+                <svg-icon icon-name="export-foundry" />
+            </ui-button>
 
-                <button
-                    v-if="closeAvailable"
-                    v-tippy="{ content: 'Закрыть' }"
-                    class="section-header__control--main"
-                    type="button"
-                    @click.left.exact.prevent.stop="$emit('close')"
-                >
-                    <svg-icon
-                        icon-name="close"
-                        :stroke-enable="false"
-                        fill-enable
-                    />
-                </button>
-            </div>
+            <ui-button
+                v-if="fullscreen"
+                v-tippy="{
+                    content: uiStore.fullscreen
+                        ? 'Свернуть окно'
+                        : 'Развернуть окно',
+                }"
+                class="section-header__control is-only-desktop"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
+            >
+                <svg-icon
+                    :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
+                    :stroke-enable="false"
+                    fill-enable
+                />
+            </ui-button>
+
+            <ui-button
+                v-if="closeAvailable"
+                v-tippy="{ content: 'Закрыть' }"
+                class="section-header__control"
+                is-icon
+                type-link-filled
+                @click.left.exact.prevent.stop="$emit('close')"
+            >
+                <svg-icon
+                    icon-name="close"
+                    :stroke-enable="false"
+                    fill-enable
+                />
+            </ui-button>
         </div>
     </div>
 </template>
@@ -174,11 +166,13 @@
             const uiStore = useUIStore();
             const clipboard = useClipboard();
             const toast = useToast(ToastEventBus);
-
-            const hasOptionalControls = computed(() => !!props.bookmark || !!props.print || !!props.onExportFoundry);
-            const hasMainControls = computed(() => !!props.onClose || !!props.fullscreen);
-            const hasControls = computed(() => hasOptionalControls.value || hasMainControls.value);
             const urlForCopy = computed(() => window.location.origin + route.path);
+
+            const hasControls = computed(() => !!props.bookmark
+                || !!props.print
+                || !!props.onExportFoundry
+                || !!props.onClose
+                || !!props.fullscreen);
 
             const closeAvailable = computed(() => {
                 if (!uiStore.isMobile) {
@@ -225,8 +219,6 @@
             return {
                 uiStore,
                 hasControls,
-                hasOptionalControls,
-                hasMainControls,
                 urlForCopy,
                 closeAvailable,
                 copyText,
@@ -240,21 +232,15 @@
 <style lang="scss" scoped>
     .section-header {
         width: 100%;
-        height: 72px;
         display: flex;
-        align-items: center;
         justify-content: flex-end;
+        align-items: flex-start;
         flex-wrap: nowrap;
         flex-shrink: 0;
+        padding: 12px 12px 0 24px;
 
         &__body {
-            padding: 0 16px;
-            flex: 1;
-            min-width: 0;
-
-            @media (min-width: 1200px) {
-                padding-left: 24px;
-            }
+            flex: 1 1 auto;
         }
 
         &__title {
@@ -317,66 +303,40 @@
 
         &__controls {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             flex-shrink: 0;
-            margin-top: -16px;
-            margin-right: 12px;
-
-            &--main,
-            &--optional {
-                display: flex;
-                align-items: center;
-                flex-shrink: 0;
-            }
         }
 
         &__control {
-            &--main,
-            &--optional {
-                &.is-only-desktop {
-                    display: none;
+            @include css_anim();
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 6px;
+            border-radius: 8px;
+
+            @include media-min($md) {
+                &:hover {
+                    background-color: var(--primary-hover);
+                    color: var(--text-btn-color);
                 }
+            }
+
+            &.is-only-desktop {
+                display: none;
 
                 @include media-min($lg) {
-                    &.is-only-desktop {
-                        display: flex;
-                    }
+                    display: flex;
                 }
             }
 
-            &--main {
-                @include css_anim();
-
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-shrink: 0;
-                cursor: pointer;
-                color: var(--primary);
-                padding: 6px;
-                border-radius: 8px;
-
-                @include media-min($md) {
-                    &:hover {
-                        background-color: var(--primary-hover);
-                        color: var(--text-btn-color);
-                    }
-                }
-            }
-
-            &--main {
-                flex: 1 0;
-
-                svg {
-                    width: 24px;
-                    height: 24px;
-                }
-            }
-
-            &--optional {
-                & + & {
-                    margin-left: 8px;
-                }
+            svg {
+                width: 24px;
+                height: 24px;
             }
         }
     }

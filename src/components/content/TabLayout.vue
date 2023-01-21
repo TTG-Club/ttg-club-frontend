@@ -96,6 +96,7 @@
         &__filter {
             flex-shrink: 0;
             position: relative;
+            padding-bottom: 8px;
 
             &_dropdown {
                 position: absolute;
@@ -117,7 +118,7 @@
             overflow: auto;
 
             &--inner {
-                padding: 24px;
+                padding: 8px 24px 24px;
             }
         }
     }

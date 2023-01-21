@@ -169,9 +169,9 @@
         z-index: 1;
         margin: 0 !important;
         width: 18px;
-        padding: 12px 0;
 
         &__wrapper {
+            height: 100%;
             margin-left: -4px;
             position: relative;
         }
@@ -199,7 +199,6 @@
             cursor: pointer;
             min-width: 100px;
             max-width: 260px;
-
             white-space: nowrap;
             overflow: hidden;
             width: 100%;
