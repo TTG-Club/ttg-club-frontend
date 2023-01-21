@@ -380,13 +380,17 @@
         }
 
         &.in-tab {
-            padding: 0 24px;
+            padding: 0 16px;
 
             .filter {
                 &__body {
                     border-radius: 8px;
                     background-color: var(--bg-sub-menu);
                 }
+            }
+
+            @include media-min($xl) {
+                padding: 0 24px;
             }
         }
     }
