@@ -118,7 +118,7 @@
             overflow: auto;
 
             &--inner {
-                padding: 8 16px 16px;
+                padding: 8px 16px 16px;
 
                 @include media-min($xl) {
                     padding: 8px 24px 24px;
