@@ -348,8 +348,10 @@
   display: flex;
   flex-wrap: wrap;
   background: var(--bg-sub-menu);
-  border-top: 1px solid var(--border);
-  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 16px 24px 0 24px;
+  overflow: hidden;
 
   .block {
     flex: 1 0 calc(33% - 49px);
@@ -357,6 +359,8 @@
     border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     padding: 10px 24px;
+    margin-bottom: -1px;
+    margin-right: -1px;
 
     p {
       margin: 0 0 4px 0;
