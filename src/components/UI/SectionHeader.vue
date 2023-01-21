@@ -372,12 +372,6 @@
                     height: 24px;
                 }
             }
-
-            &--optional {
-                & + & {
-                    margin-left: 8px;
-                }
-            }
         }
     }
 </style>
