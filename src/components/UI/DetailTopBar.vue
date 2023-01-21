@@ -11,7 +11,7 @@
         </span>
 
         <span
-            v-else
+            v-else-if="!!$slots.left"
             class="left_info"
         >
             <slot name="left" />
