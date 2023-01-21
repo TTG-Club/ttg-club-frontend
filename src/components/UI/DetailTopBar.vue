@@ -17,7 +17,10 @@
             <slot name="left" />
         </span>
 
-        <span v-if="source">
+        <span
+            v-if="source"
+            class="right_info"
+        >
             Источник:
 
             <span
@@ -30,7 +33,10 @@
             >&nbsp;{{ source.shortName }}</span>
         </span>
 
-        <span v-else-if="$slots.default">
+        <span
+            v-else-if="$slots.default"
+            class="right_info"
+        >
             <slot />
         </span>
     </div>
@@ -60,29 +66,34 @@
     .row_info {
         display: flex;
         padding: 12px;
+        flex-direction: column;
         justify-content: space-between;
         border-radius: 8px;
-        margin: 0 24px;
+        margin: 0 16px;
+        gap: 12px;
         background: var(--bg-sub-menu);
+
+        @include media-min($xl) {
+            flex-direction: row;
+            margin: 0 24px;
+        }
 
         .left_info {
             font-style: italic;
             margin-right: 8px;
+            flex: 1 1 100%;
+
+            @include media-min($xl) {
+                margin-right: 0;
+            }
+        }
+
+        .right_info {
+            flex-shrink: 0;
         }
 
         &.bg_grey {
             background: var(--bg-sub-menu);
-        }
-
-        @media (max-width: 1200px) {
-            flex-direction: column;
-            margin: 0 16px;
-
-            span {
-                &:nth-child(n + 2) {
-                    margin-top: 12px;
-                }
-            }
         }
     }
 </style>
