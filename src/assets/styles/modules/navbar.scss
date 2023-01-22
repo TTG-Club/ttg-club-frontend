@@ -161,11 +161,11 @@
   .line {
     @include css_anim();
 
-    width: 22px;
+    width: 20px;
     height: 2px;
     background-color: var(--text-color);
     display: block;
-    margin: 5px auto;
+    margin: 4px auto;
     -webkit-transition: all 0.3s ease-in-out;
     -o-transition: all 0.3s ease-in-out;
     transition: all 0.3s ease-in-out;
@@ -179,11 +179,11 @@
       }
 
       &:nth-child(1) {
-        transform: translateY(7px) rotate(45deg) translate3d(0, 0, 0);
+        transform: translateY(6px) rotate(45deg) translate3d(0, 0, 0);
       }
 
       &:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg) translate3d(0, 0, 0);
+        transform: translateY(-6px) rotate(-45deg) translate3d(0, 0, 0);
       }
     }
   }
@@ -203,8 +203,8 @@
     &.is-active {
       .line {
         &:nth-child(1) {
-          transform: translateY(7px) rotate(45deg) translate3d(0, 0, 0);
-          width: 22px;
+          transform: translateY(6px) rotate(45deg) translate3d(0, 0, 0);
+          width: 20px;
         }
       }
     }

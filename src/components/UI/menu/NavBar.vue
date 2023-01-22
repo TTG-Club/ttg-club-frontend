@@ -37,3 +37,16 @@
         }
     });
 </script>
+
+<style lang="scss" scoped>
+    .navbar__header_left {
+        .site-logo {
+            width: 50px;
+            height: 50px;
+        }
+
+        hr {
+            width: 100%;
+        }
+    }
+</style>

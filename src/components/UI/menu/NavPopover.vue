@@ -75,7 +75,7 @@
 
 <style lang="scss" scoped>
     .nav-popover {
-        position: relative;
+        // position: relative; // Нужно будет включать, если нужно относительно кнопки позиционирование
         width: 40px;
         height: 40px;
         flex-shrink: 0;
@@ -110,48 +110,29 @@
             overflow: auto;
             border-radius: 8px;
             box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
-            transform-origin: top right;
+            transform-origin: bottom left;
             z-index: 111;
             position: absolute;
             top: inherit;
-            bottom: 56px;
-            left: 0;
+            bottom: 64px;
+            left: 8px;
             right: 0;
-            max-width: 1170px;
+            max-width: calc(100vw - 16px);
             max-height: calc(var(--max-vh) / 100 * 90);
 
             @include media-min($md) {
-                left: 56px;
+                top: 16px;
+                left: 64px;
                 bottom: inherit;
-            }
-
-            // @media (max-width: 1200px) {
-            //     max-width: calc(100vw / 100 * 90);
-            // }
-
-            // @media (max-width: 600px) {
-            //     position: fixed;
-            //     width: 100vw;
-            //     max-width: 100%;
-            //     max-height: calc(var(--max-vh) - 76px);
-            //     left: 8px;
-            //     top: 8px;
-            //     right: 8px;
-            // }
-
-            &.is-left {
-                transform-origin: bottom left;
-
-                @include media-min($md) {
-                    transform-origin: top left;
-                }
+                max-width: 1170px;
+                width: fit-content;
+                transform-origin: top left;
             }
 
             &.is-menu {
                 width: calc(100vw - 16px);
 
                 @include media-min($md) {
-                    top: -56px;
                     width: calc(100vw - 56px - 24px);
                 }
             }
@@ -180,45 +161,20 @@
         .nav-popover {
             &__body {
                 top: auto;
-                left: initial;
-                right: 0;
-                bottom: 68px;
+                left: 8px;
+                right: 8px;
+                bottom: 64px;
                 width: auto;
                 transform-origin: bottom right;
 
                 @include media-min($md) {
                     top: auto;
-                    left: 56px;
+                    left: 64px;
                     right: initial;
-                    bottom: 0px;
+                    bottom: 16px;
                     transform-origin: bottom left;
                 }
             }
         }
     }
-
-    .navbar__header_left {
-        .site-logo {
-            width: 50px;
-            height: 50px;
-        }
-    }
-    // .navbar__header_left {
-    //     .nav-popover {
-    //         &__body {
-
-    //             &.is-menu {
-    //                 width: 100vw;
-
-    //                 @include media-min($md) {
-    //                     width: 100vw;
-    //                 }
-    //             }
-
-    //             @include media-min($md) {
-    //                 transform-origin: top left;
-    //             }
-    //         }
-    //     }
-    // }
 </style>
