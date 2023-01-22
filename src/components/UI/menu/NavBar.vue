@@ -22,6 +22,8 @@
             </div>
 
             <div class="navbar__header_right">
+                <nav-search />
+
                 <nav-bookmarks />
 
                 <nav-profile />
@@ -38,10 +40,12 @@
     import NavProfile from '@/components/UI/menu/NavProfile.vue';
     import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
+    import NavSearch from '@/components/UI/menu/NavSearch.vue';
 
     export default defineComponent({
         name: 'NavBar',
         components: {
+            NavSearch,
             NavMenu,
             NavBookmarks,
             NavProfile,
