@@ -118,7 +118,7 @@
             left: 8px;
             right: 0;
             max-width: calc(100vw - 16px);
-            max-height: calc(var(--max-vh) / 100 * 90);
+            max-height: calc(var(--max-vh) - 72px);
 
             @include media-min($md) {
                 top: 16px;
