@@ -2,9 +2,12 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
-                <hr />
-
-                <hr />
+                <a
+                    class="nav-menu__logo"
+                    href="/"
+                >
+                    <site-logo />
+                </a>
 
                 <nav-menu />
 
@@ -45,8 +48,31 @@
             height: 50px;
         }
 
-        hr {
-            width: 100%;
+        // hr {
+        //     display: none;
+
+        //     @include media-min($md) {
+        //         width: 100%;
+        //         display: block;
+        //     }
+        // }
+
+        .nav-menu__logo {
+            width: 52px;
+            height: 36px;
+            padding: 0 16px 0 0;
+            border-bottom: 0;
+            border-right: 1px solid var(--border);
+            margin: 0 8px 0 0;
+
+            @include media-min($md) {
+                width: 36px;
+                height: 52px;
+                padding: 0 0 16px 0;
+                border-bottom: 1px solid var(--border);
+                border-right: 0;
+                margin: 0 0 8px 0;
+            }
         }
     }
 </style>
