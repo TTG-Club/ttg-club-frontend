@@ -43,13 +43,10 @@
   margin: auto;
   padding: 0;
   overflow: auto;
+  padding: 0 16px;
 
-  @media (max-width: 1400px) {
-    padding: 0 24px 0 24px;
-  }
-
-  @media (max-width: 1200px) {
-    padding: 0 16px 0 16px;
+  @include media-min($xl) {
+    padding: 0 24px;
   }
 }
 

@@ -172,17 +172,19 @@
     .navbar__header_right {
         .nav-popover {
             &__body {
-                top: 42px;
+                top: auto;
                 left: initial;
                 right: 0;
+                bottom: 68px;
+                width: auto;
+                transform-origin: bottom right;
 
-                @media (max-width: 600px) {
+                @include media-min($md) {
                     top: auto;
-                    left: 8px;
-                    right: 8px;
-                    width: auto;
-                    bottom: 68px;
-                    transform-origin: bottom right;
+                    left: 56px;
+                    right: initial;
+                    bottom: 0px;
+                    transform-origin: bottom left;
                 }
             }
         }
