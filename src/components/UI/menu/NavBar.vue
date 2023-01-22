@@ -2,6 +2,10 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
+                <hr />
+
+                <hr />
+
                 <nav-menu />
 
                 <nav-bookmarks />

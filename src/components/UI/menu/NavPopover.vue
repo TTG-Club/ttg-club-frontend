@@ -113,39 +113,46 @@
             transform-origin: top right;
             z-index: 111;
             position: absolute;
-            top: 0;
+            top: inherit;
+            bottom: 56px;
             left: 0;
             right: 0;
             max-width: 1170px;
             max-height: calc(var(--max-vh) / 100 * 90);
 
-            @media (max-width: 1200px) {
-                max-width: calc(100vw / 100 * 90);
+            @include media-min($md) {
+                left: 56px;
+                bottom: inherit;
             }
 
-            @media (max-width: 600px) {
-                position: fixed;
-                width: 100vw;
-                max-width: 100%;
-                max-height: calc(var(--max-vh) - 76px);
-                left: 8px;
-                top: 8px;
-                right: 8px;
-            }
+            // @media (max-width: 1200px) {
+            //     max-width: calc(100vw / 100 * 90);
+            // }
+
+            // @media (max-width: 600px) {
+            //     position: fixed;
+            //     width: 100vw;
+            //     max-width: 100%;
+            //     max-height: calc(var(--max-vh) - 76px);
+            //     left: 8px;
+            //     top: 8px;
+            //     right: 8px;
+            // }
 
             &.is-left {
-                transform-origin: top left;
+                transform-origin: bottom left;
 
-                @media (max-width: 600px) {
-                    transform-origin: bottom left;
+                @include media-min($md) {
+                    transform-origin: top left;
                 }
             }
 
             &.is-menu {
-                width: 100vw;
+                width: calc(100vw - 16px);
 
-                @media (max-width: 600px) {
-                    width: auto;
+                @include media-min($md) {
+                    top: -56px;
+                    width: calc(100vw - 56px - 24px);
                 }
             }
         }
@@ -189,4 +196,29 @@
             }
         }
     }
+
+    .navbar__header_left {
+        .site-logo {
+            width: 50px;
+            height: 50px;
+        }
+    }
+    // .navbar__header_left {
+    //     .nav-popover {
+    //         &__body {
+
+    //             &.is-menu {
+    //                 width: 100vw;
+
+    //                 @include media-min($md) {
+    //                     width: 100vw;
+    //                 }
+    //             }
+
+    //             @include media-min($md) {
+    //                 transform-origin: top left;
+    //             }
+    //         }
+    //     }
+    // }
 </style>

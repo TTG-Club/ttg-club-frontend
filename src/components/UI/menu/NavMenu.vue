@@ -173,7 +173,7 @@
         padding: 16px 16px 8px 16px;
 
         &__header {
-            padding: 32px 16px 16px 16px;
+            padding: 16px 16px 16px 16px;
             display: flex;
             align-items: center;
 
