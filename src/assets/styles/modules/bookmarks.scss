@@ -1,5 +1,5 @@
 .bookmarks {
-  width: 360px;
+  width: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -12,8 +12,8 @@
     }
   }
 
-  @media (max-width: 600px) {
-    width: 100%;
+  @include media-min($md) {
+    width: 360px;
   }
 
   &__header {

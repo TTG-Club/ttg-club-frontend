@@ -2,28 +2,19 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
+                <a
+                    class="navbar__logo"
+                    href="/"
+                >
+                    <site-logo />
+                </a>
+
                 <nav-menu />
 
-                <div class="navbar__section">
-                    <a
-                        class="navbar__link"
-                        href="/"
-                    >TTG Club</a>
-
-                    <div
-                        v-if="section"
-                        class="navbar__text"
-                    >
-                        <span>/</span>
-
-                        <span>{{ section }}</span>
-                    </div>
-                </div>
+                <nav-bookmarks />
             </div>
 
             <div class="navbar__header_right">
-                <nav-bookmarks />
-
                 <nav-profile />
 
                 <menu-theme-switcher />
@@ -46,12 +37,28 @@
             NavBookmarks,
             NavProfile,
             MenuThemeSwitcher
-        },
-        props: {
-            section: {
-                type: String,
-                default: ''
-            }
         }
     });
 </script>
+
+<style lang="scss" scoped>
+    .navbar__header_left {
+        .navbar__logo {
+            width: 52px;
+            height: 36px;
+            padding: 0 16px 0 0;
+            border-bottom: 0;
+            border-right: 1px solid var(--border);
+            margin: 0 8px 0 0;
+
+            @include media-min($md) {
+                width: 36px;
+                height: 52px;
+                padding: 0 0 16px 0;
+                border-bottom: 1px solid var(--border);
+                border-right: 0;
+                margin: 0 0 8px 0;
+            }
+        }
+    }
+</style>

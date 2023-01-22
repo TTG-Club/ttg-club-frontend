@@ -75,7 +75,7 @@
 
 <style lang="scss" scoped>
     .nav-popover {
-        position: relative;
+        // position: relative; // Нужно будет включать, если нужно относительно кнопки позиционирование
         width: 40px;
         height: 40px;
         flex-shrink: 0;
@@ -110,42 +110,30 @@
             overflow: auto;
             border-radius: 8px;
             box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
-            transform-origin: top right;
+            transform-origin: bottom left;
             z-index: 111;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: inherit;
+            bottom: 64px;
+            left: 8px;
             right: 0;
-            max-width: 1170px;
+            max-width: calc(100vw - 16px);
             max-height: calc(var(--max-vh) / 100 * 90);
 
-            @media (max-width: 1200px) {
-                max-width: calc(100vw / 100 * 90);
-            }
-
-            @media (max-width: 600px) {
-                position: fixed;
-                width: 100vw;
-                max-width: 100%;
-                max-height: calc(var(--max-vh) - 76px);
-                left: 8px;
-                top: 8px;
-                right: 8px;
-            }
-
-            &.is-left {
+            @include media-min($md) {
+                top: 16px;
+                left: 64px;
+                bottom: inherit;
+                max-width: 1170px;
+                width: fit-content;
                 transform-origin: top left;
-
-                @media (max-width: 600px) {
-                    transform-origin: bottom left;
-                }
             }
 
             &.is-menu {
-                width: 100vw;
+                width: calc(100vw - 16px);
 
-                @media (max-width: 600px) {
-                    width: auto;
+                @include media-min($md) {
+                    width: calc(100vw - 56px - 24px);
                 }
             }
         }
@@ -172,17 +160,19 @@
     .navbar__header_right {
         .nav-popover {
             &__body {
-                top: 42px;
-                left: initial;
-                right: 0;
+                top: auto;
+                left: 8px;
+                right: 8px;
+                bottom: 64px;
+                width: auto;
+                transform-origin: bottom right;
 
-                @media (max-width: 600px) {
+                @include media-min($md) {
                     top: auto;
-                    left: 8px;
-                    right: 8px;
-                    width: auto;
-                    bottom: 68px;
-                    transform-origin: bottom right;
+                    left: 64px;
+                    right: initial;
+                    bottom: 16px;
+                    transform-origin: bottom left;
                 }
             }
         }
