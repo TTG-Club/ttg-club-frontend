@@ -3,7 +3,7 @@
         <header class="navbar__header">
             <div class="navbar__header_left">
                 <a
-                    class="nav-menu__logo"
+                    class="navbar__logo"
                     href="/"
                 >
                     <site-logo />
@@ -43,12 +43,7 @@
 
 <style lang="scss" scoped>
     .navbar__header_left {
-        .site-logo {
-            width: 50px;
-            height: 50px;
-        }
-
-        .nav-menu__logo {
+        .navbar__logo {
             width: 52px;
             height: 36px;
             padding: 0 16px 0 0;

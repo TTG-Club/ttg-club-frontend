@@ -263,10 +263,9 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                width: auto;
                 height: calc(var(--max-vh) - 56px);
                 overflow: hidden;
-                border-radius: 0px;
+                border-radius: 0;
                 background-color: var(--bg-secondary);
                 position: fixed;
                 margin-left: auto;
@@ -274,7 +273,7 @@
 
                 @include media-min($md) {
                     left: 56px;
-                    height: calc(var(--max-vh));
+                    height: var(--max-vh);
                 }
 
                 @include media-min($xl) {
