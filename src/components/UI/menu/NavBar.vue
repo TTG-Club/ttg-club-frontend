@@ -48,15 +48,6 @@
             height: 50px;
         }
 
-        // hr {
-        //     display: none;
-
-        //     @include media-min($md) {
-        //         width: 100%;
-        //         display: block;
-        //     }
-        // }
-
         .nav-menu__logo {
             width: 52px;
             height: 36px;
