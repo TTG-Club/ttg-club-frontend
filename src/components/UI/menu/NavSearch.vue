@@ -6,7 +6,11 @@
                 class="navbar__btn"
                 @click.left.exact.prevent="isShow = !isShow"
             >
-                <svg-icon icon-name="search" />
+                <svg-icon
+                    icon-name="search-new"
+                    :stroke-enable="false"
+                    fill-enable
+                />
             </div>
         </template>
     </nav-popover>
