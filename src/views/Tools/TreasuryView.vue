@@ -568,6 +568,7 @@
 
             &.btn-wrapper {
                 display: flex;
+                gap: 8px;
             }
         }
     }

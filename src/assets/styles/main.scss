@@ -637,14 +637,14 @@
   border: 1px solid var(--border);
   position: relative;
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 32px;
   background-color: var(--bg-main);
 
   &__row {
     margin-top: 16px;
 
     .ui-checkbox {
-      margin-right: 16px;
+      margin-right: 8px;
       margin-top: 8px;
     }
   }
