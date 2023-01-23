@@ -60,6 +60,20 @@
                         </div>
                     </a>
 
+                    <div
+                        v-if="!search.length"
+                        class="search-modal__text"
+                    >
+                        Введите текст, что бы начать
+                    </div>
+
+                    <div
+                        v-else-if="!results.length && isShowCounter"
+                        class="search-modal__text"
+                    >
+                        Боги не нашли ответа на твой запрос
+                    </div>
+
                     <a
                         href="#"
                         class="search-modal__all"
@@ -155,6 +169,7 @@
                 } catch (err) {
                     return Promise.reject(err);
                 } finally {
+                    controller.value = null;
                     isShowCounter.value = true;
                 }
             };
@@ -289,6 +304,14 @@
                 opacity: .4;
                 color: var(--text-color);
             }
+        }
+
+        &__text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            color: var(--text-color);
         }
 
         &__all {
