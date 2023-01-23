@@ -188,10 +188,12 @@
     .content-layout {
         width: 100%;
         max-width: var(--max-content);
+        min-height: var(--max-vh);
         margin: 0 auto;
 
         &__body {
             width: 100%;
+            min-height: var(--max-vh);
             display: flex;
             justify-content: flex-start;
             position: relative;
