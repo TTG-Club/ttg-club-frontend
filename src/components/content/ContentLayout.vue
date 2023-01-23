@@ -188,10 +188,12 @@
     .content-layout {
         width: 100%;
         max-width: var(--max-content);
+        min-height: var(--max-vh);
         margin: 0 auto;
 
         &__body {
             width: 100%;
+            min-height: var(--max-vh);
             display: flex;
             justify-content: flex-start;
             position: relative;
@@ -224,7 +226,7 @@
                 &.is-showed-right-side {
                     width: 100%;
 
-                    @include media-min($sm) {
+                    @include media-min($xl) {
                         width: 40%;
                     }
                 }
@@ -261,29 +263,28 @@
             &--right {
                 display: block;
                 top: 0;
+                left: 0;
                 right: 0;
-                width: calc(60% - 24px);
-                height: calc(var(--max-vh) - 56px - 24px);
+                height: calc(var(--max-vh) - 56px);
                 overflow: hidden;
-                border-radius: 12px;
+                border-radius: 0;
                 background-color: var(--bg-secondary);
-                position: sticky;
+                position: fixed;
                 margin-left: auto;
                 z-index: 12;
 
-                @media (max-width: 1200px) {
-                    width: 100%;
-                    height: calc(var(--max-vh) - 56px);
-                    position: fixed;
-                    top: 56px;
-                    left: 0;
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
+                @include media-min($md) {
+                    left: 56px;
+                    height: var(--max-vh);
                 }
 
-                @media (max-width: 600px) {
-                    top: 0;
-                    border-radius: 0;
+                @include media-min($xl) {
+                    left: 0;
+                    top: 24px;
+                    position: sticky;
+                    width: calc(60% - 24px);
+                    height: calc(var(--max-vh) - 24px - 24px);
+                    border-radius: 12px;
                 }
 
                 &.is-fullscreen {
@@ -309,6 +310,7 @@
             top: 0;
             z-index: 12;
             pointer-events: none;
+            padding-top: 16px;
             background: linear-gradient(
                     180deg,
                     var(--bg-main) 0,
@@ -340,7 +342,6 @@
             }
 
             @media (max-width: 600px) {
-                padding-top: 16px;
                 background: linear-gradient(
                         180deg,
                         var(--bg-main) 0,
@@ -348,6 +349,10 @@
                         var(--bg-main) 58px,
                         transparent 78px
                 )
+            }
+
+            @include media-min($xl) {
+                padding-top: 24px;
             }
         }
 

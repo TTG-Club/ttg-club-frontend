@@ -41,15 +41,11 @@
   height: var(--max-vh);
   position: relative;
   margin: auto;
-  padding: 0;
   overflow: auto;
+  padding: 0 16px;
 
-  @media (max-width: 1400px) {
-    padding: 0 24px 0 24px;
-  }
-
-  @media (max-width: 1200px) {
-    padding: 0 16px 0 16px;
+  @include media-min($xl) {
+    padding: 0 24px;
   }
 }
 
@@ -85,7 +81,7 @@
     display: flex;
     flex-wrap: wrap;
     padding: 0;
-    margin: 0 -8px;
+    margin: 8px -8px 0 -8px;
 
     .card {
       flex: 1 1 15%;
@@ -563,6 +559,18 @@
 
   .avatar {
     width: 140px;
+  }
+
+  .row_info {
+    margin: 0;
+  }
+
+  .content-padding {
+    padding: 16px 0;
+  }
+
+  .grid_stat_block {
+    margin: 16px 0 0 0;
   }
 }
 

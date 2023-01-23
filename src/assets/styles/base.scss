@@ -43,7 +43,6 @@
   appearance: none;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  // overscroll-behavior: contain;
 
   &::selection {
     background: var(--primary);
@@ -100,10 +99,10 @@ body,
 
 #dnd5club {
   display: flex;
-  flex-flow: column;
+  flex-flow: column-reverse;
 
-  @media (max-width: 600px) {
-    flex-flow: column-reverse;
+  @include media-min($md) {
+    flex-flow: row;
   }
 }
 

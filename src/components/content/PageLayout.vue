@@ -119,7 +119,7 @@
         }
 
         &__header {
-            padding: 8px 0 16px 0;
+            padding: 32px 0 16px 0;
             border-bottom: 1px solid var(--border);
             margin-bottom: 16px;
 
