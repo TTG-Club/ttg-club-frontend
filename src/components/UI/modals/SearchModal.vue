@@ -25,7 +25,7 @@
                     </div>
 
                     <div
-                        v-if="search.length"
+                        v-if="isShowCounter"
                         class="search-modal__control__count"
                     >
                         Найдено: {{ results.length }}
@@ -109,6 +109,7 @@
             const controller = ref<AbortController | null>(null);
             const search = ref('');
             const results = ref([]);
+            const isShowCounter = ref(false);
             const input = ref<HTMLElement | null>(null);
 
             const onSearch = async () => {
@@ -117,6 +118,13 @@
                 }
 
                 if (search.value.length < 3 && search.value.length !== 0) {
+                    return Promise.resolve();
+                }
+
+                if (!search.value.length) {
+                    isShowCounter.value = false;
+                    results.value = [];
+
                     return Promise.resolve();
                 }
 
@@ -146,6 +154,8 @@
                     return Promise.resolve();
                 } catch (err) {
                     return Promise.reject(err);
+                } finally {
+                    isShowCounter.value = true;
                 }
             };
 
@@ -168,6 +178,7 @@
 
             return {
                 isShowModal,
+                isShowCounter,
                 input,
                 search,
                 results
