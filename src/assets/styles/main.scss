@@ -647,6 +647,11 @@
       margin-right: 8px;
       margin-top: 8px;
     }
+
+    &.btn-wrapper {
+      display: flex;
+      gap: 8px;
+    }
   }
 
   &__colum {

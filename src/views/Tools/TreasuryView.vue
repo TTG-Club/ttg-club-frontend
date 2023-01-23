@@ -560,16 +560,3 @@
         }
     };
 </script>
-
-<style lang="scss" scoped>
-    .tools_settings {
-        &__row {
-            margin-top: 12px;
-
-            &.btn-wrapper {
-                display: flex;
-                gap: 8px;
-            }
-        }
-    }
-</style>
