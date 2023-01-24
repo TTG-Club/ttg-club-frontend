@@ -74,7 +74,7 @@
                     </a>
 
                     <div
-                        v-if="!search.length"
+                        v-if="!search.length && !results?.list.length"
                         class="search-modal__text"
                     >
                         Введите текст, что бы начать
