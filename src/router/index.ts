@@ -218,6 +218,11 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'ability-calc',
         path: '/tools/ability-calc',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Tools' */ '@/views/Tools/AbilityCalc/AbilityCalcView.vue')
+    },
+    {
+        name: 'search-page',
+        path: '/search',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Search' */ '@/views/Search/SearchView.vue')
     }
 ];
 /* eslint-enable max-len,vue/max-len */

@@ -11,6 +11,7 @@
             <div
                 v-if="$slots.title || $slots.subtitle"
                 class="page-layout__header"
+                :class="{ 'show-separator': showSeparator }"
             >
                 <h1
                     v-if="$slots.title"
@@ -26,12 +27,11 @@
                     <slot name="subtitle" />
                 </h4>
 
-                <h5>
-                    <time
-                        v-if="dateTimeFormatted"
-                        :datetime="dateTime"
-                    >{{ dateTimeFormatted }}
-                    </time>
+                <h5
+                    v-if="dateTimeFormatted"
+                    class="page-layout__date"
+                >
+                    <time :datetime="dateTime">{{ dateTimeFormatted }}</time>
                 </h5>
             </div>
 
@@ -67,6 +67,10 @@
             dateTime: {
                 type: String,
                 default: ''
+            },
+            showSeparator: {
+                type: Boolean,
+                default: true
             }
         },
         setup(props) {
@@ -120,8 +124,11 @@
 
         &__header {
             padding: 32px 0 16px 0;
-            border-bottom: 1px solid var(--border);
             margin-bottom: 16px;
+
+            &.show-separator {
+                border-bottom: 1px solid var(--border);
+            }
 
             @media (max-width: 600px) {
                 padding: 16px 0 16px 0;
@@ -129,18 +136,22 @@
         }
 
         &__title {
-            margin-bottom: 16px;
             font-weight: 500;
             font-family: "Lora";
+            margin: 0;
         }
 
         &__subtitle {
-            margin-top: 0;
             line-height: normal;
+            margin: 16px 0 0;
 
             @media (max-width: 600px) {
                 font-size: calc(var(--h4-font-size) - 2px);
             }
+        }
+
+        &__date {
+
         }
 
         &__socials {
