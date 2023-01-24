@@ -14,9 +14,9 @@
     display: flex;
     flex-direction: row;
     align-items: initial;
-    padding: 6px 8px;
+    padding: 6px 12px;
     width: 100%;
-    min-height: 48px;
+    min-height: 38px;
   }
 
   &__body {
@@ -24,12 +24,13 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
   }
 
   &__row {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 
     & + & {
       margin-top: 4px;
@@ -45,9 +46,28 @@
     flex: 1 0 auto;
     color: var(--text-g-color);
     font-size: calc(var(--main-font-size) - 1px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &:first-child {
       flex: 1 1 auto;
+    }
+  }
+
+  &__damage {
+    &_type {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__ac {
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
@@ -67,22 +87,23 @@
   }
 
   &__name {
-    display: block;
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-g-color);
     font-size: var(--main-font-size);
-    font-weight: 500;
-
-    &--rus,
-    &--eng {
-      display: inline;
-      line-height: normal;
-    }
+    line-height: var(--main-line-height);
 
     &--rus {
+      display: inline;
       color: var(--text-color-title);
+      max-width: 100%;
     }
 
     &--eng {
-      color: var(--text-g-color);
+      display: inline;
     }
   }
 

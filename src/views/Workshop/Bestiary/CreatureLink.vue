@@ -12,13 +12,13 @@
             <div class="link-item__body">
                 <div class="link-item__row">
                     <div class="link-item__name">
-                        <div class="link-item__name--rus">
+                        <span class="link-item__name--rus">
                             {{ creature.name.rus }}
-                        </div>
+                        </span>
 
-                        <div class="link-item__name--eng">
+                        <span class="link-item__name--eng">
                             [{{ creature.name.eng }}]
-                        </div>
+                        </span>
                     </div>
                 </div>
 
@@ -63,6 +63,7 @@
             color: var(--text-color);
             border-right: 1px solid var(--border);
             margin-right: 12px;
+            margin-left: -8px;
 
             span {
                 width: 42px;
