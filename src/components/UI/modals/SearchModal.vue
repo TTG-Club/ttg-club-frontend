@@ -5,6 +5,7 @@
         content-class="search-modal"
         esc-to-close
         focus-trap
+        @opened="focused = true"
     >
         <div class="search-modal__container">
             <div class="search-modal__wrapper">
@@ -25,10 +26,10 @@
                     </div>
 
                     <div
-                        v-if="isShowCounter"
+                        v-if="!inProgress && results?.count"
                         class="search-modal__control__count"
                     >
-                        Найдено: {{ results.length }}
+                        Найдено: {{ results?.count }}
                     </div>
 
                     <ui-button
@@ -46,17 +47,29 @@
 
                 <div class="search-modal__results">
                     <a
-                        v-for="(res, key) in results"
+                        v-for="(res, key) in results?.list || []"
                         :key="key"
-                        :href="res[2]"
+                        :href="res.url"
                         class="search-modal__result"
+                        target="_blank"
+                        rel="noopener noreferrer"
                     >
-                        <div class="search-modal__result_label">
-                            {{ res[0] }}
+                        <div class="search-modal__result_body">
+                            <div class="search-modal__result_label">
+                                {{ res.name }}
+                            </div>
+
+                            <div class="search-modal__result_desc">
+                                {{ res.section }}
+                            </div>
                         </div>
 
-                        <div class="search-modal__result_desc">
-                            {{ res[1] }}
+                        <div class="search-modal__result_icon">
+                            <svg-icon
+                                icon-name="new-page"
+                                :stroke-enable="false"
+                                fill-enable
+                            />
                         </div>
                     </a>
 
@@ -68,7 +81,21 @@
                     </div>
 
                     <div
-                        v-else-if="!results.length && isShowCounter"
+                        v-else-if="search.length < 3 && !results?.list.length"
+                        class="search-modal__text"
+                    >
+                        Минимум 3 символа для поиска
+                    </div>
+
+                    <div
+                        v-else-if="search.length >= 3 && inProgress"
+                        class="search-modal__text"
+                    >
+                        Боги ищут ответ на твой запрос
+                    </div>
+
+                    <div
+                        v-else-if="!results?.list.length && !inProgress"
                         class="search-modal__text"
                     >
                         Боги не нашли ответа на твой запрос
@@ -100,11 +127,22 @@
     import {
         defineComponent, ref, watch
     } from 'vue';
-    import { debounce } from 'lodash';
-    import { useVModel } from '@vueuse/core';
+    import debounce from 'lodash/debounce';
+    import { useVModel, useFocus } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/form/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
+
+    type TResult = {
+        name: string
+        section: string
+        url: string
+    }
+
+    type TResultList = {
+        count: number
+        list: TResult[]
+    }
 
     export default defineComponent({
         components: {
@@ -122,23 +160,20 @@
             const http = useAxios();
             const controller = ref<AbortController | null>(null);
             const search = ref('');
-            const results = ref([]);
-            const isShowCounter = ref(false);
+            const results = ref<TResultList | null>(null);
+            const inProgress = ref(false);
             const input = ref<HTMLElement | null>(null);
+            const { focused } = useFocus(input, { initialValue: true });
 
             const onSearch = async () => {
+                results.value = null;
+                inProgress.value = true;
+
                 if (controller.value !== null) {
                     controller.value.abort();
                 }
 
-                if (search.value.length < 3 && search.value.length !== 0) {
-                    return Promise.resolve();
-                }
-
-                if (!search.value.length) {
-                    isShowCounter.value = false;
-                    results.value = [];
-
+                if (!search.value.length || (search.value.length < 3 && search.value.length !== 0)) {
                     return Promise.resolve();
                 }
 
@@ -163,14 +198,16 @@
                         return Promise.reject(resp.statusText);
                     }
 
-                    results.value = resp.data;
+                    results.value = resp.data as TResultList;
 
                     return Promise.resolve();
                 } catch (err) {
+                    results.value = null;
+
                     return Promise.reject(err);
                 } finally {
                     controller.value = null;
-                    isShowCounter.value = true;
+                    inProgress.value = false;
                 }
             };
 
@@ -182,21 +219,17 @@
                 onSearchDebounce();
             });
 
-            watch(
-                isShowModal,
-                () => {
-                    if (input.value?.focus) {
-                        input.value.focus();
-                    }
-                }
-            );
+            watch(focused, () => {
+                focused.value = true;
+            });
 
             return {
                 isShowModal,
-                isShowCounter,
+                inProgress,
                 input,
                 search,
-                results
+                results,
+                focused
             };
         }
     });
@@ -269,7 +302,15 @@
 
             &_dice {
                 svg {
+                    @include css_anim($item: transform);
+
                     color: var(--text-color-title);
+                }
+
+                &:hover {
+                    svg {
+                        transform: rotate(45deg);
+                    }
                 }
             }
 
@@ -289,12 +330,13 @@
         &__result {
             @include css_anim();
 
-            display: block;
+            display: flex;
+            align-items: center;
             padding: 6px 12px;
             color: var(--text-color-title);
 
-            &:hover {
-                background: var(--hover);
+            &_body {
+                flex: 1 1 100%;
             }
 
             &_desc {
@@ -303,6 +345,29 @@
                 font-size: 13px;
                 opacity: .4;
                 color: var(--text-color);
+            }
+
+            &_icon {
+                @include css_anim();
+
+                flex-shrink: 0;
+                width: 18px;
+                height: 18px;
+                opacity: 0;
+
+                svg {
+                    color: var(--text-color);
+                }
+            }
+
+            &:hover {
+                background: var(--hover);
+
+                .search-modal__result {
+                    &_icon {
+                        opacity: 1;
+                    }
+                }
             }
         }
 
