@@ -46,9 +46,28 @@
     flex: 1 0 auto;
     color: var(--text-g-color);
     font-size: calc(var(--main-font-size) - 1px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &:first-child {
       flex: 1 1 auto;
+    }
+  }
+
+  &__damage {
+    &_type {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__ac {
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
