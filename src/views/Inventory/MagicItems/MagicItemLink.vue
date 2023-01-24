@@ -23,13 +23,13 @@
                 <div class="link-item__body">
                     <div class="link-item__row">
                         <div class="link-item__name">
-                            <p class="link-item__name--rus">
+                            <span class="link-item__name--rus">
                                 {{ magicItem.name.rus }}
-                            </p>
+                            </span>
 
-                            <p class="link-item__name--eng">
+                            <span class="link-item__name--eng">
                                 [{{ magicItem.name.eng }}]
-                            </p>
+                            </span>
                         </div>
                     </div>
 

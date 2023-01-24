@@ -18,16 +18,16 @@
                         class="link-item__row"
                     >
                         <div class="link-item__name">
-                            <div class="link-item__name--rus">
+                            <span class="link-item__name--rus">
                                 {{ armor.name.rus }}
-                            </div>
+                            </span>
 
-                            <div
+                            <span
                                 v-if="armor.name.eng"
                                 class="link-item__name--eng"
                             >
                                 [{{ armor.name.eng }}]
-                            </div>
+                            </span>
                         </div>
                     </div>
 
