@@ -68,25 +68,23 @@
   }
 
   &__name {
-    display: block;
-    font-size: var(--main-font-size);
-    font-weight: 500;
+    display: inline-block;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    &--rus,
-    &--eng {
-      display: inline;
-      line-height: normal;
-    }
+    color: var(--text-g-color);
+    font-size: var(--main-font-size);
+    line-height: var(--main-line-height);
 
     &--rus {
+      display: inline;
       color: var(--text-color-title);
+      max-width: 100%;
     }
 
     &--eng {
-      color: var(--text-g-color);
+      display: inline;
     }
   }
 
