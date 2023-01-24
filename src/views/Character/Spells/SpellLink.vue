@@ -23,13 +23,13 @@
                 <div class="link-item__body">
                     <div class="link-item__row">
                         <div class="link-item__name">
-                            <div class="link-item__name--rus">
+                            <p class="link-item__name--rus">
                                 {{ spell.name.rus }}
-                            </div>
+                            </p>
 
-                            <div class="link-item__name--eng">
+                            <p class="link-item__name--eng">
                                 [{{ spell.name.eng }}]
-                            </div>
+                            </p>
                         </div>
                     </div>
 
@@ -214,6 +214,7 @@
             color: var(--text-color);
             border-right: 1px solid var(--border);
             margin-right: 12px;
+            margin-left: -8px;
         }
 
         &__modifications {
@@ -238,6 +239,9 @@
             color: var(--text-g-color);
             font-size: calc(var(--main-font-size) - 1px);
             line-height: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         &__components {

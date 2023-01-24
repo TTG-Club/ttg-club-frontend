@@ -16,13 +16,13 @@
                 <div class="link-item__body">
                     <div class="link-item__row">
                         <div class="link-item__name">
-                            <div class="link-item__name--rus">
+                            <p class="link-item__name--rus">
                                 {{ book.name.rus }}
-                            </div>
+                            </p>
 
-                            <div class="link-item__name--eng">
+                            <p class="link-item__name--eng">
                                 [{{ book.name.eng }}]
-                            </div>
+                            </p>
                         </div>
                     </div>
                 </div>
