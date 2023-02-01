@@ -39,6 +39,10 @@ export default defineComponent({
             } catch (err) {
                 this.userStore.clearUser();
             }
+        },
+
+        openSearchModal() {
+            document.dispatchEvent(new Event('open-search'));
         }
     }
 });

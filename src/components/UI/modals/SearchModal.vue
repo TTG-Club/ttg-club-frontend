@@ -112,10 +112,12 @@
 
 <script lang="ts">
     import {
-        defineComponent, ref, watch
+        defineComponent, onMounted, ref, watch
     } from 'vue';
     import debounce from 'lodash/debounce';
-    import { useVModel, useFocus } from '@vueuse/core';
+    import {
+        useVModel, useFocus, onStartTyping
+    } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
@@ -190,6 +192,14 @@
                 }
             };
 
+            onStartTyping(() => {
+                focused.value = true;
+            });
+
+            onMounted(() => {
+                focused.value = true;
+            });
+
             const navigate = () => {
                 window.location.href = `/search?search=${ search.value }`;
             };
@@ -200,10 +210,6 @@
 
             watch(search, () => {
                 onSearchDebounce();
-            });
-
-            watch(focused, () => {
-                focused.value = true;
             });
 
             return {

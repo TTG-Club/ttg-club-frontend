@@ -32,6 +32,7 @@
                             </div>
 
                             <input
+                                ref="input"
                                 v-model="search"
                                 class="search-view__control_field"
                                 @update:model-value="onChangeSearch"
@@ -74,7 +75,7 @@
 
 <script lang="ts">
     import {
-        computed, defineComponent, onMounted, ref
+        computed, defineComponent, ref
     } from 'vue';
     import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
     import {
@@ -82,6 +83,9 @@
     } from 'vue-router';
     import debounce from 'lodash/debounce';
     import { storeToRefs } from 'pinia';
+    import {
+        onStartTyping, tryOnBeforeMount, useFocus
+    } from '@vueuse/core';
     import PageLayout from '@/components/content/PageLayout.vue';
     import type { TSearchResultList } from '@/types/Search/Search.types';
     import { useAxios } from '@/common/composition/useAxios';
@@ -112,6 +116,8 @@
             const results = ref<TSearchResultList | null>(null);
             const controls = ref<null | HTMLElement>(null);
             const isNeedUpdateScroll = ref(false);
+            const input = ref<null | HTMLElement>(null);
+            const { focused } = useFocus(input, { initialValue: true });
 
             const pages = computed(() => {
                 if (!results.value?.count || results.value.count <= 20) {
@@ -297,7 +303,11 @@
                 }
             };
 
-            onMounted(async () => {
+            onStartTyping(() => {
+                focused.value = true;
+            });
+
+            tryOnBeforeMount(async () => {
                 resolveQuery(route);
 
                 await onUpdateRoute(true);
@@ -321,6 +331,7 @@
 
             return {
                 controls,
+                input,
                 search,
                 results,
                 page,
