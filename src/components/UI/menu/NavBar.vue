@@ -12,6 +12,8 @@
                 <nav-menu />
 
                 <nav-bookmarks />
+
+                <nav-search v-if="isShowSearch" />
             </div>
 
             <div class="navbar__header_right">
@@ -24,19 +26,31 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
+    import { computed, defineComponent } from 'vue';
+    import { useRoute } from 'vue-router';
     import MenuThemeSwitcher from '@/components/UI/MenuThemeSwitcher.vue';
     import NavProfile from '@/components/UI/menu/NavProfile.vue';
     import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
+    import NavSearch from '@/components/UI/menu/NavSearch.vue';
 
     export default defineComponent({
         name: 'NavBar',
         components: {
+            NavSearch,
             NavMenu,
             NavBookmarks,
             NavProfile,
             MenuThemeSwitcher
+        },
+        setup() {
+            const route = useRoute();
+
+            const isShowSearch = computed(() => route.name !== 'search-page');
+
+            return {
+                isShowSearch
+            };
         }
     });
 </script>

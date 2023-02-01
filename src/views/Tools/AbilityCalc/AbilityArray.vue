@@ -44,7 +44,7 @@
     } from 'vue';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({

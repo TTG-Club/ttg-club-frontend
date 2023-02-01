@@ -61,8 +61,8 @@
     import {
         AbilityKey, AbilityName, AbilityShortName
     } from '@/types/Tools/AbilityCalc.types';
-    import UiButton from '@/components/form/UiButton.vue';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import { usePluralize } from '@/common/composition/usePluralize';
 
     export default defineComponent({

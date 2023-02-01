@@ -297,9 +297,9 @@
     import throttle from 'lodash/throttle';
     import { mapState } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
-    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
     import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
     import SpellBody from '@/views/Character/Spells/SpellBody.vue';
     import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
@@ -307,7 +307,7 @@
     import errorHandler from '@/common/helpers/errorHandler';
     import ContentDetail from '@/components/content/ContentDetail.vue';
     import { useUIStore } from '@/store/UI/UIStore';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {

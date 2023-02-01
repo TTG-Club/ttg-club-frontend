@@ -204,7 +204,7 @@
     import type { TRaceLink } from '@/types/Character/Races.types';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
     import { usePagination } from '@/common/composition/usePagination';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import type { AbilityRoll, ChoiceDouble } from '@/types/Tools/AbilityCalc.types';
     import {
         AbilityChoiceDouble,

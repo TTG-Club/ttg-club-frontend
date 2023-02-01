@@ -1,4 +1,5 @@
 import { defineComponent } from 'vue';
+import UAParser from 'ua-parser-js';
 import { useUIStore } from '@/store/UI/UIStore';
 import { useUserStore } from '@/store/UI/UserStore';
 
@@ -7,6 +8,14 @@ export default defineComponent({
         uiStore: useUIStore(),
         userStore: useUserStore()
     }),
+    computed: {
+        isAppleDevice() {
+            const ua = new UAParser();
+            const device = ua.getDevice();
+
+            return device.vendor === 'Apple';
+        }
+    },
     async beforeMount() {
         await this.initUser();
     },
@@ -39,6 +48,10 @@ export default defineComponent({
             } catch (err) {
                 this.userStore.clearUser();
             }
+        },
+
+        openSearchModal() {
+            document.dispatchEvent(new Event('open-search'));
         }
     }
 });

@@ -218,6 +218,11 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'ability-calc',
         path: '/tools/ability-calc',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Tools' */ '@/views/Tools/AbilityCalc/AbilityCalcView.vue')
+    },
+    {
+        name: 'search-page',
+        path: '/search',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Search' */ '@/views/Search/SearchView.vue')
     }
 ];
 /* eslint-enable max-len,vue/max-len */
@@ -227,10 +232,12 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach(async to => {
-    const navStore = useNavStore();
+router.beforeEach(async (to, from) => {
+    if (from.path !== to.path) {
+        const navStore = useNavStore();
 
-    await navStore.updateMetaByURL(to.path);
+        await navStore.updateMetaByURL(to.path);
+    }
 });
 
 export default router;

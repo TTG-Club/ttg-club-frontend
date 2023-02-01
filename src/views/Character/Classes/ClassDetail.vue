@@ -133,7 +133,7 @@
     import cloneDeep from 'lodash/cloneDeep';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import SpellsView from '@/views/Character/Spells/SpellsView.vue';
     import errorHandler from '@/common/helpers/errorHandler';
     import OptionsView from '@/views/Character/Options/OptionsView.vue';

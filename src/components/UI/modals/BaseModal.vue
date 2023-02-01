@@ -106,7 +106,7 @@
 <script>
     import { mapActions, mapState } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
 

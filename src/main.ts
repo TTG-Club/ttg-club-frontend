@@ -38,11 +38,11 @@ app.use(pinia)
         ...ToastOptions,
         eventBus: ToastEventBus
     })
-    .use(vfmPlugin, {
+    .use(vfmPlugin({
         key: '$vfm',
         componentName: 'VueFinalModal',
         dynamicContainerName: 'ModalsContainer'
-    });
+    }));
 
 registerComponents(app);
 

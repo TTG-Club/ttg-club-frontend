@@ -74,9 +74,9 @@
         defineComponent, reactive, ref
     } from 'vue';
     import { useToast } from 'vue-toastification';
-    import UiInput from '@/components/form/UiInput.vue';
-    import UiCheckbox from '@/components/form/UiCheckbox.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
+    import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useUserStore } from '@/store/UI/UserStore';
     import {
         validateEmailFormat,
