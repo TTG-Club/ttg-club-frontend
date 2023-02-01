@@ -11,11 +11,35 @@
         <template #default>
             <div class="search-view__wrapper">
                 <div class="search-view__filter">
-                    <ui-input
-                        v-model="search"
-                        @update:model-value="onChangeSearch"
-                        @keyup.enter.exact.prevent.stop="onChangeSearch"
-                    />
+                    <form
+                        class="search-view__control"
+                        novalidate="novalidate"
+                        autocomplete="off"
+                        autofocus="autofocus"
+                        autocapitalize="off"
+                        @submit.prevent.stop="onChangeSearch"
+                    >
+                        <div class="search-view__control_body">
+                            <div class="search-view__control_icon">
+                                <svg-icon
+                                    icon-name="search-new"
+                                    :stroke-enable="false"
+                                    fill-enable
+                                />
+                            </div>
+
+                            <input
+                                v-model="search"
+                                class="search-view__control_field"
+                                @update:model-value="onChangeSearch"
+                                @keyup.enter.exact.prevent.stop="onChangeSearch"
+                            />
+                        </div>
+
+                        <ui-button class="search-view__control_btn">
+                            Поиск
+                        </ui-button>
+                    </form>
                 </div>
 
                 <div
@@ -49,23 +73,25 @@
     import {
         computed, defineComponent, onMounted, ref
     } from 'vue';
+    import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
     import {
         onBeforeRouteUpdate, useRoute, useRouter
     } from 'vue-router';
-    import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
     import debounce from 'lodash/debounce';
     import PageLayout from '@/components/content/PageLayout.vue';
-    import UiInput from '@/components/UI/kit/UiInput.vue';
     import type { TSearchResultList } from '@/types/Search/Search.types';
     import { useAxios } from '@/common/composition/useAxios';
     import SearchLink from '@/views/Search/SearchLink.vue';
     import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
 
     export default defineComponent({
         components: {
+            UiButton,
+            SvgIcon,
             UiPaginate,
             SearchLink,
-            UiInput,
             PageLayout
         },
         setup() {
@@ -92,7 +118,7 @@
                     : numberOfPages;
             });
 
-            const resultsNumbers = ref<null | {min: number, max: number}>(null);
+            const resultsNumbers = ref<null | { min: number, max: number }>(null);
 
             const onUpdateRoute = async (replace: boolean = false) => {
                 const to = {
@@ -294,6 +320,52 @@
             display: flex;
             flex-direction: column;
             min-height: 100%;
+        }
+
+        &__control {
+            display: flex;
+
+            &_body {
+                display: flex;
+                background: var(--bg-sub-menu);
+                overflow: hidden;
+                flex: 1 1 auto;
+                border: {
+                    width: 1px;
+                    style: solid;
+                    color: var(--border);
+                    radius: 8px 0 0 8px;
+                    right-width: 0;
+                };
+            }
+
+            &_field {
+                overflow: hidden;
+                appearance: none;
+                border: 0;
+                outline: none;
+                flex: 1 1 auto;
+                padding: 0;
+                text-overflow: ellipsis;
+                background: transparent;
+                color: var(--text-b-color);
+            }
+
+            &_icon {
+                padding: 8px;
+                flex-shrink: 0;
+
+                svg {
+                    width: 24px;
+                    height: 24px;
+                    color: var(--text-color);
+                }
+            }
+
+            &_btn {
+                border-radius: 0 8px 8px 0;
+                padding: 8px 16px;
+            }
         }
 
         &__count {
