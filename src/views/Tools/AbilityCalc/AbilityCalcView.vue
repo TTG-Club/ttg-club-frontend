@@ -49,7 +49,7 @@
         computed, defineComponent, ref, shallowRef
     } from 'vue';
     import PageLayout from '@/components/content/PageLayout.vue';
-    import UiSwitch from '@/components/form/UiSwitch.vue';
+    import UiSwitch from '@/components/UI/kit/UiSwitch.vue';
     import AbilityTable from '@/views/Tools/AbilityCalc/AbilityTable.vue';
     import AbilityRandom from '@/views/Tools/AbilityCalc/AbilityRandom.vue';
     import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';

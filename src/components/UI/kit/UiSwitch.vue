@@ -22,8 +22,8 @@
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import UiGroupButton from '@/components/form/UiGroupButton.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiGroupButton from '@/components/UI/kit/UiGroupButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({

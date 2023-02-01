@@ -35,10 +35,15 @@
                 </h5>
             </div>
 
-            <slot />
+            <div class="page-layout__content">
+                <slot />
+            </div>
 
-            <div class="page-layout__socials">
-                <social-links v-if="useSocialLinks" />
+            <div
+                v-if="useSocialLinks"
+                class="page-layout__socials"
+            >
+                <social-links />
             </div>
         </div>
 
@@ -97,8 +102,8 @@
 
 <style lang="scss" scoped>
     .page-layout {
-        height: 100%;
         display: flex;
+        min-height: var(--max-vh);
 
         &__side {
             &--left {
@@ -110,6 +115,8 @@
                 max-width: 620px;
                 margin: 0 auto;
                 border-radius: 12px;
+                display: flex;
+                flex-direction: column;
 
                 @include media-min($lg) {
                     flex: 1 1 960px;
@@ -154,8 +161,13 @@
 
         }
 
+        &__content {
+            padding-bottom: 24px;
+            flex: 1 1 auto;
+        }
+
         &__socials {
-            margin: 40px 0;
+            margin: 16px 0 40px;
         }
     }
 </style>

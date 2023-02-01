@@ -38,7 +38,7 @@
 
 <script>
     import { defineComponent } from 'vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
 
     export default defineComponent({
         components: { UiButton },

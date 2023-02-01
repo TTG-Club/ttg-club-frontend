@@ -18,12 +18,20 @@
                         />
                     </div>
 
-                    <div class="search-modal__control_field">
+                    <form
+                        class="search-modal__control_field"
+                        novalidate="novalidate"
+                        autocomplete="off"
+                        autofocus="autofocus"
+                        autocapitalize="off"
+                        @submit.prevent.stop="navigate"
+                    >
                         <input
                             ref="input"
                             v-model="search"
+                            @keyup.enter.exact.prevent.stop="navigate"
                         />
-                    </div>
+                    </form>
 
                     <div
                         v-if="!inProgress && results?.count"
@@ -46,32 +54,11 @@
                 </div>
 
                 <div class="search-modal__results">
-                    <a
+                    <search-link
                         v-for="(res, key) in results?.list || []"
                         :key="key"
-                        :href="res.url"
-                        class="search-modal__result"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <div class="search-modal__result_body">
-                            <div class="search-modal__result_label">
-                                {{ res.name }}
-                            </div>
-
-                            <div class="search-modal__result_desc">
-                                {{ res.section }}
-                            </div>
-                        </div>
-
-                        <div class="search-modal__result_icon">
-                            <svg-icon
-                                icon-name="new-page"
-                                :stroke-enable="false"
-                                fill-enable
-                            />
-                        </div>
-                    </a>
+                        :search-link="res"
+                    />
 
                     <div
                         v-if="!search.length && !results?.list.length"
@@ -102,8 +89,8 @@
                     </div>
 
                     <a
-                        href="#"
                         class="search-modal__all"
+                        @click.left.exact.stop="navigate"
                     >
                         <div class="search-modal__all_icon">
                             <svg-icon
@@ -130,22 +117,14 @@
     import debounce from 'lodash/debounce';
     import { useVModel, useFocus } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
-
-    type TResult = {
-        name: string
-        section: string
-        url: string
-    }
-
-    type TResultList = {
-        count: number
-        list: TResult[]
-    }
+    import type { TSearchResultList } from '@/types/Search/Search.types';
+    import SearchLink from '@/views/Search/SearchLink.vue';
 
     export default defineComponent({
         components: {
+            SearchLink,
             UiButton,
             SvgIcon
         },
@@ -160,7 +139,7 @@
             const http = useAxios();
             const controller = ref<AbortController | null>(null);
             const search = ref('');
-            const results = ref<TResultList | null>(null);
+            const results = ref<TSearchResultList | null>(null);
             const inProgress = ref(false);
             const input = ref<HTMLElement | null>(null);
             const { focused } = useFocus(input, { initialValue: true });
@@ -198,7 +177,7 @@
                         return Promise.reject(resp.statusText);
                     }
 
-                    results.value = resp.data as TResultList;
+                    results.value = resp.data as TSearchResultList;
 
                     return Promise.resolve();
                 } catch (err) {
@@ -209,6 +188,10 @@
                     controller.value = null;
                     inProgress.value = false;
                 }
+            };
+
+            const navigate = () => {
+                window.location.href = `/search?search=${ search.value }`;
             };
 
             const onSearchDebounce = debounce(async () => {
@@ -229,7 +212,8 @@
                 input,
                 search,
                 results,
-                focused
+                focused,
+                navigate
             };
         }
     });
@@ -271,6 +255,8 @@
                 flex: 1 1 100%;
                 height: 36px;
                 overflow: hidden;
+                appearance: none;
+                border: 0;
 
                 input {
                     appearance: none;
@@ -327,50 +313,6 @@
             user-select: none;
         }
 
-        &__result {
-            @include css_anim();
-
-            display: flex;
-            align-items: center;
-            padding: 6px 12px;
-            color: var(--text-color-title);
-
-            &_body {
-                flex: 1 1 100%;
-            }
-
-            &_desc {
-                margin-top: 4px;
-                font-style: italic;
-                font-size: 13px;
-                opacity: .4;
-                color: var(--text-color);
-            }
-
-            &_icon {
-                @include css_anim();
-
-                flex-shrink: 0;
-                width: 18px;
-                height: 18px;
-                opacity: 0;
-
-                svg {
-                    color: var(--text-color);
-                }
-            }
-
-            &:hover {
-                background: var(--hover);
-
-                .search-modal__result {
-                    &_icon {
-                        opacity: 1;
-                    }
-                }
-            }
-        }
-
         &__text {
             display: flex;
             align-items: center;
@@ -386,6 +328,7 @@
             align-items: center;
             padding: 6px 12px;
             color: var(--text-color-title);
+            cursor: pointer;
 
             &:hover {
                 background: var(--hover);

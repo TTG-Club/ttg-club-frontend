@@ -78,10 +78,10 @@
     import { reactive } from 'vue';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import errorHandler from '@/common/helpers/errorHandler';
-    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
     import RawContent from '@/components/content/RawContent.vue';
-    import UiInput from '@/components/form/UiInput.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
 
     export default {
         name: 'MadnessView',

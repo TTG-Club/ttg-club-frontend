@@ -105,8 +105,8 @@
         computed, defineComponent, onBeforeMount, ref
     } from 'vue';
     import draggableComponent from 'vuedraggable';
-    import UiInput from '@/components/form/UiInput.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import CustomBookmarkCategory from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';

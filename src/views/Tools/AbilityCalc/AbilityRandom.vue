@@ -63,11 +63,11 @@
     import orderBy from 'lodash/orderBy';
     import reverse from 'lodash/reverse';
     import { storeToRefs } from 'pinia';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDiceRoller } from '@/common/composition/useDiceRoller';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
     import { ToastEventBus } from '@/common/utils/ToastConfig';
     import { useUIStore } from '@/store/UI/UIStore';

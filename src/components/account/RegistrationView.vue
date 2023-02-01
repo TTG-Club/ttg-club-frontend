@@ -87,8 +87,8 @@
     import useVuelidate from '@vuelidate/core';
     import { helpers, sameAs } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
-    import UiInput from '@/components/form/UiInput.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import {
         validateEmailExist,
         validateEmailFormat,
