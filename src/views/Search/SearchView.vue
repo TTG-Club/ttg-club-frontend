@@ -382,6 +382,16 @@
             min-height: 100%;
         }
 
+        &__controls {
+            position: sticky;
+            top: 0;
+            padding: 16px 0;
+            margin: -16px 0;
+            opacity: 1;
+            background-color: var(--bg-main);
+            z-index: 10;
+        }
+
         &__control {
             display: flex;
 

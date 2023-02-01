@@ -249,9 +249,9 @@
             background: var(--bg-secondary);
             overflow: hidden;
             border-radius: 12px;
-            box-shadow: 0 8px 31px 15px var(--bg-light-main);
             width: 100%;
             pointer-events: auto;
+            box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
         }
 
         &__control {
