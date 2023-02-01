@@ -36,6 +36,7 @@
         display: block;
         padding: 6px 12px;
         color: var(--text-color-title);
+        user-select: none;
 
         &__desc {
             margin-top: 4px;

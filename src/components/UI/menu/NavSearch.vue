@@ -43,11 +43,8 @@
                 isShow.value = true;
             };
 
-            const {
-                meta,
-                control,
-                k
-            } = useMagicKeys();
+            const keys = useMagicKeys();
+            const divide = keys['/'];
 
             const notUsingInput = computed(() => (
                 activeElement.value?.tagName !== 'INPUT'
@@ -55,7 +52,7 @@
             ));
 
             watchEffect(() => {
-                if (((meta.value && k.value) || (control.value && k.value)) && notUsingInput.value) {
+                if (divide.value && notUsingInput.value) {
                     onOpenSearch();
                 }
             });
