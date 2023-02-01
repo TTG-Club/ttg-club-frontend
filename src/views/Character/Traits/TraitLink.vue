@@ -8,13 +8,13 @@
             <div class="link-item__body">
                 <div class="link-item__row">
                     <div class="link-item__name">
-                        <div class="link-item__name--rus">
+                        <span class="link-item__name--rus">
                             {{ traitItem.name.rus }}
-                        </div>
+                        </span>
 
-                        <div class="link-item__name--eng">
+                        <span class="link-item__name--eng">
                             [{{ traitItem.name.eng }}]
-                        </div>
+                        </span>
                     </div>
                 </div>
 
@@ -49,6 +49,9 @@
             color: var(--text-g-color);
             font-size: calc(var(--main-font-size) - 1px);
             line-height: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         &.router-link-active {

@@ -358,11 +358,11 @@
 
         &__side--left_fixed {
             position: sticky;
-            top: 0;
+            top: 16px;
             z-index: 3;
 
-            @media (max-width: 600px) {
-                top: 16px;
+            @include media-min($xl) {
+                top: 24px;
             }
         }
     }

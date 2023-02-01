@@ -60,20 +60,47 @@
   .header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin: 0 0 16px 0;
+    justify-content: center;
+    margin: 32px 0 16px 0;
 
     .search_row_g {
       height: 46px;
       width: 100%;
+      max-width: 600px;
       position: relative;
-      border-radius: 12px;
+      border-radius: 36px;
       overflow: hidden;
-      padding: 0;
+      padding: 0 16px;
       background-color: var(--bg-secondary);
       display: flex;
       align-items: center;
-      padding-left: 16px;
+      justify-content: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--hover);
+      }
+
+      span.key {
+        padding: 0 8px;
+        font-weight: 600;
+        color: var(--text-color-title);
+      }
+
+      span.computer_version {
+        display: none;
+
+        @include media-min($md) {
+          display: block;
+        }
+      }
+
+      span.key {
+        padding: 0 8px;
+        font-weight: 600;
+        color: var(--text-color-title);
+      }
     }
   }
 
@@ -637,15 +664,20 @@
   border: 1px solid var(--border);
   position: relative;
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 32px;
   background-color: var(--bg-main);
 
   &__row {
     margin-top: 16px;
 
     .ui-checkbox {
-      margin-right: 16px;
+      margin-right: 8px;
       margin-top: 8px;
+    }
+
+    &.btn-wrapper {
+      display: flex;
+      gap: 8px;
     }
   }
 
