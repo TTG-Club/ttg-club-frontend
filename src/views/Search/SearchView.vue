@@ -65,7 +65,7 @@
                     v-model="page"
                     class="search-view__paginate"
                     :page-count="pages"
-                    :click-handler="onChangeSearch"
+                    :click-handler="onPageChanged"
                 />
             </div>
         </template>
@@ -111,6 +111,7 @@
             const page = ref(1);
             const results = ref<TSearchResultList | null>(null);
             const controls = ref<null | HTMLElement>(null);
+            const isNeedUpdateScroll = ref(false);
 
             const pages = computed(() => {
                 if (!results.value?.count || results.value.count <= 20) {
@@ -198,6 +199,12 @@
                 await onUpdateRoute();
             }, 300);
 
+            const onPageChanged = debounce(async () => {
+                isNeedUpdateScroll.value = true;
+
+                await onUpdateRoute();
+            }, 300);
+
             const searchQuery = async () => {
                 try {
                     controller.value = new AbortController();
@@ -228,7 +235,7 @@
                 }
             };
 
-            const onSearch = async (useScroll: boolean = true) => {
+            const onSearch = async () => {
                 inProgress.value = true;
 
                 if (controller.value !== null) {
@@ -252,7 +259,7 @@
 
                     results.value = result;
 
-                    if (useScroll) {
+                    if (isNeedUpdateScroll.value) {
                         const controlsRect = controls.value?.getBoundingClientRect();
 
                         const controlsTop = controlsRect?.top
@@ -263,6 +270,8 @@
                             top: controlsTop - 24,
                             behavior: 'smooth'
                         });
+
+                        isNeedUpdateScroll.value = false;
                     }
 
                     return Promise.resolve();
@@ -297,7 +306,7 @@
                     return;
                 }
 
-                await onSearch(false);
+                await onSearch();
             });
 
             onBeforeRouteUpdate(async (to, from, next) => {
@@ -319,7 +328,8 @@
                 resultsNumbers,
                 inProgress,
                 onUpdateRoute,
-                onChangeSearch
+                onChangeSearch,
+                onPageChanged
             };
         }
     });
