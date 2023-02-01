@@ -59,6 +59,34 @@
                         :key="key"
                         :search-link="res"
                     />
+
+                    <div
+                        v-if="!search.length && !results?.list.length"
+                        class="search-view__results_text"
+                    >
+                        Введите текст, что бы начать
+                    </div>
+
+                    <div
+                        v-else-if="search.length < 3 && !results?.list.length"
+                        class="search-view__results_text"
+                    >
+                        Минимум 3 символа для поиска
+                    </div>
+
+                    <div
+                        v-else-if="search.length >= 3 && inProgress && !results?.list.length"
+                        class="search-view__results_text"
+                    >
+                        Боги ищут ответ на твой запрос
+                    </div>
+
+                    <div
+                        v-else-if="!results?.list.length && !inProgress"
+                        class="search-view__results_text"
+                    >
+                        Боги не нашли ответа на твой запрос
+                    </div>
                 </div>
 
                 <ui-paginate
@@ -406,6 +434,14 @@
 
         &__results {
             flex: 1 1 auto;
+
+            &_text {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 32px 12px;
+                color: var(--text-color);
+            }
         }
 
         &__paginate {

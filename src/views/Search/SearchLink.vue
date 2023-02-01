@@ -8,8 +8,15 @@
             {{ searchLink.name }}
         </div>
 
-        <div class="search-link__desc">
+        <div class="search-link__section">
             {{ searchLink.section }}
+        </div>
+
+        <div
+            v-if="searchLink.description"
+            class="search-link__desc"
+        >
+            {{ searchLink.description }}
         </div>
     </a>
 </template>
@@ -38,12 +45,26 @@
         color: var(--text-color-title);
         user-select: none;
 
-        &__desc {
+        &__section {
             margin-top: 4px;
             font-style: italic;
             font-size: 13px;
             opacity: .4;
             color: var(--text-color);
+        }
+
+        &__desc {
+            margin-top: 4px;
+            color: var(--text-color);
+            white-space: nowrap;
+            max-width: 100%;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            @include media-min($xl) {
+                white-space: initial;
+            }
         }
 
         &:hover {

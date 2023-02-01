@@ -1,6 +1,7 @@
 export type TSearchResult = {
     name: string
     section: string
+    description?: string
     url: string
 }
 
