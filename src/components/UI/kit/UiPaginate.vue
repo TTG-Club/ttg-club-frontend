@@ -108,6 +108,14 @@
                 color: var(--text-color);
                 opacity: .4;
             }
+
+            &:hover {
+                &:not(.is-active):not(.is-disabled) {
+                    border-color: var(--primary-hover);
+                    background: var(--primary-hover);
+                    color: var(--text-btn-color);
+                }
+            }
         }
 
         &__prev {

@@ -9,23 +9,20 @@
         </template>
 
         <template #default>
-            <div
-                ref="wrapper"
-                class="search-view__wrapper"
-            >
+            <div class="search-view__wrapper">
                 <div class="search-view__filter">
                     <ui-input
                         v-model="search"
-                        @input.prevent.stop="onChangeSearch"
+                        @update:model-value="onChangeSearch"
                         @keyup.enter.exact.prevent.stop="onChangeSearch"
                     />
                 </div>
 
                 <div
-                    v-if="results?.count && !!resultsNumbers"
+                    v-if="resultsNumbers"
                     class="search-view__count"
                 >
-                    Результат: {{ resultsNumbers.min }}-{{ resultsNumbers.max }} из {{ results.count }}
+                    Результат: {{ resultsNumbers.min }}-{{ resultsNumbers.max }} из {{ results?.count }}
                 </div>
 
                 <div class="search-view__results">
@@ -77,7 +74,6 @@
             const http = useAxios();
             const controller = ref<AbortController | null>(null);
             const inProgress = ref(false);
-            const prevSearch = ref('');
             const search = ref('');
             const page = ref(1);
             const results = ref<TSearchResultList | null>(null);
@@ -114,93 +110,6 @@
                 }
 
                 await router.push(to);
-            };
-
-            const searchQuery = async () => {
-                try {
-                    controller.value = new AbortController();
-
-                    const resp = await http.post({
-                        url: '/search',
-                        payload: {
-                            page: page.value - 1,
-                            limit: 20,
-                            search: {
-                                value: search.value,
-                                exact: false
-                            },
-                            order: []
-                        },
-                        signal: controller.value.signal
-                    });
-
-                    if (resp.status !== 200) {
-                        return Promise.reject(resp.statusText);
-                    }
-
-                    return Promise.resolve(resp.data as TSearchResultList);
-                } catch (err) {
-                    return Promise.reject(err);
-                } finally {
-                    controller.value = null;
-                }
-            };
-
-            const onSearch = async () => {
-                inProgress.value = true;
-
-                if (controller.value !== null) {
-                    controller.value.abort();
-                }
-
-                if (search.value.length < 3) {
-                    return Promise.resolve();
-                }
-
-                if (search.value !== prevSearch.value) {
-                    prevSearch.value = search.value;
-                }
-
-                try {
-                    controller.value = new AbortController();
-
-                    let result = await searchQuery();
-
-                    if (result.count && !result.list.length && page.value !== 1) {
-                        page.value = 1;
-
-                        result = await searchQuery();
-                    }
-
-                    results.value = result;
-
-                    wrapper.value?.scroll({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-
-                    if (!results.value?.count) {
-                        return null;
-                    }
-
-                    resultsNumbers.value = {
-                        min: page.value > 1
-                            ? 20 * (page.value - 1) + 1
-                            : 1,
-                        max: page.value < pages.value && results.value.count > 20
-                            ? 20 * page.value
-                            : results.value.count
-                    };
-
-                    return Promise.resolve();
-                } catch (err) {
-                    results.value = null;
-
-                    return Promise.reject(err);
-                } finally {
-                    controller.value = null;
-                    inProgress.value = false;
-                }
             };
 
             const resolveQuerySearch = (querySearch?: LocationQueryValue | LocationQueryValue[]) => {
@@ -255,6 +164,92 @@
             const onChangeSearch = debounce(async () => {
                 await onUpdateRoute();
             }, 300);
+
+            const searchQuery = async () => {
+                try {
+                    controller.value = new AbortController();
+
+                    const resp = await http.post({
+                        url: '/search',
+                        payload: {
+                            page: page.value - 1,
+                            limit: 20,
+                            search: {
+                                value: search.value,
+                                exact: false
+                            },
+                            order: []
+                        },
+                        signal: controller.value.signal
+                    });
+
+                    if (resp.status !== 200) {
+                        return Promise.reject(resp.statusText);
+                    }
+
+                    return Promise.resolve(resp.data as TSearchResultList);
+                } catch (err) {
+                    return Promise.reject(err);
+                } finally {
+                    controller.value = null;
+                }
+            };
+
+            const onSearch = async () => {
+                inProgress.value = true;
+
+                if (controller.value !== null) {
+                    controller.value.abort();
+                }
+
+                if (search.value.length < 3) {
+                    return Promise.resolve();
+                }
+
+                try {
+                    const result = await searchQuery();
+
+                    if (result.count && !result.list.length && page.value !== 1) {
+                        page.value = 1;
+
+                        await onUpdateRoute(true);
+
+                        return Promise.resolve();
+                    }
+
+                    results.value = result;
+
+                    wrapper.value?.scroll({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+
+                    if (!results.value?.count) {
+                        return null;
+                    }
+
+                    return Promise.resolve();
+                } catch (err) {
+                    return Promise.reject(err);
+                } finally {
+                    inProgress.value = false;
+
+                    if (results.value?.count) {
+                        resultsNumbers.value = {
+                            min: page.value > 1
+                                ? 20 * (page.value - 1) + 1
+                                : 1,
+                            max: page.value < pages.value && results.value.count > 20
+                                ? 20 * page.value
+                                : results.value.count
+                        };
+                    }
+
+                    if (!results.value?.count) {
+                        resultsNumbers.value = null;
+                    }
+                }
+            };
 
             onMounted(async () => {
                 resolveQuery(route);
