@@ -10,7 +10,10 @@
 
         <template #default>
             <div class="search-view__wrapper">
-                <div class="search-view__filter">
+                <div
+                    ref="controls"
+                    class="search-view__controls"
+                >
                     <form
                         class="search-view__control"
                         novalidate="novalidate"
@@ -78,6 +81,7 @@
         onBeforeRouteUpdate, useRoute, useRouter
     } from 'vue-router';
     import debounce from 'lodash/debounce';
+    import { storeToRefs } from 'pinia';
     import PageLayout from '@/components/content/PageLayout.vue';
     import type { TSearchResultList } from '@/types/Search/Search.types';
     import { useAxios } from '@/common/composition/useAxios';
@@ -85,6 +89,7 @@
     import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
 
     export default defineComponent({
         components: {
@@ -97,13 +102,15 @@
         setup() {
             const route = useRoute();
             const router = useRouter();
+            const uiStore = useUIStore();
+            const { bodyElement } = storeToRefs(uiStore);
             const http = useAxios();
             const controller = ref<AbortController | null>(null);
             const inProgress = ref(false);
             const search = ref('');
             const page = ref(1);
             const results = ref<TSearchResultList | null>(null);
-            const wrapper = ref<null | HTMLElement>(null);
+            const controls = ref<null | HTMLElement>(null);
 
             const pages = computed(() => {
                 if (!results.value?.count || results.value.count <= 20) {
@@ -221,7 +228,7 @@
                 }
             };
 
-            const onSearch = async () => {
+            const onSearch = async (useScroll: boolean = true) => {
                 inProgress.value = true;
 
                 if (controller.value !== null) {
@@ -245,13 +252,17 @@
 
                     results.value = result;
 
-                    wrapper.value?.scroll({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
+                    if (useScroll) {
+                        const controlsRect = controls.value?.getBoundingClientRect();
 
-                    if (!results.value?.count) {
-                        return null;
+                        const controlsTop = controlsRect?.top
+                            ? controlsRect.top + uiStore.bodyScroll.y
+                            : 0;
+
+                        bodyElement.value?.scroll({
+                            top: controlsTop - 24,
+                            behavior: 'smooth'
+                        });
                     }
 
                     return Promise.resolve();
@@ -286,7 +297,7 @@
                     return;
                 }
 
-                await onSearch();
+                await onSearch(false);
             });
 
             onBeforeRouteUpdate(async (to, from, next) => {
@@ -300,7 +311,7 @@
             });
 
             return {
-                wrapper,
+                controls,
                 search,
                 results,
                 page,
