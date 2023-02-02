@@ -112,13 +112,13 @@
 
             &--center {
                 flex: 1 1 620px;
-                max-width: 620px;
+                max-width: 100%;
                 margin: 0 auto;
                 border-radius: 12px;
                 display: flex;
                 flex-direction: column;
 
-                @include media-min($lg) {
+                @include media-min($xl) {
                     flex: 1 1 960px;
                     max-width: 960px;
                 }

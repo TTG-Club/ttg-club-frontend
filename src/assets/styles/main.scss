@@ -30,9 +30,10 @@
   z-index: -100;
   height: var(--max-vh);
   pointer-events: none;
+  display: none;
 
-  @media (max-width: 1400px) {
-    display: none;
+  @include media-min($xxl) {
+    display: block;
   }
 }
 
