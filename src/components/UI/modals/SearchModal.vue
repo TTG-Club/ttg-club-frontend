@@ -32,7 +32,7 @@
                             autocomplete="off"
                             autocapitalize="off"
                             formnovalidate="formnovalidate"
-                            @input.prevent.stop="search = $event"
+                            @input.prevent.stop="search = $event.target.value"
                             @keyup.enter.exact.prevent.stop="onSubmit"
                         />
                     </form>
