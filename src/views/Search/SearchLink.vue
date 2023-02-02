@@ -1,8 +1,10 @@
 <template>
     <a
         v-if="searchLink"
+        ref="link"
         :href="searchLink.url"
         class="search-link"
+        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover }"
     >
         <div class="search-link__label">
             {{ searchLink.name }}
@@ -26,7 +28,10 @@
 
 <script lang="ts">
     import type { PropType } from 'vue';
-    import { defineComponent } from 'vue';
+    import {
+        defineComponent, ref, watch
+    } from 'vue';
+    import { useFocus } from '@vueuse/core';
     import type { TSearchResult } from '@/types/Search/Search.types';
     import RawContent from '@/components/content/RawContent.vue';
 
@@ -35,12 +40,37 @@
         props: {
             searchLink: {
                 type: Object as PropType<TSearchResult>,
-                default: null
+                default: null,
+                required: true
             },
             showDesc: {
                 type: Boolean,
                 default: false
+            },
+            disableHover: {
+                type: Boolean,
+                default: false
+            },
+            selected: {
+                type: Boolean,
+                default: false
             }
+        },
+        setup(props) {
+            const link = ref<HTMLElement | null>(null);
+            const { focused } = useFocus(link);
+
+            watch(
+                () => props.selected,
+                value => {
+                    focused.value = value;
+                }
+            );
+
+            return {
+                link,
+                focused
+            };
         }
     });
 </script>
@@ -77,6 +107,14 @@
         }
 
         &:hover {
+            &:not(.is-hover-disabled):not(.is-selected) {
+                background: var(--hover);
+            }
+        }
+
+        &.is-selected {
+            @include css_anim();
+
             background: var(--hover);
         }
     }

@@ -24,12 +24,12 @@
                         autocomplete="off"
                         autofocus="autofocus"
                         autocapitalize="off"
-                        @submit.prevent.stop="navigate"
+                        @submit.prevent.stop="onSubmit"
                     >
                         <input
                             ref="input"
                             v-model="search"
-                            @keyup.enter.exact.prevent.stop="navigate"
+                            @keyup.enter.exact.prevent.stop="onSubmit"
                         />
                     </form>
 
@@ -58,11 +58,15 @@
                         v-for="(res, key) in results?.list || []"
                         :key="key"
                         :search-link="res"
+                        :selected="selectedIndex === key"
+                        disable-hover
+                        @mouseenter.self="selectedIndex = key"
                     />
 
                     <div
                         v-if="!search.length && !results?.list.length"
                         class="search-modal__text"
+                        @mouseenter.self="selectedIndex = null"
                     >
                         Введите текст, что бы начать
                     </div>
@@ -70,6 +74,7 @@
                     <div
                         v-else-if="search.length < 3 && !results?.list.length"
                         class="search-modal__text"
+                        @mouseenter.self="selectedIndex = null"
                     >
                         Минимум 3 символа для поиска
                     </div>
@@ -77,6 +82,7 @@
                     <div
                         v-else-if="search.length >= 3 && inProgress"
                         class="search-modal__text"
+                        @mouseenter.self="selectedIndex = null"
                     >
                         Боги ищут ответ на твой запрос
                     </div>
@@ -84,12 +90,14 @@
                     <div
                         v-else-if="!results?.list.length && !inProgress"
                         class="search-modal__text"
+                        @mouseenter.self="selectedIndex = null"
                     >
                         Боги не нашли ответа на твой запрос
                     </div>
 
                     <a
                         class="search-modal__all"
+                        @mouseenter.self="selectedIndex = null"
                         @click.left.exact.stop="navigate"
                     >
                         <div class="search-modal__all_icon">
@@ -112,11 +120,12 @@
 
 <script lang="ts">
     import {
+        computed,
         defineComponent, onMounted, ref, watch
     } from 'vue';
     import debounce from 'lodash/debounce';
     import {
-        useVModel, useFocus, onStartTyping
+        useVModel, useFocus, onStartTyping, onKeyStroke, useActiveElement
     } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
@@ -145,6 +154,8 @@
             const inProgress = ref(false);
             const input = ref<HTMLElement | null>(null);
             const { focused } = useFocus(input, { initialValue: true });
+            const selectedIndex = ref<number | null>(null);
+            const activeElement = useActiveElement();
 
             const onSearch = async () => {
                 results.value = null;
@@ -180,6 +191,7 @@
                     }
 
                     results.value = resp.data as TSearchResultList;
+                    selectedIndex.value = null;
 
                     return Promise.resolve();
                 } catch (err) {
@@ -194,14 +206,96 @@
 
             onStartTyping(() => {
                 focused.value = true;
+                selectedIndex.value = null;
             });
 
             onMounted(() => {
                 focused.value = true;
             });
 
+            onKeyStroke('ArrowDown', e => {
+                if (!isShowModal.value) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                focused.value = false;
+
+                if (!results.value?.list.length) {
+                    return;
+                }
+
+                if (selectedIndex.value === null || selectedIndex.value === results.value.list.length - 1) {
+                    selectedIndex.value = 0;
+
+                    return;
+                }
+
+                selectedIndex.value++;
+            });
+
+            onKeyStroke('ArrowUp', e => {
+                if (!isShowModal.value) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                focused.value = false;
+
+                if (!results.value?.list.length) {
+                    return;
+                }
+
+                if (!selectedIndex.value) {
+                    selectedIndex.value = results.value.list.length - 1;
+
+                    return;
+                }
+
+                selectedIndex.value--;
+            });
+
+            const notUsingInput = computed(() => (
+                activeElement.value?.tagName !== 'INPUT'
+                && activeElement.value?.tagName !== 'TEXTAREA'
+            ));
+
+            onKeyStroke('Enter', e => {
+                if (!isShowModal.value) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                if (!notUsingInput.value) {
+                    return;
+                }
+
+                if (typeof selectedIndex.value !== 'number' || !results.value?.list.length) {
+                    return;
+                }
+
+                const result = results.value.list[selectedIndex.value];
+
+                if (!result) {
+                    return;
+                }
+
+                window.location.href = result.url;
+            });
+
             const navigate = () => {
                 window.location.href = `/search?search=${ search.value }`;
+            };
+
+            const onSubmit = () => {
+                if (!focused.value) {
+                    return;
+                }
+
+                navigate();
             };
 
             const onSearchDebounce = debounce(async () => {
@@ -219,7 +313,9 @@
                 search,
                 results,
                 focused,
-                navigate
+                selectedIndex,
+                navigate,
+                onSubmit
             };
         }
     });
