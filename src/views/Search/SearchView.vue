@@ -58,6 +58,7 @@
                         v-for="(res, key) in results?.list || []"
                         :key="key"
                         :search-link="res"
+                        show-desc
                     />
 
                     <div

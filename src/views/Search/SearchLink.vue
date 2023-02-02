@@ -31,6 +31,10 @@
             searchLink: {
                 type: Object as PropType<TSearchResult>,
                 default: null
+            },
+            showDesc: {
+                type: Boolean,
+                default: false
             }
         }
     });
