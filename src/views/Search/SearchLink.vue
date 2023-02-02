@@ -13,7 +13,7 @@
         </div>
 
         <div
-            v-if="searchLink.description"
+            v-if="searchLink.description && showDesc"
             class="search-link__desc"
         >
             {{ searchLink.description }}
