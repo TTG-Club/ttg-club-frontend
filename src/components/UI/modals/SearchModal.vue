@@ -29,6 +29,7 @@
                         <input
                             ref="input"
                             v-model="search"
+                            @input.prevent.stop="search = $event"
                             @keyup.enter.exact.prevent.stop="onSubmit"
                         />
                     </form>
