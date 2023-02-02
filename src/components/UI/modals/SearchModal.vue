@@ -22,13 +22,16 @@
                         class="search-modal__control_field"
                         novalidate="novalidate"
                         autocomplete="off"
-                        autofocus="autofocus"
                         autocapitalize="off"
                         @submit.prevent.stop="onSubmit"
                     >
                         <input
                             ref="input"
                             v-model="search"
+                            autofocus="autofocus"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            formnovalidate="formnovalidate"
                             @input.prevent.stop="search = $event"
                             @keyup.enter.exact.prevent.stop="onSubmit"
                         />
