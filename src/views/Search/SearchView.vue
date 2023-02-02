@@ -440,7 +440,7 @@
         }
 
         &__count {
-            padding: 16px 12px 32px;
+            padding: 16px 12px 16px;
         }
 
         &__results {
@@ -456,7 +456,11 @@
         }
 
         &__paginate {
-            margin-top: 16px;
+            position: sticky;
+            bottom: 0;
+            background-color: var(--bg-main);
+            padding: 8px 0 24px 0;
+            margin: -8px 0 -24px 0;
         }
     }
 
