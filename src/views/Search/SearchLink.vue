@@ -41,7 +41,7 @@
         @include css_anim();
 
         display: block;
-        padding: 6px 12px;
+        padding: 10px 12px;
         color: var(--text-color-title);
         user-select: none;
 
