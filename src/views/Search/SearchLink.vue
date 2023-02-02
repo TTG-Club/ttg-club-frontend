@@ -18,10 +18,7 @@
             v-if="searchLink.description && showDesc"
             class="search-link__desc"
         >
-            <raw-content
-                :template="searchLink.description"
-                tag="span"
-            />
+            {{ searchLink.description }}
         </div>
     </a>
 </template>
@@ -33,10 +30,8 @@
     } from 'vue';
     import { useFocus } from '@vueuse/core';
     import type { TSearchResult } from '@/types/Search/Search.types';
-    import RawContent from '@/components/content/RawContent.vue';
 
     export default defineComponent({
-        components: { RawContent },
         props: {
             searchLink: {
                 type: Object as PropType<TSearchResult>,

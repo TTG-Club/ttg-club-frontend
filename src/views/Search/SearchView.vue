@@ -153,12 +153,7 @@
                     return 0;
                 }
 
-                const numberOfPages = Math.round(results.value.count / 20);
-                const hasNotFullPage = results.value.count % 20 > 0;
-
-                return hasNotFullPage
-                    ? numberOfPages + 1
-                    : numberOfPages;
+                return Math.round(results.value.count / 20);
             });
 
             const resultsNumbers = ref<null | { min: number, max: number }>(null);
@@ -231,6 +226,8 @@
             };
 
             const onChangeSearch = debounce(async () => {
+                isNeedUpdateScroll.value = true;
+
                 await onUpdateRoute();
             }, 300);
 
@@ -297,12 +294,14 @@
                     if (isNeedUpdateScroll.value) {
                         const controlsRect = controls.value?.getBoundingClientRect();
 
-                        const controlsTop = controlsRect?.top
-                            ? controlsRect.top + uiStore.bodyScroll.y
-                            : 0;
+                        if (!uiStore.bodyScroll.y || (controlsRect && controlsRect.top > 0)) {
+                            isNeedUpdateScroll.value = false;
+
+                            return Promise.resolve();
+                        }
 
                         bodyElement.value?.scroll({
-                            top: controlsTop - 24,
+                            top: 0,
                             behavior: 'smooth'
                         });
 
