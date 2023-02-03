@@ -27,12 +27,13 @@
                     >
                         <input
                             ref="input"
-                            v-model="search"
                             autofocus="autofocus"
                             autocomplete="off"
                             autocapitalize="off"
                             formnovalidate="formnovalidate"
-                            @input.prevent.stop="search = $event.target.value"
+                            :value="search"
+                            placeholder="Поиск..."
+                            @input.prevent.stop="onUpdateSearch($event.target.value)"
                             @keyup.enter.exact.prevent.stop="onSubmit"
                         />
                     </form>
@@ -48,6 +49,7 @@
                         class="search-modal__control_dice"
                         type-link
                         is-icon
+                        @click.left.exact.prevent="onSearchRandom"
                     >
                         <svg-icon
                             icon-name="dice-flat"
@@ -162,18 +164,16 @@
             const activeElement = useActiveElement();
 
             const onSearch = async () => {
-                results.value = null;
-                inProgress.value = true;
-
                 if (controller.value !== null) {
                     controller.value.abort();
                 }
 
-                if (!search.value.length || (search.value.length < 3 && search.value.length !== 0)) {
+                if (search.value.length < 3) {
                     return Promise.resolve();
                 }
 
                 try {
+                    inProgress.value = true;
                     controller.value = new AbortController();
 
                     const resp = await http.post({
@@ -185,6 +185,45 @@
                                 value: search.value,
                                 exact: false
                             },
+                            order: []
+                        },
+                        signal: controller.value.signal
+                    });
+
+                    if (resp.status !== 200) {
+                        return Promise.reject(resp.statusText);
+                    }
+
+                    results.value = resp.data as TSearchResultList;
+                    selectedIndex.value = null;
+
+                    return Promise.resolve();
+                } catch (err) {
+                    results.value = null;
+
+                    return Promise.reject(err);
+                } finally {
+                    controller.value = null;
+                    inProgress.value = false;
+                }
+            };
+
+            const onSearchRandom = async () => {
+                if (controller.value !== null) {
+                    controller.value.abort();
+                }
+
+                try {
+                    search.value = '';
+                    inProgress.value = true;
+                    controller.value = new AbortController();
+
+                    const resp = await http.post({
+                        url: '/search/random',
+                        payload: {
+                            page: 0,
+                            limit: 5,
+                            search: null,
                             order: []
                         },
                         signal: controller.value.signal
@@ -306,9 +345,11 @@
                 await onSearch();
             }, 300);
 
-            watch(search, () => {
+            const onUpdateSearch = (e: string) => {
+                search.value = e;
+
                 onSearchDebounce();
-            });
+            };
 
             return {
                 isShowModal,
@@ -319,7 +360,9 @@
                 focused,
                 selectedIndex,
                 navigate,
-                onSubmit
+                onSubmit,
+                onSearchRandom,
+                onUpdateSearch
             };
         }
     });

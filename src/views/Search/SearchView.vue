@@ -35,6 +35,7 @@
                                 ref="input"
                                 v-model="search"
                                 class="search-view__control_field"
+                                placeholder="Поиск..."
                                 @update:model-value="onChangeSearch"
                                 @keyup.enter.exact.prevent.stop="onChangeSearch"
                             />
@@ -239,6 +240,10 @@
 
             const searchQuery = async () => {
                 try {
+                    if (controller.value !== null) {
+                        controller.value.abort();
+                    }
+
                     controller.value = new AbortController();
 
                     const resp = await http.post({
@@ -268,17 +273,13 @@
             };
 
             const onSearch = async () => {
-                inProgress.value = true;
-
-                if (controller.value !== null) {
-                    controller.value.abort();
-                }
-
                 if (search.value.length < 3) {
                     return Promise.resolve();
                 }
 
                 try {
+                    inProgress.value = true;
+
                     const result = await searchQuery();
 
                     if (result.count && !result.list.length && page.value !== 1) {
