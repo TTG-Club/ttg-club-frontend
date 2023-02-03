@@ -16,9 +16,16 @@
                 class="content-layout__side--left"
             >
                 <div
-                    v-if="filterInstance"
+                    v-if="
+                        filterInstance"
                     class="content-layout__filter"
                 >
+                    <div
+                        class="content-layout__filter_title"
+                    >
+                        <h1>Title</h1>
+                    </div>
+
                     <div class="content-layout__filter_body">
                         <list-filter
                             :filter-instance="filterInstance"
@@ -314,10 +321,18 @@
             background: linear-gradient(
                     180deg,
                     var(--bg-main) 0,
-                    var(--bg-main) 28px,
-                    var(--bg-main) 48px,
-                    transparent 68px
+                    var(--bg-main) 108px,
+                    var(--bg-main) 128px,
+                    transparent 148px
             );
+
+            &_title {
+                margin: 0 0 16px 0;
+                h1 {
+                    font-size: calc(var(--h1-font-size) - 10px);
+                    font-weight: 400;
+                }
+            }
 
             &_body {
                 padding-bottom: 24px;
