@@ -1,5 +1,6 @@
 <template>
     <content-layout
+        title="Классы"
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="initPages"

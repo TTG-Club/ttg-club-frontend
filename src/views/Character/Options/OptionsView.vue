@@ -1,6 +1,7 @@
 <template>
     <component
         :is="layout"
+        title="Особенности классов"
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"
