@@ -127,7 +127,7 @@
 <script lang="ts">
     import {
         computed,
-        defineComponent, onMounted, ref, watch
+        defineComponent, onMounted, ref
     } from 'vue';
     import debounce from 'lodash/debounce';
     import {
@@ -335,6 +335,12 @@
 
             const onSubmit = () => {
                 if (!focused.value) {
+                    return;
+                }
+
+                if (results.value?.list.length === 1) {
+                    window.location.href = results.value.list[0].url;
+
                     return;
                 }
 
