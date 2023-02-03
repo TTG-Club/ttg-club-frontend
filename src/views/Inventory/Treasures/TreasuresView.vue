@@ -1,5 +1,6 @@
 <template>
     <content-layout
+        title="Драгоценности"
         :filter-instance="filter"
         @search="onSearch"
         @update="initPages"
