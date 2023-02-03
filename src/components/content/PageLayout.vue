@@ -11,6 +11,7 @@
             <div
                 v-if="$slots.title || $slots.subtitle"
                 class="page-layout__header"
+                :class="{ 'show-separator': showSeparator }"
             >
                 <h1
                     v-if="$slots.title"
@@ -26,19 +27,23 @@
                     <slot name="subtitle" />
                 </h4>
 
-                <h5>
-                    <time
-                        v-if="dateTimeFormatted"
-                        :datetime="dateTime"
-                    >{{ dateTimeFormatted }}
-                    </time>
+                <h5
+                    v-if="dateTimeFormatted"
+                    class="page-layout__date"
+                >
+                    <time :datetime="dateTime">{{ dateTimeFormatted }}</time>
                 </h5>
             </div>
 
-            <slot />
+            <div class="page-layout__content">
+                <slot />
+            </div>
 
-            <div class="page-layout__socials">
-                <social-links v-if="useSocialLinks" />
+            <div
+                v-if="useSocialLinks"
+                class="page-layout__socials"
+            >
+                <social-links />
             </div>
         </div>
 
@@ -67,6 +72,10 @@
             dateTime: {
                 type: String,
                 default: ''
+            },
+            showSeparator: {
+                type: Boolean,
+                default: true
             }
         },
         setup(props) {
@@ -93,8 +102,8 @@
 
 <style lang="scss" scoped>
     .page-layout {
-        height: 100%;
         display: flex;
+        min-height: var(--max-vh);
 
         &__side {
             &--left {
@@ -103,11 +112,13 @@
 
             &--center {
                 flex: 1 1 620px;
-                max-width: 620px;
+                max-width: 100%;
                 margin: 0 auto;
                 border-radius: 12px;
+                display: flex;
+                flex-direction: column;
 
-                @include media-min($lg) {
+                @include media-min($xl) {
                     flex: 1 1 960px;
                     max-width: 960px;
                 }
@@ -119,9 +130,12 @@
         }
 
         &__header {
-            padding: 8px 0 16px 0;
-            border-bottom: 1px solid var(--border);
+            padding: 32px 0 16px 0;
             margin-bottom: 16px;
+
+            &.show-separator {
+                border-bottom: 1px solid var(--border);
+            }
 
             @media (max-width: 600px) {
                 padding: 16px 0 16px 0;
@@ -129,22 +143,31 @@
         }
 
         &__title {
-            margin-bottom: 16px;
             font-weight: 500;
             font-family: "Lora";
+            margin: 0;
         }
 
         &__subtitle {
-            margin-top: 0;
             line-height: normal;
+            margin: 16px 0 0;
 
             @media (max-width: 600px) {
                 font-size: calc(var(--h4-font-size) - 2px);
             }
         }
 
+        &__date {
+
+        }
+
+        &__content {
+            padding-bottom: 24px;
+            flex: 1 1 auto;
+        }
+
         &__socials {
-            margin: 40px 0;
+            margin: 16px 0 40px;
         }
     }
 </style>

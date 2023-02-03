@@ -8,13 +8,13 @@
             <div class="link-item__body">
                 <div class="link-item__row">
                     <div class="link-item__name">
-                        <div class="link-item__name--rus">
+                        <span class="link-item__name--rus">
                             {{ backgroundItem.name.rus }}
-                        </div>
+                        </span>
 
-                        <div class="link-item__name--eng">
+                        <span class="link-item__name--eng">
                             [{{ backgroundItem.name.eng }}]
-                        </div>
+                        </span>
                     </div>
                 </div>
             </div>

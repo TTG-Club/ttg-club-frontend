@@ -44,7 +44,7 @@
     } from 'vue';
     import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
     import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
 
     export default defineComponent({
@@ -162,7 +162,7 @@
         grid-template-columns: 1fr 1fr 1fr;
 
         &__select {
-            ::v-deep(.multiselect__option) {
+            :deep(.multiselect__option) {
                 padding: 0;
             }
 

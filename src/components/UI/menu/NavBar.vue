@@ -2,28 +2,21 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
+                <a
+                    class="navbar__logo"
+                    href="/"
+                >
+                    <site-logo />
+                </a>
+
                 <nav-menu />
 
-                <div class="navbar__section">
-                    <a
-                        class="navbar__link"
-                        href="/"
-                    >TTG Club</a>
+                <nav-bookmarks />
 
-                    <div
-                        v-if="section"
-                        class="navbar__text"
-                    >
-                        <span>/</span>
-
-                        <span>{{ section }}</span>
-                    </div>
-                </div>
+                <nav-search v-if="isShowSearch" />
             </div>
 
             <div class="navbar__header_right">
-                <nav-bookmarks />
-
                 <nav-profile />
 
                 <menu-theme-switcher />
@@ -33,25 +26,53 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
+    import { computed, defineComponent } from 'vue';
+    import { useRoute } from 'vue-router';
     import MenuThemeSwitcher from '@/components/UI/MenuThemeSwitcher.vue';
     import NavProfile from '@/components/UI/menu/NavProfile.vue';
     import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
+    import NavSearch from '@/components/UI/menu/NavSearch.vue';
 
     export default defineComponent({
         name: 'NavBar',
         components: {
+            NavSearch,
             NavMenu,
             NavBookmarks,
             NavProfile,
             MenuThemeSwitcher
         },
-        props: {
-            section: {
-                type: String,
-                default: ''
-            }
+        setup() {
+            const route = useRoute();
+
+            const isShowSearch = computed(() => route.name !== 'search-page');
+
+            return {
+                isShowSearch
+            };
         }
     });
 </script>
+
+<style lang="scss" scoped>
+    .navbar__header_left {
+        .navbar__logo {
+            width: 52px;
+            height: 36px;
+            padding: 0 16px 0 0;
+            border-bottom: 0;
+            border-right: 1px solid var(--border);
+            margin: 0 8px 0 0;
+
+            @include media-min($md) {
+                width: 36px;
+                height: 52px;
+                padding: 0 0 16px 0;
+                border-bottom: 1px solid var(--border);
+                border-right: 0;
+                margin: 0 0 8px 0;
+            }
+        }
+    }
+</style>

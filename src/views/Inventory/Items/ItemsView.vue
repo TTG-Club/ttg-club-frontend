@@ -1,5 +1,6 @@
 <template>
     <content-layout
+        title="Снаряжение"
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"

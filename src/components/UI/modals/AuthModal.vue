@@ -38,7 +38,7 @@
 
 <script>
     import { defineComponent } from 'vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
 
     export default defineComponent({
         components: { UiButton },
@@ -52,7 +52,7 @@
 </script>
 
 <style lang="scss" scoped>
-    ::v-deep(.auth-reg-modal) {
+    :deep(.auth-reg-modal) {
         background-color: var(--bg-secondary);
         max-height: calc(var(--max-vh) / 100 * 90);
         margin: auto;

@@ -56,7 +56,7 @@
 <script>
     import cloneDeep from 'lodash/cloneDeep';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
 
     export default {
 

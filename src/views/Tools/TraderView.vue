@@ -137,17 +137,17 @@
     import groupBy from 'lodash/groupBy';
     import { mapState } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
-    import UiSelect from '@/components/form/UiSelect.vue';
+    import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
-    import UiCheckbox from '@/components/form/UiCheckbox.vue';
+    import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
     import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
     import SpellBody from '@/views/Character/Spells/SpellBody.vue';
     import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
     import errorHandler from '@/common/helpers/errorHandler';
     import ContentDetail from '@/components/content/ContentDetail.vue';
     import { useUIStore } from '@/store/UI/UIStore';
-    import UiInput from '@/components/form/UiInput.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
 
     export default {
         name: 'TraderView',

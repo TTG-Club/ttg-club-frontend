@@ -16,23 +16,42 @@
                 class="content-layout__side--left"
             >
                 <div
-                    v-if="filterInstance"
-                    class="content-layout__filter"
+                    ref="fixedContainer"
+                    class="content-layout__fixed"
                 >
-                    <div class="content-layout__filter_body">
-                        <list-filter
-                            :filter-instance="filterInstance"
-                            @search="$emit('search', $event)"
-                            @update="$emit('update', $event)"
-                        />
-                    </div>
-                </div>
+                    <div class="content-layout__fixed_body">
+                        <h1
+                            v-if="$slots.title"
+                            class="content-layout__title"
+                        >
+                            <slot name="title" />
+                        </h1>
 
-                <div
-                    v-if="$slots.fixed"
-                    class="content-layout__side--left_fixed"
-                >
-                    <slot name="fixed" />
+                        <h1
+                            v-else-if="title"
+                            class="content-layout__title"
+                        >
+                            {{ title }}
+                        </h1>
+
+                        <div
+                            v-if="filterInstance"
+                            class="content-layout__filter"
+                        >
+                            <list-filter
+                                :filter-instance="filterInstance"
+                                @search="$emit('search', $event)"
+                                @update="$emit('update', $event)"
+                            />
+                        </div>
+
+                        <div
+                            v-if="$slots.fixed"
+                            class="content-layout__fixed_slot"
+                        >
+                            <slot name="fixed" />
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -66,8 +85,8 @@
     import type { PropType } from 'vue';
     import { defineComponent, ref } from 'vue';
     import {
-        useEventListener,
-        useInfiniteScroll, useResizeObserver
+        useElementBounding,
+        useEventListener, useInfiniteScroll, useResizeObserver
     } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import { useUIStore } from '@/store/UI/UIStore';
@@ -80,6 +99,10 @@
             showRightSide: {
                 type: Boolean,
                 default: false
+            },
+            title: {
+                type: String,
+                default: null
             },
             filterInstance: {
                 type: Object as PropType<FilterComposable>,
@@ -97,7 +120,10 @@
 
             const container = ref<HTMLDivElement | null>(null);
             const leftSide = ref<HTMLDivElement | null>(null);
+            const fixedContainer = ref<HTMLDivElement | null>(null);
             const shadow = ref(false);
+
+            const fixedContainerRect = useElementBounding(fixedContainer);
 
             const scrollToActive = (oldLink?: Element) => {
                 if (isMobile.value) {
@@ -120,8 +146,10 @@
                     return;
                 }
 
+                fixedContainerRect.update();
+
                 bodyElement.value.scroll({
-                    top: rect.top + uiStore.bodyScroll.y - 68 - 52,
+                    top: rect.top + uiStore.bodyScroll.y - fixedContainerRect.height.value,
                     behavior: 'smooth'
                 });
             };
@@ -176,6 +204,7 @@
                 fullscreen,
                 shadow,
                 leftSide,
+                fixedContainer,
                 container,
                 scrollToActive,
                 scrollToLastActive
@@ -188,16 +217,69 @@
     .content-layout {
         width: 100%;
         max-width: var(--max-content);
+        min-height: calc(var(--max-vh) - 56px);
         margin: 0 auto;
 
         &__body {
             width: 100%;
+            min-height: calc(var(--max-vh) - 56px);
             display: flex;
             justify-content: flex-start;
             position: relative;
 
             &.is-fullscreen {
                 border-radius: 12px;
+            }
+
+            @include media-min($md) {
+                min-height: var(--max-vh);
+            }
+        }
+
+        &__title {
+            font-size: calc(var(--h1-font-size) - 10px);
+            font-weight: 400;
+        }
+
+        &__fixed {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            pointer-events: none;
+            padding-bottom: 16px;
+
+            &:after {
+                content: '';
+                display: block;
+                position: absolute;
+                bottom: 0;
+                height: 16px;
+                width: 100%;
+                background: linear-gradient(
+                        180deg,
+                        var(--bg-main) 0,
+                        var(--bg-main) 15%,
+                        transparent 80%,
+                        transparent 90%,
+                        transparent 100%
+                );
+            }
+
+            &_body {
+                pointer-events: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-top: 16px;
+                background-color: var(--bg-main);
+
+                @include media-min($md) {
+                    gap: 16px;
+                }
+
+                @include media-min($xl) {
+                    padding-top: 24px;
+                }
             }
         }
 
@@ -224,7 +306,7 @@
                 &.is-showed-right-side {
                     width: 100%;
 
-                    @include media-min($sm) {
+                    @include media-min($xl) {
                         width: 40%;
                     }
                 }
@@ -261,29 +343,28 @@
             &--right {
                 display: block;
                 top: 0;
+                left: 0;
                 right: 0;
-                width: calc(60% - 24px);
-                height: calc(var(--max-vh) - 56px - 24px);
+                height: calc(var(--max-vh) - 56px);
                 overflow: hidden;
-                border-radius: 12px;
+                border-radius: 0;
                 background-color: var(--bg-secondary);
-                position: sticky;
+                position: fixed;
                 margin-left: auto;
                 z-index: 12;
 
-                @media (max-width: 1200px) {
-                    width: 100%;
-                    height: calc(var(--max-vh) - 56px);
-                    position: fixed;
-                    top: 56px;
-                    left: 0;
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
+                @include media-min($md) {
+                    left: 56px;
+                    height: var(--max-vh);
                 }
 
-                @media (max-width: 600px) {
-                    top: 0;
-                    border-radius: 0;
+                @include media-min($xl) {
+                    left: 0;
+                    top: 24px;
+                    position: sticky;
+                    width: calc(60% - 24px);
+                    height: calc(var(--max-vh) - 24px - 24px);
+                    border-radius: 12px;
                 }
 
                 &.is-fullscreen {
@@ -303,62 +384,8 @@
             }
         }
 
-        &__filter {
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            z-index: 12;
-            pointer-events: none;
-            background: linear-gradient(
-                    180deg,
-                    var(--bg-main) 0,
-                    var(--bg-main) 28px,
-                    var(--bg-main) 48px,
-                    transparent 68px
-            );
-
-            &_body {
-                padding-bottom: 24px;
-
-                ::v-deep(*) {
-                    pointer-events: auto;
-                }
-            }
-
-            &_dropdown {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 12;
-
-                ::v-deep(*) {
-                    pointer-events: auto;
-                }
-            }
-
-            @media (max-width: 600px) {
-                padding-top: 16px;
-                background: linear-gradient(
-                        180deg,
-                        var(--bg-main) 0,
-                        var(--bg-main) 38px,
-                        var(--bg-main) 58px,
-                        transparent 78px
-                )
-            }
-        }
-
-        &__side--left_fixed {
-            position: sticky;
-            top: 0;
-            z-index: 3;
-
-            @media (max-width: 600px) {
-                top: 16px;
-            }
+        @include media-min($md) {
+            min-height: var(--max-vh);
         }
     }
 </style>

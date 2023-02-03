@@ -85,8 +85,8 @@
         computed, defineComponent, reactive, ref
     } from 'vue';
     import { useToast } from 'vue-toastification';
-    import UiButton from '@/components/form/UiButton.vue';
-    import UiInput from '@/components/form/UiInput.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
     import { useUserStore } from '@/store/UI/UserStore';
     import {
         validateEmailFormat,

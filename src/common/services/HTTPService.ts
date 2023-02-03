@@ -27,10 +27,7 @@ export default class HTTPService {
         this.instance.interceptors.request.use(req => {
             if (Cookies.get(USER_TOKEN_COOKIE)) {
                 // eslint-disable-next-line no-param-reassign
-                req.headers = {
-                    ...req.headers,
-                    Authorization: `Bearer ${ Cookies.get(USER_TOKEN_COOKIE) }`
-                };
+                req.headers.Authorization = `Bearer ${ Cookies.get(USER_TOKEN_COOKIE) }`;
             }
 
             return req;

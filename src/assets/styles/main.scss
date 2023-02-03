@@ -30,9 +30,10 @@
   z-index: -100;
   height: var(--max-vh);
   pointer-events: none;
+  display: none;
 
-  @media (max-width: 1400px) {
-    display: none;
+  @include media-min($xxl) {
+    display: block;
   }
 }
 
@@ -41,15 +42,11 @@
   height: var(--max-vh);
   position: relative;
   margin: auto;
-  padding: 0;
   overflow: auto;
+  padding: 0 16px;
 
-  @media (max-width: 1400px) {
-    padding: 0 24px 0 24px;
-  }
-
-  @media (max-width: 1200px) {
-    padding: 0 16px 0 16px;
+  @include media-min($xl) {
+    padding: 0 24px;
   }
 }
 
@@ -64,20 +61,47 @@
   .header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin: 0 0 16px 0;
+    justify-content: center;
+    margin: 44px 0 8px 0;
 
     .search_row_g {
       height: 46px;
       width: 100%;
+      max-width: 600px;
       position: relative;
-      border-radius: 12px;
+      border-radius: 36px;
       overflow: hidden;
-      padding: 0;
+      padding: 0 16px;
       background-color: var(--bg-secondary);
       display: flex;
       align-items: center;
-      padding-left: 16px;
+      justify-content: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--hover);
+      }
+
+      span.key {
+        padding: 0 8px;
+        font-weight: 600;
+        color: var(--text-color-title);
+      }
+
+      span.computer_version {
+        display: none;
+
+        @include media-min($md) {
+          display: block;
+        }
+      }
+
+      span.key {
+        padding: 0 8px;
+        font-weight: 600;
+        color: var(--text-color-title);
+      }
     }
   }
 
@@ -85,7 +109,7 @@
     display: flex;
     flex-wrap: wrap;
     padding: 0;
-    margin: 0 -8px;
+    margin: 8px -8px 0 -8px;
 
     .card {
       flex: 1 1 15%;
@@ -564,6 +588,18 @@
   .avatar {
     width: 140px;
   }
+
+  .row_info {
+    margin: 0;
+  }
+
+  .content-padding {
+    padding: 16px 0;
+  }
+
+  .grid_stat_block {
+    margin: 16px 0 0 0;
+  }
 }
 
 .weapons-group,
@@ -629,15 +665,19 @@
   border: 1px solid var(--border);
   position: relative;
   border-radius: 12px;
-  margin-bottom: 16px;
   background-color: var(--bg-main);
 
   &__row {
     margin-top: 16px;
 
     .ui-checkbox {
-      margin-right: 16px;
+      margin-right: 8px;
       margin-top: 8px;
+    }
+
+    &.btn-wrapper {
+      display: flex;
+      gap: 8px;
     }
   }
 
@@ -650,23 +690,6 @@
   .label {
     margin-bottom: 8px;
     display: flex;
-  }
-
-  &:before {
-    content: "";
-    position: absolute;
-    display: block;
-    top: -56px;
-    left: -1px;
-    right: 0;
-    width: calc(100% + 2px);
-    height: 70px;
-    background-color: var(--bg-main);
-    z-index: -1;
-  }
-
-  @media (max-width: 600px) {
-    margin-bottom: 32px;
   }
 }
 

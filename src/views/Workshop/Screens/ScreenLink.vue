@@ -165,7 +165,7 @@
             height: 40px;
             flex-shrink: 0;
 
-            ::v-deep(svg) {
+            :deep(svg) {
                 width: 100% !important;
                 height: 100% !important;
 

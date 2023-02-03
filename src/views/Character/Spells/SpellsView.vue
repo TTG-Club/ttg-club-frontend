@@ -1,6 +1,7 @@
 <template>
     <component
         :is="layout"
+        title="Заклинания"
         :filter-instance="filter"
         :show-right-side="showRightSide"
         @search="onSearch"

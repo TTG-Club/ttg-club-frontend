@@ -106,7 +106,7 @@
 <script>
     import { mapActions, mapState } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiButton from '@/components/form/UiButton.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
 
@@ -171,7 +171,7 @@
 </script>
 
 <style lang="scss" scoped>
-    ::v-deep(.base-modal) {
+    :deep(.base-modal) {
         background-color: var(--bg-secondary);
         width: 100%;
         max-width: $lg - 1px;

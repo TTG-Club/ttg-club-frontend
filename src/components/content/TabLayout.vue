@@ -107,7 +107,7 @@
                 pointer-events: none;
                 z-index: 10;
 
-                ::v-deep(*) {
+                :deep(*) {
                     pointer-events: auto;
                 }
             }

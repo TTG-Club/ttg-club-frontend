@@ -214,15 +214,16 @@
 
             const selectRace = async () => {
                 if (!props.isAbilityCalc) {
-                    submenu.value = true;
+                    if (!uiStore.isMobile) {
+                        submenu.value = true;
+                    }
 
                     await navigate();
 
                     return;
                 }
 
-                window.open(href.value, '_blank')
-                    ?.focus();
+                window.open(href.value, '_blank')?.focus();
             };
 
             return {

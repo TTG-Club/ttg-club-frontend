@@ -71,9 +71,9 @@
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import RawContent from '@/components/content/RawContent.vue';
     import errorHandler from '@/common/helpers/errorHandler';
-    import FieldInput from '@/components/form/FieldType/FieldInput.vue';
-    import FormButton from '@/components/form/FormButton.vue';
-    import FieldCheckbox from '@/components/form/FieldType/FieldCheckbox.vue';
+    import FieldInput from '@/components/UI/kit/FieldType/FieldInput.vue';
+    import FormButton from '@/components/UI/kit/FormButton.vue';
+    import FieldCheckbox from '@/components/UI/kit/FieldType/FieldCheckbox.vue';
 
     export default defineComponent({
         components: {
