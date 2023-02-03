@@ -162,7 +162,7 @@
         grid-template-columns: 1fr 1fr 1fr;
 
         &__select {
-            ::v-deep(.multiselect__option) {
+            :deep(.multiselect__option) {
                 padding: 0;
             }
 

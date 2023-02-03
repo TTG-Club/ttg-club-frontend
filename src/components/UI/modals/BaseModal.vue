@@ -171,7 +171,7 @@
 </script>
 
 <style lang="scss" scoped>
-    ::v-deep(.base-modal) {
+    :deep(.base-modal) {
         background-color: var(--bg-secondary);
         width: 100%;
         max-width: $lg - 1px;
