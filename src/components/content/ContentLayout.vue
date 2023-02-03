@@ -217,18 +217,22 @@
     .content-layout {
         width: 100%;
         max-width: var(--max-content);
-        min-height: var(--max-vh);
+        min-height: calc(var(--max-vh) - 56px);
         margin: 0 auto;
 
         &__body {
             width: 100%;
-            min-height: var(--max-vh);
+            min-height: calc(var(--max-vh) - 56px);
             display: flex;
             justify-content: flex-start;
             position: relative;
 
             &.is-fullscreen {
                 border-radius: 12px;
+            }
+
+            @include media-min($md) {
+                min-height: var(--max-vh);
             }
         }
 
@@ -378,6 +382,10 @@
                     }
                 }
             }
+        }
+
+        @include media-min($md) {
+            min-height: var(--max-vh);
         }
     }
 </style>
