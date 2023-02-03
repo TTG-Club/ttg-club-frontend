@@ -408,6 +408,7 @@
 
         &__control {
             display: flex;
+            padding: 4px 4px;
 
             &_field {
                 flex: 1 1 100%;
