@@ -10,9 +10,12 @@
         <div class="search-modal__container">
             <div class="search-modal__wrapper">
                 <div class="search-modal__control">
-                    <div class="search-modal__control_icon">
+                    <div
+                        class="search-modal__control_icon"
+                        :class="{ 'in-progress': inProgress }"
+                    >
                         <svg-icon
-                            icon-name="search-new"
+                            :icon-name="inProgress ? 'dice-d20' : 'search-new'"
                             :stroke-enable="false"
                             fill-enable
                         />
@@ -60,16 +63,6 @@
                 </div>
 
                 <div class="search-modal__results">
-                    <search-link
-                        v-for="(res, key) in results?.list || []"
-                        :key="key"
-                        :search-link="res"
-                        :selected="selectedIndex === key"
-                        disable-hover
-                        @mouseenter.self="selectedIndex = key"
-                        @focusin="selectedIndex = key"
-                    />
-
                     <div
                         v-if="!search.length && !results?.list.length"
                         class="search-modal__text"
@@ -89,7 +82,7 @@
                     </div>
 
                     <div
-                        v-else-if="search.length >= 3 && inProgress"
+                        v-else-if="search.length >= 3 && !results?.list.length && inProgress"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
                         @focusin.self="selectedIndex = null"
@@ -105,6 +98,16 @@
                     >
                         Боги не нашли ответа на твой запрос
                     </div>
+
+                    <search-link
+                        v-for="(res, key) in results?.list || []"
+                        :key="key"
+                        :search-link="res"
+                        :selected="selectedIndex === key"
+                        disable-hover
+                        @mouseenter.self="selectedIndex = key"
+                        @focusin="selectedIndex = key"
+                    />
 
                     <a
                         :href="searchUrl"
@@ -409,6 +412,7 @@
         &__control {
             display: flex;
             padding: 4px 4px;
+            position: relative;
 
             &_field {
                 flex: 1 1 100%;
@@ -442,6 +446,26 @@
             &_icon {
                 svg {
                     color: var(--text-color);
+                }
+
+                &.in-progress {
+                    svg {
+                        @keyframes loader {
+                            from {
+                                transform: rotate(0deg);
+                            }
+
+                            to {
+                                transform: rotate(360deg);
+                            }
+                        }
+
+                        animation: {
+                            name: loader;
+                            duration: 1.5s;
+                            iteration-count: infinite;
+                        };
+                    }
                 }
             }
 

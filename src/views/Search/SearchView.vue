@@ -23,9 +23,12 @@
                         @submit.prevent.stop="onChangeSearch"
                     >
                         <div class="search-view__control_body">
-                            <div class="search-view__control_icon">
+                            <div
+                                class="search-view__control_icon"
+                                :class="{ 'in-progress': inProgress }"
+                            >
                                 <svg-icon
-                                    icon-name="search-new"
+                                    :icon-name="inProgress ? 'dice-d20' : 'search-new'"
                                     :stroke-enable="false"
                                     fill-enable
                                 />
@@ -430,6 +433,26 @@
                     width: 24px;
                     height: 24px;
                     color: var(--text-color);
+                }
+
+                &.in-progress {
+                    svg {
+                        @keyframes loader {
+                            from {
+                                transform: rotate(0deg);
+                            }
+
+                            to {
+                                transform: rotate(360deg);
+                            }
+                        }
+
+                        animation: {
+                            name: loader;
+                            duration: 1.5s;
+                            iteration-count: infinite;
+                        };
+                    }
                 }
             }
 
