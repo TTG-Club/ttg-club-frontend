@@ -321,9 +321,9 @@
             background: linear-gradient(
                     180deg,
                     var(--bg-main) 0,
-                    var(--bg-main) 108px,
-                    var(--bg-main) 128px,
-                    transparent 148px
+                    var(--bg-main) 104px,
+                    var(--bg-main) 124px,
+                    transparent 144px
             );
 
             &_title {
