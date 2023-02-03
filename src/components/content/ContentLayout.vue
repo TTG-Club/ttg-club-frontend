@@ -20,8 +20,18 @@
                     class="content-layout__fixed"
                 >
                     <div class="content-layout__fixed_body">
-                        <h1 class="content-layout__title">
-                            Title
+                        <h1
+                            v-if="$slots.title"
+                            class="content-layout__title"
+                        >
+                            <slot name="title" />
+                        </h1>
+
+                        <h1
+                            v-else-if="title"
+                            class="content-layout__title"
+                        >
+                            {{ title }}
                         </h1>
 
                         <div
@@ -89,6 +99,10 @@
             showRightSide: {
                 type: Boolean,
                 default: false
+            },
+            title: {
+                type: String,
+                default: null
             },
             filterInstance: {
                 type: Object as PropType<FilterComposable>,
