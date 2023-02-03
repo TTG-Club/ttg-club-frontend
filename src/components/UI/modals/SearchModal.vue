@@ -67,12 +67,14 @@
                         :selected="selectedIndex === key"
                         disable-hover
                         @mouseenter.self="selectedIndex = key"
+                        @focusin="selectedIndex = key"
                     />
 
                     <div
                         v-if="!search.length && !results?.list.length"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
+                        @focusin.self="selectedIndex = null"
                     >
                         Введите текст, что бы начать
                     </div>
@@ -81,6 +83,7 @@
                         v-else-if="search.length < 3 && !results?.list.length"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
+                        @focusin.self="selectedIndex = null"
                     >
                         Минимум 3 символа для поиска
                     </div>
@@ -89,6 +92,7 @@
                         v-else-if="search.length >= 3 && inProgress"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
+                        @focusin.self="selectedIndex = null"
                     >
                         Боги ищут ответ на твой запрос
                     </div>
@@ -97,14 +101,16 @@
                         v-else-if="!results?.list.length && !inProgress"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
+                        @focusin.self="selectedIndex = null"
                     >
                         Боги не нашли ответа на твой запрос
                     </div>
 
                     <a
+                        :href="searchUrl"
                         class="search-modal__all"
                         @mouseenter.self="selectedIndex = null"
-                        @click.left.exact.stop="navigate"
+                        @focusin.self="selectedIndex = null"
                     >
                         <div class="search-modal__all_icon">
                             <svg-icon
@@ -126,12 +132,11 @@
 
 <script lang="ts">
     import {
-        computed,
-        defineComponent, onMounted, ref
+        computed, defineComponent, onMounted, ref
     } from 'vue';
     import debounce from 'lodash/debounce';
     import {
-        useVModel, useFocus, onStartTyping, onKeyStroke, useActiveElement
+        onKeyStroke, onStartTyping, useActiveElement, useFocus, useVModel
     } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
@@ -162,6 +167,8 @@
             const { focused } = useFocus(input, { initialValue: true });
             const selectedIndex = ref<number | null>(null);
             const activeElement = useActiveElement();
+
+            const searchUrl = computed(() => `/search?search=${ search.value }`);
 
             const onSearch = async () => {
                 if (controller.value !== null) {
@@ -329,10 +336,6 @@
                 window.location.href = result.url;
             });
 
-            const navigate = () => {
-                window.location.href = `/search?search=${ search.value }`;
-            };
-
             const onSubmit = () => {
                 if (!focused.value) {
                     return;
@@ -344,7 +347,7 @@
                     return;
                 }
 
-                navigate();
+                window.location.href = searchUrl.value;
             };
 
             const onSearchDebounce = debounce(async () => {
@@ -362,10 +365,10 @@
                 inProgress,
                 input,
                 search,
+                searchUrl,
                 results,
                 focused,
                 selectedIndex,
-                navigate,
                 onSubmit,
                 onSearchRandom,
                 onUpdateSearch
@@ -448,7 +451,8 @@
                     color: var(--text-color-title);
                 }
 
-                &:hover {
+                &:hover,
+                &:focus-within {
                     svg {
                         transform: rotate(45deg);
                     }
@@ -486,7 +490,10 @@
             color: var(--text-color-title);
             cursor: pointer;
 
-            &:hover {
+            &:hover,
+            &:focus-within {
+                @include css_anim();
+
                 background: var(--hover);
             }
 
