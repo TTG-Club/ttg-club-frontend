@@ -92,7 +92,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--text-g-color);
+    color: var(--text-color-title);
     font-size: var(--main-font-size);
     line-height: var(--main-line-height);
 
@@ -104,6 +104,7 @@
 
     &--eng {
       display: inline;
+      color: var(--text-g-color);
     }
   }
 
