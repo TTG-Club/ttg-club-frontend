@@ -524,7 +524,7 @@
         }
 
         &__select {
-            ::v-deep(.ui-select) {
+            :deep(.ui-select) {
                 .multiselect {
                     margin: 0 16px;
                     width: auto;

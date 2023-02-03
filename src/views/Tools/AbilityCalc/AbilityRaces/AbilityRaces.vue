@@ -504,7 +504,7 @@
         }
 
         &__select {
-            ::v-deep(.multiselect__option) {
+            :deep(.multiselect__option) {
                 padding: 0;
 
                 .ability-races {
