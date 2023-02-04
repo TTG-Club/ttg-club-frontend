@@ -3,7 +3,7 @@ export type TSearchResult = {
     section: string
     description?: string
     url: string
-    isHomebrew?: boolean
+    homebrew?: boolean
 }
 
 export type TSearchResultList = {

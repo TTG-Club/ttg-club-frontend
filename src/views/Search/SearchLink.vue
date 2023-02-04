@@ -4,7 +4,7 @@
         ref="link"
         :href="searchLink.url"
         class="search-link"
-        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover, 'is-homebrew': searchLink.isHomebrew }"
+        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover, 'is-homebrew': searchLink.homebrew }"
     >
         <div class="search-link__body">
             <div class="search-link__label">
