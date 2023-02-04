@@ -15,7 +15,7 @@
                 <div
                     v-if="searchLink.source"
                     v-tippy="{ content: searchLink.source.name }"
-                    class="search-link__section__source"
+                    class="search-link__source"
                 >
                     ({{ searchLink.source.shortName }})
                 </div>
@@ -112,9 +112,10 @@
             color: var(--text-color);
             display: flex;
 
-            &__source {
-                margin-right: 4px;
-            }
+        }
+
+        &__source {
+            margin-right: 4px;
         }
 
         &__desc {
