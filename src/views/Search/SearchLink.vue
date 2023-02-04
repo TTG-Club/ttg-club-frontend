@@ -4,7 +4,7 @@
         ref="link"
         :href="searchLink.url"
         class="search-link"
-        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover, 'is-homebrew': searchLink.homebrew }"
+        :class="classes"
     >
         <div class="search-link__body">
             <div class="search-link__label">
@@ -28,6 +28,7 @@
 <script lang="ts">
     import type { PropType } from 'vue';
     import {
+        computed,
         defineComponent, ref, watch
     } from 'vue';
     import { useFocus } from '@vueuse/core';
@@ -57,6 +58,12 @@
             const link = ref<HTMLElement | null>(null);
             const { focused } = useFocus(link);
 
+            const classes = computed(() => ({
+                'is-selected': props.selected,
+                'is-hover-disabled': props.disableHover,
+                'is-homebrew': props.searchLink.source?.homebrew
+            }));
+
             watch(
                 () => props.selected,
                 value => {
@@ -66,7 +73,8 @@
 
             return {
                 link,
-                focused
+                focused,
+                classes
             };
         }
     });
