@@ -4,21 +4,23 @@
         ref="link"
         :href="searchLink.url"
         class="search-link"
-        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover }"
+        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover, 'is-homebrew': searchLink.isHomebrew }"
     >
-        <div class="search-link__label">
-            {{ searchLink.name }}
-        </div>
+        <div class="search-link__body">
+            <div class="search-link__label">
+                {{ searchLink.name }}
+            </div>
 
-        <div class="search-link__section">
-            {{ searchLink.section }}
-        </div>
+            <div class="search-link__section">
+                {{ searchLink.section }}
+            </div>
 
-        <div
-            v-if="searchLink.description && showDesc"
-            class="search-link__desc"
-        >
-            {{ searchLink.description }}
+            <div
+                v-if="searchLink.description && showDesc"
+                class="search-link__desc"
+            >
+                {{ searchLink.description }}
+            </div>
         </div>
     </a>
 </template>
@@ -72,12 +74,20 @@
 
 <style lang="scss" scoped>
     .search-link {
-        @include css_anim();
-
         display: block;
-        padding: 10px 12px;
         color: var(--text-color-title);
         user-select: none;
+        overflow: hidden;
+
+        &.is-homebrew {
+            background: var(--bg-homebrew-gradient-left);
+        }
+
+        &__body {
+            @include css_anim();
+
+            padding: 10px 12px;
+        }
 
         &__section {
             margin-top: 4px;
@@ -103,14 +113,22 @@
 
         &:hover {
             &:not(.is-hover-disabled):not(.is-selected) {
-                background: var(--hover);
+                .search-link {
+                    &__body {
+                        background: var(--hover);
+                    }
+                }
             }
         }
 
         &.is-selected {
-            @include css_anim();
+            .search-link {
+                &__body {
+                    @include css_anim();
 
-            background: var(--hover);
+                    background: var(--hover);
+                }
+            }
         }
     }
 </style>
