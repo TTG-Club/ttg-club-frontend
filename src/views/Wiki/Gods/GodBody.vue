@@ -23,37 +23,37 @@
             </div>
 
             <p>
-                <b>Мировоззрение:</b>
+                <b>Мировоззрение: </b>
 
                 <span>{{ god.alignment }}</span>
             </p>
 
             <p>
-                <b>Ранг:</b>
+                <b>Ранг: </b>
 
                 <span>{{ god.rank }}</span>
             </p>
 
             <p v-if="god.titles?.length">
-                <b>Титулы:</b>
+                <b>Титулы: </b>
 
                 <span>{{ god.titles.join(', ') }}</span>
             </p>
 
             <p>
-                <b>Символ:</b>
+                <b>Символ: </b>
 
                 <span>{{ god.symbol }}</span>
             </p>
 
             <p v-if="god.domains?.length">
-                <b>Домены:</b>
+                <b>Домены: </b>
 
                 <span>{{ god.domains.join(', ') }}</span>
             </p>
 
             <p v-if="god.panteons?.length">
-                <b>Пантеон:</b>
+                <b>Пантеон: </b>
 
                 <span>{{ god.panteons.join(', ') }}</span>
             </p>
