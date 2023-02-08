@@ -1,6 +1,5 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import VueEasyLightbox from 'vue-easy-lightbox';
 import VueTippy from 'vue-tippy';
 import VueLazyLoad from 'vue3-lazyload';
 import Toast from 'vue-toastification';
@@ -29,10 +28,9 @@ pinia.use(({ store }) => {
 
 app.use(pinia)
     .use(router)
-    .use(VueEasyLightbox)
     .use(VueTippy, TippyOptions)
     .use(VueLazyLoad, {
-        preLoad: 1.7
+        observer: true
     })
     .use(Toast, {
         ...ToastOptions,

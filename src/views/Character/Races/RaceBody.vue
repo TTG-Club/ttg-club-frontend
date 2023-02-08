@@ -5,18 +5,10 @@
         />
 
         <div class="content-padding">
-            <div class="avatar">
-                <div class="image-container">
-                    <a id="race_href">
-                        <img
-                            id="race_img"
-                            v-lazy="!race.images?.length ? '/img/dark/no-img-best.png' : race.images[0]"
-                            :alt="race.name.rus"
-                            @click.left.exact.prevent="showGallery"
-                        >
-                    </a>
-                </div>
-            </div>
+            <ui-easy-lightbox
+                :images="race.images"
+                :use-bg-hide="false"
+            />
 
             <div class="scores">
                 <div class="scores__stats">
@@ -146,30 +138,18 @@
             </template>
         </div>
     </div>
-
-    <vue-easy-lightbox
-        v-if="race.images?.length"
-        :imgs="race.images"
-        :index="gallery.index"
-        :visible="gallery.show"
-        loop
-        move-disabled
-        scroll-disabled
-        teleport="body"
-        @hide="gallery.show = false"
-    >
-        <template #toolbar />
-    </vue-easy-lightbox>
 </template>
 
 <script>
     import sortBy from 'lodash/sortBy';
     import RawContent from '@/components/content/RawContent.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+    import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
 
     export default {
         name: 'RaceBody',
         components: {
+            UiEasyLightbox,
             DetailTopBar,
             RawContent
         },
@@ -180,12 +160,6 @@
                 required: true
             }
         },
-        data: () => ({
-            gallery: {
-                index: 0,
-                show: false
-            }
-        }),
         computed: {
             abilities() {
                 if (!this.race.abilities?.length) {
@@ -219,16 +193,6 @@
 
             skills() {
                 return sortBy(this.race.skills, [o => o.opened, o => !o.subrace]);
-            }
-        },
-        methods: {
-            showGallery() {
-                if (!this.race.images?.length) {
-                    return;
-                }
-
-                this.gallery.show = true;
-                this.gallery.index = 0;
             }
         }
     };
