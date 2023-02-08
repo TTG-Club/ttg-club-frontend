@@ -232,11 +232,11 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach(async (to, from) => {
+router.beforeEach((to, from) => {
     if (from.path !== to.path) {
         const navStore = useNavStore();
 
-        await navStore.updateMetaByURL(to.path);
+        navStore.updateMetaByURL(to.path).then();
     }
 });
 
