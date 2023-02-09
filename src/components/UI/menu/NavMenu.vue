@@ -1,6 +1,6 @@
 <template>
     <nav-popover
-        v-model="menu"
+        v-model="isShowMenu"
         is-left
         is-menu
     >
@@ -8,7 +8,7 @@
             <div
                 :class="{ 'is-active': isActive }"
                 class="navbar__btn hamburger"
-                @click.left.exact.prevent="menu = !menu"
+                @click.left.exact.prevent="isShowMenu = !isShowMenu"
             >
                 <span class="line" />
 
@@ -64,10 +64,19 @@
                                 class="nav-menu__link"
                             >
                                 <a
+                                    v-if="!isRouteExist(link)"
                                     :href="link.url"
                                     :target="link.external ? '_blank' : '_self'"
                                     class="nav-menu__link_label"
                                 >{{ link.name }}</a>
+
+                                <router-link
+                                    v-else
+                                    :to="{ path: link.url }"
+                                    class="nav-menu__link_label"
+                                >
+                                    {{ link.name }}
+                                </router-link>
 
                                 <div
                                     :class="{ 'is-active': isSaved(link.url) }"
@@ -93,10 +102,14 @@
     </nav-popover>
 </template>
 
-<script>
-    import { defineComponent, ref } from 'vue';
+<script lang="ts">
+    import {
+        defineComponent, ref
+    } from 'vue';
     import { tryOnBeforeMount } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
+    import { useRoute, useRouter } from 'vue-router';
+    import type { TNavItem } from '@/store/UI/NavStore';
     import { useNavStore } from '@/store/UI/NavStore';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import NavPopover from '@/components/UI/menu/NavPopover.vue';
@@ -113,27 +126,58 @@
             SiteLogo
         },
         setup() {
-            const menu = ref(false);
             const navStore = useNavStore();
+            const { isShowMenu } = storeToRefs(navStore);
             const userStore = useUserStore();
+            const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
-            const inProgressURLs = ref([]);
+            const inProgressURLs = ref<string[]>([]);
             const { navItems } = storeToRefs(navStore);
+            const router = useRouter();
+            const route = useRoute();
 
             tryOnBeforeMount(async () => {
                 navItems.value = await navStore.getNavItems();
             });
 
-            const isSaved = url => {
-                if (userStore.isAuthenticated) {
+            const isRouteExist = (link: TNavItem) => {
+                if (!link.url) {
+                    return false;
+                }
+
+                if (link.external || link.url.startsWith('http')) {
+                    return false;
+                }
+
+                const currentResolved = router.resolve(route.path);
+
+                if (!currentResolved.name) {
+                    return false;
+                }
+
+                if (!router.hasRoute(currentResolved.name)) {
+                    return false;
+                }
+
+                const resolved = router.resolve(link.url);
+
+                if (!resolved.name) {
+                    return false;
+                }
+
+                return router.hasRoute(resolved.name);
+            };
+
+            const isSaved = (url: string) => {
+                if (isAuthenticated.value) {
                     return customBookmarkStore.isBookmarkSavedInDefault(url);
                 }
 
                 return defaultBookmarkStore.isBookmarkSaved(url);
             };
 
-            async function updateBookmark(url, name) {
+            async function updateBookmark(url: string, name: string) {
                 if (inProgressURLs.value.includes(url)) {
                     return;
                 }
@@ -155,12 +199,14 @@
                     return;
                 }
 
+                // @ts-ignore
                 await defaultBookmarkStore.updateBookmark(url, name, 'menu');
             }
 
             return {
-                menu,
+                isShowMenu,
                 navItems,
+                isRouteExist,
                 isSaved,
                 updateBookmark
             };

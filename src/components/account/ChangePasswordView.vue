@@ -84,6 +84,7 @@
     import {
         computed, defineComponent, reactive, ref
     } from 'vue';
+    import { storeToRefs } from 'pinia';
     import { useToast } from 'vue-toastification';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
@@ -115,6 +116,7 @@
         setup(props, { emit }) {
             const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
+            const { isAuthenticated } = storeToRefs(userStore);
             const success = ref(false);
             const inProgress = ref(false);
             const error = ref({});
@@ -125,7 +127,7 @@
                 repeat: ''
             });
 
-            const isOnlyPassword = computed(() => props.token || userStore.isAuthenticated);
+            const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
 
             const validations = computed(() => {
                 if (isOnlyPassword.value) {
@@ -166,7 +168,7 @@
                     try {
                         const payload = {
                             password: state.password,
-                            [userStore.isAuthenticated ? 'userToken' : 'resetToken']: userStore.isAuthenticated
+                            [isAuthenticated.value ? 'userToken' : 'resetToken']: isAuthenticated.value
                                 ? userStore.getUserToken()
                                 : props.token
                         };
@@ -231,7 +233,7 @@
             }
 
             return {
-                isAuthenticated: computed(() => userStore.isAuthenticated),
+                isAuthenticated,
                 inProgress,
                 isOnlyPassword,
                 v$,
