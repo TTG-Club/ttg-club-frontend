@@ -230,7 +230,7 @@
                 modalInfo,
                 modalComponent,
                 openPersonalArea: () => {
-                    window.location.href = '/lk';
+                    window.location.href = '/account';
                 }
             };
         }
