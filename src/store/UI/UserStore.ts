@@ -27,6 +27,7 @@ export type TUser = {
     name: string
     email: string
     roles: EUserRoles[]
+    avatar: string
 }
 
 export type TRegBody = {
@@ -53,16 +54,16 @@ export const useUserStore = defineStore('UserStore', () => {
     const user = ref<TUser | null>(null);
     const isAuthenticated = ref<boolean>(false);
 
-    const userRoles = computed(() => {
+    const roles = computed(() => {
         if (!user.value?.roles || !Array.isArray(user.value.roles)) {
             return [];
         }
 
         const entries = Object.entries(EUserRolesRus) as [EUserRoles, EUserRolesRus][];
         const availRoles: {[key in EUserRoles]?: EUserRolesRus} = fromPairs(entries);
-        const { roles } = user.value;
+        const { roles: userRoles } = user.value;
 
-        const translated = roles
+        const translated = userRoles
             .map(role => ({
                 role,
                 name: availRoles[role]
@@ -75,6 +76,12 @@ export const useUserStore = defineStore('UserStore', () => {
 
         return translated;
     });
+
+    const avatar = computed(() => ({
+        src: user.value?.avatar || null,
+        error: '/icon/avatar.png',
+        loading: '/icon/avatar.png'
+    }));
 
     const clearUser = () => {
         user.value = null;
@@ -246,7 +253,8 @@ export const useUserStore = defineStore('UserStore', () => {
     return {
         user,
         isAuthenticated,
-        userRoles,
+        roles,
+        avatar,
 
         clearUser,
         getUserToken,

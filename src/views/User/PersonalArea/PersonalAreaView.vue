@@ -13,7 +13,7 @@
                     <div class="personal-area__main-info">
                         <div class="personal-area__main-info_avatar">
                             <img
-                                v-lazy="'/icon/avatar.png'"
+                                v-lazy="avatar"
                                 alt="Аватар"
                             />
                         </div>
@@ -196,10 +196,17 @@
     import { useUserStore } from '@/store/UI/UserStore';
 
     export default defineComponent({
-        components: { PageLayout },
+        components: {
+            PageLayout
+        },
         setup() {
             const userStore = useUserStore();
-            const { user, userRoles } = storeToRefs(userStore);
+
+            const {
+                user,
+                avatar,
+                roles: userRoles
+            } = storeToRefs(userStore);
 
             const roles = computed(() => (
                 upperFirst(orderBy(userRoles.value)
@@ -209,7 +216,8 @@
 
             return {
                 user,
-                roles
+                roles,
+                avatar
             };
         }
     });
