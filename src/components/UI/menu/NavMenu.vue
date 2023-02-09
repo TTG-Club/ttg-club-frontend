@@ -116,6 +116,7 @@
             const menu = ref(false);
             const navStore = useNavStore();
             const userStore = useUserStore();
+            const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgressURLs = ref([]);
@@ -126,7 +127,7 @@
             });
 
             const isSaved = url => {
-                if (userStore.isAuthenticated) {
+                if (isAuthenticated.value) {
                     return customBookmarkStore.isBookmarkSavedInDefault(url);
                 }
 

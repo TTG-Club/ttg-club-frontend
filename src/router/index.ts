@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useNavStore } from '@/store/UI/NavStore';
+import { useUserStore } from '@/store/UI/UserStore';
 
 /* eslint-disable max-len,vue/max-len */
 const routes: Readonly<RouteRecordRaw[]> = [
@@ -223,6 +224,22 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'search-page',
         path: '/search',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Search' */ '@/views/Search/SearchView.vue')
+    },
+    {
+        name: 'personal-area',
+        path: '/lk',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'PersonalArea' */ '@/views/User/PersonalArea/PersonalAreaView.vue'),
+        beforeEnter: async (to, from, next) => {
+            try {
+                const userStore = useUserStore();
+
+                await userStore.getUserInfo();
+
+                next();
+            } catch (err) {
+                window.location.href = '/';
+            }
+        }
     }
 ];
 /* eslint-enable max-len,vue/max-len */

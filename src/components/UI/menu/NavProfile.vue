@@ -21,9 +21,19 @@
             >
                 <div class="nav-profile__line is-main">
                     <span class="nav-profile__line_body">
-                        {{ greeting }}, <b>{{ getUser.username }}</b>
+                        {{ greeting }}, <b>{{ user.username }}</b>
                     </span>
                 </div>
+
+                <a
+                    class="nav-profile__line"
+                    href="#"
+                    @click.left.exact.prevent="openPersonalArea"
+                >
+                    <span class="nav-profile__line_body">
+                        Личный кабинет
+                    </span>
+                </a>
 
                 <a
                     class="nav-profile__line"
@@ -81,6 +91,7 @@
 
 <script>
     import { computed, ref } from 'vue';
+    import { storeToRefs } from 'pinia';
     import AuthModal from '@/components/UI/modals/AuthModal.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUserStore } from '@/store/UI/UserStore';
@@ -98,6 +109,7 @@
         },
         setup() {
             const userStore = useUserStore();
+            const { isAuthenticated, user } = storeToRefs(userStore);
             const popover = ref(false);
             const modal = ref('');
 
@@ -113,7 +125,7 @@
                     component: () => RegistrationView
                 },
                 {
-                    rus: `${ userStore.isAuthenticated ? 'Изменение' : 'Восстановление' } пароля`,
+                    rus: `${ isAuthenticated.value ? 'Изменение' : 'Восстановление' } пароля`,
                     eng: 'change-password',
                     component: () => ChangePasswordView
                 }
@@ -203,17 +215,20 @@
             }
 
             return {
-                isAuthenticated: computed(() => userStore.isAuthenticated),
+                isAuthenticated,
                 isModalOpened,
                 greeting,
-                getUser: computed(() => userStore.getUser),
+                user,
                 popover,
                 userLogout,
                 clickHandler,
                 closeModal,
                 modal,
                 modalInfo,
-                modalComponent
+                modalComponent,
+                openPersonalArea: () => {
+                    window.location.href = '/lk';
+                }
             };
         }
     };
