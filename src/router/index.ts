@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useNavStore } from '@/store/UI/NavStore';
+import { useUserStore } from '@/store/UI/UserStore';
 
 /* eslint-disable max-len,vue/max-len */
 const routes: Readonly<RouteRecordRaw[]> = [
@@ -225,9 +226,9 @@ const routes: Readonly<RouteRecordRaw[]> = [
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Search' */ '@/views/Search/SearchView.vue')
     },
     {
-        name: 'personal-area',
-        path: '/lk',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'PersonalArea' */ '@/views/User/PersonalArea/PersonalAreaView.vue')
+        name: 'account',
+        path: '/account',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Account/AccountView.vue')
     }
 ];
 /* eslint-enable max-len,vue/max-len */
@@ -237,8 +238,17 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach(async (to, from) => {
     const navStore = useNavStore();
+    const userStore = useUserStore();
+
+    try {
+        if (to.name === 'account' && !(await userStore.getUserStatus())) {
+            window.location.href = '/';
+        }
+    } catch (err) {
+        window.location.href = '/';
+    }
 
     if (from.path !== to.path) {
         navStore.updateMetaByURL(to.path).then();

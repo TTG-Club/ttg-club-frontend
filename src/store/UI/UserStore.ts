@@ -91,7 +91,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
         Cookies.remove(USER_TOKEN_COOKIE);
 
-        if (route.name === 'personal-area') {
+        if (route.name === 'account') {
             window.location.href = '/';
         }
     };
@@ -248,7 +248,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
             isAuthenticated.value = true;
 
-            return Promise.resolve(resp.data);
+            return Promise.resolve(resp.data as boolean);
         } catch (err) {
             clearUser();
 
