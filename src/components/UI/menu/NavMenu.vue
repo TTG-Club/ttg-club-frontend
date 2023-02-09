@@ -364,23 +364,25 @@
                 }
             }
 
-            &:hover {
-                .nav-menu {
-                    &__link {
-                        &_icon {
-                            &.only-hover {
-                                opacity: 1;
+            @include media-min($xl) {
+                &:hover {
+                    .nav-menu {
+                        &__link {
+                            &_icon {
+                                &.only-hover {
+                                    opacity: 1;
+                                }
                             }
-                        }
 
-                        &_label,
-                        &_icon {
-                            cursor: pointer;
-                            color: var(--text-btn-color);
-                        }
+                            &_label,
+                            &_icon {
+                                cursor: pointer;
+                                color: var(--text-btn-color);
+                            }
 
-                        &_label {
-                            background-color: var(--primary-hover);
+                            &_label {
+                                background-color: var(--primary-hover);
+                            }
                         }
                     }
                 }
