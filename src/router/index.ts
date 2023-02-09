@@ -226,9 +226,9 @@ const routes: Readonly<RouteRecordRaw[]> = [
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Search' */ '@/views/Search/SearchView.vue')
     },
     {
-        name: 'account',
-        path: '/account',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Account/AccountView.vue')
+        name: 'profile',
+        path: '/profile',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue')
     }
 ];
 /* eslint-enable max-len,vue/max-len */
@@ -243,7 +243,7 @@ router.beforeEach(async (to, from) => {
     const userStore = useUserStore();
 
     try {
-        if (to.name === 'account' && !(await userStore.getUserStatus())) {
+        if (to.name === 'profile' && !(await userStore.getUserStatus())) {
             window.location.href = '/';
         }
     } catch (err) {

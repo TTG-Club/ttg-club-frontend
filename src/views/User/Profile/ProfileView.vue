@@ -8,173 +8,173 @@
         </template>
 
         <template #default>
-            <div class="account">
-                <div class="account__row">
-                    <div class="account__main-info">
-                        <div class="account__main-info_avatar">
+            <div class="profile">
+                <div class="profile__row">
+                    <div class="profile__main-info">
+                        <div class="profile__main-info_avatar">
                             <img
                                 v-lazy="avatar"
                                 alt="Аватар"
                             />
                         </div>
 
-                        <div class="account__main-info_body">
-                            <h3 class="account__main-info_name">
+                        <div class="profile__main-info_body">
+                            <h3 class="profile__main-info_name">
                                 {{ user?.username || 'Имя пользователя не указано' }}
                             </h3>
 
-                            <p class="account__main-info_mail">
+                            <p class="profile__main-info_mail">
                                 {{ user?.email || 'E-mail не указан' }}
                             </p>
 
-                            <p class="account__main-info_role">
+                            <p class="profile__main-info_role">
                                 {{ roles || 'Нет роли' }}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="account__row">
+                <div class="profile__row">
                     <a
                         href="#"
-                        class="account__btn"
+                        class="profile__btn"
                     >
                         Добавить существо
                     </a>
                 </div>
 
-                <div class="account__row">
-                    <div class="account__blocks">
-                        <div class="account__block">
-                            <h5 class="account__block_name">
+                <div class="profile__row">
+                    <div class="profile__blocks">
+                        <div class="profile__block">
+                            <h5 class="profile__block_name">
                                 Статьи
                             </h5>
 
-                            <div class="account__block_body">
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Черновики: </span>
+                            <div class="profile__block_body">
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Черновики: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
 
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">На проверке: </span>
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">На проверке: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
 
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Ожидают модерации: </span>
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Ожидают модерации: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
                             </div>
 
-                            <div class="account__block_footer">
+                            <div class="profile__block_footer">
                                 <a href="#">Добавить</a>
 
                                 <a href="#">Все мои статьи</a>
                             </div>
                         </div>
 
-                        <div class="account__block">
-                            <h5 class="account__block_name">
+                        <div class="profile__block">
+                            <h5 class="profile__block_name">
                                 Приключения
                             </h5>
 
-                            <div class="account__block_body">
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Черновики: </span>
+                            <div class="profile__block_body">
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Черновики: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
 
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">На проверке: </span>
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">На проверке: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
 
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Ожидают модерации: </span>
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Ожидают модерации: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
                             </div>
 
-                            <div class="account__block_footer">
+                            <div class="profile__block_footer">
                                 <a href="#">Добавить</a>
 
                                 <a href="#">Все мои приключения</a>
                             </div>
                         </div>
 
-                        <div class="account__block">
-                            <h5 class="account__block_name">
+                        <div class="profile__block">
+                            <h5 class="profile__block_name">
                                 Новости
                             </h5>
 
-                            <div class="account__block_body">
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Черновики: </span>
+                            <div class="profile__block_body">
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Черновики: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
                             </div>
 
-                            <div class="account__block_footer">
+                            <div class="profile__block_footer">
                                 <a href="#">Добавить</a>
 
                                 <a href="#">Все мои новости</a>
                             </div>
                         </div>
 
-                        <div class="account__block">
-                            <h5 class="account__block_name">
+                        <div class="profile__block">
+                            <h5 class="profile__block_name">
                                 Пользователи
                             </h5>
 
-                            <div class="account__block_body">
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Всего: </span>
+                            <div class="profile__block_body">
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Всего: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
 
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Писателей: </span>
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Писателей: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
 
-                                <p class="account__block_item">
-                                    <span class="account__block_item-name">Модераторов: </span>
+                                <p class="profile__block_item">
+                                    <span class="profile__block_item-name">Модераторов: </span>
 
-                                    <span class="account__block_item-value">
+                                    <span class="profile__block_item-value">
                                         <a href="#">0</a>
                                     </span>
                                 </p>
                             </div>
 
-                            <div class="account__block_footer">
+                            <div class="profile__block_footer">
                                 <a href="#">Посмотреть всех</a>
                             </div>
                         </div>
@@ -224,7 +224,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .account {
+    .profile {
         &__row {
             & + & {
                 margin-top: 24px;

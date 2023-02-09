@@ -91,7 +91,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
         Cookies.remove(USER_TOKEN_COOKIE);
 
-        if (route.name === 'account') {
+        if (route.name === 'profile') {
             window.location.href = '/';
         }
     };
