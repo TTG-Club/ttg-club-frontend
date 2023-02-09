@@ -26,6 +26,7 @@
                 </div>
 
                 <a
+                    v-if="isDev"
                     class="nav-profile__line"
                     href="#"
                     @click.left.exact.prevent="openPersonalArea"
@@ -99,6 +100,7 @@
     import LoginView from '@/components/account/LoginView.vue';
     import RegistrationView from '@/components/account/RegistrationView.vue';
     import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
+    import { useIsDev } from '@/common/helpers/isDev';
 
     export default {
         name: 'NavProfile',
@@ -215,6 +217,7 @@
             }
 
             return {
+                isDev: useIsDev(),
                 isAuthenticated,
                 isModalOpened,
                 greeting,
