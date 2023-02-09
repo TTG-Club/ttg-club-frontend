@@ -14,10 +14,9 @@ export type TNavItem = {
 
 export const useNavStore = defineStore('NavStore', () => {
     const http = useAxios();
-
     const navItems = ref<Array<TNavItem>>([]);
-
     const metaInfo = ref(undefined);
+    const isShowMenu = ref(false);
 
     const showedNavItems = computed(() => navItems.value
         .filter(group => {
@@ -112,6 +111,7 @@ export const useNavStore = defineStore('NavStore', () => {
     };
 
     return {
+        isShowMenu,
         navItems,
         showedNavItems,
         metaInfo,

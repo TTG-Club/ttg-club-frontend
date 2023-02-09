@@ -242,6 +242,8 @@ router.beforeEach(async (to, from) => {
     const navStore = useNavStore();
     const userStore = useUserStore();
 
+    navStore.isShowMenu = false;
+
     try {
         if (to.name === 'profile' && !(await userStore.getUserStatus())) {
             window.location.href = '/';
