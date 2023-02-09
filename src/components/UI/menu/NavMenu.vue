@@ -338,6 +338,11 @@
                 display: flex;
                 border-radius: 6px;
                 font-size: var(--main-font-size);
+
+                &.router-link-active {
+                    color: var(--text-btn-color);
+                    background-color: var(--primary-active);
+                }
             }
 
             &_icon {
