@@ -131,6 +131,7 @@
     import groupBy from 'lodash/groupBy';
     import { resolveUnref } from '@vueuse/core';
     import cloneDeep from 'lodash/cloneDeep';
+    import VueEasyLightbox from 'vue-easy-lightbox';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiSelect from '@/components/UI/kit/UiSelect.vue';
@@ -150,7 +151,8 @@
             SpellsView,
             UiSelect,
             SvgIcon,
-            SectionHeader
+            SectionHeader,
+            VueEasyLightbox
         },
         inject: {
             queryBooks: {
