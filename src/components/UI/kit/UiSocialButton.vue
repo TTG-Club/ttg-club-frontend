@@ -57,6 +57,7 @@
         align-items: center;
         text-decoration: none;
         color: var(--text-btn-color);
+        user-select: none;
 
         &__icon {
             width: 20px;
