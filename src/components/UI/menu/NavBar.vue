@@ -17,6 +17,28 @@
             </div>
 
             <div class="navbar__header_right">
+                <div class="navbar__social-buttons">
+                    <ui-social-button
+                        social-name="boosty"
+                        url="https://boosty.to/dnd5club"
+                        hide-label
+                    />
+
+                    <ui-social-button
+                        social-name="vk"
+                        url="https://vk.com/ttg.club"
+                        hide-label
+                    />
+
+                    <ui-social-button
+                        social-name="discord"
+                        url="https://discord.gg/zqBnMJVf3z"
+                        hide-label
+                    />
+
+                    <hr />
+                </div>
+
                 <nav-profile />
 
                 <menu-theme-switcher />
@@ -33,6 +55,7 @@
     import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
     import NavSearch from '@/components/UI/menu/NavSearch.vue';
+    import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';
 
     export default defineComponent({
         name: 'NavBar',
@@ -41,7 +64,8 @@
             NavMenu,
             NavBookmarks,
             NavProfile,
-            MenuThemeSwitcher
+            MenuThemeSwitcher,
+            UiSocialButton
         },
         setup() {
             const route = useRoute();
@@ -72,6 +96,53 @@
                 border-bottom: 1px solid var(--border);
                 border-right: 0;
                 margin: 0 0 8px 0;
+            }
+        }
+
+    }
+    .navbar__header_right {
+        .navbar__social-buttons {
+            display: none;
+
+            @include media-min($md) {
+                display: block;
+            }
+
+            .ui-social-button {
+                padding: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                border-radius: 8px;
+
+                &.is-discord {
+                    background-color: transparent;
+                    color: var(--color-text);
+
+                    &:hover {
+                        background-color: var(--discord-base);
+                        color: var(--text-btn-color);
+                    }
+                }
+                &.is-boosty {
+                    background-color: transparent;
+                    color: var(--color-text);
+
+                    &:hover {
+                        background-color: var(--boosty-base);
+                        color: var(--text-btn-color);
+                    }
+                }
+                &.is-vk {
+                    background-color: transparent;
+                    color: var(--color-text);
+
+                    &:hover {
+                        background-color: var(--vk-base);
+                        color: var(--text-btn-color);
+                    }
+                }
             }
         }
     }
