@@ -13,14 +13,14 @@
         </span>
 
         <span
-            v-if="!$slots.default"
+            v-if="!$slots.default && !hideLabel"
             class="ui-social-button__label"
         >
             {{ socialName }}
         </span>
 
         <span
-            v-else
+            v-else-if="!hideLabel"
             class="ui-social-button__label"
         >
             <slot />
@@ -42,6 +42,10 @@
             socialName: {
                 type: String,
                 required: true
+            },
+            hideLabel: {
+                type: Boolean,
+                default: false
             }
         }
     });
