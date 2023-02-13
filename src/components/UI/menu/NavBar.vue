@@ -17,7 +17,7 @@
             </div>
 
             <div class="navbar__header_right">
-                <div class="navbar__social_button">
+                <div class="navbar__social-button">
                     <ui-social-button
                         social-name="boosty"
                         url="https://boosty.to/dnd5club"
@@ -101,7 +101,7 @@
 
     }
     .navbar__header_right {
-        .navbar__social_button {
+        .navbar__social-button {
             display: none;
 
             @include media-min($md) {
