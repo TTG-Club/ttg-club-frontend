@@ -62,7 +62,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 8% 0 8px 0;
+    margin: 32px 0 8px 0;
 
     .search_row_g {
       height: 46px;
@@ -102,6 +102,10 @@
         font-weight: 600;
         color: var(--text-color-title);
       }
+    }
+    
+    @include media-min($xl) {
+      margin: 8vw 0 8px 0;
     }
   }
 
@@ -221,13 +225,13 @@
   .dnd5club_tel_bot {
     display: flex;
     flex-direction: row;
-    margin: 0 0 16px 0;
     padding: 16px 16px 0 16px;
     background-color: var(--bg-table-list);
     border-radius: 12px;
     width: 100%;
     position: relative;
     overflow: hidden;
+    height: 80px;
 
     .info {
       z-index: 1;
@@ -290,14 +294,31 @@
     padding-top: 32px;
     gap: 16px;
 
-    .left,
-    .center,
     .right {
       flex: 1 1 33%;
     }
 
     @include media-min($md) {
       flex-direction: row;
+    }
+
+    .left {
+      flex: 1 1 66%;
+
+      .block {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .dnd5club_tel_bot,
+        .links_block {
+          flex: 1 1 50%;
+        }
+
+        @include media-min($xl) {
+          flex-direction: row;
+        }
+      }
     }
   }
 }
