@@ -17,20 +17,27 @@
             </div>
 
             <div class="navbar__header_right">
-                <ui-social-button
-                    social-name="boosty"
-                    url="#"
-                />
+                <div class="social-button">
+                    <ui-social-button
+                        social-name="boosty"
+                        url="#"
+                        hide-label
+                    />
 
-                <ui-social-button
-                    social-name="vk"
-                    url="#"
-                />
+                    <ui-social-button
+                        social-name="vk"
+                        url="#"
+                        hide-label
+                    />
 
-                <ui-social-button
-                    social-name="discord"
-                    url="#"
-                />
+                    <ui-social-button
+                        social-name="discord"
+                        url="#"
+                        hide-label
+                    />
+
+                    <hr />
+                </div>
 
                 <nav-profile />
 
@@ -89,6 +96,53 @@
                 border-bottom: 1px solid var(--border);
                 border-right: 0;
                 margin: 0 0 8px 0;
+            }
+        }
+
+    }
+    .navbar__header_right {
+        .social-button {
+            display: none;
+
+            @include media-min($md) {
+                display: block;
+            }
+
+            .ui-social-button {
+                padding: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                border-radius: 8px;
+
+                &.is-discord {
+                    background-color: transparent;
+                    color: var(--color-text);
+
+                    &:hover {
+                        background-color: var(--discord-base);
+                        color: var(--text-btn-color);
+                    }
+                }
+                &.is-boosty {
+                    background-color: transparent;
+                    color: var(--color-text);
+
+                    &:hover {
+                        background-color: var(--boosty-base);
+                        color: var(--text-btn-color);
+                    }
+                }
+                &.is-vk {
+                    background-color: transparent;
+                    color: var(--color-text);
+
+                    &:hover {
+                        background-color: var(--vk-base);
+                        color: var(--text-btn-color);
+                    }
+                }
             }
         }
     }
