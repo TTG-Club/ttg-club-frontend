@@ -17,6 +17,21 @@
             </div>
 
             <div class="navbar__header_right">
+                <ui-social-button
+                    social-name="boosty"
+                    url="#"
+                />
+
+                <ui-social-button
+                    social-name="vk"
+                    url="#"
+                />
+
+                <ui-social-button
+                    social-name="discord"
+                    url="#"
+                />
+
                 <nav-profile />
 
                 <menu-theme-switcher />
@@ -33,6 +48,7 @@
     import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
     import NavSearch from '@/components/UI/menu/NavSearch.vue';
+    import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';
 
     export default defineComponent({
         name: 'NavBar',
@@ -41,7 +57,8 @@
             NavMenu,
             NavBookmarks,
             NavProfile,
-            MenuThemeSwitcher
+            MenuThemeSwitcher,
+            UiSocialButton
         },
         setup() {
             const route = useRoute();
