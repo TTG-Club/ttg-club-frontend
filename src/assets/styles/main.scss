@@ -62,7 +62,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 44px 0 8px 0;
+    margin: 8% 0 8px 0;
 
     .search_row_g {
       height: 46px;
@@ -109,12 +109,13 @@
     display: flex;
     flex-wrap: wrap;
     padding: 0;
-    margin: 8px -8px 0 -8px;
+    margin: 8px 0 0 0;
+    gap: 16px;
 
     .card {
       flex: 1 1 15%;
       min-width: 15%;
-      margin: 16px 8px 0 8px;
+      margin: 16px 0 0 0;
       background-color: var(--bg-secondary);
       border-radius: 12px;
       display: grid;
@@ -192,7 +193,7 @@
       }
 
       @media (max-width: 1200px) {
-        margin: 16px 8px 0 8px;
+        margin: 16px 0 0 0;
         height: 48px;
       }
 
@@ -225,7 +226,6 @@
     background-color: var(--bg-table-list);
     border-radius: 12px;
     width: 100%;
-    max-width: 50%;
     position: relative;
     overflow: hidden;
 
@@ -286,31 +286,18 @@
 
   .column {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     padding-top: 32px;
+    gap: 16px;
 
-    .left {
-      margin-right: 32px;
-
-      @media (max-width: 600px) {
-        margin-right: 0;
-      }
-    }
-
+    .left,
+    .center,
     .right {
-      flex: calc(30% + 32px);
-      min-width: calc(30% + 32px);
-      // margin-bottom: 16px;
-
-      @media (max-width: 600px) {
-        flex: 100%;
-        min-width: 100%;
-      }
+      flex: 1 1 33%;
     }
 
-    @media (max-width: 600px) {
-      display: flex;
-      flex-direction: column;
+    @include media-min($md) {
+      flex-direction: row;
     }
   }
 }
@@ -349,6 +336,7 @@
         flex: 100%;
         display: flex;
         justify-content: center;
+        text-align: center;
       }
 
       img {

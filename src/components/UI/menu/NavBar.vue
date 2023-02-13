@@ -20,19 +20,19 @@
                 <div class="social-button">
                     <ui-social-button
                         social-name="boosty"
-                        url="#"
+                        url="https://boosty.to/dnd5club"
                         hide-label
                     />
 
                     <ui-social-button
                         social-name="vk"
-                        url="#"
+                        url="https://vk.com/ttg.club"
                         hide-label
                     />
 
                     <ui-social-button
                         social-name="discord"
-                        url="#"
+                        url="https://discord.gg/zqBnMJVf3z"
                         hide-label
                     />
 
