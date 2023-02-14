@@ -275,12 +275,15 @@
           z-index: 1;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
     
           h4 {
             margin-top: 0;
             font-family: "Open Sans",sans-serif;
             font-weight: 500;
+          }
+
+          .bottom {
+            margin-top: auto;
           }
     
           a {
@@ -291,6 +294,11 @@
             color: var(--text-color);
             padding: 6px 8px;
             border-radius: 8px;
+
+            &.main {
+              background-color: var(--primary);
+              color: var(--text-btn-color);
+            }
 
             &:hover {
               background-color: var(--primary-hover);
