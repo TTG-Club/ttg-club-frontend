@@ -1,6 +1,8 @@
 <template>
     <a
         :href="url"
+        target="_blank"
+        rel="noopener noreferrer"
         class="ui-social-button"
         :class="[`is-${ socialName.toLowerCase() }`]"
     >
