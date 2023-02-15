@@ -9,17 +9,19 @@
         />
 
         <div class=" content-padding">
-            <p v-if="item.price">
-                <b>Стоимость: </b>
+            <ul class="stat-list">
+                <li v-if="item.price">
+                    <b>Стоимость: </b>
 
-                <span>{{ item.price }}</span>
-            </p>
+                    <span>{{ item.price }}</span>
+                </li>
 
-            <p v-if="item.weight">
-                <b>Вес (в фунтах): </b>
+                <li v-if="item.weight">
+                    <b>Вес (в фунтах): </b>
 
-                <span>{{ item.weight }}</span>
-            </p>
+                    <span>{{ item.weight }}</span>
+                </li>
+            </ul>
 
             <raw-content
                 v-if="item?.description"

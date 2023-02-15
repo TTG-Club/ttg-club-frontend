@@ -15,34 +15,36 @@
                 :use-bg-hide="false"
             />
 
-            <p>
-                <b>Настройка: </b>
+            <ul class="stat-list">
+                <li>
+                    <b>Настройка: </b>
 
-                <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
+                    <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
 
-                <span v-if="magicItem.detailCustamization?.length">
-                    ({{
-                        magicItem.detailCustamization.join(', ')
-                            .toLowerCase()
-                    }})
-                </span>
-            </p>
+                    <span v-if="magicItem.detailCustamization?.length">
+                        ({{
+                            magicItem.detailCustamization.join(', ')
+                                .toLowerCase()
+                        }})
+                    </span>
+                </li>
 
-            <p v-if="magicItem.cost">
-                <b>Стоимость по <span
-                    v-tippy="'Руководство Мастера'"
-                >DMG</span>: </b>
+                <li v-if="magicItem.cost">
+                    <b>Стоимость по <span
+                        v-tippy="'Руководство Мастера'"
+                    >DMG</span>: </b>
 
-                <span>{{ magicItem.cost.dmg }}</span>
+                    <span>{{ magicItem.cost.dmg }}</span>
+                </li>
 
-                <br>
+                <li v-if="magicItem.cost">
+                    <b>Стоимость по <span
+                        v-tippy="'Руководство Зантара обо всем'"
+                    >XGE</span>: </b>
 
-                <b>Стоимость по <span
-                    v-tippy="'Руководство Зантара обо всем'"
-                >XGE</span>: </b>
-
-                <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
-            </p>
+                    <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
+                </li>
+            </ul>
 
             <raw-content
                 v-if="magicItem.description"

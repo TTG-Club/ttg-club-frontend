@@ -14,41 +14,43 @@
                 :use-bg-hide="false"
             />
 
-            <p>
-                <b>Мировоззрение: </b>
+            <ul class="stat-list">
+                <li>
+                    <b>Мировоззрение: </b>
 
-                <span>{{ god.alignment }}</span>
-            </p>
+                    <span>{{ god.alignment }}</span>
+                </li>
 
-            <p>
-                <b>Ранг: </b>
+                <li>
+                    <b>Ранг: </b>
 
-                <span>{{ god.rank }}</span>
-            </p>
+                    <span>{{ god.rank }}</span>
+                </li>
 
-            <p v-if="god.titles?.length">
-                <b>Титулы: </b>
+                <li v-if="god.titles?.length">
+                    <b>Титулы: </b>
 
-                <span>{{ god.titles.join(', ') }}</span>
-            </p>
+                    <span>{{ god.titles.join(', ') }}</span>
+                </li>
 
-            <p>
-                <b>Символ: </b>
+                <li>
+                    <b>Символ: </b>
 
-                <span>{{ god.symbol }}</span>
-            </p>
+                    <span>{{ god.symbol }}</span>
+                </li>
 
-            <p v-if="god.domains?.length">
-                <b>Домены: </b>
+                <li v-if="god.domains?.length">
+                    <b>Домены: </b>
 
-                <span>{{ god.domains.join(', ') }}</span>
-            </p>
+                    <span>{{ god.domains.join(', ') }}</span>
+                </li>
 
-            <p v-if="god.panteons?.length">
-                <b>Пантеон: </b>
+                <li v-if="god.panteons?.length">
+                    <b>Пантеон: </b>
 
-                <span>{{ god.panteons.join(', ') }}</span>
-            </p>
+                    <span>{{ god.panteons.join(', ') }}</span>
+                </li>
+            </ul>
 
             <raw-content
                 v-if="god.description"

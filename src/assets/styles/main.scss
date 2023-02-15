@@ -587,6 +587,19 @@
   }
 }
 
+.class_stats {
+  margin-bottom: 6px;
+}
+
+.stat-list {
+  padding: 0;
+
+  li {
+    margin-bottom: 6px;
+    list-style: none;
+  }
+}
+
 .form {
   &__row {
     display: flex;
