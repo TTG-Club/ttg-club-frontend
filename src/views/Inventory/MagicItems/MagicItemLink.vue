@@ -211,10 +211,7 @@
                         background: linear-gradient(
                                     90deg,
                                     var(--common) 0%,
-                                    var(--uncommon) 20%,
-                                    var(--rare) 40%,
-                                    var(--very_rare) 60%,
-                                    var(--legendary) 80%,
+                                    var(--very_rare) 50%,
                                     var(--artifact) 100%
                                 );
                     }
