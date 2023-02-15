@@ -124,7 +124,6 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin: 0;
         flex-shrink: 0;
         font-size: var(--main-font-size);
         line-height: calc(var(--main-line-height) - 1px);

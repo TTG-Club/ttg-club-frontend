@@ -112,6 +112,12 @@ button {
   cursor: pointer;
 }
 
+.form__row {
+  button {
+    margin-right: 8px;
+  }
+}
+
 .become-button {
   @include css_anim($time: .2s);
 
