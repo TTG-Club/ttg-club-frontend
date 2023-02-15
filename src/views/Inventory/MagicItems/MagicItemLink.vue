@@ -210,9 +210,8 @@
                     &:after {
                         background: linear-gradient(
                                     90deg,
-                                    var(--common) 0%,
-                                    var(--very_rare) 50%,
-                                    var(--legendary) 100%
+                                    var(--common) 10%,
+                                    var(--artifact) 100%
                                 );
                     }
                 }
