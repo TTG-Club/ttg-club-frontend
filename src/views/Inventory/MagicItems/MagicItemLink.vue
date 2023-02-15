@@ -212,7 +212,7 @@
                                     90deg,
                                     var(--common) 0%,
                                     var(--very_rare) 50%,
-                                    var(--artifact) 100%
+                                    var(--legendary) 100%
                                 );
                     }
                 }
