@@ -597,6 +597,10 @@
   li {
     margin-bottom: 6px;
     list-style: none;
+
+    p {
+      display: inherit;
+    }
   }
 }
 
