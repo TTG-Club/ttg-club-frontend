@@ -229,6 +229,11 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'profile',
         path: '/profile',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue')
+    },
+    {
+        name: 'markup-render',
+        path: '/markup-render',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Markup' */ '@/views/Markup/MarkupTestView.vue')
     }
 ];
 /* eslint-enable max-len,vue/max-len */
