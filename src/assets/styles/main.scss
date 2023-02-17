@@ -716,3 +716,16 @@ img.responsive {
   background: var(--bg-secondary);
   border-radius: 8px;
 }
+
+.damage-type {
+  border-bottom: 1px dashed var(--text-color);
+  cursor: help;
+
+  &.is-fire {
+    color: var(--bg-disadvantage);
+  }
+
+  &.is-acid {
+    color: var(--bg-advantage);
+  }
+}

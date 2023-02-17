@@ -1,9 +1,12 @@
 import type { VNode } from 'vue';
 import { h } from 'vue';
 import DiceRoller from '@/components/UI/DiceRoller.vue';
-import { CHALLENGE_RATING, SPEED } from '@/types/Markup/base.types';
+import {
+    CHALLENGE_RATING, DAMAGE_TYPE, SPEED
+} from '@/types/Markup/base.types';
 import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
 import { usePluralize } from '@/common/composition/usePluralize';
+import DetailTooltip from '@/components/UI/DetailTooltip.vue';
 
 /* eslint-disable no-use-before-define */
 export const useMarkup = (leadingCharacter = '@') => {
@@ -309,6 +312,35 @@ export const useMarkup = (leadingCharacter = '@') => {
         return h('span', `${ current.rating } (0 или ${ expNumber.toLocaleString() } ${ plural })`);
     };
 
+    const renderDamageType = (entry: string) => {
+        const [
+            type,
+            toDisplay,
+            colored
+        ] = splitByPipeBase(entry);
+
+        const damage = DAMAGE_TYPE.find(item => item.key === type);
+
+        if (!damage) {
+            throw new Error(`Неизвестный тип урона: ${ type }`);
+        }
+
+        return h(
+            DetailTooltip,
+            {
+                url: `/screens/${ type }`,
+                type: 'screen',
+                class: {
+                    'damage-type': true,
+                    [`is-${ type }`]: colored === 'colored'
+                }
+            },
+            {
+                default: () => toDisplay || damage.localized
+            }
+        );
+    };
+
     const renderVNode = (marker: string, text: string): VNode => {
         switch (marker) {
             // Жирный текст
@@ -373,6 +405,9 @@ export const useMarkup = (leadingCharacter = '@') => {
 
             case '@challengeRating':
                 return renderChallengeRating(text);
+
+            case '@damageType':
+                return renderDamageType(text);
 
             default:
                 return h('span', text);

@@ -9,9 +9,13 @@
         </template>
 
         <template #content>
+            <span v-if="!content && !error">Волшебники и волшебницы телепортируют нужную информацию...</span>
+
+            <span v-else-if="!content && error">Волшебники и волшебницы телепортируют нужную информацию...</span>
+
             <component
                 :is="bodyComponent"
-                v-if="content"
+                v-else
                 :[type]="content"
                 in-tooltip
             />
@@ -56,7 +60,11 @@
             tippyConfig() {
                 const config = cloneDeep(DefaultTippyProps);
 
-                config.onShow = () => this.getContent();
+                config.onTrigger = () => {
+                    if (!this.content) {
+                        this.getContent();
+                    }
+                };
 
                 return config;
             },
@@ -103,18 +111,18 @@
                 this.error = false;
 
                 if (this.content) {
-                    return true;
+                    return Promise.resolve(true);
                 }
 
                 const link = this.$slots.default()
-                    .find(node => node.props.href);
+                    .find(node => node.props?.href);
 
                 const url = this.url || link?.props?.href;
 
                 if (!url?.length) {
                     this.error = true;
 
-                    return false;
+                    return Promise.resolve(false);
                 }
 
                 const res = await this.$http.post({ url });
@@ -124,12 +132,12 @@
 
                     this.error = true;
 
-                    return false;
+                    return Promise.resolve(false);
                 }
 
                 this.content = res.data;
 
-                return true;
+                return Promise.resolve(true);
             }
         }
     };

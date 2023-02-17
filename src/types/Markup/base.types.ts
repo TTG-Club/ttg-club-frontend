@@ -62,3 +62,61 @@ export const CHALLENGE_RATING: {[key: string]: string} = {
     '135000': '29',
     '155000': '30'
 };
+
+export const DAMAGE_TYPE: Array<{
+    key: string
+    localized: string
+}> = [
+    {
+        key: 'acid',
+        localized: 'кислота'
+    },
+    {
+        key: 'bludgeoning',
+        localized: 'дробящий'
+    },
+    {
+        key: 'cold',
+        localized: 'холод'
+    },
+    {
+        key: 'fire',
+        localized: 'огонь'
+    },
+    {
+        key: 'force',
+        localized: 'силовое поле'
+    },
+    {
+        key: 'lightning',
+        localized: 'электричество'
+    },
+    {
+        key: 'necrotic',
+        localized: 'некротическая энергия'
+    },
+    {
+        key: 'piercing',
+        localized: 'колющий'
+    },
+    {
+        key: 'poison',
+        localized: 'яд'
+    },
+    {
+        key: 'psychic',
+        localized: 'психическая энергия'
+    },
+    {
+        key: 'radiant',
+        localized: 'излучение'
+    },
+    {
+        key: 'slashing',
+        localized: 'рубящий'
+    },
+    {
+        key: 'thunder',
+        localized: 'звук'
+    }
+];
