@@ -1,8 +1,9 @@
 import type { VNode } from 'vue';
 import { h } from 'vue';
 import DiceRoller from '@/components/UI/DiceRoller.vue';
-import { SPEED } from '@/types/Markup/base.types';
+import { CHALLENGE_RATING, SPEED } from '@/types/Markup/base.types';
 import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
+import { usePluralize } from '@/common/composition/usePluralize';
 
 /* eslint-disable no-use-before-define */
 export const useMarkup = (leadingCharacter = '@') => {
@@ -139,25 +140,24 @@ export const useMarkup = (leadingCharacter = '@') => {
             : [string, ''];
     };
 
-    const convertBold = (entry: string) => h('b', convertString(entry));
+    const renderBold = (entry: string) => h('b', recursiveRender(entry));
 
-    const convertItalic = (entry: string) => h('i', convertString(entry));
+    const renderItalic = (entry: string) => h('i', recursiveRender(entry));
 
-    const convertStrike = (entry: string) => h('s', convertString(entry));
+    const renderStrike = (entry: string) => h('s', recursiveRender(entry));
 
-    const convertUnderline = (entry: string) => h('u', convertString(entry));
+    const renderUnderline = (entry: string) => h('u', recursiveRender(entry));
 
-    const convertCode = (entry: string) => h('code', convertString(entry));
+    const renderCode = (entry: string) => h('code', recursiveRender(entry));
 
-    const convertSpeed = (entry: string) => {
+    const renderSpeed = (entry: string) => {
         const [speed, type] = splitByPipeBase(entry);
 
         if (!type) {
             return h('span', `${ speed } фт.`);
         }
 
-        const types = Object.values(SPEED);
-        const founded = types.find(item => item.key === type);
+        const founded = SPEED.find(item => item.key === type);
 
         if (!founded) {
             throw new Error(`Неизвестный тип скорости: "${ type }"`);
@@ -166,18 +166,18 @@ export const useMarkup = (leadingCharacter = '@') => {
         return h('span', `${ speed } фт. ${ founded.localized }`);
     };
 
-    const convertStyle = (entry: string) => {
+    const renderStyle = (entry: string) => {
         const [displayText, styles] = splitByPipeBase(entry);
         const classList = (styles || '').split(';');
 
         return h(
             'span',
             { class: classList },
-            convertString(displayText)
+            recursiveRender(displayText)
         );
     };
 
-    const convertGallery = (entry: string) => {
+    const renderGallery = (entry: string) => {
         const [
             urls,
             preview,
@@ -225,7 +225,7 @@ export const useMarkup = (leadingCharacter = '@') => {
             .slice(0, 8);
     };
 
-    const convertColor = (entry: string) => {
+    const renderColor = (entry: string) => {
         const [text, colorString] = splitByPipeBase(entry);
         const color = getValidColor(colorString, true);
 
@@ -236,11 +236,11 @@ export const useMarkup = (leadingCharacter = '@') => {
                     color: color.startsWith('--') ? `var(${ color })` : `#${ color }`
                 }
             },
-            convertString(text)
+            recursiveRender(text)
         );
     };
 
-    const convertTitle = (marker: string, entry: string) => {
+    const renderTitle = (marker: string, entry: string) => {
         const level = marker.replace('@title', '');
         const [text, styles] = splitByPipeBase(entry);
         const classList = (styles || '').split(';');
@@ -248,64 +248,115 @@ export const useMarkup = (leadingCharacter = '@') => {
         return h(
             `h${ level }`,
             { class: classList },
-            convertString(text)
+            recursiveRender(text)
         );
     };
 
-    const convertDice = (marker: string, text: string) => {
-        const [, ...flags] = splitByPipeBase(text);
+    const renderDice = (marker: string, entry: string) => {
+        const [, ...flags] = splitByPipeBase(entry);
 
-        return h(DiceRoller, { formula: text });
+        return h(DiceRoller, { formula: entry });
     };
 
-    const getVNode = (marker: string, text: string) => {
+    const renderChallengeRating = (entry: string) => {
+        const ratings = Object.entries(CHALLENGE_RATING)
+            .map(([exp, rating]) => ({
+                exp,
+                rating
+            })) as Array<{
+            exp: string
+            rating: string
+        }>;
+
+        if (entry === '-1' || !entry) {
+            return h('span', '—');
+        }
+
+        const current = ratings.find(item => item.rating === entry && item.exp !== '0');
+
+        if (!current) {
+            throw new Error(`Неизвестный уровень опасности: ${ entry }`);
+        }
+
+        const { getPlural } = usePluralize();
+
+        if (current.rating !== '0') {
+            const expNumber = parseInt(current.exp, 10);
+
+            const plural = getPlural(
+                expNumber,
+                [
+                    'опыт',
+                    'опыта',
+                    'опыта'
+                ]
+            );
+
+            return h('span', `${ current.rating } (${ expNumber.toLocaleString() } ${ plural })`);
+        }
+
+        const expNumber = parseInt(current.exp, 10);
+
+        const plural = getPlural(
+            expNumber,
+            [
+                'опыт',
+                'опыта',
+                'опыта'
+            ]
+        );
+
+        return h('span', `${ current.rating } (0 или ${ expNumber.toLocaleString() } ${ plural })`);
+    };
+
+    const renderVNode = (marker: string, text: string): VNode => {
         switch (marker) {
             // Жирный текст
             case '@b':
             case '@bold':
-                return convertBold(text);
+                return renderBold(text);
 
             // Курсивный текст
             case '@i':
             case '@italic':
-                return convertItalic(text);
+                return renderItalic(text);
 
             // Зачеркнутый текст
             case '@s':
             case '@strike':
-                return convertStrike(text);
+                return renderStrike(text);
 
             // Подчеркнутый текст
             case '@u':
             case '@underline':
-                return convertUnderline(text);
+                return renderUnderline(text);
 
             // Элемент с моноширным шрифтом
             case '@code':
-                return convertCode(text);
+                return renderCode(text);
 
             // Заголовки
             case '@title2':
             case '@title3':
             case '@title4':
             case '@title5':
-                return convertTitle(marker, text);
+                return renderTitle(marker, text);
 
             // Элемент с классами
             case '@style':
-                return convertStyle(text);
+                return renderStyle(text);
 
             // Изменение цвета
             case '@color':
-                return convertColor(text);
+                return renderColor(text);
 
             // Скорость перемещения
             case '@speed':
-                return convertSpeed(text);
+                return renderSpeed(text);
 
             // Галерея
             case '@gallery':
-                return convertGallery(text);
+                return renderGallery(text);
 
             // DiceRoller
             case '@dice':
@@ -318,14 +369,17 @@ export const useMarkup = (leadingCharacter = '@') => {
             case '@ability':
             case '@savingThrow':
             case '@skillCheck':
-                return convertDice(marker, text);
+                return renderDice(marker, text);
+
+            case '@challengeRating':
+                return renderChallengeRating(text);
 
             default:
                 return h('span', text);
         }
     };
 
-    const convertString = (entry: string) => {
+    const recursiveRender = (entry: string) => {
         const tagSplit = splitByMarkers(entry);
         const len = tagSplit.length;
         const result: Array<VNode | string> = [];
@@ -340,7 +394,7 @@ export const useMarkup = (leadingCharacter = '@') => {
             if (str.startsWith(`{${ leadingCharacter }`)) {
                 const [marker, text] = splitFirstSpace(str.slice(1, -1));
 
-                result.push(getVNode(marker, text));
+                result.push(renderVNode(marker, text));
             } else {
                 result.push(str);
             }
@@ -349,7 +403,7 @@ export const useMarkup = (leadingCharacter = '@') => {
         return result;
     };
 
-    const parse = (entry: string | null) => {
+    const render = (entry: string | null) => {
         if (!entry) {
             return h('span', 'Произошла какая-то ошибка...');
         }
@@ -357,13 +411,13 @@ export const useMarkup = (leadingCharacter = '@') => {
         const paragraphs = entry.split('\n\n');
 
         if (paragraphs.length > 1) {
-            return paragraphs.map(str => h('p', convertString(str)));
+            return paragraphs.map(str => h('p', recursiveRender(str)));
         }
 
-        return convertString(entry);
+        return recursiveRender(entry);
     };
 
     return {
-        parse
+        render
     };
 };

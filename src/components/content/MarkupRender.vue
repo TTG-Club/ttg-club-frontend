@@ -11,14 +11,14 @@
         }
     );
 
-    const { parse } = useMarkup();
+    const { render } = useMarkup();
 
     const converted = computed(() => {
         if (!props.entry) {
             return h('span', 'loading...');
         }
 
-        return parse(props.entry);
+        return render(props.entry);
     });
 
     const markup = h(
