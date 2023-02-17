@@ -4,27 +4,21 @@
 
     const props = withDefaults(
         defineProps<{
-            entries?: any[] | null;
-            entry?: any | null;
+            entry: string | null;
         }>(),
         {
-            entries: null,
             entry: null
         }
     );
 
-    const { getConverted } = useMarkup();
+    const { parse } = useMarkup();
 
     const converted = computed(() => {
-        if (!props.entry && !props.entries) {
+        if (!props.entry) {
             return h('span', 'loading...');
         }
 
-        if (props.entries instanceof Array) {
-            return getConverted(props);
-        }
-
-        return getConverted(props.entry);
+        return parse(props.entry);
     });
 
     const markup = h(
