@@ -115,6 +115,7 @@
 
             h4 {
                 margin: 0;
+                pointer-events: none;
             }
         }
 
