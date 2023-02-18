@@ -110,7 +110,7 @@
                     />
 
                     <a
-                        :href="searchUrl"
+                        :to="{ path: searchUrl }"
                         class="search-modal__all"
                         @mouseenter.self="selectedIndex = null"
                         @focusin.self="selectedIndex = null"

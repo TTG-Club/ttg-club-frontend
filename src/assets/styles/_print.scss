@@ -13,7 +13,12 @@
     }
   }
 
-  .bg-img-main,
+  #dnd5club {
+    &:after {
+      display: none !important;
+    }
+  }
+
   .content-layout__side--left {
     display: none !important;
   }

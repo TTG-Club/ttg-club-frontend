@@ -2,12 +2,12 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
-                <a
+                <router-link
                     class="navbar__logo"
-                    href="/"
+                    :to="{ name: 'index' }"
                 >
                     <site-logo />
-                </a>
+                </router-link>
 
                 <nav-menu />
 
@@ -56,10 +56,12 @@
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
     import NavSearch from '@/components/UI/menu/NavSearch.vue';
     import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';
+    import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
 
     export default defineComponent({
         name: 'NavBar',
         components: {
+            SiteLogo,
             NavSearch,
             NavMenu,
             NavBookmarks,

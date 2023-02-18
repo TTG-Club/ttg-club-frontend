@@ -21,12 +21,12 @@
         <template #default>
             <div class="nav-menu">
                 <div class="nav-menu__header">
-                    <a
+                    <router-link
                         class="nav-menu__logo"
-                        href="/"
+                        :to="{ name: 'index' }"
                     >
                         <site-logo />
-                    </a>
+                    </router-link>
 
                     <div class="nav-menu__info">
                         <span class="nav-menu__info--desc">Онлайн справочник по D&D 5e</span>
