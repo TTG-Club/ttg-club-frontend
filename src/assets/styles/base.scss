@@ -104,6 +104,29 @@ body,
   @include media-min($md) {
     flex-flow: row;
   }
+
+  &:after {
+    content: '';
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    opacity: 0.65;
+    z-index: -100;
+    width: 100%;
+    height: var(--max-vh);
+    pointer-events: none;
+    display: none;
+    background: {
+      image: var(--bg-img);
+      repeat: no-repeat;
+      position: bottom right;
+      size: contain;
+    };
+
+    @include media-min($xxl) {
+      display: block;
+    }
+  }
 }
 
 button {
