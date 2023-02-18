@@ -9,7 +9,7 @@ import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import { TippyOptions } from '@/common/utils/TippyConfig';
 import { ToastEventBus, ToastOptions } from '@/common/utils/ToastConfig';
-import App from '@/App';
+import App from '@/App.vue';
 import router from './router';
 import '@/assets/styles/index.scss';
 

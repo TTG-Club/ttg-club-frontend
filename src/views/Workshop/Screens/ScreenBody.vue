@@ -9,7 +9,7 @@
                 v-if="screen.parent?.url"
                 #left
             >
-                Раздел: <a :href="screen.parent.url">{{ screen.parent.name.rus }}</a>
+                Раздел: <a :to="{ path: screen.parent.url }">{{ screen.parent.name.rus }}</a>
             </template>
         </detail-top-bar>
 

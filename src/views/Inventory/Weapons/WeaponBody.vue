@@ -45,10 +45,10 @@
                     v-for="(property, propKey) in weapon.properties"
                     :key="propKey"
                 >
-                    <a
+                    <router-link
                         v-tippy="{ content: property.description }"
-                        :href="property.url"
-                    >{{ property.name }}</a>
+                        :to="{ path: property.url }"
+                    >{{ property.name }}</router-link>
 
                     <span
                         v-if="property.twoHandDice"

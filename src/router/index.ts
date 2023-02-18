@@ -6,6 +6,11 @@ import { useUserStore } from '@/store/UI/UserStore';
 /* eslint-disable max-len,vue/max-len */
 const routes: Readonly<RouteRecordRaw[]> = [
     {
+        name: 'index',
+        path: '/',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Main' */ '@/views/IndexView.vue')
+    },
+    {
         name: 'classes',
         path: '/classes',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Character' */ '@/views/Character/Classes/ClassesView.vue'),
