@@ -139,7 +139,7 @@ export const useMarkup = (leadingCharacter = '@') => {
         const firstIndex = string.indexOf(' ');
 
         return firstIndex !== -1
-            ? [string.substr(0, firstIndex), string.substr(firstIndex + 1)]
+            ? [string.substring(0, firstIndex), string.substring(firstIndex + 1)]
             : [string, ''];
     };
 
@@ -257,6 +257,9 @@ export const useMarkup = (leadingCharacter = '@') => {
 
     const renderDice = (marker: string, entry: string) => {
         const [, ...flags] = splitByPipeBase(entry);
+
+        // eslint-disable-next-line no-console
+        console.log(flags);
 
         return h(DiceRoller, { formula: entry });
     };
