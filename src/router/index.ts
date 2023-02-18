@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useNavStore } from '@/store/UI/NavStore';
 import { useUserStore } from '@/store/UI/UserStore';
+import { useAxios } from '@/common/composition/useAxios';
 
 /* eslint-disable max-len,vue/max-len */
 const routes: Readonly<RouteRecordRaw[]> = [
@@ -234,6 +235,28 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'profile',
         path: '/profile',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue')
+    },
+    {
+        name: 'info-page',
+        path: '/info/:path',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'InfoPage' */ '@/views/InfoPageView.vue'),
+        beforeEnter: async (to, from, next) => {
+            const http = useAxios();
+
+            try {
+                const resp = await http.post({ url: to.path });
+
+                if (resp.status !== 200) {
+                    await next({ name: 'index' });
+
+                    return;
+                }
+
+                await next();
+            } catch (err) {
+                await next({ name: 'index' });
+            }
+        }
     }
 ];
 /* eslint-enable max-len,vue/max-len */

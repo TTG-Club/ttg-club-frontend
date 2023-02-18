@@ -56,7 +56,7 @@
 
             <ui-button
                 v-if="onExportFoundry"
-                v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;/fvtt_import&quot;>Инструкция</a>' }"
+                v-tippy="{ content: 'Импорт в Foundry VTT. <a href=&quot;https://vk.com/@ttg.club-import-suschestv-v-fvtt&quot;>Инструкция</a>' }"
                 class="section-header__control is-only-desktop"
                 is-icon
                 type-link-filled
