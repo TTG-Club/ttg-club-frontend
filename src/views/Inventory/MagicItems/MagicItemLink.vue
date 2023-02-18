@@ -47,6 +47,13 @@
                         >
                             {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
                         </div>
+
+                        <div
+                            v-if="magicItem.customization"
+                            class="link-item__customization"
+                        >
+                            Настройка
+                        </div>
                     </div>
                 </div>
             </div>
@@ -130,7 +137,7 @@
                 display: block;
                 left: 0;
                 top: 4px;
-                z-index: 1;
+                //z-index: 1;
             }
 
             &.is-common {
