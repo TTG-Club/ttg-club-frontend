@@ -233,7 +233,8 @@ const routes: Readonly<RouteRecordRaw[]> = [
     },
     {
         name: 'profile',
-        path: '/profile',
+        path: '/profile/:username',
+        alias: '/profile',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue')
     },
     {
@@ -266,7 +267,7 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to, from, next) => {
     const navStore = useNavStore();
     const userStore = useUserStore();
 
@@ -274,15 +275,17 @@ router.beforeEach(async (to, from) => {
 
     try {
         if (to.name === 'profile' && !(await userStore.getUserStatus())) {
-            window.location.href = '/';
+            next({ name: 'index' });
         }
     } catch (err) {
-        window.location.href = '/';
+        next({ name: 'index' });
     }
 
     if (from.path !== to.path) {
         navStore.updateMetaByURL(to.path).then();
     }
+
+    next();
 });
 
 export default router;

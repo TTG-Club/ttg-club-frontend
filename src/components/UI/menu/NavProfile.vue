@@ -25,16 +25,15 @@
                     </span>
                 </div>
 
-                <a
+                <router-link
                     v-if="isDev"
                     class="nav-profile__line"
-                    href="#"
-                    @click.left.exact.prevent="openPersonalArea"
+                    :to="{ path: `/profile` }"
                 >
                     <span class="nav-profile__line_body">
                         Личный кабинет
                     </span>
-                </a>
+                </router-link>
 
                 <a
                     class="nav-profile__line"
@@ -228,10 +227,7 @@
                 closeModal,
                 modal,
                 modalInfo,
-                modalComponent,
-                openPersonalArea: () => {
-                    window.location.href = '/profile';
-                }
+                modalComponent
             };
         }
     };

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
 import { computed, ref } from 'vue';
 import fromPairs from 'lodash/fromPairs';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { USER_TOKEN_COOKIE } from '@/common/const/UI';
 import { useAxios } from '@/common/composition/useAxios';
 import { useIsDev } from '@/common/helpers/isDev';
@@ -51,6 +51,7 @@ export type TChangePassBody = {
 
 export const useUserStore = defineStore('UserStore', () => {
     const route = useRoute();
+    const router = useRouter();
     const http = useAxios();
     const isDev = useIsDev();
     const user = ref<TUser | null>(null);
@@ -85,14 +86,14 @@ export const useUserStore = defineStore('UserStore', () => {
         loading: '/icon/avatar.png'
     }));
 
-    const clearUser = () => {
+    const clearUser = async () => {
         user.value = null;
         isAuthenticated.value = false;
 
         Cookies.remove(USER_TOKEN_COOKIE);
 
         if (route.name === 'profile') {
-            window.location.href = '/';
+            await router.push({ name: 'index' });
         }
     };
 

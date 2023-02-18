@@ -9,7 +9,9 @@
                 v-if="screen.parent?.url"
                 #left
             >
-                Раздел: <a :to="{ path: screen.parent.url }">{{ screen.parent.name.rus }}</a>
+                Раздел: <router-link :to="{ path: screen.parent.url }">
+                    {{ screen.parent.name.rus }}
+                </router-link>
             </template>
         </detail-top-bar>
 

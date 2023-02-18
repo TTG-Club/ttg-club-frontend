@@ -109,7 +109,7 @@
                         @focusin="selectedIndex = key"
                     />
 
-                    <a
+                    <router-link
                         :to="{ path: searchUrl }"
                         class="search-modal__all"
                         @mouseenter.self="selectedIndex = null"
@@ -126,7 +126,7 @@
                         <div class="search-modal__all_body">
                             Открыть страницу поиска
                         </div>
-                    </a>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -141,6 +141,7 @@
     import {
         onKeyStroke, onStartTyping, useActiveElement, useFocus, useVModel
     } from '@vueuse/core';
+    import { useRouter } from 'vue-router';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
@@ -161,6 +162,7 @@
         },
         setup(props) {
             const isShowModal = useVModel(props, 'modelValue');
+            const router = useRouter();
             const http = useAxios();
             const controller = ref<AbortController | null>(null);
             const search = ref('');
@@ -336,7 +338,7 @@
                     return;
                 }
 
-                window.location.href = result.url;
+                router.push({ path: result.url });
             });
 
             const onSubmit = () => {
@@ -345,12 +347,12 @@
                 }
 
                 if (results.value?.list.length === 1) {
-                    window.location.href = results.value.list[0].url;
+                    router.push({ path: results.value.list[0].url });
 
                     return;
                 }
 
-                window.location.href = searchUrl.value;
+                router.push({ path: searchUrl.value });
             };
 
             const onSearchDebounce = debounce(async () => {

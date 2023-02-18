@@ -86,6 +86,7 @@
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from 'vue-toastification';
+    import { useRouter } from 'vue-router';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import { useUserStore } from '@/store/UI/UserStore';
@@ -114,6 +115,7 @@
         },
         emits: ['close', 'switch:auth'],
         setup(props, { emit }) {
+            const router = useRouter();
             const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
@@ -181,7 +183,7 @@
                                     return;
                                 }
 
-                                window.location.replace('/');
+                                router.replace({ name: 'index' });
                             }
                         });
 
