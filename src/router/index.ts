@@ -270,13 +270,11 @@ const routes: Readonly<RouteRecordRaw[]> = [
 
                     return;
                 }
+
+                next();
             } catch (err) {
                 errorHandler(err, next);
-
-                return;
             }
-
-            next();
         }
     },
     {
@@ -298,8 +296,6 @@ const routes: Readonly<RouteRecordRaw[]> = [
                 next();
             } catch (err) {
                 errorHandler(err, next);
-
-                next({ name: 'internal-server' });
             }
         }
     },
