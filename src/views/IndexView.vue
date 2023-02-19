@@ -52,7 +52,6 @@
 
                                         <a
                                             href="/info/telegram_bot"
-                                            target="_blank"
                                             rel="noopener noreferrer"
                                         >Описание</a>
                                     </div>
@@ -79,7 +78,6 @@
 
                                         <a
                                             href="/info/discord_bot"
-                                            target="_blank"
                                             rel="noopener noreferrer"
                                         >Описание</a>
                                     </div>
