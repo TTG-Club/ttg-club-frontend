@@ -51,7 +51,7 @@
                                         >Подключить</a>
 
                                         <a
-                                            href="https://vk.com/@ttg.club-telegram-spell-bot"
+                                            href="/info/telegram_bot"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >Описание</a>
@@ -78,7 +78,7 @@
                                         <!-- eslint-enable vue/max-len -->
 
                                         <a
-                                            href="https://vk.com/@ttg.club-kak-ispolzovat-discord-bot"
+                                            href="/info/discord_bot"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >Описание</a>
