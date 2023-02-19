@@ -235,7 +235,24 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'profile',
         path: '/profile/:username',
         alias: '/profile',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue')
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue'),
+        beforeEnter: async (to, from, next) => {
+            const userStore = useUserStore();
+
+            try {
+                if (!(await userStore.getUserStatus())) {
+                    next({ name: 'index' });
+
+                    return;
+                }
+            } catch (err) {
+                next({ name: 'index' });
+
+                return;
+            }
+
+            next();
+        }
     },
     {
         name: 'info-page',
@@ -248,14 +265,14 @@ const routes: Readonly<RouteRecordRaw[]> = [
                 const resp = await http.post({ url: to.path });
 
                 if (resp.status !== 200) {
-                    await next({ name: 'index' });
+                    next({ name: 'index' });
 
                     return;
                 }
 
-                await next();
+                next();
             } catch (err) {
-                await next({ name: 'index' });
+                next({ name: 'index' });
             }
         }
     }
@@ -267,19 +284,10 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
     const navStore = useNavStore();
-    const userStore = useUserStore();
 
     navStore.isShowMenu = false;
-
-    try {
-        if (to.name === 'profile' && !(await userStore.getUserStatus())) {
-            next({ name: 'index' });
-        }
-    } catch (err) {
-        next({ name: 'index' });
-    }
 
     if (from.path !== to.path) {
         navStore.updateMetaByURL(to.path).then();
