@@ -73,16 +73,7 @@
                     </div>
 
                     <div
-                        v-else-if="search.length < 3 && !results?.list.length"
-                        class="search-modal__text"
-                        @mouseenter.self="selectedIndex = null"
-                        @focusin.self="selectedIndex = null"
-                    >
-                        Минимум 3 символа для поиска
-                    </div>
-
-                    <div
-                        v-else-if="search.length >= 3 && !results?.list.length && inProgress"
+                        v-else-if="search.length && !results?.list.length && inProgress"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
                         @focusin.self="selectedIndex = null"
@@ -110,7 +101,7 @@
                     />
 
                     <router-link
-                        :to="{ path: searchUrl }"
+                        :to="searchUrl"
                         class="search-modal__all"
                         @mouseenter.self="selectedIndex = null"
                         @focusin.self="selectedIndex = null"
@@ -173,14 +164,20 @@
             const selectedIndex = ref<number | null>(null);
             const activeElement = useActiveElement();
 
-            const searchUrl = computed(() => `/search?search=${ search.value }`);
+            const searchUrl = computed(() => ({
+                path: '/search',
+                query: {
+                    search: search.value,
+                    page: 1
+                }
+            }));
 
             const onSearch = async () => {
                 if (controller.value !== null) {
                     controller.value.abort();
                 }
 
-                if (search.value.length < 3) {
+                if (!search.value) {
                     return Promise.resolve();
                 }
 
@@ -352,7 +349,7 @@
                     return;
                 }
 
-                router.push({ path: searchUrl.value });
+                router.push(searchUrl.value);
             };
 
             const onSearchDebounce = debounce(async () => {
