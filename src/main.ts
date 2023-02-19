@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import VueTippy from 'vue-tippy';
-import VueLazyLoad from 'vue3-lazyload';
+import VueLazyLoad from 'vue-lazyload';
 import Toast from 'vue-toastification';
 import { vfmPlugin } from 'vue-final-modal';
 import isDev from '@/common/helpers/isDev';
@@ -29,9 +29,7 @@ pinia.use(({ store }) => {
 app.use(pinia)
     .use(router)
     .use(VueTippy, TippyOptions)
-    .use(VueLazyLoad, {
-        observer: true
-    })
+    .use(VueLazyLoad)
     .use(Toast, {
         ...ToastOptions,
         eventBus: ToastEventBus

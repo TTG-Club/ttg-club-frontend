@@ -126,7 +126,7 @@
 
 <script lang="ts">
     import {
-        computed, defineComponent, onMounted, ref
+        computed, defineComponent, onMounted, ref, watch
     } from 'vue';
     import debounce from 'lodash/debounce';
     import {
@@ -361,6 +361,13 @@
 
                 onSearchDebounce();
             };
+
+            watch(isShowModal, value => {
+                if (!value) {
+                    search.value = '';
+                    results.value = null;
+                }
+            });
 
             return {
                 isShowModal,
