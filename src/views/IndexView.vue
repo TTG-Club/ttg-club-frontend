@@ -51,7 +51,7 @@
                                         >Подключить</a>
 
                                         <a
-                                            href="/info/telegram_bot"
+                                            href="/info/telegram_spells_bot"
                                             rel="noopener noreferrer"
                                         >Описание</a>
                                     </div>

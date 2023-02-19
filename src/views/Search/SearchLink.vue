@@ -9,6 +9,7 @@
         <div class="search-link__body">
             <div class="search-link__label">
                 {{ searchLink.name }}
+                <span class="search-link__label--eng">[{{ searchLink.englishName }}]</span>
             </div>
 
             <div class="search-link__section">
@@ -129,6 +130,12 @@
 
             @include media-min($xl) {
                 white-space: initial;
+            }
+        }
+
+        &__label {
+            &--eng {
+                color: var(--text-g-color);
             }
         }
 
