@@ -275,6 +275,37 @@ const routes: Readonly<RouteRecordRaw[]> = [
                 next({ name: 'index' });
             }
         }
+    },
+    {
+        name: 'unknown-error',
+        path: '/error',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnknownView.vue')
+    },
+    {
+        name: 'not-found',
+        path: '/404',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/NotFoundView.vue')
+    },
+    {
+        name: 'unauthorized',
+        path: '/401',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnauthorizedView.vue')
+    },
+    {
+        name: 'forbidden',
+        path: '/403',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/ForbiddenView.vue')
+    },
+    {
+        name: 'internal-server',
+        path: '/500',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/InternalServerView.vue')
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: {
+            path: '/404'
+        }
     }
 ];
 /* eslint-enable max-len,vue/max-len */
