@@ -33,11 +33,11 @@ export default class HTTPService {
             return req;
         });
 
-        this.instance.interceptors.response.use(resp => {
+        this.instance.interceptors.response.use(async resp => {
             if (resp.status === 401) {
                 const userStore = useUserStore();
 
-                userStore.clearUser();
+                await userStore.clearUser();
             }
 
             return resp;

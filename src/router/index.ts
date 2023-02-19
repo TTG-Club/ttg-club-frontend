@@ -1,8 +1,33 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type { NavigationGuardNext, RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
+import { AxiosError } from 'axios';
 import { useNavStore } from '@/store/UI/NavStore';
 import { useUserStore } from '@/store/UI/UserStore';
 import { useAxios } from '@/common/composition/useAxios';
+
+const errorHandler = (err: any, next: NavigationGuardNext) => {
+    if (err instanceof AxiosError) {
+        switch (err.response?.status) {
+            case 401:
+                next({ name: 'unauthorized' });
+
+                return;
+
+            case 403:
+                next({ name: 'forbidden' });
+
+                return;
+
+            case 404:
+                next({ name: 'not-found' });
+
+                return;
+
+            default:
+                next({ name: 'internal-server' });
+        }
+    }
+};
 
 /* eslint-disable max-len,vue/max-len */
 const routes: Readonly<RouteRecordRaw[]> = [
@@ -241,12 +266,12 @@ const routes: Readonly<RouteRecordRaw[]> = [
 
             try {
                 if (!(await userStore.getUserStatus())) {
-                    next({ name: 'index' });
+                    next({ name: 'unauthorized' });
 
                     return;
                 }
             } catch (err) {
-                next({ name: 'index' });
+                errorHandler(err, next);
 
                 return;
             }
@@ -265,46 +290,55 @@ const routes: Readonly<RouteRecordRaw[]> = [
                 const resp = await http.post({ url: to.path });
 
                 if (resp.status !== 200) {
-                    next({ name: 'index' });
+                    next({ name: 'not-found' });
 
                     return;
                 }
 
                 next();
             } catch (err) {
-                next({ name: 'index' });
+                errorHandler(err, next);
+
+                next({ name: 'internal-server' });
             }
         }
     },
     {
         name: 'unknown-error',
         path: '/error',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnknownView.vue')
-    },
-    {
-        name: 'not-found',
-        path: '/404',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/NotFoundView.vue')
-    },
-    {
-        name: 'unauthorized',
-        path: '/401',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnauthorizedView.vue')
-    },
-    {
-        name: 'forbidden',
-        path: '/403',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/ForbiddenView.vue')
-    },
-    {
-        name: 'internal-server',
-        path: '/500',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/InternalServerView.vue')
+        children: [
+            {
+                name: 'unknown-error',
+                path: '',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnknownView.vue')
+            },
+            {
+                name: 'not-found',
+                path: '/404',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/NotFoundView.vue')
+            },
+            {
+                name: 'unauthorized',
+                path: '/401',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnauthorizedView.vue')
+            },
+            {
+                name: 'forbidden',
+                path: '/403',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/ForbiddenView.vue')
+            },
+            {
+                name: 'internal-server',
+                path: '/500',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/InternalServerView.vue')
+            }
+        ]
     },
     {
         path: '/:pathMatch(.*)*',
         redirect: {
-            path: '/404'
+            name: 'not-found',
+            params: {}
         }
     }
 ];
@@ -315,7 +349,7 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
     const navStore = useNavStore();
 
     navStore.isShowMenu = false;
@@ -323,8 +357,6 @@ router.beforeEach((to, from, next) => {
     if (from.path !== to.path) {
         navStore.updateMetaByURL(to.path).then();
     }
-
-    next();
 });
 
 export default router;
