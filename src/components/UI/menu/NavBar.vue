@@ -117,32 +117,27 @@
                 display: flex;
                 justify-content: center;
                 border-radius: 8px;
+                margin: 8px 0 8px 0;
 
                 &.is-discord {
-                    background-color: transparent;
-                    color: var(--color-text);
+                    color: var(--text-btn-color);
 
                     &:hover {
-                        background-color: var(--discord-base);
-                        color: var(--text-btn-color);
+                        background-color: var(--discord-hover);
                     }
                 }
                 &.is-boosty {
-                    background-color: transparent;
-                    color: var(--color-text);
+                    color: var(--text-btn-color);
 
                     &:hover {
-                        background-color: var(--boosty-base);
-                        color: var(--text-btn-color);
+                        background-color: var(--boosty-hover);
                     }
                 }
                 &.is-vk {
-                    background-color: transparent;
-                    color: var(--color-text);
+                    color: var(--text-btn-color);
 
                     &:hover {
-                        background-color: var(--vk-base);
-                        color: var(--text-btn-color);
+                        background-color: var(--vk-hover);
                     }
                 }
             }
