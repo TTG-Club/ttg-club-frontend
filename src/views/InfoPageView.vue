@@ -8,7 +8,7 @@
             v-if="infoPage?.subtitle"
             #subtitle
         >
-            Описание не обязательно
+            {{ infoPage?.subtitle || '' }}
         </template>
 
         <template #default>
