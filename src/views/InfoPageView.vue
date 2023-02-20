@@ -28,9 +28,9 @@
     import { defineComponent, ref } from 'vue';
     import { tryOnBeforeMount } from '@vueuse/core';
     import { useRoute, useRouter } from 'vue-router';
+    import { AxiosError } from 'axios';
     import { useAxios } from '@/common/composition/useAxios';
     import PageLayout from '@/components/content/PageLayout.vue';
-    import errorHandler from '@/common/helpers/errorHandler';
     import RawContent from '@/components/content/RawContent.vue';
 
     export default defineComponent({
@@ -45,12 +45,36 @@
             const infoPage = ref();
             const error = ref(false);
 
-            tryOnBeforeMount(async () => {
+            const errorHandler = (err: any) => {
+                if (err instanceof AxiosError) {
+                    switch (err.response?.status) {
+                        case 401:
+                            router.replace({ name: 'unauthorized' });
+
+                            return;
+
+                        case 403:
+                            router.replace({ name: 'forbidden' });
+
+                            return;
+
+                        case 404:
+                            router.replace({ name: 'not-found' });
+
+                            return;
+
+                        default:
+                            router.replace({ name: 'internal-server' });
+                    }
+                }
+            };
+
+            const queryInfoPage = async () => {
                 try {
                     const resp = await http.get({ url: route.path });
 
                     if (resp.status !== 200) {
-                        await router.push({ name: 'index' });
+                        await router.replace({ name: 'not-found' });
 
                         return;
                     }
@@ -61,6 +85,10 @@
 
                     errorHandler(err);
                 }
+            };
+
+            tryOnBeforeMount(async () => {
+                await queryInfoPage();
             });
 
             return {
