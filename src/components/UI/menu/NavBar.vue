@@ -118,6 +118,7 @@
                 justify-content: center;
                 border-radius: 8px;
                 margin: 8px 0 8px 0;
+                opacity: 70%;
 
                 &.is-discord {
                     color: var(--text-btn-color);
@@ -139,6 +140,10 @@
                     &:hover {
                         background-color: var(--vk-hover);
                     }
+                }
+
+                &:hover {
+                    opacity: 100%;
                 }
             }
         }
