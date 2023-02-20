@@ -204,6 +204,7 @@
 <style lang="scss">
     .vel-modal {
         @include css_anim($item: background-color);
+        z-index: 10000;
 
         &.is-bg-hide {
             background-color: var(--bg-main) !important;
