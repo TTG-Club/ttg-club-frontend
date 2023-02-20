@@ -1,4 +1,6 @@
-import type { NavigationGuardNext, RouteRecordRaw } from 'vue-router';
+import type {
+    NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw
+} from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 import { AxiosError } from 'axios';
 import { useNavStore } from '@/store/UI/NavStore';
@@ -280,24 +282,7 @@ const routes: Readonly<RouteRecordRaw[]> = [
     {
         name: 'info-page',
         path: '/info/:path',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'InfoPage' */ '@/views/InfoPageView.vue'),
-        beforeEnter: async (to, from, next) => {
-            const http = useAxios();
-
-            try {
-                const resp = await http.post({ url: to.path });
-
-                if (resp.status !== 200) {
-                    next({ name: 'not-found' });
-
-                    return;
-                }
-
-                next();
-            } catch (err) {
-                errorHandler(err, next);
-            }
-        }
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'InfoPage' */ '@/views/InfoPageView.vue')
     },
     {
         name: 'unknown-error',
@@ -345,14 +330,76 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from) => {
+const getUrlStatus = async (to: RouteLocationNormalized) => {
+    const axios = useAxios();
+
+    try {
+        const resp = await axios.headRaw({ url: to.fullPath });
+
+        return Promise.resolve(resp.status);
+    } catch (err) {
+        if (err instanceof AxiosError) {
+            return Promise.resolve(err.response?.status);
+        }
+
+        return Promise.resolve(500);
+    }
+};
+
+const checkAllowStatus = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
+    const availRoutes = routes
+        .map(route => route.name)
+        .filter(route => !!route);
+
+    if (!!to.name && availRoutes.includes(to.name)) {
+        return true;
+    }
+
+    const status = await getUrlStatus(to);
+
+    switch (status) {
+        case 200:
+            return true;
+
+        case 401:
+            next({ name: 'unauthorized' });
+
+            return false;
+
+        case 403:
+            next({ name: 'forbidden' });
+
+            return false;
+
+        case 404:
+            next({ name: 'not-found' });
+
+            return false;
+
+        default:
+            next({ name: 'internal-server' });
+
+            return false;
+    }
+};
+
+router.beforeEach(async (to, from, next) => {
     const navStore = useNavStore();
 
     navStore.isShowMenu = false;
 
-    if (from.path !== to.path) {
-        navStore.updateMetaByURL(to.path).then();
+    const isExist = await checkAllowStatus(to, next);
+
+    if (!isExist) {
+        return;
     }
+
+    if (from.path !== to.path) {
+        navStore.updateMetaByURL(to.path)
+            .then();
+    }
+
+    next();
 });
 
 export default router;

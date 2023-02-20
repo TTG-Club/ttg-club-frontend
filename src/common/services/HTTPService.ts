@@ -94,6 +94,14 @@ export default class HTTPService {
         });
     }
 
+    headRaw(config: Omit<RequestConfig, 'payload'>) {
+        return this.instanceRaw({
+            method: 'head',
+            url: config.url,
+            signal: config.signal
+        });
+    }
+
     rawGet(config: RequestConfig) {
         return this.instanceRaw({
             method: 'get',

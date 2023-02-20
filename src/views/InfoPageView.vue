@@ -27,7 +27,10 @@
 <script lang="ts">
     import { defineComponent, ref } from 'vue';
     import { tryOnBeforeMount } from '@vueuse/core';
-    import { useRoute, useRouter } from 'vue-router';
+    import type { RouteLocationNormalized } from 'vue-router';
+    import {
+        onBeforeRouteUpdate, useRoute, useRouter
+    } from 'vue-router';
     import { AxiosError } from 'axios';
     import { useAxios } from '@/common/composition/useAxios';
     import PageLayout from '@/components/content/PageLayout.vue';
@@ -69,9 +72,9 @@
                 }
             };
 
-            const queryInfoPage = async () => {
+            const queryInfoPage = async (to: RouteLocationNormalized) => {
                 try {
-                    const resp = await http.get({ url: route.path });
+                    const resp = await http.get({ url: to.path });
 
                     if (resp.status !== 200) {
                         await router.replace({ name: 'not-found' });
@@ -87,8 +90,12 @@
                 }
             };
 
+            onBeforeRouteUpdate(async to => {
+                await queryInfoPage(to);
+            });
+
             tryOnBeforeMount(async () => {
-                await queryInfoPage();
+                await queryInfoPage(route);
             });
 
             return {
