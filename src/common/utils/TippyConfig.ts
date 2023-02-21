@@ -12,6 +12,9 @@ export const DefaultTippyProps: DefaultProps = {
     theme: 'dnd5club',
     strategy: 'fixed',
     maxWidth: 450,
+    inlinePositioning: true,
+    arrow: false,
+    offset: [0, 6],
 
     // @ts-ignore
     delay: [450, null],
