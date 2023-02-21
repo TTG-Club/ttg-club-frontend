@@ -101,6 +101,28 @@
                                 </router-link>
                             </div>
                         </div>
+
+                        <div class="block__youtube">
+                            <h3>D&D 5e новости:</h3>
+
+                            <!-- Менять надо только последние символы после / EVGfn931MzQ -->
+                            <iframe
+                                title="D&D 5e новости"
+                                width="100%"
+                                height="200"
+                                src="https://www.youtube.com/embed/EVGfn931MzQ"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                            />
+
+                            <a
+                                href="https://www.youtube.com/@online.shirma"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn"
+                            >Все видео</a>
+                        </div>
                     </div>
                 </div>
 
