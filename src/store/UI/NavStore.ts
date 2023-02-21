@@ -19,6 +19,7 @@ export const useNavStore = defineStore('NavStore', () => {
     const navItems = ref<Array<TNavItem>>([]);
     const metaInfo = ref(undefined);
     const isShowPopover = ref(false);
+    const isShowSearch = ref(false);
 
     const showedNavItems = computed(() => (
         orderBy(
@@ -126,6 +127,7 @@ export const useNavStore = defineStore('NavStore', () => {
 
     return {
         isShowPopover,
+        isShowSearch,
         navItems,
         showedNavItems,
         metaInfo,

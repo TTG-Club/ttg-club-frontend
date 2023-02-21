@@ -403,6 +403,7 @@ router.beforeEach(async (to, from, next) => {
     const navStore = useNavStore();
 
     navStore.isShowPopover = false;
+    navStore.isShowSearch = false;
 
     const isExist = await checkAllowStatus(to, next);
 

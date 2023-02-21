@@ -1,8 +1,8 @@
 <template>
-    <a
+    <router-link
         v-if="searchLink"
         ref="link"
-        :href="searchLink.url"
+        :to="{ path: searchLink.url }"
         class="search-link"
         :class="classes"
     >
@@ -30,7 +30,7 @@
                 {{ searchLink.description }}
             </div>
         </div>
-    </a>
+    </router-link>
 </template>
 
 <script lang="ts">
