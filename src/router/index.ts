@@ -347,16 +347,16 @@ const getUrlStatus = async (to: RouteLocationNormalized) => {
 };
 
 const checkAllowStatus = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
-    const getIterated = (children: RouteRecordRaw[]): Array<symbol | string> => {
+    const getAvailRoute = (route: RouteRecordRaw): Array<string | symbol> => {
         const list = [];
 
-        for (const child of children) {
-            if (child.name && !child.path.includes(':')) {
-                list.push(child.name);
-            }
+        if (route.name && !route.path.includes(':')) {
+            list.push(route.name);
+        }
 
-            if (child.children instanceof Array && child.children.length) {
-                list.push(...getIterated(child.children));
+        if (route.children instanceof Array) {
+            for (const child of route.children) {
+                list.push(...getAvailRoute(child));
             }
         }
 
@@ -364,19 +364,7 @@ const checkAllowStatus = async (to: RouteLocationNormalized, next: NavigationGua
     };
 
     const availRoutes = routes
-        .flatMap(route => {
-            const list = [];
-
-            if (route.name && !route.path.includes(':')) {
-                list.push(route.name);
-            }
-
-            if (route.children instanceof Array) {
-                list.push(...getIterated(route.children));
-            }
-
-            return list;
-        })
+        .flatMap(route => getAvailRoute(route))
         .filter(route => !!route);
 
     if (!!to.name && availRoutes.includes(to.name)) {
