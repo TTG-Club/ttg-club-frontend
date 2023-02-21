@@ -23,7 +23,7 @@
                 v-for="(roll, index) in modelValue"
                 :key="index"
                 :model-value="roll"
-                :options="options"
+                :options="getOptions(roll)"
                 class="ability-point-buy__select"
                 label="value"
                 track-by="key"
@@ -170,7 +170,15 @@
                     return partialSum + costItem.value;
                 }, 0));
 
-            const options = computed(() => cost.filter(item => (sum.value + item.value <= 27)));
+            const getOptions = (roll: AbilityRoll) => {
+                const rollValue = cost.find(costItem => costItem.key === roll.value);
+
+                if (!rollValue) {
+                    return 'wtf?!';
+                }
+
+                return cost.filter(item => ((sum.value + item.value - rollValue.value) <= 27));
+            };
 
             const getLabel = (roll: typeof rolls.value[number], option: typeof cost[number]) => {
                 let result = `${ option.key }`;
@@ -213,7 +221,7 @@
                         name: AbilityName[key as AbilityKey]
                     }))),
                 sum,
-                options,
+                getOptions,
                 getLabel,
                 onReset
             };
