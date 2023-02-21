@@ -402,7 +402,7 @@ const checkAllowStatus = async (to: RouteLocationNormalized, next: NavigationGua
 router.beforeEach(async (to, from, next) => {
     const navStore = useNavStore();
 
-    navStore.isShowMenu = false;
+    navStore.isShowPopover = false;
 
     const isExist = await checkAllowStatus(to, next);
 

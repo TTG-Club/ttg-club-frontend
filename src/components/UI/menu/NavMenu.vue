@@ -127,7 +127,6 @@
         },
         setup() {
             const navStore = useNavStore();
-            const { isShowMenu } = storeToRefs(navStore);
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
@@ -136,6 +135,7 @@
             const { showedNavItems } = storeToRefs(navStore);
             const router = useRouter();
             const route = useRoute();
+            const isShowMenu = ref(false);
 
             tryOnBeforeMount(async () => {
                 await navStore.initNavItems();

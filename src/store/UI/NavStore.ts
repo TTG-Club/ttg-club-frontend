@@ -18,7 +18,7 @@ export const useNavStore = defineStore('NavStore', () => {
     const http = useAxios();
     const navItems = ref<Array<TNavItem>>([]);
     const metaInfo = ref(undefined);
-    const isShowMenu = ref(false);
+    const isShowPopover = ref(false);
 
     const showedNavItems = computed(() => (
         orderBy(
@@ -125,7 +125,7 @@ export const useNavStore = defineStore('NavStore', () => {
     };
 
     return {
-        isShowMenu,
+        isShowPopover,
         navItems,
         showedNavItems,
         metaInfo,
