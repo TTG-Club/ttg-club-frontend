@@ -10,18 +10,7 @@
         />
 
         <div class="content-padding">
-            <div class="avatar">
-                <div class="image-container">
-                    <a id="creature_href">
-                        <img
-                            id="creature_img"
-                            v-lazy="!creature.images?.length ? '/img/dark/no-img-best.png' : creature.images[0]"
-                            alt="Title best"
-                            @click.left.exact.prevent="showGallery"
-                        >
-                    </a>
-                </div>
-            </div>
+            <ui-easy-lightbox :images="creature.images" />
 
             <div class="beast_info">
                 <p>
@@ -428,51 +417,21 @@
             </details>
         </div>
     </div>
-
-    <vue-easy-lightbox
-        v-if="creature.images?.length"
-        :imgs="creature.images"
-        :index="gallery.index"
-        :visible="gallery.show"
-        loop
-        move-disabled
-        scroll-disabled
-        teleport="body"
-        @hide="gallery.show = false"
-    >
-        <template #toolbar>
-            <div class="vel-toolbar">
-                <button
-                    aria-label="hide-bg button"
-                    class="toolbar-btn"
-                    type="button"
-                    @click.left.exact.prevent="setGalleryBgMode(!gallery.hideBg)"
-                >
-                    <svg-icon
-                        :icon-name="gallery.hideBg ? 'light-theme' : 'dark-theme'"
-                        :stroke-enable="false"
-                        class="vel-icon icon"
-                        fill-enable
-                    />
-                </button>
-            </div>
-        </template>
-    </vue-easy-lightbox>
 </template>
 
 <script>
     import RawContent from '@/components/content/RawContent.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
-    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import DiceRoller from '@/components/UI/DiceRoller.vue';
     import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
+    import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
 
     export default {
         name: 'CreatureBody',
         components: {
+            UiEasyLightbox,
             DetailTopBar,
             RawContent,
-            SvgIcon,
             DiceRoller
         },
         props: {
@@ -497,13 +456,6 @@
                 getAbilityFormula
             };
         },
-        data: () => ({
-            gallery: {
-                index: null,
-                show: false,
-                hideBg: false
-            }
-        }),
         computed: {
             topBarLeftString() {
                 // eslint-disable-next-line max-len
@@ -623,30 +575,6 @@
             }
         },
         methods: {
-            showGallery() {
-                if (!this.creature.images?.length) {
-                    return;
-                }
-
-                this.gallery.show = true;
-                this.gallery.index = 0;
-            },
-
-            setGalleryBgMode(isActive) {
-                const modal = document.body.querySelector('.vel-modal');
-                const className = 'is-bg-hide';
-
-                this.gallery.hideBg = isActive;
-
-                if (isActive) {
-                    modal.classList.add(className);
-
-                    return;
-                }
-
-                modal.classList.remove(className);
-            },
-
             getIterableStr(strings) {
                 let str = '';
 
@@ -663,7 +591,6 @@
 
                 return str;
             }
-
         }
     };
 </script>

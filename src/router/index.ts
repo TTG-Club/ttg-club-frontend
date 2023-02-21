@@ -1,9 +1,43 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type {
+    NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw
+} from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
+import { AxiosError } from 'axios';
 import { useNavStore } from '@/store/UI/NavStore';
+import { useUserStore } from '@/store/UI/UserStore';
+import { useAxios } from '@/common/composition/useAxios';
+
+const errorHandler = (err: any, next: NavigationGuardNext) => {
+    if (err instanceof AxiosError) {
+        switch (err.response?.status) {
+            case 401:
+                next({ name: 'unauthorized' });
+
+                return;
+
+            case 403:
+                next({ name: 'forbidden' });
+
+                return;
+
+            case 404:
+                next({ name: 'not-found' });
+
+                return;
+
+            default:
+                next({ name: 'internal-server' });
+        }
+    }
+};
 
 /* eslint-disable max-len,vue/max-len */
 const routes: Readonly<RouteRecordRaw[]> = [
+    {
+        name: 'index',
+        path: '/',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Main' */ '@/views/IndexView.vue')
+    },
     {
         name: 'classes',
         path: '/classes',
@@ -223,6 +257,70 @@ const routes: Readonly<RouteRecordRaw[]> = [
         name: 'search-page',
         path: '/search',
         component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Search' */ '@/views/Search/SearchView.vue')
+    },
+    {
+        name: 'profile',
+        path: '/profile/:username',
+        alias: '/profile',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/Profile/ProfileView.vue'),
+        beforeEnter: async (to, from, next) => {
+            const userStore = useUserStore();
+
+            try {
+                if (!(await userStore.getUserStatus())) {
+                    next({ name: 'unauthorized' });
+
+                    return;
+                }
+
+                next();
+            } catch (err) {
+                errorHandler(err, next);
+            }
+        }
+    },
+    {
+        name: 'info-page',
+        path: '/info/:path',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'InfoPage' */ '@/views/InfoPageView.vue')
+    },
+    {
+        name: 'unknown-error',
+        path: '/error',
+        children: [
+            {
+                name: 'unknown-error',
+                path: '',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnknownView.vue')
+            },
+            {
+                name: 'not-found',
+                path: '/404',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/NotFoundView.vue')
+            },
+            {
+                name: 'unauthorized',
+                path: '/401',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/UnauthorizedView.vue')
+            },
+            {
+                name: 'forbidden',
+                path: '/403',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/ForbiddenView.vue')
+            },
+            {
+                name: 'internal-server',
+                path: '/500',
+                component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'ErrorPages' */ '@/views/Errors/InternalServerView.vue')
+            }
+        ]
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: {
+            name: 'not-found',
+            params: {}
+        }
     }
 ];
 /* eslint-enable max-len,vue/max-len */
@@ -232,12 +330,93 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach(async (to, from) => {
-    if (from.path !== to.path) {
-        const navStore = useNavStore();
+const getUrlStatus = async (to: RouteLocationNormalized) => {
+    const axios = useAxios();
 
-        await navStore.updateMetaByURL(to.path);
+    try {
+        const resp = await axios.headRaw({ url: to.fullPath });
+
+        return Promise.resolve(resp.status);
+    } catch (err) {
+        if (err instanceof AxiosError) {
+            return Promise.resolve(err.response?.status);
+        }
+
+        return Promise.resolve(500);
     }
+};
+
+const checkAllowStatus = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
+    const getAvailRoute = (route: RouteRecordRaw): Array<string | symbol> => {
+        const list = [];
+
+        if (route.name && !route.path.includes(':')) {
+            list.push(route.name);
+        }
+
+        if (route.children instanceof Array) {
+            for (const child of route.children) {
+                list.push(...getAvailRoute(child));
+            }
+        }
+
+        return list;
+    };
+
+    const availRoutes = routes
+        .flatMap(route => getAvailRoute(route))
+        .filter(route => !!route);
+
+    if (!!to.name && availRoutes.includes(to.name)) {
+        return true;
+    }
+
+    const status = await getUrlStatus(to);
+
+    switch (status) {
+        case 200:
+            return true;
+
+        case 401:
+            next({ name: 'unauthorized' });
+
+            return false;
+
+        case 403:
+            next({ name: 'forbidden' });
+
+            return false;
+
+        case 404:
+            next({ name: 'not-found' });
+
+            return false;
+
+        default:
+            next({ name: 'internal-server' });
+
+            return false;
+    }
+};
+
+router.beforeEach(async (to, from, next) => {
+    const navStore = useNavStore();
+
+    navStore.isShowPopover = false;
+    navStore.isShowSearch = false;
+
+    const isExist = await checkAllowStatus(to, next);
+
+    if (!isExist) {
+        return;
+    }
+
+    if (from.path !== to.path) {
+        navStore.updateMetaByURL(to.path)
+            .then();
+    }
+
+    next();
 });
 
 export default router;

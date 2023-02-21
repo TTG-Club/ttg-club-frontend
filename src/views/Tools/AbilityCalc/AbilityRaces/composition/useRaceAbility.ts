@@ -63,6 +63,13 @@ export function useRaceAbility(config: TConfig) {
     const secondValue = ref<AbilityRoll | null>(null);
 
     const isSecondDisabled = computed(() => {
+        if (
+            checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.CHOICE))
+            && checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.ONE))
+        ) {
+            return false;
+        }
+
         if (isChoiceDouble.value) {
             return !selectedChoiceDouble.value;
         }
@@ -75,6 +82,16 @@ export function useRaceAbility(config: TConfig) {
     const secondLabel = computed(() => {
         if (isChoiceDouble.value && !!selectedChoiceDouble.value) {
             return 1;
+        }
+
+        if (
+            checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.CHOICE))
+            && checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.ONE))
+        ) {
+            const ability = checkInstance.value?.abilities
+                .find(item => (item.key as AbilityTypeKey === AbilityTypeKey.CHOICE));
+
+            return ability?.value || null;
         }
 
         const ability = checkInstance.value?.abilities

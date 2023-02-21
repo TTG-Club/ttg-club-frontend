@@ -18,6 +18,7 @@
       background-color: var(--bg-main);
       border: 1px solid var(--border);
       border-radius: 8px;
+      box-shadow: var(--box-shadow);
 
       & > .tippy-backdrop {
         background-color: var(--bg-main);
@@ -58,6 +59,29 @@
       }
     }
   }
+
+  .scores {
+    &__stats {
+      max-width: calc(33% - 8px);
+      flex: 1 0 calc(33% - 8px);
+    }
+  }
+
+  .ui-easy-lightbox {
+    width: 140px;
+  }
+
+  .row_info {
+    margin: 0;
+  }
+
+  .content-padding {
+    padding: 16px 0;
+  }
+
+  .grid_stat_block {
+    margin: 16px 0 0 0;
+  }
 }
 
 .ps {
@@ -89,29 +113,6 @@
           }
         }
       }
-    }
-  }
-}
-
-.vel-modal {
-  @include css_anim($item: background-color);
-
-  &.is-bg-hide {
-    background-color: var(--bg-main) !important;
-  }
-
-  .vel-img-wrapper {
-    .vel-img {
-      background-color: transparent;
-      box-shadow: none;
-    }
-  }
-
-  .vel-toolbar {
-    .vel-icon {
-      width: 1.5em;
-      height: 1.5em;
-      vertical-align: -0.15em;
     }
   }
 }

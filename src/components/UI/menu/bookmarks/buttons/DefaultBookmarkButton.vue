@@ -21,6 +21,7 @@
         computed, defineComponent, ref
     } from 'vue';
     import { useToast } from 'vue-toastification';
+    import { storeToRefs } from 'pinia';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
@@ -45,6 +46,7 @@
             const route = useRoute();
             const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
+            const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgress = ref(false);
@@ -56,7 +58,7 @@
             ));
 
             const isSaved = computed(() => {
-                if (userStore.isAuthenticated) {
+                if (isAuthenticated.value) {
                     return customBookmarkStore.isBookmarkSavedInDefault(bookmarkUrl.value);
                 }
 
@@ -71,7 +73,7 @@
                 try {
                     inProgress.value = true;
 
-                    if (userStore.isAuthenticated) {
+                    if (isAuthenticated.value) {
                         const defaultGroup = await customBookmarkStore.getDefaultGroup();
 
                         await customBookmarkStore.updateBookmarkInGroup({

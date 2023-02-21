@@ -246,7 +246,7 @@
             height: 122px;
 
             @include media-min($sm) {
-                height: 210px;
+                height: 160px;
             }
         }
 

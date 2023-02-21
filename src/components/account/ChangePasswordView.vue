@@ -84,7 +84,9 @@
     import {
         computed, defineComponent, reactive, ref
     } from 'vue';
+    import { storeToRefs } from 'pinia';
     import { useToast } from 'vue-toastification';
+    import { useRouter } from 'vue-router';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import { useUserStore } from '@/store/UI/UserStore';
@@ -113,8 +115,10 @@
         },
         emits: ['close', 'switch:auth'],
         setup(props, { emit }) {
+            const router = useRouter();
             const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
+            const { isAuthenticated } = storeToRefs(userStore);
             const success = ref(false);
             const inProgress = ref(false);
             const error = ref({});
@@ -125,7 +129,7 @@
                 repeat: ''
             });
 
-            const isOnlyPassword = computed(() => props.token || userStore.isAuthenticated);
+            const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
 
             const validations = computed(() => {
                 if (isOnlyPassword.value) {
@@ -166,7 +170,7 @@
                     try {
                         const payload = {
                             password: state.password,
-                            [userStore.isAuthenticated ? 'userToken' : 'resetToken']: userStore.isAuthenticated
+                            [isAuthenticated.value ? 'userToken' : 'resetToken']: isAuthenticated.value
                                 ? userStore.getUserToken()
                                 : props.token
                         };
@@ -179,7 +183,7 @@
                                     return;
                                 }
 
-                                window.location.replace('/');
+                                router.replace({ name: 'index' });
                             }
                         });
 
@@ -231,7 +235,7 @@
             }
 
             return {
-                isAuthenticated: computed(() => userStore.isAuthenticated),
+                isAuthenticated,
                 inProgress,
                 isOnlyPassword,
                 v$,

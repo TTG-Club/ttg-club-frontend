@@ -368,6 +368,7 @@
                 height: 100%;
                 margin: 0;
                 padding: 8px;
+                color: var(--text-color);
             }
 
             &__single,

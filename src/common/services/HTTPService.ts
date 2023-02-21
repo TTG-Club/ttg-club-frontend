@@ -33,11 +33,11 @@ export default class HTTPService {
             return req;
         });
 
-        this.instance.interceptors.response.use(resp => {
+        this.instance.interceptors.response.use(async resp => {
             if (resp.status === 401) {
                 const userStore = useUserStore();
 
-                userStore.clearUser();
+                await userStore.clearUser();
             }
 
             return resp;
@@ -90,6 +90,14 @@ export default class HTTPService {
             method: 'delete',
             url: config.url,
             data: config.payload,
+            signal: config.signal
+        });
+    }
+
+    headRaw(config: Omit<RequestConfig, 'payload'>) {
+        return this.instanceRaw({
+            method: 'head',
+            url: config.url,
             signal: config.signal
         });
     }

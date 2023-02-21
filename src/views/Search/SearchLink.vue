@@ -1,31 +1,42 @@
 <template>
-    <a
+    <router-link
         v-if="searchLink"
         ref="link"
-        :href="searchLink.url"
+        :to="{ path: searchLink.url }"
         class="search-link"
-        :class="{ 'is-selected': selected, 'is-hover-disabled': disableHover }"
+        :class="classes"
     >
-        <div class="search-link__label">
-            {{ searchLink.name }}
-        </div>
+        <div class="search-link__body">
+            <div class="search-link__label">
+                {{ searchLink.name }}
+                <span class="search-link__label--eng">[{{ searchLink.englishName }}]</span>
+            </div>
 
-        <div class="search-link__section">
-            {{ searchLink.section }}
-        </div>
+            <div class="search-link__section">
+                <div
+                    v-if="searchLink.source"
+                    v-tippy="{ content: searchLink.source.name }"
+                    class="search-link__source"
+                >
+                    ({{ searchLink.source.shortName }})
+                </div>
+                {{ searchLink.section }}
+            </div>
 
-        <div
-            v-if="searchLink.description && showDesc"
-            class="search-link__desc"
-        >
-            {{ searchLink.description }}
+            <div
+                v-if="searchLink.description && showDesc"
+                class="search-link__desc"
+            >
+                {{ searchLink.description }}
+            </div>
         </div>
-    </a>
+    </router-link>
 </template>
 
 <script lang="ts">
     import type { PropType } from 'vue';
     import {
+        computed,
         defineComponent, ref, watch
     } from 'vue';
     import { useFocus } from '@vueuse/core';
@@ -55,6 +66,12 @@
             const link = ref<HTMLElement | null>(null);
             const { focused } = useFocus(link);
 
+            const classes = computed(() => ({
+                'is-selected': props.selected,
+                'is-hover-disabled': props.disableHover,
+                'is-homebrew': props.searchLink.source?.homebrew
+            }));
+
             watch(
                 () => props.selected,
                 value => {
@@ -64,7 +81,8 @@
 
             return {
                 link,
-                focused
+                focused,
+                classes
             };
         }
     });
@@ -72,12 +90,20 @@
 
 <style lang="scss" scoped>
     .search-link {
-        @include css_anim();
-
         display: block;
-        padding: 10px 12px;
         color: var(--text-color-title);
         user-select: none;
+        overflow: hidden;
+
+        &.is-homebrew {
+            background: var(--bg-homebrew-gradient-left);
+        }
+
+        &__body {
+            @include css_anim();
+
+            padding: 10px 12px;
+        }
 
         &__section {
             margin-top: 4px;
@@ -85,6 +111,12 @@
             font-size: 13px;
             opacity: .4;
             color: var(--text-color);
+            display: flex;
+
+        }
+
+        &__source {
+            margin-right: 4px;
         }
 
         &__desc {
@@ -101,16 +133,30 @@
             }
         }
 
+        &__label {
+            &--eng {
+                color: var(--text-g-color);
+            }
+        }
+
         &:hover {
             &:not(.is-hover-disabled):not(.is-selected) {
-                background: var(--hover);
+                .search-link {
+                    &__body {
+                        background: var(--hover);
+                    }
+                }
             }
         }
 
         &.is-selected {
-            @include css_anim();
+            .search-link {
+                &__body {
+                    @include css_anim();
 
-            background: var(--hover);
+                    background: var(--hover);
+                }
+            }
         }
     }
 </style>

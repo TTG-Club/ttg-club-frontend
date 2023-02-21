@@ -4,7 +4,7 @@
             <div
                 :class="{ 'is-active': isActive }"
                 class="navbar__btn"
-                @click.left.exact.prevent="isShow = !isShow"
+                @click.left.exact.prevent="isShowSearch = !isShowSearch"
             >
                 <svg-icon
                     icon-name="search-new"
@@ -15,19 +15,21 @@
         </template>
     </nav-popover>
 
-    <search-modal v-model="isShow" />
+    <search-modal v-model="isShowSearch" />
 </template>
 
 <script>
     import {
-        computed, defineComponent, ref, watchEffect
+        computed, defineComponent, watchEffect
     } from 'vue';
     import {
         useActiveElement, useEventListener, useMagicKeys
     } from '@vueuse/core';
+    import { storeToRefs } from 'pinia';
     import NavPopover from '@/components/UI/menu/NavPopover.vue';
     import SearchModal from '@/components/UI/modals/SearchModal.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import { useNavStore } from '@/store/UI/NavStore';
 
     export default defineComponent({
         components: {
@@ -36,11 +38,12 @@
             NavPopover
         },
         setup() {
-            const isShow = ref(false);
+            const navStore = useNavStore();
+            const { isShowSearch } = storeToRefs(navStore);
             const activeElement = useActiveElement();
 
             const onOpenSearch = () => {
-                isShow.value = true;
+                isShowSearch.value = true;
             };
 
             const keys = useMagicKeys();
@@ -62,7 +65,7 @@
             });
 
             return {
-                isShow
+                isShowSearch
             };
         }
     });

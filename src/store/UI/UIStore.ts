@@ -4,7 +4,9 @@ import Cookies from 'js-cookie';
 import {
     computed, ref, watch
 } from 'vue';
-import { useScroll, useWindowSize } from '@vueuse/core';
+import {
+    useCssVar, useScroll, useWindowSize
+} from '@vueuse/core';
 import {
     DB_NAME, FULLSCREEN_DB_KEY, THEME_DB_KEY
 } from '@/common/const/UI';
@@ -64,6 +66,32 @@ export const useUIStore = defineStore('UIStore', () => {
         }
     };
 
+    const updateHTMLDataset = (name: string) => {
+        const html = document.querySelector('html');
+
+        if (!html) {
+            return;
+        }
+
+        html.dataset.theme = `theme-${ name }`;
+    };
+
+    const updateThemeMeta = () => {
+        let el: HTMLMetaElement | null = document.querySelector('meta[name="theme-color"]');
+
+        if (!el) {
+            el = document.createElement('meta');
+        }
+
+        el.name = 'theme-color';
+
+        const color = useCssVar('--bg-main');
+
+        el.setAttribute('content', color.value);
+
+        document.getElementsByTagName('head')[0].appendChild(el);
+    };
+
     const setTheme = ({
         name = '',
         avoidHtmlUpdate = false
@@ -81,14 +109,10 @@ export const useUIStore = defineStore('UIStore', () => {
         );
 
         if (!avoidHtmlUpdate) {
-            const html = document.querySelector('html');
-
-            if (!html) {
-                return;
-            }
-
-            html.dataset.theme = `theme-${ themeName }`;
+            updateHTMLDataset(themeName);
         }
+
+        updateThemeMeta();
     };
 
     const setFullscreenState = async (payload: boolean) => {

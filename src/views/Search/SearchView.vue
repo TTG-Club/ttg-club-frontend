@@ -73,14 +73,7 @@
                     </div>
 
                     <div
-                        v-else-if="search.length < 3 && !results?.list.length"
-                        class="search-view__results_text"
-                    >
-                        Минимум 3 символа для поиска
-                    </div>
-
-                    <div
-                        v-else-if="search.length >= 3 && inProgress && !results?.list.length"
+                        v-else-if="search.length && inProgress && !results?.list.length"
                         class="search-view__results_text"
                     >
                         Боги ищут ответ на твой запрос
@@ -276,7 +269,7 @@
             };
 
             const onSearch = async () => {
-                if (search.value.length < 3) {
+                if (!search.value) {
                     return Promise.resolve();
                 }
 

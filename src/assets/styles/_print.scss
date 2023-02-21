@@ -13,7 +13,12 @@
     }
   }
 
-  .bg-img-main,
+  #dnd5club {
+    &:after {
+      display: none !important;
+    }
+  }
+
   .content-layout__side--left {
     display: none !important;
   }
@@ -61,7 +66,7 @@
   }
 
   .navbar,
-  .avatar,
+  .ui-easy-lightbox,
   [data-tippy-root],
   .content-layout__list {
     display: none !important;

@@ -1,8 +1,8 @@
 <template>
-    <a
+    <router-link
         v-if="icon && url"
         v-tippy="{ content: name }"
-        :href="url"
+        :to="{ path: url }"
         class="class-square"
     >
         <svg-icon
@@ -10,7 +10,7 @@
             :stroke-enable="false"
             fill-enable
         />
-    </a>
+    </router-link>
 </template>
 
 <script>

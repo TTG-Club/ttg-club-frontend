@@ -10,47 +10,41 @@
         />
 
         <div class=" content-padding">
-            <div class="avatar">
-                <div class="image-container">
-                    <a id="magic-item-href">
-                        <img
-                            id="magic-item-img"
-                            v-lazy="!magicItem.images?.length ? '/img/dark/no-img-best.png' : magicItem.images[0]"
-                            :alt="magicItem.name.rus"
-                            @click.left.exact.prevent="showGallery"
-                        >
-                    </a>
-                </div>
-            </div>
+            <ui-easy-lightbox
+                :images="magicItem.images"
+                :use-bg-hide="false"
+            />
 
-            <p>
-                <b>Настройка: </b>
+            <ul class="stat-list">
+                <li>
+                    <b>Настройка: </b>
 
-                <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
+                    <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
 
-                <span v-if="magicItem.detailCustamization?.length">
-                    ({{
-                        magicItem.detailCustamization.join(', ')
-                            .toLowerCase()
-                    }})
-                </span>
-            </p>
+                    <span v-if="magicItem.detailCustamization?.length">
+                        ({{
+                            magicItem.detailCustamization.join(', ')
+                                .toLowerCase()
+                        }})
+                    </span>
+                </li>
 
-            <p v-if="magicItem.cost">
-                <b>Стоимость по <span
-                    v-tippy="'Руководство Мастера'"
-                >DMG</span>: </b>
+                <li v-if="magicItem.cost">
+                    <b>Стоимость по <span
+                        v-tippy="'Руководство Мастера'"
+                    >DMG</span>: </b>
 
-                <span>{{ magicItem.cost.dmg }}</span>
+                    <span>{{ magicItem.cost.dmg }}</span>
+                </li>
 
-                <br>
+                <li v-if="magicItem.cost">
+                    <b>Стоимость по <span
+                        v-tippy="'Руководство Зантара обо всем'"
+                    >XGE</span>: </b>
 
-                <b>Стоимость по <span
-                    v-tippy="'Руководство Зантара обо всем'"
-                >XGE</span>: </b>
-
-                <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
-            </p>
+                    <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
+                </li>
+            </ul>
 
             <raw-content
                 v-if="magicItem.description"
@@ -58,20 +52,6 @@
             />
         </div>
     </div>
-
-    <vue-easy-lightbox
-        v-if="magicItem.images?.length"
-        :imgs="magicItem.images"
-        :index="gallery.index"
-        :visible="gallery.show"
-        loop
-        move-disabled
-        scroll-disabled
-        teleport="body"
-        @hide="gallery.show = false"
-    >
-        <template #toolbar />
-    </vue-easy-lightbox>
 </template>
 
 <script>
@@ -79,10 +59,12 @@
     import RawContent from '@/components/content/RawContent.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
     import DiceRoller from '@/components/UI/DiceRoller.vue';
+    import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
 
     export default {
         name: 'MagicItemBody',
         components: {
+            UiEasyLightbox,
             DetailTopBar,
             RawContent,
             DiceRoller
@@ -98,12 +80,6 @@
                 default: false
             }
         },
-        data: () => ({
-            gallery: {
-                index: null,
-                show: false
-            }
-        }),
         computed: {
             topBarLeftString() {
                 let detail = '';
@@ -113,16 +89,6 @@
                 }
 
                 return `${ upperFirst(this.magicItem.type.name) }${ detail }, ${ this.magicItem.rarity.name }`;
-            }
-        },
-        methods: {
-            showGallery() {
-                if (!this.magicItem.images?.length) {
-                    return;
-                }
-
-                this.gallery.show = true;
-                this.gallery.index = 0;
             }
         }
     };

@@ -34,8 +34,12 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent } from 'vue';
+    import {
+        computed, defineComponent, watch
+    } from 'vue';
     import { useVModel } from '@vueuse/core';
+    import { storeToRefs } from 'pinia';
+    import { useNavStore } from '@/store/UI/NavStore';
 
     export default defineComponent({
         props: {
@@ -54,6 +58,18 @@
         },
         setup(props, { emit }) {
             const isShow = useVModel(props, 'modelValue');
+            const navStore = useNavStore();
+            const { isShowPopover } = storeToRefs(navStore);
+
+            watch(isShow, value => {
+                isShowPopover.value = value;
+            });
+
+            watch(isShowPopover, value => {
+                if (!value && isShow.value) {
+                    isShow.value = false;
+                }
+            });
 
             return {
                 isShow,

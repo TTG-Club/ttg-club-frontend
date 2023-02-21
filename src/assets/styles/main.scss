@@ -22,21 +22,6 @@
   }
 }
 
-.bg-img-main {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  opacity: 0.65;
-  z-index: -100;
-  height: var(--max-vh);
-  pointer-events: none;
-  display: none;
-
-  @include media-min($xxl) {
-    display: block;
-  }
-}
-
 .container {
   width: 100%;
   height: var(--max-vh);
@@ -62,7 +47,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 44px 0 8px 0;
+    margin: 32px 0 8px 0;
 
     .search_row_g {
       height: 46px;
@@ -103,18 +88,23 @@
         color: var(--text-color-title);
       }
     }
+
+    @include media-min($xl) {
+      margin: 5vw 0 8px 0;
+    }
   }
 
   .card_row {
     display: flex;
     flex-wrap: wrap;
     padding: 0;
-    margin: 8px -8px 0 -8px;
+    margin: 8px 0 0 0;
+    gap: 16px;
 
     .card {
       flex: 1 1 15%;
       min-width: 15%;
-      margin: 16px 8px 0 8px;
+      margin: 8px 0 0 0;
       background-color: var(--bg-secondary);
       border-radius: 12px;
       display: grid;
@@ -192,7 +182,7 @@
       }
 
       @media (max-width: 1200px) {
-        margin: 16px 8px 0 8px;
+        margin: 16px 0 0 0;
         height: 48px;
       }
 
@@ -217,100 +207,136 @@
     }
   }
 
-  .dnd5club_tel_bot {
-    display: flex;
-    flex-direction: row;
-    margin: 0 0 16px 0;
-    padding: 16px 16px 0 16px;
-    background-color: var(--bg-table-list);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 50%;
-    position: relative;
-    overflow: hidden;
-
-    .info {
-      z-index: 1;
-
-      h4 {
-        margin-top: 0;
-      }
-
-      a {
-        margin-right: 8px;
-        margin-bottom: 16px;
-        font-weight: 500;
-        text-transform: uppercase;
-        display: inline-block;
-      }
-    }
-
-    .bg_img {
-      transition: transform .6s;
-      background-position: 50%;
-      background-size: cover;
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background-image: url(/img/bg_main_page_button_nav_bot_2.png);
-    }
-
-    &:after {
-      position: absolute;
-      pointer-events: none;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      display: block;
-      background: var(--bg-liner-main-page);
-      content: "";
-    }
-
-    @media (max-width: 1000px) {
-      max-width: 100%;
-    }
-  }
-
-  .info_main_block {
-    // margin-top: -32px;
-
-    h3 {
-      margin-top: 32px;
-      margin-bottom: 8px;
-    }
-  }
-
   .column {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     padding-top: 32px;
-
-    .left {
-      margin-right: 32px;
-
-      @media (max-width: 600px) {
-        margin-right: 0;
-      }
-    }
+    margin-bottom: 16px;
+    gap: 16px;
 
     .right {
-      flex: calc(30% + 32px);
-      min-width: calc(30% + 32px);
-      // margin-bottom: 16px;
-
-      @media (max-width: 600px) {
-        flex: 100%;
-        min-width: 100%;
-      }
+      flex: 1 1 33%;
     }
 
-    @media (max-width: 600px) {
-      display: flex;
-      flex-direction: column;
+    @include media-min($md) {
+      flex-direction: row;
+    }
+
+    .left {
+      flex: 1 1 66%;
+
+      .block {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .links_block {
+          flex: 1 1 50%;
+        }
+
+        @include media-min($xl) {
+          flex-direction: row;
+        }
+
+        &__bot {
+          flex: 1 1 50%;
+          flex-direction: column;
+          display: flex;
+          gap: 16px;
+        }
+      }
+
+      .discord_bot,
+      .dnd5club_tel_bot {
+        display: flex;
+        flex-direction: row;
+        padding: 16px 16px 0 16px;
+        background-color: var(--bg-table-list);
+        border-radius: 12px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+
+        .info {
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+
+          h4 {
+            margin-top: 0;
+            font-family: "Open Sans",sans-serif;
+            font-weight: 500;
+          }
+
+          .bottom {
+            margin-top: auto;
+          }
+
+          a {
+            margin-right: 8px;
+            margin-bottom: 16px;
+            display: inline-block;
+            background-color: var(--hover);
+            color: var(--text-color);
+            padding: 6px 8px;
+            border-radius: 8px;
+
+            &.main {
+              background-color: var(--primary);
+              color: var(--text-btn-color);
+            }
+
+            &:hover {
+              background-color: var(--primary-hover);
+              transition: all .5s;
+            }
+          }
+        }
+
+        .bg_img {
+          transition: transform .6s;
+          background-position: 50%;
+          background-size: cover;
+          display: block;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+        }
+
+        &:after {
+          position: absolute;
+          pointer-events: none;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          display: block;
+          content: "";
+          background: var(--bg-liner-main-page);
+        }
+
+        @media (max-width: 1000px) {
+          max-width: 100%;
+        }
+      }
+
+      .dnd5club_tel_bot {
+        min-height: 124px;
+
+        .bg_img {
+          background-image: url(/img/bg_telegram_bot.webp?v=2);
+        }
+      }
+
+      .discord_bot {
+        height: 100%;
+
+        .bg_img {
+          background-image: url(/img/bg_discord_bot.webp?v=2);
+        }
+      }
     }
   }
 }
@@ -319,7 +345,6 @@
   background: var(--bg-secondary);
   padding: 8px 16px 16px 16px;
   border-radius: 12px;
-  margin-bottom: 16px;
 
   h3 {
     font-size: calc(var(--h3-font-size) - 12px);
@@ -349,6 +374,7 @@
         flex: 100%;
         display: flex;
         justify-content: center;
+        text-align: center;
       }
 
       img {
@@ -467,66 +493,11 @@
   }
 }
 
-.avatar {
-  position: relative;
-  width: 200px;
-  min-height: 100px;
-  float: right;
-  margin: 0 0 32px 32px;
-
-  .image-container {
-    background: var(--bg-sub-menu);
-    box-shadow: 0 6px 21px rgb(0 0 0 / 21%);
-    overflow: hidden;
-    border-radius: 12px;
-    height: auto;
-    position: relative;
-    width: 100%;
-
-    a {
-      position: relative;
-      height: 100%;
-      width: 100%;
-      display: grid;
-
-      img {
-        position: relative;
-        left: 50%;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        transform: translate(-50%, 0%);
-        -o-object-fit: cover;
-        object-fit: cover;
-      }
-
-      @media (max-width: 500px) {
-        align-content: center;
-      }
-    }
-
-    @media (max-width: 500px) {
-      height: 100%;
-    }
-  }
-
-  @media (max-width: 1400px) {
-    width: 180px;
-  }
-
-  @media (max-width: 500px) {
-    width: 120px;
-    height: 120px;
-    overflow: hidden;
-    border-radius: 50%;
-    margin: 0 0 16px 16px;
-  }
-}
-
 .scores {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  margin: 16px 0 16px 0;
 
   &__stats {
     text-align: center;
@@ -577,31 +548,6 @@
   }
 }
 
-.tippy-content {
-  .scores {
-    &__stats {
-      max-width: calc(33% - 8px);
-      flex: 1 0 calc(33% - 8px);
-    }
-  }
-
-  .avatar {
-    width: 140px;
-  }
-
-  .row_info {
-    margin: 0;
-  }
-
-  .content-padding {
-    padding: 16px 0;
-  }
-
-  .grid_stat_block {
-    margin: 16px 0 0 0;
-  }
-}
-
 .weapons-group,
 .books-group,
 .armors-group {
@@ -623,6 +569,23 @@
 
   @include media-min($xl) {
     padding: 16px 24px;
+  }
+}
+
+.class_stats {
+  margin-bottom: 6px;
+}
+
+.stat-list {
+  padding: 0;
+
+  li {
+    margin-bottom: 6px;
+    list-style: none;
+
+    p {
+      display: inherit;
+    }
   }
 }
 

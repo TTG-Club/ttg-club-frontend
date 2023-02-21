@@ -2,12 +2,12 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
-                <a
+                <router-link
                     class="navbar__logo"
-                    href="/"
+                    :to="{ name: 'index' }"
                 >
                     <site-logo />
-                </a>
+                </router-link>
 
                 <nav-menu />
 
@@ -17,6 +17,28 @@
             </div>
 
             <div class="navbar__header_right">
+                <div class="navbar__social-buttons">
+                    <ui-social-button
+                        social-name="boosty"
+                        url="https://boosty.to/dnd5club"
+                        hide-label
+                    />
+
+                    <ui-social-button
+                        social-name="vk"
+                        url="https://vk.com/ttg.club"
+                        hide-label
+                    />
+
+                    <ui-social-button
+                        social-name="discord"
+                        url="https://discord.gg/zqBnMJVf3z"
+                        hide-label
+                    />
+
+                    <hr />
+                </div>
+
                 <nav-profile />
 
                 <menu-theme-switcher />
@@ -33,15 +55,19 @@
     import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
     import NavSearch from '@/components/UI/menu/NavSearch.vue';
+    import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';
+    import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
 
     export default defineComponent({
         name: 'NavBar',
         components: {
+            SiteLogo,
             NavSearch,
             NavMenu,
             NavBookmarks,
             NavProfile,
-            MenuThemeSwitcher
+            MenuThemeSwitcher,
+            UiSocialButton
         },
         setup() {
             const route = useRoute();
@@ -72,6 +98,53 @@
                 border-bottom: 1px solid var(--border);
                 border-right: 0;
                 margin: 0 0 8px 0;
+            }
+        }
+
+    }
+    .navbar__header_right {
+        .navbar__social-buttons {
+            display: none;
+
+            @include media-min($md) {
+                display: block;
+            }
+
+            .ui-social-button {
+                padding: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                border-radius: 8px;
+                margin: 8px 0 8px 0;
+                opacity: 70%;
+
+                &.is-discord {
+                    color: var(--text-btn-color);
+
+                    &:hover {
+                        background-color: var(--discord-hover);
+                    }
+                }
+                &.is-boosty {
+                    color: var(--text-btn-color);
+
+                    &:hover {
+                        background-color: var(--boosty-hover);
+                    }
+                }
+                &.is-vk {
+                    color: var(--text-btn-color);
+
+                    &:hover {
+                        background-color: var(--vk-hover);
+                    }
+                }
+
+                &:hover {
+                    opacity: 100%;
+                }
             }
         }
     }
