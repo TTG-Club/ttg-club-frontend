@@ -280,10 +280,14 @@
         }
 
         iframe {
-          height: 300px;
+          height: 100%;
           margin: 0 0 8px 0;
           overflow: hidden;
           border-radius: 12px;
+
+          @include media-min($sm) {
+            height: 300px;
+          }
 
           @include media-min($xl) {
             height: 100%;
