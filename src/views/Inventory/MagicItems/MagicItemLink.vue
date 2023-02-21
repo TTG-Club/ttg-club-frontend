@@ -125,6 +125,9 @@
         &__type {
             padding-left: 14px;
             position: relative;
+            color: var(--text-g-color);
+            font-size: calc(var(--main-font-size) - 1px);
+            line-height: normal;
 
             &:after {
                 content: '';
@@ -187,7 +190,7 @@
             }
         }
 
-        &__type {
+        &__customization {
             color: var(--text-g-color);
             font-size: calc(var(--main-font-size) - 1px);
             line-height: normal;
