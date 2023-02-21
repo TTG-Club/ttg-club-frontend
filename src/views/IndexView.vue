@@ -50,10 +50,12 @@
                                             rel="noopener noreferrer"
                                         >Подключить</a>
 
-                                        <a
-                                            href="/info/telegram_spells_bot"
+                                        <router-link
+                                            :to="{ path: '/info/telegram_spells_bot' }"
                                             rel="noopener noreferrer"
-                                        >Описание</a>
+                                        >
+                                            Описание
+                                        </router-link>
                                     </div>
                                 </div>
 
@@ -76,10 +78,12 @@
                                         >Пригласить</a>
                                         <!-- eslint-enable vue/max-len -->
 
-                                        <a
-                                            href="/info/discord_bot"
+                                        <router-link
+                                            :to="{ path: '/info/discord_bot' }"
                                             rel="noopener noreferrer"
-                                        >Описание</a>
+                                        >
+                                            Описание
+                                        </router-link>
                                     </div>
                                 </div>
 
@@ -111,7 +115,6 @@
                             title="D&D 5e новости"
                             width="100%"
                             src="https://www.youtube.com/embed/EVGfn931MzQ"
-                            frameborder="0"
                             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
                         />
