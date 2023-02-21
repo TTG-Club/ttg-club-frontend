@@ -49,6 +49,7 @@
         computed, defineComponent, ref
     } from 'vue';
     import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
+    import { watchArray } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default defineComponent({
@@ -126,6 +127,15 @@
 
                 show();
             };
+
+            watchArray(
+                () => props.images,
+                value => {
+                    imgs.value = value;
+                    index.value = 0;
+                },
+                { flush: 'post' }
+            );
 
             return {
                 isNoImages,
