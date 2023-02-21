@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import orderBy from 'lodash/orderBy';
 import { useAxios } from '@/common/composition/useAxios';
 import isDev from '@/common/helpers/isDev';
 
@@ -10,6 +11,7 @@ export type TNavItem = {
     onlyDev?: boolean
     external?: boolean
     children: Array<TNavItem>
+    order: number
 }
 
 export const useNavStore = defineStore('NavStore', () => {
@@ -18,33 +20,45 @@ export const useNavStore = defineStore('NavStore', () => {
     const metaInfo = ref(undefined);
     const isShowMenu = ref(false);
 
-    const showedNavItems = computed(() => navItems.value
-        .filter(group => {
-            if (isDev) {
-                return true;
-            }
+    const showedNavItems = computed(() => (
+        orderBy(
+            navItems.value
+                .filter(group => {
+                    if (isDev) {
+                        return true;
+                    }
 
-            return !group.onlyDev;
-        })
-        .map(group => ({
-            ...group,
-            children: group.children.filter(link => {
-                if (isDev) {
-                    return true;
-                }
+                    return !group.onlyDev;
+                })
+                .map(group => ({
+                    ...group,
+                    children: orderBy(
+                        group.children.filter(link => {
+                            if (isDev) {
+                                return true;
+                            }
 
-                return !link.onlyDev;
-            })
-        })));
+                            return !link.onlyDev;
+                        }),
+                        ['order'],
+                        ['asc']
+                    )
+                })),
+            ['order'],
+            ['asc']
+        )
+    ));
 
-    const getNavItems = async () => {
+    const initNavItems = async () => {
         try {
             const resp = await http.get({
                 url: '/menu'
             });
 
             if (resp.status === 200) {
-                return Promise.resolve(resp.data);
+                navItems.value = resp.data;
+
+                return Promise.resolve();
             }
 
             return Promise.reject(resp.statusText);
@@ -115,7 +129,7 @@ export const useNavStore = defineStore('NavStore', () => {
         navItems,
         showedNavItems,
         metaInfo,
-        getNavItems,
+        initNavItems,
         updateMetaByURL
     };
 });

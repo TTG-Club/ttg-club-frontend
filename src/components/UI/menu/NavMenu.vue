@@ -36,11 +36,11 @@
                 </div>
 
                 <div
-                    v-if="navItems.length"
+                    v-if="showedNavItems.length"
                     class="nav-menu__body"
                 >
                     <div
-                        v-for="(group, groupKey) in navItems"
+                        v-for="(group, groupKey) in showedNavItems"
                         :key="group.name + groupKey"
                         class="nav-menu__group"
                     >
@@ -133,12 +133,12 @@
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgressURLs = ref<string[]>([]);
-            const { navItems } = storeToRefs(navStore);
+            const { showedNavItems } = storeToRefs(navStore);
             const router = useRouter();
             const route = useRoute();
 
             tryOnBeforeMount(async () => {
-                navItems.value = await navStore.getNavItems();
+                await navStore.initNavItems();
             });
 
             const isRouteExist = (link: TNavItem) => {
@@ -205,7 +205,7 @@
 
             return {
                 isShowMenu,
-                navItems,
+                showedNavItems,
                 isRouteExist,
                 isSaved,
                 updateBookmark
