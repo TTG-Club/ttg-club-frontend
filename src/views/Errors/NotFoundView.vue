@@ -1,6 +1,6 @@
 <template>
-    <div class="error_wrapper">
-        <div>
+    <div class="error-view">
+        <div class="error-view__body">
             <h1>404</h1>
 
             <h4>
@@ -10,7 +10,7 @@
                     }"
                 >
                     началу
-                </router-link>.
+                </router-link>
             </h4>
         </div>
     </div>
