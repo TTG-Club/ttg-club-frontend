@@ -1,12 +1,21 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { useUserStore } from '@/store/UI/UserStore';
+import { useNavStore } from '@/store/UI/NavStore';
 
 /* eslint-disable max-len,vue/max-len */
 export const routes: Readonly<RouteRecordRaw[]> = [
     {
         name: 'index',
         path: '/',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Main' */ '@/views/IndexView.vue')
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Main' */ '@/views/IndexView.vue'),
+        beforeEnter: (to, from, next) => {
+            const navStore = useNavStore();
+
+            navStore.initPartners()
+                .then(() => {
+                    next();
+                });
+        }
     },
     {
         name: 'classes',

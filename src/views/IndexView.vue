@@ -127,15 +127,20 @@
                     </div>
                 </div>
 
-                <div class="right">
+                <div
+                    v-if="showedPartners.length"
+                    class="right"
+                >
                     <div class="links_block">
                         <h3>Наши друзья:</h3>
 
                         <div class="list">
                             <a
-                                v-for="(partner, key) in partners"
+                                v-for="(partner, key) in showedPartners"
                                 :key="key"
-                                v-tippy="partner.tooltip"
+                                v-tippy="{
+                                    content: partner.description,
+                                }"
                                 :href="partner.url"
                                 class="block tip"
                                 target="_blank"
@@ -145,9 +150,9 @@
                                     width="20px"
                                     height="20px"
                                     :src="partner.img"
-                                    :alt="partner.alt"
+                                    :alt="partner.name"
                                 >
-                                {{ partner.label }}
+                                {{ partner.name }}
                             </a>
                         </div>
                     </div>
@@ -165,7 +170,7 @@
     export default defineComponent({
         setup() {
             const navStore = useNavStore();
-            const { indexNavItems } = storeToRefs(navStore);
+            const { indexNavItems, showedPartners } = storeToRefs(navStore);
 
             const tools = ref([
                 {
@@ -194,116 +199,6 @@
                 }
             ]);
 
-            /* eslint-disable vue/max-len */
-            const partners = ref([
-                {
-                    tooltip: 'команда создает авторские миниатюры в разных системах и жанрах. Заказать 3Д скульпт и найти качественную отливку можно у них в группе или на сайте',
-                    url: 'https://badmimic.com/?partner=ttg.club',
-                    label: 'Bad Mimic',
-                    img: '/partner/bad_mimic.webp',
-                    alt: 'Наши друзья магазин миниатюр Bad Mimic'
-                },
-                {
-                    tooltip: 'Канал расскжет вам о тонкостях и нюансах игры в онлайне. Поможет разобраться с виртуальными столами. Упростит подготовку к вашей игре. Автоматизирует максимум процессов игровой механики. Всё, чтобы игра стала атмосфернее и интереснее.',
-                    url: 'https://www.youtube.com/channel/UCMfMw5ZX4_rZ4rv4TlY8j8g?partner=ttg.club',
-                    label: '«Онлайн ширма»',
-                    img: '/partner/koroz.webp',
-                    alt: 'Онлайн ширма'
-                },
-                {
-                    tooltip: 'Сервер ставит перед собой цель помочь новичкам, интересующимся D&D в Discord сегменте, а также стремится стать надежной базой для Discord-комьюнити системы D&D.',
-                    url: 'https://discord.gg/Vxu2Cu9mbM?partner=ttg.club',
-                    label: 'Empire Tavern',
-                    img: '/partner/Empire_tavern.webp',
-                    alt: 'Empire Tavern'
-                },
-                {
-                    tooltip: 'Это клуб ролевых игр Великого Новгорода Студия «Ravenheart». Если ты хочешь круто провести время, то ты пришел по адресу!',
-                    url: 'https://vk.com/ravenheart_studio?partner=ttg.club',
-                    label: 'Студия «Ravenheart»',
-                    img: '/partner/ravenheart_studio.webp',
-                    alt: 'Студия «Ravenheart»'
-                },
-                {
-                    tooltip: 'Сообщество опытного мастера Andy по настольным и ролевым играм, который хочет сделать ваш досуг максимально интересным и доступным.',
-                    url: 'https://vk.com/anykeyspb?partner=ttg.club',
-                    label: 'ANY KEY',
-                    img: '/partner/any_key.webp',
-                    alt: 'ANY KEY'
-                },
-                {
-                    tooltip: 'Random Rules это канал про настольные ролевые игры. Любите проводить время с друзьями, играя в Dungeons & Dragons? Вам сюда!',
-                    url: 'https://vk.com/rrules?partner=ttg.club',
-                    label: 'Random Rules',
-                    img: '/partner/random_rules.webp',
-                    alt: 'Random Rules'
-                },
-                {
-                    tooltip: 'DiceHead собирает множество информации по Dungeons & Dragons, выкладывает материалы для вдохновения и стремиться поддерживать сообщество НРИ в России.',
-                    url: 'https://vk.com/dicehead_dnd?partner=ttg.club',
-                    label: 'DiceHead | D&D',
-                    img: '/partner/dicehead.webp',
-                    alt: 'DiceHead | D&D'
-                },
-                {
-                    tooltip: 'Короткие авторские приключения для D&D 5e и других систем.',
-                    url: 'https://vk.com/ngdnd?partner=ttg.club',
-                    label: 'Заметки упыря',
-                    img: '/partner/ngdnd.webp',
-                    alt: 'Заметки упыря | Короткие приключения | D&D'
-                },
-                {
-                    tooltip: 'Если вы хотите украсить свой игровой стол различными игровыми предметами по настольным играм, приобрести фигурки для D&D и других игр, то вам нужна Плутовка Пэтти.',
-                    url: 'https://vk.com/plutovkapetti?partner=ttg.club',
-                    label: 'Плутовка Пэтти',
-                    img: '/partner/plutovkapetti.webp',
-                    alt: 'Плутовка Пэтти'
-                },
-                {
-                    tooltip: 'Пятеро друзей, которые любят играть в Dungeons & Dragons. Среди них есть актёры, режиссёры, художники, и сценаристы, но в первую очередь они друзья и большие поклонники ролевых игр.',
-                    url: 'https://vk.com/gryadut_priklyucheniya?partner=ttg.club',
-                    label: 'Грядут Приключения',
-                    img: '/partner/gryadut_priklyucheniya.webp',
-                    alt: 'Грядут Приключения'
-                },
-                {
-                    tooltip: 'Этот парень любит настольно-ролевые игры и делится своей любовью на канале, рассказывая о правилах и нюансах игры на своём опыте, да и просто веселится.',
-                    url: 'https://www.youtube.com/channel/UCe_vCsHHRPT9XPVYDInQqqQ?partner=ttg.club',
-                    label: 'Sneaky Dice',
-                    img: '/partner/sneaky_dice.webp',
-                    alt: 'Sneaky Dice'
-                },
-                {
-                    tooltip: 'Программа DM Helpmate 2 будет полезна мастерам D&D для подготовки и проведения игр в офлайн. В ней вы сможете найти: база данных D&D 5, добавление персонажей и НПЦ, ведение тактических карт, генератор добычи и множество других вещей.',
-                    url: 'https://vk.com/mastademic?partner=ttg.club',
-                    label: 'DM Helpmate',
-                    img: '/partner/dm_helpmate.webp',
-                    alt: 'DM Helpmate'
-                },
-                {
-                    tooltip: 'Переводы материалов для мастеров и игроков, мемы, запись на игры.',
-                    url: 'https://vk.com/dndworlds?partner=ttg.club',
-                    label: 'Круговорот миров',
-                    img: '/partner/dndworlds.webp',
-                    alt: 'Круговорот миров'
-                },
-                {
-                    tooltip: 'Небольшая команда энтузиастов, которая хочет переводить, оформлять и делиться с вами интересными новостями, статьями, артами и прочими работами во вселенной D&D',
-                    url: 'https://vk.com/myriads_of_truths?partner=ttg.club',
-                    label: 'Мириады Истин',
-                    img: '/partner/myriads_of_truths.webp',
-                    alt: 'Мириады Истин'
-                },
-                {
-                    tooltip: 'Создатель НРИ-контента, рисующий иконки, карты, токены и другие вещи, которые пригодятся как ГМам, так и игрокам.',
-                    url: 'https://vk.com/artfilinkov?partner=ttg.club',
-                    label: 'A.Filinkov',
-                    img: '/partner/artfilinkov.webp',
-                    alt: 'A.Filinkov'
-                }
-            ]);
-            /* eslint-enable vue/max-len */
-
             const openSearchModal = () => {
                 document.dispatchEvent(new Event('open-search'));
             };
@@ -311,7 +206,7 @@
             return {
                 indexNavItems,
                 tools,
-                partners,
+                showedPartners,
                 openSearchModal
             };
         }

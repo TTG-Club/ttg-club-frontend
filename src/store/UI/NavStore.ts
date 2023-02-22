@@ -19,12 +19,21 @@ export type TNavItem = {
     indexOrder?: number
 }
 
+export type TPartner = {
+    name: string
+    description?: string
+    img: string
+    url: string
+    order: number
+}
+
 export const useNavStore = defineStore('NavStore', () => {
     const http = useAxios();
-    const navItems = ref<Array<TNavItem>>([]);
-    const metaInfo = ref(undefined);
     const isShowPopover = ref(false);
     const isShowSearch = ref(false);
+
+    /* Menu */
+    const navItems = ref<Array<TNavItem>>([]);
 
     const showedNavItems = computed(() => (
         orderBy(
@@ -101,6 +110,42 @@ export const useNavStore = defineStore('NavStore', () => {
         }
     };
 
+    /* Partners */
+    const partners = ref<TPartner[]>([]);
+
+    const showedPartners = computed(() => (
+        orderBy(
+            partners.value,
+            ['order'],
+            ['asc']
+        )
+    ));
+
+    const initPartners = async () => {
+        if (partners.value.length) {
+            return Promise.resolve();
+        }
+
+        try {
+            const resp = await http.get({
+                url: '/partners'
+            });
+
+            if (resp.status === 200) {
+                partners.value = resp.data;
+
+                return Promise.resolve();
+            }
+
+            return Promise.reject(resp.statusText);
+        } catch (err) {
+            return Promise.reject(err);
+        }
+    };
+
+    /* Meta */
+    const metaInfo = ref(undefined);
+
     const hidePopovers = () => {
         isShowPopover.value = false;
         isShowSearch.value = false;
@@ -170,12 +215,20 @@ export const useNavStore = defineStore('NavStore', () => {
     return {
         isShowPopover,
         isShowSearch,
+        hidePopovers,
+
+        // Menu
         navItems,
         showedNavItems,
         indexNavItems,
-        metaInfo,
         initNavItems,
-        updateMetaByURL,
-        hidePopovers
+
+        // Partners
+        showedPartners,
+        initPartners,
+
+        // Meta
+        metaInfo,
+        updateMetaByURL
     };
 });
