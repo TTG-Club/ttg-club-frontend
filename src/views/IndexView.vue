@@ -109,11 +109,11 @@
                     <div class="block__youtube">
                         <h3>D&D 5e новости:</h3>
 
-                        <!-- Менять надо только последние символы после / EVGfn931MzQ -->
+                        <!-- Менять надо только последние символы после / D3FfWlhP9Co -->
                         <iframe
                             title="D&D 5e новости"
                             width="100%"
-                            src="https://www.youtube.com/embed/EVGfn931MzQ"
+                            src="https://www.youtube.com/embed/D3FfWlhP9Co"
                             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
                         />
