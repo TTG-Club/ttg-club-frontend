@@ -20,14 +20,13 @@
 
             <div class="card_row">
                 <router-link
-                    v-for="(section, key) in nav"
+                    v-for="(section, key) in indexNavItems"
                     :key="key"
                     :to="{ path: section.url }"
                     class="card"
-                    :class="[section.name]"
                 >
                     <div class="title">
-                        <h4>{{ section.label }}</h4>
+                        <h4>{{ section.name }}</h4>
                     </div>
                 </router-link>
             </div>
@@ -160,71 +159,13 @@
 
 <script lang="ts">
     import { defineComponent, ref } from 'vue';
+    import { storeToRefs } from 'pinia';
+    import { useNavStore } from '@/store/UI/NavStore';
 
     export default defineComponent({
         setup() {
-            const nav = ref([
-                {
-                    name: 'classes',
-                    url: '/classes',
-                    label: 'Классы'
-                },
-                {
-                    name: 'races',
-                    url: '/races',
-                    label: 'Расы'
-                },
-                {
-                    name: 'traits',
-                    url: '/traits',
-                    label: 'Черты'
-                },
-                {
-                    name: 'options',
-                    url: '/options',
-                    label: 'Особенности классов'
-                },
-                {
-                    name: 'backgrounds',
-                    url: '/backgrounds',
-                    label: 'Предыстории'
-                },
-                {
-                    name: 'spells',
-                    url: '/spells',
-                    label: 'Заклинания'
-                },
-                {
-                    name: 'weapons',
-                    url: '/weapons',
-                    label: 'Оружие'
-                },
-                {
-                    name: 'armors',
-                    url: '/armors',
-                    label: 'Доспехи'
-                },
-                {
-                    name: 'items',
-                    url: '/items',
-                    label: 'Снаряжение'
-                },
-                {
-                    name: 'magic-items',
-                    url: '/items/magic',
-                    label: 'Магические предметы'
-                },
-                {
-                    name: 'bestiary',
-                    url: '/bestiary',
-                    label: 'Бестиарий'
-                },
-                {
-                    name: 'screens',
-                    url: '/screens',
-                    label: 'Ширма'
-                }
-            ]);
+            const navStore = useNavStore();
+            const { indexNavItems } = storeToRefs(navStore);
 
             const tools = ref([
                 {
@@ -368,7 +309,7 @@
             };
 
             return {
-                nav,
+                indexNavItems,
                 tools,
                 partners,
                 openSearchModal

@@ -4,7 +4,6 @@ import VueTippy from 'vue-tippy';
 import VueLazyLoad from 'vue-lazyload';
 import Toast from 'vue-toastification';
 import { vfmPlugin } from 'vue-final-modal';
-import isDev from '@/common/helpers/isDev';
 import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import { TippyOptions } from '@/common/utils/TippyConfig';
@@ -22,7 +21,6 @@ const pinia = createPinia();
 pinia.use(({ store }) => {
     /* eslint-disable no-param-reassign */
     store.$http = new HTTPService();
-    store.$isDev = isDev;
     /* eslint-enable no-param-reassign */
 });
 

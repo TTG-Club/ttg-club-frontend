@@ -10,8 +10,10 @@ export type TNavItem = {
     url?: string
     onlyDev?: boolean
     external?: boolean
-    children: Array<TNavItem>
+    children?: Array<TNavItem>
     order: number
+    onIndex?: boolean
+    indexOrder?: number
 }
 
 export const useNavStore = defineStore('NavStore', () => {
@@ -34,13 +36,13 @@ export const useNavStore = defineStore('NavStore', () => {
                 .map(group => ({
                     ...group,
                     children: orderBy(
-                        group.children.filter(link => {
+                        group.children?.filter(link => {
                             if (isDev) {
                                 return true;
                             }
 
                             return !link.onlyDev;
-                        }),
+                        }) || [],
                         ['order'],
                         ['asc']
                     )
@@ -49,6 +51,30 @@ export const useNavStore = defineStore('NavStore', () => {
             ['asc']
         )
     ));
+
+    const indexNavItems = computed(() => {
+        const items: TNavItem[] = [];
+
+        const iterate = (childList: TNavItem[]) => {
+            for (const child of childList) {
+                if (child.children instanceof Array && child.children.length) {
+                    iterate(child.children);
+                }
+
+                if (child.onIndex) {
+                    items.push(child);
+                }
+            }
+        };
+
+        iterate(navItems.value);
+
+        return orderBy(
+            items,
+            ['indexOrder'],
+            ['asc']
+        );
+    });
 
     const initNavItems = async () => {
         try {
@@ -130,6 +156,7 @@ export const useNavStore = defineStore('NavStore', () => {
         isShowSearch,
         navItems,
         showedNavItems,
+        indexNavItems,
         metaInfo,
         initNavItems,
         updateMetaByURL
