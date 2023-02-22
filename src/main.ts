@@ -8,9 +8,9 @@ import HTTPService from '@/common/services/HTTPService';
 import { TippyOptions } from '@/common/utils/TippyConfig';
 import { ToastEventBus, ToastOptions } from '@/common/utils/ToastConfig';
 import App from '@/App.vue';
+import pinia from '@/store';
 import router from './router';
 import '@/assets/styles/index.scss';
-import pinia from '@/store';
 
 const app = createApp(App);
 
