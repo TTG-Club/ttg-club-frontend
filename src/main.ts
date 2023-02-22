@@ -1,5 +1,4 @@
 import { createApp } from 'vue';
-import { createPinia } from 'pinia';
 import VueTippy from 'vue-tippy';
 import VueLazyLoad from 'vue-lazyload';
 import Toast from 'vue-toastification';
@@ -11,18 +10,11 @@ import { ToastEventBus, ToastOptions } from '@/common/utils/ToastConfig';
 import App from '@/App.vue';
 import router from './router';
 import '@/assets/styles/index.scss';
+import pinia from '@/store';
 
 const app = createApp(App);
 
 app.config.globalProperties.$http = new HTTPService();
-
-const pinia = createPinia();
-
-pinia.use(({ store }) => {
-    /* eslint-disable no-param-reassign */
-    store.$http = new HTTPService();
-    /* eslint-enable no-param-reassign */
-});
 
 app.use(pinia)
     .use(router)

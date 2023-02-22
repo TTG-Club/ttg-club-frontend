@@ -1,6 +1,9 @@
-import { computed, ref } from 'vue';
+import {
+    computed, ref
+} from 'vue';
 import { defineStore } from 'pinia';
 import orderBy from 'lodash/orderBy';
+import type { RouteLocationNormalized } from 'vue-router';
 import { useAxios } from '@/common/composition/useAxios';
 import isDev from '@/common/helpers/isDev';
 
@@ -77,6 +80,10 @@ export const useNavStore = defineStore('NavStore', () => {
     });
 
     const initNavItems = async () => {
+        if (navItems.value.length) {
+            return Promise.resolve();
+        }
+
         try {
             const resp = await http.get({
                 url: '/menu'
@@ -92,6 +99,11 @@ export const useNavStore = defineStore('NavStore', () => {
         } catch (err) {
             return Promise.reject(err);
         }
+    };
+
+    const hidePopovers = () => {
+        isShowPopover.value = false;
+        isShowSearch.value = false;
     };
 
     const getMetaByURL = async (url: string) => {
@@ -139,9 +151,13 @@ export const useNavStore = defineStore('NavStore', () => {
         }
     };
 
-    const updateMetaByURL = async (url: string) => {
+    const updateMetaByURL = async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+        if (to.path === from.path) {
+            return Promise.resolve();
+        }
+
         try {
-            const meta = await getMetaByURL(url);
+            const meta = await getMetaByURL(to.path);
 
             setMeta(meta);
 
@@ -159,6 +175,7 @@ export const useNavStore = defineStore('NavStore', () => {
         indexNavItems,
         metaInfo,
         initNavItems,
-        updateMetaByURL
+        updateMetaByURL,
+        hidePopovers
     };
 });

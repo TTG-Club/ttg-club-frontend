@@ -104,7 +104,7 @@
 
 <script lang="ts">
     import {
-        defineComponent, ref
+        defineComponent, ref, watch
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
@@ -197,6 +197,18 @@
                 // @ts-ignore
                 await defaultBookmarkStore.updateBookmark(url, name, 'menu');
             }
+
+            watch(
+                isShowMenu,
+                async value => {
+                    if (value) {
+                        await navStore.initNavItems();
+                    }
+                },
+                {
+                    immediate: true
+                }
+            );
 
             return {
                 isShowMenu,

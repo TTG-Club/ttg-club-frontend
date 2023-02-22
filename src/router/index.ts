@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import { routes } from '@/router/routes';
 import { useNavStore } from '@/store/UI/NavStore';
 import { useRouterHelpers } from '@/router/composition/useRouterHelpers';
+import pinia from '@/store';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -10,33 +10,20 @@ const router = createRouter({
 });
 
 const { nextAvailable } = useRouterHelpers();
-
-router.beforeResolve(async () => {
-    const navStore = useNavStore();
-
-    const {
-        isShowPopover, isShowSearch, navItems
-    } = storeToRefs(navStore);
-
-    isShowPopover.value = false;
-    isShowSearch.value = false;
-
-    if (!navItems.value.length) {
-        await navStore.initNavItems();
-    }
-});
+const navStore = useNavStore(pinia);
 
 router.beforeEach(async (to, from, next) => {
     await nextAvailable(to, next);
 });
 
-router.afterEach((to, from) => {
-    const navStore = useNavStore();
+router.beforeResolve(async () => {
+    navStore.hidePopovers();
 
-    if (to.path !== from.path) {
-        navStore.updateMetaByURL(to.path)
-            .then();
-    }
+    await navStore.initNavItems();
+});
+
+router.afterEach(async (to, from) => {
+    await navStore.updateMetaByURL(to, from);
 });
 
 export default router;
