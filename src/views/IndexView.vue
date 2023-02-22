@@ -20,7 +20,7 @@
 
             <div class="card_row">
                 <router-link
-                    v-for="(section, key) in indexNavItems"
+                    v-for="(section, key) in navItems"
                     :key="key"
                     :to="{ path: section.url }"
                     class="card"
@@ -100,7 +100,7 @@
                                     :to="{ path: tool.url }"
                                     class="block tip w-100"
                                 >
-                                    {{ tool.label }}
+                                    {{ tool.name }}
                                 </router-link>
                             </div>
                         </div>
@@ -163,48 +163,63 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref } from 'vue';
+    import {
+        computed, defineComponent
+    } from 'vue';
     import { storeToRefs } from 'pinia';
+    import orderBy from 'lodash/orderBy';
     import { useNavStore } from '@/store/UI/NavStore';
+    import type { TNavItem } from '@/store/UI/NavStore';
 
     export default defineComponent({
         setup() {
             const navStore = useNavStore();
-            const { indexNavItems, showedPartners } = storeToRefs(navStore);
+            const { showedNavItems, showedPartners } = storeToRefs(navStore);
 
-            const tools = ref([
-                {
-                    label: 'Калькулятор характеристик',
-                    url: '/tools/ability-calc'
-                },
-                {
-                    label: 'Торговец',
-                    url: '/tools/trader'
-                },
-                {
-                    label: 'Случайные столкновения',
-                    url: '/tools/encounters'
-                },
-                {
-                    label: 'Генератор содержимого сокровищницы',
-                    url: '/tools/treasury'
-                },
-                {
-                    label: 'Случайная дикая магия',
-                    url: '/tools/wildmagic'
-                },
-                {
-                    label: 'Случайное безумие',
-                    url: '/tools/madness'
+            const navItems = computed(() => {
+                const items: TNavItem[] = [];
+
+                const iterate = (childList: TNavItem[]) => {
+                    for (const child of childList) {
+                        if (child.children instanceof Array && child.children.length) {
+                            iterate(child.children);
+                        }
+
+                        if (child.onIndex) {
+                            items.push(child);
+                        }
+                    }
+                };
+
+                iterate(showedNavItems.value);
+
+                return orderBy(
+                    items,
+                    ['indexOrder'],
+                    ['asc']
+                );
+            });
+
+            const tools = computed<TNavItem[]>(() => {
+                const navTools = showedNavItems.value.find(item => item?.icon === 'menu-tools');
+
+                if (!navTools?.children?.length) {
+                    return [];
                 }
-            ]);
+
+                return orderBy(
+                    navTools.children,
+                    ['order'],
+                    ['asc']
+                );
+            });
 
             const openSearchModal = () => {
                 document.dispatchEvent(new Event('open-search'));
             };
 
             return {
-                indexNavItems,
+                navItems,
                 tools,
                 showedPartners,
                 openSearchModal

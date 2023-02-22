@@ -64,30 +64,6 @@ export const useNavStore = defineStore('NavStore', () => {
         )
     ));
 
-    const indexNavItems = computed(() => {
-        const items: TNavItem[] = [];
-
-        const iterate = (childList: TNavItem[]) => {
-            for (const child of childList) {
-                if (child.children instanceof Array && child.children.length) {
-                    iterate(child.children);
-                }
-
-                if (child.onIndex) {
-                    items.push(child);
-                }
-            }
-        };
-
-        iterate(navItems.value);
-
-        return orderBy(
-            items,
-            ['indexOrder'],
-            ['asc']
-        );
-    });
-
     const initNavItems = async () => {
         if (navItems.value.length) {
             return Promise.resolve();
@@ -220,7 +196,6 @@ export const useNavStore = defineStore('NavStore', () => {
         // Menu
         navItems,
         showedNavItems,
-        indexNavItems,
         initNavItems,
 
         // Partners
