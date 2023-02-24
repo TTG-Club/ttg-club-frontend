@@ -109,10 +109,23 @@
                     <div class="block__youtube">
                         <h3>D&D 5e новости:</h3>
 
-                        <ui-youtube
-                            id="D3FfWlhP9Co"
-                            ref="youtube"
-                        />
+                        <transition
+                            name="fade"
+                            mode="out-in"
+                        >
+                            <ui-youtube
+                                v-if="currentVideo"
+                                :id="currentVideo"
+                                ref="youtube"
+                            />
+
+                            <div
+                                v-else
+                                class="no-video"
+                            >
+                                Новостей не было за последнее время
+                            </div>
+                        </transition>
 
                         <a
                             href="https://www.youtube.com/@online.shirma"
@@ -164,9 +177,11 @@
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import orderBy from 'lodash/orderBy';
+    import { tryOnBeforeMount } from '@vueuse/core';
     import { useNavStore } from '@/store/UI/NavStore';
     import type { TNavItem } from '@/store/UI/NavStore';
     import UiYoutube from '@/components/UI/kit/UiYoutube.vue';
+    import { useAxios } from '@/common/composition/useAxios';
 
     export default defineComponent({
         components: { UiYoutube },
@@ -174,6 +189,8 @@
             const navStore = useNavStore();
             const { showedNavItems, showedPartners } = storeToRefs(navStore);
             const youtube = ref<HTMLElement | null>(null);
+            const http = useAxios();
+            const currentVideo = ref<string | null>(null);
 
             const navItems = computed(() => {
                 const items: TNavItem[] = [];
@@ -213,12 +230,33 @@
                 );
             });
 
+            const setLastVideo = async () => {
+                try {
+                    const resp = await http.get({ url: '/youtube/last' });
+
+                    if (resp.status !== 200) {
+                        return Promise.reject(resp.status);
+                    }
+
+                    currentVideo.value = resp.data.id;
+
+                    return Promise.resolve(resp.data);
+                } catch (err) {
+                    return Promise.reject(err);
+                }
+            };
+
             const openSearchModal = () => {
                 document.dispatchEvent(new Event('open-search'));
             };
 
+            tryOnBeforeMount(async () => {
+                await setLastVideo();
+            });
+
             return {
                 youtube,
+                currentVideo,
                 navItems,
                 tools,
                 showedPartners,
