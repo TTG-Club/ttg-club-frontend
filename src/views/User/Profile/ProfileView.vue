@@ -45,6 +45,7 @@
                         <ui-button
                             is-icon
                             :disabled="inProgress"
+                            @click.left.exact.prevent="setNewVideo"
                         >
                             <svg-icon icon-name="check" />
                         </ui-button>
