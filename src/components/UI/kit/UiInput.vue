@@ -193,6 +193,11 @@
         display: block;
         width: 100%;
 
+        &__label {
+            margin-bottom: 8px;
+            display: block;
+        }
+
         &__control {
             @include css_anim();
 

@@ -104,9 +104,8 @@
 
 <script lang="ts">
     import {
-        defineComponent, ref
+        defineComponent, ref, watch
     } from 'vue';
-    import { tryOnBeforeMount } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import type { TNavItem } from '@/store/UI/NavStore';
@@ -136,10 +135,6 @@
             const router = useRouter();
             const route = useRoute();
             const isShowMenu = ref(false);
-
-            tryOnBeforeMount(async () => {
-                await navStore.initNavItems();
-            });
 
             const isRouteExist = (link: TNavItem) => {
                 if (!link.url) {
@@ -202,6 +197,18 @@
                 // @ts-ignore
                 await defaultBookmarkStore.updateBookmark(url, name, 'menu');
             }
+
+            watch(
+                isShowMenu,
+                async value => {
+                    if (value) {
+                        await navStore.initNavItems();
+                    }
+                },
+                {
+                    immediate: true
+                }
+            );
 
             return {
                 isShowMenu,

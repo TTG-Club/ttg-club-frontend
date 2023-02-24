@@ -11,25 +11,29 @@
 
 <script lang="ts">
     import { defineComponent } from 'vue';
+    import { tryOnBeforeMount } from '@vueuse/core';
     import { useUIStore } from '@/store/UI/UIStore';
     import { useUserStore } from '@/store/UI/UserStore';
     import NavBar from '@/components/UI/menu/NavBar.vue';
 
     export default defineComponent({
         components: { NavBar },
-        data: () => ({
-            uiStore: useUIStore(),
-            userStore: useUserStore()
-        }),
-        async beforeMount() {
-            await this.initUser();
-        },
-        async mounted() {
-            await this.initTheme();
-        },
-        methods: {
-            async initTheme() {
-                await this.uiStore.removeOldTheme();
+        setup() {
+            const uiStore = useUIStore();
+            const userStore = useUserStore();
+
+            const initUser = async () => {
+                try {
+                    if (await userStore.getUserStatus()) {
+                        await userStore.getUserInfo();
+                    }
+                } catch (err) {
+                    await userStore.clearUser();
+                }
+            };
+
+            const initTheme = async () => {
+                await uiStore.removeOldTheme();
 
                 const html = document.querySelector('html');
 
@@ -39,21 +43,16 @@
                     avoidHtmlUpdate = ['theme-light', 'theme-dark'].includes(html?.dataset?.theme);
                 }
 
-                this.uiStore.setTheme({
-                    name: this.uiStore.getCookieTheme(),
+                uiStore.setTheme({
+                    name: uiStore.getCookieTheme(),
                     avoidHtmlUpdate
                 });
-            },
+            };
 
-            async initUser() {
-                try {
-                    if (await this.userStore.getUserStatus()) {
-                        await this.userStore.getUserInfo();
-                    }
-                } catch (err) {
-                    this.userStore.clearUser();
-                }
-            }
+            tryOnBeforeMount(async () => {
+                await initTheme();
+                await initUser();
+            });
         }
     });
 </script>

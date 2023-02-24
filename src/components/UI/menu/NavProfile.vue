@@ -26,7 +26,7 @@
                 </div>
 
                 <router-link
-                    v-if="isDev"
+                    v-if="hasAccessToProfile"
                     class="nav-profile__line"
                     :to="{ path: `/profile` }"
                 >
@@ -94,12 +94,11 @@
     import { storeToRefs } from 'pinia';
     import AuthModal from '@/components/UI/modals/AuthModal.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import { useUserStore } from '@/store/UI/UserStore';
+    import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
     import NavPopover from '@/components/UI/menu/NavPopover.vue';
     import LoginView from '@/components/account/LoginView.vue';
     import RegistrationView from '@/components/account/RegistrationView.vue';
     import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
-    import { useIsDev } from '@/common/helpers/isDev';
 
     export default {
         name: 'NavProfile',
@@ -162,6 +161,11 @@
                 return 'Добрый вечер';
             });
 
+            const hasAccessToProfile = computed(() => (
+                user.value.roles.includes(EUserRoles.MODERATOR)
+                || user.value.roles.includes(EUserRoles.ADMIN)
+            ));
+
             function openPopover() {
                 popover.value = true;
             }
@@ -216,7 +220,7 @@
             }
 
             return {
-                isDev: useIsDev(),
+                hasAccessToProfile,
                 isAuthenticated,
                 isModalOpened,
                 greeting,
