@@ -218,6 +218,7 @@
             };
 
             return {
+                youtube,
                 navItems,
                 tools,
                 showedPartners,
