@@ -110,7 +110,7 @@
                         <h3>D&D 5e новости:</h3>
 
                         <ui-youtube
-                            id="EVGfn931MzQ"
+                            id="D3FfWlhP9Co"
                             ref="youtube"
                         />
 
@@ -218,7 +218,6 @@
             };
 
             return {
-                youtube,
                 navItems,
                 tools,
                 showedPartners,
