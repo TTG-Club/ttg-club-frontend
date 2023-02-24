@@ -109,13 +109,9 @@
                     <div class="block__youtube">
                         <h3>D&D 5e новости:</h3>
 
-                        <!-- Менять надо только последние символы после / EVGfn931MzQ -->
-                        <iframe
-                            title="D&D 5e новости"
-                            width="100%"
-                            src="https://www.youtube.com/embed/EVGfn931MzQ"
-                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
+                        <ui-youtube
+                            id="EVGfn931MzQ"
+                            ref="youtube"
                         />
 
                         <a
@@ -164,17 +160,20 @@
 
 <script lang="ts">
     import {
-        computed, defineComponent
+        computed, defineComponent, ref
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import orderBy from 'lodash/orderBy';
     import { useNavStore } from '@/store/UI/NavStore';
     import type { TNavItem } from '@/store/UI/NavStore';
+    import UiYoutube from '@/components/UI/kit/UiYoutube.vue';
 
     export default defineComponent({
+        components: { UiYoutube },
         setup() {
             const navStore = useNavStore();
             const { showedNavItems, showedPartners } = storeToRefs(navStore);
+            const youtube = ref<HTMLElement | null>(null);
 
             const navItems = computed(() => {
                 const items: TNavItem[] = [];
@@ -219,6 +218,7 @@
             };
 
             return {
+                youtube,
                 navItems,
                 tools,
                 showedPartners,

@@ -14,7 +14,6 @@
     import { tryOnBeforeMount } from '@vueuse/core';
     import { useUIStore } from '@/store/UI/UIStore';
     import { useUserStore } from '@/store/UI/UserStore';
-    import { useNavStore } from '@/store/UI/NavStore';
     import NavBar from '@/components/UI/menu/NavBar.vue';
 
     export default defineComponent({
