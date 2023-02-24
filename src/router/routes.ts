@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
-import { useUserStore } from '@/store/UI/UserStore';
+import { storeToRefs } from 'pinia';
+import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
 import { useNavStore } from '@/store/UI/NavStore';
 
 /* eslint-disable max-len,vue/max-len */
@@ -245,13 +246,21 @@ export const routes: Readonly<RouteRecordRaw[]> = [
             const userStore = useUserStore();
 
             try {
-                if (!(await userStore.getUserStatus())) {
+                const user = await userStore.getUserInfo();
+
+                if (!user) {
                     next({ name: 'unauthorized' });
 
                     return;
                 }
 
-                next();
+                if (user.roles.includes(EUserRoles.MODERATOR) || user.roles.includes(EUserRoles.ADMIN)) {
+                    next();
+
+                    return;
+                }
+
+                next({ name: 'forbidden' });
             } catch (err) {
                 next({ name: 'internal-server' });
             }

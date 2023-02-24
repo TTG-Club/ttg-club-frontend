@@ -176,6 +176,11 @@
             &.is-right {
                 margin-left: 8px;
             }
+
+            .svg-icon {
+                width: 100%;
+                height: 100%;
+            }
         }
 
         &.is-full-width {

@@ -99,7 +99,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
     const getUserToken = () => Cookies.get(USER_TOKEN_COOKIE);
 
-    const getUserInfo = async () => {
+    const getUserInfo = async (): Promise<TUser> => {
         try {
             const resp = await http.get({
                 url: '/user/info'
