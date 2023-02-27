@@ -76,11 +76,12 @@
     </form>
 </template>
 
-<script>
+<script lang="ts">
     import useVuelidate from '@vuelidate/core';
     import {
         helpers, or, sameAs
     } from '@vuelidate/validators';
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, reactive, ref
     } from 'vue';
@@ -111,6 +112,16 @@
             token: {
                 type: String,
                 default: ''
+            },
+            tokenValidate: {
+                type: Object as PropType<{
+                    correct: boolean
+                    message: string
+                }>,
+                default: () => ({
+                    correct: true,
+                    message: ''
+                })
             }
         },
         emits: ['close', 'switch:auth'],
@@ -209,6 +220,12 @@
             }
 
             async function onSubmit() {
+                if (!props.tokenValidate?.correct) {
+                    toast.error(props.tokenValidate.message);
+
+                    return;
+                }
+
                 inProgress.value = true;
 
                 await v$.value.$reset();

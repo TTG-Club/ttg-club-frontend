@@ -1,5 +1,4 @@
 import type { RouteRecordRaw } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
 import { useNavStore } from '@/store/UI/NavStore';
 
@@ -263,6 +262,26 @@ export const routes: Readonly<RouteRecordRaw[]> = [
                 next({ name: 'forbidden' });
             } catch (err) {
                 next({ name: 'internal-server' });
+            }
+        }
+    },
+    {
+        name: 'reset-password',
+        path: '/reset/password',
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/ResetPasswordView.vue'),
+        beforeEnter: async (to, from, next) => {
+            const userStore = useUserStore();
+
+            try {
+                if (await userStore.getUserStatus()) {
+                    next({ name: 'forbidden' });
+                }
+
+                await userStore.getUserInfo();
+
+                next();
+            } catch (err) {
+                next();
             }
         }
     },
