@@ -1,5 +1,8 @@
 <template>
-    <page-layout>
+    <page-layout
+        :use-social-links="false"
+        :show-separator="false"
+    >
         <template #title>
             Сброс пароля
         </template>
@@ -30,9 +33,13 @@
     import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
     import { useAxios } from '@/common/composition/useAxios';
     import { useUserStore } from '@/store/UI/UserStore';
+    import PageLayout from '@/components/content/PageLayout.vue';
 
     export default defineComponent({
-        components: { ChangePasswordView },
+        components: {
+            PageLayout,
+            ChangePasswordView
+        },
         setup() {
             const route = useRoute();
             const http = useAxios();
@@ -45,7 +52,7 @@
             });
 
             const checkToken = async () => {
-                if (isAuthenticated.value) {
+                if (isAuthenticated.value || !route.query.token) {
                     return Promise.resolve();
                 }
 
