@@ -268,7 +268,7 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     {
         name: 'reset-password',
         path: '/reset/password',
-        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/components/account/ChangePasswordView.vue'),
+        component: () => import(/* webpackPrefetch: true */ /* webpackChunkName: 'Account' */ '@/views/User/ResetPasswordView.vue'),
         beforeEnter: async (to, from, next) => {
             const userStore = useUserStore();
 
