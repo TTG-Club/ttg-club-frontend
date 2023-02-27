@@ -273,6 +273,10 @@ export const routes: Readonly<RouteRecordRaw[]> = [
             const userStore = useUserStore();
 
             try {
+                if (await userStore.getUserStatus()) {
+                    next({ name: 'forbidden' });
+                }
+
                 await userStore.getUserInfo();
 
                 next();
