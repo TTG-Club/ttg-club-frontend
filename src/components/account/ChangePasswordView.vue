@@ -1,79 +1,94 @@
 <template>
-    <form
-        class="change-password form"
-        @keyup.enter.exact.prevent="onSubmit"
-        @submit.prevent="onSubmit"
-    >
-        <div
-            :class="{ 'is-hidden': isOnlyPassword }"
-            class="form__row"
-        >
-            <ui-input
-                v-model.trim="v$.email.$model"
-                :autocomplete="isOnlyPassword ? 'username' : 'email'"
-                :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
-                autocapitalize="off"
-                autocorrect="off"
-                placeholder="Электронный адрес"
-                required
-                @blur="v$.email.$touch()"
-                @input="v$.email.$reset()"
-            />
-        </div>
+    <page-layout>
+        <template #title>
+            Сброс пароля
+        </template>
 
-        <div
-            v-if="isOnlyPassword"
-            class="form__row"
+        <template
+            v-if="!tokenValidation.correct"
+            #subtitle
         >
-            <ui-input
-                v-model.trim="v$.password.$model"
-                :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
-                autocapitalize="off"
-                autocomplete="new-password"
-                autocorrect="off"
-                is-password
-                placeholder="Новый пароль"
-                required
-                @blur="v$.password.$touch()"
-                @input="v$.password.$reset()"
-            />
-        </div>
+            {{ tokenValidation.message }}
+        </template>
 
-        <div
-            v-if="isOnlyPassword"
-            class="form__row"
-        >
-            <ui-input
-                v-model.trim="v$.repeat.$model"
-                :error-text="v$.repeat.$dirty ? v$.repeat.$errors?.[0]?.$message : ''"
-                autocapitalize="off"
-                autocomplete="new-password"
-                autocorrect="off"
-                is-password
-                placeholder="Повторите пароль"
-                required
-                @blur="v$.repeat.$touch()"
-                @input="v$.repeat.$reset()"
-            />
-        </div>
-
-        <div class="form__row">
-            <ui-button
-                :disabled="success || inProgress"
-                @click.left.exact.prevent="onSubmit"
+        <template #default>
+            <form
+                class="change-password form"
+                @keyup.enter.exact.prevent="onSubmit"
+                @submit.prevent="onSubmit"
             >
-                {{ isOnlyPassword ? 'Изменить пароль' : 'Восстановить пароль' }}
-            </ui-button>
+                <div
+                    :class="{ 'is-hidden': isOnlyPassword }"
+                    class="form__row"
+                >
+                    <ui-input
+                        v-model.trim="v$.email.$model"
+                        :autocomplete="isOnlyPassword ? 'username' : 'email'"
+                        :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
+                        autocapitalize="off"
+                        autocorrect="off"
+                        placeholder="Электронный адрес"
+                        required
+                        @blur="v$.email.$touch()"
+                        @input="v$.email.$reset()"
+                    />
+                </div>
 
-            <ui-button
-                v-if="!isAuthenticated"
-                type-link
-                @click.left.exact.prevent="$emit('switch:auth')"
-            >
-                Авторизация
-            </ui-button>
-        </div>
-    </form>
+                <div
+                    v-if="isOnlyPassword"
+                    class="form__row"
+                >
+                    <ui-input
+                        v-model.trim="v$.password.$model"
+                        :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
+                        autocapitalize="off"
+                        autocomplete="new-password"
+                        autocorrect="off"
+                        is-password
+                        placeholder="Новый пароль"
+                        required
+                        @blur="v$.password.$touch()"
+                        @input="v$.password.$reset()"
+                    />
+                </div>
+
+                <div
+                    v-if="isOnlyPassword"
+                    class="form__row"
+                >
+                    <ui-input
+                        v-model.trim="v$.repeat.$model"
+                        :error-text="v$.repeat.$dirty ? v$.repeat.$errors?.[0]?.$message : ''"
+                        autocapitalize="off"
+                        autocomplete="new-password"
+                        autocorrect="off"
+                        is-password
+                        placeholder="Повторите пароль"
+                        required
+                        @blur="v$.repeat.$touch()"
+                        @input="v$.repeat.$reset()"
+                    />
+                </div>
+
+                <div class="form__row">
+                    <ui-button
+                        :disabled="success || inProgress"
+                        @click.left.exact.prevent="onSubmit"
+                    >
+                        {{ isOnlyPassword ? 'Изменить пароль' : 'Восстановить пароль' }}
+                    </ui-button>
+
+                    <ui-button
+                        v-if="!isAuthenticated"
+                        type-link
+                        @click.left.exact.prevent="$emit('switch:auth')"
+                    >
+                        Авторизация
+                    </ui-button>
+                </div>
+            </form>
+        </template>
+    </page-layout>
 </template>
 
 <script>
@@ -82,11 +97,11 @@
         helpers, or, sameAs
     } from '@vuelidate/validators';
     import {
-        computed, defineComponent, reactive, ref
+        computed, defineComponent, onBeforeMount, reactive, ref
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from 'vue-toastification';
-    import { useRouter } from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import { useUserStore } from '@/store/UI/UserStore';
@@ -101,20 +116,19 @@
         validateUsernameSpecialChars
     } from '@/common/helpers/authChecks';
     import { ToastEventBus } from '@/common/utils/ToastConfig';
+    import PageLayout from '@/components/content/PageLayout.vue';
+    import { useAxios } from '@/common/composition/useAxios';
 
     export default defineComponent({
         components: {
+            PageLayout,
             UiButton,
             UiInput
         },
-        props: {
-            token: {
-                type: String,
-                default: ''
-            }
-        },
         emits: ['close', 'switch:auth'],
         setup(props, { emit }) {
+            const http = useAxios();
+            const route = useRoute();
             const router = useRouter();
             const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
@@ -129,7 +143,14 @@
                 repeat: ''
             });
 
-            const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
+            const token = computed(() => route.query.token);
+
+            const tokenValidation = ref({
+                correct: true,
+                message: ''
+            });
+
+            const isOnlyPassword = computed(() => token.value || isAuthenticated.value);
 
             const validations = computed(() => {
                 if (isOnlyPassword.value) {
@@ -166,20 +187,24 @@
             const v$ = useVuelidate(validations.value, state, { $lazy: true });
 
             async function sendQuery() {
+                if (!isAuthenticated.value && !tokenValidation.value.correct) {
+                    return Promise.reject(tokenValidation.value.message);
+                }
+
                 if (isOnlyPassword.value) {
                     try {
                         const payload = {
                             password: state.password,
                             [isAuthenticated.value ? 'userToken' : 'resetToken']: isAuthenticated.value
                                 ? userStore.getUserToken()
-                                : props.token
+                                : token.value
                         };
 
                         await userStore.changePassword(payload);
 
                         toast.success('Пароль успешно изменен!', {
                             onClose: () => {
-                                if (!props.token) {
+                                if (!token.value) {
                                     return;
                                 }
 
@@ -208,6 +233,36 @@
                 }
             }
 
+            const checkToken = async () => {
+                if (isAuthenticated.value) {
+                    return Promise.resolve();
+                }
+
+                try {
+                    const resp = await http.get({ url: `/auth/token/validate?token=${ route.query.token }` });
+
+                    if (resp.status !== 200) {
+                        tokenValidation.value = {
+                            correct: false,
+                            message: 'Неизвестная ошибка'
+                        };
+
+                        return Promise.resolve();
+                    }
+
+                    tokenValidation.value = resp.data;
+
+                    return Promise.resolve();
+                } catch (err) {
+                    tokenValidation.value = {
+                        correct: false,
+                        message: 'Неизвестная ошибка'
+                    };
+
+                    return Promise.resolve();
+                }
+            };
+
             async function onSubmit() {
                 inProgress.value = true;
 
@@ -234,6 +289,10 @@
                 }
             }
 
+            onBeforeMount(async () => {
+                await checkToken();
+            });
+
             return {
                 isAuthenticated,
                 inProgress,
@@ -241,6 +300,8 @@
                 v$,
                 error,
                 success,
+                token,
+                tokenValidation,
                 onSubmit
             };
         }
