@@ -73,16 +73,7 @@
                     </div>
 
                     <div
-                        v-else-if="search.length < 3 && !results?.list.length"
-                        class="search-modal__text"
-                        @mouseenter.self="selectedIndex = null"
-                        @focusin.self="selectedIndex = null"
-                    >
-                        Минимум 3 символа для поиска
-                    </div>
-
-                    <div
-                        v-else-if="search.length >= 3 && !results?.list.length && inProgress"
+                        v-else-if="search.length && !results?.list.length && inProgress"
                         class="search-modal__text"
                         @mouseenter.self="selectedIndex = null"
                         @focusin.self="selectedIndex = null"
@@ -109,8 +100,8 @@
                         @focusin="selectedIndex = key"
                     />
 
-                    <a
-                        :href="searchUrl"
+                    <router-link
+                        :to="searchUrl"
                         class="search-modal__all"
                         @mouseenter.self="selectedIndex = null"
                         @focusin.self="selectedIndex = null"
@@ -126,7 +117,7 @@
                         <div class="search-modal__all_body">
                             Открыть страницу поиска
                         </div>
-                    </a>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -135,12 +126,13 @@
 
 <script lang="ts">
     import {
-        computed, defineComponent, onMounted, ref
+        computed, defineComponent, onMounted, ref, watch
     } from 'vue';
     import debounce from 'lodash/debounce';
     import {
         onKeyStroke, onStartTyping, useActiveElement, useFocus, useVModel
     } from '@vueuse/core';
+    import { useRouter } from 'vue-router';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
@@ -161,6 +153,7 @@
         },
         setup(props) {
             const isShowModal = useVModel(props, 'modelValue');
+            const router = useRouter();
             const http = useAxios();
             const controller = ref<AbortController | null>(null);
             const search = ref('');
@@ -171,14 +164,20 @@
             const selectedIndex = ref<number | null>(null);
             const activeElement = useActiveElement();
 
-            const searchUrl = computed(() => `/search?search=${ search.value }`);
+            const searchUrl = computed(() => ({
+                path: '/search',
+                query: {
+                    search: search.value,
+                    page: 1
+                }
+            }));
 
             const onSearch = async () => {
                 if (controller.value !== null) {
                     controller.value.abort();
                 }
 
-                if (search.value.length < 3) {
+                if (!search.value) {
                     return Promise.resolve();
                 }
 
@@ -336,7 +335,7 @@
                     return;
                 }
 
-                window.location.href = result.url;
+                router.push({ path: result.url });
             });
 
             const onSubmit = () => {
@@ -345,12 +344,12 @@
                 }
 
                 if (results.value?.list.length === 1) {
-                    window.location.href = results.value.list[0].url;
+                    router.push({ path: results.value.list[0].url });
 
                     return;
                 }
 
-                window.location.href = searchUrl.value;
+                router.push(searchUrl.value);
             };
 
             const onSearchDebounce = debounce(async () => {
@@ -362,6 +361,13 @@
 
                 onSearchDebounce();
             };
+
+            watch(isShowModal, value => {
+                if (!value) {
+                    search.value = '';
+                    results.value = null;
+                }
+            });
 
             return {
                 isShowModal,

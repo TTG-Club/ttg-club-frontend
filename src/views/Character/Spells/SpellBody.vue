@@ -99,10 +99,10 @@
                         v-for="(el, key) in spell.subclasses"
                         :key="key"
                     >
-                        <a
+                        <router-link
                             v-tippy="{ content: el.class }"
-                            :href="el.url"
-                        >{{ el.name }}</a>
+                            :to="{ path: el.url }"
+                        >{{ el.name }}</router-link>
 
                         <span v-if="key !== spell.subclasses.length - 1">,&nbsp;</span>
                     </span>
@@ -120,9 +120,7 @@
                         v-for="(el, key) in spell.races"
                         :key="key"
                     >
-                        <a
-                            :href="el.url"
-                        >{{ el.name }}</a>
+                        <router-link :to="{ path: el.url }">{{ el.name }}</router-link>
 
                         <span v-if="key !== spell.races.length - 1">,&nbsp;</span>
                     </span>
@@ -140,9 +138,7 @@
                         v-for="(el, key) in spell.backgrounds"
                         :key="key"
                     >
-                        <a
-                            :href="el.url"
-                        >{{ el.name }}</a>
+                        <router-link :to="{ path: el.url }">{{ el.name }}</router-link>
 
                         <span v-if="key !== spell.backgrounds.length - 1">,&nbsp;</span>
                     </span>

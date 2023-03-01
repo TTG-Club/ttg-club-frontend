@@ -2,12 +2,12 @@
     <div class="navbar">
         <header class="navbar__header">
             <div class="navbar__header_left">
-                <a
+                <router-link
                     class="navbar__logo"
-                    href="/"
+                    :to="{ name: 'index' }"
                 >
                     <site-logo />
-                </a>
+                </router-link>
 
                 <nav-menu />
 
@@ -56,10 +56,12 @@
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
     import NavSearch from '@/components/UI/menu/NavSearch.vue';
     import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';
+    import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
 
     export default defineComponent({
         name: 'NavBar',
         components: {
+            SiteLogo,
             NavSearch,
             NavMenu,
             NavBookmarks,
@@ -115,33 +117,33 @@
                 display: flex;
                 justify-content: center;
                 border-radius: 8px;
+                margin: 8px 0 8px 0;
+                opacity: 70%;
 
                 &.is-discord {
-                    background-color: transparent;
-                    color: var(--color-text);
+                    color: var(--text-btn-color);
 
                     &:hover {
-                        background-color: var(--discord-base);
-                        color: var(--text-btn-color);
+                        background-color: var(--discord-hover);
                     }
                 }
                 &.is-boosty {
-                    background-color: transparent;
-                    color: var(--color-text);
+                    color: var(--text-btn-color);
 
                     &:hover {
-                        background-color: var(--boosty-base);
-                        color: var(--text-btn-color);
+                        background-color: var(--boosty-hover);
                     }
                 }
                 &.is-vk {
-                    background-color: transparent;
-                    color: var(--color-text);
+                    color: var(--text-btn-color);
 
                     &:hover {
-                        background-color: var(--vk-base);
-                        color: var(--text-btn-color);
+                        background-color: var(--vk-hover);
                     }
+                }
+
+                &:hover {
+                    opacity: 100%;
                 }
             }
         }

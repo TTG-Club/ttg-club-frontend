@@ -13,8 +13,6 @@ export type RequestConfig = {
 export default class HTTPService {
     protected instance: AxiosInstance;
 
-    protected instanceRaw: AxiosInstance;
-
     constructor() {
         axios.defaults.withCredentials = true;
 
@@ -33,19 +31,14 @@ export default class HTTPService {
             return req;
         });
 
-        this.instance.interceptors.response.use(resp => {
+        this.instance.interceptors.response.use(async resp => {
             if (resp.status === 401) {
                 const userStore = useUserStore();
 
-                userStore.clearUser();
+                await userStore.clearUser();
             }
 
             return resp;
-        });
-
-        this.instanceRaw = axios.create({
-            baseURL: '',
-            withCredentials: true
         });
     }
 
@@ -94,9 +87,19 @@ export default class HTTPService {
         });
     }
 
+    headRaw(config: Omit<RequestConfig, 'payload'>) {
+        return this.instance({
+            method: 'head',
+            baseURL: '',
+            url: config.url,
+            signal: config.signal
+        });
+    }
+
     rawGet(config: RequestConfig) {
-        return this.instanceRaw({
+        return this.instance({
             method: 'get',
+            baseURL: '',
             url: config.url,
             params: config.payload,
             signal: config.signal

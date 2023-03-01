@@ -47,6 +47,13 @@
                         >
                             {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
                         </div>
+
+                        <div
+                            v-if="magicItem.customization"
+                            class="link-item__customization"
+                        >
+                            Настройка
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,6 +125,9 @@
         &__type {
             padding-left: 14px;
             position: relative;
+            color: var(--text-g-color);
+            font-size: calc(var(--main-font-size) - 1px);
+            line-height: normal;
 
             &:after {
                 content: '';
@@ -130,7 +140,7 @@
                 display: block;
                 left: 0;
                 top: 4px;
-                z-index: 1;
+                //z-index: 1;
             }
 
             &.is-common {
@@ -180,7 +190,7 @@
             }
         }
 
-        &__type {
+        &__customization {
             color: var(--text-g-color);
             font-size: calc(var(--main-font-size) - 1px);
             line-height: normal;

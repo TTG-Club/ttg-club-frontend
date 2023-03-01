@@ -21,12 +21,12 @@
         <template #default>
             <div class="nav-menu">
                 <div class="nav-menu__header">
-                    <a
+                    <router-link
                         class="nav-menu__logo"
-                        href="/"
+                        :to="{ name: 'index' }"
                     >
                         <site-logo />
-                    </a>
+                    </router-link>
 
                     <div class="nav-menu__info">
                         <span class="nav-menu__info--desc">Онлайн справочник по D&D 5e</span>
@@ -36,11 +36,11 @@
                 </div>
 
                 <div
-                    v-if="navItems.length"
+                    v-if="showedNavItems.length"
                     class="nav-menu__body"
                 >
                     <div
-                        v-for="(group, groupKey) in navItems"
+                        v-for="(group, groupKey) in showedNavItems"
                         :key="group.name + groupKey"
                         class="nav-menu__group"
                     >
@@ -104,9 +104,8 @@
 
 <script lang="ts">
     import {
-        defineComponent, ref
+        defineComponent, ref, watch
     } from 'vue';
-    import { tryOnBeforeMount } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import type { TNavItem } from '@/store/UI/NavStore';
@@ -127,19 +126,15 @@
         },
         setup() {
             const navStore = useNavStore();
-            const { isShowMenu } = storeToRefs(navStore);
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
             const customBookmarkStore = useCustomBookmarkStore();
             const inProgressURLs = ref<string[]>([]);
-            const { navItems } = storeToRefs(navStore);
+            const { showedNavItems } = storeToRefs(navStore);
             const router = useRouter();
             const route = useRoute();
-
-            tryOnBeforeMount(async () => {
-                navItems.value = await navStore.getNavItems();
-            });
+            const isShowMenu = ref(false);
 
             const isRouteExist = (link: TNavItem) => {
                 if (!link.url) {
@@ -203,9 +198,21 @@
                 await defaultBookmarkStore.updateBookmark(url, name, 'menu');
             }
 
+            watch(
+                isShowMenu,
+                async value => {
+                    if (value) {
+                        await navStore.initNavItems();
+                    }
+                },
+                {
+                    immediate: true
+                }
+            );
+
             return {
                 isShowMenu,
-                navItems,
+                showedNavItems,
                 isRouteExist,
                 isSaved,
                 updateBookmark

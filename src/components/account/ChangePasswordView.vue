@@ -76,16 +76,18 @@
     </form>
 </template>
 
-<script>
+<script lang="ts">
     import useVuelidate from '@vuelidate/core';
     import {
         helpers, or, sameAs
     } from '@vuelidate/validators';
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, reactive, ref
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useToast } from 'vue-toastification';
+    import { useRouter } from 'vue-router';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import { useUserStore } from '@/store/UI/UserStore';
@@ -110,10 +112,21 @@
             token: {
                 type: String,
                 default: ''
+            },
+            tokenValidate: {
+                type: Object as PropType<{
+                    correct: boolean
+                    message: string
+                }>,
+                default: () => ({
+                    correct: true,
+                    message: ''
+                })
             }
         },
         emits: ['close', 'switch:auth'],
         setup(props, { emit }) {
+            const router = useRouter();
             const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
@@ -181,7 +194,7 @@
                                     return;
                                 }
 
-                                window.location.replace('/');
+                                router.replace({ name: 'index' });
                             }
                         });
 
@@ -207,6 +220,12 @@
             }
 
             async function onSubmit() {
+                if (!props.tokenValidate?.correct) {
+                    toast.error(props.tokenValidate.message);
+
+                    return;
+                }
+
                 inProgress.value = true;
 
                 await v$.value.$reset();

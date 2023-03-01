@@ -22,21 +22,6 @@
   }
 }
 
-.bg-img-main {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  opacity: 0.65;
-  z-index: -100;
-  height: var(--max-vh);
-  pointer-events: none;
-  display: none;
-
-  @include media-min($xxl) {
-    display: block;
-  }
-}
-
 .container {
   width: 100%;
   height: var(--max-vh);
@@ -230,26 +215,27 @@
     gap: 16px;
 
     .right {
-      flex: 1 1 33%;
-    }
-
-    @include media-min($md) {
-      flex-direction: row;
+      flex: 1 1 100%;
     }
 
     .left {
-      flex: 1 1 66%;
+      flex: 1 1 100%;
+      margin: 0 0 16px;
+      display: flex;
+      gap: 16px;
+      flex-direction: column;
 
       .block {
         display: flex;
         flex-direction: column;
         gap: 16px;
+        flex: 1 1 66%;
 
         .links_block {
           flex: 1 1 50%;
         }
 
-        @include media-min($xl) {
+        @include media-min($md) {
           flex-direction: row;
         }
 
@@ -258,6 +244,54 @@
           flex-direction: column;
           display: flex;
           gap: 16px;
+        }
+
+      }
+
+      .block__youtube {
+        flex: 1 1 calc(33% - 10px);
+        background-color: var(--bg-table-list);
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 8px 16px 8px 16px;
+        flex-direction: column;
+        display: flex;
+
+        h3 {
+          font-size: calc(var(--h3-font-size) - 12px);
+          margin-top: 0;
+          font-family: "Open Sans", sans-serif;
+          font-weight: 400;
+          opacity: 0.6;
+        }
+
+        .btn {
+          padding: 8px 8px;
+          background-color: var(--hover);
+          color: var(--text-color);
+          border-radius: 8px;
+          margin: 4px 0;
+          transition: all 0.5s;
+          width: fit-content;
+
+          &:hover {
+            background-color: var(--bg-main);
+          }
+        }
+
+        .ui-youtube,
+        .no-video {
+          height: 180px;
+          margin: 0 0 8px 0;
+          border-radius: 12px;
+
+          @include media-min($sm) {
+            height: 300px;
+          }
+
+          @include media-min($xl) {
+            height: 100%;
+          }
         }
       }
 
@@ -351,6 +385,10 @@
         .bg_img {
           background-image: url(/img/bg_discord_bot.webp?v=2);
         }
+      }
+
+      @include media-min($xl) {
+        flex-direction: row;
       }
     }
   }

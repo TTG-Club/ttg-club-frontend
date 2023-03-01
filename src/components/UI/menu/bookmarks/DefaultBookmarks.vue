@@ -93,9 +93,11 @@
 
 <script>
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {
         name: 'DefaultBookmarks',
+        components: { SvgIcon },
         data: () => ({
             defaultBookmarkStore: useDefaultBookmarkStore()
         }),

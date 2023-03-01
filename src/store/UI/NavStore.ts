@@ -1,5 +1,9 @@
-import { computed, ref } from 'vue';
+import {
+    computed, ref
+} from 'vue';
 import { defineStore } from 'pinia';
+import orderBy from 'lodash/orderBy';
+import type { RouteLocationNormalized } from 'vue-router';
 import { useAxios } from '@/common/composition/useAxios';
 import isDev from '@/common/helpers/isDev';
 
@@ -9,48 +13,118 @@ export type TNavItem = {
     url?: string
     onlyDev?: boolean
     external?: boolean
-    children: Array<TNavItem>
+    children?: Array<TNavItem>
+    order: number
+    onIndex?: boolean
+    indexOrder?: number
+}
+
+export type TPartner = {
+    name: string
+    description?: string
+    img: string
+    url: string
+    order: number
 }
 
 export const useNavStore = defineStore('NavStore', () => {
     const http = useAxios();
+    const isShowPopover = ref(false);
+    const isShowSearch = ref(false);
+
+    /* Menu */
     const navItems = ref<Array<TNavItem>>([]);
-    const metaInfo = ref(undefined);
-    const isShowMenu = ref(false);
 
-    const showedNavItems = computed(() => navItems.value
-        .filter(group => {
-            if (isDev) {
-                return true;
-            }
+    const showedNavItems = computed(() => (
+        orderBy(
+            navItems.value
+                .filter(group => {
+                    if (isDev) {
+                        return true;
+                    }
 
-            return !group.onlyDev;
-        })
-        .map(group => ({
-            ...group,
-            children: group.children.filter(link => {
-                if (isDev) {
-                    return true;
-                }
+                    return !group.onlyDev;
+                })
+                .map(group => ({
+                    ...group,
+                    children: orderBy(
+                        group.children?.filter(link => {
+                            if (isDev) {
+                                return true;
+                            }
 
-                return !link.onlyDev;
-            })
-        })));
+                            return !link.onlyDev;
+                        }) || [],
+                        ['order'],
+                        ['asc']
+                    )
+                })),
+            ['order'],
+            ['asc']
+        )
+    ));
 
-    const getNavItems = async () => {
+    const initNavItems = async () => {
+        if (navItems.value.length) {
+            return Promise.resolve();
+        }
+
         try {
             const resp = await http.get({
                 url: '/menu'
             });
 
             if (resp.status === 200) {
-                return Promise.resolve(resp.data);
+                navItems.value = resp.data;
+
+                return Promise.resolve();
             }
 
             return Promise.reject(resp.statusText);
         } catch (err) {
             return Promise.reject(err);
         }
+    };
+
+    /* Partners */
+    const partners = ref<TPartner[]>([]);
+
+    const showedPartners = computed(() => (
+        orderBy(
+            partners.value,
+            ['order'],
+            ['asc']
+        )
+    ));
+
+    const initPartners = async () => {
+        if (partners.value.length) {
+            return Promise.resolve();
+        }
+
+        try {
+            const resp = await http.get({
+                url: '/partners'
+            });
+
+            if (resp.status === 200) {
+                partners.value = resp.data;
+
+                return Promise.resolve();
+            }
+
+            return Promise.reject(resp.statusText);
+        } catch (err) {
+            return Promise.reject(err);
+        }
+    };
+
+    /* Meta */
+    const metaInfo = ref(undefined);
+
+    const hidePopovers = () => {
+        isShowPopover.value = false;
+        isShowSearch.value = false;
     };
 
     const getMetaByURL = async (url: string) => {
@@ -98,9 +172,13 @@ export const useNavStore = defineStore('NavStore', () => {
         }
     };
 
-    const updateMetaByURL = async (url: string) => {
+    const updateMetaByURL = async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+        if (to.path === from.path) {
+            return Promise.resolve();
+        }
+
         try {
-            const meta = await getMetaByURL(url);
+            const meta = await getMetaByURL(to.path);
 
             setMeta(meta);
 
@@ -111,11 +189,21 @@ export const useNavStore = defineStore('NavStore', () => {
     };
 
     return {
-        isShowMenu,
+        isShowPopover,
+        isShowSearch,
+        hidePopovers,
+
+        // Menu
         navItems,
         showedNavItems,
+        initNavItems,
+
+        // Partners
+        showedPartners,
+        initPartners,
+
+        // Meta
         metaInfo,
-        getNavItems,
         updateMetaByURL
     };
 });

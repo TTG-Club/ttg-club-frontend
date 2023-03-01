@@ -35,6 +35,27 @@
                 </div>
 
                 <div class="profile__row">
+                    <div class="profile__youtube">
+                        <ui-input
+                            v-model="currentVideo"
+                            label="ID нового видео"
+                            :is-error="isError"
+                        />
+
+                        <ui-button
+                            is-icon
+                            :disabled="inProgress"
+                            @click.left.exact.prevent="setNewVideo"
+                        >
+                            <svg-icon icon-name="check" />
+                        </ui-button>
+                    </div>
+                </div>
+
+                <div
+                    v-if="false"
+                    class="profile__row"
+                >
                     <a
                         href="#"
                         class="profile__btn"
@@ -43,7 +64,10 @@
                     </a>
                 </div>
 
-                <div class="profile__row">
+                <div
+                    v-if="false"
+                    class="profile__row"
+                >
                     <div class="profile__blocks">
                         <div class="profile__block">
                             <h5 class="profile__block_name">
@@ -185,22 +209,34 @@
     </page-layout>
 </template>
 
-<script>
+<script lang="ts">
     import {
-        computed, defineComponent
+        computed, defineComponent, ref
     } from 'vue';
     import { storeToRefs } from 'pinia';
     import orderBy from 'lodash/orderBy';
     import upperFirst from 'lodash/upperFirst';
+    import { tryOnBeforeMount } from '@vueuse/core';
     import PageLayout from '@/components/content/PageLayout.vue';
     import { useUserStore } from '@/store/UI/UserStore';
+    import UiInput from '@/components/UI/kit/UiInput.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
+    import { useAxios } from '@/common/composition/useAxios';
 
     export default defineComponent({
         components: {
-            PageLayout
+            SvgIcon,
+            UiInput,
+            PageLayout,
+            UiButton
         },
         setup() {
+            const http = useAxios();
             const userStore = useUserStore();
+            const currentVideo = ref<string | null>(null);
+            const isError = ref(false);
+            const inProgress = ref(false);
 
             const {
                 user,
@@ -214,10 +250,59 @@
                     .join(', '))
             ));
 
+            const getLastVideo = async () => {
+                try {
+                    const resp = await http.get({ url: '/youtube/last' });
+
+                    if (resp.status !== 200) {
+                        return Promise.reject(resp.status);
+                    }
+
+                    currentVideo.value = resp.data.id;
+
+                    return Promise.resolve(resp.data);
+                } catch (err) {
+                    return Promise.reject(err);
+                }
+            };
+
+            const setNewVideo = async () => {
+                inProgress.value = true;
+                isError.value = false;
+
+                try {
+                    const resp = await http.put({ url: `/youtube/${ currentVideo.value }` });
+
+                    if (resp.status !== 200) {
+                        isError.value = true;
+                        inProgress.value = false;
+
+                        return Promise.reject(resp.status);
+                    }
+
+                    currentVideo.value = resp.data.id;
+                    inProgress.value = false;
+
+                    return Promise.resolve(resp.data);
+                } catch (err) {
+                    inProgress.value = false;
+
+                    return Promise.reject(err);
+                }
+            };
+
+            tryOnBeforeMount(async () => {
+                await getLastVideo();
+            });
+
             return {
                 user,
                 roles,
-                avatar
+                avatar,
+                currentVideo,
+                isError,
+                inProgress,
+                setNewVideo
             };
         }
     });
@@ -263,6 +348,17 @@
             &_mail,
             &_role {
                 margin: 8px 0 0 0;
+            }
+        }
+
+        &__youtube {
+            display: flex;
+            align-items: flex-end;
+
+            .ui-button {
+                width: 40px;
+                height: 40px;
+                margin-left: 8px;
             }
         }
 

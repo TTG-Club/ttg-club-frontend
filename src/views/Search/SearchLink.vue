@@ -1,14 +1,15 @@
 <template>
-    <a
+    <router-link
         v-if="searchLink"
         ref="link"
-        :href="searchLink.url"
+        :to="{ path: searchLink.url }"
         class="search-link"
         :class="classes"
     >
         <div class="search-link__body">
             <div class="search-link__label">
                 {{ searchLink.name }}
+                <span class="search-link__label--eng">[{{ searchLink.englishName }}]</span>
             </div>
 
             <div class="search-link__section">
@@ -29,7 +30,7 @@
                 {{ searchLink.description }}
             </div>
         </div>
-    </a>
+    </router-link>
 </template>
 
 <script lang="ts">
@@ -129,6 +130,12 @@
 
             @include media-min($xl) {
                 white-space: initial;
+            }
+        }
+
+        &__label {
+            &--eng {
+                color: var(--text-g-color);
             }
         }
 
