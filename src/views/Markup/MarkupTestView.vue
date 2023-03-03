@@ -9,15 +9,17 @@
         </template>
 
         <template #default>
-            <markup-render :entry="test" />
+            <markup-render
+                :entry="test"
+            />
         </template>
     </page-layout>
 </template>
 
-<script>
+<script lang="ts">
     import { defineComponent } from 'vue';
     import PageLayout from '@/components/content/PageLayout.vue';
-    import MarkupRender from '@/components/content/MarkupRender.vue';
+    import MarkupRender from '@/components/render/MarkupRender.vue';
 
     export default defineComponent({
         components: {
@@ -26,7 +28,43 @@
         },
         setup() {
             /* eslint-disable vue/max-len */
-            const test = '{@gallery https://image.ttg.club:8089/creatures/Tiamat.webp;https://image.ttg.club:8089/creatures/Tiamat2.webp}\n\n{@b Класс доспеха} {@ac 25 natural}\n\n{@b Хиты} {@hit 30d20+300}\n\n{@bold Скорость} {@speed 60}, {@speed 120|fly}\n\n{@style {@style {@b СИЛ} {@ability str 30}|scores__stats;strength} {@style {@b ЛОВ} {@ability dex 10}|scores__stats;dexterity} {@style {@b ТЕЛ} {@ability con 30}|scores__stats;constitution} {@style {@b ИНТ} {@ability int 26}|scores__stats;intelligence} {@style {@b МДР} {@ability wis 26}|scores__stats;wisdom} {@style {@b ХАР} {@ability cha 29}|scores__stats;charisma}|scores}\n\n{@b Спасброски} Сил {@savingThrow str 19}, Лов {@savingThrow dex 9}, Мдр {@savingThrow wis 17}\n\n{@b Навыки} {@skill arcana} {@skillCheck arcana 17}, {@skill perception} {@skillCheck perception 26}, {@skill religion} {@skillCheck religion 17}\n\n{@b Иммунитет к урону} {@damageType fire|от огня|colored}, {@damageType cold|от холода}, {@damageType lightning|от электричества}, {@damageType poison|от яда}, {@damageType acid|от кислоты|colored}; {@damageType bludgeoning}, {@damageType piercing} и {@damageType slashing} от немагических атак\n\n{@b Иммунитет к состояниям} ослепление, очарование, глухота, испуг, отравление, ошеломление\n\n{@b Чувства} {@sense darkvision} 240 фт., {@sense truesight} 120 фт., пассивная Внимательность 36\n\n{@b Языки} {@language Общий}, {@language Драконий}, {@language Инфернальный}\n\n{@b Уровень опасности} {@challengeRating 30}\n\n{@title4 Способности|header_separator}';
+            const test = [
+                'Для начала нужно знать: закладки, когда вы не вошли в профиль на сайте, сохраняются только у вас в браузере. Закладки, которые у вас после авторизации, хранятся у нас на сервере и вы можете получить к ним доступ с любого устройства. Если у вас возникнут затруднения с инструкцией, вы всегда можете обратиться за помощью на нашем Discordсервере или в группе ВКонтакте.',
+                {
+                    type: 'heading',
+                    level: 2,
+                    name: 'Термины'
+                },
+                {
+                    type: 'list',
+                    items: ['Группа - это разделы закладок такие как "Общая", в нее входят категории.', 'Категории - это разделы в группах такие как: "Заклинания", "Классы", "Расы" и т.д.']
+                },
+                {
+                    type: 'heading',
+                    level: 1,
+                    name: 'Инструкция'
+                },
+                {
+                    type: 'list',
+                    items: [
+                        'Чтобы была возможность управлять группами и категориям закладок, вам нужно зарегистрироваться и авторизоваться на сайте.',
+                        'После чего вы можете создать нужные группы закладок.',
+                        'В момент добавления закладки, вы можете нажать на стрелку рядом с "флажком" и выбрать нужную группу — закладка будет добавлена в нее.',
+                        'Вы можете перетаскивать закладки между группами и категориями, а также выполнять перетаскивание категории целиком (между группами).',
+                        'В мобильной версии для перетаскивания и удаления закладок, нужно перейти в режим редактирования.'
+                    ]
+                },
+                {
+                    type: 'heading',
+                    level: 3,
+                    name: 'Ниже будет приведен видеоролик подготовки игрока перед игрой, а именно "создание" персонажа.'
+                },
+                {
+                    type: 'youtube',
+                    id: 'KsUGkjbkaSy'
+                },
+                'С уважением, команда {@link TTG Club|https://ttg.club}.'
+            ];
             /* eslint-enable vue/max-len */
 
             return {

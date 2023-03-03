@@ -3,13 +3,14 @@ import { h } from 'vue';
 import DiceRoller from '@/components/UI/DiceRoller.vue';
 import {
     CHALLENGE_RATING, DAMAGE_TYPE, SPEED
-} from '@/types/Markup/base.types';
+} from '@/components/render/constants/base.types';
 import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
 import { usePluralize } from '@/common/composition/usePluralize';
 import DetailTooltip from '@/components/UI/DetailTooltip.vue';
+import type { TMarkupHeading } from '@/components/render/composition/useHeadingRender';
 
 /* eslint-disable no-use-before-define */
-export const useMarkup = (leadingCharacter = '@') => {
+export const useRender = (leadingCharacter = '@') => {
     const splitByMarkers = (string: string) => {
         let tagDepth = 0;
         let char;
@@ -344,7 +345,7 @@ export const useMarkup = (leadingCharacter = '@') => {
         );
     };
 
-    const renderVNode = (marker: string, text: string): VNode => {
+    const renderTagVNode = (marker: string, text: string): VNode => {
         switch (marker) {
             // Жирный текст
             case '@b':
@@ -417,7 +418,7 @@ export const useMarkup = (leadingCharacter = '@') => {
         }
     };
 
-    const recursiveRender = (entry: string) => {
+    const recursiveRenderString = (entry: string) => {
         const tagSplit = splitByMarkers(entry);
         const len = tagSplit.length;
         const result: Array<VNode | string> = [];
@@ -432,7 +433,7 @@ export const useMarkup = (leadingCharacter = '@') => {
             if (str.startsWith(`{${ leadingCharacter }`)) {
                 const [marker, text] = splitFirstSpace(str.slice(1, -1));
 
-                result.push(renderVNode(marker, text));
+                result.push(renderTagVNode(marker, text));
             } else {
                 result.push(str);
             }
@@ -441,21 +442,86 @@ export const useMarkup = (leadingCharacter = '@') => {
         return result;
     };
 
-    const render = (entry: string | null) => {
+    const renderTitleObject = (entry: TMarkupHeading) => {
+        if (entry.level === 2 && entry.collapse && (!(entry.entries instanceof Array) || !entry.entries.length)) {
+            throw new Error('Заголовок нельзя сворачивать, если в нем нет "entries"');
+        }
+
+        let classList = entry.style;
+
+        const getSplitClasses = (str?: string): string[] => (
+            str?.replace(/;/g, ' ')
+                .split(/\s/g)
+                .map(item => item.trim())
+                .filter(item => !!item) || []
+        );
+
+        if (typeof entry.style === 'string') {
+            classList = getSplitClasses(entry.style);
+        }
+
+        if (entry.style instanceof Array) {
+            classList = entry.style
+                .flatMap(styleItem => getSplitClasses(styleItem))
+                .filter(item => !!item);
+        }
+
+        return h(
+            'div',
+            { class: 'markup-heading' },
+            [
+                h(
+                    `h${ entry.level + 2 }`,
+                    { class: classList },
+                    entry.name
+                ),
+                h(
+                    'div',
+                    recursiveRender(entry.entries)
+                )
+            ]
+        );
+    };
+
+    const recursiveRenderObject = (entry: any): VNode | VNode[] => {
+        switch (entry.type) {
+            case 'heading':
+                return renderTitleObject(entry);
+
+            default:
+                return h('span', 'wtf');
+        }
+    };
+
+    const recursiveRender = (entry: any | any[]) => {
         if (!entry) {
             return h('span', 'Произошла какая-то ошибка...');
         }
 
-        const paragraphs = entry.split('\n\n');
+        if (entry instanceof Array) {
+            const nodes = [];
 
-        if (paragraphs.length > 1) {
-            return paragraphs.map(str => h('p', recursiveRender(str)));
+            for (const entryElement of entry) {
+                if (typeof entryElement === 'string') {
+                    nodes.push(recursiveRenderString(entryElement));
+
+                    continue;
+                }
+
+                nodes.push(recursiveRenderObject(entryElement));
+            }
+
+            return nodes;
         }
 
-        return recursiveRender(entry);
+        if (typeof entry === 'string') {
+            return recursiveRenderString(entry);
+        }
+
+        return recursiveRenderObject(entry);
     };
 
     return {
-        render
+        recursiveRender
     };
 };
