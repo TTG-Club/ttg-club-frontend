@@ -3,11 +3,13 @@ import {
 } from 'vue';
 import type { MaybeComputedRef, MaybeRef } from '@vueuse/core';
 import { resolveUnref } from '@vueuse/core';
+import { useRoute } from 'vue-router';
 import type { FilterQueryParams } from '@/common/composition/useFilter';
 import { useIsDev } from '@/common/helpers/isDev';
 import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
 import type { RequestConfig } from '@/common/services/HTTPService';
+import { useMetrics } from '@/common/composition/useMetrics';
 
 export type PaginationSearch = {
     value: MaybeRef<string>
@@ -48,8 +50,10 @@ export type PaginationConfig = {
 export function usePagination(config: PaginationConfig) {
     let abortController: AbortController | null;
 
+    const route = useRoute();
     const http = useAxios();
     const isDev = useIsDev();
+    const { sendPageViewMetrics } = useMetrics();
 
     const isLoading = ref(false);
     const isFirstLoad = ref(true);
@@ -154,6 +158,8 @@ export function usePagination(config: PaginationConfig) {
         page.value++;
 
         await load(true);
+
+        sendPageViewMetrics(route);
     };
 
     const resetPages = () => {

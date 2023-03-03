@@ -63,7 +63,7 @@
                 class="section-header__control is-only-desktop"
                 is-icon
                 type-link-filled
-                @click.left.exact.prevent.stop="$emit('exportFoundry')"
+                @click.left.exact.prevent.stop="exportToFoundry"
             >
                 <svg-icon icon-name="export-foundry" />
             </ui-button>
@@ -115,6 +115,7 @@
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
     import { ToastEventBus } from '@/common/utils/ToastConfig';
+    import { useMetrics } from '@/common/composition/useMetrics';
 
     export default defineComponent({
         components: {
@@ -164,10 +165,11 @@
                 default: null
             }
         },
-        setup(props) {
+        setup(props, { emit }) {
             const route = useRoute();
             const uiStore = useUIStore();
             const clipboard = useClipboard();
+            const { sendShareMetrics } = useMetrics();
             const toast = useToast(ToastEventBus);
             const urlForCopy = computed(() => window.location.origin + route.path);
 
@@ -191,7 +193,11 @@
                 }
 
                 clipboard.copy(urlForCopy.value)
-                    .then(() => toast('Ссылка успешно скопирована'))
+                    .then(() => {
+                        toast('Ссылка успешно скопирована');
+
+                        sendShareMetrics();
+                    })
                     .catch(() => toast.error((
                       <span>
                         Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем
@@ -219,6 +225,12 @@
                 window.print();
             };
 
+            const exportToFoundry = () => {
+                sendShareMetrics('export_foundry');
+
+                emit('exportFoundry');
+            };
+
             return {
                 uiStore,
                 hasControls,
@@ -226,7 +238,8 @@
                 closeAvailable,
                 copyText,
                 copyURL,
-                openPrintWindow
+                openPrintWindow,
+                exportToFoundry
             };
         }
     });
