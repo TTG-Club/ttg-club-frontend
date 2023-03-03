@@ -35,7 +35,8 @@ app.use(pinia)
 if (isDev) {
     app.use(VueGtag, {
         config: {
-            id: 'G-WXD97L1HCX'
+            // @ts-ignore
+            id: window.GTAG_ID
         }
     });
 }

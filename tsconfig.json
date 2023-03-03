@@ -44,7 +44,6 @@
     "strictPropertyInitialization": true,
     "target": "esnext",
     "typeRoots": [
-      "./env.d.ts",
       "./src/shims-vue.d.ts",
       "./node_modules/@types"
     ],
