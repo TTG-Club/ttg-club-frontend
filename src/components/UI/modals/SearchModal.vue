@@ -138,6 +138,7 @@
     import { useAxios } from '@/common/composition/useAxios';
     import type { TSearchResultList } from '@/types/Search/Search.types';
     import SearchLink from '@/views/Search/SearchLink.vue';
+    import { useMetrics } from '@/common/composition/useMetrics';
 
     export default defineComponent({
         components: {
@@ -163,6 +164,7 @@
             const { focused } = useFocus(input, { initialValue: true });
             const selectedIndex = ref<number | null>(null);
             const activeElement = useActiveElement();
+            const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
 
             const searchUrl = computed(() => ({
                 path: '/search',
@@ -203,8 +205,12 @@
                         return Promise.reject(resp.statusText);
                     }
 
+                    sendSearchMetrics(search);
+
                     results.value = resp.data as TSearchResultList;
                     selectedIndex.value = null;
+
+                    sendSearchViewResultsMetrics(search);
 
                     return Promise.resolve();
                 } catch (err) {
@@ -244,6 +250,8 @@
 
                     results.value = resp.data as TSearchResultList;
                     selectedIndex.value = null;
+
+                    sendSearchMetrics('random');
 
                     return Promise.resolve();
                 } catch (err) {

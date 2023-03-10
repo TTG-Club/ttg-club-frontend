@@ -120,6 +120,7 @@
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useUIStore } from '@/store/UI/UIStore';
+    import { useMetrics } from '@/common/composition/useMetrics';
 
     export default defineComponent({
         components: {
@@ -135,6 +136,7 @@
             const uiStore = useUIStore();
             const { bodyElement } = storeToRefs(uiStore);
             const http = useAxios();
+            const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
             const controller = ref<AbortController | null>(null);
             const inProgress = ref(false);
             const search = ref('');
@@ -260,6 +262,8 @@
                         return Promise.reject(resp.statusText);
                     }
 
+                    sendSearchMetrics(search);
+
                     return Promise.resolve(resp.data as TSearchResultList);
                 } catch (err) {
                     return Promise.reject(err);
@@ -304,6 +308,8 @@
 
                         isNeedUpdateScroll.value = false;
                     }
+
+                    sendSearchViewResultsMetrics(search);
 
                     return Promise.resolve();
                 } catch (err) {

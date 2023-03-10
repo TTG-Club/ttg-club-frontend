@@ -3,6 +3,7 @@ import { routes } from '@/router/routes';
 import { useNavStore } from '@/store/UI/NavStore';
 import { useRouterHelpers } from '@/router/composition/useRouterHelpers';
 import pinia from '@/store';
+import { useMetrics } from '@/common/composition/useMetrics';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -10,6 +11,7 @@ const router = createRouter({
 });
 
 const { nextAvailable } = useRouterHelpers();
+const { sendPageViewMetrics } = useMetrics();
 const navStore = useNavStore(pinia);
 
 router.beforeEach(async (to, from, next) => {
@@ -22,8 +24,11 @@ router.beforeResolve(async () => {
     await navStore.initNavItems();
 });
 
-router.afterEach(async (to, from) => {
-    await navStore.updateMetaByURL(to, from);
+router.afterEach((to, from) => {
+    sendPageViewMetrics(to, from);
+
+    navStore.updateMetaByURL(to, from)
+        .finally();
 });
 
 export default router;

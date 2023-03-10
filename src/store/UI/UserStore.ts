@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { USER_TOKEN_COOKIE } from '@/common/const/UI';
 import { useAxios } from '@/common/composition/useAxios';
 import { useIsDev } from '@/common/helpers/isDev';
+import { useMetrics } from '@/common/composition/useMetrics';
 
 export enum EUserRoles {
     USER = 'USER',
@@ -54,6 +55,7 @@ export const useUserStore = defineStore('UserStore', () => {
     const router = useRouter();
     const http = useAxios();
     const isDev = useIsDev();
+    const { sendSignUpMetrics, sendLoginMetrics } = useMetrics();
     const user = ref<TUser | null>(null);
     const isAuthenticated = ref<boolean>(false);
 
@@ -132,6 +134,8 @@ export const useUserStore = defineStore('UserStore', () => {
 
             switch (resp.status) {
                 case 200:
+                    sendSignUpMetrics();
+
                     return Promise.resolve();
                 default:
                     return Promise.reject(resp.statusText);
@@ -163,6 +167,8 @@ export const useUserStore = defineStore('UserStore', () => {
                             }
                         );
                     }
+
+                    sendLoginMetrics();
 
                     await getUserInfo();
 
