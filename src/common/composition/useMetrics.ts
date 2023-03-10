@@ -3,6 +3,7 @@ import { unref } from 'vue';
 import { event, pageview } from 'vue-gtag';
 import type { RouteLocationNormalized } from 'vue-router';
 import { useIsDev } from '@/common/helpers/isDev';
+import { routes } from '@/router/routes';
 
 export const useMetrics = () => {
     const isDev = useIsDev();
@@ -33,8 +34,21 @@ export const useMetrics = () => {
         });
     };
 
-    const sendPageViewMetrics = (to: RouteLocationNormalized) => {
+    const sendPageViewMetrics = (to: RouteLocationNormalized, from?: RouteLocationNormalized) => {
         if (isDev) {
+            return;
+        }
+
+        const errGroup = routes.find(route => route.name === 'unknown-error');
+
+        const exclude = errGroup?.children
+            ?.map(child => child.name)
+            .filter(name => !!name) || [];
+
+        exclude.push('profile');
+        exclude.push('reset-password');
+
+        if (to.name && exclude.includes(to.name)) {
             return;
         }
 

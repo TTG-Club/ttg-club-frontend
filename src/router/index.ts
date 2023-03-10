@@ -25,7 +25,7 @@ router.beforeResolve(async () => {
 });
 
 router.afterEach((to, from) => {
-    sendPageViewMetrics(to);
+    sendPageViewMetrics(to, from);
 
     navStore.updateMetaByURL(to, from)
         .finally();

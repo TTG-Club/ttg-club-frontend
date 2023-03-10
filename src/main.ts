@@ -32,7 +32,7 @@ app.use(pinia)
         dynamicContainerName: 'ModalsContainer'
     }));
 
-if (isDev) {
+if (!isDev) {
     app.use(VueGtag, {
         config: {
             // @ts-ignore

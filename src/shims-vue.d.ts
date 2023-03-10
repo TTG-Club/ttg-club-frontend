@@ -16,5 +16,6 @@ declare global {
 
     interface Window {
         GTAG_ID: string;
+        YM_ID: string;
     }
 }
