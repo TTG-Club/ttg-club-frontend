@@ -215,7 +215,7 @@
                     sendSearchViewResultsMetrics(
                         search,
                         result.list.map(item => ({
-                            item_id: item.name,
+                            item_id: item.url,
                             item_name: item.name,
                             item_category: item.section
                         }))
@@ -267,7 +267,7 @@
                     sendSearchViewResultsMetrics(
                         'random',
                         result.list.map(item => ({
-                            item_id: item.name,
+                            item_id: item.url,
                             item_name: item.name,
                             item_category: item.section
                         }))
