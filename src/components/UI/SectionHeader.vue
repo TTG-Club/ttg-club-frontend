@@ -196,7 +196,10 @@
                     .then(() => {
                         toast('Ссылка успешно скопирована');
 
-                        sendShareMetrics();
+                        sendShareMetrics({
+                            method: 'link_copy',
+                            id: route.path
+                        });
                     })
                     .catch(() => toast.error((
                       <span>
@@ -226,7 +229,10 @@
             };
 
             const exportToFoundry = () => {
-                sendShareMetrics('export_foundry');
+                sendShareMetrics({
+                    method: 'export_foundry',
+                    id: route.path
+                });
 
                 emit('exportFoundry');
             };

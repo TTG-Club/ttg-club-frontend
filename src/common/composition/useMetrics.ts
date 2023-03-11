@@ -5,33 +5,47 @@ import type { RouteLocationNormalized } from 'vue-router';
 import { useIsDev } from '@/common/helpers/isDev';
 import { routes } from '@/router/routes';
 
+export interface ISearchItem {
+    item_id: string;
+    item_name: string;
+    item_category?: string;
+}
+
 export const useMetrics = () => {
     const isDev = useIsDev();
 
-    const sendSearchMetrics = (str: MaybeRef<string>) => {
+    const sendSearchMetrics = (search: MaybeRef<string>) => {
         if (isDev) {
             return;
         }
 
-        const value = unref(str);
+        const term = unref(search);
 
         event('search', {
-            event_category: 'engagement',
-            event_label: value
+            search_term: term
         });
     };
 
-    const sendSearchViewResultsMetrics = (str: MaybeRef<string>) => {
+    const sendSearchViewResultsMetrics = (search: MaybeRef<string>, items?: MaybeRef<Array<ISearchItem>>) => {
         if (isDev) {
             return;
         }
 
-        const value = unref(str);
+        const term = unref(search);
+        const list = unref(items);
 
-        event('view_search_results', {
-            event_category: 'engagement',
-            event_label: value
-        });
+        const eventParams: {
+            search_term: string;
+            items?: Array<ISearchItem>
+        } = {
+            search_term: term
+        };
+
+        if (list instanceof Array) {
+            eventParams.items = list;
+        }
+
+        event('view_search_results', eventParams);
     };
 
     const sendPageViewMetrics = (to: RouteLocationNormalized, from?: RouteLocationNormalized) => {
@@ -54,7 +68,7 @@ export const useMetrics = () => {
 
         pageview({
             page_path: to.path,
-            page_location: window.location.href
+            page_location: window.location.origin + to.fullPath
         });
     };
 
@@ -63,11 +77,8 @@ export const useMetrics = () => {
             return;
         }
 
-        const value = unref(method);
-
         event('sign_up', {
-            event_category: 'engagement',
-            event_label: value
+            method: unref(method)
         });
     };
 
@@ -76,25 +87,39 @@ export const useMetrics = () => {
             return;
         }
 
-        const value = unref(method);
-
         event('login', {
-            event_category: 'engagement',
-            event_label: value
+            method: unref(method)
         });
     };
 
-    const sendShareMetrics = (method: MaybeRef<string> = 'link_copy') => {
+    const sendShareMetrics = (payload: {
+        method: MaybeRef<string>;
+        id?: MaybeRef<string>;
+        category?: MaybeRef<string>;
+    } = { method: 'link_copy' }) => {
         if (isDev) {
             return;
         }
 
-        const value = unref(method);
+        const method = unref(payload.method);
+        const id = unref(payload.id);
+        const category = unref(payload.category);
 
-        event('share', {
-            event_category: 'engagement',
-            event_label: value
-        });
+        const eventParams: {
+            method: string;
+            item_id?: string;
+            content_type?: string;
+        } = { method };
+
+        if (id) {
+            eventParams.item_id = id;
+        }
+
+        if (category) {
+            eventParams.content_type = category;
+        }
+
+        event('share', eventParams);
     };
 
     return {

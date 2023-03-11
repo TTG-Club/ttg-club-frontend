@@ -309,7 +309,14 @@
                         isNeedUpdateScroll.value = false;
                     }
 
-                    sendSearchViewResultsMetrics(search);
+                    sendSearchViewResultsMetrics(
+                        search,
+                        result.list.map(item => ({
+                            item_id: item.name,
+                            item_name: item.name,
+                            item_category: item.section
+                        }))
+                    );
 
                     return Promise.resolve();
                 } catch (err) {
