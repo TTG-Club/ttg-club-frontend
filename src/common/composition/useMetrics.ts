@@ -9,6 +9,7 @@ export interface ISearchItem {
     item_id: string;
     item_name: string;
     item_category?: string;
+    item_brand?: string;
 }
 
 export const useMetrics = () => {
