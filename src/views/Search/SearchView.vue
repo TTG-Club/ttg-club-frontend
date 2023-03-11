@@ -314,7 +314,8 @@
                         result.list.map(item => ({
                             item_id: item.url,
                             item_name: item.name,
-                            item_category: item.section
+                            item_category: item.section,
+                            item_brand: item.source?.name
                         }))
                     );
 
