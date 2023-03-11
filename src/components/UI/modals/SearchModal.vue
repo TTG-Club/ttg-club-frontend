@@ -207,10 +207,19 @@
 
                     sendSearchMetrics(search);
 
-                    results.value = resp.data as TSearchResultList;
+                    const result = resp.data as TSearchResultList;
+
+                    results.value = result;
                     selectedIndex.value = null;
 
-                    sendSearchViewResultsMetrics(search);
+                    sendSearchViewResultsMetrics(
+                        search,
+                        result.list.map(item => ({
+                            item_id: item.name,
+                            item_name: item.name,
+                            item_category: item.section
+                        }))
+                    );
 
                     return Promise.resolve();
                 } catch (err) {
@@ -248,10 +257,21 @@
                         return Promise.reject(resp.statusText);
                     }
 
-                    results.value = resp.data as TSearchResultList;
+                    sendSearchMetrics('random');
+
+                    const result = resp.data as TSearchResultList;
+
+                    results.value = result;
                     selectedIndex.value = null;
 
-                    sendSearchMetrics('random');
+                    sendSearchViewResultsMetrics(
+                        'random',
+                        result.list.map(item => ({
+                            item_id: item.name,
+                            item_name: item.name,
+                            item_category: item.section
+                        }))
+                    );
 
                     return Promise.resolve();
                 } catch (err) {
