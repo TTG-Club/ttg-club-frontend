@@ -42,13 +42,6 @@
                         </div>
 
                         <div
-                            v-if="inTools"
-                            class="link-item__price"
-                        >
-                            {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
-                        </div>
-
-                        <div
                             v-if="magicItem.customization"
                             class="link-item__customization"
                         >
