@@ -125,7 +125,7 @@
                     >
                         <router-link :to="{ path: el.url }">{{ el.name }}</router-link>
 
-                        <span v-if="key !== spell.races.length - 1">,&nbsp;</span>
+                        <span v-if="key !== spell.races.length - 1">, </span>
                     </span>
                 </div>
             </div>
@@ -152,7 +152,6 @@
 </template>
 
 <script>
-    import ClassSquare from '@/components/UI/ClassSquare.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
     import RawContent from '@/components/content/RawContent.vue';
 
