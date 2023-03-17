@@ -35,6 +35,13 @@
                         </div>
 
                         <div
+                            v-if="inTools"
+                            class="link-item__price"
+                        >
+                            {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
+                        </div>
+
+                        <div
                             v-if="magicItem.custom?.count"
                             class="link-item__count"
                         >
