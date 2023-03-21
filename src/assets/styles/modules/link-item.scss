@@ -41,6 +41,7 @@
   &__damage,
   &__ac,
   &__count,
+  &__customization,
   &__price {
     display: flex;
     flex: 1 0 auto;
@@ -49,6 +50,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    justify-content: flex-end;
 
     &:first-child {
       flex: 1 1 auto;
@@ -72,6 +74,8 @@
   }
 
   &__type {
+    justify-content: flex-start;
+
     @media (max-width: 1200px) {
       flex: 1 0 100%;
       margin-bottom: 6px;
@@ -80,10 +84,6 @@
 
   &__ac {
     justify-content: flex-start;
-  }
-
-  &__price {
-    justify-content: flex-end;
   }
 
   &__name {
