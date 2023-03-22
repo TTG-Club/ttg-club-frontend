@@ -4,6 +4,7 @@ import VueLazyLoad from 'vue-lazyload';
 import Toast from 'vue-toastification';
 import { vfmPlugin } from 'vue-final-modal';
 import VueGtag from 'vue-gtag';
+import { initYandexMetrika } from 'yandex-metrika-vue3';
 import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import { TippyOptions } from '@/common/utils/TippyConfig';
@@ -32,12 +33,23 @@ app.use(pinia)
         dynamicContainerName: 'ModalsContainer'
     }));
 
-if (!isDev) {
+// @ts-ignore
+if (!isDev && window.GTAG_ID) {
     app.use(VueGtag, {
         config: {
             // @ts-ignore
-            id: window.GTAG_ID
+            id: String(window.GTAG_ID)
         }
+    });
+}
+
+// @ts-ignore
+if (isDev && window.YM_ID) {
+    app.use(initYandexMetrika, {
+        // @ts-ignore
+        id: String(window.YM_ID),
+        env: 'production',
+        scriptSrc: 'https://mc.yandex.ru/metrika/tag.js'
     });
 }
 

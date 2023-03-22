@@ -2,6 +2,7 @@ import type { MaybeRef } from '@vueuse/core';
 import { unref } from 'vue';
 import { event, pageview } from 'vue-gtag';
 import type { RouteLocationNormalized } from 'vue-router';
+import { useYandexMetrika } from 'yandex-metrika-vue3';
 import { useIsDev } from '@/common/helpers/isDev';
 import { routes } from '@/router/routes';
 
@@ -14,6 +15,7 @@ export interface ISearchItem {
 
 export const useMetrics = () => {
     const isDev = useIsDev();
+    const { hit, reachGoal } = useYandexMetrika();
 
     const sendSearchMetrics = (search: MaybeRef<string>) => {
         if (isDev) {
@@ -25,6 +27,8 @@ export const useMetrics = () => {
         event('search', {
             search_term: term
         });
+
+        reachGoal('search');
     };
 
     const sendSearchViewResultsMetrics = (search: MaybeRef<string>, items?: MaybeRef<Array<ISearchItem>>) => {
@@ -47,9 +51,11 @@ export const useMetrics = () => {
         }
 
         event('view_search_results', eventParams);
+
+        reachGoal('view_search_results');
     };
 
-    const sendPageViewMetrics = (to: RouteLocationNormalized, from?: RouteLocationNormalized) => {
+    const sendPageViewMetrics = (to: RouteLocationNormalized) => {
         if (isDev) {
             return;
         }
@@ -71,6 +77,8 @@ export const useMetrics = () => {
             page_path: to.path,
             page_location: window.location.origin + to.fullPath
         });
+
+        hit(to.fullPath);
     };
 
     const sendSignUpMetrics = (method: MaybeRef<string> = 'default') => {
@@ -81,6 +89,8 @@ export const useMetrics = () => {
         event('sign_up', {
             method: unref(method)
         });
+
+        reachGoal('sign_up');
     };
 
     const sendLoginMetrics = (method: MaybeRef<string> = 'default') => {
@@ -91,6 +101,8 @@ export const useMetrics = () => {
         event('login', {
             method: unref(method)
         });
+
+        reachGoal('login');
     };
 
     const sendShareMetrics = (payload: {
@@ -121,6 +133,8 @@ export const useMetrics = () => {
         }
 
         event('share', eventParams);
+
+        reachGoal('share');
     };
 
     return {
