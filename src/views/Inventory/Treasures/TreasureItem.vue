@@ -7,7 +7,10 @@
         <div class="link-item__content">
             <div class="link-item__body">
                 <div class="link-item__row">
-                    <div class="link-item__name">
+                    <div
+                        v-tippy="{ content: treasure.name.rus }"
+                        class="link-item__name"
+                    >
                         {{ treasure.name.rus }}
                     </div>
                 </div>
