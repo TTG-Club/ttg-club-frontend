@@ -51,10 +51,17 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     justify-content: flex-end;
+    height: 18px;
+    line-height: normal;
 
     &:first-child {
       flex: 1 1 auto;
     }
+  }
+
+  &__type {
+    display: inline-block;
+    padding-right: 4px;
   }
 
   &__damage {
@@ -78,7 +85,6 @@
 
     @media (max-width: 1200px) {
       flex: 1 0 100%;
-      margin-bottom: 6px;
     }
   }
 
@@ -108,19 +114,13 @@
     }
   }
 
-  &__count + &__price {
-    margin-left: 16px;
-    flex: 0 1 auto;
+  &__count + &__price,
+  &__count + &__customization  {
+    flex: 0 1 80px;
   }
 
-  &__price + &__count {
-    margin-left: 16px;
-    flex: 0 1 auto;
-  }
-
-  &__price + &__customization {
-    margin-left: 16px;
-    flex: 0 1 auto;
+  &__customization + &__price {
+    flex: 0 1 80px;
   }
 
   &:hover {

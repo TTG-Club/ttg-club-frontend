@@ -35,13 +35,6 @@
                         </div>
 
                         <div
-                            v-if="inTrader"
-                            class="link-item__price"
-                        >
-                            {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
-                        </div>
-
-                        <div
                             v-if="magicItem.custom?.count"
                             class="link-item__count"
                         >
@@ -53,6 +46,13 @@
                             class="link-item__customization"
                         >
                             Настройка
+                        </div>
+
+                        <div
+                            v-if="inTrader"
+                            class="link-item__price"
+                        >
+                            {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
                         </div>
                     </div>
                 </div>
