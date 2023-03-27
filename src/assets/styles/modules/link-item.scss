@@ -108,6 +108,21 @@
     }
   }
 
+  &__count + &__price {
+    margin-left: 16px;
+    flex: 0 1 auto;
+  }
+
+  &__price + &__count {
+    margin-left: 16px;
+    flex: 0 1 auto;
+  }
+
+  &__price + &__customization {
+    margin-left: 16px;
+    flex: 0 1 auto;
+  }
+
   &:hover {
     .link-item {
       &__content {

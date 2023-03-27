@@ -65,10 +65,5 @@
             display: flex;
             margin-left: auto;
         }
-
-        &__count + &__price {
-            margin-left: 16px;
-            flex: 0 1 auto;
-        }
     }
 </style>
