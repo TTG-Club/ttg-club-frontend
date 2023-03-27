@@ -49,7 +49,7 @@ export const useMetrics = () => {
         event('view_search_results', eventParams);
     };
 
-    const sendPageViewMetrics = (to: RouteLocationNormalized, from?: RouteLocationNormalized) => {
+    const sendPageViewMetrics = (to: RouteLocationNormalized) => {
         if (isDev) {
             return;
         }
