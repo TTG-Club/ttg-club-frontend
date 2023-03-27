@@ -288,14 +288,16 @@
     </content-layout>
 </template>
 
-<script>
-    import { reactive } from 'vue';
+<script lang="ts" setup>
+    import {
+        ref, computed, onBeforeMount
+    } from 'vue';
     import sortedUniq from 'lodash/sortedUniq';
     import groupBy from 'lodash/groupBy';
     import max from 'lodash/max';
     import mean from 'lodash/mean';
     import throttle from 'lodash/throttle';
-    import { mapState } from 'pinia';
+    import { storeToRefs } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import UiSelect from '@/components/UI/kit/UiSelect.vue';
     import SectionHeader from '@/components/UI/SectionHeader.vue';
@@ -309,254 +311,258 @@
     import { useUIStore } from '@/store/UI/UIStore';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import { useAxios } from '@/common/composition/useAxios';
 
-    export default {
-        name: 'TreasuryView',
-        components: {
-            ContentDetail,
-            MagicItemLink,
-            TreasureItem,
-            SpellBody,
-            MagicItemBody,
-            UiCheckbox,
-            SectionHeader,
-            UiSelect,
-            ContentLayout,
-            UiButton,
-            SvgIcon
+    interface CrListItem {
+        name: string
+        value: number
+    }
+
+    const crList: CrListItem[] = [
+        {
+            name: '0-4',
+            value: 1
         },
-        data: () => ({
-            crList: [
-                {
-                    name: '0-4',
-                    value: 1
-                },
-                {
-                    name: '5-10',
-                    value: 2
-                },
-                {
-                    name: '11-16',
-                    value: 3
-                },
-                {
-                    name: '17+',
-                    value: 4
+        {
+            name: '5-10',
+            value: 2
+        },
+        {
+            name: '11-16',
+            value: 3
+        },
+        {
+            name: '17+',
+            value: 4
+        }
+    ];
+
+    const form = ref({
+        cr: 1,
+        coins: true,
+        magicItem: true,
+        scroll: true,
+        trinket: true,
+        art: true,
+        gem: true,
+        unique: true
+    });
+
+    const settings = ref({
+        grouping: true,
+        max: false,
+        opened: false
+    });
+
+    const result = ref({});
+
+    const detailCard = ref<{
+        item?: any
+        spell?: any
+    }>({
+        item: undefined,
+        spell: undefined
+    });
+
+    const selected = ref<{
+        index?: number
+        item?: any
+    }>({
+        index: undefined,
+        item: undefined
+    });
+
+    const loading = ref(false);
+    const error = ref(false);
+    const showRightSide = ref(false);
+
+    const controllers = ref<{
+        list?: AbortController
+        detail?: AbortController
+    }>({
+        list: undefined,
+        detail: undefined
+    });
+
+    const http = useAxios();
+    const uiStore = useUIStore();
+    const { fullscreen, isMobile } = storeToRefs(uiStore);
+
+    const crValue = computed<CrListItem>({
+        get() {
+            return crList.find(el => el.value === form.value.cr) || crList[0];
+        },
+
+        set(e: CrListItem) {
+            form.value.cr = e.value;
+        }
+    });
+
+    const groupedResult = computed(() => {
+        if (!settings.value.grouping) {
+            return result.value;
+        }
+
+        const res: any = {};
+
+        for (const [key, value] of Object.entries(result.value)) {
+            if (!value || !Array.isArray(value)) {
+                res[key] = value;
+
+                continue;
+            }
+
+            const groups = Object.values(groupBy(value, o => o.name.rus));
+            const entryRes = [];
+
+            for (const group of groups) {
+                const el = group[0];
+
+                if (group.length === 1) {
+                    entryRes.push(el);
+
+                    continue;
                 }
-            ],
-            form: {
-                cr: 1,
-                coins: true,
-                magicItem: true,
-                scroll: true,
-                trinket: true,
-                art: true,
-                gem: true,
-                unique: true
-            },
-            settings: {
-                grouping: true,
-                max: false,
-                opened: false
-            },
-            result: {},
-            detailCard: {
+
+                const prices = sortedUniq(group.map(o => o.price));
+
+                entryRes.push({
+                    ...el,
+                    custom: {
+                        count: group.length,
+                        price: settings.value.max ? max(prices) : Math.round(mean(prices))
+                    }
+                });
+            }
+
+            res[key] = entryRes;
+        }
+
+        return res;
+    });
+
+    onBeforeMount(() => {
+        showRightSide.value = !isMobile.value;
+    });
+
+    const clearSelected = () => {
+        selected.value.index = undefined;
+        selected.value.item = undefined;
+        detailCard.value.item = undefined;
+        detailCard.value.spell = undefined;
+    };
+
+    const sendForm = throttle(() => {
+        if (controllers.value.list) {
+            controllers.value.list.abort();
+        }
+
+        controllers.value.list = new AbortController();
+
+        const options = {
+            ...form.value,
+            cr: form.value.cr || 1
+        };
+
+        http.post({
+            url: '/tools/treasury',
+            payload: options,
+            signal: controllers.value.list.signal
+        })
+            .then(res => {
+                if (res.status !== 200) {
+                    errorHandler(res.statusText);
+
+                    return;
+                }
+
+                result.value = [];
+
+                clearSelected();
+
+                result.value = res.data;
+            })
+            .catch(err => {
+                errorHandler(err);
+            })
+            .finally(() => {
+                controllers.value.list = undefined;
+            });
+    }, 300);
+
+    const selectItem = async (group: number, index: number) => {
+        try {
+            if (controllers.value.detail) {
+                controllers.value.detail.abort();
+            }
+
+            error.value = false;
+            loading.value = true;
+
+            clearSelected();
+
+            controllers.value.detail = new AbortController();
+
+            const item = groupedResult.value[group][index];
+
+            const resMagicItem = await http.post({
+                url: item.url,
+                signal: controllers.value.detail.signal
+            });
+
+            if (resMagicItem.status !== 200) {
+                error.value = true;
+                loading.value = false;
+
+                errorHandler(resMagicItem.statusText);
+
+                return;
+            }
+
+            detailCard.value.item = resMagicItem.data;
+            controllers.value.detail = new AbortController();
+
+            if (item.spell?.url) {
+                const resSpell = await http.post({
+                    url: item.spell.url,
+                    signal: controllers.value.detail.signal
+                });
+
+                if (resSpell.status !== 200) {
+                    error.value = true;
+                    loading.value = false;
+
+                    errorHandler(resSpell.statusText);
+
+                    return;
+                }
+
+                detailCard.value.spell = resSpell.data;
+            }
+
+            selected.value = {
+                index,
+                item
+            };
+
+            showRightSide.value = true;
+        } catch (err) {
+            error.value = true;
+            loading.value = false;
+
+            detailCard.value = {
                 item: undefined,
                 spell: undefined
-            },
-            selected: {
-                index: undefined,
-                item: undefined
-            },
-            loading: false,
-            error: false,
-            controllers: {
-                list: undefined,
-                detail: undefined
-            },
-            showRightSide: false
-        }),
-        computed: {
-            ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+            };
 
-            crValue: {
-                get() {
-                    return this.crList.find(el => el.value === this.form.cr);
-                },
-
-                set(e) {
-                    this.form.cr = e.value;
-                }
-            },
-
-            groupedResult() {
-                if (!this.settings.grouping) {
-                    return this.result;
-                }
-
-                const result = {};
-
-                for (const [key, value] of Object.entries(this.result)) {
-                    if (!value || !Array.isArray(value)) {
-                        result[key] = value;
-
-                        continue;
-                    }
-
-                    const groups = Object.values(groupBy(value, o => o.name.rus));
-                    const res = [];
-
-                    for (const group of groups) {
-                        const el = group[0];
-
-                        if (group.length === 1) {
-                            res.push(el);
-
-                            continue;
-                        }
-
-                        const prices = sortedUniq(group.map(o => o.price));
-
-                        res.push(reactive({
-                            ...el,
-                            custom: {
-                                count: group.length,
-                                price: this.settings.max ? max(prices) : Math.round(mean(prices))
-                            }
-                        }));
-                    }
-
-                    result[key] = res;
-                }
-
-                return result;
-            }
-        },
-        mounted() {
-            this.showRightSide = !this.isMobile;
-        },
-        methods: {
-            // eslint-disable-next-line func-names
-            sendForm: throttle(function() {
-                if (this.controllers.list) {
-                    this.controllers.list.abort();
-                }
-
-                this.controllers.list = new AbortController();
-
-                const options = {
-                    ...this.form,
-                    cr: this.form.cr || 1
-                };
-
-                this.$http.post({
-                    url: '/tools/treasury',
-                    payload: options,
-                    signal: this.controllers.list.signal
-                })
-                    .then(res => {
-                        if (res.status !== 200) {
-                            errorHandler(res.statusText);
-
-                            return;
-                        }
-
-                        this.result = [];
-
-                        this.clearSelected();
-
-                        this.$nextTick(() => {
-                            this.result = res.data;
-                        });
-                    })
-                    .catch(err => {
-                        errorHandler(err);
-                    })
-                    .finally(() => {
-                        this.controllers.list = undefined;
-                    });
-            }, 300),
-
-            clearSelected() {
-                this.selected.index = undefined;
-                this.selected.item = undefined;
-                this.detailCard.item = undefined;
-                this.detailCard.spell = undefined;
-            },
-
-            async selectItem(group, index) {
-                try {
-                    if (this.controllers.detail) {
-                        this.controllers.detail.abort();
-                    }
-
-                    this.error = false;
-                    this.loading = true;
-
-                    this.clearSelected();
-
-                    this.controllers.detail = new AbortController();
-
-                    const item = this.groupedResult[group][index];
-
-                    const resMagicItem = await this.$http.post({
-                        url: item.url,
-                        signal: this.controllers.detail.signal
-                    });
-
-                    if (resMagicItem.status !== 200) {
-                        this.error = true;
-                        this.loading = false;
-
-                        errorHandler(resMagicItem.statusText);
-
-                        return;
-                    }
-
-                    this.detailCard.item = resMagicItem.data;
-                    this.controllers.detail = new AbortController();
-
-                    if (item.spell?.url) {
-                        const resSpell = await this.$http.post({
-                            url: item.spell.url,
-                            signal: this.controllers.detail.signal
-                        });
-
-                        if (resSpell.status !== 200) {
-                            this.error = true;
-                            this.loading = false;
-
-                            errorHandler(resSpell.statusText);
-
-                            return;
-                        }
-
-                        this.detailCard.spell = resSpell.data;
-                    }
-
-                    this.selected = {
-                        index,
-                        item
-                    };
-                } catch (err) {
-                    this.error = true;
-                    this.loading = false;
-
-                    this.detailCard = {
-                        item: undefined,
-                        spell: undefined
-                    };
-
-                    errorHandler(err);
-                } finally {
-                    this.loading = false;
-                    this.controllers.detail = undefined;
-                }
-            },
-
-            close() {
-                this.showRightSide = false;
-            }
+            errorHandler(err);
+        } finally {
+            loading.value = false;
+            controllers.value.detail = undefined;
         }
+    };
+
+    const close = () => {
+        showRightSide.value = false;
     };
 </script>
