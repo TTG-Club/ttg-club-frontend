@@ -41,6 +41,7 @@
   &__damage,
   &__ac,
   &__count,
+  &__customization,
   &__price {
     display: flex;
     flex: 1 0 auto;
@@ -49,6 +50,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    justify-content: flex-end;
+    height: 18px;
+    line-height: normal;
 
     &:first-child {
       flex: 1 1 auto;
@@ -72,18 +76,17 @@
   }
 
   &__type {
+    justify-content: flex-start;
+    display: inline-block;
+    padding-right: 4px;
+
     @media (max-width: 1200px) {
       flex: 1 0 100%;
-      margin-bottom: 6px;
     }
   }
 
   &__ac {
     justify-content: flex-start;
-  }
-
-  &__price {
-    justify-content: flex-end;
   }
 
   &__name {
@@ -106,6 +109,15 @@
       display: inline;
       color: var(--text-g-color);
     }
+  }
+
+  &__count + &__price,
+  &__count + &__customization  {
+    flex: 0 1 80px;
+  }
+
+  &__customization + &__price {
+    flex: 0 1 80px;
   }
 
   &:hover {

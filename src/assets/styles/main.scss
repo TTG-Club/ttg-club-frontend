@@ -516,6 +516,7 @@
 
   .classes_icon {
     display: flex;
+    flex-wrap: wrap;
 
     .icon,
     .class-square {

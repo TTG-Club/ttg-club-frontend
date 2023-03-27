@@ -122,6 +122,7 @@
                 :magic-item="item"
                 :to="{ path: item.url }"
                 in-tools
+                in-trader
                 @select-item="selectItem(key)"
             />
         </template>

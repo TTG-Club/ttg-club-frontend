@@ -78,13 +78,16 @@
                 <p>Классы:</p>
 
                 <div class="classes_icon">
-                    <class-square
+                    <span
                         v-for="(el, key) in spell.classes"
                         :key="key"
-                        :icon="el.icon"
-                        :name="el.name"
-                        :url="el.url"
-                    />
+                    >
+                        <router-link
+                            :to="{ path: el.url }"
+                        >{{ el.name }}</router-link>
+
+                        <span v-if="key !== spell.classes.length - 1">,&nbsp;</span>
+                    </span>
                 </div>
             </div>
 
@@ -122,7 +125,7 @@
                     >
                         <router-link :to="{ path: el.url }">{{ el.name }}</router-link>
 
-                        <span v-if="key !== spell.races.length - 1">,&nbsp;</span>
+                        <span v-if="key !== spell.races.length - 1">, </span>
                     </span>
                 </div>
             </div>
@@ -149,7 +152,6 @@
 </template>
 
 <script>
-    import ClassSquare from '@/components/UI/ClassSquare.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
     import RawContent from '@/components/content/RawContent.vue';
 
@@ -157,8 +159,7 @@
         name: 'SpellBody',
         components: {
             RawContent,
-            DetailTopBar,
-            ClassSquare
+            DetailTopBar
         },
         props: {
             spell: {

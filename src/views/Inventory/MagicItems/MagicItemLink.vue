@@ -42,17 +42,17 @@
                         </div>
 
                         <div
-                            v-if="inTools"
-                            class="link-item__price"
-                        >
-                            {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
-                        </div>
-
-                        <div
                             v-if="magicItem.customization"
                             class="link-item__customization"
                         >
                             Настройка
+                        </div>
+
+                        <div
+                            v-if="inTrader"
+                            class="link-item__price"
+                        >
+                            {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
                         </div>
                     </div>
                 </div>
@@ -83,6 +83,10 @@
                 default: () => ({})
             },
             inTools: {
+                type: Boolean,
+                default: false
+            },
+            inTrader: {
                 type: Boolean,
                 default: false
             }
@@ -190,15 +194,8 @@
             }
         }
 
-        &__customization {
-            color: var(--text-g-color);
-            font-size: calc(var(--main-font-size) - 1px);
-            line-height: normal;
-        }
-
         &__count {
             margin-left: auto;
-            display: block;
         }
 
         &.router-link-active {
