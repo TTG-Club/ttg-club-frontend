@@ -55,6 +55,11 @@
     @import "../../../assets/styles/modules/link-item";
 
     .link-item {
+        &__name {
+            max-width: 100%;
+            width: auto;
+        }
+
         &__source {
             display: flex;
             margin-right: 8px;
