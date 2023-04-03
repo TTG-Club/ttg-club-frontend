@@ -44,6 +44,7 @@
     import { storeToRefs } from 'pinia';
     import sortBy from 'lodash/sortBy';
     import groupBy from 'lodash/groupBy';
+    import cloneDeep from 'lodash/cloneDeep';
     import { useUIStore } from '@/store/UI/UIStore';
     import ClassLink from '@/views/Character/Classes/ClassLink.vue';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -127,8 +128,8 @@
 
                     const mapped: Array<TClassList> = sortBy(
                         Object.values(groupBy(
-                            newClasses.filter((item: TClassItem) => 'group' in item),
-                            [(o: TClassItem) => o.group!.name]
+                            cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
+                            (o: TClassItem) => o.group?.name
                         ) as { [key: string]: Array<TClassItem> })
                             .map(classList => ({
                                 group: classList[0].group!,
