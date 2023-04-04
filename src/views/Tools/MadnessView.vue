@@ -8,7 +8,7 @@
                 <div class="tools_settings__row">
                     <div class="tools_settings__colum">
                         <div class="row">
-                            <span class="label">Количеств:</span>
+                            <span class="label">Количество:</span>
 
                             <ui-input
                                 v-model="count"
