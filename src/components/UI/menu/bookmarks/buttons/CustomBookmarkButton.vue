@@ -3,7 +3,7 @@
         <ui-button
             v-if="groups?.length"
             ref="trigger"
-            v-tippy="{ content: 'Добавить в закладки' }"
+            v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
             class="custom-bookmark-button"
             is-icon
             type-link-filled
