@@ -175,7 +175,7 @@
                 margin: 24px 0 16px 0;
                 color: var(--text-color-title);
                 position: relative;
-                font-family: 'Lora';
+                font-family: 'Lora', sans-serif;
             }
 
             &_list {
