@@ -9,7 +9,7 @@
                         content: 'Больше возможностей.',
                     }"
                     class="bookmarks__info--info"
-                    href="/bookmarks_info"
+                    href="/info/bookmarks"
                     target="_blank"
                 >
                     <svg-icon icon-name="menu-question" />
