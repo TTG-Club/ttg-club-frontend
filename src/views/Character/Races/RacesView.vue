@@ -215,7 +215,7 @@
         }
 
         &.is-selected {
-            .class-items {
+            .race-items {
                 &__group {
                     &_list {
                         @include media-min($sm) {
