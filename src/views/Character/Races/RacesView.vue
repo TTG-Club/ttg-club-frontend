@@ -121,10 +121,10 @@
                 const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> => sortBy(
                     Object.values(groupBy(list, o => o.type.name))
                         .map(value => ({
-                            name: value[0].type,
+                            group: value[0].type,
                             list: value
                         })),
-                    [o => o.name.order]
+                    [o => o.group.order]
                 );
 
                 const getGroupClasses = (): Array<TRaceList> => {
