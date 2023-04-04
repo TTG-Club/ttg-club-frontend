@@ -10,12 +10,27 @@
             :class="{ 'is-selected': showRightSide, 'is-fullscreen': fullscreen }"
             class="race-items"
         >
-            <race-link
-                v-for="race in races"
-                :key="race.url"
-                :race-item="race"
-                :to="{ path: race.url }"
-            />
+            <div
+                v-for="(group, groupKey) in sortedRaces"
+                :key="groupKey"
+                class="race-items__group"
+            >
+                <div
+                    v-if="group.group?.name"
+                    class="race-items__group_name"
+                >
+                    {{ group.group.name }}
+                </div>
+
+                <div class="race-items__group_list">
+                    <race-link
+                        v-for="el in group.list"
+                        :key="el.url"
+                        :race-item="el"
+                        :to="{ path: el.url }"
+                    />
+                </div>
+            </div>
         </div>
     </content-layout>
 </template>
@@ -23,14 +38,19 @@
 <script lang="ts">
     import { storeToRefs } from 'pinia';
     import {
+        computed,
         defineComponent, nextTick, onBeforeMount, ref, watch
     } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
+    import sortBy from 'lodash/sortBy';
+    import groupBy from 'lodash/groupBy';
+    import cloneDeep from 'lodash/cloneDeep';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import RaceLink from '@/views/Character/Races/RaceLink.vue';
     import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
+    import type { TRaceLink, TRaceList } from '@/types/Character/Races.types';
     import { RacesFilterDefaults } from '@/types/Character/Races.types';
 
     export default defineComponent({
@@ -93,6 +113,54 @@
                 }
             };
 
+            const sortedRaces = computed((): Array<TRaceList> => {
+                if (!races.value?.length) {
+                    return [];
+                }
+
+                const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> => sortBy(
+                    Object.values(groupBy(list, o => o.type.name))
+                        .map(value => ({
+                            name: value[0].type,
+                            list: value
+                        })),
+                    [o => o.name.order]
+                );
+
+                const getGroupClasses = (): Array<TRaceList> => {
+                    const newClasses: Array<TRaceLink> = races.value.map(race => ({
+                        ...race,
+                        archetypes: getGroupArchetypes(race.archetypes)
+                    }));
+
+                    const defaultGroup: TRaceList = {
+                        list: sortBy(
+                            newClasses.filter(item => !('group' in item)),
+                            [o => o.name.rus]
+                        )
+                    };
+
+                    const mapped: Array<TRaceList> = sortBy(
+                        Object.values(groupBy(
+                            cloneDeep(newClasses.filter((item: TRaceLink) => 'group' in item)),
+                            (o: TRaceLink) => o.group?.name
+                        ) as { [key: string]: Array<TRaceLink> })
+                            .map(classList => ({
+                                group: classList[0].group!,
+                                list: sortBy(
+                                    classList,
+                                    [o => o.name.rus]
+                                )
+                            })),
+                        [o => o.group!.order]
+                    );
+
+                    return [defaultGroup, ...mapped];
+                };
+
+                return getGroupClasses();
+            });
+
             onBeforeMount(async () => {
                 await filter.initFilter();
                 await initPages();
@@ -102,6 +170,7 @@
                 isMobile,
                 fullscreen,
                 races,
+                sortedRaces,
                 filter,
                 showRightSide,
                 initPages,
@@ -113,28 +182,47 @@
 
 <style lang="scss" scoped>
     .race-items {
-        width: 100%;
-        padding: 0;
-        display: grid;
-        grid-gap: 16px;
-        align-items: start;
-        grid-template-columns: repeat(1, 1fr);
+        &__group {
+            &_name {
+                font-size: var(--h3-font-size);
+                font-weight: 300;
+                margin: 24px 0 16px 0;
+                color: var(--text-color-title);
+                position: relative;
+                font-family: 'Lora', sans-serif;
+            }
 
-        @include media-min($sm) {
-            grid-template-columns: repeat(2, 1fr);
-        }
+            &_list {
+                width: 100%;
+                padding: 0;
+                display: grid;
+                grid-gap: 16px;
+                align-items: start;
+                grid-template-columns: repeat(1, 1fr);
 
-        @include media-min($lg) {
-            grid-template-columns: repeat(4, 1fr);
-        }
+                @include media-min($sm) {
+                    grid-template-columns: repeat(2, 1fr);
+                }
 
-        @include media-min($xxl) {
-            grid-template-columns: repeat(5, 1fr);
+                @include media-min($lg) {
+                    grid-template-columns: repeat(4, 1fr);
+                }
+
+                @include media-min($xxl) {
+                    grid-template-columns: repeat(5, 1fr);
+                }
+            }
         }
 
         &.is-selected {
-            @include media-min($sm) {
-                grid-template-columns: repeat(2, 1fr);
+            .class-items {
+                &__group {
+                    &_list {
+                        @include media-min($sm) {
+                            grid-template-columns: repeat(2, 1fr);
+                        }
+                    }
+                }
             }
         }
     }
