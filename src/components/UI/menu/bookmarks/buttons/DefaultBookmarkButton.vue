@@ -90,7 +90,7 @@
 
                     const bookmark = await handleBookmarkUpdate();
 
-                    notifyBookmarkUpdate(bookmark);
+                    notifyBookmarkUpdate(!!bookmark);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {
