@@ -3,7 +3,7 @@
         <ui-button
             v-if="groups?.length"
             ref="trigger"
-            v-tippy="{ content: 'Добавить в закладки' }"
+            v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
             class="custom-bookmark-button"
             is-icon
             type-link-filled
@@ -124,11 +124,13 @@
                 try {
                     inProgress.value = true;
 
-                    await bookmarksStore.updateBookmarkInGroup({
+                    const bookmark = await bookmarksStore.updateBookmarkInGroup({
                         url: bookmarkUrl.value,
                         name: props.name,
                         groupUUID
                     });
+
+                    toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {
