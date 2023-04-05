@@ -42,6 +42,7 @@
     import { useRoute } from 'vue-router';
     import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
+    import { notifyBookmarkUpdate } from '@/common/helpers/notifications/Notifications.bookmark';
     import errorHandler from '@/common/helpers/errorHandler';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
     import UiButton from '@/components/UI/kit/UiButton.vue';
@@ -124,11 +125,13 @@
                 try {
                     inProgress.value = true;
 
-                    await bookmarksStore.updateBookmarkInGroup({
+                    const bookmark = await bookmarksStore.updateBookmarkInGroup({
                         url: bookmarkUrl.value,
                         name: props.name,
                         groupUUID
                     });
+
+                    notifyBookmarkUpdate(bookmark);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {

@@ -330,13 +330,11 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
                     groupUUID
                 });
 
-                await this.queryAddBookmark(cloneDeep({
+                return this.queryAddBookmark(cloneDeep({
                     url,
                     name,
                     parentUUID: savedCat.uuid
                 }));
-
-                return Promise.resolve();
             } catch (err) {
                 return Promise.reject(err);
             }
@@ -384,14 +382,12 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', {
             }
 
             try {
-                await this.addBookmarkInGroup({
+                return this.addBookmarkInGroup({
                     url,
                     name,
                     category,
                     groupUUID
                 });
-
-                return Promise.resolve();
             } catch (err) {
                 return Promise.reject(err);
             }
