@@ -22,6 +22,7 @@
     } from 'vue';
     import { useToast } from 'vue-toastification';
     import { storeToRefs } from 'pinia';
+    import { notifyBookmarkUpdate } from '@/common/helpers/notifications/Notifications.bookmark';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
@@ -65,6 +66,20 @@
                 return defaultBookmarkStore.isBookmarkSaved(bookmarkUrl.value);
             });
 
+            const handleBookmarkUpdate = async () => {
+                if (isAuthenticated.value) {
+                    const defaultGroup = await customBookmarkStore.getDefaultGroup();
+
+                    return customBookmarkStore.updateBookmarkInGroup({
+                        url: bookmarkUrl.value,
+                        name: props.name,
+                        groupUUID: defaultGroup.uuid
+                    });
+                }
+
+                return defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
+            };
+
             async function updateBookmark() {
                 if (inProgress.value) {
                     return;
@@ -73,19 +88,9 @@
                 try {
                     inProgress.value = true;
 
-                    if (isAuthenticated.value) {
-                        const defaultGroup = await customBookmarkStore.getDefaultGroup();
+                    const bookmark = await handleBookmarkUpdate();
 
-                        await customBookmarkStore.updateBookmarkInGroup({
-                            url: bookmarkUrl.value,
-                            name: props.name,
-                            groupUUID: defaultGroup.uuid
-                        });
-
-                        return;
-                    }
-
-                    await defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
+                    notifyBookmarkUpdate(bookmark);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {

@@ -5,6 +5,8 @@ import IconToastClose from '@/components/UI/icons/IconToastClose.vue';
 
 export const ToastEventBus = new EventBus();
 
+const toastComposition = useToast(ToastEventBus);
+
 const maxToasts = 6;
 
 const filterToasts = (toasts: Array<ToastOptionsAndRequiredContent>): Array<ToastOptionsAndRequiredContent> => toasts;
@@ -19,8 +21,6 @@ const filterBeforeCreate = (
 
     const toastsForDelete = orderBy(toasts, ['id'])
         .slice(0, Math.abs(maxToasts - toasts.length + 1));
-
-    const toastComposition = useToast(ToastEventBus);
 
     for (const toastForDelete of toastsForDelete) {
         toastComposition.dismiss(toastForDelete.id!);
@@ -39,6 +39,8 @@ export const ToastOptions: PluginOptions = {
     filterToasts,
     maxToasts
 };
+
+export const toast = toastComposition;
 
 export default {
     ToastOptions,

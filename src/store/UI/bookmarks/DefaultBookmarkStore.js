@@ -106,17 +106,19 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
                     savedCat = this.createCategory(cat);
                 }
 
-                this.bookmarks.push(cloneDeep({
+                const newBookmark = cloneDeep({
                     uuid: this.getNewUUID(),
                     name,
                     url,
                     order: this.bookmarks.filter(bookmark => bookmark.parentUUID === savedCat.uuid).length,
                     parentUUID: savedCat.uuid
-                }));
+                });
+
+                this.bookmarks.push(newBookmark);
 
                 await this.saveBookmarks();
 
-                return Promise.resolve();
+                return newBookmark;
             } catch (err) {
                 return Promise.reject(err);
             }
@@ -166,10 +168,10 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
             if (this.isBookmarkSaved(url)) {
                 await this.removeBookmark(url);
 
-                return;
+                return null;
             }
 
-            await this.addBookmark(url, name, category);
+            return this.addBookmark(url, name, category);
         },
 
         async getConvertedBookmarks(oldFormat) {
