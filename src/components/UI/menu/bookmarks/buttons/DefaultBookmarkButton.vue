@@ -20,14 +20,12 @@
     import {
         computed, defineComponent, ref
     } from 'vue';
-    import { useToast } from 'vue-toastification';
     import { storeToRefs } from 'pinia';
-    import { notifyBookmarkUpdate } from '@/common/helpers/notifications/Notifications.bookmark';
+    import { toast } from '@/common/helpers/toast';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
     import { useUserStore } from '@/store/UI/UserStore';
-    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -45,7 +43,6 @@
         },
         setup(props) {
             const route = useRoute();
-            const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
@@ -90,7 +87,7 @@
 
                     const bookmark = await handleBookmarkUpdate();
 
-                    notifyBookmarkUpdate(!!bookmark);
+                    toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {

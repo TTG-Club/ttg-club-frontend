@@ -42,7 +42,6 @@
     import { useRoute } from 'vue-router';
     import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
-    import { notifyBookmarkUpdate } from '@/common/helpers/notifications/Notifications.bookmark';
     import errorHandler from '@/common/helpers/errorHandler';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
     import UiButton from '@/components/UI/kit/UiButton.vue';
@@ -131,7 +130,7 @@
                         groupUUID
                     });
 
-                    notifyBookmarkUpdate(!!bookmark);
+                    toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {

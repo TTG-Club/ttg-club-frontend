@@ -1,11 +1,12 @@
-import type { PluginOptions, ToastOptionsAndRequiredContent } from 'vue-toastification/dist/types/types';
-import { EventBus, useToast } from 'vue-toastification';
+import type {
+    PluginOptions,
+    ToastOptionsAndRequiredContent
+} from 'vue-toastification/dist/types/types';
 import orderBy from 'lodash/orderBy';
 import IconToastClose from '@/components/UI/icons/IconToastClose.vue';
+import { toast as toastHelper, ToastEventBus as GlobalToastBus } from '@/common/helpers/toast';
 
-export const ToastEventBus = new EventBus();
-
-const toastComposition = useToast(ToastEventBus);
+export const ToastEventBus = GlobalToastBus;
 
 const maxToasts = 6;
 
@@ -23,7 +24,7 @@ const filterBeforeCreate = (
         .slice(0, Math.abs(maxToasts - toasts.length + 1));
 
     for (const toastForDelete of toastsForDelete) {
-        toastComposition.dismiss(toastForDelete.id!);
+        toastHelper.dismiss(toastForDelete.id!);
     }
 
     return toast;
@@ -39,8 +40,6 @@ export const ToastOptions: PluginOptions = {
     filterToasts,
     maxToasts
 };
-
-export const toast = toastComposition;
 
 export default {
     ToastOptions,
