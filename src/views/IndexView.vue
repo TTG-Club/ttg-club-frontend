@@ -39,7 +39,7 @@
                                 <div class="info">
                                     <h4>Telegram Spells Bot</h4>
 
-                                    <p>Книга заклинаний, у вас в руках!</p>
+                                    <p>Книга заклинаний у вас в руках!</p>
 
                                     <div class="bottom">
                                         <a
@@ -65,7 +65,7 @@
                                 <div class="info">
                                     <h4>Discord Bot <sup class="beta">β</sup></h4>
 
-                                    <p>Весь сайт, у вас на сервере!</p>
+                                    <p>Весь сайт у вас на сервере!</p>
 
                                     <div class="bottom">
                                         <!-- eslint-disable vue/max-len -->
