@@ -193,12 +193,15 @@
     }
 
     &_body {
-      padding: 0 6px;
+      padding: 0 8px;
     }
   }
 
   &__cat {
     margin-bottom: 16px;
+    padding: 12px 8px;
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
 
     &_label {
       padding: 2px 8px 2px 8px;
@@ -317,14 +320,13 @@
     display: flex;
     align-items: center;
     border-radius: 6px;
-    margin-bottom: 4px;
 
     &_label {
       @include css_anim();
 
       color: var(--text-color);
       font-weight: 400;
-      padding: 6px 8px;
+      padding: 8px 8px;
       line-height: 16px;
       width: 100%;
       display: flex;
