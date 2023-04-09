@@ -62,7 +62,7 @@
                         h(
                             'a',
                             {
-                                href: '/info/fvtt_import', // вот тут ссылку нужную подставь
+                                href: '/info/fvtt_import',
                                 target: '_blank',
                             },
                             'Инструкция',
