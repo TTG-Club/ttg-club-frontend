@@ -58,7 +58,7 @@
                 v-if="onExportFoundry"
                 v-tippy="{
                     // eslint-disable-next-line vue/max-len
-                    content: 'Импорт в Foundry VTT. <a href=&quot;https://vk.com/@ttg.club-import-suschestv-v-fvtt&quot;>Инструкция</a>',
+                    content: 'Импорт в Foundry VTT. <a href=&quot;/info/fvtt_import&quot;>Инструкция</a>',
                 }"
                 class="section-header__control is-only-desktop"
                 is-icon
