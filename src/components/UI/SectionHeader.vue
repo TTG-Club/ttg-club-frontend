@@ -276,8 +276,8 @@
             align-items: center;
 
             &--text {
-                font-size: var(--h4-font-size);
-                line-height: var(--h4-line-height);
+                font-size: var(--h3-font-size);
+                line-height: var(--h3-line-height);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
