@@ -28,6 +28,11 @@ export type TRaceType = {
     order: number
 }
 
+export type TRaceGroup = {
+    name: string
+    order: number
+}
+
 export type TRaceLink = {
     name: TRaceName
     image: string
@@ -36,6 +41,12 @@ export type TRaceLink = {
     url: string
     abilities: Array<TRaceAbility>
     subraces?: Array<TRaceLink>
+    group?: TRaceGroup
+}
+
+export type TRaceList = {
+    list: Array<TRaceLink>
+    group?: TRaceGroup
 }
 
 export enum RacesFilterDefaults {

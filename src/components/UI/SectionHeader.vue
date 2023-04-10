@@ -57,8 +57,17 @@
             <ui-button
                 v-if="onExportFoundry"
                 v-tippy="{
-                    // eslint-disable-next-line vue/max-len
-                    content: 'Импорт в Foundry VTT. <a href=&quot;https://vk.com/@ttg.club-import-suschestv-v-fvtt&quot;>Инструкция</a>',
+                    content: h('span', [
+                        'Импорт в Foundry VTT.&nbsp;',
+                        h(
+                            'a',
+                            {
+                                href: '/info/fvtt_import',
+                                target: '_blank',
+                            },
+                            'Инструкция',
+                        ),
+                    ]),
                 }"
                 class="section-header__control is-only-desktop"
                 is-icon
@@ -107,7 +116,9 @@
 
 <script lang="tsx">
     import { useClipboard } from '@vueuse/core';
-    import { computed, defineComponent } from 'vue';
+    import {
+        computed, defineComponent, h
+    } from 'vue';
     import { useRoute } from 'vue-router';
     import { useToast } from 'vue-toastification';
     import { useUIStore } from '@/store/UI/UIStore';
@@ -247,7 +258,8 @@
                 openPrintWindow,
                 exportToFoundry
             };
-        }
+        },
+        methods: { h }
     });
 </script>
 
@@ -276,8 +288,8 @@
             align-items: center;
 
             &--text {
-                font-size: var(--h4-font-size);
-                line-height: var(--h4-line-height);
+                font-size: var(--h3-font-size);
+                line-height: var(--h3-line-height);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;

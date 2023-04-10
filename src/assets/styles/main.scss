@@ -253,7 +253,7 @@
         background-color: var(--bg-table-list);
         border-radius: 12px;
         overflow: hidden;
-        padding: 8px 16px 8px 16px;
+        padding: 16px;
         flex-direction: column;
         display: flex;
 
@@ -396,7 +396,7 @@
 
 .links_block {
   background: var(--bg-secondary);
-  padding: 8px 16px 16px 16px;
+  padding: 16px;
   border-radius: 12px;
 
   h3 {
@@ -611,10 +611,11 @@
     margin-bottom: 12px;
     border-radius: 8px;
     color: var(--text-btn-color);
+    font-size: var(--h4-font-size);
   }
 
   & + & {
-    margin-top: 12px;
+    margin-top: 32px;
   }
 }
 

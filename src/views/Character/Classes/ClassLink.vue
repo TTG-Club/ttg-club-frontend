@@ -99,7 +99,7 @@
                             class="link-item-expand__arch-type"
                         >
                             <div class="link-item-expand__arch-type_name">
-                                {{ group.name.name }}
+                                {{ group.group.name }}
                             </div>
 
                             <div class="link-item-expand__arch-type_items">
@@ -141,6 +141,7 @@
     } from 'vue-router';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useUIStore } from '@/store/UI/UIStore';
+    import type { TClassItem } from '@/types/Character/Classes.types';
 
     export default defineComponent({
         components: { SvgIcon },
@@ -151,7 +152,7 @@
                 required: true
             },
             classItem: {
-                type: Object,
+                type: Object as PropType<TClassItem>,
                 default: () => null,
                 required: true
             },

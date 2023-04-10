@@ -9,14 +9,17 @@
             </div>
 
             <ui-button
-                v-if="isMobile"
                 v-tippy="{ content: 'Перейти в режим редактирования' }"
                 :type-link-filled="!isEdit"
                 is-icon
                 is-small
                 @click.left.exact.prevent="isEdit = !isEdit"
             >
-                <svg-icon icon-name="edit" />
+                <svg-icon
+                    icon-name="edit"
+                    :stroke-enable="false"
+                    fill-enable
+                />
             </ui-button>
 
             <label

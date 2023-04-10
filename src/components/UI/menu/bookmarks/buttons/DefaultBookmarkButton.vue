@@ -20,13 +20,12 @@
     import {
         computed, defineComponent, ref
     } from 'vue';
-    import { useToast } from 'vue-toastification';
     import { storeToRefs } from 'pinia';
+    import { toast } from '@/common/helpers/toast';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
     import { useUserStore } from '@/store/UI/UserStore';
-    import { ToastEventBus } from '@/common/utils/ToastConfig';
 
     export default defineComponent({
         components: {
@@ -44,7 +43,6 @@
         },
         setup(props) {
             const route = useRoute();
-            const toast = useToast(ToastEventBus);
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
             const defaultBookmarkStore = useDefaultBookmarkStore();
@@ -65,6 +63,20 @@
                 return defaultBookmarkStore.isBookmarkSaved(bookmarkUrl.value);
             });
 
+            const handleBookmarkUpdate = async () => {
+                if (isAuthenticated.value) {
+                    const defaultGroup = await customBookmarkStore.getDefaultGroup();
+
+                    return customBookmarkStore.updateBookmarkInGroup({
+                        url: bookmarkUrl.value,
+                        name: props.name,
+                        groupUUID: defaultGroup.uuid
+                    });
+                }
+
+                return defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
+            };
+
             async function updateBookmark() {
                 if (inProgress.value) {
                     return;
@@ -73,19 +85,9 @@
                 try {
                     inProgress.value = true;
 
-                    if (isAuthenticated.value) {
-                        const defaultGroup = await customBookmarkStore.getDefaultGroup();
+                    const bookmark = await handleBookmarkUpdate();
 
-                        await customBookmarkStore.updateBookmarkInGroup({
-                            url: bookmarkUrl.value,
-                            name: props.name,
-                            groupUUID: defaultGroup.uuid
-                        });
-
-                        return;
-                    }
-
-                    await defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
+                    toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
                 } catch (err) {
                     toast.error('Произошла какая-то ошибка...');
                 } finally {

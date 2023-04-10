@@ -44,6 +44,7 @@
     import { storeToRefs } from 'pinia';
     import sortBy from 'lodash/sortBy';
     import groupBy from 'lodash/groupBy';
+    import cloneDeep from 'lodash/cloneDeep';
     import { useUIStore } from '@/store/UI/UIStore';
     import ClassLink from '@/views/Character/Classes/ClassLink.vue';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -106,10 +107,10 @@
                 const getGroupArchetypes = (list: Array<TClassArchetype>): Array<TClassArchetypeList> => sortBy(
                     Object.values(groupBy(list, o => o.type.name))
                         .map(value => ({
-                            name: value[0].type,
+                            group: value[0].type,
                             list: value
                         })),
-                    [o => o.name.order]
+                    [o => o.group.order]
                 );
 
                 const getGroupClasses = (): Array<TClassList> => {
@@ -127,8 +128,8 @@
 
                     const mapped: Array<TClassList> = sortBy(
                         Object.values(groupBy(
-                            newClasses.filter((item: TClassItem) => 'group' in item),
-                            [(o: TClassItem) => o.group!.name]
+                            cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
+                            (o: TClassItem) => o.group?.name
                         ) as { [key: string]: Array<TClassItem> })
                             .map(classList => ({
                                 group: classList[0].group!,
@@ -169,12 +170,12 @@
     .class-items {
         &__group {
             &_name {
-                font-size: var(--h3-font-size);
+                font-size: var(--h2-font-size);
                 font-weight: 300;
-                margin: 24px 0 16px 0;
+                margin: 32px 0 24px 0;
                 color: var(--text-color-title);
                 position: relative;
-                font-family: 'Lora';
+                font-family: 'Lora', sans-serif;
             }
 
             &_list {

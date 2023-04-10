@@ -38,7 +38,11 @@
                 class="bookmarks__group_icon is-right"
                 @click.left.exact.prevent.stop="removeBookmark(group.uuid)"
             >
-                <svg-icon icon-name="close" />
+                <svg-icon
+                    icon-name="close"
+                    :stroke-enable="false"
+                    fill-enable
+                />
             </div>
         </div>
 
