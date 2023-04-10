@@ -170,9 +170,9 @@
     .class-items {
         &__group {
             &_name {
-                font-size: var(--h3-font-size);
+                font-size: var(--h2-font-size);
                 font-weight: 300;
-                margin: 24px 0 16px 0;
+                margin: 32px 0 24px 0;
                 color: var(--text-color-title);
                 position: relative;
                 font-family: 'Lora', sans-serif;
