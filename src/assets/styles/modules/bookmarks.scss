@@ -234,6 +234,7 @@
         color: var(--text-color-title);
 
         &.is-left {
+          margin-right: 4px;
 
           &:hover {
             cursor: grab;
@@ -267,7 +268,7 @@
 
       .is-left {
         margin-left: -6px;
-        margin-right: 10px;
+        margin-right: 14px;
         width: 20px;
         height: 20px;
       }
@@ -342,6 +343,7 @@
       flex-shrink: 0;
       margin-left: 4px;
       border-radius: 6px;
+      cursor: pointer;
 
       &.only-hover {
         &:not(.is-active) {
@@ -406,7 +408,6 @@
 
             &_label,
             &_icon {
-              cursor: pointer;
               color: var(--text-color-title);
             }
 

@@ -6,8 +6,7 @@
             class="bookmarks__cat_label"
         >
             <div
-                v-if="!isMobile || (isMobile && isEdit)"
-                :class="{ 'only-hover': !isMobile }"
+                v-if="isEdit"
                 class="bookmarks__cat_label_icon is-left js-drag-category"
             >
                 <svg-icon icon-name="sandwich" />
@@ -23,7 +22,11 @@
                 class="bookmarks__cat_label_icon is-right"
                 @click.left.exact.prevent="removeBookmark(category.uuid)"
             >
-                <svg-icon icon-name="close" />
+                <svg-icon
+                    icon-name="close"
+                    :stroke-enable="false"
+                    fill-enable
+                />
             </div>
         </div>
 
@@ -45,17 +48,19 @@
                     class="bookmarks__item"
                 >
                     <div
-                        v-if="!isMobile || (isMobile && isEdit)"
-                        :class="{ 'only-hover': !isMobile }"
+                        v-if="isEdit"
                         class="bookmarks__cat_label_icon is-left js-drag-bookmark"
                     >
                         <svg-icon icon-name="sandwich" />
                     </div>
 
-                    <a
+                    <component
+                        :is="isEdit ? 'span' : 'a'"
                         :href="bookmark.url"
                         class="bookmarks__item_label"
-                    >{{ bookmark.name }}</a>
+                    >
+                        {{ bookmark.name }}
+                    </component>
 
                     <div
                         v-if="!isMobile || (isMobile && isEdit)"
@@ -63,7 +68,11 @@
                         class="bookmarks__item_icon is-right"
                         @click.left.exact.prevent="removeBookmark(bookmark.uuid)"
                     >
-                        <svg-icon icon-name="close" />
+                        <svg-icon
+                            icon-name="close"
+                            :stroke-enable="false"
+                            fill-enable
+                        />
                     </div>
                 </div>
             </template>
