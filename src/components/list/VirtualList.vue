@@ -10,7 +10,7 @@
                 :item="item"
                 :data-index="index"
                 :active="active"
-                class="item"
+                :class="getItemClass(index)"
             >
                 <slot v-bind="{ item, index, active }" />
             </dynamic-scroller-item>
@@ -20,6 +20,8 @@
 
 <script setup lang="ts">
     import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+    import clsx from "clsx";
+    import { isLastIndex } from "@/common/helpers/array";
 
     type TProps = {
         items: unknown[];
@@ -33,15 +35,26 @@
         pageMode: true,
         minItemSize: 55
     });
+
+    const getItemClass = (index: number) => clsx('item', {
+        'is-last': isLastIndex(props.items, index)
+    });
 </script>
 
 <style lang="scss" scoped>
-    :deep(.vue-recycle-scroller__item-view)  {
-        margin: 0;
-        padding: 0;
+    :deep {
+        .vue-recycle-scroller__item-wrapper {
+            padding: 0;
+            margin: 0;
+        }
 
-        > .item {
-            padding-bottom: 12px;
+        .vue-recycle-scroller__item-view  {
+            margin: 0;
+            padding: 0;
+
+            > .item:not(.is-last) {
+                padding-bottom: 12px;
+            }
         }
     }
 </style>
