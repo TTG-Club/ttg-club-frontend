@@ -6,12 +6,17 @@
         @search="onSearch"
         @update="initPages"
     >
-        <background-link
-            v-for="background in backgrounds"
-            :key="background.url"
-            :background-item="background"
-            :to="{ path: background.url }"
-        />
+        <virtual-list
+            :items="backgrounds"
+            :min-item-size="50"
+        >
+            <template #default="{ item: background }">
+                <background-link
+                    :background-item="background"
+                    :to="{ path: background.url }"
+                />
+            </template>
+        </virtual-list>
     </content-layout>
 </template>
 
@@ -27,9 +32,11 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
+    import VirtualList from "@/components/list/VirtualList.vue";
 
     export default defineComponent({
         components: {
+            VirtualList,
             BackgroundLink,
             ContentLayout
         },
