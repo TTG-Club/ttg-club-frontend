@@ -6,12 +6,14 @@
         @search="onSearch"
         @update="initPages"
     >
-        <trait-link
-            v-for="trait in traits"
-            :key="trait.url"
-            :to="{ path: trait.url }"
-            :trait-item="trait"
-        />
+        <virtual-list :items="traits">
+            <template #default="{ item: trait }">
+                <trait-link
+                    :to="{ path: trait.url }"
+                    :trait-item="trait"
+                />
+            </template>
+        </virtual-list>
     </content-layout>
 </template>
 
@@ -27,9 +29,11 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
+    import VirtualList from "@/components/list/VirtualList.vue";
 
     export default defineComponent({
         components: {
+            VirtualList,
             TraitLink,
             ContentLayout
         },
