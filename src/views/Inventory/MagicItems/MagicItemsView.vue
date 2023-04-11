@@ -7,51 +7,38 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <dynamic-scroller
+        <virtual-list
             :items="items"
-            key-field="url"
-            :min-item-size="55"
-            page-mode
-            class="scroller"
         >
-            <template #default="{ item, index, active }">
-                <dynamic-scroller-item
-                    :key="item.url"
-                    :item="item"
-                    :data-index="index"
-                    :active="active"
-                    class="item"
-                >
-                    <magic-item-link
-                        :magic-item="item"
-                        :to="{ path: item.url }"
-                    />
-                </dynamic-scroller-item>
+            <template #default="{ item }">
+                <magic-item-link
+                    :magic-item="item"
+                    :to="{ path: item.url }"
+                />
             </template>
-        </dynamic-scroller>
+        </virtual-list>
     </content-layout>
 </template>
 
 <script>
+    import { storeToRefs } from 'pinia';
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
-    import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
-    import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from '@/components/content/ContentLayout.vue';
-    import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
     import { useFilter } from '@/common/composition/useFilter';
-    import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
     import { usePagination } from '@/common/composition/usePagination';
+    import ContentLayout from '@/components/content/ContentLayout.vue';
+    import VirtualList from '@/components/list/VirtualList.vue';
+    import { useUIStore } from '@/store/UI/UIStore';
+    import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
+    import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
 
     export default defineComponent({
         components: {
+            VirtualList,
             MagicItemLink,
-            ContentLayout,
-            DynamicScroller,
-            DynamicScrollerItem
+            ContentLayout
         },
         setup() {
             const route = useRoute();
@@ -122,11 +109,3 @@
         }
     });
 </script>
-
-<style lang="scss" scoped>
-    .item {
-        :deep(.vue-recycle-scroller__item-view #{&})  {
-            padding-bottom: 12px;
-        }
-    }
-</style>
