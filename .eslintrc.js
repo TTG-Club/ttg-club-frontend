@@ -46,6 +46,14 @@ module.exports = {
                     allow: ['warn', 'error']
                 }
             ],
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': [
+            'error',
+            {
+                typedefs: false,
+                enums: false
+            }
+        ],
         'no-debugger': 'error',
         'no-alert': ['error'],
         'max-len': [1, 120],
