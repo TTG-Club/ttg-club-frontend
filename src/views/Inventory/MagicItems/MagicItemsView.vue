@@ -125,7 +125,7 @@
 
 <style lang="scss" scoped>
     .item {
-        :global(.vue-recycle-scroller__item-view #{&})  {
+        :deep(.vue-recycle-scroller__item-view #{&})  {
             padding-bottom: 12px;
         }
     }
