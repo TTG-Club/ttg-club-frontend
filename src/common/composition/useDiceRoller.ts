@@ -19,7 +19,7 @@ export function useDiceRoller() {
     const roller = new DiceRoller();
     const toast = useToast(ToastEventBus);
 
-    /* eslint-disable no-use-before-define */
+    /* eslint-disable @typescript-eslint/no-use-before-define */
     const doRender = (roll: RollBase): VNode => {
         let render;
 
@@ -210,7 +210,7 @@ export function useDiceRoller() {
             ]
         );
     };
-    /* eslint-enable no-use-before-define */
+    /* eslint-enable @typescript-eslint/no-use-before-define */
 
     const isCritical = (
         roll: RollBase
