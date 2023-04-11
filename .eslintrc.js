@@ -415,6 +415,9 @@ module.exports = {
         {
             files: ['*.vue'],
             rules: {
+                /* turn off no-unused-vars for script setup */
+                '@typescript-eslint/no-unused-vars': 'off',
+                'vue/script-setup-uses-vars': 'error',
                 'indent': 'off',
                 'vue/html-indent': ['error', 4],
                 'vue/script-indent': [
