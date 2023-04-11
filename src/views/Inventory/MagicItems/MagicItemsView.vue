@@ -7,12 +7,28 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <magic-item-link
-            v-for="item in items"
-            :key="item.url"
-            :magic-item="item"
-            :to="{ path: item.url }"
-        />
+        <dynamic-scroller
+            :items="items"
+            key-field="url"
+            :min-item-size="55"
+            page-mode
+            class="scroller"
+        >
+            <template #default="{ item, index, active }">
+                <dynamic-scroller-item
+                    :key="item.url"
+                    :item="item"
+                    :data-index="index"
+                    :active="active"
+                    class="item"
+                >
+                    <magic-item-link
+                        :magic-item="item"
+                        :to="{ path: item.url }"
+                    />
+                </dynamic-scroller-item>
+            </template>
+        </dynamic-scroller>
     </content-layout>
 </template>
 
@@ -20,6 +36,7 @@
     import {
         computed, defineComponent, onBeforeMount
     } from 'vue';
+    import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -32,7 +49,9 @@
     export default defineComponent({
         components: {
             MagicItemLink,
-            ContentLayout
+            ContentLayout,
+            DynamicScroller,
+            DynamicScrollerItem
         },
         setup() {
             const route = useRoute();
@@ -103,3 +122,11 @@
         }
     });
 </script>
+
+<style lang="scss" scoped>
+    .item {
+        :global(.vue-recycle-scroller__item-view #{&})  {
+            padding-bottom: 12px;
+        }
+    }
+</style>
