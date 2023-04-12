@@ -84,7 +84,7 @@ a {
   font-weight: 400;
 
   &:hover {
-    background-color: var(--primary-hover);
+    color: var(--link-color-hover);
     transition: all .5s;
   }
 }
