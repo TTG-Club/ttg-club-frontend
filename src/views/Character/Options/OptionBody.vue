@@ -15,13 +15,16 @@
                 <p>Классы:</p>
 
                 <div class="classes_icon">
-                    <class-square
+                    <span
                         v-for="(el, key) in option.classes"
                         :key="key"
-                        :icon="el.icon"
-                        :name="el.name"
-                        :url="el.url"
-                    />
+                    >
+                        <router-link
+                            :to="{ path: el.url }"
+                        >{{ el.name }}</router-link>
+
+                        <span v-if="key !== option.classes.length - 1">,&nbsp;</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -31,12 +34,10 @@
 <script>
     import RawContent from '@/components/content/RawContent.vue';
     import DetailTopBar from '@/components/UI/DetailTopBar.vue';
-    import ClassSquare from '@/components/UI/ClassSquare.vue';
 
     export default {
         name: 'OptionBody',
         components: {
-            ClassSquare,
             DetailTopBar,
             RawContent
         },
