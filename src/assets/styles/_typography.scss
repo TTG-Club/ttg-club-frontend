@@ -82,6 +82,11 @@ a {
   color: var(--link-color);
   text-decoration: none;
   font-weight: 400;
+
+  &:hover {
+    color: var(--link-color-hover);
+    transition: all .5s;
+  }
 }
 
 p {
