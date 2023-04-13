@@ -23,14 +23,14 @@
     import clsx from "clsx";
     import { isLastIndex } from "@/common/helpers/array";
 
-    type TProps = {
+    export type TVirtualListProps = {
         items: unknown[];
         keyField?: string,
         minItemSize?: number;
         pageMode?: boolean;
     };
 
-    const props = withDefaults(defineProps<TProps>(), {
+    const props = withDefaults(defineProps<TVirtualListProps>(), {
         keyField: 'url',
         pageMode: true,
         minItemSize: 55
@@ -42,7 +42,13 @@
 </script>
 
 <style lang="scss" scoped>
+    $item-spacing: 12px;
+
     :deep {
+        .vue-recycle-scroller {
+            margin-bottom: -$item-spacing;
+        }
+
         .vue-recycle-scroller__item-wrapper {
             padding: 0;
             margin: 0;
@@ -52,8 +58,8 @@
             margin: 0;
             padding: 0;
 
-            > .item:not(.is-last) {
-                padding-bottom: 12px;
+            > .item {
+                padding-bottom: $item-spacing;
             }
         }
     }
