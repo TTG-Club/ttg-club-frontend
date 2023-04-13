@@ -8,6 +8,7 @@
     >
         <virtual-list
             :items="backgrounds"
+            key-field="url"
             :min-item-size="50"
         >
             <template #default="{ item: background }">

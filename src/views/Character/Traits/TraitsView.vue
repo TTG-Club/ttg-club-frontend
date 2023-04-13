@@ -6,7 +6,10 @@
         @search="onSearch"
         @update="initPages"
     >
-        <virtual-list :items="traits">
+        <virtual-list
+            :items="traits"
+            key-field="url"
+        >
             <template #default="{ item: trait }">
                 <trait-link
                     :to="{ path: trait.url }"
