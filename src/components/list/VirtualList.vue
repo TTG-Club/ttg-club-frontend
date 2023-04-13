@@ -6,11 +6,11 @@
     >
         <template #default="{ item, index, active }">
             <dynamic-scroller-item
-                :key="item.url"
+                :key="item[keyField]"
                 :item="item"
                 :data-index="index"
                 :active="active"
-                :class="getItemClass(index)"
+                class="item"
             >
                 <slot v-bind="{ item, index, active }" />
             </dynamic-scroller-item>
@@ -20,8 +20,7 @@
 
 <script setup lang="ts">
     import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
-    import clsx from "clsx";
-    import { isLastIndex } from "@/common/helpers/array";
+    import { DEFAULT_KEY_FIELD } from "@/common/const";
 
     export type TVirtualListProps = {
         items: unknown[];
@@ -31,13 +30,9 @@
     };
 
     const props = withDefaults(defineProps<TVirtualListProps>(), {
-        keyField: 'url',
+        keyField: DEFAULT_KEY_FIELD,
         pageMode: true,
         minItemSize: 55
-    });
-
-    const getItemClass = (index: number) => clsx('item', {
-        'is-last': isLastIndex(props.items, index)
     });
 </script>
 

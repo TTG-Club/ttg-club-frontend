@@ -9,6 +9,7 @@
     >
         <virtual-list
             :items="items"
+            key-field="url"
         >
             <template #default="{ item }">
                 <magic-item-link
