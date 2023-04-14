@@ -8,13 +8,19 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <spell-link
-            v-for="spell in spells"
-            :key="spell.url"
-            :in-tab="inTab"
-            :spell="spell"
-            :to="{ path: spell.url }"
-        />
+        <grouped-list
+            :list="{ items: spells, keyField: 'url' }"
+            :get-group="getSpellGroup"
+            :columns="2"
+        >
+            <template #default="{ item: spell }">
+                <spell-link
+                    :in-tab="inTab"
+                    :spell="spell"
+                    :to="{ path: spell.url }"
+                />
+            </template>
+        </grouped-list>
     </component>
 </template>
 
@@ -32,9 +38,12 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
+    import GroupedList from "@/components/list/GroupedList/GroupedList.vue";
+    import type { AnyObject } from "@/types/Shared/Utility.types";
 
     export default defineComponent({
         components: {
+            GroupedList,
             SpellLink,
             TabLayout,
             ContentLayout
@@ -150,6 +159,13 @@
                 }
             );
 
+            /* TODO: Добавить тип заклинания */
+            const getSpellGroup = ({ level }: AnyObject) => ({
+                url: `${ level }`,
+                name: level ? `${ level } уровень` : 'Заговоры',
+                order: level
+            });
+
             return {
                 layout,
                 isMobile,
@@ -159,7 +175,8 @@
                 showRightSide: computed(() => route.name === 'spellDetail'),
                 initPages,
                 nextPage,
-                onSearch
+                onSearch,
+                getSpellGroup
             };
         }
     });
