@@ -1,5 +1,6 @@
 <template>
     <router-link
+        v-if="spell"
         :to="{ path: spell.url }"
         custom
         v-bind="$props"
@@ -39,7 +40,7 @@
                             class="link-item__modifications"
                         >
                             <div
-                                v-if="spell.concentration"
+                                v-if="spell!.concentration"
                                 v-tippy="{ content: 'Концентрация' }"
                                 class="link-item__modification"
                             >
@@ -98,7 +99,7 @@
         :bookmark="bookmarkObj"
     >
         <template #title>
-            {{ modal.data.name.rus }}
+            {{ modal.data!.name.rus }}
         </template>
 
         <template #default>
@@ -118,6 +119,8 @@
     import BaseModal from '@/components/UI/modals/BaseModal.vue';
     import { useAxios } from '@/common/composition/useAxios';
     import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+    import type { TSpellItem, TSpellLink } from '@/types/Character/Spells.types';
+    import type { Maybe } from '@/types/Shared/Utility.types';
 
     export default defineComponent({
         components: {
@@ -134,7 +137,7 @@
                 required: true
             },
             spell: {
-                type: Object,
+                type: Object as PropType<TSpellLink>,
                 default: () => ({})
             },
             inTab: {
@@ -151,7 +154,10 @@
                 href
             } = useLink(props);
 
-            const modal = ref({
+            const modal = ref<{
+                show: boolean;
+                data: Maybe<TSpellItem>
+            }>({
                 show: false,
                 data: undefined
             });
@@ -175,7 +181,7 @@
 
                 try {
                     if (!modal.value.data) {
-                        const resp = await http.post({
+                        const resp = await http.post<TSpellItem>({
                             url: props.spell.url
                         });
 

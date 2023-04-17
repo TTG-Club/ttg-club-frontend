@@ -35,6 +35,11 @@
     import { useUserStore } from '@/store/UI/UserStore';
     import PageLayout from '@/components/content/PageLayout.vue';
 
+    interface ITokenValidation {
+        correct: boolean;
+        message: string;
+    }
+
     export default defineComponent({
         components: {
             PageLayout,
@@ -46,7 +51,7 @@
             const userStore = useUserStore();
             const { isAuthenticated } = storeToRefs(userStore);
 
-            const tokenValidation = ref({
+            const tokenValidation = ref<ITokenValidation>({
                 correct: true,
                 message: ''
             });
@@ -57,7 +62,9 @@
                 }
 
                 try {
-                    const resp = await http.get({ url: `/auth/token/validate?token=${ route.query.token }` });
+                    const resp = await http.get<ITokenValidation>({
+                        url: `/auth/token/validate?token=${ route.query.token }`
+                    });
 
                     if (resp.status !== 200) {
                         tokenValidation.value = {

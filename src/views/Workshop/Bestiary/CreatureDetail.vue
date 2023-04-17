@@ -37,6 +37,8 @@
     import { useUIStore } from '@/store/UI/UIStore';
     import errorHandler from '@/common/helpers/errorHandler';
     import { useAxios } from '@/common/composition/useAxios';
+    import type { ICreature } from '@/types/Workshop/Bestiary.types';
+    import type { Maybe } from '@/types/Shared/Utility.types';
 
     export default defineComponent({
         components: {
@@ -55,7 +57,7 @@
                 isMobile
             } = storeToRefs(uiStore);
 
-            const creature = ref(undefined);
+            const creature = ref<Maybe<ICreature>>(undefined);
             const loading = ref(true);
             const error = ref(false);
             const abortController = ref<AbortController | null>(null);
@@ -63,8 +65,6 @@
             const exportFoundry = () => {
                 if (!creature.value) return;
 
-                // TODO: Закончить типизацию
-                // @ts-ignore
                 window.open(`/api/fvtt/v1/bestiary/${ creature.value.id }`, '_self');
             };
 
@@ -78,7 +78,7 @@
                     loading.value = true;
                     abortController.value = new AbortController();
 
-                    const resp = await http.post({
+                    const resp = await http.post<ICreature>({
                         url,
                         signal: abortController.value.signal
                     });
