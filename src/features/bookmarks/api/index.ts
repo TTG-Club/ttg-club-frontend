@@ -2,11 +2,11 @@ import { useAxios } from '@/common/composition/useAxios';
 import type { IBookmark } from '@/features/bookmarks/types/Bookmark.types';
 
 export default class BookmarksApi {
-    $http = useAxios();
+    private static $http = useAxios();
 
-    async getCategoryByURL(url: string) {
+    static async getCategoryByURL(url: string) {
         try {
-            const resp = await this.$http.get<Array<IBookmark>>({
+            const resp = await this.$http.get<IBookmark>({
                 url: '/bookmarks/category',
                 payload: {
                     url: encodeURIComponent(url)
@@ -23,9 +23,9 @@ export default class BookmarksApi {
         }
     }
 
-    async getCategoryByCode(code: string) {
+    static async getCategoryByCode(code: string) {
         try {
-            const resp = await this.$http.get<Array<IBookmark>>({
+            const resp = await this.$http.get<IBookmark>({
                 url: '/bookmarks/category',
                 payload: { code }
             });
@@ -40,7 +40,7 @@ export default class BookmarksApi {
         }
     }
 
-    async getCategories() {
+    static async getCategories() {
         try {
             const resp = await this.$http.get<Array<IBookmark>>({
                 url: '/bookmarks/categories'
