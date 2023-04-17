@@ -23,8 +23,8 @@
     import { storeToRefs } from 'pinia';
     import { toast } from '@/common/helpers/toast';
     import UiButton from '@/components/UI/kit/UiButton.vue';
-    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUserStore } from '@/store/UI/UserStore';
 
     export default defineComponent({

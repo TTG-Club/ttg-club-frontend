@@ -110,12 +110,12 @@
     import { useRoute, useRouter } from 'vue-router';
     import type { TNavItem } from '@/store/UI/NavStore';
     import { useNavStore } from '@/store/UI/NavStore';
-    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
     import NavPopover from '@/components/UI/menu/NavPopover.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
     import { useUserStore } from '@/store/UI/UserStore';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
 
     export default defineComponent({
         name: 'NavMenu',

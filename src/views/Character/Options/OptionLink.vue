@@ -1,5 +1,6 @@
 <template>
     <router-link
+        v-if="optionItem"
         :to="{ path: optionItem.url }"
         custom
         v-bind="$props"
@@ -36,7 +37,7 @@
         :bookmark="bookmarkObj"
     >
         <template #title>
-            {{ modal.data.name.rus }}
+            {{ modal.data?.name.rus || '' }}
         </template>
 
         <template #default>
@@ -56,6 +57,8 @@
     import BaseModal from '@/components/UI/modals/BaseModal.vue';
     import OptionBody from '@/views/Character/Options/OptionBody.vue';
     import { useAxios } from '@/common/composition/useAxios';
+    import type { OptionDetail, OptionLink } from '@/types/Character/Options.types';
+    import type { Maybe } from '@/types/Shared/Utility.types';
 
     export default defineComponent({
         components: {
@@ -72,8 +75,8 @@
                 required: true
             },
             optionItem: {
-                type: Object,
-                default: () => ({})
+                type: Object as PropType<OptionLink>,
+                default: null
             },
             inTab: {
                 type: Boolean,
@@ -89,7 +92,10 @@
                 href
             } = useLink(props);
 
-            const modal = ref({
+            const modal = ref<{
+                show: boolean;
+                data: Maybe<OptionDetail>
+            }>({
                 show: false,
                 data: undefined
             });
@@ -113,7 +119,7 @@
 
                 try {
                     if (!modal.value.data) {
-                        const resp = await http.post({
+                        const resp = await http.post<OptionDetail>({
                             url: props.optionItem.url
                         });
 

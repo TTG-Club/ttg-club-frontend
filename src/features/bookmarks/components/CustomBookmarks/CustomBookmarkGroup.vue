@@ -111,8 +111,8 @@
     import draggableComponent from 'vuedraggable';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
-    import CustomBookmarkCategory from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 

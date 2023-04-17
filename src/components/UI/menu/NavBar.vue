@@ -52,7 +52,7 @@
     import { useRoute } from 'vue-router';
     import MenuThemeSwitcher from '@/components/UI/MenuThemeSwitcher.vue';
     import NavProfile from '@/components/UI/menu/NavProfile.vue';
-    import NavBookmarks from '@/components/UI/menu/bookmarks/NavBookmarks.vue';
+    import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
     import NavMenu from '@/components/UI/menu/NavMenu.vue';
     import NavSearch from '@/components/UI/menu/NavSearch.vue';
     import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';

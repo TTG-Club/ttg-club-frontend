@@ -318,7 +318,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
                 await store.value.setItem(unref(storeKey), restored);
             };
 
-            const resp = await http.post({ url: unref(url) });
+            const resp = await http.post<Filter | Array<FilterGroup>>({ url: unref(url) });
 
             if (!resp.data || resp.status !== 200) {
                 return Promise.reject();

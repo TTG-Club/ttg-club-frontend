@@ -103,8 +103,8 @@
         computed, defineComponent, onBeforeMount, ref
     } from 'vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
-    import CustomBookmarkGroup from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup.vue';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+    import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useUIStore } from '@/store/UI/UIStore';
@@ -149,6 +149,7 @@
             });
 
             return {
+                test: computed(() => customBookmarkStore.bookmarks),
                 bookmarks,
                 isEdit,
                 isGroupCreating,

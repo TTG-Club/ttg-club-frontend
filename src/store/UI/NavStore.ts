@@ -6,6 +6,7 @@ import orderBy from 'lodash/orderBy';
 import type { RouteLocationNormalized } from 'vue-router';
 import { useAxios } from '@/common/composition/useAxios';
 import isDev from '@/common/helpers/isDev';
+import type { Maybe } from '@/types/Shared/Utility.types';
 
 export type TNavItem = {
     name: string
@@ -25,6 +26,12 @@ export type TPartner = {
     img: string
     url: string
     order: number
+}
+
+export type TMetaInfo = {
+    title: string;
+    description: string;
+    menu: string;
 }
 
 export const useNavStore = defineStore('NavStore', () => {
@@ -70,7 +77,7 @@ export const useNavStore = defineStore('NavStore', () => {
         }
 
         try {
-            const resp = await http.get({
+            const resp = await http.get<Array<TNavItem>>({
                 url: '/menu'
             });
 
@@ -103,7 +110,7 @@ export const useNavStore = defineStore('NavStore', () => {
         }
 
         try {
-            const resp = await http.get({
+            const resp = await http.get<Array<TPartner>>({
                 url: '/partners'
             });
 
@@ -120,7 +127,7 @@ export const useNavStore = defineStore('NavStore', () => {
     };
 
     /* Meta */
-    const metaInfo = ref(undefined);
+    const metaInfo = ref<Maybe<TMetaInfo>>(undefined);
 
     const hidePopovers = () => {
         isShowPopover.value = false;
@@ -129,7 +136,7 @@ export const useNavStore = defineStore('NavStore', () => {
 
     const getMetaByURL = async (url: string) => {
         try {
-            const resp = await http.get({
+            const resp = await http.get<TMetaInfo>({
                 url: `/meta${ url }`
             });
 

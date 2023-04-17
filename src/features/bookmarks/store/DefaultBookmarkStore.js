@@ -254,22 +254,6 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
             return group;
         },
 
-        async getCategories() {
-            try {
-                const resp = await this.$http.get({
-                    url: '/bookmarks/categories'
-                });
-
-                if (resp.status !== 200) {
-                    return Promise.reject(resp.statusText);
-                }
-
-                return Promise.resolve(resp.data);
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        },
-
         createCategory(category) {
             const parent = this.getDefaultGroup();
 
@@ -283,42 +267,7 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', {
             this.bookmarks.push(newCategory);
 
             return newCategory;
-        },
-
-        async getCategoryByURL(url) {
-            try {
-                const resp = await this.$http.get({
-                    url: '/bookmarks/category',
-                    payload: {
-                        url: encodeURIComponent(url)
-                    }
-                });
-
-                if (resp.status !== 200) {
-                    return Promise.reject(resp.statusText);
-                }
-
-                return Promise.resolve(resp.data);
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        },
-
-        async getCategoryByCode(code) {
-            try {
-                const resp = await this.$http.get({
-                    url: '/bookmarks/category',
-                    payload: { code }
-                });
-
-                if (resp.status !== 200) {
-                    return Promise.reject(resp.statusText);
-                }
-
-                return Promise.resolve(resp.data);
-            } catch (err) {
-                return Promise.reject(err);
-            }
         }
+
     }
 });

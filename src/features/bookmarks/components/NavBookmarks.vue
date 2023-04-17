@@ -31,11 +31,11 @@
     import { storeToRefs } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import NavPopover from '@/components/UI/menu/NavPopover.vue';
-    import DefaultBookmarks from '@/components/UI/menu/bookmarks/DefaultBookmarks.vue';
-    import CustomBookmarks from '@/components/UI/menu/bookmarks/CustomBookmarks.vue';
+    import DefaultBookmarks from '@/features/bookmarks/components/DefaultBookmarks.vue';
+    import CustomBookmarks from '@/features/bookmarks/components/CustomBookmarks.vue';
     import { useUserStore } from '@/store/UI/UserStore';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
-    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+    import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
     export default {
         name: 'NavBookmarks',

@@ -92,7 +92,7 @@
 </template>
 
 <script>
-    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
+    import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
     export default {

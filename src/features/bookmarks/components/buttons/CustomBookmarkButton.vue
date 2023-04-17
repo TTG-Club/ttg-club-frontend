@@ -43,7 +43,7 @@
     import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
     import errorHandler from '@/common/helpers/errorHandler';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { ToastEventBus } from '@/common/utils/ToastConfig';
 

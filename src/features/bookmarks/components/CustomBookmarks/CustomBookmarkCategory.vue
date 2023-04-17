@@ -83,7 +83,7 @@
 <script>
     import { computed, defineComponent } from 'vue';
     import draggableComponent from 'vuedraggable';
-    import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 

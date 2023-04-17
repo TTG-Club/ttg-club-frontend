@@ -107,8 +107,8 @@
     import { mapActions, mapState } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
-    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
-    import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+    import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+    import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
     export default {
         name: 'BaseModal',

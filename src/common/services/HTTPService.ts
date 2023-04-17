@@ -1,4 +1,6 @@
-import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type {
+    AxiosInstance, AxiosRequestConfig, AxiosResponse
+} from 'axios';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { USER_TOKEN_COOKIE } from '@/common/const/UI';
@@ -42,7 +44,7 @@ export default class HTTPService {
         });
     }
 
-    get(config: RequestConfig) {
+    get<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
         return this.instance({
             method: 'get',
             url: config.url,
@@ -51,7 +53,7 @@ export default class HTTPService {
         });
     }
 
-    post(config: RequestConfig) {
+    post<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
         return this.instance({
             method: 'post',
             url: config.url,
@@ -60,7 +62,7 @@ export default class HTTPService {
         });
     }
 
-    put(config: RequestConfig) {
+    put<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
         return this.instance({
             method: 'put',
             url: config.url,
@@ -69,7 +71,7 @@ export default class HTTPService {
         });
     }
 
-    patch(config: RequestConfig) {
+    patch<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
         return this.instance({
             method: 'patch',
             url: config.url,
@@ -78,7 +80,7 @@ export default class HTTPService {
         });
     }
 
-    delete(config: RequestConfig) {
+    delete<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
         return this.instance({
             method: 'delete',
             url: config.url,
@@ -96,7 +98,7 @@ export default class HTTPService {
         });
     }
 
-    rawGet(config: RequestConfig) {
+    rawGet<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
         return this.instance({
             method: 'get',
             baseURL: '',

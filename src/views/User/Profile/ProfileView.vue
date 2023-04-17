@@ -223,6 +223,7 @@
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
+    import type { TYoutubeVideo } from '@/types/Shared/Youtube.types';
 
     export default defineComponent({
         components: {
@@ -252,7 +253,7 @@
 
             const getLastVideo = async () => {
                 try {
-                    const resp = await http.get({ url: '/youtube/last' });
+                    const resp = await http.get<TYoutubeVideo>({ url: '/youtube/last' });
 
                     if (resp.status !== 200) {
                         return Promise.reject(resp.status);
@@ -271,7 +272,7 @@
                 isError.value = false;
 
                 try {
-                    const resp = await http.put({ url: `/youtube/${ currentVideo.value }` });
+                    const resp = await http.put<TYoutubeVideo>({ url: `/youtube/${ currentVideo.value }` });
 
                     if (resp.status !== 200) {
                         isError.value = true;
