@@ -3,7 +3,7 @@ import type {
     TGetGroupedListItemsOptions,
     TGroupedListGroup,
     TGroupedListItem
-} from '@/components/list/GroupedList/types';
+} from '@/components/list/VirtualGroupedList/types';
 import { getListRows } from '@/common/helpers/list';
 
 export const filterItemsByGroupId = <Item, Group, KeyField extends keyof Group>(

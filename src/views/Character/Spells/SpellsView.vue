@@ -8,7 +8,7 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <grouped-list
+        <virtual-grouped-list
             :list="{ items: spells, keyField: 'url' }"
             :get-group="getSpellGroup"
             :columns="2"
@@ -20,7 +20,7 @@
                     :to="{ path: spell.url }"
                 />
             </template>
-        </grouped-list>
+        </virtual-grouped-list>
     </component>
 </template>
 
@@ -38,12 +38,12 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
-    import GroupedList from "@/components/list/GroupedList/GroupedList.vue";
+    import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
     import type { AnyObject } from "@/types/Shared/Utility.types";
 
     export default defineComponent({
         components: {
-            GroupedList,
+            VirtualGroupedList,
             SpellLink,
             TabLayout,
             ContentLayout

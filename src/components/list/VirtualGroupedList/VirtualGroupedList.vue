@@ -34,12 +34,12 @@
     import VirtualList, {
         TVirtualListProps
     } from "@/components/list/VirtualList.vue";
-    import GroupedListCategory from "@/components/list/GroupedList/components/GroupedListCategory.vue";
+    import GroupedListCategory from "@/components/list/GroupedListCategory.vue";
     import type { AnyObject } from "@/types/Shared/Utility.types";
     import type { ListIteratee } from "@/types/Shared/Lodash.types";
-    import type { TGetGroup } from "@/components/list/GroupedList/types";
+    import type { TGetGroup } from "@/components/list/VirtualGroupedList/types";
     import ListRow, { TListRowProps } from "@/components/list/ListRow.vue";
-    import { getListItemsWithGroups } from "@/components/list/GroupedList/helpers";
+    import { getListItemsWithGroups } from "@/components/list/VirtualGroupedList/helpers";
     import { DEFAULT_KEY_FIELD } from "@/common/const";
 
     /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
