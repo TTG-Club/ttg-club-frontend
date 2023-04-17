@@ -37,8 +37,6 @@ export type TType = {
     order: number;
 }
 
-export type TSign = ' + ' | ' − ';
-
 export interface IAbilitiesValue {
     str: number;
     dex: number;

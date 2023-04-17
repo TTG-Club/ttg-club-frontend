@@ -1,5 +1,5 @@
 import type {
-    TName, TSource, TSign, IAbilitiesValue
+    TName, TSource, IAbilitiesValue
 } from '@/types/Shared/BaseApiFields.types';
 
 export enum BestiaryFilterDefaults {
@@ -21,7 +21,7 @@ export interface ICreatureHits {
     average: number;
     text?: string;
     formula?: string;
-    sign?: TSign;
+    sign?: ' + ' | ' - ';
     bonus?: number;
 }
 
