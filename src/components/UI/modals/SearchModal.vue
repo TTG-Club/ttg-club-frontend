@@ -180,7 +180,7 @@
                     controller.value.abort();
                 }
 
-                if (!search.value) {
+                if (!search.value.trim()) {
                     return Promise.resolve();
                 }
 
