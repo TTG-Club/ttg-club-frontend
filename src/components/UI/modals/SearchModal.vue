@@ -30,13 +30,14 @@
                     >
                         <input
                             ref="input"
+                            :maxlength="255"
                             autofocus="autofocus"
                             autocomplete="off"
                             autocapitalize="off"
                             formnovalidate="formnovalidate"
                             :value="search"
                             placeholder="Поиск..."
-                            @input.prevent.stop="onUpdateSearch($event.target.value)"
+                            @input.prevent.stop="onSearchUpdate($event.target.value)"
                             @keyup.enter.exact.prevent.stop="onSubmit"
                         />
                     </form>
@@ -386,7 +387,7 @@
                 await onSearch();
             }, 300);
 
-            const onUpdateSearch = (e: string) => {
+            const onSearchUpdate = (e: string) => {
                 search.value = e;
 
                 onSearchDebounce();
@@ -410,7 +411,7 @@
                 selectedIndex,
                 onSubmit,
                 onSearchRandom,
-                onUpdateSearch
+                onSearchUpdate
             };
         }
     });
