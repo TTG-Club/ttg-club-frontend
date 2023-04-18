@@ -120,7 +120,7 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (spells.value.length === 1 && !isMobile.value) {
+                if (spells.value.length === 1 && !isMobile.value && !props.inTab) {
                     await router.push({ path: spells.value[0].url });
                 }
             };
