@@ -28,9 +28,8 @@
                         autocapitalize="off"
                         @submit.prevent.stop="onSubmit"
                     >
-                        <input
+                        <ui-input
                             ref="input"
-                            :maxlength="255"
                             autofocus="autofocus"
                             autocomplete="off"
                             autocapitalize="off"
@@ -140,9 +139,11 @@
     import type { TSearchResultList } from '@/types/Search/Search.types';
     import SearchLink from '@/views/Search/SearchLink.vue';
     import { useMetrics } from '@/common/composition/useMetrics';
+    import UiInput from "@/components/UI/kit/UiInput.vue";
 
     export default defineComponent({
         components: {
+            UiInput,
             SearchLink,
             UiButton,
             SvgIcon
@@ -457,18 +458,6 @@
                 overflow: hidden;
                 appearance: none;
                 border: 0;
-
-                input {
-                    appearance: none;
-                    border: 0;
-                    outline: none;
-                    width: 100%;
-                    height: 100%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    background: transparent;
-                    color: var(--text-b-color);
-                }
             }
 
             &__count {
@@ -564,6 +553,17 @@
                 height: 28px;
                 padding: 2px;
             }
+        }
+    }
+
+    :deep(.ui-input__control) {
+        border: 0;
+        background: transparent;
+
+        .ui-input__input {
+            color: var(--text-b-color);
+            height: 36px;
+            padding: 0 2px;
         }
     }
 </style>
