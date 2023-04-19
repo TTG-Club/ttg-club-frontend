@@ -1,5 +1,6 @@
 <template>
     <div
+        v-if="group"
         :class="{ 'is-active': isOpened(group.uuid) }"
         class="bookmarks__group"
     >
@@ -36,7 +37,7 @@
                 v-if="!isMobile || (isMobile && isEdit)"
                 :class="{ 'only-hover': !isMobile }"
                 class="bookmarks__group_icon is-right"
-                @click.left.exact.prevent.stop="removeBookmark(group.uuid)"
+                @click.left.exact.prevent.stop="removeBookmark(group!.uuid)"
             >
                 <svg-icon
                     icon-name="close"
@@ -47,11 +48,11 @@
         </div>
 
         <div
-            v-if="isOpened(group.uuid)"
+            v-if="isOpened(group!.uuid)"
             class="bookmarks__group_body"
         >
             <draggable
-                :model-value="group.children"
+                :model-value="group!.children"
                 chosen-class="bookmarks__cat_chosen"
                 drag-class="bookmarks__cat_drag"
                 ghost-class="bookmarks__cat_ghost"
@@ -66,7 +67,7 @@
                         :key="category.uuid + category.order"
                         :category="category"
                         :group="group"
-                        :is-edit="isEdit"
+                        :is-edit="isEdit || false"
                     />
                 </template>
             </draggable>
@@ -104,17 +105,20 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import type { PropType } from 'vue';
     import {
         computed, defineComponent, onBeforeMount, ref
     } from 'vue';
     import draggableComponent from 'vuedraggable';
+    import { storeToRefs } from 'pinia';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
 
     export default defineComponent({
         components: {
@@ -126,8 +130,8 @@
         },
         props: {
             group: {
-                type: Object,
-                default: () => ({})
+                type: Object as PropType<IBookmarkGroup>,
+                required: true
             },
             isFirst: {
                 type: Boolean,
@@ -143,20 +147,21 @@
             const customBookmarkStore = useCustomBookmarkStore();
             const isCategoryCreating = ref(false);
             const newCategoryName = ref('');
+            const { openedGroups } = storeToRefs(customBookmarkStore);
 
-            function enableCategoryCreating() {
+            const enableCategoryCreating = () => {
                 if (props.group.order > -1) {
                     isCategoryCreating.value = true;
                     newCategoryName.value = '';
                 }
-            }
+            };
 
-            function disableCategoryCreating() {
+            const disableCategoryCreating = () => {
                 isCategoryCreating.value = false;
                 newCategoryName.value = '';
-            }
+            };
 
-            async function createCategory() {
+            const createCategory = async () => {
                 await customBookmarkStore.queryAddBookmark({
                     name: newCategoryName.value,
                     order: props.group.children.length,
@@ -164,9 +169,9 @@
                 });
 
                 disableCategoryCreating();
-            }
+            };
 
-            async function updateBookmark(change) {
+            const updateBookmark = async change => {
                 if (!change) {
                     return;
                 }
@@ -185,28 +190,28 @@
                     order,
                     parentUUID: props.group.uuid
                 });
-            }
+            };
 
-            async function onChangeHandler(e) {
+            const onChangeHandler = async e => {
                 const {
                     added,
                     moved
                 } = e;
 
                 await updateBookmark(added || moved);
-            }
+            };
 
-            function openFirstGroup() {
+            const openFirstGroup = () => {
                 if (!props.isFirst) {
                     return;
                 }
 
-                if (customBookmarkStore.getOpenedGroups.length > 0) {
+                if (openedGroups.value.length > 0) {
                     return;
                 }
 
                 customBookmarkStore.toggleGroup(props.group.uuid);
-            }
+            };
 
             onBeforeMount(() => openFirstGroup());
 

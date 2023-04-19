@@ -2,10 +2,15 @@ import { defineStore } from 'pinia';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref } from 'vue';
-import type { IBookmark } from '@/features/bookmarks/types/Bookmark.types';
+import type {
+    TBookmark, IBookmarkCategoryApi, IBookmarkCategoryInfo, IBookmarkGroup, IBookmarkGroupApi, IBookmarkItemApi
+} from '@/features/bookmarks/types/Bookmark.types';
 import { useAxios } from '@/common/composition/useAxios';
 import type { Maybe } from '@/types/Shared/Utility.types';
 import BookmarksApi from '@/features/bookmarks/api';
+import {
+    isBookmarkCategoryApi, isBookmarkGroupApi, isBookmarkItemApi
+} from '@/features/bookmarks/utils';
 
 const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
 
@@ -17,33 +22,33 @@ const signals: {
     delete: undefined
 };
 
-export type TQueryAddBookmark = Omit<Partial<IBookmark>, 'name'> & Pick<IBookmark, 'name'>
+export type TQueryAddBookmark = Omit<Partial<TBookmark>, 'name'> & Pick<TBookmark, 'name'>
 
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     const http = useAxios();
 
-    const bookmarks = ref<Array<IBookmark>>([]);
-    const openedGroups = ref<IBookmark['uuid'][]>([]);
+    const bookmarks = ref<Array<TBookmark>>([]);
+    const openedGroups = ref<TBookmark['uuid'][]>([]);
 
-    const isGroupOpened = (uuid: IBookmark['uuid']) => openedGroups.value.includes(uuid);
-    const isBookmarkSaved = (url: IBookmark['url']) => bookmarks.value.findIndex(bookmark => bookmark.url === url) > -1;
+    const isGroupOpened = (uuid: TBookmark['uuid']) => openedGroups.value.includes(uuid);
+    const isBookmarkSaved = (url: IBookmarkItemApi['url']) => bookmarks.value.findIndex(bookmark => bookmark.url === url) > -1;
 
-    const isBookmarkSavedInDefault = (url: IBookmark['url']) => {
-        const defaultGroup = bookmarks.value.find(item => !item.parentUUID && item.order === -1);
+    const isBookmarkSavedInDefault = (url: IBookmarkItemApi['url']) => {
+        const defaultGroup = bookmarks.value.find(item => isBookmarkGroupApi(item) && item.order === -1);
 
         if (!defaultGroup) {
             return undefined;
         }
 
         const categoriesUUIDs = bookmarks.value
-            .filter(item => item.parentUUID === defaultGroup.uuid)
+            .filter(item => isBookmarkCategoryApi(item) && item.parentUUID === defaultGroup.uuid)
             .map(item => item.uuid);
 
         return bookmarks.value
-            .findIndex(item => (item.parentUUID && categoriesUUIDs.includes(item.parentUUID)) && item.url === url) > -1;
+            .findIndex(item => isBookmarkItemApi(item) && categoriesUUIDs.includes(item.parentUUID) && item.url === url) > -1;
     };
 
-    const isBookmarkSavedInGroup = (url: IBookmark['url'], groupUUID: IBookmark['uuid']) => {
+    const isBookmarkSavedInGroup = (url: TBookmark['url'], groupUUID: TBookmark['uuid']) => {
         const categoriesUUIDs = bookmarks.value
             .filter(item => item.parentUUID === groupUUID)
             .map(item => item.uuid);
@@ -52,8 +57,8 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
             .findIndex(item => (item.parentUUID && categoriesUUIDs.includes(item.parentUUID)) && item.url === url) > -1;
     };
 
-    const getGroupBookmarks = computed(() => {
-        const groups = bookmarks.value.filter(group => !group.parentUUID);
+    const getGroupBookmarks = computed<IBookmarkGroup>(() => {
+        const groups: IBookmarkGroup = bookmarks.value.filter(group => !group.parentUUID);
 
         return sortBy(
             groups.map(group => ({
@@ -80,7 +85,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
     const getGroups = computed(() => sortBy(bookmarks.value.filter(bookmark => !bookmark.parentUUID), [o => o.order]));
 
-    const getBookmarkParentUUIDs = (url: IBookmark['url']) => {
+    const getBookmarkParentUUIDs = (url: TBookmark['url']) => {
         if (!isBookmarkSaved(url)) {
             return undefined;
         }
@@ -99,7 +104,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
     const queryGetBookmarks = async () => {
         try {
-            const resp = await http.get<Array<IBookmark>>({
+            const resp = await http.get<Array<TBookmark>>({
                 url: '/bookmarks'
             });
 
@@ -115,7 +120,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         }
     };
 
-    const queryAddBookmark = async (bookmark: TQueryAddBookmark): Promise<IBookmark> => {
+    const queryAddBookmark = async (bookmark: TQueryAddBookmark): Promise<TBookmark> => {
         try {
             if (!bookmark?.name) {
                 return Promise.reject(new Error('Name is undefined'));
@@ -127,7 +132,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
             signals.add = new AbortController();
 
-            const resp = await http.post<IBookmark>({
+            const resp = await http.post<TBookmark>({
                 url: '/bookmarks',
                 payload: cloneDeep(bookmark),
                 signal: signals.add.signal
@@ -147,7 +152,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         }
     };
 
-    const queryUpdateBookmark = async (bookmark: IBookmark) => {
+    const queryUpdateBookmark = async (bookmark: TBookmark) => {
         try {
             if (!bookmark?.name) {
                 return Promise.reject(new Error('Name is undefined'));
@@ -179,7 +184,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         }
     };
 
-    const queryDeleteBookmark = async (uuid: IBookmark['uuid']) => {
+    const queryDeleteBookmark = async (uuid: TBookmark['uuid']) => {
         try {
             if (!uuid) {
                 return Promise.reject(new Error('UUID is undefined'));
@@ -243,7 +248,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         }
     };
 
-    const createCategory = async (category: IBookmark, groupUUID: IBookmark['uuid']) => {
+    const createCategory = async (category: IBookmarkCategoryInfo, groupUUID: TBookmark['uuid']) => {
         try {
             const newCategory = await queryAddBookmark({
                 name: category.name,
@@ -261,15 +266,18 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         category,
         groupUUID
     }: {
-        url: IBookmark['url'];
-        category: IBookmark['uuid'];
-        groupUUID: IBookmark['uuid']
+        url?: TBookmark['url'];
+        category?: TBookmark['uuid'];
+        groupUUID: TBookmark['uuid'];
     }) => {
         try {
-            let cat = await BookmarksApi.getCategoryByCode(category);
+            const cat = await BookmarksApi.getCategory({
+                code: category,
+                url
+            });
 
             if (!cat) {
-                cat = await BookmarksApi.getCategoryByURL(url!);
+                return Promise.reject();
             }
 
             const categories = bookmarks.value.filter(item => item.parentUUID === groupUUID);
@@ -292,10 +300,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         category,
         groupUUID
     }: {
-        url: IBookmark['url'];
-        name: IBookmark['name'];
-        category: IBookmark['uuid'];
-        groupUUID: IBookmark['uuid']
+        url: TBookmark['url'];
+        name: TBookmark['name'];
+        category: TBookmark['uuid'];
+        groupUUID: TBookmark['uuid']
     }) => {
         try {
             if (!url || !name) {
@@ -322,8 +330,8 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         url,
         groupUUID
     }: {
-        url: IBookmark['url'];
-        groupUUID: IBookmark['uuid']
+        url: TBookmark['url'];
+        groupUUID: TBookmark['uuid']
     }) => {
         try {
             await queryGetBookmarks();
@@ -345,10 +353,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         category,
         groupUUID
     }: {
-        url: IBookmark['url'];
-        name: IBookmark['name'];
-        category: IBookmark['uuid'];
-        groupUUID: IBookmark['uuid']
+        url: TBookmark['url'];
+        name: TBookmark['name'];
+        category: TBookmark['uuid'];
+        groupUUID: TBookmark['uuid']
     }) => {
         const bookmark = await getSavedBookmarkInGroup({
             url,
@@ -393,7 +401,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         openedGroups.value = parsed;
     };
 
-    const toggleGroup = (uuid: IBookmark['uuid']) => {
+    const toggleGroup = (uuid: TBookmark['uuid']) => {
         const isOpened = openedGroups.value.includes(uuid);
 
         const updateSessionStorage = () => {

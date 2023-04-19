@@ -80,12 +80,14 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import type { PropType } from 'vue';
     import { computed, defineComponent } from 'vue';
     import draggableComponent from 'vuedraggable';
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import type { IBookmarkCategory, IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
 
     export default defineComponent({
         components: {
@@ -94,12 +96,12 @@
         },
         props: {
             group: {
-                type: Object,
-                default: () => ({})
+                type: Object as PropType<IBookmarkGroup>,
+                required: true
             },
             category: {
-                type: Object,
-                default: () => ({})
+                type: Object as PropType<IBookmarkCategory>,
+                required: true
             },
             creating: {
                 type: Boolean,

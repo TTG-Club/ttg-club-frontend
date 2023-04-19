@@ -1,12 +1,13 @@
 import { useAxios } from '@/common/composition/useAxios';
-import type { IBookmark } from '@/features/bookmarks/types/Bookmark.types';
+import type { IBookmarkCategoryInfo } from '@/features/bookmarks/types/Bookmark.types';
+import type { Maybe } from '@/types/Shared/Utility.types';
 
 export default class BookmarksApi {
     private static $http = useAxios();
 
     static async getCategoryByURL(url: string) {
         try {
-            const resp = await this.$http.get<IBookmark>({
+            const resp = await this.$http.get<Maybe<IBookmarkCategoryInfo>>({
                 url: '/bookmarks/category',
                 payload: {
                     url: encodeURIComponent(url)
@@ -25,7 +26,7 @@ export default class BookmarksApi {
 
     static async getCategoryByCode(code: string) {
         try {
-            const resp = await this.$http.get<IBookmark>({
+            const resp = await this.$http.get<Maybe<IBookmarkCategoryInfo>>({
                 url: '/bookmarks/category',
                 payload: { code }
             });
@@ -40,9 +41,21 @@ export default class BookmarksApi {
         }
     }
 
+    static getCategory({ code, url }: {code?: Maybe<string>, url?: Maybe<string>}) {
+        if (code) {
+            return this.getCategoryByCode(code);
+        }
+
+        if (url) {
+            return this.getCategoryByURL(url);
+        }
+
+        return Promise.reject(new Error('Method must have code or url'));
+    }
+
     static async getCategories() {
         try {
-            const resp = await this.$http.get<Array<IBookmark>>({
+            const resp = await this.$http.get<Array<IBookmarkCategoryInfo>>({
                 url: '/bookmarks/categories'
             });
 
