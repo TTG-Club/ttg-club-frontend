@@ -368,18 +368,24 @@
                 }
 
                 &.is-fullscreen {
-                    width: var(--max-content);
-                    max-width: var(--max-content);
-                    height: calc(var(--max-vh) - 56px - 24px);
-                    margin-left: -40%;
-                    z-index: 16;
+                    width: 100%;
+                    max-width: 100%;
+                    margin-left: initial;
+                    height: calc(var(--max-vh) - 56px);
 
-                    @media (max-width: 1200px) {
-                        width: 100%;
-                        max-width: 100%;
-                        margin-left: initial;
-                        height: calc(var(--max-vh) - 56px);
+                    @include media-min($xl) {
+                        width: var(--max-content);
+                        max-width: var(--max-content);
+                        margin-left: -40%;
+                        z-index: 16;
                     }
+
+                    // @media (max-width: 1200px) {
+                    //     width: 100%;
+                    //     max-width: 100%;
+                    //     margin-left: initial;
+                    //     height: calc(var(--max-vh) - 56px);
+                    // }
                 }
             }
         }
