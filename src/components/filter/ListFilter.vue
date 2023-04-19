@@ -324,6 +324,7 @@
             justify-content: center;
             padding: 8px;
             border-left: 1px solid var(--border);
+            background-color: var(--primary);
 
             svg {
                 @include css_anim();
