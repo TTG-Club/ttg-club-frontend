@@ -330,14 +330,14 @@
 
                 width: 24px;
                 height: 24px;
-                color: var(--primary);
+                color: var(--text-btn-color);
             }
 
             span {
                 @include css_anim();
 
                 margin-left: 4px;
-                color: var(--text-color);
+                color: var(--text-btn-color);
             }
 
             &.is-opened {
