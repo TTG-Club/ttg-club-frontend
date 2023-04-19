@@ -40,8 +40,8 @@ jobs:
 
       - name: Build
         env:
-          VUE_APP_DEV: ${{ github.ref_name == 'dev' && 'true' || 'false' }}
-        run: npm run build:${{ github.ref_name == 'dev' && 'dev' || 'prod' }}
+          VUE_APP_DEV: false
+        run: npm run build:prod
 
       - uses: actions/upload-artifact@v3
         with:
