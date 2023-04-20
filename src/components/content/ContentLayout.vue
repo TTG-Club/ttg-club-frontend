@@ -368,16 +368,21 @@
                 }
 
                 &.is-fullscreen {
-                    width: 100%;
+                    width: auto;
                     max-width: 100%;
                     margin-left: initial;
                     height: calc(var(--max-vh) - 56px);
+
+                    @include media-min($md) {
+                        height: var(--max-vh);
+                    }
 
                     @include media-min($xl) {
                         width: var(--max-content);
                         max-width: var(--max-content);
                         margin-left: -40%;
                         z-index: 16;
+                        height: calc(var(--max-vh) - 48px);
                     }
                 }
             }
