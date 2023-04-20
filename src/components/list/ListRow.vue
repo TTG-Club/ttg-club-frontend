@@ -4,8 +4,8 @@
         :style="style"
     >
         <div
-            v-for="(item, index) in items"
-            :key="item + index"
+            v-for="item in items"
+            :key="item[itemKey]"
             class="list-row__column"
         >
             <slot v-bind="{ item }" />
@@ -20,6 +20,7 @@
     export type TListRowProps = {
         row: unknown | AnyArray;
         columns?: number;
+        itemKey: string;
     }
 
     const props = withDefaults(defineProps<TListRowProps>(), {
@@ -29,26 +30,22 @@
     const items = isArray(props.row) ? props.row : [props.row];
 
     const style = {
-        '--list-row-columns': props.columns + 1
+        '--list-row-columns': props.columns
     };
 </script>
 
 <style lang="scss" scoped>
     $column-spacing: 12px;
-    $min-column-width: 300px;
 
     .list-row {
-        display: grid;
-        /*
-            Количество колонок динамическое,
-            каждый элемент не может занимать
-            меньше указанной в переменной ширины
-            и сворачивается при уменьшении
-        */
-        grid-template-columns: repeat(
-                auto-fit,
-                minmax(min(100%, max(#{$min-column-width}, 100% / var(--list-row-columns))), 1fr)
-        );
-        gap: $column-spacing;
+        display: flex;
+        flex-wrap: wrap;
+        margin: -$column-spacing * .5;
+
+        &__column {
+            flex-basis: calc(100% / var(--list-row-columns));
+            padding: $column-spacing * .5;
+            min-width: 0;
+        }
     }
 </style>

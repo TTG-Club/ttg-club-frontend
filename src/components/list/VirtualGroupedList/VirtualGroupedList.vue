@@ -1,6 +1,8 @@
 <template>
     <virtual-list
-        v-bind="list"
+        :key-field="list.keyField"
+        :page-mode="list.pageMode"
+        :min-item-size="list.minItemSize"
         :items="items"
     >
         <template #default="{ item, index, active }">
@@ -17,7 +19,8 @@
             <list-row
                 v-else
                 :row="item.columns"
-                :columns="columns"
+                :columns="currentColumns"
+                :item-key="itemKeyField"
             >
                 <template #default="{ item: column }">
                     <slot v-bind="{ item: column, index, active }" />
@@ -41,6 +44,10 @@
     import ListRow, { TListRowProps } from "@/components/list/ListRow.vue";
     import { getListItemsWithGroups } from "@/components/list/VirtualGroupedList/helpers";
     import { DEFAULT_KEY_FIELD } from "@/common/const";
+    import type { TBreakpoint } from "@/types/Shared/Breakpoints.types";
+    import { useAppBreakpoints } from "@/common/composition/useAppBreakpoints";
+
+    export type TResponsiveColumns = Partial<Record<TBreakpoint, number>> & {base: number};
 
     /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
     type TItem = AnyObject;
@@ -51,26 +58,37 @@
         getGroup: TGetGroup<TItem, TGroup>;
         groupLabelKey?: string;
         sortBy?: ListIteratee;
-        columns?: TListRowProps["columns"];
+        columns?: TResponsiveColumns;
     };
 
     const props = withDefaults(defineProps<TProps>(), {
         groupLabelKey: "name",
         sortBy: "order",
-        columns: 1
+        columns: () => ({ base: 1 })
     });
 
-    const keyField = props.list.keyField || DEFAULT_KEY_FIELD;
+    const breakpoints = useAppBreakpoints();
+    const itemKeyField = computed(() => props.list.keyField || DEFAULT_KEY_FIELD);
+
+    const currentColumns = computed(() => {
+        const columnBreakpointKeys = Object.keys(props.columns)
+            .filter(breakpoint => breakpoint !== 'base') as TBreakpoint[];
+
+        const currentColumnBreakpoint = columnBreakpointKeys
+            .find(breakpoint => breakpoints.smaller(breakpoint).value) ?? 'base';
+
+        return props.columns[currentColumnBreakpoint] as number;
+    });
 
     const items = computed(() => {
         const allGroups = props.list.items.map((item: TItem) => props.getGroup(item));
-        const allGroupsSet = uniqBy(allGroups, keyField);
+        const allGroupsSet = uniqBy(allGroups, itemKeyField.value);
         const sortedGroups = sortBy(allGroupsSet, props.sortBy);
 
         return getListItemsWithGroups(sortedGroups, props.list.items, {
             getGroup: props.getGroup,
-            keyField,
-            chunks: props.columns
+            keyField: itemKeyField.value,
+            chunks: currentColumns.value
         });
     });
 </script>

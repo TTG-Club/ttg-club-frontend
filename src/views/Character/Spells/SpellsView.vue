@@ -11,7 +11,7 @@
         <virtual-grouped-list
             :list="{ items: spells, keyField: 'url' }"
             :get-group="getSpellGroup"
-            :columns="2"
+            :columns="columns"
         >
             <template #default="{ item: spell }">
                 <spell-link
@@ -166,17 +166,28 @@
                 order: level
             });
 
+            const showRightSide = computed(() => route.name === 'spellDetail');
+
+            const columns = computed(() => (showRightSide.value
+                ? { base: 1 }
+                : {
+                    md: 1,
+                    xl: 2,
+                    base: 4
+                }));
+
             return {
                 layout,
                 isMobile,
                 fullscreen,
                 spells,
                 filter,
-                showRightSide: computed(() => route.name === 'spellDetail'),
+                showRightSide,
                 initPages,
                 nextPage,
                 onSearch,
-                getSpellGroup
+                getSpellGroup,
+                columns
             };
         }
     });
