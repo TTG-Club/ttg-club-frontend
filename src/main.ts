@@ -13,6 +13,7 @@ import App from '@/App.vue';
 import pinia from '@/store';
 import router from './router';
 import '@/assets/styles/index.scss';
+import { TippyLazy } from '@/common/directives/TippyLazy';
 
 const app = createApp(App);
 
@@ -30,7 +31,8 @@ app.use(pinia)
         key: '$vfm',
         componentName: 'VueFinalModal',
         dynamicContainerName: 'ModalsContainer'
-    }));
+    }))
+    .directive('tippy-lazy', TippyLazy);
 
 if (!isDev) {
     app.use(VueGtag, {
