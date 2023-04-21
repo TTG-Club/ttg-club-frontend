@@ -563,7 +563,6 @@
         .ui-input__input {
             color: var(--text-b-color);
             height: 36px;
-            padding: 0 2px;
         }
     }
 </style>
