@@ -58,7 +58,7 @@
                 v-if="onExportFoundry"
                 v-tippy="{
                     content: h('span', [
-                        'Импорт в Foundry VTT.&nbsp;',
+                        'Импорт в Foundry VTT 10.&nbsp;',
                         h(
                             'a',
                             {

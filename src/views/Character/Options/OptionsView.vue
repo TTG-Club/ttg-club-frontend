@@ -114,7 +114,7 @@
             const onSearch = async () => {
                 await initPages();
 
-                if (options.value.length === 1 && !isMobile.value) {
+                if (options.value.length === 1 && !isMobile.value && !props.inTab) {
                     await router.push({ path: options.value[0].url });
                 }
             };
