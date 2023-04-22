@@ -20,7 +20,7 @@
         <div class="bookmarks__wrapper">
             <div class="bookmarks__body">
                 <div
-                    v-for="(group, groupKey) in defaultBookmarkStore.getGroupBookmarks"
+                    v-for="(group, groupKey) in bookmarksStore.getGroupBookmarks"
                     :key="group.uuid + groupKey"
                     class="bookmarks__group"
                 >
@@ -50,7 +50,7 @@
 
                                     <div
                                         class="bookmarks__item_icon only-hover is-right"
-                                        @click.left.exact.prevent="defaultBookmarkStore.removeBookmark(bookmark.url)"
+                                        @click.left.exact.prevent="bookmarksStore.removeBookmark(bookmark.uuid)"
                                     >
                                         <svg-icon icon-name="close" />
                                     </div>
@@ -79,7 +79,7 @@
                 </div>
 
                 <div
-                    v-if="!defaultBookmarkStore.getGroupBookmarks?.length"
+                    v-if="!getGroupBookmarks?.length"
                     class="bookmarks__info"
                 >
                     <div class="bookmarks__info--desc">
@@ -91,22 +91,14 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+    import { storeToRefs } from 'pinia';
     import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-    export default {
-        name: 'DefaultBookmarks',
-        components: { SvgIcon },
-        data: () => ({
-            defaultBookmarkStore: useDefaultBookmarkStore()
-        }),
-        methods: {
-            isExternal(url) {
-                return url.startsWith('http');
-            }
-        }
-    };
+    const bookmarksStore = useDefaultBookmarkStore();
+    const { getGroupBookmarks } = storeToRefs(bookmarksStore);
+    const isExternal = (url: string) => url.startsWith('http');
 </script>
 
 <style lang="scss" scoped>

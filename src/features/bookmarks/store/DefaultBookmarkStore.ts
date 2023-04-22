@@ -7,54 +7,62 @@ import sortBy from 'lodash/sortBy';
 import { computed, ref } from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import { DB_NAME } from '@/common/const/UI';
-import type { TBookmark, IBookmarkCategoryInfo } from '@/features/bookmarks/types/Bookmark.types';
+import type {
+    IBookmarkCategory,
+    IBookmarkCategoryInfo,
+    IBookmarkGroup,
+    IBookmarkItem,
+    TBookmark, TWithChildren
+} from '@/features/bookmarks/types/Bookmark.types';
 import BookmarksApi from '@/features/bookmarks/api';
+import {
+    isBookmarkCategory, isBookmarkGroup, isBookmarkItem
+} from '@/features/bookmarks/utils';
 
 export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () => {
-    const bookmarks = ref<Array<TBookmark>>([]);
-
     const store = localforage.createInstance({
         name: DB_NAME,
         storeName: 'bookmarks'
     });
 
-    const isBookmarkSaved = (url: TBookmark['url']) => bookmarks.value.findIndex(bookmark => bookmark.url === url) >= 0;
+    const groups = ref<IBookmarkGroup[]>([]);
+    const categories = ref<IBookmarkCategory[]>([]);
+    const bookmarks = ref<IBookmarkItem[]>([]);
 
-    const getGroupBookmarks = computed(() => {
-        const groups = bookmarks.value.filter(group => !group.parentUUID);
+    const isBookmarkSaved = (url: IBookmarkItem['url']) => bookmarks.value
+        .findIndex(bookmark => bookmark.url === url) >= 0;
 
-        return sortBy(
-            groups.map(group => ({
-                ...group,
-                children: sortBy(
-                    bookmarks.value
-                        .filter(category => category.parentUUID && category.parentUUID === group.uuid)
-                        .map(category => ({
-                            ...category,
-                            children: sortBy(
-                                bookmarks.value.filter(bookmark => (
-                                    bookmark.parentUUID
-                                        && bookmark.parentUUID === category.uuid
-                                )),
-                                [o => o.order]
-                            )
-                        })),
-                    [o => o.order]
-                )
-            })),
-            [o => o.order]
-        );
-    });
+    const getGroupBookmarks = computed(() => sortBy(
+        groups.value.map<TWithChildren<IBookmarkGroup, IBookmarkCategory>>(group => ({
+            ...group,
+            children: sortBy(
+                categories.value
+                    .filter(category => category.parentUUID && category.parentUUID === group.uuid)
+                    .map<TWithChildren<IBookmarkCategory, IBookmarkItem>>(category => ({
+                        ...category,
+                        children: sortBy(
+                            bookmarks.value.filter(bookmark => (
+                                bookmark.parentUUID
+                                && bookmark.parentUUID === category.uuid
+                            )),
+                            [o => o.order]
+                        )
+                    })),
+                [o => o.order]
+            )
+        })),
+        [o => o.order]
+    ));
 
-    const getBookmarkByURL = (url: TBookmark['url']) => {
-        const defaultGroup = bookmarks.value.find(bookmark => bookmark.order === -1);
+    const getBookmarkByURL = (url: IBookmarkItem['url']) => {
+        const defaultGroup = groups.value.find(bookmark => bookmark.order === -1);
 
-        const categoriesUUIDs = bookmarks.value
+        const categoriesUUIDs = categories.value
             .filter(bookmark => bookmark.parentUUID === defaultGroup?.uuid)
             .map(category => category.uuid);
 
         return bookmarks.value
-            .filter(bookmark => bookmark.parentUUID && categoriesUUIDs.includes(bookmark.parentUUID))
+            .filter(bookmark => categoriesUUIDs.includes(bookmark.parentUUID))
             .find(bookmark => bookmark.url === url);
     };
 
@@ -69,121 +77,101 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
     };
 
     const createDefaultGroup = () => {
-        const defaultGroup = cloneDeep({
+        const defaultGroup: IBookmarkGroup = cloneDeep({
             uuid: getNewUUID(),
             name: 'Общие',
             order: -1
         });
 
-        bookmarks.value.push(defaultGroup);
+        groups.value.push(defaultGroup);
 
         return defaultGroup;
     };
 
-    const getDefaultGroup = () => {
-        let group = bookmarks.value.find(bookmark => bookmark.order === -1);
-
-        if (!group) {
-            group = createDefaultGroup();
-        }
-
-        return group;
-    };
+    const getDefaultGroup = () => groups.value.find(bookmark => bookmark.order === -1) || createDefaultGroup();
 
     const createCategory = (category: IBookmarkCategoryInfo): TBookmark => {
         const parent = getDefaultGroup();
 
-        const newCategory = {
+        const newCategory: IBookmarkCategory = {
             uuid: getNewUUID(),
             name: category.name,
             order: category.order,
             parentUUID: parent.uuid
         };
 
-        bookmarks.value.push(newCategory);
+        categories.value.push(newCategory);
 
         return newCategory;
     };
 
-    const getConvertedBookmarks = async (oldFormat: any[]) => {
-        try {
-            const categories = await BookmarksApi.getCategories();
+    const setBookmarks = (items: TBookmark[]) => {
+        const newGroups: IBookmarkGroup[] = [];
+        const newCategories: IBookmarkCategory[] = [];
+        const newBookmarks: IBookmarkItem[] = [];
 
-            const parent = {
-                uuid: getNewUUID(),
-                order: -1,
-                name: 'Общие'
-            };
+        for (const item of items) {
+            if (isBookmarkGroup(item)) {
+                newGroups.push(item);
 
-            const list: TBookmark[] = [parent];
-
-            for (let i = 0; i < oldFormat.length; i++) {
-                const category = oldFormat[i];
-                const newCategory = categories.find(item => item.name === category.label);
-
-                if (!newCategory) {
-                    continue;
-                }
-
-                const updatedCat = {
-                    uuid: getNewUUID(),
-                    order: newCategory.order,
-                    name: newCategory.name,
-                    parentUUID: parent.uuid
-                };
-
-                list.push(updatedCat);
-
-                for (let j = 0; j < category.links.length; j++) {
-                    const bookmark = category.links[j];
-
-                    list.push({
-                        uuid: getNewUUID(),
-                        order: j,
-                        name: bookmark.label,
-                        url: bookmark.url,
-                        parentUUID: updatedCat.uuid
-                    });
-                }
+                continue;
             }
 
-            await store.removeItem('saved');
+            if (isBookmarkCategory(item)) {
+                newCategories.push(item);
 
-            return list;
-        } catch (err) {
-            errorHandler(err);
+                continue;
+            }
 
-            return [];
+            if (isBookmarkItem(item)) {
+                newBookmarks.push(item);
+
+                continue;
+            }
+
+            console.error(`Unknown bookmark type: ${ JSON.stringify(item) }`);
         }
+
+        groups.value = cloneDeep(newGroups);
+        categories.value = cloneDeep(newCategories);
+        bookmarks.value = cloneDeep(newBookmarks);
     };
 
     const restoreBookmarks = async () => {
         try {
             await store.ready();
 
-            const oldFormat = await store.getItem('saved');
+            const restored = await store.getItem('default');
 
-            const restored = isArray(oldFormat) && oldFormat.length
-                ? await getConvertedBookmarks(oldFormat)
-                : await store.getItem('default');
+            if (!isArray(restored) || !restored.length) {
+                return;
+            }
 
-            bookmarks.value = cloneDeep(!isArray(restored) || !restored.length ? [] : restored);
+            setBookmarks(restored);
         } catch (err) {
             errorHandler(err);
         }
     };
 
-    const saveBookmarks = async (payload?: TBookmark[]) => {
+    const saveBookmarks = async () => {
         try {
             await store.ready();
 
-            await store.setItem('default', payload || bookmarks.value);
+            await store.setItem('default', [
+                ...cloneDeep(groups.value),
+                ...cloneDeep(categories.value),
+                ...cloneDeep(bookmarks.value)
+            ]);
         } catch (err) {
             errorHandler(err);
         }
     };
 
-    const addBookmark = async (url: TBookmark['url'], name: TBookmark['name'], code?: IBookmarkCategoryInfo['code']) => {
+    const addBookmark = async (
+        url: IBookmarkItem['url'],
+        name: TBookmark['name'],
+        code?: IBookmarkCategoryInfo['code']
+    ) => {
         try {
             if (!url || !name) {
                 return Promise.reject();
@@ -198,9 +186,9 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
                 return Promise.reject();
             }
 
-            const savedCat = bookmarks.value.find(bookmark => bookmark.name === cat.name) || createCategory(cat);
+            const savedCat = categories.value.find(category => category.name === cat.name) || createCategory(cat);
 
-            const newBookmark = cloneDeep({
+            const newBookmark: IBookmarkItem = cloneDeep({
                 uuid: getNewUUID(),
                 name,
                 url,
@@ -218,47 +206,58 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
         }
     };
 
-    const removeBookmark = (url: TBookmark['url']) => {
-        if (!url || !isBookmarkSaved(url)) {
+    const removeCategory = (uuid: IBookmarkCategory['uuid']) => {
+        if (!uuid) {
+            console.error('No UUID present.');
+
             return Promise.reject();
         }
 
         try {
-            const deleteUUIDs: Array<TBookmark['uuid']> = [];
+            const category = categories.value.find(item => item.uuid === uuid);
 
-            const addEmptyParents = (bookmark: TBookmark) => {
-                const parent = bookmarks.value.find(item => item.uuid === bookmark?.parentUUID);
-
-                if (!parent) {
-                    return;
-                }
-
-                const siblings = bookmarks.value.filter(item => item.parentUUID === parent.uuid);
-
-                if (siblings?.length !== 1) {
-                    return;
-                }
-
-                deleteUUIDs.push(parent.uuid);
-
-                if (parent.parentUUID) {
-                    addEmptyParents(parent);
-                }
-            };
-
-            const bookmark = getBookmarkByURL(url);
-
-            if (!bookmark) {
+            if (!category) {
                 return Promise.reject();
             }
 
-            deleteUUIDs.push(bookmark.uuid);
+            categories.value = categories.value.filter(item => item.uuid !== uuid);
+            bookmarks.value = bookmarks.value.filter(item => item.parentUUID !== uuid);
 
-            if (bookmark.parentUUID) {
-                addEmptyParents(bookmark);
+            return saveBookmarks();
+        } catch (err) {
+            return Promise.reject(err);
+        }
+    };
+
+    const removeBookmark = async (uuid: IBookmarkItem['uuid']) => {
+        if (!uuid) {
+            console.error('No UUID present.');
+
+            return Promise.reject();
+        }
+
+        try {
+            const bookmark = bookmarks.value.find(item => item.uuid === uuid);
+
+            if (!bookmark) {
+                console.error('Can\'t find bookmark.');
+
+                return Promise.reject();
             }
 
-            bookmarks.value = bookmarks.value.filter(item => !deleteUUIDs.includes(item.uuid));
+            bookmarks.value = bookmarks.value.filter(item => item.uuid !== uuid);
+
+            const parent = categories.value.find(item => item.uuid === bookmark.parentUUID);
+
+            if (!parent) {
+                return saveBookmarks();
+            }
+
+            const siblings = bookmarks.value.filter(item => item.parentUUID === parent.uuid);
+
+            if (!siblings.length) {
+                await removeCategory(parent.uuid);
+            }
 
             return saveBookmarks();
         } catch (err) {
@@ -277,11 +276,13 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
     };
 
     return {
+        groups,
+        categories,
         bookmarks,
 
         isBookmarkSaved,
-
         getGroupBookmarks,
+
         getBookmarkByURL,
         createDefaultGroup,
         getDefaultGroup,

@@ -1,26 +1,22 @@
 import type {
-    IBookmarkCategoryApi,
-    IBookmarkGroupApi,
-    IBookmarkItemApi
+    IBookmarkCategory,
+    IBookmarkGroup,
+    IBookmarkItem,
+    TBookmark
 } from '@/features/bookmarks/types/Bookmark.types';
 
-const isBookmarkItemApi = (item:
-        | IBookmarkItemApi
-        | IBookmarkCategoryApi
-        | IBookmarkGroupApi) => (('url' in item) && ('parentUUID' in item));
+const isBookmarkItem = (item: TBookmark): item is IBookmarkItem => (('url' in item) && ('parentUUID' in item));
 
-const isBookmarkCategoryApi = (item:
-    | IBookmarkItemApi
-    | IBookmarkCategoryApi
-    | IBookmarkGroupApi) => (!('url' in item) && ('parentUUID' in item));
+const isBookmarkCategory = (item: TBookmark): item is IBookmarkCategory => (
+    !('url' in item) && ('parentUUID' in item)
+);
 
-const isBookmarkGroupApi = (item:
-    | IBookmarkItemApi
-    | IBookmarkCategoryApi
-    | IBookmarkGroupApi) => (!('url' in item) && !('parentUUID' in item));
+const isBookmarkGroup = (item: TBookmark): item is IBookmarkGroup => (
+    !('url' in item) && !('parentUUID' in item)
+);
 
 export {
-    isBookmarkItemApi,
-    isBookmarkCategoryApi,
-    isBookmarkGroupApi
+    isBookmarkItem,
+    isBookmarkCategory,
+    isBookmarkGroup
 };

@@ -87,7 +87,12 @@
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import type { IBookmarkCategory, IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
+    import type {
+        IBookmarkCategory,
+        IBookmarkGroup,
+        IBookmarkItem,
+        TWithChildren
+    } from '@/features/bookmarks/types/Bookmark.types';
 
     export default defineComponent({
         components: {
@@ -96,11 +101,11 @@
         },
         props: {
             group: {
-                type: Object as PropType<IBookmarkGroup>,
+                type: Object as PropType<TWithChildren<IBookmarkGroup, IBookmarkCategory>>,
                 required: true
             },
             category: {
-                type: Object as PropType<IBookmarkCategory>,
+                type: Object as PropType<TWithChildren<IBookmarkCategory, IBookmarkItem>>,
                 required: true
             },
             creating: {
@@ -116,7 +121,7 @@
             const uiStore = useUIStore();
             const customBookmarkStore = useCustomBookmarkStore();
 
-            async function updateBookmark(change) {
+            const updateBookmark = async (change: { element: { uuid: any; name: any; url: any; }; newIndex: any; }) => {
                 if (!change) {
                     return;
                 }
@@ -137,16 +142,16 @@
                     url,
                     parentUUID: props.category.uuid
                 });
-            }
+            };
 
-            async function onChangeHandler(e) {
+            const onChangeHandler = async (e: { added: any; moved: any; }) => {
                 const {
                     added,
                     moved
                 } = e;
 
                 await updateBookmark(added || moved);
-            }
+            };
 
             return {
                 removeBookmark: customBookmarkStore.queryDeleteBookmark,

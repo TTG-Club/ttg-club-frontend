@@ -1,15 +1,15 @@
 <template>
     <div
         v-if="group"
-        :class="{ 'is-active': isOpened(group.uuid) }"
+        :class="{ 'is-active': customBookmarkStore.isGroupOpened(group.uuid) }"
         class="bookmarks__group"
     >
         <div
             class="bookmarks__group_head"
-            @click.left.exact.prevent="toggleGroup(group.uuid)"
+            @click.left.exact.prevent="customBookmarkStore.toggleGroup(group.uuid)"
         >
             <div
-                :class="{ 'is-active': isOpened(group.uuid) }"
+                :class="{ 'is-active': customBookmarkStore.isGroupOpened(group.uuid) }"
                 class="bookmarks__group_icon"
             >
                 <svg-icon icon-name="arrow-stroke" />
@@ -20,7 +20,7 @@
             </div>
 
             <div
-                v-if="isOpened(group.uuid) && group.order > -1"
+                v-if="customBookmarkStore.isGroupOpened(group.uuid) && group.order > -1"
                 v-tippy="{ content: 'Добавить категорию' }"
                 :class="{ 'only-hover': !isMobile }"
                 class="bookmarks__group_icon is-right"
@@ -37,7 +37,7 @@
                 v-if="!isMobile || (isMobile && isEdit)"
                 :class="{ 'only-hover': !isMobile }"
                 class="bookmarks__group_icon is-right"
-                @click.left.exact.prevent.stop="removeBookmark(group!.uuid)"
+                @click.left.exact.prevent.stop="customBookmarkStore.queryDeleteBookmark(group.uuid)"
             >
                 <svg-icon
                     icon-name="close"
@@ -48,11 +48,11 @@
         </div>
 
         <div
-            v-if="isOpened(group!.uuid)"
+            v-if="customBookmarkStore.isGroupOpened(group.uuid)"
             class="bookmarks__group_body"
         >
             <draggable
-                :model-value="group!.children"
+                :model-value="group.children"
                 chosen-class="bookmarks__cat_chosen"
                 drag-class="bookmarks__cat_drag"
                 ghost-class="bookmarks__cat_ghost"
@@ -108,7 +108,7 @@
 <script lang="ts">
     import type { PropType } from 'vue';
     import {
-        computed, defineComponent, onBeforeMount, ref
+        defineComponent, onBeforeMount, ref
     } from 'vue';
     import draggableComponent from 'vuedraggable';
     import { storeToRefs } from 'pinia';
@@ -118,7 +118,9 @@
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
+    import type {
+        IBookmarkCategory, IBookmarkGroup, TWithChildren
+    } from '@/features/bookmarks/types/Bookmark.types';
 
     export default defineComponent({
         components: {
@@ -130,7 +132,7 @@
         },
         props: {
             group: {
-                type: Object as PropType<IBookmarkGroup>,
+                type: Object as PropType<TWithChildren<IBookmarkGroup, IBookmarkCategory>>,
                 required: true
             },
             isFirst: {
@@ -148,6 +150,7 @@
             const isCategoryCreating = ref(false);
             const newCategoryName = ref('');
             const { openedGroups } = storeToRefs(customBookmarkStore);
+            const { isMobile } = storeToRefs(uiStore);
 
             const enableCategoryCreating = () => {
                 if (props.group.order > -1) {
@@ -171,7 +174,7 @@
                 disableCategoryCreating();
             };
 
-            const updateBookmark = async change => {
+            const updateBookmark = async (change: { element: { uuid: any; name: any; }; newIndex: any; }) => {
                 if (!change) {
                     return;
                 }
@@ -192,7 +195,7 @@
                 });
             };
 
-            const onChangeHandler = async e => {
+            const onChangeHandler = async (e: { added: any; moved: any; }) => {
                 const {
                     added,
                     moved
@@ -221,11 +224,9 @@
                 enableCategoryCreating,
                 disableCategoryCreating,
                 createCategory,
-                removeBookmark: customBookmarkStore.queryDeleteBookmark,
                 onChangeHandler,
-                isOpened: customBookmarkStore.isGroupOpened,
-                toggleGroup: customBookmarkStore.toggleGroup,
-                isMobile: computed(() => uiStore.isMobile)
+                customBookmarkStore,
+                isMobile
             };
         }
     });
