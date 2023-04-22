@@ -7,34 +7,19 @@
     />
 </template>
 
-<script>
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
     import { storeToRefs } from 'pinia';
     import DefaultBookmarkButton from '@/features/bookmarks/components/buttons/DefaultBookmarkButton.vue';
     import CustomBookmarkButton from '@/features/bookmarks/components/buttons/CustomBookmarkButton.vue';
     import { useUserStore } from '@/store/UI/UserStore';
 
-    export default defineComponent({
-        components: {
-            CustomBookmarkButton,
-            DefaultBookmarkButton
-        },
-        props: {
-            name: {
-                type: String,
-                default: ''
-            },
-            url: {
-                type: String,
-                default: ''
-            }
-        },
-        setup() {
-            const { isAuthenticated } = storeToRefs(useUserStore());
-
-            return {
-                isAuthenticated
-            };
-        }
+    withDefaults(defineProps<{
+        name?: string;
+        url?: string;
+    }>(), {
+        name: '',
+        url: ''
     });
+
+    const { isAuthenticated } = storeToRefs(useUserStore());
 </script>

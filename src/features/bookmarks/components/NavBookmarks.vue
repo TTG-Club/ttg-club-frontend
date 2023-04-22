@@ -24,7 +24,7 @@
     </nav-popover>
 </template>
 
-<script>
+<script lang="ts" setup>
     import {
         computed, onBeforeMount, ref, watch
     } from 'vue';
@@ -37,65 +37,47 @@
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
-    export default {
-        name: 'NavBookmarks',
-        components: {
-            CustomBookmarks,
-            DefaultBookmarks,
-            NavPopover,
-            SvgIcon
-        },
-        setup() {
-            const opened = ref(false);
-            const userStore = useUserStore();
-            const { isAuthenticated } = storeToRefs(userStore);
-            const defaultBookmarkStore = useDefaultBookmarkStore();
-            const customBookmarkStore = useCustomBookmarkStore();
+    const opened = ref(false);
+    const userStore = useUserStore();
+    const { isAuthenticated } = storeToRefs(userStore);
+    const defaultBookmarkStore = useDefaultBookmarkStore();
+    const customBookmarkStore = useCustomBookmarkStore();
 
-            const bookmarkIcon = computed(() => {
-                const getIcon = value => (value ? 'bookmark-filled' : 'bookmark');
+    const bookmarkIcon = computed(() => {
+        const getIcon = value => (value ? 'bookmark-filled' : 'bookmark');
 
-                if (isAuthenticated.value) {
-                    return getIcon(customBookmarkStore.bookmarks.filter(item => item.url).length > 0);
-                }
-
-                return getIcon(defaultBookmarkStore.bookmarks.filter(item => item.url).length > 0);
-            });
-
-            const clickHandler = async () => {
-                if (!opened.value) {
-                    await userStore.getUserStatus();
-                }
-
-                opened.value = !opened.value;
-            };
-
-            const restoreBookmarks = async () => {
-                if (isAuthenticated.value) {
-                    await customBookmarkStore.queryGetBookmarks();
-
-                    return;
-                }
-
-                await defaultBookmarkStore.restoreBookmarks();
-            };
-
-            onBeforeMount(async () => {
-                await restoreBookmarks();
-            });
-
-            watch(isAuthenticated, async () => {
-                await restoreBookmarks();
-            });
-
-            return {
-                opened,
-                clickHandler,
-                bookmarkIcon,
-                isAuthenticated
-            };
+        if (isAuthenticated.value) {
+            return getIcon(customBookmarkStore.bookmarks.filter(item => item.url).length > 0);
         }
+
+        return getIcon(defaultBookmarkStore.bookmarks.filter(item => item.url).length > 0);
+    });
+
+    const clickHandler = async () => {
+        if (!opened.value) {
+            await userStore.getUserStatus();
+        }
+
+        opened.value = !opened.value;
     };
+
+    const restoreBookmarks = async () => {
+        if (isAuthenticated.value) {
+            await customBookmarkStore.queryGetBookmarks();
+
+            return;
+        }
+
+        await defaultBookmarkStore.restoreBookmarks();
+    };
+
+    onBeforeMount(async () => {
+        await restoreBookmarks();
+    });
+
+    watch(isAuthenticated, async () => {
+        await restoreBookmarks();
+    });
 </script>
 
 <style lang="scss" scoped>

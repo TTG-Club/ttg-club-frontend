@@ -336,7 +336,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     }: {
         url: IBookmarkItem['url'];
         name: TBookmark['name'];
-        category: IBookmarkCategory['uuid'];
+        category?: IBookmarkCategory['uuid'];
         groupUUID: IBookmarkGroup['uuid']
     }) => {
         try {
@@ -389,7 +389,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     }: {
         url: IBookmarkItem['url'];
         name: TBookmark['name'];
-        category: IBookmarkCategory['uuid'];
+        category?: IBookmarkCategory['uuid'];
         groupUUID: IBookmarkGroup['uuid']
     }) => {
         const bookmark = await getSavedBookmarkInGroup({

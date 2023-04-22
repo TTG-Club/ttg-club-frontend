@@ -102,6 +102,7 @@
     import {
         computed, defineComponent, onBeforeMount, ref
     } from 'vue';
+    import { storeToRefs } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
@@ -119,6 +120,7 @@
         },
         setup() {
             const uiStore = useUIStore();
+            const { isMobile } = storeToRefs(uiStore);
             const customBookmarkStore = useCustomBookmarkStore();
             const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
             const isEdit = ref(false);
@@ -149,7 +151,6 @@
             });
 
             return {
-                test: computed(() => customBookmarkStore.bookmarks),
                 bookmarks,
                 isEdit,
                 isGroupCreating,
@@ -157,7 +158,7 @@
                 enableGroupCreating,
                 disableGroupCreating,
                 createGroup,
-                isMobile: computed(() => uiStore.isMobile)
+                isMobile
             };
         }
     });

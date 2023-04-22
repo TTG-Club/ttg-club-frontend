@@ -20,7 +20,7 @@
                 v-if="!isMobile || (isMobile && isEdit)"
                 :class="{ 'only-hover': !isMobile }"
                 class="bookmarks__cat_label_icon is-right"
-                @click.left.exact.prevent="removeBookmark(category.uuid)"
+                @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(category.uuid)"
             >
                 <svg-icon
                     icon-name="close"
@@ -66,7 +66,7 @@
                         v-if="!isMobile || (isMobile && isEdit)"
                         :class="{ 'only-hover': !isMobile }"
                         class="bookmarks__item_icon is-right"
-                        @click.left.exact.prevent="removeBookmark(bookmark.uuid)"
+                        @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
                     >
                         <svg-icon
                             icon-name="close"
@@ -82,8 +82,9 @@
 
 <script lang="ts">
     import type { PropType } from 'vue';
-    import { computed, defineComponent } from 'vue';
+    import { defineComponent } from 'vue';
     import draggableComponent from 'vuedraggable';
+    import { storeToRefs } from 'pinia';
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
@@ -120,6 +121,7 @@
         setup(props) {
             const uiStore = useUIStore();
             const customBookmarkStore = useCustomBookmarkStore();
+            const { isMobile } = storeToRefs(uiStore);
 
             const updateBookmark = async (change: { element: { uuid: any; name: any; url: any; }; newIndex: any; }) => {
                 if (!change) {
@@ -154,9 +156,9 @@
             };
 
             return {
-                removeBookmark: customBookmarkStore.queryDeleteBookmark,
+                customBookmarkStore,
                 onChangeHandler,
-                isMobile: computed(() => uiStore.isMobile)
+                isMobile
             };
         }
     });
