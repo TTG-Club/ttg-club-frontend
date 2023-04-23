@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="group"
-        :class="{ 'is-active': customBookmarkStore.isGroupOpened(group.uuid) }"
+        :class="{ 'is-active': isOpened }"
         class="bookmarks__group"
     >
         <div
@@ -9,7 +9,7 @@
             @click.left.exact.prevent="customBookmarkStore.toggleGroup(group.uuid)"
         >
             <div
-                :class="{ 'is-active': customBookmarkStore.isGroupOpened(group.uuid) }"
+                :class="{ 'is-active': isOpened }"
                 class="bookmarks__group_icon"
             >
                 <svg-icon icon-name="arrow-stroke" />
@@ -20,7 +20,7 @@
             </div>
 
             <div
-                v-if="customBookmarkStore.isGroupOpened(group.uuid) && group.order > -1"
+                v-if="isOpened && group.order > -1"
                 v-tippy="{ content: 'Добавить категорию' }"
                 :class="{ 'only-hover': !isMobile }"
                 class="bookmarks__group_icon is-right"
@@ -48,7 +48,7 @@
         </div>
 
         <div
-            v-if="customBookmarkStore.isGroupOpened(group.uuid)"
+            v-if="isOpened"
             class="bookmarks__group_body"
         >
             <draggable
@@ -108,6 +108,7 @@
 <script lang="ts">
     import type { PropType } from 'vue';
     import {
+        computed,
         defineComponent, onBeforeMount, ref
     } from 'vue';
     import draggableComponent from 'vuedraggable';
@@ -119,8 +120,9 @@
     import { useUIStore } from '@/store/UI/UIStore';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import type {
-        IBookmarkCategory, IBookmarkGroup, TWithChildren
+        IBookmarkCategory, IBookmarkGroup
     } from '@/features/bookmarks/types/Bookmark.types';
+    import type { WithChildren } from '@/types/Shared/Utility.types';
 
     export default defineComponent({
         components: {
@@ -132,7 +134,7 @@
         },
         props: {
             group: {
-                type: Object as PropType<TWithChildren<IBookmarkGroup, IBookmarkCategory>>,
+                type: Object as PropType<WithChildren<IBookmarkGroup, IBookmarkCategory>>,
                 required: true
             },
             isFirst: {
@@ -151,6 +153,8 @@
             const newCategoryName = ref('');
             const { openedGroups } = storeToRefs(customBookmarkStore);
             const { isMobile } = storeToRefs(uiStore);
+
+            const isOpened = computed(() => customBookmarkStore.isGroupOpened(props.group.uuid));
 
             const enableCategoryCreating = () => {
                 if (props.group.order > -1) {
@@ -219,6 +223,7 @@
             onBeforeMount(() => openFirstGroup());
 
             return {
+                isOpened,
                 isCategoryCreating,
                 newCategoryName,
                 enableCategoryCreating,

@@ -91,9 +91,9 @@
     import type {
         IBookmarkCategory,
         IBookmarkGroup,
-        IBookmarkItem,
-        TWithChildren
+        IBookmarkItem
     } from '@/features/bookmarks/types/Bookmark.types';
+    import type { WithChildren } from '@/types/Shared/Utility.types';
 
     export default defineComponent({
         components: {
@@ -102,11 +102,11 @@
         },
         props: {
             group: {
-                type: Object as PropType<TWithChildren<IBookmarkGroup, IBookmarkCategory>>,
+                type: Object as PropType<WithChildren<IBookmarkGroup, IBookmarkCategory>>,
                 required: true
             },
             category: {
-                type: Object as PropType<TWithChildren<IBookmarkCategory, IBookmarkItem>>,
+                type: Object as PropType<WithChildren<IBookmarkCategory, IBookmarkItem>>,
                 required: true
             },
             creating: {

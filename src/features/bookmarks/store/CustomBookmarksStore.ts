@@ -6,7 +6,8 @@ import type {
     IBookmarkCategoryInfo,
     IBookmarkGroup,
     IBookmarkItem,
-    TBookmark, TQueryAddBookmark
+    TBookmark,
+    TQueryAddBookmark
 } from '@/features/bookmarks/types/Bookmark.types';
 import BookmarksApi from '@/features/bookmarks/api';
 import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
@@ -51,7 +52,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
     const getGroups = computed(() => sortBy(groups.value, [o => o.order]));
 
-    const queryGetBookmarks = async () => {
+    const queryGetBookmarks = async (): Promise<TBookmark[]> => {
         try {
             const { data: items } = await BookmarksApi.getBookmarks();
 
@@ -62,7 +63,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
                 bookmarks
             });
 
-            return Promise.resolve(items);
+            return items;
         } catch (err) {
             return Promise.reject(err);
         }
@@ -78,7 +79,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
             await queryGetBookmarks();
 
-            return Promise.resolve(data);
+            return data;
         } catch (err) {
             return Promise.reject(err);
         }
@@ -94,7 +95,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
             await queryGetBookmarks();
 
-            return Promise.resolve(data);
+            return data;
         } catch (err) {
             return Promise.reject(err);
         }
@@ -128,9 +129,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         try {
             await queryGetBookmarks();
 
-            const group = groups.value.find(bookmark => bookmark.order === -1) || await createDefaultGroup();
-
-            return Promise.resolve(group);
+            return groups.value.find(bookmark => bookmark.order === -1) || await createDefaultGroup();
         } catch (err) {
             return Promise.reject(err);
         }
@@ -163,10 +162,8 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
                 return Promise.reject();
             }
 
-            const savedCat = categories.value.find(bookmark => bookmark.name === cat.name)
+            return categories.value.find(bookmark => bookmark.name === cat.name)
                 || await createCategory(cat, groupUUID);
-
-            return Promise.resolve(savedCat);
         } catch (err) {
             return Promise.reject(err);
         }

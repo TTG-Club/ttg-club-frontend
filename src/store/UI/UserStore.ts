@@ -50,7 +50,7 @@ export type TChangePassBody = {
     password: string
 }
 
-export type TAuthResp = {
+export type TAuthResponse = {
     accessToken: string;
     tokenType: string;
 }
@@ -156,7 +156,7 @@ export const useUserStore = defineStore('UserStore', () => {
                 return Promise.reject(new Error('All fields are required to fill'));
             }
 
-            const resp = await http.post<TAuthResp>({
+            const resp = await http.post<TAuthResponse>({
                 url: '/auth/signin',
                 payload: body
             });

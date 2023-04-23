@@ -22,8 +22,4 @@ export interface IBookmarkCategoryInfo {
     order: number
 }
 
-export type TWithChildren<T, C> = T & {
-    children: Array<C>
-}
-
 export type TQueryAddBookmark = Pick<TBookmark, 'name'> & Partial<TBookmark>

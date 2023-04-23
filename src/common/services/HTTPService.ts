@@ -98,7 +98,7 @@ export default class HTTPService {
         });
     }
 
-    rawGet<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
+    rawGet(config: RequestConfig): Promise<AxiosResponse<string>> {
         return this.instance({
             method: 'get',
             baseURL: '',

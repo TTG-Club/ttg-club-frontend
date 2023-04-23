@@ -3,7 +3,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import localforage from 'localforage';
 import isArray from 'lodash/isArray';
 import { v4 as uuidV4 } from 'uuid';
-import { computed, ref } from 'vue';
+import {
+    computed, ref, toRaw
+} from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import { DB_NAME } from '@/common/const/UI';
 import type {
@@ -29,18 +31,6 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
     const isBookmarkSaved = (url: IBookmarkItem['url']) => bookmarks.value
         .findIndex(bookmark => bookmark.url === url) >= 0;
 
-    const getBookmarkByURL = (url: IBookmarkItem['url']) => {
-        const defaultGroup = groups.value.find(bookmark => bookmark.order === -1);
-
-        const categoriesUUIDs = categories.value
-            .filter(bookmark => bookmark.parentUUID === defaultGroup?.uuid)
-            .map(category => category.uuid);
-
-        return bookmarks.value
-            .filter(bookmark => categoriesUUIDs.includes(bookmark.parentUUID))
-            .find(bookmark => bookmark.url === url);
-    };
-
     const getNewUUID = () => {
         let uuid = uuidV4();
 
@@ -52,11 +42,11 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
     };
 
     const createDefaultGroup = () => {
-        const defaultGroup: IBookmarkGroup = cloneDeep({
+        const defaultGroup: IBookmarkGroup = {
             uuid: getNewUUID(),
             name: 'Общие',
             order: -1
-        });
+        };
 
         groups.value.push(defaultGroup);
 
@@ -64,6 +54,18 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
     };
 
     const getDefaultGroup = () => groups.value.find(bookmark => bookmark.order === -1) || createDefaultGroup();
+
+    const getBookmarkByURL = (url: IBookmarkItem['url']) => {
+        const defaultGroup = getDefaultGroup();
+
+        const categoriesUUIDs = categories.value
+            .filter(bookmark => bookmark.parentUUID === defaultGroup?.uuid)
+            .map(category => category.uuid);
+
+        return bookmarks.value
+            .filter(bookmark => categoriesUUIDs.includes(bookmark.parentUUID))
+            .find(bookmark => bookmark.url === url);
+    };
 
     const createCategory = (category: IBookmarkCategoryInfo): IBookmarkCategory => {
         const parent = getDefaultGroup();
@@ -106,9 +108,9 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
             await store.ready();
 
             await store.setItem<TBookmark[]>('default', [
-                ...cloneDeep(groups.value),
-                ...cloneDeep(categories.value),
-                ...cloneDeep(bookmarks.value)
+                ...toRaw(groups.value),
+                ...toRaw(categories.value),
+                ...toRaw(bookmarks.value)
             ]);
         } catch (err) {
             errorHandler(err);

@@ -5,9 +5,9 @@ import type {
     IBookmarkCategory,
     IBookmarkGroup,
     IBookmarkItem,
-    TBookmark,
-    TWithChildren
+    TBookmark
 } from '@/features/bookmarks/types/Bookmark.types';
+import type { WithChildren } from '@/types/Shared/Utility.types';
 
 export const isBookmarkItem = (item: TBookmark): item is IBookmarkItem => (('url' in item) && ('parentUUID' in item));
 
@@ -28,12 +28,12 @@ export const getGroupBookmarks = ({
     categories: Ref<IBookmarkCategory[]>;
     bookmarks: Ref<IBookmarkItem[]>;
 }) => sortBy(
-    groups.value.map<TWithChildren<IBookmarkGroup, IBookmarkCategory>>(group => ({
+    groups.value.map<WithChildren<IBookmarkGroup, IBookmarkCategory>>(group => ({
         ...group,
         children: sortBy(
             categories.value
                 .filter(category => category.parentUUID === group.uuid)
-                .map<TWithChildren<IBookmarkCategory, IBookmarkItem>>(category => ({
+                .map<WithChildren<IBookmarkCategory, IBookmarkItem>>(category => ({
                     ...category,
                     children: sortBy(
                         bookmarks.value.filter(bookmark => (
