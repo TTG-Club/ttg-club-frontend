@@ -46,7 +46,6 @@ export const DefaultTippyProps: DefaultProps = {
         const http = new HTTPService();
 
         if (attr) {
-            // TODO: this is kostbl/\b
             http.rawGet({
                 url: attr
             })
