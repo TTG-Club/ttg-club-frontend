@@ -3,9 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import localforage from 'localforage';
 import isArray from 'lodash/isArray';
 import { v4 as uuidV4 } from 'uuid';
-import {
-    computed, ref, toRaw
-} from 'vue';
+import { computed, ref } from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import { DB_NAME } from '@/common/const/UI';
 import type {
@@ -107,13 +105,13 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
         try {
             await store.ready();
 
-            await store.setItem<TBookmark[]>('default', [
-                ...toRaw(groups.value),
-                ...toRaw(categories.value),
-                ...toRaw(bookmarks.value)
+            return store.setItem<TBookmark[]>('default', [
+                ...cloneDeep(groups.value),
+                ...cloneDeep(categories.value),
+                ...cloneDeep(bookmarks.value)
             ]);
         } catch (err) {
-            errorHandler(err);
+            return Promise.reject(err);
         }
     };
 
