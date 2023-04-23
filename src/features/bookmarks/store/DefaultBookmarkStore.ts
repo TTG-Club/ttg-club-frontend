@@ -3,7 +3,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import localforage from 'localforage';
 import isArray from 'lodash/isArray';
 import { v4 as uuidV4 } from 'uuid';
-import sortBy from 'lodash/sortBy';
 import { computed, ref } from 'vue';
 import errorHandler from '@/common/helpers/errorHandler';
 import { DB_NAME } from '@/common/const/UI';
@@ -12,12 +11,10 @@ import type {
     IBookmarkCategoryInfo,
     IBookmarkGroup,
     IBookmarkItem,
-    TBookmark, TWithChildren
+    TBookmark
 } from '@/features/bookmarks/types/Bookmark.types';
 import BookmarksApi from '@/features/bookmarks/api';
-import {
-    isBookmarkCategory, isBookmarkGroup, isBookmarkItem
-} from '@/features/bookmarks/utils';
+import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
 
 export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () => {
     const store = localforage.createInstance({
@@ -31,28 +28,6 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
 
     const isBookmarkSaved = (url: IBookmarkItem['url']) => bookmarks.value
         .findIndex(bookmark => bookmark.url === url) >= 0;
-
-    const getGroupBookmarks = computed(() => sortBy(
-        groups.value.map<TWithChildren<IBookmarkGroup, IBookmarkCategory>>(group => ({
-            ...group,
-            children: sortBy(
-                categories.value
-                    .filter(category => category.parentUUID && category.parentUUID === group.uuid)
-                    .map<TWithChildren<IBookmarkCategory, IBookmarkItem>>(category => ({
-                        ...category,
-                        children: sortBy(
-                            bookmarks.value.filter(bookmark => (
-                                bookmark.parentUUID
-                                && bookmark.parentUUID === category.uuid
-                            )),
-                            [o => o.order]
-                        )
-                    })),
-                [o => o.order]
-            )
-        })),
-        [o => o.order]
-    ));
 
     const getBookmarkByURL = (url: IBookmarkItem['url']) => {
         const defaultGroup = groups.value.find(bookmark => bookmark.order === -1);
@@ -90,7 +65,7 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
 
     const getDefaultGroup = () => groups.value.find(bookmark => bookmark.order === -1) || createDefaultGroup();
 
-    const createCategory = (category: IBookmarkCategoryInfo): TBookmark => {
+    const createCategory = (category: IBookmarkCategoryInfo): IBookmarkCategory => {
         const parent = getDefaultGroup();
 
         const newCategory: IBookmarkCategory = {
@@ -105,49 +80,22 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
         return newCategory;
     };
 
-    const setBookmarks = (items: TBookmark[]) => {
-        const newGroups: IBookmarkGroup[] = [];
-        const newCategories: IBookmarkCategory[] = [];
-        const newBookmarks: IBookmarkItem[] = [];
-
-        for (const item of items) {
-            if (isBookmarkGroup(item)) {
-                newGroups.push(item);
-
-                continue;
-            }
-
-            if (isBookmarkCategory(item)) {
-                newCategories.push(item);
-
-                continue;
-            }
-
-            if (isBookmarkItem(item)) {
-                newBookmarks.push(item);
-
-                continue;
-            }
-
-            console.error(`Unknown bookmark type: ${ JSON.stringify(item) }`);
-        }
-
-        groups.value = cloneDeep(newGroups);
-        categories.value = cloneDeep(newCategories);
-        bookmarks.value = cloneDeep(newBookmarks);
-    };
-
     const restoreBookmarks = async () => {
         try {
             await store.ready();
 
-            const restored = await store.getItem('default');
+            const restored = await store.getItem<TBookmark[]>('default');
 
             if (!isArray(restored) || !restored.length) {
                 return;
             }
 
-            setBookmarks(restored);
+            setBookmarks({
+                items: restored,
+                groups,
+                categories,
+                bookmarks
+            });
         } catch (err) {
             errorHandler(err);
         }
@@ -157,7 +105,7 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
         try {
             await store.ready();
 
-            await store.setItem('default', [
+            await store.setItem<TBookmark[]>('default', [
                 ...cloneDeep(groups.value),
                 ...cloneDeep(categories.value),
                 ...cloneDeep(bookmarks.value)
@@ -177,7 +125,7 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
                 return Promise.reject();
             }
 
-            const cat = await BookmarksApi.getCategory({
+            const { data: cat } = await BookmarksApi.getCategory({
                 code,
                 url
             });
@@ -281,7 +229,11 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
         bookmarks,
 
         isBookmarkSaved,
-        getGroupBookmarks,
+        getGroupBookmarks: computed(() => getGroupBookmarks({
+            groups,
+            categories,
+            bookmarks
+        })),
 
         getBookmarkByURL,
         createDefaultGroup,

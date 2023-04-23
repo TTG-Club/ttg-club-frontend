@@ -80,7 +80,9 @@
     });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+    @import "../styles/bookmarks";
+
     .nav-bookmarks {
         display: flex;
         height: 100%;
