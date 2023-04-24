@@ -30,11 +30,7 @@
                     >
                         <ui-input
                             ref="input"
-                            autofocus="autofocus"
-                            autocomplete="off"
-                            autocapitalize="off"
-                            formnovalidate="formnovalidate"
-                            :value="search"
+                            v-model="search"
                             placeholder="Поиск..."
                             @input.prevent.stop="onSearchUpdate($event.target.value)"
                             @keyup.enter.exact.prevent.stop="onSubmit"
