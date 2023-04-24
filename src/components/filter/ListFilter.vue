@@ -15,6 +15,7 @@
                         :autocomplete="false"
                         :spellcheck="false"
                         placeholder="Поиск..."
+                        :maxlength="maxInputLength"
                         type="text"
                     >
                 </label>
@@ -129,6 +130,10 @@
             inTab: {
                 type: Boolean,
                 default: false
+            },
+            maxInputLength: {
+                type: Number,
+                default: 255
             }
         },
         setup(props, { emit }) {

@@ -16,7 +16,7 @@
                 v-model="value"
                 :autocomplete="inputAutocomplete"
                 :placeholder="placeholder"
-                :maxlength="maxLength"
+                :maxlength="maxInputLength"
                 :spellcheck="false"
                 :type="inputType"
                 class="ui-input__input"
@@ -100,7 +100,7 @@
                 type: Number,
                 default: undefined
             },
-            maxLength: {
+            maxInputLength: {
                 type: Number,
                 default: 255
             },
