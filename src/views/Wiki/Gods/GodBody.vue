@@ -40,29 +40,6 @@
                 </li>
             </ul>
 
-            <!-- <h4 class="header_separator">
-                Информация из других источников
-            </h4>
-
-            <ul class="stat-list">
-                <li>
-                    <b>Ранг: </b>
-
-                    <span>{{ god.rank }}</span>
-                </li>
-
-                <li v-if="god.titles?.length">
-                    <b>Титулы: </b>
-
-                    <span>{{ god.titles.join(', ') }}</span>
-                </li>
-            </ul>
-
-            <raw-content
-                v-if="god.description"
-                :template="god.description"
-            /> -->
-
             <details>
                 <summary class="h4 header_separator">
                     <span>Информация из других источников</span>
