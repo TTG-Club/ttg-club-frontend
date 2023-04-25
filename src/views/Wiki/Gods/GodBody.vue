@@ -22,18 +22,6 @@
                 </li>
 
                 <li>
-                    <b>Ранг: </b>
-
-                    <span>{{ god.rank }}</span>
-                </li>
-
-                <li v-if="god.titles?.length">
-                    <b>Титулы: </b>
-
-                    <span>{{ god.titles.join(', ') }}</span>
-                </li>
-
-                <li>
                     <b>Символ: </b>
 
                     <span>{{ god.symbol }}</span>
@@ -52,10 +40,55 @@
                 </li>
             </ul>
 
+            <!-- <h4 class="header_separator">
+                Информация из других источников
+            </h4>
+
+            <ul class="stat-list">
+                <li>
+                    <b>Ранг: </b>
+
+                    <span>{{ god.rank }}</span>
+                </li>
+
+                <li v-if="god.titles?.length">
+                    <b>Титулы: </b>
+
+                    <span>{{ god.titles.join(', ') }}</span>
+                </li>
+            </ul>
+
             <raw-content
                 v-if="god.description"
                 :template="god.description"
-            />
+            /> -->
+
+            <details>
+                <summary class="h4 header_separator">
+                    <span>Информация из других источников</span>
+                </summary>
+
+                <div class="content">
+                    <ul class="stat-list">
+                        <li>
+                            <b>Ранг: </b>
+
+                            <span>{{ god.rank }}</span>
+                        </li>
+
+                        <li v-if="god.titles?.length">
+                            <b>Титулы: </b>
+
+                            <span>{{ god.titles.join(', ') }}</span>
+                        </li>
+                    </ul>
+
+                    <raw-content
+                        v-if="god.description"
+                        :template="god.description"
+                    />
+                </div>
+            </details>
         </div>
     </div>
 </template>
