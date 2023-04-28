@@ -34,10 +34,9 @@
                                 />
                             </div>
 
-                            <input
+                            <ui-input
                                 ref="input"
                                 v-model="search"
-                                class="search-view__control_field"
                                 placeholder="Поиск..."
                                 @update:model-value="onChangeSearch"
                                 @keyup.enter.exact.prevent.stop="onChangeSearch"
@@ -66,14 +65,14 @@
                     />
 
                     <div
-                        v-if="!search.length && !results?.list.length"
+                        v-if="!search.trim() && !results?.list.length"
                         class="search-view__results_text"
                     >
                         Введите текст, что бы начать
                     </div>
 
                     <div
-                        v-else-if="search.length && inProgress && !results?.list.length"
+                        v-else-if="search.trim() && inProgress && !results?.list.length"
                         class="search-view__results_text"
                     >
                         Боги ищут ответ на твой запрос
@@ -121,9 +120,11 @@
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useUIStore } from '@/store/UI/UIStore';
     import { useMetrics } from '@/common/composition/useMetrics';
+    import UiInput from "@/components/UI/kit/UiInput.vue";
 
     export default defineComponent({
         components: {
+            UiInput,
             UiButton,
             SvgIcon,
             UiPaginate,
@@ -227,7 +228,9 @@
             const onChangeSearch = debounce(async () => {
                 isNeedUpdateScroll.value = true;
 
-                await onUpdateRoute();
+                if (search.value.trim()) {
+                    await onUpdateRoute();
+                }
             }, 300);
 
             const onPageChanged = debounce(async () => {
@@ -420,18 +423,6 @@
                 };
             }
 
-            &_field {
-                overflow: hidden;
-                appearance: none;
-                border: 0;
-                outline: none;
-                flex: 1 1 auto;
-                padding: 0;
-                text-overflow: ellipsis;
-                background: transparent;
-                color: var(--text-b-color);
-            }
-
             &_icon {
                 padding: 8px;
                 flex-shrink: 0;
@@ -497,5 +488,14 @@
     .search-link {
         margin-top: 8px;
         border-radius: 4px;
+    }
+
+    :deep(.ui-input__control) {
+        border: 0;
+        .ui-input__input {
+            height: 40px;
+            padding: 0;
+            color: var(--text-b-color);
+        }
     }
 </style>
