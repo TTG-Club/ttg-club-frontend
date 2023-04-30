@@ -499,6 +499,7 @@
 
     :deep(.ui-input__control) {
         border: 0;
+
         .ui-input__input {
             height: 40px;
             padding: 0;

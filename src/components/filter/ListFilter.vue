@@ -10,14 +10,11 @@
                         <svg-icon icon-name="search" />
                     </span>
 
-                    <input
+                    <ui-input
                         v-model.trim="search"
-                        :autocomplete="false"
                         :spellcheck="false"
                         placeholder="Поиск..."
-                        :maxlength="maxInputLength"
-                        type="text"
-                    >
+                    />
                 </label>
 
                 <ui-erase-button
@@ -109,10 +106,12 @@
         Filter, FilterComposable, FilterGroup, FilterItem
     } from '@/common/composition/useFilter';
     import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
+    import UiInput from "@/components/UI/kit/UiInput.vue";
 
     export default defineComponent({
 
         components: {
+            UiInput,
             UiEraseButton,
             BaseModal,
             FilterItemCheckboxes,
@@ -127,10 +126,6 @@
             inTab: {
                 type: Boolean,
                 default: false
-            },
-            maxInputLength: {
-                type: Number,
-                default: 255
             }
         },
         setup(props, { emit }) {
@@ -281,15 +276,6 @@
                         color: var(--primary);
                     }
                 }
-
-                input {
-                    width: 100%;
-                    height: 100%;
-                    border: 0;
-                    background-color: transparent;
-                    color: var(--text-color);
-                    padding: 0;
-                }
             }
         }
 
@@ -371,6 +357,15 @@
             @include media-min($xl) {
                 padding: 0 24px;
             }
+        }
+    }
+
+    :deep(.ui-input__control) {
+        border: 0;
+        background-color: transparent;
+
+        .ui-input__input {
+            padding: 0;
         }
     }
 </style>
