@@ -21,6 +21,7 @@
                 :type="inputType"
                 class="ui-input__input"
                 v-bind="attrs"
+                @keydown="typeValidate($event)"
                 @blur="$emit('blur')"
             >
 
@@ -188,6 +189,16 @@
                 this.showedPass = !this.showedPass;
 
                 this.$refs.input.focus();
+            },
+
+            typeValidate(e) {
+                // e.key.length > 1 is control key like Backspace and Arrows
+                if (this.isNumber && e.key.length === 1) {
+                    // 48-57 codes is 0-9 numbers
+                    if (e.keyCode < 48 || e.keyCode > 57 || (!e.target.value.length && e.keyCode === 48)) {
+                        e.preventDefault();
+                    }
+                }
             }
         }
     });
