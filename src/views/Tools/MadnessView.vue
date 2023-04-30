@@ -13,9 +13,9 @@
                             <ui-input
                                 v-model="count"
                                 class="form-control select"
-                                min="1"
+                                is-number
+                                :min="1"
                                 placeholder="Количеств"
-                                type="number"
                             />
                         </div>
 
