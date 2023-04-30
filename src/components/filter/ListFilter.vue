@@ -20,15 +20,10 @@
                     >
                 </label>
 
-                <button
-                    v-if="!!search"
-                    v-tippy="{ content: 'Стереть строку поиска' }"
-                    class="filter__search_clear"
-                    type="button"
-                    @click.left.exact.prevent="search = ''"
-                >
-                    <svg-icon icon-name="close" />
-                </button>
+                <ui-erase-button
+                    v-if="search"
+                    @click="search = ''"
+                />
             </div>
 
             <button
@@ -113,10 +108,12 @@
     import type {
         Filter, FilterComposable, FilterGroup, FilterItem
     } from '@/common/composition/useFilter';
+    import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
 
     export default defineComponent({
 
         components: {
+            UiEraseButton,
             BaseModal,
             FilterItemCheckboxes,
             FilterItemSources,
@@ -292,30 +289,6 @@
                     background-color: transparent;
                     color: var(--text-color);
                     padding: 0;
-                }
-            }
-
-            &_clear {
-                @include css_anim();
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 42px;
-                height: 42px;
-                flex-shrink: 0;
-                color: var(--primary);
-
-                @include media-min($md) {
-                    &:hover {
-                        color: var(--text-btn-color);
-                        background-color: var(--primary-hover);
-                    }
-                }
-
-                svg {
-                    width: 16px;
-                    height: 16px;
                 }
             }
         }

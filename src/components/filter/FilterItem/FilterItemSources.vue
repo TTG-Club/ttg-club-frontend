@@ -85,7 +85,6 @@
     import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
 
     export default {
-
         components: {
             UiCheckbox,
             SvgIcon

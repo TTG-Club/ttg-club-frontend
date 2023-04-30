@@ -41,6 +41,11 @@
                                 @update:model-value="onChangeSearch"
                                 @keyup.enter.exact.prevent.stop="onChangeSearch"
                             />
+
+                            <ui-erase-button
+                                v-if="search"
+                                @click="search = ''"
+                            />
                         </div>
 
                         <ui-button class="search-view__control_btn">
@@ -121,9 +126,11 @@
     import { useUIStore } from '@/store/UI/UIStore';
     import { useMetrics } from '@/common/composition/useMetrics';
     import UiInput from "@/components/UI/kit/UiInput.vue";
+    import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
 
     export default defineComponent({
         components: {
+            UiEraseButton,
             UiInput,
             UiButton,
             SvgIcon,
