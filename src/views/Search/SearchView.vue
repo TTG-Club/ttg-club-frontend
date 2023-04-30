@@ -36,7 +36,7 @@
 
                             <ui-input
                                 ref="input"
-                                v-model="search"
+                                v-model.trim="search"
                                 placeholder="Поиск..."
                                 @update:model-value="onChangeSearch"
                                 @keyup.enter.exact.prevent.stop="onChangeSearch"
@@ -70,14 +70,14 @@
                     />
 
                     <div
-                        v-if="!search.trim() && !results?.list.length"
+                        v-if="!search.length && !results?.list.length"
                         class="search-view__results_text"
                     >
                         Введите текст, что бы начать
                     </div>
 
                     <div
-                        v-else-if="search.trim() && inProgress && !results?.list.length"
+                        v-else-if="search.length && inProgress && !results?.list.length"
                         class="search-view__results_text"
                     >
                         Боги ищут ответ на твой запрос
@@ -235,7 +235,7 @@
             const onChangeSearch = debounce(async () => {
                 isNeedUpdateScroll.value = true;
 
-                if (search.value.trim()) {
+                if (search.value) {
                     await onUpdateRoute();
                 }
             }, 300);
