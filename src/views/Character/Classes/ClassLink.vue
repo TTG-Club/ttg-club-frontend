@@ -59,7 +59,7 @@
                                 </span>
 
                                 <span
-                                    v-tippy="{ content: classItem.source.name }"
+                                    v-tippy-lazy="{ content: classItem.source.name }"
                                     class="link-item-expand__tag"
                                 >
                                     {{ classItem.source.shortName }}
@@ -71,7 +71,7 @@
 
                     <button
                         v-if="hasArchetypes"
-                        v-tippy="{ content: classItem.archetypeName, placement: 'left' }"
+                        v-tippy-lazy="{ content: classItem.archetypeName, placement: 'left' }"
                         class="link-item-expand__toggle"
                         type="button"
                         @click.left.exact.prevent="toggleArch"
@@ -112,7 +112,7 @@
                                     <span class="link-item-expand__arch-item_name">{{ arch.name.rus }}</span>
 
                                     <span class="link-item-expand__arch-item_book">
-                                        <span v-tippy="{ content: arch.source.name }">
+                                        <span v-tippy-lazy="{ content: arch.source.name }">
                                             {{ arch.source.shortName }}
                                         </span>
 
