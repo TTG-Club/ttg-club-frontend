@@ -41,7 +41,7 @@
 
                         <div
                             v-if="armor.armorClass"
-                            v-tippy="{ content: 'Класс доспеха (АС)' }"
+                            v-tippy-lazy="{ content: 'Класс доспеха (АС)' }"
                             class="link-item__ac"
                         >
                             <span>
@@ -52,7 +52,7 @@
 
                         <div
                             v-if="armor.price"
-                            v-tippy="{ content: 'Стоимость' }"
+                            v-tippy-lazy="{ content: 'Стоимость' }"
                             class="link-item__price"
                         ><span>
 
