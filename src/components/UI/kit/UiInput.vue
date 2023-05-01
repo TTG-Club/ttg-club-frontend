@@ -16,7 +16,7 @@
                 v-model="value"
                 :autocomplete="inputAutocomplete"
                 :placeholder="placeholder"
-                :maxlength="maxInputLength"
+                :maxlength="maxLength"
                 :spellcheck="false"
                 :type="inputType"
                 class="ui-input__input"
@@ -26,7 +26,7 @@
             >
 
             <span
-                v-if="isPassword"
+                v-if="type === 'password'"
                 class="ui-input__control_icon"
                 @click.left.exact.prevent="togglePass"
             >
@@ -81,18 +81,6 @@
                 type: String,
                 default: 'text'
             },
-            isNumber: {
-                type: Boolean,
-                default: false
-            },
-            isPassword: {
-                type: Boolean,
-                default: false
-            },
-            isEmail: {
-                type: Boolean,
-                default: false
-            },
             isError: {
                 type: Boolean,
                 default: false
@@ -101,7 +89,7 @@
                 type: Number,
                 default: undefined
             },
-            maxInputLength: {
+            maxLength: {
                 type: Number,
                 default: 255
             },
@@ -134,16 +122,8 @@
             },
 
             inputType() {
-                if (this.isNumber) {
-                    return 'number';
-                }
-
-                if (this.isPassword) {
+                if (this.type === 'password') {
                     return this.showedPass ? 'text' : 'password';
-                }
-
-                if (this.isEmail) {
-                    return 'email';
                 }
 
                 return this.type;
@@ -164,7 +144,7 @@
             attrs() {
                 const attrs = { ...this.$attrs };
 
-                if (this.isNumber) {
+                if (this.type === 'number') {
                     if (this.min !== undefined) {
                         attrs.min = this.min;
                     }
@@ -192,10 +172,13 @@
             },
 
             typeValidate(e) {
-                // e.key.length > 1 is control key like Backspace and Arrows
-                if (this.isNumber && e.key.length === 1) {
-                    // 48-57 codes is 0-9 numbers
-                    if (e.keyCode < 48 || e.keyCode > 57 || (!e.target.value.length && e.keyCode === 48)) {
+                const isControlKey = e.key.length > 1;
+                const key = Number(e.key);
+                const isNum = Number.isInteger(key);
+                const isValueEmpty = e.target.value;
+
+                if (this.type === 'number' && !isControlKey) {
+                    if (!isNum || (!isValueEmpty && !key)) {
                         e.preventDefault();
                     }
                 }

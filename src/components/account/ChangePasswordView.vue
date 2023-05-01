@@ -49,7 +49,7 @@
                 autocapitalize="off"
                 autocomplete="new-password"
                 autocorrect="off"
-                is-password
+                type="password"
                 placeholder="Повторите пароль"
                 required
                 @blur="v$.repeat.$touch()"

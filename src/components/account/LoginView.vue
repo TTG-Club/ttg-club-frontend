@@ -25,7 +25,7 @@
                 autocapitalize="off"
                 autocomplete="current-password"
                 autocorrect="off"
-                is-password
+                type="password"
                 placeholder="Пароль"
                 required
                 @blur="v$.password.$touch()"

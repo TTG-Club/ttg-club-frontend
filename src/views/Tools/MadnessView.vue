@@ -13,7 +13,7 @@
                             <ui-input
                                 v-model="count"
                                 class="form-control select"
-                                is-number
+                                type="number"
                                 :min="1"
                                 placeholder="Количеств"
                             />
