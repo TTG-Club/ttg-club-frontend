@@ -26,3 +26,8 @@ declare module 'vue-virtual-scroller' {
     export const DynamicScroller: DefineComponent;
     export const DynamicScrollerItem: DefineComponent;
 }
+
+declare module '*.module.scss' {
+    const classes: { [key: string]: string };
+    export default classes;
+}
