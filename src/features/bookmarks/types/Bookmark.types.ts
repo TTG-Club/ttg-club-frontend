@@ -11,6 +11,7 @@ export interface IBookmarkCategory extends IBookmarkGroup {
 export interface IBookmarkItem extends IBookmarkCategory {
     url: string;
     type?: string;
+    prefix?: string;
 }
 
 export type TBookmark = IBookmarkGroup | IBookmarkCategory | IBookmarkItem

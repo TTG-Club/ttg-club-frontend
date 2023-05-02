@@ -60,7 +60,7 @@
                             :href="bookmark.url"
                             class="bookmarks__item_label"
                         >
-                            {{ bookmark.name }}
+                            {{ bookmark.prefix ? `[${bookmark.prefix}] ${bookmark.name}` : bookmark.name }}
                         </component>
 
                         <div
