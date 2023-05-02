@@ -47,32 +47,34 @@
                     :key="bookmark.uuid + bookmark.order"
                     class="bookmarks__item"
                 >
-                    <div
-                        v-if="isEdit"
-                        class="bookmarks__cat_label_icon is-left js-drag-bookmark"
-                    >
-                        <svg-icon icon-name="sandwich" />
-                    </div>
+                    <div class="bookmarks__item_body">
+                        <div
+                            v-if="isEdit"
+                            class="bookmarks__cat_label_icon is-left js-drag-bookmark"
+                        >
+                            <svg-icon icon-name="sandwich" />
+                        </div>
 
-                    <component
-                        :is="isEdit ? 'span' : 'a'"
-                        :href="bookmark.url"
-                        class="bookmarks__item_label"
-                    >
-                        {{ bookmark.name }}
-                    </component>
+                        <component
+                            :is="isEdit ? 'span' : 'a'"
+                            :href="bookmark.url"
+                            class="bookmarks__item_label"
+                        >
+                            {{ bookmark.name }}
+                        </component>
 
-                    <div
-                        v-if="!isMobile || (isMobile && isEdit)"
-                        :class="{ 'only-hover': !isMobile }"
-                        class="bookmarks__item_icon is-right"
-                        @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
-                    >
-                        <svg-icon
-                            icon-name="close"
-                            :stroke-enable="false"
-                            fill-enable
-                        />
+                        <div
+                            v-if="!isMobile || (isMobile && isEdit)"
+                            :class="{ 'only-hover': !isMobile }"
+                            class="bookmarks__item_icon is-right"
+                            @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
+                        >
+                            <svg-icon
+                                icon-name="close"
+                                :stroke-enable="false"
+                                fill-enable
+                            />
+                        </div>
                     </div>
                 </div>
             </template>

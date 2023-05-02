@@ -42,17 +42,19 @@
                                     :key="bookmark.uuid + bookmarkKey"
                                     class="bookmarks__item"
                                 >
-                                    <a
-                                        :href="bookmark.url"
-                                        :target="isExternal(bookmark.url) ? '_blank' : '_self'"
-                                        class="bookmarks__item_label"
-                                    >{{ bookmark.name }}</a>
+                                    <div class="bookmarks__item_body">
+                                        <a
+                                            :href="bookmark.url"
+                                            :target="isExternal(bookmark.url) ? '_blank' : '_self'"
+                                            class="bookmarks__item_label"
+                                        >{{ bookmark.name }}</a>
 
-                                    <div
-                                        class="bookmarks__item_icon only-hover is-right"
-                                        @click.left.exact.prevent="bookmarksStore.removeBookmark(bookmark.uuid)"
-                                    >
-                                        <svg-icon icon-name="close" />
+                                        <div
+                                            class="bookmarks__item_icon only-hover is-right"
+                                            @click.left.exact.prevent="bookmarksStore.removeBookmark(bookmark.uuid)"
+                                        >
+                                            <svg-icon icon-name="close" />
+                                        </div>
                                     </div>
                                 </div>
 
