@@ -21,14 +21,20 @@
     height: 50px;
     border-bottom: 1px solid var(--hover);
     display: flex;
-    justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+  }
+
+  &__to-top {
+    svg {
+      transform: rotate(180deg);
+    }
   }
 
   &__wrapper {
     padding: 8px 8px;
     display: block;
+    overflow: auto;
   }
 
   &__body {
@@ -60,6 +66,7 @@
 
   &__info {
     height: 16px;
+    margin-right: auto;
 
     &--desc {
       font-size: var(--h5-font-size);

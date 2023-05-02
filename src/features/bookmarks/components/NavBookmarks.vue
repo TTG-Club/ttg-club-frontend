@@ -1,5 +1,8 @@
 <template>
-    <nav-popover v-model="opened">
+    <nav-popover
+        v-model="opened"
+        inner-scroll
+    >
         <template #trigger="{ isActive }">
             <div
                 :class="{ 'is-active': isActive }"

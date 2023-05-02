@@ -9,6 +9,16 @@
             </div>
 
             <ui-button
+                is-icon
+                is-small
+                type-link-filled
+                class="bookmarks__to-top"
+                @click.left.prevent="scrollToTop"
+            >
+                <svg-icon icon-name="arrow-stroke" />
+            </ui-button>
+
+            <ui-button
                 v-tippy="{ content: 'Перейти в режим редактирования' }"
                 :type-link-filled="!isEdit"
                 is-icon
@@ -33,6 +43,7 @@
         </div>
 
         <div
+            ref="wrapper"
             class="bookmarks__wrapper"
         >
             <div class="bookmarks__body">
@@ -98,68 +109,50 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
     import {
-        computed, defineComponent, onBeforeMount, ref
+        computed, onBeforeMount, ref
     } from 'vue';
-    import { storeToRefs } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
     import UiInput from '@/components/UI/kit/UiInput.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
 
-    export default defineComponent({
-        name: 'CustomBookmarks',
-        components: {
-            UiButton,
-            UiInput,
-            CustomBookmarkGroup,
-            SvgIcon
-        },
-        setup() {
-            const uiStore = useUIStore();
-            const { isMobile } = storeToRefs(uiStore);
-            const customBookmarkStore = useCustomBookmarkStore();
-            const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
-            const isEdit = ref(false);
-            const isGroupCreating = ref(false);
-            const newGroupName = ref('');
+    const customBookmarkStore = useCustomBookmarkStore();
+    const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
+    const isEdit = ref(false);
+    const isGroupCreating = ref(false);
+    const newGroupName = ref('');
+    const wrapper = ref<HTMLDivElement>();
 
-            function enableGroupCreating() {
-                isGroupCreating.value = true;
-                newGroupName.value = '';
-            }
+    const enableGroupCreating = () => {
+        isGroupCreating.value = true;
+        newGroupName.value = '';
+    };
 
-            function disableGroupCreating() {
-                isGroupCreating.value = false;
-                newGroupName.value = '';
-            }
+    const disableGroupCreating = () => {
+        isGroupCreating.value = false;
+        newGroupName.value = '';
+    };
 
-            async function createGroup() {
-                await customBookmarkStore.queryAddBookmark({
-                    name: newGroupName.value,
-                    order: customBookmarkStore.getGroupBookmarks.length
-                });
+    const createGroup = async () => {
+        await customBookmarkStore.queryAddBookmark({
+            name: newGroupName.value,
+            order: customBookmarkStore.getGroupBookmarks.length
+        });
 
-                disableGroupCreating();
-            }
+        disableGroupCreating();
+    };
 
-            onBeforeMount(() => {
-                customBookmarkStore.restoreOpenedGroupsFromSession();
-            });
+    const scrollToTop = () => {
+        wrapper.value?.scroll({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
 
-            return {
-                bookmarks,
-                isEdit,
-                isGroupCreating,
-                newGroupName,
-                enableGroupCreating,
-                disableGroupCreating,
-                createGroup,
-                isMobile
-            };
-        }
+    onBeforeMount(() => {
+        customBookmarkStore.restoreOpenedGroupsFromSession();
     });
 </script>

@@ -33,58 +33,49 @@
     </div>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, watch
-    } from 'vue';
+<script lang="ts" setup>
+    import { computed, watch } from 'vue';
     import { useVModel } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
     import { useNavStore } from '@/store/UI/NavStore';
 
-    export default defineComponent({
-        props: {
-            modelValue: {
-                type: Boolean,
-                default: false
-            },
-            isMenu: {
-                type: Boolean,
-                default: false
-            },
-            isLeft: {
-                type: Boolean,
-                default: false
-            }
-        },
-        setup(props, { emit }) {
-            const isShow = useVModel(props, 'modelValue');
-            const navStore = useNavStore();
-            const { isShowPopover } = storeToRefs(navStore);
+    const props = withDefaults(defineProps<{
+        modelValue: boolean;
+        isMenu?: boolean;
+        isLeft?: boolean;
+        innerScroll?: boolean;
+    }>(), {
+        modelValue: false,
+        isMenu: false,
+        isLeft: false,
+        innerScroll: false
+    });
 
-            watch(isShow, value => {
-                isShowPopover.value = value;
-            });
+    const emit = defineEmits(['close']);
 
-            watch(isShowPopover, value => {
-                if (!value && isShow.value) {
-                    isShow.value = false;
-                }
-            });
+    const isShow = useVModel(props, 'modelValue');
+    const navStore = useNavStore();
+    const { isShowPopover } = storeToRefs(navStore);
 
-            return {
-                isShow,
+    const classes = computed(() => ({
+        'is-left': props.isLeft,
+        'is-menu': props.isMenu,
+        'inner-scroll': props.innerScroll
+    }));
 
-                classes: computed(() => ({
-                    'is-left': props.isLeft,
-                    'is-menu': props.isMenu
-                })),
+    const onClose = () => {
+        isShow.value = false;
 
-                onClose: () => {
-                    isShow.value = false;
+        emit('close');
+    };
 
-                    emit('close');
-                }
-            };
+    watch(isShow, value => {
+        isShowPopover.value = value;
+    });
+
+    watch(isShowPopover, value => {
+        if (!value && isShow.value) {
+            isShow.value = false;
         }
     });
 </script>
@@ -151,6 +142,12 @@
                 @include media-min($md) {
                     width: calc(100vw - 56px - 24px);
                 }
+            }
+
+            &.inner-scroll {
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
             }
         }
     }
