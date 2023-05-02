@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 // media quires
 $xs: 0;
 $sm: 576px;
@@ -77,7 +79,7 @@ $ultra_hd: 3840px;
 // @return {Number} - Unitless number
 @function strip-unit($number) {
   @if type-of($number) == 'number' and not unitless($number) {
-    @return $number / ($number * 0 + 1);
+    @return  math.div($number, $number * 0 + 1);
   }
 
   @return $number;
