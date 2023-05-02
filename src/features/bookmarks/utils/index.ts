@@ -19,6 +19,14 @@ export const isBookmarkGroup = (item: TBookmark): item is IBookmarkGroup => (
     !('url' in item) && !('parentUUID' in item)
 );
 
+/**
+ * Метод обходит все группы, добавляет в них поле children и кладет туда категории (заклинания, классы, черты и т.д.).
+ * С каждой категорией происходит то же самое - в нее кладутся все дочерние закладки.
+ *
+ * @param {Ref<Array<IBookmarkGroup>>} groups
+ * @param {Ref<Array<IBookmarkCategory>>} categories
+ * @param {Ref<Array<IBookmarkItem>>} bookmarks
+ */
 export const getGroupBookmarks = ({
     groups,
     categories,

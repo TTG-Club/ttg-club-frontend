@@ -47,13 +47,13 @@
     const customBookmarkStore = useCustomBookmarkStore();
 
     const bookmarkIcon = computed(() => {
-        const getIcon = (value: boolean) => (value ? 'bookmark-filled' : 'bookmark');
+        const { bookmarks } = storeToRefs(isAuthenticated.value
+            ? customBookmarkStore
+            : defaultBookmarkStore);
 
-        if (isAuthenticated.value) {
-            return getIcon(customBookmarkStore.bookmarks.length > 0);
-        }
-
-        return getIcon(defaultBookmarkStore.bookmarks.length > 0);
+        return bookmarks.value.length > 0
+            ? 'bookmark-filled'
+            : 'bookmark';
     });
 
     const clickHandler = async () => {
