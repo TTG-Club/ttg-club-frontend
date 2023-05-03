@@ -77,22 +77,6 @@
                                 >
                                     {{ link.name }}
                                 </router-link>
-
-                                <div
-                                    :class="{ 'is-active': isSaved(link.url) }"
-                                    class="nav-menu__link_icon only-hover"
-                                    @click.left.exact.stop.prevent="updateBookmark(link.url, link.name)"
-                                    @dblclick.prevent.stop
-                                >
-                                    <svg-icon
-                                        :icon-name="isSaved(link.url)
-                                            ? 'bookmark-dot-filled'
-                                            : 'bookmark-dot'
-                                        "
-                                        :stroke-enable="false"
-                                        fill-enable
-                                    />
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -110,12 +94,9 @@
     import { useRoute, useRouter } from 'vue-router';
     import type { TNavItem } from '@/store/UI/NavStore';
     import { useNavStore } from '@/store/UI/NavStore';
-    import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
     import NavPopover from '@/components/UI/menu/NavPopover.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
-    import { useUserStore } from '@/store/UI/UserStore';
-    import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
 
     export default defineComponent({
         name: 'NavMenu',
@@ -126,11 +107,6 @@
         },
         setup() {
             const navStore = useNavStore();
-            const userStore = useUserStore();
-            const { isAuthenticated } = storeToRefs(userStore);
-            const defaultBookmarkStore = useDefaultBookmarkStore();
-            const customBookmarkStore = useCustomBookmarkStore();
-            const inProgressURLs = ref<string[]>([]);
             const { showedNavItems } = storeToRefs(navStore);
             const router = useRouter();
             const route = useRoute();
@@ -164,40 +140,6 @@
                 return router.hasRoute(resolved.name);
             };
 
-            const isSaved = (url: string) => {
-                if (isAuthenticated.value) {
-                    return customBookmarkStore.isBookmarkSavedInDefault(url);
-                }
-
-                return defaultBookmarkStore.isBookmarkSaved(url);
-            };
-
-            async function updateBookmark(url: string, name: string) {
-                if (inProgressURLs.value.includes(url)) {
-                    return;
-                }
-
-                if (await userStore.getUserStatus()) {
-                    inProgressURLs.value.push(url);
-
-                    const defaultGroup = await customBookmarkStore.getDefaultGroup();
-
-                    await customBookmarkStore.updateBookmarkInGroup({
-                        url,
-                        name,
-                        category: 'menu',
-                        groupUUID: defaultGroup.uuid
-                    });
-
-                    inProgressURLs.value = inProgressURLs.value.filter(item => item !== url);
-
-                    return;
-                }
-
-                // @ts-ignore
-                await defaultBookmarkStore.updateBookmark(url, name, 'menu');
-            }
-
             watch(
                 isShowMenu,
                 async value => {
@@ -213,9 +155,7 @@
             return {
                 isShowMenu,
                 showedNavItems,
-                isRouteExist,
-                isSaved,
-                updateBookmark
+                isRouteExist
             };
         }
     });

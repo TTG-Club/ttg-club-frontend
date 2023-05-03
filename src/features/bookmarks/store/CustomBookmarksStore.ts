@@ -147,18 +147,13 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
     const getCategoryInGroup = async ({
         url,
-        category,
         groupUUID
     }: {
         url?: IBookmarkItem['url'];
-        category?: IBookmarkCategory['uuid'];
         groupUUID: IBookmarkGroup['uuid'];
     }) => {
         try {
-            const { data: cat } = await BookmarksApi.getCategory({
-                code: category,
-                url
-            });
+            const { data: cat } = await BookmarksApi.getCategory({ url });
 
             if (!cat) {
                 return Promise.reject();
@@ -174,12 +169,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     const addBookmarkInGroup = async ({
         url,
         name,
-        category,
         groupUUID
     }: {
         url: IBookmarkItem['url'];
         name: TBookmark['name'];
-        category?: IBookmarkCategory['uuid'];
         groupUUID: IBookmarkGroup['uuid']
     }) => {
         try {
@@ -189,7 +182,6 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
             const savedCat = await getCategoryInGroup({
                 url,
-                category,
                 groupUUID
             });
 
@@ -227,12 +219,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     const updateBookmarkInGroup = async ({
         url,
         name,
-        category,
         groupUUID
     }: {
         url: IBookmarkItem['url'];
         name: TBookmark['name'];
-        category?: IBookmarkCategory['uuid'];
         groupUUID: IBookmarkGroup['uuid']
     }) => {
         const bookmark = await getSavedBookmarkInGroup({
@@ -254,7 +244,6 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
             return addBookmarkInGroup({
                 url,
                 name,
-                category,
                 groupUUID
             });
         } catch (err) {
