@@ -21,6 +21,8 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
 
     const openedGroups = ref<IBookmarkGroup['uuid'][]>([]);
 
+    const isAllGroupsOpened = computed(() => (openedGroups.value.length === groups.value.length));
+
     const isGroupOpened = (uuid: IBookmarkGroup['uuid']) => openedGroups.value.includes(uuid);
 
     const isBookmarkSaved = (url: IBookmarkItem['url']) => bookmarks.value
@@ -276,18 +278,18 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         openedGroups.value = parsed;
     };
 
+    const updateSessionStorage = () => {
+        if (openedGroups.value.length) {
+            sessionStorage.setItem(SESSION_OPENED_GROUPS_KEY, JSON.stringify(openedGroups.value));
+
+            return;
+        }
+
+        sessionStorage.removeItem(SESSION_OPENED_GROUPS_KEY);
+    };
+
     const toggleGroup = (uuid: TBookmark['uuid']) => {
         const isOpened = openedGroups.value.includes(uuid);
-
-        const updateSessionStorage = () => {
-            if (openedGroups.value.length) {
-                sessionStorage.setItem(SESSION_OPENED_GROUPS_KEY, JSON.stringify(openedGroups.value));
-
-                return;
-            }
-
-            sessionStorage.removeItem(SESSION_OPENED_GROUPS_KEY);
-        };
 
         if (isOpened) {
             openedGroups.value = openedGroups.value.filter(item => item !== uuid);
@@ -304,6 +306,24 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         }
     };
 
+    const toggleAll = () => {
+        const open = () => {
+            openedGroups.value = groups.value.map(group => group.uuid);
+
+            updateSessionStorage();
+        };
+
+        if (!openedGroups.value.length || groups.value.length > openedGroups.value.length) {
+            open();
+
+            return;
+        }
+
+        openedGroups.value = [];
+
+        updateSessionStorage();
+    };
+
     return {
         groups,
         categories,
@@ -311,6 +331,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         openedGroups,
 
         isGroupOpened,
+        isAllGroupsOpened,
         isBookmarkSaved,
         isBookmarkSavedInDefault,
         isBookmarkSavedInGroup,
@@ -335,6 +356,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         updateBookmarkInGroup,
         clearBookmarks,
         restoreOpenedGroupsFromSession,
-        toggleGroup
+        toggleGroup,
+        toggleAll
     };
 });

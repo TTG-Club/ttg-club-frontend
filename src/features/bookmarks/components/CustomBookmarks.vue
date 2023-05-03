@@ -1,5 +1,5 @@
 <template>
-    <div class="bookmarks is-custom">
+    <div class="bookmarks">
         <div class="bookmarks__header">
             <div class="bookmarks__info">
                 <span
@@ -8,14 +8,34 @@
                 </span>
             </div>
 
+            <transition
+                name="fade"
+                mode="out-in"
+            >
+                <ui-button
+                    v-if="isShowScrollBtn"
+                    is-icon
+                    is-small
+                    type-link-filled
+                    class="bookmarks__to-top"
+                    @click.left.prevent="scrollToTop"
+                >
+                    <svg-icon icon-name="arrow-stroke" />
+                </ui-button>
+            </transition>
+
             <ui-button
                 is-icon
                 is-small
                 type-link-filled
-                class="bookmarks__to-top"
-                @click.left.prevent="scrollToTop"
+                class="bookmarks__toggle-all"
+                @click.left.prevent="toggleAll"
             >
-                <svg-icon icon-name="arrow-stroke" />
+                <svg-icon
+                    :icon-name="isAllGroupsOpened ? 'exit-fullscreen' : 'fullscreen'"
+                    :stroke-enable="false"
+                    fill-enable
+                />
             </ui-button>
 
             <ui-button
@@ -113,6 +133,7 @@
     import {
         computed, onBeforeMount, ref
     } from 'vue';
+    import { storeToRefs } from 'pinia';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
     import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
@@ -125,6 +146,15 @@
     const isGroupCreating = ref(false);
     const newGroupName = ref('');
     const wrapper = ref<HTMLDivElement>();
+    const { isAllGroupsOpened } = storeToRefs(customBookmarkStore);
+
+    const isShowScrollBtn = computed(() => {
+        if (!wrapper.value) {
+            return false;
+        }
+
+        return wrapper.value.scrollTop > 15;
+    });
 
     const enableGroupCreating = () => {
         isGroupCreating.value = true;
@@ -150,6 +180,10 @@
             top: 0,
             behavior: 'smooth'
         });
+    };
+
+    const toggleAll = () => {
+        customBookmarkStore.toggleAll();
     };
 
     onBeforeMount(() => {
