@@ -159,8 +159,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
                 return Promise.reject();
             }
 
-            return categories.value.find(bookmark => bookmark.name === cat.name)
-                || await createCategory(cat, groupUUID);
+            return categories.value.find(category => (
+                category.name === cat.name
+                    && category.parentUUID === groupUUID
+            )) || await createCategory(cat, groupUUID);
         } catch (err) {
             return Promise.reject(err);
         }
@@ -225,22 +227,16 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
         name: TBookmark['name'];
         groupUUID: IBookmarkGroup['uuid']
     }) => {
-        const bookmark = await getSavedBookmarkInGroup({
-            url,
-            groupUUID
-        });
-
-        if (bookmark) {
-            try {
-                await queryDeleteBookmark(bookmark.uuid);
-
-                return Promise.resolve();
-            } catch (err) {
-                return Promise.reject(err);
-            }
-        }
-
         try {
+            const bookmark = await getSavedBookmarkInGroup({
+                url,
+                groupUUID
+            });
+
+            if (bookmark) {
+                return queryDeleteBookmark(bookmark.uuid);
+            }
+
             return addBookmarkInGroup({
                 url,
                 name,
@@ -296,14 +292,10 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     };
 
     const toggleAll = () => {
-        const open = () => {
+        if (!openedGroups.value.length || groups.value.length > openedGroups.value.length) {
             openedGroups.value = groups.value.map(group => group.uuid);
 
             updateSessionStorage();
-        };
-
-        if (!openedGroups.value.length || groups.value.length > openedGroups.value.length) {
-            open();
 
             return;
         }
