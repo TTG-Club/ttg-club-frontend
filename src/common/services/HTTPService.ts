@@ -89,7 +89,7 @@ export default class HTTPService {
         });
     }
 
-    headRaw(config: Omit<RequestConfig, 'payload'>) {
+    rawHead(config: Omit<RequestConfig, 'payload'>) {
         return this.instance({
             method: 'head',
             baseURL: '',
