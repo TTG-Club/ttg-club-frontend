@@ -3,7 +3,7 @@
         v-tippy="{ content: 'Стереть строку поиска' }"
         class="filter__search_clear"
         type="button"
-        @click.prevent="$emit('click')"
+        @click.prevent="clear"
     >
         <svg-icon icon-name="close" />
     </button>
@@ -11,6 +11,13 @@
 
 <script setup lang="ts">
     import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
+
+    const emit = defineEmits(['update:modelValue']);
+
+    function clear() {
+        emit('update:modelValue', '');
+    }
+
 </script>
 
 <style lang="scss" scoped>

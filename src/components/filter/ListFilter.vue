@@ -19,7 +19,7 @@
 
                 <ui-erase-button
                     v-if="search"
-                    @click="search = ''"
+                    v-model="search"
                 />
             </div>
 
