@@ -36,7 +36,7 @@
 
                             <ui-input
                                 ref="input"
-                                v-model.trim="search"
+                                v-model="search"
                                 placeholder="Поиск..."
                                 @update:model-value="onChangeSearch"
                                 @keyup.enter.exact.prevent.stop="onChangeSearch"
@@ -70,7 +70,7 @@
                     />
 
                     <div
-                        v-if="!search.length && !results?.list.length"
+                        v-if="!search.trim().length && !results?.list.length"
                         class="search-view__results_text"
                     >
                         Введите текст, что бы начать
@@ -103,295 +103,248 @@
     </page-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import {
-        computed, defineComponent, ref
+        computed, ref
     } from 'vue';
     import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
     import {
         onBeforeRouteUpdate, useRoute, useRouter
     } from 'vue-router';
-    import debounce from 'lodash/debounce';
     import { storeToRefs } from 'pinia';
+    import { debounce, isString } from "lodash";
     import {
         onStartTyping, tryOnBeforeMount, useFocus
     } from '@vueuse/core';
-    import PageLayout from '@/components/content/PageLayout.vue';
     import type { TSearchResultList } from '@/types/Search/Search.types';
-    import { useAxios } from '@/common/composition/useAxios';
-    import SearchLink from '@/views/Search/SearchLink.vue';
-    import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
-    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-    import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useUIStore } from '@/store/UI/UIStore';
+    import { useAxios } from '@/common/composition/useAxios';
     import { useMetrics } from '@/common/composition/useMetrics';
+    import SearchLink from '@/views/Search/SearchLink.vue';
     import UiInput from "@/components/UI/kit/UiInput.vue";
+    import UiButton from '@/components/UI/kit/UiButton.vue';
+    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+    import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
+    import PageLayout from '@/components/content/PageLayout.vue';
     import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
 
-    export default defineComponent({
-        components: {
-            UiEraseButton,
-            UiInput,
-            UiButton,
-            SvgIcon,
-            UiPaginate,
-            SearchLink,
-            PageLayout
-        },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
-            const { bodyElement } = storeToRefs(uiStore);
-            const http = useAxios();
-            const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
-            const controller = ref<AbortController | null>(null);
-            const inProgress = ref(false);
-            const search = ref('');
-            const page = ref(1);
-            const results = ref<TSearchResultList | null>(null);
-            const controls = ref<null | HTMLElement>(null);
-            const isNeedUpdateScroll = ref(false);
-            const input = ref<null | HTMLElement>(null);
-            const { focused } = useFocus(input, { initialValue: true });
+    const http = useAxios();
+    const route = useRoute();
+    const router = useRouter();
+    const uiStore = useUIStore();
+    const { bodyElement } = storeToRefs(uiStore);
+    const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
+    const page = ref(1);
+    const search = ref('');
+    const inProgress = ref(false);
+    const isNeedUpdateScroll = ref(false);
+    const input = ref<null | HTMLElement>(null);
+    const controls = ref<null | HTMLElement>(null);
+    const results = ref<TSearchResultList | null>(null);
+    const controller = ref<AbortController | null>(null);
+    const { focused } = useFocus(input, { initialValue: true });
 
-            const pages = computed(() => {
-                if (!results.value?.count || results.value.count <= 20) {
-                    return 0;
-                }
+    const pages = computed(() => {
+        if (!results.value?.count || results.value.count <= 20) {
+            return 0;
+        }
 
-                return Math.round(results.value.count / 20);
+        return Math.round(results.value.count / 20);
+    });
+
+    const resultsNumbers = ref<null | { min: number, max: number }>(null);
+
+    const onUpdateRoute = async (replace: boolean = false) => {
+        const to = {
+            name: 'search-page',
+            query: {
+                search: search.value,
+                page: page.value
+            }
+        };
+
+        if (replace) {
+            await router.replace(to);
+
+            return;
+        }
+
+        await router.push(to);
+    };
+
+    const resolveQuerySearch = (querySearch?: LocationQueryValue | LocationQueryValue[]) => {
+        if (Array.isArray(querySearch)) {
+            search.value = '';
+
+            return;
+        }
+
+        search.value = isString(querySearch) ? querySearch : '';
+    };
+
+    const resolveQueryPage = (queryPage?: LocationQueryValue | LocationQueryValue[]) => {
+        if (!search.value || Array.isArray(queryPage)) {
+            page.value = 1;
+
+            return;
+        }
+
+        if (isString(queryPage)) {
+            page.value = !route.query.page ? parseInt(queryPage, 10) : 1;
+        } else {
+            page.value = 1;
+        }
+    };
+
+    const resolveQuery = (to?: RouteLocationNormalized) => {
+        resolveQuerySearch(to?.query.search);
+        resolveQueryPage(to?.query.page);
+    };
+
+    const onChangeSearch = debounce(async () => {
+        isNeedUpdateScroll.value = true;
+
+        if (search.value.trim()) {
+            await onUpdateRoute();
+        }
+    }, 300);
+
+    const onPageChanged = debounce(async () => {
+        isNeedUpdateScroll.value = true;
+
+        await onUpdateRoute();
+    }, 300);
+
+    const searchQuery = async () => {
+        try {
+            if (controller.value !== null) {
+                controller.value.abort();
+            }
+
+            controller.value = new AbortController();
+
+            const resp = await http.post({
+                url: '/search',
+                payload: {
+                    page: page.value - 1,
+                    limit: 20,
+                    search: {
+                        value: search.value,
+                        exact: false
+                    },
+                    order: []
+                },
+                signal: controller.value.signal
             });
 
-            const resultsNumbers = ref<null | { min: number, max: number }>(null);
+            if (resp.status !== 200) {
+                return Promise.reject(resp.statusText);
+            }
 
-            const onUpdateRoute = async (replace: boolean = false) => {
-                const to = {
-                    name: 'search-page',
-                    query: {
-                        search: search.value,
-                        page: page.value
-                    }
-                };
+            sendSearchMetrics(search);
 
-                if (replace) {
-                    await router.replace(to);
+            return Promise.resolve(resp.data as TSearchResultList);
+        } catch (err) {
+            return Promise.reject(err);
+        } finally {
+            controller.value = null;
+        }
+    };
 
-                    return;
-                }
+    const onSearch = async () => {
+        if (!search.value) {
+            return Promise.resolve();
+        }
 
-                await router.push(to);
-            };
+        try {
+            inProgress.value = true;
 
-            const resolveQuerySearch = (querySearch?: LocationQueryValue | LocationQueryValue[]) => {
-                if (Array.isArray(querySearch)) {
-                    search.value = '';
+            const result = await searchQuery();
 
-                    return;
-                }
-
-                switch (typeof querySearch) {
-                    case 'string':
-                        search.value = querySearch;
-
-                        break;
-                    default:
-                        search.value = '';
-
-                        break;
-                }
-            };
-
-            const resolveQueryPage = (queryPage?: LocationQueryValue | LocationQueryValue[]) => {
-                if (!search.value || Array.isArray(queryPage)) {
-                    page.value = 1;
-
-                    return;
-                }
-
-                switch (typeof queryPage) {
-                    case 'string':
-                        if (!route.query.page) {
-                            page.value = 1;
-
-                            break;
-                        }
-
-                        page.value = parseInt(queryPage, 10);
-
-                        break;
-                    default:
-                        page.value = 1;
-
-                        break;
-                }
-            };
-
-            const resolveQuery = (to?: RouteLocationNormalized) => {
-                resolveQuerySearch(to?.query.search);
-                resolveQueryPage(to?.query.page);
-            };
-
-            const onChangeSearch = debounce(async () => {
-                isNeedUpdateScroll.value = true;
-
-                if (search.value) {
-                    await onUpdateRoute();
-                }
-            }, 300);
-
-            const onPageChanged = debounce(async () => {
-                isNeedUpdateScroll.value = true;
-
-                await onUpdateRoute();
-            }, 300);
-
-            const searchQuery = async () => {
-                try {
-                    if (controller.value !== null) {
-                        controller.value.abort();
-                    }
-
-                    controller.value = new AbortController();
-
-                    const resp = await http.post({
-                        url: '/search',
-                        payload: {
-                            page: page.value - 1,
-                            limit: 20,
-                            search: {
-                                value: search.value,
-                                exact: false
-                            },
-                            order: []
-                        },
-                        signal: controller.value.signal
-                    });
-
-                    if (resp.status !== 200) {
-                        return Promise.reject(resp.statusText);
-                    }
-
-                    sendSearchMetrics(search);
-
-                    return Promise.resolve(resp.data as TSearchResultList);
-                } catch (err) {
-                    return Promise.reject(err);
-                } finally {
-                    controller.value = null;
-                }
-            };
-
-            const onSearch = async () => {
-                if (!search.value) {
-                    return Promise.resolve();
-                }
-
-                try {
-                    inProgress.value = true;
-
-                    const result = await searchQuery();
-
-                    if (result.count && !result.list.length && page.value !== 1) {
-                        page.value = 1;
-
-                        await onUpdateRoute(true);
-
-                        return Promise.resolve();
-                    }
-
-                    results.value = result;
-
-                    if (isNeedUpdateScroll.value) {
-                        const controlsRect = controls.value?.getBoundingClientRect();
-
-                        if (!uiStore.bodyScroll.y || (controlsRect && controlsRect.top > 0)) {
-                            isNeedUpdateScroll.value = false;
-
-                            return Promise.resolve();
-                        }
-
-                        bodyElement.value?.scroll({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-
-                        isNeedUpdateScroll.value = false;
-                    }
-
-                    sendSearchViewResultsMetrics(
-                        search,
-                        result.list.map(item => ({
-                            item_id: item.url,
-                            item_name: item.name,
-                            item_category: item.section,
-                            item_brand: item.source?.name
-                        }))
-                    );
-
-                    return Promise.resolve();
-                } catch (err) {
-                    return Promise.reject(err);
-                } finally {
-                    inProgress.value = false;
-
-                    if (results.value?.count) {
-                        resultsNumbers.value = {
-                            min: page.value > 1
-                                ? 20 * (page.value - 1) + 1
-                                : 1,
-                            max: page.value < pages.value && results.value.count > 20
-                                ? 20 * page.value
-                                : results.value.count
-                        };
-                    }
-
-                    if (!results.value?.count) {
-                        resultsNumbers.value = null;
-                    }
-                }
-            };
-
-            onStartTyping(() => {
-                focused.value = true;
-            });
-
-            tryOnBeforeMount(async () => {
-                resolveQuery(route);
+            if (result.count && !result.list.length && page.value !== 1) {
+                page.value = 1;
 
                 await onUpdateRoute(true);
 
-                if (!search.value) {
-                    return;
+                return Promise.resolve();
+            }
+
+            results.value = result;
+
+            if (isNeedUpdateScroll.value) {
+                const controlsRect = controls.value?.getBoundingClientRect();
+
+                if (!uiStore.bodyScroll.y || (controlsRect && controlsRect.top > 0)) {
+                    isNeedUpdateScroll.value = false;
+
+                    return Promise.resolve();
                 }
 
-                await onSearch();
-            });
+                bodyElement.value?.scroll({
+                    top: 0,
+                    behavior: 'smooth'
+                });
 
-            onBeforeRouteUpdate(async (to, from, next) => {
-                resolveQuery(to);
+                isNeedUpdateScroll.value = false;
+            }
 
-                if (search.value) {
-                    await onSearch();
-                }
-
-                next();
-            });
-
-            return {
-                controls,
-                input,
+            sendSearchViewResultsMetrics(
                 search,
-                results,
-                page,
-                pages,
-                resultsNumbers,
-                inProgress,
-                onUpdateRoute,
-                onChangeSearch,
-                onPageChanged
-            };
+                result.list.map(item => ({
+                    item_id: item.url,
+                    item_name: item.name,
+                    item_category: item.section,
+                    item_brand: item.source?.name
+                }))
+            );
+
+            return Promise.resolve();
+        } catch (err) {
+            return Promise.reject(err);
+        } finally {
+            inProgress.value = false;
+
+            if (results.value?.count) {
+                resultsNumbers.value = {
+                    min: page.value > 1
+                        ? 20 * (page.value - 1) + 1
+                        : 1,
+                    max: page.value < pages.value && results.value.count > 20
+                        ? 20 * page.value
+                        : results.value.count
+                };
+            }
+
+            if (!results.value?.count) {
+                resultsNumbers.value = null;
+            }
         }
+    };
+
+    onStartTyping(() => {
+        focused.value = true;
+    });
+
+    tryOnBeforeMount(async () => {
+        resolveQuery(route);
+
+        await onUpdateRoute(true);
+
+        if (!search.value) {
+            return;
+        }
+
+        await onSearch();
+    });
+
+    onBeforeRouteUpdate(async (to, from, next) => {
+        resolveQuery(to);
+
+        if (search.value) {
+            await onSearch();
+        }
+
+        next();
     });
 </script>
 
@@ -435,8 +388,8 @@
                 flex-shrink: 0;
 
                 svg {
-                    width: 24px;
-                    height: 24px;
+                    width: 26px;
+                    height: 26px;
                     color: var(--text-color);
                 }
 
@@ -501,7 +454,7 @@
         border: 0;
 
         .ui-input__input {
-            height: 40px;
+            height: 42px;
             padding: 0;
             color: var(--text-b-color);
         }
