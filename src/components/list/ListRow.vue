@@ -1,7 +1,6 @@
 <template>
     <div
         class="list-row"
-        :style="style"
     >
         <div
             v-for="item in items"
@@ -28,10 +27,6 @@
     });
 
     const items = isArray(props.row) ? props.row : [props.row];
-
-    const style = {
-        '--list-row-columns': props.columns
-    };
 </script>
 
 <style lang="scss" scoped>
@@ -43,7 +38,7 @@
         margin: -$column-spacing * .5;
 
         &__column {
-            flex-basis: calc(100% / var(--list-row-columns));
+            flex-basis: calc(100% / v-bind(columns));
             padding: $column-spacing * .5;
             min-width: 0;
         }
