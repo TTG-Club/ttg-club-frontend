@@ -36,7 +36,7 @@
             <bookmark-save-button
                 v-if="bookmark"
                 :name="title"
-                :url="url"
+                :url="url || ''"
             />
 
             <ui-button
@@ -57,17 +57,8 @@
             <ui-button
                 v-if="onExportFoundry"
                 v-tippy="{
-                    content: h('span', [
-                        'Импорт в Foundry VTT.&nbsp;',
-                        h(
-                            'a',
-                            {
-                                href: '/info/fvtt_import',
-                                target: '_blank',
-                            },
-                            'Инструкция',
-                        ),
-                    ]),
+                    // eslint-disable-next-line vue/max-len
+                    content: '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>',
                 }"
                 class="section-header__control is-only-desktop"
                 is-icon
@@ -114,7 +105,7 @@
     </div>
 </template>
 
-<script lang="tsx">
+<script lang="ts">
     import { useClipboard } from '@vueuse/core';
     import {
         computed, defineComponent, h
@@ -212,18 +203,22 @@
                             id: route.path
                         });
                     })
-                    .catch(() => toast.error((
-                      <span>
-                        Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем
-                        <a
-                          target="_blank"
-                          href="https://discord.gg/zqBnMJVf3z"
-                          rel="noopener"
-                        >
-                          Discord-канале
-                        </a>
-                      </span>
-                    )));
+                    .catch(() => toast.error(() => [
+                        h(
+                            'span',
+                            null,
+                            'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
+                        ),
+                        h(
+                            'a',
+                            {
+                                target: "_blank",
+                                href: "https://discord.gg/zqBnMJVf3z",
+                                rel: "noopener"
+                            },
+                            'Discord-канале'
+                        )
+                    ]));
             };
 
             const copyText = (text?: string) => {
@@ -258,8 +253,7 @@
                 openPrintWindow,
                 exportToFoundry
             };
-        },
-        methods: { h }
+        }
     });
 </script>
 
