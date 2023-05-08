@@ -6,16 +6,20 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <treasure-item
-            v-for="(treasure, key) in treasures"
-            :key="treasure.name.eng + key"
-            :treasure="treasure"
-        />
+        <virtual-grid-list
+            :list="{ items: treasures }"
+        >
+            <template #default="{ item: treasure }">
+                <treasure-item
+                    :treasure="treasure"
+                />
+            </template>
+        </virtual-grid-list>
     </content-layout>
 </template>
 
-<script lang="ts">
-    import { defineComponent, onBeforeMount } from 'vue';
+<script lang="ts" setup>
+    import { computed, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import ContentLayout from '@/components/content/ContentLayout.vue';
     import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
@@ -23,67 +27,56 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
+    import VirtualGridList from "@/components/list/VirtualGridList/VirtualGridList.vue";
 
-    export default defineComponent({
-        components: {
-            TreasureItem,
-            ContentLayout
+    const uiStore = useUIStore();
+
+    const {
+        isMobile,
+        fullscreen
+    } = storeToRefs(uiStore);
+
+    const filter = useFilter({
+        dbName: TreasuresFilterDefaults.dbName,
+        url: TreasuresFilterDefaults.url
+    });
+
+    const {
+        initPages,
+        nextPage,
+        items
+    } = usePagination({
+        url: '/treasures',
+        limit: 70,
+        filter: {
+            isCustomized: filter.isCustomized,
+            value: filter.queryParams
         },
-        setup() {
-            const uiStore = useUIStore();
+        search: filter.search,
+        order: [
+            {
+                field: 'cost',
+                direction: 'asc'
+            },
+            {
+                field: 'name',
+                direction: 'asc'
+            }
+        ]
+    });
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+    /* Для добавления идентификатора к элементам */
+    const treasures = computed(() => items.value.map(item => ({
+        ...item,
+        id: item.id || `${ item.name.eng || item.name.rus } ${ item.type.name }`
+    })));
 
-            const filter = useFilter({
-                dbName: TreasuresFilterDefaults.dbName,
-                url: TreasuresFilterDefaults.url
-            });
+    const onSearch = async () => {
+        await initPages();
+    };
 
-            const {
-                initPages,
-                nextPage,
-                items: treasures
-            } = usePagination({
-                url: '/treasures',
-                limit: 70,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'cost',
-                        direction: 'asc'
-                    },
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
-
-            const onSearch = async () => {
-                await initPages();
-            };
-
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
-            });
-
-            return {
-                isMobile,
-                fullscreen,
-                treasures,
-                filter,
-                initPages,
-                nextPage,
-                onSearch
-            };
-        }
+    onBeforeMount(async () => {
+        await filter.initFilter();
+        await initPages();
     });
 </script>
