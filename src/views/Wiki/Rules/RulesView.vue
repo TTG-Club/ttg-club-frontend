@@ -7,19 +7,22 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <rule-link
-            v-for="rule in rules"
-            :key="rule.url"
-            :rule="rule"
-            :to="{ path: rule.url }"
-        />
+        <virtual-grid-list
+            :list="{ items: rules, keyField: 'url' }"
+            :flat="showRightSide"
+        >
+            <template #default="{ item: rule }">
+                <rule-link
+                    :rule="rule"
+                    :to="{ path: rule.url }"
+                />
+            </template>
+        </virtual-grid-list>
     </content-layout>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
+<script lang="ts" setup>
+    import { computed, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -28,74 +31,58 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
+    import VirtualGridList from "@/components/list/VirtualGridList/VirtualGridList.vue";
 
-    export default defineComponent({
-        components: {
-            RuleLink,
-            ContentLayout
+    const route = useRoute();
+    const router = useRouter();
+    const uiStore = useUIStore();
+
+    const {
+        isMobile,
+        fullscreen
+    } = storeToRefs(uiStore);
+
+    const filter = useFilter({
+        dbName: RulesFilterDefaults.dbName,
+        url: RulesFilterDefaults.url
+    });
+
+    const {
+        initPages,
+        nextPage,
+        items: rules
+    } = usePagination({
+        url: '/rules',
+        limit: 70,
+        filter: {
+            isCustomized: filter.isCustomized,
+            value: filter.queryParams
         },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
+        search: filter.search,
+        order: [
+            {
+                field: 'name',
+                direction: 'asc'
+            }
+        ]
+    });
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+    const onSearch = async () => {
+        await initPages();
 
-            const filter = useFilter({
-                dbName: RulesFilterDefaults.dbName,
-                url: RulesFilterDefaults.url
-            });
+        if (rules.value.length === 1 && !isMobile.value) {
+            await router.push({ path: rules.value[0].url });
+        }
+    };
 
-            const {
-                initPages,
-                nextPage,
-                items: rules
-            } = usePagination({
-                url: '/rules',
-                limit: 70,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+    onBeforeMount(async () => {
+        await filter.initFilter();
+        await initPages();
 
-            const onSearch = async () => {
-                await initPages();
-
-                if (rules.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: rules.value[0].url });
-                }
-            };
-
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
-
-                if (!isMobile.value && rules.value.length && route.name === 'rules') {
-                    await router.push({ path: rules.value[0].url });
-                }
-            });
-
-            return {
-                isMobile,
-                fullscreen,
-                rules,
-                filter,
-                showRightSide: computed(() => route.name === 'ruleDetail'),
-                initPages,
-                nextPage,
-                onSearch
-            };
+        if (!isMobile.value && rules.value.length && route.name === 'rules') {
+            await router.push({ path: rules.value[0].url });
         }
     });
+
+    const showRightSide = computed(() => route.name === 'ruleDetail');
 </script>
