@@ -1,5 +1,6 @@
 <template>
     <virtual-list
+        class="grid-list"
         :key-field="list.keyField"
         :page-mode="list.pageMode"
         :min-item-size="list.minItemSize"
@@ -77,3 +78,16 @@
             keyField: itemKeyField.value
         })));
 </script>
+
+<style lang="scss" scoped>
+    .grid-list :deep {
+        .vue-recycle-scroller__item-view {
+            margin: 0;
+            padding: 0;
+
+            > .item {
+                padding-bottom: 0;
+            }
+        }
+    }
+</style>

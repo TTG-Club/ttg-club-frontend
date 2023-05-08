@@ -42,7 +42,7 @@
     $item-spacing: 12px;
 
     :deep {
-        .vue-recycle-scroller {
+        &.vue-recycle-scroller {
             margin-bottom: -$item-spacing;
         }
 
