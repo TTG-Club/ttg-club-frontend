@@ -15,7 +15,7 @@
                                 class="form-control select"
                                 type="number"
                                 :min="1"
-                                placeholder="Количеств"
+                                placeholder="Количество"
                             />
                         </div>
 
