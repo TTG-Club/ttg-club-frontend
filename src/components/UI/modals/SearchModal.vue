@@ -28,7 +28,7 @@
                         autocapitalize="off"
                         @submit.prevent.stop="onSubmit"
                     >
-                        <input
+                        <ui-input
                             ref="input"
                             autofocus="autofocus"
                             autocomplete="off"
@@ -36,7 +36,7 @@
                             formnovalidate="formnovalidate"
                             :value="search"
                             placeholder="Поиск..."
-                            @input.prevent.stop="onUpdateSearch($event.target.value)"
+                            @input.prevent.stop="onSearchUpdate($event.target.value)"
                             @keyup.enter.exact.prevent.stop="onSubmit"
                         />
                     </form>
@@ -139,9 +139,11 @@
     import type { TSearchResultList } from '@/types/Search/Search.types';
     import SearchLink from '@/views/Search/SearchLink.vue';
     import { useMetrics } from '@/common/composition/useMetrics';
+    import UiInput from "@/components/UI/kit/UiInput.vue";
 
     export default defineComponent({
         components: {
+            UiInput,
             SearchLink,
             UiButton,
             SvgIcon
@@ -179,7 +181,7 @@
                     controller.value.abort();
                 }
 
-                if (!search.value) {
+                if (!search.value.trim()) {
                     return Promise.resolve();
                 }
 
@@ -386,7 +388,7 @@
                 await onSearch();
             }, 300);
 
-            const onUpdateSearch = (e: string) => {
+            const onSearchUpdate = (e: string) => {
                 search.value = e;
 
                 onSearchDebounce();
@@ -410,7 +412,7 @@
                 selectedIndex,
                 onSubmit,
                 onSearchRandom,
-                onUpdateSearch
+                onSearchUpdate
             };
         }
     });
@@ -456,18 +458,6 @@
                 overflow: hidden;
                 appearance: none;
                 border: 0;
-
-                input {
-                    appearance: none;
-                    border: 0;
-                    outline: none;
-                    width: 100%;
-                    height: 100%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    background: transparent;
-                    color: var(--text-b-color);
-                }
             }
 
             &__count {
@@ -563,6 +553,16 @@
                 height: 28px;
                 padding: 2px;
             }
+        }
+    }
+
+    :deep(.ui-input__control) {
+        border: 0;
+        background: transparent;
+
+        .ui-input__input {
+            color: var(--text-b-color);
+            height: 36px;
         }
     }
 </style>
