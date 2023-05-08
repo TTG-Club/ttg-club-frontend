@@ -1,51 +1,49 @@
 <template>
-    <virtual-list
-        :key-field="list.keyField"
-        :page-mode="list.pageMode"
-        :min-item-size="list.minItemSize"
-        :items="items"
+    <virtual-grid-list
+        :list="list"
+        v-bind="grid"
+        :get-rows="getRows"
     >
-        <template #default="{ item, index, active }">
+        <template
+            #row="rowProps"
+        >
             <slot
-                v-if="item.isGroup"
-                name="category"
-                v-bind="{ item, index, active }"
+                v-if="rowProps.row.isGroup"
+                name="group"
+                v-bind="rowProps"
             >
                 <grouped-list-category>
-                    {{ item[groupLabelKey] }}
+                    {{ rowProps.row[groupLabelKey] }}
                 </grouped-list-category>
             </slot>
 
-            <list-row
-                v-else
-                :row="item.columns"
-                :columns="currentColumns"
-                :item-key="itemKeyField"
-            >
-                <template #default="{ item: column }">
-                    <slot v-bind="{ item: column, index, active }" />
-                </template>
-            </list-row>
+            <slot
+                name="row"
+                v-bind="rowProps"
+            />
         </template>
-    </virtual-list>
+
+        <template #default="slotProps">
+            <slot v-bind="slotProps" />
+        </template>
+    </virtual-grid-list>
 </template>
 
 <script setup lang="ts">
-    import { computed } from "vue";
     import uniqBy from "lodash/uniqBy";
     import sortBy from "lodash/sortBy";
-    import VirtualList, {
-        TVirtualListProps
-    } from "@/components/list/VirtualList.vue";
+    import { TVirtualListProps } from "@/components/list/VirtualList.vue";
     import GroupedListCategory from "@/components/list/GroupedListCategory.vue";
     import type { AnyObject } from "@/types/Shared/Utility.types";
     import type { ListIteratee } from "@/types/Shared/Lodash.types";
     import type { TGetGroup } from "@/components/list/VirtualGroupedList/types";
-    import ListRow, { TListRowProps } from "@/components/list/ListRow.vue";
+    import { TListRowProps } from "@/components/list/ListRow.vue";
     import { getListItemsWithGroups } from "@/components/list/VirtualGroupedList/helpers";
-    import { DEFAULT_KEY_FIELD } from "@/common/const";
-    import type { TResponsiveValues } from "@/common/composition/useResponsiveValues";
-    import { useResponsiveValues } from "@/common/composition/useResponsiveValues";
+    import type {
+        TVirtualGridListContext,
+        TVirtualGridListProps
+    } from "@/components/list/VirtualGridList/VirtualGridList.vue";
+    import VirtualGridList from "@/components/list/VirtualGridList/VirtualGridList.vue";
 
     /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
     type TItem = AnyObject;
@@ -56,28 +54,24 @@
         getGroup: TGetGroup<TItem, TGroup>;
         groupLabelKey?: string;
         sortBy?: ListIteratee;
-        columns?: TResponsiveValues<number>;
+        grid: TVirtualGridListProps;
     };
 
     const props = withDefaults(defineProps<TProps>(), {
         groupLabelKey: "name",
-        sortBy: "order",
-        columns: () => ({ base: 1 })
+        sortBy: "order"
     });
 
-    const itemKeyField = computed(() => props.list.keyField || DEFAULT_KEY_FIELD);
-
-    const { current } = useResponsiveValues({ values: props.columns });
-
-    const items = computed(() => {
-        const allGroups = props.list.items.map((item: TItem) => props.getGroup(item));
-        const allGroupsSet = uniqBy(allGroups, itemKeyField.value);
+    const getRows: TVirtualGridListProps['getRows'] = (items: TItem[], context: TVirtualGridListContext) => {
+        const { keyField, columns } = context;
+        const allGroups = items.map((item: TItem) => props.getGroup(item));
+        const allGroupsSet = uniqBy(allGroups, keyField);
         const sortedGroups = sortBy(allGroupsSet, props.sortBy);
 
-        return getListItemsWithGroups(sortedGroups, props.list.items, {
+        return getListItemsWithGroups(sortedGroups, items, {
             getGroup: props.getGroup,
-            keyField: itemKeyField.value,
-            chunks: current.value
+            keyField,
+            chunks: columns
         });
-    });
+    };
 </script>

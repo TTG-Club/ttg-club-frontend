@@ -22,6 +22,8 @@
     import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
     import { DEFAULT_KEY_FIELD } from "@/common/const";
 
+    /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
+
     export type TVirtualListProps = {
         items: unknown[];
         keyField?: string,
