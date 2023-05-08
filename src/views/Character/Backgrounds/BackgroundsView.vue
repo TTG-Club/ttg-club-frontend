@@ -6,10 +6,9 @@
         @search="onSearch"
         @update="initPages"
     >
-        <virtual-list
-            :items="backgrounds"
-            key-field="url"
-            :min-item-size="50"
+        <virtual-grid-list
+            :list="{ items: backgrounds, keyField: 'url', minItemSize: 50 }"
+            :flat="showRightSide"
         >
             <template #default="{ item: background }">
                 <background-link
@@ -17,14 +16,12 @@
                     :to="{ path: background.url }"
                 />
             </template>
-        </virtual-list>
+        </virtual-grid-list>
     </content-layout>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
+<script lang="ts" setup>
+    import { computed, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -33,74 +30,57 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
-    import VirtualList from "@/components/list/VirtualList.vue";
+    import VirtualGridList from "@/components/list/VirtualGridList/VirtualGridList.vue";
 
-    export default defineComponent({
-        components: {
-            VirtualList,
-            BackgroundLink,
-            ContentLayout
+    const route = useRoute();
+    const router = useRouter();
+    const uiStore = useUIStore();
+
+    const {
+        isMobile,
+        fullscreen
+    } = storeToRefs(uiStore);
+
+    const filter = useFilter({
+        dbName: BackgroundsFilterDefaults.dbName,
+        url: BackgroundsFilterDefaults.url
+    });
+
+    const {
+        initPages,
+        items: backgrounds
+    } = usePagination({
+        url: '/backgrounds',
+        limit: -1,
+        filter: {
+            isCustomized: filter.isCustomized,
+            value: filter.queryParams
         },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
+        search: filter.search,
+        order: [
+            {
+                field: 'name',
+                direction: 'asc'
+            }
+        ]
+    });
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+    const onSearch = async () => {
+        await initPages();
 
-            const filter = useFilter({
-                dbName: BackgroundsFilterDefaults.dbName,
-                url: BackgroundsFilterDefaults.url
-            });
+        if (backgrounds.value.length === 1 && !isMobile.value) {
+            await router.push({ path: backgrounds.value[0].url });
+        }
+    };
 
-            const {
-                initPages,
-                items: backgrounds
-            } = usePagination({
-                url: '/backgrounds',
-                limit: -1,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+    onBeforeMount(async () => {
+        await filter.initFilter();
+        await initPages();
 
-            const onSearch = async () => {
-                await initPages();
-
-                if (backgrounds.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: backgrounds.value[0].url });
-                }
-            };
-
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
-
-                if (!isMobile.value && backgrounds.value.length && route.name === 'backgrounds') {
-                    await router.push({ path: backgrounds.value[0].url });
-                }
-            });
-
-            return {
-                isMobile,
-                fullscreen,
-                backgrounds,
-                filter,
-                showRightSide: computed(() => route.name === 'backgroundDetail'),
-                initPages,
-                onSearch
-            };
+        if (!isMobile.value && backgrounds.value.length && route.name === 'backgrounds') {
+            await router.push({ path: backgrounds.value[0].url });
         }
     });
+
+    const showRightSide = computed(() => route.name === 'backgroundDetail');
 </script>

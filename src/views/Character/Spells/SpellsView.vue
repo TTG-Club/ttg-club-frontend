@@ -11,7 +11,7 @@
         <virtual-grouped-list
             :list="{ items: spells, keyField: 'url' }"
             :get-group="getSpellGroup"
-            :columns="columns"
+            :grid="{ flat: showRightSide }"
         >
             <template #default="{ item: spell }">
                 <spell-link
@@ -168,14 +168,6 @@
 
             const showRightSide = computed(() => route.name === 'spellDetail');
 
-            const columns = computed(() => (showRightSide.value
-                ? { base: 1 }
-                : {
-                    md: 1,
-                    xl: 2,
-                    base: 4
-                }));
-
             return {
                 layout,
                 isMobile,
@@ -186,8 +178,7 @@
                 initPages,
                 nextPage,
                 onSearch,
-                getSpellGroup,
-                columns
+                getSpellGroup
             };
         }
     });
