@@ -14,7 +14,7 @@
         >
             <div class="link-item__content">
                 <div
-                    v-tippy="{ content: spell.level ? `${spell.level} уровень заклинания` : 'Заговор' }"
+                    v-tippy-lazy="{ content: spell.level ? `${spell.level} уровень заклинания` : 'Заговор' }"
                     class="link-item__lvl"
                 >
                     <span>{{ spell.level || '◐' }}</span>
@@ -40,7 +40,7 @@
                         >
                             <div
                                 v-if="spell.concentration"
-                                v-tippy="{ content: 'Концентрация' }"
+                                v-tippy-lazy="{ content: 'Концентрация' }"
                                 class="link-item__modification"
                             >
                                 К
@@ -48,7 +48,7 @@
 
                             <div
                                 v-if="spell.ritual"
-                                v-tippy="{ content: 'Ритуал' }"
+                                v-tippy-lazy="{ content: 'Ритуал' }"
                                 class="link-item__modification"
                             >
                                 Р
@@ -66,21 +66,21 @@
                             class="link-item__components"
                         >
                             <div
-                                v-tippy="{ content: 'Вербальный', onShow() { return !!spell?.components?.v } }"
+                                v-tippy-lazy="{ content: 'Вербальный', onShow() { return !!spell?.components?.v } }"
                                 class="link-item__component"
                             >
                                 {{ spell?.components?.v ? 'В' : '·' }}
                             </div>
 
                             <div
-                                v-tippy="{ content: 'Соматический', onShow() { return !!spell?.components?.s } }"
+                                v-tippy-lazy="{ content: 'Соматический', onShow() { return !!spell?.components?.s } }"
                                 class="link-item__component"
                             >
                                 {{ spell?.components?.s ? 'С' : '·' }}
                             </div>
 
                             <div
-                                v-tippy="{ content: 'Материальный', onShow() { return !!spell?.components?.m } }"
+                                v-tippy-lazy="{ content: 'Материальный', onShow() { return !!spell?.components?.m } }"
                                 class="link-item__component"
                             >
                                 {{ !!spell?.components?.m ? 'М' : '·' }}

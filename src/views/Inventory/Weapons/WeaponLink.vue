@@ -45,7 +45,7 @@
                         >
                             <span
                                 v-if="weapon.damage.dice"
-                                v-tippy="{ content: 'Урон' }"
+                                v-tippy-lazy="{ content: 'Урон' }"
                                 class="link-item__damage_dice dice_text"
                             >
                                 {{ weapon.damage.dice }}
@@ -53,7 +53,7 @@
                             &nbsp;
                             <span
                                 v-if="weapon.damage.type"
-                                v-tippy="{ content: 'Тип урона' }"
+                                v-tippy-lazy="{ content: 'Тип урона' }"
                                 class="link-item__damage_type"
                             >
                                 {{ weapon.damage.type }}
@@ -62,7 +62,7 @@
 
                         <div
                             v-if="weapon.price"
-                            v-tippy="{ content: 'Стоимость' }"
+                            v-tippy-lazy="{ content: 'Стоимость' }"
                             class="link-item__price"
                         >
                             <span>

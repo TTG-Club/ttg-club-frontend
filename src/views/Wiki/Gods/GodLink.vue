@@ -14,7 +14,7 @@
         >
             <div class="link-item__content">
                 <div
-                    v-tippy="{ content: god.alignment }"
+                    v-tippy-lazy="{ content: god.alignment }"
                     class="link-item__alignment"
                 >
                     <span>{{ god.shortAlignment }}</span>

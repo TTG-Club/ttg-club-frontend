@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="screen-link__desc">
-                    <span v-tippy="{ content: screen.source.name }">{{
+                    <span v-tippy-lazy="{ content: screen.source.name }">{{
                         screen.source.shortName
                     }}</span>
 
