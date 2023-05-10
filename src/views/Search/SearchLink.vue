@@ -15,7 +15,7 @@
             <div class="search-link__section">
                 <div
                     v-if="searchLink.source"
-                    v-tippy="{ content: searchLink.source.name }"
+                    v-tippy-lazy="{ content: searchLink.source.name }"
                     class="search-link__source"
                 >
                     ({{ searchLink.source.shortName }})

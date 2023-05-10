@@ -49,7 +49,7 @@
                                 </span>
 
                                 <span
-                                    v-tippy="{ content: raceItem.source.name }"
+                                    v-tippy-lazy="{ content: raceItem.source.name }"
                                     class="link-item-expand__tag"
                                 >
                                     {{ raceItem.source.shortName }}
@@ -60,7 +60,7 @@
 
                     <button
                         v-if="!isAbilityCalc && hasSubRaces"
-                        v-tippy="{ content: 'Разновидности', placement: 'left' }"
+                        v-tippy-lazy="{ content: 'Разновидности', placement: 'left' }"
                         :class="{ 'is-active': submenu }"
                         class="link-item-expand__toggle"
                         type="button"
@@ -98,7 +98,7 @@
                                 <span class="link-item-expand__arch-item_name">{{ subRace.name.rus }}</span>
 
                                 <span class="link-item-expand__arch-item_book">
-                                    <span v-tippy="{ content: subRace.source.name }">
+                                    <span v-tippy-lazy="{ content: subRace.source.name }">
                                         {{ subRace.source.shortName }}
                                     </span>
 
