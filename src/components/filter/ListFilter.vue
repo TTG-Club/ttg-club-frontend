@@ -90,11 +90,11 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import cloneDeep from 'lodash/cloneDeep';
     import type { PropType } from 'vue';
     import {
-        computed, defineComponent, ref
+        computed, ref
     } from 'vue';
     import { useDebounceFn } from '@vueuse/core';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
@@ -108,134 +108,110 @@
     import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
     import UiInput from "@/components/UI/kit/UiInput.vue";
 
-    export default defineComponent({
+    const showed = ref(false);
 
-        components: {
-            UiInput,
-            UiEraseButton,
-            BaseModal,
-            FilterItemCheckboxes,
-            FilterItemSources,
-            SvgIcon
+    const props = defineProps({
+        filterInstance: {
+            type: Object as PropType<FilterComposable>,
+            required: true
         },
-        props: {
-            filterInstance: {
-                type: Object as PropType<FilterComposable>,
-                required: true
-            },
-            inTab: {
-                type: Boolean,
-                default: false
-            }
+        inTab: {
+            type: Boolean,
+            default: false
+        }
+    });
+
+    const emit = defineEmits(['search', 'update']);
+
+    const emitSearch = useDebounceFn(value => {
+        emit('search', value);
+    }, 500);
+
+    const emitFilter = useDebounceFn(() => {
+        emit('update');
+    }, 500);
+
+    const search = computed({
+        get() {
+            return props.filterInstance.search.value.value;
         },
-        setup(props, { emit }) {
-            const showed = ref(false);
+        set(value: string) {
+            emitSearch(props.filterInstance.search.updateSearch(value));
+        }
+    });
 
-            const emitSearch = useDebounceFn(value => {
-                emit('search', value);
-            }, 500);
-
-            const emitFilter = useDebounceFn(() => {
-                emit('update');
-            }, 500);
-
-            const search = computed({
-                get() {
-                    return props.filterInstance.search.value.value;
-                },
-                set(value: string) {
-                    emitSearch(props.filterInstance.search.updateSearch(value));
-                }
-            });
-
-            const filter = computed<Filter | Array<FilterGroup> | undefined>({
-                get: () => props.filterInstance.filter.value,
-                set: async value => {
-                    try {
-                        if (!value) {
-                            return;
-                        }
-
-                        await props.filterInstance.saveFilter(value);
-
-                        emitFilter();
-                    } catch (err) {
-                        errorHandler(err);
-                    }
-                }
-            });
-
-            const otherFilters = computed({
-                get(): Array<FilterGroup> {
-                    if (Array.isArray(filter.value)) {
-                        return filter.value;
-                    }
-
-                    return filter.value?.other || [];
-                },
-
-                set(value: Array<FilterGroup>) {
-                    if (Array.isArray(filter.value)) {
-                        filter.value = value;
-
-                        return;
-                    }
-
-                    if (filter.value?.other) {
-                        filter.value = {
-                            ...filter.value,
-                            other: value as Array<FilterGroup>
-                        };
-                    }
-                }
-            });
-
-            const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
-            const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
-
-            const setSourcesValue = (value: Array<FilterGroup>) => {
-                if (!filter.value || Array.isArray(filter.value)) {
+    const filter = computed<Filter | Array<FilterGroup> | undefined>({
+        get: () => props.filterInstance.filter.value,
+        set: async value => {
+            try {
+                if (!value) {
                     return;
                 }
 
-                filter.value = {
-                    ...filter.value,
-                    sources: value
-                };
-            };
+                await props.filterInstance.saveFilter(value);
 
-            const setOtherValue = (value: Array<FilterItem>, key: string) => {
-                const otherFiltersCopy = cloneDeep(otherFilters.value);
-                const index = otherFiltersCopy.findIndex(group => group.key === key);
-
-                if (index > -1) {
-                    otherFiltersCopy[index].values = value;
-
-                    otherFilters.value = otherFiltersCopy;
-                }
-            };
-
-            const resetFilter = async () => {
-                await props.filterInstance.resetFilter();
-
-                emitFilter();
-            };
-
-            return {
-                showed,
-
-                search,
-                filter,
-                otherFilters,
-                otherFiltered,
-                isFilterCustomized,
-
-                setSourcesValue,
-                setOtherValue,
-                resetFilter
-            };
+                await emitFilter();
+            } catch (err) {
+                errorHandler(err);
+            }
         }
     });
+
+    const otherFilters = computed({
+        get(): Array<FilterGroup> {
+            if (Array.isArray(filter.value)) {
+                return filter.value;
+            }
+
+            return filter.value?.other || [];
+        },
+
+        set(value: Array<FilterGroup>) {
+            if (Array.isArray(filter.value)) {
+                filter.value = value;
+
+                return;
+            }
+
+            if (filter.value?.other) {
+                filter.value = {
+                    ...filter.value,
+                    other: value as Array<FilterGroup>
+                };
+            }
+        }
+    });
+
+    const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
+    const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
+
+    const setSourcesValue = (value: Array<FilterGroup>) => {
+        if (!filter.value || Array.isArray(filter.value)) {
+            return;
+        }
+
+        filter.value = {
+            ...filter.value,
+            sources: value
+        };
+    };
+
+    const setOtherValue = (value: Array<FilterItem>, key: string) => {
+        const otherFiltersCopy = cloneDeep(otherFilters.value);
+        const index = otherFiltersCopy.findIndex(group => group.key === key);
+
+        if (index > -1) {
+            otherFiltersCopy[index].values = value;
+
+            otherFilters.value = otherFiltersCopy;
+        }
+    };
+
+    const resetFilter = async () => {
+        await props.filterInstance.resetFilter();
+
+        await emitFilter();
+    };
 </script>
 
 <style lang="scss" scoped>
