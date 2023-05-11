@@ -107,7 +107,7 @@
                     </div>
 
                     <div class="block__youtube">
-                        <h3>D&D 5e новости:</h3>
+                        <h3>Интересное D&D 5e:</h3>
 
                         <transition
                             name="fade"
@@ -127,12 +127,12 @@
                             </div>
                         </transition>
 
-                        <a
+                        <!-- <a
                             href="https://www.youtube.com/@online.shirma"
                             target="_blank"
                             rel="noopener noreferrer"
                             class="btn"
-                        >Все видео</a>
+                        >Все видео</a> -->
                     </div>
                 </div>
 
