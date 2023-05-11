@@ -89,7 +89,8 @@
             font-size: 17px;
             color: var(--text-color);
             border-right: 1px solid var(--border);
-            margin-right: 16px;
+            margin-right: 12px;
+            margin-left: -8px;
 
             span {
                 width: 42px;
