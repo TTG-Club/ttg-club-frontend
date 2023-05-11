@@ -19,3 +19,15 @@ declare global {
         YM_ID: string;
     }
 }
+
+declare module 'vue-virtual-scroller' {
+    import type { DefineComponent } from 'vue';
+
+    export const DynamicScroller: DefineComponent;
+    export const DynamicScrollerItem: DefineComponent;
+}
+
+declare module '*.module.scss' {
+    const classes: { [key: string]: string };
+    export default classes;
+}

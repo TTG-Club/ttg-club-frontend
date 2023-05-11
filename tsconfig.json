@@ -19,6 +19,7 @@
       "dom.iterable",
       "scripthost"
     ],
+    "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,

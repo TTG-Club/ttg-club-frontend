@@ -7,19 +7,22 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <creature-link
-            v-for="creature in bestiary"
-            :key="creature.url"
-            :creature="creature"
-            :to="{ path: creature.url }"
-        />
+        <virtual-grid-list
+            :list="{ items: bestiary, keyField: 'url' }"
+            :flat="showRightSide"
+        >
+            <template #default="{ item: creature }">
+                <creature-link
+                    :creature="creature"
+                    :to="{ path: creature.url }"
+                />
+            </template>
+        </virtual-grid-list>
     </content-layout>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
+<script lang="ts" setup>
+    import { computed, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -28,74 +31,58 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
+    import VirtualGridList from "@/components/list/VirtualGridList/VirtualGridList.vue";
 
-    export default defineComponent({
+    const route = useRoute();
+    const router = useRouter();
+    const uiStore = useUIStore();
+    const { isMobile } = storeToRefs(uiStore);
 
-        components: {
-            CreatureLink,
-            ContentLayout
+    const filter = useFilter({
+        url: BestiaryFilterDefaults.url,
+        dbName: BestiaryFilterDefaults.dbName
+    });
+
+    const {
+        initPages,
+        nextPage,
+        items: bestiary
+    } = usePagination({
+        url: '/bestiary',
+        filter: {
+            isCustomized: filter.isCustomized,
+            value: filter.queryParams
         },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
-            const { isMobile } = storeToRefs(uiStore);
+        search: filter.search,
+        order: [
+            {
+                field: 'exp',
+                direction: 'asc'
+            },
+            {
+                field: 'name',
+                direction: 'asc'
+            }
+        ]
+    });
 
-            const filter = useFilter({
-                url: BestiaryFilterDefaults.url,
-                dbName: BestiaryFilterDefaults.dbName
-            });
+    const onSearch = async () => {
+        await initPages();
 
-            const {
-                initPages,
-                nextPage,
-                items: bestiary
-            } = usePagination({
-                url: '/bestiary',
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'exp',
-                        direction: 'asc'
-                    },
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+        if (!isMobile.value && bestiary.value.length) {
+            await router.push({ path: bestiary.value[0].url });
+        }
+    };
 
-            const onSearch = async () => {
-                await initPages();
+    onBeforeMount(async () => {
+        await filter.initFilter();
 
-                if (!isMobile.value && bestiary.value.length) {
-                    await router.push({ path: bestiary.value[0].url });
-                }
-            };
+        await initPages();
 
-            onBeforeMount(async () => {
-                await filter.initFilter();
-
-                await initPages();
-
-                if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
-                    await router.push({ path: bestiary.value[0].url });
-                }
-            });
-
-            return {
-                isMobile,
-                showRightSide: computed(() => route.name === 'creatureDetail'),
-                filter,
-                bestiary,
-                initPages,
-                nextPage,
-                onSearch
-            };
+        if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
+            await router.push({ path: bestiary.value[0].url });
         }
     });
+
+    const showRightSide = computed(() => route.name === 'creatureDetail');
 </script>

@@ -8,13 +8,19 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <spell-link
-            v-for="spell in spells"
-            :key="spell.url"
-            :in-tab="inTab"
-            :spell="spell"
-            :to="{ path: spell.url }"
-        />
+        <virtual-grouped-list
+            :list="{ items: spells, keyField: 'url' }"
+            :get-group="getSpellGroup"
+            :grid="{ flat: showRightSide }"
+        >
+            <template #default="{ item: spell }">
+                <spell-link
+                    :in-tab="inTab"
+                    :spell="spell"
+                    :to="{ path: spell.url }"
+                />
+            </template>
+        </virtual-grouped-list>
     </component>
 </template>
 
@@ -32,9 +38,12 @@
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
     import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
+    import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+    import type { AnyObject } from "@/types/Shared/Utility.types";
 
     export default defineComponent({
         components: {
+            VirtualGroupedList,
             SpellLink,
             TabLayout,
             ContentLayout
@@ -150,16 +159,26 @@
                 }
             );
 
+            /* TODO: Добавить тип заклинания */
+            const getSpellGroup = ({ level }: AnyObject) => ({
+                url: `${ level }`,
+                name: level ? `${ level } уровень` : 'Заговоры',
+                order: level
+            });
+
+            const showRightSide = computed(() => route.name === 'spellDetail');
+
             return {
                 layout,
                 isMobile,
                 fullscreen,
                 spells,
                 filter,
-                showRightSide: computed(() => route.name === 'spellDetail'),
+                showRightSide,
                 initPages,
                 nextPage,
-                onSearch
+                onSearch,
+                getSpellGroup
             };
         }
     });

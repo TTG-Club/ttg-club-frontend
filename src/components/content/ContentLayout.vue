@@ -86,9 +86,12 @@
     import { defineComponent, ref } from 'vue';
     import {
         useElementBounding,
-        useEventListener, useInfiniteScroll, useResizeObserver
+        useEventListener,
+        useInfiniteScroll,
+        useResizeObserver
     } from '@vueuse/core';
     import { storeToRefs } from 'pinia';
+    import throttle from "lodash/throttle";
     import { useUIStore } from '@/store/UI/UIStore';
     import ListFilter from '@/components/filter/ListFilter.vue';
     import type { FilterComposable } from '@/common/composition/useFilter';
@@ -184,9 +187,9 @@
                     = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
             };
 
-            const scrollHandler = () => {
+            const scrollHandler = throttle(() => {
                 toggleShadow();
-            };
+            }, 200);
 
             useInfiniteScroll(
                 bodyElement,

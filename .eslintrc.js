@@ -46,6 +46,14 @@ module.exports = {
                     allow: ['warn', 'error']
                 }
             ],
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': [
+            'error',
+            {
+                typedefs: false,
+                enums: false
+            }
+        ],
         'no-debugger': 'error',
         'no-alert': ['error'],
         'max-len': [1, 120],
@@ -415,6 +423,9 @@ module.exports = {
         {
             files: ['*.vue'],
             rules: {
+                /* turn off no-unused-vars for script setup */
+                '@typescript-eslint/no-unused-vars': 'off',
+                'vue/script-setup-uses-vars': 'error',
                 'indent': 'off',
                 'vue/html-indent': ['error', 4],
                 'vue/script-indent': [

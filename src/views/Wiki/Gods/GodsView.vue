@@ -7,19 +7,25 @@
         @update="initPages"
         @list-end="nextPage"
     >
-        <god-link
-            v-for="god in gods"
-            :key="god.url"
-            :god="god"
-            :to="{ path: god.url }"
-        />
+        <virtual-grid-list
+            :list="{
+                items: gods,
+                keyField: 'url',
+            }"
+            :flat="showRightSide"
+        >
+            <template #default="{ item: god }">
+                <god-link
+                    :god="god"
+                    :to="{ path: god.url }"
+                />
+            </template>
+        </virtual-grid-list>
     </content-layout>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
+<script lang="ts" setup>
+    import { computed, onBeforeMount } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useRoute, useRouter } from 'vue-router';
     import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -28,74 +34,58 @@
     import { GodsFilterDefaults } from '@/types/Wiki/Gods.types';
     import { useFilter } from '@/common/composition/useFilter';
     import { usePagination } from '@/common/composition/usePagination';
+    import VirtualGridList from "@/components/list/VirtualGridList/VirtualGridList.vue";
 
-    export default defineComponent({
-        components: {
-            GodLink,
-            ContentLayout
+    const route = useRoute();
+    const router = useRouter();
+    const uiStore = useUIStore();
+
+    const {
+        isMobile,
+        fullscreen
+    } = storeToRefs(uiStore);
+
+    const filter = useFilter({
+        dbName: GodsFilterDefaults.dbName,
+        url: GodsFilterDefaults.url
+    });
+
+    const {
+        initPages,
+        nextPage,
+        items: gods
+    } = usePagination({
+        url: '/gods',
+        limit: 70,
+        filter: {
+            isCustomized: filter.isCustomized,
+            value: filter.queryParams
         },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
+        search: filter.search,
+        order: [
+            {
+                field: 'name',
+                direction: 'asc'
+            }
+        ]
+    });
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+    const onSearch = async () => {
+        await initPages();
 
-            const filter = useFilter({
-                dbName: GodsFilterDefaults.dbName,
-                url: GodsFilterDefaults.url
-            });
+        if (gods.value.length === 1 && !isMobile.value) {
+            await router.push({ path: gods.value[0].url });
+        }
+    };
 
-            const {
-                initPages,
-                nextPage,
-                items: gods
-            } = usePagination({
-                url: '/gods',
-                limit: 70,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+    onBeforeMount(async () => {
+        await filter.initFilter();
+        await initPages();
 
-            const onSearch = async () => {
-                await initPages();
-
-                if (gods.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: gods.value[0].url });
-                }
-            };
-
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
-
-                if (!isMobile.value && gods.value.length && route.name === 'gods') {
-                    await router.push({ path: gods.value[0].url });
-                }
-            });
-
-            return {
-                isMobile,
-                fullscreen,
-                gods,
-                filter,
-                showRightSide: computed(() => route.name === 'godDetail'),
-                initPages,
-                nextPage,
-                onSearch
-            };
+        if (!isMobile.value && gods.value.length && route.name === 'gods') {
+            await router.push({ path: gods.value[0].url });
         }
     });
+
+    const showRightSide = computed(() => route.name === 'godDetail');
 </script>
