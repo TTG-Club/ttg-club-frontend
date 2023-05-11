@@ -482,6 +482,7 @@
             min-width: fit-content;
             border: 1px solid var(--border);
             border-radius: 8px;
+            background: var(--bg-sub-menu);
 
             &.is-only-icon {
                 flex: 1 0 fit-content;
