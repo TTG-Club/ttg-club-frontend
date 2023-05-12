@@ -1,10 +1,7 @@
 <template>
   <virtual-list
+    v-bind="list"
     :items="items"
-    :key-field="list.keyField"
-    :min-item-size="list.minItemSize"
-    :page-mode="list.pageMode"
-    class="grid-list"
   >
     <template #default="{ item: row, index, active }">
       <slot
@@ -27,6 +24,7 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue';
+  import clsx from "clsx";
   import VirtualList, { TVirtualListProps } from '@/components/list/VirtualList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import ListRow, { TListRowProps } from '@/components/list/ListRow.vue';
@@ -68,6 +66,11 @@
 
   const { current: currentColumns } = useResponsiveValues({ values: columnConfig });
 
+  const list = computed<TVirtualListProps>(() => ({
+    ...props.list,
+    getItemClass: (item: TItem) => clsx(props.list.getItemClass?.(item), "virtual-grid-list__item")
+  }));
+
   const items = computed(() => (props.getRows
     ? props.getRows(props.list.items, {
       columns: currentColumns.value,
@@ -80,12 +83,12 @@
 </script>
 
 <style lang="scss" scoped>
-  .grid-list :deep {
+    :deep {
     .vue-recycle-scroller__item-view {
       margin: 0;
       padding: 0;
 
-      > .item {
+            > .virtual-grid-list__item {
         padding-bottom: 0;
       }
     }

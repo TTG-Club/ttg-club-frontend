@@ -1,5 +1,6 @@
 <template>
   <virtual-grid-list
+    class="virtual-grouped-list"
     :get-rows="getRows"
     :list="list"
     v-bind="grid"
@@ -32,6 +33,8 @@
 <script lang="ts" setup>
   import uniqBy from 'lodash/uniqBy';
   import sortBy from 'lodash/sortBy';
+  import { computed } from "vue";
+  import clsx from "clsx";
   import { TVirtualListProps } from '@/components/list/VirtualList.vue';
   import GroupedListCategory from '@/components/list/GroupedListCategory.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
@@ -62,6 +65,13 @@
     sortBy: 'order'
   });
 
+  const list = computed<TVirtualListProps>(() => ({
+    ...props.list,
+    getItemClass: (item: TItem) => clsx(props.list.getItemClass?.(item), {
+      "virtual-grouped-list__group": item.isGroup
+    })
+  }));
+
   const getRows: TVirtualGridListProps['getRows'] = (items: TItem[], context: TVirtualGridListContext) => {
     const {
       keyField,
@@ -79,3 +89,13 @@
     });
   };
 </script>
+
+<style lang="scss" scoped>
+    .virtual-grouped-list :deep {
+        .vue-recycle-scroller__item-view {
+            > .virtual-grouped-list__group {
+                padding-bottom: var(--item-spacing);
+            }
+        }
+    }
+</style>

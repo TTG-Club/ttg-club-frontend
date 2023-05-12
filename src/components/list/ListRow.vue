@@ -30,16 +30,16 @@
 </script>
 
 <style lang="scss" scoped>
-  $column-spacing: 12px;
+    $item-spacing: 12px;
 
   .list-row {
     display: flex;
     flex-wrap: wrap;
-    margin: -$column-spacing * .5;
+        margin: calc(-1 * var(--item-spacing, #{$item-spacing * .5}) / 2);
 
     &__column {
       flex-basis: calc(100% / v-bind(columns));
-      padding: $column-spacing * .5;
+            padding: calc(var(--item-spacing, #{$item-spacing}) / 2);
       min-width: 0;
     }
   }

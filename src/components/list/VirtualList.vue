@@ -1,8 +1,9 @@
 <template>
   <dynamic-scroller
-    item-tag="li"
-    list-tag="ul"
     v-bind="props"
+    class="virtual-list"
+    list-tag="ul"
+    item-tag="li"
   >
     <template #default="{ item, index, active }">
       <dynamic-scroller-item
@@ -10,7 +11,7 @@
         :active="active"
         :data-index="index"
         :item="item"
-        class="item"
+        :class="getItemClasses(item)"
       >
         <slot v-bind="{ item, index, active }" />
       </dynamic-scroller-item>
@@ -20,7 +21,9 @@
 
 <script lang="ts" setup>
   import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+  import clsx from "clsx";
   import { DEFAULT_KEY_FIELD } from '@/common/const';
+  import type { Maybe } from "@/types/Shared/Utility.types";
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
 
@@ -29,21 +32,30 @@
     keyField?: string,
     minItemSize?: number;
     pageMode?: boolean;
+    getItemClass?: (item: unknown) => Maybe<string>;
   };
 
   const props = withDefaults(defineProps<TVirtualListProps>(), {
     keyField: DEFAULT_KEY_FIELD,
     pageMode: true,
-    minItemSize: 55
+    minItemSize: 55,
+    getItemClass: () => undefined
   });
+
+  const getItemClasses = (item: unknown) => clsx('virtual-list__item', props.getItemClass?.(item));
 </script>
 
 <style lang="scss" scoped>
   $item-spacing: 12px;
 
+    .virtual-list {
+        --item-spacing: #{$item-spacing};
+    }
+
   :deep {
     &.vue-recycle-scroller {
-      margin-bottom: -$item-spacing;
+            // Добавляем отрицательный margin для родителя, чтобы не было лишнего отступа
+            margin-bottom: calc(-1 * var(--item-spacing, #{$item-spacing}));
     }
 
     .vue-recycle-scroller__item-wrapper {
@@ -55,8 +67,9 @@
       margin: 0;
       padding: 0;
 
-      > .item {
-        padding-bottom: $item-spacing;
+            // Добавляем отступ между элементами
+            > .virtual-list__item {
+                padding-bottom: var(--item-spacing, #{$item-spacing})
       }
     }
   }
