@@ -76,10 +76,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && backgrounds.value.length && route.name === 'backgrounds') {
-      await router.push({ path: backgrounds.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'backgroundDetail');

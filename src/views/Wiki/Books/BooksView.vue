@@ -119,10 +119,6 @@
 
       onBeforeMount(async () => {
         await initPages();
-
-        if (!isMobile.value && books.value.length && route.name === 'books') {
-          await router.push({ path: books.value[0].list[0].url });
-        }
       });
 
       return {

@@ -78,10 +78,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && items.value.length && route.name === 'items') {
-      await router.push({ path: items.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'itemDetail');

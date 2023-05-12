@@ -118,10 +118,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && options.value.length && route.name === 'options') {
-      await router.push({ path: options.value[0].url });
-    }
   });
 
   watch(

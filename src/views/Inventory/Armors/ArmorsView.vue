@@ -113,10 +113,6 @@
 
       onBeforeMount(async () => {
         await initPages();
-
-        if (!isMobile.value && armors.value.length && route.name === 'armors') {
-          await router.push({ path: armors.value[0].list[0].url });
-        }
       });
 
       return {

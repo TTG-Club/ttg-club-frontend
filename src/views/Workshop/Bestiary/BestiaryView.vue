@@ -78,10 +78,6 @@
     await filter.initFilter();
 
     await initPages();
-
-    if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
-      await router.push({ path: bestiary.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'creatureDetail');

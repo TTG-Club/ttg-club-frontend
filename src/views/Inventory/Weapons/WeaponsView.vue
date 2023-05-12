@@ -118,10 +118,6 @@
       onBeforeMount(async () => {
         await filter.initFilter();
         await initPages();
-
-        if (!isMobile.value && weapons.value.length && route.name === 'weapons') {
-          await router.push({ path: weapons.value[0].list[0].url });
-        }
       });
 
       return {

@@ -137,10 +137,6 @@
       onBeforeMount(async () => {
         await filter.initFilter();
         await initPages();
-
-        if (!isMobile.value && spells.value.length && route.name === 'spells') {
-          await router.push({ path: spells.value[0].url });
-        }
       });
 
       watch(
