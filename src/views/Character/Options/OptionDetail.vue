@@ -2,7 +2,6 @@
   <content-detail class="option-detail">
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :copy="!error && !loading"
         :fullscreen="!isMobile"
         :subtitle="option?.name?.eng || ''"

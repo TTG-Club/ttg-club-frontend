@@ -84,7 +84,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :close-on-desktop="fullscreen"
             :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'On sale'"
             :title="selected.item?.name.rus || 'В продаже'"

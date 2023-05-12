@@ -164,7 +164,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :close-on-desktop="fullscreen"
             :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'In treasury'"
             :title="selected.item?.name.rus || 'В сокровищнице'"

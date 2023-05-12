@@ -2,7 +2,6 @@
   <content-detail>
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :fullscreen="!isMobile"
         :subtitle="armor?.name?.eng"
         :title="armor?.name?.rus"

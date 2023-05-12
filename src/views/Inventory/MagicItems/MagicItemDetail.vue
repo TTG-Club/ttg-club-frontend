@@ -2,7 +2,6 @@
   <content-detail class="magic-item-detail">
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :copy="!error && !loading"
         :fullscreen="!isMobile"
         :subtitle="magicItem?.name?.eng || ''"
