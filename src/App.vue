@@ -7,6 +7,8 @@
     >
         <router-view />
     </div>
+
+    <bug-reporter />
 </template>
 
 <script lang="ts">
@@ -15,9 +17,13 @@
     import { useUIStore } from '@/store/UI/UIStore';
     import { useUserStore } from '@/store/UI/UserStore';
     import NavBar from '@/components/UI/menu/NavBar.vue';
+    import BugReporter from '@/components/UI/BugReporter.vue';
 
     export default defineComponent({
-        components: { NavBar },
+        components: {
+            BugReporter,
+            NavBar
+        },
         setup() {
             const uiStore = useUIStore();
             const userStore = useUserStore();
