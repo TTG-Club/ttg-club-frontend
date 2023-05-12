@@ -57,7 +57,7 @@
     columns: () => ({
       md: 1,
       xl: 2,
-      base: 4
+      base: 3
     }),
     flat: false,
     getRows: undefined
