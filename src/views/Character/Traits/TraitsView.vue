@@ -7,7 +7,7 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :list="{ items: traits, keyField: 'url' }"
+      :list="{ items: traits, keyField: DEFAULT_ENTITY_KEY_FIELD }"
       :get-group="getGroupByFirstLetter"
       :grid="{ flat: showRightSide }"
     >
@@ -33,6 +33,7 @@
   import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   type TProps = {
     storeKey?: string;

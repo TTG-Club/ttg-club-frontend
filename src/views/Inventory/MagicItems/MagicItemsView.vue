@@ -8,8 +8,8 @@
     @list-end="nextPage"
   >
     <virtual-grid-list
+      :list="{ items, keyField: DEFAULT_ENTITY_KEY_FIELD }"
       :flat="showRightSide"
-      :list="{ items, keyField: 'url' }"
     >
       <template #default="{ item }">
         <magic-item-link
@@ -32,6 +32,7 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
   import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();

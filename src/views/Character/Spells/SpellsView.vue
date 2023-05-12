@@ -9,9 +9,9 @@
     @list-end="nextPage"
   >
     <virtual-grouped-list
+      :list="{ items: spells, keyField: DEFAULT_ENTITY_KEY_FIELD }"
       :get-group="getSpellGroup"
       :grid="{ flat: showRightSide }"
-      :list="{ items: spells, keyField: 'url' }"
     >
       <template #default="{ item: spell }">
         <spell-link
@@ -40,6 +40,7 @@
   import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   export default defineComponent({
     components: {
@@ -174,7 +175,8 @@
         initPages,
         nextPage,
         onSearch,
-        getSpellGroup
+        getSpellGroup,
+        DEFAULT_ENTITY_KEY_FIELD
       };
     }
   });

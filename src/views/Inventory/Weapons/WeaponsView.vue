@@ -10,7 +10,7 @@
       :grid="{ flat: showRightSide }"
       :get-group="getWeaponGroup"
       :list="{
-        keyField: 'url',
+        keyField: DEFAULT_ENTITY_KEY_FIELD,
         items: weapons,
       }"
     >
@@ -36,6 +36,7 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();

@@ -7,8 +7,8 @@
     @update="initPages"
   >
     <virtual-grid-list
+      :list="{ items: backgrounds, keyField: DEFAULT_ENTITY_KEY_FIELD, minItemSize: 50 }"
       :flat="showRightSide"
-      :list="{ items: backgrounds, keyField: 'url', minItemSize: 50 }"
     >
       <template #default="{ item: background }">
         <background-link
@@ -31,6 +31,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();

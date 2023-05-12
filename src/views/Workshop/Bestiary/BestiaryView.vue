@@ -8,8 +8,8 @@
     @list-end="nextPage"
   >
     <virtual-grid-list
+      :list="{ items: bestiary, keyField: DEFAULT_ENTITY_KEY_FIELD }"
       :flat="showRightSide"
-      :list="{ items: bestiary, keyField: 'url' }"
     >
       <template #default="{ item: creature }">
         <creature-link
@@ -32,6 +32,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();

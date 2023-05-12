@@ -9,7 +9,7 @@
     <virtual-grouped-list
       :grid="{ flat: showRightSide }"
       :get-group="getArmorGroup"
-      :list="{ items: armors, keyField: 'url' }"
+      :list="{ items: armors, keyField: DEFAULT_ENTITY_KEY_FIELD }"
     >
       <template #default="{ item: armor }">
         <armor-link
@@ -33,6 +33,7 @@
   import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();

@@ -11,7 +11,7 @@
       :flat="showRightSide"
       :list="{
         items: gods,
-        keyField: 'url',
+        keyField: DEFAULT_ENTITY_KEY_FIELD,
       }"
     >
       <template #default="{ item: god }">
@@ -35,6 +35,7 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();

@@ -8,8 +8,8 @@
     @list-end="nextPage"
   >
     <virtual-grid-list
+      :list="{ items: rules, keyField: DEFAULT_ENTITY_KEY_FIELD }"
       :flat="showRightSide"
-      :list="{ items: rules, keyField: 'url' }"
     >
       <template #default="{ item: rule }">
         <rule-link
@@ -32,6 +32,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();
