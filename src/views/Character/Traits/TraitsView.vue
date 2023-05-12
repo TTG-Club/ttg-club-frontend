@@ -8,7 +8,7 @@
   >
     <virtual-grouped-list
       :list="{ items: traits, keyField: 'url' }"
-      :get-group="getTraitGroup"
+      :get-group="getGroupByFirstLetter"
       :grid="{ flat: showRightSide }"
     >
       <template #default="{ item: trait }">
@@ -32,7 +32,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
 
   type TProps = {
     storeKey?: string;
@@ -81,16 +81,6 @@
     if (traits.value.length === 1 && !isMobile.value) {
       await router.push({ path: traits.value[0].url });
     }
-  };
-
-  /* TODO: Добавить тип черты */
-  const getTraitGroup = (trait: AnyObject & {name: Record<string, unknown[]>}) => {
-    const [firstLetter] = trait.name.rus;
-
-    return {
-      name: firstLetter,
-      url: firstLetter
-    };
   };
 
   onBeforeMount(async () => {
