@@ -1,134 +1,138 @@
 <template>
-    <transition
-        name="fade"
-        mode="out-in"
+    <div
+        v-if="modelValue"
+        ref="uiCropper"
+        :class="$style['ui-cropper']"
     >
-        <div
-            v-if="modelValue"
-            :class="$style['ui-cropper']"
-        >
-            <svg :class="$style.cropper">
-                <mask id="mask">
-                    <rect
-                        fill="white"
-                        width="100%"
-                        height="100%"
-                        fill-opacity="1"
-                    />
-
-                    <rect
-                        :x="calcRect.x"
-                        :y="calcRect.y"
-                        :width="calcRect.width"
-                        :height="calcRect.height"
-                    />
-                </mask>
-
+        <svg :class="$style.cropper">
+            <mask id="mask">
                 <rect
-                    :class="$style.bg"
+                    fill="white"
                     width="100%"
                     height="100%"
+                    fill-opacity="1"
                 />
 
                 <rect
-                    ref="mover"
-                    :class="$style.mover"
                     :x="calcRect.x"
                     :y="calcRect.y"
                     :width="calcRect.width"
                     :height="calcRect.height"
                 />
+            </mask>
 
-                <line
-                    :x1="calcRect.left"
-                    :x2="calcRect.right"
-                    :y1="calcRect.top"
-                    :y2="calcRect.top"
-                    :class="[$style.line, $style['cursor-ns']]"
-                />
+            <rect
+                :class="$style.bg"
+                width="100%"
+                height="100%"
+            />
 
-                <line
-                    :x1="calcRect.right"
-                    :x2="calcRect.right"
-                    :y1="calcRect.top"
-                    :y2="calcRect.bottom"
-                    :class="[$style.line, $style['cursor-ew']]"
-                />
+            <rect
+                ref="mover"
+                :class="{ [$style.mover]: true, [$style['is-grabbed']]: isMoving }"
+                :x="calcRect.x"
+                :y="calcRect.y"
+                :width="calcRect.width"
+                :height="calcRect.height"
+            />
 
-                <line
-                    :x1="calcRect.right"
-                    :x2="calcRect.left"
-                    :y1="calcRect.bottom"
-                    :y2="calcRect.bottom"
-                    :class="[$style.line, $style['cursor-ns']]"
-                />
+            <line
+                :x1="calcRect.left"
+                :x2="calcRect.right"
+                :y1="calcRect.top"
+                :y2="calcRect.top"
+                :class="[$style.line, $style['cursor-ns']]"
+            />
 
-                <line
-                    :x1="calcRect.left"
-                    :x2="calcRect.left"
-                    :y1="calcRect.bottom"
-                    :y2="calcRect.top"
-                    :class="[$style.line, $style['cursor-ew']]"
-                />
+            <line
+                :x1="calcRect.right"
+                :x2="calcRect.right"
+                :y1="calcRect.top"
+                :y2="calcRect.bottom"
+                :class="[$style.line, $style['cursor-ew']]"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-nwse']]"
-                    :cx="calcRect.left"
-                    :cy="calcRect.top"
-                    r="4"
-                />
+            <line
+                :x1="calcRect.right"
+                :x2="calcRect.left"
+                :y1="calcRect.bottom"
+                :y2="calcRect.bottom"
+                :class="[$style.line, $style['cursor-ns']]"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-ns']]"
-                    :cx="calcRect.centerX"
-                    :cy="calcRect.top"
-                    r="4"
-                />
+            <line
+                :x1="calcRect.left"
+                :x2="calcRect.left"
+                :y1="calcRect.bottom"
+                :y2="calcRect.top"
+                :class="[$style.line, $style['cursor-ew']]"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-nesw']]"
-                    :cx="calcRect.right"
-                    :cy="calcRect.top"
-                    r="4"
-                />
+            <circle
+                :class="[$style.dot, $style['cursor-nwse']]"
+                :cx="calcRect.left"
+                :cy="calcRect.top"
+                r="4"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-ew']]"
-                    :cx="calcRect.left"
-                    :cy="calcRect.centerY"
-                    r="4"
-                />
+            <circle
+                :class="[$style.dot, $style['cursor-ns']]"
+                :cx="calcRect.centerX"
+                :cy="calcRect.top"
+                r="4"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-ew']]"
-                    :cx="calcRect.right"
-                    :cy="calcRect.centerY"
-                    r="4"
-                />
+            <circle
+                :class="[$style.dot, $style['cursor-nesw']]"
+                :cx="calcRect.right"
+                :cy="calcRect.top"
+                r="4"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-nesw']]"
-                    :cx="calcRect.left"
-                    :cy="calcRect.bottom"
-                    r="4"
-                />
+            <circle
+                :class="[$style.dot, $style['cursor-ew']]"
+                :cx="calcRect.left"
+                :cy="calcRect.centerY"
+                r="4"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-ns']]"
-                    :cx="calcRect.centerX"
-                    :cy="calcRect.bottom"
-                    r="4"
-                />
+            <circle
+                :class="[$style.dot, $style['cursor-ew']]"
+                :cx="calcRect.right"
+                :cy="calcRect.centerY"
+                r="4"
+            />
 
-                <circle
-                    :class="[$style.dot, $style['cursor-nwse']]"
-                    :cx="calcRect.right"
-                    :cy="calcRect.bottom"
-                    r="4"
-                />
-            </svg>
-        </div>
-    </transition>
+            <circle
+                :class="[$style.dot, $style['cursor-nesw']]"
+                :cx="calcRect.left"
+                :cy="calcRect.bottom"
+                r="4"
+            />
+
+            <circle
+                :class="[$style.dot, $style['cursor-ns']]"
+                :cx="calcRect.centerX"
+                :cy="calcRect.bottom"
+                r="4"
+            />
+
+            <circle
+                :class="[$style.dot, $style['cursor-nwse']]"
+                :cx="calcRect.right"
+                :cy="calcRect.bottom"
+                r="4"
+            />
+        </svg>
+
+        <ui-button
+            :class="$style.apply"
+            is-large
+            @click.left.exact.prevent="takeScreenshot"
+        >
+            Применить
+        </ui-button>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -136,10 +140,13 @@
         computed, ref, watch
     } from 'vue';
     import {
-        Position,
+        onKeyStroke,
         useDraggable,
         useMouse, useVModel, whenever
     } from '@vueuse/core';
+    import type { Position } from '@vueuse/core';
+    import html2canvas from 'html2canvas';
+    import UiButton from '@/components/UI/kit/UiButton.vue';
 
     interface IRect {
         x: number;
@@ -172,13 +179,14 @@
 
     const emit = defineEmits<IEmit>();
 
-    const mover = ref<SVGLineElement>();
+    const uiCropper = ref();
+    const mover = ref<SVGRectElement>();
 
     const modelValue = useVModel(props, 'modelValue');
     const mouse = useMouse();
 
+    const inProgress = ref(false);
     const isResizing = ref(false);
-    const isMoving = ref(false);
 
     const rect = ref<IRect>({
         x: 256,
@@ -204,7 +212,18 @@
         };
     };
 
-    const { isDragging } = useDraggable(mover, {
+    onKeyStroke('Escape', e => {
+        if (!modelValue.value) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        modelValue.value = false;
+    });
+
+    const { isDragging: isMoving } = useDraggable(mover, {
         preventDefault: true,
         stopPropagation: true,
         onMove: position => moveHandler(position)
@@ -219,6 +238,33 @@
         };
     });
 
+    const takeScreenshot = async () => {
+        try {
+            const canvas = await html2canvas(document.body, {
+                ...rect.value,
+                allowTaint: true,
+                useCORS: true
+            });
+
+            canvas.getContext('2d');
+
+            const imgSrc = canvas.toDataURL('image/png', 0.5);
+            const createEl = document.createElement('a');
+
+            createEl.href = imgSrc;
+            createEl.download = "download-this-canvas";
+
+            createEl.click();
+            createEl.remove();
+
+            return imgSrc;
+        } catch (err) {
+            return Promise.reject(err);
+        } finally {
+            modelValue.value = false;
+        }
+    };
+
     watch<IRectCalc>(calcRect, value => {
         emit('resize', value);
     });
@@ -230,6 +276,11 @@
         z-index: 1000000000000000000;
         width: 100vw;
         height: 100vh;
+        pointer-events: initial;
+    }
+
+    .hidden {
+        opacity: 0 !important;
     }
 
     .cropper {
@@ -258,12 +309,16 @@
     }
 
     .mover {
-        cursor: move;
+        cursor: grab;
         fill: transparent;
         fill-opacity: 0;
         stroke: transparent;
         stroke-opacity: 0;
         stroke-width: 0;
+    }
+
+    .mover.is-grabbed {
+        cursor: grabbing;
     }
 
     .cursor-nwse {
@@ -280,5 +335,12 @@
 
     .cursor-nesw {
         cursor: nesw-resize;
+    }
+
+    .apply {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
     }
 </style>

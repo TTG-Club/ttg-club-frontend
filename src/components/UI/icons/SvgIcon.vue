@@ -1,10 +1,10 @@
 <template>
     <svg
         :class="classList"
-        aria-hidden="true"
         class="svg-icon"
         role="img"
         viewBox="0 0 16 16"
+        aria-hidden="false"
         xmlns="http://www.w3.org/2000/svg"
     >
         <use :xlink:href="svg" />
