@@ -3,7 +3,10 @@
         :class="$style['bug-reporter']"
         data-html2canvas-ignore
     >
-        <ui-cropper v-model="isEnabled" />
+        <ui-cropper
+            v-model="isEnabled"
+            @crop="download"
+        />
     </div>
 </template>
 
@@ -18,8 +21,10 @@
 
     const keys = useMagicKeys();
     const shiftA = keys['Shift+A'];
+    const screenshot = ref<string | null>(null);
 
     whenever(shiftA, () => {
+        screenshot.value = null;
         isEnabled.value = true;
     });
 </script>

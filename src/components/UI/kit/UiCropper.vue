@@ -181,7 +181,7 @@
     interface IEmit {
         (e: 'update:modelValue', value: boolean): void;
         (e: 'resize', value: IRectCalc): void;
-        (e: 'crop', value: string): void;
+        (e: 'crop', value: Blob): void;
     }
 
     const props = withDefaults(defineProps<IProp>(), {
@@ -269,6 +269,20 @@
     });
 
     const takeScreenshot = async () => {
+        const emitBlob = (canvas: HTMLCanvasElement) => new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob(blob => {
+                if (!blob) {
+                    reject();
+
+                    return;
+                }
+
+                emit('crop', blob);
+
+                resolve(blob);
+            }, 'image/jpeg', 0.5);
+        });
+
         try {
             const canvas = await html2canvas(document.body, {
                 ...rect.value,
@@ -278,11 +292,7 @@
 
             canvas.getContext('2d');
 
-            const imgSrc = canvas.toDataURL('image/png', 0.5);
-
-            emit('crop', imgSrc);
-
-            return imgSrc;
+            return emitBlob(canvas);
         } catch (err) {
             return Promise.reject(err);
         } finally {
@@ -290,9 +300,9 @@
         }
     };
 
-    watch<IRectCalc>(calcRect, value => {
+    watch(calcRect, value => {
         emit('resize', value);
-    });
+    }, { immediate: true });
 
     // resizer
     const mover = ref<SVGRectElement>();
