@@ -40,6 +40,10 @@
 
     export default defineComponent({
         props: {
+            typeSecondary: {
+                type: Boolean,
+                default: false
+            },
             typeLink: {
                 type: Boolean,
                 default: false
@@ -75,6 +79,10 @@
         },
         setup(props) {
             const type = computed(() => {
+                if (props.typeSecondary) {
+                    return 'secondary';
+                }
+
                 if (props.typeLink) {
                     return 'link';
                 }
@@ -119,7 +127,7 @@
         background-color: var(--primary);
         color: var(--text-btn-color);
         border-radius: 8px;
-        padding: 6px;
+        padding: 10px 16px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -127,6 +135,8 @@
         flex-shrink: 0;
         font-size: var(--main-font-size);
         line-height: calc(var(--main-line-height) - 1px);
+        border: 1px solid var(--border);
+        max-height: 38px;
 
         @include media-min($xl) {
             &:hover {
@@ -232,9 +242,34 @@
             }
         }
 
+        &.is-secondary {
+            background-color: var(--bg-sub-menu);
+            color: var(--text-color);
+            border:1px solid var(--border);
+
+            @include media-min($xl) {
+                &:hover {
+                    background-color: var(--hover);
+                }
+
+                &:active,
+                &.is-active {
+                    background-color: var(--bg-main);
+                }
+            }
+
+            &:disabled {
+                opacity: .6;
+                background-color: transparent;
+                color: var(--primary);
+                cursor: not-allowed;
+            }
+        }
+
         &.is-link {
             background-color: transparent;
             color: var(--primary);
+            border: 0;
 
             @include media-min($xl) {
                 &:hover {

@@ -107,6 +107,8 @@
     .default-bookmark-button {
         width: 28px;
         z-index: 1;
+        padding: 6px;
+        border: 0;
 
         &:hover {
             position: relative;

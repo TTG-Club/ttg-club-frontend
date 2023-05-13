@@ -96,4 +96,10 @@
             background: var(--bg-sub-menu);
         }
     }
+
+    .base-modal__body {
+        .row_info {
+            margin-top: 16px;
+        }
+    }
 </style>

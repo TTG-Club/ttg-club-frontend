@@ -51,14 +51,14 @@
             </ui-button>
 
             <ui-button
-                type-link
+                type-secondary
                 @click.left.exact.prevent="$emit('switch:reg')"
             >
                 Регистрация
             </ui-button>
 
             <ui-button
-                type-link
+                type-secondary
                 @click.left.exact.prevent="$emit('switch:change-password')"
             >
                 Забыли пароль?

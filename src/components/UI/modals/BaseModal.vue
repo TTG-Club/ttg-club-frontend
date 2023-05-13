@@ -21,7 +21,7 @@
             <ui-button
                 class="base-modal__close"
                 is-icon
-                type-link
+                type-secondary
                 @click.left.exact.prevent="close"
             >
                 <svg-icon icon-name="close" />
@@ -220,10 +220,10 @@
         }
 
         &__close {
+            padding: 10px 6px;
             margin: {
-                left: 16px;
+                left: 6px;
                 top: -6px;
-                right: -6px;
                 bottom: -6px;
             }
         }

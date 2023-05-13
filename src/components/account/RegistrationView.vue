@@ -71,7 +71,7 @@
             </ui-button>
 
             <ui-button
-                type-link
+                type-secondary
                 @click.left.exact.prevent="$emit('switch:auth')"
             >
                 Авторизация

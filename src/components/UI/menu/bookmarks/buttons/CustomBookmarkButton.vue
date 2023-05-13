@@ -171,6 +171,8 @@
         z-index: 1;
         margin: 0 !important;
         width: 18px;
+        border: 0;
+        padding: 8px 6px;
 
         &__wrapper {
             height: 100%;

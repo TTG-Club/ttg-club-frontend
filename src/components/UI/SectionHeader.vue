@@ -90,9 +90,9 @@
             <ui-button
                 v-if="closeAvailable"
                 v-tippy="{ content: 'Закрыть' }"
-                class="section-header__control"
+                class="section-header__control close"
                 is-icon
-                type-link-filled
+                type-secondary
                 @click.left.exact.prevent.stop="$emit('close')"
             >
                 <svg-icon
@@ -352,6 +352,7 @@
             color: var(--primary);
             padding: 6px;
             border-radius: 8px;
+            border: 0;
 
             @include media-min($md) {
                 &:hover {
@@ -371,6 +372,10 @@
             svg {
                 width: 24px;
                 height: 24px;
+            }
+
+            &.close {
+                margin-left: 8px;
             }
         }
     }
