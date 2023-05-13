@@ -2,7 +2,7 @@
     <vue-final-modal
         v-bind="$attrs"
         v-model="isShowModal"
-        content-class="search-modal"
+        class="search-modal"
         esc-to-close
         focus-trap
         @opened="focused = true"
@@ -133,6 +133,7 @@
         onKeyStroke, onStartTyping, useActiveElement, useFocus, useVModel
     } from '@vueuse/core';
     import { useRouter } from 'vue-router';
+    import { VueFinalModal } from 'vue-final-modal';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import { useAxios } from '@/common/composition/useAxios';
@@ -143,6 +144,7 @@
 
     export default defineComponent({
         components: {
+            VueFinalModal,
             UiInput,
             SearchLink,
             UiButton,

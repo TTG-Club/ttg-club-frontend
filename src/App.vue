@@ -8,12 +8,15 @@
         <router-view />
     </div>
 
+    <modals-container />
+
     <bug-reporter />
 </template>
 
 <script lang="ts">
     import { defineComponent } from 'vue';
     import { tryOnBeforeMount } from '@vueuse/core';
+    import { ModalsContainer } from 'vue-final-modal';
     import { useUIStore } from '@/store/UI/UIStore';
     import { useUserStore } from '@/store/UI/UserStore';
     import NavBar from '@/components/UI/menu/NavBar.vue';
@@ -21,6 +24,7 @@
 
     export default defineComponent({
         components: {
+            ModalsContainer,
             BugReporter,
             NavBar
         },

@@ -33,7 +33,7 @@
     "uuid": "^9.0.0",
     "vue": "^3.2.47",
     "vue-easy-lightbox": "^1.12.0",
-    "vue-final-modal": "^3.4.4",
+    "vue-final-modal": "^4.4.2",
     "vue-gtag": "^2.0.1",
     "vue-lazyload": "^3.0.0-rc.2",
     "vue-multiselect": "^3.0.0-beta.1",
