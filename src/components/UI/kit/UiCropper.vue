@@ -181,6 +181,7 @@
     interface IEmit {
         (e: 'update:modelValue', value: boolean): void;
         (e: 'resize', value: IRectCalc): void;
+        (e: 'crop', value: string): void;
     }
 
     const props = withDefaults(defineProps<IProp>(), {
@@ -278,13 +279,8 @@
             canvas.getContext('2d');
 
             const imgSrc = canvas.toDataURL('image/png', 0.5);
-            const createEl = document.createElement('a');
 
-            createEl.href = imgSrc;
-            createEl.download = "download-this-canvas";
-
-            createEl.click();
-            createEl.remove();
+            emit('crop', imgSrc);
 
             return imgSrc;
         } catch (err) {
