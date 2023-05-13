@@ -38,6 +38,11 @@
             </span>
         </span>
 
+        <ui-erase-button
+            v-if="isClearable && value"
+            v-model="value"
+        />
+
         <span
             v-if="!!errorText"
             class="ui-input__error"
@@ -100,6 +105,10 @@
         errorText: {
             type: String,
             default: ''
+        },
+        isClearable: {
+            type: Boolean,
+            default: false
         }
     });
 

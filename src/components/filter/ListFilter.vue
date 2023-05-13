@@ -14,13 +14,9 @@
                         v-model.trim="search"
                         :spellcheck="false"
                         placeholder="Поиск..."
+                        is-clearable
                     />
                 </label>
-
-                <ui-erase-button
-                    v-if="search"
-                    v-model="search"
-                />
             </div>
 
             <button
@@ -105,7 +101,6 @@
     import type {
         Filter, FilterComposable, FilterGroup, FilterItem
     } from '@/common/composition/useFilter';
-    import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
     import UiInput from "@/components/UI/kit/UiInput.vue";
 
     const showed = ref(false);

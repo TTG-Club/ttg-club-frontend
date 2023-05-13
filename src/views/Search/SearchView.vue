@@ -38,13 +38,9 @@
                                 ref="input"
                                 v-model="search"
                                 placeholder="Поиск..."
+                                is-clearable
                                 @update:model-value="onChangeSearch"
                                 @keyup.enter.exact.prevent.stop="onChangeSearch"
-                            />
-
-                            <ui-erase-button
-                                v-if="search"
-                                @click="search = ''"
                             />
                         </div>
 
@@ -126,7 +122,6 @@
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
     import PageLayout from '@/components/content/PageLayout.vue';
-    import UiEraseButton from "@/components/UI/kit/UiEraseButton.vue";
 
     const http = useAxios();
     const route = useRoute();
