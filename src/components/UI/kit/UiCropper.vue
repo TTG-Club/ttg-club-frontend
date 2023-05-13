@@ -1,7 +1,6 @@
 <template>
     <div
         v-if="modelValue"
-        ref="uiCropper"
         :class="$style['ui-cropper']"
     >
         <svg :class="$style.cropper">
@@ -37,6 +36,7 @@
             />
 
             <line
+                ref="nsTopLineResizer"
                 :x1="calcRect.left"
                 :x2="calcRect.right"
                 :y1="calcRect.top"
@@ -45,6 +45,7 @@
             />
 
             <line
+                ref="ewRightLineResizer"
                 :x1="calcRect.right"
                 :x2="calcRect.right"
                 :y1="calcRect.top"
@@ -53,6 +54,7 @@
             />
 
             <line
+                ref="nsBottomLineResizer"
                 :x1="calcRect.right"
                 :x2="calcRect.left"
                 :y1="calcRect.bottom"
@@ -61,6 +63,7 @@
             />
 
             <line
+                ref="ewLeftLineResizer"
                 :x1="calcRect.left"
                 :x2="calcRect.left"
                 :y1="calcRect.bottom"
@@ -69,6 +72,7 @@
             />
 
             <circle
+                ref="nwseTopResizer"
                 :class="[$style.dot, $style['cursor-nwse']]"
                 :cx="calcRect.left"
                 :cy="calcRect.top"
@@ -76,6 +80,7 @@
             />
 
             <circle
+                ref="nsTopResizer"
                 :class="[$style.dot, $style['cursor-ns']]"
                 :cx="calcRect.centerX"
                 :cy="calcRect.top"
@@ -83,6 +88,7 @@
             />
 
             <circle
+                ref="neswTopResizer"
                 :class="[$style.dot, $style['cursor-nesw']]"
                 :cx="calcRect.right"
                 :cy="calcRect.top"
@@ -90,6 +96,7 @@
             />
 
             <circle
+                ref="ewLeftResizer"
                 :class="[$style.dot, $style['cursor-ew']]"
                 :cx="calcRect.left"
                 :cy="calcRect.centerY"
@@ -97,6 +104,7 @@
             />
 
             <circle
+                ref="ewRightResizer"
                 :class="[$style.dot, $style['cursor-ew']]"
                 :cx="calcRect.right"
                 :cy="calcRect.centerY"
@@ -104,6 +112,7 @@
             />
 
             <circle
+                ref="neswBottomResizer"
                 :class="[$style.dot, $style['cursor-nesw']]"
                 :cx="calcRect.left"
                 :cy="calcRect.bottom"
@@ -111,6 +120,7 @@
             />
 
             <circle
+                ref="nsBottomResizer"
                 :class="[$style.dot, $style['cursor-ns']]"
                 :cx="calcRect.centerX"
                 :cy="calcRect.bottom"
@@ -118,6 +128,7 @@
             />
 
             <circle
+                ref="nwseBottomResizer"
                 :class="[$style.dot, $style['cursor-nwse']]"
                 :cx="calcRect.right"
                 :cy="calcRect.bottom"
@@ -140,11 +151,10 @@
         computed, ref, watch
     } from 'vue';
     import {
-        onKeyStroke,
+        onKeyStroke, Position,
         useDraggable,
         useMouse, useVModel, whenever
     } from '@vueuse/core';
-    import type { Position } from '@vueuse/core';
     import html2canvas from 'html2canvas';
     import UiButton from '@/components/UI/kit/UiButton.vue';
 
@@ -179,14 +189,8 @@
 
     const emit = defineEmits<IEmit>();
 
-    const uiCropper = ref();
-    const mover = ref<SVGRectElement>();
-
     const modelValue = useVModel(props, 'modelValue');
     const mouse = useMouse();
-
-    const inProgress = ref(false);
-    const isResizing = ref(false);
 
     const rect = ref<IRect>({
         x: 256,
@@ -205,13 +209,6 @@
         centerY: rect.value.height / 2 + rect.value.y
     }));
 
-    const moveHandler = (position: Position) => {
-        rect.value = {
-            ...rect.value,
-            ...position
-        };
-    };
-
     onKeyStroke('Escape', e => {
         if (!modelValue.value) {
             return;
@@ -223,19 +220,51 @@
         modelValue.value = false;
     });
 
-    const { isDragging: isMoving } = useDraggable(mover, {
-        preventDefault: true,
-        stopPropagation: true,
-        onMove: position => moveHandler(position)
-    });
+    const onMoveHandler = (position: Position, size?: {width: number, height: number}) => {
+        const getPositionX = () => {
+            if (position.x <= 0) {
+                return 0;
+            }
+
+            if (position.x + rect.value.width >= window.innerWidth) {
+                return window.innerWidth - rect.value.width;
+            }
+
+            return position.x;
+        };
+
+        const getPositionY = () => {
+            if (position.y <= 0) {
+                return 0;
+            }
+
+            if (position.y + rect.value.height >= window.innerHeight) {
+                return window.innerHeight - rect.value.height;
+            }
+
+            return position.y;
+        };
+
+        rect.value = {
+            x: getPositionX(),
+            y: getPositionY(),
+            width: size?.width || rect.value.width,
+            height: size?.height || rect.value.height
+        };
+    };
 
     whenever(modelValue, () => {
-        rect.value = {
-            x: mouse.x.value - 128,
-            y: mouse.y.value - 128,
+        const size = {
             width: 256,
             height: 256
         };
+
+        const position = {
+            x: mouse.x.value - size.width / 2,
+            y: mouse.y.value - size.height / 2
+        };
+
+        onMoveHandler(position, size);
     });
 
     const takeScreenshot = async () => {
@@ -267,6 +296,194 @@
 
     watch<IRectCalc>(calcRect, value => {
         emit('resize', value);
+    });
+
+    // resizer
+    const mover = ref<SVGRectElement>();
+
+    const nsTopLineResizer = ref<SVGLineElement>();
+    const ewRightLineResizer = ref<SVGLineElement>();
+    const nsBottomLineResizer = ref<SVGLineElement>();
+    const ewLeftLineResizer = ref<SVGLineElement>();
+
+    const nwseTopResizer = ref<SVGCircleElement>();
+    const nsTopResizer = ref<SVGCircleElement>();
+    const neswTopResizer = ref<SVGCircleElement>();
+    const ewLeftResizer = ref<SVGCircleElement>();
+    const ewRightResizer = ref<SVGCircleElement>();
+    const neswBottomResizer = ref<SVGCircleElement>();
+    const nsBottomResizer = ref<SVGCircleElement>();
+    const nwseBottomResizer = ref<SVGCircleElement>();
+
+    const { isDragging: isMoving } = useDraggable(mover, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: position => onMoveHandler(position)
+    });
+
+    const nsTopResizeHandler = (position: Position) => {
+        if (position.y <= 0) {
+            rect.value = {
+                ...rect.value,
+                y: 0,
+                height: calcRect.value.bottom
+            };
+
+            return;
+        }
+
+        const max = calcRect.value.bottom - 24;
+        const delta = rect.value.y - position.y;
+
+        rect.value = {
+            ...rect.value,
+            y: position.y > max ? max : position.y,
+            height: position.y > max ? 24 : rect.value.height + delta
+        };
+    };
+
+    const nsBottomResizeHandler = (position: Position) => {
+        if (position.y >= window.innerHeight) {
+            rect.value = {
+                ...rect.value,
+                height: window.innerHeight - rect.value.y
+            };
+
+            return;
+        }
+
+        const height = position.y - rect.value.y;
+
+        rect.value = {
+            ...rect.value,
+            height: height <= 24 ? 24 : height
+        };
+    };
+
+    const ewLeftResizeHandler = (position: Position) => {
+        if (position.x <= 0) {
+            rect.value = {
+                ...rect.value,
+                x: 0,
+                width: calcRect.value.right
+            };
+
+            return;
+        }
+
+        const max = calcRect.value.right - 24;
+        const delta = rect.value.x - position.x;
+
+        rect.value = {
+            ...rect.value,
+            x: position.x > max ? max : position.x,
+            width: position.x > max ? 24 : rect.value.width + delta
+        };
+    };
+
+    const ewRightResizeHandler = (position: Position) => {
+        if (position.x >= window.innerWidth) {
+            rect.value = {
+                ...rect.value,
+                width: window.innerWidth - rect.value.x
+            };
+
+            return;
+        }
+
+        const width = position.x - rect.value.x;
+
+        rect.value = {
+            ...rect.value,
+            width: width <= 24 ? 24 : width
+        };
+    };
+
+    // Resizing by lines
+    useDraggable(nsTopLineResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: nsTopResizeHandler
+    });
+
+    useDraggable(ewRightLineResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: ewRightResizeHandler
+    });
+
+    useDraggable(nsBottomLineResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: nsBottomResizeHandler
+    });
+
+    useDraggable(ewLeftLineResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: ewLeftResizeHandler
+    });
+
+    // Resizing by dots on lines
+    useDraggable(nsTopResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: nsTopResizeHandler
+    });
+
+    useDraggable(ewRightResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: ewRightResizeHandler
+    });
+
+    useDraggable(nsBottomResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: nsBottomResizeHandler
+    });
+
+    useDraggable(ewLeftResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: ewLeftResizeHandler
+    });
+
+    // Resizing by dots on angles
+    useDraggable(nwseTopResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: position => {
+            nsTopResizeHandler(position);
+            ewLeftResizeHandler(position);
+        }
+    });
+
+    useDraggable(neswTopResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: position => {
+            nsTopResizeHandler(position);
+            ewRightResizeHandler(position);
+        }
+    });
+
+    useDraggable(nwseBottomResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: position => {
+            nsBottomResizeHandler(position);
+            ewRightResizeHandler(position);
+        }
+    });
+
+    useDraggable(neswBottomResizer, {
+        preventDefault: true,
+        stopPropagation: true,
+        onMove: position => {
+            nsBottomResizeHandler(position);
+            ewLeftResizeHandler(position);
+        }
     });
 </script>
 
