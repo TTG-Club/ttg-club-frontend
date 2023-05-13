@@ -105,73 +105,48 @@
     </vue-final-modal>
 </template>
 
-<script>
-    import { mapActions, mapState } from 'pinia';
+<script setup lang="ts">
     import { VueFinalModal } from 'vue-final-modal';
+    import { computed } from 'vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
     import UiButton from '@/components/UI/kit/UiButton.vue';
-    import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
     import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
 
-    export default {
-        name: 'BaseModal',
-        components: {
-            VueFinalModal,
-            BookmarkSaveButton,
-            UiButton,
-            SvgIcon
-        },
-        inheritAttrs: true,
-        props: {
-            typeConfirm: {
-                type: Boolean,
-                default: false
-            },
-            typeRemove: {
-                type: Boolean,
-                default: false
-            },
-            typeNotify: {
-                type: Boolean,
-                default: false
-            },
-            typeError: {
-                type: Boolean,
-                default: false
-            },
-            bookmark: {
-                type: Object,
-                default: undefined
-            }
-        },
-        emits: ['confirm'],
-        computed: {
-            ...mapState(useDefaultBookmarkStore, ['isBookmarkSaved']),
+    const props = withDefaults(defineProps<{
+        typeConfirm?: boolean;
+        typeRemove?: boolean;
+        typeNotify?: boolean;
+        typeError?: boolean;
+        bookmark?: any;
+    }>(), {
+        typeConfirm: false,
+        typeRemove: false,
+        typeNotify: false,
+        typeError: false,
+        bookmark: undefined
+    });
 
-            type() {
-                if (this.typeConfirm) {
-                    return 'confirm';
-                }
+    const emit = defineEmits(['confirm']);
 
-                if (this.typeRemove) {
-                    return 'remove';
-                }
-
-                if (this.typeNotify) {
-                    return 'notify';
-                }
-
-                if (this.typeError) {
-                    return 'error';
-                }
-
-                return '';
-            }
-        },
-        methods: {
-            ...mapActions(useDefaultBookmarkStore, ['updateBookmark'])
+    const type = computed(() => {
+        if (props.typeConfirm) {
+            return 'confirm';
         }
-    };
+
+        if (props.typeRemove) {
+            return 'remove';
+        }
+
+        if (props.typeNotify) {
+            return 'notify';
+        }
+
+        if (props.typeError) {
+            return 'error';
+        }
+
+        return '';
+    });
 </script>
 
 <style lang="scss" scoped>

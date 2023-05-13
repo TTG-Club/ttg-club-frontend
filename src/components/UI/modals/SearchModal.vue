@@ -124,9 +124,9 @@
     </vue-final-modal>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import {
-        computed, defineComponent, onMounted, ref, watch
+        computed, onMounted, ref, watch
     } from 'vue';
     import debounce from 'lodash/debounce';
     import {
@@ -142,280 +142,255 @@
     import { useMetrics } from '@/common/composition/useMetrics';
     import UiInput from "@/components/UI/kit/UiInput.vue";
 
-    export default defineComponent({
-        components: {
-            VueFinalModal,
-            UiInput,
-            SearchLink,
-            UiButton,
-            SvgIcon
-        },
-        props: {
-            modelValue: {
-                type: Boolean,
-                default: false
+    const props = withDefaults(defineProps<{
+        modelValue?: boolean;
+    }>(), {
+        modelValue: false
+    });
+
+    const isShowModal = useVModel(props, 'modelValue');
+    const router = useRouter();
+    const http = useAxios();
+    const controller = ref<AbortController | null>(null);
+    const search = ref('');
+    const results = ref<TSearchResultList | null>(null);
+    const inProgress = ref(false);
+    const input = ref<HTMLElement | null>(null);
+    const { focused } = useFocus(input, { initialValue: true });
+    const selectedIndex = ref<number | null>(null);
+    const activeElement = useActiveElement();
+    const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
+
+    const searchUrl = computed(() => ({
+        path: '/search',
+        query: {
+            search: search.value,
+            page: 1
+        }
+    }));
+
+    const onSearch = async () => {
+        if (controller.value !== null) {
+            controller.value.abort();
+        }
+
+        if (!search.value.trim()) {
+            return Promise.resolve();
+        }
+
+        try {
+            inProgress.value = true;
+            controller.value = new AbortController();
+
+            const resp = await http.post({
+                url: '/search',
+                payload: {
+                    page: 0,
+                    limit: 5,
+                    search: {
+                        value: search.value,
+                        exact: false
+                    },
+                    order: []
+                },
+                signal: controller.value.signal
+            });
+
+            if (resp.status !== 200) {
+                return Promise.reject(resp.statusText);
             }
-        },
-        setup(props) {
-            const isShowModal = useVModel(props, 'modelValue');
-            const router = useRouter();
-            const http = useAxios();
-            const controller = ref<AbortController | null>(null);
-            const search = ref('');
-            const results = ref<TSearchResultList | null>(null);
-            const inProgress = ref(false);
-            const input = ref<HTMLElement | null>(null);
-            const { focused } = useFocus(input, { initialValue: true });
-            const selectedIndex = ref<number | null>(null);
-            const activeElement = useActiveElement();
-            const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
 
-            const searchUrl = computed(() => ({
-                path: '/search',
-                query: {
-                    search: search.value,
-                    page: 1
-                }
-            }));
+            sendSearchMetrics(search);
 
-            const onSearch = async () => {
-                if (controller.value !== null) {
-                    controller.value.abort();
-                }
+            const result = resp.data as TSearchResultList;
 
-                if (!search.value.trim()) {
-                    return Promise.resolve();
-                }
+            results.value = result;
+            selectedIndex.value = null;
 
-                try {
-                    inProgress.value = true;
-                    controller.value = new AbortController();
-
-                    const resp = await http.post({
-                        url: '/search',
-                        payload: {
-                            page: 0,
-                            limit: 5,
-                            search: {
-                                value: search.value,
-                                exact: false
-                            },
-                            order: []
-                        },
-                        signal: controller.value.signal
-                    });
-
-                    if (resp.status !== 200) {
-                        return Promise.reject(resp.statusText);
-                    }
-
-                    sendSearchMetrics(search);
-
-                    const result = resp.data as TSearchResultList;
-
-                    results.value = result;
-                    selectedIndex.value = null;
-
-                    sendSearchViewResultsMetrics(
-                        search,
-                        result.list.map(item => ({
-                            item_id: item.url,
-                            item_name: item.name,
-                            item_category: item.section,
-                            item_brand: item.source?.name
-                        }))
-                    );
-
-                    return Promise.resolve();
-                } catch (err) {
-                    results.value = null;
-
-                    return Promise.reject(err);
-                } finally {
-                    controller.value = null;
-                    inProgress.value = false;
-                }
-            };
-
-            const onSearchRandom = async () => {
-                if (controller.value !== null) {
-                    controller.value.abort();
-                }
-
-                try {
-                    search.value = '';
-                    inProgress.value = true;
-                    controller.value = new AbortController();
-
-                    const resp = await http.post({
-                        url: '/search/random',
-                        payload: {
-                            page: 0,
-                            limit: 5,
-                            search: null,
-                            order: []
-                        },
-                        signal: controller.value.signal
-                    });
-
-                    if (resp.status !== 200) {
-                        return Promise.reject(resp.statusText);
-                    }
-
-                    sendSearchMetrics('random');
-
-                    const result = resp.data as TSearchResultList;
-
-                    results.value = result;
-                    selectedIndex.value = null;
-
-                    sendSearchViewResultsMetrics(
-                        'random',
-                        result.list.map(item => ({
-                            item_id: item.url,
-                            item_name: item.name,
-                            item_category: item.section,
-                            item_brand: item.source?.name
-                        }))
-                    );
-
-                    return Promise.resolve();
-                } catch (err) {
-                    results.value = null;
-
-                    return Promise.reject(err);
-                } finally {
-                    controller.value = null;
-                    inProgress.value = false;
-                }
-            };
-
-            onStartTyping(() => {
-                focused.value = true;
-                selectedIndex.value = null;
-            });
-
-            onMounted(() => {
-                focused.value = true;
-            });
-
-            onKeyStroke('ArrowDown', e => {
-                if (!isShowModal.value) {
-                    return;
-                }
-
-                e.preventDefault();
-
-                focused.value = false;
-
-                if (!results.value?.list.length) {
-                    return;
-                }
-
-                if (selectedIndex.value === null || selectedIndex.value === results.value.list.length - 1) {
-                    selectedIndex.value = 0;
-
-                    return;
-                }
-
-                selectedIndex.value++;
-            });
-
-            onKeyStroke('ArrowUp', e => {
-                if (!isShowModal.value) {
-                    return;
-                }
-
-                e.preventDefault();
-
-                focused.value = false;
-
-                if (!results.value?.list.length) {
-                    return;
-                }
-
-                if (!selectedIndex.value) {
-                    selectedIndex.value = results.value.list.length - 1;
-
-                    return;
-                }
-
-                selectedIndex.value--;
-            });
-
-            const notUsingInput = computed(() => (
-                activeElement.value?.tagName !== 'INPUT'
-                && activeElement.value?.tagName !== 'TEXTAREA'
-            ));
-
-            onKeyStroke('Enter', e => {
-                if (!isShowModal.value) {
-                    return;
-                }
-
-                e.preventDefault();
-
-                if (!notUsingInput.value) {
-                    return;
-                }
-
-                if (typeof selectedIndex.value !== 'number' || !results.value?.list.length) {
-                    return;
-                }
-
-                const result = results.value.list[selectedIndex.value];
-
-                if (!result) {
-                    return;
-                }
-
-                router.push({ path: result.url });
-            });
-
-            const onSubmit = () => {
-                if (!focused.value) {
-                    return;
-                }
-
-                if (results.value?.list.length === 1) {
-                    router.push({ path: results.value.list[0].url });
-
-                    return;
-                }
-
-                router.push(searchUrl.value);
-            };
-
-            const onSearchDebounce = debounce(async () => {
-                await onSearch();
-            }, 300);
-
-            const onSearchUpdate = (e: string) => {
-                search.value = e;
-
-                onSearchDebounce();
-            };
-
-            watch(isShowModal, value => {
-                if (!value) {
-                    search.value = '';
-                    results.value = null;
-                }
-            });
-
-            return {
-                isShowModal,
-                inProgress,
-                input,
+            sendSearchViewResultsMetrics(
                 search,
-                searchUrl,
-                results,
-                focused,
-                selectedIndex,
-                onSubmit,
-                onSearchRandom,
-                onSearchUpdate
-            };
+                result.list.map(item => ({
+                    item_id: item.url,
+                    item_name: item.name,
+                    item_category: item.section,
+                    item_brand: item.source?.name
+                }))
+            );
+
+            return Promise.resolve();
+        } catch (err) {
+            results.value = null;
+
+            return Promise.reject(err);
+        } finally {
+            controller.value = null;
+            inProgress.value = false;
+        }
+    };
+
+    const onSearchRandom = async () => {
+        if (controller.value !== null) {
+            controller.value.abort();
+        }
+
+        try {
+            search.value = '';
+            inProgress.value = true;
+            controller.value = new AbortController();
+
+            const resp = await http.post({
+                url: '/search/random',
+                payload: {
+                    page: 0,
+                    limit: 5,
+                    search: null,
+                    order: []
+                },
+                signal: controller.value.signal
+            });
+
+            if (resp.status !== 200) {
+                return Promise.reject(resp.statusText);
+            }
+
+            sendSearchMetrics('random');
+
+            const result = resp.data as TSearchResultList;
+
+            results.value = result;
+            selectedIndex.value = null;
+
+            sendSearchViewResultsMetrics(
+                'random',
+                result.list.map(item => ({
+                    item_id: item.url,
+                    item_name: item.name,
+                    item_category: item.section,
+                    item_brand: item.source?.name
+                }))
+            );
+
+            return Promise.resolve();
+        } catch (err) {
+            results.value = null;
+
+            return Promise.reject(err);
+        } finally {
+            controller.value = null;
+            inProgress.value = false;
+        }
+    };
+
+    onStartTyping(() => {
+        focused.value = true;
+        selectedIndex.value = null;
+    });
+
+    onMounted(() => {
+        focused.value = true;
+    });
+
+    onKeyStroke('ArrowDown', e => {
+        if (!isShowModal.value) {
+            return;
+        }
+
+        e.preventDefault();
+
+        focused.value = false;
+
+        if (!results.value?.list.length) {
+            return;
+        }
+
+        if (selectedIndex.value === null || selectedIndex.value === results.value.list.length - 1) {
+            selectedIndex.value = 0;
+
+            return;
+        }
+
+        selectedIndex.value++;
+    });
+
+    onKeyStroke('ArrowUp', e => {
+        if (!isShowModal.value) {
+            return;
+        }
+
+        e.preventDefault();
+
+        focused.value = false;
+
+        if (!results.value?.list.length) {
+            return;
+        }
+
+        if (!selectedIndex.value) {
+            selectedIndex.value = results.value.list.length - 1;
+
+            return;
+        }
+
+        selectedIndex.value--;
+    });
+
+    const notUsingInput = computed(() => (
+        activeElement.value?.tagName !== 'INPUT'
+        && activeElement.value?.tagName !== 'TEXTAREA'
+    ));
+
+    onKeyStroke('Enter', e => {
+        if (!isShowModal.value) {
+            return;
+        }
+
+        e.preventDefault();
+
+        if (!notUsingInput.value) {
+            return;
+        }
+
+        if (typeof selectedIndex.value !== 'number' || !results.value?.list.length) {
+            return;
+        }
+
+        const result = results.value.list[selectedIndex.value];
+
+        if (!result) {
+            return;
+        }
+
+        router.push({ path: result.url });
+    });
+
+    const onSubmit = () => {
+        if (!focused.value) {
+            return;
+        }
+
+        if (results.value?.list.length === 1) {
+            router.push({ path: results.value.list[0].url });
+
+            return;
+        }
+
+        router.push(searchUrl.value);
+    };
+
+    const onSearchDebounce = debounce(async () => {
+        await onSearch();
+    }, 300);
+
+    const onSearchUpdate = (e: string) => {
+        search.value = e;
+
+        onSearchDebounce();
+    };
+
+    watch(isShowModal, value => {
+        if (!value) {
+            search.value = '';
+            results.value = null;
         }
     });
 </script>

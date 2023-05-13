@@ -38,24 +38,15 @@
     </vue-final-modal>
 </template>
 
-<script>
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
     import { VueFinalModal } from 'vue-final-modal';
     import UiButton from '@/components/UI/kit/UiButton.vue';
     import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-    export default defineComponent({
-        components: {
-            SvgIcon,
-            VueFinalModal,
-            UiButton
-        },
-        props: {
-            title: {
-                type: String,
-                default: ''
-            }
-        }
+    withDefaults(defineProps<{
+        title?: string;
+    }>(), {
+        title: ''
     });
 </script>
 
