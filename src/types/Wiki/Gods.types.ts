@@ -1,4 +1,4 @@
 export enum GodsFilterDefaults {
-    dbName = 'gods',
-    url = '/filters/gods'
+  dbName = 'gods',
+  url = '/filters/gods'
 }

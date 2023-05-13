@@ -6,129 +6,129 @@ import { useIsDev } from '@/common/helpers/isDev';
 import { routes } from '@/router/routes';
 
 export interface ISearchItem {
-    item_id: string;
-    item_name: string;
-    item_category?: string;
-    item_brand?: string;
+  item_id: string;
+  item_name: string;
+  item_category?: string;
+  item_brand?: string;
 }
 
 export const useMetrics = () => {
-    const isDev = useIsDev();
+  const isDev = useIsDev();
 
-    const sendSearchMetrics = (search: MaybeRef<string>) => {
-        if (isDev) {
-            return;
-        }
+  const sendSearchMetrics = (search: MaybeRef<string>) => {
+    if (isDev) {
+      return;
+    }
 
-        const term = unref(search);
+    const term = unref(search);
 
-        event('search', {
-            search_term: term
-        });
+    event('search', {
+      search_term: term
+    });
+  };
+
+  const sendSearchViewResultsMetrics = (search: MaybeRef<string>, items?: MaybeRef<Array<ISearchItem>>) => {
+    if (isDev) {
+      return;
+    }
+
+    const term = unref(search);
+    const list = unref(items);
+
+    const eventParams: {
+      search_term: string;
+      items?: Array<ISearchItem>
+    } = {
+      search_term: term
     };
 
-    const sendSearchViewResultsMetrics = (search: MaybeRef<string>, items?: MaybeRef<Array<ISearchItem>>) => {
-        if (isDev) {
-            return;
-        }
+    if (list instanceof Array) {
+      eventParams.items = list;
+    }
 
-        const term = unref(search);
-        const list = unref(items);
+    event('view_search_results', eventParams);
+  };
 
-        const eventParams: {
-            search_term: string;
-            items?: Array<ISearchItem>
-        } = {
-            search_term: term
-        };
+  const sendPageViewMetrics = (to: RouteLocationNormalized) => {
+    if (isDev) {
+      return;
+    }
 
-        if (list instanceof Array) {
-            eventParams.items = list;
-        }
+    const errGroup = routes.find(route => route.name === 'unknown-error');
 
-        event('view_search_results', eventParams);
-    };
+    const exclude = errGroup?.children
+      ?.map(child => child.name)
+      .filter(name => !!name) || [];
 
-    const sendPageViewMetrics = (to: RouteLocationNormalized) => {
-        if (isDev) {
-            return;
-        }
+    exclude.push('profile');
+    exclude.push('reset-password');
 
-        const errGroup = routes.find(route => route.name === 'unknown-error');
+    if (to.name && exclude.includes(to.name)) {
+      return;
+    }
 
-        const exclude = errGroup?.children
-            ?.map(child => child.name)
-            .filter(name => !!name) || [];
+    pageview({
+      page_path: to.path,
+      page_location: window.location.origin + to.fullPath
+    });
+  };
 
-        exclude.push('profile');
-        exclude.push('reset-password');
+  const sendSignUpMetrics = (method: MaybeRef<string> = 'default') => {
+    if (isDev) {
+      return;
+    }
 
-        if (to.name && exclude.includes(to.name)) {
-            return;
-        }
+    event('sign_up', {
+      method: unref(method)
+    });
+  };
 
-        pageview({
-            page_path: to.path,
-            page_location: window.location.origin + to.fullPath
-        });
-    };
+  const sendLoginMetrics = (method: MaybeRef<string> = 'default') => {
+    if (isDev) {
+      return;
+    }
 
-    const sendSignUpMetrics = (method: MaybeRef<string> = 'default') => {
-        if (isDev) {
-            return;
-        }
+    event('login', {
+      method: unref(method)
+    });
+  };
 
-        event('sign_up', {
-            method: unref(method)
-        });
-    };
+  const sendShareMetrics = (payload: {
+    method: MaybeRef<string>;
+    id?: MaybeRef<string>;
+    category?: MaybeRef<string>;
+  } = { method: 'link_copy' }) => {
+    if (isDev) {
+      return;
+    }
 
-    const sendLoginMetrics = (method: MaybeRef<string> = 'default') => {
-        if (isDev) {
-            return;
-        }
+    const method = unref(payload.method);
+    const id = unref(payload.id);
+    const category = unref(payload.category);
 
-        event('login', {
-            method: unref(method)
-        });
-    };
+    const eventParams: {
+      method: string;
+      item_id?: string;
+      content_type?: string;
+    } = { method };
 
-    const sendShareMetrics = (payload: {
-        method: MaybeRef<string>;
-        id?: MaybeRef<string>;
-        category?: MaybeRef<string>;
-    } = { method: 'link_copy' }) => {
-        if (isDev) {
-            return;
-        }
+    if (id) {
+      eventParams.item_id = id;
+    }
 
-        const method = unref(payload.method);
-        const id = unref(payload.id);
-        const category = unref(payload.category);
+    if (category) {
+      eventParams.content_type = category;
+    }
 
-        const eventParams: {
-            method: string;
-            item_id?: string;
-            content_type?: string;
-        } = { method };
+    event('share', eventParams);
+  };
 
-        if (id) {
-            eventParams.item_id = id;
-        }
-
-        if (category) {
-            eventParams.content_type = category;
-        }
-
-        event('share', eventParams);
-    };
-
-    return {
-        sendSearchMetrics,
-        sendSearchViewResultsMetrics,
-        sendPageViewMetrics,
-        sendSignUpMetrics,
-        sendLoginMetrics,
-        sendShareMetrics
-    };
+  return {
+    sendSearchMetrics,
+    sendSearchViewResultsMetrics,
+    sendPageViewMetrics,
+    sendSignUpMetrics,
+    sendLoginMetrics,
+    sendShareMetrics
+  };
 };

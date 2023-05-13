@@ -1,128 +1,128 @@
 .editor_text textarea {
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: 0 !important;
-    z-index: -1 !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  z-index: -1 !important;
 }
 
 .editor_text .ce-block__content,
 .editor_text .ce-toolbar__content {
-    max-width: none;
+  max-width: none;
 }
 
 @media (max-width: 1200px) {
-    .editor_text .ce-block__content,
-    .editor_text .ce-toolbar__content {
-        max-width: calc(100% - 80px);
-    }
+  .editor_text .ce-block__content,
+  .editor_text .ce-toolbar__content {
+    max-width: calc(100% - 80px);
+  }
 }
 
 @media (max-width: 650px) {
-    .editor_text .ce-block__content,
-    .editor_text .ce-toolbar__content {
-        max-width: none;
-    }
+  .editor_text .ce-block__content,
+  .editor_text .ce-toolbar__content {
+    max-width: none;
+  }
 }
 
 .editor_text .codex-editor__redactor {
-    padding-bottom: 100px !important;
+  padding-bottom: 100px !important;
 }
 
 .editor_text .codex-editor svg {
-    fill: var(--text-color);
+  fill: var(--text-color);
 }
 
 .editor_text .tc-toolbox__toggler svg rect {
-    fill: var(--hover);
+  fill: var(--hover);
 }
 
 .editor_text .ce-toolbar__plus--active, .ce-toolbar__plus:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-toolbar__settings-btn--active, .ce-toolbar__settings-btn:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-toolbox__button--active, .ce-toolbox__button:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-block--selected .ce-block__content {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-inline-tool {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 
 .editor_text .ce-inline-tool svg {
-    fill: currentColor;
+  fill: currentColor;
 }
 
 .editor_text .ce-inline-tool.ce-inline-tool--active {
-    color: var(--primary);
+  color: var(--primary);
 }
 
 .editor_text .ce-inline-tool:hover,
 .editor_text .ce-conversion-tool:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-inline-toolbar__dropdown:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-conversion-tool__icon {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .ce-settings__button:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .cdx-settings-button:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .tc-add-row:hover:before {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_text .tc-cell--selected {
-    background: var(--hover);
+  background: var(--hover);
 }
 
 .editor_text .tc-popover {
-    background: var(--bg-sub-menu);
-    border-color: var(--border);
+  background: var(--bg-sub-menu);
+  border-color: var(--border);
 }
 
 .editor_text .tc-popover__item-icon {
-    background: var(--bg-sub-menu);
-    border-color: var(--border);
+  background: var(--bg-sub-menu);
+  border-color: var(--border);
 }
 
 .editor_text .codex-editor--narrow .ce-toolbar__actions {
-    right: 100%;
+  right: 100%;
 }
 
 .editor_text .codex-editor--narrow .ce-toolbox {
-    background-color: var(--bg-sub-menu);
+  background-color: var(--bg-sub-menu);
 }
 
 .editor_text .ce-conversion-toolbar {
-    background-color: var(--bg-sub-menu);
-    border: 1px solid var(--border);
+  background-color: var(--bg-sub-menu);
+  border: 1px solid var(--border);
 }
 
 .editor_text .ce-settings,
 .editor_text .ce-inline-toolbar {
-    background-color: var(--bg-sub-menu);
-    border: 1px solid var(--border);
+  background-color: var(--bg-sub-menu);
+  border: 1px solid var(--border);
 }
 
 .editor_text .tc-add-column,
@@ -130,81 +130,81 @@
 .editor_text .tc-cell,
 .editor_text .tc-row,
 .editor_text .tc-table {
-    border-color: var(--border);
+  border-color: var(--border);
 }
 
 .editor_text .tc-add-column:hover, .editor_text .tc-add-row:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 @media (max-width: 650px) {
-    .editor_text .ce-toolbar {
-        background-color: var(--bg-sub-menu);
-        border: 1px solid var(--border);
-    }
+  .editor_text .ce-toolbar {
+    background-color: var(--bg-sub-menu);
+    border: 1px solid var(--border);
+  }
 
-    .editor_text .ce-toolbox {
-        display: flex;
-        flex-wrap: wrap;
-    }
+  .editor_text .ce-toolbox {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
 
 .editor_text .ce-block__content .cdx-input {
-    border: 0;
+  border: 0;
 }
 
 .editor_text .ce-block__content .cdx-quote__caption {
-    border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border);
 }
 
 .editor_text .cdx-list {
-    color: var(--text-color);
-    padding-left: 24px;
-    margin: 0 0 12px 0;
+  color: var(--text-color);
+  padding-left: 24px;
+  margin: 0 0 12px 0;
 }
 
 .editor_text .cdx-list li {
-    line-height: 20px;
-    padding: 0;
-    margin-bottom: 4px;
+  line-height: 20px;
+  padding: 0;
+  margin-bottom: 4px;
 }
 
 .editor_text .cdx-checklist .cdx-checklist__item-checkbox {
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .editor_text .cdx-checklist .cdx-checklist__item-checkbox:after {
-    top: 5px;
-    left: 4px;
-    width: 6px;
-    height: 3px;
+  top: 5px;
+  left: 4px;
+  width: 6px;
+  height: 3px;
 }
 
 .editor_text dnd5club-saving-throw,
 .editor_text dnd5club-dice-text,
 .editor_text dnd5club-advantage,
 .editor_text dnd5club-disadvantage {
-    padding: 0 3px;
-    border-radius: 4px;
-    color: var(--text-btn-color);
+  padding: 0 3px;
+  border-radius: 4px;
+  color: var(--text-btn-color);
 }
 
 .editor_text dnd5club-dice-text {
-    background-color: var(--bg-dice);
-    color: var(--text-btn-color)
+  background-color: var(--bg-dice);
+  color: var(--text-btn-color)
 }
 
 .editor_text dnd5club-saving-throw {
-    background-color: var(--bg-advantage);
+  background-color: var(--bg-advantage);
 }
 
 .editor_text dnd5club-advantage {
-    background-color: var(--bg-disadvantage);
+  background-color: var(--bg-disadvantage);
 }
 
 .editor_text dnd5club-disadvantage {
-    background-color: var(--bg-saving_throw);
+  background-color: var(--bg-saving_throw);
 }
 
 .editor_readonly {
@@ -212,119 +212,119 @@
 
 .editor_readonly .ce-block__content,
 .editor_readonly .ce-toolbar__content {
-    max-width: none;
+  max-width: none;
 }
 
 @media (max-width: 1200px) {
-    .editor_readonly .ce-block__content,
-    .editor_readonly .ce-toolbar__content {
-        max-width: calc(100% - 80px);
-    }
+  .editor_readonly .ce-block__content,
+  .editor_readonly .ce-toolbar__content {
+    max-width: calc(100% - 80px);
+  }
 }
 
 @media (max-width: 650px) {
-    .editor_readonly .ce-block__content,
-    .editor_readonly .ce-toolbar__content {
-        max-width: none;
-    }
+  .editor_readonly .ce-block__content,
+  .editor_readonly .ce-toolbar__content {
+    max-width: none;
+  }
 }
 
 .editor_readonly .codex-editor__redactor {
-    padding-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .editor_readonly .codex-editor svg {
-    fill: var(--text-color);
+  fill: var(--text-color);
 }
 
 .editor_readonly .tc-toolbox__toggler svg rect {
-    fill: var(--hover);
+  fill: var(--hover);
 }
 
 .editor_readonly .ce-toolbar__plus--active, .ce-toolbar__plus:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-toolbar__settings-btn--active, .ce-toolbar__settings-btn:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-toolbox__button--active, .ce-toolbox__button:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-block--selected .ce-block__content {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-inline-tool {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 
 .editor_readonly .ce-inline-tool svg {
-    fill: currentColor;
+  fill: currentColor;
 }
 
 .editor_readonly .ce-inline-tool.ce-inline-tool--active {
-    color: var(--primary);
+  color: var(--primary);
 }
 
 .editor_readonly .ce-inline-tool:hover,
 .editor_readonly .ce-conversion-tool:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-inline-toolbar__dropdown:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-conversion-tool__icon {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .ce-settings__button:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .cdx-settings-button:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .tc-add-row:hover:before {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 .editor_readonly .tc-cell--selected {
-    background: var(--hover);
+  background: var(--hover);
 }
 
 .editor_readonly .tc-popover {
-    background: var(--bg-sub-menu);
-    border-color: var(--border);
+  background: var(--bg-sub-menu);
+  border-color: var(--border);
 }
 
 .editor_readonly .tc-popover__item-icon {
-    background: var(--bg-sub-menu);
-    border-color: var(--border);
+  background: var(--bg-sub-menu);
+  border-color: var(--border);
 }
 
 .editor_readonly .codex-editor--narrow .ce-toolbar__actions {
-    right: 100%;
+  right: 100%;
 }
 
 .editor_readonly .codex-editor--narrow .ce-toolbox {
-    background-color: var(--bg-sub-menu);
+  background-color: var(--bg-sub-menu);
 }
 
 .editor_readonly .ce-conversion-toolbar {
-    background-color: var(--bg-sub-menu);
-    border: 1px solid var(--border);
+  background-color: var(--bg-sub-menu);
+  border: 1px solid var(--border);
 }
 
 .editor_readonly .ce-settings,
 .editor_readonly .ce-inline-toolbar {
-    background-color: var(--bg-sub-menu);
-    border: 1px solid var(--border);
+  background-color: var(--bg-sub-menu);
+  border: 1px solid var(--border);
 }
 
 .editor_readonly .tc-add-column,
@@ -332,79 +332,79 @@
 .editor_readonly .tc-cell,
 .editor_readonly .tc-row,
 .editor_readonly .tc-table {
-    border-color: var(--border);
+  border-color: var(--border);
 }
 
 .editor_readonly .tc-add-column:hover, .editor_readonly .tc-add-row:hover {
-    background-color: var(--hover);
+  background-color: var(--hover);
 }
 
 @media (max-width: 650px) {
-    .editor_readonly .ce-toolbar {
-        background-color: var(--bg-sub-menu);
-        border: 1px solid var(--border);
-    }
+  .editor_readonly .ce-toolbar {
+    background-color: var(--bg-sub-menu);
+    border: 1px solid var(--border);
+  }
 
-    .editor_readonly .ce-toolbox {
-        display: flex;
-        flex-wrap: wrap;
-    }
+  .editor_readonly .ce-toolbox {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
 
 .editor_readonly .ce-block__content .cdx-input {
-    border: 0;
+  border: 0;
 }
 
 .editor_readonly .ce-block__content .cdx-quote__caption {
-    border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border);
 }
 
 .editor_readonly .cdx-list {
-    color: var(--text-color);
-    padding-left: 24px;
-    margin: 0 0 12px 0;
+  color: var(--text-color);
+  padding-left: 24px;
+  margin: 0 0 12px 0;
 }
 
 .editor_readonly .cdx-list li {
-    line-height: 20px;
-    padding: 0;
-    margin-bottom: 4px;
+  line-height: 20px;
+  padding: 0;
+  margin-bottom: 4px;
 }
 
 .editor_readonly .cdx-checklist .cdx-checklist__item-checkbox {
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .editor_readonly .cdx-checklist .cdx-checklist__item-checkbox:after {
-    top: 5px;
-    left: 4px;
-    width: 6px;
-    height: 3px;
+  top: 5px;
+  left: 4px;
+  width: 6px;
+  height: 3px;
 }
 
 .editor_readonly dnd5club-saving-throw,
 .editor_readonly dnd5club-dice-text,
 .editor_readonly dnd5club-advantage,
 .editor_readonly dnd5club-disadvantage {
-    padding: 0 3px;
-    border-radius: 4px;
-    color: var(--text-btn-color);
+  padding: 0 3px;
+  border-radius: 4px;
+  color: var(--text-btn-color);
 }
 
 .editor_readonly dnd5club-dice-text {
-    background-color: var(--bg-dice);
-    color: var(--text-btn-color)
+  background-color: var(--bg-dice);
+  color: var(--text-btn-color)
 }
 
 .editor_readonly dnd5club-saving-throw {
-    background-color: var(--bg-advantage);
+  background-color: var(--bg-advantage);
 }
 
 .editor_readonly dnd5club-advantage {
-    background-color: var(--bg-disadvantage);
+  background-color: var(--bg-disadvantage);
 }
 
 .editor_readonly dnd5club-disadvantage {
-    background-color: var(--bg-saving_throw);
+  background-color: var(--bg-saving_throw);
 }

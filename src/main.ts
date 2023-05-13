@@ -20,27 +20,27 @@ const app = createApp(App);
 app.config.globalProperties.$http = new HTTPService();
 
 app.use(pinia)
-    .use(router)
-    .use(VueTippy, TippyOptions)
-    .use(VueLazyLoad)
-    .use(Toast, {
-        ...ToastOptions,
-        eventBus: ToastEventBus
-    })
-    .use(vfmPlugin({
-        key: '$vfm',
-        componentName: 'VueFinalModal',
-        dynamicContainerName: 'ModalsContainer'
-    }))
-    .directive('tippy-lazy', TippyLazy);
+  .use(router)
+  .use(VueTippy, TippyOptions)
+  .use(VueLazyLoad)
+  .use(Toast, {
+    ...ToastOptions,
+    eventBus: ToastEventBus
+  })
+  .use(vfmPlugin({
+    key: '$vfm',
+    componentName: 'VueFinalModal',
+    dynamicContainerName: 'ModalsContainer'
+  }))
+  .directive('tippy-lazy', TippyLazy);
 
 if (!isDev) {
-    app.use(VueGtag, {
-        config: {
-            // @ts-ignore
-            id: window.GTAG_ID
-        }
-    });
+  app.use(VueGtag, {
+    config: {
+      // @ts-ignore
+      id: window.GTAG_ID
+    }
+  });
 }
 
 registerComponents(app);

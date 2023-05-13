@@ -1,46 +1,46 @@
 <template>
+  <div
+    class="list-row"
+  >
     <div
-        class="list-row"
+      v-for="item in items"
+      :key="item[itemKey]"
+      class="list-row__column"
     >
-        <div
-            v-for="item in items"
-            :key="item[itemKey]"
-            class="list-row__column"
-        >
-            <slot v-bind="{ item }" />
-        </div>
+      <slot v-bind="{ item }" />
     </div>
+  </div>
 </template>
 
-<script setup lang="ts">
-    import isArray from "lodash/isArray";
-    import type { AnyArray } from "@/types/Shared/Utility.types";
+<script lang="ts" setup>
+  import isArray from 'lodash/isArray';
+  import type { AnyArray } from '@/types/Shared/Utility.types';
 
-    export type TListRowProps = {
-        row: unknown | AnyArray;
-        columns?: number;
-        itemKey: string;
-    }
+  export type TListRowProps = {
+    row: unknown | AnyArray;
+    columns?: number;
+    itemKey: string;
+  }
 
-    const props = withDefaults(defineProps<TListRowProps>(), {
-        columns: 1
-    });
+  const props = withDefaults(defineProps<TListRowProps>(), {
+    columns: 1
+  });
 
-    const items = isArray(props.row) ? props.row : [props.row];
+  const items = isArray(props.row) ? props.row : [props.row];
 </script>
 
 <style lang="scss" scoped>
-    $column-spacing: 12px;
+  $column-spacing: 12px;
 
-    .list-row {
-        display: flex;
-        flex-wrap: wrap;
-        margin: -$column-spacing * .5;
+  .list-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -$column-spacing * .5;
 
-        &__column {
-            flex-basis: calc(100% / v-bind(columns));
-            padding: $column-spacing * .5;
-            min-width: 0;
-        }
+    &__column {
+      flex-basis: calc(100% / v-bind(columns));
+      padding: $column-spacing * .5;
+      min-width: 0;
     }
+  }
 </style>

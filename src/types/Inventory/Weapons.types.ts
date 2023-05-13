@@ -1,4 +1,4 @@
 export enum WeaponsFilterDefaults {
-    dbName = 'weapons',
-    url = '/filters/weapons'
+  dbName = 'weapons',
+  url = '/filters/weapons'
 }
