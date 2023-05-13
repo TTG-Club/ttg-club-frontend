@@ -244,24 +244,16 @@
 
         &.is-secondary {
             background-color: var(--bg-sub-menu);
-            color: var(--text-color);
-            border:1px solid var(--border);
+            color: var(--text-color);border:1px solid var(--border);
 
             @include media-min($xl) {
                 &:hover {
                     background-color: var(--hover);
                 }
-
-                &:active,
-                &.is-active {
-                    background-color: var(--bg-main);
-                }
             }
 
             &:disabled {
                 opacity: .6;
-                background-color: transparent;
-                color: var(--primary);
                 cursor: not-allowed;
             }
         }
