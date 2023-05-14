@@ -1,4 +1,4 @@
 export enum SpellsFilterDefaults {
-    dbName = 'spells',
-    url = '/filters/spells'
+  dbName = 'spells',
+  url = '/filters/spells'
 }

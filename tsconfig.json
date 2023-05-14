@@ -19,7 +19,11 @@
       "dom.iterable",
       "scripthost"
     ],
-    "plugins": [{ "name": "typescript-plugin-css-modules" }],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -58,12 +62,6 @@
   ],
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "src/**/*.vue",
-    "src/**/*.json"
+    "src/**/*",
   ]
 }

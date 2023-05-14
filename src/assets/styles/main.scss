@@ -313,7 +313,7 @@
 
           h4 {
             margin-top: 0;
-            font-family: "Open Sans",sans-serif;
+            font-family: "Open Sans", sans-serif;
             font-weight: 500;
           }
 
@@ -329,6 +329,7 @@
             color: var(--text-color);
             padding: 6px 8px;
             border-radius: 8px;
+            border: 1px solid var(--border);
 
             &.main {
               background-color: var(--primary);
@@ -337,6 +338,7 @@
 
             &:hover {
               background-color: var(--primary-hover);
+              color: var(--text-btn-color);
               transition: all .5s;
             }
           }
@@ -405,6 +407,7 @@
     font-family: "Open Sans", sans-serif;
     font-weight: 400;
     opacity: 0.6;
+    margin-bottom: 12px;
   }
 
   .list {
@@ -414,13 +417,14 @@
 
     .block {
       padding: 8px 8px;
-      background-color: var(--hover);
+      background-color: var(--bg-sub-menu);
       color: var(--text-color);
       border-radius: 8px;
       display: inline-flex;
       margin: 4px 4px;
       align-items: center;
       transition: all 0.5s;
+      border: 1px solid var(--border);
 
       &.w-100 {
         width: 100%;
@@ -442,6 +446,7 @@
 
       &:hover {
         background-color: var(--bg-main);
+        color: var(--text-color-title);
       }
     }
   }
@@ -577,7 +582,7 @@
       text-transform: uppercase;
       color: var(--text-color-title);
       background-color: var(--hover);
-      font-family: "Open Sans",sans-serif;
+      font-family: "Open Sans", sans-serif;
     }
 
     p {

@@ -1,4 +1,4 @@
 export enum OptionsFilterDefaults {
-    dbName = 'options',
-    url = '/filters/options'
+  dbName = 'options',
+  url = '/filters/options'
 }

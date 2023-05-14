@@ -1,10 +1,10 @@
 :export {
-    sm: strip-unit($sm);
-    md: strip-unit($md);
-    lg: strip-unit($lg);
-    xl: strip-unit($xl);
-    xxl: strip-unit($xxl);
-    fullHD: strip-unit($full_hd);
-    retina: strip-unit($retina);
-    ultraHD: strip-unit($ultra_hd);
+  sm: strip-unit($sm);
+  md: strip-unit($md);
+  lg: strip-unit($lg);
+  xl: strip-unit($xl);
+  xxl: strip-unit($xxl);
+  fullHD: strip-unit($full_hd);
+  retina: strip-unit($retina);
+  ultraHD: strip-unit($ultra_hd);
 }

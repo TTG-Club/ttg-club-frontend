@@ -1,4 +1,4 @@
 export enum BooksFilterDefaults {
-    dbName = 'books',
-    url = '/filters/books'
+  dbName = 'books',
+  url = '/filters/books'
 }

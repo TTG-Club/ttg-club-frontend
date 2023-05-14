@@ -1,5 +1,5 @@
 export const isLastIndex = (array: unknown[], index: number) => {
-    const lastIndex = array.length - 1;
+  const lastIndex = array.length - 1;
 
-    return index === lastIndex;
+  return index === lastIndex;
 };
