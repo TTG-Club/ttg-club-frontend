@@ -1,28 +1,28 @@
 import type { InjectionKey } from 'vue';
 import {
-    getCurrentInstance, inject, provide
+  getCurrentInstance, inject, provide
 } from 'vue';
 
 const isDev: boolean = !!process?.env?.VUE_APP_DEV && (process?.env?.VUE_APP_DEV === 'true');
 const isDevInjectionKey: InjectionKey<boolean> = Symbol('isDev');
 
 const provideIsDev = () => {
-    if (getCurrentInstance()) {
-        provide(isDevInjectionKey, isDev);
-    }
+  if (getCurrentInstance()) {
+    provide(isDevInjectionKey, isDev);
+  }
 };
 
 const useIsDev = () => {
-    const isDevInstance = getCurrentInstance()
-        ? inject<boolean>(isDevInjectionKey, false)
-        : undefined;
+  const isDevInstance = getCurrentInstance()
+    ? inject<boolean>(isDevInjectionKey, false)
+    : undefined;
 
-    return isDevInstance || isDev;
+  return isDevInstance || isDev;
 };
 
 export {
-    provideIsDev,
-    useIsDev
+  provideIsDev,
+  useIsDev
 };
 
 export default isDev;

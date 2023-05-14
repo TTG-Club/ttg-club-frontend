@@ -12,16 +12,16 @@ import SocialLinks from '@/components/content/SocialLinks.vue';
 
 /* eslint-disable vue/match-component-file-name */
 export default function registerComponents(app: App) {
-    // Components
-    app.component('MenuThemeSwitcher', MenuThemeSwitcher);
-    app.component('SiteLogo', SiteLogo);
-    app.component('SvgIcon', SvgIcon);
-    app.component('DiceRoller', DiceRoller);
-    app.component('NavBar', NavBar);
-    app.component('RawContent', RawContent);
-    app.component('DetailTooltip', DetailTooltip);
-    app.component('ChangePasswordView', ChangePasswordView);
-    app.component('PageLayout', PageLayout);
-    app.component('SocialLinks', SocialLinks);
+  // Components
+  app.component('MenuThemeSwitcher', MenuThemeSwitcher);
+  app.component('SiteLogo', SiteLogo);
+  app.component('SvgIcon', SvgIcon);
+  app.component('DiceRoller', DiceRoller);
+  app.component('NavBar', NavBar);
+  app.component('RawContent', RawContent);
+  app.component('DetailTooltip', DetailTooltip);
+  app.component('ChangePasswordView', ChangePasswordView);
+  app.component('PageLayout', PageLayout);
+  app.component('SocialLinks', SocialLinks);
 }
 /* eslint-enable vue/match-component-file-name */

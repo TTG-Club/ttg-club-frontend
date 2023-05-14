@@ -1,54 +1,54 @@
 export type TClassSource = {
-    name: string
-    shortName: string
-    homebrew?: boolean
+  name: string
+  shortName: string
+  homebrew?: boolean
 }
 
 export type TClassName = {
-    rus: string
-    eng: string
+  rus: string
+  eng: string
 }
 
 export type TClassGroup = {
-    name: string
-    order: number
+  name: string
+  order: number
 }
 
 export type TClassArchetype = {
-    name: TClassName
-    type: TClassGroup
-    source: TClassSource
-    url: string
+  name: TClassName
+  type: TClassGroup
+  source: TClassSource
+  url: string
 }
 
 export type TClassLink = {
-    archetypeName?: string
-    archetypes: Array<TClassArchetype>
-    dice: 'к6' | 'к8' | 'к10' | 'к12'
-    icon?: string
-    image: string
-    name: TClassName
-    sidekick: boolean
-    source: TClassSource
-    url: string
-    group?: TClassGroup
+  archetypeName?: string
+  archetypes: Array<TClassArchetype>
+  dice: 'к6' | 'к8' | 'к10' | 'к12'
+  icon?: string
+  image: string
+  name: TClassName
+  sidekick: boolean
+  source: TClassSource
+  url: string
+  group?: TClassGroup
 }
 
 export type TClassArchetypeList = {
-    list: Array<TClassArchetype>
-    group?: TClassGroup
+  list: Array<TClassArchetype>
+  group?: TClassGroup
 }
 
 export type TClassItem = Omit<TClassLink, 'archetypes'> & {
-    archetypes: Array<TClassArchetypeList>
+  archetypes: Array<TClassArchetypeList>
 }
 
 export type TClassList = {
-    list: Array<TClassItem>
-    group?: TClassGroup
+  list: Array<TClassItem>
+  group?: TClassGroup
 }
 
 export enum ClassesFilterDefaults {
-    dbName = 'classes',
-    url = '/filters/classes'
+  dbName = 'classes',
+  url = '/filters/classes'
 }

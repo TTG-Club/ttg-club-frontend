@@ -1,4 +1,4 @@
 export enum ArmorsFilterDefaults {
-    dbName = 'armors',
-    url = '/filters/armors'
+  dbName = 'armors',
+  url = '/filters/armors'
 }

@@ -1,9 +1,6 @@
 import type { AnyObject, RecordKey } from '@/types/Shared/Utility.types';
 import type { DefaultKeyField } from '@/common/const';
-import type {
-    TGetListRowsOptions,
-    TListRow
-} from '@/types/Shared/List.types';
+import type { TGetListRowsOptions, TListRow } from '@/types/Shared/List.types';
 
 export type TGroupedListGroup<Group = AnyObject> = Group & {
   isGroup: boolean;
