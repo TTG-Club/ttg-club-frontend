@@ -15,17 +15,18 @@
         ref="input"
         v-model="value"
         :autocomplete="inputAutocomplete"
-        :maxlength="maxLength"
         :placeholder="placeholder"
+        :maxlength="maxLength"
         :spellcheck="false"
         :type="inputType"
         class="ui-input__input"
         v-bind="attrs"
+        @keydown="typeValidate($event)"
         @blur="$emit('blur')"
       >
 
       <span
-        v-if="isPassword"
+        v-if="type === 'password'"
         class="ui-input__control_icon"
         @click.left.exact.prevent="togglePass"
       >
@@ -35,6 +36,11 @@
           fill-enable
         />
       </span>
+
+      <ui-erase-button
+        v-if="isClearable && value"
+        v-model="value"
+      />
     </span>
 
     <span
@@ -46,156 +52,149 @@
   </label>
 </template>
 
-<script>
-  import { defineComponent } from 'vue';
+<script setup>
+  import {
+    computed, onMounted, ref, useAttrs
+  } from 'vue';
+  import { useVModel } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import UiEraseButton from '@/components/UI/kit/UiEraseButton.vue';
 
-  export default defineComponent({
-    components: {
-      SvgIcon
+  const props = defineProps({
+    modelValue: {
+      type: [String, Number],
+      default: ''
     },
-    inheritAttrs: false,
-    props: {
-      modelValue: {
-        type: [String, Number],
-        default: ''
-      },
-      label: {
-        type: String,
-        default: ''
-      },
-      placeholder: {
-        type: String,
-        default: ''
-      },
-      autofocus: {
-        type: Boolean,
-        default: false
-      },
-      autocomplete: {
-        type: [Boolean, String],
-        default: false
-      },
-      type: {
-        type: String,
-        default: 'text'
-      },
-      isNumber: {
-        type: Boolean,
-        default: false
-      },
-      isPassword: {
-        type: Boolean,
-        default: false
-      },
-      isEmail: {
-        type: Boolean,
-        default: false
-      },
-      isError: {
-        type: Boolean,
-        default: false
-      },
-      min: {
-        type: Number,
-        default: undefined
-      },
-      maxLength: {
-        type: Number,
-        default: 255
-      },
-      required: {
-        type: Boolean,
-        default: false
-      },
-      errorText: {
-        type: String,
-        default: ''
-      }
+    label: {
+      type: String,
+      default: ''
     },
-    emits: ['update:modelValue', 'blur'],
-    data: () => ({
-      showedPass: false,
-      error: {
-        status: false,
-        text: ''
-      }
-    }),
-    computed: {
-      value: {
-        get() {
-          return this.modelValue;
-        },
-
-        set(e) {
-          this.$emit('update:modelValue', e);
-        }
-      },
-
-      inputType() {
-        if (this.isNumber) {
-          return 'number';
-        }
-
-        if (this.isPassword) {
-          return this.showedPass ? 'text' : 'password';
-        }
-
-        if (this.isEmail) {
-          return 'email';
-        }
-
-        return this.type;
-      },
-
-      inputAutocomplete() {
-        switch (typeof this.autocomplete) {
-          case 'boolean':
-            return this.autocomplete ? 'on' : 'off';
-          case 'string':
-            return this.autocomplete;
-
-          default:
-            return 'off';
-        }
-      },
-
-      attrs() {
-        const attrs = { ...this.$attrs };
-
-        if (this.isNumber) {
-          if (this.min !== undefined) {
-            attrs.min = this.min;
-          }
-        }
-
-        return attrs;
-      }
+    placeholder: {
+      type: String,
+      default: ''
     },
-    mounted() {
-      if (this.autofocus) {
-        this.focusInput();
-      }
+    autofocus: {
+      type: Boolean,
+      default: false
     },
-    methods: {
-      focusInput() {
-        if (this.$refs.input) {
-          this.$refs.input.focus();
-        }
-      },
+    autocomplete: {
+      type: [Boolean, String],
+      default: false
+    },
+    type: {
+      type: String,
+      default: 'text'
+    },
+    isError: {
+      type: Boolean,
+      default: false
+    },
+    isClearable: {
+      type: Boolean,
+      default: false
+    },
+    min: {
+      type: Number,
+      default: undefined
+    },
+    maxLength: {
+      type: Number,
+      default: 255
+    },
+    required: {
+      type: Boolean,
+      default: false
+    },
+    errorText: {
+      type: String,
+      default: ''
+    }
+  });
 
-      togglePass() {
-        this.showedPass = !this.showedPass;
+  const emit = defineEmits(['update:modelValue', 'blur']);
+  const showedPass = ref(false);
+  const input = ref(null);
+  const value = useVModel(props, 'modelValue');
 
-        this.$refs.input.focus();
+  const error = ref({
+    status: false,
+    text: ''
+  });
+
+  const inputType = computed(() => {
+    if (props.type === 'password') {
+      return showedPass.value ? 'text' : 'password';
+    }
+
+    return props.type;
+  });
+
+  const inputAutocomplete = computed(() => {
+    switch (typeof props.autocomplete) {
+      case 'boolean':
+        return props.autocomplete ? 'on' : 'off';
+
+      case 'string':
+        return props.autocomplete;
+
+      default:
+        return 'off';
+    }
+  });
+
+  const attrs = computed(() => {
+    const attributes = { ...useAttrs() };
+
+    if (props.type === 'number') {
+      if (this.min !== undefined) {
+        attributes.min = props.min;
       }
+    }
+
+    return attributes;
+  });
+
+  const focusInput = () => {
+    if (input.value?.focus) {
+      input.value.focus();
+    }
+  };
+
+  const togglePass = () => {
+    showedPass.value = !showedPass.value;
+
+    focusInput();
+  };
+
+  const typeValidate = e => {
+    const isControlKey = e.key.length > 1;
+    const key = Number(e.key);
+    const isNum = Number.isInteger(key);
+    const isValueEmpty = e.target.value;
+
+    if (props.type === 'number' && !isControlKey) {
+      if (!isNum || (!isValueEmpty && !key)) {
+        e.preventDefault();
+      }
+    }
+  };
+
+  onMounted(() => {
+    if (props.autofocus) {
+      focusInput();
     }
   });
 </script>
 
+<script>
+  export default {
+    inheritAttrs: false
+  };
+</script>
+
 <style lang="scss" scoped>
   .ui-input {
-    display: block;
+    display: inline-flex;
     width: 100%;
 
     &__label {
@@ -234,7 +233,7 @@
       background-color: transparent;
       color: var(--text-color);
       font-size: var(--main-font-size);
-      height: 38px;
+      height: 42px;
       font-family: 'Open Sans', serif;
       padding: 4px 12px;
       margin: 0;

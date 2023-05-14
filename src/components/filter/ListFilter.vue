@@ -10,24 +10,14 @@
             <svg-icon icon-name="search" />
           </span>
 
-          <input
+          <ui-input
             v-model.trim="search"
             :autocomplete="false"
             :spellcheck="false"
             placeholder="Поиск..."
-            type="text"
-          >
+            is-clearable
+          />
         </label>
-
-        <button
-          v-if="!!search"
-          v-tippy="{ content: 'Стереть строку поиска' }"
-          class="filter__search_clear"
-          type="button"
-          @click.left.exact.prevent="search = ''"
-        >
-          <svg-icon icon-name="close" />
-        </button>
       </div>
 
       <button
@@ -112,10 +102,11 @@
   import type {
     Filter, FilterComposable, FilterGroup, FilterItem
   } from '@/common/composition/useFilter';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
 
   export default defineComponent({
-
     components: {
+      UiInput,
       BaseModal,
       FilterItemCheckboxes,
       FilterItemSources,
@@ -161,7 +152,7 @@
 
             await props.filterInstance.saveFilter(value);
 
-            emitFilter();
+            await emitFilter();
           } catch (err) {
             errorHandler(err);
           }
@@ -220,8 +211,7 @@
 
       const resetFilter = async () => {
         await props.filterInstance.resetFilter();
-
-        emitFilter();
+        await emitFilter();
       };
 
       return {
@@ -278,39 +268,6 @@
             height: 24px;
             color: var(--primary);
           }
-        }
-
-        input {
-          width: 100%;
-          height: 100%;
-          border: 0;
-          background-color: transparent;
-          color: var(--text-color);
-          padding: 0;
-        }
-      }
-
-      &_clear {
-        @include css_anim();
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 42px;
-        height: 42px;
-        flex-shrink: 0;
-        color: var(--primary);
-
-        @include media-min($md) {
-          &:hover {
-            color: var(--text-btn-color);
-            background-color: var(--primary-hover);
-          }
-        }
-
-        svg {
-          width: 16px;
-          height: 16px;
         }
       }
     }
@@ -393,6 +350,15 @@
       @include media-min($xl) {
         padding: 0 24px;
       }
+    }
+  }
+
+  :deep(.ui-input__control) {
+    border: 0;
+    background-color: transparent;
+
+    .ui-input__input {
+      padding: 0;
     }
   }
 </style>
