@@ -118,13 +118,24 @@
   }
 }
 
-.vfm__container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-height: var(--max-vh);
-  width: 100%;
-  background-color: var(--bg-light-main);
+.vfm {
+  cursor: pointer;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: var(--max-vh);
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-light-main);
+    pointer-events: none;
+    cursor: initial;
+
+    > * {
+      pointer-events: initial;
+    }
+  }
 }
 
 .Vue-Toastification {
