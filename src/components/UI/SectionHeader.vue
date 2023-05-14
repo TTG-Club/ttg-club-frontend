@@ -350,17 +350,9 @@
             align-items: center;
             flex-shrink: 0;
             cursor: pointer;
-            color: var(--primary);
             padding: 6px;
             border-radius: 8px;
             border: 0;
-
-            @include media-min($md) {
-                &:hover {
-                    background-color: var(--primary-hover);
-                    color: var(--text-btn-color);
-                }
-            }
 
             &.is-only-desktop {
                 display: none;
