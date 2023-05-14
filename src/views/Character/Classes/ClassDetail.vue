@@ -518,7 +518,7 @@
 
             &.is-active {
                 background-color: var(--primary-active);
-                border: 0;
+                border: 1px solid var(--primary-active);
 
                 .class-detail__tab {
                     &_icon,
