@@ -2,10 +2,10 @@
   <vue-final-modal
     v-slot="{ close }"
     class="auth-reg-modal"
+    content-transition="vfm-fade"
     esc-to-close
     focus-trap
     overlay-transition="vfm-fade"
-    content-transition="vfm-fade"
     v-bind="$attrs"
   >
     <div class="auth-reg-modal__container">
@@ -53,75 +53,75 @@
 </script>
 
 <style lang="scss" scoped>
-    .auth-reg-modal {
-        &__container {
-            background-color: var(--bg-secondary);
-            max-height: calc(var(--max-vh) / 100 * 90);
-            margin: auto;
-            overflow: hidden;
-            box-shadow: 0 0 12px -8px var(--bg-transparent);
-            display: flex;
-            width: 100%;
-            max-width: 700px;
+  .auth-reg-modal {
+    &__container {
+      background-color: var(--bg-secondary);
+      max-height: calc(var(--max-vh) / 100 * 90);
+      margin: auto;
+      overflow: hidden;
+      box-shadow: 0 0 12px -8px var(--bg-transparent);
+      display: flex;
+      width: 100%;
+      max-width: 700px;
 
-            @include media-min($sm) {
-                border-radius: 8px;
-            }
-        }
-
-        &__bg {
-            width: 240px;
-            object-fit: cover;
-            display: none;
-
-            @include media-min($md) {
-                display: block;
-            }
-        }
-
-        &__content {
-            flex: 1 1 100%;
-            max-height: var(--max-vh);
-            padding: 16px;
-            position: relative;
-            overflow: auto;
-
-            @include media-min($md) {
-                padding: 48px;
-            }
-        }
-
-        &__header {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        &__close {
-            @include css_anim();
-
-            padding: 4px;
-            width: 40px;
-            height: 40px;
-            position: absolute;
-            top: 12px;
-            right: 12px;
-        }
-
-        &__body {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            h4 {
-                margin: 0;
-                pointer-events: none;
-            }
-        }
-
-        &__form {
-            margin-top: 24px;
-        }
+      @include media-min($sm) {
+        border-radius: 8px;
+      }
     }
+
+    &__bg {
+      width: 240px;
+      object-fit: cover;
+      display: none;
+
+      @include media-min($md) {
+        display: block;
+      }
+    }
+
+    &__content {
+      flex: 1 1 100%;
+      max-height: var(--max-vh);
+      padding: 16px;
+      position: relative;
+      overflow: auto;
+
+      @include media-min($md) {
+        padding: 48px;
+      }
+    }
+
+    &__header {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    &__close {
+      @include css_anim();
+
+      padding: 4px;
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+
+    &__body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      h4 {
+        margin: 0;
+        pointer-events: none;
+      }
+    }
+
+    &__form {
+      margin-top: 24px;
+    }
+  }
 </style>

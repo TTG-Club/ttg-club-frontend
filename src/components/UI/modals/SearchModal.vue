@@ -1,20 +1,20 @@
 <template>
   <vue-final-modal
-    v-bind="$attrs"
     v-model="isShowModal"
     class="search-modal"
+    content-transition="vfm-fade"
     esc-to-close
     focus-trap
     overlay-transition="vfm-fade"
-    content-transition="vfm-fade"
+    v-bind="$attrs"
     @opened="focused = true"
   >
     <div class="search-modal__container">
       <div class="search-modal__wrapper">
         <div class="search-modal__control">
           <div
-            class="search-modal__control_icon"
             :class="{ 'in-progress': inProgress }"
+            class="search-modal__control_icon"
           >
             <svg-icon
               :icon-name="inProgress ? 'dice-d20' : 'search-new'"
@@ -24,19 +24,19 @@
           </div>
 
           <form
+            autocapitalize="off"
+            autocomplete="off"
             class="search-modal__control_field"
             novalidate="novalidate"
-            autocomplete="off"
-            autocapitalize="off"
             @submit.prevent.stop="onSubmit"
           >
             <ui-input
               ref="input"
-              autofocus="autofocus"
-              autocomplete="off"
-              autocapitalize="off"
-              formnovalidate="formnovalidate"
               :value="search"
+              autocapitalize="off"
+              autocomplete="off"
+              autofocus="autofocus"
+              formnovalidate="formnovalidate"
               placeholder="Поиск..."
               @input.prevent.stop="onSearchUpdate($event.target.value)"
               @keyup.enter.exact.prevent.stop="onSubmit"
@@ -52,14 +52,14 @@
 
           <ui-button
             class="search-modal__control_dice"
-            type-link
             is-icon
+            type-link
             @click.left.exact.prevent="onSearchRandom"
           >
             <svg-icon
-              icon-name="dice-flat"
               :stroke-enable="false"
               fill-enable
+              icon-name="dice-flat"
             />
           </ui-button>
         </div>
@@ -98,8 +98,8 @@
             :search-link="res"
             :selected="selectedIndex === key"
             disable-hover
-            @mouseenter.self="selectedIndex = key"
             @focusin="selectedIndex = key"
+            @mouseenter.self="selectedIndex = key"
           />
 
           <router-link
@@ -110,9 +110,9 @@
           >
             <div class="search-modal__all_icon">
               <svg-icon
-                icon-name="search-page"
                 :stroke-enable="false"
                 fill-enable
+                icon-name="search-page"
               />
             </div>
 
@@ -142,7 +142,7 @@
   import type { TSearchResultList } from '@/types/Search/Search.types';
   import SearchLink from '@/views/Search/SearchLink.vue';
   import { useMetrics } from '@/common/composition/useMetrics';
-  import UiInput from "@/components/UI/kit/UiInput.vue";
+  import UiInput from '@/components/UI/kit/UiInput.vue';
 
   const props = withDefaults(defineProps<{
     modelValue?: boolean;
@@ -161,7 +161,11 @@
   const { focused } = useFocus(input, { initialValue: true });
   const selectedIndex = ref<number | null>(null);
   const activeElement = useActiveElement();
-  const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
+
+  const {
+    sendSearchMetrics,
+    sendSearchViewResultsMetrics
+  } = useMetrics();
 
   const searchUrl = computed(() => ({
     path: '/search',
@@ -398,150 +402,150 @@
 </script>
 
 <style lang="scss" scoped>
-    :deep(.search-modal) {
-        pointer-events: none;
+  :deep(.search-modal) {
+    pointer-events: none;
+  }
+
+  .search-modal {
+    &__container {
+      height: var(--max-vh);
+      padding: 24px 24px 0;
+      display: flex;
+      flex-direction: column;
+      max-width: 560px;
+      width: 100vw;
+      pointer-events: none;
+
+      @include media-min($md) {
+        padding: 56px 24px 0;
+      }
     }
 
-    .search-modal {
-        &__container {
-            height: var(--max-vh);
-            padding: 24px 24px 0;
-            display: flex;
-            flex-direction: column;
-            max-width: 560px;
-            width: 100vw;
-            pointer-events: none;
-
-            @include media-min($md) {
-                padding: 56px 24px 0;
-            }
-        }
-
-        &__wrapper {
-            background: var(--bg-secondary);
-            overflow: hidden;
-            border-radius: 12px;
-            width: 100%;
-            pointer-events: auto;
-            box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
-        }
-
-        &__control {
-            display: flex;
-            padding: 4px 4px;
-            position: relative;
-
-            &_field {
-                flex: 1 1 100%;
-                height: 36px;
-                overflow: hidden;
-                appearance: none;
-                border: 0;
-            }
-
-            &__count {
-                flex-shrink: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: var(--text-color);
-                padding: 0 16px;
-            }
-
-            &_icon {
-                svg {
-                    color: var(--text-color);
-                }
-
-                &.in-progress {
-                    svg {
-                        @keyframes loader {
-                            from {
-                                transform: rotate(0deg);
-                            }
-
-                            to {
-                                transform: rotate(360deg);
-                            }
-                        }
-
-                        animation: {
-                            name: loader;
-                            duration: 1.5s;
-                            iteration-count: infinite;
-                        };
-                    }
-                }
-            }
-
-            &_dice {
-                svg {
-                    @include css_anim($item: transform);
-
-                    color: var(--text-color-title);
-                }
-
-                &:hover,
-                &:focus-within {
-                    svg {
-                        transform: rotate(45deg);
-                    }
-                }
-            }
-
-            &_icon,
-            &_dice {
-                width: 36px;
-                height: 36px;
-                padding: 6px;
-                flex-shrink: 0;
-            }
-        }
-
-        &__results {
-            user-select: none;
-            padding: 8px 0 0;
-        }
-
-        &__text {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px 12px;
-            color: var(--text-color);
-        }
-
-        &__all {
-            @include css_anim();
-
-            display: flex;
-            align-items: center;
-            padding: 6px 12px;
-            color: var(--text-color-title);
-            cursor: pointer;
-
-            &:hover,
-            &:focus-within {
-                @include css_anim();
-
-                background: var(--hover);
-            }
-
-            &_icon {
-                width: 28px;
-                height: 28px;
-                padding: 2px;
-            }
-        }
+    &__wrapper {
+      background: var(--bg-secondary);
+      overflow: hidden;
+      border-radius: 12px;
+      width: 100%;
+      pointer-events: auto;
+      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
     }
 
-    :deep(.ui-input__control) {
+    &__control {
+      display: flex;
+      padding: 4px 4px;
+      position: relative;
+
+      &_field {
+        flex: 1 1 100%;
+        height: 36px;
+        overflow: hidden;
+        appearance: none;
         border: 0;
-        background: transparent;
+      }
 
-        .ui-input__input {
-            color: var(--text-b-color);
-            height: 36px;
+      &__count {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+        padding: 0 16px;
+      }
+
+      &_icon {
+        svg {
+          color: var(--text-color);
         }
+
+        &.in-progress {
+          svg {
+            @keyframes loader {
+              from {
+                transform: rotate(0deg);
+              }
+
+              to {
+                transform: rotate(360deg);
+              }
+            }
+
+            animation: {
+              name: loader;
+              duration: 1.5s;
+              iteration-count: infinite;
+            };
+          }
+        }
+      }
+
+      &_dice {
+        svg {
+          @include css_anim($item: transform);
+
+          color: var(--text-color-title);
+        }
+
+        &:hover,
+        &:focus-within {
+          svg {
+            transform: rotate(45deg);
+          }
+        }
+      }
+
+      &_icon,
+      &_dice {
+        width: 36px;
+        height: 36px;
+        padding: 6px;
+        flex-shrink: 0;
+      }
     }
+
+    &__results {
+      user-select: none;
+      padding: 8px 0 0;
+    }
+
+    &__text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      color: var(--text-color);
+    }
+
+    &__all {
+      @include css_anim();
+
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      color: var(--text-color-title);
+      cursor: pointer;
+
+      &:hover,
+      &:focus-within {
+        @include css_anim();
+
+        background: var(--hover);
+      }
+
+      &_icon {
+        width: 28px;
+        height: 28px;
+        padding: 2px;
+      }
+    }
+  }
+
+  :deep(.ui-input__control) {
+    border: 0;
+    background: transparent;
+
+    .ui-input__input {
+      color: var(--text-b-color);
+      height: 36px;
+    }
+  }
 </style>
