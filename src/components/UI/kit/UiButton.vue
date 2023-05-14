@@ -135,6 +135,7 @@
         flex-shrink: 0;
         font-size: var(--main-font-size);
         line-height: calc(var(--main-line-height) - 1px);
+        border: 1px solid var(--primary);
         max-height: 38px;
 
         @include media-min($xl) {
@@ -142,6 +143,7 @@
                 @include css_anim();
 
                 background-color: var(--primary-hover);
+                border-color: var(--primary-hover);
             }
 
             &:active,
@@ -261,7 +263,7 @@
         &.is-link {
             background-color: transparent;
             color: var(--primary);
-            border: 0;
+            border: 1px solid transparent;
 
             @include media-min($xl) {
                 &:hover {
@@ -286,6 +288,7 @@
         &.is-link-filled {
             background-color: transparent;
             color: var(--primary);
+            border: 1px solid transparent;
 
             @include media-min($xl) {
                 &:hover {
