@@ -1,4 +1,4 @@
 export enum TraitsFilterDefaults {
-    dbName = 'traits',
-    url = '/filters/traits'
+  dbName = 'traits',
+  url = '/filters/traits'
 }

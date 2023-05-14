@@ -2,24 +2,24 @@ import { computed, type Ref } from 'vue';
 import { useAppBreakpoints } from '@/common/composition/useAppBreakpoints';
 import type { TBreakpoint } from '@/types/Shared/Breakpoints.types';
 
-export type TResponsiveValues<T> = Partial<Record<TBreakpoint, T>> & {base: T};
+export type TResponsiveValues<T> = Partial<Record<TBreakpoint, T>> & { base: T };
 
 export interface UseResponsiveValuesParams<T> {
-    values: Ref<TResponsiveValues<T>>;
+  values: Ref<TResponsiveValues<T>>;
 }
 
 export const useResponsiveValues = <T>({ values }: UseResponsiveValuesParams<T>) => {
-    const breakpoints = useAppBreakpoints();
+  const breakpoints = useAppBreakpoints();
 
-    const current = computed(() => {
-        const breakpointKeys = Object.keys(values.value)
-            .filter(breakpoint => breakpoint !== 'base') as TBreakpoint[];
+  const current = computed(() => {
+    const breakpointKeys = Object.keys(values.value)
+      .filter(breakpoint => breakpoint !== 'base') as TBreakpoint[];
 
-        const currentValueBreakpoint = breakpointKeys
-            .find(breakpoint => breakpoints.smaller(breakpoint).value) ?? 'base';
+    const currentValueBreakpoint = breakpointKeys
+      .find(breakpoint => breakpoints.smaller(breakpoint).value) ?? 'base';
 
-        return values.value[currentValueBreakpoint] as T;
-    });
+    return values.value[currentValueBreakpoint] as T;
+  });
 
-    return { current };
+  return { current };
 };

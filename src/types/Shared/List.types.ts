@@ -1,7 +1,5 @@
 import type {
-    AnyObject,
-    RecordKey,
-    WithProperty
+  AnyObject, RecordKey, WithProperty
 } from '@/types/Shared/Utility.types';
 import type { DefaultKeyField } from '@/common/const';
 
