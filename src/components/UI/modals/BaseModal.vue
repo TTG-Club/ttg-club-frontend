@@ -112,7 +112,7 @@
   import { computed } from 'vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiButton from '@/components/UI/kit/UiButton.vue';
-  import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   const props = withDefaults(defineProps<{
     typeConfirm?: boolean;
