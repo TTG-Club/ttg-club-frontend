@@ -506,12 +506,19 @@
 
             @include media-min($md) {
                 &:hover {
-                    background-color: var(--bg-sub-menu);
+                    background: var(--bg-main);
+
+                    .class-detail__tab_name {
+                        @include css_anim();
+
+                        color: var(--text-color-title);
+                    }
                 }
             }
 
             &.is-active {
                 background-color: var(--primary-active);
+                border: 0;
 
                 .class-detail__tab {
                     &_icon,

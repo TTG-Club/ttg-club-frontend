@@ -135,7 +135,7 @@
         flex-shrink: 0;
         font-size: var(--main-font-size);
         line-height: calc(var(--main-line-height) - 1px);
-        border: 1px solid var(--border);
+        // border: 1px solid var(--border);
         max-height: 38px;
 
         @include media-min($xl) {
@@ -244,17 +244,18 @@
 
         &.is-secondary {
             background-color: var(--bg-sub-menu);
-            color: var(--text-color);border:1px solid var(--border);
+            color: var(--text-color);
+            border:1px solid var(--border);
 
             @include media-min($xl) {
                 &:hover {
-                    background-color: var(--hover);
+                    background-color: var(--bg-main);
+                    color: var(--text-color-title);
                 }
             }
 
             &:disabled {
-                opacity: .6;
-                cursor: not-allowed;
+                background-color: var(--bg-sub-menu);
             }
         }
 
