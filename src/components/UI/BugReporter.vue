@@ -7,6 +7,13 @@
             v-model="isEnabled"
             @crop="download"
         />
+
+        <img
+            v-if="screenshot"
+            :src="screenshot"
+            :class="$style.img"
+            alt="asd"
+        />
     </div>
 </template>
 
@@ -27,6 +34,10 @@
         screenshot.value = null;
         isEnabled.value = true;
     });
+
+    const download = (uri: Blob) => {
+        screenshot.value = URL.createObjectURL(uri);
+    };
 </script>
 
 <style module>
@@ -37,5 +48,12 @@
         height: 100vh;
         pointer-events: none;
         user-select: none;
+    }
+
+    .img {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
     }
 </style>
