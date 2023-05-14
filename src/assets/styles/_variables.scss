@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 // media quires
 $xs: 0;
 $sm: 576px;
@@ -70,29 +72,17 @@ $ultra_hd: 3840px;
   background-repeat: $repeat;
 }
 
-// <transition name="<class>"/>
-.fade {
-  &-enter-from, &-leave-to {
-    opacity: 0;
+// Functions
+
+// Remove the unit of a length
+// @param {Number} $number - Number to remove unit from
+// @return {Number} - Unitless number
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return math.div($number, $number * 0 + 1);
   }
 
-  &-enter-to, &-leave-from {
-    opacity: 1;
-  }
-
-  &-enter-active, &-leave-active {
-    @include css_anim;
-  }
-}
-
-.vue-anim {
-  &-fade-enter-active {
-    @include css_anim;
-  }
-
-  &-fade-leave-active {
-    transition: none;
-  }
+  @return $number;
 }
 
 // Toast
@@ -104,12 +94,12 @@ $vt-color-warning: var(--warning);
 $vt-color-error: var(--error);
 
 $vt-color-progress-default: linear-gradient(
-                to right,
-                #4cd964,
-                #5ac8fa,
-                #007aff,
-                #34aadc,
-                #5856d6,
-                #ff2d55
+    to right,
+    #4cd964,
+    #5ac8fa,
+    #007aff,
+    #34aadc,
+    #5856d6,
+    #ff2d55
 );
 $vt-font-family: "Open Sans", sans-serif;

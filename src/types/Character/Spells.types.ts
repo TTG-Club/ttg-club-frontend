@@ -1,10 +1,10 @@
 import type {
-    TClassBadge, TName, TRaceBadge, TSource, TSubclassBadge
+  TClassBadge, TName, TRaceBadge, TSource, TSubclassBadge
 } from '@/types/Shared/BaseApiFields.types';
 
 export enum SpellsFilterDefaults {
-    dbName = 'spells',
-    url = '/filters/spells'
+  dbName = 'spells',
+  url = '/filters/spells'
 }
 
 export type TSpellLinkComponents = {

@@ -1,8 +1,8 @@
 import type { TName, TSource } from '@/types/Shared/BaseApiFields.types';
 
 export enum ScreensFilterDefaults {
-    dbName = 'screens',
-    url = '/filters/screens'
+  dbName = 'screens',
+  url = '/filters/screens'
 }
 
 export interface IScreenGroupLink {

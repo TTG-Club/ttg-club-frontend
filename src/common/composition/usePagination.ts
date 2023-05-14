@@ -1,5 +1,5 @@
 import {
-    computed, ref, unref
+  computed, ref, unref
 } from 'vue';
 import type { MaybeComputedRef, MaybeRef } from '@vueuse/core';
 import { resolveUnref } from '@vueuse/core';
@@ -12,178 +12,178 @@ import type { RequestConfig } from '@/common/services/HTTPService';
 import { useMetrics } from '@/common/composition/useMetrics';
 
 export type PaginationSearch = {
-    value: MaybeRef<string>
-    exact: MaybeRef<boolean>
+  value: MaybeRef<string>
+  exact: MaybeRef<boolean>
 }
 
 export type PaginationOrder = Array<{
-    field: string
-    direction: 'asc' | 'desc'
+  field: string
+  direction: 'asc' | 'desc'
 }>
 
 export type PaginationQuery = {
-    page?: number
+  page?: number
 
-    /**
-     * -1 для получения всего списка
-     */
-    limit?: number
-    filter?: FilterQueryParams
-    search?: PaginationSearch,
-    order?: PaginationOrder
+  /**
+   * -1 для получения всего списка
+   */
+  limit?: number
+  filter?: FilterQueryParams
+  search?: PaginationSearch,
+  order?: PaginationOrder
 }
 
 export type PaginationFilter = {
-    isCustomized: MaybeRef<boolean> | MaybeComputedRef<boolean>
-    value: MaybeRef<FilterQueryParams> | MaybeComputedRef<FilterQueryParams>
+  isCustomized: MaybeRef<boolean> | MaybeComputedRef<boolean>
+  value: MaybeRef<FilterQueryParams> | MaybeComputedRef<FilterQueryParams>
 }
 
 export type PaginationConfig = {
-    url: MaybeRef<string>
-    page?: MaybeRef<number>
-    limit?: MaybeRef<number>
-    search?: MaybeRef<PaginationSearch>
-    order?: MaybeRef<PaginationOrder>
-    filter?: MaybeRef<PaginationFilter>
+  url: MaybeRef<string>
+  page?: MaybeRef<number>
+  limit?: MaybeRef<number>
+  search?: MaybeRef<PaginationSearch>
+  order?: MaybeRef<PaginationOrder>
+  filter?: MaybeRef<PaginationFilter>
 }
 
 export function usePagination<T>(config: PaginationConfig) {
-    let abortController: AbortController | null;
+  let abortController: AbortController | null;
 
-    const route = useRoute();
-    const http = useAxios();
-    const isDev = useIsDev();
-    const { sendPageViewMetrics } = useMetrics();
+  const route = useRoute();
+  const http = useAxios();
+  const isDev = useIsDev();
+  const { sendPageViewMetrics } = useMetrics();
 
-    const isLoading = ref(false);
-    const isFirstLoad = ref(true);
+  const isLoading = ref(false);
+  const isFirstLoad = ref(true);
 
-    const items = ref<Array<any>>([]);
-    const page = ref(unref(config.page) || 0);
-    const limit = computed(() => unref(config.limit) || 70);
-    const isEnd = ref(unref(config.limit) === -1 || false);
+  const items = ref<Array<any>>([]);
+  const page = ref(unref(config.page) || 0);
+  const limit = computed(() => unref(config.limit) || 70);
+  const isEnd = ref(unref(config.limit) === -1 || false);
 
-    const payload = computed((): PaginationQuery => {
-        const request: PaginationQuery = {
-            page: unref(page),
-            limit: unref(limit)
-        };
-
-        const search = unref(config.search);
-
-        if (search?.value) {
-            request.search = {
-                value: unref(search.value),
-                exact: unref(search.exact)
-            };
-        }
-
-        if (unref(config.order)?.length) {
-            request.order = unref(config.order);
-        }
-
-        const filter = unref(config.filter);
-
-        if (filter && resolveUnref(filter.isCustomized)) {
-            request.filter = resolveUnref(filter.value);
-        }
-
-        return request;
-    });
-
-    const abort = () => {
-        if (abortController) abortController.abort();
+  const payload = computed((): PaginationQuery => {
+    const request: PaginationQuery = {
+      page: unref(page),
+      limit: unref(limit)
     };
 
-    const load = async (nextPage = false): Promise<void> => {
-        if (!config.url) {
-            return Promise.resolve();
-        }
+    const search = unref(config.search);
 
-        isLoading.value = true;
+    if (search?.value) {
+      request.search = {
+        value: unref(search.value),
+        exact: unref(search.exact)
+      };
+    }
 
-        abort();
+    if (unref(config.order)?.length) {
+      request.order = unref(config.order);
+    }
 
-        abortController = new AbortController();
+    const filter = unref(config.filter);
 
-        try {
-            const apiConfig: RequestConfig = {
-                url: unref(config.url),
-                payload: unref(payload),
-                signal: abortController.signal
-            };
+    if (filter && resolveUnref(filter.isCustomized)) {
+      request.filter = resolveUnref(filter.value);
+    }
 
-            const resp = await http.post<Array<T>>(apiConfig);
+    return request;
+  });
 
-            if (nextPage) {
-                items.value.push(...resp.data);
-            }
+  const abort = () => {
+    if (abortController) abortController.abort();
+  };
 
-            if (!nextPage) {
-                items.value = resp.data;
-            }
+  const load = async (nextPage = false): Promise<void> => {
+    if (!config.url) {
+      return Promise.resolve();
+    }
 
-            isEnd.value = Array.isArray(items.value) && (items.value.length < limit.value);
+    isLoading.value = true;
 
-            return Promise.resolve();
-        } catch (err: any) {
-            if (err.message === 'canceled') return Promise.resolve();
+    abort();
 
-            if (isDev) {
-                errorHandler(err);
-            }
+    abortController = new AbortController();
 
-            return Promise.reject(err);
-        } finally {
-            isLoading.value = false;
-            abortController = null;
-        }
-    };
+    try {
+      const apiConfig: RequestConfig = {
+        url: unref(config.url),
+        payload: unref(payload),
+        signal: abortController.signal
+      };
 
-    const initPages = async () => {
-        page.value = 0;
+      const resp = await http.post<Array<T>>(apiConfig);
 
-        const result = await load();
+      if (nextPage) {
+        items.value.push(...resp.data);
+      }
 
-        isFirstLoad.value = false;
+      if (!nextPage) {
+        items.value = resp.data;
+      }
 
-        return Promise.resolve(result);
-    };
+      isEnd.value = Array.isArray(items.value) && (items.value.length < limit.value);
 
-    const nextPage = async () => {
-        if (limit.value === -1 || isEnd.value) {
-            return;
-        }
+      return Promise.resolve();
+    } catch (err: any) {
+      if (err.message === 'canceled') return Promise.resolve();
 
-        page.value++;
+      if (isDev) {
+        errorHandler(err);
+      }
 
-        await load(true);
+      return Promise.reject(err);
+    } finally {
+      isLoading.value = false;
+      abortController = null;
+    }
+  };
 
-        sendPageViewMetrics(route);
-    };
+  const initPages = async () => {
+    page.value = 0;
 
-    const resetPages = () => {
-        page.value = 0;
-        isFirstLoad.value = true;
-        items.value = [];
-        isEnd.value = false;
+    const result = await load();
 
-        abortController = null;
+    isFirstLoad.value = false;
 
-        return Promise.resolve();
-    };
+    return Promise.resolve(result);
+  };
 
-    return {
-        isLoading,
-        isFirstLoad,
-        isEnd,
-        items,
-        page,
-        limit,
-        payload,
-        abort,
-        initPages,
-        nextPage,
-        resetPages
-    };
+  const nextPage = async () => {
+    if (limit.value === -1 || isEnd.value) {
+      return;
+    }
+
+    page.value++;
+
+    await load(true);
+
+    sendPageViewMetrics(route);
+  };
+
+  const resetPages = () => {
+    page.value = 0;
+    isFirstLoad.value = true;
+    items.value = [];
+    isEnd.value = false;
+
+    abortController = null;
+
+    return Promise.resolve();
+  };
+
+  return {
+    isLoading,
+    isFirstLoad,
+    isEnd,
+    items,
+    page,
+    limit,
+    payload,
+    abort,
+    initPages,
+    nextPage,
+    resetPages
+  };
 }

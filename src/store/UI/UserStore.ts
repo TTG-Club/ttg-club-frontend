@@ -9,45 +9,45 @@ import { useIsDev } from '@/common/helpers/isDev';
 import { useMetrics } from '@/common/composition/useMetrics';
 
 export enum EUserRoles {
-    USER = 'USER',
-    WRITER = 'WRITER',
-    SUBSCRIBER = 'SUBSCRIBER',
-    MODERATOR = 'MODERATOR',
-    ADMIN = 'ADMIN'
+  USER = 'USER',
+  WRITER = 'WRITER',
+  SUBSCRIBER = 'SUBSCRIBER',
+  MODERATOR = 'MODERATOR',
+  ADMIN = 'ADMIN'
 }
 
 export enum EUserRolesRus {
-    USER = 'пользователь',
-    WRITER = 'писатель',
-    SUBSCRIBER = 'подписчик',
-    MODERATOR = 'модератор',
-    ADMIN = 'администратор'
+  USER = 'пользователь',
+  WRITER = 'писатель',
+  SUBSCRIBER = 'подписчик',
+  MODERATOR = 'модератор',
+  ADMIN = 'администратор'
 }
 
 export type TUser = {
-    username: string
-    name: string
-    email: string
-    roles: EUserRoles[]
-    avatar: string
+  username: string
+  name: string
+  email: string
+  roles: EUserRoles[]
+  avatar: string
 }
 
 export type TRegBody = {
-    username: string
-    password: string
-    email: string
+  username: string
+  password: string
+  email: string
 }
 
 export type TAuthBody = {
-    usernameOrEmail: string
-    password: string
-    remember: boolean
+  usernameOrEmail: string
+  password: string
+  remember: boolean
 }
 
 export type TChangePassBody = {
-    userToken?: string
-    resetToken?: string
-    password: string
+  userToken?: string
+  resetToken?: string
+  password: string
 }
 
 export type TAuthResponse = {
@@ -56,232 +56,239 @@ export type TAuthResponse = {
 }
 
 export const useUserStore = defineStore('UserStore', () => {
-    const route = useRoute();
-    const router = useRouter();
-    const http = useAxios();
-    const isDev = useIsDev();
-    const { sendSignUpMetrics, sendLoginMetrics } = useMetrics();
-    const user = ref<TUser | null>(null);
-    const isAuthenticated = ref<boolean>(false);
+  const route = useRoute();
+  const router = useRouter();
+  const http = useAxios();
+  const isDev = useIsDev();
 
-    const roles = computed(() => {
-        if (!user.value?.roles || !Array.isArray(user.value.roles)) {
-            return [];
-        }
+  const {
+    sendSignUpMetrics,
+    sendLoginMetrics
+  } = useMetrics();
 
-        const entries = Object.entries(EUserRolesRus) as [EUserRoles, EUserRolesRus][];
-        const availRoles: {[key in EUserRoles]?: EUserRolesRus} = fromPairs(entries);
-        const { roles: userRoles } = user.value;
+  const user = ref<TUser | null>(null);
+  const isAuthenticated = ref<boolean>(false);
 
-        const translated = userRoles
-            .map(role => ({
-                role,
-                name: availRoles[role]
-            }))
-            .filter(role => !!role.name);
+  const roles = computed(() => {
+    if (!user.value?.roles || !Array.isArray(user.value.roles)) {
+      return [];
+    }
 
-        if (!translated.length) {
-            return [];
-        }
+    const entries = Object.entries(EUserRolesRus) as [EUserRoles, EUserRolesRus][];
+    const availRoles: { [key in EUserRoles]?: EUserRolesRus } = fromPairs(entries);
+    const { roles: userRoles } = user.value;
 
-        return translated;
-    });
+    const translated = userRoles
+      .map(role => ({
+        role,
+        name: availRoles[role]
+      }))
+      .filter(role => !!role.name);
 
-    const avatar = computed(() => ({
-        src: user.value?.avatar || null,
-        error: '/icon/avatar.png',
-        loading: '/icon/avatar.png'
-    }));
+    if (!translated.length) {
+      return [];
+    }
 
-    const clearUser = async () => {
-        user.value = null;
-        isAuthenticated.value = false;
+    return translated;
+  });
 
-        Cookies.remove(USER_TOKEN_COOKIE);
+  const avatar = computed(() => ({
+    src: user.value?.avatar || null,
+    error: '/icon/avatar.png',
+    loading: '/icon/avatar.png'
+  }));
 
-        if (route.name === 'profile') {
-            await router.push({ name: 'index' });
-        }
-    };
+  const clearUser = async () => {
+    user.value = null;
+    isAuthenticated.value = false;
 
-    const getUserToken = () => Cookies.get(USER_TOKEN_COOKIE);
+    Cookies.remove(USER_TOKEN_COOKIE);
 
-    const getUserInfo = async (): Promise<TUser> => {
-        try {
-            const resp = await http.get<TUser>({
-                url: '/user/info'
-            });
+    if (route.name === 'profile') {
+      await router.push({ name: 'index' });
+    }
+  };
 
-            switch (resp.status) {
-                case 200:
-                    user.value = resp.data;
-                    isAuthenticated.value = true;
+  const getUserToken = () => Cookies.get(USER_TOKEN_COOKIE);
 
-                    return Promise.resolve(resp.data);
-                default:
-                    return Promise.reject(resp.statusText);
-            }
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    };
+  const getUserInfo = async (): Promise<TUser> => {
+    try {
+      const resp = await http.get<TUser>({
+        url: '/user/info'
+      });
 
-    const registration = async (body: TRegBody) => {
-        try {
-            if (Object.values(body).find(item => !item)) {
-                return Promise.reject(new Error('All fields are required to fill'));
-            }
+      switch (resp.status) {
+        case 200:
+          user.value = resp.data;
+          isAuthenticated.value = true;
 
-            const resp = await http.post({
-                url: '/auth/signup',
-                payload: body
-            });
+          return Promise.resolve(resp.data);
+        default:
+          return Promise.reject(resp.statusText);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
 
-            switch (resp.status) {
-                case 200:
-                    sendSignUpMetrics();
+  const registration = async (body: TRegBody) => {
+    try {
+      if (Object.values(body)
+        .find(item => !item)) {
+        return Promise.reject(new Error('All fields are required to fill'));
+      }
 
-                    return Promise.resolve();
-                default:
-                    return Promise.reject(resp.statusText);
-            }
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    };
+      const resp = await http.post({
+        url: '/auth/signup',
+        payload: body
+      });
 
-    const authorization = async (body: TAuthBody) => {
-        try {
-            if (Object.values(body).find(item => typeof item === 'string' && !item)) {
-                return Promise.reject(new Error('All fields are required to fill'));
-            }
+      switch (resp.status) {
+        case 200:
+          sendSignUpMetrics();
 
-            const resp = await http.post<TAuthResponse>({
-                url: '/auth/signin',
-                payload: body
-            });
+          return Promise.resolve();
+        default:
+          return Promise.reject(resp.statusText);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
 
-            switch (resp.status) {
-                case 200:
-                    if (isDev) {
-                        Cookies.set(
-                            USER_TOKEN_COOKIE,
-                            resp.data.accessToken,
-                            {
-                                expires: 365
-                            }
-                        );
-                    }
+  const authorization = async (body: TAuthBody) => {
+    try {
+      if (Object.values(body)
+        .find(item => typeof item === 'string' && !item)) {
+        return Promise.reject(new Error('All fields are required to fill'));
+      }
 
-                    sendLoginMetrics();
+      const resp = await http.post<TAuthResponse>({
+        url: '/auth/signin',
+        payload: body
+      });
 
-                    await getUserInfo();
+      switch (resp.status) {
+        case 200:
+          if (isDev) {
+            Cookies.set(
+              USER_TOKEN_COOKIE,
+              resp.data.accessToken,
+              {
+                expires: 365
+              }
+            );
+          }
 
-                    return Promise.resolve();
-                case 401:
-                    // eslint-disable-next-line prefer-promise-reject-errors
-                    return Promise.reject('Неверный логин или пароль');
-                default:
-                    return Promise.reject(resp.statusText);
-            }
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    };
+          sendLoginMetrics();
 
-    const resetPassword = async (email: string) => {
-        try {
-            const resp = await http.get({
-                url: '/auth/change/password',
-                payload: { email }
-            });
+          await getUserInfo();
 
-            switch (resp.status) {
-                case 200:
-                    return Promise.resolve();
-                default:
-                    return Promise.reject(resp.statusText);
-            }
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    };
+          return Promise.resolve();
+        case 401:
+          // eslint-disable-next-line prefer-promise-reject-errors
+          return Promise.reject('Неверный логин или пароль');
+        default:
+          return Promise.reject(resp.statusText);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
 
-    const changePassword = async (payload: TChangePassBody) => {
-        try {
-            const resp = await http.post({
-                url: '/auth/change/password',
-                payload
-            });
+  const resetPassword = async (email: string) => {
+    try {
+      const resp = await http.get({
+        url: '/auth/change/password',
+        payload: { email }
+      });
 
-            switch (resp.status) {
-                case 200:
-                    return Promise.resolve();
-                default:
-                    return Promise.reject(resp.statusText);
-            }
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    };
+      switch (resp.status) {
+        case 200:
+          return Promise.resolve();
+        default:
+          return Promise.reject(resp.statusText);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
 
-    const logout = async () => {
-        try {
-            const resp = await http.post({ url: '/auth/signout' });
+  const changePassword = async (payload: TChangePassBody) => {
+    try {
+      const resp = await http.post({
+        url: '/auth/change/password',
+        payload
+      });
 
-            switch (resp.status) {
-                case 200:
-                    if (isDev) {
-                        Cookies.remove(USER_TOKEN_COOKIE, { path: '' });
-                    }
+      switch (resp.status) {
+        case 200:
+          return Promise.resolve();
+        default:
+          return Promise.reject(resp.statusText);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
 
-                    return Promise.resolve();
-                default:
-                    return Promise.reject();
-            }
-        } catch (err) {
-            return Promise.reject(err);
-        } finally {
-            clearUser();
-        }
-    };
+  const logout = async () => {
+    try {
+      const resp = await http.post({ url: '/auth/signout' });
 
-    const getUserStatus = async () => {
-        try {
-            const resp = await http.get({
-                url: '/user/status'
-            });
+      switch (resp.status) {
+        case 200:
+          if (isDev) {
+            Cookies.remove(USER_TOKEN_COOKIE, { path: '' });
+          }
 
-            if (resp.status !== 200 || !resp.data) {
-                clearUser();
+          return Promise.resolve();
+        default:
+          return Promise.reject();
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    } finally {
+      clearUser();
+    }
+  };
 
-                return Promise.resolve(false);
-            }
+  const getUserStatus = async () => {
+    try {
+      const resp = await http.get({
+        url: '/user/status'
+      });
 
-            isAuthenticated.value = true;
+      if (resp.status !== 200 || !resp.data) {
+        clearUser();
 
-            return Promise.resolve(resp.data as boolean);
-        } catch (err) {
-            clearUser();
+        return Promise.resolve(false);
+      }
 
-            return Promise.resolve(false);
-        }
-    };
+      isAuthenticated.value = true;
 
-    return {
-        user,
-        isAuthenticated,
-        roles,
-        avatar,
+      return Promise.resolve(resp.data as boolean);
+    } catch (err) {
+      clearUser();
 
-        clearUser,
-        getUserToken,
-        getUserStatus,
-        getUserInfo,
-        registration,
-        authorization,
-        resetPassword,
-        changePassword,
-        logout
-    };
+      return Promise.resolve(false);
+    }
+  };
+
+  return {
+    user,
+    isAuthenticated,
+    roles,
+    avatar,
+
+    clearUser,
+    getUserToken,
+    getUserStatus,
+    getUserInfo,
+    registration,
+    authorization,
+    resetPassword,
+    changePassword,
+    logout
+  };
 });
