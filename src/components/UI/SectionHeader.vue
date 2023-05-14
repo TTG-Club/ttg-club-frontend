@@ -90,7 +90,7 @@
             <ui-button
                 v-if="closeAvailable"
                 v-tippy="{ content: 'Закрыть' }"
-                class="section-header__control close"
+                class="section-header__control"
                 is-icon
                 type-secondary
                 @click.left.exact.prevent.stop="$emit('close')"
@@ -339,6 +339,7 @@
             display: flex;
             align-items: flex-start;
             flex-shrink: 0;
+            gap: 4px;
         }
 
         &__control {
@@ -372,10 +373,6 @@
             svg {
                 width: 24px;
                 height: 24px;
-            }
-
-            &.close {
-                margin-left: 8px;
             }
         }
     }

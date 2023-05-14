@@ -176,7 +176,7 @@
 
         &__wrapper {
             height: 100%;
-            margin-left: -4px;
+            margin-left: -8px;
             position: relative;
         }
 
