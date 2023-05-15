@@ -159,12 +159,6 @@
       </div>
 
       <div class="beast_info">
-        <p>
-          <strong>Бонус мастерства </strong>
-
-          <span>{{ proficiencyBonus }}</span>
-        </p>
-
         <p v-if="savingThrows.length">
           <strong>Спасброски </strong>
 
@@ -245,6 +239,12 @@
           <strong>Уровень опасности </strong>
 
           <span>{{ challengeRating }}</span>
+        </p>
+
+        <p>
+          <strong>Бонус мастерства </strong>
+
+          <span>{{ proficiencyBonus }}</span>
         </p>
       </div>
 
