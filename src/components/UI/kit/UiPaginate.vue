@@ -1,24 +1,3 @@
-<script lang="ts">
-  import { defineComponent } from 'vue';
-  import { VuePaginate } from '@svifty7/vue-paginate';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-
-  export default defineComponent({
-    components: {
-      VuePaginate,
-      SvgIcon
-    },
-    props: {
-      ...VuePaginate.props
-    },
-    setup(props) {
-      return {
-        props
-      };
-    }
-  });
-</script>
-
 <template>
   <vue-paginate
     :no-li-surround="true"
@@ -40,6 +19,23 @@
     </template>
   </vue-paginate>
 </template>
+
+<script setup lang="ts">
+  import { VuePaginate } from '@svifty7/vue-paginate';
+  import type { TVuePaginateProps } from '@svifty7/vue-paginate/types/VuePaginate';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+
+  const props = defineProps<Omit<
+    TVuePaginateProps,
+    'noLiSurround'
+      | 'activeClass'
+      | 'containerClass'
+      | 'disabledClass'
+      | 'nextLinkClass'
+      | 'pageLinkClass'
+      | 'prevLinkClass'
+  >>();
+</script>
 
 <style lang="scss">
   .ui-paginate {
