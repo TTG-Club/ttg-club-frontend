@@ -64,10 +64,10 @@
 
           <p>
             <dice-roller
-              :formula="getAbilityFormula(creature.ability.str)"
+              :formula="getFormula(creature.ability.str)"
               label="Проверка Силы"
             >
-              {{ creature.ability.str }} ({{ getAbilityModifier(creature.ability.str) }})
+              {{ creature.ability.str }} ({{ getFormattedModifier(creature.ability.str) }})
             </dice-roller>
           </p>
         </div>
@@ -81,10 +81,10 @@
 
           <p>
             <dice-roller
-              :formula="getAbilityFormula(creature.ability.dex)"
+              :formula="getFormula(creature.ability.dex)"
               label="Проверка Ловкости"
             >
-              {{ creature.ability.dex }} ({{ getAbilityModifier(creature.ability.dex) }})
+              {{ creature.ability.dex }} ({{ getFormattedModifier(creature.ability.dex) }})
             </dice-roller>
           </p>
         </div>
@@ -98,10 +98,10 @@
 
           <p>
             <dice-roller
-              :formula="getAbilityFormula(creature.ability.con)"
+              :formula="getFormula(creature.ability.con)"
               label="Проверка Телосложения"
             >
-              {{ creature.ability.con }} ({{ getAbilityModifier(creature.ability.con) }})
+              {{ creature.ability.con }} ({{ getFormattedModifier(creature.ability.con) }})
             </dice-roller>
           </p>
         </div>
@@ -115,10 +115,10 @@
 
           <p>
             <dice-roller
-              :formula="getAbilityFormula(creature.ability.int)"
+              :formula="getFormula(creature.ability.int)"
               label="Проверка Интеллекта"
             >
-              {{ creature.ability.int }} ({{ getAbilityModifier(creature.ability.int) }})
+              {{ creature.ability.int }} ({{ getFormattedModifier(creature.ability.int) }})
             </dice-roller>
           </p>
         </div>
@@ -132,10 +132,10 @@
 
           <p>
             <dice-roller
-              :formula="getAbilityFormula(creature.ability.wiz)"
+              :formula="getFormula(creature.ability.wiz)"
               label="Проверка Мудрости"
             >
-              {{ creature.ability.wiz }} ({{ getAbilityModifier(creature.ability.wiz) }})
+              {{ creature.ability.wiz }} ({{ getFormattedModifier(creature.ability.wiz) }})
             </dice-roller>
           </p>
         </div>
@@ -149,16 +149,22 @@
 
           <p>
             <dice-roller
-              :formula="getAbilityFormula(creature.ability.cha)"
+              :formula="getFormula(creature.ability.cha)"
               label="Проверка Харизмы"
             >
-              {{ creature.ability.cha }} ({{ getAbilityModifier(creature.ability.cha) }})
+              {{ creature.ability.cha }} ({{ getFormattedModifier(creature.ability.cha) }})
             </dice-roller>
           </p>
         </div>
       </div>
 
       <div class="beast_info">
+        <p>
+          <strong>Бонус мастерства </strong>
+
+          <span>{{ proficiencyBonus }}</span>
+        </p>
+
         <p v-if="savingThrows.length">
           <strong>Спасброски </strong>
 
@@ -202,25 +208,25 @@
         <p v-if="creature.damageVulnerabilities">
           <strong>Уязвимость к урону </strong>
 
-          <span>{{ getIterableStr(creature.damageVulnerabilities) }}</span>
+          <span>{{ getIterableString(creature.damageVulnerabilities) }}</span>
         </p>
 
         <p v-if="creature.damageResistances">
           <strong>Сопротивление к урону </strong>
 
-          <span>{{ getIterableStr(creature.damageResistances) }}</span>
+          <span>{{ getIterableString(creature.damageResistances) }}</span>
         </p>
 
         <p v-if="creature.damageImmunities">
           <strong>Иммунитет к урону </strong>
 
-          <span>{{ getIterableStr(creature.damageImmunities) }}</span>
+          <span>{{ getIterableString(creature.damageImmunities) }}</span>
         </p>
 
         <p v-if="creature.conditionImmunities">
           <strong>Иммунитет к состояниям </strong>
 
-          <span>{{ getIterableStr(creature.conditionImmunities) }}</span>
+          <span>{{ getIterableString(creature.conditionImmunities) }}</span>
         </p>
 
         <p v-if="senses">
@@ -419,178 +425,161 @@
   </div>
 </template>
 
-<script>
+<script setup>
+  import { computed } from 'vue';
+  import toNumber from 'lodash/toNumber';
   import RawContent from '@/components/content/RawContent.vue';
   import DetailTopBar from '@/components/UI/DetailTopBar.vue';
   import DiceRoller from '@/components/UI/DiceRoller.vue';
-  import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
   import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
+  import { getIterableString } from '@/common/helpers/string';
+  import { getFormattedModifier, getFormula } from '@/common/helpers/abilityTransforms';
 
-  export default {
-    name: 'CreatureBody',
-    components: {
-      UiEasyLightbox,
-      DetailTopBar,
-      RawContent,
-      DiceRoller
+  const props = defineProps({
+    creature: {
+      type: Object,
+      default: undefined,
+      required: true
     },
-    props: {
-      creature: {
-        type: Object,
-        default: undefined,
-        required: true
-      },
-      inTooltip: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup() {
-      const {
-        getFormattedModifier: getAbilityModifier,
-        getFormula: getAbilityFormula
-      } = useAbilityTransforms();
+    inTooltip: {
+      type: Boolean,
+      default: false
+    }
+  });
 
-      return {
-        getAbilityModifier,
-        getAbilityFormula
-      };
-    },
-    computed: {
-      topBarLeftString() {
-        // eslint-disable-next-line max-len
-        return `${
-          this.creature.size.rus
-        } ${
-          this.creature.type.name
-        }${
-          this.creature.type.tags?.length ? ` (${ this.creature.type.tags.join(', ') })` : ''
-        }, ${
-          this.creature.alignment
-        } / ${
-          this.creature.size.eng
-        } ${
-          this.creature.size.cell
-        }`;
-      },
+  const topBarLeftString = computed(() => `${
+    props.creature.size.rus
+  } ${
+    props.creature.type.name
+  }${
+    props.creature.type.tags?.length ? ` (${ props.creature.type.tags.join(', ') })` : ''
+  }, ${
+    props.creature.alignment
+  } / ${
+    props.creature.size.eng
+  } ${
+    props.creature.size.cell
+  }`);
 
-      speed() {
-        if (!this.creature.speed?.length) {
-          return '';
+  const speed = computed(() => {
+    if (!(props.creature.speed instanceof Array)) {
+      return '';
+    }
+
+    return props.creature.speed
+      .map(item => `${
+        item.name ? `${ item.name } ` : ''
+      }${
+        item.value
+      } фт.${
+        item.additional ? ` (${ item.additional })` : ''
+      }`)
+      .join(', ');
+  });
+
+  const savingThrows = computed(() => {
+    if (!(props.creature.savingThrows instanceof Array)) {
+      return [];
+    }
+
+    return props.creature.savingThrows.map(save => ({
+      formula: `к20${ getFormattedModifier(save.value) }`,
+      label: save.shortName,
+      name: save.name,
+      value: `${ getFormattedModifier(save.value) }${ save.additional ? save.additional : '' }`
+    }));
+  });
+
+  const skills = computed(() => {
+    if (!(props.creature.skills instanceof Array)) {
+      return [];
+    }
+
+    return props.creature.skills.map(skill => ({
+      formula: `к20${ getFormattedModifier(skill.value) }`,
+      label: skill.name,
+      value: `${ getFormattedModifier(skill.value) }${ skill.additional ? skill.additional : '' }`
+    }));
+  });
+
+  const senses = computed(() => {
+    const list = [];
+
+    if (props.creature.senses?.senses?.length) {
+      for (const sense of props.creature.senses.senses) {
+        const index = list.push(`${ sense.name } ${ sense.value } фт.`);
+
+        if (sense.additional) {
+          list[index - 1] += ` (${ sense.additional })`;
         }
-
-        const speeds = [];
-
-        for (const speed of this.creature.speed) {
-          speeds.push(`${
-            speed.name ? `${ speed.name } ` : ''
-          }${
-            speed.value
-          } фт.${
-            speed.additional ? ` (${ speed.additional })` : ''
-          }`);
-        }
-
-        return speeds.join(', ');
-      },
-
-      savingThrows() {
-        if (!this.creature.savingThrows?.length) {
-          return [];
-        }
-
-        const saves = [];
-
-        for (const save of this.creature.savingThrows) {
-          const sign = Math.sign(save.value) > -1 ? '+' : '-';
-
-          saves.push({
-            formula: `к20${ sign }${ Math.abs(save.value) }`,
-            label: save.shortName,
-            name: save.name,
-            value: `${ sign }${ Math.abs(save.value) }${ save.additional ? save.additional : '' }`
-          });
-        }
-
-        return saves;
-      },
-
-      skills() {
-        if (!this.creature.skills?.length) {
-          return [];
-        }
-
-        const skills = [];
-
-        for (const skill of this.creature.skills) {
-          const sign = Math.sign(skill.value) > -1 ? '+' : '-';
-
-          skills.push({
-            formula: `к20${ sign }${ Math.abs(skill.value) }`,
-            label: skill.name,
-            value: `${ sign }${ Math.abs(skill.value) }${ skill.additional ? skill.additional : '' }`
-          });
-        }
-
-        return skills;
-      },
-
-      senses() {
-        const senses = [];
-
-        if (this.creature.senses?.senses?.length) {
-          for (const sense of this.creature.senses.senses) {
-            const index = senses.push(`${ sense.name } ${ sense.value } фт.`);
-
-            if (sense.additional) {
-              senses[index - 1] += ` (${ sense.additional })`;
-            }
-          }
-        }
-
-        if (this.creature.senses?.passivePerception) {
-          senses.push(`пассивная Внимательность ${ this.creature.senses.passivePerception }`);
-        }
-
-        return senses.join(', ');
-      },
-      challengeRating() {
-        if (this.creature.challengeRating === '—') {
-          return this.creature.challengeRating;
-        }
-
-        if (this.creature.experience === 0) {
-          return `${ this.creature.challengeRating } (0 или 10 опыта)`;
-        }
-
-        return `${ this.creature.challengeRating } (${ this.creature.experience.toLocaleString() } опыта)`;
-      },
-      hitDiceFormula() {
-        const sign = Math.sign(this.creature.hits.bonus) > -1 ? '+' : '-';
-        const bonus = Math.abs(this.creature.hits.bonus);
-
-        return this.creature.hits.bonus
-          ? `${ this.creature.hits.formula } ${ sign } ${ bonus }`
-          : this.creature.hits.formula;
-      }
-    },
-    methods: {
-      getIterableStr(strings) {
-        let str = '';
-
-        for (let i = 0; i < strings.length; i++) {
-          if (!i) {
-            str += strings[i];
-
-            continue;
-          }
-
-          str += strings[i].indexOf(',') > -1 ? '; ' : ', ';
-          str += strings[i];
-        }
-
-        return str;
       }
     }
-  };
+
+    if (props.creature.senses?.passivePerception) {
+      list.push(`пассивная Внимательность ${ props.creature.senses.passivePerception }`);
+    }
+
+    return list.join(', ');
+  });
+
+  const challengeRating = computed(() => {
+    if (props.creature.challengeRating === '—') {
+      return props.creature.challengeRating;
+    }
+
+    if (props.creature.experience === 0) {
+      return `${ props.creature.challengeRating } (0 или 10 опыта)`;
+    }
+
+    return `${ props.creature.challengeRating } (${ props.creature.experience.toLocaleString() } опыта)`;
+  });
+
+  const proficiencyBonus = computed(() => {
+    // CR 0-4 → БМ=2
+    // CR 5-8 → БМ=3
+    // CR 9-12 → БМ=4
+    // CR 13-16 → БМ=5
+    // CR 17-20 → БМ=6
+    // CR 21-24 → БМ=7
+    // CR 25-28 → БМ=8
+    // CR 29-30→ БМ=9
+
+    const cr = toNumber(props.creature.challengeRating);
+
+    console.log(Number.isNaN(cr));
+
+    if (Number.isNaN(cr) || !cr || cr <= 4) {
+      return '+2';
+    }
+
+    if (cr <= 8) {
+      return '+3';
+    }
+
+    if (cr <= 12) {
+      return '+4';
+    }
+
+    if (cr <= 16) {
+      return '+5';
+    }
+
+    if (cr <= 20) {
+      return '+6';
+    }
+
+    if (cr <= 24) {
+      return '+7';
+    }
+
+    if (cr <= 28) {
+      return '+8';
+    }
+
+    return '+9';
+  });
+
+  const hitDiceFormula = computed(() => (props.creature.hits.bonus
+    ? `${ props.creature.hits.formula } ${ getFormattedModifier(props.creature.hits.bonus) }`
+    : props.creature.hits.formula));
 </script>

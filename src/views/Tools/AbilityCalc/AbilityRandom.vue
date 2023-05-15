@@ -68,7 +68,7 @@
   import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
   import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
+  import { getFormattedModifier } from '@/common/helpers/abilityTransforms';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
   import { useUIStore } from '@/store/UI/UIStore';
 
@@ -92,8 +92,6 @@
         doRoll,
         notifyResult
       } = useDiceRoller();
-
-      const { getFormattedModifier } = useAbilityTransforms();
 
       const rolls = ref<Array<AbilityRoll>>([]);
 
