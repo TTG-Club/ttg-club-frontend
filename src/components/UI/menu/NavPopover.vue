@@ -33,58 +33,46 @@
   </div>
 </template>
 
-<script lang="ts">
-  import {
-    computed, defineComponent, watch
-  } from 'vue';
+<script setup lang="ts">
+  import { computed, watch } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import { useNavStore } from '@/store/UI/NavStore';
 
-  export default defineComponent({
-    props: {
-      modelValue: {
-        type: Boolean,
-        default: false
-      },
-      isMenu: {
-        type: Boolean,
-        default: false
-      },
-      isLeft: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props, { emit }) {
-      const isShow = useVModel(props, 'modelValue');
-      const navStore = useNavStore();
-      const { isShowPopover } = storeToRefs(navStore);
+  const props = withDefaults(defineProps<{
+    modelValue?: boolean;
+    isMenu?: boolean;
+    isLeft?: boolean;
+  }>(), {
+    modelValue: false,
+    isMenu: false,
+    isLeft: false
+  });
 
-      watch(isShow, value => {
-        isShowPopover.value = value;
-      });
+  const emit = defineEmits<{(e: 'close'): void; }>();
 
-      watch(isShowPopover, value => {
-        if (!value && isShow.value) {
-          isShow.value = false;
-        }
-      });
+  const isShow = useVModel(props, 'modelValue');
+  const navStore = useNavStore();
+  const { isShowPopover } = storeToRefs(navStore);
 
-      return {
-        isShow,
+  const classes = computed(() => ({
+    'is-left': props.isLeft,
+    'is-menu': props.isMenu
+  }));
 
-        classes: computed(() => ({
-          'is-left': props.isLeft,
-          'is-menu': props.isMenu
-        })),
+  const onClose = () => {
+    isShow.value = false;
 
-        onClose: () => {
-          isShow.value = false;
+    emit('close');
+  };
 
-          emit('close');
-        }
-      };
+  watch(isShow, value => {
+    isShowPopover.value = value;
+  });
+
+  watch(isShowPopover, value => {
+    if (!value && isShow.value) {
+      isShow.value = false;
     }
   });
 </script>
@@ -130,11 +118,11 @@
       z-index: 111;
       position: absolute;
       top: inherit;
-      bottom: 64px;
+      bottom: calc(64px + var(--safe-area-inset-bottom));
       left: 8px;
       right: 0;
       max-width: calc(100vw - 16px);
-      max-height: calc(var(--max-vh) - 72px);
+      max-height: calc(var(--max-vh) - 72px - var(--safe-area-inset-bottom));
 
       @include media-min($md) {
         top: 16px;
