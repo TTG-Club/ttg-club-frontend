@@ -146,7 +146,7 @@
     const attributes = { ...useAttrs() };
 
     if (props.type === 'number') {
-      if (this.min !== undefined) {
+      if (props.min !== undefined) {
         attributes.min = props.min;
       }
     }
