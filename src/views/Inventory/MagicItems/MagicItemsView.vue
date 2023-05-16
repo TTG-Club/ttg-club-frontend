@@ -7,9 +7,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
+    <virtual-grouped-list
       :list="{ items, keyField: DEFAULT_ENTITY_KEY_FIELD }"
-      :flat="showRightSide"
+      :get-group="getGroupByRarity"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item }">
         <magic-item-link
@@ -17,7 +18,7 @@
           :to="{ path: item.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -25,7 +26,7 @@
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import capitalize from "lodash/capitalize";
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -33,8 +34,10 @@
   import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
   import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
 
-  const route = useRoute();
+  const route = useRoute;
   const router = useRouter();
   const uiStore = useUIStore();
 
@@ -79,6 +82,11 @@
       await router.push({ path: items.value[0].url });
     }
   };
+
+  const getGroupByRarity = (item: AnyObject & {rarity: AnyObject}) => ({
+    url: item.rarity.type,
+    name: capitalize(String(item.rarity.name))
+  });
 
   onBeforeMount(async () => {
     await filter.initFilter();
