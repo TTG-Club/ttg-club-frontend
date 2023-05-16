@@ -68,12 +68,6 @@
         background-color: var(--hover);
       }
 
-      span.key {
-        padding: 0 8px;
-        font-weight: 600;
-        color: var(--text-color-title);
-      }
-
       span.computer_version {
         display: none;
 
@@ -86,6 +80,13 @@
         padding: 0 8px;
         font-weight: 600;
         color: var(--text-color-title);
+        background-color: var(--bg-sub-menu);
+        border: {
+          width: 1px;
+          style: solid;
+          color: var(--border);
+          radius: 4px;
+        };
       }
     }
 

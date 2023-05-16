@@ -10,11 +10,7 @@
           class="search_row_g"
           @click.left.exact.prevent="openSearchModal"
         >
-          Нажмите
-          <span class="computer_version">
-            &nbsp;тут или<span class="key">&#171; / &#187;</span>
-          </span>
-          для начала поиска
+          Нажмите <span class="computer_version">&nbsp;тут или <span class="key">\</span>&nbsp;</span>для начала поиска
         </p>
       </div>
 
