@@ -6,9 +6,10 @@
     @search="onSearch"
     @update="initPages"
   >
-    <virtual-grid-list
+    <virtual-grouped-list
       :list="{ items: backgrounds, keyField: DEFAULT_ENTITY_KEY_FIELD, minItemSize: 50 }"
-      :flat="showRightSide"
+      :get-group="getGroupByFirstLetter"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item: background }">
         <background-link
@@ -16,7 +17,7 @@
           :to="{ path: background.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -30,8 +31,9 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
 
   const route = useRoute();
   const router = useRouter();
