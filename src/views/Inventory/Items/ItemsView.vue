@@ -7,9 +7,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
+    <virtual-grouped-list
       :list="{ items, keyField: DEFAULT_ENTITY_KEY_FIELD }"
-      :flat="showRightSide"
+      :get-group="getGroupByFirstLetter"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item }">
         <item-link
@@ -17,7 +18,7 @@
           :to="{ path: item.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -28,11 +29,12 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
   import ItemLink from '@/views/Inventory/Items/ItemLink.vue';
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
 
   const route = useRoute();
   const router = useRouter();
