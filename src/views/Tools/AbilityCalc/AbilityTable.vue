@@ -10,11 +10,11 @@
       </div>
 
       <div class="ability-table__row is-aside">
-        Бон. расы
+        Бонус расы
       </div>
 
       <div class="ability-table__row is-aside">
-        Модиф.
+        Модификатор
       </div>
 
       <div class="ability-table__row is-aside">
