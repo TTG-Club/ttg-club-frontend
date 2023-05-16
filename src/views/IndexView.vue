@@ -10,11 +10,7 @@
           class="search_row_g"
           @click.left.exact.prevent="openSearchModal"
         >
-          Нажмите
-          <span class="computer_version">
-            &nbsp;тут или<span class="key">&#171; / &#187;</span>
-          </span>
-          для начала поиска
+          Нажмите <span class="computer_version">&nbsp;тут или <span class="key">\</span>&nbsp;</span>для начала поиска
         </p>
       </div>
 
@@ -190,7 +186,8 @@
 
       const {
         showedNavItems,
-        showedPartners
+        showedPartners,
+        isShowSearch
       } = storeToRefs(navStore);
 
       const youtube = ref<HTMLElement | null>(null);
@@ -252,7 +249,7 @@
       };
 
       const openSearchModal = () => {
-        document.dispatchEvent(new Event('open-search'));
+        isShowSearch.value = true;
       };
 
       tryOnBeforeMount(async () => {
