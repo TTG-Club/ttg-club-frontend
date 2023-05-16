@@ -57,12 +57,13 @@
     getGroup: TGetGroup<TItem, TGroup>;
     groupLabelKey?: string;
     sortBy?: ListIteratee;
-    grid: TVirtualGridListProps;
+    grid?: TVirtualGridListProps;
   };
 
   const props = withDefaults(defineProps<TProps>(), {
-    groupLabelKey: 'name',
-    sortBy: 'order'
+    groupLabelKey: "name",
+    sortBy: "order",
+    grid: () => ({})
   });
 
   const list = computed<TVirtualListProps>(() => ({
