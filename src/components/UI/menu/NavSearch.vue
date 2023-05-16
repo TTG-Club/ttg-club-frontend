@@ -18,12 +18,9 @@
   <search-modal v-model="isShowSearch" />
 </template>
 
-<script>
+<script setup lang="ts">
   import {
-    computed, defineComponent, watchEffect
-  } from 'vue';
-  import {
-    useActiveElement, useEventListener, useMagicKeys
+    onKeyStroke, useActiveElement, useEventListener
   } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import NavPopover from '@/components/UI/menu/NavPopover.vue';
@@ -31,46 +28,34 @@
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import { useNavStore } from '@/store/UI/NavStore';
 
-  export default defineComponent({
-    components: {
-      SvgIcon,
-      SearchModal,
-      NavPopover
-    },
-    setup() {
-      const navStore = useNavStore();
-      const { isShowSearch } = storeToRefs(navStore);
+  const navStore = useNavStore();
+  const { isShowSearch } = storeToRefs(navStore);
+
+  const onOpenSearch = () => {
+    isShowSearch.value = true;
+  };
+
+  onKeyStroke(
+    [
+      '/',
+      '\\',
+      'Find'
+    ],
+    e => {
       const activeElement = useActiveElement();
 
-      const onOpenSearch = () => {
-        isShowSearch.value = true;
-      };
+      if (activeElement.value?.tagName === 'INPUT' || activeElement.value?.tagName === 'TEXTAREA') {
+        return;
+      }
 
-      const keys = useMagicKeys();
-      const divide = keys['/'];
+      e.preventDefault();
+      e.stopPropagation();
 
-      const notUsingInput = computed(() => (
-        activeElement.value?.tagName !== 'INPUT'
-        && activeElement.value?.tagName !== 'TEXTAREA'
-      ));
-
-      watchEffect(() => {
-        if (divide.value && notUsingInput.value) {
-          onOpenSearch();
-        }
-      });
-
-      useEventListener(document, 'open-search', () => {
-        onOpenSearch();
-      });
-
-      return {
-        isShowSearch
-      };
+      onOpenSearch();
     }
+  );
+
+  useEventListener(document, 'open-search', () => {
+    onOpenSearch();
   });
 </script>
-
-<style lang="scss" scoped>
-
-</style>
