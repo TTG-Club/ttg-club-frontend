@@ -8,9 +8,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: options, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="{ items: options, keyField: DEFAULT_ENTITY_KEY_FIELD }"
+      :grid="{ flat: showRightSide }"
+      :get-group="getGroupByFirstLetter"
     >
       <template #default="{ item: option }">
         <option-link
@@ -19,7 +20,7 @@
           :to="{ path: option.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </component>
 </template>
 
@@ -36,7 +37,9 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { OptionsFilterDefaults } from '@/types/Character/Options.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
 
   type TProps = {
     inTab?: boolean,

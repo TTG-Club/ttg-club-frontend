@@ -1,6 +1,7 @@
 import chunk from 'lodash/chunk';
 import type { TGetListRowsOptions, TListRow } from '@/types/Shared/List.types';
 import type { TName } from '@/types/Shared/BaseApiFields.types';
+import { DEFAULT_ENTITY_KEY_FIELD } from '@/common/const';
 
 export const getListRows = <Item, KeyField extends keyof Item>(
   items: Item[],
@@ -16,13 +17,13 @@ export const getListRows = <Item, KeyField extends keyof Item>(
       columns
     } as TListRow<Item, KeyField>));
 
-export const getGroupByFirstLetter = <Item extends {name: TName}>(
-  item: Item
-) => {
+export const createGetGroupByFirstLetter = (keyField: string = DEFAULT_ENTITY_KEY_FIELD) => (item: {name: TName}) => {
   const [firstLetter] = item.name.rus;
 
   return {
     name: firstLetter,
-    url: firstLetter
+    [keyField]: firstLetter
   };
 };
+
+export const getGroupByFirstLetter = createGetGroupByFirstLetter(DEFAULT_ENTITY_KEY_FIELD);
