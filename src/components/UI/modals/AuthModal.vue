@@ -59,7 +59,7 @@
       max-height: calc(var(--max-vh) / 100 * 90);
       margin: auto;
       overflow: hidden;
-      box-shadow: 0 0 12px -8px var(--bg-transparent);
+      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
       display: flex;
       width: 100%;
       max-width: 700px;
