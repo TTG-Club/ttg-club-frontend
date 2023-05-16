@@ -190,7 +190,8 @@
 
       const {
         showedNavItems,
-        showedPartners
+        showedPartners,
+        isShowSearch
       } = storeToRefs(navStore);
 
       const youtube = ref<HTMLElement | null>(null);
@@ -252,7 +253,7 @@
       };
 
       const openSearchModal = () => {
-        document.dispatchEvent(new Event('open-search'));
+        isShowSearch.value = true;
       };
 
       tryOnBeforeMount(async () => {

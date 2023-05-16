@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
   import {
-    onKeyStroke, useActiveElement, useEventListener
+    onKeyStroke, useActiveElement
   } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import NavPopover from '@/components/UI/menu/NavPopover.vue';
@@ -54,8 +54,4 @@
       onOpenSearch();
     }
   );
-
-  useEventListener(document, 'open-search', () => {
-    onOpenSearch();
-  });
 </script>
