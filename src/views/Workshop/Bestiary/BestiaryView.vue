@@ -7,9 +7,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
+    <virtual-grouped-list
       :list="{ items: bestiary, keyField: DEFAULT_ENTITY_KEY_FIELD }"
-      :flat="showRightSide"
+      :get-group="getGroupByChallengeRating"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item: creature }">
         <creature-link
@@ -17,7 +18,7 @@
           :to="{ path: creature.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -31,8 +32,9 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
 
   const route = useRoute();
   const router = useRouter();
@@ -74,6 +76,11 @@
       await router.push({ path: bestiary.value[0].url });
     }
   };
+
+  const getGroupByChallengeRating = (item: AnyObject) => ({
+    name: item.challengeRating,
+    url: item.challengeRating
+  });
 
   onBeforeMount(async () => {
     await filter.initFilter();
