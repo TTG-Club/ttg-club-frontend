@@ -27,3 +27,5 @@ export const createGetGroupByFirstLetter = (keyField: string = DEFAULT_ENTITY_KE
 };
 
 export const getGroupByFirstLetter = createGetGroupByFirstLetter(DEFAULT_ENTITY_KEY_FIELD);
+
+export const getGroupWithIdByFirstLetter = createGetGroupByFirstLetter('id');
