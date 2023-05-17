@@ -12,10 +12,10 @@
 
               <ui-input
                 v-model="count"
-                :min="1"
                 class="form-control select"
-                is-number
-                placeholder="Количеств"
+                type="number"
+                :min="1"
+                placeholder="Количество"
               />
             </div>
 

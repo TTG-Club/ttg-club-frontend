@@ -470,7 +470,7 @@
       .map(item => `${
         item.name ? `${ item.name } ` : ''
       }${
-        item.value
+        item.value ? `${ speed.value } фт.` : ''
       } фт.${
         item.additional ? ` (${ item.additional })` : ''
       }`)
