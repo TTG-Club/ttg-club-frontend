@@ -96,7 +96,7 @@
     items: options
   } = usePagination({
     url: '/options',
-    limit: 70,
+    limit: 120,
     filter: {
       isCustomized,
       value: queryParams

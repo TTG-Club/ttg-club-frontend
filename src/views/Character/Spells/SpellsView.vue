@@ -109,7 +109,7 @@
         items: spells
       } = usePagination({
         url: '/spells',
-        limit: 70,
+        limit: 120,
         filter: {
           isCustomized,
           value: queryParams

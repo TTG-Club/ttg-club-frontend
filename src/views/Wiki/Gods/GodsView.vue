@@ -61,7 +61,7 @@
     items: gods
   } = usePagination({
     url: '/gods',
-    limit: 70,
+    limit: 125,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

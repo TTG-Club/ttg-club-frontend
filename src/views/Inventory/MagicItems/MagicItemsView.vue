@@ -57,7 +57,7 @@
     items
   } = usePagination({
     url: '/items/magic',
-    limit: 70,
+    limit: 120,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

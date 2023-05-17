@@ -68,7 +68,7 @@
         items
       } = usePagination({
         url: '/books',
-        limit: 70,
+        limit: 120,
         search: filter.search,
         order: [
           {

@@ -49,7 +49,7 @@
     items
   } = usePagination({
     url: '/treasures',
-    limit: 70,
+    limit: 120,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
