@@ -470,8 +470,8 @@
       .map(item => `${
         item.name ? `${ item.name } ` : ''
       }${
-        item.value ? `${ speed.value } фт.` : ''
-      } фт.${
+        item.value ? `${ item.value } фт.` : ''
+      }${
         item.additional ? ` (${ item.additional })` : ''
       }`)
       .join(', ');
