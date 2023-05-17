@@ -28,7 +28,8 @@
               <ui-input
                 v-model="form.persuasion"
                 class="form-control select"
-                is-number
+                type="number"
+                :min="1"
                 placeholder="Харизма (Убеждение)"
               />
             </div>
