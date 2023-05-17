@@ -485,8 +485,8 @@
           speeds.push(`${
             speed.name ? `${ speed.name } ` : ''
           }${
-            speed.value
-          } фт.${
+            speed.value ? `${ speed.value } фт.` : ''
+          }${
             speed.additional ? ` (${ speed.additional })` : ''
           }`);
         }
