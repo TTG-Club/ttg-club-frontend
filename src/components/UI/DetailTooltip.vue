@@ -76,7 +76,7 @@
     return null;
   });
 
-  const components: { [key in TDetailType]: Component } = {
+  const components: Record<TDetailType, Component> = {
     'option': OptionBody,
     'trait': TraitBody,
     'armor': ArmorBody,
