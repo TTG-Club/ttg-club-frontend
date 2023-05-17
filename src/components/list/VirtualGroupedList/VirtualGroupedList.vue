@@ -93,8 +93,13 @@
 
 <style lang="scss" scoped>
     .virtual-grouped-list :deep {
+        --group-spacing: calc(var(--item-spacing) * 2);
+        // Добавляем отрицательный margin для родителя, чтобы не было лишнего отступа
+        margin-top: calc(-1 * var(--group-spacing));
+
         .vue-recycle-scroller__item-view {
             > .virtual-grouped-list__group {
+                padding-top: var(--group-spacing);
                 padding-bottom: var(--item-spacing);
             }
         }
