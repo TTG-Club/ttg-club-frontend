@@ -1,108 +1,85 @@
 <template>
-  <component :is="tag">
-    <component :is="component" />
-  </component>
+  <render />
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
   import {
-    computed, defineComponent, nextTick, onBeforeUnmount, ref, watch
+    computed, defineComponent, h, onBeforeUnmount, ref, watch
   } from 'vue';
   import { useAxios } from '@/common/composition/useAxios';
 
-  // eslint-disable-next-line vue/one-component-per-file
-  export default defineComponent({
-    name: 'RawContent',
-    props: {
-      template: {
-        type: String,
-        default: undefined
-      },
-      url: {
-        type: String,
-        default: undefined
-      },
-      tag: {
-        type: String,
-        default: 'div'
-      }
-    },
-    setup(props, { emit }) {
-      const http = useAxios();
-      const templateString = ref<string | null>(null);
-      const error = ref(false);
-      const loading = ref(true);
+  const props = withDefaults(defineProps<{
+    template?: string;
+    url?: string;
+    tag?: string;
+  }>(), {
+    template: undefined,
+    url: undefined,
+    tag: 'div'
+  });
 
-      const initComponent = async () => {
-        if (!props.template && !props.url) {
-          throw new Error('URL and template is not defined');
-        }
+  const emit = defineEmits(['loaded', 'before-unmount']);
 
-        try {
-          error.value = false;
-          loading.value = true;
+  const http = useAxios();
+  const templateString = ref<string | null>(null);
+  const error = ref(false);
+  const loading = ref(true);
 
-          templateString.value = props.template || '';
-
-          if (!templateString.value && !props.template) {
-            const { data } = await http.rawGet({
-              url: props.url
-            });
-
-            templateString.value = data;
-          }
-
-          loading.value = false;
-
-          nextTick(() => {
-            emit('loaded');
-          });
-
-          return Promise.resolve();
-        } catch (err) {
-          error.value = true;
-          loading.value = false;
-
-          return Promise.reject(err);
-        }
-      };
-
-      const component = computed(() => {
-        let inner = '';
-
-        if (templateString.value) {
-          inner = templateString.value;
-        }
-
-        if (error.value || (!loading.value && !templateString.value)) {
-          inner = 'Ошибка...';
-        }
-
-        if (loading.value && !error.value) {
-          inner = 'Загрузка...';
-        }
-
-        // eslint-disable-next-line vue/one-component-per-file
-        return defineComponent({ template: inner });
-      });
-
-      watch(
-        [() => props.template, () => props.url],
-        async () => {
-          await initComponent();
-        },
-        {
-          immediate: true
-        }
-      );
-
-      onBeforeUnmount(() => {
-        emit('before-unmount');
-      });
-
-      return {
-        component
-      };
+  const updateTemplate = async () => {
+    if (!props.template && !props.url) {
+      throw new Error('URL and template is not defined');
     }
+
+    try {
+      error.value = false;
+      loading.value = true;
+
+      templateString.value = props.template || '';
+
+      if (!templateString.value && !props.template) {
+        const { data } = await http.rawGet({
+          url: props.url
+        });
+
+        templateString.value = data;
+      }
+
+      loading.value = false;
+
+      emit('loaded');
+
+      return Promise.resolve();
+    } catch (err) {
+      error.value = true;
+      loading.value = false;
+
+      return Promise.reject(err);
+    }
+  };
+
+  const render = computed(() => {
+    if (loading.value) {
+      return h(props.tag, null, 'Загрузка...');
+    }
+
+    if (error.value || !templateString.value) {
+      return h(props.tag, null, 'Ошибка...');
+    }
+
+    return h(props.tag, null, h(defineComponent({ template: templateString.value })));
+  });
+
+  watch(
+    [() => props.template, () => props.url],
+    async () => {
+      await updateTemplate();
+    },
+    {
+      immediate: true
+    }
+  );
+
+  onBeforeUnmount(() => {
+    emit('before-unmount');
   });
 </script>
