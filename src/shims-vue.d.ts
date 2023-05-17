@@ -41,3 +41,9 @@ declare module '*.module.scss' {
   const classes: { [key: string]: string };
   export default classes;
 }
+
+declare module 'tippy' {
+    import type { TippyComponent } from 'vue-tippy';
+
+    export const Tippy: TippyComponent;
+}
