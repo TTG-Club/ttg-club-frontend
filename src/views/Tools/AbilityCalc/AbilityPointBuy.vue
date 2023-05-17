@@ -63,7 +63,7 @@
   } from '@/types/Tools/AbilityCalc.types';
   import UiButton from '@/components/UI/kit/UiButton.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { usePluralize } from '@/common/composition/usePluralize';
+  import { getPlural } from '@/common/helpers/string';
 
   export default defineComponent({
     components: {
@@ -77,8 +77,6 @@
       }
     },
     setup(props, { emit }) {
-      const { getPlural } = usePluralize();
-
       const cost = [
         {
           key: 8,

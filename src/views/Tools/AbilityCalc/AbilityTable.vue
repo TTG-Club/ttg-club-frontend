@@ -59,7 +59,7 @@
   import {
     AbilityKey, AbilityName, AbilityShortName
   } from '@/types/Tools/AbilityCalc.types';
-  import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
+  import { getFormattedModifier } from '@/common/helpers/abilityTransforms';
 
   export default defineComponent({
     props: {
@@ -73,8 +73,6 @@
       }
     },
     setup(props) {
-      const { getFormattedModifier } = useAbilityTransforms();
-
       const abilities = computed(() => Object.values(AbilityKey)
         .map((key: AbilityKey) => {
           const roll = props.rolls.find(item => item.key === key);
