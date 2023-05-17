@@ -534,19 +534,18 @@
     return `${ props.creature.challengeRating } (${ props.creature.experience.toLocaleString() } опыта)`;
   });
 
+  /**
+   * // CR 0-4   → БМ=2
+   * // CR 5-8   → БМ=3
+   * // CR 9-12  → БМ=4
+   * // CR 13-16 → БМ=5
+   * // CR 17-20 → БМ=6
+   * // CR 21-24 → БМ=7
+   * // CR 25-28 → БМ=8
+   * // CR 29-30 → БМ=9
+   */
   const proficiencyBonus = computed(() => {
-    // CR 0-4 → БМ=2
-    // CR 5-8 → БМ=3
-    // CR 9-12 → БМ=4
-    // CR 13-16 → БМ=5
-    // CR 17-20 → БМ=6
-    // CR 21-24 → БМ=7
-    // CR 25-28 → БМ=8
-    // CR 29-30→ БМ=9
-
     const cr = toNumber(props.creature.challengeRating);
-
-    console.log(Number.isNaN(cr));
 
     if (Number.isNaN(cr) || !cr || cr <= 4) {
       return '+2';
