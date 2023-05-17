@@ -1,6 +1,6 @@
 <template>
   <dynamic-scroller
-    v-bind="props"
+    v-bind="scrollerProps"
     class="virtual-list"
     list-tag="ul"
     item-tag="li"
@@ -22,6 +22,7 @@
 <script lang="ts" setup>
   import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
   import clsx from "clsx";
+  import { computed } from "vue";
   import { DEFAULT_KEY_FIELD } from '@/common/const';
   import type { Maybe } from "@/types/Shared/Utility.types";
 
@@ -40,6 +41,12 @@
     pageMode: true,
     minItemSize: 55,
     getItemClass: () => undefined
+  });
+
+  const scrollerProps = computed(() => {
+    const { getItemClass, ...rest } = props;
+
+    return rest;
   });
 
   const getItemClasses = (item: unknown) => clsx('virtual-list__item', props.getItemClass?.(item));
