@@ -73,7 +73,26 @@
         </div>
 
         <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+          <ui-button
+            icon-position="right"
+            type="text"
+            @click.left.exact.prevent="sendForm"
+          >
+            Найти торговца
+          </ui-button>
+
+          <ui-button
+            icon="profile"
+            type="secondary"
+            @click.left.exact.prevent="sendForm"
+          >
+            Найти торговца
+          </ui-button>
+
+          <ui-button
+            type="outline"
+            @click.left.exact.prevent="sendForm"
+          >
             Найти торговца
           </ui-button>
         </div>

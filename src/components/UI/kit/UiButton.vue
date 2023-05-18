@@ -1,283 +1,231 @@
 <template>
   <button
-    :class="classList"
+    :class="{
+      [$style['ui-button']]: true,
+      [$style[`type-${ props.type }`]]: true,
+      [$style[`size-${ props.size }`]]: true,
+      [$style['is-disabled']]: isDisabled,
+      [$style['is-full-with']]: props.fullWidth,
+      [$style['is-loading']]: props.loading,
+    }"
     :disabled="disabled"
-    class="ui-button"
     type="button"
   >
     <span
-      v-if="$slots['icon-left']"
-      class="ui-button__icon is-left"
+      v-if="!isDisabled"
+      :class="$style.hover"
+    />
+
+    <span
+      :class="{
+        [$style.body]: true,
+        [$style[`icon-${ props.iconPosition }`]]: true,
+        [$style['with-icon']]: hasIcon,
+      }"
     >
-      <slot name="icon-left" />
+      <span
+        v-if="loading"
+        :class="$style.icon"
+      >
+        <svg-icon
+          icon-name="loading"
+          :stroke-enable="false"
+          fill-enable
+        />
+      </span>
+
+      <span
+        v-else-if="icon || !!$slots.icon"
+        :class="$style.icon"
+      >
+        <svg-icon
+          v-if="icon"
+          :icon-name="icon"
+          :stroke-enable="false"
+          fill-enable
+        />
+
+        <slot
+          v-else
+          name="icon"
+        />
+      </span>
+
+      <span>
+        <slot name="default" />
+      </span>
     </span>
 
     <span
-      v-if="isIcon"
-      class="ui-button__icon"
-    >
-      <slot name="default" />
-    </span>
-
-    <span
-      v-else
-      class="ui-button__text"
-    >
-      <slot name="default" />
-    </span>
-
-    <span
-      v-if="$slots['icon-right']"
-      class="ui-button__icon is-right"
-    >
-      <slot name="icon-right" />
-    </span>
+      v-if="isDisabled"
+      :class="$style.disabled"
+    />
   </button>
 </template>
 
-<script>
-  import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+  import { computed, useSlots } from 'vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-  export default defineComponent({
-    props: {
-      typeLink: {
-        type: Boolean,
-        default: false
-      },
-      typeLinkFilled: {
-        type: Boolean,
-        default: false
-      },
-      typePrimary: {
-        type: Boolean,
-        default: true
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      isIcon: {
-        type: Boolean,
-        default: false
-      },
-      isSmall: {
-        type: Boolean,
-        default: false
-      },
-      isLarge: {
-        type: Boolean,
-        default: false
-      },
-      useFullWidth: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const type = computed(() => {
-        if (props.typeLink) {
-          return 'link';
-        }
-
-        if (props.typeLinkFilled) {
-          return 'link-filled';
-        }
-
-        return 'primary';
-      });
-
-      const classList = computed(() => {
-        const list = [`is-${ type.value }`];
-
-        if (props.isSmall) {
-          list.push('is-small');
-        }
-
-        if (props.isLarge) {
-          list.push('is-large');
-        }
-
-        if (props.useFullWidth) {
-          list.push('is-full-width');
-        }
-
-        return list;
-      });
-
-      return {
-        type,
-        classList
-      };
-    }
+  const props = withDefaults(defineProps<{
+    type?: 'default' | 'secondary' | 'outline' | 'text';
+    size?: 'sm' | 'md' | 'lg';
+    color?: 'primary' | 'success' | 'warning' | 'error' | 'info';
+    iconPosition?: 'left' | 'right';
+    icon?: string;
+    disabled?: boolean;
+    loading?: boolean;
+    fullWidth?: boolean;
+  }>(), {
+    type: 'default',
+    size: 'md',
+    color: 'primary',
+    iconPosition: 'left',
+    icon: undefined,
+    disabled: false,
+    loading: false,
+    fullWidth: false
   });
+
+  const slots = useSlots();
+
+  const color = computed(() => `var(--${ props.color })`);
+  const isDisabled = computed(() => props.disabled || props.loading);
+  const hasIcon = computed(() => props.icon || !!slots.icon || props.loading);
 </script>
 
-<style lang="scss" scoped>
-  .ui-button {
+<style lang="scss" module>
+  .hover,
+  .disabled {
     @include css_anim();
 
-    background-color: var(--primary);
-    color: var(--text-btn-color);
-    border-radius: 8px;
-    padding: 6px;
-    cursor: pointer;
-    display: inline-flex;
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: not-allowed;
+  }
+
+  .hover {
+    opacity: 0;
+    background-color: black;
+    z-index: 1;
+  }
+
+  .body {
+    display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    font-size: var(--main-font-size);
-    line-height: calc(var(--main-line-height) - 1px);
+    z-index: 2;
+    gap: 8px;
 
-    @include media-min($xl) {
-      &:hover {
-        @include css_anim();
-
-        background-color: var(--primary-hover);
+    &.icon {
+      &-left {
+        flex-direction: row;
       }
 
-      &:active,
-      &.is-active {
-        @include css_anim();
+      &-right {
+        flex-direction: row-reverse;
+      }
+    }
+  }
 
-        background-color: var(--primary-active);
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  .disabled {
+    z-index: 3;
+    background-color: white;
+    opacity: 20%;
+  }
+
+  .ui-button {
+    color: var(--text-btn-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0;
+    border: {
+      radius: 8px;
+      width: 1px;
+      style: solid;
+      color: var(--border);
+    };
+
+    &:hover {
+      .hover {
+        opacity: 10%;
       }
     }
 
-    &:disabled {
-      opacity: .6;
-      background-color: var(--primary);
-      cursor: not-allowed;
-    }
-
-    &__text {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    &__icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-
-      &.is-left,
-      &.is-right {
-        padding: 2px;
-      }
-
-      &.is-left {
-        margin-right: 8px;
-      }
-
-      &.is-right {
-        margin-left: 8px;
-      }
-
-      .svg-icon {
-        width: 100%;
-        height: 100%;
+    &.size {
+      &-md {
+        font-size: 14px;
+        line-height: 18px;
       }
     }
 
-    &.is-full-width {
-      display: flex;
-      width: 100%;
-    }
+    &.type {
+      &-default {
+        background-color: v-bind(color);
+        border: {
+          width: 0;
+        };
 
-    &.is-small {
-      padding: 8px;
+        .body {
+          padding: 10px 8px;
 
-      & + & {
-        margin-left: 8px;
-      }
-
-      .ui-button__icon {
-        width: 20px;
-        height: 20px;
-
-        &.is-left,
-        &.is-right {
-          padding: 2px;
-        }
-
-        &.is-left {
-          margin-right: 8px;
-        }
-
-        &.is-right {
-          margin-left: 8px;
-        }
-      }
-    }
-
-    &.is-large {
-      padding: 16px;
-
-      & + & {
-        margin-left: 16px;
-      }
-
-      .ui-button__icon {
-        width: 28px;
-        height: 28px;
-
-        &.is-left,
-        &.is-right {
-          padding: 4px;
-        }
-      }
-    }
-
-    &.is-link {
-      background-color: transparent;
-      color: var(--primary);
-
-      @include media-min($xl) {
-        &:hover {
-          background-color: var(--bg-sub-menu);
-          color: var(--primary-hover);
-        }
-
-        &:active,
-        &.is-active {
-          background-color: var(--bg-main);
+          &.with-icon {
+            padding: 7px 8px;
+          }
         }
       }
 
-      &:disabled {
-        opacity: .6;
+      &-secondary {
+        background-color: var(--bg-secondary);
+
+        .body {
+          padding: 9px 8px;
+
+          &.with-icon {
+            padding: 6px 8px;
+          }
+        }
+      }
+
+      &-outline {
         background-color: transparent;
-        color: var(--primary);
-        cursor: not-allowed;
-      }
-    }
 
-    &.is-link-filled {
-      background-color: transparent;
-      color: var(--primary);
+        .body {
+          padding: 9px 8px;
 
-      @include media-min($xl) {
-        &:hover {
-          background-color: var(--primary-hover);
-          color: var(--text-btn-color);
-        }
-
-        &:active,
-        &.is-active {
-          background-color: var(--primary-active);
-          color: var(--text-btn-color);
+          &.with-icon {
+            padding: 6px 8px;
+          }
         }
       }
 
-      &:disabled {
-        opacity: .6;
+      &-text {
         background-color: transparent;
-        color: var(--primary);
-        cursor: not-allowed;
+        border: {
+          width: 0;
+        };
+
+        .body {
+          padding: 10px 8px;
+
+          &.with-icon {
+            padding: 7px 8px;
+          }
+        }
       }
     }
   }
