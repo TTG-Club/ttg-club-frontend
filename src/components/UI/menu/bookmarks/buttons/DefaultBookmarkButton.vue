@@ -2,17 +2,11 @@
   <ui-button
     v-tippy="{ content: 'Добавить в закладки' }"
     class="default-bookmark-button"
-    is-icon
-    type-link-filled
+    :icon="isSaved ? 'bookmark-filled' : 'bookmark'"
+    type="text"
     @click.left.exact.prevent.stop="updateBookmark"
     @dblclick.prevent.stop
-  >
-    <svg-icon
-      :icon-name="isSaved ? 'bookmark-filled' : 'bookmark'"
-      :stroke-enable="false"
-      fill-enable
-    />
-  </ui-button>
+  />
 </template>
 
 <script>
@@ -22,7 +16,7 @@
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { toast } from '@/common/helpers/toast';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useDefaultBookmarkStore } from '@/store/UI/bookmarks/DefaultBookmarkStore';
   import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
   import { useUserStore } from '@/store/UI/UserStore';
@@ -104,13 +98,4 @@
 </script>
 
 <style lang="scss" scoped>
-  .default-bookmark-button {
-    width: 28px;
-    z-index: 1;
-
-    &:hover {
-      position: relative;
-      z-index: 2;
-    }
-  }
 </style>

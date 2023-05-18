@@ -1,31 +1,32 @@
 <template>
   <button
     :class="{
-      [$style['ui-button']]: true,
-      [$style[`type-${ props.type }`]]: true,
-      [$style[`size-${ props.size }`]]: true,
-      [$style['is-disabled']]: isDisabled,
-      [$style['is-full-with']]: props.fullWidth,
-      [$style['is-loading']]: props.loading,
+      'ui-button': true,
+      [`type-${ buttonType }`]: true,
+      [`size-${ buttonSize }`]: true,
+      ['is-disabled']: isDisabled,
+      ['is-full-with']: props.fullWidth,
+      ['is-loading']: props.loading,
     }"
     :disabled="disabled"
-    type="button"
+    :type="nativeType"
+    :aria-disabled="isDisabled"
   >
     <span
       v-if="!isDisabled"
-      :class="$style.hover"
+      class="hover"
     />
 
     <span
       :class="{
-        [$style.body]: true,
-        [$style[`icon-${ props.iconPosition }`]]: true,
-        [$style['with-icon']]: hasIcon,
+        body: true,
+        [`icon-${ props.iconPosition }`]: true,
+        'with-icon': hasIcon,
       }"
     >
       <span
         v-if="loading"
-        :class="$style.icon"
+        class="icon"
       >
         <svg-icon
           icon-name="loading"
@@ -36,7 +37,7 @@
 
       <span
         v-else-if="icon || !!$slots.icon"
-        :class="$style.icon"
+        class="icon"
       >
         <svg-icon
           v-if="icon"
@@ -51,32 +52,36 @@
         />
       </span>
 
-      <span>
+      <span v-if="$slots.default">
         <slot name="default" />
       </span>
     </span>
 
     <span
       v-if="isDisabled"
-      :class="$style.disabled"
+      class="disabled"
     />
   </button>
 </template>
 
 <script setup lang="ts">
-  import { computed, useSlots } from 'vue';
+  import {
+    computed, inject, useSlots
+  } from 'vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import type {
+    ISharedButtonProps, TButtonIconPosition, TButtonType
+  } from '@/components/UI/kit/button/UiButton.types';
+  import { buttonGroupContextKey } from '@/components/UI/kit/button/UiButton.const';
 
-  const props = withDefaults(defineProps<{
-    type?: 'default' | 'secondary' | 'outline' | 'text';
-    size?: 'sm' | 'md' | 'lg';
-    color?: 'primary' | 'success' | 'warning' | 'error' | 'info';
-    iconPosition?: 'left' | 'right';
+  interface IProps extends ISharedButtonProps {
+    type?: TButtonType;
+    iconPosition?: TButtonIconPosition;
     icon?: string;
-    disabled?: boolean;
     loading?: boolean;
-    fullWidth?: boolean;
-  }>(), {
+  }
+
+  const props = withDefaults(defineProps<IProps>(), {
     type: 'default',
     size: 'md',
     color: 'primary',
@@ -84,17 +89,22 @@
     icon: undefined,
     disabled: false,
     loading: false,
-    fullWidth: false
+    fullWidth: false,
+    nativeType: 'button'
   });
 
   const slots = useSlots();
 
-  const color = computed(() => `var(--${ props.color })`);
-  const isDisabled = computed(() => props.disabled || props.loading);
+  const groupContext = inject(buttonGroupContextKey, undefined);
+
+  const buttonType = computed(() => groupContext?.type || props.type || 'default');
+  const buttonColor = computed(() => `var(--${ groupContext?.color || props.color || 'primary' })`);
+  const buttonSize = computed(() => groupContext?.size || props.size || 'md');
+  const isDisabled = computed(() => groupContext?.disabled || props.disabled || props.loading);
   const hasIcon = computed(() => props.icon || !!slots.icon || props.loading);
 </script>
 
-<style lang="scss" module>
+<style lang="scss" scoped>
   .hover,
   .disabled {
     @include css_anim();
@@ -104,7 +114,6 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    cursor: not-allowed;
   }
 
   .hover {
@@ -143,6 +152,7 @@
     z-index: 3;
     background-color: white;
     opacity: 20%;
+    cursor: not-allowed;
   }
 
   .ui-button {
@@ -153,6 +163,7 @@
     justify-content: center;
     overflow: hidden;
     padding: 0;
+    flex-shrink: 0;
     border: {
       radius: 8px;
       width: 1px;
@@ -175,7 +186,7 @@
 
     &.type {
       &-default {
-        background-color: v-bind(color);
+        background-color: v-bind(buttonColor);
         border: {
           width: 0;
         };
@@ -215,6 +226,7 @@
 
       &-text {
         background-color: transparent;
+        color: v-bind(buttonColor);
         border: {
           width: 0;
         };

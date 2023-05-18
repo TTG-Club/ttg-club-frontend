@@ -22,12 +22,10 @@
 
         <ui-button
           class="base-modal__close"
-          is-icon
-          type-link
+          icon="close"
+          type="secondary"
           @click.left.exact.prevent="onClose"
-        >
-          <svg-icon icon-name="close" />
-        </ui-button>
+        />
       </div>
 
       <div class="base-modal__content">
@@ -112,7 +110,7 @@
   import { computed } from 'vue';
   import { useVModel } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
 
   interface IEmits {

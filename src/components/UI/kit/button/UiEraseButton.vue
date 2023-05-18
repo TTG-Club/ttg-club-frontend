@@ -16,7 +16,7 @@
 <script setup lang="ts">
   import { useVModel } from '@vueuse/core';
   import SvgIcon from "@/components/UI/icons/SvgIcon.vue";
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   const props = defineProps<{
     modelValue: string;

@@ -81,7 +81,7 @@
   import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
   import RawContent from '@/components/content/RawContent.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   export default {
     name: 'MadnessView',

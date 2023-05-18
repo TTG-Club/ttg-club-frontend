@@ -11,16 +11,10 @@
       <ui-button
         v-tippy="{ content: 'Перейти в режим редактирования' }"
         :type-link-filled="!isEdit"
-        is-icon
-        is-small
+        icon="edit"
+        size="sm"
         @click.left.exact.prevent="isEdit = !isEdit"
-      >
-        <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="edit"
-        />
-      </ui-button>
+      />
 
       <label
         v-if="false"
@@ -56,42 +50,29 @@
           />
 
           <ui-button
-            is-icon
-            is-small
-            type-link-filled
+            icon="check"
+            size="sm"
+            type="text"
             @click.left.exact.prevent="createGroup"
-          >
-            <svg-icon icon-name="check" />
-          </ui-button>
+          />
 
           <ui-button
-            is-icon
-            is-small
-            type-link-filled
+            icon="close"
+            size="sm"
+            type="text"
             @click.left.exact.prevent="disableGroupCreating"
-          >
-            <svg-icon icon-name="close" />
-          </ui-button>
+          />
         </div>
 
         <ui-button
           v-else
           class="bookmarks__new"
-          is-small
-          type-link-filled
+          size="sm"
+          type="text"
+          icon="plus"
           @click.left.exact.prevent="enableGroupCreating"
         >
-          <template #icon-left>
-            <svg-icon
-              :stroke-enable="false"
-              fill-enable
-              icon-name="plus"
-            />
-          </template>
-
-          <template #default>
-            Добавить группу
-          </template>
+          Добавить группу
         </ui-button>
       </div>
     </div>
@@ -106,7 +87,7 @@
   import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
   import CustomBookmarkGroup from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useUIStore } from '@/store/UI/UIStore';
 
   export default defineComponent({

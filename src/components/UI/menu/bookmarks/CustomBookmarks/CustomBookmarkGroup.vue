@@ -83,22 +83,18 @@
         />
 
         <ui-button
-          is-icon
-          is-small
-          type-link-filled
+          icon="check"
+          size="sm"
+          type="text"
           @click.left.exact.prevent="createCategory"
-        >
-          <svg-icon icon-name="check" />
-        </ui-button>
+        />
 
         <ui-button
-          is-icon
-          is-small
-          type-link-filled
+          icon="close"
+          size="sm"
+          type="text"
           @click.left.exact.prevent="disableCategoryCreating"
-        >
-          <svg-icon icon-name="close" />
-        </ui-button>
+        />
       </div>
     </div>
   </div>
@@ -110,7 +106,7 @@
   } from 'vue';
   import draggableComponent from 'vuedraggable';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import CustomBookmarkCategory from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue';
   import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
   import { useUIStore } from '@/store/UI/UIStore';

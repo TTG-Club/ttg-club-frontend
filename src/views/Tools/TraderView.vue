@@ -73,26 +73,7 @@
         </div>
 
         <div class="tools_settings__row btn-wrapper">
-          <ui-button
-            icon-position="right"
-            type="text"
-            @click.left.exact.prevent="sendForm"
-          >
-            Найти торговца
-          </ui-button>
-
-          <ui-button
-            icon="profile"
-            type="secondary"
-            @click.left.exact.prevent="sendForm"
-          >
-            Найти торговца
-          </ui-button>
-
-          <ui-button
-            type="outline"
-            @click.left.exact.prevent="sendForm"
-          >
+          <ui-button @click.left.exact.prevent="sendForm">
             Найти торговца
           </ui-button>
         </div>
@@ -168,7 +149,7 @@
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   export default {
     name: 'TraderView',

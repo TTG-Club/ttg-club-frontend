@@ -58,7 +58,7 @@
   } from 'vue';
   import { useVModel } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiEraseButton from '@/components/UI/kit/UiEraseButton.vue';
+  import UiEraseButton from '@/components/UI/kit/button/UiEraseButton.vue';
 
   const props = defineProps({
     modelValue: {

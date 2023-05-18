@@ -52,16 +52,11 @@
 
           <ui-button
             class="search-modal__control_dice"
-            is-icon
-            type-link
+            icon="dice-flat"
+            type="text"
+            color="text"
             @click.left.exact.prevent="onSearchRandom"
-          >
-            <svg-icon
-              :stroke-enable="false"
-              fill-enable
-              icon-name="dice-flat"
-            />
-          </ui-button>
+          />
         </div>
 
         <div class="search-modal__results">
@@ -137,7 +132,7 @@
   import { useRouter } from 'vue-router';
   import { VueFinalModal } from 'vue-final-modal';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useAxios } from '@/common/composition/useAxios';
   import type { TSearchResultList } from '@/types/Search/Search.types';
   import SearchLink from '@/views/Search/SearchLink.vue';

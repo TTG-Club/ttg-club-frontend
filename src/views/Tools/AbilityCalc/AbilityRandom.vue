@@ -7,8 +7,8 @@
 
       <ui-button
         class="ability-random__block is-btn"
-        is-small
-        use-full-width
+        size="sm"
+        full-width
         @click.left.exact.prevent="tryRoll"
       >
         {{ modelValue.length ? 'Перебросить' : 'Бросить кубики' }}
@@ -63,7 +63,7 @@
   import orderBy from 'lodash/orderBy';
   import reverse from 'lodash/reverse';
   import { storeToRefs } from 'pinia';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useDiceRoller } from '@/common/composition/useDiceRoller';
   import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
   import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';

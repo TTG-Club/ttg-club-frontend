@@ -44,7 +44,10 @@
               />
             </div>
 
-            <ui-button class="search-view__control_btn">
+            <ui-button
+              class="search-view__control_btn"
+              native-type="submit"
+            >
               Поиск
             </ui-button>
           </form>
@@ -119,7 +122,7 @@
   import { useMetrics } from '@/common/composition/useMetrics';
   import SearchLink from '@/views/Search/SearchLink.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
   import PageLayout from '@/components/content/PageLayout.vue';

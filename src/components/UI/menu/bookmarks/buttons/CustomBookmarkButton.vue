@@ -5,16 +5,10 @@
       ref="trigger"
       v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
       class="custom-bookmark-button"
-      is-icon
-      type-link-filled
+      icon="arrow-2"
+      type="text"
       @click.left.exact.prevent.stop="toggleSubmenu"
-    >
-      <svg-icon
-        :stroke-enable="false"
-        fill-enable
-        icon-name="arrow-2"
-      />
-    </ui-button>
+    />
 
     <div
       v-if="isOpen"
@@ -44,7 +38,7 @@
   import { onClickOutside } from '@vueuse/core';
   import errorHandler from '@/common/helpers/errorHandler';
   import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
 
   export default defineComponent({

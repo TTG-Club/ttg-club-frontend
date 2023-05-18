@@ -147,14 +147,11 @@
             Создать
           </ui-button>
 
-          <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
-            <template #icon-left>
-              <svg-icon :icon-name="settings.opened ? 'show-pass' : 'hide-pass'" />
-            </template>
-
-            <template #default>
-              Настройки
-            </template>
+          <ui-button
+            :icon="settings.opened ? 'show-pass' : 'hide-pass'"
+            @click.left.exact.prevent="settings.opened = !settings.opened"
+          >
+            Настройки
           </ui-button>
         </div>
       </form>
@@ -309,7 +306,7 @@
   import errorHandler from '@/common/helpers/errorHandler';
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import { useAxios } from '@/common/composition/useAxios';
 
