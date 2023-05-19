@@ -23,18 +23,18 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="OptionType extends Record<string, any>">
   import { onBeforeMount } from 'vue';
   import { useVModel } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
 
   const props = withDefaults(defineProps<{
-    options: any[];
-    modelValue: any | null;
-    trackBy?: string;
-    label?: string;
+    modelValue: OptionType;
+    options: Array<OptionType>;
+    trackBy?: keyof OptionType;
+    label?: keyof OptionType;
     preSelectFirst?: boolean;
-    fullWidth?: boolean
+    fullWidth?: boolean;
   }>(), {
     trackBy: 'id',
     label: 'name',

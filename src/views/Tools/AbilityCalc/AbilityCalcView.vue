@@ -90,9 +90,7 @@
       ];
 
       const raceBonuses = ref<Array<AbilityRoll>>([]);
-
       const currentTab = ref(tabs[0]);
-
       const rolls = ref<Array<AbilityRoll>>([]);
 
       const component = computed(() => currentTab.value?.component || null);
