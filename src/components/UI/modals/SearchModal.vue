@@ -38,7 +38,7 @@
               autofocus="autofocus"
               formnovalidate="formnovalidate"
               placeholder="Поиск..."
-              @input.prevent.stop="onSearchUpdate($event.target.value)"
+              @update:model-value="onSearchUpdate"
               @keyup.enter.exact.prevent.stop="onSubmit"
             />
           </form>

@@ -33,14 +33,14 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
   import { computed, watch } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import { useNavStore } from '@/store/UI/NavStore';
 
   const props = withDefaults(defineProps<{
-    modelValue: boolean;
+    modelValue?: boolean;
     isMenu?: boolean;
     isLeft?: boolean;
     innerScroll?: boolean;
@@ -51,7 +51,7 @@
     innerScroll: false
   });
 
-  const emit = defineEmits(['close']);
+  const emit = defineEmits<{(e: 'close'): void; }>();
 
   const isShow = useVModel(props, 'modelValue');
   const navStore = useNavStore();
@@ -121,11 +121,11 @@
       z-index: 111;
       position: absolute;
       top: inherit;
-      bottom: 64px;
+      bottom: calc(64px + var(--safe-area-inset-bottom));
       left: 8px;
       right: 0;
       max-width: calc(100vw - 16px);
-      max-height: calc(var(--max-vh) - 72px);
+      max-height: calc(var(--max-vh) - 72px - var(--safe-area-inset-bottom));
 
       @include media-min($md) {
         top: 16px;
