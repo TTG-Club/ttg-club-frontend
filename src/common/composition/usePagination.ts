@@ -47,7 +47,7 @@ export type PaginationConfig = {
   filter?: MaybeRef<PaginationFilter>
 }
 
-export function usePagination(config: PaginationConfig) {
+export function usePagination<T>(config: PaginationConfig) {
   let abortController: AbortController | null;
 
   const route = useRoute();
@@ -113,7 +113,7 @@ export function usePagination(config: PaginationConfig) {
         signal: abortController.signal
       };
 
-      const resp = await http.post(apiConfig);
+      const resp = await http.post<Array<T>>(apiConfig);
 
       if (nextPage) {
         items.value.push(...resp.data);

@@ -20,7 +20,7 @@
         v-if="!isMobile || (isMobile && isEdit)"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__cat_label_icon is-right"
-        @click.left.exact.prevent="removeBookmark(category.uuid)"
+        @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(category.uuid)"
       >
         <svg-icon
           :stroke-enable="false"
@@ -47,32 +47,34 @@
           :key="bookmark.uuid + bookmark.order"
           class="bookmarks__item"
         >
-          <div
-            v-if="isEdit"
-            class="bookmarks__cat_label_icon is-left js-drag-bookmark"
-          >
-            <svg-icon icon-name="sandwich" />
-          </div>
+          <div class="bookmarks__item_body">
+            <div
+              v-if="isEdit"
+              class="bookmarks__cat_label_icon is-left js-drag-bookmark"
+            >
+              <svg-icon icon-name="sandwich" />
+            </div>
 
-          <component
-            :is="isEdit ? 'span' : 'a'"
-            :href="bookmark.url"
-            class="bookmarks__item_label"
-          >
-            {{ bookmark.name }}
-          </component>
+            <component
+              :is="isEdit ? 'span' : 'a'"
+              :href="bookmark.url"
+              class="bookmarks__item_label"
+            >
+              {{ bookmark.prefix ? `[${bookmark.prefix}] ${bookmark.name}` : bookmark.name }}
+            </component>
 
-          <div
-            v-if="!isMobile || (isMobile && isEdit)"
-            :class="{ 'only-hover': !isMobile }"
-            class="bookmarks__item_icon is-right"
-            @click.left.exact.prevent="removeBookmark(bookmark.uuid)"
-          >
-            <svg-icon
-              :stroke-enable="false"
-              fill-enable
-              icon-name="close"
-            />
+            <div
+              v-if="!isMobile || (isMobile && isEdit)"
+              :class="{ 'only-hover': !isMobile }"
+              class="bookmarks__item_icon is-right"
+              @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
+            >
+              <svg-icon
+
+                :stroke-enable="false"
+                fill-enableicon-name="close"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -80,12 +82,20 @@
   </div>
 </template>
 
-<script>
-  import { computed, defineComponent } from 'vue';
+<script lang="ts">
+  import type { PropType } from 'vue';
+  import { defineComponent } from 'vue';
   import draggableComponent from 'vuedraggable';
-  import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+  import { storeToRefs } from 'pinia';
+  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useUIStore } from '@/store/UI/UIStore';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import type {
+    IBookmarkCategory,
+    IBookmarkGroup,
+    IBookmarkItem
+  } from '@/features/bookmarks/types/Bookmark.types';
+  import type { WithChildren } from '@/types/Shared/Utility.types';
 
   export default defineComponent({
     components: {
@@ -94,12 +104,12 @@
     },
     props: {
       group: {
-        type: Object,
-        default: () => ({})
+        type: Object as PropType<WithChildren<IBookmarkGroup, IBookmarkCategory>>,
+        required: true
       },
       category: {
-        type: Object,
-        default: () => ({})
+        type: Object as PropType<WithChildren<IBookmarkCategory, IBookmarkItem>>,
+        required: true
       },
       creating: {
         type: Boolean,
@@ -113,8 +123,9 @@
     setup(props) {
       const uiStore = useUIStore();
       const customBookmarkStore = useCustomBookmarkStore();
+      const { isMobile } = storeToRefs(uiStore);
 
-      async function updateBookmark(change) {
+      const updateBookmark = async (change: { element: { uuid: any; name: any; url: any; }; newIndex: any; }) => {
         if (!change) {
           return;
         }
@@ -135,21 +146,21 @@
           url,
           parentUUID: props.category.uuid
         });
-      }
+      };
 
-      async function onChangeHandler(e) {
+      const onChangeHandler = async (e: { added: any; moved: any; }) => {
         const {
           added,
           moved
         } = e;
 
         await updateBookmark(added || moved);
-      }
+      };
 
       return {
-        removeBookmark: customBookmarkStore.queryDeleteBookmark,
+        customBookmarkStore,
         onChangeHandler,
-        isMobile: computed(() => uiStore.isMobile)
+        isMobile
       };
     }
   });

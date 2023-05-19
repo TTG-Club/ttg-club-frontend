@@ -1,14 +1,15 @@
 <template>
   <div
-    :class="{ 'is-active': isOpened(group.uuid) }"
+    v-if="group"
+    :class="{ 'is-active': isOpened }"
     class="bookmarks__group"
   >
     <div
       class="bookmarks__group_head"
-      @click.left.exact.prevent="toggleGroup(group.uuid)"
+      @click.left.exact.prevent="customBookmarkStore.toggleGroup(group.uuid)"
     >
       <div
-        :class="{ 'is-active': isOpened(group.uuid) }"
+        :class="{ 'is-active': isOpened }"
         class="bookmarks__group_icon"
       >
         <svg-icon icon-name="arrow-stroke" />
@@ -19,7 +20,7 @@
       </div>
 
       <div
-        v-if="isOpened(group.uuid) && group.order > -1"
+        v-if="isOpened && group.order > -1"
         v-tippy="{ content: 'Добавить категорию' }"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__group_icon is-right"
@@ -36,7 +37,7 @@
         v-if="!isMobile || (isMobile && isEdit)"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__group_icon is-right"
-        @click.left.exact.prevent.stop="removeBookmark(group.uuid)"
+        @click.left.exact.prevent.stop="customBookmarkStore.queryDeleteBookmark(group.uuid)"
       >
         <svg-icon
           :stroke-enable="false"
@@ -47,7 +48,7 @@
     </div>
 
     <div
-      v-if="isOpened(group.uuid)"
+      v-if="isOpened"
       class="bookmarks__group_body"
     >
       <draggable
@@ -66,7 +67,7 @@
             :key="category.uuid + category.order"
             :category="category"
             :group="group"
-            :is-edit="isEdit"
+            :is-edit="isEdit || false"
           />
         </template>
       </draggable>
@@ -104,17 +105,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  import type { PropType } from 'vue';
   import {
-    computed, defineComponent, onBeforeMount, ref
+    computed,
+    defineComponent, onBeforeMount, ref
   } from 'vue';
   import draggableComponent from 'vuedraggable';
+  import { storeToRefs } from 'pinia';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import UiButton from '@/components/UI/kit/UiButton.vue';
-  import CustomBookmarkCategory from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkCategory.vue';
-  import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
+  import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
+  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useUIStore } from '@/store/UI/UIStore';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import type {
+    IBookmarkCategory, IBookmarkGroup
+  } from '@/features/bookmarks/types/Bookmark.types';
+  import type { WithChildren } from '@/types/Shared/Utility.types';
 
   export default defineComponent({
     components: {
@@ -126,8 +134,8 @@
     },
     props: {
       group: {
-        type: Object,
-        default: () => ({})
+        type: Object as PropType<WithChildren<IBookmarkGroup, IBookmarkCategory>>,
+        required: true
       },
       isFirst: {
         type: Boolean,
@@ -143,20 +151,24 @@
       const customBookmarkStore = useCustomBookmarkStore();
       const isCategoryCreating = ref(false);
       const newCategoryName = ref('');
+      const { openedGroups } = storeToRefs(customBookmarkStore);
+      const { isMobile } = storeToRefs(uiStore);
 
-      function enableCategoryCreating() {
+      const isOpened = computed(() => customBookmarkStore.isGroupOpened(props.group.uuid));
+
+      const enableCategoryCreating = () => {
         if (props.group.order > -1) {
           isCategoryCreating.value = true;
           newCategoryName.value = '';
         }
-      }
+      };
 
-      function disableCategoryCreating() {
+      const disableCategoryCreating = () => {
         isCategoryCreating.value = false;
         newCategoryName.value = '';
-      }
+      };
 
-      async function createCategory() {
+      const createCategory = async () => {
         await customBookmarkStore.queryAddBookmark({
           name: newCategoryName.value,
           order: props.group.children.length,
@@ -164,9 +176,9 @@
         });
 
         disableCategoryCreating();
-      }
+      };
 
-      async function updateBookmark(change) {
+      const updateBookmark = async (change: { element: { uuid: any; name: any; }; newIndex: any; }) => {
         if (!change) {
           return;
         }
@@ -185,42 +197,41 @@
           order,
           parentUUID: props.group.uuid
         });
-      }
+      };
 
-      async function onChangeHandler(e) {
+      const onChangeHandler = async (e: { added: any; moved: any; }) => {
         const {
           added,
           moved
         } = e;
 
         await updateBookmark(added || moved);
-      }
+      };
 
-      function openFirstGroup() {
+      const openFirstGroup = () => {
         if (!props.isFirst) {
           return;
         }
 
-        if (customBookmarkStore.getOpenedGroups.length > 0) {
+        if (openedGroups.value.length > 0) {
           return;
         }
 
         customBookmarkStore.toggleGroup(props.group.uuid);
-      }
+      };
 
       onBeforeMount(() => openFirstGroup());
 
       return {
+        isOpened,
         isCategoryCreating,
         newCategoryName,
         enableCategoryCreating,
         disableCategoryCreating,
         createCategory,
-        removeBookmark: customBookmarkStore.queryDeleteBookmark,
         onChangeHandler,
-        isOpened: customBookmarkStore.isGroupOpened,
-        toggleGroup: customBookmarkStore.toggleGroup,
-        isMobile: computed(() => uiStore.isMobile)
+        customBookmarkStore,
+        isMobile
       };
     }
   });

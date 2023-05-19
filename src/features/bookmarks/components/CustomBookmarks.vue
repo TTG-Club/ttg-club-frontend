@@ -1,5 +1,5 @@
 <template>
-  <div class="bookmarks is-custom">
+  <div class="bookmarks">
     <div class="bookmarks__header">
       <div class="bookmarks__info">
         <span
@@ -7,6 +7,36 @@
         >Закладки <sup class="beta">β</sup>
         </span>
       </div>
+
+      <transition
+        name="fade"
+        mode="out-in"
+      >
+        <ui-button
+          v-if="isShowScrollBtn"
+          is-icon
+          is-small
+          type-link-filled
+          class="bookmarks__to-top"
+          @click.left.prevent="scrollToTop"
+        >
+          <svg-icon icon-name="arrow-stroke" />
+        </ui-button>
+      </transition>
+
+      <ui-button
+        is-icon
+        is-small
+        type-link-filled
+        class="bookmarks__toggle-all"
+        @click.left.prevent="toggleAll"
+      >
+        <svg-icon
+          :icon-name="isAllGroupsOpened ? 'exit-fullscreen' : 'fullscreen'"
+          :stroke-enable="false"
+          fill-enable
+        />
+      </ui-button>
 
       <ui-button
         v-tippy="{ content: 'Перейти в режим редактирования' }"
@@ -33,6 +63,7 @@
     </div>
 
     <div
+      ref="wrapper"
       class="bookmarks__wrapper"
     >
       <div class="bookmarks__body">
@@ -98,66 +129,64 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
   import {
-    computed, defineComponent, onBeforeMount, ref
+    computed, onBeforeMount, ref
   } from 'vue';
+  import { storeToRefs } from 'pinia';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
-  import CustomBookmarkGroup from '@/components/UI/menu/bookmarks/CustomBookmarks/CustomBookmarkGroup.vue';
+  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+  import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import UiButton from '@/components/UI/kit/UiButton.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
 
-  export default defineComponent({
-    name: 'CustomBookmarks',
-    components: {
-      UiButton,
-      UiInput,
-      CustomBookmarkGroup,
-      SvgIcon
-    },
-    setup() {
-      const uiStore = useUIStore();
-      const customBookmarkStore = useCustomBookmarkStore();
-      const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
-      const isEdit = ref(false);
-      const isGroupCreating = ref(false);
-      const newGroupName = ref('');
+  const customBookmarkStore = useCustomBookmarkStore();
+  const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
+  const isEdit = ref(false);
+  const isGroupCreating = ref(false);
+  const newGroupName = ref('');
+  const wrapper = ref<HTMLDivElement>();
+  const { isAllGroupsOpened } = storeToRefs(customBookmarkStore);
 
-      function enableGroupCreating() {
-        isGroupCreating.value = true;
-        newGroupName.value = '';
-      }
-
-      function disableGroupCreating() {
-        isGroupCreating.value = false;
-        newGroupName.value = '';
-      }
-
-      async function createGroup() {
-        await customBookmarkStore.queryAddBookmark({
-          name: newGroupName.value,
-          order: customBookmarkStore.getGroupBookmarks.length
-        });
-
-        disableGroupCreating();
-      }
-
-      onBeforeMount(() => {
-        customBookmarkStore.restoreOpenedGroupsFromSession();
-      });
-
-      return {
-        bookmarks,
-        isEdit,
-        isGroupCreating,
-        newGroupName,
-        enableGroupCreating,
-        disableGroupCreating,
-        createGroup,
-        isMobile: computed(() => uiStore.isMobile)
-      };
+  const isShowScrollBtn = computed(() => {
+    if (!wrapper.value) {
+      return false;
     }
+
+    return wrapper.value.scrollTop > 15;
+  });
+
+  const enableGroupCreating = () => {
+    isGroupCreating.value = true;
+    newGroupName.value = '';
+  };
+
+  const disableGroupCreating = () => {
+    isGroupCreating.value = false;
+    newGroupName.value = '';
+  };
+
+  const createGroup = async () => {
+    await customBookmarkStore.queryAddBookmark({
+      name: newGroupName.value,
+      order: customBookmarkStore.getGroupBookmarks.length
+    });
+
+    disableGroupCreating();
+  };
+
+  const scrollToTop = () => {
+    wrapper.value?.scroll({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  const toggleAll = () => {
+    customBookmarkStore.toggleAll();
+  };
+
+  onBeforeMount(() => {
+    customBookmarkStore.restoreOpenedGroupsFromSession();
   });
 </script>

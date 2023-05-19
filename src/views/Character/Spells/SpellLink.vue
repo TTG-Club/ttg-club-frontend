@@ -66,21 +66,21 @@
               class="link-item__components"
             >
               <div
-                v-tippy-lazy="{ content: 'Вербальный', onShow() { return !!spell?.components?.v } }"
+                v-tippy-lazy="{ content: 'Вербальный', onShow() { return !!spell.components?.v } }"
                 class="link-item__component"
               >
                 {{ spell?.components?.v ? 'В' : '·' }}
               </div>
 
               <div
-                v-tippy-lazy="{ content: 'Соматический', onShow() { return !!spell?.components?.s } }"
+                v-tippy-lazy="{ content: 'Соматический', onShow() { return !!spell.components?.s } }"
                 class="link-item__component"
               >
                 {{ spell?.components?.s ? 'С' : '·' }}
               </div>
 
               <div
-                v-tippy-lazy="{ content: 'Материальный', onShow() { return !!spell?.components?.m } }"
+                v-tippy-lazy="{ content: 'Материальный', onShow() { return !!spell.components?.m } }"
                 class="link-item__component"
               >
                 {{ !!spell?.components?.m ? 'М' : '·' }}
@@ -98,7 +98,7 @@
     :bookmark="bookmarkObj"
   >
     <template #title>
-      {{ modal.data.name.rus }}
+      {{ modal.data!.name.rus }}
     </template>
 
     <template #default>
@@ -107,96 +107,72 @@
   </base-modal>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
   import type { RouteLocationPathRaw } from 'vue-router';
   import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { computed, ref } from 'vue';
+  import { CapitalizeFirst as vCapitalizeFirst } from '@/common/directives/CapitalizeFirst';
   import BaseModal from '@/components/UI/modals/BaseModal.vue';
   import { useAxios } from '@/common/composition/useAxios';
   import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+  import type { TSpellItem, TSpellLink } from '@/types/Character/Spells.types';
+  import type { Maybe } from '@/types/Shared/Utility.types';
 
-  export default defineComponent({
-    components: {
-      SpellBody,
-      BaseModal
-    },
-    directives: {
-      CapitalizeFirst
-    },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      spell: {
-        type: Object,
-        default: () => ({})
-      },
-      inTab: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const http = useAxios();
-
-      const {
-        navigate,
-        isActive,
-        href
-      } = useLink(props);
-
-      const modal = ref({
-        show: false,
-        data: undefined
-      });
-
-      const bookmarkObj = computed(() => ({
-        url: props.spell.url,
-        name: props.spell.name.rus
-      }));
-
-      const classList = computed(() => ({
-        'router-link-active': isActive.value,
-        'is-green': props.spell?.source?.homebrew
-      }));
-
-      const clickHandler = async () => {
-        if (!props.inTab) {
-          await navigate();
-
-          return;
-        }
-
-        try {
-          if (!modal.value.data) {
-            const resp = await http.post({
-              url: props.spell.url
-            });
-
-            modal.value.data = resp.data;
-          }
-
-          modal.value.show = true;
-        } catch (err) {
-          console.error(err);
-        }
-      };
-
-      return {
-        href,
-        modal,
-        bookmarkObj,
-        classList,
-        clickHandler
-      };
-    }
+  const props = withDefaults(defineProps<{
+    to: RouteLocationPathRaw;
+    spell: TSpellLink;
+    inTab?: boolean;
+  }>(), {
+    inTab: false
   });
+
+  const http = useAxios();
+
+  const {
+    navigate,
+    isActive,
+    href
+  } = useLink(props);
+
+  const modal = ref<{
+    show: boolean;
+    data: Maybe<TSpellItem>
+  }>({
+    show: false,
+    data: undefined
+  });
+
+  const bookmarkObj = computed(() => ({
+    url: props.spell.url,
+    name: props.spell.name.rus
+  }));
+
+  const classList = computed(() => ({
+    'router-link-active': isActive.value,
+    'is-green': props.spell?.source?.homebrew
+  }));
+
+  const clickHandler = async () => {
+    if (!props.inTab) {
+      await navigate();
+
+      return;
+    }
+
+    try {
+      if (!modal.value.data) {
+        const resp = await http.post<TSpellItem>({
+          url: props.spell.url
+        });
+
+        modal.value.data = resp.data;
+      }
+
+      modal.value.show = true;
+    } catch (err) {
+      console.error(err);
+    }
+  };
 </script>
 
 <style lang="scss" scoped>
