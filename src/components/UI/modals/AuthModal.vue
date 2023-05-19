@@ -114,9 +114,6 @@
     &__close {
       @include css_anim();
 
-      padding: 4px;
-      width: 40px;
-      height: 40px;
       position: absolute;
       top: 12px;
       right: 12px;

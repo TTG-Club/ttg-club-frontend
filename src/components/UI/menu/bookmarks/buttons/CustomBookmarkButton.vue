@@ -1,32 +1,31 @@
 <template>
-  <div class="custom-bookmark-button__wrapper">
-    <ui-button
-      v-if="groups?.length"
-      ref="trigger"
-      v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
-      class="custom-bookmark-button"
-      icon="arrow-2"
-      type="text"
-      @click.left.exact.prevent.stop="toggleSubmenu"
-    />
-
-    <div
-      v-if="isOpen"
-      ref="submenu"
-      class="custom-bookmark-button__submenu"
-    >
+  <ui-button
+    v-if="groups?.length"
+    ref="trigger"
+    v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
+    icon="bookmark"
+    type="text"
+    @click.left.exact.prevent.stop="toggleSubmenu"
+  >
+    <template #dropdown>
       <div
-        v-for="(group, key) in groups"
-        :key="key"
-        :class="{ 'is-saved': isSaved(group.uuid) }"
-        class="custom-bookmark-button__group"
-        @click.left.exact.prevent="updateBookmark(group.uuid)"
-        @dblclick.prevent.stop
+        v-if="isOpen"
+        ref="submenu"
+        class="custom-bookmark-button__submenu"
       >
-        {{ group.name }}
+        <div
+          v-for="(group, key) in groups"
+          :key="key"
+          :class="{ 'is-saved': isSaved(group.uuid) }"
+          class="custom-bookmark-button__group"
+          @click.left.exact.prevent="updateBookmark(group.uuid)"
+          @dblclick.prevent.stop
+        >
+          {{ group.name }}
+        </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </ui-button>
 </template>
 
 <script>
@@ -162,10 +161,6 @@
 
 <style lang="scss" scoped>
   .custom-bookmark-button {
-    z-index: 1;
-    margin: 0 !important;
-    width: 18px;
-
     &__wrapper {
       height: 100%;
       margin-left: -4px;

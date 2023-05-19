@@ -192,10 +192,10 @@
         };
 
         .body {
-          padding: 10px 8px;
+          padding: 10px;
 
           &.with-icon {
-            padding: 7px 8px;
+            padding: 7px;
           }
         }
       }
@@ -204,10 +204,10 @@
         background-color: var(--bg-secondary);
 
         .body {
-          padding: 9px 8px;
+          padding: 9px;
 
           &.with-icon {
-            padding: 6px 8px;
+            padding: 6px;
           }
         }
       }
@@ -216,10 +216,10 @@
         background-color: transparent;
 
         .body {
-          padding: 9px 8px;
+          padding: 9px;
 
           &.with-icon {
-            padding: 6px 8px;
+            padding: 6px;
           }
         }
       }
@@ -232,10 +232,10 @@
         };
 
         .body {
-          padding: 10px 8px;
+          padding: 10px;
 
           &.with-icon {
-            padding: 7px 8px;
+            padding: 7px;
           }
         }
       }
