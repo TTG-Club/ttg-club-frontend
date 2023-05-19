@@ -29,8 +29,7 @@
     size: toRef(props, 'size'),
     color: toRef(props, 'color'),
     nativeType: toRef(props, 'nativeType'),
-    disabled: toRef(props, 'disabled'),
-    fullWidth: toRef(props, 'fullWidth')
+    disabled: toRef(props, 'disabled')
   }));
 </script>
 
@@ -40,7 +39,12 @@
     flex-direction: row;
 
     &.is-full-width {
+      display: flex;
       width: 100%;
+
+      :slotted(.ui-button) {
+        flex: 1 1 auto;
+      }
     }
 
     :slotted(.ui-button) {

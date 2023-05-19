@@ -192,7 +192,6 @@
   const buttonType = computed(() => groupContext?.type || props.type || 'default');
   const buttonColor = computed(() => `var(--${ groupContext?.color || props.color || 'primary' })`);
   const buttonSize = computed(() => groupContext?.size || props.size || 'md');
-  const buttonFullWidth = computed(() => groupContext?.fullWidth || props.fullWidth || false);
   const isDisabled = computed(() => groupContext?.disabled || props.disabled || props.loading);
 
   const isDropdownShow = ref(false);
@@ -287,7 +286,7 @@
     }
 
     &.is-full-width {
-      flex: 1 1 auto;
+      width: 100%;
     }
   }
 
