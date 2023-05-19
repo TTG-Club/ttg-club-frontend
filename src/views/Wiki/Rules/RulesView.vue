@@ -32,7 +32,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
 
   const route = useRoute();
   const router = useRouter();
@@ -54,7 +54,7 @@
     items: rules
   } = usePagination({
     url: '/rules',
-    limit: 120,
+    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

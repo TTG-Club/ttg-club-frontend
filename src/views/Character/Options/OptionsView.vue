@@ -38,7 +38,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { OptionsFilterDefaults } from '@/types/Character/Options.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
   import { getGroupByFirstLetter } from "@/common/helpers/list";
 
   type TProps = {
@@ -96,7 +96,7 @@
     items: options
   } = usePagination({
     url: '/options',
-    limit: 120,
+    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized,
       value: queryParams

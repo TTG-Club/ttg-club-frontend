@@ -40,7 +40,7 @@
   import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
 
   export default defineComponent({
     components: {
@@ -109,7 +109,7 @@
         items: spells
       } = usePagination({
         url: '/spells',
-        limit: 120,
+        limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
         filter: {
           isCustomized,
           value: queryParams

@@ -30,6 +30,7 @@
   import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupWithIdByFirstLetter } from "@/common/helpers/list";
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
 
   const uiStore = useUIStore();
 
@@ -49,7 +50,7 @@
     items
   } = usePagination({
     url: '/treasures',
-    limit: 120,
+    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

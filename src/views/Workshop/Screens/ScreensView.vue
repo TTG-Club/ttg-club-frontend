@@ -39,6 +39,7 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { ScreensFilterDefaults } from '@/types/Workshop/Screens.types';
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
 
   export default defineComponent({
     components: {
@@ -65,7 +66,7 @@
         items: screens
       } = usePagination({
         url: '/screens',
-        limit: 120,
+        limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
         filter: {
           isCustomized: filter.isCustomized,
           value: filter.queryParams
