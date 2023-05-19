@@ -3,11 +3,9 @@
     :class="{
       'ui-button': true,
       [$style['ui-button']]: true,
+      [$style['is-full-width']]: fullWidth,
       [$style['is-disabled']]: isDisabled,
-      [$style['is-full-with']]: props.fullWidth,
-      [$style['is-loading']]: props.loading,
     }"
-    :aria-disabled="isDisabled"
     @click.prevent.stop
   >
     <button
@@ -17,11 +15,14 @@
         [$style.main]: true,
         [$style[`type-${ buttonType }`]]: true,
         [$style[`size-${ buttonSize }`]]: true,
-        [$style[`icon-${ props.iconPosition }`]]: true,
+        [$style[`icon-${ iconPosition }`]]: true,
         [$style['with-split']]: split && $slots.dropdown,
         [$style['no-text']]: !$slots.default,
+        [$style['is-disabled']]: isDisabled,
       }"
       :type="nativeType"
+      :disabled="isDisabled"
+      :aria-disabled="isDisabled"
       @click.stop="onClick"
     >
       <span
@@ -70,6 +71,11 @@
           fill-enable
         />
       </span>
+
+      <span
+        v-if="isDisabled"
+        :class="$style.disabled"
+      />
     </button>
 
     <button
@@ -81,7 +87,10 @@
         [$style.split]: true,
         [$style[`type-${ buttonType }`]]: true,
         [$style[`size-${ buttonSize }`]]: true,
+        [$style['is-disabled']]: isDisabled,
       }"
+      :aria-disabled="isDisabled"
+      :disabled="isDisabled"
       @click.left.exact.prevent.stop="toggleDropdown"
     >
       <span
@@ -98,6 +107,11 @@
           fill-enable
         />
       </span>
+
+      <span
+        v-if="isDisabled"
+        :class="$style.disabled"
+      />
     </button>
 
     <transition
@@ -178,6 +192,7 @@
   const buttonType = computed(() => groupContext?.type || props.type || 'default');
   const buttonColor = computed(() => `var(--${ groupContext?.color || props.color || 'primary' })`);
   const buttonSize = computed(() => groupContext?.size || props.size || 'md');
+  const buttonFullWidth = computed(() => groupContext?.fullWidth || props.fullWidth || false);
   const isDisabled = computed(() => groupContext?.disabled || props.disabled || props.loading);
 
   const isDropdownShow = ref(false);
@@ -185,6 +200,10 @@
   const dropdown = ref<HTMLElement | null>(null);
 
   const onDropdownShow = async () => {
+    if (isDisabled.value) {
+      return;
+    }
+
     if (props.beforeDropdownShow) {
       try {
         await props.beforeDropdownShow();
@@ -221,6 +240,10 @@
   const toggleDropdown = () => (isDropdownShow.value ? onDropdownHide() : onDropdownShow());
 
   const onClick = async (e: Events['onClick']) => {
+    if (isDisabled.value) {
+      return;
+    }
+
     if (!props.split && slots.dropdown) {
       await toggleDropdown();
 
@@ -315,6 +338,7 @@
 
       &-secondary {
         background-color: var(--bg-secondary);
+        color: var(--text-b-color);
         padding: 9px;
       }
 

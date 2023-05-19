@@ -16,6 +16,6 @@ export interface ISharedButtonProps {
   fullWidth?: boolean;
 }
 
-export type TButtonGroupContext = Partial<Omit<ISharedButtonProps, 'fullWidth'> & {
+export type TButtonGroupContext = Partial<ISharedButtonProps & {
   type: TButtonType;
 }>;

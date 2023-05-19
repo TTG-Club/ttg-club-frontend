@@ -29,7 +29,8 @@
     size: toRef(props, 'size'),
     color: toRef(props, 'color'),
     nativeType: toRef(props, 'nativeType'),
-    disabled: toRef(props, 'disabled')
+    disabled: toRef(props, 'disabled'),
+    fullWidth: toRef(props, 'fullWidth')
   }));
 </script>
 
@@ -39,36 +40,36 @@
     flex-direction: row;
 
     &.is-full-width {
-      display: flex;
       width: 100%;
-
-      :slotted(.ui-button) {
-        display: flex;
-        flex: 1 1 auto;
-      }
     }
 
     :slotted(.ui-button) {
       margin: 0;
 
       &:first-child:not(:last-child) {
-        border: {
-          top-right-radius: 0;
-          bottom-right-radius: 0;
-        };
+        > button {
+          border: {
+            top-right-radius: 0;
+            bottom-right-radius: 0;
+          };
+        }
       }
 
       &:not(:first-child):not(:last-child) {
-        border: {
-          radius: 0;
-        };
+        > button {
+          border: {
+            radius: 0;
+          };
+        }
       }
 
       &:last-child:not(:first-child) {
-        border: {
-          top-left-radius: 0;
-          bottom-left-radius: 0;
-        };
+        > button {
+          border: {
+            top-left-radius: 0;
+            bottom-left-radius: 0;
+          };
+        }
       }
     }
   }
