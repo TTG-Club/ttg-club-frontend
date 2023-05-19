@@ -1,32 +1,26 @@
 <template>
-  <ui-group-button type="text">
-    <ui-button
-      v-if="groups?.length"
-      ref="trigger"
-      v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
-      icon="bookmark"
-      @click.left.exact.prevent.stop="toggleSubmenu"
-    >
-      <template #dropdown>
-        <div
-          v-if="isOpen"
-          ref="submenu"
-          class="custom-bookmark-button__submenu"
-        >
-          <div
-            v-for="(group, key) in groups"
-            :key="key"
-            :class="{ 'is-saved': isSaved(group.uuid) }"
-            class="custom-bookmark-button__group"
-            @click.left.exact.prevent="updateBookmark(group.uuid)"
-            @dblclick.prevent.stop
-          >
-            {{ group.name }}
-          </div>
-        </div>
-      </template>
-    </ui-button>
-  </ui-group-button>
+  <ui-button
+    v-if="groups?.length"
+    ref="trigger"
+    :tooltip="{ content: 'Добавить в закладки', hideOnClick: true }"
+    icon="bookmark"
+    type="text"
+    split
+    :before-dropdown-show="onBeforeOpen"
+  >
+    <template #dropdown>
+      <div
+        v-for="(group, key) in groups"
+        :key="key"
+        :class="{ 'is-saved': isSaved(group.uuid) }"
+        class="custom-bookmark-button__group"
+        @click.left.exact.prevent="updateBookmark(group.uuid)"
+        @dblclick.prevent.stop
+      >
+        {{ group.name }}
+      </div>
+    </template>
+  </ui-button>
 </template>
 
 <script>
@@ -35,16 +29,12 @@
   } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
-  import { onClickOutside } from '@vueuse/core';
-  import errorHandler from '@/common/helpers/errorHandler';
   import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
-  import UiGroupButton from '@/components/UI/kit/button/UiGroupButton.vue';
 
   export default defineComponent({
     components: {
-      UiGroupButton,
       UiButton
     },
     props: {
@@ -69,7 +59,6 @@
           : route.path
       ));
 
-      const isOpen = ref(false);
       const bookmarks = ref([]);
       const groups = computed(() => bookmarksStore.getGroups.filter(group => group.order > -1));
 
@@ -86,31 +75,11 @@
 
       const isSaved = uuid => bookmarksStore.isBookmarkSavedInGroup(bookmarkUrl.value, uuid);
 
-      async function openSubmenu() {
-        try {
-          await bookmarksStore.queryGetBookmarks();
-
-          isOpen.value = true;
-        } catch (err) {
-          errorHandler(err);
-        }
-      }
-
-      function closeSubmenu() {
-        isOpen.value = false;
-      }
-
-      async function toggleSubmenu() {
-        if (isOpen.value) {
-          closeSubmenu();
-
-          return;
-        }
-
-        await openSubmenu();
-      }
-
       const inProgress = ref(false);
+
+      const onBeforeOpen = async () => {
+        await bookmarksStore.queryGetBookmarks();
+      };
 
       async function updateBookmark(groupUUID) {
         if (inProgress.value) {
@@ -137,93 +106,16 @@
       const submenu = ref(null);
       const trigger = ref(null);
 
-      onClickOutside(
-        submenu,
-        () => {
-          isOpen.value = false;
-        },
-        {
-          ignore: [trigger]
-        }
-      );
-
       return {
         submenu,
         trigger,
         bookmarkName,
-        isOpen,
         isSaved,
         groups,
         savedGroups,
-        toggleSubmenu,
+        onBeforeOpen,
         updateBookmark
       };
     }
   });
 </script>
-
-<style lang="scss" scoped>
-  .custom-bookmark-button {
-    &__wrapper {
-      height: 100%;
-      margin-left: -4px;
-      position: relative;
-    }
-
-    &:hover {
-      position: relative;
-      z-index: 2;
-    }
-
-    &__submenu {
-      position: absolute;
-      background-color: var(--bg-sub-menu);
-      padding: 8px;
-      border-radius: 6px;
-      box-shadow: 0 5px 30px #00000038;
-      right: 0;
-      z-index: 1;
-      max-height: calc(16px + 30px * 4); // padding + 4 elements
-      overflow: auto;
-    }
-
-    &__group {
-      padding: 6px 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      min-width: 100px;
-      max-width: 260px;
-      white-space: nowrap;
-      overflow: hidden;
-      width: 100%;
-      text-overflow: ellipsis;
-      line-height: 18px;
-      font-size: 14px;
-
-      &.is-saved {
-        background-color: var(--primary-select);
-        position: relative;
-        padding-left: 12px;
-
-        &::before {
-          content: '';
-          width: 4px;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          position: absolute;
-          background-color: var(--primary);
-          display: block;
-        }
-      }
-
-      &:hover {
-        background-color: var(--hover);
-      }
-
-      & + & {
-        margin-top: 4px;
-      }
-    }
-  }
-</style>
