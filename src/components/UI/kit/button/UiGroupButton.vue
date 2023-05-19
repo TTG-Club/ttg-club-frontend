@@ -24,10 +24,8 @@
     fullWidth: false
   });
 
-  const type: TButtonType = 'default';
-
   provide(buttonGroupContextKey, reactive({
-    type,
+    type: 'default' as TButtonType,
     size: toRef(props, 'size'),
     color: toRef(props, 'color'),
     nativeType: toRef(props, 'nativeType'),
@@ -51,7 +49,9 @@
     }
 
     :slotted(.ui-button) {
-      &:first-child {
+      margin: 0;
+
+      &:first-child:not(:last-child) {
         border: {
           top-right-radius: 0;
           bottom-right-radius: 0;
@@ -64,7 +64,7 @@
         };
       }
 
-      &:last-child {
+      &:last-child:not(:first-child) {
         border: {
           top-left-radius: 0;
           bottom-left-radius: 0;

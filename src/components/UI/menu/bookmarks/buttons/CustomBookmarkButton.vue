@@ -1,31 +1,32 @@
 <template>
-  <ui-button
-    v-if="groups?.length"
-    ref="trigger"
-    v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
-    icon="bookmark"
-    type="text"
-    @click.left.exact.prevent.stop="toggleSubmenu"
-  >
-    <template #dropdown>
-      <div
-        v-if="isOpen"
-        ref="submenu"
-        class="custom-bookmark-button__submenu"
-      >
+  <ui-group-button type="text">
+    <ui-button
+      v-if="groups?.length"
+      ref="trigger"
+      v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
+      icon="bookmark"
+      @click.left.exact.prevent.stop="toggleSubmenu"
+    >
+      <template #dropdown>
         <div
-          v-for="(group, key) in groups"
-          :key="key"
-          :class="{ 'is-saved': isSaved(group.uuid) }"
-          class="custom-bookmark-button__group"
-          @click.left.exact.prevent="updateBookmark(group.uuid)"
-          @dblclick.prevent.stop
+          v-if="isOpen"
+          ref="submenu"
+          class="custom-bookmark-button__submenu"
         >
-          {{ group.name }}
+          <div
+            v-for="(group, key) in groups"
+            :key="key"
+            :class="{ 'is-saved': isSaved(group.uuid) }"
+            class="custom-bookmark-button__group"
+            @click.left.exact.prevent="updateBookmark(group.uuid)"
+            @dblclick.prevent.stop
+          >
+            {{ group.name }}
+          </div>
         </div>
-      </div>
-    </template>
-  </ui-button>
+      </template>
+    </ui-button>
+  </ui-group-button>
 </template>
 
 <script>
@@ -39,9 +40,11 @@
   import { useCustomBookmarkStore } from '@/store/UI/bookmarks/CustomBookmarksStore';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
+  import UiGroupButton from '@/components/UI/kit/button/UiGroupButton.vue';
 
   export default defineComponent({
     components: {
+      UiGroupButton,
       UiButton
     },
     props: {

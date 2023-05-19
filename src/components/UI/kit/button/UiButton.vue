@@ -171,6 +171,10 @@
       color: var(--border);
     };
 
+    & + & {
+      margin-left: 8px;
+    }
+
     &:hover {
       .hover {
         opacity: 10%;
