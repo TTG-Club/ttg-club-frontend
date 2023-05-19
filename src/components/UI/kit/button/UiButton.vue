@@ -268,6 +268,8 @@
 </script>
 
 <style lang="scss" module>
+  $radius: 8px;
+
   .ui-button {
     position: relative;
     display: flex;
@@ -303,7 +305,7 @@
     margin: 0;
     position: relative;
     border: {
-      radius: 8px;
+      radius: $radius;
       width: 1px;
       style: solid;
       color: var(--border);
@@ -430,6 +432,13 @@
   .icon {
     position: relative;
     z-index: 2;
+  }
+
+  .text {
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .icon {
