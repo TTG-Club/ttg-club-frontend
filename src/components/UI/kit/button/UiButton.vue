@@ -164,6 +164,7 @@
     overflow: hidden;
     padding: 0;
     flex-shrink: 0;
+    margin: 0;
     border: {
       radius: 8px;
       width: 1px;
