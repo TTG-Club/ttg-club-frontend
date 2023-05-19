@@ -178,6 +178,7 @@
   import { useNavStore } from '@/store/UI/NavStore';
   import UiYoutube from '@/components/UI/kit/UiYoutube.vue';
   import { useAxios } from '@/common/composition/useAxios';
+  import type { TYoutubeVideo } from '@/types/Shared/Youtube.types';
 
   export default defineComponent({
     components: { UiYoutube },
@@ -234,7 +235,7 @@
 
       const setLastVideo = async () => {
         try {
-          const resp = await http.get({ url: '/youtube/last' });
+          const resp = await http.get<TYoutubeVideo>({ url: '/youtube/last' });
 
           if (resp.status !== 200) {
             return Promise.reject(resp.status);

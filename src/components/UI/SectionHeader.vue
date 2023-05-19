@@ -93,7 +93,7 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
   import { useUIStore } from '@/store/UI/UIStore';
-  import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';

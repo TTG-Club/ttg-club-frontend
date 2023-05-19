@@ -43,10 +43,12 @@
     modelValue?: boolean;
     isMenu?: boolean;
     isLeft?: boolean;
+    innerScroll?: boolean;
   }>(), {
     modelValue: false,
     isMenu: false,
-    isLeft: false
+    isLeft: false,
+    innerScroll: false
   });
 
   const emit = defineEmits<{(e: 'close'): void; }>();
@@ -57,7 +59,8 @@
 
   const classes = computed(() => ({
     'is-left': props.isLeft,
-    'is-menu': props.isMenu
+    'is-menu': props.isMenu,
+    'inner-scroll': props.innerScroll
   }));
 
   const onClose = () => {
@@ -136,12 +139,18 @@
       &.is-menu {
         width: calc(100vw - 16px);
 
-        @include media-min($md) {
-          width: calc(100vw - 56px - 24px);
+                @include media-min($md) {
+                    width: calc(100vw - 56px - 24px);
+                }
+            }
+
+            &.inner-scroll {
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
         }
-      }
     }
-  }
 
   .nav-popover-animation {
     &-enter-from, &-leave-to {

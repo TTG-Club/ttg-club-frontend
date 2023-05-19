@@ -50,6 +50,11 @@ export type TChangePassBody = {
   password: string
 }
 
+export type TAuthResponse = {
+    accessToken: string;
+    tokenType: string;
+}
+
 export const useUserStore = defineStore('UserStore', () => {
   const route = useRoute();
   const router = useRouter();
@@ -108,7 +113,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const getUserInfo = async (): Promise<TUser> => {
     try {
-      const resp = await http.get({
+      const resp = await http.get<TUser>({
         url: '/user/info'
       });
 
@@ -158,7 +163,7 @@ export const useUserStore = defineStore('UserStore', () => {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
-      const resp = await http.post({
+      const resp = await http.post<TAuthResponse>({
         url: '/auth/signin',
         payload: body
       });
