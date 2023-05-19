@@ -1,30 +1,21 @@
 <template>
   <ui-button
-    v-tippy="{ content: 'Добавить в закладки' }"
-    class="default-bookmark-button"
-    is-icon
-    type-link-filled
+    :icon="isSaved ? 'bookmark-filled' : 'bookmark'"
+    :tooltip="{ content: isSaved ? 'Удалить из закладок' : 'Добавить в закладки' }"
+    :loading="inProgress"
+    type="text"
     @click.left.exact.prevent.stop="updateBookmark"
     @dblclick.prevent.stop
-  >
-    <svg-icon
-      :icon-name="isSaved ? 'bookmark-filled' : 'bookmark'"
-      :stroke-enable="false"
-      fill-enable
-    />
-  </ui-button>
+  />
 </template>
 
 <script lang="ts" setup>
   import { useRoute } from 'vue-router';
   import { computed, ref } from 'vue';
-  import { storeToRefs } from 'pinia';
   import { toast } from '@/common/helpers/toast';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
-  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useUserStore } from '@/store/UI/UserStore';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   const props = withDefaults(defineProps<{
     name?: string;
@@ -36,34 +27,11 @@
 
   const route = useRoute();
   const userStore = useUserStore();
-  const { isAuthenticated } = storeToRefs(userStore);
   const defaultBookmarkStore = useDefaultBookmarkStore();
-  const customBookmarkStore = useCustomBookmarkStore();
   const inProgress = ref(false);
 
   const bookmarkUrl = computed(() => (props.url !== '' ? props.url : route.path));
-
-  const isSaved = computed(() => {
-    if (isAuthenticated.value) {
-      return customBookmarkStore.isBookmarkSavedInDefault(bookmarkUrl.value);
-    }
-
-    return defaultBookmarkStore.isBookmarkSaved(bookmarkUrl.value);
-  });
-
-  const handleBookmarkUpdate = async () => {
-    if (isAuthenticated.value) {
-      const defaultGroup = await customBookmarkStore.getDefaultGroup();
-
-      return customBookmarkStore.updateBookmarkInGroup({
-        url: bookmarkUrl.value,
-        name: props.name,
-        groupUUID: defaultGroup.uuid
-      });
-    }
-
-    return defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
-  };
+  const isSaved = computed(() => defaultBookmarkStore.isBookmarkSaved(bookmarkUrl.value));
 
   const updateBookmark = async () => {
     if (inProgress.value) {
@@ -73,7 +41,7 @@
     try {
       inProgress.value = true;
 
-      const bookmark = await handleBookmarkUpdate();
+      const bookmark = await defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
 
       toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
     } catch (err) {

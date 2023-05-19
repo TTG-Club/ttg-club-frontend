@@ -70,9 +70,9 @@
               @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
             >
               <svg-icon
-
                 :stroke-enable="false"
-                fill-enableicon-name="close"
+                fill-enable
+                icon-name="close"
               />
             </div>
           </div>

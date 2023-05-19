@@ -1,8 +1,11 @@
 <template>
-  <default-bookmark-button v-bind="$props" />
-
   <custom-bookmark-button
     v-if="isAuthenticated"
+    v-bind="$props"
+  />
+
+  <default-bookmark-button
+    v-else
     v-bind="$props"
   />
 </template>

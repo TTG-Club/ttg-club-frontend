@@ -33,11 +33,7 @@
         v-if="loading"
         :class="$style.icon"
       >
-        <svg-icon
-          icon-name="loading"
-          :stroke-enable="false"
-          fill-enable
-        />
+        <icon-loader />
       </span>
 
       <span
@@ -110,6 +106,7 @@
     >
       <span
         v-if="$slots.dropdown && isDropdownShow"
+        ref="dropdown"
         :class="$style.dropdown"
       >
         <slot name="dropdown" />
@@ -120,18 +117,18 @@
 
 <script setup lang="ts">
   import {
-    Component,
-    computed, inject, Ref, ref, useSlots, watch
+    computed, inject, ref, useSlots, watch
   } from 'vue';
   import type { Events } from 'vue';
   import { onClickOutside } from '@vueuse/core';
-  import type { TippyContent, TippyOptions } from 'vue-tippy';
+  import type { TippyOptions } from 'vue-tippy';
   import { useTippy } from 'vue-tippy';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import type {
     ISharedButtonProps, TButtonIconPosition, TButtonType
   } from '@/components/UI/kit/button/UiButton.types';
   import { buttonGroupContextKey } from '@/components/UI/kit/button/UiButton.const';
+  import IconLoader from '@/components/UI/icons/IconLoader.vue';
 
   interface IProps extends ISharedButtonProps {
     type?: TButtonType;
@@ -185,6 +182,7 @@
 
   const isDropdownShow = ref(false);
   const dropdownTrigger = ref<HTMLButtonElement | null>(null);
+  const dropdown = ref<HTMLElement | null>(null);
 
   const onDropdownShow = async () => {
     if (props.beforeDropdownShow) {
@@ -223,7 +221,7 @@
   const toggleDropdown = () => (isDropdownShow.value ? onDropdownHide() : onDropdownShow());
 
   const onClick = async (e: Events['onClick']) => {
-    if (slots.dropdown) {
+    if (!props.split && slots.dropdown) {
       await toggleDropdown();
 
       return;
@@ -232,7 +230,9 @@
     emit('click', e);
   };
 
-  onClickOutside(dropdownTrigger, onDropdownHide);
+  onClickOutside(dropdown, onDropdownHide, {
+    ignore: [dropdownTrigger]
+  });
 
   watch(isDropdownShow, value => {
     if (value) {
@@ -434,7 +434,7 @@
     top: calc(100% + 4px);
     right: 0;
     z-index: 1;
-    max-height: calc(16px + 30px * 4); // padding + 4 elements
+    max-height: calc(16px + 30px * 4); // TODO: fix (padding + 4 elements)
     overflow: auto;
   }
 </style>

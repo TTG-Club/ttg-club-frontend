@@ -14,43 +14,29 @@
       >
         <ui-button
           v-if="isShowScrollBtn"
-          is-icon
-          is-small
-          type-link-filled
+          icon="arrow-stroke"
+          size="sm"
+          type="text"
           class="bookmarks__to-top"
           @click.left.prevent="scrollToTop"
-        >
-          <svg-icon icon-name="arrow-stroke" />
-        </ui-button>
+        />
       </transition>
 
       <ui-button
-        is-icon
-        is-small
-        type-link-filled
+        :icon="isAllGroupsOpened ? 'exit-fullscreen' : 'fullscreen'"
+        size="sm"
+        type="text"
         class="bookmarks__toggle-all"
         @click.left.prevent="toggleAll"
-      >
-        <svg-icon
-          :icon-name="isAllGroupsOpened ? 'exit-fullscreen' : 'fullscreen'"
-          :stroke-enable="false"
-          fill-enable
-        />
-      </ui-button>
+      />
 
       <ui-button
         v-tippy="{ content: 'Перейти в режим редактирования' }"
-        :type-link-filled="!isEdit"
-        is-icon
-        is-small
+        :type="!isEdit ? 'default' : 'text'"
+        icon="edit"
+        size="sm"
         @click.left.exact.prevent="isEdit = !isEdit"
-      >
-        <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="edit"
-        />
-      </ui-button>
+      />
 
       <label
         v-if="false"
@@ -87,42 +73,29 @@
           />
 
           <ui-button
-            is-icon
-            is-small
-            type-link-filled
+            icon="check"
+            size="sm"
+            type="text"
             @click.left.exact.prevent="createGroup"
-          >
-            <svg-icon icon-name="check" />
-          </ui-button>
+          />
 
           <ui-button
-            is-icon
-            is-small
-            type-link-filled
+            icon="close"
+            size="sm"
+            type="text"
             @click.left.exact.prevent="disableGroupCreating"
-          >
-            <svg-icon icon-name="close" />
-          </ui-button>
+          />
         </div>
 
         <ui-button
           v-else
           class="bookmarks__new"
-          is-small
-          type-link-filled
+          size="sm"
+          icon="plus"
+          type="text"
           @click.left.exact.prevent="enableGroupCreating"
         >
-          <template #icon-left>
-            <svg-icon
-              :stroke-enable="false"
-              fill-enable
-              icon-name="plus"
-            />
-          </template>
-
-          <template #default>
-            Добавить группу
-          </template>
+          Добавить группу
         </ui-button>
       </div>
     </div>
@@ -138,7 +111,7 @@
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   const customBookmarkStore = useCustomBookmarkStore();
   const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
