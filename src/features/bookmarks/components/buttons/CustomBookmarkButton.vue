@@ -1,7 +1,7 @@
 <template>
   <ui-button
     :tooltip="{ content: isSaved() ? 'Удалить из закладок' : 'Добавить в закладки', hideOnClick: true }"
-    :icon="isSaved() ? 'bookmark-filled' : 'bookmark'"
+    :icon="`bookmark/${isSaved() ? 'filled' : 'outline'}`"
     :before-dropdown-show="onOpenDropdown"
     :loading="inProgress"
     type="text"

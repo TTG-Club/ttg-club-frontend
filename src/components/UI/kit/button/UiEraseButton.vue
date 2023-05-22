@@ -7,7 +7,7 @@
     @click.prevent="value = ''"
   >
     <svg-icon
-      icon-name="close"
+      icon="close"
       :size="16"
     />
   </ui-button>

@@ -28,9 +28,7 @@
                 :class="{ 'in-progress': inProgress }"
               >
                 <svg-icon
-                  :icon-name="inProgress ? 'dice-d20' : 'search-new'"
-                  :stroke-enable="false"
-                  fill-enable
+                  :icon="inProgress ? 'dice/d20' : 'search'"
                 />
               </div>
 
@@ -39,7 +37,7 @@
                 v-model="search"
                 placeholder="Поиск..."
                 is-clearable
-                @update:model-value="onChangeSearch"
+                @update:model-value="onChangeSearch()"
                 @keyup.enter.exact.prevent.stop="onChangeSearch"
               />
             </div>
@@ -95,7 +93,7 @@
           v-model="page"
           class="search-view__paginate"
           :page-count="pages"
-          :click-handler="onPageChanged"
+          :click-handler="onPageChanged()"
         />
       </div>
     </template>

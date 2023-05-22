@@ -1,13 +1,12 @@
 <template>
   <svg
-    :class="classList"
     aria-hidden="true"
-    class="svg-icon"
+    :class="$style['svg-icon']"
     role="img"
-    viewBox="0 0 16 16"
+    viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <use :xlink:href="name" />
+    <use :xlink:href="icon" />
   </svg>
 </template>
 
@@ -16,23 +15,13 @@
   import { computed } from 'vue';
 
   const props = withDefaults(defineProps<{
-    iconName: string;
-    strokeEnable?: boolean;
-    fillEnable?: boolean;
+    icon: string;
     size?: string | number;
   }>(), {
-    strokeEnable: true,
-    fillEnable: false,
     size: undefined
   });
 
-  const name = computed(() => `#dnd5club-icon-${ props.iconName }`);
-
-  const classList = computed(() => ({
-    'svg-color--stroke': !props.fillEnable,
-    'svg-color--fill': props.fillEnable,
-    'svg-color': props.fillEnable && props.strokeEnable
-  }));
+  const icon = computed(() => `#ttg-${ props.icon.replaceAll('/', '-') }`);
 
   const size = computed(() => {
     if (!props.size) {
@@ -51,27 +40,13 @@
   });
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
   .svg-icon {
     overflow: hidden;
     flex-shrink: 0;
     display: block;
     width: v-bind(size);
     height: v-bind(size);
-
-    &.svg-color {
-      stroke: currentColor;
-      fill: currentColor;
-
-      &--stroke {
-        stroke: currentColor;
-        fill: none;
-      }
-
-      &--fill {
-        fill: currentColor;
-        stroke: none;
-      }
-    }
+    fill: currentColor;
   }
 </style>

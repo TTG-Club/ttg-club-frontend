@@ -35,9 +35,7 @@
                   class="link-item-expand__icon"
                 >
                   <svg-icon
-                    :icon-name="classItem.icon"
-                    :stroke-enable="false"
-                    fill-enable
+                    :icon="classItem.icon"
                   />
                 </span>
 
@@ -77,9 +75,7 @@
             @click.left.exact.prevent="toggleArch"
           >
             <svg-icon
-              :icon-name="submenu ? 'minus' : 'plus'"
-              :stroke-enable="false"
-              fill-enable
+              :icon="submenu ? 'minus' : 'plus'"
             />
           </button>
         </div>

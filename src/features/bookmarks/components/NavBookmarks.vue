@@ -10,9 +10,7 @@
         @click.left.exact.prevent="clickHandler"
       >
         <svg-icon
-          :icon-name="bookmarkIcon"
-          :stroke-enable="false"
-          fill-enable
+          :icon="bookmarkIcon"
         />
       </div>
     </template>
@@ -51,9 +49,7 @@
       ? customBookmarkStore
       : defaultBookmarkStore);
 
-    return bookmarks.value.length > 0
-      ? 'bookmark-filled'
-      : 'bookmark';
+    return `bookmark/${ bookmarks.value.length > 0 ? 'filled' : 'outline' }`;
   });
 
   const clickHandler = async () => {

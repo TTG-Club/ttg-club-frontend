@@ -54,7 +54,7 @@
             v-if="!tab.name"
             class="class-detail__tab_icon"
           >
-            <svg-icon :icon-name="`tab-${tab.type}`" />
+            <svg-icon :icon="`tab-${tab.type}`" />
           </div>
 
           <div

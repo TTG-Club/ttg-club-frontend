@@ -7,7 +7,7 @@
       <div class="filter__search">
         <label class="filter__search_field">
           <span class="filter__search_field_icon">
-            <svg-icon icon-name="search" />
+            <svg-icon icon="search" />
           </span>
 
           <ui-input
@@ -28,11 +28,7 @@
         type="button"
         @click.left.exact.prevent="showed = !showed"
       >
-        <svg-icon
-          :fill-enable="true"
-          :icon-name="isFilterCustomized ? 'filter-customized' : 'filter'"
-          :stroke-enable="false"
-        />
+        <svg-icon :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`" />
 
         <span>Фильтр</span>
       </button>
@@ -44,7 +40,7 @@
         type="button"
         @click.left.exact.prevent="resetFilter"
       >
-        <svg-icon icon-name="clear-filter" />
+        <svg-icon icon="clear" />
       </button>
     </div>
 

@@ -7,9 +7,7 @@
         @click.left.exact.prevent="isShowSearch = !isShowSearch"
       >
         <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="search-new"
+          icon="search"
         />
       </div>
     </template>

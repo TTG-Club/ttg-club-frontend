@@ -32,10 +32,8 @@
           @click.left.exact.prevent="onToggleBg"
         >
           <svg-icon
-            :icon-name="bgHide ? 'light-theme' : 'dark-theme'"
-            :stroke-enable="false"
+            :icon="`theme/${bgHide ? 'light' : 'dark'}`"
             class="vel-icon icon"
-            fill-enable
           />
         </button>
       </div>
