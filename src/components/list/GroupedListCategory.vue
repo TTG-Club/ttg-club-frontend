@@ -6,10 +6,11 @@
 
 <style lang="scss" scoped>
   .category {
-    background: var(--bg-liner-divider);
-    padding: 8px 12px;
+    padding: 8px 16px;
+    color: var(--text-color-title);
+    font-size: calc(var(--h5-font-size) + 2px);
+    font-weight: 600;
+    background: var(--border);
     border-radius: 8px;
-    color: var(--text-btn-color);
-    font-size: var(--h4-font-size);
   }
 </style>
