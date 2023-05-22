@@ -6,7 +6,6 @@
         :subtitle="race?.name?.eng || ''"
         :title="race?.name?.rus || ''"
         bookmark
-        close-on-desktop
         fullscreen
         print
         @close="close"

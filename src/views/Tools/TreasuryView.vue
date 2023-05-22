@@ -164,7 +164,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :close-on-desktop="fullscreen"
             :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'In treasury'"
             :title="selected.item?.name.rus || 'В сокровищнице'"
@@ -484,7 +483,7 @@
 
         clearSelected();
 
-        result.value = res.data;
+        result.value = res.data as never;
       })
       .catch(err => {
         errorHandler(err);

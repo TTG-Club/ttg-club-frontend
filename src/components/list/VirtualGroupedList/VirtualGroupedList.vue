@@ -1,5 +1,6 @@
 <template>
   <virtual-grid-list
+    class="virtual-grouped-list"
     :get-rows="getRows"
     :list="list"
     v-bind="grid"
@@ -32,7 +33,8 @@
 <script lang="ts" setup>
   import uniqBy from 'lodash/uniqBy';
   import sortBy from 'lodash/sortBy';
-  import { TVirtualListProps } from '@/components/list/VirtualList.vue';
+  import { computed } from "vue";
+  import clsx from "clsx";
   import GroupedListCategory from '@/components/list/GroupedListCategory.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import type { ListIteratee } from '@/types/Shared/Lodash.types';
@@ -44,6 +46,7 @@
     TVirtualGridListProps
   } from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -54,13 +57,23 @@
     getGroup: TGetGroup<TItem, TGroup>;
     groupLabelKey?: string;
     sortBy?: ListIteratee;
-    grid: TVirtualGridListProps;
+    grid?: TVirtualGridListProps;
   };
 
   const props = withDefaults(defineProps<TProps>(), {
-    groupLabelKey: 'name',
-    sortBy: 'order'
+    groupLabelKey: "name",
+    sortBy: "order",
+    grid: () => ({})
   });
+
+  const list = computed<TVirtualListProps>(() => ({
+    ...props.list,
+
+    /* TODO: Типизировать через дженерики и убрать any */
+    getItemClass: (item: any) => clsx(props.list.getItemClass?.(item), {
+      "virtual-grouped-list__group": item.isGroup
+    })
+  }));
 
   const getRows: TVirtualGridListProps['getRows'] = (items: TItem[], context: TVirtualGridListContext) => {
     const {
@@ -79,3 +92,18 @@
     });
   };
 </script>
+
+<style lang="scss" scoped>
+  .virtual-grouped-list :deep {
+    --group-spacing: calc(var(--item-spacing) * 2);
+    // Добавляем отрицательный margin для родителя, чтобы не было лишнего отступа
+    margin-top: calc(-1 * var(--group-spacing));
+
+    .vue-recycle-scroller__item-view {
+      > .virtual-grouped-list__group {
+        padding-top: var(--group-spacing);
+        padding-bottom: var(--item-spacing);
+      }
+    }
+  }
+</style>

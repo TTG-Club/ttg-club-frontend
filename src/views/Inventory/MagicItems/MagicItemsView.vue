@@ -7,9 +7,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="getListProps({ items })"
+      :get-group="getGroupByRarity"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item }">
         <magic-item-link
@@ -17,7 +18,7 @@
           :to="{ path: item.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -25,15 +26,19 @@
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import capitalize from "lodash/capitalize";
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
   import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
-  const route = useRoute();
+  const route = useRoute;
   const router = useRouter();
   const uiStore = useUIStore();
 
@@ -53,7 +58,7 @@
     items
   } = usePagination({
     url: '/items/magic',
-    limit: 70,
+    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
@@ -79,13 +84,14 @@
     }
   };
 
+  const getGroupByRarity = (item: AnyObject & {rarity: AnyObject}) => ({
+    url: item.rarity.type,
+    name: capitalize(String(item.rarity.name))
+  });
+
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && items.value.length && route.name === 'magicItems') {
-      await router.push({ path: items.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'magicItemDetail');

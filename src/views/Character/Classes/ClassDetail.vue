@@ -6,7 +6,6 @@
         :subtitle="currentClass?.name?.eng || ''"
         :title="currentClass?.name?.rus || ''"
         bookmark
-        close-on-desktop
         fullscreen
         print
         @close="close"
