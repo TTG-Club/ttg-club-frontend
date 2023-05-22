@@ -41,6 +41,7 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BooksFilterDefaults } from '@/types/Wiki/Books.types';
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
 
   export default defineComponent({
     components: {
@@ -68,7 +69,7 @@
         items
       } = usePagination({
         url: '/books',
-        limit: 70,
+        limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
         search: filter.search,
         order: [
           {
@@ -119,10 +120,6 @@
 
       onBeforeMount(async () => {
         await initPages();
-
-        if (!isMobile.value && books.value.length && route.name === 'books') {
-          await router.push({ path: books.value[0].list[0].url });
-        }
       });
 
       return {

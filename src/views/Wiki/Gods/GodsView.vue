@@ -7,12 +7,11 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
+    <virtual-grouped-list
       :flat="showRightSide"
-      :list="{
-        items: gods,
-        keyField: 'url',
-      }"
+      :list="getListProps({ items: gods })"
+      :get-group="getGroupByAlignment"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item: god }">
         <god-link
@@ -20,7 +19,7 @@
           :to="{ path: god.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -28,13 +27,17 @@
   import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
+  import capitalize from "lodash/capitalize";
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import GodLink from '@/views/Wiki/Gods/GodLink.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import { GodsFilterDefaults } from '@/types/Wiki/Gods.types';
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();
@@ -56,13 +59,17 @@
     items: gods
   } = usePagination({
     url: '/gods',
-    limit: 70,
+    limit: 125,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
     },
     search: filter.search,
     order: [
+      {
+        field: 'aligment',
+        direction: 'asc'
+      },
       {
         field: 'name',
         direction: 'asc'
@@ -78,13 +85,14 @@
     }
   };
 
+  const getGroupByAlignment = (god: AnyObject) => ({
+    [DEFAULT_ENTITY_KEY_FIELD]: god.alignment,
+    name: capitalize(String(god.alignment))
+  });
+
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && gods.value.length && route.name === 'gods') {
-      await router.push({ path: gods.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'godDetail');

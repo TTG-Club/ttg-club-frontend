@@ -8,9 +8,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: options, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="getListProps({ items: options })"
+      :grid="{ flat: showRightSide }"
+      :get-group="getGroupByFirstLetter"
     >
       <template #default="{ item: option }">
         <option-link
@@ -19,7 +20,7 @@
           :to="{ path: option.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </component>
 </template>
 
@@ -36,7 +37,10 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { OptionsFilterDefaults } from '@/types/Character/Options.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   type TProps = {
     inTab?: boolean,
@@ -93,7 +97,7 @@
     items: options
   } = usePagination({
     url: '/options',
-    limit: 70,
+    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized,
       value: queryParams
@@ -118,10 +122,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && options.value.length && route.name === 'options') {
-      await router.push({ path: options.value[0].url });
-    }
   });
 
   watch(

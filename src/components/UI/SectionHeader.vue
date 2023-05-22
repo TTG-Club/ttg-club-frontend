@@ -134,10 +134,6 @@
         type: Boolean,
         default: false
       },
-      closeOnDesktop: {
-        type: Boolean,
-        default: false
-      },
       onClose: {
         type: Function,
         default: null
@@ -161,13 +157,7 @@
         || !!props.onClose
         || props.fullscreen);
 
-      const closeAvailable = computed(() => {
-        if (!uiStore.isMobile) {
-          return props.closeOnDesktop;
-        }
-
-        return props.onClose;
-      });
+      const closeAvailable = computed(() => props.onClose);
 
       const copyURL = () => {
         if (!clipboard.isSupported) {

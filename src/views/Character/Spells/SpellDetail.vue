@@ -2,7 +2,6 @@
   <content-detail class="spell-detail">
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :copy="!error && !loading"
         :fullscreen="!isMobile"
         :subtitle="spell?.name?.eng || ''"

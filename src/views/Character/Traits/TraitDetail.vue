@@ -2,7 +2,6 @@
   <content-detail class="trait-detail">
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :copy="!error && !loading"
         :fullscreen="!isMobile"
         :subtitle="trait?.name?.eng || ''"

@@ -6,9 +6,10 @@
     @search="onSearch"
     @update="initPages"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: backgrounds, keyField: 'url', minItemSize: 50 }"
+    <virtual-grouped-list
+      :list="getListProps({ items: backgrounds, minItemSize: 50 })"
+      :get-group="getGroupByFirstLetter"
+      :grid="{ flat: showRightSide }"
     >
       <template #default="{ item: background }">
         <background-link
@@ -16,7 +17,7 @@
           :to="{ path: background.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -30,7 +31,9 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();
@@ -76,10 +79,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && backgrounds.value.length && route.name === 'backgrounds') {
-      await router.push({ path: backgrounds.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'backgroundDetail');

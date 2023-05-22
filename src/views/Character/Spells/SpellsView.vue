@@ -9,9 +9,9 @@
     @list-end="nextPage"
   >
     <virtual-grouped-list
+      :list="getListProps({ items: spells })"
       :get-group="getSpellGroup"
       :grid="{ flat: showRightSide }"
-      :list="{ items: spells, keyField: 'url' }"
     >
       <template #default="{ item: spell }">
         <spell-link
@@ -40,6 +40,8 @@
   import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
+  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   export default defineComponent({
     components: {
@@ -108,7 +110,7 @@
         items: spells
       } = usePagination({
         url: '/spells',
-        limit: 70,
+        limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
         filter: {
           isCustomized,
           value: queryParams
@@ -137,10 +139,6 @@
       onBeforeMount(async () => {
         await filter.initFilter();
         await initPages();
-
-        if (!isMobile.value && spells.value.length && route.name === 'spells') {
-          await router.push({ path: spells.value[0].url });
-        }
       });
 
       watch(
@@ -178,8 +176,10 @@
         initPages,
         nextPage,
         onSearch,
-        getSpellGroup
+        getSpellGroup,
+        DEFAULT_ENTITY_KEY_FIELD
       };
-    }
+    },
+    methods: { getListProps }
   });
 </script>
