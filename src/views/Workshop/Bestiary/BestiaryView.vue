@@ -8,7 +8,7 @@
     @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="{ items: bestiary, keyField: DEFAULT_ENTITY_KEY_FIELD }"
+      :list="getListProps({ items: bestiary })"
       :get-group="getGroupByChallengeRating"
       :grid="{ flat: showRightSide }"
     >
@@ -32,9 +32,9 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();

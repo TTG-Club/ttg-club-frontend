@@ -9,7 +9,7 @@
     @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="{ items: spells, keyField: DEFAULT_ENTITY_KEY_FIELD }"
+      :list="getListProps({ items: spells })"
       :get-group="getSpellGroup"
       :grid="{ flat: showRightSide }"
     >
@@ -41,6 +41,7 @@
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   export default defineComponent({
     components: {
@@ -178,6 +179,7 @@
         getSpellGroup,
         DEFAULT_ENTITY_KEY_FIELD
       };
-    }
+    },
+    methods: { getListProps }
   });
 </script>

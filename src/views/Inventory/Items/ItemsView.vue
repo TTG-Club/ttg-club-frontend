@@ -8,7 +8,7 @@
     @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="{ items, keyField: DEFAULT_ENTITY_KEY_FIELD }"
+      :list="getListProps({ items })"
       :get-group="getGroupByFirstLetter"
       :grid="{ flat: showRightSide }"
     >
@@ -32,9 +32,10 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
   import ItemLink from '@/views/Inventory/Items/ItemLink.vue';
-  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();

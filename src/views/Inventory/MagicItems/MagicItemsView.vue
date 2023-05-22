@@ -8,7 +8,7 @@
     @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="{ items, keyField: DEFAULT_ENTITY_KEY_FIELD }"
+      :list="getListProps({ items })"
       :get-group="getGroupByRarity"
       :grid="{ flat: showRightSide }"
     >
@@ -33,9 +33,10 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
   import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute;
   const router = useRouter();

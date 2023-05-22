@@ -9,10 +9,7 @@
   >
     <virtual-grouped-list
       :flat="showRightSide"
-      :list="{
-        items: gods,
-        keyField: DEFAULT_ENTITY_KEY_FIELD,
-      }"
+      :list="getListProps({ items: gods })"
       :get-group="getGroupByAlignment"
       :grid="{ flat: showRightSide }"
     >
@@ -40,6 +37,7 @@
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();

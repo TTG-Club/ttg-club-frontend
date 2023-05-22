@@ -483,7 +483,7 @@
 
         clearSelected();
 
-        result.value = res.data;
+        result.value = res.data as never;
       })
       .catch(err => {
         errorHandler(err);

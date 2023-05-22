@@ -8,7 +8,7 @@
     @list-end="nextPage"
   >
     <virtual-grid-list
-      :list="{ items: rules, keyField: DEFAULT_ENTITY_KEY_FIELD }"
+      :list="getListProps({ items: rules })"
       :flat="showRightSide"
     >
       <template #default="{ item: rule }">
@@ -32,7 +32,8 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
-  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();

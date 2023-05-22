@@ -24,17 +24,7 @@
   import clsx from "clsx";
   import { computed } from "vue";
   import { DEFAULT_KEY_FIELD } from '@/common/const';
-  import type { Maybe } from "@/types/Shared/Utility.types";
-
-  /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
-
-  export type TVirtualListProps = {
-    items: unknown[];
-    keyField?: string,
-    minItemSize?: number;
-    pageMode?: boolean;
-    getItemClass?: (item: unknown) => Maybe<string>;
-  };
+  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
 
   const props = withDefaults(defineProps<TVirtualListProps>(), {
     keyField: DEFAULT_KEY_FIELD,

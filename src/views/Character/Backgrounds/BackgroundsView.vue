@@ -7,7 +7,7 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :list="{ items: backgrounds, keyField: DEFAULT_ENTITY_KEY_FIELD, minItemSize: 50 }"
+      :list="getListProps({ items: backgrounds, minItemSize: 50 })"
       :get-group="getGroupByFirstLetter"
       :grid="{ flat: showRightSide }"
     >
@@ -31,9 +31,9 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();

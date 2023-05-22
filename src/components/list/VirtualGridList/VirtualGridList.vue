@@ -25,14 +25,15 @@
 <script lang="ts" setup>
   import { computed } from 'vue';
   import clsx from "clsx";
-  import VirtualList, { TVirtualListProps } from '@/components/list/VirtualList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
+  import VirtualList from '@/components/list/VirtualList/VirtualList.vue';
+  import type { AnyObject, RecordKey } from '@/types/Shared/Utility.types';
   import ListRow, { TListRowProps } from '@/components/list/ListRow.vue';
   import { DEFAULT_KEY_FIELD } from '@/common/const';
   import type { TResponsiveValues } from '@/common/composition/useResponsiveValues';
   import { useResponsiveValues } from '@/common/composition/useResponsiveValues';
   import { getListRows } from '@/common/helpers/list';
   import type { TListRow } from '@/types/Shared/List.types';
+  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -48,7 +49,7 @@
     list: TVirtualListProps;
     columns?: TResponsiveValues<number>;
     flat?: boolean;
-    getRows?: (items: TItem[], context: TVirtualGridListContext) => TListRow<TItem, typeof props.list.keyField>[];
+    getRows?: (items: TItem[], context: TVirtualGridListContext) => TListRow<TItem, RecordKey>[];
   }
 
   const props = withDefaults(defineProps<TProps>(), {
@@ -68,7 +69,7 @@
 
   const list = computed<TVirtualListProps>(() => ({
     ...props.list,
-    getItemClass: (item: TItem) => clsx(props.list.getItemClass?.(item), "virtual-grid-list__item")
+    getItemClass: (item: unknown) => clsx(props.list.getItemClass?.(item), "virtual-grid-list__item")
   }));
 
   const items = computed(() => (props.getRows

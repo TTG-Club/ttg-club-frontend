@@ -35,7 +35,6 @@
   import sortBy from 'lodash/sortBy';
   import { computed } from "vue";
   import clsx from "clsx";
-  import { TVirtualListProps } from '@/components/list/VirtualList.vue';
   import GroupedListCategory from '@/components/list/GroupedListCategory.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import type { ListIteratee } from '@/types/Shared/Lodash.types';
@@ -47,6 +46,7 @@
     TVirtualGridListProps
   } from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -68,7 +68,9 @@
 
   const list = computed<TVirtualListProps>(() => ({
     ...props.list,
-    getItemClass: (item: TItem) => clsx(props.list.getItemClass?.(item), {
+
+    /* TODO: Типизировать через дженерики и убрать any */
+    getItemClass: (item: any) => clsx(props.list.getItemClass?.(item), {
       "virtual-grouped-list__group": item.isGroup
     })
   }));

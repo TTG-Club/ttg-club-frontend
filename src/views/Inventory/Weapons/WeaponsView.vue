@@ -9,10 +9,9 @@
     <virtual-grouped-list
       :grid="{ flat: showRightSide }"
       :get-group="getWeaponGroup"
-      :list="{
-        keyField: DEFAULT_ENTITY_KEY_FIELD,
+      :list="getListProps({
         items: weapons,
-      }"
+      })"
     >
       <template #default="{ item: weapon }">
         <weapon-link
@@ -36,7 +35,7 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
 
   const route = useRoute();
   const router = useRouter();
@@ -87,7 +86,7 @@
   const showRightSide = computed(() => route.name === 'weaponDetail');
 
   /* TODO: Добавить тип доспеха */
-  const getWeaponGroup = ({ type }: AnyObject & {type: AnyObject}) => ({
+  const getWeaponGroup = ({ type }: AnyObject & { type: AnyObject }) => ({
     url: type.name,
     name: type.name,
     order: type.order
