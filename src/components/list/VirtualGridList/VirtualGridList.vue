@@ -83,12 +83,12 @@
 </script>
 
 <style lang="scss" scoped>
-    :deep {
+  :deep {
     .vue-recycle-scroller__item-view {
       margin: 0;
       padding: 0;
 
-            > .virtual-grid-list__item {
+      > .virtual-grid-list__item {
         padding-bottom: 0;
       }
     }
