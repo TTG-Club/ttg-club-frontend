@@ -23,7 +23,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="OptionType extends Record<string, any>">
+<script setup lang="ts" generic="OptionType extends Record<string | 'id' | 'name', any>">
   import { onBeforeMount } from 'vue';
   import { useVModel } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
@@ -45,7 +45,7 @@
   const selected = useVModel(props, 'modelValue');
 
   onBeforeMount(() => {
-    if (props.preSelectFirst && props.modelValue === null) {
+    if (props.preSelectFirst) {
       selected.value = cloneDeep(props.options[0]);
     }
   });

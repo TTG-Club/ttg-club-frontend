@@ -10,6 +10,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "importsNotUsedAsValues": "remove",
     "incremental": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -37,7 +38,7 @@
       ]
     },
     "preserveConstEnums": true,
-    "preserveValueImports": true,
+    "preserveValueImports": false,
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
@@ -55,7 +56,8 @@
     "types": [
       "webpack-env"
     ],
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true,
   },
   "exclude": [
     "node_modules"
