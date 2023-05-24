@@ -110,7 +110,6 @@
   } from 'vue-router';
   import { storeToRefs } from 'pinia';
   import debounce from 'lodash/debounce';
-  import isString from 'lodash/isString';
   import {
     onStartTyping, tryOnBeforeMount, useFocus
   } from '@vueuse/core';
@@ -135,14 +134,18 @@
   const search = ref('');
   const inProgress = ref(false);
   const isNeedUpdateScroll = ref(false);
-  const input = ref<null | HTMLElement>(null);
-  const controls = ref<null | HTMLElement>(null);
-  const results = ref<TSearchResultList | null>(null);
-  const controller = ref<AbortController | null>(null);
+  const input = ref<HTMLElement>();
+  const controls = ref<HTMLElement>();
+  const controller = ref<AbortController>(new AbortController());
   const { focused } = useFocus(input, { initialValue: true });
 
+  const results = ref<TSearchResultList>({
+    count: 0,
+    list: []
+  });
+
   const pages = computed(() => {
-    if (!results.value?.count || results.value.count <= 20) {
+    if (results.value?.count <= 20) {
       return 0;
     }
 
@@ -170,13 +173,19 @@
   };
 
   const resolveQuerySearch = (querySearch?: LocationQueryValue | LocationQueryValue[]) => {
+    if (!querySearch) {
+      search.value = '';
+
+      return;
+    }
+
     if (Array.isArray(querySearch)) {
       search.value = '';
 
       return;
     }
 
-    search.value = isString(querySearch) ? querySearch : '';
+    search.value = querySearch || '';
   };
 
   const resolveQueryPage = (queryPage?: LocationQueryValue | LocationQueryValue[]) => {
@@ -186,11 +195,13 @@
       return;
     }
 
-    if (isString(queryPage)) {
+    if (typeof queryPage === 'string') {
       page.value = !route.query.page ? parseInt(queryPage, 10) : 1;
-    } else {
-      page.value = 1;
+
+      return;
     }
+
+    page.value = 1;
   };
 
   const resolveQuery = (to?: RouteLocationNormalized) => {
@@ -214,12 +225,6 @@
 
   const searchQuery = async () => {
     try {
-      if (controller.value !== null) {
-        controller.value.abort();
-      }
-
-      controller.value = new AbortController();
-
       const resp = await http.post({
         url: '/search',
         payload: {
@@ -243,8 +248,6 @@
       return Promise.resolve(resp.data as TSearchResultList);
     } catch (err) {
       return Promise.reject(err);
-    } finally {
-      controller.value = null;
     }
   };
 
