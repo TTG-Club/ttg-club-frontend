@@ -33,7 +33,6 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
   import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
@@ -58,7 +57,6 @@
     items
   } = usePagination({
     url: '/items/magic',
-    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

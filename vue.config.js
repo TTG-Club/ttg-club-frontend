@@ -66,7 +66,7 @@ module.exports = defineConfig({
               .replace(/\.svg$/, '')
               .replaceAll('/', '-')
               .replaceAll('\\', '-')
-              .replaceAll('--', '-')
+              .replace(/-+/, '-')
           }`
       })
       .end()
