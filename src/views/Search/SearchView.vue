@@ -412,8 +412,10 @@
       }
 
       &_btn {
-        border-radius: 0 8px 8px 0;
-        padding: 8px 16px;
+        :deep(button) {
+          border-radius: 0 8px 8px 0;
+          padding: 13px 16px;
+        }
       }
     }
 
