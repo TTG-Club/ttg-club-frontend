@@ -27,11 +27,11 @@
 
   const route = useRoute();
   const userStore = useUserStore();
-  const defaultBookmarkStore = useDefaultBookmarkStore();
+  const bookmarkStore = useDefaultBookmarkStore();
   const inProgress = ref(false);
 
   const bookmarkUrl = computed(() => (props.url !== '' ? props.url : route.path));
-  const isSaved = computed(() => defaultBookmarkStore.isBookmarkSaved(bookmarkUrl.value));
+  const isSaved = computed(() => bookmarkStore.isBookmarkSaved(bookmarkUrl.value));
 
   const updateBookmark = async () => {
     if (inProgress.value) {
@@ -41,7 +41,7 @@
     try {
       inProgress.value = true;
 
-      const bookmark = await defaultBookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
+      const bookmark = await bookmarkStore.updateBookmark(bookmarkUrl.value, props.name);
 
       toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
     } catch (err) {

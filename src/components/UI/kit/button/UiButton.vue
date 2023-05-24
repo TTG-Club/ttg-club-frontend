@@ -442,6 +442,7 @@
     display: inline-block;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: normal;
   }
 
   .icon {
