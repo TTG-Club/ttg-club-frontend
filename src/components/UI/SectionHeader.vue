@@ -16,7 +16,7 @@
           class="section-header__title--copy"
           @click.left.exact.prevent.stop="copyURL"
         >
-          <svg-icon icon-name="copy" />
+          <svg-icon icon="copy" />
         </a>
       </div>
 
@@ -68,7 +68,7 @@
             : 'Развернуть окно',
         }"
         class="section-header__control is-only-desktop"
-        :icon="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
+        :icon="`expand/${ uiStore.fullscreen ? 'exit' : 'enter'}`"
         type="text"
         @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
       />

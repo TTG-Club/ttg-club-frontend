@@ -1,6 +1,6 @@
 <template>
   <ui-button
-    :icon="isSaved ? 'bookmark-filled' : 'bookmark'"
+    :icon="`bookmark/${isSaved ? 'filled' : 'outline'}`"
     :tooltip="{ content: isSaved ? 'Удалить из закладок' : 'Добавить в закладки' }"
     :loading="inProgress"
     type="text"

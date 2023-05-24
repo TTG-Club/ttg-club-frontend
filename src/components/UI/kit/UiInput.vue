@@ -31,9 +31,7 @@
         @click.left.exact.prevent="togglePass"
       >
         <svg-icon
-          :icon-name="showedPass ? 'hide-pass' : 'show-pass'"
-          :stroke-enable="false"
-          fill-enable
+          :icon="`password/${showedPass ? 'show' : 'hide'}`"
         />
       </span>
 

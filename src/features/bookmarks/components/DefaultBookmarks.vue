@@ -12,7 +12,7 @@
           href="/info/bookmarks"
           target="_blank"
         >
-          <svg-icon icon-name="menu-question" />
+          <svg-icon icon="menu/question" />
         </a>
       </div>
     </div>
@@ -53,7 +53,7 @@
                       class="bookmarks__item_icon only-hover is-right"
                       @click.left.exact.prevent="bookmarksStore.removeBookmark(bookmark.uuid)"
                     >
-                      <svg-icon icon-name="close" />
+                      <svg-icon icon="close" />
                     </div>
                   </div>
                 </div>

@@ -6,9 +6,7 @@
     class="class-square"
   >
     <svg-icon
-      :icon-name="icon"
-      :stroke-enable="false"
-      fill-enable
+      :icon="icon"
     />
   </router-link>
 </template>

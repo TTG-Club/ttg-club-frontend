@@ -7,9 +7,7 @@
         @click.left.exact.prevent="clickHandler"
       >
         <svg-icon
-          :icon-name="isAuthenticated ? 'profile' : 'profile-outline'"
-          :stroke-enable="false"
-          fill-enable
+          :icon="`profile/${isAuthenticated ? 'filled' : 'outline'}`"
         />
       </div>
     </template>
@@ -56,9 +54,7 @@
 
           <span class="nav-profile__line_icon">
             <svg-icon
-              :stroke-enable="false"
-              fill-enable
-              icon-name="logout"
+              icon="logout"
             />
           </span>
         </a>

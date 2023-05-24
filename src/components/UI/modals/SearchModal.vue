@@ -17,9 +17,7 @@
             class="search-modal__control_icon"
           >
             <svg-icon
-              :icon-name="inProgress ? 'dice-d20' : 'search-new'"
-              :stroke-enable="false"
-              fill-enable
+              :icon="inProgress ? 'dice/d20' : 'search'"
             />
           </div>
 
@@ -52,7 +50,7 @@
 
           <ui-button
             class="search-modal__control_dice"
-            icon="dice-flat"
+            icon="dice/d6"
             type="text"
             color="text"
             @click.left.exact.prevent="onSearchRandom"
@@ -105,9 +103,7 @@
           >
             <div class="search-modal__all_icon">
               <svg-icon
-                :stroke-enable="false"
-                fill-enable
-                icon-name="search-page"
+                icon="search-page"
               />
             </div>
 
@@ -474,6 +470,10 @@
       }
 
       &_dice {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+
         svg {
           @include css_anim($item: transform);
 
@@ -488,8 +488,7 @@
         }
       }
 
-      &_icon,
-      &_dice {
+      &_icon {
         width: 36px;
         height: 36px;
         padding: 6px;

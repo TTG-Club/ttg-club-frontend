@@ -43,9 +43,7 @@
       >
         <svg-icon
           v-if="icon"
-          :icon-name="icon"
-          :stroke-enable="false"
-          fill-enable
+          :icon="icon"
         />
 
         <slot
@@ -66,9 +64,7 @@
         :class="$style.icon"
       >
         <svg-icon
-          icon-name="arrow-down"
-          :stroke-enable="false"
-          fill-enable
+          icon="arrow/filled/down-mini"
         />
       </span>
 
@@ -102,9 +98,7 @@
         :class="$style.icon"
       >
         <svg-icon
-          icon-name="arrow-2"
-          :stroke-enable="false"
-          fill-enable
+          icon="arrow/down"
         />
       </span>
 

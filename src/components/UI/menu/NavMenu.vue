@@ -53,7 +53,7 @@
                 v-if="group.icon"
                 class="nav-menu__group_icon"
               >
-                <svg-icon :icon-name="group.icon" />
+                <svg-icon :icon="group.icon" />
               </div>
             </div>
 

@@ -14,7 +14,7 @@
       >
         <ui-button
           v-if="isShowScrollBtn"
-          icon="arrow-stroke"
+          icon="arrow/up"
           size="sm"
           type="text"
           class="bookmarks__to-top"
@@ -23,7 +23,7 @@
       </transition>
 
       <ui-button
-        :icon="isAllGroupsOpened ? 'exit-fullscreen' : 'fullscreen'"
+        :icon="`expand/${isAllGroupsOpened ? 'exit' : 'enter'}`"
         size="sm"
         type="text"
         class="bookmarks__toggle-all"
@@ -32,7 +32,7 @@
 
       <ui-button
         v-tippy="{ content: 'Перейти в режим редактирования' }"
-        :type="!isEdit ? 'default' : 'text'"
+        :type="!isEdit ? 'text' : 'default'"
         icon="edit"
         size="sm"
         @click.left.exact.prevent="isEdit = !isEdit"
@@ -43,7 +43,7 @@
         class="bookmarks__search"
       >
         <span class="bookmarks__search--icon">
-          <svg-icon icon-name="search" />
+          <svg-icon icon="search" />
         </span>
       </label>
     </div>
@@ -126,7 +126,7 @@
       return false;
     }
 
-    return wrapper.value.scrollTop > 15;
+    return wrapper.value?.scrollTop > 15;
   });
 
   const enableGroupCreating = () => {

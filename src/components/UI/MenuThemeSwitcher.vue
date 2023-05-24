@@ -4,9 +4,7 @@
     @click.left.exact.prevent="switchTheme"
   >
     <svg-icon
-      :icon-name="`${icon}-theme`"
-      :stroke-enable="false"
-      fill-enable
+      :icon="`theme/${icon}`"
     />
   </div>
 </template>

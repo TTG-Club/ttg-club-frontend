@@ -26,12 +26,6 @@
     flex-shrink: 0;
   }
 
-  &__to-top {
-    svg {
-      transform: rotate(180deg);
-    }
-  }
-
   &__wrapper {
     padding: 8px 8px;
     display: block;
@@ -142,18 +136,6 @@
       border-radius: 4px;
       background: var(--bg-sub-menu);
       color: var(--text-color-title);
-
-      svg {
-        @include css_anim();
-
-        transform: rotate(-90deg);
-      }
-
-      &.is-active {
-        svg {
-          transform: none;
-        }
-      }
 
       &.only-hover {
         &:not(.is-active) {
