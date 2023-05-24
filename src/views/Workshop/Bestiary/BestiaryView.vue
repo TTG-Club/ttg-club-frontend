@@ -35,7 +35,6 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from '@/common/const';
 
   const route = useRoute();
   const router = useRouter();
@@ -53,7 +52,6 @@
     items: bestiary
   } = usePagination({
     url: '/bestiary',
-    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

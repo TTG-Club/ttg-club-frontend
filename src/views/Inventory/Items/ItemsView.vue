@@ -32,7 +32,6 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
   import ItemLink from '@/views/Inventory/Items/ItemLink.vue';
-  import { DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import { getGroupByFirstLetter } from "@/common/helpers/list";
   import { getListProps } from "@/components/list/VirtualList/helpers";
@@ -57,7 +56,6 @@
     items
   } = usePagination({
     url: '/items',
-    limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

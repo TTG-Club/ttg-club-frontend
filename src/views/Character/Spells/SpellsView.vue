@@ -37,10 +37,10 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
-  import { SpellsFilterDefaults } from '@/types/Character/Spells.types';
+  import { SpellsFilterDefaults, TSpellLink } from '@/types/Character/Spells.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { DEFAULT_ENTITY_KEY_FIELD, DEFAULT_PAGINATION_ITEMS_LIMIT } from "@/common/const";
+  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import { getListProps } from "@/components/list/VirtualList/helpers";
 
   export default defineComponent({
@@ -108,9 +108,8 @@
         nextPage,
         resetPages,
         items: spells
-      } = usePagination({
+      } = usePagination<TSpellLink[]>({
         url: '/spells',
-        limit: DEFAULT_PAGINATION_ITEMS_LIMIT,
         filter: {
           isCustomized,
           value: queryParams
