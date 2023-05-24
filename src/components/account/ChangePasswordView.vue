@@ -69,7 +69,7 @@
 
       <ui-button
         v-if="!isAuthenticated"
-        type="text"
+        type="secondary"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
         Авторизация
