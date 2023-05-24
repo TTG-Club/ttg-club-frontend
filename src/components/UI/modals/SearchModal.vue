@@ -17,9 +17,7 @@
             class="search-modal__control_icon"
           >
             <svg-icon
-              :icon-name="inProgress ? 'dice-d20' : 'search-new'"
-              :stroke-enable="false"
-              fill-enable
+              :icon="inProgress ? 'dice/d20' : 'search'"
             />
           </div>
 
@@ -52,16 +50,11 @@
 
           <ui-button
             class="search-modal__control_dice"
-            is-icon
-            type-link
+            icon="dice/d6"
+            type="text"
+            color="text"
             @click.left.exact.prevent="onSearchRandom"
-          >
-            <svg-icon
-              :stroke-enable="false"
-              fill-enable
-              icon-name="dice-flat"
-            />
-          </ui-button>
+          />
         </div>
 
         <div class="search-modal__results">
@@ -110,9 +103,7 @@
           >
             <div class="search-modal__all_icon">
               <svg-icon
-                :stroke-enable="false"
-                fill-enable
-                icon-name="search-page"
+                icon="search-page"
               />
             </div>
 
@@ -137,7 +128,7 @@
   import { useRouter } from 'vue-router';
   import { VueFinalModal } from 'vue-final-modal';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useAxios } from '@/common/composition/useAxios';
   import type { TSearchResultList } from '@/types/Search/Search.types';
   import SearchLink from '@/views/Search/SearchLink.vue';
@@ -479,6 +470,10 @@
       }
 
       &_dice {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+
         svg {
           @include css_anim($item: transform);
 
@@ -493,8 +488,7 @@
         }
       }
 
-      &_icon,
-      &_dice {
+      &_icon {
         width: 36px;
         height: 36px;
         padding: 6px;

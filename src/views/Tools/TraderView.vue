@@ -148,7 +148,7 @@
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   export default {
     name: 'TraderView',

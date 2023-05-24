@@ -31,9 +31,7 @@
         @click.left.exact.prevent="togglePass"
       >
         <svg-icon
-          :icon-name="showedPass ? 'hide-pass' : 'show-pass'"
-          :stroke-enable="false"
-          fill-enable
+          :icon="`password/${showedPass ? 'show' : 'hide'}`"
         />
       </span>
 
@@ -58,7 +56,7 @@
   } from 'vue';
   import { useVModel } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiEraseButton from '@/components/UI/kit/UiEraseButton.vue';
+  import UiEraseButton from '@/components/UI/kit/button/UiEraseButton.vue';
 
   const props = defineProps({
     modelValue: {

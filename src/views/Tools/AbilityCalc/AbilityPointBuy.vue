@@ -7,8 +7,8 @@
 
       <ui-button
         class="ability-point-buy__block is-btn"
-        is-small
-        use-full-width
+        size="sm"
+        full-width
         @click.left.exact.prevent="onReset"
       >
         Сбросить
@@ -61,7 +61,7 @@
   import {
     AbilityKey, AbilityName, AbilityShortName
   } from '@/types/Tools/AbilityCalc.types';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import { getPlural } from '@/common/helpers/string';
 

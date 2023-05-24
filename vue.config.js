@@ -57,7 +57,15 @@ module.exports = defineConfig({
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
-      .options({ symbolId: 'dnd5club-icon-[name]' })
+      .options({
+        symbolId: filePath => `ttg-${
+            filePath
+              .replace(path.resolve(__dirname, './src/assets/icons/svg'), '')
+              .replace(/^\//, '')
+              .replace(/\.svg$/, '')
+              .replaceAll('/', '-')
+          }`
+      })
       .end()
       .use('svgo-loader')
       .loader('svgo-loader')

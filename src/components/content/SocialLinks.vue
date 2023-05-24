@@ -16,9 +16,7 @@
         target="_blank"
       >
         <svg-icon
-          :icon-name="link.icon"
-          :stroke-enable="false"
-          fill-enable
+          :icon="link.icon"
         />
       </a>
     </div>

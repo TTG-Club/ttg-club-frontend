@@ -1,25 +1,16 @@
 <template>
-  <div class="custom-bookmark-button__wrapper">
-    <ui-button
+  <ui-button
+    :tooltip="{ content: isSaved() ? 'Удалить из закладок' : 'Добавить в закладки', hideOnClick: true }"
+    :icon="`bookmark/${isSaved() ? 'filled' : 'outline'}`"
+    :before-dropdown-show="onOpenDropdown"
+    :loading="inProgress"
+    type="text"
+    split
+    @click.left.exact.prevent="updateBookmark()"
+  >
+    <template
       v-if="groups?.length"
-      ref="trigger"
-      v-tippy="{ content: 'Добавить в закладки', hideOnClick: true }"
-      class="custom-bookmark-button"
-      is-icon
-      type-link-filled
-      @click.left.exact.prevent.stop="toggleSubmenu"
-    >
-      <svg-icon
-        :stroke-enable="false"
-        fill-enable
-        icon-name="arrow-2"
-      />
-    </ui-button>
-
-    <div
-      v-if="isOpen"
-      ref="submenu"
-      class="custom-bookmark-button__submenu"
+      #dropdown
     >
       <div
         v-for="(group, key) in groups"
@@ -31,20 +22,17 @@
       >
         {{ group.name }}
       </div>
-    </div>
-  </div>
+    </template>
+  </ui-button>
 </template>
 
 <script setup lang="ts">
   import { computed, ref } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
-  import { onClickOutside } from '@vueuse/core';
-  import errorHandler from '@/common/helpers/errorHandler';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
 
   const props = withDefaults(defineProps<{
@@ -60,51 +48,43 @@
   const route = useRoute();
 
   const bookmarkUrl = computed(() => (props.url !== '' ? props.url : route.path));
-
-  const isOpen = ref(false);
   const groups = computed(() => bookmarksStore.getGroups.filter(group => group.order > -1));
 
-  const isSaved = (uuid: IBookmarkGroup['uuid']) => bookmarksStore.isBookmarkSavedInGroup(bookmarkUrl.value, uuid);
+  const isSaved = (uuid?: IBookmarkGroup['uuid']) => (uuid
+    ? bookmarksStore.isBookmarkSavedInGroup(bookmarkUrl.value, uuid)
+    : !!bookmarksStore.isBookmarkSavedInDefault(bookmarkUrl.value));
 
-  const openSubmenu = async () => {
-    try {
-      await bookmarksStore.queryGetBookmarks();
-
-      isOpen.value = true;
-    } catch (err) {
-      errorHandler(err);
-    }
-  };
-
-  const closeSubmenu = () => {
-    isOpen.value = false;
-  };
-
-  const toggleSubmenu = async () => {
-    if (isOpen.value) {
-      closeSubmenu();
-
-      return;
-    }
-
-    await openSubmenu();
-  };
+  const onOpenDropdown = () => bookmarksStore.queryGetBookmarks();
 
   const inProgress = ref(false);
 
-  const updateBookmark = async (groupUUID: IBookmarkGroup['uuid']) => {
+  const updateBookmark = async (groupUUID?: IBookmarkGroup['uuid']) => {
     if (inProgress.value) {
       return;
     }
 
+    const updateInGroup = (uuid: IBookmarkGroup['uuid']) => bookmarksStore.updateBookmarkInGroup({
+      url: bookmarkUrl.value,
+      name: props.name,
+      groupUUID: uuid
+    });
+
+    const updateInDefault = async () => {
+      const defaultGroup = await bookmarksStore.getDefaultGroup();
+
+      return bookmarksStore.updateBookmarkInGroup({
+        url: bookmarkUrl.value,
+        name: props.name,
+        groupUUID: defaultGroup.uuid
+      });
+    };
+
     try {
       inProgress.value = true;
 
-      const bookmark = await bookmarksStore.updateBookmarkInGroup({
-        url: bookmarkUrl.value,
-        name: props.name,
-        groupUUID
-      });
+      const bookmark = groupUUID
+        ? await updateInGroup(groupUUID)
+        : await updateInDefault();
 
       toast.success(`Закладка ${ bookmark ? 'добавлена' : 'удалена' }!`);
     } catch (err) {
@@ -113,19 +93,6 @@
       inProgress.value = false;
     }
   };
-
-  const submenu = ref(null);
-  const trigger = ref(null);
-
-  onClickOutside(
-    submenu,
-    () => {
-      isOpen.value = false;
-    },
-    {
-      ignore: [trigger]
-    }
-  );
 </script>
 
 <style lang="scss" scoped>

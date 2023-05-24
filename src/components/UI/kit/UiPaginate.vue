@@ -11,11 +11,11 @@
     @update:model-value="$emit('update:model-value', $event)"
   >
     <template #prevBtnText>
-      <svg-icon icon-name="arrow-stroke" />
+      <svg-icon icon="arrow/left" />
     </template>
 
     <template #nextBtnText>
-      <svg-icon icon-name="arrow-stroke" />
+      <svg-icon icon="arrow/right" />
     </template>
   </vue-paginate>
 </template>
@@ -111,18 +111,6 @@
           background: var(--primary-hover);
           color: var(--text-btn-color);
         }
-      }
-    }
-
-    &__prev {
-      svg {
-        transform: rotate(90deg);
-      }
-    }
-
-    &__next {
-      svg {
-        transform: rotate(-90deg);
       }
     }
   }

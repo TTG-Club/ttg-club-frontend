@@ -48,13 +48,6 @@
     height: 42px;
     color: var(--primary);
 
-    svg {
-      @include css_anim();
-
-      width: 16px;
-      height: 16px;
-    }
-
     @include media-min($md) {
       &:hover {
         @include css_anim();
@@ -74,18 +67,6 @@
     &.is-toggle {
       flex-wrap: nowrap;
       flex-direction: column;
-    }
-  }
-
-  &.is-active {
-    .filter-item {
-      &__button {
-        &--toggle {
-          svg {
-            transform: rotate(-180deg);
-          }
-        }
-      }
     }
   }
 }

@@ -16,7 +16,7 @@
           class="section-header__title--copy"
           @click.left.exact.prevent.stop="copyURL"
         >
-          <svg-icon icon-name="copy" />
+          <svg-icon icon="copy" />
         </a>
       </div>
 
@@ -43,16 +43,10 @@
         v-if="print"
         v-tippy="{ content: 'Открыть окно печати' }"
         class="section-header__control is-only-desktop"
-        is-icon
-        type-link-filled
+        icon="print"
+        type="text"
         @click.left.exact.prevent.stop="openPrintWindow"
-      >
-        <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="print"
-        />
-      </ui-button>
+      />
 
       <ui-button
         v-if="onExportFoundry"
@@ -61,12 +55,10 @@
           content: '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>',
         }"
         class="section-header__control is-only-desktop"
-        is-icon
-        type-link-filled
+        icon="export-foundry"
+        type="text"
         @click.left.exact.prevent.stop="exportToFoundry"
-      >
-        <svg-icon icon-name="export-foundry" />
-      </ui-button>
+      />
 
       <ui-button
         v-if="fullscreen"
@@ -76,31 +68,19 @@
             : 'Развернуть окно',
         }"
         class="section-header__control is-only-desktop"
-        is-icon
-        type-link-filled
+        :icon="`expand/${ uiStore.fullscreen ? 'exit' : 'enter'}`"
+        type="text"
         @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
-      >
-        <svg-icon
-          :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
-          :stroke-enable="false"
-          fill-enable
-        />
-      </ui-button>
+      />
 
       <ui-button
         v-if="closeAvailable"
         v-tippy="{ content: 'Закрыть' }"
         class="section-header__control"
-        is-icon
-        type-link-filled
+        icon="close"
+        type="secondary"
         @click.left.exact.prevent.stop="$emit('close')"
-      >
-        <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="close"
-        />
-      </ui-button>
+      />
     </div>
   </div>
 </template>
@@ -114,7 +94,7 @@
   import { useToast } from 'vue-toastification';
   import { useUIStore } from '@/store/UI/UIStore';
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
   import { useMetrics } from '@/common/composition/useMetrics';
@@ -171,11 +151,11 @@
       const toast = useToast(ToastEventBus);
       const urlForCopy = computed(() => window.location.origin + route.path);
 
-      const hasControls = computed(() => !!props.bookmark
-        || !!props.print
+      const hasControls = computed(() => props.bookmark
+        || props.print
         || !!props.onExportFoundry
         || !!props.onClose
-        || !!props.fullscreen);
+        || props.fullscreen);
 
       const closeAvailable = computed(() => props.onClose);
 
@@ -332,35 +312,12 @@
     }
 
     &__control {
-      @include css_anim();
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      color: var(--primary);
-      padding: 6px;
-      border-radius: 8px;
-
-      @include media-min($md) {
-        &:hover {
-          background-color: var(--primary-hover);
-          color: var(--text-btn-color);
-        }
-      }
-
       &.is-only-desktop {
         display: none;
 
         @include media-min($lg) {
-          display: flex;
+          display: inherit;
         }
-      }
-
-      svg {
-        width: 24px;
-        height: 24px;
       }
     }
   }

@@ -9,7 +9,7 @@
         v-if="isEdit"
         class="bookmarks__cat_label_icon is-left js-drag-category"
       >
-        <svg-icon icon-name="sandwich" />
+        <svg-icon icon="sandwich" />
       </div>
 
       <div class="bookmarks__cat_label_name">
@@ -23,9 +23,7 @@
         @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(category.uuid)"
       >
         <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="close"
+          icon="close"
         />
       </div>
     </div>
@@ -52,7 +50,7 @@
               v-if="isEdit"
               class="bookmarks__cat_label_icon is-left js-drag-bookmark"
             >
-              <svg-icon icon-name="sandwich" />
+              <svg-icon icon="sandwich" />
             </div>
 
             <component
@@ -70,9 +68,7 @@
               @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
             >
               <svg-icon
-
-                :stroke-enable="false"
-                fill-enableicon-name="close"
+                icon="close"
               />
             </div>
           </div>

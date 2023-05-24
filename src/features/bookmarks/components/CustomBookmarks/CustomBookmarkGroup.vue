@@ -8,11 +8,8 @@
       class="bookmarks__group_head"
       @click.left.exact.prevent="customBookmarkStore.toggleGroup(group.uuid)"
     >
-      <div
-        :class="{ 'is-active': isOpened }"
-        class="bookmarks__group_icon"
-      >
-        <svg-icon icon-name="arrow-stroke" />
+      <div class="bookmarks__group_icon">
+        <svg-icon :icon="`arrow/${isOpened ? 'down' : 'right'}`" />
       </div>
 
       <div class="bookmarks__group_label">
@@ -27,9 +24,7 @@
         @click.left.exact.prevent.stop="enableCategoryCreating"
       >
         <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="plus"
+          icon="plus"
         />
       </div>
 
@@ -40,9 +35,7 @@
         @click.left.exact.prevent.stop="customBookmarkStore.queryDeleteBookmark(group.uuid)"
       >
         <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="close"
+          icon="close"
         />
       </div>
     </div>
@@ -84,22 +77,18 @@
         />
 
         <ui-button
-          is-icon
-          is-small
-          type-link-filled
+          icon="check"
+          size="sm"
+          type="text"
           @click.left.exact.prevent="createCategory"
-        >
-          <svg-icon icon-name="check" />
-        </ui-button>
+        />
 
         <ui-button
-          is-icon
-          is-small
-          type-link-filled
+          icon="close"
+          size="sm"
+          type="text"
           @click.left.exact.prevent="disableCategoryCreating"
-        >
-          <svg-icon icon-name="close" />
-        </ui-button>
+        />
       </div>
     </div>
   </div>
@@ -114,7 +103,7 @@
   import draggableComponent from 'vuedraggable';
   import { storeToRefs } from 'pinia';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useUIStore } from '@/store/UI/UIStore';

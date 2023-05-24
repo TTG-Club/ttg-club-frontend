@@ -67,9 +67,7 @@
             @click.left.exact.prevent="submenu = !submenu"
           >
             <svg-icon
-              :icon-name="submenu ? 'minus' : 'plus'"
-              :stroke-enable="false"
-              fill-enable
+              :icon="submenu ? 'minus' : 'plus'"
             />
           </button>
         </div>
