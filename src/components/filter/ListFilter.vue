@@ -236,11 +236,11 @@
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          color: var(--text-color);
 
           svg {
             width: 24px;
             height: 24px;
-            color: var(--primary);
           }
         }
       }

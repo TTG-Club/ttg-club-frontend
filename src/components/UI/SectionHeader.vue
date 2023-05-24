@@ -37,6 +37,7 @@
         v-if="bookmark"
         :name="title"
         :url="url || ''"
+        color="text"
       />
 
       <ui-button
@@ -45,7 +46,7 @@
         class="section-header__control is-only-desktop"
         icon="print"
         type="text"
-        color="text-color-title"
+        color="text"
         @click.left.exact.prevent.stop="openPrintWindow"
       />
 

@@ -184,7 +184,7 @@
   const groupContext = inject(buttonGroupContextKey, undefined);
 
   const buttonType = computed(() => groupContext?.type || props.type || 'default');
-  const buttonColor = computed(() => `var(--${ groupContext?.color || props.color || 'primary' })`);
+  const buttonColor = computed(() => `var(--btn-${ groupContext?.color || props.color || 'primary' })`);
   const buttonSize = computed(() => groupContext?.size || props.size || 'md');
   const isDisabled = computed(() => groupContext?.disabled || props.disabled || props.loading);
 
@@ -263,6 +263,15 @@
 
 <style lang="scss" module>
   $radius: 8px;
+
+  :root {
+    --btn-primary: var(--primary);
+    --btn-success: var(--success);
+    --btn-error: var(--error);
+    --btn-warning: var(--warning);
+    --btn-info: var(--info);
+    --btn-text: var(--text-b-color);
+  }
 
   .ui-button {
     position: relative;
