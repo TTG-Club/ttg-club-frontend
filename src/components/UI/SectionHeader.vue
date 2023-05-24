@@ -37,6 +37,7 @@
         v-if="bookmark"
         :name="title"
         :url="url || ''"
+        color="text"
       />
 
       <ui-button
@@ -45,6 +46,7 @@
         class="section-header__control is-only-desktop"
         icon="print"
         type="text"
+        color="text"
         @click.left.exact.prevent.stop="openPrintWindow"
       />
 
@@ -57,6 +59,7 @@
         class="section-header__control is-only-desktop"
         icon="export-foundry"
         type="text"
+        color="text"
         @click.left.exact.prevent.stop="exportToFoundry"
       />
 
@@ -70,6 +73,7 @@
         class="section-header__control is-only-desktop"
         :icon="`expand/${ uiStore.fullscreen ? 'exit' : 'enter'}`"
         type="text"
+        color="text"
         @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
       />
 

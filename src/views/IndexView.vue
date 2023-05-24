@@ -103,7 +103,7 @@
           </div>
 
           <div class="block__youtube">
-            <h3>Интересное D&D 5e:</h3>
+            <h3>Интересное видео:</h3>
 
             <transition
               mode="out-in"

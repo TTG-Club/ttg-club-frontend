@@ -23,7 +23,7 @@
       <button
         v-if="filter"
         v-tippy="{ content: showed ? 'Скрыть фильтры' : 'Показать фильтры' }"
-        :class="{ 'is-opened': showed }"
+        :class="{ 'is-active': isFilterCustomized }"
         class="filter__button"
         type="button"
         @click.left.exact.prevent="showed = !showed"
@@ -37,6 +37,7 @@
         v-if="!!filter && isFilterCustomized"
         v-tippy="'Сбросить все фильтры'"
         class="filter__button"
+        :class="{ 'is-active': isFilterCustomized }"
         type="button"
         @click.left.exact.prevent="resetFilter"
       >
@@ -236,11 +237,11 @@
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          color: var(--text-color);
 
           svg {
             width: 24px;
             height: 24px;
-            color: var(--primary);
           }
         }
       }
@@ -255,7 +256,7 @@
       justify-content: center;
       padding: 8px;
       border-left: 1px solid var(--border);
-      background-color: var(--primary);
+      background-color: var(--primary-select);
 
       svg {
         @include css_anim();
@@ -272,7 +273,7 @@
         color: var(--text-btn-color);
       }
 
-      &.is-opened {
+      &.is-active {
         @include css_anim();
 
         background-color: var(--primary-active);
