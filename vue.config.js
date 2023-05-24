@@ -62,8 +62,11 @@ module.exports = defineConfig({
             filePath
               .replace(path.resolve(__dirname, './src/assets/icons/svg'), '')
               .replace(/^\//, '')
+              .replace(/^\\/, '')
               .replace(/\.svg$/, '')
               .replaceAll('/', '-')
+              .replaceAll('\\', '-')
+              .replaceAll('--', '-')
           }`
       })
       .end()
