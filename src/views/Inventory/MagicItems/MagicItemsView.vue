@@ -37,7 +37,7 @@
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
 
-  const route = useRoute;
+  const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 

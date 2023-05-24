@@ -213,9 +213,15 @@ export const useDefaultBookmarkStore = defineStore('DefaultBookmarkStore', () =>
     }
   };
 
-  const updateBookmark = async (url: string, name: string, category = undefined) => {
-    if (isBookmarkSaved(url)) {
-      await removeBookmark(url);
+  const updateBookmark = async (
+    url: IBookmarkItem['url'],
+    name: IBookmarkItem['name'],
+    category: IBookmarkItem['parentUUID'] | undefined = undefined
+  ) => {
+    const bookmark = bookmarks.value.find(item => item.url === url);
+
+    if (bookmark) {
+      await removeBookmark(bookmark.uuid);
 
       return null;
     }
