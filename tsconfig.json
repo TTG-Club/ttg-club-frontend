@@ -20,14 +20,10 @@
       "dom.iterable",
       "scripthost"
     ],
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules"
-      }
-    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -37,6 +33,11 @@
         "./src/*"
       ]
     },
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
     "preserveConstEnums": true,
     "preserveValueImports": false,
     "pretty": true,
@@ -50,20 +51,23 @@
     "strictPropertyInitialization": true,
     "target": "esnext",
     "typeRoots": [
-      "./src/shims-vue.d.ts",
+      "./src/vite-env.d.ts",
       "./node_modules/@types"
     ],
     "types": [
-      "webpack-env"
+      "node",
+      "vite/client",
+      "vite-plugin-svg-icons/client"
     ],
     "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true
   },
   "exclude": [
     "node_modules"
   ],
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
+    "vite.config.*",
     "src/**/*",
   ]
 }

@@ -1,14 +1,14 @@
 declare module '*.vue' {
-  import { defineComponent } from 'vue';
+  import type { DefineComponent } from 'vue';
 
-  const Component: ReturnType<typeof defineComponent>;
+  const Component: DefineComponent;
   export default Component;
 }
 
 interface ImportMetaEnv {
-  readonly VUE_APP_API_URL: string;
-  readonly VUE_APP_DEV: 'true' | 'false';
-  readonly VUE_APP_BUILD_PATH: string;
+  readonly VITE_APP_API_URL: string;
+  readonly VITE_APP_DEV: 'true' | 'false';
+  readonly VITE_APP_BUILD_PATH: string;
 }
 
 interface ImportMeta {
@@ -16,14 +16,6 @@ interface ImportMeta {
 }
 
 declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      readonly VUE_APP_API_URL: string;
-      readonly VUE_APP_DEV: 'true' | 'false';
-      readonly VUE_APP_BUILD_PATH: string;
-    }
-  }
-
   interface Window {
     GTAG_ID: string;
     YM_ID: string;
@@ -43,7 +35,7 @@ declare module '*.module.scss' {
 }
 
 declare module 'tippy' {
-    import type { TippyComponent } from 'vue-tippy';
+  import type { TippyComponent } from 'vue-tippy';
 
-    export const Tippy: TippyComponent;
+  export const Tippy: TippyComponent;
 }

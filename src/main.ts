@@ -1,3 +1,5 @@
+import 'vite/modulepreload-polyfill';
+import 'virtual:svg-icons-register';
 import { createApp } from 'vue';
 import VueTippy from 'vue-tippy';
 import VueLazyLoad from 'vue-lazyload';
