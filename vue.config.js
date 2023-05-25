@@ -40,7 +40,6 @@ module.exports = defineConfig({
 
     config.optimization.runtimeChunk('single');
 
-    config.output.filename('js/[name].js');
     config.output.chunkFilename('js/[name].[chunkhash].js');
 
     config.module
@@ -93,7 +92,6 @@ module.exports = defineConfig({
   css: {
     extract: process.env.BUILD_TARGET !== 'serve'
       ? {
-        filename: 'css/[name].css',
         chunkFilename: 'css/[name].[chunkhash].css'
       }
       : false,
