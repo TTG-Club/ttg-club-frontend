@@ -2,7 +2,7 @@
   <virtual-grid-list
     class="virtual-grouped-list"
     :get-rows="getRows"
-    :list="list"
+    :list="listProps"
     v-bind="grid"
   >
     <template
@@ -32,7 +32,7 @@
 
 <script lang="ts" setup>
   import uniqBy from 'lodash/uniqBy';
-  import sortBy from 'lodash/sortBy';
+  import _sortBy from 'lodash/sortBy';
   import { computed } from "vue";
   import clsx from "clsx";
   import GroupedListCategory from '@/components/list/GroupedListCategory.vue';
@@ -66,7 +66,7 @@
     grid: () => ({})
   });
 
-  const list = computed<TVirtualListProps>(() => ({
+  const listProps = computed<TVirtualListProps>(() => ({
     ...props.list,
 
     /* TODO: Типизировать через дженерики и убрать any */
@@ -83,7 +83,7 @@
 
     const allGroups = items.map((item: TItem) => props.getGroup(item));
     const allGroupsSet = uniqBy(allGroups, keyField);
-    const sortedGroups = sortBy(allGroupsSet, props.sortBy);
+    const sortedGroups = _sortBy(allGroupsSet, props.sortBy);
 
     return getListItemsWithGroups(sortedGroups, items, {
       getGroup: props.getGroup,

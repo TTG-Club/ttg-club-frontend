@@ -1,6 +1,6 @@
 <template>
   <virtual-list
-    v-bind="list"
+    v-bind="listProps"
     :items="items"
   >
     <template #default="{ item: row, index, active }">
@@ -67,7 +67,7 @@
 
   const { current: currentColumns } = useResponsiveValues({ values: columnConfig });
 
-  const list = computed<TVirtualListProps>(() => ({
+  const listProps = computed<TVirtualListProps>(() => ({
     ...props.list,
     getItemClass: (item: unknown) => clsx(props.list.getItemClass?.(item), "virtual-grid-list__item")
   }));
