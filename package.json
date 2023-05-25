@@ -1,14 +1,12 @@
 {
-  "name": "dnd5club",
-  "version": "0.1.1",
+  "name": "ttg-club",
   "private": true,
   "scripts": {
     "serve": "vite",
     "watch": "vite build --watch --emptyOutDir",
     "build": "vite build --emptyOutDir",
-    "build:check": "run-s typecheck build",
-    "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json --composite false",
+    "build:check": "run-s type-check build",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json --composite false",
     "lint:js": "eslint --ext .ts,.js,.vue ./src",
     "lint:fix": "eslint --ext .ts,.js,.vue ./src --fix"
   },
@@ -62,6 +60,7 @@
     "eslint-plugin-vue": "^9.12.0",
     "eslint-plugin-vuejs-accessibility": "^2.1.0",
     "lint-staged": "^13.0.3",
+    "npm-run-all": "^4.1.5",
     "sass": "^1.62.1",
     "terser": "^5.17.3",
     "typescript": "^5.0.4",

@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
@@ -40,8 +40,8 @@ jobs:
 
       - name: Build
         env:
-          VUE_APP_DEV: false
-        run: npm run build:prod
+          VITE_APP_DEV: false
+        run: npm run build
 
       - uses: actions/upload-artifact@v3
         with:
