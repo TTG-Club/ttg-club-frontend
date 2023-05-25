@@ -256,7 +256,7 @@
       justify-content: center;
       padding: 8px;
       border-left: 1px solid var(--border);
-      background-color: var(--primary-select);
+      background-color: var(--primary);
 
       svg {
         @include css_anim();
@@ -276,7 +276,11 @@
       &.is-active {
         @include css_anim();
 
-        background-color: var(--primary-active);
+        background-color: var(--warning);
+
+        &:hover {
+          background-color: var(--warning-hover);
+        }
 
         svg {
           color: var(--text-btn-color);
