@@ -482,11 +482,13 @@
       return [];
     }
 
+    console.log(props.creature.savingThrows);
+
     return props.creature.savingThrows.map(save => ({
-      formula: `к20${ getFormattedModifier(save.value) }`,
+      formula: `к20+${ save.value }`,
       label: save.shortName,
       name: save.name,
-      value: `${ getFormattedModifier(save.value) }${ save.additional ? save.additional : '' }`
+      value: `+${ save.value }${ save.additional ? save.additional : '' }`
     }));
   });
 
@@ -496,9 +498,9 @@
     }
 
     return props.creature.skills.map(skill => ({
-      formula: `к20${ getFormattedModifier(skill.value) }`,
+      formula: `к20+${ skills.value }`,
       label: skill.name,
-      value: `${ getFormattedModifier(skill.value) }${ skill.additional ? skill.additional : '' }`
+      value: `+${ skill.value }${ skill.additional ? skill.additional : '' }`
     }));
   });
 
