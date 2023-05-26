@@ -21,6 +21,7 @@
     "dayjs": "^1.11.5",
     "dice-roller-parser": "^0.1.8",
     "js-cookie": "^3.0.1",
+    "js-file-downloader": "^1.1.25",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",

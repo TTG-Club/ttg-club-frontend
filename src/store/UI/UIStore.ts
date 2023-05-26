@@ -115,21 +115,11 @@ export const useUIStore = defineStore('UIStore', () => {
     updateThemeMeta();
   };
 
-  const setFullscreenState = async (payload: boolean) => {
+  const restoreFullscreenState = async () => {
     try {
       await store.ready();
 
-      let state = payload || false;
-
-      const storageState = await store.getItem(FULLSCREEN_DB_KEY);
-
-      if (typeof storageState === 'boolean') {
-        state = storageState;
-      }
-
-      fullscreen.value = state;
-
-      await store.setItem(FULLSCREEN_DB_KEY, state);
+      fullscreen.value = await store.getItem<boolean>(FULLSCREEN_DB_KEY) || false;
 
       return Promise.resolve();
     } catch (err) {
@@ -186,7 +176,7 @@ export const useUIStore = defineStore('UIStore', () => {
     getCookieTheme,
     removeOldTheme,
     setTheme,
-    setFullscreenState,
+    restoreFullscreenState,
     updateFullscreen,
     toggleFullscreen
   };

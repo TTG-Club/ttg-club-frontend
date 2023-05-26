@@ -17,6 +17,7 @@
           icon="arrow/up"
           size="sm"
           type="text"
+          color="text"
           class="bookmarks__to-top"
           @click.left.prevent="scrollToTop"
         />
@@ -26,6 +27,7 @@
         :icon="`expand/${isAllGroupsOpened ? 'exit' : 'enter'}`"
         size="sm"
         type="text"
+        color="text"
         class="bookmarks__toggle-all"
         @click.left.prevent="toggleAll"
       />
@@ -34,6 +36,7 @@
         v-tippy="{ content: 'Перейти в режим редактирования' }"
         :type="!isEdit ? 'text' : 'default'"
         icon="edit"
+        color="text"
         size="sm"
         @click.left.exact.prevent="isEdit = !isEdit"
       />

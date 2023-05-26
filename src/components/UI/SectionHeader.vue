@@ -74,7 +74,7 @@
         :icon="`expand/${ uiStore.fullscreen ? 'exit' : 'enter'}`"
         type="text"
         color="text"
-        @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
+        @click.left.exact.prevent.stop="toggleFullscreen"
       />
 
       <ui-button
@@ -89,11 +89,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import { useClipboard } from '@vueuse/core';
-  import {
-    computed, defineComponent, h
-  } from 'vue';
+  import { computed, h } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
   import { useUIStore } from '@/store/UI/UIStore';
@@ -103,132 +101,102 @@
   import { ToastEventBus } from '@/common/utils/ToastConfig';
   import { useMetrics } from '@/common/composition/useMetrics';
 
-  export default defineComponent({
-    components: {
-      UiButton,
-      BookmarkSaveButton,
-      SvgIcon
-    },
-    props: {
-      title: {
-        type: String,
-        required: true
-      },
-      subtitle: {
-        type: String,
-        default: ''
-      },
-      copy: {
-        type: Boolean,
-        default: false
-      },
-      bookmark: {
-        type: Boolean,
-        default: false
-      },
-      url: {
-        type: String,
-        default: ''
-      },
-      print: {
-        type: Boolean,
-        default: false
-      },
-      fullscreen: {
-        type: Boolean,
-        default: false
-      },
-      onClose: {
-        type: Function,
-        default: null
-      },
-      onExportFoundry: {
-        type: Function,
-        default: null
-      }
-    },
-    setup(props, { emit }) {
-      const route = useRoute();
-      const uiStore = useUIStore();
-      const clipboard = useClipboard();
-      const { sendShareMetrics } = useMetrics();
-      const toast = useToast(ToastEventBus);
-      const urlForCopy = computed(() => window.location.origin + route.path);
+  const props = withDefaults(defineProps<{
+    title: string;
+    subtitle?: string;
+    url?: string;
+    copy?: boolean;
+    bookmark?: boolean;
+    print?: boolean;
+    fullscreen?: boolean;
+    onExportFoundry?:() => void;
+    onClose?:() => void;
+  }>(), {
+    subtitle: '',
+    url: '',
+    copy: false,
+    bookmark: false,
+    print: false,
+    fullscreen: false,
+    onExportFoundry: undefined,
+    onClose: undefined
+  });
 
-      const hasControls = computed(() => props.bookmark
-        || props.print
-        || !!props.onExportFoundry
-        || !!props.onClose
-        || props.fullscreen);
+  const emit = defineEmits<{
+    exportFoundry: void;
+    close: void;
+  }>();
 
-      const closeAvailable = computed(() => props.onClose);
+  const route = useRoute();
+  const uiStore = useUIStore();
+  const clipboard = useClipboard();
+  const { sendShareMetrics } = useMetrics();
+  const toast = useToast(ToastEventBus);
+  const { toggleFullscreen } = uiStore;
 
-      const copyURL = () => {
-        if (!clipboard.isSupported) {
-          toast.error('Ваш браузер не поддерживает копирование');
-        }
+  const urlForCopy = computed(() => window.location.origin + route.path);
 
-        clipboard.copy(urlForCopy.value)
-          .then(() => {
-            toast('Ссылка успешно скопирована');
+  const hasControls = computed(() => props.bookmark
+    || props.print
+    || !!props.onExportFoundry
+    || !!props.onClose
+    || props.fullscreen);
 
-            sendShareMetrics({
-              method: 'link_copy',
-              id: route.path
-            });
-          })
-          .catch(() => toast.error(() => [
-            h(
-              'span',
-              null,
-              'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
-            ),
-            h(
-              'a',
-              {
-                target: '_blank',
-                href: 'https://discord.gg/zqBnMJVf3z',
-                rel: 'noopener'
-              },
-              'Discord-канале'
-            )
-          ]));
-      };
+  const closeAvailable = computed(() => props.onClose);
 
-      const copyText = (text?: string) => {
-        if (!text) {
-          return;
-        }
+  const copyURL = () => {
+    if (!clipboard.isSupported) {
+      toast.error('Ваш браузер не поддерживает копирование');
+    }
 
-        clipboard.copy(text)
-          .then(() => toast('Текст скопирован'));
-      };
+    clipboard.copy(urlForCopy.value)
+      .then(() => {
+        toast('Ссылка успешно скопирована');
 
-      const openPrintWindow = () => {
-        window.print();
-      };
-
-      const exportToFoundry = () => {
         sendShareMetrics({
-          method: 'export_foundry',
+          method: 'link_copy',
           id: route.path
         });
+      })
+      .catch(() => toast.error(() => [
+        h(
+          'span',
+          null,
+          'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
+        ),
+        h(
+          'a',
+          {
+            target: '_blank',
+            href: 'https://discord.gg/zqBnMJVf3z',
+            rel: 'noopener'
+          },
+          'Discord-канале'
+        )
+      ]));
+  };
 
-        emit('exportFoundry');
-      };
-
-      return {
-        uiStore,
-        hasControls,
-        urlForCopy,
-        closeAvailable,
-        copyText,
-        copyURL,
-        openPrintWindow,
-        exportToFoundry
-      };
+  const copyText = (text?: string) => {
+    if (!text) {
+      return;
     }
-  });
+
+    clipboard.copy(text)
+      .then(() => toast('Текст скопирован'));
+  };
+
+  const openPrintWindow = () => {
+    window.print();
+  };
+
+  const exportToFoundry = () => {
+    sendShareMetrics({
+      method: 'export_foundry',
+      id: route.path
+    });
+
+    emit('exportFoundry');
+  };
 </script>
 
 <style lang="scss" scoped>
