@@ -11,7 +11,7 @@
     <virtual-grouped-list
       :list="getListProps({ items: spells })"
       :get-group="getSpellGroup"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item: spell }">
         <spell-link
@@ -42,6 +42,7 @@
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
 
   export default defineComponent({
     components: {
@@ -179,6 +180,9 @@
         DEFAULT_ENTITY_KEY_FIELD
       };
     },
-    methods: { getListProps }
+    methods: {
+      checkIsListGridFlat,
+      getListProps
+    }
   });
 </script>
