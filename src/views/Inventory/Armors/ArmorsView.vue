@@ -7,7 +7,7 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
       :get-group="getArmorGroup"
       :list="getListProps({ items: armors })"
     >
@@ -34,6 +34,7 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
 
   const route = useRoute();
   const router = useRouter();

@@ -9,7 +9,7 @@
     <virtual-grouped-list
       :list="getListProps({ items: traits })"
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item: trait }">
         <trait-link
@@ -34,6 +34,7 @@
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupByFirstLetter } from "@/common/helpers/list";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
 
   type TProps = {
     storeKey?: string;
