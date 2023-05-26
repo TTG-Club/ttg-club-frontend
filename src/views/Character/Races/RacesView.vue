@@ -51,6 +51,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import type { TRaceLink, TRaceList } from '@/types/Character/Races.types';
   import { RacesFilterDefaults } from '@/types/Character/Races.types';
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   export default defineComponent({
 
@@ -107,7 +108,7 @@
       const onSearch = async () => {
         await initPages();
 
-        if (races.value.length === 1 && !isMobile.value) {
+        if (isAutoOpenAvailable(races)) {
           await router.push({ path: races.value[0].url });
         }
       };

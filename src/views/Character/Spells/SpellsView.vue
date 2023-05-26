@@ -43,6 +43,7 @@
   import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import { getListProps } from "@/components/list/VirtualList/helpers";
   import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   export default defineComponent({
     components: {
@@ -131,7 +132,7 @@
       const onSearch = async () => {
         await initPages();
 
-        if (spells.value.length === 1 && !isMobile.value && !props.inTab) {
+        if (isAutoOpenAvailable(spells, props.inTab)) {
           await router.push({ path: spells.value[0].url });
         }
       };

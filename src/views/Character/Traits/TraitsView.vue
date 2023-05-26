@@ -35,6 +35,7 @@
   import { getGroupByFirstLetter } from "@/common/helpers/list";
   import { getListProps } from "@/components/list/VirtualList/helpers";
   import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
     storeKey?: string;
@@ -80,7 +81,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (traits.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(traits)) {
       await router.push({ path: traits.value[0].url });
     }
   };

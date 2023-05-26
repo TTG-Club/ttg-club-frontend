@@ -39,6 +39,7 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { ScreensFilterDefaults } from '@/types/Workshop/Screens.types';
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   export default defineComponent({
     components: {
@@ -85,7 +86,7 @@
       const onSearch = async () => {
         await initPages();
 
-        if (screens.value.length === 1 && !isMobile.value) {
+        if (isAutoOpenAvailable(screens)) {
           await router.push({ path: screens.value[0].url });
         }
       };

@@ -38,6 +38,7 @@
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
   import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
@@ -79,7 +80,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (gods.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(gods)) {
       await router.push({ path: gods.value[0].url });
     }
   };
