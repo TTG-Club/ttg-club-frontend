@@ -7,7 +7,7 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
       :get-group="getArmorGroup"
       :list="getListProps({ items: armors })"
     >
@@ -34,6 +34,8 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
@@ -67,7 +69,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (armors.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(armors)) {
       await router.push({ path: armors.value[0].url });
     }
   };

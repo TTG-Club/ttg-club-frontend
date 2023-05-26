@@ -10,7 +10,7 @@
     <virtual-grouped-list
       :list="getListProps({ items })"
       :get-group="getGroupByRarity"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item }">
         <magic-item-link
@@ -36,6 +36,8 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
@@ -77,7 +79,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (items.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(items)) {
       await router.push({ path: items.value[0].url });
     }
   };

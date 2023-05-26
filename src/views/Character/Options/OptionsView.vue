@@ -10,7 +10,7 @@
   >
     <virtual-grouped-list
       :list="getListProps({ items: options })"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
       :get-group="getGroupByFirstLetter"
     >
       <template #default="{ item: option }">
@@ -40,6 +40,8 @@
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupByFirstLetter } from "@/common/helpers/list";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
     inTab?: boolean,
@@ -112,7 +114,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (options.value.length === 1 && !isMobile.value && !props.inTab) {
+    if (isAutoOpenAvailable(options, props.inTab)) {
       await router.push({ path: options.value[0].url });
     }
   };

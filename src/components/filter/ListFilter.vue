@@ -5,10 +5,13 @@
   >
     <div class="filter__body">
       <div class="filter__search">
-        <label class="filter__search_field">
-          <span class="filter__search_field_icon">
+        <div
+          class="filter__search_field"
+          :class="{ 'has-filter': !!filter }"
+        >
+          <div class="filter__search_field_icon">
             <svg-icon icon="search" />
-          </span>
+          </div>
 
           <ui-input
             v-model.trim="search"
@@ -17,7 +20,7 @@
             placeholder="Поиск..."
             is-clearable
           />
-        </label>
+        </div>
       </div>
 
       <button
@@ -242,6 +245,15 @@
           svg {
             width: 24px;
             height: 24px;
+          }
+        }
+
+        &.has-filter {
+          :deep(.ui-input__control) {
+            border: {
+              top-right-radius: 0;
+              bottom-right-radius: 0;
+            };
           }
         }
       }

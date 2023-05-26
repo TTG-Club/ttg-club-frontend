@@ -10,7 +10,7 @@
     <virtual-grouped-list
       :list="getListProps({ items: bestiary })"
       :get-group="getGroupByChallengeRating"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item: creature }">
         <creature-link
@@ -35,11 +35,13 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
-  const { isMobile } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     url: BestiaryFilterDefaults.url,
@@ -72,7 +74,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (!isMobile.value && bestiary.value.length) {
+    if (isAutoOpenAvailable(bestiary)) {
       await router.push({ path: bestiary.value[0].url });
     }
   };

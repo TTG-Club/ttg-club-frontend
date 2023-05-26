@@ -1,16 +1,12 @@
 <template>
   <ui-button
     v-tippy="{ content: 'Стереть строку поиска' }"
-    class="ui-erase-button"
-    type-link
-    is-icon
+    :class="$style['ui-erase-button']"
+    type="text"
+    icon="close"
+    color="text"
     @click.prevent="value = ''"
-  >
-    <svg-icon
-      icon="close"
-      :size="16"
-    />
-  </ui-button>
+  />
 </template>
 
 <script setup lang="ts">
@@ -24,3 +20,12 @@
 
   const value = useVModel(props, 'modelValue');
 </script>
+
+<style lang="scss" module>
+  .ui-erase-button {
+    button {
+      height: 100%;
+      border-radius: 0;
+    }
+  }
+</style>

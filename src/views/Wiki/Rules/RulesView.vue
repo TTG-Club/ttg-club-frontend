@@ -9,7 +9,7 @@
   >
     <virtual-grid-list
       :list="getListProps({ items: rules })"
-      :flat="showRightSide"
+      :flat="checkIsListGridFlat({ showRightSide, fullscreen })"
     >
       <template #default="{ item: rule }">
         <rule-link
@@ -33,6 +33,8 @@
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
@@ -70,7 +72,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (rules.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(rules)) {
       await router.push({ path: rules.value[0].url });
     }
   };

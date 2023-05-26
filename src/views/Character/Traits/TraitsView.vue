@@ -9,7 +9,7 @@
     <virtual-grouped-list
       :list="getListProps({ items: traits })"
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item: trait }">
         <trait-link
@@ -34,6 +34,8 @@
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupByFirstLetter } from "@/common/helpers/list";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
     storeKey?: string;
@@ -79,7 +81,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (traits.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(traits)) {
       await router.push({ path: traits.value[0].url });
     }
   };
