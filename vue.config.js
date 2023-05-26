@@ -1,6 +1,5 @@
 const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
-const webpack = require('webpack');
 
 module.exports = defineConfig({
   outputDir: process.env.VUE_APP_BUILD_PATH || './dist/',
@@ -27,13 +26,6 @@ module.exports = defineConfig({
         /* eslint-enable consistent-return */
       }
     }
-  },
-  configureWebpack: {
-    plugins: [
-      new webpack.ProvidePlugin({
-        process: 'process/browser'
-      })
-    ]
   },
   chainWebpack: config => {
     const removeHTML = () => {
