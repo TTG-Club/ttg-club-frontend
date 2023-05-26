@@ -1,133 +1,88 @@
 <template>
-    <content-layout
-        title="Доспехи"
-        :filter-instance="filter"
-        :show-right-side="showRightSide"
-        @search="onSearch"
-        @update="initPages"
+  <content-layout
+    :filter-instance="filter"
+    :show-right-side="showRightSide"
+    title="Доспехи"
+    @search="onSearch"
+    @update="initPages"
+  >
+    <virtual-grouped-list
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :get-group="getArmorGroup"
+      :list="getListProps({ items: armors })"
     >
-        <div
-            v-for="(group, groupKey) in armors"
-            :key="groupKey"
-            class="armors-group"
-        >
-            <div class="armors-group__name">
-                {{ group.name }}
-            </div>
-
-            <div class="armors-group__list">
-                <armor-link
-                    v-for="armor in group.list"
-                    :key="armor.url"
-                    :armor="armor"
-                    :to="{ path: armor.url }"
-                />
-            </div>
-        </div>
-    </content-layout>
+      <template #default="{ item: armor }">
+        <armor-link
+          :armor="armor"
+          :to="{ path: armor.url }"
+        />
+      </template>
+    </virtual-grouped-list>
+  </content-layout>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
-    import sortBy from 'lodash/sortBy';
-    import { storeToRefs } from 'pinia';
-    import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from '@/components/content/ContentLayout.vue';
-    import ArmorLink from '@/views/Inventory/Armors/ArmorLink.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
-    import { useFilter } from '@/common/composition/useFilter';
-    import { usePagination } from '@/common/composition/usePagination';
-    import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
+<script lang="ts" setup>
+  import { computed, onBeforeMount } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import { useRoute, useRouter } from 'vue-router';
+  import ContentLayout from '@/components/content/ContentLayout.vue';
+  import ArmorLink from '@/views/Inventory/Armors/ArmorLink.vue';
+  import { useUIStore } from '@/store/UI/UIStore';
+  import { useFilter } from '@/common/composition/useFilter';
+  import { usePagination } from '@/common/composition/usePagination';
+  import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
-    export default defineComponent({
-        components: {
-            ArmorLink,
-            ContentLayout
-        },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
 
-            const filter = useFilter({
-                dbName: ArmorsFilterDefaults.dbName,
-                url: ArmorsFilterDefaults.url
-            });
+  const filter = useFilter({
+    dbName: ArmorsFilterDefaults.dbName,
+    url: ArmorsFilterDefaults.url
+  });
 
-            const {
-                initPages,
-                items
-            } = usePagination({
-                url: '/armors',
-                limit: -1,
-                search: filter.search,
-                order: [
-                    {
-                        field: 'AC',
-                        direction: 'asc'
-                    }
-                ]
-            });
+  const {
+    initPages,
+    items: armors
+  } = usePagination({
+    url: '/armors',
+    limit: -1,
+    search: filter.search,
+    order: [
+      {
+        field: 'AC',
+        direction: 'asc'
+      }
+    ]
+  });
 
-            // TODO: Доделать типизацию
-            const armors = computed(() => {
-                const list: any = [];
-                const types: any = [];
+  const onSearch = async () => {
+    await initPages();
 
-                if (!items.value) {
-                    return list;
-                }
+    if (isAutoOpenAvailable(armors)) {
+      await router.push({ path: armors.value[0].url });
+    }
+  };
 
-                for (const armor of items.value) {
-                    if (types.find((obj: any) => obj.name === armor.type.name)) {
-                        continue;
-                    }
+  const getArmorGroup = ({ type }: AnyObject & {type: AnyObject}) => ({
+    url: type.name,
+    name: type.name,
+    order: type.order
+  });
 
-                    types.push(armor.type);
-                }
+  onBeforeMount(async () => {
+    await initPages();
+  });
 
-                for (const type of sortBy(types, [o => o.order])) {
-                    list.push({
-                        name: type.name,
-                        list: items.value.filter(armor => armor.type.name === type.name)
-                    });
-                }
-
-                return list;
-            });
-
-            const onSearch = async () => {
-                await initPages();
-
-                if (armors.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: armors.value[0].list[0].url });
-                }
-            };
-
-            onBeforeMount(async () => {
-                await initPages();
-
-                if (!isMobile.value && armors.value.length && route.name === 'armors') {
-                    await router.push({ path: armors.value[0].list[0].url });
-                }
-            });
-
-            return {
-                isMobile,
-                fullscreen,
-                armors,
-                filter,
-                showRightSide: computed(() => route.name === 'armorDetail'),
-                initPages,
-                onSearch
-            };
-        }
-    });
+  const showRightSide = computed(() => route.name === 'armorDetail');
 </script>

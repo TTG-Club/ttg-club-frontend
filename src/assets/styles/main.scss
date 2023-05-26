@@ -68,12 +68,6 @@
         background-color: var(--hover);
       }
 
-      span.key {
-        padding: 0 8px;
-        font-weight: 600;
-        color: var(--text-color-title);
-      }
-
       span.computer_version {
         display: none;
 
@@ -86,6 +80,13 @@
         padding: 0 8px;
         font-weight: 600;
         color: var(--text-color-title);
+        background-color: var(--bg-sub-menu);
+        border: {
+          width: 1px;
+          style: solid;
+          color: var(--border);
+          radius: 4px;
+        };
       }
     }
 
@@ -313,7 +314,7 @@
 
           h4 {
             margin-top: 0;
-            font-family: "Open Sans",sans-serif;
+            font-family: "Open Sans", sans-serif;
             font-weight: 500;
           }
 
@@ -329,6 +330,7 @@
             color: var(--text-color);
             padding: 6px 8px;
             border-radius: 8px;
+            border: 1px solid var(--border);
 
             &.main {
               background-color: var(--primary);
@@ -337,6 +339,7 @@
 
             &:hover {
               background-color: var(--primary-hover);
+              color: var(--text-btn-color);
               transition: all .5s;
             }
           }
@@ -405,6 +408,7 @@
     font-family: "Open Sans", sans-serif;
     font-weight: 400;
     opacity: 0.6;
+    margin-bottom: 12px;
   }
 
   .list {
@@ -414,13 +418,14 @@
 
     .block {
       padding: 8px 8px;
-      background-color: var(--hover);
+      background-color: var(--bg-sub-menu);
       color: var(--text-color);
       border-radius: 8px;
       display: inline-flex;
       margin: 4px 4px;
       align-items: center;
       transition: all 0.5s;
+      border: 1px solid var(--border);
 
       &.w-100 {
         width: 100%;
@@ -442,6 +447,7 @@
 
       &:hover {
         background-color: var(--bg-main);
+        color: var(--text-color-title);
       }
     }
   }
@@ -547,32 +553,45 @@
   }
 }
 
+.bestiary {
+  .scores {
+    margin: 16px 0;
+  }
+}
+
 .scores {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  margin: 16px 0 16px 0;
+  gap: 8px;
 
   &__stats {
     text-align: center;
     min-width: calc(16% - 8px);
     flex: 1 0 calc(16% - 8px);
     background-color: var(--hover);
-    border-radius: 4px;
-    margin-right: 8px;
-    margin-bottom: 8px;
+    border-radius: 8px;
+    overflow: hidden;
 
     h4 {
-      margin: 10px 0 2px;
+      margin: 0;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: var(--main-font-size);
-      line-height: 1.2em;
       text-transform: uppercase;
-      color: var(--text-s-color);
+      color: var(--text-color-title);
+      background-color: var(--hover);
+      font-family: "Open Sans", sans-serif;
     }
 
     p {
-      margin: 0 0 10px;
-      line-height: 1.2em;
+      margin: 0;
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     @media (max-width: 1500px) {
@@ -602,22 +621,6 @@
   }
 }
 
-.weapons-group,
-.books-group,
-.armors-group {
-  &__name {
-    background: var(--bg-liner-divider);
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    color: var(--text-btn-color);
-    font-size: var(--h4-font-size);
-  }
-
-  & + & {
-    margin-top: 32px;
-  }
-}
 
 .content-padding {
   padding: 16px;

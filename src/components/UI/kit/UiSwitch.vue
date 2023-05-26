@@ -1,133 +1,168 @@
 <template>
-    <div
-        :class="{ 'is-full-width': useFullWidth }"
-        class="ui-switch"
+  <div
+    :class="{
+      'ui-switch': true,
+      [$style['ui-switch']]: true,
+      [$style['is-full-width']]: fullWidth,
+    }"
+  >
+    <button
+      v-for="(option, index) in options"
+      :key="`${option[trackBy]}_${index}`"
+      :class="{
+        [$style.option]: true,
+        [$style['is-active']]: selected?.[trackBy] === option[trackBy],
+      }"
+      type="button"
+      @click.left.exact.prevent="selected = option"
     >
-        <ui-group-button
-            :use-full-width="useFullWidth"
-        >
-            <ui-button
-                v-for="(option, index) in options"
-                :key="`${option[trackBy]}_${index}`"
-                :class="{ 'is-active': selected?.[trackBy] === option[trackBy] }"
-                @click.left.exact.prevent="selected = option"
-            >
-                {{ option[label] }}
-            </ui-button>
-        </ui-group-button>
-    </div>
+      <span :class="$style.hover" />
+
+      <span :class="$style.text">{{ option[label] }}</span>
+    </button>
+  </div>
 </template>
 
-<script>
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
-    import UiGroupButton from '@/components/UI/kit/UiGroupButton.vue';
-    import UiButton from '@/components/UI/kit/UiButton.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
+<script setup lang="ts" generic="OptionType extends Record<string | 'id' | 'name', any>">
+  import { onBeforeMount } from 'vue';
+  import { useVModel } from '@vueuse/core';
+  import cloneDeep from 'lodash/cloneDeep';
 
-    export default defineComponent({
-        components: {
-            UiButton,
-            UiGroupButton
-        },
-        props: {
-            options: {
-                type: Array,
-                required: true
-            },
-            modelValue: {
-                type: [Object, null],
-                required: true
-            },
-            trackBy: {
-                type: String,
-                default: 'id'
-            },
-            label: {
-                type: String,
-                default: 'name'
-            },
-            preSelectFirst: {
-                type: Boolean,
-                default: false
-            },
-            useFullWidth: {
-                type: Boolean,
-                default: false
-            }
-        },
-        setup(props, { emit }) {
-            const uiStore = useUIStore();
+  const props = withDefaults(defineProps<{
+    modelValue: OptionType;
+    options: Array<OptionType>;
+    trackBy?: keyof OptionType;
+    label?: keyof OptionType;
+    preSelectFirst?: boolean;
+    fullWidth?: boolean;
+  }>(), {
+    trackBy: 'id',
+    label: 'name',
+    preSelectFirst: false,
+    fullWidth: false
+  });
 
-            const selected = computed({
-                get: () => props.modelValue,
-                set: value => emit('update:model-value', value)
-            });
+  const selected = useVModel(props, 'modelValue');
 
-            onBeforeMount(() => {
-                if (props.preSelectFirst && props.modelValue === null) {
-                    emit('update:model-value', props.options[0]);
-                }
-            });
-
-            return {
-                selected,
-                isMobile: computed(() => uiStore.isMobile)
-            };
-        }
-    });
+  onBeforeMount(() => {
+    if (props.preSelectFirst) {
+      selected.value = cloneDeep(props.options[0]);
+    }
+  });
 </script>
 
-<style lang="scss" scoped>
-    .ui-switch {
-        display: inline-flex;
+<style lang="scss" module>
+  $radius: 8px;
 
-        &.is-full-width {
-            display: flex;
-            width: 100%;
-        }
+  .ui-switch {
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
 
-        .ui-button {
-            background-color: var(--bg-secondary);
-            color: var(--text-b-color);
-
-            &:active,
-            &.is-active {
-                @include css_anim();
-
-                background-color: var(--primary-active);
-                color: var(--text-btn-color);
-            }
-
-            @include media-min($xl) {
-                &:hover {
-                    @include css_anim();
-
-                    background-color: var(--primary-hover);
-                    color: var(--text-btn-color);
-                }
-            }
-
-            &:disabled {
-                background-color: var(--primary);
-                color: var(--text-btn-color);
-                cursor: not-allowed;
-                opacity: .6;
-            }
-        }
-
-        .ui-group-button {
-
-            button {
-                @media (max-width: 576px) {
-                    border-radius: 0;
-                }
-            }
-
-            @media (max-width: 576px) {
-                flex-direction: column;
-            }
-        }
+    @include media-min($lg) {
+      flex-direction: row;
+      width: initial;
     }
+
+    &.is-full-width {
+      display: flex;
+      width: 100%;
+
+      > .option {
+        flex: 1 1 auto;
+      }
+    }
+  }
+
+  .option {
+    @include css_anim();
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    gap: 8px;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+    font-size: 14px;
+    line-height: 18px;
+    padding: 10px;
+    color: var(--text-color);
+    background-color: var(--bg-secondary);
+
+    &:first-child {
+      border: {
+        top-left-radius: $radius;
+        top-right-radius: $radius;
+      };
+
+      @include media-min($lg) {
+        border: {
+          top-left-radius: $radius;
+          top-right-radius: 0;
+          bottom-left-radius: $radius;
+        };
+      }
+    }
+
+    &:last-child {
+      border: {
+        bottom-left-radius: $radius;
+        bottom-right-radius: $radius;
+      };
+
+      @include media-min($lg) {
+        border: {
+          top-right-radius: $radius;
+          bottom-left-radius: 0;
+          bottom-right-radius: $radius;
+        };
+      }
+    }
+
+    &:hover {
+      &:not(.is-active) {
+        color: var(--text-btn-color);
+
+        .hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    &.is-active {
+      color: var(--text-btn-color);
+      background-color: var(--primary);
+    }
+  }
+
+  .text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .disabled,
+  .hover {
+    @include css_anim();
+
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hover {
+    background-color: var(--primary-hover);
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .disabled {
+    z-index: 3;
+    background-color: white;
+    opacity: 20%;
+    cursor: not-allowed;
+  }
 </style>

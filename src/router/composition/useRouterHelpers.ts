@@ -1,102 +1,101 @@
 import type {
-    RouteRecordRaw,
-    RouteLocationNormalized, NavigationGuardNext
+  NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw
 } from 'vue-router';
 import { AxiosError } from 'axios';
 import { routes } from '@/router/routes';
 import { useAxios } from '@/common/composition/useAxios';
 
 export const useRouterHelpers = () => {
-    const isUrlAvailable = async (to: RouteLocationNormalized) => {
-        const axios = useAxios();
+  const isUrlAvailable = async (to: RouteLocationNormalized) => {
+    const axios = useAxios();
 
-        try {
-            const resp = await axios.headRaw({ url: to.fullPath });
+    try {
+      const resp = await axios.rawHead({ url: to.fullPath });
 
-            return Promise.resolve(resp.status);
-        } catch (err) {
-            if (err instanceof AxiosError) {
-                return Promise.reject(err.response?.status);
-            }
+      return Promise.resolve(resp.status);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        return Promise.reject(err.response?.status);
+      }
 
-            // eslint-disable-next-line prefer-promise-reject-errors
-            return Promise.reject(500);
+      // eslint-disable-next-line prefer-promise-reject-errors
+      return Promise.reject(500);
+    }
+  };
+
+  const isStaticUrl = (to: RouteLocationNormalized) => {
+    const getAvailRoute = (route: RouteRecordRaw): Array<string | symbol> => {
+      const list = [];
+
+      if (route.name && (route.name === 'profile' || !route.path.includes(':'))) {
+        list.push(route.name);
+      }
+
+      if (route.children instanceof Array) {
+        for (const child of route.children) {
+          list.push(...getAvailRoute(child));
         }
+      }
+
+      return list;
     };
 
-    const isStaticUrl = (to: RouteLocationNormalized) => {
-        const getAvailRoute = (route: RouteRecordRaw): Array<string | symbol> => {
-            const list = [];
+    const availRoutes = routes
+      .flatMap(route => getAvailRoute(route))
+      .filter(route => !!route);
 
-            if (route.name && (route.name === 'profile' || !route.path.includes(':'))) {
-                list.push(route.name);
-            }
+    return !!to.name && availRoutes.includes(to.name);
+  };
 
-            if (route.children instanceof Array) {
-                for (const child of route.children) {
-                    list.push(...getAvailRoute(child));
-                }
-            }
+  const nextAvailable = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isStaticUrl(to)) {
+      next();
 
-            return list;
-        };
+      return;
+    }
 
-        const availRoutes = routes
-            .flatMap(route => getAvailRoute(route))
-            .filter(route => !!route);
+    try {
+      const status = await isUrlAvailable(to);
 
-        return !!to.name && availRoutes.includes(to.name);
-    };
+      switch (status) {
+        case 200:
+          next();
 
-    const nextAvailable = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
-        if (isStaticUrl(to)) {
-            next();
+          break;
 
-            return;
-        }
+        default:
+          next({ name: 'internal-server' });
 
-        try {
-            const status = await isUrlAvailable(to);
+          break;
+      }
+    } catch (errStatus) {
+      switch (errStatus) {
+        case 401:
+          next({ name: 'unauthorized' });
 
-            switch (status) {
-                case 200:
-                    next();
+          break;
 
-                    break;
+        case 403:
+          next({ name: 'forbidden' });
 
-                default:
-                    next({ name: 'internal-server' });
+          break;
 
-                    break;
-            }
-        } catch (errStatus) {
-            switch (errStatus) {
-                case 401:
-                    next({ name: 'unauthorized' });
+        case 404:
+          next({ name: 'not-found' });
 
-                    break;
+          break;
 
-                case 403:
-                    next({ name: 'forbidden' });
+        default:
+          next({ name: 'internal-server' });
 
-                    break;
+          break;
+      }
+    }
+  };
 
-                case 404:
-                    next({ name: 'not-found' });
-
-                    break;
-
-                default:
-                    next({ name: 'internal-server' });
-
-                    break;
-            }
-        }
-    };
-
-    return {
-        isUrlAvailable,
-        isStaticUrl,
-        nextAvailable
-    };
+  return {
+    isUrlAvailable,
+    isStaticUrl,
+    nextAvailable
+  };
 };

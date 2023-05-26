@@ -1,89 +1,83 @@
 <template>
-    <content-layout
-        title="Драгоценности"
-        :filter-instance="filter"
-        @search="onSearch"
-        @update="initPages"
-        @list-end="nextPage"
+  <content-layout
+    :filter-instance="filter"
+    title="Драгоценности"
+    @search="onSearch"
+    @update="initPages"
+    @list-end="nextPage"
+  >
+    <virtual-grouped-list
+      :list="{ items: treasures }"
+      :get-group="getGroupWithIdByFirstLetter"
     >
+      <template #default="{ item: treasure }">
         <treasure-item
-            v-for="(treasure, key) in treasures"
-            :key="treasure.name.eng + key"
-            :treasure="treasure"
+          :treasure="treasure"
         />
-    </content-layout>
+      </template>
+    </virtual-grouped-list>
+  </content-layout>
 </template>
 
-<script lang="ts">
-    import { defineComponent, onBeforeMount } from 'vue';
-    import { storeToRefs } from 'pinia';
-    import ContentLayout from '@/components/content/ContentLayout.vue';
-    import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
-    import { useFilter } from '@/common/composition/useFilter';
-    import { usePagination } from '@/common/composition/usePagination';
-    import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
+<script lang="ts" setup>
+  import { computed, onBeforeMount } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import ContentLayout from '@/components/content/ContentLayout.vue';
+  import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
+  import { useUIStore } from '@/store/UI/UIStore';
+  import { useFilter } from '@/common/composition/useFilter';
+  import { usePagination } from '@/common/composition/usePagination';
+  import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getGroupWithIdByFirstLetter } from "@/common/helpers/list";
 
-    export default defineComponent({
-        components: {
-            TreasureItem,
-            ContentLayout
-        },
-        setup() {
-            const uiStore = useUIStore();
+  const uiStore = useUIStore();
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
 
-            const filter = useFilter({
-                dbName: TreasuresFilterDefaults.dbName,
-                url: TreasuresFilterDefaults.url
-            });
+  const filter = useFilter({
+    dbName: TreasuresFilterDefaults.dbName,
+    url: TreasuresFilterDefaults.url
+  });
 
-            const {
-                initPages,
-                nextPage,
-                items: treasures
-            } = usePagination({
-                url: '/treasures',
-                limit: 70,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'cost',
-                        direction: 'asc'
-                    },
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+  const {
+    initPages,
+    nextPage,
+    items
+  } = usePagination({
+    url: '/treasures',
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams
+    },
+    search: filter.search,
+    order: [
+      {
+        field: 'cost',
+        direction: 'asc'
+      },
+      {
+        field: 'name',
+        direction: 'asc'
+      }
+    ]
+  });
 
-            const onSearch = async () => {
-                await initPages();
-            };
+  /* Для добавления идентификатора к элементам */
+  const treasures = computed(() => items.value.map(item => ({
+    ...item,
+    id: item.id || `${ item.name.eng || item.name.rus } ${ item.type.name }`
+  })));
 
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
-            });
+  const onSearch = async () => {
+    await initPages();
+  };
 
-            return {
-                isMobile,
-                fullscreen,
-                treasures,
-                filter,
-                initPages,
-                nextPage,
-                onSearch
-            };
-        }
-    });
+  onBeforeMount(async () => {
+    await filter.initFilter();
+    await initPages();
+  });
 </script>

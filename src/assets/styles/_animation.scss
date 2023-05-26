@@ -1,0 +1,25 @@
+// <transition name="<class>"/>
+.fade {
+  &-enter-from, &-leave-to {
+    opacity: 0;
+  }
+
+  &-enter-to, &-leave-from {
+    opacity: 1;
+  }
+
+  &-enter-active, &-leave-active {
+    @include css_anim;
+  }
+}
+
+.vue-anim {
+  &-fade-enter-active {
+    @include css_anim;
+  }
+
+  &-fade-leave-active {
+    transition: none;
+  }
+}
+

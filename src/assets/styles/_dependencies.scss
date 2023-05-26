@@ -8,6 +8,7 @@
 @import "vue-toastification/src/scss/_progressBar";
 @import "vue-toastification/src/scss/_icon";
 @import "vue-toastification/src/scss/animations/_bounce";
+@import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 [data-tippy-root] {
   display: inline;
@@ -117,13 +118,28 @@
   }
 }
 
-.vfm__container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-height: var(--max-vh);
-  width: 100%;
-  background-color: var(--bg-light-main);
+.vfm {
+  cursor: pointer;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: var(--max-vh);
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-light-main);
+    pointer-events: none;
+    cursor: initial;
+
+    > * {
+      pointer-events: initial;
+    }
+
+    .row_info {
+      margin-top: 16px;
+    }
+  }
 }
 
 .Vue-Toastification {

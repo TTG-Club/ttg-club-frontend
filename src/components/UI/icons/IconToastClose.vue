@@ -1,29 +1,29 @@
 <template>
-    <div class="icon-toast-close">
-        <svg-icon icon-name="close" />
-    </div>
+  <div class="icon-toast-close">
+    <svg-icon icon="close" />
+  </div>
 </template>
 
 <script>
-    import { defineComponent } from 'vue';
-    import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import { defineComponent } from 'vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-    export default defineComponent({
-        components: {
-            SvgIcon
-        }
-    });
+  export default defineComponent({
+    components: {
+      SvgIcon
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
-    .icon-toast-close {
-        @include css_anim();
+  .icon-toast-close {
+    @include css_anim();
 
-        opacity: 1;
-        border-radius: 8px;
+    opacity: 1;
+    border-radius: 8px;
 
-        &:hover {
-            background-color: var(--hover);
-        }
+    &:hover {
+      background-color: var(--hover);
     }
+  }
 </style>

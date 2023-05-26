@@ -1,142 +1,96 @@
 <template>
-    <content-layout
-        title="Оружие"
-        :filter-instance="filter"
-        :show-right-side="showRightSide"
-        @search="onSearch"
-        @update="initPages"
+  <content-layout
+    :filter-instance="filter"
+    :show-right-side="showRightSide"
+    title="Оружие"
+    @search="onSearch"
+    @update="initPages"
+  >
+    <virtual-grouped-list
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :get-group="getWeaponGroup"
+      :list="getListProps({
+        items: weapons,
+      })"
     >
-        <div
-            v-for="(group, groupKey) in weapons"
-            :key="groupKey"
-            class="weapons-group"
-        >
-            <div class="weapons-group__name">
-                {{ group.name }}
-            </div>
-
-            <div class="weapons-group__list">
-                <weapon-link
-                    v-for="weapon in group.list"
-                    :key="weapon.url"
-                    :to="{ path: weapon.url }"
-                    :weapon="weapon"
-                />
-            </div>
-        </div>
-    </content-layout>
+      <template #default="{ item: weapon }">
+        <weapon-link
+          :to="{ path: weapon.url }"
+          :weapon="weapon"
+        />
+      </template>
+    </virtual-grouped-list>
+  </content-layout>
 </template>
 
-<script lang="ts">
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
-    import sortBy from 'lodash/sortBy';
-    import { storeToRefs } from 'pinia';
-    import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from '@/components/content/ContentLayout.vue';
-    import WeaponLink from '@/views/Inventory/Weapons/WeaponLink.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
-    import { useFilter } from '@/common/composition/useFilter';
-    import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.types';
-    import { usePagination } from '@/common/composition/usePagination';
+<script lang="ts" setup>
+  import { computed, onBeforeMount } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import { useRoute, useRouter } from 'vue-router';
+  import ContentLayout from '@/components/content/ContentLayout.vue';
+  import { useUIStore } from '@/store/UI/UIStore';
+  import { useFilter } from '@/common/composition/useFilter';
+  import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.types';
+  import { usePagination } from '@/common/composition/usePagination';
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
-    export default defineComponent({
-        components: {
-            WeaponLink,
-            ContentLayout
-        },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
 
-            const filter = useFilter({
-                dbName: WeaponsFilterDefaults.dbName,
-                url: WeaponsFilterDefaults.url
-            });
+  const filter = useFilter({
+    dbName: WeaponsFilterDefaults.dbName,
+    url: WeaponsFilterDefaults.url
+  });
 
-            const {
-                initPages,
-                items
-            } = usePagination({
-                url: '/weapons',
-                limit: -1,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+  const {
+    initPages,
+    items: weapons
+  } = usePagination({
+    url: '/weapons',
+    limit: -1,
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams
+    },
+    search: filter.search,
+    order: [
+      {
+        field: 'name',
+        direction: 'asc'
+      }
+    ]
+  });
 
-            // TODO: Доделать типизацию
-            const weapons = computed(() => {
-                const list: any = [];
-                const types: any = [];
+  const onSearch = async () => {
+    await initPages();
 
-                if (!items.value) {
-                    return list;
-                }
+    if (isAutoOpenAvailable(weapons)) {
+      await router.push({ path: weapons.value[0].url });
+    }
+  };
 
-                for (const armor of items.value) {
-                    if (types.find((obj: any) => obj.name === armor.type.name)) {
-                        continue;
-                    }
+  onBeforeMount(async () => {
+    await filter.initFilter();
+    await initPages();
+  });
 
-                    types.push(armor.type);
-                }
+  const showRightSide = computed(() => route.name === 'weaponDetail');
 
-                for (const type of sortBy(types, [o => o.order])) {
-                    list.push({
-                        name: type.name,
-                        list: items.value.filter(armor => armor.type.name === type.name)
-                    });
-                }
-
-                return list;
-            });
-
-            const onSearch = async () => {
-                await initPages();
-
-                if (weapons.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: weapons.value[0].list[0].url });
-                }
-            };
-
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
-
-                if (!isMobile.value && weapons.value.length && route.name === 'weapons') {
-                    await router.push({ path: weapons.value[0].list[0].url });
-                }
-            });
-
-            return {
-                isMobile,
-                fullscreen,
-                weapons,
-                filter,
-                showRightSide: computed(() => route.name === 'weaponDetail'),
-                initPages,
-                onSearch
-            };
-        }
-    });
+  /* TODO: Добавить тип доспеха */
+  const getWeaponGroup = ({ type }: AnyObject & { type: AnyObject }) => ({
+    url: type.name,
+    name: type.name,
+    order: type.order
+  });
 </script>
-
-<style lang="scss" scoped>
-
-</style>

@@ -1,105 +1,98 @@
 <template>
-    <content-layout
-        title="Магические предметы"
-        :filter-instance="filter"
-        :show-right-side="showRightSide"
-        @search="onSearch"
-        @update="initPages"
-        @list-end="nextPage"
+  <content-layout
+    :filter-instance="filter"
+    :show-right-side="showRightSide"
+    title="Магические предметы"
+    @search="onSearch"
+    @update="initPages"
+    @list-end="nextPage"
+  >
+    <virtual-grouped-list
+      :list="getListProps({ items })"
+      :get-group="getGroupByRarity"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
+      <template #default="{ item }">
         <magic-item-link
-            v-for="item in items"
-            :key="item.url"
-            :magic-item="item"
-            :to="{ path: item.url }"
+          :magic-item="item"
+          :to="{ path: item.url }"
         />
-    </content-layout>
+      </template>
+    </virtual-grouped-list>
+  </content-layout>
 </template>
 
-<script>
-    import {
-        computed, defineComponent, onBeforeMount
-    } from 'vue';
-    import { storeToRefs } from 'pinia';
-    import { useRoute, useRouter } from 'vue-router';
-    import ContentLayout from '@/components/content/ContentLayout.vue';
-    import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-    import { useUIStore } from '@/store/UI/UIStore';
-    import { useFilter } from '@/common/composition/useFilter';
-    import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
-    import { usePagination } from '@/common/composition/usePagination';
+<script lang="ts" setup>
+  import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import capitalize from "lodash/capitalize";
+  import { useFilter } from '@/common/composition/useFilter';
+  import { usePagination } from '@/common/composition/usePagination';
+  import ContentLayout from '@/components/content/ContentLayout.vue';
+  import { useUIStore } from '@/store/UI/UIStore';
+  import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
+  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
-    export default defineComponent({
-        components: {
-            MagicItemLink,
-            ContentLayout
-        },
-        setup() {
-            const route = useRoute();
-            const router = useRouter();
-            const uiStore = useUIStore();
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-            const {
-                isMobile,
-                fullscreen
-            } = storeToRefs(uiStore);
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
 
-            const filter = useFilter({
-                dbName: MagicItemsFilterDefaults.dbName,
-                url: MagicItemsFilterDefaults.url
-            });
+  const filter = useFilter({
+    dbName: MagicItemsFilterDefaults.dbName,
+    url: MagicItemsFilterDefaults.url
+  });
 
-            const {
-                initPages,
-                nextPage,
-                items
-            } = usePagination({
-                url: '/items/magic',
-                limit: 70,
-                filter: {
-                    isCustomized: filter.isCustomized,
-                    value: filter.queryParams
-                },
-                search: filter.search,
-                order: [
-                    {
-                        field: 'rarity',
-                        direction: 'asc'
-                    },
-                    {
-                        field: 'name',
-                        direction: 'asc'
-                    }
-                ]
-            });
+  const {
+    initPages,
+    nextPage,
+    items
+  } = usePagination({
+    url: '/items/magic',
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams
+    },
+    search: filter.search,
+    order: [
+      {
+        field: 'rarity',
+        direction: 'asc'
+      },
+      {
+        field: 'name',
+        direction: 'asc'
+      }
+    ]
+  });
 
-            const onSearch = async () => {
-                await initPages();
+  const onSearch = async () => {
+    await initPages();
 
-                if (items.value.length === 1 && !isMobile.value) {
-                    await router.push({ path: items.value[0].url });
-                }
-            };
+    if (isAutoOpenAvailable(items)) {
+      await router.push({ path: items.value[0].url });
+    }
+  };
 
-            onBeforeMount(async () => {
-                await filter.initFilter();
-                await initPages();
+  const getGroupByRarity = (item: AnyObject & {rarity: AnyObject}) => ({
+    url: item.rarity.type,
+    name: capitalize(String(item.rarity.name))
+  });
 
-                if (!isMobile.value && items.value.length && route.name === 'magicItems') {
-                    await router.push({ path: items.value[0].url });
-                }
-            });
+  onBeforeMount(async () => {
+    await filter.initFilter();
+    await initPages();
+  });
 
-            return {
-                isMobile,
-                fullscreen,
-                items,
-                filter,
-                showRightSide: computed(() => route.name === 'magicItemDetail'),
-                initPages,
-                nextPage,
-                onSearch
-            };
-        }
-    });
+  const showRightSide = computed(() => route.name === 'magicItemDetail');
 </script>

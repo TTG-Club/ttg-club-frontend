@@ -10,6 +10,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "importsNotUsedAsValues": "remove",
     "incremental": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -18,6 +19,11 @@
       "dom",
       "dom.iterable",
       "scripthost"
+    ],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
     ],
     "module": "esnext",
     "moduleResolution": "node",
@@ -32,7 +38,7 @@
       ]
     },
     "preserveConstEnums": true,
-    "preserveValueImports": true,
+    "preserveValueImports": false,
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
@@ -50,19 +56,14 @@
     "types": [
       "webpack-env"
     ],
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true,
   },
   "exclude": [
     "node_modules"
   ],
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "src/**/*.vue",
-    "src/**/*.json"
+    "src/**/*",
   ]
 }

@@ -113,7 +113,7 @@ ul li {
 strong,
 b {
   font-weight: 600;
-  color: var(--text-b-color);
+  color: var(--text-color-title);
 }
 
 .btn_text {
@@ -423,15 +423,21 @@ table th,
 table thead th {
   padding: 4px 4px;
   font-size: var(--main-font-size);
-  // background: var(--bg-liner-divider);
   background: var(--primary);
+  color: var(--text-btn-color);
+  font-weight: 300;
+}
+
+table th b,
+table th strong,
+table thead th b,
+table thead th strong {
   color: var(--text-btn-color);
   font-weight: 300;
 }
 
 table td {
   border-right: 1px solid var(--border);
-  /* border-bottom: 1px solid var(--border); */
   height: 30px;
   padding: 4px 4px;
 }
