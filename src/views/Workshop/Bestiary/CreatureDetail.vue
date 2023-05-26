@@ -38,6 +38,7 @@
   import { useAxios } from '@/common/composition/useAxios';
   import type { ICreature } from '@/types/Workshop/Bestiary.types';
   import type { Maybe } from '@/types/Shared/Utility.types';
+  import { downloadByUrl } from '@/common/helpers/download';
 
   export default defineComponent({
     components: {
@@ -62,9 +63,15 @@
       const abortController = ref<AbortController | null>(null);
 
       const exportFoundry = () => {
-        if (!creature.value) return;
+        if (!creature.value) {
+          return Promise.reject();
+        }
 
-        window.open(`/api/fvtt/v1/bestiary/${ creature.value.id }`, '_self');
+        try {
+          return downloadByUrl(`/api/fvtt/v1/bestiary/${ creature.value.id }`);
+        } catch (err) {
+          return Promise.reject(err);
+        }
       };
 
       const creatureInfoQuery = async (url: string) => {
