@@ -482,8 +482,6 @@
       return [];
     }
 
-    console.log(props.creature.savingThrows);
-
     return props.creature.savingThrows.map(save => ({
       formula: `к20+${ save.value }`,
       label: save.shortName,
