@@ -10,7 +10,7 @@
     <virtual-grouped-list
       :list="getListProps({ items })"
       :get-group="getGroupByRarity"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item }">
         <magic-item-link
@@ -36,6 +36,7 @@
   import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
   import type { AnyObject } from "@/types/Shared/Utility.types";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
 
   const route = useRoute();
   const router = useRouter();

@@ -303,7 +303,7 @@
           border-radius: 12px;
         }
 
-        &.is-showed-right-side {
+        &.is-showed-right-side:not(.is-fullscreen) {
           width: 100%;
 
           @include media-min($xl) {
@@ -380,7 +380,7 @@
           @include media-min($xl) {
             width: var(--max-content);
             max-width: var(--max-content);
-            margin-left: -40%;
+            margin-left: -100%;
             z-index: 16;
             height: calc(var(--max-vh) - 48px);
           }

@@ -10,7 +10,7 @@
   >
     <virtual-grouped-list
       :list="getListProps({ items: options })"
-      :grid="{ flat: showRightSide }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
       :get-group="getGroupByFirstLetter"
     >
       <template #default="{ item: option }">
@@ -40,6 +40,7 @@
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupByFirstLetter } from "@/common/helpers/list";
   import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
 
   type TProps = {
     inTab?: boolean,
