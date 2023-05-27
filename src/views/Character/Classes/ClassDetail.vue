@@ -329,16 +329,51 @@
     router.push({ path });
   };
 
-  const scrollToSection = e => {
+  const scrollToSection = (hash: string) => {
+    if (!hash || !(classBody.value instanceof HTMLDivElement)) {
+      return;
+    }
+
+    const formattedHash = hash.startsWith('#')
+      ? hash
+      : `#${ hash }`;
+
+    const section = classBody.value.querySelector(formattedHash);
+
+    if (!section) {
+      return;
+    }
+
+    if (!route.hash) {
+      // const { href } = router.resolve(
+      //   {
+      //     path: route.path,
+      //     hash: formattedHash
+      //   },
+      //   route
+      // );
+      //
+      // window.history.replaceState({}, '', href);
+
+      router.replace({
+        path: route.path,
+        hash: formattedHash
+      });
+    }
+
+    classBody.value.scroll({
+      top: section.getBoundingClientRect().top - 119 - 56,
+      behavior: 'smooth'
+    });
+  };
+
+  const anchorClickHandler = e => {
     if (e.button) {
       return;
     }
 
     e.preventDefault();
-
-    if (!(classBody.value instanceof HTMLDivElement)) {
-      return;
-    }
+    e.stopPropagation();
 
     const { target } = e;
 
@@ -347,25 +382,25 @@
       .replace('#', '')
       .trim();
 
-    if (!hash) {
-      return;
+    if (hash) {
+      scrollToSection(hash);
+    }
+  };
+
+  const getAnchorLinks = () => {
+    if (!(classBody.value instanceof HTMLDivElement)) {
+      return [];
     }
 
-    const section = classBody.value.querySelector(`#${ hash }`);
+    const nodeList = classBody.value.querySelectorAll('[href^="#"]');
 
-    if (!section) {
-      return;
-    }
-
-    router.replace({
-      path: route.path,
-      hash
-    });
-
-    classBody.value.scroll({
-      top: section.getBoundingClientRect().top - 119 - 56,
-      behavior: 'smooth'
-    });
+    return Array.from(nodeList)
+      .filter(link => !!(
+        link
+          .getAttribute('href')
+          .replace('#', '')
+          .trim()
+      ));
   };
 
   const initScrollListeners = () => {
@@ -374,44 +409,17 @@
     }
 
     if (route.hash) {
-      const section = classBody.value.querySelector(route.hash);
-
-      if (!section) {
-        return;
-      }
-
-      classBody.value.scroll({
-        top: section.getBoundingClientRect().top - 119 - 56,
-        behavior: 'smooth'
-      });
+      scrollToSection(route.hash);
     }
 
-    const links = classBody.value
-      .querySelectorAll('[href^="#"]');
-
-    for (const link of links) {
-      const hash = !link
-        .getAttribute('href')
-        .replace('#', '')
-        .trim();
-
-      if (!hash) {
-        continue;
-      }
-
-      link.addEventListener('click', scrollToSection);
+    for (const link of getAnchorLinks()) {
+      link.addEventListener('click', anchorClickHandler);
     }
   };
 
   const removeScrollListeners = () => {
-    if (!(classBody.value instanceof HTMLDivElement)) {
-      return;
-    }
-
-    const links = classBody.value.querySelectorAll('[href^="#"]');
-
-    for (const link of links) {
-      link.removeEventListener('click', scrollToSection);
+    for (const link of getAnchorLinks()) {
+      link.removeEventListener('click', anchorClickHandler);
     }
   };
 
