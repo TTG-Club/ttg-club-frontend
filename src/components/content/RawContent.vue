@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
   import {
-    computed, defineComponent, h, onBeforeUnmount, ref, watch
+    computed, defineComponent, h, nextTick, onBeforeUnmount, ref, watch
   } from 'vue';
   import { useAxios } from '@/common/composition/useAxios';
 
@@ -41,12 +41,10 @@
           url: props.url
         });
 
-        templateString.value = data;
+        templateString.value = data as string;
       }
 
       loading.value = false;
-
-      emit('loaded');
 
       return Promise.resolve();
     } catch (err) {
@@ -66,7 +64,12 @@
       return h(props.tag, null, 'Ошибка...');
     }
 
-    return h(props.tag, null, h(defineComponent({ template: templateString.value })));
+    return h(props.tag, null, h(defineComponent({
+      mounted() {
+        emit('loaded');
+      },
+      template: templateString.value as string
+    })));
   });
 
   watch(
