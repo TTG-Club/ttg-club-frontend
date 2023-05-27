@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
   import {
-    computed, defineComponent, h, nextTick, onBeforeUnmount, ref, watch
+    computed, defineComponent, h, onBeforeUnmount, ref, watch
   } from 'vue';
   import { useAxios } from '@/common/composition/useAxios';
 
