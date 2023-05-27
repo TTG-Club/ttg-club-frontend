@@ -513,6 +513,14 @@
     }
   }
 
+  :deep(.multiselect--disabled) {
+    .multiselect {
+      &__select {
+        background: #ffffff0d;
+      }
+    }
+  }
+
   .ui-select {
     &__label {
       margin-bottom: 8px;
