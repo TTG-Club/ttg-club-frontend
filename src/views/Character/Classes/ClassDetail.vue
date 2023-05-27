@@ -93,6 +93,7 @@
           v-else-if="currentTab?.type === 'spells'"
           :filter-url="currentTab.url"
           :store-key="getStoreKey"
+          :query-books="queryBooks"
           in-tab
         />
 
@@ -100,6 +101,7 @@
           v-else-if="currentTab?.type === 'options'"
           :filter-url="currentTab.url"
           :store-key="getStoreKey"
+          :query-books="queryBooks"
           in-tab
         />
       </div>
@@ -146,6 +148,7 @@
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import { useAxios } from '@/common/composition/useAxios';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
   interface IEmit {
     (e: 'scroll-to-active'): void;
@@ -160,13 +163,7 @@
 
   const { isMobile } = storeToRefs(useUIStore());
 
-  const queryBooks = computedInject<Array<string>>('queryBooks', source => {
-    if (unref(source) instanceof Array) {
-      return unref(source);
-    }
-
-    return [];
-  });
+  const queryBooks = computedInject(DEFAULT_QUERY_BOOKS_INJECT_KEY, source => resolveUnref(source), []);
 
   const loading = ref(true);
   const error = ref(false);

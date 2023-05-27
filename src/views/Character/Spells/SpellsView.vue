@@ -25,13 +25,12 @@
 </template>
 
 <script setup lang="ts">
-  import type { PropType } from 'vue';
   import {
-    computed, defineComponent, onBeforeMount, unref, watch
+    computed, onBeforeMount, watch
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
-  import { computedInject } from '@vueuse/core';
+  import { resolveUnref } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import SpellLink from '@/views/Character/Spells/SpellLink.vue';
@@ -41,38 +40,20 @@
   import { SpellsFilterDefaults, TSpellLink } from '@/types/Character/Spells.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
   import { getListProps } from "@/components/list/VirtualList/helpers";
   import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-
-  // props: {
-  //   inTab: {
-  //     type: Boolean,
-  //   default: false
-  //   },
-  //   storeKey: {
-  //     type: String,
-  //   default: ''
-  //   },
-  //   filterUrl: {
-  //     type: String,
-  //   default: undefined
-  //   },
-  //   queryBooks: {
-  //     type: Array as PropType<Array<string>>,
-  //   default: undefined
-  //   }
-  // },
 
   const props = withDefaults(defineProps<{
     inTab?: boolean;
     storeKey?: string;
     filterUrl?: string;
+    queryBooks?: Array<string>;
   }>(), {
     inTab: false,
     storeKey: '',
-    filterUrl: ''
+    filterUrl: '',
+    queryBooks: undefined
   });
 
   const route = useRoute();
@@ -96,18 +77,10 @@
     url: computed(() => props.filterUrl || SpellsFilterDefaults.url)
   });
 
-  const queryBooks = computedInject<Array<string>>('queryBooks', source => {
-    if (unref(source) instanceof Array) {
-      return unref(source);
-    }
-
-    return [];
-  });
-
-  const isCustomized = computed(() => !!queryBooks.value.length || filter.isCustomized.value);
+  const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    const params = unref(filter.queryParams);
+    const params = resolveUnref(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return filter.queryParams.value;
@@ -115,7 +88,7 @@
 
     return {
       ...params,
-      book: queryBooks.value
+      book: props.queryBooks
     };
   });
 
@@ -158,7 +131,7 @@
 
   watch(
     [
-      queryBooks,
+      () => props.queryBooks,
       () => props.filterUrl,
       () => props.storeKey
     ],

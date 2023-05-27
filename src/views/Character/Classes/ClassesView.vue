@@ -45,6 +45,7 @@
   import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
   import cloneDeep from 'lodash/cloneDeep';
+  import { resolveUnref } from '@vueuse/shared';
   import { useUIStore } from '@/store/UI/UIStore';
   import ClassLink from '@/views/Character/Classes/ClassLink.vue';
   import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -54,6 +55,7 @@
     TClassArchetype, TClassArchetypeList, TClassItem, TClassList
   } from '@/types/Character/Classes.types';
   import { ClassesFilterDefaults } from '@/types/Character/Classes.types';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
   export default defineComponent({
 
@@ -147,13 +149,17 @@
         return getGroupClasses();
       });
 
-      provide('queryBooks', computed(() => {
-        if (filter.queryParams.value?.book instanceof Array) {
-          return filter.queryParams.value.book;
+      const books = computed(() => {
+        const params = resolveUnref(filter.queryParams);
+
+        if (params?.book instanceof Array) {
+          return params.book;
         }
 
         return [];
-      }));
+      });
+
+      provide(DEFAULT_QUERY_BOOKS_INJECT_KEY, books);
 
       onBeforeMount(async () => {
         await filter.initFilter();

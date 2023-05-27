@@ -26,11 +26,11 @@
 
 <script lang="ts" setup>
   import {
-    computed, onBeforeMount, watch, unref
+    computed, onBeforeMount, watch
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
-  import { computedInject } from '@vueuse/core';
+  import { resolveUnref } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import OptionLink from '@/views/Character/Options/OptionLink.vue';
@@ -45,15 +45,17 @@
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
-    inTab?: boolean,
-    storeKey?: string,
-    filterUrl?: string,
+    inTab?: boolean;
+    storeKey?: string;
+    filterUrl?: string;
+    queryBooks?: Array<string>;
   };
 
   const props = withDefaults(defineProps<TProps>(), {
     inTab: false,
     storeKey: '',
-    filterUrl: undefined
+    filterUrl: undefined,
+    queryBooks: undefined
   });
 
   const route = useRoute();
@@ -77,18 +79,10 @@
     url: computed(() => props.filterUrl || OptionsFilterDefaults.url)
   });
 
-  const queryBooks = computedInject<Array<string>>('queryBooks', source => {
-    if (unref(source) instanceof Array) {
-      return unref(source);
-    }
-
-    return [];
-  });
-
-  const isCustomized = computed(() => !!queryBooks.value.length || filter.isCustomized.value);
+  const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    const params = unref(filter.queryParams);
+    const params = resolveUnref(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return filter.queryParams.value;
@@ -96,7 +90,7 @@
 
     return {
       ...params,
-      book: queryBooks.value
+      book: props.queryBooks
     };
   });
 
@@ -135,7 +129,7 @@
 
   watch(
     [
-      queryBooks,
+      () => props.queryBooks,
       () => props.filterUrl,
       () => props.storeKey
     ],
