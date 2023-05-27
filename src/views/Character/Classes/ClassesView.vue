@@ -147,7 +147,13 @@
         return getGroupClasses();
       });
 
-      provide('queryBooks', () => filter.queryParams.value.book || []);
+      provide('queryBooks', computed(() => {
+        if (filter.queryParams.value?.book instanceof Array) {
+          return filter.queryParams.value.book;
+        }
+
+        return [];
+      }));
 
       onBeforeMount(async () => {
         await filter.initFilter();

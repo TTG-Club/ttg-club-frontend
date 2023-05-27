@@ -92,7 +92,6 @@
         <spells-view
           v-else-if="currentTab?.type === 'spells'"
           :filter-url="currentTab.url"
-          :query-books="providedQueryBooks"
           :store-key="getStoreKey"
           in-tab
         />
@@ -100,7 +99,6 @@
         <options-view
           v-else-if="currentTab?.type === 'options'"
           :filter-url="currentTab.url"
-          :query-books="providedQueryBooks"
           :store-key="getStoreKey"
           in-tab
         />
@@ -132,7 +130,7 @@
   import cloneDeep from 'lodash/cloneDeep';
   import VueEasyLightbox from 'vue-easy-lightbox';
   import {
-    computed, nextTick, onBeforeUnmount, onMounted, ref
+    computed, nextTick, onBeforeUnmount, onMounted, ref, unref
   } from 'vue';
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
   import {
@@ -162,7 +160,13 @@
 
   const { isMobile } = storeToRefs(useUIStore());
 
-  const queryBooks = computedInject('queryBooks', source => source);
+  const queryBooks = computedInject<Array<string>>('queryBooks', source => {
+    if (unref(source) instanceof Array) {
+      return unref(source);
+    }
+
+    return [];
+  });
 
   const loading = ref(true);
   const error = ref(false);
@@ -173,10 +177,10 @@
 
   const gallery = ref<{
     show: boolean;
-    index: number | null
+    index: number;
   }>({
     show: false,
-    index: null
+    index: 0
   });
 
   const classBody = ref<HTMLDivElement>();
@@ -291,7 +295,7 @@
         url,
         payload: {
           filter: {
-            book: resolveUnref(queryBooks.value)
+            book: resolveUnref<Array<string>>(queryBooks)
           }
         },
         signal: abortController.value.signal
