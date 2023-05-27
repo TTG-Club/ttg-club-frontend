@@ -35,8 +35,8 @@
       <ui-button
         v-tippy="{ content: 'Перейти в режим редактирования' }"
         :type="!isEdit ? 'text' : 'default'"
+        :color="!isEdit ? 'text' : 'primary'"
         icon="edit"
-        color="text"
         size="sm"
         @click.left.exact.prevent="isEdit = !isEdit"
       />
