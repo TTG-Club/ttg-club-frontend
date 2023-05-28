@@ -7,7 +7,12 @@
       <slot name="label" />
     </div>
 
-    <div class="ui-select__wrapper">
+    <div
+      ref="wrapper"
+      class="ui-select__wrapper"
+      @focusin="focused = true"
+      @focusout="focused = false"
+    >
       <ui-input
         v-model="selectedOption"
         :placeholder="placeholder"
@@ -15,14 +20,14 @@
 
       <div
         class="ui-select__select"
-        @mousedown.left.exact.prevent.stop="toggle()"
+        @click="toggleFocus"
       >
-        <svg-icon icon-name="arrow-stroke" />
+        <svg-icon :icon="iconToggle" />
       </div>
     </div>
 
     <div
-      v-if="focused.value"
+      v-if="focused"
       class="ui-select"
     >
       <div
@@ -37,7 +42,9 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from "vue";
+  import {
+    computed, onMounted, ref
+  } from "vue";
   import UiInput from "@/components/UI/kit/UiInput.vue";
 
   const props = defineProps({
@@ -53,6 +60,20 @@
 
   const selectedOption = '';
   const focused = ref<Boolean>(false);
+  const wrapper = ref<Element | null>(null);
+
+  const iconToggle = computed(() => {
+    if (focused.value) {
+      return "arrow/up";
+    }
+
+    return "arrow/down";
+  });
+
+  const toggleFocus = computed(
+    () => {
+    return focused.value = !focused.value;
+  });
 </script>
 
 <style lang="scss" scoped>

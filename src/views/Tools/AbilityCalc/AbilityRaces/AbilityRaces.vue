@@ -1,4 +1,13 @@
 <template>
+  <ui-dropdown
+    placeholder="Все расы"
+    :options="races"
+  >
+    <template #label>
+      Расы
+    </template>
+  </ui-dropdown>
+
   <div class="ability-races">
     <div
       :class="{ 'is-empty': !checkInstance }"
@@ -205,6 +214,7 @@
   import RaceLink from '@/views/Character/Races/RaceLink.vue';
   import { usePagination } from '@/common/composition/usePagination';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
+  import UiDropdown from "@/components/UI/kit/UiDropdown.vue";
   import type { AbilityRoll, ChoiceDouble } from '@/types/Tools/AbilityCalc.types';
   import {
     AbilityChoiceDouble,
