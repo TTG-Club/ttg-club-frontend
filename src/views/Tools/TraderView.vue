@@ -12,7 +12,7 @@
 
               <ui-select
                 v-model="magicLevelsValue"
-                :options="magicLevels"
+                :options="config.magicLevels"
                 label="name"
                 track-by="value"
               >
@@ -30,6 +30,7 @@
                 class="form-control select"
                 type="number"
                 :min="1"
+                :max="50"
                 placeholder="Харизма (Убеждение)"
               />
             </div>
@@ -44,6 +45,19 @@
           >
             Только уникальные
           </ui-checkbox>
+        </div>
+
+        <div class="tools_settings__row">
+          <span class="label">Источники:</span>
+
+          <div class="checkbox-group">
+            <ui-switch
+              v-model="currentPriceSource"
+              track-by="shortName"
+              label="shortName"
+              :options="config.sources"
+            />
+          </div>
         </div>
 
         <div
@@ -121,6 +135,7 @@
         :is-active="selected.index === key"
         :magic-item="item"
         :to="{ path: item.url }"
+        :price-source="currentPriceSource"
         in-tools
         in-trader
         @select-item="selectItem(key)"
@@ -149,6 +164,7 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiSwitch from '@/components/UI/kit/UiSwitch.vue';
 
   export default {
     name: 'TraderView',
@@ -162,10 +178,17 @@
       UiCheckbox,
       SectionHeader,
       UiSelect,
-      ContentLayout
+      ContentLayout,
+      UiSwitch
     },
     data: () => ({
-      magicLevels: [],
+      config: {
+        magicLevels: [],
+        sources: []
+      },
+      currentPriceSource: {
+
+      },
       form: {
         magicLevel: 1,
         persuasion: 1,
@@ -197,7 +220,7 @@
 
       magicLevelsValue: {
         get() {
-          return this.magicLevels.find(el => el.value === this.form.magicLevel);
+          return this.config.magicLevels.find(el => el.value === this.form.magicLevel);
         },
 
         set(e) {
@@ -237,13 +260,13 @@
       }
     },
     async beforeMount() {
-      await this.getLevels();
+      await this.getConfig();
     },
     mounted() {
       this.showRightSide = !this.isMobile;
     },
     methods: {
-      async getLevels() {
+      async getConfig() {
         try {
           const resp = await this.$http.get({
             url: '/tools/trader'
@@ -255,7 +278,7 @@
             return;
           }
 
-          this.magicLevels = resp.data;
+          this.config = resp.data;
         } catch (err) {
           errorHandler(err);
         }

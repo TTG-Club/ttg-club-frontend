@@ -52,7 +52,7 @@
               v-if="inTrader"
               class="link-item__price"
             >
-              {{ `${ magicItem.custom?.price || magicItem.price || 0 } зм` }}
+              {{ `${ currentPrice || 0 }` }}
             </div>
           </div>
         </div>
@@ -89,7 +89,12 @@
       inTrader: {
         type: Boolean,
         default: false
+      },
+      priceSource: {
+        type: Object,
+        default: undefined
       }
+
     },
     setup(props, { emit }) {
       const {
@@ -113,10 +118,13 @@
         navigate();
       };
 
+      const currentPrice = computed(() => props.magicItem.price[props.priceSource?.shortName.toLowerCase()]);
+
       return {
         href,
         classList,
-        clickHandler
+        clickHandler,
+        currentPrice
       };
     }
   });
