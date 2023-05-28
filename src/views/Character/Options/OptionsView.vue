@@ -30,6 +30,7 @@
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
+  import { resolveUnref } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import OptionLink from '@/views/Character/Options/OptionLink.vue';
@@ -44,10 +45,10 @@
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
-    inTab?: boolean,
-    storeKey?: string,
-    filterUrl?: string,
-    queryBooks?: string[],
+    inTab?: boolean;
+    storeKey?: string;
+    filterUrl?: string;
+    queryBooks?: Array<string>;
   };
 
   const props = withDefaults(defineProps<TProps>(), {
@@ -81,14 +82,16 @@
   const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    if (props.queryBooks) {
-      return {
-        ...filter.queryParams.value,
-        book: props.queryBooks
-      };
+    const params = resolveUnref(filter.queryParams);
+
+    if (params?.book instanceof Array) {
+      return filter.queryParams.value;
     }
 
-    return filter.queryParams.value;
+    return {
+      ...params,
+      book: props.queryBooks
+    };
   });
 
   const {

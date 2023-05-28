@@ -121,25 +121,19 @@
       const customBookmarkStore = useCustomBookmarkStore();
       const { isMobile } = storeToRefs(uiStore);
 
-      const updateBookmark = async (change: { element: { uuid: any; name: any; url: any; }; newIndex: any; }) => {
+      const updateBookmark = async (change: { element: IBookmarkItem; newIndex: any; }) => {
         if (!change) {
           return;
         }
 
         const {
-          element: {
-            uuid,
-            name,
-            url
-          },
+          element,
           newIndex: order
         } = change;
 
         await customBookmarkStore.queryUpdateBookmark({
-          uuid,
-          name,
+          ...element,
           order,
-          url,
           parentUUID: props.category.uuid
         });
       };
