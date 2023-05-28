@@ -31,7 +31,7 @@
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
-        is-password
+        type="password"
         placeholder="Новый пароль"
         required
         @blur="v$.password.$touch()"
@@ -49,7 +49,7 @@
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
-        is-password
+        type="password"
         placeholder="Повторите пароль"
         required
         @blur="v$.repeat.$touch()"
@@ -59,7 +59,9 @@
 
     <div class="form__row">
       <ui-button
-        :disabled="success || inProgress"
+        :disabled="success"
+        :loading="inProgress"
+        native-type="submit"
         @click.left.exact.prevent="onSubmit"
       >
         {{ isOnlyPassword ? 'Изменить пароль' : 'Восстановить пароль' }}
@@ -67,7 +69,7 @@
 
       <ui-button
         v-if="!isAuthenticated"
-        type-link
+        type="secondary"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
         Авторизация
@@ -88,7 +90,7 @@
   import { storeToRefs } from 'pinia';
   import { useToast } from 'vue-toastification';
   import { useRouter } from 'vue-router';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import { useUserStore } from '@/store/UI/UserStore';
   import {

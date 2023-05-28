@@ -18,7 +18,7 @@
         :options="tabs"
         class="ability-calc__row"
         pre-select-first
-        use-full-width
+        full-width
       />
 
       <transition

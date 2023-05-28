@@ -25,7 +25,7 @@
         autocapitalize="off"
         autocomplete="current-password"
         autocorrect="off"
-        is-password
+        type="password"
         placeholder="Пароль"
         required
         @blur="v$.password.$touch()"
@@ -44,21 +44,23 @@
 
     <div class="form__row">
       <ui-button
-        :disabled="success || inProgress"
+        :disabled="success"
+        :loading="inProgress"
+        native-type="submit"
         @click.left.exact.prevent="onSubmit"
       >
         Вход
       </ui-button>
 
       <ui-button
-        type-link
+        type="secondary"
         @click.left.exact.prevent="$emit('switch:reg')"
       >
         Регистрация
       </ui-button>
 
       <ui-button
-        type-link
+        type="secondary"
         @click.left.exact.prevent="$emit('switch:change-password')"
       >
         Забыли пароль?
@@ -76,7 +78,7 @@
   import { useToast } from 'vue-toastification';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import { useUserStore } from '@/store/UI/UserStore';
   import {
     validateEmailFormat,

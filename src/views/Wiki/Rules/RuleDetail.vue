@@ -2,7 +2,6 @@
   <content-detail class="rule-detail">
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :copy="!error && !loading"
         :fullscreen="!isMobile"
         :subtitle="rule?.name?.eng || ''"

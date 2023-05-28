@@ -104,7 +104,7 @@
   import errorHandler from '@/common/helpers/errorHandler';
   import RawContent from '@/components/content/RawContent.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import BaseModal from '@/components/UI/modals/BaseModal.vue';
   import RollTable from '@/components/UI/RollTable.vue';
 

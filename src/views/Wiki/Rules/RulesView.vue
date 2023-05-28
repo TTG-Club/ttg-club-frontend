@@ -8,8 +8,8 @@
     @list-end="nextPage"
   >
     <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: rules, keyField: 'url' }"
+      :list="getListProps({ items: rules })"
+      :flat="checkIsListGridFlat({ showRightSide, fullscreen })"
     >
       <template #default="{ item: rule }">
         <rule-link
@@ -32,6 +32,9 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
@@ -53,7 +56,6 @@
     items: rules
   } = usePagination({
     url: '/rules',
-    limit: 70,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
@@ -70,7 +72,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (rules.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(rules)) {
       await router.push({ path: rules.value[0].url });
     }
   };
@@ -78,10 +80,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && rules.value.length && route.name === 'rules') {
-      await router.push({ path: rules.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'ruleDetail');

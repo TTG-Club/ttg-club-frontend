@@ -45,7 +45,7 @@
   import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
   import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { useAbilityTransforms } from '@/common/composition/useAbilityTransforms';
+  import { getFormattedModifier } from '@/common/helpers/abilityTransforms';
 
   export default defineComponent({
     components: {
@@ -58,8 +58,6 @@
       }
     },
     setup(props, { emit }) {
-      const { getFormattedModifier } = useAbilityTransforms();
-
       const rolls = ref<Array<AbilityRoll>>([
         {
           name: null,

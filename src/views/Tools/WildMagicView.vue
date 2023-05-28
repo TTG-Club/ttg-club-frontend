@@ -12,10 +12,10 @@
 
               <ui-input
                 v-model="count"
-                :min="1"
                 class="form-control select"
-                is-number
-                placeholder="Количеств"
+                type="number"
+                :min="1"
+                placeholder="Количество"
               />
             </div>
 
@@ -79,7 +79,7 @@
   import RawContent from '@/components/content/RawContent.vue';
   import errorHandler from '@/common/helpers/errorHandler';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   export default {
     name: 'WildMagicView',

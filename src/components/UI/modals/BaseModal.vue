@@ -1,6 +1,6 @@
 <template>
   <vue-final-modal
-    v-slot="{ params, close }"
+    v-model="isShowModal"
     class="base-modal"
     content-transition="vfm-fade"
     esc-to-close
@@ -22,18 +22,16 @@
 
         <ui-button
           class="base-modal__close"
-          is-icon
-          type-link
-          @click.left.exact.prevent="close"
-        >
-          <svg-icon icon-name="close" />
-        </ui-button>
+          icon="close"
+          type="secondary"
+          @click.left.exact.prevent="onClose"
+        />
       </div>
 
       <div class="base-modal__content">
         <div class="base-modal__safe">
           <div class="base-modal__body">
-            <slot :params="params" />
+            <slot @close="onClose" />
           </div>
         </div>
       </div>
@@ -43,8 +41,8 @@
         class="base-modal__footer"
       >
         <slot
-          :close="close"
           name="footer"
+          @close="onClose"
         />
       </div>
 
@@ -52,13 +50,13 @@
         v-else-if="typeConfirm"
         class="base-modal__footer"
       >
-        <ui-button @click.left.exact.prevent="$emit('confirm', close)">
+        <ui-button @click.left.exact.prevent="onConfirm">
           Применить
         </ui-button>
 
         <ui-button
           type-outline
-          @click.left.exact.prevent="close"
+          @click.left.exact.prevent="onClose"
         >
           Отменить
         </ui-button>
@@ -68,13 +66,13 @@
         v-else-if="typeRemove"
         class="base-modal__footer"
       >
-        <ui-button @click.left.exact.prevent="$emit('confirm', close)">
+        <ui-button @click.left.exact.prevent="onConfirm">
           Удалить
         </ui-button>
 
         <ui-button
           type-outline
-          @click.left.exact.prevent="close"
+          @click.left.exact.prevent="onClose"
         >
           Отменить
         </ui-button>
@@ -86,7 +84,7 @@
       >
         <ui-button
           type-outline
-          @click.left.exact.prevent="close"
+          @click.left.exact.prevent="onClose"
         >
           Закрыть
         </ui-button>
@@ -98,7 +96,7 @@
       >
         <ui-button
           outline
-          @click.left.exact.prevent="close"
+          @click.left.exact.prevent="onClose"
         >
           Закрыть
         </ui-button>
@@ -110,11 +108,18 @@
 <script lang="ts" setup>
   import { VueFinalModal } from 'vue-final-modal';
   import { computed } from 'vue';
+  import { useVModel } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
-  import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
+  interface IEmits {
+    (e: 'close'): void;
+    (e: 'confirm'): void;
+  }
 
   const props = withDefaults(defineProps<{
+    modelValue: boolean;
     typeConfirm?: boolean;
     typeRemove?: boolean;
     typeNotify?: boolean;
@@ -128,7 +133,9 @@
     bookmark: undefined
   });
 
-  const emit = defineEmits(['confirm']);
+  const emit = defineEmits<IEmits>();
+
+  const isShowModal = useVModel(props, 'modelValue');
 
   const type = computed(() => {
     if (props.typeConfirm) {
@@ -149,6 +156,18 @@
 
     return '';
   });
+
+  const onConfirm = () => {
+    isShowModal.value = false;
+
+    emit('confirm');
+  };
+
+  const onClose = () => {
+    isShowModal.value = false;
+
+    emit('close');
+  };
 </script>
 
 <style lang="scss" scoped>

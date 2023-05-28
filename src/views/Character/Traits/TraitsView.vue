@@ -6,9 +6,10 @@
     @search="onSearch"
     @update="initPages"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: traits, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="getListProps({ items: traits })"
+      :get-group="getGroupByFirstLetter"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item: trait }">
         <trait-link
@@ -16,7 +17,7 @@
           :trait-item="trait"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -30,7 +31,11 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
     storeKey?: string;
@@ -76,7 +81,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (traits.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(traits)) {
       await router.push({ path: traits.value[0].url });
     }
   };
@@ -84,10 +89,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && traits.value.length && route.name === 'traits') {
-      await router.push({ path: traits.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'traitDetail');

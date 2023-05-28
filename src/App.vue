@@ -48,8 +48,13 @@
     });
   };
 
+  const initFullscreen = async () => {
+    await uiStore.restoreFullscreenState();
+  };
+
   tryOnBeforeMount(async () => {
     await initTheme();
     await initUser();
+    await initFullscreen();
   });
 </script>

@@ -5,44 +5,33 @@
   >
     <div class="filter__body">
       <div class="filter__search">
-        <label class="filter__search_field">
-          <span class="filter__search_field_icon">
-            <svg-icon icon-name="search" />
-          </span>
+        <div
+          class="filter__search_field"
+          :class="{ 'has-filter': !!filter }"
+        >
+          <div class="filter__search_field_icon">
+            <svg-icon icon="search" />
+          </div>
 
-          <input
+          <ui-input
             v-model.trim="search"
             :autocomplete="false"
             :spellcheck="false"
             placeholder="Поиск..."
-            type="text"
-          >
-        </label>
-
-        <button
-          v-if="!!search"
-          v-tippy="{ content: 'Стереть строку поиска' }"
-          class="filter__search_clear"
-          type="button"
-          @click.left.exact.prevent="search = ''"
-        >
-          <svg-icon icon-name="close" />
-        </button>
+            is-clearable
+          />
+        </div>
       </div>
 
       <button
         v-if="filter"
         v-tippy="{ content: showed ? 'Скрыть фильтры' : 'Показать фильтры' }"
-        :class="{ 'is-opened': showed }"
+        :class="{ 'is-active': isFilterCustomized }"
         class="filter__button"
         type="button"
         @click.left.exact.prevent="showed = !showed"
       >
-        <svg-icon
-          :fill-enable="true"
-          :icon-name="isFilterCustomized ? 'filter-customized' : 'filter'"
-          :stroke-enable="false"
-        />
+        <svg-icon :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`" />
 
         <span>Фильтр</span>
       </button>
@@ -51,10 +40,11 @@
         v-if="!!filter && isFilterCustomized"
         v-tippy="'Сбросить все фильтры'"
         class="filter__button"
+        :class="{ 'is-active': isFilterCustomized }"
         type="button"
         @click.left.exact.prevent="resetFilter"
       >
-        <svg-icon icon-name="clear-filter" />
+        <svg-icon icon="clear" />
       </button>
     </div>
 
@@ -78,7 +68,7 @@
             <filter-item-checkboxes
               v-for="(block, blockKey) in otherFiltered"
               :key="blockKey"
-              :expand="block.expand"
+              :expand="block.expand || false"
               :model-value="block.values"
               :name="block.name"
               :type="block.type || 'crumb'"
@@ -97,7 +87,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import cloneDeep from 'lodash/cloneDeep';
   import type { PropType } from 'vue';
   import {
@@ -112,133 +102,111 @@
   import type {
     Filter, FilterComposable, FilterGroup, FilterItem
   } from '@/common/composition/useFilter';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
 
-  export default defineComponent({
-
-    components: {
-      BaseModal,
-      FilterItemCheckboxes,
-      FilterItemSources,
-      SvgIcon
+  const props = defineProps({
+    filterInstance: {
+      type: Object as PropType<FilterComposable>,
+      required: true
     },
-    props: {
-      filterInstance: {
-        type: Object as PropType<FilterComposable>,
-        required: true
-      },
-      inTab: {
-        type: Boolean,
-        default: false
-      }
+    inTab: {
+      type: Boolean,
+      default: false
+    }
+  });
+
+  const emit = defineEmits(['search', 'update']);
+
+  const showed = ref(false);
+
+  const emitSearch = useDebounceFn(value => {
+    emit('search', value);
+  }, 500);
+
+  const emitFilter = useDebounceFn(() => {
+    emit('update');
+  }, 500);
+
+  const search = computed({
+    get() {
+      return props.filterInstance.search.value.value;
     },
-    setup(props, { emit }) {
-      const showed = ref(false);
+    set(value: string) {
+      emitSearch(props.filterInstance.search.updateSearch(value));
+    }
+  });
 
-      const emitSearch = useDebounceFn(value => {
-        emit('search', value);
-      }, 500);
-
-      const emitFilter = useDebounceFn(() => {
-        emit('update');
-      }, 500);
-
-      const search = computed({
-        get() {
-          return props.filterInstance.search.value.value;
-        },
-        set(value: string) {
-          emitSearch(props.filterInstance.search.updateSearch(value));
-        }
-      });
-
-      const filter = computed<Filter | Array<FilterGroup> | undefined>({
-        get: () => props.filterInstance.filter.value,
-        set: async value => {
-          try {
-            if (!value) {
-              return;
-            }
-
-            await props.filterInstance.saveFilter(value);
-
-            emitFilter();
-          } catch (err) {
-            errorHandler(err);
-          }
-        }
-      });
-
-      const otherFilters = computed({
-        get(): Array<FilterGroup> {
-          if (Array.isArray(filter.value)) {
-            return filter.value;
-          }
-
-          return filter.value?.other || [];
-        },
-
-        set(value: Array<FilterGroup>) {
-          if (Array.isArray(filter.value)) {
-            filter.value = value;
-
-            return;
-          }
-
-          if (filter.value?.other) {
-            filter.value = {
-              ...filter.value,
-              other: value as Array<FilterGroup>
-            };
-          }
-        }
-      });
-
-      const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
-      const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
-
-      const setSourcesValue = (value: Array<FilterGroup>) => {
-        if (!filter.value || Array.isArray(filter.value)) {
+  const filter = computed<Filter | Array<FilterGroup> | undefined>({
+    get: () => props.filterInstance.filter.value,
+    set: async value => {
+      try {
+        if (!value) {
           return;
         }
 
-        filter.value = {
-          ...filter.value,
-          sources: value
-        };
-      };
+        await props.filterInstance.saveFilter(value);
 
-      const setOtherValue = (value: Array<FilterItem>, key: string) => {
-        const otherFiltersCopy = cloneDeep(otherFilters.value);
-        const index = otherFiltersCopy.findIndex(group => group.key === key);
-
-        if (index > -1) {
-          otherFiltersCopy[index].values = value;
-
-          otherFilters.value = otherFiltersCopy;
-        }
-      };
-
-      const resetFilter = async () => {
-        await props.filterInstance.resetFilter();
-
-        emitFilter();
-      };
-
-      return {
-        showed,
-
-        search,
-        filter,
-        otherFilters,
-        otherFiltered,
-        isFilterCustomized,
-
-        setSourcesValue,
-        setOtherValue,
-        resetFilter
-      };
+        await emitFilter();
+      } catch (err) {
+        errorHandler(err);
+      }
     }
   });
+
+  const otherFilters = computed({
+    get(): Array<FilterGroup> {
+      if (Array.isArray(filter.value)) {
+        return filter.value;
+      }
+
+      return filter.value?.other || [];
+    },
+
+    set(value: Array<FilterGroup>) {
+      if (Array.isArray(filter.value)) {
+        filter.value = value;
+
+        return;
+      }
+
+      if (filter.value?.other) {
+        filter.value = {
+          ...filter.value,
+          other: value as Array<FilterGroup>
+        };
+      }
+    }
+  });
+
+  const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
+  const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
+
+  const setSourcesValue = (value: Array<FilterGroup>) => {
+    if (!filter.value || Array.isArray(filter.value)) {
+      return;
+    }
+
+    filter.value = {
+      ...filter.value,
+      sources: value
+    };
+  };
+
+  const setOtherValue = (value: Array<FilterItem>, key: string) => {
+    const otherFiltersCopy = cloneDeep(otherFilters.value);
+    const index = otherFiltersCopy.findIndex(group => group.key === key);
+
+    if (index > -1) {
+      otherFiltersCopy[index].values = value;
+
+      otherFilters.value = otherFiltersCopy;
+    }
+  };
+
+  const resetFilter = async () => {
+    await props.filterInstance.resetFilter();
+    await emitFilter();
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -272,45 +240,21 @@
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          color: var(--text-color);
 
           svg {
             width: 24px;
             height: 24px;
-            color: var(--primary);
           }
         }
 
-        input {
-          width: 100%;
-          height: 100%;
-          border: 0;
-          background-color: transparent;
-          color: var(--text-color);
-          padding: 0;
-        }
-      }
-
-      &_clear {
-        @include css_anim();
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 42px;
-        height: 42px;
-        flex-shrink: 0;
-        color: var(--primary);
-
-        @include media-min($md) {
-          &:hover {
-            color: var(--text-btn-color);
-            background-color: var(--primary-hover);
+        &.has-filter {
+          :deep(.ui-input__control) {
+            border: {
+              top-right-radius: 0;
+              bottom-right-radius: 0;
+            };
           }
-        }
-
-        svg {
-          width: 16px;
-          height: 16px;
         }
       }
     }
@@ -341,10 +285,14 @@
         color: var(--text-btn-color);
       }
 
-      &.is-opened {
+      &.is-active {
         @include css_anim();
 
-        background-color: var(--primary-active);
+        background-color: var(--warning);
+
+        &:hover {
+          background-color: var(--warning-hover);
+        }
 
         svg {
           color: var(--text-btn-color);
@@ -393,6 +341,15 @@
       @include media-min($xl) {
         padding: 0 24px;
       }
+    }
+  }
+
+  :deep(.ui-input__control) {
+    border: 0;
+    background-color: transparent;
+
+    .ui-input__input {
+      padding: 0;
     }
   }
 </style>

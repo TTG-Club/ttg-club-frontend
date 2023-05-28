@@ -57,6 +57,8 @@
   import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
   import errorHandler from '@/common/helpers/errorHandler';
   import { useAxios } from '@/common/composition/useAxios';
+  import type { IScreenItem, IScreenLink } from '@/types/Workshop/Screens.types';
+  import type { Maybe } from '@/types/Shared/Utility.types';
 
   export default defineComponent({
     components: {
@@ -71,7 +73,7 @@
         required: true
       },
       screen: {
-        type: Object,
+        type: Object as PropType<IScreenLink>,
         default: () => ({}),
         required: true
       }
@@ -80,7 +82,10 @@
       const http = useAxios();
       const { href } = useLink(props);
 
-      const modal = ref({
+      const modal = ref<{
+        show: boolean;
+        data: Maybe<IScreenItem>
+      }>({
         data: undefined,
         show: false
       });
@@ -99,7 +104,7 @@
           loading.value = true;
           abortController.value = new AbortController();
 
-          const resp = await http.post({
+          const resp = await http.post<IScreenItem>({
             url: href.value,
             signal: abortController.value.signal
           });

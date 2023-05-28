@@ -1,6 +1,6 @@
 <template>
   <div class="icon-toast-close">
-    <svg-icon icon-name="close" />
+    <svg-icon icon="close" />
   </div>
 </template>
 

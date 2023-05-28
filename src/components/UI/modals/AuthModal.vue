@@ -1,6 +1,6 @@
 <template>
   <vue-final-modal
-    v-slot="{ close }"
+    v-model="isShowModal"
     class="auth-reg-modal"
     content-transition="vfm-fade"
     esc-to-close
@@ -18,20 +18,18 @@
       <div class="auth-reg-modal__content">
         <ui-button
           class="auth-reg-modal__close"
-          is-icon
-          type-link
-          @click.left.exact.prevent="$emit('close')"
-        >
-          <svg-icon icon-name="close" />
-        </ui-button>
+          icon="close"
+          type="secondary"
+          @click.left.exact.prevent="onClose"
+        />
 
         <div class="auth-reg-modal__body">
           <h4>{{ title }}</h4>
 
           <div class="auth-reg-modal__form">
             <slot
-              :close="close"
               name="default"
+              @close="onClose"
             />
           </div>
         </div>
@@ -42,14 +40,30 @@
 
 <script lang="ts" setup>
   import { VueFinalModal } from 'vue-final-modal';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import { useVModel } from '@vueuse/core';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-  withDefaults(defineProps<{
+  interface IEmit {
+    (e: 'close'): void;
+  }
+
+  const props = withDefaults(defineProps<{
+    modelValue: boolean;
     title?: string;
   }>(), {
     title: ''
   });
+
+  const emit = defineEmits<IEmit>();
+
+  const isShowModal = useVModel(props, 'modelValue');
+
+  const onClose = () => {
+    isShowModal.value = false;
+
+    emit('close');
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -100,9 +114,6 @@
     &__close {
       @include css_anim();
 
-      padding: 4px;
-      width: 40px;
-      height: 40px;
       position: absolute;
       top: 12px;
       right: 12px;

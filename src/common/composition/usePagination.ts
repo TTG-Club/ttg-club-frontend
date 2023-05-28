@@ -10,6 +10,7 @@ import errorHandler from '@/common/helpers/errorHandler';
 import { useAxios } from '@/common/composition/useAxios';
 import type { RequestConfig } from '@/common/services/HTTPService';
 import { useMetrics } from '@/common/composition/useMetrics';
+import { DEFAULT_PAGINATION_ITEMS_LIMIT } from '@/common/const';
 
 export type PaginationSearch = {
   value: MaybeRef<string>
@@ -47,7 +48,7 @@ export type PaginationConfig = {
   filter?: MaybeRef<PaginationFilter>
 }
 
-export function usePagination(config: PaginationConfig) {
+export function usePagination<T>(config: PaginationConfig) {
   let abortController: AbortController | null;
 
   const route = useRoute();
@@ -60,7 +61,7 @@ export function usePagination(config: PaginationConfig) {
 
   const items = ref<Array<any>>([]);
   const page = ref(unref(config.page) || 0);
-  const limit = computed(() => unref(config.limit) || 70);
+  const limit = computed(() => unref(config.limit) || DEFAULT_PAGINATION_ITEMS_LIMIT);
   const isEnd = ref(unref(config.limit) === -1 || false);
 
   const payload = computed((): PaginationQuery => {
@@ -113,7 +114,7 @@ export function usePagination(config: PaginationConfig) {
         signal: abortController.signal
       };
 
-      const resp = await http.post(apiConfig);
+      const resp = await http.post<Array<T>>(apiConfig);
 
       if (nextPage) {
         items.value.push(...resp.data);

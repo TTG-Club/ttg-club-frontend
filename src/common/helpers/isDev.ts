@@ -3,7 +3,7 @@ import {
   getCurrentInstance, inject, provide
 } from 'vue';
 
-const isDev: boolean = !!process?.env?.VUE_APP_DEV && (process?.env?.VUE_APP_DEV === 'true');
+const isDev = process?.env?.VUE_APP_DEV === 'true';
 const isDevInjectionKey: InjectionKey<boolean> = Symbol('isDev');
 
 const provideIsDev = () => {

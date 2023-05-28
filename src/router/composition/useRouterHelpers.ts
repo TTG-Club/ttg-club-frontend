@@ -10,7 +10,7 @@ export const useRouterHelpers = () => {
     const axios = useAxios();
 
     try {
-      const resp = await axios.headRaw({ url: to.fullPath });
+      const resp = await axios.rawHead({ url: to.fullPath });
 
       return Promise.resolve(resp.status);
     } catch (err) {

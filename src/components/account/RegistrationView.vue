@@ -39,7 +39,7 @@
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
-        is-password
+        type="password"
         placeholder="Пароль"
         required
         @blur="v$.password.$touch()"
@@ -54,7 +54,7 @@
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
-        is-password
+        type="password"
         placeholder="Повторите пароль"
         required
         @blur="v$.repeat.$touch()"
@@ -64,14 +64,16 @@
 
     <div class="form__row">
       <ui-button
-        :disabled="success || inProgress"
+        :disabled="success"
+        :loading="inProgress"
+        native-type="submit"
         @click.left.exact.prevent="onSubmit"
       >
         Регистрация
       </ui-button>
 
       <ui-button
-        type-link
+        type="secondary"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
         Авторизация
@@ -88,7 +90,7 @@
   import { helpers, sameAs } from '@vuelidate/validators';
   import { useToast } from 'vue-toastification';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import {
     validateEmailExist,
     validateEmailFormat,

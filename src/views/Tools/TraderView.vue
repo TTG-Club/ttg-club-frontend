@@ -28,7 +28,8 @@
               <ui-input
                 v-model="form.persuasion"
                 class="form-control select"
-                is-number
+                type="number"
+                :min="1"
                 placeholder="Харизма (Убеждение)"
               />
             </div>
@@ -83,7 +84,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :close-on-desktop="fullscreen"
             :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'On sale'"
             :title="selected.item?.name.rus || 'В продаже'"
@@ -148,7 +148,7 @@
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   export default {
     name: 'TraderView',

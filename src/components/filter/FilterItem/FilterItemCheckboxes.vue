@@ -19,7 +19,7 @@
           type="button"
           @click.self.left.exact.prevent.stop="toggleBlock"
         >
-          <svg-icon icon-name="arrow-stroke" />
+          <svg-icon :icon="`arrow/${opened ? 'down' : 'right'}`" />
         </button>
       </div>
 
@@ -30,7 +30,7 @@
         type="button"
         @click.left.exact.prevent="resetValues"
       >
-        <svg-icon icon-name="close" />
+        <svg-icon icon="close" />
       </button>
     </div>
 

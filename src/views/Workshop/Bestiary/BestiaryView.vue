@@ -7,9 +7,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: bestiary, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="getListProps({ items: bestiary })"
+      :get-group="getGroupByChallengeRating"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item: creature }">
         <creature-link
@@ -17,7 +18,7 @@
           :to="{ path: creature.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -31,12 +32,16 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import type { AnyObject } from "@/types/Shared/Utility.types";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
-  const { isMobile } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     url: BestiaryFilterDefaults.url,
@@ -69,19 +74,20 @@
   const onSearch = async () => {
     await initPages();
 
-    if (!isMobile.value && bestiary.value.length) {
+    if (isAutoOpenAvailable(bestiary)) {
       await router.push({ path: bestiary.value[0].url });
     }
   };
+
+  const getGroupByChallengeRating = (item: AnyObject) => ({
+    name: item.challengeRating,
+    url: item.challengeRating
+  });
 
   onBeforeMount(async () => {
     await filter.initFilter();
 
     await initPages();
-
-    if (!isMobile.value && bestiary.value.length && route.name === 'bestiary') {
-      await router.push({ path: bestiary.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'creatureDetail');

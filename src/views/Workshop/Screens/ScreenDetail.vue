@@ -7,7 +7,6 @@
         :subtitle="screen?.name?.eng || ''"
         :title="screen?.name?.rus || ''"
         bookmark
-        close-on-desktop
         @close="close"
       />
     </template>

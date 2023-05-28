@@ -2,7 +2,6 @@
   <content-detail class="creature-detail">
     <template #fixed>
       <section-header
-        :close-on-desktop="fullscreen"
         :copy="!error && !loading"
         :fullscreen="!isMobile"
         :subtitle="creature?.name?.eng || ''"
@@ -37,6 +36,9 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import errorHandler from '@/common/helpers/errorHandler';
   import { useAxios } from '@/common/composition/useAxios';
+  import type { ICreature } from '@/types/Workshop/Bestiary.types';
+  import type { Maybe } from '@/types/Shared/Utility.types';
+  import { downloadByUrl } from '@/common/helpers/download';
 
   export default defineComponent({
     components: {
@@ -55,17 +57,21 @@
         isMobile
       } = storeToRefs(uiStore);
 
-      const creature = ref(undefined);
+      const creature = ref<Maybe<ICreature>>(undefined);
       const loading = ref(true);
       const error = ref(false);
       const abortController = ref<AbortController | null>(null);
 
       const exportFoundry = () => {
-        if (!creature.value) return;
+        if (!creature.value) {
+          return Promise.reject();
+        }
 
-        // TODO: Закончить типизацию
-        // @ts-ignore
-        window.open(`/api/fvtt/v1/bestiary/${ creature.value.id }`, '_self');
+        try {
+          return downloadByUrl(`/api/fvtt/v1/bestiary/${ creature.value.id }`);
+        } catch (err) {
+          return Promise.reject(err);
+        }
       };
 
       const creatureInfoQuery = async (url: string) => {
@@ -78,7 +84,7 @@
           loading.value = true;
           abortController.value = new AbortController();
 
-          const resp = await http.post({
+          const resp = await http.post<ICreature>({
             url,
             signal: abortController.value.signal
           });

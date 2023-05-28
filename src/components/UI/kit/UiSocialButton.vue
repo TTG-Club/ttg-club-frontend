@@ -8,9 +8,7 @@
   >
     <span class="ui-social-button__icon">
       <svg-icon
-        :icon-name="socialName.toLowerCase()"
-        :stroke-enable="false"
-        fill-enable
+        :icon="socialName.toLowerCase()"
       />
     </span>
 

@@ -40,7 +40,6 @@ module.exports = defineConfig({
 
     config.optimization.runtimeChunk('single');
 
-    config.output.filename('js/[name].js');
     config.output.chunkFilename('js/[name].[chunkhash].js');
 
     config.module
@@ -57,7 +56,18 @@ module.exports = defineConfig({
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
-      .options({ symbolId: 'dnd5club-icon-[name]' })
+      .options({
+        symbolId: filePath => `ttg-${
+            filePath
+              .replace(path.resolve(__dirname, './src/assets/icons/svg'), '')
+              .replace(/^\//, '')
+              .replace(/^\\/, '')
+              .replace(/\.svg$/, '')
+              .replaceAll('/', '-')
+              .replaceAll('\\', '-')
+              .replace(/-+/, '-')
+          }`
+      })
       .end()
       .use('svgo-loader')
       .loader('svgo-loader')
@@ -82,7 +92,6 @@ module.exports = defineConfig({
   css: {
     extract: process.env.BUILD_TARGET !== 'serve'
       ? {
-        filename: 'css/[name].css',
         chunkFilename: 'css/[name].[chunkhash].css'
       }
       : false,

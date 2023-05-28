@@ -7,9 +7,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="getListProps({ items })"
+      :get-group="getGroupByFirstLetter"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
       <template #default="{ item }">
         <item-link
@@ -17,7 +18,7 @@
           :to="{ path: item.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -28,10 +29,14 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
   import ItemLink from '@/views/Inventory/Items/ItemLink.vue';
+  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
@@ -53,7 +58,6 @@
     items
   } = usePagination({
     url: '/items',
-    limit: 70,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
@@ -70,7 +74,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (items.value.length === 1 && !isMobile.value) {
+    if (isAutoOpenAvailable(items)) {
       await router.push({ path: items.value[0].url });
     }
   };
@@ -78,10 +82,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && items.value.length && route.name === 'items') {
-      await router.push({ path: items.value[0].url });
-    }
   });
 
   const showRightSide = computed(() => route.name === 'itemDetail');

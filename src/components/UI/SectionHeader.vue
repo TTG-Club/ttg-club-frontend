@@ -16,7 +16,7 @@
           class="section-header__title--copy"
           @click.left.exact.prevent.stop="copyURL"
         >
-          <svg-icon icon-name="copy" />
+          <svg-icon icon="copy" />
         </a>
       </div>
 
@@ -37,22 +37,18 @@
         v-if="bookmark"
         :name="title"
         :url="url || ''"
+        color="text"
       />
 
       <ui-button
         v-if="print"
         v-tippy="{ content: 'Открыть окно печати' }"
         class="section-header__control is-only-desktop"
-        is-icon
-        type-link-filled
+        icon="print"
+        type="text"
+        color="text"
         @click.left.exact.prevent.stop="openPrintWindow"
-      >
-        <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="print"
-        />
-      </ui-button>
+      />
 
       <ui-button
         v-if="onExportFoundry"
@@ -61,12 +57,11 @@
           content: '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>',
         }"
         class="section-header__control is-only-desktop"
-        is-icon
-        type-link-filled
+        icon="export-foundry"
+        type="text"
+        color="text"
         @click.left.exact.prevent.stop="exportToFoundry"
-      >
-        <svg-icon icon-name="export-foundry" />
-      </ui-button>
+      />
 
       <ui-button
         v-if="fullscreen"
@@ -76,185 +71,132 @@
             : 'Развернуть окно',
         }"
         class="section-header__control is-only-desktop"
-        is-icon
-        type-link-filled
-        @click.left.exact.prevent.stop="uiStore.toggleFullscreen"
-      >
-        <svg-icon
-          :icon-name="uiStore.fullscreen ? 'exit-fullscreen' : 'fullscreen'"
-          :stroke-enable="false"
-          fill-enable
-        />
-      </ui-button>
+        :icon="`expand/${ uiStore.fullscreen ? 'exit' : 'enter'}`"
+        type="text"
+        color="text"
+        @click.left.exact.prevent.stop="toggleFullscreen"
+      />
 
       <ui-button
         v-if="closeAvailable"
         v-tippy="{ content: 'Закрыть' }"
         class="section-header__control"
-        is-icon
-        type-link-filled
+        icon="close"
+        type="secondary"
         @click.left.exact.prevent.stop="$emit('close')"
-      >
-        <svg-icon
-          :stroke-enable="false"
-          fill-enable
-          icon-name="close"
-        />
-      </ui-button>
+      />
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import { useClipboard } from '@vueuse/core';
-  import {
-    computed, defineComponent, h
-  } from 'vue';
+  import { computed, h } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
   import { useUIStore } from '@/store/UI/UIStore';
-  import BookmarkSaveButton from '@/components/UI/menu/bookmarks/buttons/BookmarkSaveButton.vue';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
   import { useMetrics } from '@/common/composition/useMetrics';
 
-  export default defineComponent({
-    components: {
-      UiButton,
-      BookmarkSaveButton,
-      SvgIcon
-    },
-    props: {
-      title: {
-        type: String,
-        required: true
-      },
-      subtitle: {
-        type: String,
-        default: ''
-      },
-      copy: {
-        type: Boolean,
-        default: false
-      },
-      bookmark: {
-        type: Boolean,
-        default: false
-      },
-      url: {
-        type: String,
-        default: ''
-      },
-      print: {
-        type: Boolean,
-        default: false
-      },
-      fullscreen: {
-        type: Boolean,
-        default: false
-      },
-      closeOnDesktop: {
-        type: Boolean,
-        default: false
-      },
-      onClose: {
-        type: Function,
-        default: null
-      },
-      onExportFoundry: {
-        type: Function,
-        default: null
-      }
-    },
-    setup(props, { emit }) {
-      const route = useRoute();
-      const uiStore = useUIStore();
-      const clipboard = useClipboard();
-      const { sendShareMetrics } = useMetrics();
-      const toast = useToast(ToastEventBus);
-      const urlForCopy = computed(() => window.location.origin + route.path);
+  const props = withDefaults(defineProps<{
+    title: string;
+    subtitle?: string;
+    url?: string;
+    copy?: boolean;
+    bookmark?: boolean;
+    print?: boolean;
+    fullscreen?: boolean;
+    onExportFoundry?:() => void;
+    onClose?:() => void;
+  }>(), {
+    subtitle: '',
+    url: '',
+    copy: false,
+    bookmark: false,
+    print: false,
+    fullscreen: false,
+    onExportFoundry: undefined,
+    onClose: undefined
+  });
 
-      const hasControls = computed(() => !!props.bookmark
-        || !!props.print
-        || !!props.onExportFoundry
-        || !!props.onClose
-        || !!props.fullscreen);
+  const emit = defineEmits<{
+    exportFoundry: void;
+    close: void;
+  }>();
 
-      const closeAvailable = computed(() => {
-        if (!uiStore.isMobile) {
-          return props.closeOnDesktop;
-        }
+  const route = useRoute();
+  const uiStore = useUIStore();
+  const clipboard = useClipboard();
+  const { sendShareMetrics } = useMetrics();
+  const toast = useToast(ToastEventBus);
+  const { toggleFullscreen } = uiStore;
 
-        return props.onClose;
-      });
+  const urlForCopy = computed(() => window.location.origin + route.path);
 
-      const copyURL = () => {
-        if (!clipboard.isSupported) {
-          toast.error('Ваш браузер не поддерживает копирование');
-        }
+  const hasControls = computed(() => props.bookmark
+    || props.print
+    || !!props.onExportFoundry
+    || !!props.onClose
+    || props.fullscreen);
 
-        clipboard.copy(urlForCopy.value)
-          .then(() => {
-            toast('Ссылка успешно скопирована');
+  const closeAvailable = computed(() => props.onClose);
 
-            sendShareMetrics({
-              method: 'link_copy',
-              id: route.path
-            });
-          })
-          .catch(() => toast.error(() => [
-            h(
-              'span',
-              null,
-              'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
-            ),
-            h(
-              'a',
-              {
-                target: '_blank',
-                href: 'https://discord.gg/zqBnMJVf3z',
-                rel: 'noopener'
-              },
-              'Discord-канале'
-            )
-          ]));
-      };
+  const copyURL = () => {
+    if (!clipboard.isSupported) {
+      toast.error('Ваш браузер не поддерживает копирование');
+    }
 
-      const copyText = (text?: string) => {
-        if (!text) {
-          return;
-        }
+    clipboard.copy(urlForCopy.value)
+      .then(() => {
+        toast('Ссылка успешно скопирована');
 
-        clipboard.copy(text)
-          .then(() => toast('Текст скопирован'));
-      };
-
-      const openPrintWindow = () => {
-        window.print();
-      };
-
-      const exportToFoundry = () => {
         sendShareMetrics({
-          method: 'export_foundry',
+          method: 'link_copy',
           id: route.path
         });
+      })
+      .catch(() => toast.error(() => [
+        h(
+          'span',
+          null,
+          'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
+        ),
+        h(
+          'a',
+          {
+            target: '_blank',
+            href: 'https://discord.gg/zqBnMJVf3z',
+            rel: 'noopener'
+          },
+          'Discord-канале'
+        )
+      ]));
+  };
 
-        emit('exportFoundry');
-      };
-
-      return {
-        uiStore,
-        hasControls,
-        urlForCopy,
-        closeAvailable,
-        copyText,
-        copyURL,
-        openPrintWindow,
-        exportToFoundry
-      };
+  const copyText = (text?: string) => {
+    if (!text) {
+      return;
     }
-  });
+
+    clipboard.copy(text)
+      .then(() => toast('Текст скопирован'));
+  };
+
+  const openPrintWindow = () => {
+    window.print();
+  };
+
+  const exportToFoundry = () => {
+    sendShareMetrics({
+      method: 'export_foundry',
+      id: route.path
+    });
+
+    emit('exportFoundry');
+  };
 </script>
 
 <style lang="scss" scoped>
@@ -342,35 +284,12 @@
     }
 
     &__control {
-      @include css_anim();
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      color: var(--primary);
-      padding: 6px;
-      border-radius: 8px;
-
-      @include media-min($md) {
-        &:hover {
-          background-color: var(--primary-hover);
-          color: var(--text-btn-color);
-        }
-      }
-
       &.is-only-desktop {
         display: none;
 
         @include media-min($lg) {
-          display: flex;
+          display: inherit;
         }
-      }
-
-      svg {
-        width: 24px;
-        height: 24px;
       }
     }
   }

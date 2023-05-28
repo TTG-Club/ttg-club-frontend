@@ -61,7 +61,7 @@
             class="multiselect__select"
             @mousedown.left.exact.prevent.stop="toggle()"
           >
-            <svg-icon icon-name="arrow-stroke" />
+            <svg-icon icon="arrow/down" />
           </div>
         </slot>
       </template>
@@ -324,7 +324,7 @@
         min-height: 100%;
         max-height: 100%;
         height: initial;
-        padding: 11px;
+        padding: 7px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -509,6 +509,14 @@
 
       &__tags {
         border-radius: 8px 0 0 0;
+      }
+    }
+  }
+
+  :deep(.multiselect--disabled) {
+    .multiselect {
+      &__select {
+        background: #ffffff0d;
       }
     }
   }

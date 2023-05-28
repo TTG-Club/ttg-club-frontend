@@ -6,15 +6,16 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
+    <virtual-grouped-list
       :list="{ items: treasures }"
+      :get-group="getGroupWithIdByFirstLetter"
     >
       <template #default="{ item: treasure }">
         <treasure-item
           :treasure="treasure"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
@@ -27,7 +28,8 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getGroupWithIdByFirstLetter } from "@/common/helpers/list";
 
   const uiStore = useUIStore();
 
@@ -47,7 +49,6 @@
     items
   } = usePagination({
     url: '/treasures',
-    limit: 70,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

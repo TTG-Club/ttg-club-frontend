@@ -147,14 +147,10 @@
             Создать
           </ui-button>
 
-          <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
-            <template #icon-left>
-              <svg-icon :icon-name="settings.opened ? 'show-pass' : 'hide-pass'" />
-            </template>
-
-            <template #default>
-              Настройки
-            </template>
+          <ui-button
+            @click.left.exact.prevent="settings.opened = !settings.opened"
+          >
+            Настройки
           </ui-button>
         </div>
       </form>
@@ -164,7 +160,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :close-on-desktop="fullscreen"
             :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'In treasury'"
             :title="selected.item?.name.rus || 'В сокровищнице'"
@@ -309,7 +304,7 @@
   import errorHandler from '@/common/helpers/errorHandler';
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
-  import UiButton from '@/components/UI/kit/UiButton.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import { useAxios } from '@/common/composition/useAxios';
 
@@ -484,7 +479,7 @@
 
         clearSelected();
 
-        result.value = res.data;
+        result.value = res.data as never;
       })
       .catch(err => {
         errorHandler(err);

@@ -8,9 +8,10 @@
     @update="initPages"
     @list-end="nextPage"
   >
-    <virtual-grid-list
-      :flat="showRightSide"
-      :list="{ items: options, keyField: 'url' }"
+    <virtual-grouped-list
+      :list="getListProps({ items: options })"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :get-group="getGroupByFirstLetter"
     >
       <template #default="{ item: option }">
         <option-link
@@ -19,7 +20,7 @@
           :to="{ path: option.url }"
         />
       </template>
-    </virtual-grid-list>
+    </virtual-grouped-list>
   </component>
 </template>
 
@@ -29,6 +30,7 @@
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
+  import { resolveUnref } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import OptionLink from '@/views/Character/Options/OptionLink.vue';
@@ -36,13 +38,17 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { OptionsFilterDefaults } from '@/types/Character/Options.types';
-  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getGroupByFirstLetter } from "@/common/helpers/list";
+  import { getListProps } from "@/components/list/VirtualList/helpers";
+  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {
-    inTab?: boolean,
-    storeKey?: string,
-    filterUrl?: string,
-    queryBooks?: string[],
+    inTab?: boolean;
+    storeKey?: string;
+    filterUrl?: string;
+    queryBooks?: Array<string>;
   };
 
   const props = withDefaults(defineProps<TProps>(), {
@@ -76,14 +82,16 @@
   const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    if (props.queryBooks) {
-      return {
-        ...filter.queryParams.value,
-        book: props.queryBooks
-      };
+    const params = resolveUnref(filter.queryParams);
+
+    if (params?.book instanceof Array) {
+      return filter.queryParams.value;
     }
 
-    return filter.queryParams.value;
+    return {
+      ...params,
+      book: props.queryBooks
+    };
   });
 
   const {
@@ -93,7 +101,6 @@
     items: options
   } = usePagination({
     url: '/options',
-    limit: 70,
     filter: {
       isCustomized,
       value: queryParams
@@ -110,7 +117,7 @@
   const onSearch = async () => {
     await initPages();
 
-    if (options.value.length === 1 && !isMobile.value && !props.inTab) {
+    if (isAutoOpenAvailable(options, props.inTab)) {
       await router.push({ path: options.value[0].url });
     }
   };
@@ -118,10 +125,6 @@
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
-
-    if (!isMobile.value && options.value.length && route.name === 'options') {
-      await router.push({ path: options.value[0].url });
-    }
   });
 
   watch(
