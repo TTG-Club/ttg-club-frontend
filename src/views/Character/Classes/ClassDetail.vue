@@ -1,67 +1,72 @@
 <template>
   <content-detail class="class-detail">
     <template #fixed>
-      <section-header
-        :copy="!error && !loading"
-        :subtitle="currentClass?.name?.eng || ''"
-        :title="currentClass?.name?.rus || ''"
-        bookmark
-        fullscreen
-        print
-        @close="close"
-      />
-
       <div
-        v-if="isMobile && currentArchetypes.length"
-        class="class-detail__select"
+        ref="fixed"
+        class="class-detail__fixed"
       >
-        <ui-select
-          :group-select="false"
-          :model-value="currentSelectArchetype"
-          :options="currentArchetypes"
-          group-label="group"
-          group-values="list"
-          label="name"
-          track-by="url"
-        >
-          <template #placeholder>
-            --- {{ currentClass?.archetypeName }} ---
-          </template>
+        <section-header
+          :copy="!error && !loading"
+          :subtitle="currentClass?.name?.eng || ''"
+          :title="currentClass?.name?.rus || ''"
+          bookmark
+          fullscreen
+          print
+          @close="close"
+        />
 
-          <template #option="{ option }">
-            <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
-
-            <span
-              v-else
-              @click.left.exact.prevent="goToArchetype(option.url)"
-            >{{ option.name }}</span>
-          </template>
-        </ui-select>
-      </div>
-
-      <div
-        v-if="tabs.length"
-        class="class-detail__tabs"
-      >
         <div
-          v-for="(tab, tabKey) in tabs"
-          :key="tabKey"
-          :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
-          class="class-detail__tab"
-          @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
+          v-if="isMobile && currentArchetypes.length"
+          class="class-detail__select"
+        >
+          <ui-select
+            :group-select="false"
+            :model-value="currentSelectArchetype"
+            :options="currentArchetypes"
+            group-label="group"
+            group-values="list"
+            label="name"
+            track-by="url"
+          >
+            <template #placeholder>
+              --- {{ currentClass?.archetypeName }} ---
+            </template>
+
+            <template #option="{ option }">
+              <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
+
+              <span
+                v-else
+                @click.left.exact.prevent="goToArchetype(option.url)"
+              >{{ option.name }}</span>
+            </template>
+          </ui-select>
+        </div>
+
+        <div
+          v-if="tabs.length"
+          class="class-detail__tabs"
         >
           <div
-            v-if="!tab.name"
-            class="class-detail__tab_icon"
+            v-for="(tab, tabKey) in tabs"
+            :key="tabKey"
+            :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
+            class="class-detail__tab"
+            @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
           >
-            <svg-icon :icon="`tab-${tab.type}`" />
-          </div>
+            <div
+              v-if="!tab.name"
+              class="class-detail__tab_icon"
+            >
+              <svg-icon :icon="`tab-${tab.type}`" />
+            </div>
 
-          <div
-            v-else
-            class="class-detail__tab_name"
-          >
-            {{ tab.name }}
+            <div
+              v-else
+              class="class-detail__tab_name"
+            >
+              {{ tab.name }}
+            </div>
           </div>
         </div>
       </div>
@@ -128,11 +133,13 @@
   import isArray from 'lodash/isArray';
   import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
-  import { computedInject, resolveUnref } from '@vueuse/core';
+  import {
+    computedInject, resolveUnref, useElementBounding, useScroll
+  } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
   import VueEasyLightbox from 'vue-easy-lightbox';
   import {
-    computed, nextTick, onBeforeUnmount, onMounted, ref, unref
+    computed, nextTick, onBeforeUnmount, onMounted, ref
   } from 'vue';
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
   import {
@@ -181,6 +188,13 @@
   });
 
   const classBody = ref<HTMLDivElement>();
+  const fixed = ref<HTMLDivElement>();
+
+  const { height: fixedHeight } = useElementBounding(fixed);
+
+  const { y: bodyScroll } = useScroll(classBody, {
+    behavior: 'smooth'
+  });
 
   const getStoreKey = computed(() => `${
     currentClass.value.name.eng + currentTab.value.type + currentTab.value.order
@@ -240,11 +254,7 @@
       loading.value = false;
 
       nextTick(() => {
-        if (classBody.value instanceof HTMLDivElement) {
-          classBody.value.scroll({
-            top: 0
-          });
-        }
+        bodyScroll.value = 0;
       });
     } catch (err) {
       loading.value = false;
@@ -339,33 +349,20 @@
       ? hash
       : `#${ hash }`;
 
-    const section = classBody.value.querySelector(formattedHash);
+    const section = classBody.value.querySelector(formattedHash).parentElement;
 
     if (!section) {
       return;
     }
 
-    if (!route.hash) {
-      // const { href } = router.resolve(
-      //   {
-      //     path: route.path,
-      //     hash: formattedHash
-      //   },
-      //   route
-      // );
-      //
-      // window.history.replaceState({}, '', href);
-
+    if (route.hash !== formattedHash) {
       router.replace({
         path: route.path,
         hash: formattedHash
       });
     }
 
-    classBody.value.scroll({
-      top: section.getBoundingClientRect().top - 119 - 56,
-      behavior: 'smooth'
-    });
+    bodyScroll.value = section.offsetTop - fixedHeight.value;
   };
 
   const anchorClickHandler = e => {
