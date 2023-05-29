@@ -11,8 +11,8 @@
               <span class="label">Количество магии в мире:</span>
 
               <ui-select
-                v-model="magicLevelsValue"
-                :options="magicLevels"
+                v-model="magicLevel"
+                :options="config.magicLevels"
                 label="name"
                 track-by="value"
               >
@@ -30,51 +30,76 @@
                 class="form-control select"
                 type="number"
                 :min="1"
+                :max="50"
                 placeholder="Харизма (Убеждение)"
               />
             </div>
           </div>
         </div>
 
-        <div class="tools_settings__row">
+        <div
+          v-if="settings.opened"
+          class="tools_settings__row"
+        >
           <ui-checkbox
             :model-value="form.unique"
             type="toggle"
-            @update:model-value="form.unique = $event"
+            @update:model-value="updateUnique"
           >
             Только уникальные
           </ui-checkbox>
         </div>
 
         <div
-          v-if="!form.unique"
+          v-if="settings.opened && config.sources.length"
+          class="tools_settings__row"
+        >
+          <span class="label">Источники:</span>
+
+          <div class="checkbox-group">
+            <ui-switch
+              track-by="shortName"
+              label="shortName"
+              :model-value="settings.priceSource"
+              :options="config.sources"
+              @update:model-value="updatePriceSource"
+            />
+          </div>
+        </div>
+
+        <div
+          v-if="settings.opened && !form.unique"
           class="tools_settings__row"
         >
           <ui-checkbox
             :model-value="settings.grouping"
             type="toggle"
-            @update:model-value="settings.grouping = $event"
+            @update:model-value="updateGrouping"
           >
             Группировать одинаковые
           </ui-checkbox>
         </div>
 
         <div
-          v-if="!form.unique && settings.grouping"
+          v-if="settings.opened && !form.unique && settings.grouping"
           class="tools_settings__row"
         >
           <ui-checkbox
             :model-value="settings.max"
             type="toggle"
-            @update:model-value="settings.max = $event"
+            @update:model-value="updateUsingMaxPrice"
           >
             {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
           </ui-checkbox>
         </div>
 
         <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+          <ui-button @click.left.exact.prevent="sendForm()">
             Найти торговца
+          </ui-button>
+
+          <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
+            Настройки
           </ui-button>
         </div>
       </form>
@@ -129,14 +154,19 @@
   </content-layout>
 </template>
 
-<script>
-  import { reactive } from 'vue';
+<script setup lang="ts">
+  import {
+    computed, ref, toRaw
+  } from 'vue';
   import max from 'lodash/max';
   import mean from 'lodash/mean';
   import sortedUniq from 'lodash/sortedUniq';
   import throttle from 'lodash/throttle';
   import groupBy from 'lodash/groupBy';
-  import { mapState } from 'pinia';
+  import { storeToRefs } from 'pinia';
+  import { tryOnBeforeMount } from '@vueuse/core';
+  import toNumber from 'lodash/toNumber';
+  import localforage from 'localforage';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import SectionHeader from '@/components/UI/SectionHeader.vue';
@@ -149,245 +179,395 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiSwitch from '@/components/UI/kit/UiSwitch.vue';
+  import { useAxios } from '@/common/composition/useAxios';
+  import type { TNameValue, TSource } from '@/types/Shared/BaseApiFields.types';
+  import type { TSpellItem } from '@/types/Character/Spells.types';
+  import type { TArtifactItem } from '@/types/Inventory/MagicItems.types';
+  import type { TGroupedTraderLink, TTraderLink } from '@/types/Tools/Trader.types';
+  import { DB_NAME } from '@/common/const/UI';
 
-  export default {
-    name: 'TraderView',
-    components: {
-      UiButton,
-      UiInput,
-      ContentDetail,
-      MagicItemLink,
-      SpellBody,
-      MagicItemBody,
-      UiCheckbox,
-      SectionHeader,
-      UiSelect,
-      ContentLayout
-    },
-    data: () => ({
-      magicLevels: [],
-      form: {
-        magicLevel: 1,
-        persuasion: 1,
-        unique: true
-      },
-      settings: {
-        grouping: true,
-        max: false
-      },
-      results: [],
-      detailCard: {
-        item: undefined,
-        spell: undefined
-      },
-      selected: {
-        index: undefined,
-        item: undefined
-      },
-      loading: false,
-      error: false,
-      controllers: {
-        list: undefined,
-        detail: undefined
-      },
-      showRightSide: false
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+  type TConfig = {
+    magicLevels: Array<TNameValue<number>>;
+    sources: Array<TSource>
+  }
 
-      magicLevelsValue: {
-        get() {
-          return this.magicLevels.find(el => el.value === this.form.magicLevel);
-        },
+  const http = useAxios();
+  const uiStore = useUIStore();
+  const { fullscreen, isMobile } = storeToRefs(uiStore);
 
-        set(e) {
-          this.form.magicLevel = e.value;
-        }
-      },
+  const store = localforage.createInstance({
+    name: DB_NAME,
+    storeName: 'trader'
+  });
 
-      groupedResults() {
-        if (!this.settings.grouping) {
-          return this.results;
-        }
+  const config = ref<TConfig>({
+    magicLevels: [],
+    sources: []
+  });
 
-        const groups = Object.values(groupBy(this.results, o => o.name.rus));
-        const res = [];
+  const form = ref<{
+    magicLevel: number;
+    persuasion: number;
+    unique: boolean;
+  }>({
+    magicLevel: 1,
+    persuasion: 1,
+    unique: true
+  });
 
-        for (const group of groups) {
-          const el = group[0];
+  const settings = ref<{
+    opened: boolean;
+    grouping: boolean;
+    max: boolean;
+    priceSource?: TSource
+  }>({
+    opened: !isMobile.value,
+    grouping: true,
+    max: false
+  });
 
-          if (group.length === 1) {
-            res.push(el);
+  const results = ref<Array<TTraderLink>>([]);
 
-            continue;
-          }
+  const detailCard = ref<{
+    item?: TArtifactItem;
+    spell?: TSpellItem
+  }>({});
 
-          const prices = sortedUniq(group.map(o => o.price));
+  const selected = ref<{
+    index?: number;
+    item?: TArtifactItem
+  }>({});
 
-          res.push(reactive({
-            ...el,
-            custom: {
-              count: group.length,
-              price: this.settings.max ? max(prices) : Math.round(mean(prices))
-            }
-          }));
-        }
+  const loading = ref(false);
+  const error = ref(false);
 
-        return res;
+  const controllers = ref(new AbortController());
+
+  const showRightSide = ref(false);
+
+  const magicLevel = computed<TNameValue<number>>({
+    get: () => config.value.magicLevels.find(el => el.value === form.value.magicLevel),
+    set: v => {
+      form.value.magicLevel = v.value;
+    }
+  });
+
+  const groupedResults = computed(() => {
+    const getCurrentPrice = (price: Record<string, number | null>) => {
+      if (!price) {
+        return null;
       }
-    },
-    async beforeMount() {
-      await this.getLevels();
-    },
-    mounted() {
-      this.showRightSide = !this.isMobile;
-    },
-    methods: {
-      async getLevels() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/trader'
-          });
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+      const priceKey = settings.value.priceSource?.shortName;
 
-            return;
+      if (!priceKey) {
+        return null;
+      }
+
+      const currentPrice = price[priceKey.toLowerCase()];
+      const formatted = toNumber(currentPrice);
+
+      return Number.isNaN(formatted)
+        ? null
+        : formatted;
+    };
+
+    if (!settings.value.grouping) {
+      return results.value.map(item => {
+        if (!item.price) {
+          return item;
+        }
+
+        return {
+          ...item,
+          custom: {
+            price: getCurrentPrice(toRaw(item.price))
           }
-
-          this.magicLevels = resp.data;
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
-
-      // eslint-disable-next-line func-names
-      sendForm: throttle(function() {
-        if (this.controllers.list) {
-          this.controllers.list.abort();
-        }
-
-        this.controllers.list = new AbortController();
-
-        const options = {
-          ...this.form,
-          persuasion: this.form.persuasion || 1
         };
+      });
+    }
 
-        this.$http.post({
-          url: '/tools/trader',
-          payload: options,
-          signal: this.controllers.list.signal
+    const getGroupPrice = (group: Array<TTraderLink>) => {
+      const prices = sortedUniq(group
+        .map(o => {
+          if (!o.price) {
+            return null;
+          }
+
+          return getCurrentPrice(toRaw(o.price));
         })
-          .then(res => {
-            if (res.status !== 200) {
-              errorHandler(res.statusText);
+        .filter(price => typeof price === 'number'));
 
-              return;
-            }
+      return settings.value.max
+        ? max(prices)
+        : Math.round(mean(prices));
+    };
 
-            this.results = [];
+    const groups = Object.values<Array<TTraderLink>>(groupBy(results.value, o => o.name.rus));
+    const res: Array<TGroupedTraderLink> = [];
 
-            this.clearSelected();
+    for (const group of groups) {
+      const el = group[0];
 
-            this.$nextTick(() => {
-              this.results = res.data;
-            });
-          })
-          .catch(err => {
-            errorHandler(err);
-          })
-          .finally(() => {
-            this.controllers.list = undefined;
-          });
-      }, 300),
-
-      clearSelected() {
-        this.selected.index = undefined;
-        this.selected.item = undefined;
-        this.detailCard.item = undefined;
-        this.detailCard.spell = undefined;
-      },
-
-      async selectItem(index) {
-        try {
-          if (this.controllers.detail) {
-            this.controllers.detail.abort();
-          }
-
-          this.error = false;
-          this.loading = true;
-
-          this.clearSelected();
-
-          this.controllers.detail = new AbortController();
-
-          const item = this.groupedResults[index];
-
-          const resMagicItem = await this.$http.post({
-            url: item.url,
-            signal: this.controllers.detail.signal
-          });
-
-          if (resMagicItem.status !== 200) {
-            this.error = true;
-            this.loading = false;
-
-            errorHandler(resMagicItem.statusText);
-
-            return;
-          }
-
-          this.detailCard.item = resMagicItem.data;
-          this.controllers.detail = new AbortController();
-
-          if (item.spell?.url) {
-            const resSpell = await this.$http.post({
-              url: item.spell.url,
-              signal: this.controllers.detail.signal
-            });
-
-            if (resSpell.status !== 200) {
-              this.error = true;
-              this.loading = false;
-
-              errorHandler(resSpell.statusText);
-
-              return;
-            }
-
-            this.detailCard.spell = resSpell.data;
-          }
-
-          this.selected = {
-            index,
-            item
-          };
-
-          this.showRightSide = true;
-        } catch (err) {
-          this.error = true;
-          this.loading = false;
-
-          this.detailCard = {
-            item: undefined,
-            spell: undefined
-          };
-
-          errorHandler(err);
-        } finally {
-          this.loading = false;
-          this.controllers.detail = undefined;
+      res.push({
+        ...el,
+        custom: {
+          count: group.length,
+          price: getGroupPrice(group)
         }
-      },
+      });
+    }
 
-      close() {
-        this.showRightSide = false;
-      }
+    return res;
+  });
+
+  const clearSelected = () => {
+    selected.value.index = undefined;
+    selected.value.item = undefined;
+    detailCard.value.item = undefined;
+    detailCard.value.spell = undefined;
+  };
+
+  const updateUnique = async (value: boolean) => {
+    try {
+      await store.ready();
+
+      form.value.unique = value;
+
+      return store.setItem<boolean>('unique', value);
+    } catch (err) {
+      return Promise.reject(err);
     }
   };
+
+  const restoreUnique = async () => {
+    try {
+      await store.ready();
+
+      const restored = await store.getItem<boolean>('unique');
+      const value = restored !== null ? restored : true;
+
+      await updateUnique(value);
+
+      return restored;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updateGrouping = async (value: boolean) => {
+    try {
+      await store.ready();
+
+      settings.value.grouping = value;
+
+      return store.setItem<boolean>('grouping', value);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const restoreGrouping = async () => {
+    try {
+      await store.ready();
+
+      const restored = await store.getItem<boolean>('grouping');
+      const value = restored !== null ? restored : true;
+
+      await updateGrouping(value);
+
+      return restored;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updateUsingMaxPrice = async (value: boolean) => {
+    try {
+      await store.ready();
+
+      settings.value.max = value;
+
+      return store.setItem<boolean>('maxPrice', value);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const restoreUsingMaxPrice = async () => {
+    try {
+      await store.ready();
+
+      const restored = await store.getItem<boolean>('maxPrice');
+      const value = restored !== null ? restored : false;
+
+      await updateUsingMaxPrice(value);
+
+      return restored;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const restorePriceSource = async (sources: Array<TSource>) => {
+    try {
+      if (!sources.length) {
+        return undefined;
+      }
+
+      if (sources.length < 2) {
+        return sources[0];
+      }
+
+      await store.ready();
+
+      const sourceKey = await store.getItem<TSource['shortName']>('priceSource');
+
+      if (!sourceKey) {
+        return sources[0];
+      }
+
+      const oldSource = sources.find(source => source.shortName === sourceKey);
+
+      if (!oldSource) {
+        return sources[0];
+      }
+
+      settings.value.priceSource = oldSource;
+
+      return oldSource;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updatePriceSource = async (source: TSource) => {
+    try {
+      await store.ready();
+
+      settings.value.priceSource = source;
+
+      return store.setItem<TSource['shortName']>('priceSource', source.shortName);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const getConfig = async () => {
+    try {
+      const resp = await http.get<TConfig>({
+        url: '/tools/trader'
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      config.value = resp.data as TConfig;
+      settings.value.priceSource = await restorePriceSource(resp.data.sources);
+    } catch (err) {
+      errorHandler(err);
+    }
+  };
+
+  const sendForm = throttle(async () => {
+    loading.value = true;
+
+    if (controllers.value instanceof AbortController) {
+      controllers.value.abort();
+    }
+
+    controllers.value = new AbortController();
+
+    const options = {
+      ...form.value,
+      persuasion: form.value.persuasion || 1
+    };
+
+    try {
+      const {
+        status, statusText, data
+      } = await http.post<Array<TTraderLink>>({
+        url: '/tools/trader',
+        payload: options,
+        signal: controllers.value.signal
+      });
+
+      if (status !== 200) {
+        errorHandler(statusText);
+
+        return;
+      }
+
+      clearSelected();
+
+      results.value = data as Array<TTraderLink>;
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      loading.value = false;
+    }
+  }, 300);
+
+  const getItemDetail = async <T, L>(url: L['url']): Promise<T> => {
+    try {
+      const {
+        status, statusText, data
+      } = await http.post<T>({ url });
+
+      if (status !== 200) {
+        error.value = true;
+
+        return Promise.reject(statusText);
+      }
+
+      return data;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const selectItem = async index => {
+    try {
+      error.value = false;
+
+      clearSelected();
+
+      const item = groupedResults.value[index];
+
+      detailCard.value.item = await getItemDetail<TArtifactItem, TTraderLink>(item.url);
+
+      if (item.spell?.url) {
+        detailCard.value.spell = await getItemDetail<TSpellItem, TTraderLink['spell']>(item.spell.url);
+      }
+
+      selected.value = {
+        index,
+        item
+      };
+
+      showRightSide.value = true;
+    } catch (err) {
+      error.value = true;
+
+      clearSelected();
+      errorHandler(err);
+    }
+  };
+
+  const close = () => {
+    showRightSide.value = false;
+  };
+
+  tryOnBeforeMount(async () => {
+    showRightSide.value = !isMobile.value;
+
+    await restoreUnique();
+    await restoreGrouping();
+    await restoreUsingMaxPrice();
+    await getConfig();
+  });
 </script>
-
-<style lang="scss" scoped>
-
-</style>
