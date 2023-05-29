@@ -35,7 +35,7 @@
             </div>
 
             <div
-              v-if="magicItem.custom?.count"
+              v-if="magicItem.custom?.count > 1"
               class="link-item__count"
             >
               {{ `x${ magicItem.custom.count }` }}
@@ -49,10 +49,10 @@
             </div>
 
             <div
-              v-if="inTrader"
+              v-if="inTrader && magicItem.custom"
               class="link-item__price"
             >
-              {{ `${ currentPrice || 0 }` }}
+              {{ `${ price }` }}
             </div>
           </div>
         </div>
@@ -61,72 +61,56 @@
   </router-link>
 </template>
 
-<script lang="ts">
+<script setup lang="ts" generic="T extends TGroupedTraderLink">
   import type { RouteLocationPathRaw } from 'vue-router';
   import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
-  import { computed, defineComponent } from 'vue';
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { computed } from 'vue';
+  import { CapitalizeFirst as vCapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import type { TGroupedTraderLink } from '@/types/Tools/Trader.types';
 
-  export default defineComponent({
-    directives: {
-      CapitalizeFirst
-    },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      magicItem: {
-        type: Object,
-        default: () => ({})
-      },
-      inTools: {
-        type: Boolean,
-        default: false
-      },
-      inTrader: {
-        type: Boolean,
-        default: false
-      },
-      priceSource: {
-        type: Object,
-        default: undefined
-      }
+  const props = withDefaults(defineProps<{
+    to: RouteLocationPathRaw;
+    magicItem: T;
+    inTools?: boolean;
+    inTrader?: boolean;
+  }>(), {
+    inTools: false,
+    inTrader: false
+  });
 
-    },
-    setup(props, { emit }) {
-      const {
-        navigate,
-        isActive,
-        href
-      } = useLink(props);
+  const emit = defineEmits<{(e: 'select-item'): void }>();
 
-      const classList = computed(() => ({
-        'router-link-active': isActive.value,
-        'is-green': props.magicItem?.source?.homebrew
-      }));
+  const {
+    navigate,
+    isActive,
+    href
+  } = useLink(props);
 
-      const clickHandler = () => {
-        if (props.inTools) {
-          emit('select-item');
+  const classList = computed(() => ({
+    'router-link-active': isActive.value,
+    'is-green': props.magicItem?.source?.homebrew
+  }));
 
-          return;
-        }
+  const clickHandler = () => {
+    if (props.inTools) {
+      emit('select-item');
 
-        navigate();
-      };
-
-      const currentPrice = computed(() => props.magicItem.price[props.priceSource?.shortName.toLowerCase()]);
-
-      return {
-        href,
-        classList,
-        clickHandler,
-        currentPrice
-      };
+      return;
     }
+
+    navigate();
+  };
+
+  const price = computed(() => {
+    if ('price' in props.magicItem.custom) {
+      return props.magicItem.custom.price;
+    }
+
+    if ('price' in props.magicItem) {
+      return props.magicItem;
+    }
+
+    return null;
   });
 </script>
 
