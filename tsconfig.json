@@ -63,7 +63,8 @@
     "verbatimModuleSyntax": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ],
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
