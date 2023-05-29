@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "serve": "vite",
-    "build:dev": "vite build --emptyOutDir --mode dev",
-    "build:prod": "vite build --emptyOutDir --mode prod",
+    "build:dev": "vite build --emptyOutDir --mode development",
+    "build:prod": "vite build --emptyOutDir --mode production",
     "type-check": "vue-tsc --noEmit -p tsconfig.json --composite false",
     "lint:js": "eslint --ext .ts,.js,.vue ./src",
     "lint:fix": "eslint --ext .ts,.js,.vue ./src --fix",
