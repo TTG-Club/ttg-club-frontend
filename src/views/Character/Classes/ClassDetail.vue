@@ -1,67 +1,72 @@
 <template>
   <content-detail class="class-detail">
     <template #fixed>
-      <section-header
-        :copy="!error && !loading"
-        :subtitle="currentClass?.name?.eng || ''"
-        :title="currentClass?.name?.rus || ''"
-        bookmark
-        fullscreen
-        print
-        @close="close"
-      />
-
       <div
-        v-if="isMobile && currentArchetypes.length"
-        class="class-detail__select"
+        ref="fixed"
+        class="class-detail__fixed"
       >
-        <ui-select
-          :group-select="false"
-          :model-value="currentSelectArchetype"
-          :options="currentArchetypes"
-          group-label="group"
-          group-values="list"
-          label="name"
-          track-by="url"
-        >
-          <template #placeholder>
-            --- {{ currentClass?.archetypeName }} ---
-          </template>
+        <section-header
+          :copy="!error && !loading"
+          :subtitle="currentClass?.name?.eng || ''"
+          :title="currentClass?.name?.rus || ''"
+          bookmark
+          fullscreen
+          print
+          @close="close"
+        />
 
-          <template #option="{ option }">
-            <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
-
-            <span
-              v-else
-              @click.left.exact.prevent="goToArchetype(option.url)"
-            >{{ option.name }}</span>
-          </template>
-        </ui-select>
-      </div>
-
-      <div
-        v-if="tabs.length"
-        class="class-detail__tabs"
-      >
         <div
-          v-for="(tab, tabKey) in tabs"
-          :key="tabKey"
-          :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
-          class="class-detail__tab"
-          @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
+          v-if="isMobile && currentArchetypes.length"
+          class="class-detail__select"
+        >
+          <ui-select
+            :group-select="false"
+            :model-value="currentSelectArchetype"
+            :options="currentArchetypes"
+            group-label="group"
+            group-values="list"
+            label="name"
+            track-by="url"
+          >
+            <template #placeholder>
+              --- {{ currentClass?.archetypeName }} ---
+            </template>
+
+            <template #option="{ option }">
+              <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
+
+              <span
+                v-else
+                @click.left.exact.prevent="goToArchetype(option.url)"
+              >{{ option.name }}</span>
+            </template>
+          </ui-select>
+        </div>
+
+        <div
+          v-if="tabs.length"
+          class="class-detail__tabs"
         >
           <div
-            v-if="!tab.name"
-            class="class-detail__tab_icon"
+            v-for="(tab, tabKey) in tabs"
+            :key="tabKey"
+            :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
+            class="class-detail__tab"
+            @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
           >
-            <svg-icon :icon="`tab-${tab.type}`" />
-          </div>
+            <div
+              v-if="!tab.name"
+              class="class-detail__tab_icon"
+            >
+              <svg-icon :icon="`tab-${tab.type}`" />
+            </div>
 
-          <div
-            v-else
-            class="class-detail__tab_name"
-          >
-            {{ tab.name }}
+            <div
+              v-else
+              class="class-detail__tab_name"
+            >
+              {{ tab.name }}
+            </div>
           </div>
         </div>
       </div>
@@ -92,16 +97,16 @@
         <spells-view
           v-else-if="currentTab?.type === 'spells'"
           :filter-url="currentTab.url"
-          :query-books="providedQueryBooks"
           :store-key="getStoreKey"
+          :query-books="queryBooks"
           in-tab
         />
 
         <options-view
           v-else-if="currentTab?.type === 'options'"
           :filter-url="currentTab.url"
-          :query-books="providedQueryBooks"
           :store-key="getStoreKey"
+          :query-books="queryBooks"
           in-tab
         />
       </div>
@@ -123,14 +128,23 @@
   </content-detail>
 </template>
 
-<script>
-  import { mapState } from 'pinia';
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
   import isArray from 'lodash/isArray';
   import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
-  import { resolveUnref } from '@vueuse/core';
+  import {
+    computedInject, resolveUnref, useElementBounding, useScroll
+  } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
   import VueEasyLightbox from 'vue-easy-lightbox';
+  import {
+    computed, nextTick, onBeforeUnmount, onMounted, ref
+  } from 'vue';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+  import {
+    onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter
+  } from 'vue-router';
   import SectionHeader from '@/components/UI/SectionHeader.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
@@ -140,281 +154,304 @@
   import RawContent from '@/components/content/RawContent.vue';
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
+  import { useAxios } from '@/common/composition/useAxios';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
-  export default {
+  interface IEmit {
+    (e: 'scroll-to-active'): void;
+    (e: 'scroll-to-last-active', href: RouteLocationNormalizedLoaded['path']): void;
+  }
 
-    components: {
-      ContentDetail,
-      RawContent,
-      OptionsView,
-      SpellsView,
-      UiSelect,
-      SvgIcon,
-      SectionHeader,
-      VueEasyLightbox
-    },
-    inject: {
-      queryBooks: {
-        default: undefined
-      }
-    },
-    async beforeRouteUpdate(to, from, next) {
-      this.removeScrollListeners();
+  const emit = defineEmits<IEmit>();
 
-      await this.classInfoQuery(to.path);
+  const route = useRoute();
+  const router = useRouter();
+  const http = useAxios();
 
-      next();
-    },
-    beforeRouteLeave(to, from) {
-      if (to.name !== 'classes') {
-        return;
-      }
+  const { isMobile } = storeToRefs(useUIStore());
 
-      this.$emit('scroll-to-last-active', from.path);
-    },
-    data: () => ({
-      loading: true,
-      error: false,
-      currentClass: undefined,
-      currentTab: undefined,
-      tabs: [],
-      gallery: {
-        show: false,
-        index: null
-      },
-      abortController: null
-    }),
-    computed: {
-      ...mapState(useUIStore, ['isMobile']),
+  const queryBooks = computedInject(DEFAULT_QUERY_BOOKS_INJECT_KEY, source => resolveUnref(source), []);
 
-      providedQueryBooks() {
-        return this.queryBooks();
-      },
+  const loading = ref(true);
+  const error = ref(false);
+  const currentClass = ref(undefined);
+  const currentTab = ref(undefined);
+  const tabs = ref([]);
+  const abortController = ref();
 
-      getStoreKey() {
-        return `${ this.currentClass.name.eng + this.currentTab.type + this.currentTab.order }`
-          .replaceAll(' ', '');
-      },
+  const gallery = ref<{
+    show: boolean;
+    index: number;
+  }>({
+    show: false,
+    index: 0
+  });
 
-      currentSelectArchetype() {
-        let selected;
+  const classBody = ref<HTMLDivElement>();
+  const fixed = ref<HTMLDivElement>();
 
-        for (let i = 0; i < this.currentArchetypes.length && !selected; i++) {
-          for (let index = 0; index < this.currentArchetypes[i].list.length && !selected; index++) {
-            if (this.currentArchetypes[i].list[index].url === this.$route.path) {
-              selected = this.currentArchetypes[i].list[index];
-            }
-          }
+  const { height: fixedHeight } = useElementBounding(fixed);
+
+  const { y: bodyScroll } = useScroll(classBody, {
+    behavior: 'smooth'
+  });
+
+  const getStoreKey = computed(() => `${
+    currentClass.value.name.eng + currentTab.value.type + currentTab.value.order
+  }`.replaceAll(' ', ''));
+
+  const currentArchetypes = computed(() => {
+    const getArchetypes = list => sortBy(
+      Object.values(groupBy(list, o => o.type.name))
+        .map(value => ({
+          group: value[0].type,
+          list: value.map(el => ({
+            name: `${ el.name.rus } [${ el.source.shortName }]`,
+            url: el.url
+          }))
+        })),
+      [o => o.group.order]
+    );
+
+    return isArray(currentClass.value?.archetypes) && currentClass.value.archetypes.length
+      ? getArchetypes(currentClass.value.archetypes)
+      : [];
+  });
+
+  const currentSelectArchetype = computed(() => {
+    let selected;
+
+    for (let i = 0; i < currentArchetypes.value.length && !selected; i++) {
+      for (let index = 0; index < currentArchetypes.value[i].list.length && !selected; index++) {
+        if (currentArchetypes.value[i].list[index].url === route.path) {
+          selected = currentArchetypes.value[i].list[index];
         }
-
-        return selected;
-      },
-
-      currentArchetypes() {
-        const getArchetypes = list => sortBy(
-          Object.values(groupBy(list, o => o.type.name))
-            .map(value => ({
-              group: value[0].type,
-              list: value.map(el => ({
-                name: `${ el.name.rus } [${ el.source.shortName }]`,
-                url: el.url
-              }))
-            })),
-          [o => o.group.order]
-        );
-
-        return isArray(this.currentClass?.archetypes) && this.currentClass.archetypes.length
-          ? getArchetypes(this.currentClass.archetypes)
-          : [];
-      }
-    },
-    async mounted() {
-      await this.classInfoQuery(this.$route.path);
-
-      this.$emit('scroll-to-active');
-    },
-    beforeUnmount() {
-      this.removeScrollListeners();
-    },
-    methods: {
-      async classInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
-
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
-
-          const resp = await this.$http.post({
-            url,
-            payload: {
-              filter: {
-                book: resolveUnref(this.queryBooks)
-              }
-            },
-            signal: this.abortController.signal
-          });
-
-          const classInfo = this.getUpdatedClass(resp.data);
-
-          await this.initTabs(classInfo);
-
-          this.currentClass = classInfo;
-        } catch (err) {
-          errorHandler(err);
-
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
-
-      getUpdatedClass(classInfo) {
-        const updatedClass = cloneDeep(classInfo);
-
-        if (!updatedClass.images || !Array.isArray(updatedClass.images)) {
-          updatedClass.images = [];
-        }
-
-        if (!updatedClass.images.length && updatedClass.image) {
-          updatedClass.images.unshift(updatedClass.image);
-        }
-
-        return updatedClass;
-      },
-
-      async initTabs(loadedClass) {
-        this.tabs = sortBy(loadedClass.tabs, ['order']);
-
-        if (isArray(loadedClass.images) && loadedClass.images?.length) {
-          this.tabs.push({
-            type: 'images',
-            name: 'Галерея',
-            order: this.tabs.length,
-            callback: this.showGallery
-          });
-        }
-
-        await this.setTab(0);
-      },
-
-      setTab(index) {
-        try {
-          this.loading = true;
-
-          this.currentTab = this.tabs[index];
-          this.loading = false;
-
-          this.$nextTick(() => {
-            if (this.$refs.classBody) {
-              this.$refs.classBody.scroll({
-                top: 0
-              });
-            }
-          });
-        } catch (err) {
-          this.loading = false;
-          this.error = true;
-
-          errorHandler(err);
-        }
-      },
-
-      async clickTabHandler({
-        index,
-        callback
-      }) {
-        if (typeof callback === 'function') {
-          callback();
-
-          return;
-        }
-
-        await this.setTab(index);
-      },
-
-      goToArchetype(path) {
-        this.$router.push({ path });
-      },
-
-      initScrollListeners() {
-        if (this.$route.hash) {
-          const section = this.$refs.classBody.querySelector(this.$route.hash);
-
-          if (!section) {
-            return;
-          }
-
-          this.$refs.classBody.scroll({
-            top: section.getBoundingClientRect().top - 119 - 56,
-            behavior: 'smooth'
-          });
-        }
-
-        const links = this.$refs.classBody.querySelectorAll('[href^="#"]');
-
-        for (const link of links) {
-          link.addEventListener('click', this.scrollToSection);
-        }
-      },
-
-      removeScrollListeners() {
-        if (!this.$refs.classBody) {
-          return;
-        }
-
-        const links = this.$refs.classBody.querySelectorAll('[href^="#"]');
-
-        for (const link of links) {
-          link.removeEventListener('click', this.scrollToSection);
-        }
-      },
-
-      scrollToSection(e) {
-        if (e.button) {
-          return;
-        }
-
-        e.preventDefault();
-
-        const { target } = e;
-        const hash = target.getAttribute('href');
-
-        if (!hash) {
-          return;
-        }
-
-        const section = this.$refs.classBody.querySelector(hash);
-
-        if (!section) {
-          return;
-        }
-
-        window.history.pushState({ ...window.history.state }, null, hash);
-
-        this.$refs.classBody.scroll({
-          top: section.getBoundingClientRect().top - 119 - 56,
-          behavior: 'smooth'
-        });
-      },
-
-      showGallery() {
-        if (!this.currentClass?.images?.length) {
-          return;
-        }
-
-        this.gallery.show = true;
-        this.gallery.index = 0;
-      },
-
-      close() {
-        this.$router.push({ name: 'classes' });
       }
     }
+
+    return selected;
+  });
+
+  const getUpdatedClass = classInfo => {
+    const updatedClass = cloneDeep(classInfo);
+
+    if (!updatedClass.images || !Array.isArray(updatedClass.images)) {
+      updatedClass.images = [];
+    }
+
+    if (!updatedClass.images.length && updatedClass.image) {
+      updatedClass.images.unshift(updatedClass.image);
+    }
+
+    return updatedClass;
   };
+
+  const setTab = index => {
+    try {
+      loading.value = true;
+
+      currentTab.value = tabs.value[index];
+      loading.value = false;
+
+      nextTick(() => {
+        bodyScroll.value = 0;
+      });
+    } catch (err) {
+      loading.value = false;
+      error.value = true;
+
+      errorHandler(err);
+    }
+  };
+
+  const showGallery = () => {
+    if (!currentClass.value?.images?.length) {
+      return;
+    }
+
+    gallery.value.show = true;
+    gallery.value.index = 0;
+  };
+
+  const initTabs = async loadedClass => {
+    tabs.value = sortBy(loadedClass.tabs, ['order']);
+
+    if (isArray(loadedClass.images) && loadedClass.images?.length) {
+      tabs.value.push({
+        type: 'images',
+        name: 'Галерея',
+        order: tabs.value.length,
+        callback: showGallery
+      });
+    }
+
+    await setTab(0);
+  };
+
+  const classInfoQuery = async url => {
+    if (abortController.value instanceof AbortController) {
+      abortController.value.abort();
+    }
+
+    try {
+      error.value = false;
+      loading.value = true;
+      abortController.value = new AbortController();
+
+      const resp = await http.post({
+        url,
+        payload: {
+          filter: {
+            book: resolveUnref<Array<string>>(queryBooks)
+          }
+        },
+        signal: abortController.value.signal
+      });
+
+      const classInfo = getUpdatedClass(resp.data);
+
+      await initTabs(classInfo);
+
+      currentClass.value = classInfo;
+    } catch (err) {
+      errorHandler(err);
+
+      error.value = true;
+    } finally {
+      loading.value = false;
+      abortController.value = null;
+    }
+  };
+
+  const clickTabHandler = async ({
+    index,
+    callback
+  }) => {
+    if (typeof callback === 'function') {
+      callback();
+
+      return;
+    }
+
+    await setTab(index);
+  };
+
+  const goToArchetype = path => {
+    router.push({ path });
+  };
+
+  const scrollToSection = (hash: string) => {
+    if (!hash || !(classBody.value instanceof HTMLDivElement)) {
+      return;
+    }
+
+    const formattedHash = hash.startsWith('#')
+      ? hash
+      : `#${ hash }`;
+
+    const section = classBody.value.querySelector(formattedHash).parentElement;
+
+    if (!section) {
+      return;
+    }
+
+    if (route.hash !== formattedHash) {
+      router.replace({
+        path: route.path,
+        hash: formattedHash
+      });
+    }
+
+    bodyScroll.value = section.offsetTop - fixedHeight.value;
+  };
+
+  const anchorClickHandler = e => {
+    if (e.button) {
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const { target } = e;
+
+    const hash = target
+      .getAttribute('href')
+      .replace('#', '')
+      .trim();
+
+    if (hash) {
+      scrollToSection(hash);
+    }
+  };
+
+  const getAnchorLinks = () => {
+    if (!(classBody.value instanceof HTMLDivElement)) {
+      return [];
+    }
+
+    const nodeList = classBody.value.querySelectorAll('[href^="#"]');
+
+    return Array.from(nodeList)
+      .filter(link => !!(
+        link
+          .getAttribute('href')
+          .replace('#', '')
+          .trim()
+      ));
+  };
+
+  const initScrollListeners = () => {
+    if (!(classBody.value instanceof HTMLDivElement)) {
+      return;
+    }
+
+    if (route.hash) {
+      scrollToSection(route.hash);
+    }
+
+    for (const link of getAnchorLinks()) {
+      link.addEventListener('click', anchorClickHandler);
+    }
+  };
+
+  const removeScrollListeners = () => {
+    for (const link of getAnchorLinks()) {
+      link.removeEventListener('click', anchorClickHandler);
+    }
+  };
+
+  const close = () => {
+    router.push({ name: 'classes' });
+  };
+
+  onMounted(async () => {
+    await classInfoQuery(route.path);
+
+    emit('scroll-to-active');
+  });
+
+  onBeforeUnmount(() => {
+    removeScrollListeners();
+  });
+
+  onBeforeRouteUpdate(async (to, from, next) => {
+    if (to.path !== from.path) {
+      removeScrollListeners();
+
+      await classInfoQuery(to.path);
+    }
+
+    next();
+  });
+
+  onBeforeRouteLeave((to, from) => {
+    if (to.name !== 'classes') {
+      return;
+    }
+
+    emit('scroll-to-last-active', from.path);
+  });
 </script>
 
 <style lang="scss" scoped>

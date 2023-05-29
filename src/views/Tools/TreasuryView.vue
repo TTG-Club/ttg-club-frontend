@@ -148,7 +148,6 @@
           </ui-button>
 
           <ui-button
-            :icon="settings.opened ? 'show-pass' : 'hide-pass'"
             @click.left.exact.prevent="settings.opened = !settings.opened"
           >
             Настройки
