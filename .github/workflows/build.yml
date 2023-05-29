@@ -39,9 +39,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        env:
-          VITE_APP_DEV: false
-        run: npm run build
+        run: npm run build:${{ github.ref_name == 'dev' && 'dev' || 'prod' }}
 
       - uses: actions/upload-artifact@v3
         with:

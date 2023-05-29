@@ -1,15 +1,81 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<head th:fragment="head">
+  <meta name="robots" content="<%= mode === 'prod' ? 'all' : 'noindex' %>">
+
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TTG Club</title>
-</head>
-<body id="body">
-<div id="dnd5club" class="dnd5club"></div>
 
-<script type="module" src="http://localhost:5173/@vite/client"></script>
-<script type="module" src="http://localhost:5173/src/main.ts"></script>
+  <meta name="author" content="Peterko - https://www.behance.net/peterko, Magistrus"/>
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ttg.club">
+
+  <link rel="preconnect" href="https://img.ttg.club/" crossorigin/>
+  <link rel="dns-prefetch" href="https://img.ttg.club/" crossorigin/>
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon_ttg_v3.svg"/>
+  <link rel="icon" type="image/png" href="/favicon_ttg_v3.svg"/>
+
+  <!-- Chrome на Android -->
+  <link rel="icon" sizes="192x192" href="/style/icons/192.png">
+  <link rel="manifest" href="/manifest.json" crossorigin="anonymous">
+
+  <!-- Иконка закладки в iOS -->
+  <link rel="apple-touch-icon" sizes="48x48" href="/style/icons/48.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/style/icons/72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="/style/icons/96.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/style/icons/144.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/style/icons/192.png">
+  <link rel="apple-touch-icon" sizes="256x256" href="/style/icons/256.png">
+  <link rel="apple-touch-icon" sizes="384x384" href="/style/icons/384.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/style/icons/512.png">
+
+  <% if (mode === 'prod') { %>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id='<%= env.VITE_GTAG_ID %>'"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', '<%= env.VITE_GTAG_ID %>', {
+      send_page_view: false
+    });
+  </script>
+  <!-- //Global site tag (gtag.js) - Google Analytics -->
+  <% } %>
+</head>
+<body id="body" th:fragment="body">
+<div id="dnd5club" class="dnd5club"></div>
+<script type="module" src="src/main.ts"></script>
+
+<% if (mode === 'prod') { %>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+  (function(m, e, t, r, i, k, a) {
+    m[i] = m[i] || function() {
+      (m[i].a = m[i].a || []).push(arguments);
+    };
+    m[i].l = 1 * new Date();
+    k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
+  })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+  ym('<%= env.VITE_YM_ID %>', 'init', {
+    clickmap: true,
+    trackLinks: true,
+    accurateTrackBounce: true,
+    webvisor: true,
+    trackHash: true
+  });
+</script>
+<!-- /Yandex.Metrika counter -->
+<% } %>
 </body>
 </html>

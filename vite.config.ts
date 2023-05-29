@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import viteLegacyPlugin from '@vitejs/plugin-legacy';
+import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv) => {
@@ -11,7 +12,7 @@ export default ({ mode }: ConfigEnv) => {
   const API_HOST = env.VITE_APP_API_URL || 'http://localhost:8080';
 
   return defineConfig({
-    base: './',
+    base: '/',
     server: {
       proxy: {
         '^/proxy': {
@@ -32,9 +33,10 @@ export default ({ mode }: ConfigEnv) => {
       outDir: env.VITE_APP_BUILD_PATH || 'dist',
       sourcemap: 'inline',
       minify: 'terser',
-      manifest: 'spa-manifest.json',
+
+      // manifest: 'spa-manifest.json',
       rollupOptions: {
-        input: fileURLToPath(new URL('./src/main.ts', import.meta.url)),
+        // input: fileURLToPath(new URL('./src/main.ts', import.meta.url)),
         output: {
           entryFileNames: 'js/app.[hash:8].js',
           chunkFileNames: 'js/[name].[hash:8].js',
@@ -49,6 +51,10 @@ export default ({ mode }: ConfigEnv) => {
       }
     },
     plugins: [
+      ViteEjsPlugin(() => ({
+        env,
+        mode
+      })),
       viteLegacyPlugin({
         modernPolyfills: true
       }),
