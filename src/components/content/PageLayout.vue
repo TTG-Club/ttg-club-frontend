@@ -83,6 +83,10 @@
       const dayjs = useDayjs();
 
       const dateTimeFormatted = computed(() => {
+        if (!props.dateTime) {
+          return '';
+        }
+
         const datetime = dayjs(props.dateTime);
 
         if (!datetime.isValid()) {
