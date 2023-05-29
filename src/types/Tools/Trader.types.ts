@@ -8,7 +8,7 @@ export type TTraderLink = TArtifactLink & {
 
 export type TGroupedTraderLink = TTraderLink & {
   custom?: {
-    count: number;
+    count?: number;
     price: number | null;
   }
 };

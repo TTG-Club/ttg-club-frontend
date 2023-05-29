@@ -37,18 +37,21 @@
           </div>
         </div>
 
-        <div class="tools_settings__row">
+        <div
+          v-if="settings.opened"
+          class="tools_settings__row"
+        >
           <ui-checkbox
             :model-value="form.unique"
             type="toggle"
-            @update:model-value="form.unique = $event"
+            @update:model-value="updateUnique"
           >
             Только уникальные
           </ui-checkbox>
         </div>
 
         <div
-          v-if="config.sources.length"
+          v-if="settings.opened && config.sources.length"
           class="tools_settings__row"
         >
           <span class="label">Источники:</span>
@@ -57,7 +60,6 @@
             <ui-switch
               track-by="shortName"
               label="shortName"
-              pre-select-first
               :model-value="settings.priceSource"
               :options="config.sources"
               @update:model-value="updatePriceSource"
@@ -66,25 +68,26 @@
         </div>
 
         <div
-          v-if="!form.unique"
+          v-if="settings.opened && !form.unique"
           class="tools_settings__row"
         >
           <ui-checkbox
-            v-model="settings.grouping"
+            :model-value="settings.grouping"
             type="toggle"
+            @update:model-value="updateGrouping"
           >
             Группировать одинаковые
           </ui-checkbox>
         </div>
 
         <div
-          v-if="!form.unique && settings.grouping"
+          v-if="settings.opened && !form.unique && settings.grouping"
           class="tools_settings__row"
         >
           <ui-checkbox
             :model-value="settings.max"
             type="toggle"
-            @update:model-value="settings.max = $event"
+            @update:model-value="updateUsingMaxPrice"
           >
             {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
           </ui-checkbox>
@@ -93,6 +96,10 @@
         <div class="tools_settings__row btn-wrapper">
           <ui-button @click.left.exact.prevent="sendForm()">
             Найти торговца
+          </ui-button>
+
+          <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
+            Настройки
           </ui-button>
         </div>
       </form>
@@ -149,7 +156,7 @@
 
 <script setup lang="ts">
   import {
-    computed, onMounted, ref, toRaw
+    computed, ref, toRaw
   } from 'vue';
   import max from 'lodash/max';
   import mean from 'lodash/mean';
@@ -210,13 +217,14 @@
   });
 
   const settings = ref<{
+    opened: boolean;
     grouping: boolean;
     max: boolean;
     priceSource?: TSource
   }>({
+    opened: !isMobile.value,
     grouping: true,
-    max: false,
-    priceSource: undefined
+    max: false
   });
 
   const results = ref<Array<TTraderLink>>([]);
@@ -274,7 +282,6 @@
         return {
           ...item,
           custom: {
-            count: 1,
             price: getCurrentPrice(toRaw(item.price))
           }
         };
@@ -320,6 +327,87 @@
     selected.value.item = undefined;
     detailCard.value.item = undefined;
     detailCard.value.spell = undefined;
+  };
+
+  const updateUnique = async (value: boolean) => {
+    try {
+      await store.ready();
+
+      form.value.unique = value;
+
+      return store.setItem<boolean>('unique', value);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const restoreUnique = async () => {
+    try {
+      await store.ready();
+
+      const restored = await store.getItem<boolean>('unique');
+      const value = restored !== null ? restored : true;
+
+      await updateUnique(value);
+
+      return restored;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updateGrouping = async (value: boolean) => {
+    try {
+      await store.ready();
+
+      settings.value.grouping = value;
+
+      return store.setItem<boolean>('grouping', value);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const restoreGrouping = async () => {
+    try {
+      await store.ready();
+
+      const restored = await store.getItem<boolean>('grouping');
+      const value = restored !== null ? restored : true;
+
+      await updateGrouping(value);
+
+      return restored;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updateUsingMaxPrice = async (value: boolean) => {
+    try {
+      await store.ready();
+
+      settings.value.max = value;
+
+      return store.setItem<boolean>('maxPrice', value);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const restoreUsingMaxPrice = async () => {
+    try {
+      await store.ready();
+
+      const restored = await store.getItem<boolean>('maxPrice');
+      const value = restored !== null ? restored : false;
+
+      await updateUsingMaxPrice(value);
+
+      return restored;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   };
 
   const restorePriceSource = async (sources: Array<TSource>) => {
@@ -475,14 +563,11 @@
   };
 
   tryOnBeforeMount(async () => {
+    showRightSide.value = !isMobile.value;
+
+    await restoreUnique();
+    await restoreGrouping();
+    await restoreUsingMaxPrice();
     await getConfig();
   });
-
-  onMounted(() => {
-    showRightSide.value = !isMobile.value;
-  });
 </script>
-
-<style lang="scss" scoped>
-
-</style>
