@@ -9,17 +9,12 @@ interface ImportMetaEnv {
   readonly VITE_APP_API_URL: string;
   readonly VITE_APP_DEV: 'true' | 'false';
   readonly VITE_APP_BUILD_PATH: string;
+  readonly VITE_GTAG_ID: string;
+  readonly VITE_YM_ID: number;
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
-}
-
-declare global {
-  interface Window {
-    GTAG_ID: string;
-    YM_ID: string;
-  }
 }
 
 declare module 'vue-virtual-scroller' {

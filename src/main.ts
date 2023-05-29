@@ -37,8 +37,7 @@ app.use(pinia)
 if (!isDev) {
   app.use(VueGtag, {
     config: {
-      // @ts-ignore
-      id: window.GTAG_ID
+      id: import.meta.env.GTAG_ID
     }
   });
 }
