@@ -70,5 +70,6 @@
   "include": [
     "vite.config.*",
     "src/**/*",
+    "src/**/*.vue"
   ]
 }
