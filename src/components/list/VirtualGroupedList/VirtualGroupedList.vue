@@ -33,8 +33,8 @@
 <script lang="ts" setup>
   import uniqBy from 'lodash/uniqBy';
   import _sortBy from 'lodash/sortBy';
-  import { computed } from "vue";
-  import clsx from "clsx";
+  import { computed } from 'vue';
+  import clsx from 'clsx';
   import GroupedListCategory from '@/components/list/GroupedListCategory.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import type { ListIteratee } from '@/types/Shared/Lodash.types';
@@ -46,7 +46,7 @@
     TVirtualGridListProps
   } from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
-  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
+  import type { TVirtualListProps } from '@/components/list/VirtualList/types';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -61,8 +61,8 @@
   };
 
   const props = withDefaults(defineProps<TProps>(), {
-    groupLabelKey: "name",
-    sortBy: "order",
+    groupLabelKey: 'name',
+    sortBy: 'order',
     grid: () => ({})
   });
 
@@ -71,7 +71,7 @@
 
     /* TODO: Типизировать через дженерики и убрать any */
     getItemClass: (item: any) => clsx(props.list.getItemClass?.(item), {
-      "virtual-grouped-list__group": item.isGroup
+      'virtual-grouped-list__group': item.isGroup
     })
   }));
 

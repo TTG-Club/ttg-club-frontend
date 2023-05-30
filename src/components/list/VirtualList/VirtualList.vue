@@ -21,10 +21,10 @@
 
 <script lang="ts" setup>
   import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
-  import clsx from "clsx";
-  import { computed } from "vue";
+  import clsx from 'clsx';
+  import { computed } from 'vue';
   import { DEFAULT_KEY_FIELD } from '@/common/const';
-  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
+  import type { TVirtualListProps } from '@/components/list/VirtualList/types';
 
   const props = withDefaults(defineProps<TVirtualListProps>(), {
     keyField: DEFAULT_KEY_FIELD,

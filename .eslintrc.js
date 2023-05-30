@@ -59,6 +59,14 @@ module.exports = {
     'max-len': [1, 120],
     'consistent-return': [1],
     'arrow-parens': [2, 'as-needed'],
+    'quotes': [
+      'error',
+      'single',
+      {
+        avoidEscape: true,
+        allowTemplateLiterals: true
+      }
+    ],
     'quote-props': ['error', 'consistent-as-needed'],
     'import/extensions': [0],
     'import/no-extraneous-dependencies': [0],
@@ -441,11 +449,6 @@ module.exports = {
             baseIndent: 1,
             switchCase: 1
           }
-        ],
-        'quotes': [
-          0,
-          'double',
-          'single'
         ],
         'max-len': 'off',
         'vue/max-len': [1, 120],

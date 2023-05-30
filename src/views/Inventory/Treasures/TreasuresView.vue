@@ -29,7 +29,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupWithIdByFirstLetter } from "@/common/helpers/list";
+  import { getGroupWithIdByFirstLetter } from '@/common/helpers/list';
 
   const uiStore = useUIStore();
 

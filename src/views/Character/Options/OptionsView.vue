@@ -39,9 +39,9 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { OptionsFilterDefaults } from '@/types/Character/Options.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from "@/common/helpers/list";
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { getGroupByFirstLetter } from '@/common/helpers/list';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {

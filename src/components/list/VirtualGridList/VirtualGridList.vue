@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue';
-  import clsx from "clsx";
+  import clsx from 'clsx';
   import VirtualList from '@/components/list/VirtualList/VirtualList.vue';
   import type { AnyObject, RecordKey } from '@/types/Shared/Utility.types';
   import ListRow, { TListRowProps } from '@/components/list/ListRow.vue';
@@ -33,7 +33,7 @@
   import { useResponsiveValues } from '@/common/composition/useResponsiveValues';
   import { getListRows } from '@/common/helpers/list';
   import type { TListRow } from '@/types/Shared/List.types';
-  import type { TVirtualListProps } from "@/components/list/VirtualList/types";
+  import type { TVirtualListProps } from '@/components/list/VirtualList/types';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -69,7 +69,7 @@
 
   const listProps = computed<TVirtualListProps>(() => ({
     ...props.list,
-    getItemClass: (item: unknown) => clsx(props.list.getItemClass?.(item), "virtual-grid-list__item")
+    getItemClass: (item: unknown) => clsx(props.list.getItemClass?.(item), 'virtual-grid-list__item')
   }));
 
   const items = computed(() => (props.getRows
