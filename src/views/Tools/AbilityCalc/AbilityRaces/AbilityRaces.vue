@@ -1,6 +1,6 @@
 <template>
   <ui-dropdown
-    placeholder="Все расы"
+    placeholder="Выбрать расу"
     :options="races"
   >
     <template #label>

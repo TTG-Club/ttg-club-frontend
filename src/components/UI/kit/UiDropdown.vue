@@ -8,21 +8,21 @@
     </div>
 
     <div
-      ref="wrapper"
       class="ui-select__wrapper"
-      @focusin="focused = true"
-      @focusout="focused = false"
+      @focusin="toggleFocus"
+      @focusout="toggleFocus"
     >
       <ui-input
+        ref="input"
         v-model="selectedOption"
-        :placeholder="placeholder"
+        :placeholder="togglePlaceholder"
       />
 
       <div
         class="ui-select__select"
         @click="toggleFocus"
       >
-        <svg-icon :icon="iconToggle" />
+        <svg-icon :icon="toggleIcon" />
       </div>
     </div>
 
@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
   import {
-    computed, onMounted, ref
+    computed, ref
   } from "vue";
   import UiInput from "@/components/UI/kit/UiInput.vue";
 
@@ -58,22 +58,28 @@
     }
   });
 
-  const selectedOption = '';
+  const input = ref(null);
+  const selectedOption = ref<String>('');
   const focused = ref<Boolean>(false);
-  const wrapper = ref<Element | null>(null);
 
-  const iconToggle = computed(() => {
-    if (focused.value) {
-      return "arrow/up";
+  const toggleFocus = e => {
+    if (e.type === "focusin") {
+      focused.value = true;
+      console.log(input);
     }
 
-    return "arrow/down";
-  });
+    if (e.type === "focusout") {
+      focused.value = false;
+    }
 
-  const toggleFocus = computed(
-    () => {
-    return focused.value = !focused.value;
-  });
+    if (e.type === "click") {
+      focused.value = !focused.value;
+    }
+  };
+
+  const togglePlaceholder = computed(() => (focused.value ? '' : props.placeholder));
+
+  const toggleIcon = computed(() => (focused.value ? "arrow/up" : "arrow/down"));
 </script>
 
 <style lang="scss" scoped>
