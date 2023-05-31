@@ -23,11 +23,15 @@
 
 <script>
   import { mapState } from 'pinia';
+  import {
+    computedInject, toValue
+  } from '@vueuse/core';
   import SectionHeader from '@/components/UI/SectionHeader.vue';
   import errorHandler from '@/common/helpers/errorHandler';
   import RaceBody from '@/views/Character/Races/RaceBody.vue';
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
   export default {
     components: {
@@ -47,6 +51,13 @@
 
       next();
     },
+
+    setup() {
+      const queryBooks = computedInject(DEFAULT_QUERY_BOOKS_INJECT_KEY, source => toValue(source), []);
+
+      return { queryBooks };
+    },
+
     data: () => ({
       race: undefined,
       loading: false,
@@ -74,6 +85,11 @@
 
           const resp = await this.$http.post({
             url,
+            payload: {
+              filter: {
+                book: this.queryBooks
+              }
+            },
             signal: this.abortController.signal
           });
 

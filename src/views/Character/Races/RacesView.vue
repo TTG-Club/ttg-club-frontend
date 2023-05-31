@@ -38,12 +38,13 @@
 <script lang="ts">
   import { storeToRefs } from 'pinia';
   import {
-    computed, defineComponent, nextTick, onBeforeMount, ref, watch
+    computed, defineComponent, nextTick, onBeforeMount, ref, watch, provide
   } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
   import cloneDeep from 'lodash/cloneDeep';
+  import { toValue } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import RaceLink from '@/views/Character/Races/RaceLink.vue';
   import { useUIStore } from '@/store/UI/UIStore';
@@ -52,6 +53,7 @@
   import type { TRaceLink, TRaceList } from '@/types/Character/Races.types';
   import { RacesFilterDefaults } from '@/types/Character/Races.types';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
   export default defineComponent({
 
@@ -165,6 +167,18 @@
         await filter.initFilter();
         await initPages();
       });
+
+      const books = computed(() => {
+        const params = toValue(filter.queryParams);
+
+        if (params?.book instanceof Array) {
+          return params.book;
+        }
+
+        return [];
+      });
+
+      provide(DEFAULT_QUERY_BOOKS_INJECT_KEY, books);
 
       return {
         isMobile,
