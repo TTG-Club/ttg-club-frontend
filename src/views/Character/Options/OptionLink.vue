@@ -107,7 +107,8 @@
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,
-        'is-green': props.optionItem?.homebrew
+        'is-green': props.optionItem?.homebrew,
+        'is-sub-item': props.inTab
       }));
 
       const clickHandler = async () => {
