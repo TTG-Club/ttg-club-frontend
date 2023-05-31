@@ -11,7 +11,7 @@
     <virtual-grouped-list
       :list="getListProps({ items: spells })"
       :get-group="getSpellGroup"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="grid"
     >
       <template #default="{ item: spell }">
         <spell-link
@@ -41,7 +41,7 @@
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
   import { getListProps } from '@/components/list/VirtualList/helpers';
-  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
+  import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const props = withDefaults(defineProps<{
@@ -153,4 +153,10 @@
   });
 
   const showRightSide = computed(() => route.name === 'spellDetail');
+
+  const grid = computed(() => getListGridInTabProps({
+    showRightSide: showRightSide.value,
+    fullscreen: fullscreen.value,
+    inTab: props.inTab
+  }));
 </script>
