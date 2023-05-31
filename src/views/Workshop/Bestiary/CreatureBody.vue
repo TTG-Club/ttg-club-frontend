@@ -470,7 +470,7 @@
       .map(item => `${
         item.name ? `${ item.name } ` : ''
       }${
-        item.value ? `${ item.value } фт.` : ''
+        item.value || item.value === 0 ? `${ item.value } фт.` : ''
       }${
         item.additional ? ` (${ item.additional })` : ''
       }`)
