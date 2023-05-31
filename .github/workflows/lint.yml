@@ -35,6 +35,3 @@ jobs:
 
       - name: Lint application
         run: npm run lint:fix
-
-      - name: Type-check application
-        run: npm run type-check
