@@ -19,7 +19,7 @@ export default class HTTPService {
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
-      baseURL: '/api/v1',
+      baseURL: this.getBaseURL('/api/v1'),
       withCredentials: true,
       headers: {}
     });
@@ -92,7 +92,7 @@ export default class HTTPService {
   rawHead(config: Omit<RequestConfig, 'payload'>) {
     return this.instance({
       method: 'head',
-      baseURL: '',
+      baseURL: this.getBaseURL(),
       url: config.url,
       signal: config.signal
     });
@@ -101,10 +101,16 @@ export default class HTTPService {
   rawGet(config: RequestConfig): Promise<AxiosResponse<string>> {
     return this.instance({
       method: 'get',
-      baseURL: '',
+      baseURL: this.getBaseURL(),
       url: config.url,
       params: config.payload,
       signal: config.signal
     });
   }
+
+  private getBaseURL = (url = '') => {
+    const devPrefix = import.meta.env.DEV ? '/proxy' : '';
+
+    return `${ devPrefix }${ url }`;
+  };
 }

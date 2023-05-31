@@ -235,7 +235,7 @@
       inProgress.value = true;
       controller.value = new AbortController();
 
-      const resp = await http.post({
+      const resp = await http.post<TSearchResultList>({
         url: '/search/random',
         payload: {
           page: 0,
@@ -252,7 +252,7 @@
 
       sendSearchMetrics('random');
 
-      const result = resp.data as TSearchResultList;
+      const result = resp.data;
 
       results.value = result;
       selectedIndex.value = null;

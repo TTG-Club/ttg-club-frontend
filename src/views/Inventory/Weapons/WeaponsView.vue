@@ -32,11 +32,11 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.types';
   import { usePagination } from '@/common/composition/usePagination';
-  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
-  import type { AnyObject } from "@/types/Shared/Utility.types";
-  import WeaponLink from "@/views/Inventory/Weapons/WeaponLink.vue";
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import type { AnyObject } from '@/types/Shared/Utility.types';
+  import WeaponLink from '@/views/Inventory/Weapons/WeaponLink.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();

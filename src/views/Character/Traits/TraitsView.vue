@@ -32,9 +32,9 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from "@/common/helpers/list";
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { getGroupByFirstLetter } from '@/common/helpers/list';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {

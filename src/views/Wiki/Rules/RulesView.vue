@@ -32,8 +32,8 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();

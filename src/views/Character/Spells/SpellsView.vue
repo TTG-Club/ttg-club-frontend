@@ -40,8 +40,8 @@
   import { SpellsFilterDefaults, TSpellLink } from '@/types/Character/Spells.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const props = withDefaults(defineProps<{

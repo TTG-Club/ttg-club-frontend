@@ -26,18 +26,18 @@
   import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
-  import capitalize from "lodash/capitalize";
+  import capitalize from 'lodash/capitalize';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import GodLink from '@/views/Wiki/Gods/GodLink.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import { GodsFilterDefaults } from '@/types/Wiki/Gods.types';
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
-  import { DEFAULT_ENTITY_KEY_FIELD } from "@/common/const";
-  import VirtualGroupedList from "@/components/list/VirtualGroupedList/VirtualGroupedList.vue";
-  import type { AnyObject } from "@/types/Shared/Utility.types";
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { DEFAULT_ENTITY_KEY_FIELD } from '@/common/const';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import type { AnyObject } from '@/types/Shared/Utility.types';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
