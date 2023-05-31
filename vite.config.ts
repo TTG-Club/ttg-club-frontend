@@ -33,10 +33,7 @@ export default ({ mode }: ConfigEnv) => {
       outDir: env.VITE_APP_BUILD_PATH || 'dist',
       sourcemap: 'inline',
       minify: 'terser',
-
-      // manifest: 'spa-manifest.json',
       rollupOptions: {
-        // input: fileURLToPath(new URL('./src/main.ts', import.meta.url)),
         output: {
           entryFileNames: 'js/app.[hash:8].js',
           chunkFileNames: 'js/[name].[hash:8].js',
@@ -51,10 +48,12 @@ export default ({ mode }: ConfigEnv) => {
       }
     },
     plugins: [
-      ViteEjsPlugin(() => ({
-        env,
-        mode
-      })),
+      ViteEjsPlugin(() => (
+        {
+          env,
+          mode
+        }
+      )),
       viteLegacyPlugin({
         modernPolyfills: true
       }),
