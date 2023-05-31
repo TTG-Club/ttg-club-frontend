@@ -5,12 +5,12 @@
     class="content-layout"
   >
     <div
-      :class="{ 'is-fullscreen': fullscreen }"
+      :class="{ 'is-fullscreen': fullscreenState }"
       class="content-layout__body"
     >
       <div
         :class="{
-          'is-fullscreen': fullscreen,
+          'is-fullscreen': fullscreenState,
           'is-showed-right-side': showRightSide,
         }"
         class="content-layout__side--left"
@@ -56,7 +56,7 @@
 
         <div
           ref="leftSide"
-          :class="{ 'is-shadow': shadow || (showRightSide && fullscreen) }"
+          :class="{ 'is-shadow': shadow || (showRightSide && fullscreenState) }"
           class="content-layout__side--left_body"
         >
           <slot name="default" />
@@ -66,7 +66,7 @@
       <div
         v-if="showRightSide"
         ref="detail"
-        :class="{ 'is-fullscreen': fullscreen }"
+        :class="{ 'is-fullscreen': fullscreenState }"
         class="content-layout__side--right"
       >
         <router-view
@@ -81,9 +81,8 @@
   </div>
 </template>
 
-<script lang="ts">
-  import type { PropType } from 'vue';
-  import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+  import { computed, ref } from 'vue';
   import {
     useElementBounding, useEventListener, useInfiniteScroll, useResizeObserver
   } from '@vueuse/core';
@@ -93,124 +92,123 @@
   import ListFilter from '@/components/filter/ListFilter.vue';
   import type { FilterComposable } from '@/common/composition/useFilter';
 
-  export default defineComponent({
-    components: { ListFilter },
-    props: {
-      showRightSide: {
-        type: Boolean,
-        default: false
-      },
-      title: {
-        type: String,
-        default: null
-      },
-      filterInstance: {
-        type: Object as PropType<FilterComposable>,
-        default: undefined
-      }
-    },
-    setup(props, { emit }) {
-      const uiStore = useUIStore();
+  type TEmit = {
+    (e: 'list-end'): void;
+  }
 
-      const {
-        isMobile,
-        fullscreen,
-        bodyElement
-      } = storeToRefs(uiStore);
-
-      const container = ref<HTMLDivElement | null>(null);
-      const leftSide = ref<HTMLDivElement | null>(null);
-      const fixedContainer = ref<HTMLDivElement | null>(null);
-      const shadow = ref(false);
-
-      const fixedContainerRect = useElementBounding(fixedContainer);
-
-      const scrollToActive = (oldLink?: Element) => {
-        if (isMobile.value) {
-          return;
-        }
-
-        if (!leftSide.value) {
-          return;
-        }
-
-        const link = oldLink || leftSide.value.querySelector('.router-link-active');
-
-        if (!link) {
-          return;
-        }
-
-        const rect = link.getBoundingClientRect();
-
-        if (!bodyElement.value || !rect?.top && rect?.top !== 0) {
-          return;
-        }
-
-        fixedContainerRect.update();
-
-        bodyElement.value.scroll({
-          top: rect.top + uiStore.bodyScroll.y - fixedContainerRect.height.value,
-          behavior: 'smooth'
-        });
-      };
-
-      const scrollToLastActive = (url: string) => {
-        if (isMobile.value) {
-          return;
-        }
-
-        if (!leftSide.value) {
-          return;
-        }
-
-        const link = leftSide.value.querySelector(`[href="${ url }"]`)
-          ?.closest('.link-item-expand');
-
-        if (!link) {
-          return;
-        }
-
-        setTimeout(() => {
-          scrollToActive(link);
-        }, 350);
-      };
-
-      const toggleShadow = () => {
-        if (!bodyElement.value || !container.value) {
-          return;
-        }
-
-        shadow.value
-          = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
-      };
-
-      const scrollHandler = throttle(() => {
-        toggleShadow();
-      }, 200);
-
-      useInfiniteScroll(
-        bodyElement,
-        () => {
-          emit('list-end');
-        },
-        { distance: 1080 }
-      );
-
-      useEventListener(bodyElement, 'scroll', scrollHandler);
-      useResizeObserver(bodyElement, scrollHandler);
-
-      return {
-        isMobile,
-        fullscreen,
-        shadow,
-        leftSide,
-        fixedContainer,
-        container,
-        scrollToActive,
-        scrollToLastActive
-      };
+  const props = withDefaults(
+    defineProps<{
+      showRightSide?: boolean;
+      title?: string | null;
+      forceFullscreenState?: boolean;
+      filterInstance?: FilterComposable
+    }>(),
+    {
+      showRightSide: false,
+      title: null,
+      forceFullscreenState: undefined,
+      filterInstance: undefined
     }
+  );
+
+  const emit = defineEmits<TEmit>();
+
+  const uiStore = useUIStore();
+
+  const {
+    isMobile,
+    fullscreen,
+    bodyElement
+  } = storeToRefs(uiStore);
+
+  const container = ref<HTMLDivElement | null>(null);
+  const leftSide = ref<HTMLDivElement | null>(null);
+  const fixedContainer = ref<HTMLDivElement | null>(null);
+  const shadow = ref(false);
+
+  const fullscreenState = computed(() => {
+    if (typeof props.forceFullscreenState === 'boolean') {
+      return props.forceFullscreenState;
+    }
+
+    return fullscreen.value;
   });
+
+  const fixedContainerRect = useElementBounding(fixedContainer);
+
+  const scrollToActive = (oldLink?: Element) => {
+    if (isMobile.value) {
+      return;
+    }
+
+    if (!leftSide.value) {
+      return;
+    }
+
+    const link = oldLink || leftSide.value.querySelector('.router-link-active');
+
+    if (!link) {
+      return;
+    }
+
+    const rect = link.getBoundingClientRect();
+
+    if (!bodyElement.value || !rect?.top && rect?.top !== 0) {
+      return;
+    }
+
+    fixedContainerRect.update();
+
+    bodyElement.value.scroll({
+      top: rect.top + uiStore.bodyScroll.y - fixedContainerRect.height.value,
+      behavior: 'smooth'
+    });
+  };
+
+  const scrollToLastActive = (url: string) => {
+    if (isMobile.value) {
+      return;
+    }
+
+    if (!leftSide.value) {
+      return;
+    }
+
+    const link = leftSide.value.querySelector(`[href="${ url }"]`)
+      ?.closest('.link-item-expand');
+
+    if (!link) {
+      return;
+    }
+
+    setTimeout(() => {
+      scrollToActive(link);
+    }, 350);
+  };
+
+  const toggleShadow = () => {
+    if (!bodyElement.value || !container.value) {
+      return;
+    }
+
+    shadow.value
+      = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
+  };
+
+  const scrollHandler = throttle(() => {
+    toggleShadow();
+  }, 200);
+
+  useInfiniteScroll(
+    bodyElement,
+    () => {
+      emit('list-end');
+    },
+    { distance: 1080 }
+  );
+
+  useEventListener(bodyElement, 'scroll', scrollHandler);
+  useResizeObserver(bodyElement, scrollHandler);
 </script>
 
 <style lang="scss" scoped>

@@ -1,5 +1,8 @@
 <template>
-  <content-layout :show-right-side="showRightSide">
+  <content-layout
+    :show-right-side="showRightSide"
+    :force-fullscreen-state="false"
+  >
     <template #fixed>
       <form
         class="tools_settings"

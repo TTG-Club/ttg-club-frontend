@@ -1,5 +1,8 @@
 <template>
-  <content-layout :show-right-side="showRightSide">
+  <content-layout
+    :show-right-side="showRightSide"
+    :force-fullscreen-state="false"
+  >
     <template #fixed>
       <form
         class="tools_settings"
@@ -109,7 +112,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'On sale'"
             :title="selected.item?.name.rus || 'В продаже'"
             @close="close"
