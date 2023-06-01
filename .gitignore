@@ -2,6 +2,7 @@
 node_modules
 /dist
 /public_html
+/storybook-static
 
 # local env files
 .env.local
