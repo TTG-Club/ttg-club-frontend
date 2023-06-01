@@ -470,7 +470,7 @@
       .map(item => `${
         item.name ? `${ item.name } ` : ''
       }${
-        item.value ? `${ item.value } фт.` : ''
+        item.value || item.value === 0 ? `${ item.value } фт.` : ''
       }${
         item.additional ? ` (${ item.additional })` : ''
       }`)
@@ -579,6 +579,6 @@
   });
 
   const hitDiceFormula = computed(() => (props.creature.hits.bonus
-    ? `${ props.creature.hits.formula } ${ getFormattedModifier(props.creature.hits.bonus) }`
+    ? `${ props.creature.hits.formula } ${ props.creature.hits.sign } ${ Math.abs(props.creature.hits.bonus) }`
     : props.creature.hits.formula));
 </script>
