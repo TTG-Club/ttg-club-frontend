@@ -81,7 +81,7 @@
                   type="toggle"
                   @update:model-value="updateUsingMaxPrice"
                 >
-                  {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
+                  Отображать максимальную цену
                 </ui-checkbox>
               </div>
             </div>
