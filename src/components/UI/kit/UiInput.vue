@@ -231,7 +231,7 @@
       background-color: transparent;
       color: var(--text-color);
       font-size: var(--main-font-size);
-      height: 42px;
+      height: 38px;
       font-family: 'Open Sans', serif;
       padding: 4px 12px;
       margin: 0;
