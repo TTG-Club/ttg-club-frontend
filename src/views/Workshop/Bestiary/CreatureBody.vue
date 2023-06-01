@@ -579,6 +579,6 @@
   });
 
   const hitDiceFormula = computed(() => (props.creature.hits.bonus
-    ? `${ props.creature.hits.formula } ${ getFormattedModifier(props.creature.hits.bonus) }`
+    ? `${ props.creature.hits.formula } ${ props.creature.hits.sign } ${ Math.abs(props.creature.hits.bonus) }`
     : props.creature.hits.formula));
 </script>
