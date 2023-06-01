@@ -73,9 +73,11 @@
     magicItem: T;
     inTools?: boolean;
     inTrader?: boolean;
+    isActive?: boolean;
   }>(), {
     inTools: false,
-    inTrader: false
+    inTrader: false,
+    isActive: false
   });
 
   const emit = defineEmits<{(e: 'select-item'): void }>();
@@ -87,7 +89,7 @@
   } = useLink(props);
 
   const classList = computed(() => ({
-    'router-link-active': isActive.value,
+    'router-link-active': props.isActive || isActive.value,
     'is-green': props.magicItem?.source?.homebrew
   }));
 
@@ -102,12 +104,12 @@
   };
 
   const price = computed(() => {
-    if ('price' in props.magicItem.custom) {
-      return props.magicItem.custom.price;
+    if (typeof props.magicItem.custom?.price === 'number') {
+      return `${ props.magicItem.custom.price } зм`;
     }
 
-    if ('price' in props.magicItem) {
-      return props.magicItem;
+    if (props.magicItem.price) {
+      return props.magicItem.price;
     }
 
     return null;
