@@ -692,8 +692,10 @@
     margin-top: 16px;
 
     .ui-checkbox {
-      margin-right: 8px;
-      margin-top: 8px;
+      &:not(.ui-checkbox--toggle) {
+        margin-right: 8px;
+        margin-top: 8px;
+      }
     }
 
     &.btn-wrapper {
