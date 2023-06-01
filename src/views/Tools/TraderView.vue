@@ -9,7 +9,7 @@
         @submit.prevent="sendForm"
       >
         <div class="tools_settings__row">
-          <div class="tools_settings__colum">
+          <div class="tools_settings__column">
             <div class="row">
               <span class="label">Количество магии в мире:</span>
 
@@ -44,56 +44,67 @@
           v-if="settings.opened"
           class="tools_settings__row"
         >
-          <ui-checkbox
-            :model-value="form.unique"
-            type="toggle"
-            @update:model-value="updateUnique"
-          >
-            Только уникальные
-          </ui-checkbox>
-        </div>
+          <div class="tools_settings__column">
+            <div class="row">
+              <div
+                v-if="settings.opened"
+                class="tools_settings__row"
+              >
+                <ui-checkbox
+                  :model-value="form.unique"
+                  type="toggle"
+                  @update:model-value="updateUnique"
+                >
+                  Только уникальные
+                </ui-checkbox>
+              </div>
 
-        <div
-          v-if="settings.opened && config.sources.length"
-          class="tools_settings__row"
-        >
-          <span class="label">Источники:</span>
+              <div
+                v-if="settings.opened && !form.unique"
+                class="tools_settings__row"
+              >
+                <ui-checkbox
+                  :model-value="settings.grouping"
+                  type="toggle"
+                  @update:model-value="updateGrouping"
+                >
+                  Группировать одинаковые
+                </ui-checkbox>
+              </div>
 
-          <div class="checkbox-group">
-            <ui-switch
-              track-by="shortName"
-              label="shortName"
-              :model-value="settings.priceSource"
-              :options="config.sources"
-              @update:model-value="updatePriceSource"
-            />
+              <div
+                v-if="settings.opened && !form.unique && settings.grouping"
+                class="tools_settings__row"
+              >
+                <ui-checkbox
+                  :model-value="settings.max"
+                  type="toggle"
+                  @update:model-value="updateUsingMaxPrice"
+                >
+                  {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
+                </ui-checkbox>
+              </div>
+            </div>
+
+            <div
+              v-if="settings.opened && config.sources.length"
+              class="row align-right"
+            >
+              <div class="tools_settings__row">
+                <span class="label">Источники:</span>
+
+                <div class="checkbox-group">
+                  <ui-switch
+                    track-by="shortName"
+                    label="shortName"
+                    :model-value="settings.priceSource"
+                    :options="config.sources"
+                    @update:model-value="updatePriceSource"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div
-          v-if="settings.opened && !form.unique"
-          class="tools_settings__row"
-        >
-          <ui-checkbox
-            :model-value="settings.grouping"
-            type="toggle"
-            @update:model-value="updateGrouping"
-          >
-            Группировать одинаковые
-          </ui-checkbox>
-        </div>
-
-        <div
-          v-if="settings.opened && !form.unique && settings.grouping"
-          class="tools_settings__row"
-        >
-          <ui-checkbox
-            :model-value="settings.max"
-            type="toggle"
-            @update:model-value="updateUsingMaxPrice"
-          >
-            {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
-          </ui-checkbox>
         </div>
 
         <div class="tools_settings__row btn-wrapper">

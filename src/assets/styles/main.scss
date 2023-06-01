@@ -702,10 +702,16 @@
     }
   }
 
-  &__colum {
+  &__column {
     display: flex;
     flex-wrap: wrap;
     gap: 16px 16px;
+
+    .row {
+      &.align-right {
+        margin-left: auto;
+      }
+    }
   }
 
   .label {

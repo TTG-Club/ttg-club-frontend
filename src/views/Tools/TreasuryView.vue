@@ -30,7 +30,7 @@
                 Настройки предметов:
               </h5>
 
-              <div class="tools_settings__colum">
+              <div class="tools_settings__column">
                 <div class="row">
                   <div>
                     <ui-checkbox
@@ -84,7 +84,7 @@
                 Настройки вида:
               </h5>
 
-              <div class="tools_settings__colum">
+              <div class="tools_settings__column">
                 <div class="row">
                   <div>
                     <ui-checkbox
