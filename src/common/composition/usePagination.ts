@@ -62,7 +62,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const items = ref<Array<any>>([]);
   const page = ref(unref(config.page) || 0);
   const limit = computed(() => unref(config.limit) || DEFAULT_PAGINATION_ITEMS_LIMIT);
-  const isEnd = ref(unref(config.limit) === -1 || false);
+  const isEnd = ref(unref(config.limit) === -1 || true);
 
   const payload = computed((): PaginationQuery => {
     const request: PaginationQuery = {
@@ -143,7 +143,6 @@ export function usePagination<T>(config: PaginationConfig) {
 
   const initPages = async () => {
     page.value = 0;
-    isEnd.value = false;
 
     const result = await load();
 

@@ -2,23 +2,21 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :on-load-more="nextPage"
+    :is-end="isEnd"
+    :items="items"
     title="Снаряжение"
+    virtualized
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
-    <virtual-grouped-list
-      :list="getListProps({ items })"
-      :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-    >
-      <template #default="{ item }">
-        <item-link
-          :item="item"
-          :to="{ path: item.url }"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item }">
+      <item-link
+        v-if="item"
+        :item="item"
+        :to="{ path: item.url }"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -55,6 +53,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items
   } = usePagination({
     url: '/items',

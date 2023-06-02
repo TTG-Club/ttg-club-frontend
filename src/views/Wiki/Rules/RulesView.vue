@@ -2,22 +2,22 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :items="rules"
+    :on-load-more="nextPage"
+    :is-end="isEnd"
+    virtualized-type="grid"
     title="Правила и термины"
+    virtualized
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
-    <virtual-grid-list
-      :list="getListProps({ items: rules })"
-      :flat="checkIsListGridFlat({ showRightSide, fullscreen })"
-    >
-      <template #default="{ item: rule }">
-        <rule-link
-          :rule="rule"
-          :to="{ path: rule.url }"
-        />
-      </template>
-    </virtual-grid-list>
+    <template #default="{ item: rule }">
+      <rule-link
+        v-if="rule"
+        :rule="rule"
+        :to="{ path: rule.url }"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -53,6 +53,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items: rules
   } = usePagination({
     url: '/rules',

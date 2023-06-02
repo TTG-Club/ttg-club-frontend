@@ -40,8 +40,8 @@
             >
               <list-filter
                 :filter-instance="filterInstance"
-                @search="$emit('search', $event)"
-                @update="$emit('update', $event)"
+                @search="onUpdateSearch"
+                @update="onUpdateFilter"
               />
             </div>
 
@@ -59,7 +59,54 @@
           :class="{ 'is-shadow': shadow || (showRightSide && fullscreenState) }"
           class="content-layout__side--left_body"
         >
-          <slot name="default" />
+          <slot
+            v-if="!items || !items.length"
+            name="default"
+          />
+
+          <div
+            v-else-if="!virtualized"
+            class="content-layout__items"
+          >
+            <div
+              v-for="(item, key) in items"
+              :key="key"
+              class="content-layout__item"
+            >
+              <slot
+                :item="item"
+                :index="key"
+                name="default"
+              />
+            </div>
+          </div>
+
+          <virtual-grouped-list
+            v-else-if="virtualizedType === 'grouped'"
+            :list="mergedListProps"
+            :grid="computedGrid"
+            :get-group="customGetGroup"
+          >
+            <template #default="{ item }">
+              <slot
+                name="default"
+                :item="item"
+              />
+            </template>
+          </virtual-grouped-list>
+
+          <virtual-grid-list
+            v-else-if="virtualizedType === 'grid'"
+            :list="mergedListProps"
+            :flat="computedFlat"
+          >
+            <template #default="{ item }">
+              <slot
+                name="default"
+                :item="item"
+              />
+            </template>
+          </virtual-grid-list>
         </div>
       </div>
 
@@ -81,19 +128,32 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import { computed, ref } from 'vue';
+<script setup lang="ts" generic="T extends Array<unknown>">
   import {
-    useElementBounding, useEventListener, useInfiniteScroll, useResizeObserver
+    computed, onMounted, ref, watch
+  } from 'vue';
+  import type { MaybeRef } from '@vueuse/core';
+  import {
+    useElementBounding, useInfiniteScroll, useScroll
   } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import throttle from 'lodash/throttle';
   import { useUIStore } from '@/store/UI/UIStore';
   import ListFilter from '@/components/filter/ListFilter.vue';
   import type { FilterComposable } from '@/common/composition/useFilter';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { getGroupByFirstLetter } from '@/common/helpers/list';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import type { TGroup, TItem } from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { checkIsListGridFlat, getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
+  import type { TVirtualListProps } from '@/components/list/VirtualList/types';
+  import type { TGetGroup } from '@/components/list/VirtualGroupedList/types';
+  import type { TVirtualGridListProps } from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
 
   type TEmit = {
-    (e: 'list-end'): void;
+    (e: 'update'): void;
+    (e: 'search', v: MaybeRef<string>): void;
   }
 
   const props = withDefaults(
@@ -101,13 +161,31 @@
       showRightSide?: boolean;
       title?: string | null;
       forceFullscreenState?: boolean;
-      filterInstance?: FilterComposable
+      filterInstance?: FilterComposable;
+      virtualized?: boolean;
+      virtualizedType?: 'grouped' | 'grid';
+      listProps?: Omit<TVirtualListProps, 'items'>;
+      getGroup?: TGetGroup<TItem, TGroup>;
+      grid?: TVirtualGridListProps;
+      flat?: TVirtualGridListProps;
+      onLoadMore?:() => Promise<void>;
+      isEnd?: boolean;
+      items?: T
     }>(),
     {
       showRightSide: false,
       title: null,
       forceFullscreenState: undefined,
-      filterInstance: undefined
+      filterInstance: undefined,
+      onLoadMore: undefined,
+      isEnd: false,
+      virtualized: false,
+      virtualizedType: 'grouped',
+      listProps: undefined,
+      getGroup: undefined,
+      grid: undefined,
+      flat: undefined,
+      items: []
     }
   );
 
@@ -134,7 +212,71 @@
     return fullscreen.value;
   });
 
+  const mergedListProps = computed(() => getListProps({
+    items: props.items,
+    ...props.listProps
+  }));
+
+  const customGetGroup = computed(() => {
+    if (props.getGroup) {
+      return props.getGroup;
+    }
+
+    return getGroupByFirstLetter;
+  });
+
+  const computedGrid = computed(() => {
+    if (!props.virtualized) {
+      return {};
+    }
+
+    if (props.grid) {
+      return props.grid;
+    }
+
+    return getListGridInTabProps({
+      showRightSide: props.showRightSide,
+      fullscreen: fullscreen.value,
+      inTab: false
+    });
+  });
+
+  const computedFlat = computed(() => {
+    if (!props.virtualized) {
+      return false;
+    }
+
+    if (props.flat) {
+      return props.flat;
+    }
+
+    return checkIsListGridFlat({
+      showRightSide: props.flat,
+      fullscreen: fullscreen.value
+    });
+  });
+
+  const toggleShadow = () => {
+    if (!bodyElement.value || !container.value) {
+      return;
+    }
+
+    shadow.value
+      = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
+  };
+
+  const scrollHandler = throttle(() => {
+    toggleShadow();
+  }, 200);
+
   const fixedContainerRect = useElementBounding(fixedContainer);
+  const bodyRect = useElementBounding(bodyElement);
+
+  const bodyScroll = useScroll(bodyElement, {
+    behavior: 'smooth',
+    throttle: 300,
+    onScroll: scrollHandler
+  });
 
   const scrollToActive = (oldLink?: Element) => {
     if (isMobile.value) {
@@ -159,10 +301,7 @@
 
     fixedContainerRect.update();
 
-    bodyElement.value.scroll({
-      top: rect.top + uiStore.bodyScroll.y - fixedContainerRect.height.value,
-      behavior: 'smooth'
-    });
+    bodyScroll.y.value = rect.top + bodyScroll.y.value - fixedContainerRect.height.value;
   };
 
   const scrollToLastActive = (url: string) => {
@@ -186,29 +325,39 @@
     }, 350);
   };
 
-  const toggleShadow = () => {
-    if (!bodyElement.value || !container.value) {
-      return;
-    }
+  const onUpdateSearch = (value: string) => {
+    bodyScroll.y.value = 0;
 
-    shadow.value
-      = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
+    emit('search', value);
   };
 
-  const scrollHandler = throttle(() => {
-    toggleShadow();
-  }, 200);
+  const onUpdateFilter = () => {
+    bodyScroll.y.value = 0;
 
-  useInfiniteScroll(
-    bodyElement,
-    () => {
-      emit('list-end');
-    },
-    { distance: 1080 }
-  );
+    emit('update');
+  };
 
-  useEventListener(bodyElement, 'scroll', scrollHandler);
-  useResizeObserver(bodyElement, scrollHandler);
+  watch(bodyRect.height, scrollHandler, {
+    immediate: true,
+    flush: 'post'
+  });
+
+  onMounted(() => {
+    useInfiniteScroll(
+      bodyElement,
+      async () => {
+        if (props.isEnd || !props.onLoadMore) {
+          return;
+        }
+
+        await props.onLoadMore();
+      },
+      {
+        distance: 1080,
+        interval: 1000
+      }
+    );
+  });
 </script>
 
 <style lang="scss" scoped>

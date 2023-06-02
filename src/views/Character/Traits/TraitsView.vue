@@ -2,22 +2,19 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :items="traits"
     title="Черты"
+    virtualized
     @search="onSearch"
     @update="initPages"
   >
-    <virtual-grouped-list
-      :list="getListProps({ items: traits })"
-      :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-    >
-      <template #default="{ item: trait }">
-        <trait-link
-          :to="{ path: trait.url }"
-          :trait-item="trait"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item: trait }">
+      <trait-link
+        v-if="trait"
+        :to="{ path: trait.url }"
+        :trait-item="trait"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -31,10 +28,6 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from '@/common/helpers/list';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
-  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   type TProps = {

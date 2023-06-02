@@ -2,23 +2,22 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :items="items"
+    :on-load-more="nextPage"
+    :is-end="isEnd"
+    :get-group="getGroupByRarity"
+    virtualized
     title="Магические предметы"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
-    <virtual-grouped-list
-      :list="getListProps({ items })"
-      :get-group="getGroupByRarity"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-    >
-      <template #default="{ item }">
-        <magic-item-link
-          :magic-item="item"
-          :to="{ path: item.url }"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item }">
+      <magic-item-link
+        v-if="item"
+        :magic-item="item"
+        :to="{ path: item.url }"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -56,6 +55,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items
   } = usePagination({
     url: '/items/magic',

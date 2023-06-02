@@ -49,8 +49,9 @@
   import type { TVirtualListProps } from '@/components/list/VirtualList/types';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
-  type TItem = AnyObject;
-  type TGroup = AnyObject;
+  export type TItem = AnyObject;
+
+  export type TGroup = AnyObject;
 
   type TProps = {
     list: TVirtualListProps;

@@ -3,24 +3,23 @@
     :is="layout"
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :items="spells"
+    :get-group="getSpellGroup"
+    :on-load-more="nextPage"
+    :is-end="isEnd"
     title="Заклинания"
+    virtualized
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
-    <virtual-grouped-list
-      :list="getListProps({ items: spells })"
-      :get-group="getSpellGroup"
-      :grid="grid"
-    >
-      <template #default="{ item: spell }">
-        <spell-link
-          :in-tab="inTab"
-          :spell="spell"
-          :to="{ path: spell.url }"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item: spell }">
+      <spell-link
+        v-if="spell"
+        :in-tab="inTab"
+        :spell="spell"
+        :to="{ path: spell.url }"
+      />
+    </template>
   </component>
 </template>
 
@@ -30,7 +29,7 @@
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
-  import { resolveUnref } from '@vueuse/shared';
+  import { toValue } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import SpellLink from '@/views/Character/Spells/SpellLink.vue';
@@ -38,10 +37,7 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { SpellsFilterDefaults, TSpellLink } from '@/types/Character/Spells.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
-  import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const props = withDefaults(defineProps<{
@@ -80,7 +76,7 @@
   const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    const params = resolveUnref(filter.queryParams);
+    const params = toValue(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return filter.queryParams.value;
@@ -96,6 +92,7 @@
     initPages,
     nextPage,
     resetPages,
+    isEnd,
     items: spells
   } = usePagination<TSpellLink[]>({
     url: '/spells',
@@ -153,10 +150,4 @@
   });
 
   const showRightSide = computed(() => route.name === 'spellDetail');
-
-  const grid = computed(() => getListGridInTabProps({
-    showRightSide: showRightSide.value,
-    fullscreen: fullscreen.value,
-    inTab: props.inTab
-  }));
 </script>

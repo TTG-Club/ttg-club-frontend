@@ -2,23 +2,22 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :get-group="getGroupByAlignment"
+    :on-load-more="nextPage"
+    :items="gods"
+    :is-end="isEnd"
+    virtualized
     title="Боги"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
-    <virtual-grouped-list
-      :list="getListProps({ items: gods })"
-      :get-group="getGroupByAlignment"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-    >
-      <template #default="{ item: god }">
-        <god-link
-          :god="god"
-          :to="{ path: god.url }"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item: god }">
+      <god-link
+        v-if="god"
+        :god="god"
+        :to="{ path: god.url }"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -57,6 +56,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items: gods
   } = usePagination({
     url: '/gods',

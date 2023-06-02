@@ -36,7 +36,7 @@
   </content-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import { useRoute } from 'vue-router';
   import {
     computed, defineComponent, nextTick, onBeforeMount, provide, ref, watch
@@ -57,124 +57,106 @@
   import { ClassesFilterDefaults } from '@/types/Character/Classes.types';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
-  export default defineComponent({
+  const uiStore = useUIStore();
+  const route = useRoute();
+  const showRightSide = ref(false);
 
-    components: {
-      ClassLink,
-      ContentLayout
+  const filter = useFilter({
+    dbName: ClassesFilterDefaults.dbName,
+    url: ClassesFilterDefaults.url
+  });
+
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
+
+  const {
+    initPages,
+    items: classes
+  } = usePagination({
+    url: '/classes',
+    limit: -1,
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams
     },
-    setup() {
-      const uiStore = useUIStore();
-      const route = useRoute();
-      const showRightSide = ref(false);
+    search: filter.search
+  });
 
-      const filter = useFilter({
-        dbName: ClassesFilterDefaults.dbName,
-        url: ClassesFilterDefaults.url
+  watch(
+    [classes, () => route.name],
+    () => {
+      nextTick(() => {
+        showRightSide.value = !!classes.value.length && route.name === 'classDetail';
       });
+    },
+    { flush: 'post' }
+  );
 
-      const {
-        isMobile,
-        fullscreen
-      } = storeToRefs(uiStore);
+  const sortedClasses = computed((): Array<TClassList> => {
+    if (!classes.value?.length) {
+      return [];
+    }
 
-      const {
-        initPages,
-        items: classes
-      } = usePagination({
-        url: '/classes',
-        limit: -1,
-        filter: {
-          isCustomized: filter.isCustomized,
-          value: filter.queryParams
-        },
-        search: filter.search
-      });
+    const getGroupArchetypes = (list: Array<TClassArchetype>): Array<TClassArchetypeList> => sortBy(
+      Object.values(groupBy(list, o => o.type.name))
+        .map(value => ({
+          group: value[0].type,
+          list: value
+        })),
+      [o => o.group.order]
+    );
 
-      watch(
-        [classes, () => route.name],
-        () => {
-          nextTick(() => {
-            showRightSide.value = !!classes.value.length && route.name === 'classDetail';
-          });
-        },
-        { flush: 'post' }
-      );
+    const getGroupClasses = (): Array<TClassList> => {
+      const newClasses: Array<TClassItem> = classes.value.map(classItem => ({
+        ...classItem,
+        archetypes: getGroupArchetypes(classItem.archetypes)
+      }));
 
-      const sortedClasses = computed((): Array<TClassList> => {
-        if (!classes.value?.length) {
-          return [];
-        }
+      const defaultGroup: TClassList = {
+        list: sortBy(
+          newClasses.filter(item => !('group' in item)),
+          [o => o.name.rus]
+        )
+      };
 
-        const getGroupArchetypes = (list: Array<TClassArchetype>): Array<TClassArchetypeList> => sortBy(
-          Object.values(groupBy(list, o => o.type.name))
-            .map(value => ({
-              group: value[0].type,
-              list: value
-            })),
-          [o => o.group.order]
-        );
-
-        const getGroupClasses = (): Array<TClassList> => {
-          const newClasses: Array<TClassItem> = classes.value.map(classItem => ({
-            ...classItem,
-            archetypes: getGroupArchetypes(classItem.archetypes)
-          }));
-
-          const defaultGroup: TClassList = {
+      const mapped: Array<TClassList> = sortBy(
+        Object.values(groupBy(
+          cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
+          (o: TClassItem) => o.group?.name
+        ) as { [key: string]: Array<TClassItem> })
+          .map(classList => ({
+            group: classList[0].group!,
             list: sortBy(
-              newClasses.filter(item => !('group' in item)),
+              classList,
               [o => o.name.rus]
             )
-          };
+          })),
+        [o => o.group!.order]
+      );
 
-          const mapped: Array<TClassList> = sortBy(
-            Object.values(groupBy(
-              cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
-              (o: TClassItem) => o.group?.name
-            ) as { [key: string]: Array<TClassItem> })
-              .map(classList => ({
-                group: classList[0].group!,
-                list: sortBy(
-                  classList,
-                  [o => o.name.rus]
-                )
-              })),
-            [o => o.group!.order]
-          );
+      return [defaultGroup, ...mapped];
+    };
 
-          return [defaultGroup, ...mapped];
-        };
+    return getGroupClasses();
+  });
 
-        return getGroupClasses();
-      });
+  const books = computed(() => {
+    const params = resolveUnref(filter.queryParams);
 
-      const books = computed(() => {
-        const params = resolveUnref(filter.queryParams);
-
-        if (params?.book instanceof Array) {
-          return params.book;
-        }
-
-        return [];
-      });
-
-      provide(DEFAULT_QUERY_BOOKS_INJECT_KEY, books);
-
-      onBeforeMount(async () => {
-        await filter.initFilter();
-        await initPages();
-      });
-
-      return {
-        isMobile,
-        fullscreen,
-        sortedClasses,
-        showRightSide,
-        filter,
-        initPages
-      };
+    if (params?.book instanceof Array) {
+      return params.book;
     }
+
+    return [];
+  });
+
+  provide(DEFAULT_QUERY_BOOKS_INJECT_KEY, books);
+
+  onBeforeMount(async () => {
+    await filter.initFilter();
+    await initPages();
   });
 </script>
 

@@ -2,24 +2,20 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :items="weapons"
+    :get-group="getWeaponGroup"
+    virtualized
     title="Оружие"
     @search="onSearch"
     @update="initPages"
   >
-    <virtual-grouped-list
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-      :get-group="getWeaponGroup"
-      :list="getListProps({
-        items: weapons,
-      })"
-    >
-      <template #default="{ item: weapon }">
-        <weapon-link
-          :to="{ path: weapon.url }"
-          :weapon="weapon"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item: weapon }">
+      <weapon-link
+        v-if="weapon"
+        :to="{ path: weapon.url }"
+        :weapon="weapon"
+      />
+    </template>
   </content-layout>
 </template>
 

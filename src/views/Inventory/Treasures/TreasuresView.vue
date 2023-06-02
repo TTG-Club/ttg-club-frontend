@@ -1,21 +1,22 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :items="treasures"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
+    :get-group="getGroupWithIdByFirstLetter"
+    :grid="{}"
+    virtualized
     title="Драгоценности"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
-    <virtual-grouped-list
-      :list="{ items: treasures }"
-      :get-group="getGroupWithIdByFirstLetter"
-    >
-      <template #default="{ item: treasure }">
-        <treasure-item
-          :treasure="treasure"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item: treasure }">
+      <treasure-item
+        v-if="treasure"
+        :treasure="treasure"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -28,7 +29,6 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import { getGroupWithIdByFirstLetter } from '@/common/helpers/list';
 
   const uiStore = useUIStore();
@@ -46,6 +46,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items
   } = usePagination({
     url: '/treasures',

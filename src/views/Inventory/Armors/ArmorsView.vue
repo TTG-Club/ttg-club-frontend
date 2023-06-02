@@ -2,22 +2,20 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :items="armors"
+    :get-group="getArmorGroup"
+    virtualized
     title="Доспехи"
     @search="onSearch"
     @update="initPages"
   >
-    <virtual-grouped-list
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-      :get-group="getArmorGroup"
-      :list="getListProps({ items: armors })"
-    >
-      <template #default="{ item: armor }">
-        <armor-link
-          :armor="armor"
-          :to="{ path: armor.url }"
-        />
-      </template>
-    </virtual-grouped-list>
+    <template #default="{ item: armor }">
+      <armor-link
+        v-if="armor"
+        :armor="armor"
+        :to="{ path: armor.url }"
+      />
+    </template>
   </content-layout>
 </template>
 
@@ -31,10 +29,7 @@
   import { useFilter } from '@/common/composition/useFilter';
   import { usePagination } from '@/common/composition/usePagination';
   import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
   import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
-  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
