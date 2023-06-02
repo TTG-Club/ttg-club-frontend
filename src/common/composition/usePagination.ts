@@ -124,7 +124,7 @@ export function usePagination<T>(config: PaginationConfig) {
         items.value = resp.data;
       }
 
-      isEnd.value = Array.isArray(items.value) && (items.value.length < limit.value);
+      isEnd.value = !(resp.data instanceof Array) || (resp.data.length < limit.value);
 
       return Promise.resolve();
     } catch (err: any) {
