@@ -143,6 +143,7 @@ export function usePagination<T>(config: PaginationConfig) {
 
   const initPages = async () => {
     page.value = 0;
+    isEnd.value = false;
 
     const result = await load();
 
