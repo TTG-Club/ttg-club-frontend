@@ -3,7 +3,7 @@
     v-if="searchLink"
     ref="link"
     :class="classes"
-    :to="{ path: searchLink.url }"
+    :to="searchLink.url"
     class="search-link"
   >
     <div class="search-link__body">
