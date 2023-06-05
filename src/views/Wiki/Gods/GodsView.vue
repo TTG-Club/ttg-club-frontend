@@ -1,16 +1,17 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Боги"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="getListProps({ items: gods })"
       :get-group="getGroupByAlignment"
       :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :list="getListProps({ items: gods })"
     >
       <template #default="{ item: god }">
         <god-link
@@ -57,6 +58,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items: gods
   } = usePagination({
     url: '/gods',
@@ -85,10 +87,12 @@
     }
   };
 
-  const getGroupByAlignment = (god: AnyObject) => ({
-    [DEFAULT_ENTITY_KEY_FIELD]: god.alignment,
-    name: capitalize(String(god.alignment))
-  });
+  const getGroupByAlignment = (god: AnyObject) => (
+    {
+      [DEFAULT_ENTITY_KEY_FIELD]: god.alignment,
+      name: capitalize(String(god.alignment))
+    }
+  );
 
   onBeforeMount(async () => {
     await filter.initFilter();

@@ -40,8 +40,8 @@
             >
               <list-filter
                 :filter-instance="filterInstance"
-                @search="$emit('search', $event)"
-                @update="$emit('update', $event)"
+                @search="onUpdateSearch"
+                @update="onUpdateFilter"
               />
             </div>
 
@@ -81,10 +81,13 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import { computed, ref } from 'vue';
+<script lang="ts" setup>
   import {
-    useElementBounding, useEventListener, useInfiniteScroll, useResizeObserver
+    computed, onMounted, ref, watch
+  } from 'vue';
+  import type { MaybeRef } from '@vueuse/core';
+  import {
+    useElementBounding, useInfiniteScroll, useScroll
   } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import throttle from 'lodash/throttle';
@@ -93,7 +96,8 @@
   import type { FilterComposable } from '@/common/composition/useFilter';
 
   type TEmit = {
-    (e: 'list-end'): void;
+    (e: 'update'): void;
+    (e: 'search', v: MaybeRef<string>): void;
   }
 
   const props = withDefaults(
@@ -101,13 +105,17 @@
       showRightSide?: boolean;
       title?: string | null;
       forceFullscreenState?: boolean;
-      filterInstance?: FilterComposable
+      filterInstance?: FilterComposable;
+      onLoadMore?:() => Promise<void>;
+      isEnd?: boolean;
     }>(),
     {
       showRightSide: false,
       title: null,
       forceFullscreenState: undefined,
-      filterInstance: undefined
+      filterInstance: undefined,
+      onLoadMore: undefined,
+      isEnd: false
     }
   );
 
@@ -134,7 +142,27 @@
     return fullscreen.value;
   });
 
+  const toggleShadow = () => {
+    if (!bodyElement.value || !container.value) {
+      return;
+    }
+
+    shadow.value
+      = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
+  };
+
+  const scrollHandler = throttle(() => {
+    toggleShadow();
+  }, 200);
+
   const fixedContainerRect = useElementBounding(fixedContainer);
+  const bodyRect = useElementBounding(bodyElement);
+
+  const bodyScroll = useScroll(bodyElement, {
+    behavior: 'smooth',
+    throttle: 300,
+    onScroll: scrollHandler
+  });
 
   const scrollToActive = (oldLink?: Element) => {
     if (isMobile.value) {
@@ -159,10 +187,7 @@
 
     fixedContainerRect.update();
 
-    bodyElement.value.scroll({
-      top: rect.top + uiStore.bodyScroll.y - fixedContainerRect.height.value,
-      behavior: 'smooth'
-    });
+    bodyScroll.y.value = rect.top + bodyScroll.y.value - fixedContainerRect.height.value;
   };
 
   const scrollToLastActive = (url: string) => {
@@ -186,29 +211,39 @@
     }, 350);
   };
 
-  const toggleShadow = () => {
-    if (!bodyElement.value || !container.value) {
-      return;
-    }
+  const onUpdateSearch = (value: string) => {
+    bodyScroll.y.value = 0;
 
-    shadow.value
-      = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
+    emit('search', value);
   };
 
-  const scrollHandler = throttle(() => {
-    toggleShadow();
-  }, 200);
+  const onUpdateFilter = () => {
+    bodyScroll.y.value = 0;
 
-  useInfiniteScroll(
-    bodyElement,
-    () => {
-      emit('list-end');
-    },
-    { distance: 1080 }
-  );
+    emit('update');
+  };
 
-  useEventListener(bodyElement, 'scroll', scrollHandler);
-  useResizeObserver(bodyElement, scrollHandler);
+  watch(bodyRect.height, scrollHandler, {
+    immediate: true,
+    flush: 'post'
+  });
+
+  onMounted(() => {
+    useInfiniteScroll(
+      bodyElement,
+      async () => {
+        if (props.isEnd || !props.onLoadMore) {
+          return;
+        }
+
+        await props.onLoadMore();
+      },
+      {
+        distance: 1080,
+        interval: 1000
+      }
+    );
+  });
 </script>
 
 <style lang="scss" scoped>

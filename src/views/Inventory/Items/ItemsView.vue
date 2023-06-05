@@ -1,16 +1,17 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Снаряжение"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="getListProps({ items })"
       :get-group="getGroupByFirstLetter"
       :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :list="getListProps({ items })"
     >
       <template #default="{ item }">
         <item-link
@@ -55,6 +56,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items
   } = usePagination({
     url: '/items',

@@ -46,10 +46,7 @@
         >
           <div class="tools_settings__column">
             <div class="row">
-              <div
-                v-if="settings.opened"
-                class="tools_settings__row"
-              >
+              <div class="tools_settings__row">
                 <ui-checkbox
                   :model-value="form.unique"
                   type="toggle"
@@ -60,7 +57,7 @@
               </div>
 
               <div
-                v-if="settings.opened && !form.unique"
+                v-if="!form.unique"
                 class="tools_settings__row"
               >
                 <ui-checkbox
@@ -73,7 +70,7 @@
               </div>
 
               <div
-                v-if="settings.opened && !form.unique && settings.grouping"
+                v-if="!form.unique && settings.grouping"
                 class="tools_settings__row"
               >
                 <ui-checkbox
@@ -81,13 +78,13 @@
                   type="toggle"
                   @update:model-value="updateUsingMaxPrice"
                 >
-                  {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
+                  Отображать максимальную цену
                 </ui-checkbox>
               </div>
             </div>
 
             <div
-              v-if="settings.opened && config.sources.length"
+              v-if="config.sources.length"
               class="row align-right"
             >
               <div class="tools_settings__row">

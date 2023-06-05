@@ -1,16 +1,17 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Магические предметы"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="getListProps({ items })"
       :get-group="getGroupByRarity"
       :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :list="getListProps({ items })"
     >
       <template #default="{ item }">
         <magic-item-link
@@ -56,6 +57,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items
   } = usePagination({
     url: '/items/magic',
@@ -84,10 +86,12 @@
     }
   };
 
-  const getGroupByRarity = (item: AnyObject & {rarity: AnyObject}) => ({
-    url: item.rarity.type,
-    name: capitalize(String(item.rarity.name))
-  });
+  const getGroupByRarity = (item: AnyObject & { rarity: AnyObject }) => (
+    {
+      url: item.rarity.type,
+      name: capitalize(String(item.rarity.name))
+    }
+  );
 
   onBeforeMount(async () => {
     await filter.initFilter();

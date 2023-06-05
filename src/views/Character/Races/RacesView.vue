@@ -35,7 +35,7 @@
   </content-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import { storeToRefs } from 'pinia';
   import {
     computed, defineComponent, nextTick, onBeforeMount, ref, watch, provide
@@ -55,143 +55,123 @@
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
-  export default defineComponent({
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-    components: {
-      RaceLink,
-      ContentLayout
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
+
+  const showRightSide = ref(false);
+
+  const filter = useFilter({
+    dbName: RacesFilterDefaults.dbName,
+    url: RacesFilterDefaults.url
+  });
+
+  const {
+    initPages,
+    items: races
+  } = usePagination({
+    url: '/races',
+    limit: -1,
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams
     },
-    setup() {
-      const route = useRoute();
-      const router = useRouter();
-      const uiStore = useUIStore();
+    search: filter.search,
+    order: [
+      {
+        field: 'name',
+        direction: 'asc'
+      }
+    ]
+  });
 
-      const {
-        isMobile,
-        fullscreen
-      } = storeToRefs(uiStore);
-
-      const showRightSide = ref(false);
-
-      const filter = useFilter({
-        dbName: RacesFilterDefaults.dbName,
-        url: RacesFilterDefaults.url
+  watch(
+    [races, () => route.name],
+    () => {
+      nextTick(() => {
+        showRightSide.value = !!races.value.length && route.name === 'raceDetail';
       });
+    },
+    { flush: 'post' }
+  );
 
-      const {
-        initPages,
-        items: races
-      } = usePagination({
-        url: '/races',
-        limit: -1,
-        filter: {
-          isCustomized: filter.isCustomized,
-          value: filter.queryParams
-        },
-        search: filter.search,
-        order: [
-          {
-            field: 'name',
-            direction: 'asc'
-          }
-        ]
-      });
+  const onSearch = async () => {
+    await initPages();
 
-      watch(
-        [races, () => route.name],
-        () => {
-          nextTick(() => {
-            showRightSide.value = !!races.value.length && route.name === 'raceDetail';
-          });
-        },
-        { flush: 'post' }
-      );
+    if (isAutoOpenAvailable(races)) {
+      await router.push({ path: races.value[0].url });
+    }
+  };
 
-      const onSearch = async () => {
-        await initPages();
+  const sortedRaces = computed((): Array<TRaceList> => {
+    if (!races.value?.length) {
+      return [];
+    }
 
-        if (isAutoOpenAvailable(races)) {
-          await router.push({ path: races.value[0].url });
-        }
+    const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> => sortBy(
+      Object.values(groupBy(list, o => o.type.name))
+        .map(value => ({
+          group: value[0].type,
+          list: value
+        })),
+      [o => o.group.order]
+    );
+
+    const getGroupClasses = (): Array<TRaceList> => {
+      const newClasses: Array<TRaceLink> = races.value.map(race => ({
+        ...race,
+        archetypes: getGroupArchetypes(race.archetypes)
+      }));
+
+      const defaultGroup: TRaceList = {
+        list: sortBy(
+          newClasses.filter(item => !('group' in item)),
+          [o => o.name.rus]
+        )
       };
 
-      const sortedRaces = computed((): Array<TRaceList> => {
-        if (!races.value?.length) {
-          return [];
-        }
-
-        const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> => sortBy(
-          Object.values(groupBy(list, o => o.type.name))
-            .map(value => ({
-              group: value[0].type,
-              list: value
-            })),
-          [o => o.group.order]
-        );
-
-        const getGroupClasses = (): Array<TRaceList> => {
-          const newClasses: Array<TRaceLink> = races.value.map(race => ({
-            ...race,
-            archetypes: getGroupArchetypes(race.archetypes)
-          }));
-
-          const defaultGroup: TRaceList = {
+      const mapped: Array<TRaceList> = sortBy(
+        Object.values(groupBy(
+          cloneDeep(newClasses.filter((item: TRaceLink) => 'group' in item)),
+          (o: TRaceLink) => o.group?.name
+        ) as { [key: string]: Array<TRaceLink> })
+          .map(classList => ({
+            group: classList[0].group!,
             list: sortBy(
-              newClasses.filter(item => !('group' in item)),
+              classList,
               [o => o.name.rus]
             )
-          };
+          })),
+        [o => o.group!.order]
+      );
 
-          const mapped: Array<TRaceList> = sortBy(
-            Object.values(groupBy(
-              cloneDeep(newClasses.filter((item: TRaceLink) => 'group' in item)),
-              (o: TRaceLink) => o.group?.name
-            ) as { [key: string]: Array<TRaceLink> })
-              .map(classList => ({
-                group: classList[0].group!,
-                list: sortBy(
-                  classList,
-                  [o => o.name.rus]
-                )
-              })),
-            [o => o.group!.order]
-          );
+      return [defaultGroup, ...mapped];
+    };
 
-          return [defaultGroup, ...mapped];
-        };
-
-        return getGroupClasses();
-      });
-
-      onBeforeMount(async () => {
-        await filter.initFilter();
-        await initPages();
-      });
-
-      const books = computed(() => {
-        const params = toValue(filter.queryParams);
-
-        if (params?.book instanceof Array) {
-          return params.book;
-        }
-
-        return [];
-      });
-
-      provide(DEFAULT_QUERY_BOOKS_INJECT_KEY, books);
-
-      return {
-        isMobile,
-        fullscreen,
-        races,
-        sortedRaces,
-        filter,
-        showRightSide,
-        initPages,
-        onSearch
-      };
-    }
+    return getGroupClasses();
   });
+
+  onBeforeMount(async () => {
+    await filter.initFilter();
+    await initPages();
+  });
+
+  const books = computed(() => {
+    const params = toValue(filter.queryParams);
+
+    if (params?.book instanceof Array) {
+      return params.book;
+    }
+
+    return [];
+  });
+
+  provide(DEFAULT_QUERY_BOOKS_INJECT_KEY, books);
 </script>
 
 <style lang="scss" scoped>

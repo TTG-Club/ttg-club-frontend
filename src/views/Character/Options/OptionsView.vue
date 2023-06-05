@@ -2,16 +2,17 @@
   <component
     :is="layout"
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Особенности классов"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="getListProps({ items: options })"
-      :grid="grid"
       :get-group="getGroupByFirstLetter"
+      :grid="grid"
+      :list="getListProps({ items: options })"
     >
       <template #default="{ item: option }">
         <option-link
@@ -30,7 +31,7 @@
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
-  import { resolveUnref } from '@vueuse/shared';
+  import { toValue } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import OptionLink from '@/views/Character/Options/OptionLink.vue';
@@ -82,7 +83,7 @@
   const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    const params = resolveUnref(filter.queryParams);
+    const params = toValue(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return filter.queryParams.value;
@@ -98,6 +99,7 @@
     initPages,
     nextPage,
     resetPages,
+    isEnd,
     items: options
   } = usePagination({
     url: '/options',

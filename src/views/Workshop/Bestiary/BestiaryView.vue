@@ -2,10 +2,11 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     title="Бестиарий"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
       :list="getListProps({ items: bestiary })"
@@ -51,6 +52,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items: bestiary
   } = usePagination({
     url: '/bestiary',
