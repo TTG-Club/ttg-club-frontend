@@ -1,15 +1,16 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Правила и термины"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grid-list
-      :list="getListProps({ items: rules })"
       :flat="checkIsListGridFlat({ showRightSide, fullscreen })"
+      :list="getListProps({ items: rules })"
     >
       <template #default="{ item: rule }">
         <rule-link
@@ -53,6 +54,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items: rules
   } = usePagination({
     url: '/rules',

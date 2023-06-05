@@ -2,9 +2,10 @@
   <content-layout
     :filter-instance="filter"
     :show-right-side="showRightSide"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     title="Ширма (Справочник)"
     @search="onSearch"
-    @list-end="nextPage"
   >
     <div
       :class="{ 'is-selected': showRightSide }"
@@ -28,7 +29,7 @@
   </content-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import { storeToRefs } from 'pinia';
   import {
     computed, defineComponent, onBeforeMount
@@ -41,72 +42,57 @@
   import { ScreensFilterDefaults } from '@/types/Workshop/Screens.types';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
-  export default defineComponent({
-    components: {
-      ContentLayout
-    },
-    setup() {
-      const route = useRoute();
-      const router = useRouter();
-      const uiStore = useUIStore();
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-      const {
-        isMobile,
-        fullscreen
-      } = storeToRefs(uiStore);
+  const {
+    isMobile,
+    fullscreen
+  } = storeToRefs(uiStore);
 
-      const filter = useFilter({
-        dbName: ScreensFilterDefaults.dbName,
-        url: ScreensFilterDefaults.url
-      });
-
-      const {
-        initPages,
-        nextPage,
-        items: screens
-      } = usePagination({
-        url: '/screens',
-        filter: {
-          isCustomized: filter.isCustomized,
-          value: filter.queryParams
-        },
-        search: filter.search,
-        order: [
-          {
-            field: 'ordering',
-            direction: 'asc'
-          },
-          {
-            field: 'name',
-            direction: 'asc'
-          }
-        ]
-      });
-
-      const onSearch = async () => {
-        await initPages();
-
-        if (isAutoOpenAvailable(screens)) {
-          await router.push({ path: screens.value[0].url });
-        }
-      };
-
-      onBeforeMount(async () => {
-        await initPages();
-      });
-
-      return {
-        isMobile,
-        fullscreen,
-        screens,
-        filter,
-        showRightSide: computed(() => route.name === 'screenDetail'),
-        initPages,
-        nextPage,
-        onSearch
-      };
-    }
+  const filter = useFilter({
+    dbName: ScreensFilterDefaults.dbName,
+    url: ScreensFilterDefaults.url
   });
+
+  const {
+    initPages,
+    nextPage,
+    isEnd,
+    items: screens
+  } = usePagination({
+    url: '/screens',
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams
+    },
+    search: filter.search,
+    order: [
+      {
+        field: 'ordering',
+        direction: 'asc'
+      },
+      {
+        field: 'name',
+        direction: 'asc'
+      }
+    ]
+  });
+
+  const onSearch = async () => {
+    await initPages();
+
+    if (isAutoOpenAvailable(screens)) {
+      await router.push({ path: screens.value[0].url });
+    }
+  };
+
+  onBeforeMount(async () => {
+    await initPages();
+  });
+
+  const showRightSide = computed(() => route.name === 'screenDetail');
 </script>
 
 <style lang="scss" scoped>

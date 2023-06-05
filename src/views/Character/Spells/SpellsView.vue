@@ -2,16 +2,17 @@
   <component
     :is="layout"
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Заклинания"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="getListProps({ items: spells })"
       :get-group="getSpellGroup"
       :grid="grid"
+      :list="getListProps({ items: spells })"
     >
       <template #default="{ item: spell }">
         <spell-link
@@ -24,13 +25,13 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
   import {
     computed, onBeforeMount, watch
   } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
-  import { resolveUnref } from '@vueuse/shared';
+  import { toValue } from '@vueuse/shared';
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
   import SpellLink from '@/views/Character/Spells/SpellLink.vue';
@@ -80,7 +81,7 @@
   const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
 
   const queryParams = computed(() => {
-    const params = resolveUnref(filter.queryParams);
+    const params = toValue(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return filter.queryParams.value;
@@ -96,6 +97,7 @@
     initPages,
     nextPage,
     resetPages,
+    isEnd,
     items: spells
   } = usePagination<TSpellLink[]>({
     url: '/spells',
@@ -146,11 +148,13 @@
   );
 
   /* TODO: Добавить тип заклинания */
-  const getSpellGroup = ({ level }: AnyObject) => ({
-    url: `${ level }`,
-    name: level ? `${ level } уровень` : 'Заговоры',
-    order: level
-  });
+  const getSpellGroup = ({ level }: AnyObject) => (
+    {
+      url: `${ level }`,
+      name: level ? `${ level } уровень` : 'Заговоры',
+      order: level
+    }
+  );
 
   const showRightSide = computed(() => route.name === 'spellDetail');
 

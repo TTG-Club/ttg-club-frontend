@@ -2,7 +2,7 @@ import {
   computed, ref, unref
 } from 'vue';
 import type { MaybeComputedRef, MaybeRef } from '@vueuse/core';
-import { resolveUnref } from '@vueuse/core';
+import { toValue } from '@vueuse/core';
 import { useRoute } from 'vue-router';
 import type { FilterQueryParams } from '@/common/composition/useFilter';
 import { useIsDev } from '@/common/helpers/isDev';
@@ -62,7 +62,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const items = ref<Array<any>>([]);
   const page = ref(unref(config.page) || 0);
   const limit = computed(() => unref(config.limit) || DEFAULT_PAGINATION_ITEMS_LIMIT);
-  const isEnd = ref(unref(config.limit) === -1 || false);
+  const isEnd = ref<boolean>(unref(config.limit) === -1 || true);
 
   const payload = computed((): PaginationQuery => {
     const request: PaginationQuery = {
@@ -85,15 +85,17 @@ export function usePagination<T>(config: PaginationConfig) {
 
     const filter = unref(config.filter);
 
-    if (filter && resolveUnref(filter.isCustomized)) {
-      request.filter = resolveUnref(filter.value);
+    if (filter && toValue(filter.isCustomized)) {
+      request.filter = toValue(filter.value);
     }
 
     return request;
   });
 
   const abort = () => {
-    if (abortController) abortController.abort();
+    if (abortController) {
+      abortController.abort();
+    }
   };
 
   const load = async (nextPage = false): Promise<void> => {
@@ -124,11 +126,17 @@ export function usePagination<T>(config: PaginationConfig) {
         items.value = resp.data;
       }
 
-      isEnd.value = !(resp.data instanceof Array) || (resp.data.length < limit.value);
+      isEnd.value = !(
+        resp.data instanceof Array
+      ) || (
+        resp.data.length < limit.value
+      );
 
       return Promise.resolve();
     } catch (err: any) {
-      if (err.message === 'canceled') return Promise.resolve();
+      if (err.message === 'canceled') {
+        return Promise.resolve();
+      }
 
       if (isDev) {
         errorHandler(err);
@@ -143,7 +151,7 @@ export function usePagination<T>(config: PaginationConfig) {
 
   const initPages = async () => {
     page.value = 0;
-    isEnd.value = false;
+    isEnd.value = true;
 
     const result = await load();
 

@@ -13,7 +13,7 @@
           :filter-instance="filterInstance"
           :in-tab="true"
           @search="$emit('search', $event)"
-          @update="$emit('update', $event)"
+          @update="$emit('update')"
         />
       </div>
 
@@ -25,7 +25,7 @@
     </div>
 
     <div
-      ref="items"
+      ref="list"
       class="tab-layout__items"
     >
       <div class="tab-layout__items--inner">
@@ -35,53 +35,53 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
   import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
-  import type { PropType } from 'vue';
-  import {
-    defineComponent, onMounted, ref
-  } from 'vue';
-  import ListFilter from '@/components/filter/ListFilter.vue';
+  import { onMounted, ref } from 'vue';
   import type { FilterComposable } from '@/common/composition/useFilter';
+  import ListFilter from '@/components/filter/ListFilter.vue';
 
-  export default defineComponent({
-
-    components: { ListFilter },
-    props: {
-      filterInstance: {
-        type: Object as PropType<FilterComposable>,
-        default: undefined
-      }
-    },
-    setup(props, { emit }) {
-      const dropdownHeight = ref(0);
-
-      const items = ref<HTMLDivElement | null>(null);
-
-      onMounted(() => {
-        useInfiniteScroll(
-          items,
-          () => {
-            emit('list-end');
-          },
-          { distance: 1080 }
-        );
-
-        useResizeObserver(items, entries => {
-          if (Array.isArray(entries) && entries.length) {
-            const entry = entries[0];
-            const { height } = entry.contentRect;
-
-            dropdownHeight.value = height || 0;
-          }
-        });
-      });
-
-      return {
-        dropdownHeight,
-        items
-      };
+  const props = withDefaults(
+    defineProps<{
+      filterInstance?: FilterComposable;
+      onLoadMore?:() => Promise<void>;
+      isEnd?: boolean;
+    }>(),
+    {
+      filterInstance: undefined,
+      onLoadMore: undefined,
+      isEnd: false
     }
+  );
+
+  const dropdownHeight = ref(0);
+
+  const list = ref<HTMLDivElement | null>(null);
+
+  onMounted(() => {
+    useInfiniteScroll(
+      list,
+      async () => {
+        if (props.isEnd || !props.onLoadMore) {
+          return;
+        }
+
+        await props.onLoadMore();
+      },
+      {
+        distance: 1080,
+        interval: 1000
+      }
+    );
+
+    useResizeObserver(list, entries => {
+      if (Array.isArray(entries) && entries.length) {
+        const entry = entries[0];
+        const { height } = entry.contentRect;
+
+        dropdownHeight.value = height || 0;
+      }
+    });
   });
 </script>
 
