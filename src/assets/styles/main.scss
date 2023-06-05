@@ -691,13 +691,6 @@
   &__row {
     margin-top: 16px;
 
-    .ui-checkbox {
-      &:not(.ui-checkbox--toggle) {
-        margin-right: 8px;
-        margin-top: 8px;
-      }
-    }
-
     &.btn-wrapper {
       display: flex;
       gap: 8px;
@@ -719,6 +712,12 @@
   .label {
     margin-bottom: 8px;
     display: flex;
+  }
+
+  .checkbox-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 }
 
