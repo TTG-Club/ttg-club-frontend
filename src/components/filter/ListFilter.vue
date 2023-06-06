@@ -234,8 +234,8 @@
         cursor: text;
 
         &_icon {
-          width: 42px;
-          height: 42px;
+          width: 38px;
+          height: 38px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -266,7 +266,7 @@
       flex-shrink: 0;
       align-items: center;
       justify-content: center;
-      padding: 8px;
+      padding: 7px 8px;
       border-left: 1px solid var(--border);
       background-color: var(--primary);
 
