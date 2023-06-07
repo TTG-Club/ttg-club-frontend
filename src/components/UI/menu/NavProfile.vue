@@ -7,7 +7,7 @@
         @click.left.exact.prevent="clickHandler"
       >
         <svg-icon
-          :icon="`profile/${isAuthenticated ? 'filled' : 'outline'}`"
+          :icon="`profile/helmet/${isAuthenticated ? 'filled' : 'outline'}`"
         />
       </div>
     </template>

@@ -16,7 +16,7 @@
 
       <div class="card_row">
         <router-link
-          v-for="(section, key) in navItems"
+          v-for="(section, key) in mainNavItems"
           :key="key"
           :to="{ path: section.url }"
           class="card"
@@ -122,13 +122,6 @@
                 Новостей не было за последнее время
               </div>
             </transition>
-
-            <!-- <a
-                            href="https://www.youtube.com/@online.shirma"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="btn"
-                        >Все видео</a> -->
           </div>
         </div>
 
@@ -167,7 +160,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import {
     computed, defineComponent, ref
   } from 'vue';
@@ -180,92 +173,77 @@
   import { useAxios } from '@/common/composition/useAxios';
   import type { TYoutubeVideo } from '@/types/Shared/Youtube.types';
 
-  export default defineComponent({
-    components: { UiYoutube },
-    setup() {
-      const navStore = useNavStore();
+  const navStore = useNavStore();
 
-      const {
-        showedNavItems,
-        showedPartners,
-        isShowSearch
-      } = storeToRefs(navStore);
+  const {
+    navItems,
+    showedNavItems,
+    showedPartners,
+    isShowSearch
+  } = storeToRefs(navStore);
 
-      const youtube = ref<HTMLElement | null>(null);
-      const http = useAxios();
-      const currentVideo = ref<string | null>(null);
+  const youtube = ref<HTMLElement | null>(null);
+  const http = useAxios();
+  const currentVideo = ref<string | null>(null);
 
-      const navItems = computed(() => {
-        const items: TNavItem[] = [];
+  const mainNavItems = computed(() => {
+    const items: TNavItem[] = [];
 
-        const iterate = (childList: TNavItem[]) => {
-          for (const child of childList) {
-            if (child.children instanceof Array && child.children.length) {
-              iterate(child.children);
-            }
-
-            if (child.onIndex) {
-              items.push(child);
-            }
-          }
-        };
-
-        iterate(showedNavItems.value);
-
-        return orderBy(
-          items,
-          ['indexOrder'],
-          ['asc']
-        );
-      });
-
-      const tools = computed<TNavItem[]>(() => {
-        const navTools = showedNavItems.value.find(item => item?.icon === 'menu-tools');
-
-        if (!navTools?.children?.length) {
-          return [];
+    const iterate = (childList: TNavItem[]) => {
+      for (const child of childList) {
+        if (child.children instanceof Array && child.children.length) {
+          iterate(child.children);
         }
 
-        return orderBy(
-          navTools.children,
-          ['order'],
-          ['asc']
-        );
-      });
-
-      const setLastVideo = async () => {
-        try {
-          const resp = await http.get<TYoutubeVideo>({ url: '/youtube/last' });
-
-          if (resp.status !== 200) {
-            return Promise.reject(resp.status);
-          }
-
-          currentVideo.value = resp.data.id;
-
-          return Promise.resolve(resp.data);
-        } catch (err) {
-          return Promise.reject(err);
+        if (child.onIndex) {
+          items.push(child);
         }
-      };
+      }
+    };
 
-      const openSearchModal = () => {
-        isShowSearch.value = true;
-      };
+    iterate(showedNavItems.value);
 
-      tryOnBeforeMount(async () => {
-        await setLastVideo();
-      });
+    return orderBy(
+      items,
+      ['indexOrder'],
+      ['asc']
+    );
+  });
 
-      return {
-        youtube,
-        currentVideo,
-        navItems,
-        tools,
-        showedPartners,
-        openSearchModal
-      };
+  const tools = computed<TNavItem[]>(() => {
+    const navTools = navItems.value
+      .flatMap(group => group.children)
+      .filter(item => item.url?.startsWith('/tools'));
+
+    return orderBy(
+      navTools,
+      ['order'],
+      ['asc']
+    );
+  });
+
+  const setLastVideo = async () => {
+    try {
+      const resp = await http.get<TYoutubeVideo>({ url: '/youtube/last' });
+
+      if (resp.status !== 200) {
+        return Promise.reject(resp.status);
+      }
+
+      currentVideo.value = resp.data.id;
+
+      return Promise.resolve(resp.data);
+    } catch (err) {
+      return Promise.reject(err);
     }
+  };
+
+  const openSearchModal = () => {
+    isShowSearch.value = true;
+  };
+
+  tryOnBeforeMount(async () => {
+    await setLastVideo();
   });
 </script>
 
