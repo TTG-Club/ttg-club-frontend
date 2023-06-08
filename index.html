@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
 <head th:fragment="head">
-  <meta name="robots" content="<%= mode === 'prod' ? 'all' : 'noindex' %>">
+  <meta name="robots" content="<%= mode === 'production' ? 'all' : 'noindex' %>">
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
