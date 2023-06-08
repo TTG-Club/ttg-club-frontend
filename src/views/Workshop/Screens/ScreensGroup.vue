@@ -43,8 +43,8 @@
     inheritAttrs: false,
     props: {
       description: {
-        type: Object,
-        default: undefined,
+        type: String,
+        default: '',
         required: false
       },
       childList: {
