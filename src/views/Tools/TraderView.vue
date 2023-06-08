@@ -88,7 +88,7 @@
               class="row align-right"
             >
               <div class="tools_settings__row">
-                <span class="label">Источники:</span>
+                <span class="label">Источник цены:</span>
 
                 <div class="checkbox-group">
                   <ui-switch
