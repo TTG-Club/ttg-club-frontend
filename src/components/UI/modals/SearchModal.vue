@@ -423,7 +423,7 @@
 
     &__control {
       display: flex;
-      padding: 4px 4px;
+      padding: 0 4px;
       position: relative;
 
       &_field {
@@ -473,6 +473,7 @@
         width: 36px;
         height: 36px;
         flex-shrink: 0;
+        margin: 4px 0;
 
         svg {
           @include css_anim($item: transform);
@@ -493,6 +494,7 @@
         height: 36px;
         padding: 6px;
         flex-shrink: 0;
+        margin: 4px 0;
       }
     }
 
@@ -539,7 +541,7 @@
 
     .ui-input__input {
       color: var(--text-b-color);
-      height: 36px;
+      height: 44px;
     }
   }
 </style>
