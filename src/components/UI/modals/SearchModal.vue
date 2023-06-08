@@ -428,7 +428,7 @@
 
       &_field {
         flex: 1 1 100%;
-        height: 36px;
+        height: 44px;
         overflow: hidden;
         appearance: none;
         border: 0;
