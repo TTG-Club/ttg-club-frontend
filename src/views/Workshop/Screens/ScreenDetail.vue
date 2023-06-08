@@ -12,15 +12,6 @@
     </template>
 
     <template #default>
-      <div
-        v-if="screen?.description"
-        class="content-padding"
-      >
-        <raw-content
-          :template="screen.description"
-        />
-      </div>
-
       <screens-group
         v-if="screen?.chields?.length"
         :child-list="screen.chields"
@@ -42,11 +33,9 @@
   import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
   import ScreensGroup from '@/views/Workshop/Screens/ScreensGroup.vue';
   import errorHandler from '@/common/helpers/errorHandler';
-  import RawContent from '@/components/content/RawContent.vue';
 
   export default {
     components: {
-      RawContent,
       ScreensGroup,
       ScreenBody,
       ContentDetail,
