@@ -17,7 +17,6 @@
         class="content-padding"
       >
         <raw-content
-
           :template="screen.description"
         />
       </div>
