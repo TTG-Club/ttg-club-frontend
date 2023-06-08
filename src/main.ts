@@ -1,3 +1,5 @@
+import 'vite/modulepreload-polyfill';
+import 'virtual:svg-icons-register';
 import { createApp } from 'vue';
 import VueTippy from 'vue-tippy';
 import VueLazyLoad from 'vue-lazyload';
@@ -35,8 +37,7 @@ app.use(pinia)
 if (!isDev) {
   app.use(VueGtag, {
     config: {
-      // @ts-ignore
-      id: window.GTAG_ID
+      id: import.meta.env.VITE_GTAG_ID
     }
   });
 }

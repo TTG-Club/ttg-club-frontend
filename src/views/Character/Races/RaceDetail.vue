@@ -21,78 +21,99 @@
   </content-detail>
 </template>
 
-<script>
-  import { mapState } from 'pinia';
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+  import {
+    computedInject, toValue, tryOnMounted
+  } from '@vueuse/core';
+  import { ref, watch } from 'vue';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+  import {
+    onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter
+  } from 'vue-router';
   import SectionHeader from '@/components/UI/SectionHeader.vue';
   import errorHandler from '@/common/helpers/errorHandler';
   import RaceBody from '@/views/Character/Races/RaceBody.vue';
   import ContentDetail from '@/components/content/ContentDetail.vue';
   import { useUIStore } from '@/store/UI/UIStore';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
+  import { useAxios } from '@/common/composition/useAxios';
 
-  export default {
-    components: {
-      ContentDetail,
-      RaceBody,
-      SectionHeader
-    },
-    beforeRouteLeave(to, from) {
-      if (to.name !== 'races') {
-        return;
-      }
+  type TEmit = {
+    (e: 'scroll-to-active'): void;
+    (e: 'scroll-to-last-active', v: RouteLocationNormalizedLoaded['path']): void;
+  }
 
-      this.$emit('scroll-to-last-active', from.path);
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.raceInfoQuery(to.path);
+  const emit = defineEmits<TEmit>();
 
-      next();
-    },
-    data: () => ({
-      race: undefined,
-      loading: false,
-      error: false,
-      abortController: null
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile'])
-    },
-    async mounted() {
-      await this.raceInfoQuery(this.$route.path);
+  const route = useRoute();
+  const router = useRouter();
+  const http = useAxios();
+  const { fullscreen, isMobile } = storeToRefs(useUIStore());
+  const race = ref();
+  const loading = ref(false);
+  const error = ref(false);
+  const abortController = ref(new AbortController());
 
-      this.$emit('scroll-to-active');
-    },
-    methods: {
-      async raceInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
+  const queryBooks = computedInject(DEFAULT_QUERY_BOOKS_INJECT_KEY, source => toValue(source), []);
 
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
+  const raceInfoQuery = async url => {
+    if (abortController.value instanceof AbortController) {
+      abortController.value.abort();
+    }
 
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal
-          });
+    try {
+      error.value = false;
+      loading.value = true;
+      abortController.value = new AbortController();
 
-          this.race = resp.data;
-        } catch (err) {
-          errorHandler(err);
+      const resp = await http.post({
+        url,
+        payload: {
+          filter: {
+            book: toValue(queryBooks)
+          }
+        },
+        signal: abortController.value.signal
+      });
 
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
+      race.value = resp.data;
+    } catch (err) {
+      errorHandler(err);
 
-      close() {
-        this.$router.push({ name: 'races' });
-      }
+      error.value = true;
+    } finally {
+      loading.value = false;
     }
   };
+
+  const close = () => {
+    router.push({ name: 'races' });
+  };
+
+  tryOnMounted(async () => {
+    await raceInfoQuery(route.path);
+
+    emit('scroll-to-active');
+  });
+
+  onBeforeRouteUpdate(async (to, from, next) => {
+    await raceInfoQuery(to.path);
+
+    next();
+  });
+
+  onBeforeRouteLeave((to, from) => {
+    if (to.name !== 'races') {
+      return;
+    }
+
+    emit('scroll-to-last-active', from.path);
+  });
+
+  watch(queryBooks, async () => {
+    await raceInfoQuery(route.path);
+  });
 </script>
 
 <style lang="scss" scoped>

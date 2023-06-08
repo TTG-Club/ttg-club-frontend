@@ -56,47 +56,41 @@
   </div>
 </template>
 
-<script>
-  import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+  import { computed } from 'vue';
+  import { storeToRefs } from 'pinia';
   import SocialLinks from '@/components/content/SocialLinks.vue';
   import { useDayjs } from '@/common/composition/useDayjs';
   import { useUIStore } from '@/store/UI/UIStore';
 
-  export default defineComponent({
-    components: { SocialLinks },
-    props: {
-      useSocialLinks: {
-        type: Boolean,
-        default: true
-      },
-      dateTime: {
-        type: String,
-        default: ''
-      },
-      showSeparator: {
-        type: Boolean,
-        default: true
-      }
-    },
-    setup(props) {
-      const uiStore = useUIStore();
-      const dayjs = useDayjs();
-
-      const dateTimeFormatted = computed(() => {
-        const datetime = dayjs(props.dateTime);
-
-        if (!datetime.isValid()) {
-          return '';
-        }
-
-        return datetime.format('LL');
-      });
-
-      return {
-        dateTimeFormatted,
-        isMobile: computed(() => uiStore.isMobile)
-      };
+  const props = withDefaults(
+    defineProps<{
+      useSocialLinks?: boolean;
+      showSeparator?: boolean;
+      dateTime?: string;
+    }>(),
+    {
+      useSocialLinks: true,
+      showSeparator: true,
+      dateTime: undefined
     }
+  );
+
+  const { isMobile } = storeToRefs(useUIStore());
+  const dayjs = useDayjs();
+
+  const dateTimeFormatted = computed(() => {
+    if (!props.dateTime) {
+      return '';
+    }
+
+    const datetime = dayjs(props.dateTime);
+
+    if (!datetime.isValid()) {
+      return '';
+    }
+
+    return datetime.format('LL');
   });
 </script>
 

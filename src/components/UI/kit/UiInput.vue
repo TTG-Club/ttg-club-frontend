@@ -218,8 +218,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 38px;
-        width: 38px;
+        height: 36px;
+        width: 36px;
         cursor: pointer;
         padding: 10px;
         color: var(--text-color-title);
@@ -231,7 +231,7 @@
       background-color: transparent;
       color: var(--text-color);
       font-size: var(--main-font-size);
-      height: 42px;
+      height: 36px;
       font-family: 'Open Sans', serif;
       padding: 4px 12px;
       margin: 0;

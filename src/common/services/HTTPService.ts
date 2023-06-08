@@ -19,7 +19,7 @@ export default class HTTPService {
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
-      baseURL: '/api/v1',
+      baseURL: this.getBaseURL('/api/v1'),
       withCredentials: true,
       headers: {}
     });
@@ -44,8 +44,8 @@ export default class HTTPService {
     });
   }
 
-  get<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
-    return this.instance({
+  get<T>(config: RequestConfig) {
+    return this.instance<T>({
       method: 'get',
       url: config.url,
       params: config.payload,
@@ -53,8 +53,8 @@ export default class HTTPService {
     });
   }
 
-  post<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
-    return this.instance({
+  post<T>(config: RequestConfig) {
+    return this.instance<T>({
       method: 'post',
       url: config.url,
       data: config.payload,
@@ -62,8 +62,8 @@ export default class HTTPService {
     });
   }
 
-  put<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
-    return this.instance({
+  put<T>(config: RequestConfig) {
+    return this.instance<T>({
       method: 'put',
       url: config.url,
       data: config.payload,
@@ -71,8 +71,8 @@ export default class HTTPService {
     });
   }
 
-  patch<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
-    return this.instance({
+  patch<T>(config: RequestConfig) {
+    return this.instance<T>({
       method: 'patch',
       url: config.url,
       data: config.payload,
@@ -80,8 +80,8 @@ export default class HTTPService {
     });
   }
 
-  delete<T, R = AxiosResponse<T>>(config: RequestConfig): Promise<R> {
-    return this.instance({
+  delete<T>(config: RequestConfig) {
+    return this.instance<T>({
       method: 'delete',
       url: config.url,
       data: config.payload,
@@ -92,7 +92,7 @@ export default class HTTPService {
   rawHead(config: Omit<RequestConfig, 'payload'>) {
     return this.instance({
       method: 'head',
-      baseURL: '',
+      baseURL: this.getBaseURL(),
       url: config.url,
       signal: config.signal
     });
@@ -101,10 +101,16 @@ export default class HTTPService {
   rawGet(config: RequestConfig): Promise<AxiosResponse<string>> {
     return this.instance({
       method: 'get',
-      baseURL: '',
+      baseURL: this.getBaseURL(),
       url: config.url,
       params: config.payload,
       signal: config.signal
     });
   }
+
+  private getBaseURL = (url = '') => {
+    const devPrefix = import.meta.env.DEV ? '/proxy' : '';
+
+    return `${ devPrefix }${ url }`;
+  };
 }

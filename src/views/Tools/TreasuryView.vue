@@ -1,5 +1,8 @@
 <template>
-  <content-layout :show-right-side="showRightSide">
+  <content-layout
+    :show-right-side="showRightSide"
+    :force-fullscreen-state="false"
+  >
     <template #fixed>
       <form
         class="tools_settings"
@@ -27,7 +30,7 @@
                 Настройки предметов:
               </h5>
 
-              <div class="tools_settings__colum">
+              <div class="tools_settings__column">
                 <div class="row">
                   <div>
                     <ui-checkbox
@@ -81,7 +84,7 @@
                 Настройки вида:
               </h5>
 
-              <div class="tools_settings__colum">
+              <div class="tools_settings__column">
                 <div class="row">
                   <div>
                     <ui-checkbox

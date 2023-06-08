@@ -1,14 +1,15 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     title="Драгоценности"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grouped-list
-      :list="{ items: treasures }"
       :get-group="getGroupWithIdByFirstLetter"
+      :list="{ items: treasures }"
     >
       <template #default="{ item: treasure }">
         <treasure-item
@@ -29,7 +30,7 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupWithIdByFirstLetter } from "@/common/helpers/list";
+  import { getGroupWithIdByFirstLetter } from '@/common/helpers/list';
 
   const uiStore = useUIStore();
 
@@ -46,6 +47,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items
   } = usePagination({
     url: '/treasures',
@@ -67,10 +69,12 @@
   });
 
   /* Для добавления идентификатора к элементам */
-  const treasures = computed(() => items.value.map(item => ({
-    ...item,
-    id: item.id || `${ item.name.eng || item.name.rus } ${ item.type.name }`
-  })));
+  const treasures = computed(() => items.value.map(item => (
+    {
+      ...item,
+      id: item.id || `${ item.name.eng || item.name.rus } ${ item.type.name }`
+    }
+  )));
 
   const onSearch = async () => {
     await initPages();

@@ -6,7 +6,7 @@
         @submit.prevent="sendForm"
       >
         <div class="tools_settings__row">
-          <div class="tools_settings__colum">
+          <div class="tools_settings__column">
             <div class="row">
               <span class="label">Средний уровень Группы</span>
 

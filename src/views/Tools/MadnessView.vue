@@ -6,7 +6,7 @@
         @submit.prevent="sendForm"
       >
         <div class="tools_settings__row">
-          <div class="tools_settings__colum">
+          <div class="tools_settings__column">
             <div class="row">
               <span class="label">Количество:</span>
 
@@ -22,7 +22,7 @@
             <div class="row">
               <span class="label">Виды безумия:</span>
 
-              <div>
+              <div class="checkbox-group">
                 <ui-checkbox
                   v-for="(type, key) in types"
                   :key="key"

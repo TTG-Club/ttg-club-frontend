@@ -1,5 +1,14 @@
 <template>
   <div
+    v-if="description"
+    class="content-padding"
+  >
+    <raw-content
+      :template="description"
+    />
+  </div>
+
+  <div
     v-for="group in groups"
     :key="group.name"
     class="screen-group"
@@ -23,14 +32,21 @@
   import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
   import ScreenLink from '@/views/Workshop/Screens/ScreenLink.vue';
+  import RawContent from '@/components/content/RawContent.vue';
 
   export default {
     name: 'ScreensGroup',
     components: {
-      ScreenLink
+      ScreenLink,
+      RawContent
     },
     inheritAttrs: false,
     props: {
+      description: {
+        type: String,
+        default: '',
+        required: false
+      },
       childList: {
         type: Array,
         default: () => ([]),

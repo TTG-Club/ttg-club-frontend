@@ -149,7 +149,8 @@
 
   const classList = computed(() => ({
     'router-link-active': isActive.value,
-    'is-green': props.spell?.source?.homebrew
+    'is-green': props.spell?.source?.homebrew,
+    'is-sub-item': props.inTab
   }));
 
   const clickHandler = async () => {
