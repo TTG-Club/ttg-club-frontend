@@ -15,6 +15,7 @@
       <screens-group
         v-if="screen?.chields?.length"
         :child-list="screen.chields"
+        :description="screen?.description || ''"
       />
 
       <screen-body
