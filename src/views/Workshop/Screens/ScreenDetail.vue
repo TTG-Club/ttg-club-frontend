@@ -12,9 +12,12 @@
     </template>
 
     <template #default>
-      <div class="content-padding">
+      <div
+        v-if="screen?.description"
+        class="content-padding"
+      >
         <raw-content
-          v-if="screen?.description"
+
           :template="screen.description"
         />
       </div>
