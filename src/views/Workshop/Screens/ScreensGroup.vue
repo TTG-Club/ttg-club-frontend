@@ -1,20 +1,20 @@
 <template>
   <div
+    v-if="description"
+    class="content-padding"
+  >
+    <raw-content
+      :template="description"
+    />
+  </div>
+
+  <div
     v-for="group in groups"
     :key="group.name"
     class="screen-group"
   >
     <div class="screen-group__name">
       {{ group.name }}
-    </div>
-
-    <div
-      v-if="description"
-      class="content-padding"
-    >
-      <raw-content
-        :template="description"
-      />
     </div>
 
     <div class="screen-group__list">
