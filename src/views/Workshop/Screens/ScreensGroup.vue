@@ -95,6 +95,10 @@
       margin: 16px 16px 0 16px;
       border-radius: 8px;
       padding: 0 16px;
+
+      @include media-min($xl) {
+        margin: 16px 24px 0 24px;
+      }
     }
 
     &__list {
@@ -111,6 +115,10 @@
 
       @include media-min($md) {
         grid-template-columns: repeat(3, 1fr);
+      }
+
+      @include media-min($xl) {
+        padding: 8px 24px;
       }
     }
   }
