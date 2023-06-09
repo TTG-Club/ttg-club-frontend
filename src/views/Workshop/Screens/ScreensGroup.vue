@@ -28,54 +28,53 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
   import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
+  import { computed } from 'vue';
   import ScreenLink from '@/views/Workshop/Screens/ScreenLink.vue';
   import RawContent from '@/components/content/RawContent.vue';
 
-  export default {
-    name: 'ScreensGroup',
-    components: {
-      ScreenLink,
-      RawContent
-    },
-    inheritAttrs: false,
-    props: {
-      description: {
-        type: String,
-        default: '',
-        required: false
-      },
-      childList: {
-        type: Array,
-        default: () => ([]),
-        required: true
-      }
-    },
-    computed: {
-      groups() {
-        const groups = sortBy(
-          Object.values(groupBy(
-            this.childList.filter(item => item.group),
-            o => o.group
-          ))
-            .map(list => ({
-              name: list[0].group,
-              list: sortBy(list, [o => o.order, o => o.name.rus])
-            })),
-          [o => o.group]
-        );
+  defineOptions({
+    inheritAttrs: false
+  });
 
-        return [
-          {
-            list: sortBy(this.childList.filter(item => !item.group), [o => o.order, o => o.name.rus])
-          },
-          ...groups
-        ];
-      }
+  const props = withDefaults(
+    defineProps<{
+      description?: '';
+      childList: any[]
+    }>(),
+    {
+      description: ''
     }
-  };
+  );
+
+  const groups = computed(() => {
+    const hasGroups = sortBy(
+      Object.values(groupBy(
+        props.childList.filter(item => item.group),
+        o => o.group
+      ))
+        .map(list => ({
+          name: list[0].group,
+          list: sortBy(list, [o => o.order, o => o.name.rus])
+        })),
+      [o => o.group]
+    );
+
+    const noGroup = props.childList.filter(item => !item.group);
+
+    if (noGroup.length) {
+      return [
+        {
+          list: sortBy(noGroup, [o => o.order, o => o.name.rus])
+        },
+        ...hasGroups
+      ];
+    }
+
+    return hasGroups;
+  });
 </script>
 
 <style lang="scss" scoped>
