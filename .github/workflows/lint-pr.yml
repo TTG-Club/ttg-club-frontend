@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
@@ -42,3 +42,6 @@ jobs:
 
       - name: Lint application
         run: npm run lint:fix
+
+      - name: Type-check application
+        run: npm run type-check

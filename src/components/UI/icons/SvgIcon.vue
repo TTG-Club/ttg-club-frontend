@@ -6,12 +6,11 @@
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <use :xlink:href="icon" />
+    <use :xlink:href="iconName" />
   </svg>
 </template>
 
 <script setup lang="ts">
-  import '@/common/utils/SvgRequire';
   import { computed } from 'vue';
 
   const props = withDefaults(defineProps<{
@@ -21,9 +20,9 @@
     size: undefined
   });
 
-  const icon = computed(() => `#ttg-${ props.icon.replaceAll('/', '-') }`);
+  const iconName = computed(() => `#ttg-${ props.icon.replaceAll('/', '-') }`);
 
-  const size = computed(() => {
+  const sizeCalculated = computed(() => {
     if (!props.size) {
       return '100%';
     }
@@ -45,8 +44,8 @@
     overflow: hidden;
     flex-shrink: 0;
     display: block;
-    width: v-bind(size);
-    height: v-bind(size);
+    width: v-bind(sizeCalculated);
+    height: v-bind(sizeCalculated);
     fill: currentColor;
   }
 </style>

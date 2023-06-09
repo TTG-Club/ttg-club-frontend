@@ -1,3 +1,8 @@
+export type TNameValue<T = string> = {
+  name: string;
+  value: T
+}
+
 export type TName = {
     rus: string;
     eng: string;

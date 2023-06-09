@@ -235,7 +235,7 @@
       inProgress.value = true;
       controller.value = new AbortController();
 
-      const resp = await http.post({
+      const resp = await http.post<TSearchResultList>({
         url: '/search/random',
         payload: {
           page: 0,
@@ -252,7 +252,7 @@
 
       sendSearchMetrics('random');
 
-      const result = resp.data as TSearchResultList;
+      const result = resp.data;
 
       results.value = result;
       selectedIndex.value = null;
@@ -423,12 +423,12 @@
 
     &__control {
       display: flex;
-      padding: 4px 4px;
+      padding: 0 4px;
       position: relative;
 
       &_field {
         flex: 1 1 100%;
-        height: 36px;
+        height: 44px;
         overflow: hidden;
         appearance: none;
         border: 0;
@@ -473,6 +473,7 @@
         width: 36px;
         height: 36px;
         flex-shrink: 0;
+        margin: 4px 0;
 
         svg {
           @include css_anim($item: transform);
@@ -493,6 +494,7 @@
         height: 36px;
         padding: 6px;
         flex-shrink: 0;
+        margin: 4px 0;
       }
     }
 
@@ -539,7 +541,7 @@
 
     .ui-input__input {
       color: var(--text-b-color);
-      height: 36px;
+      height: 44px;
     }
   }
 </style>

@@ -6,6 +6,10 @@
   margin-bottom: 12px;
   display: block;
 
+  &.is-sub-item {
+    background: var(--bg-sub-menu);
+  }
+
   &.is-green {
     background: var(--bg-homebrew-gradient-left);
   }

@@ -51,17 +51,24 @@
     innerScroll: false
   });
 
-  const emit = defineEmits<{(e: 'close'): void; }>();
+  interface IEmit {
+    (e: 'close'): void;
+    (e: 'update:modelValue', v: typeof props.modelValue): void;
+  }
+
+  const emit = defineEmits<IEmit>();
 
   const isShow = useVModel(props, 'modelValue');
   const navStore = useNavStore();
   const { isShowPopover } = storeToRefs(navStore);
 
-  const classes = computed(() => ({
-    'is-left': props.isLeft,
-    'is-menu': props.isMenu,
-    'inner-scroll': props.innerScroll
-  }));
+  const classes = computed(() => (
+    {
+      'is-left': props.isLeft,
+      'is-menu': props.isMenu,
+      'inner-scroll': props.innerScroll
+    }
+  ));
 
   const onClose = () => {
     isShow.value = false;
@@ -139,18 +146,18 @@
       &.is-menu {
         width: calc(100vw - 16px);
 
-                @include media-min($md) {
-                    width: calc(100vw - 56px - 24px);
-                }
-            }
-
-            &.inner-scroll {
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-            }
+        @include media-min($md) {
+          width: calc(100vw - 56px - 24px);
         }
+      }
+
+      &.inner-scroll {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
     }
+  }
 
   .nav-popover-animation {
     &-enter-from, &-leave-to {

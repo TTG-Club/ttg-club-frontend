@@ -470,7 +470,7 @@
       .map(item => `${
         item.name ? `${ item.name } ` : ''
       }${
-        item.value ? `${ item.value } фт.` : ''
+        item.value || item.value === 0 ? `${ item.value } фт.` : ''
       }${
         item.additional ? ` (${ item.additional })` : ''
       }`)
@@ -496,7 +496,7 @@
     }
 
     return props.creature.skills.map(skill => ({
-      formula: `к20+${ skills.value }`,
+      formula: `к20+${ skill.value }`,
       label: skill.name,
       value: `+${ skill.value }${ skill.additional ? skill.additional : '' }`
     }));
@@ -579,6 +579,6 @@
   });
 
   const hitDiceFormula = computed(() => (props.creature.hits.bonus
-    ? `${ props.creature.hits.formula } ${ getFormattedModifier(props.creature.hits.bonus) }`
+    ? `${ props.creature.hits.formula } ${ props.creature.hits.sign } ${ Math.abs(props.creature.hits.bonus) }`
     : props.creature.hits.formula));
 </script>

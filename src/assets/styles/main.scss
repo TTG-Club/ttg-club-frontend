@@ -691,26 +691,33 @@
   &__row {
     margin-top: 16px;
 
-    .ui-checkbox {
-      margin-right: 8px;
-      margin-top: 8px;
-    }
-
     &.btn-wrapper {
       display: flex;
       gap: 8px;
     }
   }
 
-  &__colum {
+  &__column {
     display: flex;
     flex-wrap: wrap;
     gap: 16px 16px;
+
+    .row {
+      &.align-right {
+        margin-left: auto;
+      }
+    }
   }
 
   .label {
     margin-bottom: 8px;
     display: flex;
+  }
+
+  .checkbox-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 }
 

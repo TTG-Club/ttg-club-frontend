@@ -1,15 +1,16 @@
 <template>
   <content-layout
     :filter-instance="filter"
+    :is-end="isEnd"
+    :on-load-more="nextPage"
     :show-right-side="showRightSide"
     title="Правила и термины"
     @search="onSearch"
     @update="initPages"
-    @list-end="nextPage"
   >
     <virtual-grid-list
-      :list="getListProps({ items: rules })"
       :flat="checkIsListGridFlat({ showRightSide, fullscreen })"
+      :list="getListProps({ items: rules })"
     >
       <template #default="{ item: rule }">
         <rule-link
@@ -32,8 +33,8 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
-  import { getListProps } from "@/components/list/VirtualList/helpers";
-  import { checkIsListGridFlat } from "@/components/list/VirtualGridList/helpers";
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
@@ -53,6 +54,7 @@
   const {
     initPages,
     nextPage,
+    isEnd,
     items: rules
   } = usePagination({
     url: '/rules',

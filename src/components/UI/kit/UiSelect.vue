@@ -278,7 +278,7 @@
     flex-direction: row-reverse;
     background: var(--bg-sub-menu);
     cursor: pointer;
-    min-height: 38px;
+    min-height: 36px;
     border: {
       width: 1px;
       style: solid;
@@ -309,7 +309,7 @@
         font-size: var(--main-font-size);
         line-height: var(--main-line-height);
         background: transparent;
-        min-height: 38px;
+        min-height: 36px;
         width: 100%;
         padding: 0;
         border: 0;
@@ -320,7 +320,7 @@
       &__select {
         @include css_anim();
 
-        width: 38px;
+        width: 36px;
         min-height: 100%;
         max-height: 100%;
         height: initial;
@@ -530,7 +530,7 @@
     &__slotted {
       display: flex;
       height: 100%;
-      min-height: 38px;
+      min-height: 36px;
 
       &--left,
       &--right {
