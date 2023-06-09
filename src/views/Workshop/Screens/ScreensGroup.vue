@@ -13,7 +13,10 @@
     :key="group.name"
     class="screen-group"
   >
-    <div class="screen-group__name">
+    <div
+      v-if="group.name"
+      class="screen-group__name"
+    >
       {{ group.name }}
     </div>
 
