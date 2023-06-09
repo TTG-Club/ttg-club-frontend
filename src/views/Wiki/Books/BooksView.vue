@@ -8,30 +8,23 @@
     @search="onSearch"
     @update="initPages"
   >
-    <div
-      v-for="(group, groupKey) in books"
-      :key="groupKey"
-      class="books-group"
+    <virtual-grouped-list
+      :get-group="getBookGroup"
+      :list="getListProps({ items: books, minItemSize: 50 })"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
     >
-      <div class="books-group__name">
-        {{ group.name }}
-      </div>
-
-      <div class="books-group__list">
+      <template #default="{ item: book }">
         <book-link
-          v-for="book in group.list"
-          :key="book.url"
           :book="book"
           :to="{ path: book.url }"
         />
-      </div>
-    </div>
+      </template>
+    </virtual-grouped-list>
   </content-layout>
 </template>
 
 <script lang="ts" setup>
   import { computed, onBeforeMount } from 'vue';
-  import sortBy from 'lodash/sortBy';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
   import ContentLayout from '@/components/content/ContentLayout.vue';
@@ -41,6 +34,10 @@
   import { usePagination } from '@/common/composition/usePagination';
   import { BooksFilterDefaults } from '@/types/Wiki/Books.types';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import type { AnyObject } from '@/types/Shared/Utility.types';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
 
   const route = useRoute();
   const router = useRouter();
@@ -60,7 +57,7 @@
     initPages,
     nextPage,
     isEnd,
-    items
+    items: books
   } = usePagination({
     url: '/books',
     search: filter.search,
@@ -76,38 +73,17 @@
     ]
   });
 
-  // TODO: Доделать типизацию
-  const books = computed(() => {
-    const bookList: any[] = [];
-    const types: any[] = [];
-
-    if (!items.value) {
-      return bookList;
-    }
-
-    for (const book of items.value) {
-      if (types.find(obj => obj.name === book.type.name)) {
-        continue;
-      }
-
-      types.push(book.type);
-    }
-
-    for (const type of sortBy(types, [o => o.order])) {
-      bookList.push({
-        name: type.name,
-        list: items.value.filter(book => book.type.name === type.name)
-      });
-    }
-
-    return bookList;
+  const getBookGroup = (book: AnyObject & {type: AnyObject}) => ({
+    url: book.type.name,
+    name: book.type.name,
+    order: book.type.order
   });
 
   const onSearch = async () => {
     await initPages();
 
-    if (isAutoOpenAvailable(books)) {
-      await router.push({ path: books.value[0].list[0].url });
+    if (isAutoOpenAvailable(books.value)) {
+      await router.push({ path: books.value[0].url });
     }
   };
 
