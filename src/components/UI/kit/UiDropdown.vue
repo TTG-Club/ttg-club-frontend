@@ -1,5 +1,8 @@
 <template>
-  <div class="ui-select">
+  <div
+    class="ui-select"
+    style="width: 15%;"
+  >
     <div
       v-if="$slots.label"
       class="ui-select__label"
@@ -27,16 +30,21 @@
     </div>
 
     <div
-      v-if="focused"
-      class="ui-select"
+      v-if="true"
+      class="ui-select__content-wrapper"
     >
-      <div
-        v-for="option in options"
-        :key="option.url"
-      >
-        {{ option.name.rus }}
-        <br>
-      </div>
+      <ul class="ui-select__content">
+        <li
+          v-for="option in options"
+          :key="option.url"
+          class="ui-select__element"
+          @click="selectOption"
+        >
+          <span class="ui-select__option">
+            {{ option.name.rus }}
+          </span>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -44,8 +52,8 @@
 <script setup lang="ts">
   import {
     computed, ref
-  } from "vue";
-  import UiInput from "@/components/UI/kit/UiInput.vue";
+  } from 'vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
 
   const props = defineProps({
     placeholder: {
@@ -63,23 +71,26 @@
   const focused = ref<Boolean>(false);
 
   const toggleFocus = e => {
-    if (e.type === "focusin") {
+    if (e.type === 'focusin') {
       focused.value = true;
-      console.log(input);
     }
 
-    if (e.type === "focusout") {
+    if (e.type === 'focusout') {
       focused.value = false;
     }
 
-    if (e.type === "click") {
+    if (e.type === 'click') {
       focused.value = !focused.value;
     }
   };
 
+  const selectOption = () => {
+
+  };
+
   const togglePlaceholder = computed(() => (focused.value ? '' : props.placeholder));
 
-  const toggleIcon = computed(() => (focused.value ? "arrow/up" : "arrow/down"));
+  const toggleIcon = computed(() => (focused.value ? 'arrow/up' : 'arrow/down'));
 </script>
 
 <style lang="scss" scoped>
@@ -139,6 +150,78 @@
       color: var(--border);
       radius: 8px;
     };
+  }
+
+  &__content {
+    width: 100%;
+    padding: 0;
+
+    &-wrapper {
+      background: var(--bg-secondary);
+      color: var(--text-color);
+      font-size: var(--main-font-size);
+      line-height: var(--main-line-height);
+      position: absolute;
+      height: calc(43.2px * 5);
+      overflow: scroll;
+      bottom: auto;
+      margin: 5px 0 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      z-index: 3;
+    }
+  }
+
+  &__element {
+    list-style: none;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: initial;
+    line-height: initial;
+    padding: 12px 12px 12px 28px;
+
+    &:hover {
+      background: var(--hover);
+      color: var(--text-color);
+
+      &:after {
+        background: transparent;
+      }
+    }
+  }
+
+  &__option {
+    color: var(--text-color);
+    width: 100%;
+
+    span {
+      white-space: break-spaces;
+      width: 100%;
+      display: block;
+    }
+
+    &--group {
+      background: var(--bg-sub-menu);
+      color: var(--text-color);
+      font-weight: 600;
+    }
+
+    &--disabled {
+      background: var(--hover) !important;
+    }
+
+    &--selected {
+      font-weight: 400;
+      color: var(--text-color-active);
+      background: var(--hover);
+
+      &.ui-select {
+        &__option:hover {
+          color: var(--text-btn-color);
+          background: var(--primary-hover);
+        }
+      }
+    }
   }
 }
 
