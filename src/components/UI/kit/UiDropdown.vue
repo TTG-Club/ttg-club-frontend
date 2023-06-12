@@ -38,7 +38,7 @@
           v-for="option in options"
           :key="option.url"
           class="ui-select__element"
-          @click="selectOption"
+          @click="selectOption()"
         >
           <span class="ui-select__option">
             {{ option.name.rus }}
@@ -85,7 +85,7 @@
   };
 
   const selectOption = () => {
-
+    // p.target.classList.add('ui-select-eleKment--selected');
   };
 
   const togglePlaceholder = computed(() => (focused.value ? '' : props.placeholder));
@@ -188,6 +188,20 @@
         background: transparent;
       }
     }
+    &--selected {
+      font-weight: 400;
+      color: var(--text-color-active);
+      background: var(--hover);
+
+      &.ui-select {
+        &__element {
+          &:hover, &--highlight {
+            color: var(--text-btn-color);
+            background: var(--primary-hover);
+          }
+        }
+      }
+    }
   }
 
   &__option {
@@ -208,19 +222,6 @@
 
     &--disabled {
       background: var(--hover) !important;
-    }
-
-    &--selected {
-      font-weight: 400;
-      color: var(--text-color-active);
-      background: var(--hover);
-
-      &.ui-select {
-        &__option:hover {
-          color: var(--text-btn-color);
-          background: var(--primary-hover);
-        }
-      }
     }
   }
 }
