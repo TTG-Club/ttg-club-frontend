@@ -2,8 +2,8 @@
 
 :root {
   --main-font-size: 14px;
-  --h1-font-size: 42px;
-  --h2-font-size: 28px;
+  --h1-font-size: 38px;
+  --h2-font-size: 30px;
   --h3-font-size: 26px;
   --h4-font-size: 22px;
   --h5-font-size: 14px;
@@ -54,7 +54,7 @@ h3 {
 
 h4 {
   font-size: var(--h4-font-size);
-  font-weight: 300;
+  font-weight: 400;
   margin: 36px 0 8px 0;
   color: var(--text-color-title);
   position: relative;
@@ -176,7 +176,7 @@ blockquote p:last-child {
 .header_separator {
   display: flex;
   align-items: center;
-  margin-top: 36px;
+  margin-top: 28px;
 }
 
 h5.header_separator {
@@ -211,14 +211,23 @@ h5.header_separator {
 
 /********* Сворачивание текста / details  *********/
 details {
-  margin-bottom: 16px;
   margin-left: -8px;
   margin-right: -8px;
-  margin-top: 28px;
-}
+  margin-top: 24px;
 
-details[open] {
-  margin-bottom: 16px;
+  details {
+    margin-left: 8px;
+    margin-right: 8px;
+    border-radius: 8px;
+  }
+  
+  details[open] {
+    background-color: var(--bg-details-title);
+
+    .content {
+      padding: 4px 8px;
+    }
+  }
 }
 
 details .content {
@@ -228,15 +237,15 @@ details .content {
 details > summary.h4 {
   padding: 8px 8px;
   font-size: var(--h4-font-size);
-  font-weight: 300;
+  font-weight: 400;
   margin: 0 0 4px 0;
   color: var(--text-color-title);
   position: relative;
-  font-family: 'Lora';
   cursor: pointer;
   background: var(--bg-details-title);
   border-radius: 8px;
   width: auto;
+  font-family: 'Lora'
 }
 
 details[open] > summary.h4 {
@@ -249,7 +258,7 @@ summary::marker {
 
 summary.header_separator:after {
   opacity: 0;
-  margin-right: 24px;
+  margin-right: 32px;
 }
 
 details[open] > summary.header_separator:after {
@@ -257,32 +266,24 @@ details[open] > summary.header_separator:after {
 }
 
 summary:before {
-  transform: rotate(-90deg);
-  top: 16px;
-  right: 12px;
+  right: 32px;
   position: absolute;
-  content: "";
-  display: inline-block;
+  content: "➕";
   width: 0;
   height: 0;
-  border-style: solid;
-  border-width: 7px 12px 7px 0;
-  border-color: transparent currentColor transparent transparent;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
 }
 
 details[open] > summary::before {
-  transform: rotate(90deg);
-  top: 14px;
+  content: "➖";
 }
 
 @media (max-width: 800px) {
   summary::before {
-    top: 10px;
-    right: 8px;
-  }
-
-  details[open] > summary::before {
-    top: 8px;
+    right: 28px;
   }
 }
 
@@ -315,8 +316,12 @@ h4.separator_card {
 
 details.spoiler {
   padding: 0 0 4px 0;
-  margin: 0 -8px 16px -8px;
+  margin: 24px -8px 16px -8px;
   border-radius: 8px;
+
+  .content {
+    padding: 8px 16px;
+  }
 }
 
 details[open].spoiler {

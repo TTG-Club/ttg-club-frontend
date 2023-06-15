@@ -270,7 +270,7 @@
     }
 
     &__title {
-      font-size: calc(var(--h1-font-size) - 10px);
+      font-size: var(--h1-font-size);
       font-weight: 400;
     }
 

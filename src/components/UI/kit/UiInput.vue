@@ -38,6 +38,7 @@
       <ui-erase-button
         v-if="isClearable && value"
         v-model="value"
+        body-class="ui-input__erase-body"
       />
     </span>
 
@@ -51,10 +52,10 @@
 </template>
 
 <script setup>
+  import { useVModel } from '@vueuse/core';
   import {
     computed, onMounted, ref, useAttrs
   } from 'vue';
-  import { useVModel } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiEraseButton from '@/components/UI/kit/button/UiEraseButton.vue';
 
@@ -224,6 +225,11 @@
         padding: 10px;
         color: var(--text-color-title);
       }
+    }
+
+    & :deep(.ui-input__erase-body) {
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     &__input {
