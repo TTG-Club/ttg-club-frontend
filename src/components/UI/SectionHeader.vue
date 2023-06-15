@@ -287,7 +287,7 @@
       &.is-only-desktop {
         display: none;
 
-        @include media-min($lg) {
+        @include media-min($xl) {
           display: inherit;
         }
       }
