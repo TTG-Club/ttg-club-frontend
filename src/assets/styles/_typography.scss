@@ -163,6 +163,10 @@ blockquote {
   margin-block-end: 16px;
   margin-inline-start: 0;
   margin-inline-end: 0;
+
+  h4 {
+    margin: 0 0 8px;
+  }
 }
 
 blockquote p {
@@ -274,7 +278,7 @@ summary:before {
   font-size: 14px;
   display: flex;
   align-items: center;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 details[open] > summary::before {
