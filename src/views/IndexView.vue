@@ -102,27 +102,7 @@
             </div>
           </div>
 
-          <div class="block__youtube">
-            <h3>Интересное видео:</h3>
-
-            <transition
-              mode="out-in"
-              name="fade"
-            >
-              <ui-youtube
-                v-if="currentVideo"
-                :id="currentVideo"
-                ref="youtube"
-              />
-
-              <div
-                v-else
-                class="no-video"
-              >
-                Новостей не было за последнее время
-              </div>
-            </transition>
-          </div>
+          <youtube-block />
         </div>
 
         <div
@@ -161,17 +141,12 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
+  import { computed } from 'vue';
   import { storeToRefs } from 'pinia';
   import orderBy from 'lodash/orderBy';
-  import { tryOnBeforeMount } from '@vueuse/core';
   import type { TNavItem } from '@/store/UI/NavStore';
   import { useNavStore } from '@/store/UI/NavStore';
-  import UiYoutube from '@/components/UI/kit/UiYoutube.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { TYoutubeVideo } from '@/types/Shared/Youtube.types';
+  import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
 
   const navStore = useNavStore();
 
@@ -181,10 +156,6 @@
     showedPartners,
     isShowSearch
   } = storeToRefs(navStore);
-
-  const youtube = ref<HTMLElement | null>(null);
-  const http = useAxios();
-  const currentVideo = ref<string | null>(null);
 
   const mainNavItems = computed(() => {
     const items: TNavItem[] = [];
@@ -222,29 +193,9 @@
     );
   });
 
-  const setLastVideo = async () => {
-    try {
-      const resp = await http.get<TYoutubeVideo>({ url: '/youtube/last' });
-
-      if (resp.status !== 200) {
-        return Promise.reject(resp.status);
-      }
-
-      currentVideo.value = resp.data.id;
-
-      return Promise.resolve(resp.data);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
   const openSearchModal = () => {
     isShowSearch.value = true;
   };
-
-  tryOnBeforeMount(async () => {
-    await setLastVideo();
-  });
 </script>
 
 <style lang="scss" scoped>

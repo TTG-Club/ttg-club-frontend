@@ -1,8 +1,9 @@
 <script lang="ts" setup>
   import {
-    computed, h, ref
+    computed, h, ref, useCssModule
   } from 'vue';
-  import IconYouTube from '@/components/UI/icons/IconYouTube.vue';
+  import YoutubePlayIcon from '@/features/youtube/components/YoutubePlayIcon.vue';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
 
   export type ImageResolution =
     | 'default'
@@ -11,21 +12,27 @@
     | 'sddefault'
     | 'maxresdefault'
 
+  const $style = useCssModule();
+
   const props = withDefaults(
     defineProps<{
-      id: string
+      video: TYoutubeVideo
+      showName?: boolean
       params?: string
       poster?: ImageResolution
       muted?: boolean
       rel?: 'prefetch' | 'preload'
       announce?: string
+      hasRadius?: boolean
     }>(),
     {
+      showName: false,
       params: '',
       poster: 'hqdefault',
       muted: false,
       rel: 'preload',
-      announce: 'Смотреть'
+      announce: 'Смотреть',
+      hasRadius: false
     }
   );
 
@@ -34,9 +41,12 @@
   const iframe = ref(false);
   const iframeElement = ref<HTMLIFrameElement | null>(null);
 
-  const videoId = computed(() => encodeURIComponent(props.id));
+  const videoId = computed(() => encodeURIComponent(props.video.id));
   const posterUrl = computed(() => `https://i.ytimg.com/vi_webp/${ videoId.value }/${ props.poster }.webp`);
-  const embedUrl = computed(() => (`https://www.youtube.com/embed/${ videoId.value }`));
+
+  const embedUrl = computed(() => (
+    `https://www.youtube.com/embed/${ videoId.value }`
+  ));
 
   const urlWithParams = computed(() => (
     `${ embedUrl.value }?autoplay=1&enablejsapi=1&state=1&mute=${ props.muted ? 1 : 0 }`
@@ -73,8 +83,8 @@
     'div',
     {
       class: {
-        'ui-youtube': true,
-        'is-active': iframe.value
+        [$style['youtube-player']]: true,
+        [$style['is-active']]: iframe.value
       }
     },
     [
@@ -87,27 +97,47 @@
         'div',
         {
           onClick: initIframe,
-          class: 'ui-youtube__body',
-          style: {
-            backgroundImage: `url(${ posterUrl.value })`
-          }
+          class: $style.body
         },
-        iframe.value
-          ? h('iframe', {
-            ref: iframeElement,
-            class: 'ui-youtube__iframe',
-            width: '100%',
-            height: '100%',
-            frameborder: 0,
-            allow: 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
-            allowfullscreen: true,
-            src: urlWithParams.value
-          })
-          : h(IconYouTube, {
-            class: 'ui-youtube__btn',
-            type: 'button',
-            ariaLabel: props.announce
-          })
+        [
+          h(
+            'div',
+            {
+              class: {
+                [$style.video]: true,
+                [$style.radius]: props.hasRadius
+              },
+              style: {
+                backgroundImage: `url(${ posterUrl.value })`
+              }
+            },
+            iframe.value
+              ? h('iframe', {
+                ref: iframeElement,
+                class: $style.iframe,
+                width: '100%',
+                height: '100%',
+                frameborder: 0,
+                allow: 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
+                allowfullscreen: true,
+                src: urlWithParams.value
+              })
+              : h(YoutubePlayIcon, {
+                class: $style.btn,
+                type: 'button',
+                ariaLabel: props.announce
+              })
+          ),
+          props.showName
+            ? h(
+              'span',
+              {
+                class: $style.name
+              },
+              props.video.name
+            )
+            : null
+        ]
       )
     ]
   );
@@ -133,28 +163,35 @@
   <player />
 </template>
 
-<style lang="scss">
-  .ui-youtube {
+<style module lang="scss">
+  .youtube-player {
     width: 100%;
-    overflow: hidden;
-    background-color: #000;
     position: relative;
     display: block;
-    contain: content;
-    background-position: 50%;
-    background-size: cover;
     cursor: pointer;
 
-    &__body {
+    .body {
+      position: relative;
       width: 100%;
-      height: 100%;
+    }
+
+    .video {
+      width: 100%;
+      padding-bottom: calc(720 / 1280 * 100%);
+      background-color: #000000;
+      position: relative;
+      overflow: hidden;
       background: {
         size: cover;
         position: center;
+      };
+
+      &.radius {
+        border-radius: 12px;
       }
     }
 
-    &__iframe {
+    .iframe {
       width: 100%;
       height: 100%;
       position: absolute;
@@ -162,8 +199,8 @@
       left: 0;
     }
 
-    &__btn {
-      @include css_anim($item: filter, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
+    .btn {
+      @include css_anim($item: all, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
 
       display: block;
       width: 68px;
@@ -174,20 +211,21 @@
       top: 50%;
       left: 50%;
       z-index: 1;
-      background-color: transparent;
-      filter: grayscale(100%);
       border: none;
-      color: #f00;
+      color: var(--text-color);
+    }
+
+    .name {
+      display: block;
+      margin-top: 8px;
     }
 
     &:hover,
     &:focus-within {
-      .ui-youtube {
-        &__btn {
-          @include css_anim($item: filter, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
+      .btn {
+        @include css_anim($item: all, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
 
-          filter: none;
-        }
+        color: var(--bg-main);
       }
     }
 

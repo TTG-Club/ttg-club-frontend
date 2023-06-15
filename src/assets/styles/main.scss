@@ -249,53 +249,6 @@
 
       }
 
-      .block__youtube {
-        flex: 1 1 calc(33% - 10px);
-        background-color: var(--bg-table-list);
-        border-radius: 12px;
-        overflow: hidden;
-        padding: 16px;
-        flex-direction: column;
-        display: flex;
-
-        h3 {
-          font-size: calc(var(--h3-font-size) - 12px);
-          margin-top: 0;
-          font-family: "Open Sans", sans-serif;
-          font-weight: 400;
-          opacity: 0.6;
-        }
-
-        .btn {
-          padding: 8px 8px;
-          background-color: var(--hover);
-          color: var(--text-color);
-          border-radius: 8px;
-          margin: 4px 0;
-          transition: all 0.5s;
-          width: fit-content;
-
-          &:hover {
-            background-color: var(--bg-main);
-          }
-        }
-
-        .ui-youtube,
-        .no-video {
-          height: 180px;
-          margin: 0 0 8px 0;
-          border-radius: 12px;
-
-          @include media-min($sm) {
-            height: 300px;
-          }
-
-          @include media-min($xl) {
-            height: 100%;
-          }
-        }
-      }
-
       .discord_bot,
       .dnd5club_tel_bot {
         display: flex;
