@@ -223,6 +223,10 @@ details {
   
   details[open] {
     background-color: var(--bg-details-title);
+
+    .content {
+      padding: 4px 8px;
+    }
   }
 }
 
