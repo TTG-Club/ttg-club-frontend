@@ -70,13 +70,31 @@
 
   const getVideos = async () => {
     try {
-      const resp = await http.get<Array<TYoutubeVideo>>({ url: '/youtube' });
+      const resp = await http.post<{
+        count: number;
+        list: Array<TYoutubeVideo>
+      }>({
+        url: '/youtube',
+        payload: {
+          page: 0,
+          limit: 5,
+          filter: {
+            active: true
+          },
+          order: [
+            {
+              field: 'created',
+              direction: 'desc'
+            }
+          ]
+        }
+      });
 
       if (resp.status !== 200) {
         return Promise.reject(resp.status);
       }
 
-      return Promise.resolve(resp.data);
+      return Promise.resolve(resp.data.list);
     } catch (err) {
       return Promise.reject(err);
     }
