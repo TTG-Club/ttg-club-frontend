@@ -41,7 +41,7 @@
       </ul>
 
       <details>
-        <summary class="h4 header_separator">
+        <summary class="h4">
           <span>Информация из других источников</span>
         </summary>
 

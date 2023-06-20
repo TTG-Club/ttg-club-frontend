@@ -58,7 +58,6 @@ h4 {
   margin: 36px 0 8px 0;
   color: var(--text-color-title);
   position: relative;
-  font-family: 'Lora';
 }
 
 h5 {
@@ -132,7 +131,7 @@ b {
   color: var(--text-g-color);
   line-height: 12px;
   font-weight: 300;
-  margin: -8px 0 12px 0;
+  margin: -4px 0 12px 0;
 }
 
 h4 + .caption_text {
@@ -164,7 +163,7 @@ blockquote {
   margin-inline-start: 0;
   margin-inline-end: 0;
 
-  h4 {
+  h4:first-child {
     margin: 0 0 8px;
   }
 }
@@ -180,7 +179,10 @@ blockquote p:last-child {
 .header_separator {
   display: flex;
   align-items: center;
-  margin-top: 28px;
+  margin-top: 32px;
+  border-bottom: 1px solid;
+  border-color: var(--border);
+  padding: 6px 0px;
 }
 
 h5.header_separator {
@@ -200,14 +202,6 @@ h5.header_separator {
   margin-left: 8px;
 }
 
-.header_separator::after {
-  content: '';
-  width: 100%;
-  height: 1px;
-  background: var(--bg-inpur-focus);
-  flex: 1;
-}
-
 .header_separator > span {
   margin-right: 8px;
 }
@@ -217,15 +211,57 @@ h5.header_separator {
 details {
   margin-left: -8px;
   margin-right: -8px;
-  margin-top: 24px;
+  margin-top: 28px;
 
-  details {
+  summary {
+    padding: 8px 8px;
+    display: flex;
+    align-items: center;
+    color: var(--text-color-title);
+    position: relative;
+    cursor: pointer;
+    background: var(--bg-details-title);
+    border-radius: 8px;
+    width: auto;
+    margin: 0;
+
+    &.h4 {
+      font-size: var(--h4-font-size);
+      font-weight: 400;
+    }
+  }
+
+  .content {
+    padding: 0 8px;
+  }
+}
+
+details[open] {
+  summary {
+    background: none;
+    border-radius: 0;
+    border-bottom: 1px solid;
+    border-color: var(--border);
+    margin: 0 0 8px 8px;
+    padding: 8px 0;
+}
+}
+
+details {
+  &.lvl {
     margin-left: 8px;
     margin-right: 8px;
     border-radius: 8px;
+    background-color: var(--bg-details-title);
+
+    summary {
+      border-bottom: 0px;
+    }
   }
-  
-  details[open] {
+}
+
+details[open] {
+  &.lvl {
     background-color: var(--bg-details-title);
 
     .content {
@@ -234,39 +270,8 @@ details {
   }
 }
 
-details .content {
-  padding: 0 8px;
-}
-
-details > summary.h4 {
-  padding: 8px 8px;
-  font-size: var(--h4-font-size);
-  font-weight: 400;
-  margin: 0 0 4px 0;
-  color: var(--text-color-title);
-  position: relative;
-  cursor: pointer;
-  background: var(--bg-details-title);
-  border-radius: 8px;
-  width: auto;
-  font-family: 'Lora'
-}
-
-details[open] > summary.h4 {
-  background: none;
-}
-
 summary::marker {
   content: '';
-}
-
-summary.header_separator:after {
-  opacity: 0;
-  margin-right: 32px;
-}
-
-details[open] > summary.header_separator:after {
-  opacity: 1;
 }
 
 summary:before {
@@ -334,6 +339,7 @@ details[open].spoiler {
 
 details[open].spoiler > summary.h4 {
   margin: 0 0 4px 0;
+  padding: 8px 8px;
   background: var(--hover);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -345,7 +351,7 @@ details[open].spoiler > summary::after {
   right: 8px !important;
 }
 
-details[open].spoiler h4.header_separator > span {
+details[open].spoiler h4 > span {
   font-size: calc(var(--h4-font-size) - 2px);
 }
 
@@ -467,6 +473,7 @@ table.dnd5_table {
 
 .table-responsive.class {
   border: 1px solid var(--border);
+  margin-top: 24px;
   margin-bottom: 24px;
 }
 

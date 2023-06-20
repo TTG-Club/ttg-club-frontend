@@ -249,16 +249,14 @@
       </div>
 
       <div v-if="creature.feats?.length">
-        <h4 class="header_separator">
-          <span>Способности</span>
-        </h4>
+        <hr />
 
         <div
           v-for="(feat, key) in creature.feats"
           :key="key"
         >
           <span class="bestiary_h5">
-            <h5>{{ feat.name }}</h5>
+            <h5>{{ feat.name }}.</h5>
 
             <raw-content :template="feat.value" />
           </span>
@@ -275,7 +273,7 @@
           :key="key"
         >
           <span class="bestiary_h5">
-            <h5>{{ action.name }}</h5>
+            <h5>{{ action.name }}.</h5>
 
             <raw-content :template="action.value" />
           </span>
@@ -292,7 +290,7 @@
           :key="key"
         >
           <span class="bestiary_h5">
-            <h5>{{ bonus.name }}</h5>
+            <h5>{{ bonus.name }}.</h5>
 
             <raw-content :template="bonus.value" />
           </span>
@@ -309,7 +307,7 @@
           :key="key"
         >
           <span class="bestiary_h5">
-            <h5>{{ reaction.name }}</h5>
+            <h5>{{ reaction.name }}.</h5>
 
             <raw-content :template="reaction.value" />
           </span>
@@ -339,7 +337,7 @@
           :key="key"
         >
           <span class="bestiary_h5">
-            <h5>{{ action.name }}</h5>
+            <h5>{{ action.name }}.</h5>
 
             <raw-content :template="action.value" />
           </span>
@@ -356,7 +354,7 @@
           :key="key"
         >
           <span class="bestiary_h5">
-            <h5>{{ mystical.name }}</h5>
+            <h5>{{ mystical.name }}.</h5>
 
             <raw-content :template="mystical.value" />
           </span>
@@ -398,7 +396,7 @@
       </div>
 
       <details v-if="creature.description">
-        <summary class="h4 header_separator">
+        <summary class="h4">
           <span>Описание</span>
         </summary>
 
@@ -412,7 +410,7 @@
         v-for="(tag, key) in creature.tags"
         :key="key"
       >
-        <summary class="h4 header_separator">
+        <summary class="h4">
           <span>{{ tag.name }}</span>
         </summary>
 
