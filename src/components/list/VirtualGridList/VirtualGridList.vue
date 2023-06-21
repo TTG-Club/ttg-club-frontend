@@ -1,5 +1,6 @@
 <template>
   <virtual-list
+    :ref="reference"
     v-bind="listProps"
     :items="items"
   >
@@ -25,41 +26,28 @@
 <script lang="ts" setup>
   import { computed } from 'vue';
   import clsx from 'clsx';
+  import omit from 'lodash/omit';
   import VirtualList from '@/components/list/VirtualList/VirtualList.vue';
-  import type { AnyObject, RecordKey } from '@/types/Shared/Utility.types';
+  import type { AnyObject } from '@/types/Shared/Utility.types';
   import ListRow, { TListRowProps } from '@/components/list/ListRow.vue';
   import { DEFAULT_KEY_FIELD } from '@/common/const';
-  import type { TResponsiveValues } from '@/common/composition/useResponsiveValues';
   import { useResponsiveValues } from '@/common/composition/useResponsiveValues';
   import { getListRows } from '@/common/helpers/list';
-  import type { TListRow } from '@/types/Shared/List.types';
   import type { TVirtualListProps } from '@/components/list/VirtualList/types';
+  import type { TVirtualGridListProps } from '@/components/list/VirtualGridList/types';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
 
-  export type TVirtualGridListContext = {
-    columns: number;
-    keyField: TVirtualListProps['keyField']
-  };
-
-  export type TVirtualGridListProps = Omit<TProps, 'list'>;
-
-  interface TProps {
-    list: TVirtualListProps;
-    columns?: TResponsiveValues<number>;
-    flat?: boolean;
-    getRows?: (items: TItem[], context: TVirtualGridListContext) => TListRow<TItem, RecordKey>[];
-  }
-
-  const props = withDefaults(defineProps<TProps>(), {
+  const props = withDefaults(defineProps<TVirtualGridListProps>(), {
     columns: () => ({
       md: 1,
       xl: 2,
       base: 3
     }),
     flat: false,
-    getRows: undefined
+    getRows: undefined,
+    reference: undefined
   });
 
   const itemKeyField = computed(() => props.list.keyField || DEFAULT_KEY_FIELD);
@@ -68,8 +56,12 @@
   const { current: currentColumns } = useResponsiveValues({ values: columnConfig });
 
   const listProps = computed<TVirtualListProps>(() => ({
-    ...props.list,
-    getItemClass: (item: unknown) => clsx(props.list.getItemClass?.(item), 'virtual-grid-list__item')
+    ...omit(props.list, 'reference'),
+    getItemClass: item => clsx(props.list.getItemClass?.(item), 'virtual-grid-list__item'),
+
+    // Ищем в колонках, т.к. именно в них содержаться элементы
+    getItemIndexByKey: (rows, key) => rows
+      .findIndex(row => row.columns?.find(item => item[itemKeyField.value] === key))
   }));
 
   const items = computed(() => (props.getRows
