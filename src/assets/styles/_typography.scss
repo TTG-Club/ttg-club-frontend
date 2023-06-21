@@ -248,15 +248,28 @@ details[open] {
 }
 
 details {
-  &.lvl {
+  &.inside {
     margin-left: 8px;
     margin-right: 8px;
     border-radius: 8px;
     background-color: var(--bg-details-title);
 
     summary {
-      border-bottom: 0px;
+      border-bottom: 0;
+      margin-bottom: 0;
     }
+  }
+}
+
+details[open] {
+  &.inside {
+    summary {
+      border-bottom: 1px solid;
+      border-color: var(--border);
+      margin-bottom: 8px;
+    }
+
+    padding-bottom: 4px;
   }
 }
 
@@ -413,6 +426,7 @@ table.dataTable.no-footer {
 .table-responsive {
   overflow-x: auto;
   border-radius: 8px;
+  margin-bottom: 12px;
 }
 
 .table-responsive .simplebar-content {
