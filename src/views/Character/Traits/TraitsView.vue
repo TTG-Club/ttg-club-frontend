@@ -9,7 +9,7 @@
     <virtual-grouped-list
       :list="getListProps({ items: traits })"
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
     >
       <template #default="{ item: trait }">
         <trait-link
@@ -36,6 +36,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   type TProps = {
     storeKey?: string;
@@ -77,6 +78,8 @@
       }
     ]
   });
+
+  const { setReference } = useScrollToPathInList({ items: traits });
 
   const onSearch = async () => {
     await initPages();

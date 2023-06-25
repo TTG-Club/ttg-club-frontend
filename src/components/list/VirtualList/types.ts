@@ -5,6 +5,7 @@ export type TVirtualListProps = {
   keyField?: string,
   minItemSize?: number;
   pageMode?: boolean;
+  buffer?: number;
 
   /**
    * Функция для получения класса элемента списка
