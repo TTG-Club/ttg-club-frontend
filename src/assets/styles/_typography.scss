@@ -217,6 +217,7 @@ details {
   summary {
     padding: 8px 8px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     color: var(--text-color-title);
     position: relative;
@@ -225,6 +226,7 @@ details {
     border-radius: 8px;
     width: auto;
     margin: 0;
+    gap: 8px;
 
     &.h4 {
       font-size: var(--h4-font-size);
@@ -245,7 +247,11 @@ details[open] {
     border-color: var(--border);
     margin: 0 0 8px 8px;
     padding: 8px 0;
-}
+
+    .source-data {
+      margin-right: 48px;
+    }
+  }
 }
 
 details {
@@ -322,6 +328,19 @@ summary.h5 {
 summary.h4:hover,
 summary.h5:hover {
   color: var(--text-color);
+}
+
+.optional-rules {
+  margin-right: 8px;
+}
+
+.source-data {
+  text-align: right;
+  margin-left: auto;
+  margin-right: 40px;
+  text-transform: uppercase;
+  color: var(--text-g-color);
+  font-size: var(--main-font-size);
 }
 
 h4.separator_card {
