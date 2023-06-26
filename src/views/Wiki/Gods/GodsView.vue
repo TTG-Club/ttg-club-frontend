@@ -10,8 +10,8 @@
   >
     <virtual-grouped-list
       :get-group="getGroupByAlignment"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-      :list="getListProps({ items: gods })"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :list="getListProps({ items: gods, size: 'medium' })"
     >
       <template #default="{ item: god }">
         <god-link
@@ -40,6 +40,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -78,6 +79,8 @@
       }
     ]
   });
+
+  const { setReference } = useScrollToPathInList({ items: gods });
 
   const onSearch = async () => {
     await initPages();

@@ -9,9 +9,9 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :list="getListProps({ items: bestiary })"
+      :list="getListProps({ items: bestiary, size: 'medium' })"
       :get-group="getGroupByChallengeRating"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
     >
       <template #default="{ item: creature }">
         <creature-link
@@ -38,6 +38,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -72,6 +73,8 @@
       }
     ]
   });
+
+  const { setReference } = useScrollToPathInList({ items: bestiary });
 
   const onSearch = async () => {
     await initPages();

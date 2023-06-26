@@ -41,12 +41,9 @@
   import type { TGetGroup } from '@/components/list/VirtualGroupedList/types';
   import { TListRowProps } from '@/components/list/ListRow.vue';
   import { getListItemsWithGroups } from '@/components/list/VirtualGroupedList/helpers';
-  import type {
-    TVirtualGridListContext,
-    TVirtualGridListProps
-  } from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import type { TVirtualListProps } from '@/components/list/VirtualList/types';
+  import type { TVirtualGridListBaseProps, TVirtualGridListContext } from '@/components/list/VirtualGridList/types';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -57,7 +54,7 @@
     getGroup: TGetGroup<TItem, TGroup>;
     groupLabelKey?: string;
     sortBy?: ListIteratee;
-    grid?: TVirtualGridListProps;
+    grid?: TVirtualGridListBaseProps;
   };
 
   const props = withDefaults(defineProps<TProps>(), {
@@ -75,7 +72,7 @@
     })
   }));
 
-  const getRows: TVirtualGridListProps['getRows'] = (items: TItem[], context: TVirtualGridListContext) => {
+  const getRows: TVirtualGridListBaseProps['getRows'] = (items: TItem[], context: TVirtualGridListContext) => {
     const {
       keyField,
       columns

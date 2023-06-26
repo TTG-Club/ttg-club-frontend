@@ -12,7 +12,7 @@
     <virtual-grouped-list
       :get-group="getGroupByFirstLetter"
       :grid="grid"
-      :list="getListProps({ items: options })"
+      :list="getListProps({ items: options, size: 'small' })"
     >
       <template #default="{ item: option }">
         <option-link
@@ -44,6 +44,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   type TProps = {
     inTab?: boolean;
@@ -129,6 +130,11 @@
     await initPages();
   });
 
+  const { setReference } = useScrollToPathInList({
+    items: options,
+    disabled: props.inTab
+  });
+
   watch(
     [
       () => props.queryBooks,
@@ -147,9 +153,12 @@
 
   const showRightSide = computed(() => route.name === 'optionDetail');
 
-  const grid = computed(() => getListGridInTabProps({
-    showRightSide: showRightSide.value,
-    fullscreen: fullscreen.value,
-    inTab: props.inTab
+  const grid = computed(() => ({
+    ...getListGridInTabProps({
+      showRightSide: showRightSide.value,
+      fullscreen: fullscreen.value,
+      inTab: props.inTab
+    }),
+    reference: setReference
   }));
 </script>
