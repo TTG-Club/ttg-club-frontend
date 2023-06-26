@@ -166,6 +166,10 @@ blockquote {
   h4:first-child {
     margin: 0 0 8px;
   }
+
+  &.rules {
+    margin: 0;
+  }
 }
 
 blockquote p {
@@ -174,6 +178,11 @@ blockquote p {
 
 blockquote p:last-child {
   margin-bottom: 0;
+}
+
+.spell-list {
+  text-indent: -16px;
+  margin-left: 16px;
 }
 
 .header_separator {
