@@ -44,6 +44,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const props = withDefaults(defineProps<{
     inTab?: boolean;
@@ -116,6 +117,11 @@
         direction: 'asc'
       }
     ]
+  });
+
+  const { setReference } = useScrollToPathInList({
+    items: spells,
+    disabled: props.inTab
   });
 
   const onSearch = async () => {

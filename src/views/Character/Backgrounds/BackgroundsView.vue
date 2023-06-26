@@ -7,9 +7,9 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :list="getListProps({ items: backgrounds, minItemSize: 50 })"
+      :list="getListProps({ items: backgrounds, size: 'small' })"
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
     >
       <template #default="{ item: background }">
         <background-link
@@ -36,6 +36,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -69,6 +70,8 @@
       }
     ]
   });
+
+  const { setReference } = useScrollToPathInList({ items: backgrounds });
 
   const onSearch = async () => {
     await initPages();
