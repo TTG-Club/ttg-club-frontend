@@ -34,7 +34,7 @@ app.use(pinia)
   .use(vfm)
   .directive('tippy-lazy', TippyLazy);
 
-if (!isDev) {
+if (isDev) {
   app.use(VueGtag, {
     config: {
       id: import.meta.env.VITE_GTAG_ID
