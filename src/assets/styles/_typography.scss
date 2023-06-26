@@ -151,10 +151,8 @@ summary.header_separator + .caption_text {
 }
 
 blockquote {
-  font-family: 'Neucha', cursive;
-  padding: 16px 16px 16px 16px;
+  padding: 16px 16px 4px 16px;
   background-color: var(--hover);
-  border-radius: 16px;
   margin-bottom: 32px;
   margin-top: 32px;
 
@@ -162,22 +160,16 @@ blockquote {
   margin-block-end: 16px;
   margin-inline-start: 0;
   margin-inline-end: 0;
+  border-left: 2px solid var(--primary);
 
   h4:first-child {
     margin: 0 0 8px;
   }
 
-  &.rules {
-    margin: 0;
+  .source {
+    display: flex;
+    justify-content: flex-end;
   }
-}
-
-blockquote p {
-  letter-spacing: 1.5px;
-}
-
-blockquote p:last-child {
-  margin-bottom: 0;
 }
 
 .spell-list {
