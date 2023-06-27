@@ -5,6 +5,8 @@ import {
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import type { MaybeRef } from '@vueuse/core';
+import { usePrevious } from '@vueuse/core';
+import { isUndefined } from 'lodash';
 import { useUIStore } from '@/store/UI/UIStore';
 import { useReference } from '@/common/composition/useReference';
 import { asyncAnimationFrame } from '@/common/helpers/dom';
@@ -83,10 +85,12 @@ export const useScrollToPathInList = ({
     bodyElement.value.scrollTop -= finishingScroll;
   };
 
+  const previousShowRightSide = usePrevious(() => unref(showRightSide));
+
   // Скроллим к элементу при изменении пути
   watch(() => route.path, (value, oldValue) => {
     // Не скроллим к элементу, если открыт детальник
-    if (unref(showRightSide)) {
+    if (unref(showRightSide) && (isUndefined(previousShowRightSide.value) || previousShowRightSide.value === true)) {
       return;
     }
 
