@@ -119,11 +119,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({
-    items: spells,
-    disabled: props.inTab
-  });
-
   const onSearch = async () => {
     await initPages();
 
@@ -164,9 +159,18 @@
 
   const showRightSide = computed(() => route.name === 'spellDetail');
 
-  const grid = computed(() => getListGridInTabProps({
-    showRightSide: showRightSide.value,
-    fullscreen: fullscreen.value,
-    inTab: props.inTab
+  const { setReference } = useScrollToPathInList({
+    items: spells,
+    disabled: props.inTab,
+    showRightSide
+  });
+
+  const grid = computed(() => ({
+    ...getListGridInTabProps({
+      showRightSide: showRightSide.value,
+      fullscreen: fullscreen.value,
+      inTab: props.inTab
+    }),
+    reference: setReference
   }));
 </script>

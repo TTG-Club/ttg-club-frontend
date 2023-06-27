@@ -74,8 +74,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: books });
-
   const getBookGroup = (book: AnyObject & {type: AnyObject}) => ({
     url: book.type.name,
     name: book.type.name,
@@ -95,4 +93,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'bookDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: books,
+    showRightSide
+  });
 </script>

@@ -15,12 +15,15 @@ import type { Maybe } from '@/types/Shared/Utility.types';
 interface UseScrollToPathInListParams {
   items: Ref<unknown[]>;
   disabled?: MaybeRef<boolean>;
+  showRightSide?: MaybeRef<boolean>;
 }
 
 /**
  * Хук для скролла к элементу в виртуальном списке
  */
-export const useScrollToPathInList = ({ items, disabled }: UseScrollToPathInListParams) => {
+export const useScrollToPathInList = ({
+  items, disabled, showRightSide
+}: UseScrollToPathInListParams) => {
   const route = useRoute();
   const uiStore = useUIStore();
   const isDisabled = computed(() => unref(disabled));
@@ -82,6 +85,11 @@ export const useScrollToPathInList = ({ items, disabled }: UseScrollToPathInList
 
   // Скроллим к элементу при изменении пути
   watch(() => route.path, (value, oldValue) => {
+    // Не скроллим к элементу, если открыт детальник
+    if (unref(showRightSide)) {
+      return;
+    }
+
     scrollToPath(value, oldValue);
   }, {
     immediate: true,

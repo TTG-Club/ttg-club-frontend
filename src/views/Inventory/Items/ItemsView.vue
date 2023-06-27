@@ -82,12 +82,15 @@
     }
   };
 
-  const { setReference } = useScrollToPathInList({ items });
-
   onBeforeMount(async () => {
     await filter.initFilter();
     await initPages();
   });
 
   const showRightSide = computed(() => route.name === 'itemDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items,
+    showRightSide
+  });
 </script>
