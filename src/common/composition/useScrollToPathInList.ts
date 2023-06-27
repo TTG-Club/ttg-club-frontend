@@ -83,7 +83,7 @@ export const useScrollToPathInList = ({
     bodyElement.value.scrollTop -= finishingScroll;
   };
 
-  const preventScroll = ref<boolean>(unref(showRightSide));
+  const preventScroll = ref(unref(showRightSide));
 
   // Скроллим к элементу при изменении пути
   watch(() => route.path, (value, oldValue) => {
@@ -105,17 +105,6 @@ export const useScrollToPathInList = ({
     immediate: true,
     flush: 'post'
   });
-
-  // Скроллим к элементу при изменении списка
-  // например, при фильтрации или получении новых данных
-  watch(items, (newItems, oldItems) => {
-    const hasNewItems = newItems && newItems.length;
-    const isOldItemsEmpty = !oldItems?.length;
-
-    if (hasNewItems && isOldItemsEmpty) {
-      scrollToPath(route.path);
-    }
-  }, { flush: 'post' });
 
   return {
     reference,
