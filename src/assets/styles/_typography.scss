@@ -445,14 +445,14 @@ span.saving_throw {
 
 
 /********* Таблицы *********/
-table.dataTable.no-footer {
-  border: none !important;
-}
-
 .table-responsive {
   overflow-x: auto;
   border-radius: 8px;
   margin-bottom: 12px;
+
+  table {
+    margin-bottom: 0;
+  }
 }
 
 .table-responsive .simplebar-content {
@@ -462,11 +462,12 @@ table.dataTable.no-footer {
 table {
   color: var(--text-color);
   border-spacing: inherit;
-  border-radius: 0;
   border: 1px solid var(--border);
   width: 100% !important;
   overflow: scroll;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  height: 100%;
 }
 
 table thead {
@@ -493,23 +494,17 @@ table thead th strong {
 
 table td {
   border-right: 1px solid var(--border);
-  height: 30px;
+  height: auto;
   padding: 4px 4px;
   line-height: var(--main-line-height);
 }
 
-table tbody tr:nth-child(2n) {
+table tr:nth-child(2n) {
   background: var(--bg-table-row);
 }
 
 table td:last-child {
   border-right: 0 solid var(--border);
-}
-
-table.dnd5_table {
-  height: 100%;
-  margin-bottom: 0;
-  border-radius: 8px;
 }
 
 .table-responsive.class {
@@ -534,38 +529,10 @@ table.dnd5_table {
   border: none;
 }
 
-.class table.dnd5_table td {
-  padding: 4px 4px;
-  height: auto;
-}
-
 .class table.dnd5_table th.bb {
   border-bottom: 1px solid;
 }
 
 table tbody tr:hover {
   background-color: var(--hover);
-}
-
-table.dataTable tr.dtrg-group {
-  margin: 0 16px 16px 0;
-  border: 0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-@media (max-width: 1200px) {
-  table.dataTable tr.dtrg-group {
-    margin: 0 16px 16px 16px;
-  }
-}
-
-table.dataTable tr + tr.dtrg-group {
-  margin-top: 32px;
-}
-
-table.dataTable tr.dtrg-group td {
-  background-color: var(--hover) !important;
-  cursor: auto;
-  padding: 0 16px !important;
 }
