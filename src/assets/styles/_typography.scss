@@ -508,7 +508,6 @@ table td:last-child {
 }
 
 .table-responsive.class {
-  border: 1px solid var(--border);
   margin-top: 24px;
   margin-bottom: 24px;
 }
@@ -523,14 +522,6 @@ table td:last-child {
   .full_screen_right_block .table-responsive.class {
     margin-top: -16px;
   }
-}
-
-.class table.dnd5_table {
-  border: none;
-}
-
-.class table.dnd5_table th.bb {
-  border-bottom: 1px solid;
 }
 
 table tbody tr:hover {
