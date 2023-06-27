@@ -10,7 +10,7 @@
 }
 
 :root {
-  --main-line-height: 1.5;
+  --main-line-height: 1.4;
   --h1-line-height: 1.3;
   --h2-line-height: 1.3;
   --h3-line-height: 1.3;
@@ -73,7 +73,7 @@ p {
   font-size: var(--main-font-size);
   line-height: var(--main-line-height);
   font-weight: 400;
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   color: var(--text-color);
 }
 
@@ -368,6 +368,12 @@ details.spoiler {
 
 details[open].spoiler {
   background-color: var(--bg-details-title);
+
+  summary {
+    .source-data {
+      margin-right: 40px;
+    }
+  }
 }
 
 details[open].spoiler > summary.h4 {
