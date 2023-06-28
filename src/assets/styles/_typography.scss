@@ -10,7 +10,7 @@
 }
 
 :root {
-  --main-line-height: 1.4;
+  --main-line-height: 1.5;
   --h1-line-height: 1.3;
   --h2-line-height: 1.3;
   --h3-line-height: 1.3;
@@ -151,10 +151,8 @@ summary.header_separator + .caption_text {
 }
 
 blockquote {
-  font-family: 'Neucha', cursive;
-  padding: 16px 16px 16px 16px;
+  padding: 16px 16px 4px 16px;
   background-color: var(--hover);
-  border-radius: 16px;
   margin-bottom: 32px;
   margin-top: 32px;
 
@@ -162,18 +160,21 @@ blockquote {
   margin-block-end: 16px;
   margin-inline-start: 0;
   margin-inline-end: 0;
+  border-left: 2px solid var(--primary);
 
   h4:first-child {
     margin: 0 0 8px;
   }
+
+  .source-quote {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
-blockquote p {
-  letter-spacing: 1.5px;
-}
-
-blockquote p:last-child {
-  margin-bottom: 0;
+.spell-list {
+  text-indent: -16px;
+  margin-left: 16px;
 }
 
 .header_separator {
@@ -216,6 +217,7 @@ details {
   summary {
     padding: 8px 8px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     color: var(--text-color-title);
     position: relative;
@@ -224,6 +226,7 @@ details {
     border-radius: 8px;
     width: auto;
     margin: 0;
+    gap: 8px;
 
     &.h4 {
       font-size: var(--h4-font-size);
@@ -244,19 +247,36 @@ details[open] {
     border-color: var(--border);
     margin: 0 0 8px 8px;
     padding: 8px 0;
-}
+
+    .source-data {
+      margin-right: 48px;
+    }
+  }
 }
 
 details {
-  &.lvl {
+  &.inside {
     margin-left: 8px;
     margin-right: 8px;
     border-radius: 8px;
     background-color: var(--bg-details-title);
 
     summary {
-      border-bottom: 0px;
+      border-bottom: 0;
+      margin-bottom: 0;
     }
+  }
+}
+
+details[open] {
+  &.inside {
+    summary {
+      border-bottom: 1px solid;
+      border-color: var(--border);
+      margin-bottom: 8px;
+    }
+
+    padding-bottom: 4px;
   }
 }
 
@@ -308,6 +328,19 @@ summary.h5 {
 summary.h4:hover,
 summary.h5:hover {
   color: var(--text-color);
+}
+
+.optional-rules {
+  margin-right: 8px;
+}
+
+.source-data {
+  text-align: right;
+  margin-left: auto;
+  margin-right: 40px;
+  text-transform: uppercase;
+  color: var(--text-g-color);
+  font-size: var(--main-font-size);
 }
 
 h4.separator_card {
@@ -413,6 +446,7 @@ table.dataTable.no-footer {
 .table-responsive {
   overflow-x: auto;
   border-radius: 8px;
+  margin-bottom: 12px;
 }
 
 .table-responsive .simplebar-content {
