@@ -10,7 +10,7 @@
 }
 
 :root {
-  --main-line-height: 1.5;
+  --main-line-height: 1.4;
   --h1-line-height: 1.3;
   --h2-line-height: 1.3;
   --h3-line-height: 1.3;
@@ -73,7 +73,7 @@ p {
   font-size: var(--main-font-size);
   line-height: var(--main-line-height);
   font-weight: 400;
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   color: var(--text-color);
 }
 
@@ -368,6 +368,12 @@ details.spoiler {
 
 details[open].spoiler {
   background-color: var(--bg-details-title);
+
+  summary {
+    .source-data {
+      margin-right: 40px;
+    }
+  }
 }
 
 details[open].spoiler > summary.h4 {
@@ -439,59 +445,54 @@ span.saving_throw {
 
 
 /********* Таблицы *********/
-table.dataTable.no-footer {
-  border: none !important;
-}
-
 .table-responsive {
   overflow-x: auto;
   border-radius: 8px;
   margin-bottom: 12px;
-}
 
-.table-responsive .simplebar-content {
-  display: block !important;
+  table {
+    margin-bottom: 0;
+  }
 }
 
 table {
   color: var(--text-color);
   border-spacing: inherit;
-  border-radius: 0;
   border: 1px solid var(--border);
   width: 100% !important;
   overflow: scroll;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  height: 100%;
 }
 
 table thead {
-  background-color: var(--bg-sub-menu);
-  font-size: 11px;
+  background-color: var(--primary);
+  font-size: calc(var(--main-font-size) - 2px);
+  color: var(--text-btn-color);
 }
 
 table th,
 table thead th {
   padding: 4px 4px;
-  font-size: var(--main-font-size);
-  background: var(--primary);
-  color: var(--text-btn-color);
-  font-weight: 300;
+  font-weight: 500;
 }
 
 table th b,
 table th strong,
 table thead th b,
 table thead th strong {
-  color: var(--text-btn-color);
-  font-weight: 300;
+  font-weight: 500;
 }
 
 table td {
   border-right: 1px solid var(--border);
-  height: 30px;
+  height: auto;
   padding: 4px 4px;
+  line-height: var(--main-line-height);
 }
 
-table tbody tr:nth-child(2n) {
+table tr:nth-child(2n) {
   background: var(--bg-table-row);
 }
 
@@ -499,66 +500,11 @@ table td:last-child {
   border-right: 0 solid var(--border);
 }
 
-table.dnd5_table {
-  height: 100%;
-  margin-bottom: 0;
-  border-radius: 8px;
-}
-
 .table-responsive.class {
-  border: 1px solid var(--border);
   margin-top: 24px;
   margin-bottom: 24px;
 }
 
-@media (max-width: 1200px) {
-  .table-responsive.class {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 30px;
-  }
-
-  .full_screen_right_block .table-responsive.class {
-    margin-top: -16px;
-  }
-}
-
-.class table.dnd5_table {
-  border: none;
-}
-
-.class table.dnd5_table td {
-  padding: 4px 4px;
-  height: auto;
-}
-
-.class table.dnd5_table th.bb {
-  border-bottom: 1px solid;
-}
-
 table tbody tr:hover {
   background-color: var(--hover);
-}
-
-table.dataTable tr.dtrg-group {
-  margin: 0 16px 16px 0;
-  border: 0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-@media (max-width: 1200px) {
-  table.dataTable tr.dtrg-group {
-    margin: 0 16px 16px 16px;
-  }
-}
-
-table.dataTable tr + tr.dtrg-group {
-  margin-top: 32px;
-}
-
-table.dataTable tr.dtrg-group td {
-  background-color: var(--hover) !important;
-  cursor: auto;
-  padding: 0 16px !important;
 }
