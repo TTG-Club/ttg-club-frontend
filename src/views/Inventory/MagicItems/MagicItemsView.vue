@@ -87,8 +87,6 @@
     }
   };
 
-  const { setReference } = useScrollToPathInList({ items });
-
   const getGroupByRarity = (item: AnyObject & { rarity: AnyObject }) => (
     {
       url: item.rarity.type,
@@ -102,4 +100,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'magicItemDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items,
+    showRightSide
+  });
 </script>

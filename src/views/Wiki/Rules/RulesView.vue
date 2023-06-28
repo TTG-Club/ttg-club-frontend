@@ -73,8 +73,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: rules });
-
   const onSearch = async () => {
     await initPages();
 
@@ -89,4 +87,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'ruleDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: rules,
+    showRightSide
+  });
 </script>

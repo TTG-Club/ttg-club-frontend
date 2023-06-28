@@ -67,8 +67,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: armors });
-
   const onSearch = async () => {
     await initPages();
 
@@ -88,4 +86,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'armorDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: armors,
+    showRightSide
+  });
 </script>
