@@ -111,7 +111,7 @@
           <summary class="h4">
             <span>{{ subrace.name.rus }}</span>
 
-            <span>{{ subrace.source.shortName }}</span>
+            <span class="source-data">{{ subrace.source.shortName }}</span>
           </summary>
 
           <div class="content">
