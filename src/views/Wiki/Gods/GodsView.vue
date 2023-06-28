@@ -80,8 +80,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: gods });
-
   const onSearch = async () => {
     await initPages();
 
@@ -103,4 +101,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'godDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: gods,
+    showRightSide
+  });
 </script>

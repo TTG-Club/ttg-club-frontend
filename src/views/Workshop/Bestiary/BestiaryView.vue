@@ -74,8 +74,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: bestiary });
-
   const onSearch = async () => {
     await initPages();
 
@@ -96,4 +94,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'creatureDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: bestiary,
+    showRightSide
+  });
 </script>

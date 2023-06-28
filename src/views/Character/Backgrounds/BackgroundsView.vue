@@ -71,8 +71,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: backgrounds });
-
   const onSearch = async () => {
     await initPages();
 
@@ -87,4 +85,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'backgroundDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: backgrounds,
+    showRightSide
+  });
 </script>

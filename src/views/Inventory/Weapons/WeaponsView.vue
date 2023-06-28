@@ -74,9 +74,6 @@
     ]
   });
 
-  // TODO: Выяснить почему некорректно срабатывает скролл к элементу
-  const { setReference } = useScrollToPathInList({ items: weapons });
-
   const onSearch = async () => {
     await initPages();
 
@@ -97,5 +94,10 @@
     url: type.name,
     name: type.name,
     order: type.order
+  });
+
+  const { setReference } = useScrollToPathInList({
+    items: weapons,
+    showRightSide
   });
 </script>

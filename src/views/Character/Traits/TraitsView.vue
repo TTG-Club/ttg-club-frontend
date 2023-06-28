@@ -79,8 +79,6 @@
     ]
   });
 
-  const { setReference } = useScrollToPathInList({ items: traits });
-
   const onSearch = async () => {
     await initPages();
 
@@ -95,4 +93,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'traitDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: traits,
+    showRightSide
+  });
 </script>
