@@ -2,8 +2,8 @@
 
 :root {
   --main-font-size: 14px;
-  --h1-font-size: 42px;
-  --h2-font-size: 28px;
+  --h1-font-size: 38px;
+  --h2-font-size: 30px;
   --h3-font-size: 26px;
   --h4-font-size: 22px;
   --h5-font-size: 14px;
@@ -54,11 +54,10 @@ h3 {
 
 h4 {
   font-size: var(--h4-font-size);
-  font-weight: 300;
+  font-weight: 400;
   margin: 36px 0 8px 0;
   color: var(--text-color-title);
   position: relative;
-  font-family: 'Lora';
 }
 
 h5 {
@@ -74,7 +73,7 @@ p {
   font-size: var(--main-font-size);
   line-height: var(--main-line-height);
   font-weight: 400;
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   color: var(--text-color);
 }
 
@@ -132,7 +131,7 @@ b {
   color: var(--text-g-color);
   line-height: 12px;
   font-weight: 300;
-  margin: -8px 0 12px 0;
+  margin: -4px 0 12px 0;
 }
 
 h4 + .caption_text {
@@ -152,10 +151,8 @@ summary.header_separator + .caption_text {
 }
 
 blockquote {
-  font-family: 'Neucha', cursive;
-  padding: 16px 16px 16px 16px;
+  padding: 16px 16px 4px 16px;
   background-color: var(--hover);
-  border-radius: 16px;
   margin-bottom: 32px;
   margin-top: 32px;
 
@@ -163,20 +160,30 @@ blockquote {
   margin-block-end: 16px;
   margin-inline-start: 0;
   margin-inline-end: 0;
+  border-left: 2px solid var(--primary);
+
+  h4:first-child {
+    margin: 0 0 8px;
+  }
+
+  .source-quote {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
-blockquote p {
-  letter-spacing: 1.5px;
-}
-
-blockquote p:last-child {
-  margin-bottom: 0;
+.spell-list {
+  text-indent: -16px;
+  margin-left: 16px;
 }
 
 .header_separator {
   display: flex;
   align-items: center;
-  margin-top: 36px;
+  margin-top: 32px;
+  border-bottom: 1px solid;
+  border-color: var(--border);
+  padding: 6px 0px;
 }
 
 h5.header_separator {
@@ -196,14 +203,6 @@ h5.header_separator {
   margin-left: 8px;
 }
 
-.header_separator::after {
-  content: '';
-  width: 100%;
-  height: 1px;
-  background: var(--bg-inpur-focus);
-  flex: 1;
-}
-
 .header_separator > span {
   margin-right: 8px;
 }
@@ -211,78 +210,109 @@ h5.header_separator {
 
 /********* Сворачивание текста / details  *********/
 details {
-  margin-bottom: 16px;
   margin-left: -8px;
   margin-right: -8px;
   margin-top: 28px;
+
+  summary {
+    padding: 8px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    color: var(--text-color-title);
+    position: relative;
+    cursor: pointer;
+    background: var(--bg-details-title);
+    border-radius: 8px;
+    width: auto;
+    margin: 0;
+    gap: 8px;
+
+    &.h4 {
+      font-size: var(--h4-font-size);
+      font-weight: 400;
+    }
+  }
+
+  .content {
+    padding: 0 8px;
+  }
 }
 
 details[open] {
-  margin-bottom: 16px;
+  summary {
+    background: none;
+    border-radius: 0;
+    border-bottom: 1px solid;
+    border-color: var(--border);
+    margin: 0 0 8px 8px;
+    padding: 8px 0;
+
+    .source-data {
+      margin-right: 48px;
+    }
+  }
 }
 
-details .content {
-  padding: 0 8px;
+details {
+  &.inside {
+    margin-left: 8px;
+    margin-right: 8px;
+    border-radius: 8px;
+    background-color: var(--bg-details-title);
+
+    summary {
+      border-bottom: 0;
+      margin-bottom: 0;
+    }
+  }
 }
 
-details > summary.h4 {
-  padding: 8px 8px;
-  font-size: var(--h4-font-size);
-  font-weight: 300;
-  margin: 0 0 4px 0;
-  color: var(--text-color-title);
-  position: relative;
-  font-family: 'Lora';
-  cursor: pointer;
-  background: var(--bg-details-title);
-  border-radius: 8px;
-  width: auto;
+details[open] {
+  &.inside {
+    summary {
+      border-bottom: 1px solid;
+      border-color: var(--border);
+      margin-bottom: 8px;
+    }
+
+    padding-bottom: 4px;
+  }
 }
 
-details[open] > summary.h4 {
-  background: none;
+details[open] {
+  &.lvl {
+    background-color: var(--bg-details-title);
+
+    .content {
+      padding: 4px 8px;
+    }
+  }
 }
 
 summary::marker {
   content: '';
 }
 
-summary.header_separator:after {
-  opacity: 0;
-  margin-right: 24px;
-}
-
-details[open] > summary.header_separator:after {
-  opacity: 1;
-}
-
 summary:before {
-  transform: rotate(-90deg);
-  top: 16px;
-  right: 12px;
+  right: 32px;
   position: absolute;
-  content: "";
-  display: inline-block;
+  content: "➕";
   width: 0;
   height: 0;
-  border-style: solid;
-  border-width: 7px 12px 7px 0;
-  border-color: transparent currentColor transparent transparent;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
 }
 
 details[open] > summary::before {
-  transform: rotate(90deg);
-  top: 14px;
+  content: "➖";
 }
 
 @media (max-width: 800px) {
   summary::before {
-    top: 10px;
-    right: 8px;
-  }
-
-  details[open] > summary::before {
-    top: 8px;
+    right: 28px;
   }
 }
 
@@ -300,6 +330,19 @@ summary.h5:hover {
   color: var(--text-color);
 }
 
+.optional-rules {
+  margin-right: 8px;
+}
+
+.source-data {
+  text-align: right;
+  margin-left: auto;
+  margin-right: 40px;
+  text-transform: uppercase;
+  color: var(--text-g-color);
+  font-size: var(--main-font-size);
+}
+
 h4.separator_card {
   width: 100%;
   margin-left: 8px;
@@ -315,16 +358,27 @@ h4.separator_card {
 
 details.spoiler {
   padding: 0 0 4px 0;
-  margin: 0 -8px 16px -8px;
+  margin: 24px -8px 16px -8px;
   border-radius: 8px;
+
+  .content {
+    padding: 8px 16px;
+  }
 }
 
 details[open].spoiler {
   background-color: var(--bg-details-title);
+
+  summary {
+    .source-data {
+      margin-right: 40px;
+    }
+  }
 }
 
 details[open].spoiler > summary.h4 {
   margin: 0 0 4px 0;
+  padding: 8px 8px;
   background: var(--hover);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -336,7 +390,7 @@ details[open].spoiler > summary::after {
   right: 8px !important;
 }
 
-details[open].spoiler h4.header_separator > span {
+details[open].spoiler h4 > span {
   font-size: calc(var(--h4-font-size) - 2px);
 }
 
@@ -391,58 +445,54 @@ span.saving_throw {
 
 
 /********* Таблицы *********/
-table.dataTable.no-footer {
-  border: none !important;
-}
-
 .table-responsive {
   overflow-x: auto;
   border-radius: 8px;
-}
+  margin-bottom: 12px;
 
-.table-responsive .simplebar-content {
-  display: block !important;
+  table {
+    margin-bottom: 0;
+  }
 }
 
 table {
   color: var(--text-color);
   border-spacing: inherit;
-  border-radius: 0;
   border: 1px solid var(--border);
   width: 100% !important;
   overflow: scroll;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  height: 100%;
 }
 
 table thead {
-  background-color: var(--bg-sub-menu);
-  font-size: 11px;
+  background-color: var(--primary);
+  font-size: calc(var(--main-font-size) - 2px);
+  color: var(--text-btn-color);
 }
 
 table th,
 table thead th {
   padding: 4px 4px;
-  font-size: var(--main-font-size);
-  background: var(--primary);
-  color: var(--text-btn-color);
-  font-weight: 300;
+  font-weight: 500;
 }
 
 table th b,
 table th strong,
 table thead th b,
 table thead th strong {
-  color: var(--text-btn-color);
-  font-weight: 300;
+  font-weight: 500;
 }
 
 table td {
   border-right: 1px solid var(--border);
-  height: 30px;
+  height: auto;
   padding: 4px 4px;
+  line-height: var(--main-line-height);
 }
 
-table tbody tr:nth-child(2n) {
+table tr:nth-child(2n) {
   background: var(--bg-table-row);
 }
 
@@ -450,65 +500,11 @@ table td:last-child {
   border-right: 0 solid var(--border);
 }
 
-table.dnd5_table {
-  height: 100%;
-  margin-bottom: 0;
-  border-radius: 8px;
-}
-
 .table-responsive.class {
-  border: 1px solid var(--border);
+  margin-top: 24px;
   margin-bottom: 24px;
-}
-
-@media (max-width: 1200px) {
-  .table-responsive.class {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 30px;
-  }
-
-  .full_screen_right_block .table-responsive.class {
-    margin-top: -16px;
-  }
-}
-
-.class table.dnd5_table {
-  border: none;
-}
-
-.class table.dnd5_table td {
-  padding: 4px 4px;
-  height: auto;
-}
-
-.class table.dnd5_table th.bb {
-  border-bottom: 1px solid;
 }
 
 table tbody tr:hover {
   background-color: var(--hover);
-}
-
-table.dataTable tr.dtrg-group {
-  margin: 0 16px 16px 0;
-  border: 0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-@media (max-width: 1200px) {
-  table.dataTable tr.dtrg-group {
-    margin: 0 16px 16px 16px;
-  }
-}
-
-table.dataTable tr + tr.dtrg-group {
-  margin-top: 32px;
-}
-
-table.dataTable tr.dtrg-group td {
-  background-color: var(--hover) !important;
-  cursor: auto;
-  padding: 0 16px !important;
 }

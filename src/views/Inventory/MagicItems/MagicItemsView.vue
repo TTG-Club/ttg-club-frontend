@@ -10,7 +10,7 @@
   >
     <virtual-grouped-list
       :get-group="getGroupByRarity"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
       :list="getListProps({ items })"
     >
       <template #default="{ item }">
@@ -39,6 +39,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -99,4 +100,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'magicItemDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items,
+    showRightSide
+  });
 </script>

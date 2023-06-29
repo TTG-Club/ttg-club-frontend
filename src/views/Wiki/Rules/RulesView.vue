@@ -10,7 +10,8 @@
   >
     <virtual-grid-list
       :flat="checkIsListGridFlat({ showRightSide, fullscreen })"
-      :list="getListProps({ items: rules })"
+      :reference="setReference"
+      :list="getListProps({ items: rules, size: 'small' })"
     >
       <template #default="{ item: rule }">
         <rule-link
@@ -36,6 +37,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -85,4 +87,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'ruleDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: rules,
+    showRightSide
+  });
 </script>

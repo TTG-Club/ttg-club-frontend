@@ -11,6 +11,7 @@
     <button
       ref="button"
       :class="{
+        [props.bodyClass]: !!props.bodyClass,
         [$style.body]: true,
         [$style.main]: true,
         [$style[`type-${ buttonType }`]]: true,
@@ -124,10 +125,10 @@
 </template>
 
 <script setup lang="ts">
+  import type { Events } from 'vue';
   import {
     computed, inject, ref, useSlots, watch
   } from 'vue';
-  import type { Events } from 'vue';
   import { onClickOutside } from '@vueuse/core';
   import type { TippyOptions } from 'vue-tippy';
   import { useTippy } from 'vue-tippy';
@@ -145,6 +146,7 @@
     loading?: boolean;
     split?: boolean;
     tooltip?: TippyOptions;
+    bodyClass?: string;
     beforeDropdownShow?: () => void;
     beforeDropdownHide?: () => void;
   }
@@ -158,6 +160,7 @@
   const emit = defineEmits<IEmit>();
 
   const props = withDefaults(defineProps<IProps>(), {
+    bodyClass: undefined,
     type: 'default',
     size: 'md',
     color: 'primary',

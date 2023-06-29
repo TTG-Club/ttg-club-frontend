@@ -499,10 +499,10 @@
       flex-shrink: 0;
       flex-wrap: wrap;
       gap: 8px;
-      padding: 8px 16px;
+      padding: 16px 16px 8px 16px;
 
       @include media-min($xl) {
-        padding: 0 24px 16px 24px;
+        padding: 8px 24px 16px 24px;
       }
     }
 
