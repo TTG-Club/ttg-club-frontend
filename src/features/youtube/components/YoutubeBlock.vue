@@ -70,7 +70,7 @@
 
   const getVideos = async () => {
     try {
-      const resp = await http.post<{
+      const resp = await http.get<{
         count: number;
         list: Array<TYoutubeVideo>
       }>({
@@ -78,15 +78,17 @@
         payload: {
           page: 0,
           limit: 5,
-          filter: {
-            active: true
-          },
-          order: [
+          activeStatus: true,
+          order: http.getOrders([
             {
               field: 'created',
               direction: 'desc'
+            },
+            {
+              field: 'name',
+              direction: 'asc'
             }
-          ]
+          ])
         }
       });
 

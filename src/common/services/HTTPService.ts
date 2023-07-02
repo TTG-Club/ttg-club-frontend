@@ -84,7 +84,7 @@ export default class HTTPService {
     return this.instance<T>({
       method: 'delete',
       url: config.url,
-      data: config.payload,
+      params: config.payload,
       signal: config.signal
     });
   }
@@ -113,4 +113,8 @@ export default class HTTPService {
 
     return `${ devPrefix }${ url }`;
   };
+
+  getOrders = (orders: Array<{ field: string; direction: 'asc' | 'desc' }>) => (
+    orders.map(order => `${ order.field } ${ order.direction }`).join(',')
+  );
 }

@@ -6,6 +6,7 @@ import VueLazyLoad from 'vue-lazyload';
 import Toast from 'vue-toastification';
 import { createVfm } from 'vue-final-modal';
 import VueGtag from 'vue-gtag';
+import { TippyLazy } from '@/common/directives/TippyLazy';
 import registerComponents from '@/common/utils/RegisterComponents';
 import HTTPService from '@/common/services/HTTPService';
 import { TippyOptions } from '@/common/utils/TippyConfig';
@@ -16,7 +17,6 @@ import pinia from '@/store';
 import router from './router';
 import 'vue-final-modal/style.css';
 import '@/assets/styles/index.scss';
-import { TippyLazy } from '@/common/directives/TippyLazy';
 
 const app = createApp(App);
 const vfm = createVfm();
