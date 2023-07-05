@@ -89,38 +89,7 @@ export const useYoutube = () => {
     }
   };
 
-  const addList = ref<Array<TYoutubeVideo['id']>>([]);
-  const isAdding = (id: TYoutubeVideo['id']) => addList.value.includes(id);
-
-  const add = async (video: TYoutubeVideo) => {
-    if (isAdding(video.id)) {
-      return Promise.resolve();
-    }
-
-    addList.value.push(video.id);
-
-    try {
-      const {
-        data, status, statusText
-      } = await http.post({
-        url: '/youtube',
-        payload: { video }
-      });
-
-      if (status !== 200) {
-        return Promise.reject(statusText);
-      }
-
-      await load();
-
-      return data;
-    } catch (err) {
-      return Promise.reject(err);
-    } finally {
-      addList.value = addList.value.filter(item => item !== video.id);
-    }
-  };
-
+  // Removing
   const removeList = ref<Array<TYoutubeVideo['id']>>([]);
   const isRemoving = (id: TYoutubeVideo['id']) => removeList.value.includes(id);
 
@@ -181,7 +150,6 @@ export const useYoutube = () => {
     pages,
     videos,
     load,
-    add,
     remove
   };
 };

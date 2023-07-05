@@ -47,7 +47,7 @@
         </div>
 
         <div
-          v-if="false"
+          v-if="isDev"
           class="profile__row"
         >
           <a
@@ -59,7 +59,7 @@
         </div>
 
         <div
-          v-if="false"
+          v-if="isDev"
           class="profile__row"
         >
           <div class="profile__blocks">
@@ -210,6 +210,7 @@
   import upperFirst from 'lodash/upperFirst';
   import PageLayout from '@/components/content/PageLayout.vue';
   import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
+  import isDev from '@/common/helpers/isDev';
 
   const userStore = useUserStore();
 

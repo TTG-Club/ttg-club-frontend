@@ -36,6 +36,7 @@
             v-if="isLoaded"
             icon="plus"
             icon-position="right"
+            @click.left.exact.prevent="isAdding = true"
           >
             <template
               v-if="!isMobile"
@@ -59,16 +60,14 @@
             </div>
 
             <div :class="$style.info">
-              <h3>
+              <div :class="$style.title">
                 {{ video.name }}
-              </h3>
+              </div>
 
-              <span v-if="getDate(video.created)">
+              <div v-if="getDate(video.created)">
                 Дата добавления: {{ getDate(video.created) }}
-              </span>
-            </div>
+              </div>
 
-            <div>
               <ui-checkbox
                 :model-value="video.active"
                 :disabled="isActivationDisabled(video.active)"
@@ -84,7 +83,7 @@
                 icon="edit"
                 :class="$style.control"
                 :body-class="$style['control-body']"
-                @click.left.exact.prevent="editVideo = cloneDeep(video)"
+                @click.left.exact.prevent=""
               />
 
               <ui-button
@@ -112,16 +111,15 @@
     </template>
   </page-layout>
 
-  <youtube-edit-modal
-    :video="editVideo"
-    @close="editVideo = undefined"
+  <youtube-add-video
+    v-model="isAdding"
+    @added="load()"
   />
 </template>
 
 <script setup lang="ts">
   import { type MaybeRef, tryOnBeforeMount } from '@vueuse/core';
   import { ref } from 'vue';
-  import cloneDeep from 'lodash/cloneDeep';
   import { storeToRefs } from 'pinia';
   import { useYoutube } from '@/features/youtube/composition/useYoutube';
   import { useYoutubeActive } from '@/features/youtube/composition/useYoutubeActive';
@@ -131,10 +129,10 @@
   import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
-  import YoutubeEditModal from '@/features/youtube/components/YoutubeEditModal.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import { useUIStore } from '@/store/UI/UIStore';
   import PageLayout from '@/components/content/PageLayout.vue';
+  import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
 
   const { isMobile } = storeToRefs(useUIStore());
 
@@ -145,7 +143,6 @@
     itemsPerPage,
     isLoaded,
     load,
-    add,
     videos,
     remove,
     isRemoving
@@ -161,7 +158,7 @@
     updateActiveStatus
   } = useYoutubeActive();
 
-  const editVideo = ref<TYoutubeVideo>();
+  const isAdding = ref(false);
 
   const init = async () => {
     try {
@@ -224,6 +221,8 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
+    min-height: 0;
+    min-width: 0;
   }
 
   .add {
@@ -259,12 +258,16 @@
   }
 
   .video {
+    width: 100%;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     gap: 8px;
     padding: 12px;
     background-color: var(--bg-secondary);
     position: relative;
+    min-height: 0;
+    min-width: 0;
     border: {
       radius: 12px;
       width: 1px;
@@ -282,8 +285,29 @@
   }
 
   .info {
-    h3 {
-      margin-top: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .title {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    padding-bottom: 8px;
+
+    font: {
+      weight: bold;
+      size: var(--h5-font-size);
+    };
+
+    border-bottom: {
+      width: 1px;
+      style: solid;
+      color: var(--border);
     }
   }
 
