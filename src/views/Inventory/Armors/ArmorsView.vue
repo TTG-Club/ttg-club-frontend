@@ -7,9 +7,9 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
       :get-group="getArmorGroup"
-      :list="getListProps({ items: armors })"
+      :list="getListProps({ items: armors, size: 'medium' })"
     >
       <template #default="{ item: armor }">
         <armor-link
@@ -36,6 +36,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -85,4 +86,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'armorDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: armors,
+    showRightSide
+  });
 </script>

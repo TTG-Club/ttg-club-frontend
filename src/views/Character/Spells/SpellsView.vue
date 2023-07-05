@@ -44,6 +44,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const props = withDefaults(defineProps<{
     inTab?: boolean;
@@ -158,9 +159,18 @@
 
   const showRightSide = computed(() => route.name === 'spellDetail');
 
-  const grid = computed(() => getListGridInTabProps({
-    showRightSide: showRightSide.value,
-    fullscreen: fullscreen.value,
-    inTab: props.inTab
+  const { setReference } = useScrollToPathInList({
+    items: spells,
+    disabled: props.inTab,
+    showRightSide
+  });
+
+  const grid = computed(() => ({
+    ...getListGridInTabProps({
+      showRightSide: showRightSide.value,
+      fullscreen: fullscreen.value,
+      inTab: props.inTab
+    }),
+    reference: setReference
   }));
 </script>

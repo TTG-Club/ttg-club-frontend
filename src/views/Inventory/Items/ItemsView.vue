@@ -10,8 +10,8 @@
   >
     <virtual-grouped-list
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
-      :list="getListProps({ items })"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :list="getListProps({ items, size: 'small' })"
     >
       <template #default="{ item }">
         <item-link
@@ -38,6 +38,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -87,4 +88,9 @@
   });
 
   const showRightSide = computed(() => route.name === 'itemDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items,
+    showRightSide
+  });
 </script>

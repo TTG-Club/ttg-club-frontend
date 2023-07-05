@@ -83,11 +83,11 @@
 
 <script lang="ts" setup>
   import {
-    computed, onMounted, ref, watch
+    computed, onMounted, ref
   } from 'vue';
   import type { MaybeRef } from '@vueuse/core';
   import {
-    useElementBounding, useInfiniteScroll, useScroll
+    useElementBounding, useInfiniteScroll, useResizeObserver, useScroll
   } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import throttle from 'lodash/throttle';
@@ -156,13 +156,14 @@
   }, 200);
 
   const fixedContainerRect = useElementBounding(fixedContainer);
-  const bodyRect = useElementBounding(bodyElement);
 
   const bodyScroll = useScroll(bodyElement, {
     behavior: 'smooth',
     throttle: 300,
     onScroll: scrollHandler
   });
+
+  useResizeObserver(bodyElement, scrollHandler);
 
   const scrollToActive = (oldLink?: Element) => {
     if (isMobile.value) {
@@ -222,11 +223,6 @@
 
     emit('update');
   };
-
-  watch(bodyRect.height, scrollHandler, {
-    immediate: true,
-    flush: 'post'
-  });
 
   onMounted(() => {
     useInfiniteScroll(

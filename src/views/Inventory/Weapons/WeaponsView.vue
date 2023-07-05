@@ -7,10 +7,11 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }) }"
+      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
       :get-group="getWeaponGroup"
       :list="getListProps({
         items: weapons,
+        size: 'medium',
       })"
     >
       <template #default="{ item: weapon }">
@@ -38,6 +39,7 @@
   import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
+  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
 
   const route = useRoute();
   const router = useRouter();
@@ -92,5 +94,10 @@
     url: type.name,
     name: type.name,
     order: type.order
+  });
+
+  const { setReference } = useScrollToPathInList({
+    items: weapons,
+    showRightSide
   });
 </script>

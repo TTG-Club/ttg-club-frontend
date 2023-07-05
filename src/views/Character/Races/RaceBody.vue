@@ -73,7 +73,7 @@
         :class="{ archetype_feet: skill.subrace }"
         :open="skill.opened"
       >
-        <summary class="h4 header_separator">
+        <summary class="h4">
           <span>{{ skill.name }}</span>
         </summary>
 
@@ -86,7 +86,7 @@
       </details>
 
       <details>
-        <summary class="h4 header_separator">
+        <summary class="h4">
           <span>Описание</span>
         </summary>
 
@@ -108,10 +108,10 @@
           :key="subraceKey"
           class="spoiler feet_show"
         >
-          <summary class="h4 header_separator">
+          <summary class="h4">
             <span>{{ subrace.name.rus }}</span>
 
-            <span>{{ subrace.source.shortName }}</span>
+            <span class="source-data">{{ subrace.source.shortName }}</span>
           </summary>
 
           <div class="content">
