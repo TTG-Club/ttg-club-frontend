@@ -12,7 +12,7 @@
       <div :class="$style.wrapper">
         <div :class="$style.header">
           <h2 :class="$style.title">
-            Новое видео
+            Изменение видео
           </h2>
 
           <ui-button
@@ -24,24 +24,9 @@
 
         <form
           :class="$style.form"
-          @keyup.enter.exact.prevent="add"
-          @submit.prevent.stop="add"
+          @keyup.enter.exact.prevent="save"
+          @submit.prevent.stop="save"
         >
-          <div :class="$style.row">
-            <ui-input
-              v-model="v$.id.$model"
-              :max-length="11"
-              :error-text="v$.id.$dirty ? v$.id.$errors?.[0]?.$message : ''"
-              :autocomplete="false"
-              autocapitalize="off"
-              autocorrect="off"
-              placeholder="ID"
-              required
-              @blur="v$.id.$touch()"
-              @input="v$.id.$reset()"
-            />
-          </div>
-
           <div :class="$style.row">
             <ui-input
               v-model="v$.name.$model"
@@ -60,7 +45,7 @@
         <div :class="$style.controls">
           <ui-button
             :loading="isLoading"
-            @click.left.exact.prevent="add"
+            @click.left.exact.prevent="save"
           >
             Сохранить
           </ui-button>
@@ -77,25 +62,25 @@
   </vue-final-modal>
 </template>
 
-<script setup lang="ts">
-  import {
-    reactive, ref, watch
-  } from 'vue';
+<script lang="ts" setup>
   import { VueFinalModal } from 'vue-final-modal';
+  import {
+    ref, watch, reactive
+  } from 'vue';
   import { useVModel } from '@vueuse/core';
+  import { useToast } from 'vue-toastification';
   import { helpers, required } from '@vuelidate/validators';
   import useVuelidate from '@vuelidate/core';
-  import { useToast } from 'vue-toastification';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
+  import cloneDeep from 'lodash/cloneDeep';
+  import { ToastEventBus } from '@/common/utils/ToastConfig';
   import { useAxios } from '@/common/composition/useAxios';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
-
-  export type TYoutubeVideoCreate = Pick<TYoutubeVideo, 'id' | 'name'>;
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
 
   type TProp = {
     modelValue: boolean;
+    video: TYoutubeVideo;
   }
 
   const props = withDefaults(defineProps<TProp>(), {
@@ -104,7 +89,7 @@
 
   type TEmit = {
     (e: 'update:modelValue', v: boolean): void;
-    (e: 'added', v: TYoutubeVideo): void;
+    (e: 'saved', v: TYoutubeVideo): void;
     (e: 'close'): void;
   }
 
@@ -115,25 +100,9 @@
   const toast = useToast(ToastEventBus);
 
   const isLoading = ref(false);
-
-  const video = reactive<TYoutubeVideoCreate>({
-    id: '',
-    name: ''
-  });
+  const state = reactive(cloneDeep(props.video));
 
   const rules = reactive({
-    id: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required
-      ),
-      format: helpers.withMessage(
-        'Поле заполнено неверно',
-        value => (
-          /([^"&?/\s]{11})/gi
-        ).test(value as string)
-      )
-    },
     name: {
       required: helpers.withMessage(
         'Поле обязательно для заполнения',
@@ -142,21 +111,20 @@
     }
   });
 
-  const v$ = useVuelidate(rules, video);
+  const v$ = useVuelidate(rules, state);
 
-  const clear = () => {
-    video.id = '';
-    video.name = '';
+  const reset = () => {
+    Object.assign(state, cloneDeep(props.video));
   };
 
   const close = () => {
-    clear();
+    reset();
     emit('close');
 
     isShow.value = false;
   };
 
-  const add = async () => {
+  const save = async () => {
     if (isLoading.value) {
       return Promise.resolve();
     }
@@ -176,16 +144,16 @@
 
       const {
         data, status, statusText
-      } = await http.post<TYoutubeVideo>({
+      } = await http.patch<TYoutubeVideo>({
         url: '/youtube',
-        payload: video
+        payload: state
       });
 
       if (status !== 200) {
         return Promise.reject(statusText);
       }
 
-      emit('added', data);
+      emit('saved', data);
       close();
 
       return data;
@@ -197,11 +165,11 @@
   };
 
   watch(() => props.modelValue, () => {
-    clear();
+    reset();
   });
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
   .modal {
   }
 

@@ -96,7 +96,7 @@
 <style lang="scss" scoped>
   .page-layout {
     display: flex;
-    min-height: var(--max-vh);
+    min-height: 100%;
 
     &__side {
       &--left {

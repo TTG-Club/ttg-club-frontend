@@ -76,14 +76,27 @@
               >
                 Отображать на главной
               </ui-checkbox>
+
+              <youtube-edit-video
+                :video="video"
+                :model-value="editID === video.id"
+                @saved="load()"
+                @close="editID = undefined"
+              />
             </div>
 
-            <div :class="$style.controls">
+            <div
+              :class="{
+                [$style.controls]: true,
+                [$style.editing]: editID === video.id,
+              }"
+            >
               <ui-button
                 icon="edit"
                 :class="$style.control"
                 :body-class="$style['control-body']"
-                @click.left.exact.prevent=""
+                :loading="editID === video.id"
+                @click.left.exact.prevent="editID = video.id"
               />
 
               <ui-button
@@ -133,6 +146,7 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import PageLayout from '@/components/content/PageLayout.vue';
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
+  import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
 
   const { isMobile } = storeToRefs(useUIStore());
 
@@ -159,6 +173,7 @@
   } = useYoutubeActive();
 
   const isAdding = ref(false);
+  const editID = ref<TYoutubeVideo['id']>();
 
   const init = async () => {
     try {
@@ -219,10 +234,14 @@
   .body {
     padding: 16px 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 24px;
     min-height: 0;
     min-width: 0;
+
+    @include media-min($md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   .add {
@@ -335,6 +354,10 @@
       style: solid;
       color: var(--border);
     };
+  }
+
+  .editing {
+    opacity: 1;
   }
 
   .control {
