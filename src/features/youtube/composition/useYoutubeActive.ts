@@ -4,12 +4,11 @@ import {
 import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/shared';
 import { useToast } from 'vue-toastification';
-import { useAxios } from '@/common/composition/useAxios';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
 import { ToastEventBus } from '@/common/utils/ToastConfig';
+import { YoutubeApi } from '@/features/youtube/api';
 
 export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
-  const http = useAxios();
   const { error } = useToast(ToastEventBus);
 
   const count = ref<number>(0);
@@ -20,16 +19,7 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
 
   const updateCount = async () => {
     try {
-      const {
-        data, status, statusText
-      } = await http.get<number>({
-        url: `/youtube/count`,
-        payload: { active: true }
-      });
-
-      if (status !== 200) {
-        return Promise.reject(statusText);
-      }
+      const data = await YoutubeApi.getCount(true);
 
       count.value = data;
       isLoaded.value = true;
@@ -48,7 +38,7 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
     }
 
     try {
-      await http.patch({ url: `/youtube/active?id=${ id }&activeStatus=${ true }` });
+      await YoutubeApi.changeStatus(id, true);
 
       return updateCount();
     } catch (err) {
@@ -58,7 +48,7 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
 
   const deactivate = async (id: TYoutubeVideo['id']) => {
     try {
-      await http.patch({ url: `/youtube/active?id=${ id }&activeStatus=${ false }` });
+      await YoutubeApi.changeStatus(id, false);
 
       return updateCount();
     } catch (err) {

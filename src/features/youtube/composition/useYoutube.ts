@@ -5,10 +5,9 @@ import {
 } from 'vue';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
 import { useUIStore } from '@/store/UI/UIStore';
-import { useAxios } from '@/common/composition/useAxios';
+import { YoutubeApi } from '@/features/youtube/api';
 
 export const useYoutube = () => {
-  const http = useAxios();
   const { bodyElement } = storeToRefs(useUIStore());
 
   const bodyScroll = useScroll(bodyElement, {
@@ -48,32 +47,20 @@ export const useYoutube = () => {
 
   const load = async (scrollToTop = true) => {
     try {
-      const {
-        data, status, statusText
-      } = await http.get<{
-        count: number;
-        list: Array<TYoutubeVideo>
-      }>({
-        url: '/youtube',
-        payload: {
-          page: page.value - 1,
-          limit: limit.value,
-          order: http.getOrders([
-            {
-              field: 'created',
-              direction: 'desc'
-            },
-            {
-              field: 'name',
-              direction: 'asc'
-            }
-          ])
-        }
+      const data = await YoutubeApi.load({
+        page: page.value - 1,
+        limit: limit.value,
+        order: [
+          {
+            field: 'created',
+            direction: 'desc'
+          },
+          {
+            field: 'name',
+            direction: 'asc'
+          }
+        ]
       });
-
-      if (status !== 200) {
-        return Promise.reject(statusText);
-      }
 
       count.value = data.count;
       videos.value = data.list;
@@ -101,14 +88,7 @@ export const useYoutube = () => {
     removeList.value.push(id);
 
     try {
-      const resp = await http.delete({
-        url: '/youtube',
-        payload: { id }
-      });
-
-      if (resp.status !== 200) {
-        return Promise.reject(resp.status);
-      }
+      await YoutubeApi.remove(id);
 
       return load();
     } catch (err) {

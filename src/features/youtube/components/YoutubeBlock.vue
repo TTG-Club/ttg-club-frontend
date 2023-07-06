@@ -48,12 +48,11 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue';
   import { tryOnBeforeMount } from '@vueuse/core';
-  import { useAxios } from '@/common/composition/useAxios';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
   import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
   import BaseModal from '@/components/UI/modals/BaseModal.vue';
+  import { YoutubeApi } from '@/features/youtube/api';
 
-  const http = useAxios();
   const youtube = ref<HTMLElement>();
   const videos = ref<Array<TYoutubeVideo>>([]);
   const activeVideo = ref<TYoutubeVideo['id'] | null>(null);
@@ -70,33 +69,23 @@
 
   const getVideos = async () => {
     try {
-      const resp = await http.get<{
-        count: number;
-        list: Array<TYoutubeVideo>
-      }>({
-        url: '/youtube',
-        payload: {
-          page: 0,
-          limit: 5,
-          activeStatus: true,
-          order: http.getOrders([
-            {
-              field: 'created',
-              direction: 'desc'
-            },
-            {
-              field: 'name',
-              direction: 'asc'
-            }
-          ])
-        }
+      const { list } = await YoutubeApi.load({
+        page: 0,
+        limit: 5,
+        activeStatus: true,
+        order: [
+          {
+            field: 'created',
+            direction: 'desc'
+          },
+          {
+            field: 'name',
+            direction: 'asc'
+          }
+        ]
       });
 
-      if (resp.status !== 200) {
-        return Promise.reject(resp.status);
-      }
-
-      return Promise.resolve(resp.data.list);
+      return Promise.resolve(list);
     } catch (err) {
       return Promise.reject(err);
     }

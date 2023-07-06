@@ -5,6 +5,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { USER_TOKEN_COOKIE } from '@/common/const/UI';
 import { useUserStore } from '@/store/UI/UserStore';
+import { getBaseURL } from '@/common/helpers/request';
 
 export type RequestConfig = {
   url: AxiosRequestConfig['url'],
@@ -19,7 +20,7 @@ export default class HTTPService {
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
-      baseURL: this.getBaseURL('/api/v1'),
+      baseURL: getBaseURL('/api/v1'),
       withCredentials: true,
       headers: {}
     });
@@ -92,7 +93,7 @@ export default class HTTPService {
   rawHead(config: Omit<RequestConfig, 'payload'>) {
     return this.instance({
       method: 'head',
-      baseURL: this.getBaseURL(),
+      baseURL: getBaseURL(),
       url: config.url,
       signal: config.signal
     });
@@ -101,20 +102,10 @@ export default class HTTPService {
   rawGet(config: RequestConfig): Promise<AxiosResponse<string>> {
     return this.instance({
       method: 'get',
-      baseURL: this.getBaseURL(),
+      baseURL: getBaseURL(),
       url: config.url,
       params: config.payload,
       signal: config.signal
     });
   }
-
-  private getBaseURL = (url = '') => {
-    const devPrefix = import.meta.env.DEV ? '/proxy' : '';
-
-    return `${ devPrefix }${ url }`;
-  };
-
-  getOrders = (orders: Array<{ field: string; direction: 'asc' | 'desc' }>) => (
-    orders.map(order => `${ order.field } ${ order.direction }`).join(',')
-  );
 }

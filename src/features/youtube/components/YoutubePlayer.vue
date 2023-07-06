@@ -70,78 +70,6 @@
     emit('init');
   };
 
-  const getLink = (href: string, rel?: string, as: string | null = null) => h(
-    'link',
-    {
-      rel: rel || 'preconnect',
-      as,
-      href
-    }
-  );
-
-  const player = () => h(
-    'div',
-    {
-      class: {
-        [$style['youtube-player']]: true,
-        [$style['is-active']]: iframe.value
-      }
-    },
-    [
-      getLink(posterUrl.value, props.rel, 'image'),
-      getLink('https://www.youtube.com'),
-      getLink('https://www.google.com'),
-      getLink('https://static.doubleclick.net'),
-      getLink('https://googleads.g.doubleclick.net'),
-      h(
-        'div',
-        {
-          onClick: withModifiers(initIframe, ['stop', 'prevent']),
-          class: $style.body
-        },
-        [
-          h(
-            'div',
-            {
-              class: {
-                [$style.video]: true,
-                [$style.radius]: props.hasRadius
-              },
-              style: {
-                backgroundImage: `url(${ posterUrl.value })`
-              }
-            },
-            iframe.value
-              ? h('iframe', {
-                ref: iframeElement,
-                class: $style.iframe,
-                width: '100%',
-                height: '100%',
-                frameborder: 0,
-                allow: 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
-                allowfullscreen: true,
-                src: urlWithParams.value
-              })
-              : h(YoutubePlayIcon, {
-                class: $style.btn,
-                type: 'button',
-                ariaLabel: props.announce
-              })
-          ),
-          props.showName
-            ? h(
-              'span',
-              {
-                class: $style.name
-              },
-              props.video.name
-            )
-            : null
-        ]
-      )
-    ]
-  );
-
   defineExpose({
     getInstance() {
       return iframeElement.value;
@@ -160,7 +88,76 @@
 </script>
 
 <template>
-  <player />
+  <div
+    :class="{
+      [$style['youtube-player']]: true,
+      [$style['is-active']]: iframe,
+    }"
+  >
+    <link
+      :href="posterUrl"
+      :rel="rel"
+      as="image"
+    />
+
+    <link
+      href="https://www.youtube.com"
+      rel="preconnect"
+    />
+
+    <link
+      href="https://www.google.com"
+      rel="preconnect"
+    />
+
+    <link
+      href="https://static.doubleclick.net"
+      rel="preconnect"
+    />
+
+    <link
+      href="https://googleads.g.doubleclick.net"
+      rel="preconnect"
+    />
+
+    <div
+      :class="$style.body"
+      @click.left.exact.stop.prevent="initIframe"
+    >
+      <div
+        :class="{
+          [$style.video]: true,
+          [$style.radius]: hasRadius,
+        }"
+        :style="{ backgroundImage: `url(${ posterUrl })` }"
+      >
+        <iframe
+          v-if="iframe"
+          ref="iframeElement"
+          width="100%"
+          height="100%"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          :class="$style.iframe"
+          :allowfullscreen="true"
+          :src="urlWithParams"
+          :title="video.name"
+        />
+
+        <youtube-play-icon
+          v-else
+          :class="$style.btn"
+          type="button"
+          :aria-label="announce"
+        />
+      </div>
+
+      <span
+        v-if="props.showName"
+        :class="$style.name"
+      >{{ video.name }}</span>
+    </div>
+  </div>
 </template>
 
 <style module lang="scss">
@@ -200,7 +197,7 @@
     }
 
     .btn {
-      @include css_anim($item: all, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
+      @include css_anim($item: color, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
 
       display: block;
       width: 68px;
@@ -222,7 +219,7 @@
     &:hover,
     &:focus-within {
       .btn {
-        @include css_anim($item: all, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
+        @include css_anim($item: color, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
 
         color: var(--bg-main);
       }

@@ -73,10 +73,10 @@
   import useVuelidate from '@vuelidate/core';
   import cloneDeep from 'lodash/cloneDeep';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
-  import { useAxios } from '@/common/composition/useAxios';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
+  import { YoutubeApi } from '@/features/youtube/api';
 
   type TProp = {
     modelValue: boolean;
@@ -96,20 +96,19 @@
   const emit = defineEmits<TEmit>();
 
   const isShow = useVModel(props, 'modelValue', emit);
-  const http = useAxios();
   const toast = useToast(ToastEventBus);
 
   const isLoading = ref(false);
   const state = reactive(cloneDeep(props.video));
 
-  const rules = reactive({
+  const rules = {
     name: {
       required: helpers.withMessage(
         'Поле обязательно для заполнения',
         required
       )
     }
-  });
+  };
 
   const v$ = useVuelidate(rules, state);
 
@@ -142,16 +141,7 @@
         return Promise.resolve();
       }
 
-      const {
-        data, status, statusText
-      } = await http.patch<TYoutubeVideo>({
-        url: '/youtube',
-        payload: state
-      });
-
-      if (status !== 200) {
-        return Promise.reject(statusText);
-      }
+      const data = await YoutubeApi.edit(state);
 
       emit('saved', data);
       close();

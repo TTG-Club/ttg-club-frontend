@@ -64,8 +64,8 @@
                 {{ video.name }}
               </div>
 
-              <div v-if="getDate(video.created)">
-                Дата добавления: {{ getDate(video.created) }}
+              <div v-if="getFormattedDate(video.created)">
+                Дата добавления: {{ getFormattedDate(video.created) }}
               </div>
 
               <ui-checkbox
@@ -136,7 +136,7 @@
   import { storeToRefs } from 'pinia';
   import { useYoutube } from '@/features/youtube/composition/useYoutube';
   import { useYoutubeActive } from '@/features/youtube/composition/useYoutubeActive';
-  import { getDate } from '@/common/composition/useDayjs';
+  import { getFormattedDate } from '@/common/composition/useDayjs';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
   import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
   import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';

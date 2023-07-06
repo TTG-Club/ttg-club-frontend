@@ -9,11 +9,18 @@ _dayjs.extend(customParseFormat);
 
 export const useDayjs = _dayjs;
 
-export const getDate = (date: _dayjs.ConfigType) => {
+/**
+ * Возвращает форматированную дату. Формат по умолчанию - LL.
+ * Документация: https://day.js.org/docs/en/display/format
+ *
+ * @param date
+ * @param format
+ */
+export const getFormattedDate = (date: _dayjs.ConfigType, format = 'LL') => {
   const resolved = useDayjs(date);
 
   if (resolved.isValid()) {
-    return resolved.format('LL');
+    return resolved.format(format);
   }
 
   return null;

@@ -87,10 +87,10 @@
   import useVuelidate from '@vuelidate/core';
   import { useToast } from 'vue-toastification';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-  import { useAxios } from '@/common/composition/useAxios';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import { ToastEventBus } from '@/common/utils/ToastConfig';
+  import { YoutubeApi } from '@/features/youtube/api';
 
   export type TYoutubeVideoCreate = Pick<TYoutubeVideo, 'id' | 'name'>;
 
@@ -111,7 +111,6 @@
   const emit = defineEmits<TEmit>();
 
   const isShow = useVModel(props, 'modelValue', emit);
-  const http = useAxios();
   const toast = useToast(ToastEventBus);
 
   const isLoading = ref(false);
@@ -121,7 +120,7 @@
     name: ''
   });
 
-  const rules = reactive({
+  const rules = {
     id: {
       required: helpers.withMessage(
         'Поле обязательно для заполнения',
@@ -140,7 +139,7 @@
         required
       )
     }
-  });
+  };
 
   const v$ = useVuelidate(rules, video);
 
@@ -174,16 +173,7 @@
         return Promise.resolve();
       }
 
-      const {
-        data, status, statusText
-      } = await http.post<TYoutubeVideo>({
-        url: '/youtube',
-        payload: video
-      });
-
-      if (status !== 200) {
-        return Promise.reject(statusText);
-      }
+      const data = await YoutubeApi.add(video);
 
       emit('added', data);
       close();

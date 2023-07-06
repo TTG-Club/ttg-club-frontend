@@ -23,15 +23,11 @@
         :class="$style.text"
       >{{ option[label] }}</span>
 
-      <span
+      <slot
         v-else
-        :class="$style.text"
-      >
-        <slot
-          name="option"
-          :option="option"
-        />
-      </span>
+        name="option"
+        :option="option"
+      />
     </button>
   </div>
 </template>
