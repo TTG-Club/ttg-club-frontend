@@ -1,3 +1,76 @@
+<template>
+  <div
+    :class="{
+      [$style['youtube-player']]: true,
+      [$style['is-active']]: iframe,
+    }"
+  >
+    <link
+      :href="posterUrl"
+      :rel="rel"
+      as="image"
+    />
+
+    <link
+      href="https://www.youtube.com"
+      rel="preconnect"
+    />
+
+    <link
+      href="https://www.google.com"
+      rel="preconnect"
+    />
+
+    <link
+      href="https://static.doubleclick.net"
+      rel="preconnect"
+    />
+
+    <link
+      href="https://googleads.g.doubleclick.net"
+      rel="preconnect"
+    />
+
+    <div
+      :class="$style.body"
+      @click.left.exact.stop.prevent="initIframe"
+    >
+      <div
+        :class="{
+          [$style.video]: true,
+          [$style.radius]: hasRadius,
+        }"
+        :style="{ backgroundImage: `url(${ posterUrl })` }"
+      >
+        <iframe
+          v-if="iframe"
+          ref="iframeElement"
+          width="100%"
+          height="100%"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          :class="$style.iframe"
+          :allowfullscreen="true"
+          :src="urlWithParams"
+          :title="video.name"
+        />
+
+        <youtube-play-icon
+          v-else
+          :class="$style.btn"
+          type="button"
+          :aria-label="announce"
+        />
+      </div>
+
+      <span
+        v-if="props.showName"
+        :class="$style.name"
+      >{{ video.name }}</span>
+    </div>
+  </div>
+</template>
+
 <script lang="ts" setup>
   import {
     computed, ref, useCssModule
@@ -86,79 +159,6 @@
     initIframe
   });
 </script>
-
-<template>
-  <div
-    :class="{
-      [$style['youtube-player']]: true,
-      [$style['is-active']]: iframe,
-    }"
-  >
-    <link
-      :href="posterUrl"
-      :rel="rel"
-      as="image"
-    />
-
-    <link
-      href="https://www.youtube.com"
-      rel="preconnect"
-    />
-
-    <link
-      href="https://www.google.com"
-      rel="preconnect"
-    />
-
-    <link
-      href="https://static.doubleclick.net"
-      rel="preconnect"
-    />
-
-    <link
-      href="https://googleads.g.doubleclick.net"
-      rel="preconnect"
-    />
-
-    <div
-      :class="$style.body"
-      @click.left.exact.stop.prevent="initIframe"
-    >
-      <div
-        :class="{
-          [$style.video]: true,
-          [$style.radius]: hasRadius,
-        }"
-        :style="{ backgroundImage: `url(${ posterUrl })` }"
-      >
-        <iframe
-          v-if="iframe"
-          ref="iframeElement"
-          width="100%"
-          height="100%"
-          frameborder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          :class="$style.iframe"
-          :allowfullscreen="true"
-          :src="urlWithParams"
-          :title="video.name"
-        />
-
-        <youtube-play-icon
-          v-else
-          :class="$style.btn"
-          type="button"
-          :aria-label="announce"
-        />
-      </div>
-
-      <span
-        v-if="props.showName"
-        :class="$style.name"
-      >{{ video.name }}</span>
-    </div>
-  </div>
-</template>
 
 <style module lang="scss">
   .youtube-player {
