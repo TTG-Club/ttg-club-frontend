@@ -208,143 +208,121 @@
     }
   }
 
-  .column {
-    display: flex;
-    flex-direction: column;
-    padding-top: 32px;
-    margin-bottom: 16px;
-    gap: 16px;
+  .main-page-blocks {
+    margin-top: 32px;
 
-    .right {
-      flex: 1 1 100%;
+    .row {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+
+      @include media-max($xl) {
+        flex-direction: column;
+      }
     }
 
-    .left {
-      flex: 1 1 100%;
-      margin: 0 0 16px;
+    .column {
       display: flex;
-      gap: 16px;
       flex-direction: column;
+      gap: 16px;
+      flex: 1 0;
 
-      .block {
+      &.youtube-block {
+        flex: 0 0 calc(33% - 10px);
+        height: fit-content;
+      }
+    }
+
+    .block {
+      display: flex;
+      flex-direction: row;
+      padding: 16px 16px 0 16px;
+      background-color: var(--bg-table-list);
+      border-radius: 12px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+
+      .info {
+        z-index: 1;
         display: flex;
         flex-direction: column;
-        gap: 16px;
-        flex: 1 1 66%;
 
-        .links_block {
-          flex: 1 1 50%;
+        h4 {
+          margin-top: 0;
+          font-family: "Open Sans", sans-serif;
+          font-weight: 500;
         }
 
-        @include media-min($md) {
-          flex-direction: row;
+        .bottom {
+          margin-top: auto;
         }
 
-        &__bot {
-          flex: 1 1 50%;
-          flex-direction: column;
-          display: flex;
-          gap: 16px;
-        }
+        a {
+          margin-right: 8px;
+          margin-bottom: 16px;
+          display: inline-block;
+          background-color: var(--hover);
+          color: var(--text-color);
+          padding: 6px 8px;
+          border-radius: 8px;
+          border: 1px solid var(--border);
 
+          &.main {
+            background-color: var(--primary);
+            color: var(--text-btn-color);
+          }
+
+          &:hover {
+            background-color: var(--primary-hover);
+            color: var(--text-btn-color);
+            transition: all .5s;
+          }
+        }
       }
 
-      .discord_bot,
-      .dnd5club_tel_bot {
-        display: flex;
-        flex-direction: row;
-        padding: 16px 16px 0 16px;
-        background-color: var(--bg-table-list);
-        border-radius: 12px;
+      .bg_img {
+        transition: transform .6s;
+        background-position: 50%;
+        background-size: cover;
+        display: block;
+        position: absolute;
         width: 100%;
-        position: relative;
-        overflow: hidden;
-
-        .info {
-          z-index: 1;
-          display: flex;
-          flex-direction: column;
-
-          h4 {
-            margin-top: 0;
-            font-family: "Open Sans", sans-serif;
-            font-weight: 500;
-          }
-
-          .bottom {
-            margin-top: auto;
-          }
-
-          a {
-            margin-right: 8px;
-            margin-bottom: 16px;
-            display: inline-block;
-            background-color: var(--hover);
-            color: var(--text-color);
-            padding: 6px 8px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-
-            &.main {
-              background-color: var(--primary);
-              color: var(--text-btn-color);
-            }
-
-            &:hover {
-              background-color: var(--primary-hover);
-              color: var(--text-btn-color);
-              transition: all .5s;
-            }
-          }
-        }
-
-        .bg_img {
-          transition: transform .6s;
-          background-position: 50%;
-          background-size: cover;
-          display: block;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-        }
-
-        &:after {
-          position: absolute;
-          pointer-events: none;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          display: block;
-          content: "";
-          background: var(--bg-liner-main-page);
-        }
-
-        @media (max-width: 1000px) {
-          max-width: 100%;
-        }
-      }
-
-      .dnd5club_tel_bot {
-        min-height: 124px;
-
-        .bg_img {
-          background-image: url(/img/bg_telegram_bot.webp?v=2);
-        }
-      }
-
-      .discord_bot {
         height: 100%;
-
-        .bg_img {
-          background-image: url(/img/bg_discord_bot.webp?v=2);
-        }
+        top: 0;
+        left: 0;
       }
 
-      @include media-min($xl) {
-        flex-direction: row;
+      &:after {
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: block;
+        content: "";
+        background: var(--bg-liner-main-page);
+      }
+
+      @media (max-width: 1000px) {
+        max-width: 100%;
+      }
+    }
+
+    .dnd5club_tel_bot {
+      min-height: 124px;
+
+      .bg_img {
+        background-image: url(/img/bg_telegram_bot.webp?v=2);
+      }
+    }
+
+    .discord_bot {
+      height: 100%;
+
+      .bg_img {
+        background-image: url(/img/bg_discord_bot.webp?v=2);
       }
     }
   }
@@ -369,7 +347,7 @@
     flex-wrap: wrap;
     margin: -4px -4px;
 
-    .block {
+    .chips {
       padding: 8px 8px;
       background-color: var(--bg-sub-menu);
       color: var(--text-color);
