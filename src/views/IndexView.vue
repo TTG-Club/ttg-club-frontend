@@ -27,112 +27,118 @@
         </router-link>
       </div>
 
-      <div class="column">
-        <div class="left">
-          <div class="block">
-            <div class="block__bot">
-              <div class="dnd5club_tel_bot">
-                <div class="info">
-                  <h4>Telegram Spells Bot</h4>
+      <div class="main-page-blocks">
+        <div class="row reverse">
+          <div class="column">
+            <div class="row">
+              <div class="column">
+                <div class="block dnd5club_tel_bot">
+                  <div class="info">
+                    <h4>Telegram Spells Bot</h4>
 
-                  <p>Книга заклинаний у вас в руках!</p>
+                    <p>Книга заклинаний у вас в руках!</p>
 
-                  <div class="bottom">
-                    <a
-                      class="main"
-                      href="https://t.me/ttg_club_bot"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >Подключить</a>
+                    <div class="bottom">
+                      <a
+                        class="main"
+                        href="https://t.me/ttg_club_bot"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >Подключить</a>
 
-                    <router-link
-                      :to="{ path: '/info/telegram_spells_bot' }"
-                      rel="noopener noreferrer"
-                    >
-                      Описание
-                    </router-link>
+                      <router-link
+                        :to="{ path: '/info/telegram_spells_bot' }"
+                        rel="noopener noreferrer"
+                      >
+                        Описание
+                      </router-link>
+                    </div>
                   </div>
+
+                  <div class="bg_img" />
                 </div>
 
-                <div class="bg_img" />
+                <div class="block discord_bot">
+                  <div class="info">
+                    <h4>Discord Bot <sup class="beta">β</sup></h4>
+
+                    <p>Весь сайт у вас на сервере!</p>
+
+                    <div class="bottom">
+                      <!-- eslint-disable vue/max-len -->
+                      <a
+                        class="main"
+                        href="https://discord.com/api/oauth2/authorize?client_id=1074095730265964654&permissions=274878032896&scope=bot%20applications.commands"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >Пригласить</a>
+                      <!-- eslint-enable vue/max-len -->
+
+                      <router-link
+                        :to="{ path: '/info/discord_bot' }"
+                        rel="noopener noreferrer"
+                      >
+                        Описание
+                      </router-link>
+                    </div>
+                  </div>
+
+                  <div class="bg_img" />
+                </div>
               </div>
 
-              <div class="discord_bot">
-                <div class="info">
-                  <h4>Discord Bot <sup class="beta">β</sup></h4>
+              <div class="column">
+                <div class="links_block">
+                  <h3>Инструменты:</h3>
 
-                  <p>Весь сайт у вас на сервере!</p>
-
-                  <div class="bottom">
-                    <!-- eslint-disable vue/max-len -->
-                    <a
-                      class="main"
-                      href="https://discord.com/api/oauth2/authorize?client_id=1074095730265964654&permissions=274878032896&scope=bot%20applications.commands"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >Пригласить</a>
-                    <!-- eslint-enable vue/max-len -->
-
+                  <div class="list">
                     <router-link
-                      :to="{ path: '/info/discord_bot' }"
-                      rel="noopener noreferrer"
+                      v-for="(tool, key) in tools"
+                      :key="key"
+                      :to="{ path: tool.url }"
+                      class="chips tip w-100"
                     >
-                      Описание
+                      {{ tool.name }}
                     </router-link>
                   </div>
                 </div>
-
-                <div class="bg_img" />
               </div>
             </div>
 
-            <div class="links_block">
-              <h3>Инструменты:</h3>
+            <div
+              v-if="showedPartners.length"
+              class="row"
+            >
+              <div class="links_block">
+                <h3>Наши друзья:</h3>
 
-              <div class="list">
-                <router-link
-                  v-for="(tool, key) in tools"
-                  :key="key"
-                  :to="{ path: tool.url }"
-                  class="block tip w-100"
-                >
-                  {{ tool.name }}
-                </router-link>
+                <div class="list">
+                  <a
+                    v-for="(partner, key) in showedPartners"
+                    :key="key"
+                    v-tippy="{
+                      content: partner.description,
+                    }"
+                    :href="partner.url"
+                    class="chips tip"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <img
+                      :alt="partner.name"
+                      :src="partner.img"
+                      height="20px"
+                      width="20px"
+                    >
+                    {{ partner.name }}
+                  </a>
+                </div>
               </div>
             </div>
           </div>
 
-          <youtube-block />
-        </div>
-
-        <div
-          v-if="showedPartners.length"
-          class="right"
-        >
-          <div class="links_block">
-            <h3>Наши друзья:</h3>
-
-            <div class="list">
-              <a
-                v-for="(partner, key) in showedPartners"
-                :key="key"
-                v-tippy="{
-                  content: partner.description,
-                }"
-                :href="partner.url"
-                class="block tip"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <img
-                  :alt="partner.name"
-                  :src="partner.img"
-                  height="20px"
-                  width="20px"
-                >
-                {{ partner.name }}
-              </a>
-            </div>
+          <div class="column youtube-block">
+            <youtube-block />
           </div>
         </div>
       </div>
