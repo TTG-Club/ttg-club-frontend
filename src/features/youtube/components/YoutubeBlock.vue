@@ -105,14 +105,6 @@
     padding: 16px;
     flex-direction: column;
     display: flex;
-
-    h3 {
-      font-size: calc(var(--h3-font-size) - 12px);
-      margin-top: 0;
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 400;
-      opacity: 0.6;
-    }
   }
 
   .list {

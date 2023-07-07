@@ -28,7 +28,7 @@
       </div>
 
       <div class="main-page-blocks">
-        <div class="row">
+        <div class="row reverse">
           <div class="column">
             <div class="row">
               <div class="column">

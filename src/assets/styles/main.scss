@@ -216,8 +216,14 @@
       flex-direction: row;
       gap: 16px;
 
-      @include media-max($xl) {
+      @include media-max($lg) {
         flex-direction: column;
+      }
+
+      &.reverse {
+        @include media-max($lg) {
+          flex-direction: column-reverse;
+        }
       }
     }
 

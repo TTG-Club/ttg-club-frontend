@@ -184,7 +184,8 @@
       };
 
       &.radius {
-        border-radius: 12px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
       }
     }
 
@@ -213,7 +214,10 @@
 
     .name {
       display: block;
-      margin-top: 8px;
+      padding: 8px;
+      background-color: var(--bg-main);
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
     }
 
     &:hover,
