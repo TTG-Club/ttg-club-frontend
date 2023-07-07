@@ -18,7 +18,16 @@
     >
       <span :class="$style.hover" />
 
-      <span :class="$style.text">{{ option[label] }}</span>
+      <span
+        v-if="!$slots.option"
+        :class="$style.text"
+      >{{ option[label] }}</span>
+
+      <slot
+        v-else
+        name="option"
+        :option="option"
+      />
     </button>
   </div>
 </template>

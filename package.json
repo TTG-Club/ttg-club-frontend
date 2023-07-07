@@ -2,7 +2,7 @@
   "name": "ttg-club",
   "private": true,
   "scripts": {
-    "serve": "vite",
+    "serve": "vite --host",
     "build:dev": "vite build --emptyOutDir --mode development",
     "build:prod": "vite build --emptyOutDir --mode production",
     "type-check": "vue-tsc --noEmit -p tsconfig.json --composite false",
