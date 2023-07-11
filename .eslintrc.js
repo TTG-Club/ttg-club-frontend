@@ -46,6 +46,7 @@ module.exports = {
           allow: ['warn', 'error']
         }
       ],
+    'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': [
       'error',

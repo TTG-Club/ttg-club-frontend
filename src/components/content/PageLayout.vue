@@ -77,14 +77,13 @@
   );
 
   const { isMobile } = storeToRefs(useUIStore());
-  const dayjs = useDayjs();
 
   const dateTimeFormatted = computed(() => {
     if (!props.dateTime) {
       return '';
     }
 
-    const datetime = dayjs(props.dateTime);
+    const datetime = useDayjs(props.dateTime);
 
     if (!datetime.isValid()) {
       return '';
@@ -97,7 +96,7 @@
 <style lang="scss" scoped>
   .page-layout {
     display: flex;
-    min-height: var(--max-vh);
+    min-height: 100%;
 
     &__side {
       &--left {
@@ -138,7 +137,7 @@
 
     &__title {
       font-weight: 500;
-      font-family: "Lora";
+      font-family: "Lora", serif;
       margin: 0;
     }
 

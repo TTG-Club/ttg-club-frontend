@@ -240,31 +240,65 @@ export const routes: Readonly<RouteRecordRaw[]> = [
   },
   {
     name: 'profile',
-    path: '/profile/:username?',
-    component: () => import('@/views/User/Profile/ProfileView.vue'),
-    beforeEnter: async (to, from, next) => {
-      const userStore = useUserStore();
+    path: '/profile',
+    children: [
+      {
+        name: 'profile-index',
+        path: '',
+        component: () => import('@/views/User/Profile/ProfileView.vue'),
+        beforeEnter: async (to, from, next) => {
+          const userStore = useUserStore();
 
-      try {
-        const user = await userStore.getUserInfo();
+          try {
+            const user = await userStore.getUserInfo();
 
-        if (!user) {
-          next({ name: 'unauthorized' });
+            if (!user) {
+              next({ name: 'unauthorized' });
 
-          return;
+              return;
+            }
+
+            next();
+          } catch (err) {
+            next({ name: 'internal-server' });
+          }
         }
-
-        if (user.roles.includes(EUserRoles.MODERATOR) || user.roles.includes(EUserRoles.ADMIN)) {
-          next();
-
-          return;
-        }
-
-        next({ name: 'forbidden' });
-      } catch (err) {
-        next({ name: 'internal-server' });
       }
-    }
+    ]
+  },
+  {
+    name: 'admin',
+    path: '/admin',
+    children: [
+      {
+        name: 'youtube',
+        path: 'youtube',
+        component: () => import('@/features/youtube/views/YoutubeView.vue'),
+        beforeEnter: async (to, from, next) => {
+          const userStore = useUserStore();
+
+          try {
+            const user = await userStore.getUserInfo();
+
+            if (!user) {
+              next({ name: 'unauthorized' });
+
+              return;
+            }
+
+            if (user.roles.includes(EUserRoles.MODERATOR) || user.roles.includes(EUserRoles.ADMIN)) {
+              next();
+
+              return;
+            }
+
+            next({ name: 'forbidden' });
+          } catch (err) {
+            next({ name: 'internal-server' });
+          }
+        }
+      }
+    ]
   },
   {
     name: 'reset-password',

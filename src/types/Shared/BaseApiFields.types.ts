@@ -50,3 +50,13 @@ export interface IAbilitiesValue {
     wiz: number;
     cha: number;
 }
+
+export interface IOrderItem {
+  field: string;
+  direction: string;
+}
+
+export interface IPaginatedResponse<T> {
+  count: number;
+  list: Array<T>
+}
