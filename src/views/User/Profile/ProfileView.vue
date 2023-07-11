@@ -34,24 +34,20 @@
           </div>
         </div>
 
-        <div class="profile__row">
-          <div class="profile__youtube">
-            <ui-input
-              v-model="currentVideo"
-              :is-error="isError"
-              label="ID нового видео"
-            />
-
-            <ui-button
-              :loading="inProgress"
-              icon="check"
-              @click.left.exact.prevent="setNewVideo"
-            />
-          </div>
+        <div
+          v-if="isYoutubeRole"
+          class="profile__row"
+        >
+          <router-link
+            to="/admin/youtube"
+            class="profile__youtube"
+          >
+            Редактировать Youtube новости
+          </router-link>
         </div>
 
         <div
-          v-if="false"
+          v-if="isDev"
           class="profile__row"
         >
           <a
@@ -63,7 +59,7 @@
         </div>
 
         <div
-          v-if="false"
+          v-if="isDev"
           class="profile__row"
         >
           <div class="profile__blocks">
@@ -207,102 +203,33 @@
   </page-layout>
 </template>
 
-<script lang="ts">
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
+<script setup lang="ts">
+  import { computed } from 'vue';
   import { storeToRefs } from 'pinia';
   import orderBy from 'lodash/orderBy';
   import upperFirst from 'lodash/upperFirst';
-  import { tryOnBeforeMount } from '@vueuse/core';
   import PageLayout from '@/components/content/PageLayout.vue';
-  import { useUserStore } from '@/store/UI/UserStore';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { TYoutubeVideo } from '@/types/Shared/Youtube.types';
+  import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
+  import isDev from '@/common/helpers/isDev';
 
-  export default defineComponent({
-    components: {
-      UiInput,
-      PageLayout,
-      UiButton
-    },
-    setup() {
-      const http = useAxios();
-      const userStore = useUserStore();
-      const currentVideo = ref<string | null>(null);
-      const isError = ref(false);
-      const inProgress = ref(false);
+  const userStore = useUserStore();
 
-      const {
-        user,
-        avatar,
-        roles: userRoles
-      } = storeToRefs(userStore);
+  const {
+    user,
+    avatar,
+    roles: userRoles
+  } = storeToRefs(userStore);
 
-      const roles = computed(() => (
-        upperFirst(orderBy(userRoles.value)
-          .map(role => role.name)
-          .join(', '))
-      ));
+  const roles = computed(() => (
+    upperFirst(orderBy(userRoles.value)
+      .map(role => role.name)
+      .join(', '))
+  ));
 
-      const getLastVideo = async () => {
-        try {
-          const resp = await http.get<TYoutubeVideo>({ url: '/youtube/last' });
-
-          if (resp.status !== 200) {
-            return Promise.reject(resp.status);
-          }
-
-          currentVideo.value = resp.data.id;
-
-          return Promise.resolve(resp.data);
-        } catch (err) {
-          return Promise.reject(err);
-        }
-      };
-
-      const setNewVideo = async () => {
-        inProgress.value = true;
-        isError.value = false;
-
-        try {
-          const resp = await http.put<TYoutubeVideo>({ url: `/youtube/${ currentVideo.value }` });
-
-          if (resp.status !== 200) {
-            isError.value = true;
-            inProgress.value = false;
-
-            return Promise.reject(resp.status);
-          }
-
-          currentVideo.value = resp.data.id;
-          inProgress.value = false;
-
-          return Promise.resolve(resp.data);
-        } catch (err) {
-          inProgress.value = false;
-
-          return Promise.reject(err);
-        }
-      };
-
-      tryOnBeforeMount(async () => {
-        await getLastVideo();
-      });
-
-      return {
-        user,
-        roles,
-        avatar,
-        currentVideo,
-        isError,
-        inProgress,
-        setNewVideo
-      };
-    }
-  });
+  const isYoutubeRole = computed(() => (
+    user.value?.roles.includes(EUserRoles.MODERATOR)
+    || user.value?.roles.includes(EUserRoles.ADMIN)
+  ));
 </script>
 
 <style lang="scss" scoped>

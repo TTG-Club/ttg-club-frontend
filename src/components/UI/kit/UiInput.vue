@@ -195,6 +195,7 @@
   .ui-input {
     display: inline-flex;
     width: 100%;
+    position: relative;
 
     &__label {
       margin-bottom: 8px;
