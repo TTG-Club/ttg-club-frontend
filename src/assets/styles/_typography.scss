@@ -175,6 +175,10 @@ blockquote {
 .spell-list {
   text-indent: -16px;
   margin-left: 16px;
+
+  p {
+    margin: 0 0 4px;
+  }
 }
 
 .header_separator {

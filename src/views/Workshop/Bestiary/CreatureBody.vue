@@ -244,7 +244,7 @@
         <p>
           <strong>Бонус мастерства </strong>
 
-          <span>{{ proficiencyBonus }}</span>
+          <span>{{ creature.proficiencyBonus }}</span>
         </p>
       </div>
 
@@ -530,50 +530,6 @@
     }
 
     return `${ props.creature.challengeRating } (${ props.creature.experience.toLocaleString() } опыта)`;
-  });
-
-  /**
-   * // CR 0-4   → БМ=2
-   * // CR 5-8   → БМ=3
-   * // CR 9-12  → БМ=4
-   * // CR 13-16 → БМ=5
-   * // CR 17-20 → БМ=6
-   * // CR 21-24 → БМ=7
-   * // CR 25-28 → БМ=8
-   * // CR 29-30 → БМ=9
-   */
-  const proficiencyBonus = computed(() => {
-    const cr = toNumber(props.creature.challengeRating);
-
-    if (Number.isNaN(cr) || !cr || cr <= 4) {
-      return '+2';
-    }
-
-    if (cr <= 8) {
-      return '+3';
-    }
-
-    if (cr <= 12) {
-      return '+4';
-    }
-
-    if (cr <= 16) {
-      return '+5';
-    }
-
-    if (cr <= 20) {
-      return '+6';
-    }
-
-    if (cr <= 24) {
-      return '+7';
-    }
-
-    if (cr <= 28) {
-      return '+8';
-    }
-
-    return '+9';
   });
 
   const hitDiceFormula = computed(() => (props.creature.hits.bonus

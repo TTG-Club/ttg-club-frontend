@@ -13,12 +13,17 @@
 <script setup lang="ts">
   import { computed } from 'vue';
 
-  const props = withDefaults(defineProps<{
-    icon: string;
-    size?: string | number;
-  }>(), {
-    size: undefined
-  });
+  const props = withDefaults(
+    defineProps<{
+      icon: string;
+      size?: string | number;
+      color?: string | 'currentColor';
+    }>(),
+    {
+      size: '100%',
+      color: 'currentColor'
+    }
+  );
 
   const iconName = computed(() => `#ttg-${ props.icon.replaceAll('/', '-') }`);
 
@@ -27,15 +32,41 @@
       return '100%';
     }
 
-    if (typeof props.size === 'number') {
+    if (typeof props.size === 'number' || (/^\d+$/i).test(props.size)) {
       return `${ props.size }px`;
     }
 
-    if (!props.size.endsWith('px') && !props.size.endsWith('%') && !props.size.endsWith('em')) {
+    if (
+      !props.size.endsWith('px')
+      && !props.size.endsWith('%')
+      && !props.size.endsWith('em')
+    ) {
       throw new Error('SvgIcon: size is incorrect');
     }
 
     return props.size;
+  });
+
+  const colorCalculated = computed(() => {
+    if (!props.color) {
+      return 'currentColor';
+    }
+
+    if ((/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i).test(props.color)) {
+      return props.color.startsWith('#')
+        ? props.color
+        : `#${ props.color }`;
+    }
+
+    if (props.color.startsWith('--')) {
+      return `var(${ props.color }, currentColor)`;
+    }
+
+    if ((/^var\(.+\)$/i).test(props.color)) {
+      return props.color;
+    }
+
+    return 'currentColor';
   });
 </script>
 
@@ -46,6 +77,6 @@
     display: block;
     width: v-bind(sizeCalculated);
     height: v-bind(sizeCalculated);
-    fill: currentColor;
+    fill: v-bind(colorCalculated);
   }
 </style>
