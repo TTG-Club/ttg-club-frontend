@@ -20,6 +20,8 @@
             autocomplete="off"
             autofocus="autofocus"
             autocapitalize="off"
+            @keyup.enter.exact.prevent.stop="onSearch"
+            @submit.prevent.stop="onSearch"
           >
             <div class="search-view__control_body">
               <div
@@ -43,7 +45,8 @@
 
             <ui-button
               class="search-view__control_btn"
-              native-type="submit"
+              native-type="button"
+              @click.left.exact.prevent.stop="onSearch"
             >
               Поиск
             </ui-button>
@@ -253,7 +256,7 @@
   };
 
   const onSearch = async () => {
-    if (!search.value) {
+    if (!search.value || inProgress.value) {
       return Promise.resolve();
     }
 
