@@ -20,7 +20,8 @@
             autocomplete="off"
             autofocus="autofocus"
             autocapitalize="off"
-            @submit.prevent.stop="onChangeSearch"
+            @keyup.enter.exact.prevent.stop="onSearch"
+            @submit.prevent.stop="onSearch"
           >
             <div class="search-view__control_body">
               <div
@@ -37,14 +38,15 @@
                 v-model="search"
                 placeholder="Поиск..."
                 is-clearable
-                @update:model-value="onChangeSearch()"
-                @keyup.enter.exact.prevent.stop="onChangeSearch"
+                @update:model-value="onChangeSearch"
+                @keyup.enter.exact.prevent.stop
               />
             </div>
 
             <ui-button
               class="search-view__control_btn"
-              native-type="submit"
+              native-type="button"
+              @click.left.exact.prevent.stop="onSearch"
             >
               Поиск
             </ui-button>
@@ -93,7 +95,7 @@
           v-model="page"
           class="search-view__paginate"
           :page-count="pages"
-          :click-handler="onPageChanged()"
+          @update:model-value="onChangedPage"
         />
       </div>
     </template>
@@ -101,12 +103,13 @@
 </template>
 
 <script setup lang="ts">
+  import { computed, ref } from 'vue';
   import {
-    computed, ref
-  } from 'vue';
-  import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
-  import {
-    onBeforeRouteUpdate, useRoute, useRouter
+    type LocationQueryValue,
+    onBeforeRouteUpdate,
+    type RouteLocationNormalized,
+    useRoute,
+    useRouter
   } from 'vue-router';
   import { storeToRefs } from 'pinia';
   import debounce from 'lodash/debounce';
@@ -130,8 +133,6 @@
   const uiStore = useUIStore();
   const { bodyElement } = storeToRefs(uiStore);
   const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
-  const page = ref(1);
-  const search = ref('');
   const inProgress = ref(false);
   const isNeedUpdateScroll = ref(false);
   const input = ref<HTMLElement>();
@@ -139,37 +140,23 @@
   const controller = ref<AbortController>(new AbortController());
   const { focused } = useFocus(input, { initialValue: true });
 
-  const results = ref<TSearchResultList>({
-    count: 0,
-    list: []
-  });
+  const page = ref(1);
+  const search = ref('');
 
-  const pages = computed(() => {
-    if (results.value?.count <= 20) {
-      return 0;
-    }
-
-    return Math.round(results.value.count / 20);
-  });
-
-  const resultsNumbers = ref<null | { min: number, max: number }>(null);
-
-  const onUpdateRoute = async (replace: boolean = false) => {
+  const onUpdateRoute = (replace: boolean = false) => {
     const to = {
       name: 'search-page',
       query: {
-        search: search.value,
-        page: page.value
+        search: search.value.trim(),
+        page: page.value || 1
       }
     };
 
     if (replace) {
-      await router.replace(to);
-
-      return;
+      return router.replace(to);
     }
 
-    await router.push(to);
+    return router.push(to);
   };
 
   const resolveQuerySearch = (querySearch?: LocationQueryValue | LocationQueryValue[]) => {
@@ -196,7 +183,7 @@
     }
 
     if (typeof queryPage === 'string') {
-      page.value = !route.query.page ? parseInt(queryPage, 10) : 1;
+      page.value = queryPage ? parseInt(queryPage, 10) : 1;
 
       return;
     }
@@ -209,18 +196,35 @@
     resolveQueryPage(to?.query.page);
   };
 
-  const onChangeSearch = debounce(async () => {
+  const results = ref<TSearchResultList>({
+    count: 0,
+    list: []
+  });
+
+  const pages = computed(() => {
+    if (results.value?.count <= 20) {
+      return 0;
+    }
+
+    return Math.ceil(results.value.count / 20);
+  });
+
+  const resultsNumbers = ref<null | { min: number, max: number }>(null);
+
+  const onChangeSearch = debounce((value: string) => {
     isNeedUpdateScroll.value = true;
 
-    if (search.value.trim()) {
-      await onUpdateRoute();
+    if (value.trim()) {
+      page.value = 1;
     }
+
+    onUpdateRoute();
   }, 300);
 
-  const onPageChanged = debounce(async () => {
+  const onChangedPage = debounce(() => {
     isNeedUpdateScroll.value = true;
 
-    await onUpdateRoute();
+    onUpdateRoute();
   }, 300);
 
   const searchQuery = async () => {
@@ -231,7 +235,7 @@
           page: page.value - 1,
           limit: 20,
           search: {
-            value: search.value,
+            value: search.value.trim(),
             exact: false
           },
           order: []
@@ -252,7 +256,7 @@
   };
 
   const onSearch = async () => {
-    if (!search.value) {
+    if (!search.value || inProgress.value) {
       return Promise.resolve();
     }
 
@@ -274,7 +278,9 @@
       if (isNeedUpdateScroll.value) {
         const controlsRect = controls.value?.getBoundingClientRect();
 
-        if (!uiStore.bodyScroll.y || (controlsRect && controlsRect.top > 0)) {
+        if (!uiStore.bodyScroll.y || (
+          controlsRect && controlsRect.top > 0
+        )) {
           isNeedUpdateScroll.value = false;
 
           return Promise.resolve();
@@ -290,12 +296,14 @@
 
       sendSearchViewResultsMetrics(
         search,
-        result.list.map(item => ({
-          item_id: item.url,
-          item_name: item.name,
-          item_category: item.section,
-          item_brand: item.source?.name
-        }))
+        result.list.map(item => (
+          {
+            item_id: item.url,
+            item_name: item.name,
+            item_category: item.section,
+            item_brand: item.source?.name
+          }
+        ))
       );
 
       return Promise.resolve();
@@ -307,7 +315,9 @@
       if (results.value?.count) {
         resultsNumbers.value = {
           min: page.value > 1
-            ? 20 * (page.value - 1) + 1
+            ? 20 * (
+              page.value - 1
+            ) + 1
             : 1,
           max: page.value < pages.value && results.value.count > 20
             ? 20 * page.value
@@ -330,7 +340,7 @@
 
     await onUpdateRoute(true);
 
-    if (!search.value) {
+    if (!search.value.trim()) {
       return;
     }
 
@@ -340,7 +350,9 @@
   onBeforeRouteUpdate(async (to, from, next) => {
     resolveQuery(to);
 
-    if (search.value) {
+    if (search.value.trim()) {
+      isNeedUpdateScroll.value = true;
+
       await onSearch();
     }
 
