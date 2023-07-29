@@ -83,7 +83,25 @@
         return result;
       });
 
+      const clearSelection = () => {
+        // @ts-ignore
+        if (document.selection && document.selection.empty) {
+          // @ts-ignore
+          document.selection.empty();
+
+          return;
+        }
+
+        if (window.getSelection) {
+          const sel = window.getSelection();
+
+          sel?.removeAllRanges();
+        }
+      };
+
       const tryRoll = (type?: 'advantage' | 'disadvantage') => {
+        clearSelection();
+
         try {
           notifyResult({
             label: props.label,
@@ -117,7 +135,6 @@
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    user-select: none;
 
     &:not(.is-error) {
       &.is-dice {
