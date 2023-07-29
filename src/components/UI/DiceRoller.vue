@@ -3,10 +3,11 @@
     v-tippy="{ content: `Нажмите для броска: <b>${formula}</b>` }"
     :class="classes"
     class="dice-roller"
-    @click.left.exact.prevent="tryRoll()"
-    @click.left.shift.exact.prevent="tryRoll('advantage')"
-    @click.left.ctrl.exact.prevent="tryRoll('disadvantage')"
-    @click.left.meta.exact.prevent="tryRoll('disadvantage')"
+    @dblclick.prevent.stop
+    @click.left.exact.prevent.stop="tryRoll()"
+    @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
+    @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
+    @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
   >
     <slot>{{ formula }}</slot>
   </span>
@@ -116,6 +117,7 @@
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
+    user-select: none;
 
     &:not(.is-error) {
       &.is-dice {
