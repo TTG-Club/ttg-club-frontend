@@ -3,10 +3,11 @@
     v-tippy="{ content: `Нажмите для броска: <b>${formula}</b>` }"
     :class="classes"
     class="dice-roller"
-    @click.left.exact.prevent="tryRoll()"
-    @click.left.shift.exact.prevent="tryRoll('advantage')"
-    @click.left.ctrl.exact.prevent="tryRoll('disadvantage')"
-    @click.left.meta.exact.prevent="tryRoll('disadvantage')"
+    @dblclick.prevent.stop
+    @click.left.exact.prevent.stop="tryRoll()"
+    @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
+    @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
+    @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
   >
     <slot>{{ formula }}</slot>
   </span>
@@ -82,7 +83,25 @@
         return result;
       });
 
+      const clearSelection = () => {
+        // @ts-ignore
+        if (document.selection && document.selection.empty) {
+          // @ts-ignore
+          document.selection.empty();
+
+          return;
+        }
+
+        if (window.getSelection) {
+          const sel = window.getSelection();
+
+          sel?.removeAllRanges();
+        }
+      };
+
       const tryRoll = (type?: 'advantage' | 'disadvantage') => {
+        clearSelection();
+
         try {
           notifyResult({
             label: props.label,

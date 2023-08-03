@@ -177,8 +177,8 @@
 
     &__logo {
       margin-right: 12px;
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       flex-shrink: 0;
 
       @media (max-width: 600px) {

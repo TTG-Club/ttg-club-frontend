@@ -122,7 +122,8 @@
       cursor: auto;
       background-color: var(--bg-secondary);
       overflow: auto;
-      border-radius: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
       box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
       transform-origin: bottom left;
       z-index: 111;

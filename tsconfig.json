@@ -17,8 +17,7 @@
     "lib": [
       "esnext",
       "dom",
-      "dom.iterable",
-      "scripthost"
+      "dom.iterable"
     ],
     "module": "esnext",
     "moduleResolution": "node",
