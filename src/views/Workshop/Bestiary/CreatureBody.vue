@@ -22,7 +22,24 @@
           }}</span>
 
           <span v-if="creature.armors?.length">
-            ({{ creature.armors.join(', ') }})
+            (<span
+              v-for="(armor, key) in creature.armors"
+              :key="key"
+            >
+              <detail-tooltip
+                v-if="armor.url?.length"
+                type="armor"
+                :url="armor.url"
+              >
+                {{ armor.name }}
+              </detail-tooltip>
+
+              <span v-else>
+                {{ armor.name }}
+              </span>
+
+              <span v-if="key < creature.armors?.length - 1">, </span>
+            </span>)
           </span>
         </p>
 
@@ -432,6 +449,7 @@
   import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
   import { getIterableString } from '@/common/helpers/string';
   import { getFormattedModifier, getFormula } from '@/common/helpers/abilityTransforms';
+  import DetailTooltip from '@/components/UI/DetailTooltip.vue';
 
   const props = defineProps({
     creature: {
