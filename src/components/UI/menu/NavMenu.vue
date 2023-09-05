@@ -115,10 +115,10 @@
                 url="https://boosty.to/dnd5club"
               />
 
-              <ui-social-button
+              <!-- <ui-social-button
                 social-name="Мастер Boosty"
                 url="https://boosty.to/dnd5eclub"
-              />
+              /> -->
             </div>
           </div>
         </div>
