@@ -3,7 +3,7 @@ require('@rushstack/eslint-patch/modern-module-resolution');
 module.exports = {
   root: true,
   env: { browser: true, es2021: true, node: true },
-  ignorePatterns: ['**/public_html/*', '**/dist/*', '**/node_modules/*'],
+  ignorePatterns: ['!(src|.storybook|public)/**/*'],
   extends: [
     'plugin:vue/vue3-recommended',
     '@vue/airbnb',

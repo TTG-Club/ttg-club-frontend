@@ -14,8 +14,8 @@ export type RequestConfig = {
   signal?: AbortSignal;
 };
 
-export default class HTTPService {
-  protected instance: AxiosInstance;
+class HTTPService {
+  readonly instance: AxiosInstance;
 
   constructor() {
     axios.defaults.withCredentials = true;
@@ -110,3 +110,5 @@ export default class HTTPService {
     });
   }
 }
+
+export default new HTTPService();

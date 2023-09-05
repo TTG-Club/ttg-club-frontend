@@ -1,10 +1,12 @@
 import { fileURLToPath, URL } from 'node:url';
-import type { ConfigEnv } from 'vite';
-import { defineConfig, loadEnv } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+
 import viteLegacyPlugin from '@vitejs/plugin-legacy';
+import vue from '@vitejs/plugin-vue';
+import { defineConfig, loadEnv } from 'vite';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+
+import type { ConfigEnv } from 'vite';
 
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv) => {

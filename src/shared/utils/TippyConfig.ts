@@ -1,5 +1,5 @@
+import { useAxios } from '@/shared/composition/useAxios';
 import errorHandler from '@/shared/helpers/errorHandler';
-import HTTPService from '@/shared/services/HTTPService';
 
 import type { DefaultProps } from 'tippy.js';
 import type { TippyPluginOptions } from 'vue-tippy';
@@ -44,7 +44,7 @@ export const DefaultTippyProps: DefaultProps = {
       return canShow;
     }
 
-    const http = new HTTPService();
+    const http = useAxios();
 
     if (attr) {
       http

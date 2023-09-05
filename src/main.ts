@@ -8,9 +8,9 @@ import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
 import Toast from 'vue-toastification';
 
+import { useAxios } from '@/shared/composition/useAxios';
 import { TippyLazy } from '@/shared/directives/TippyLazy';
 import isDev from '@/shared/helpers/isDev';
-import HTTPService from '@/shared/services/HTTPService';
 import registerComponents from '@/shared/utils/RegisterComponents';
 import { TippyOptions } from '@/shared/utils/TippyConfig';
 import { ToastEventBus, ToastOptions } from '@/shared/utils/ToastConfig';
@@ -24,7 +24,7 @@ import pinia from '@/store';
 const app = createApp(App);
 const vfm = createVfm();
 
-app.config.globalProperties.$http = new HTTPService();
+app.config.globalProperties.$http = useAxios();
 
 app
   .use(pinia)

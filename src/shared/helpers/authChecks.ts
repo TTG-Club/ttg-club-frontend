@@ -6,11 +6,11 @@ import {
   required
 } from '@vuelidate/validators';
 
+import { useAxios } from '@/shared/composition/useAxios';
 import errorHandler from '@/shared/helpers/errorHandler';
 import { useIsDev } from '@/shared/helpers/isDev';
-import HTTPService from '@/shared/services/HTTPService';
 
-const http = new HTTPService();
+const http = useAxios();
 const isDev = useIsDev();
 
 const checkExist = async (value: string, type: 'username' | 'email') => {
