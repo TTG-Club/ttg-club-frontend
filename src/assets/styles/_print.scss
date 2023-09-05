@@ -3,6 +3,22 @@
   //   margin: auto 0cm auto 0cm;
   // }
 
+  :root {
+    --main-font-size: 12px;
+    --h1-font-size: 36px;
+    --h2-font-size: 28px;
+    --h3-font-size: 24px;
+    --h4-font-size: 20px;
+    --h5-font-size: 12px;
+
+    --main-line-height: 1.1;
+    --h1-line-height: 1;
+    --h2-line-height: 1;
+    --h3-line-height: 1;
+    --h4-line-height: 1;
+    --h5-line-height: 1.1;
+  }
+
   body {
     background: white !important;
     color: black !important;
@@ -54,15 +70,28 @@
   }
 
   .section-header {
+    padding: 0 !important;
+  }
+
+  .section-header {
     &__controls {
       display: none !important;
     }
   }
 
   .scores__stats {
-    max-width: calc(15% - 8px) !important;
-    flex: 1 0 calc(15% - 8px) !important;
+    min-width: 20px !important;
+    flex: none !important;
     border: 1px solid rgb(119, 119, 119) !important;
+    padding: 8px !important;
+
+    h4 {
+      height: 16px !important;
+    }
+
+    p {
+      padding: 0 !important;
+    }
   }
 
   .navbar,
@@ -91,8 +120,9 @@
 
   .row_info,
   .section-header__body {
-    padding: 8px 0 8px 0 !important;
+    padding: 4px 0 4px 0 !important;
     margin: 0 !important;
+    gap: 0px !important;
   }
 
   .grid_stat_block {
