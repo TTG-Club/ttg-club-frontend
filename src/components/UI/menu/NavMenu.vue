@@ -206,7 +206,7 @@
 
 <style lang="scss" scoped>
   .nav-menu {
-    padding: 4px 0px 0px 0px;
+    padding: 4px 0;
 
     .ui-social-button {
       opacity: 70%;
@@ -216,9 +216,11 @@
       &.is-vk {
         background-color: transparent;
       }
+
       &.is-discord {
         background-color: transparent;
       }
+
       &.is-boosty {
         background-color: transparent;
       }
