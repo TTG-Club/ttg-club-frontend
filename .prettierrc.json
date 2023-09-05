@@ -16,13 +16,5 @@
   "htmlWhitespaceSensitivity": "css",
   "vueIndentScriptAndStyle": true,
   "endOfLine": "lf",
-  "singleAttributePerLine": true,
-  "overrides": [
-    {
-      "files": "*.html",
-      "options": {
-        "parser": "html"
-      }
-    }
-  ]
+  "singleAttributePerLine": true
 }

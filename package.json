@@ -11,7 +11,7 @@
     "lint:write": "eslint --fix --ignore-path .gitignore '{**/*,*}.{cjs,js,ts,jsx,tsx,vue}'",
     "prettier:check": "prettier . '{**/*,*}.{cjs,js,ts,jsx,tsx,html,vue}' --ignore-path .gitignore --check",
     "prettier:write": "prettier . '{**/*,*}.{cjs,js,ts,jsx,tsx,html,vue}' --ignore-path .gitignore --write",
-    "pre-commit": "run-p lint:write prettier:write",
+    "pre-commit": "run-s lint:write prettier:write",
     "prepare": "is-ci || husky install"
   },
   "dependencies": {

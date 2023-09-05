@@ -33,15 +33,15 @@
                 type="armor"
                 :url="armor.url"
               >
-                {{ armor.name }}
+                <router-link :to="armor.url">{{ armor.name }}</router-link>
               </detail-tooltip>
 
               <span v-else>
                 {{ armor.name }}
               </span>
 
-              <span v-if="key < creature.armors?.length - 1">, </span>
-            </span>)
+              <span v-if="key < creature.armors?.length - 1">, </span> </span
+            >)
           </span>
         </p>
 
@@ -459,9 +459,9 @@
   } from '@/shared/helpers/abilityTransforms';
   import { getIterableString } from '@/shared/helpers/string';
   import RawContent from '@/shared/ui/content/RawContent.vue';
+  import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
-  import DetailTooltip from '@/components/UI/DetailTooltip.vue';
 
   const props = defineProps({
     creature: {

@@ -93,6 +93,12 @@ export interface IBestiaryLink {
   source: TSource;
 }
 
+export interface ICreatureArmor {
+  name: string;
+  type: string;
+  url: string;
+}
+
 export interface ICreature {
   name: TName;
   size: ICreatureSize;
@@ -103,7 +109,7 @@ export interface ICreature {
   id: number;
   alignment: string;
   armorClass: number;
-  armors?: string[];
+  armors?: ICreatureArmor[];
   armorText?: string;
   hits: ICreatureHits;
   speed: ICreatureSpeed[];
