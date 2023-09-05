@@ -84,7 +84,7 @@
 
         <div class="nav-menu__bottom">
           <div class="nav-menu__bottom--block">
-            <div class="contacts">
+            <div class="nav-menu__bottom--block--contacts">
               Контакты:
 
               <ui-social-button
@@ -106,7 +106,7 @@
               />
             </div>
 
-            <div class="support">
+            <div class="nav-menu__bottom--block--support">
               Поддержка:
 
               <ui-social-button
@@ -115,10 +115,11 @@
                 url="https://boosty.to/dnd5club"
               />
 
-              <!-- <ui-social-button
+              <ui-social-button
+                v-if="isDev"
                 social-name="Мастер Boosty"
                 url="https://boosty.to/dnd5eclub"
-              /> -->
+              />
             </div>
           </div>
         </div>
@@ -242,14 +243,14 @@
         gap: 16px;
         align-items: center;
 
-        .contacts,
-        .support {
+        &--contacts,
+        &--support {
           display: flex;
           align-items: center;
           gap: 8px;
         }
 
-        .support {
+        &--support {
           border-left: none;
           padding-left: 0;
 
