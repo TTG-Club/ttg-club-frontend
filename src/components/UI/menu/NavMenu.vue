@@ -223,11 +223,6 @@
         background-color: transparent;
       }
 
-      &__icon {
-        width: 16px;
-        height: 16px;
-      }
-
       &:hover {
         background-color: var(--hover);
         opacity: 100%;
