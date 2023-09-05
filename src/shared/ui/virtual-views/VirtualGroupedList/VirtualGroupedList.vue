@@ -30,7 +30,7 @@
 
 <script lang="ts" setup>
   import clsx from 'clsx';
-  import { _sortBy, uniqBy } from 'lodash-es';
+  import { sortBy as _sortBy, uniqBy } from 'lodash-es';
   import { computed } from 'vue';
 
   import type { ListIteratee } from '@/shared/types/Lodash';

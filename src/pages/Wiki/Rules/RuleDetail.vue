@@ -28,7 +28,7 @@
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import { useUIStore } from '@/shared/stores/UIStore.js';
+  import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
 
   export default {
