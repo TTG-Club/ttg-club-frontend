@@ -1,6 +1,6 @@
 <template>
   <a
-    :class="[`is-${ socialName.toLowerCase() }`]"
+    :class="{ [`is-${ socialName.toLowerCase() }`]: true, 'is-transparent': transparent }"
     :href="url"
     class="ui-social-button"
     rel="noopener noreferrer"
