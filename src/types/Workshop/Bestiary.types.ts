@@ -7,6 +7,12 @@ export enum BestiaryFilterDefaults {
     url = '/filters/bestiary'
 }
 
+export interface ICreatureArmor {
+  name: string;
+  type: string;
+  url: string;
+}
+
 export interface ICreatureAction {
     name: string;
     value: string;
@@ -101,7 +107,7 @@ export interface ICreature {
     id: number;
     alignment: string;
     armorClass: number;
-    armors?: string[];
+    armors?: ICreatureArmor[];
     armorText?: string;
     hits: ICreatureHits;
     speed: ICreatureSpeed[];
