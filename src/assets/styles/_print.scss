@@ -91,10 +91,12 @@
 
     h4 {
       height: 16px !important;
+      font-size: 10px !important;
     }
 
     p {
       padding: 0 !important;
+      margin: 0px !important;
     }
   }
 
@@ -123,8 +125,9 @@
   }
 
   .header_separator {
-    margin: 16px 0 0 0 !important;
+    margin: 8px 0 0 0 !important;
     border-bottom: none !important;
+    font-size: 16px;
   }
 
   .section-header__title--text {
