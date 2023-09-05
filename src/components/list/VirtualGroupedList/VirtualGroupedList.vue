@@ -5,9 +5,7 @@
     :list="listProps"
     v-bind="grid"
   >
-    <template
-      #row="rowProps"
-    >
+    <template #row="rowProps">
       <slot
         v-if="rowProps.row.isGroup"
         name="group"
@@ -31,19 +29,23 @@
 </template>
 
 <script lang="ts" setup>
-  import uniqBy from 'lodash/uniqBy';
-  import _sortBy from 'lodash/sortBy';
-  import { computed } from 'vue';
   import clsx from 'clsx';
+  import _sortBy from 'lodash/sortBy';
+  import uniqBy from 'lodash/uniqBy';
+  import { computed } from 'vue';
+
+  import type { ListIteratee } from '@/shared/types/Lodash';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import GroupedListCategory from '@/components/list/GroupedListCategory.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import type { ListIteratee } from '@/types/Shared/Lodash.types';
-  import type { TGetGroup } from '@/components/list/VirtualGroupedList/types';
-  import { TListRowProps } from '@/components/list/ListRow.vue';
-  import { getListItemsWithGroups } from '@/components/list/VirtualGroupedList/helpers';
+  import type {
+    TVirtualGridListBaseProps,
+    TVirtualGridListContext
+  } from '@/components/list/VirtualGridList/types';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
+  import { getListItemsWithGroups } from '@/components/list/VirtualGroupedList/helpers';
+  import type { TGetGroup } from '@/components/list/VirtualGroupedList/types';
   import type { TVirtualListProps } from '@/components/list/VirtualList/types';
-  import type { TVirtualGridListBaseProps, TVirtualGridListContext } from '@/components/list/VirtualGridList/types';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;
@@ -67,16 +69,17 @@
     ...props.list,
 
     /* TODO: Типизировать через дженерики и убрать any */
-    getItemClass: (item: any) => clsx(props.list.getItemClass?.(item), {
-      'virtual-grouped-list__group': item.isGroup
-    })
+    getItemClass: (item: any) =>
+      clsx(props.list.getItemClass?.(item), {
+        'virtual-grouped-list__group': item.isGroup
+      })
   }));
 
-  const getRows: TVirtualGridListBaseProps['getRows'] = (items: TItem[], context: TVirtualGridListContext) => {
-    const {
-      keyField,
-      columns
-    } = context;
+  const getRows: TVirtualGridListBaseProps['getRows'] = (
+    items: TItem[],
+    context: TVirtualGridListContext
+  ) => {
+    const { keyField, columns } = context;
 
     const allGroups = items.map((item: TItem) => props.getGroup(item));
     const allGroupsSet = uniqBy(allGroups, keyField);

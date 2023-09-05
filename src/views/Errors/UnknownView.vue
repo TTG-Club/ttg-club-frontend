@@ -5,9 +5,7 @@
 
       <h4>
         Ошибка которую мы не знаем, посмотри
-        <router-link :to="{ path: 'index' }">
-          в другом
-        </router-link>
+        <router-link :to="{ path: 'index' }"> в другом </router-link>
         месте
       </h4>
     </div>

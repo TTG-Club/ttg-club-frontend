@@ -25,21 +25,21 @@
     }
   );
 
-  const iconName = computed(() => `#ttg-${ props.icon.replaceAll('/', '-') }`);
+  const iconName = computed(() => `#ttg-${props.icon.replaceAll('/', '-')}`);
 
   const sizeCalculated = computed(() => {
     if (!props.size) {
       return '100%';
     }
 
-    if (typeof props.size === 'number' || (/^\d+$/i).test(props.size)) {
-      return `${ props.size }px`;
+    if (typeof props.size === 'number' || /^\d+$/i.test(props.size)) {
+      return `${props.size}px`;
     }
 
     if (
-      !props.size.endsWith('px')
-      && !props.size.endsWith('%')
-      && !props.size.endsWith('em')
+      !props.size.endsWith('px') &&
+      !props.size.endsWith('%') &&
+      !props.size.endsWith('em')
     ) {
       throw new Error('SvgIcon: size is incorrect');
     }
@@ -52,17 +52,15 @@
       return 'currentColor';
     }
 
-    if ((/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i).test(props.color)) {
-      return props.color.startsWith('#')
-        ? props.color
-        : `#${ props.color }`;
+    if (/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(props.color)) {
+      return props.color.startsWith('#') ? props.color : `#${props.color}`;
     }
 
     if (props.color.startsWith('--')) {
-      return `var(${ props.color }, currentColor)`;
+      return `var(${props.color}, currentColor)`;
     }
 
-    if ((/^var\(.+\)$/i).test(props.color)) {
+    if (/^var\(.+\)$/i.test(props.color)) {
       return props.color;
     }
 

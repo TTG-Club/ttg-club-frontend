@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 .link-item-expand {
   width: 100%;
   display: block;
@@ -27,7 +29,7 @@
     isolation: isolate;
 
     &__img-bg {
-      @include css_anim($item: transform, $time: .6s);
+      @include css_anim($item: transform, $time: 0.6s);
 
       position: absolute;
       top: 0;
@@ -189,8 +191,7 @@
     }
 
     &-type {
-
-      &:nth-child(n+2) {
+      &:nth-child(n + 2) {
         margin-top: 16px;
       }
 
@@ -208,9 +209,9 @@
       &_name {
         font: {
           size: calc(var(--h5-font-size) + 2px);
-          family: "Lora", serif;
+          family: 'Lora', serif;
           weight: 300;
-        };
+        }
         color: var(--text-color-title);
         padding: 0 8px;
       }
@@ -252,7 +253,9 @@
       .link-item-expand {
         &__content {
           &__img-bg {
-            transform: scale(1.03); // Не удалять, чтобы не было мерцания при ховере
+            transform: scale(
+              1.03
+            ); // Не удалять, чтобы не было мерцания при ховере
           }
         }
       }

@@ -41,7 +41,6 @@
 
 <script>
   export default {
-
     props: {
       treasure: {
         type: Object,
@@ -52,7 +51,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item";
+  @import '../../../assets/styles/modules/link-item';
 
   .link-item {
     &__name {

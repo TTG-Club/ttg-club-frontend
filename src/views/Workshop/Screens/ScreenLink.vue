@@ -1,6 +1,5 @@
 <template>
   <router-link
-    :to="{ path: screen.url }"
     custom
     v-bind="$props"
   >
@@ -46,19 +45,22 @@
 </template>
 
 <script lang="ts">
-  import type { RouteLocationPathRaw } from 'vue-router';
+  import { computed, defineComponent, ref } from 'vue';
   import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import errorHandler from '@/shared/helpers/errorHandler';
+  import type { Maybe } from '@/shared/types/Utility';
+
   import RawContent from '@/components/content/RawContent.vue';
   import BaseModal from '@/components/UI/modals/BaseModal.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  import type { IScreenItem, IScreenLink } from '@/types/Workshop/Screens.d';
+
   import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { IScreenItem, IScreenLink } from '@/types/Workshop/Screens.types';
-  import type { Maybe } from '@/types/Shared/Utility.types';
 
   export default defineComponent({
     components: {
@@ -84,7 +86,7 @@
 
       const modal = ref<{
         show: boolean;
-        data: Maybe<IScreenItem>
+        data: Maybe<IScreenItem>;
       }>({
         data: undefined,
         show: false

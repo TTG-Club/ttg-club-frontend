@@ -27,21 +27,15 @@
       </template>
 
       <template #maxElements>
-        <slot name="maxElements">
-          Ты выбрал максимальное количество
-        </slot>
+        <slot name="maxElements"> Ты выбрал максимальное количество </slot>
       </template>
 
       <template #noResult>
-        <slot name="noResult">
-          Боги не знают ответа на твой запрос
-        </slot>
+        <slot name="noResult"> Боги не знают ответа на твой запрос </slot>
       </template>
 
       <template #noOptions>
-        <slot name="noOptions">
-          Не всегда есть выбор
-        </slot>
+        <slot name="noOptions"> Не всегда есть выбор </slot>
       </template>
 
       <template #beforeList>
@@ -115,9 +109,7 @@
             :class="{ 'is-wrap-disabled': isWrapDisabled }"
             class="ui-select__slotted--body"
           >
-            <slot name="placeholder">
-              Выбери что-нибудь
-            </slot>
+            <slot name="placeholder"> Выбери что-нибудь </slot>
           </div>
 
           <div
@@ -130,9 +122,7 @@
       </template>
 
       <template #limit>
-        <slot name="limit">
-          Ты выбрал слишком много
-        </slot>
+        <slot name="limit"> Ты выбрал слишком много </slot>
       </template>
 
       <template #clear="{ search }">
@@ -155,8 +145,9 @@
 </template>
 
 <script>
-  import Multiselect, { multiselectMixin } from 'vue-multiselect';
   import { defineComponent } from 'vue';
+  import Multiselect, { multiselectMixin } from 'vue-multiselect';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   // TODO: Создать свой селект компонент
@@ -284,7 +275,7 @@
       style: solid;
       color: var(--border);
       radius: 8px;
-    };
+    }
 
     .multiselect {
       &:after,
@@ -417,7 +408,7 @@
             style: solid;
             color: var(--border);
             radius: 0 0 8px 8px;
-          };
+          }
         }
       }
 

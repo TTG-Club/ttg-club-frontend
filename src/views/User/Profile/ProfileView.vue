@@ -3,9 +3,7 @@
     :show-separator="false"
     :use-social-links="false"
   >
-    <template #title>
-      Личный кабинет
-    </template>
+    <template #title> Личный кабинет </template>
 
     <template #default>
       <div class="profile">
@@ -64,9 +62,7 @@
         >
           <div class="profile__blocks">
             <div class="profile__block">
-              <h5 class="profile__block_name">
-                Статьи
-              </h5>
+              <h5 class="profile__block_name">Статьи</h5>
 
               <div class="profile__block_body">
                 <p class="profile__block_item">
@@ -86,7 +82,9 @@
                 </p>
 
                 <p class="profile__block_item">
-                  <span class="profile__block_item-name">Ожидают модерации: </span>
+                  <span class="profile__block_item-name"
+                    >Ожидают модерации:
+                  </span>
 
                   <span class="profile__block_item-value">
                     <a href="#">0</a>
@@ -102,9 +100,7 @@
             </div>
 
             <div class="profile__block">
-              <h5 class="profile__block_name">
-                Приключения
-              </h5>
+              <h5 class="profile__block_name">Приключения</h5>
 
               <div class="profile__block_body">
                 <p class="profile__block_item">
@@ -124,7 +120,9 @@
                 </p>
 
                 <p class="profile__block_item">
-                  <span class="profile__block_item-name">Ожидают модерации: </span>
+                  <span class="profile__block_item-name"
+                    >Ожидают модерации:
+                  </span>
 
                   <span class="profile__block_item-value">
                     <a href="#">0</a>
@@ -140,9 +138,7 @@
             </div>
 
             <div class="profile__block">
-              <h5 class="profile__block_name">
-                Новости
-              </h5>
+              <h5 class="profile__block_name">Новости</h5>
 
               <div class="profile__block_body">
                 <p class="profile__block_item">
@@ -162,9 +158,7 @@
             </div>
 
             <div class="profile__block">
-              <h5 class="profile__block_name">
-                Пользователи
-              </h5>
+              <h5 class="profile__block_name">Пользователи</h5>
 
               <div class="profile__block_body">
                 <p class="profile__block_item">
@@ -204,32 +198,34 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { storeToRefs } from 'pinia';
   import orderBy from 'lodash/orderBy';
   import upperFirst from 'lodash/upperFirst';
+  import { storeToRefs } from 'pinia';
+  import { computed } from 'vue';
+
+  import isDev from '@/shared/helpers/isDev';
+
   import PageLayout from '@/components/content/PageLayout.vue';
+
   import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
-  import isDev from '@/common/helpers/isDev';
 
   const userStore = useUserStore();
 
-  const {
-    user,
-    avatar,
-    roles: userRoles
-  } = storeToRefs(userStore);
+  const { user, avatar, roles: userRoles } = storeToRefs(userStore);
 
-  const roles = computed(() => (
-    upperFirst(orderBy(userRoles.value)
-      .map(role => role.name)
-      .join(', '))
-  ));
+  const roles = computed(() =>
+    upperFirst(
+      orderBy(userRoles.value)
+        .map(role => role.name)
+        .join(', ')
+    )
+  );
 
-  const isYoutubeRole = computed(() => (
-    user.value?.roles.includes(EUserRoles.MODERATOR)
-    || user.value?.roles.includes(EUserRoles.ADMIN)
-  ));
+  const isYoutubeRole = computed(
+    () =>
+      user.value?.roles.includes(EUserRoles.MODERATOR) ||
+      user.value?.roles.includes(EUserRoles.ADMIN)
+  );
 </script>
 
 <style lang="scss" scoped>

@@ -1,25 +1,15 @@
 <template>
   <div class="ability-table">
     <div class="ability-table__col is-aside">
-      <div class="ability-table__row is-aside">
-        Хар-ка
-      </div>
+      <div class="ability-table__row is-aside">Хар-ка</div>
 
-      <div class="ability-table__row is-aside">
-        Значение
-      </div>
+      <div class="ability-table__row is-aside">Значение</div>
 
-      <div class="ability-table__row is-aside">
-        Бон. расы
-      </div>
+      <div class="ability-table__row is-aside">Бон. расы</div>
 
-      <div class="ability-table__row is-aside">
-        Модиф.
-      </div>
+      <div class="ability-table__row is-aside">Модиф.</div>
 
-      <div class="ability-table__row is-aside">
-        Итого
-      </div>
+      <div class="ability-table__row is-aside">Итого</div>
     </div>
 
     <div class="ability-table__body">
@@ -53,13 +43,18 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
   import { computed, defineComponent } from 'vue';
-  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
+
+  import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
+
+  import type { PropType } from 'vue';
+
+  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.d';
   import {
-    AbilityKey, AbilityName, AbilityShortName
-  } from '@/types/Tools/AbilityCalc.types';
-  import { getFormattedModifier } from '@/common/helpers/abilityTransforms';
+    AbilityKey,
+    AbilityName,
+    AbilityShortName
+  } from '@/types/Tools/AbilityCalc.d';
 
   export default defineComponent({
     props: {
@@ -73,8 +68,8 @@
       }
     },
     setup(props) {
-      const abilities = computed(() => Object.values(AbilityKey)
-        .map((key: AbilityKey) => {
+      const abilities = computed(() =>
+        Object.values(AbilityKey).map((key: AbilityKey) => {
           const roll = props.rolls.find(item => item.key === key);
 
           const getValue = () => {
@@ -86,7 +81,8 @@
           };
 
           const getRaceBonus = () => {
-            const bonus = props.raceBonuses.find(item => item.key === key)?.value;
+            const bonus = props.raceBonuses.find(item => item.key === key)
+              ?.value;
 
             if (!bonus && bonus !== 0) {
               return '−';
@@ -122,7 +118,8 @@
             result: getResult(),
             modifier: getModifier()
           };
-        }));
+        })
+      );
 
       return {
         AbilityKey,

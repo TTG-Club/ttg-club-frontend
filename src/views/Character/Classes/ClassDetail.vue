@@ -38,7 +38,8 @@
               <span
                 v-else
                 @click.left.exact.prevent="goToArchetype(option.url)"
-              >{{ option.name }}</span>
+                >{{ option.name }}</span
+              >
             </template>
           </ui-select>
         </div>
@@ -50,9 +51,14 @@
           <div
             v-for="(tab, tabKey) in tabs"
             :key="tabKey"
-            :class="{ 'is-active': currentTab?.name === tab.name, 'is-only-icon': !tab.name }"
+            :class="{
+              'is-active': currentTab?.name === tab.name,
+              'is-only-icon': !tab.name
+            }"
             class="class-detail__tab"
-            @click.left.exact.prevent="clickTabHandler({ index: tabKey, callback: tab.callback })"
+            @click.left.exact.prevent="
+              clickTabHandler({ index: tabKey, callback: tab.callback })
+            "
           >
             <div
               v-if="!tab.name"
@@ -129,37 +135,48 @@
 </template>
 
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import isArray from 'lodash/isArray';
-  import sortBy from 'lodash/sortBy';
-  import groupBy from 'lodash/groupBy';
   import {
-    computedInject, resolveUnref, useElementBounding, useScroll
+    computedInject,
+    resolveUnref,
+    useElementBounding,
+    useScroll
   } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
+  import groupBy from 'lodash/groupBy';
+  import isArray from 'lodash/isArray';
+  import sortBy from 'lodash/sortBy';
+  import { storeToRefs } from 'pinia';
+  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
   import VueEasyLightbox from 'vue-easy-lightbox';
   import {
-    computed, nextTick, onBeforeUnmount, onMounted, ref
-  } from 'vue';
-  import type { RouteLocationNormalizedLoaded } from 'vue-router';
-  import {
-    onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter
+    onBeforeRouteLeave,
+    onBeforeRouteUpdate,
+    useRoute,
+    useRouter
   } from 'vue-router';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
+  import errorHandler from '@/shared/helpers/errorHandler';
+
+  import ContentDetail from '@/components/content/ContentDetail.vue';
+  import RawContent from '@/components/content/RawContent.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import SpellsView from '@/views/Character/Spells/SpellsView.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import OptionsView from '@/views/Character/Options/OptionsView.vue';
-  import RawContent from '@/components/content/RawContent.vue';
-  import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import { useAxios } from '@/common/composition/useAxios';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
+  import OptionsView from '@/views/Character/Options/OptionsView.vue';
+  import SpellsView from '@/views/Character/Spells/SpellsView.vue';
 
   interface IEmit {
     (e: 'scroll-to-active'): void;
-    (e: 'scroll-to-last-active', href: RouteLocationNormalizedLoaded['path']): void;
+    (
+      e: 'scroll-to-last-active',
+      href: RouteLocationNormalizedLoaded['path']
+    ): void;
   }
 
   const emit = defineEmits<IEmit>();
@@ -170,7 +187,11 @@
 
   const { isMobile } = storeToRefs(useUIStore());
 
-  const queryBooks = computedInject(DEFAULT_QUERY_BOOKS_INJECT_KEY, source => resolveUnref(source), []);
+  const queryBooks = computedInject(
+    DEFAULT_QUERY_BOOKS_INJECT_KEY,
+    source => resolveUnref(source),
+    []
+  );
 
   const loading = ref(true);
   const error = ref(false);
@@ -196,24 +217,29 @@
     behavior: 'smooth'
   });
 
-  const getStoreKey = computed(() => `${
-    currentClass.value.name.eng + currentTab.value.type + currentTab.value.order
-  }`.replaceAll(' ', ''));
+  const getStoreKey = computed(() =>
+    `${
+      currentClass.value.name.eng +
+      currentTab.value.type +
+      currentTab.value.order
+    }`.replaceAll(' ', '')
+  );
 
   const currentArchetypes = computed(() => {
-    const getArchetypes = list => sortBy(
-      Object.values(groupBy(list, o => o.type.name))
-        .map(value => ({
+    const getArchetypes = list =>
+      sortBy(
+        Object.values(groupBy(list, o => o.type.name)).map(value => ({
           group: value[0].type,
           list: value.map(el => ({
-            name: `${ el.name.rus } [${ el.source.shortName }]`,
+            name: `${el.name.rus} [${el.source.shortName}]`,
             url: el.url
           }))
         })),
-      [o => o.group.order]
-    );
+        [o => o.group.order]
+      );
 
-    return isArray(currentClass.value?.archetypes) && currentClass.value.archetypes.length
+    return isArray(currentClass.value?.archetypes) &&
+      currentClass.value.archetypes.length
       ? getArchetypes(currentClass.value.archetypes)
       : [];
   });
@@ -222,7 +248,11 @@
     let selected;
 
     for (let i = 0; i < currentArchetypes.value.length && !selected; i++) {
-      for (let index = 0; index < currentArchetypes.value[i].list.length && !selected; index++) {
+      for (
+        let index = 0;
+        index < currentArchetypes.value[i].list.length && !selected;
+        index++
+      ) {
         if (currentArchetypes.value[i].list[index].url === route.path) {
           selected = currentArchetypes.value[i].list[index];
         }
@@ -323,10 +353,7 @@
     }
   };
 
-  const clickTabHandler = async ({
-    index,
-    callback
-  }) => {
+  const clickTabHandler = async ({ index, callback }) => {
     if (typeof callback === 'function') {
       callback();
 
@@ -345,9 +372,7 @@
       return;
     }
 
-    const formattedHash = hash.startsWith('#')
-      ? hash
-      : `#${ hash }`;
+    const formattedHash = hash.startsWith('#') ? hash : `#${hash}`;
 
     const section = classBody.value.querySelector(formattedHash).parentElement;
 
@@ -375,10 +400,7 @@
 
     const { target } = e;
 
-    const hash = target
-      .getAttribute('href')
-      .replace('#', '')
-      .trim();
+    const hash = target.getAttribute('href').replace('#', '').trim();
 
     if (hash) {
       scrollToSection(hash);
@@ -392,13 +414,9 @@
 
     const nodeList = classBody.value.querySelectorAll('[href^="#"]');
 
-    return Array.from(nodeList)
-      .filter(link => !!(
-        link
-          .getAttribute('href')
-          .replace('#', '')
-          .trim()
-      ));
+    return Array.from(nodeList).filter(
+      link => !!link.getAttribute('href').replace('#', '').trim()
+    );
   };
 
   const initScrollListeners = () => {

@@ -54,7 +54,8 @@
         v-if="onExportFoundry"
         v-tippy="{
           // eslint-disable-next-line vue/max-len
-          content: '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>',
+          content:
+            '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>'
         }"
         class="section-header__control is-only-desktop"
         icon="export-foundry"
@@ -66,12 +67,10 @@
       <ui-button
         v-if="fullscreen"
         v-tippy="{
-          content: uiStore.fullscreen
-            ? 'Свернуть окно'
-            : 'Развернуть окно',
+          content: uiStore.fullscreen ? 'Свернуть окно' : 'Развернуть окно'
         }"
         class="section-header__control is-only-desktop"
-        :icon="`expand/${ uiStore.fullscreen ? 'exit' : 'enter'}`"
+        :icon="`expand/${uiStore.fullscreen ? 'exit' : 'enter'}`"
         type="text"
         color="text"
         @click.left.exact.prevent.stop="toggleFullscreen"
@@ -94,33 +93,40 @@
   import { computed, h } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
-  import { useMetrics } from '@/common/composition/useMetrics';
 
-  const props = withDefaults(defineProps<{
-    title: string;
-    subtitle?: string;
-    url?: string;
-    copy?: boolean;
-    bookmark?: boolean;
-    print?: boolean;
-    fullscreen?: boolean;
-    onExportFoundry?:() => void;
-    onClose?:() => void;
-  }>(), {
-    subtitle: '',
-    url: '',
-    copy: false,
-    bookmark: false,
-    print: false,
-    fullscreen: false,
-    onExportFoundry: undefined,
-    onClose: undefined
-  });
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
+  import { useMetrics } from '@/shared/composition/useMetrics';
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
+
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+
+  const props = withDefaults(
+    defineProps<{
+      title: string;
+      subtitle?: string;
+      url?: string;
+      copy?: boolean;
+      bookmark?: boolean;
+      print?: boolean;
+      fullscreen?: boolean;
+      onExportFoundry?: () => void;
+      onClose?: () => void;
+    }>(),
+    {
+      subtitle: '',
+      url: '',
+      copy: false,
+      bookmark: false,
+      print: false,
+      fullscreen: false,
+      onExportFoundry: undefined,
+      onClose: undefined
+    }
+  );
 
   const emit = defineEmits<{
     exportFoundry: void;
@@ -136,11 +142,14 @@
 
   const urlForCopy = computed(() => window.location.origin + route.path);
 
-  const hasControls = computed(() => props.bookmark
-    || props.print
-    || !!props.onExportFoundry
-    || !!props.onClose
-    || props.fullscreen);
+  const hasControls = computed(
+    () =>
+      props.bookmark ||
+      props.print ||
+      !!props.onExportFoundry ||
+      !!props.onClose ||
+      props.fullscreen
+  );
 
   const closeAvailable = computed(() => props.onClose);
 
@@ -149,7 +158,8 @@
       toast.error('Ваш браузер не поддерживает копирование');
     }
 
-    clipboard.copy(urlForCopy.value)
+    clipboard
+      .copy(urlForCopy.value)
       .then(() => {
         toast('Ссылка успешно скопирована');
 
@@ -158,22 +168,24 @@
           id: route.path
         });
       })
-      .catch(() => toast.error(() => [
-        h(
-          'span',
-          null,
-          'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
-        ),
-        h(
-          'a',
-          {
-            target: '_blank',
-            href: 'https://discord.gg/zqBnMJVf3z',
-            rel: 'noopener'
-          },
-          'Discord-канале'
-        )
-      ]));
+      .catch(() =>
+        toast.error(() => [
+          h(
+            'span',
+            null,
+            'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
+          ),
+          h(
+            'a',
+            {
+              target: '_blank',
+              href: 'https://discord.gg/zqBnMJVf3z',
+              rel: 'noopener'
+            },
+            'Discord-канале'
+          )
+        ])
+      );
   };
 
   const copyText = (text?: string) => {
@@ -181,8 +193,7 @@
       return;
     }
 
-    clipboard.copy(text)
-      .then(() => toast('Текст скопирован'));
+    clipboard.copy(text).then(() => toast('Текст скопирован'));
   };
 
   const openPrintWindow = () => {

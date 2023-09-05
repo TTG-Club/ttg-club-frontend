@@ -26,7 +26,7 @@
       duration: 1s;
       iteration-count: infinite;
       play-state: running;
-    };
+    }
 
     path {
       fill: currentColor;

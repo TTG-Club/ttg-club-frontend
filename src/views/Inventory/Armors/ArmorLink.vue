@@ -45,7 +45,6 @@
               class="link-item__ac"
             >
               <span>
-
                 {{ armor.armorClass }}
               </span>
             </div>
@@ -54,10 +53,10 @@
               v-if="armor.price"
               v-tippy-lazy="{ content: 'Стоимость' }"
               class="link-item__price"
-            ><span>
-
-              {{ armor.price }}
-            </span>
+            >
+              <span>
+                {{ armor.price }}
+              </span>
             </div>
           </div>
         </div>
@@ -67,11 +66,13 @@
 </template>
 
 <script lang="ts">
-  import type { RouteLocationPathRaw } from 'vue-router';
-  import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
   import { computed, defineComponent } from 'vue';
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { useLink } from 'vue-router';
+
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
 
   export default defineComponent({
     directives: {
@@ -89,11 +90,7 @@
       }
     },
     setup(props) {
-      const {
-        navigate,
-        isActive,
-        href
-      } = useLink(props);
+      const { navigate, isActive, href } = useLink(props);
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,
@@ -110,7 +107,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item";
+  @import '../../../assets/styles/modules/link-item';
 
   .link-item {
     &__type,

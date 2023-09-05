@@ -1,6 +1,6 @@
 <template>
   <div class="main_page_wrapper">
-    <h1 style="height: 0; opacity: 0; overflow: hidden;">
+    <h1 style="height: 0; opacity: 0; overflow: hidden">
       TTG.Club Oнлайн-справочник
     </h1>
 
@@ -10,7 +10,10 @@
           class="search_row_g"
           @click.left.exact.prevent="openSearchModal"
         >
-          Нажмите <span class="computer_version">&nbsp;тут или <span class="key">\</span>&nbsp;</span>для начала поиска
+          Нажмите
+          <span class="computer_version"
+            >&nbsp;тут или <span class="key">\</span>&nbsp;</span
+          >для начала поиска
         </p>
       </div>
 
@@ -44,7 +47,8 @@
                         href="https://t.me/ttg_club_bot"
                         rel="noopener noreferrer"
                         target="_blank"
-                      >Подключить</a>
+                        >Подключить</a
+                      >
 
                       <router-link
                         :to="{ path: '/info/telegram_spells_bot' }"
@@ -71,7 +75,8 @@
                         href="https://discord.com/api/oauth2/authorize?client_id=1074095730265964654&permissions=274878032896&scope=bot%20applications.commands"
                         rel="noopener noreferrer"
                         target="_blank"
-                      >Пригласить</a>
+                        >Пригласить</a
+                      >
                       <!-- eslint-enable vue/max-len -->
 
                       <router-link
@@ -117,7 +122,7 @@
                     v-for="(partner, key) in showedPartners"
                     :key="key"
                     v-tippy="{
-                      content: partner.description,
+                      content: partner.description
                     }"
                     :href="partner.url"
                     class="chips tip"
@@ -129,7 +134,7 @@
                       :src="partner.img"
                       height="20px"
                       width="20px"
-                    >
+                    />
                     {{ partner.name }}
                   </a>
                 </div>
@@ -147,21 +152,20 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { storeToRefs } from 'pinia';
   import orderBy from 'lodash/orderBy';
-  import type { TNavItem } from '@/store/UI/NavStore';
-  import { useNavStore } from '@/store/UI/NavStore';
+  import { storeToRefs } from 'pinia';
+  import { computed } from 'vue';
+
   import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
+
+  import type { TNavItem } from '@/store/UI/NavStore';
+
+  import { useNavStore } from '@/store/UI/NavStore';
 
   const navStore = useNavStore();
 
-  const {
-    navItems,
-    showedNavItems,
-    showedPartners,
-    isShowSearch
-  } = storeToRefs(navStore);
+  const { navItems, showedNavItems, showedPartners, isShowSearch } =
+    storeToRefs(navStore);
 
   const mainNavItems = computed(() => {
     const items: TNavItem[] = [];
@@ -180,11 +184,7 @@
 
     iterate(showedNavItems.value);
 
-    return orderBy(
-      items,
-      ['indexOrder'],
-      ['asc']
-    );
+    return orderBy(items, ['indexOrder'], ['asc']);
   });
 
   const tools = computed<TNavItem[]>(() => {
@@ -192,11 +192,7 @@
       .flatMap(group => group.children)
       .filter(item => item.url?.startsWith('/tools'));
 
-    return orderBy(
-      navTools,
-      ['order'],
-      ['asc']
-    );
+    return orderBy(navTools, ['order'], ['asc']);
   });
 
   const openSearchModal = () => {
@@ -204,6 +200,4 @@
   };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

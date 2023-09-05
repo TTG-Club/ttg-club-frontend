@@ -10,7 +10,10 @@
   >
     <virtual-grouped-list
       :get-group="getGroupByRarity"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
       :list="getListProps({ items })"
     >
       <template #default="{ item }">
@@ -24,43 +27,39 @@
 </template>
 
 <script lang="ts" setup>
+  import capitalize from 'lodash/capitalize';
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import capitalize from 'lodash/capitalize';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.types';
-  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { MagicItemsFilterDefaults } from '@/types/Inventory/MagicItems.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: MagicItemsFilterDefaults.dbName,
     url: MagicItemsFilterDefaults.url
   });
 
-  const {
-    initPages,
-    nextPage,
-    isEnd,
-    items
-  } = usePagination({
+  const { initPages, nextPage, isEnd, items } = usePagination({
     url: '/items/magic',
     filter: {
       isCustomized: filter.isCustomized,
@@ -87,12 +86,10 @@
     }
   };
 
-  const getGroupByRarity = (item: AnyObject & { rarity: AnyObject }) => (
-    {
-      url: item.rarity.type,
-      name: capitalize(String(item.rarity.name))
-    }
-  );
+  const getGroupByRarity = (item: AnyObject & { rarity: AnyObject }) => ({
+    url: item.rarity.type,
+    name: capitalize(String(item.rarity.name))
+  });
 
   onBeforeMount(async () => {
     await filter.initFilter();

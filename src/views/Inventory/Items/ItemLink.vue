@@ -20,9 +20,7 @@
                 {{ item.name.rus }}
               </span>
 
-              <span class="link-item__name--eng">
-                [{{ item.name.eng }}]
-              </span>
+              <span class="link-item__name--eng"> [{{ item.name.eng }}] </span>
             </div>
           </div>
         </div>
@@ -32,11 +30,13 @@
 </template>
 
 <script lang="ts">
-  import type { RouteLocationPathRaw } from 'vue-router';
-  import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
   import { computed, defineComponent } from 'vue';
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { useLink } from 'vue-router';
+
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
 
   export default defineComponent({
     directives: {
@@ -54,11 +54,7 @@
       }
     },
     setup(props) {
-      const {
-        navigate,
-        isActive,
-        href
-      } = useLink(props);
+      const { navigate, isActive, href } = useLink(props);
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,

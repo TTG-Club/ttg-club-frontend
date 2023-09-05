@@ -28,9 +28,7 @@
           :to="{ path: `/profile` }"
           class="nav-profile__line"
         >
-          <span class="nav-profile__line_body">
-            Личный кабинет
-          </span>
+          <span class="nav-profile__line_body"> Личный кабинет </span>
         </router-link>
 
         <a
@@ -38,9 +36,7 @@
           href="#"
           @click.left.exact.prevent="modal = 'change-password'"
         >
-          <span class="nav-profile__line_body">
-            Сменить пароль
-          </span>
+          <span class="nav-profile__line_body"> Сменить пароль </span>
         </a>
 
         <a
@@ -48,14 +44,10 @@
           href="#"
           @click.left.exact.prevent="userLogout"
         >
-          <span class="nav-profile__line_body">
-            Выйти
-          </span>
+          <span class="nav-profile__line_body"> Выйти </span>
 
           <span class="nav-profile__line_icon">
-            <svg-icon
-              icon="logout"
-            />
+            <svg-icon icon="logout" />
           </span>
         </a>
       </div>
@@ -86,15 +78,17 @@
 </template>
 
 <script>
-  import { computed, ref } from 'vue';
   import { storeToRefs } from 'pinia';
-  import AuthModal from '@/components/UI/modals/AuthModal.vue';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
-  import NavPopover from '@/components/UI/menu/NavPopover.vue';
+  import { computed, ref } from 'vue';
+
+  import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
   import LoginView from '@/components/account/LoginView.vue';
   import RegistrationView from '@/components/account/RegistrationView.vue';
-  import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import NavPopover from '@/components/UI/menu/NavPopover.vue';
+  import AuthModal from '@/components/UI/modals/AuthModal.vue';
+
+  import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
 
   export default {
     name: 'NavProfile',
@@ -106,15 +100,12 @@
     setup() {
       const userStore = useUserStore();
 
-      const {
-        isAuthenticated,
-        user
-      } = storeToRefs(userStore);
+      const { isAuthenticated, user } = storeToRefs(userStore);
 
       const popover = ref(false);
       const modal = ref('');
 
-      const modals = computed(() => ([
+      const modals = computed(() => [
         {
           rus: 'Авторизация',
           eng: 'login',
@@ -126,21 +117,24 @@
           component: () => RegistrationView
         },
         {
-          rus: `${ isAuthenticated.value ? 'Изменение' : 'Восстановление' } пароля`,
+          rus: `${
+            isAuthenticated.value ? 'Изменение' : 'Восстановление'
+          } пароля`,
           eng: 'change-password',
           component: () => ChangePasswordView
         }
-      ]));
+      ]);
 
-      const modalInfo = computed(() => modals.value.find(item => item.eng === modal.value));
+      const modalInfo = computed(() =>
+        modals.value.find(item => item.eng === modal.value)
+      );
+
       const modalComponent = computed(() => modalInfo.value?.component());
 
       const isModalOpened = computed({
         get: () => !!modal.value,
         set: e => {
-          modal.value = typeof e === 'string'
-            ? e
-            : false;
+          modal.value = typeof e === 'string' ? e : false;
         }
       });
 
@@ -162,10 +156,11 @@
         return 'Добрый вечер';
       });
 
-      const hasAccessToProfile = computed(() => (
-        user.value.roles.includes(EUserRoles.MODERATOR)
-        || user.value.roles.includes(EUserRoles.ADMIN)
-      ));
+      const hasAccessToProfile = computed(
+        () =>
+          user.value.roles.includes(EUserRoles.MODERATOR) ||
+          user.value.roles.includes(EUserRoles.ADMIN)
+      );
 
       function openPopover() {
         popover.value = true;
@@ -204,7 +199,7 @@
       }
 
       async function clickHandler() {
-        if (!await userStore.getUserStatus()) {
+        if (!(await userStore.getUserStatus())) {
           toggleModal();
 
           return;

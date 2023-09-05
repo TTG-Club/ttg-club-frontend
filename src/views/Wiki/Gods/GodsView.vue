@@ -10,7 +10,10 @@
   >
     <virtual-grouped-list
       :get-group="getGroupByAlignment"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
       :list="getListProps({ items: gods, size: 'medium' })"
     >
       <template #default="{ item: god }">
@@ -24,32 +27,33 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useRoute, useRouter } from 'vue-router';
   import capitalize from 'lodash/capitalize';
+  import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/const';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import GodLink from '@/views/Wiki/Gods/GodLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { GodsFilterDefaults } from '@/types/Wiki/Gods.types';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { DEFAULT_ENTITY_KEY_FIELD } from '@/common/const';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { GodsFilterDefaults } from '@/types/Wiki/Gods.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import GodLink from '@/views/Wiki/Gods/GodLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: GodsFilterDefaults.dbName,
@@ -88,12 +92,10 @@
     }
   };
 
-  const getGroupByAlignment = (god: AnyObject) => (
-    {
-      [DEFAULT_ENTITY_KEY_FIELD]: god.alignment,
-      name: capitalize(String(god.alignment))
-    }
-  );
+  const getGroupByAlignment = (god: AnyObject) => ({
+    [DEFAULT_ENTITY_KEY_FIELD]: god.alignment,
+    name: capitalize(String(god.alignment))
+  });
 
   onBeforeMount(async () => {
     await filter.initFilter();

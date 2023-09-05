@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
-import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
+
 import { useNavStore } from '@/store/UI/NavStore';
+import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
 import IndexView from '@/views/IndexView.vue';
 
 /* eslint-disable max-len,vue/max-len */
@@ -12,10 +13,9 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     beforeEnter: (to, from, next) => {
       const navStore = useNavStore();
 
-      navStore.initPartners()
-        .then(() => {
-          next();
-        });
+      navStore.initPartners().then(() => {
+        next();
+      });
     }
   },
   {
@@ -57,12 +57,14 @@ export const routes: Readonly<RouteRecordRaw[]> = [
   {
     name: 'backgrounds',
     path: '/backgrounds',
-    component: () => import('@/views/Character/Backgrounds/BackgroundsView.vue'),
+    component: () =>
+      import('@/views/Character/Backgrounds/BackgroundsView.vue'),
     children: [
       {
         name: 'backgroundDetail',
         path: ':backgroundName',
-        component: () => import('@/views/Character/Backgrounds/BackgroundDetail.vue')
+        component: () =>
+          import('@/views/Character/Backgrounds/BackgroundDetail.vue')
       }
     ]
   },
@@ -122,7 +124,8 @@ export const routes: Readonly<RouteRecordRaw[]> = [
       {
         name: 'magicItemDetail',
         path: ':magicItemName',
-        component: () => import('@/views/Inventory/MagicItems/MagicItemDetail.vue')
+        component: () =>
+          import('@/views/Inventory/MagicItems/MagicItemDetail.vue')
       }
     ]
   },
@@ -286,7 +289,10 @@ export const routes: Readonly<RouteRecordRaw[]> = [
               return;
             }
 
-            if (user.roles.includes(EUserRoles.MODERATOR) || user.roles.includes(EUserRoles.ADMIN)) {
+            if (
+              user.roles.includes(EUserRoles.MODERATOR) ||
+              user.roles.includes(EUserRoles.ADMIN)
+            ) {
               next();
 
               return;

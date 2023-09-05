@@ -23,14 +23,16 @@
 
 <script>
   import { mapState } from 'pinia';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import errorHandler from '@/common/helpers/errorHandler';
+  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
 
   export default {
-
     components: {
       ContentDetail,
       SpellBody,

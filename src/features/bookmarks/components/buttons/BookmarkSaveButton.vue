@@ -12,17 +12,22 @@
 
 <script lang="ts" setup>
   import { storeToRefs } from 'pinia';
-  import DefaultBookmarkButton from '@/features/bookmarks/components/buttons/DefaultBookmarkButton.vue';
+
   import CustomBookmarkButton from '@/features/bookmarks/components/buttons/CustomBookmarkButton.vue';
+  import DefaultBookmarkButton from '@/features/bookmarks/components/buttons/DefaultBookmarkButton.vue';
+
   import { useUserStore } from '@/store/UI/UserStore';
 
-  withDefaults(defineProps<{
-    name?: string;
-    url?: string;
-  }>(), {
-    name: '',
-    url: ''
-  });
+  withDefaults(
+    defineProps<{
+      name?: string;
+      url?: string;
+    }>(),
+    {
+      name: '',
+      url: ''
+    }
+  );
 
   const { isAuthenticated } = storeToRefs(useUserStore());
 </script>

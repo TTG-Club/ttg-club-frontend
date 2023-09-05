@@ -5,7 +5,7 @@
       :source="rule.source"
     />
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <raw-content
         v-if="rule?.description"
         :template="rule.description"

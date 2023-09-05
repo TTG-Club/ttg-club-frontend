@@ -1,9 +1,7 @@
 <template>
   <div class="ability-point-buy">
     <div class="ability-point-buy__blocks">
-      <div class="ability-point-buy__block">
-        Очков: {{ 27 - sum }} / 27
-      </div>
+      <div class="ability-point-buy__block">Очков: {{ 27 - sum }} / 27</div>
 
       <ui-button
         class="ability-point-buy__block is-btn"
@@ -30,19 +28,14 @@
         @select="roll.value = $event.key"
       >
         <template #left-slot>
-          {{
-            String(roll.shortName)
-              .toUpperCase()
-          }}
+          {{ String(roll.shortName).toUpperCase() }}
         </template>
 
         <template #singleLabel>
           {{ roll.value || 'Выбрать значение' }}
         </template>
 
-        <template #placeholder>
-          Выбрать значение
-        </template>
+        <template #placeholder> Выбрать значение </template>
 
         <template #option="{ option }">
           {{ getLabel(roll, option) }}
@@ -53,17 +46,21 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, onActivated, ref
-  } from 'vue';
-  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
-  import {
-    AbilityKey, AbilityName, AbilityShortName
-  } from '@/types/Tools/AbilityCalc.types';
+  import { computed, defineComponent, onActivated, ref } from 'vue';
+
+  import { getPlural } from '@/shared/helpers/string';
+
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { getPlural } from '@/common/helpers/string';
+
+  import type { PropType } from 'vue';
+
+  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.d';
+  import {
+    AbilityKey,
+    AbilityName,
+    AbilityShortName
+  } from '@/types/Tools/AbilityCalc.d';
 
   export default defineComponent({
     components: {
@@ -157,8 +154,8 @@
         emit('update:model-value', rolls.value);
       });
 
-      const sum = computed(() => rolls.value
-        .reduce((partialSum, roll) => {
+      const sum = computed(() =>
+        rolls.value.reduce((partialSum, roll) => {
           const costItem = cost.find(item => item.key === roll.value);
 
           if (!costItem) {
@@ -166,7 +163,8 @@
           }
 
           return partialSum + costItem.value;
-        }, 0));
+        }, 0)
+      );
 
       const getOptions = (roll: AbilityRoll) => {
         const rollValue = cost.find(costItem => costItem.key === roll.value);
@@ -175,11 +173,16 @@
           return 'wtf?!';
         }
 
-        return cost.filter(item => ((sum.value + item.value - rollValue.value) <= 27));
+        return cost.filter(
+          item => sum.value + item.value - rollValue.value <= 27
+        );
       };
 
-      const getLabel = (roll: typeof rolls.value[number], option: typeof cost[number]) => {
-        let result = `${ option.key }`;
+      const getLabel = (
+        roll: (typeof rolls.value)[number],
+        option: (typeof cost)[number]
+      ) => {
+        let result = `${option.key}`;
 
         const costItem = cost.find(item => item.key === roll.value);
 
@@ -197,7 +200,7 @@
         ]);
 
         if (Math.abs(difference) > 0) {
-          result += ` (${ sign }${ Math.abs(difference) } ${ plural })`;
+          result += ` (${sign}${Math.abs(difference)} ${plural})`;
         }
 
         return result;
@@ -212,12 +215,12 @@
       };
 
       return {
-        abilities: computed(() => Object
-          .keys(AbilityKey)
-          .map(key => ({
+        abilities: computed(() =>
+          Object.keys(AbilityKey).map(key => ({
             key,
             name: AbilityName[key as AbilityKey]
-          }))),
+          }))
+        ),
         sum,
         getOptions,
         getLabel,
@@ -277,7 +280,6 @@
       }
 
       &_roll {
-
       }
     }
 

@@ -23,11 +23,14 @@
 
 <script>
   import { mapState } from 'pinia';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import BackgroundBody from '@/views/Character/Backgrounds/BackgroundBody.vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
+  import BackgroundBody from '@/views/Character/Backgrounds/BackgroundBody.vue';
 
   export default {
     components: {
@@ -86,6 +89,4 @@
   };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

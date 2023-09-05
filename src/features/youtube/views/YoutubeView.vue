@@ -3,9 +3,7 @@
     :use-social-links="false"
     :show-separator="false"
   >
-    <template #title>
-      Youtube новости
-    </template>
+    <template #title> Youtube новости </template>
 
     <template #default>
       <div :class="$style.container">
@@ -26,7 +24,7 @@
             v-if="isActiveLoaded"
             :class="{
               [$style.active]: true,
-              [$style.error]: !isActiveSuccess,
+              [$style.error]: !isActiveSuccess
             }"
           >
             На главной {{ activeCount }} из {{ activeLimit }}
@@ -88,7 +86,7 @@
             <div
               :class="{
                 [$style.controls]: true,
-                [$style.editing]: editID === video.id,
+                [$style.editing]: editID === video.id
               }"
             >
               <ui-button
@@ -132,21 +130,25 @@
 
 <script setup lang="ts">
   import { type MaybeRef, tryOnBeforeMount } from '@vueuse/core';
-  import { ref } from 'vue';
   import { storeToRefs } from 'pinia';
-  import { useYoutube } from '@/features/youtube/composition/useYoutube';
-  import { useYoutubeActive } from '@/features/youtube/composition/useYoutubeActive';
-  import { getFormattedDate } from '@/common/composition/useDayjs';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
-  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
-  import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import PageLayout from '@/components/content/PageLayout.vue';
+  import { ref } from 'vue';
+
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
   import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
+  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
+  import { useYoutube } from '@/features/youtube/composition/useYoutube';
+  import { useYoutubeActive } from '@/features/youtube/composition/useYoutubeActive';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import { getFormattedDate } from '@/shared/composition/useDayjs';
+
+  import PageLayout from '@/components/content/PageLayout.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
+  import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
+  import UiSelect from '@/components/UI/kit/UiSelect.vue';
+
+  import { useUIStore } from '@/store/UI/UIStore';
 
   const { isMobile } = storeToRefs(useUIStore());
 
@@ -185,7 +187,10 @@
     }
   };
 
-  const updateVideoStatus = async (id: TYoutubeVideo['id'], status: MaybeRef<boolean>) => {
+  const updateVideoStatus = async (
+    id: TYoutubeVideo['id'],
+    status: MaybeRef<boolean>
+  ) => {
     try {
       await updateActiveStatus(id, status);
 
@@ -200,10 +205,7 @@
   });
 </script>
 
-<style
-  module
-  lang="scss"
->
+<style module lang="scss">
   .container {
     min-height: 100%;
     display: flex;
@@ -257,7 +259,7 @@
       width: 1px;
       style: solid;
       color: var(--border);
-    };
+    }
 
     &:hover {
       > div {
@@ -292,7 +294,7 @@
       width: 1px;
       style: solid;
       color: var(--border);
-    };
+    }
 
     &:hover {
       .controls {
@@ -321,7 +323,7 @@
     font: {
       weight: bold;
       size: var(--h5-font-size);
-    };
+    }
 
     border-bottom: {
       width: 1px;
@@ -353,7 +355,7 @@
       width: 1px;
       style: solid;
       color: var(--border);
-    };
+    }
   }
 
   .editing {

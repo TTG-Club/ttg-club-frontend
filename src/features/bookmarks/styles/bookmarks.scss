@@ -6,7 +6,9 @@
   background-color: var(--bg-secondary);
   user-select: none;
 
-  *, *:before, *:after {
+  *,
+  *:before,
+  *:after {
     &:not(input) {
       user-select: none;
     }
@@ -208,7 +210,7 @@
 
       &_name {
         line-height: 18px;
-        color: var(--text-color-title)
+        color: var(--text-color-title);
       }
 
       &_icon {

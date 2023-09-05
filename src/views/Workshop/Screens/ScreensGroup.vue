@@ -3,9 +3,7 @@
     v-if="description"
     class="content-padding"
   >
-    <raw-content
-      :template="description"
-    />
+    <raw-content :template="description" />
   </div>
 
   <div
@@ -32,11 +30,13 @@
 </template>
 
 <script setup lang="ts">
-  import sortBy from 'lodash/sortBy';
   import groupBy from 'lodash/groupBy';
+  import sortBy from 'lodash/sortBy';
   import { computed } from 'vue';
-  import ScreenLink from '@/views/Workshop/Screens/ScreenLink.vue';
+
   import RawContent from '@/components/content/RawContent.vue';
+
+  import ScreenLink from '@/views/Workshop/Screens/ScreenLink.vue';
 
   defineOptions({
     inheritAttrs: false
@@ -45,7 +45,8 @@
   const props = withDefaults(
     defineProps<{
       description?: '';
-      childList: any[]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      childList: any[];
     }>(),
     {
       description: ''
@@ -54,14 +55,15 @@
 
   const groups = computed(() => {
     const hasGroups = sortBy(
-      Object.values(groupBy(
-        props.childList.filter(item => item.group),
-        o => o.group
-      ))
-        .map(list => ({
-          name: list[0].group,
-          list: sortBy(list, [o => o.order, o => o.name.rus])
-        })),
+      Object.values(
+        groupBy(
+          props.childList.filter(item => item.group),
+          o => o.group
+        )
+      ).map(list => ({
+        name: list[0].group,
+        list: sortBy(list, [o => o.order, o => o.name.rus])
+      })),
       [o => o.group]
     );
 

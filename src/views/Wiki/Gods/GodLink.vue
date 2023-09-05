@@ -1,6 +1,5 @@
 <template>
   <router-link
-    :to="{ path: god.url }"
     custom
     v-bind="$props"
   >
@@ -27,9 +26,7 @@
                 {{ god.name.rus }}
               </span>
 
-              <span class="link-item__name--eng">
-                [{{ god.name.eng }}]
-              </span>
+              <span class="link-item__name--eng"> [{{ god.name.eng }}] </span>
             </div>
           </div>
         </div>
@@ -39,11 +36,13 @@
 </template>
 
 <script lang="ts">
-  import type { RouteLocationPathRaw } from 'vue-router';
-  import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
   import { computed, defineComponent } from 'vue';
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { useLink } from 'vue-router';
+
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
 
   export default defineComponent({
     directives: {
@@ -61,11 +60,7 @@
       }
     },
     setup(props) {
-      const {
-        isActive,
-        href,
-        navigate
-      } = useLink(props);
+      const { isActive, href, navigate } = useLink(props);
 
       return {
         href,
@@ -80,7 +75,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item";
+  @import '../../../assets/styles/modules/link-item';
 
   .link-item {
     &__alignment {

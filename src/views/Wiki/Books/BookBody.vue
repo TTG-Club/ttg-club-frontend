@@ -1,8 +1,6 @@
 <template>
   <div class="book-body">
-    <detail-top-bar
-      :left="book.type.name"
-    >
+    <detail-top-bar :left="book.type.name">
       <template
         v-if="book.source?.shortName"
         #default
@@ -11,7 +9,7 @@
       </template>
     </detail-top-bar>
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <raw-content
         v-if="book?.description"
         :template="book.description"

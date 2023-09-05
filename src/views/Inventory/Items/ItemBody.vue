@@ -8,7 +8,7 @@
       :source="item.source"
     />
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <ul class="stat-list">
         <li v-if="item.price">
           <b>Стоимость: </b>

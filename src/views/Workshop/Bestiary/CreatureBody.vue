@@ -18,7 +18,9 @@
 
           <!-- eslint-disable-next-line max-len -->
           <span>{{
-            `${ creature.armorClass }${ creature.armorText ? ` ${ creature.armorText }` : '' }`
+            `${creature.armorClass}${
+              creature.armorText ? ` ${creature.armorText}` : ''
+            }`
           }}</span>
 
           <span v-if="creature.armors?.length">
@@ -31,18 +33,20 @@
 
           <span>{{ creature.hits.average }}&nbsp;</span>
 
-          <span v-if="creature.hits?.formula">(<dice-roller
-            :formula="hitDiceFormula"
-            label="Хиты"
+          <span v-if="creature.hits?.formula"
+            >(<dice-roller
+              :formula="hitDiceFormula"
+              label="Хиты"
+            >
+              {{
+                `${creature.hits.formula}${
+                  creature.hits?.bonus
+                    ? `${creature.hits.sign}${Math.abs(creature.hits.bonus)}`
+                    : ''
+                }`
+              }} </dice-roller
+            >)</span
           >
-            {{
-              `${ creature.hits.formula }${
-                creature.hits?.bonus
-                  ? `${ creature.hits.sign }${ Math.abs(creature.hits.bonus) }`
-                  : ''
-              }`
-            }}
-          </dice-roller>)</span>
 
           <span v-if="creature.hits?.text">{{ creature.hits.text }}</span>
         </p>
@@ -57,9 +61,7 @@
       <div class="scores">
         <div class="scores__stats strength">
           <h4>
-            <strong
-              v-tippy="'Сила'"
-            >СИЛ</strong>
+            <strong v-tippy="'Сила'">СИЛ</strong>
           </h4>
 
           <p>
@@ -67,16 +69,16 @@
               :formula="getFormula(creature.ability.str)"
               label="Проверка Силы"
             >
-              {{ creature.ability.str }} ({{ getFormattedModifier(creature.ability.str) }})
+              {{ creature.ability.str }} ({{
+                getFormattedModifier(creature.ability.str)
+              }})
             </dice-roller>
           </p>
         </div>
 
         <div class="scores__stats dexterity">
           <h4>
-            <strong
-              v-tippy="'Ловкость'"
-            >ЛОВ</strong>
+            <strong v-tippy="'Ловкость'">ЛОВ</strong>
           </h4>
 
           <p>
@@ -84,16 +86,16 @@
               :formula="getFormula(creature.ability.dex)"
               label="Проверка Ловкости"
             >
-              {{ creature.ability.dex }} ({{ getFormattedModifier(creature.ability.dex) }})
+              {{ creature.ability.dex }} ({{
+                getFormattedModifier(creature.ability.dex)
+              }})
             </dice-roller>
           </p>
         </div>
 
         <div class="scores__stats constitution">
           <h4>
-            <strong
-              v-tippy="'Телосложение'"
-            >ТЕЛ</strong>
+            <strong v-tippy="'Телосложение'">ТЕЛ</strong>
           </h4>
 
           <p>
@@ -101,16 +103,16 @@
               :formula="getFormula(creature.ability.con)"
               label="Проверка Телосложения"
             >
-              {{ creature.ability.con }} ({{ getFormattedModifier(creature.ability.con) }})
+              {{ creature.ability.con }} ({{
+                getFormattedModifier(creature.ability.con)
+              }})
             </dice-roller>
           </p>
         </div>
 
         <div class="scores__stats intelligence">
           <h4>
-            <strong
-              v-tippy="'Интеллект'"
-            >ИНТ</strong>
+            <strong v-tippy="'Интеллект'">ИНТ</strong>
           </h4>
 
           <p>
@@ -118,16 +120,16 @@
               :formula="getFormula(creature.ability.int)"
               label="Проверка Интеллекта"
             >
-              {{ creature.ability.int }} ({{ getFormattedModifier(creature.ability.int) }})
+              {{ creature.ability.int }} ({{
+                getFormattedModifier(creature.ability.int)
+              }})
             </dice-roller>
           </p>
         </div>
 
         <div class="scores__stats wisdom">
           <h4>
-            <strong
-              v-tippy="'Мудрость'"
-            >МДР</strong>
+            <strong v-tippy="'Мудрость'">МДР</strong>
           </h4>
 
           <p>
@@ -135,16 +137,16 @@
               :formula="getFormula(creature.ability.wiz)"
               label="Проверка Мудрости"
             >
-              {{ creature.ability.wiz }} ({{ getFormattedModifier(creature.ability.wiz) }})
+              {{ creature.ability.wiz }} ({{
+                getFormattedModifier(creature.ability.wiz)
+              }})
             </dice-roller>
           </p>
         </div>
 
         <div class="scores__stats charisma">
           <h4>
-            <strong
-              v-tippy="'Харизма'"
-            >ХАР</strong>
+            <strong v-tippy="'Харизма'">ХАР</strong>
           </h4>
 
           <p>
@@ -152,7 +154,9 @@
               :formula="getFormula(creature.ability.cha)"
               label="Проверка Харизмы"
             >
-              {{ creature.ability.cha }} ({{ getFormattedModifier(creature.ability.cha) }})
+              {{ creature.ability.cha }} ({{
+                getFormattedModifier(creature.ability.cha)
+              }})
             </dice-roller>
           </p>
         </div>
@@ -170,7 +174,7 @@
 
             <dice-roller
               :formula="savingThrow.formula"
-              :label="`Спасбросок ${ savingThrow.name }`"
+              :label="`Спасбросок ${savingThrow.name}`"
             >
               {{ savingThrow.value }}
             </dice-roller>
@@ -190,7 +194,7 @@
 
             <dice-roller
               :formula="skill.formula"
-              :label="`Проверка навыка ${ skill.label }`"
+              :label="`Проверка навыка ${skill.label}`"
             >
               {{ skill.value }}
             </dice-roller>
@@ -232,7 +236,11 @@
         <p>
           <strong>Языки </strong>
 
-          <span> {{ creature.languages?.length ? creature.languages.join(', ') : '—' }}</span>
+          <span>
+            {{
+              creature.languages?.length ? creature.languages.join(', ') : '—'
+            }}</span
+          >
         </p>
 
         <p>
@@ -320,12 +328,14 @@
         </h4>
 
         <p v-if="!creature.legendary.description">
-          <span>{{ creature.name.rus }}</span> может совершить 3 легендарных действия,
-          выбирая из представленных ниже вариантов. За один раз можно использовать только одно легендарное
+          <span>{{ creature.name.rus }}</span> может совершить 3 легендарных
+          действия, выбирая из представленных ниже вариантов. За один раз можно
+          использовать только одно легендарное
           <!-- eslint-disable-next-line max-len -->
-          действие, и только в конце хода другого существа. <span>{{ creature.name.rus }}</span>
-          восстанавливает
-          использованные легендарные действия в начале своего хода.
+          действие, и только в конце хода другого существа.
+          <span>{{ creature.name.rus }}</span>
+          восстанавливает использованные легендарные действия в начале своего
+          хода.
         </p>
 
         <p v-else>
@@ -424,14 +434,19 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue';
   import toNumber from 'lodash/toNumber';
+  import { computed } from 'vue';
+
+  import {
+    getFormattedModifier,
+    getFormula
+  } from '@/shared/helpers/abilityTransforms';
+  import { getIterableString } from '@/shared/helpers/string';
+
   import RawContent from '@/components/content/RawContent.vue';
   import DetailTopBar from '@/components/UI/DetailTopBar.vue';
   import DiceRoller from '@/components/UI/DiceRoller.vue';
   import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
-  import { getIterableString } from '@/common/helpers/string';
-  import { getFormattedModifier, getFormula } from '@/common/helpers/abilityTransforms';
 
   const props = defineProps({
     creature: {
@@ -445,19 +460,16 @@
     }
   });
 
-  const topBarLeftString = computed(() => `${
-    props.creature.size.rus
-  } ${
-    props.creature.type.name
-  }${
-    props.creature.type.tags?.length ? ` (${ props.creature.type.tags.join(', ') })` : ''
-  }, ${
-    props.creature.alignment
-  } / ${
-    props.creature.size.eng
-  } ${
-    props.creature.size.cell
-  }`);
+  const topBarLeftString = computed(
+    () =>
+      `${props.creature.size.rus} ${props.creature.type.name}${
+        props.creature.type.tags?.length
+          ? ` (${props.creature.type.tags.join(', ')})`
+          : ''
+      }, ${props.creature.alignment} / ${props.creature.size.eng} ${
+        props.creature.size.cell
+      }`
+  );
 
   const speed = computed(() => {
     if (!(props.creature.speed instanceof Array)) {
@@ -465,13 +477,12 @@
     }
 
     return props.creature.speed
-      .map(item => `${
-        item.name ? `${ item.name } ` : ''
-      }${
-        item.value || item.value === 0 ? `${ item.value } фт.` : ''
-      }${
-        item.additional ? ` (${ item.additional })` : ''
-      }`)
+      .map(
+        item =>
+          `${item.name ? `${item.name} ` : ''}${
+            item.value || item.value === 0 ? `${item.value} фт.` : ''
+          }${item.additional ? ` (${item.additional})` : ''}`
+      )
       .join(', ');
   });
 
@@ -481,10 +492,10 @@
     }
 
     return props.creature.savingThrows.map(save => ({
-      formula: `к20+${ save.value }`,
+      formula: `к20+${save.value}`,
       label: save.shortName,
       name: save.name,
-      value: `+${ save.value }${ save.additional ? save.additional : '' }`
+      value: `+${save.value}${save.additional ? save.additional : ''}`
     }));
   });
 
@@ -494,9 +505,9 @@
     }
 
     return props.creature.skills.map(skill => ({
-      formula: `к20+${ skill.value }`,
+      formula: `к20+${skill.value}`,
       label: skill.name,
-      value: `+${ skill.value }${ skill.additional ? skill.additional : '' }`
+      value: `+${skill.value}${skill.additional ? skill.additional : ''}`
     }));
   });
 
@@ -505,16 +516,18 @@
 
     if (props.creature.senses?.senses?.length) {
       for (const sense of props.creature.senses.senses) {
-        const index = list.push(`${ sense.name } ${ sense.value } фт.`);
+        const index = list.push(`${sense.name} ${sense.value} фт.`);
 
         if (sense.additional) {
-          list[index - 1] += ` (${ sense.additional })`;
+          list[index - 1] += ` (${sense.additional})`;
         }
       }
     }
 
     if (props.creature.senses?.passivePerception) {
-      list.push(`пассивная Внимательность ${ props.creature.senses.passivePerception }`);
+      list.push(
+        `пассивная Внимательность ${props.creature.senses.passivePerception}`
+      );
     }
 
     return list.join(', ');
@@ -526,13 +539,19 @@
     }
 
     if (props.creature.experience === 0) {
-      return `${ props.creature.challengeRating } (0 или 10 опыта)`;
+      return `${props.creature.challengeRating} (0 или 10 опыта)`;
     }
 
-    return `${ props.creature.challengeRating } (${ props.creature.experience.toLocaleString() } опыта)`;
+    return `${
+      props.creature.challengeRating
+    } (${props.creature.experience.toLocaleString()} опыта)`;
   });
 
-  const hitDiceFormula = computed(() => (props.creature.hits.bonus
-    ? `${ props.creature.hits.formula } ${ props.creature.hits.sign } ${ Math.abs(props.creature.hits.bonus) }`
-    : props.creature.hits.formula));
+  const hitDiceFormula = computed(() =>
+    props.creature.hits.bonus
+      ? `${props.creature.hits.formula} ${props.creature.hits.sign} ${Math.abs(
+          props.creature.hits.bonus
+        )}`
+      : props.creature.hits.formula
+  );
 </script>

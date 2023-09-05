@@ -22,19 +22,24 @@
 
 <script setup lang="ts">
   import { VuePaginate } from '@svifty7/vue-paginate';
-  import type { TVuePaginateProps } from '@svifty7/vue-paginate/types/VuePaginate';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
-  const props = defineProps<Omit<
-    TVuePaginateProps,
-    'noLiSurround'
-      | 'activeClass'
-      | 'containerClass'
-      | 'disabledClass'
-      | 'nextLinkClass'
-      | 'pageLinkClass'
-      | 'prevLinkClass'
-  >>();
+  import type { TVuePaginateProps } from '@svifty7/vue-paginate/types/VuePaginate';
+
+  const props =
+    defineProps<
+      Omit<
+        TVuePaginateProps,
+        | 'noLiSurround'
+        | 'activeClass'
+        | 'containerClass'
+        | 'disabledClass'
+        | 'nextLinkClass'
+        | 'pageLinkClass'
+        | 'prevLinkClass'
+      >
+    >();
 </script>
 
 <style lang="scss">
@@ -65,7 +70,7 @@
         style: solid;
         color: var(--border);
         radius: 4px;
-      };
+      }
     }
 
     &__page {
@@ -102,7 +107,7 @@
         background: var(--hover);
         border-color: var(--hover);
         color: var(--text-color);
-        opacity: .4;
+        opacity: 0.4;
       }
 
       &:hover {

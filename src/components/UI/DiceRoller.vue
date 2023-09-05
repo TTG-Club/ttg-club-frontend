@@ -14,13 +14,12 @@
 </template>
 
 <script lang="ts">
+  import { computed, defineComponent, ref } from 'vue';
   import { useToast } from 'vue-toastification';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
-  import { useIsDev } from '@/common/helpers/isDev';
-  import { useDiceRoller } from '@/common/composition/useDiceRoller';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
+
+  import { useDiceRoller } from '@/shared/composition/useDiceRoller';
+  import { useIsDev } from '@/shared/helpers/isDev';
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
 
   export default defineComponent({
     props: {
@@ -50,10 +49,7 @@
       const isDev = useIsDev();
       const toast = useToast(ToastEventBus);
 
-      const {
-        doRoll,
-        notifyResult
-      } = useDiceRoller();
+      const { doRoll, notifyResult } = useDiceRoller();
 
       const error = ref(false);
 
@@ -182,9 +178,6 @@
       font-size: calc(var(--main-font-size) - 2px);
       line-height: calc(var(--main-font-size) + 2px);
       padding-top: 4px;
-    }
-
-    &__rendered {
     }
 
     del {

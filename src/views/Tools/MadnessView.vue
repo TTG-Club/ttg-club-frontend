@@ -55,15 +55,11 @@
         :key="key"
         class="madness-item"
       >
-        <div>
-          <b>Тип:</b> {{ item.type.name }}
-        </div>
+        <div><b>Тип:</b> {{ item.type.name }}</div>
 
-        <div>
-          <b>Длительность:</b> {{ item.type.additional }}
-        </div>
+        <div><b>Длительность:</b> {{ item.type.additional }}</div>
 
-        <br>
+        <br />
 
         <div>
           <raw-content :template="item.description" />
@@ -76,12 +72,14 @@
 <script>
   import throttle from 'lodash/throttle';
   import { reactive } from 'vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
   import RawContent from '@/components/content/RawContent.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
 
   export default {
     name: 'MadnessView',
@@ -124,7 +122,7 @@
       },
 
       // eslint-disable-next-line func-names
-      sendForm: throttle(async function() {
+      sendForm: throttle(async function () {
         if (this.controller) {
           this.controller.abort();
         }

@@ -37,25 +37,30 @@
 </template>
 
 <script lang="ts" setup>
-  import { useRoute } from 'vue-router';
-  import {
-    computed, nextTick, onBeforeMount, provide, ref, watch
-  } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import sortBy from 'lodash/sortBy';
-  import groupBy from 'lodash/groupBy';
-  import cloneDeep from 'lodash/cloneDeep';
   import { resolveUnref } from '@vueuse/shared';
+  import cloneDeep from 'lodash/cloneDeep';
+  import groupBy from 'lodash/groupBy';
+  import sortBy from 'lodash/sortBy';
+  import { storeToRefs } from 'pinia';
+  import { computed, nextTick, onBeforeMount, provide, ref, watch } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
+
+  import ContentLayout from '@/components/content/ContentLayout.vue';
+
+  import type {
+    TClassArchetype,
+    TClassArchetypeList,
+    TClassItem,
+    TClassList
+  } from '@/types/Character/Classes.d';
+  import { ClassesFilterDefaults } from '@/types/Character/Classes.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
   import ClassLink from '@/views/Character/Classes/ClassLink.vue';
-  import ContentLayout from '@/components/content/ContentLayout.vue';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import type {
-    TClassArchetype, TClassArchetypeList, TClassItem, TClassList
-  } from '@/types/Character/Classes.types';
-  import { ClassesFilterDefaults } from '@/types/Character/Classes.types';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
 
   const uiStore = useUIStore();
   const route = useRoute();
@@ -66,15 +71,9 @@
     url: ClassesFilterDefaults.url
   });
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-  const {
-    initPages,
-    items: classes
-  } = usePagination({
+  const { initPages, items: classes } = usePagination({
     url: '/classes',
     limit: -1,
     filter: {
@@ -88,7 +87,8 @@
     [classes, () => route.name],
     () => {
       nextTick(() => {
-        showRightSide.value = !!classes.value.length && route.name === 'classDetail';
+        showRightSide.value =
+          !!classes.value.length && route.name === 'classDetail';
       });
     },
     { flush: 'post' }
@@ -99,48 +99,40 @@
       return [];
     }
 
-    const getGroupArchetypes = (list: Array<TClassArchetype>): Array<TClassArchetypeList> => sortBy(
-      Object.values(groupBy(list, o => o.type.name))
-        .map(value => (
-          {
-            group: value[0].type,
-            list: value
-          }
-        )),
-      [o => o.group.order]
-    );
+    const getGroupArchetypes = (
+      list: Array<TClassArchetype>
+    ): Array<TClassArchetypeList> =>
+      sortBy(
+        Object.values(groupBy(list, o => o.type.name)).map(value => ({
+          group: value[0].type,
+          list: value
+        })),
+        [o => o.group.order]
+      );
 
     const getGroupClasses = (): Array<TClassList> => {
-      const newClasses: Array<TClassItem> = classes.value.map(classItem => (
-        {
-          ...classItem,
-          archetypes: getGroupArchetypes(classItem.archetypes)
-        }
-      ));
+      const newClasses: Array<TClassItem> = classes.value.map(classItem => ({
+        ...classItem,
+        archetypes: getGroupArchetypes(classItem.archetypes)
+      }));
 
       const defaultGroup: TClassList = {
         list: sortBy(
-          newClasses.filter(item => !(
-            'group' in item
-          )),
+          newClasses.filter(item => !('group' in item)),
           [o => o.name.rus]
         )
       };
 
       const mapped: Array<TClassList> = sortBy(
-        Object.values(groupBy(
-          cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
-          (o: TClassItem) => o.group?.name
-        ) as { [key: string]: Array<TClassItem> })
-          .map(classList => (
-            {
-              group: classList[0].group!,
-              list: sortBy(
-                classList,
-                [o => o.name.rus]
-              )
-            }
-          )),
+        Object.values(
+          groupBy(
+            cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
+            (o: TClassItem) => o.group?.name
+          ) as { [key: string]: Array<TClassItem> }
+        ).map(classList => ({
+          group: classList[0].group!,
+          list: sortBy(classList, [o => o.name.rus])
+        })),
         [o => o.group!.order]
       );
 

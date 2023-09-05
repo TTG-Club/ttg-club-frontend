@@ -4,19 +4,28 @@
 
 <script lang="ts" setup>
   import {
-    computed, defineComponent, h, onBeforeUnmount, ref, watch
+    computed,
+    defineComponent,
+    h,
+    onBeforeUnmount,
+    ref,
+    watch
   } from 'vue';
-  import { useAxios } from '@/common/composition/useAxios';
 
-  const props = withDefaults(defineProps<{
-    template?: string;
-    url?: string;
-    tag?: string;
-  }>(), {
-    template: undefined,
-    url: undefined,
-    tag: 'div'
-  });
+  import { useAxios } from '@/shared/composition/useAxios';
+
+  const props = withDefaults(
+    defineProps<{
+      template?: string;
+      url?: string;
+      tag?: string;
+    }>(),
+    {
+      template: undefined,
+      url: undefined,
+      tag: 'div'
+    }
+  );
 
   const emit = defineEmits(['loaded', 'before-unmount']);
 
@@ -64,12 +73,18 @@
       return h(props.tag, null, 'Ошибка...');
     }
 
-    return h(props.tag, null, h(defineComponent({
-      mounted() {
-        emit('loaded');
-      },
-      template: templateString.value as string
-    })));
+    return h(
+      props.tag,
+      null,
+      h(
+        defineComponent({
+          mounted() {
+            emit('loaded');
+          },
+          template: templateString.value as string
+        })
+      )
+    );
   });
 
   watch(

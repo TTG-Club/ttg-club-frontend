@@ -25,16 +25,17 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from 'vue';
   import { tryOnBeforeMount } from '@vueuse/core';
-  import type { RouteLocationNormalized } from 'vue-router';
-  import {
-    onBeforeRouteUpdate, useRoute, useRouter
-  } from 'vue-router';
   import { AxiosError } from 'axios';
-  import { useAxios } from '@/common/composition/useAxios';
+  import { defineComponent, ref } from 'vue';
+  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+
   import PageLayout from '@/components/content/PageLayout.vue';
   import RawContent from '@/components/content/RawContent.vue';
+
+  import type { RouteLocationNormalized } from 'vue-router';
 
   export default defineComponent({
     components: {
@@ -106,6 +107,4 @@
   });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

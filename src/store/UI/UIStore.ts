@@ -1,21 +1,19 @@
-import { defineStore } from 'pinia';
-import localforage from 'localforage';
+import { useCssVar, useScroll, useWindowSize } from '@vueuse/core';
 import Cookies from 'js-cookie';
-import {
-  computed, ref, watch
-} from 'vue';
-import {
-  useCssVar, useScroll, useWindowSize
-} from '@vueuse/core';
-import {
-  DB_NAME, FULLSCREEN_DB_KEY, THEME_DB_KEY
-} from '@/common/const/UI';
-import errorHandler from '@/common/helpers/errorHandler';
+import localforage from 'localforage';
+import { defineStore } from 'pinia';
+import { computed, ref, watch } from 'vue';
+
+import { DB_NAME, FULLSCREEN_DB_KEY, THEME_DB_KEY } from '@/shared/const/UI';
+import errorHandler from '@/shared/helpers/errorHandler';
 
 export const useUIStore = defineStore('UIStore', () => {
   const theme = ref('');
   const fullscreen = ref(false);
-  const bodyElement = ref<HTMLElement | null>(document.getElementById('container'));
+
+  const bodyElement = ref<HTMLElement | null>(
+    document.getElementById('container')
+  );
 
   const bodyElementWatcher = setInterval(() => {
     bodyElement.value = document.getElementById('container');
@@ -35,18 +33,18 @@ export const useUIStore = defineStore('UIStore', () => {
 
   const isMobile = computed(() => windowSize.width.value < 1200);
 
-  const getCookieTheme = () => (
-    Cookies.get(THEME_DB_KEY) && ['light', 'dark'].includes(<string>Cookies.get(THEME_DB_KEY))
+  const getCookieTheme = () =>
+    Cookies.get(THEME_DB_KEY) &&
+    ['light', 'dark'].includes(<string>Cookies.get(THEME_DB_KEY))
       ? Cookies.get(THEME_DB_KEY)
-      : 'dark'
-  );
+      : 'dark';
 
   const removeOldTheme = async () => {
     try {
       await store.ready();
 
-      const storageTheme = await store.getItem(THEME_DB_KEY)
-        || localStorage.getItem('theme');
+      const storageTheme =
+        (await store.getItem(THEME_DB_KEY)) || localStorage.getItem('theme');
 
       if (!storageTheme) {
         return Promise.resolve();
@@ -73,11 +71,13 @@ export const useUIStore = defineStore('UIStore', () => {
       return;
     }
 
-    html.dataset.theme = `theme-${ name }`;
+    html.dataset.theme = `theme-${name}`;
   };
 
   const updateThemeMeta = () => {
-    let el: HTMLMetaElement | null = document.querySelector('meta[name="theme-color"]');
+    let el: HTMLMetaElement | null = document.querySelector(
+      'meta[name="theme-color"]'
+    );
 
     if (!el) {
       el = document.createElement('meta');
@@ -92,21 +92,14 @@ export const useUIStore = defineStore('UIStore', () => {
     document.getElementsByTagName('head')[0].appendChild(el);
   };
 
-  const setTheme = ({
-    name = '',
-    avoidHtmlUpdate = false
-  }) => {
+  const setTheme = ({ name = '', avoidHtmlUpdate = false }) => {
     const themeName = name || 'dark';
 
     theme.value = themeName;
 
-    Cookies.set(
-      THEME_DB_KEY,
-      themeName,
-      {
-        expires: 365
-      }
-    );
+    Cookies.set(THEME_DB_KEY, themeName, {
+      expires: 365
+    });
 
     if (!avoidHtmlUpdate) {
       updateHTMLDataset(themeName);
@@ -119,7 +112,8 @@ export const useUIStore = defineStore('UIStore', () => {
     try {
       await store.ready();
 
-      fullscreen.value = await store.getItem<boolean>(FULLSCREEN_DB_KEY) || false;
+      fullscreen.value =
+        (await store.getItem<boolean>(FULLSCREEN_DB_KEY)) || false;
 
       return Promise.resolve();
     } catch (err) {
@@ -157,7 +151,7 @@ export const useUIStore = defineStore('UIStore', () => {
   watch(
     windowSize.height,
     value => {
-      document.documentElement.style.setProperty('--max-vh', `${ value }px`);
+      document.documentElement.style.setProperty('--max-vh', `${value}px`);
     },
     {
       immediate: true

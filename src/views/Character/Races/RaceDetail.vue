@@ -22,27 +22,35 @@
 </template>
 
 <script setup lang="ts">
+  import { computedInject, toValue, tryOnMounted } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
-  import {
-    computedInject, toValue, tryOnMounted
-  } from '@vueuse/core';
   import { ref, watch } from 'vue';
-  import type { RouteLocationNormalizedLoaded } from 'vue-router';
   import {
-    onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter
+    onBeforeRouteLeave,
+    onBeforeRouteUpdate,
+    useRoute,
+    useRouter
   } from 'vue-router';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import RaceBody from '@/views/Character/Races/RaceBody.vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
-  import { useAxios } from '@/common/composition/useAxios';
+  import RaceBody from '@/views/Character/Races/RaceBody.vue';
 
   type TEmit = {
     (e: 'scroll-to-active'): void;
-    (e: 'scroll-to-last-active', v: RouteLocationNormalizedLoaded['path']): void;
-  }
+    (
+      e: 'scroll-to-last-active',
+      v: RouteLocationNormalizedLoaded['path']
+    ): void;
+  };
 
   const emit = defineEmits<TEmit>();
 
@@ -55,7 +63,11 @@
   const error = ref(false);
   const abortController = ref(new AbortController());
 
-  const queryBooks = computedInject(DEFAULT_QUERY_BOOKS_INJECT_KEY, source => toValue(source), []);
+  const queryBooks = computedInject(
+    DEFAULT_QUERY_BOOKS_INJECT_KEY,
+    source => toValue(source),
+    []
+  );
 
   const raceInfoQuery = async url => {
     if (abortController.value instanceof AbortController) {
@@ -116,6 +128,4 @@
   });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

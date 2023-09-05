@@ -1,10 +1,6 @@
 <template>
-  <div
-    class="bookmarks__cat"
-  >
-    <div
-      class="bookmarks__cat_label"
-    >
+  <div class="bookmarks__cat">
+    <div class="bookmarks__cat_label">
       <div
         v-if="isEdit"
         class="bookmarks__cat_label_icon is-left js-drag-category"
@@ -20,11 +16,11 @@
         v-if="!isMobile || (isMobile && isEdit)"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__cat_label_icon is-right"
-        @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(category.uuid)"
+        @click.left.exact.prevent="
+          customBookmarkStore.queryDeleteBookmark(category.uuid)
+        "
       >
-        <svg-icon
-          icon="close"
-        />
+        <svg-icon icon="close" />
       </div>
     </div>
 
@@ -58,18 +54,22 @@
               :href="bookmark.url"
               class="bookmarks__item_label"
             >
-              {{ bookmark.prefix ? `[${bookmark.prefix}] ${bookmark.name}` : bookmark.name }}
+              {{
+                bookmark.prefix
+                  ? `[${bookmark.prefix}] ${bookmark.name}`
+                  : bookmark.name
+              }}
             </component>
 
             <div
               v-if="!isMobile || (isMobile && isEdit)"
               :class="{ 'only-hover': !isMobile }"
               class="bookmarks__item_icon is-right"
-              @click.left.exact.prevent="customBookmarkStore.queryDeleteBookmark(bookmark.uuid)"
+              @click.left.exact.prevent="
+                customBookmarkStore.queryDeleteBookmark(bookmark.uuid)
+              "
             >
-              <svg-icon
-                icon="close"
-              />
+              <svg-icon icon="close" />
             </div>
           </div>
         </div>
@@ -79,19 +79,24 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
+  import { storeToRefs } from 'pinia';
   import { defineComponent } from 'vue';
   import draggableComponent from 'vuedraggable';
-  import { storeToRefs } from 'pinia';
+
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import type {
     IBookmarkCategory,
     IBookmarkGroup,
     IBookmarkItem
-  } from '@/features/bookmarks/types/Bookmark.types';
-  import type { WithChildren } from '@/types/Shared/Utility.types';
+  } from '@/features/bookmarks/types/Bookmark.d';
+
+  import type { WithChildren } from '@/shared/types/Utility';
+
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+
+  import type { PropType } from 'vue';
+
+  import { useUIStore } from '@/store/UI/UIStore';
 
   export default defineComponent({
     components: {
@@ -100,11 +105,15 @@
     },
     props: {
       group: {
-        type: Object as PropType<WithChildren<IBookmarkGroup, IBookmarkCategory>>,
+        type: Object as PropType<
+          WithChildren<IBookmarkGroup, IBookmarkCategory>
+        >,
         required: true
       },
       category: {
-        type: Object as PropType<WithChildren<IBookmarkCategory, IBookmarkItem>>,
+        type: Object as PropType<
+          WithChildren<IBookmarkCategory, IBookmarkItem>
+        >,
         required: true
       },
       creating: {
@@ -121,15 +130,15 @@
       const customBookmarkStore = useCustomBookmarkStore();
       const { isMobile } = storeToRefs(uiStore);
 
-      const updateBookmark = async (change: { element: IBookmarkItem; newIndex: any; }) => {
+      const updateBookmark = async (change: {
+        element: IBookmarkItem;
+        newIndex: any;
+      }) => {
         if (!change) {
           return;
         }
 
-        const {
-          element,
-          newIndex: order
-        } = change;
+        const { element, newIndex: order } = change;
 
         await customBookmarkStore.queryUpdateBookmark({
           ...element,
@@ -138,11 +147,8 @@
         });
       };
 
-      const onChangeHandler = async (e: { added: any; moved: any; }) => {
-        const {
-          added,
-          moved
-        } = e;
+      const onChangeHandler = async (e: { added: any; moved: any }) => {
+        const { added, moved } = e;
 
         await updateBookmark(added || moved);
       };

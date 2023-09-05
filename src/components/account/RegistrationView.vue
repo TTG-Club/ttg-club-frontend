@@ -7,7 +7,9 @@
     <div class="form__row">
       <ui-input
         v-model.trim="v$.username.$model"
-        :error-text="v$.username.$dirty ? v$.username.$errors?.[0]?.$message : ''"
+        :error-text="
+          v$.username.$dirty ? v$.username.$errors?.[0]?.$message : ''
+        "
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
@@ -35,7 +37,9 @@
     <div class="form__row">
       <ui-input
         v-model.trim="v$.password.$model"
-        :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
+        :error-text="
+          v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''
+        "
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
@@ -83,14 +87,11 @@
 </template>
 
 <script lang="ts">
-  import {
-    defineComponent, reactive, ref
-  } from 'vue';
   import useVuelidate from '@vuelidate/core';
   import { helpers, sameAs } from '@vuelidate/validators';
+  import { defineComponent, reactive, ref } from 'vue';
   import { useToast } from 'vue-toastification';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+
   import {
     validateEmailExist,
     validateEmailFormat,
@@ -102,12 +103,15 @@
     validateRequired,
     validateUsernameExist,
     validateUsernameSpecialChars
-  } from '@/common/helpers/authChecks';
+  } from '@/shared/helpers/authChecks';
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
+
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
+
   import { useUserStore } from '@/store/UI/UserStore';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
 
   export default defineComponent({
-
     components: {
       UiInput,
       UiButton

@@ -4,7 +4,7 @@
       'ui-button': true,
       [$style['ui-button']]: true,
       [$style['is-full-width']]: fullWidth,
-      [$style['is-disabled']]: isDisabled,
+      [$style['is-disabled']]: isDisabled
     }"
     @click.prevent.stop
   >
@@ -14,12 +14,12 @@
         [props.bodyClass]: !!props.bodyClass,
         [$style.body]: true,
         [$style.main]: true,
-        [$style[`type-${ buttonType }`]]: true,
-        [$style[`size-${ buttonSize }`]]: true,
-        [$style[`icon-${ iconPosition }`]]: true,
+        [$style[`type-${buttonType}`]]: true,
+        [$style[`size-${buttonSize}`]]: true,
+        [$style[`icon-${iconPosition}`]]: true,
         [$style['with-split']]: split && $slots.dropdown,
         [$style['no-text']]: !$slots.default,
-        [$style['is-disabled']]: isDisabled,
+        [$style['is-disabled']]: isDisabled
       }"
       :type="nativeType"
       :disabled="isDisabled"
@@ -64,9 +64,7 @@
         v-if="!split && $slots.dropdown"
         :class="$style.icon"
       >
-        <svg-icon
-          icon="arrow/filled/down-mini"
-        />
+        <svg-icon icon="arrow/filled/down-mini" />
       </span>
 
       <span
@@ -82,9 +80,9 @@
       :class="{
         [$style.body]: true,
         [$style.split]: true,
-        [$style[`type-${ buttonType }`]]: true,
-        [$style[`size-${ buttonSize }`]]: true,
-        [$style['is-disabled']]: isDisabled,
+        [$style[`type-${buttonType}`]]: true,
+        [$style[`size-${buttonSize}`]]: true,
+        [$style['is-disabled']]: isDisabled
       }"
       :aria-disabled="isDisabled"
       :disabled="isDisabled"
@@ -95,12 +93,8 @@
         :class="$style.hover"
       />
 
-      <span
-        :class="$style.icon"
-      >
-        <svg-icon
-          icon="arrow/down"
-        />
+      <span :class="$style.icon">
+        <svg-icon icon="arrow/down" />
       </span>
 
       <span
@@ -125,19 +119,21 @@
 </template>
 
 <script setup lang="ts">
-  import type { Events } from 'vue';
-  import {
-    computed, inject, ref, useSlots, watch
-  } from 'vue';
   import { onClickOutside } from '@vueuse/core';
-  import type { TippyOptions } from 'vue-tippy';
+  import { computed, inject, ref, useSlots, watch } from 'vue';
   import { useTippy } from 'vue-tippy';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import type {
-    ISharedButtonProps, TButtonIconPosition, TButtonType
-  } from '@/components/UI/kit/button/UiButton.types';
-  import { buttonGroupContextKey } from '@/components/UI/kit/button/UiButton.const';
+
   import IconLoader from '@/components/UI/icons/IconLoader.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import { buttonGroupContextKey } from '@/components/UI/kit/button/UiButton.const';
+  import type {
+    ISharedButtonProps,
+    TButtonIconPosition,
+    TButtonType
+  } from '@/components/UI/kit/button/UiButton.d';
+
+  import type { Events } from 'vue';
+  import type { TippyOptions } from 'vue-tippy';
 
   interface IProps extends ISharedButtonProps {
     type?: TButtonType;
@@ -186,10 +182,19 @@
 
   const groupContext = inject(buttonGroupContextKey, undefined);
 
-  const buttonType = computed(() => groupContext?.type || props.type || 'default');
-  const buttonColor = computed(() => `var(--btn-${ groupContext?.color || props.color || 'primary' })`);
+  const buttonType = computed(
+    () => groupContext?.type || props.type || 'default'
+  );
+
+  const buttonColor = computed(
+    () => `var(--btn-${groupContext?.color || props.color || 'primary'})`
+  );
+
   const buttonSize = computed(() => groupContext?.size || props.size || 'md');
-  const isDisabled = computed(() => groupContext?.disabled || props.disabled || props.loading);
+
+  const isDisabled = computed(
+    () => groupContext?.disabled || props.disabled || props.loading
+  );
 
   const isDropdownShow = ref(false);
   const dropdownTrigger = ref<HTMLButtonElement | null>(null);
@@ -233,7 +238,8 @@
     isDropdownShow.value = false;
   };
 
-  const toggleDropdown = () => (isDropdownShow.value ? onDropdownHide() : onDropdownShow());
+  const toggleDropdown = () =>
+    isDropdownShow.value ? onDropdownHide() : onDropdownShow();
 
   const onClick = async (e: Events['onClick']) => {
     if (isDisabled.value) {
@@ -315,7 +321,7 @@
       width: 1px;
       style: solid;
       color: var(--border);
-    };
+    }
 
     &.icon {
       &-left {
@@ -340,7 +346,7 @@
         padding: 10px;
         border: {
           width: 0;
-        };
+        }
       }
 
       &-secondary {
@@ -360,7 +366,7 @@
         padding: 10px;
         border: {
           width: 0;
-        };
+        }
       }
     }
 
@@ -379,7 +385,7 @@
         right-width: 0;
         top-right-radius: 0;
         bottom-right-radius: 0;
-      };
+      }
 
       &.no-text {
         &.type {
@@ -402,7 +408,7 @@
       left-width: 0;
       top-left-radius: 0;
       bottom-left-radius: 0;
-    };
+    }
 
     &.type {
       &-default,

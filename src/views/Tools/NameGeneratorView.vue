@@ -66,14 +66,16 @@
 </template>
 
 <script>
-  import { defineComponent, reactive } from 'vue';
   import throttle from 'lodash/throttle';
+  import { defineComponent, reactive } from 'vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import RawContent from '@/components/content/RawContent.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
+  import FieldCheckbox from '@/components/UI/kit/FieldType/FieldCheckbox.vue';
   import FieldInput from '@/components/UI/kit/FieldType/FieldInput.vue';
   import FormButton from '@/components/UI/kit/FormButton.vue';
-  import FieldCheckbox from '@/components/UI/kit/FieldType/FieldCheckbox.vue';
 
   export default defineComponent({
     components: {
@@ -115,7 +117,7 @@
       },
 
       // eslint-disable-next-line func-names
-      sendForm: throttle(async function() {
+      sendForm: throttle(async function () {
         if (this.controller) {
           this.controller.abort();
         }

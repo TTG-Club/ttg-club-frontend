@@ -26,11 +26,12 @@
       <span
         v-if="source.homebrew"
         class="homebrew_text"
-      >Homebrew</span>
+        >Homebrew</span
+      >
 
-      <span
-        v-tippy="{ content: source.name }"
-      >&nbsp;{{ source.shortName }}</span>
+      <span v-tippy="{ content: source.name }"
+        >&nbsp;{{ source.shortName }}</span
+      >
     </span>
 
     <span

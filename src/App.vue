@@ -14,9 +14,11 @@
 <script setup lang="ts">
   import { tryOnBeforeMount } from '@vueuse/core';
   import { ModalsContainer } from 'vue-final-modal';
+
+  import NavBar from '@/components/UI/menu/NavBar.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
   import { useUserStore } from '@/store/UI/UserStore';
-  import NavBar from '@/components/UI/menu/NavBar.vue';
 
   const uiStore = useUIStore();
   const userStore = useUserStore();
@@ -39,7 +41,9 @@
     let avoidHtmlUpdate = false;
 
     if (html?.dataset?.theme) {
-      avoidHtmlUpdate = ['theme-light', 'theme-dark'].includes(html?.dataset?.theme);
+      avoidHtmlUpdate = ['theme-light', 'theme-dark'].includes(
+        html?.dataset?.theme
+      );
     }
 
     uiStore.setTheme({

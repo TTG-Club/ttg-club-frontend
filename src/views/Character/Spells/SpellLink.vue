@@ -14,7 +14,11 @@
     >
       <div class="link-item__content">
         <div
-          v-tippy-lazy="{ content: spell.level ? `${spell.level} уровень заклинания` : 'Заговор' }"
+          v-tippy-lazy="{
+            content: spell.level
+              ? `${spell.level} уровень заклинания`
+              : 'Заговор'
+          }"
           class="link-item__lvl"
         >
           <span>{{ spell.level || '◐' }}</span>
@@ -27,9 +31,7 @@
                 {{ spell.name.rus }}
               </span>
 
-              <span class="link-item__name--eng">
-                [{{ spell.name.eng }}]
-              </span>
+              <span class="link-item__name--eng"> [{{ spell.name.eng }}] </span>
             </div>
           </div>
 
@@ -62,25 +64,38 @@
               {{ spell.school }}
             </div>
 
-            <div
-              class="link-item__components"
-            >
+            <div class="link-item__components">
               <div
-                v-tippy-lazy="{ content: 'Вербальный', onShow() { return !!spell.components?.v } }"
+                v-tippy-lazy="{
+                  content: 'Вербальный',
+                  onShow() {
+                    return !!spell.components?.v;
+                  }
+                }"
                 class="link-item__component"
               >
                 {{ spell?.components?.v ? 'В' : '·' }}
               </div>
 
               <div
-                v-tippy-lazy="{ content: 'Соматический', onShow() { return !!spell.components?.s } }"
+                v-tippy-lazy="{
+                  content: 'Соматический',
+                  onShow() {
+                    return !!spell.components?.s;
+                  }
+                }"
                 class="link-item__component"
               >
                 {{ spell?.components?.s ? 'С' : '·' }}
               </div>
 
               <div
-                v-tippy-lazy="{ content: 'Материальный', onShow() { return !!spell.components?.m } }"
+                v-tippy-lazy="{
+                  content: 'Материальный',
+                  onShow() {
+                    return !!spell.components?.m;
+                  }
+                }"
                 class="link-item__component"
               >
                 {{ !!spell?.components?.m ? 'М' : '·' }}
@@ -108,35 +123,39 @@
 </template>
 
 <script lang="ts" setup>
-  import type { RouteLocationPathRaw } from 'vue-router';
-  import { useLink } from 'vue-router';
   import { computed, ref } from 'vue';
-  import { CapitalizeFirst as vCapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-  import BaseModal from '@/components/UI/modals/BaseModal.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
-  import type { TSpellItem, TSpellLink } from '@/types/Character/Spells.types';
-  import type { Maybe } from '@/types/Shared/Utility.types';
+  import { useLink } from 'vue-router';
 
-  const props = withDefaults(defineProps<{
-    to: RouteLocationPathRaw;
-    spell: TSpellLink;
-    inTab?: boolean;
-  }>(), {
-    inTab: false
-  });
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+  import type { Maybe } from '@/shared/types/Utility';
+
+  import BaseModal from '@/components/UI/modals/BaseModal.vue';
+
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  import type { TSpellItem, TSpellLink } from '@/types/Character/Spells.d';
+
+  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      to: RouteLocationPathRaw;
+      spell: TSpellLink;
+      inTab?: boolean;
+    }>(),
+    {
+      inTab: false
+    }
+  );
 
   const http = useAxios();
 
-  const {
-    navigate,
-    isActive,
-    href
-  } = useLink(props);
+  const { navigate, isActive, href } = useLink(props);
 
   const modal = ref<{
     show: boolean;
-    data: Maybe<TSpellItem>
+    data: Maybe<TSpellItem>;
   }>({
     show: false,
     data: undefined
@@ -177,7 +196,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item";
+  @import '../../../assets/styles/modules/link-item';
 
   .link-item {
     &__lvl {

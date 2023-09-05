@@ -9,9 +9,7 @@
         class="navbar__btn"
         @click.left.exact.prevent="clickHandler"
       >
-        <svg-icon
-          :icon="bookmarkIcon"
-        />
+        <svg-icon :icon="bookmarkIcon" />
       </div>
     </template>
 
@@ -26,17 +24,18 @@
 </template>
 
 <script lang="ts" setup>
-  import {
-    computed, onBeforeMount, ref, watch
-  } from 'vue';
   import { storeToRefs } from 'pinia';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import NavPopover from '@/components/UI/menu/NavPopover.vue';
-  import DefaultBookmarks from '@/features/bookmarks/components/DefaultBookmarks.vue';
+  import { computed, onBeforeMount, ref, watch } from 'vue';
+
   import CustomBookmarks from '@/features/bookmarks/components/CustomBookmarks.vue';
-  import { useUserStore } from '@/store/UI/UserStore';
+  import DefaultBookmarks from '@/features/bookmarks/components/DefaultBookmarks.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import NavPopover from '@/components/UI/menu/NavPopover.vue';
+
+  import { useUserStore } from '@/store/UI/UserStore';
 
   const opened = ref(false);
   const userStore = useUserStore();
@@ -45,11 +44,11 @@
   const customBookmarkStore = useCustomBookmarkStore();
 
   const bookmarkIcon = computed(() => {
-    const { bookmarks } = storeToRefs(isAuthenticated.value
-      ? customBookmarkStore
-      : defaultBookmarkStore);
+    const { bookmarks } = storeToRefs(
+      isAuthenticated.value ? customBookmarkStore : defaultBookmarkStore
+    );
 
-    return `bookmark/${ bookmarks.value.length > 0 ? 'filled' : 'outline' }`;
+    return `bookmark/${bookmarks.value.length > 0 ? 'filled' : 'outline'}`;
   });
 
   const clickHandler = async () => {
@@ -80,11 +79,11 @@
 </script>
 
 <style lang="scss">
-    @import "../styles/bookmarks";
+  @import '../styles/bookmarks';
 
-    .nav-bookmarks {
-        display: flex;
-        height: 100%;
-        overflow: hidden;
-    }
+  .nav-bookmarks {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+  }
 </style>

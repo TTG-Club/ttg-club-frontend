@@ -8,7 +8,7 @@
         v-lazy="previewObj"
         :alt="alt"
         class="ui-easy-lightbox__img"
-      >
+      />
     </div>
   </div>
 
@@ -42,13 +42,13 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
-  import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
   import { watchArray } from '@vueuse/core';
+  import { computed, defineComponent, ref } from 'vue';
+  import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+
+  import type { PropType } from 'vue';
 
   export default defineComponent({
     components: {

@@ -16,7 +16,7 @@
           v-lazy="classItem.image"
           alt="img-bg"
           class="link-item-expand__content__img-bg"
-        >
+        />
 
         <div class="link-item-expand__content__gradient" />
 
@@ -26,17 +26,13 @@
             class="link-item-expand__link"
             @click.left.prevent.exact="selectClass"
           >
-
             <span class="link-item-expand__body">
               <span class="link-item-expand__body_row">
-
                 <span
                   v-if="classItem.icon"
                   class="link-item-expand__icon"
                 >
-                  <svg-icon
-                    :icon="classItem.icon"
-                  />
+                  <svg-icon :icon="classItem.icon" />
                 </span>
 
                 <span class="link-item-expand__name">
@@ -47,7 +43,6 @@
                   <span class="link-item-expand__name--eng">
                     {{ classItem.name.eng }}
                   </span>
-
                 </span>
               </span>
 
@@ -64,19 +59,19 @@
                 </span>
               </span>
             </span>
-
           </a>
 
           <button
             v-if="hasArchetypes"
-            v-tippy-lazy="{ content: classItem.archetypeName, placement: 'left' }"
+            v-tippy-lazy="{
+              content: classItem.archetypeName,
+              placement: 'left'
+            }"
             class="link-item-expand__toggle"
             type="button"
             @click.left.exact.prevent="toggleArch"
           >
-            <svg-icon
-              :icon="submenu ? 'minus' : 'plus'"
-            />
+            <svg-icon :icon="submenu ? 'minus' : 'plus'" />
           </button>
         </div>
 
@@ -105,7 +100,9 @@
                   :to="{ path: arch.url }"
                   class="link-item-expand__arch-item"
                 >
-                  <span class="link-item-expand__arch-item_name">{{ arch.name.rus }}</span>
+                  <span class="link-item-expand__arch-item_name">{{
+                    arch.name.rus
+                  }}</span>
 
                   <span class="link-item-expand__arch-item_book">
                     <span v-tippy-lazy="{ content: arch.source.name }">
@@ -127,17 +124,24 @@
 </template>
 
 <script lang="ts">
-  import type { RouteLocationPathRaw } from 'vue-router';
   import {
-    useLink, useRoute, useRouter
-  } from 'vue-router';
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, nextTick, onMounted, ref, watch
+    computed,
+    defineComponent,
+    nextTick,
+    onMounted,
+    ref,
+    watch
   } from 'vue';
+  import { useLink, useRoute, useRouter } from 'vue-router';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  import type { TClassItem } from '@/types/Character/Classes.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import type { TClassItem } from '@/types/Character/Classes.types';
 
   export default defineComponent({
     components: { SvgIcon },
@@ -162,21 +166,22 @@
       const router = useRouter();
       const uiStore = useUIStore();
 
-      const {
-        isActive,
-        navigate
-      } = useLink(props);
+      const { isActive, navigate } = useLink(props);
 
       const submenu = ref(false);
 
       const getClassList = computed(() => ({
-        'router-link-active': isActive.value
-          || route.params.className === router.resolve(props.classItem.url)?.params?.className,
+        'router-link-active':
+          isActive.value ||
+          route.params.className ===
+            router.resolve(props.classItem.url)?.params?.className,
         'is-selected': route.name === 'classDetail',
         'is-green': props.classItem?.source?.homebrew
       }));
 
-      const hasArchetypes = computed(() => !!props.classItem?.archetypes?.length);
+      const hasArchetypes = computed(
+        () => !!props.classItem?.archetypes?.length
+      );
 
       const toggleArch = () => {
         submenu.value = !submenu.value;
@@ -192,19 +197,24 @@
 
       onMounted(() => {
         nextTick(() => {
-          submenu.value = route.params.className === router.resolve(props.classItem.url)?.params?.className;
+          submenu.value =
+            route.params.className ===
+            router.resolve(props.classItem.url)?.params?.className;
         });
       });
 
-      watch(() => props.afterSearch, value => {
-        if (value) {
-          submenu.value = value;
+      watch(
+        () => props.afterSearch,
+        value => {
+          if (value) {
+            submenu.value = value;
 
-          return;
+            return;
+          }
+
+          submenu.value = false;
         }
-
-        submenu.value = false;
-      });
+      );
 
       return {
         submenu,
@@ -217,4 +227,8 @@
   });
 </script>
 
-<style lang="scss" scoped src="../../../assets/styles/modules/link-item-expand.scss"></style>
+<style
+  lang="scss"
+  scoped
+  src="../../../assets/styles/modules/link-item-expand.scss"
+></style>

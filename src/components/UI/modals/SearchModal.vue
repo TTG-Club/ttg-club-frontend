@@ -16,9 +16,7 @@
             :class="{ 'in-progress': inProgress }"
             class="search-modal__control_icon"
           >
-            <svg-icon
-              :icon="inProgress ? 'dice/d20' : 'search'"
-            />
+            <svg-icon :icon="inProgress ? 'dice/d20' : 'search'" />
           </div>
 
           <form
@@ -102,14 +100,10 @@
             @focusin.self="selectedIndex = null"
           >
             <div class="search-modal__all_icon">
-              <svg-icon
-                icon="search-page"
-              />
+              <svg-icon icon="search-page" />
             </div>
 
-            <div class="search-modal__all_body">
-              Открыть страницу поиска
-            </div>
+            <div class="search-modal__all_body">Открыть страницу поиска</div>
           </router-link>
         </div>
       </div>
@@ -119,27 +113,36 @@
 
 <script lang="ts" setup>
   import {
-    computed, onMounted, ref, watch
-  } from 'vue';
-  import debounce from 'lodash/debounce';
-  import {
-    onKeyStroke, onStartTyping, useActiveElement, useFocus, useVModel
+    onKeyStroke,
+    onStartTyping,
+    useActiveElement,
+    useFocus,
+    useVModel
   } from '@vueuse/core';
-  import { useRouter } from 'vue-router';
+  import debounce from 'lodash/debounce';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
+  import { useRouter } from 'vue-router';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { useMetrics } from '@/shared/composition/useMetrics';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { TSearchResultList } from '@/types/Search/Search.types';
-  import SearchLink from '@/views/Search/SearchLink.vue';
-  import { useMetrics } from '@/common/composition/useMetrics';
   import UiInput from '@/components/UI/kit/UiInput.vue';
 
-  const props = withDefaults(defineProps<{
-    modelValue?: boolean;
-  }>(), {
-    modelValue: false
-  });
+  import type { TSearchResultList } from '@/types/Search/Search.d';
+
+  import SearchLink from '@/views/Search/SearchLink.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: boolean;
+    }>(),
+    {
+      modelValue: false
+    }
+  );
 
   const isShowModal = useVModel(props, 'modelValue');
   const router = useRouter();
@@ -153,10 +156,7 @@
   const selectedIndex = ref<number | null>(null);
   const activeElement = useActiveElement();
 
-  const {
-    sendSearchMetrics,
-    sendSearchViewResultsMetrics
-  } = useMetrics();
+  const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
 
   const searchUrl = computed(() => ({
     path: '/search',
@@ -300,7 +300,10 @@
       return;
     }
 
-    if (selectedIndex.value === null || selectedIndex.value === results.value.list.length - 1) {
+    if (
+      selectedIndex.value === null ||
+      selectedIndex.value === results.value.list.length - 1
+    ) {
       selectedIndex.value = 0;
 
       return;
@@ -331,10 +334,11 @@
     selectedIndex.value--;
   });
 
-  const notUsingInput = computed(() => (
-    activeElement.value?.tagName !== 'INPUT'
-    && activeElement.value?.tagName !== 'TEXTAREA'
-  ));
+  const notUsingInput = computed(
+    () =>
+      activeElement.value?.tagName !== 'INPUT' &&
+      activeElement.value?.tagName !== 'TEXTAREA'
+  );
 
   onKeyStroke('Enter', e => {
     if (!isShowModal.value) {
@@ -347,7 +351,10 @@
       return;
     }
 
-    if (typeof selectedIndex.value !== 'number' || !results.value?.list.length) {
+    if (
+      typeof selectedIndex.value !== 'number' ||
+      !results.value?.list.length
+    ) {
       return;
     }
 
@@ -464,7 +471,7 @@
               name: loader;
               duration: 1.5s;
               iteration-count: infinite;
-            };
+            }
           }
         }
       }

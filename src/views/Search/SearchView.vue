@@ -4,9 +4,7 @@
     :show-separator="false"
     class="search-view"
   >
-    <template #title>
-      Поиск по сайту
-    </template>
+    <template #title> Поиск по сайту </template>
 
     <template #default>
       <div class="search-view__wrapper">
@@ -16,7 +14,7 @@
         >
           <form
             class="search-view__control"
-            novalidate="novalidate"
+            novalidate="true"
             autocomplete="off"
             autofocus="autofocus"
             autocapitalize="off"
@@ -28,9 +26,7 @@
                 class="search-view__control_icon"
                 :class="{ 'in-progress': inProgress }"
               >
-                <svg-icon
-                  :icon="inProgress ? 'dice/d20' : 'search'"
-                />
+                <svg-icon :icon="inProgress ? 'dice/d20' : 'search'" />
               </div>
 
               <ui-input
@@ -57,7 +53,8 @@
           v-if="resultsNumbers"
           class="search-view__count"
         >
-          Результат: {{ resultsNumbers.min }}-{{ resultsNumbers.max }} из {{ results?.count }}
+          Результат: {{ resultsNumbers.min }}-{{ resultsNumbers.max }} из
+          {{ results?.count }}
         </div>
 
         <div class="search-view__results">
@@ -76,7 +73,9 @@
           </div>
 
           <div
-            v-else-if="search.trim().length && inProgress && !results?.list.length"
+            v-else-if="
+              search.trim().length && inProgress && !results?.list.length
+            "
             class="search-view__results_text"
           >
             Боги ищут ответ на твой запрос
@@ -103,6 +102,9 @@
 </template>
 
 <script setup lang="ts">
+  import { onStartTyping, tryOnBeforeMount, useFocus } from '@vueuse/core';
+  import debounce from 'lodash/debounce';
+  import { storeToRefs } from 'pinia';
   import { computed, ref } from 'vue';
   import {
     type LocationQueryValue,
@@ -111,21 +113,20 @@
     useRoute,
     useRouter
   } from 'vue-router';
-  import { storeToRefs } from 'pinia';
-  import debounce from 'lodash/debounce';
-  import {
-    onStartTyping, tryOnBeforeMount, useFocus
-  } from '@vueuse/core';
-  import type { TSearchResultList } from '@/types/Search/Search.types';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useAxios } from '@/common/composition/useAxios';
-  import { useMetrics } from '@/common/composition/useMetrics';
-  import SearchLink from '@/views/Search/SearchLink.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { useMetrics } from '@/shared/composition/useMetrics';
+
   import PageLayout from '@/components/content/PageLayout.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
+  import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
+
+  import type { TSearchResultList } from '@/types/Search/Search.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import SearchLink from '@/views/Search/SearchLink.vue';
 
   const http = useAxios();
   const route = useRoute();
@@ -159,7 +160,9 @@
     return router.push(to);
   };
 
-  const resolveQuerySearch = (querySearch?: LocationQueryValue | LocationQueryValue[]) => {
+  const resolveQuerySearch = (
+    querySearch?: LocationQueryValue | LocationQueryValue[]
+  ) => {
     if (!querySearch) {
       search.value = '';
 
@@ -175,7 +178,9 @@
     search.value = querySearch || '';
   };
 
-  const resolveQueryPage = (queryPage?: LocationQueryValue | LocationQueryValue[]) => {
+  const resolveQueryPage = (
+    queryPage?: LocationQueryValue | LocationQueryValue[]
+  ) => {
     if (!search.value || Array.isArray(queryPage)) {
       page.value = 1;
 
@@ -209,7 +214,7 @@
     return Math.ceil(results.value.count / 20);
   });
 
-  const resultsNumbers = ref<null | { min: number, max: number }>(null);
+  const resultsNumbers = ref<null | { min: number; max: number }>(null);
 
   const onChangeSearch = debounce((value: string) => {
     isNeedUpdateScroll.value = true;
@@ -278,9 +283,7 @@
       if (isNeedUpdateScroll.value) {
         const controlsRect = controls.value?.getBoundingClientRect();
 
-        if (!uiStore.bodyScroll.y || (
-          controlsRect && controlsRect.top > 0
-        )) {
+        if (!uiStore.bodyScroll.y || (controlsRect && controlsRect.top > 0)) {
           isNeedUpdateScroll.value = false;
 
           return Promise.resolve();
@@ -296,14 +299,12 @@
 
       sendSearchViewResultsMetrics(
         search,
-        result.list.map(item => (
-          {
-            item_id: item.url,
-            item_name: item.name,
-            item_category: item.section,
-            item_brand: item.source?.name
-          }
-        ))
+        result.list.map(item => ({
+          item_id: item.url,
+          item_name: item.name,
+          item_category: item.section,
+          item_brand: item.source?.name
+        }))
       );
 
       return Promise.resolve();
@@ -314,14 +315,11 @@
 
       if (results.value?.count) {
         resultsNumbers.value = {
-          min: page.value > 1
-            ? 20 * (
-              page.value - 1
-            ) + 1
-            : 1,
-          max: page.value < pages.value && results.value.count > 20
-            ? 20 * page.value
-            : results.value.count
+          min: page.value > 1 ? 20 * (page.value - 1) + 1 : 1,
+          max:
+            page.value < pages.value && results.value.count > 20
+              ? 20 * page.value
+              : results.value.count
         };
       }
 
@@ -392,7 +390,7 @@
           color: var(--border);
           radius: 8px 0 0 8px;
           right-width: 0;
-        };
+        }
       }
 
       &_icon {
@@ -421,7 +419,7 @@
               name: loader;
               duration: 1.5s;
               iteration-count: infinite;
-            };
+            }
           }
         }
       }

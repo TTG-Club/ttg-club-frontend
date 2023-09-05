@@ -14,7 +14,9 @@ export type GetListGridInTabProps = {
 };
 
 export const getListGridInTabProps = ({
-  showRightSide, fullscreen, inTab
+  showRightSide,
+  fullscreen,
+  inTab
 }: CheckIsListGridFlatParams & GetListGridInTabProps) => ({
   flat: checkIsListGridFlat({
     showRightSide,
@@ -22,8 +24,8 @@ export const getListGridInTabProps = ({
   }),
   columns: inTab
     ? {
-      base: 2,
-      sm: 1
-    }
+        base: 2,
+        sm: 1
+      }
     : undefined
 });

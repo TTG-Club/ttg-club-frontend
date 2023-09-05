@@ -23,14 +23,16 @@
 
 <script>
   import { mapState } from 'pinia';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import TraitBody from '@/views/Character/Traits/TraitBody.vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
+  import TraitBody from '@/views/Character/Traits/TraitBody.vue';
 
   export default {
-
     components: {
       ContentDetail,
       TraitBody,
@@ -87,6 +89,4 @@
   };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

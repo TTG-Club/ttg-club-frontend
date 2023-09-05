@@ -8,7 +8,7 @@
       :source="god.source"
     />
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <ui-easy-lightbox
         :images="god.images"
         :use-bg-hide="false"

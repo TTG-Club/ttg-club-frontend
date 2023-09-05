@@ -21,13 +21,18 @@
 </template>
 
 <script lang="ts" setup>
-  import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
   import clsx from 'clsx';
+  import omit from 'lodash/omit';
   import { computed, ref } from 'vue';
   import { useRoute } from 'vue-router';
-  import omit from 'lodash/omit';
-  import { DEFAULT_KEY_FIELD } from '@/common/const';
-  import type { TVirtualListProps, TVirtualListRef } from '@/components/list/VirtualList/types';
+  import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+
+  import { DEFAULT_KEY_FIELD } from '@/shared/const';
+
+  import type {
+    TVirtualListProps,
+    TVirtualListRef
+  } from '@/components/list/VirtualList/types';
 
   const route = useRoute();
 
@@ -39,15 +44,20 @@
     getItemIndexByKey: undefined
   });
 
-  const getItemIndexByKey = computed(() => props.getItemIndexByKey || (
-    (items, key) => items.findIndex(item => item[props.keyField] === key)
-  ));
+  const getItemIndexByKey = computed(
+    () =>
+      props.getItemIndexByKey ||
+      ((items, key) => items.findIndex(item => item[props.keyField] === key))
+  );
 
   const scroller = ref<Record<string, any>>();
 
-  const scrollerProps = computed(() => omit(props, 'getItemIndexByKey', 'getItemClass'));
+  const scrollerProps = computed(() =>
+    omit(props, 'getItemIndexByKey', 'getItemClass')
+  );
 
-  const getItemClasses = (item: unknown) => clsx('virtual-list__item', props.getItemClass?.(item));
+  const getItemClasses = (item: unknown) =>
+    clsx('virtual-list__item', props.getItemClass?.(item));
 
   /**
    * Метод для прокрутки к элементу по ключу
@@ -101,7 +111,7 @@
 
       // Добавляем отступ между элементами
       > .virtual-list__item {
-        padding-bottom: var(--item-spacing, #{$item-spacing})
+        padding-bottom: var(--item-spacing, #{$item-spacing});
       }
     }
   }

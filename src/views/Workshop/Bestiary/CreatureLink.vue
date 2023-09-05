@@ -6,7 +6,9 @@
   >
     <div class="link-item__content">
       <div class="link-item__rating">
-        <span>{{ 'challengeRating' in creature ? creature.challengeRating : '-' }}</span>
+        <span>{{
+          'challengeRating' in creature ? creature.challengeRating : '-'
+        }}</span>
       </div>
 
       <div class="link-item__body">
@@ -36,10 +38,9 @@
 </template>
 
 <script>
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
 
   export default {
-
     directives: {
       CapitalizeFirst
     },
@@ -53,7 +54,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item";
+  @import '../../../assets/styles/modules/link-item';
 
   .link-item {
     &__rating {

@@ -1,29 +1,33 @@
-import 'vite/modulepreload-polyfill';
 import 'virtual:svg-icons-register';
+import 'vite/modulepreload-polyfill';
 import { createApp } from 'vue';
-import VueTippy from 'vue-tippy';
-import VueLazyLoad from 'vue-lazyload';
-import Toast from 'vue-toastification';
 import { createVfm } from 'vue-final-modal';
-import VueGtag from 'vue-gtag';
-import { TippyLazy } from '@/common/directives/TippyLazy';
-import registerComponents from '@/common/utils/RegisterComponents';
-import HTTPService from '@/common/services/HTTPService';
-import { TippyOptions } from '@/common/utils/TippyConfig';
-import { ToastEventBus, ToastOptions } from '@/common/utils/ToastConfig';
-import isDev from '@/common/helpers/isDev';
-import App from '@/App.vue';
-import pinia from '@/store';
-import router from './router';
 import 'vue-final-modal/style.css';
+import VueGtag from 'vue-gtag';
+import VueLazyLoad from 'vue-lazyload';
+import VueTippy from 'vue-tippy';
+import Toast from 'vue-toastification';
+
+import { TippyLazy } from '@/shared/directives/TippyLazy';
+import isDev from '@/shared/helpers/isDev';
+import HTTPService from '@/shared/services/HTTPService';
+import registerComponents from '@/shared/utils/RegisterComponents';
+import { TippyOptions } from '@/shared/utils/TippyConfig';
+import { ToastEventBus, ToastOptions } from '@/shared/utils/ToastConfig';
+
+import router from './router';
+
+import App from '@/App.vue';
 import '@/assets/styles/index.scss';
+import pinia from '@/store';
 
 const app = createApp(App);
 const vfm = createVfm();
 
 app.config.globalProperties.$http = new HTTPService();
 
-app.use(pinia)
+app
+  .use(pinia)
   .use(router)
   .use(VueTippy, TippyOptions)
   .use(VueLazyLoad)
@@ -35,11 +39,7 @@ app.use(pinia)
   .directive('tippy-lazy', TippyLazy);
 
 if (!isDev) {
-  app.use(VueGtag, {
-    config: {
-      id: import.meta.env.VITE_GTAG_ID
-    }
-  });
+  app.use(VueGtag, { config: { id: import.meta.env.VITE_GTAG_ID } });
 }
 
 registerComponents(app);

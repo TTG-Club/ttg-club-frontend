@@ -19,9 +19,7 @@
             v-for="(el, key) in option.classes"
             :key="key"
           >
-            <router-link
-              :to="{ path: el.url }"
-            >{{ el.name }}</router-link>
+            <router-link :to="{ path: el.url }">{{ el.name }}</router-link>
 
             <span v-if="key !== option.classes.length - 1">,&nbsp;</span>
           </span>

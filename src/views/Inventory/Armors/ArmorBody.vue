@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <raw-content
         v-if="armor.description"
         :template="armor.description"

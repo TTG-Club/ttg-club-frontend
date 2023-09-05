@@ -1,0 +1,56 @@
+$xs: 0;
+$sm: 576px;
+$md: 768px;
+$lg: 992px;
+$xl: 1200px;
+$xxl: 1400px;
+$full_hd: 1920px;
+$retina: 2560px;
+$ultra_hd: 3840px;
+
+@mixin media-min($breakpoint) {
+  @if $breakpoint == all {
+    @media screen {
+      @content;
+    }
+  } @else if $breakpoint != all {
+    @media screen and (min-width: $breakpoint) {
+      @content;
+    }
+  }
+}
+
+@mixin media-max($breakpoint) {
+  @if $breakpoint == all {
+    @media screen {
+      @content;
+    }
+  } @else if $breakpoint != all {
+    @media screen and (max-width: $breakpoint - 1px) {
+      @content;
+    }
+  }
+}
+
+@mixin media-minmax($min, $max) {
+  @media screen and (max-width: $min - 1px), screen and (min-width: $max) {
+    @content;
+  }
+}
+
+@mixin media-fromto($min, $max) {
+  @media screen and (min-width: $min - 1px) and (max-width: $max) {
+    @content;
+  }
+}
+
+// Mixins
+@mixin css_anim($time: 0.15s, $item: all, $style: ease-in-out) {
+  transition: $item $style $time;
+
+  @include media-min($md) {
+    &:hover {
+      transition: $item $style $time;
+    }
+  }
+}

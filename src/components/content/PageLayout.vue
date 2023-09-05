@@ -57,10 +57,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed } from 'vue';
+
+  import { useDayjs } from '@/shared/composition/useDayjs';
+
   import SocialLinks from '@/components/content/SocialLinks.vue';
-  import { useDayjs } from '@/common/composition/useDayjs';
+
   import { useUIStore } from '@/store/UI/UIStore';
 
   const props = withDefaults(
@@ -137,7 +140,7 @@
 
     &__title {
       font-weight: 500;
-      font-family: "Lora", serif;
+      font-family: 'Lora', serif;
       margin: 0;
     }
 
@@ -151,7 +154,6 @@
     }
 
     &__date {
-
     }
 
     &__content {

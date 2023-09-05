@@ -7,12 +7,17 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
       :get-group="getWeaponGroup"
-      :list="getListProps({
-        items: weapons,
-        size: 'medium',
-      })"
+      :list="
+        getListProps({
+          items: weapons,
+          size: 'medium'
+        })
+      "
     >
       <template #default="{ item: weapon }">
         <weapon-link
@@ -25,40 +30,38 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.types';
-  import { usePagination } from '@/common/composition/usePagination';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import WeaponLink from '@/views/Inventory/Weapons/WeaponLink.vue';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { WeaponsFilterDefaults } from '@/types/Inventory/Weapons.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import WeaponLink from '@/views/Inventory/Weapons/WeaponLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: WeaponsFilterDefaults.dbName,
     url: WeaponsFilterDefaults.url
   });
 
-  const {
-    initPages,
-    items: weapons
-  } = usePagination({
+  const { initPages, items: weapons } = usePagination({
     url: '/weapons',
     limit: -1,
     filter: {

@@ -12,10 +12,12 @@
 
 <script setup lang="ts">
   import { useVModel } from '@vueuse/core';
-  import { useCssModule } from 'vue';
   import clsx from 'clsx';
+  import { useCssModule } from 'vue';
+
+  import type { ClassName } from '@/shared/types/Vue';
+
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import type { ClassName } from '@/types/Shared/Vue.types';
 
   const props = defineProps<{
     modelValue: string;

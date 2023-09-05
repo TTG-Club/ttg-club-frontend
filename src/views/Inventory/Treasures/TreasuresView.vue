@@ -12,44 +12,38 @@
       :list="{ items: treasures }"
     >
       <template #default="{ item: treasure }">
-        <treasure-item
-          :treasure="treasure"
-        />
+        <treasure-item :treasure="treasure" />
       </template>
     </virtual-grouped-list>
   </content-layout>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { getGroupWithIdByFirstLetter } from '@/shared/helpers/list';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.types';
   import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupWithIdByFirstLetter } from '@/common/helpers/list';
+
+  import { TreasuresFilterDefaults } from '@/types/Inventory/Treasures.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
 
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: TreasuresFilterDefaults.dbName,
     url: TreasuresFilterDefaults.url
   });
 
-  const {
-    initPages,
-    nextPage,
-    isEnd,
-    items
-  } = usePagination({
+  const { initPages, nextPage, isEnd, items } = usePagination({
     url: '/treasures',
     filter: {
       isCustomized: filter.isCustomized,
@@ -69,12 +63,12 @@
   });
 
   /* Для добавления идентификатора к элементам */
-  const treasures = computed(() => items.value.map(item => (
-    {
+  const treasures = computed(() =>
+    items.value.map(item => ({
       ...item,
-      id: item.id || `${ item.name.eng || item.name.rus } ${ item.type.name }`
-    }
-  )));
+      id: item.id || `${item.name.eng || item.name.rus} ${item.type.name}`
+    }))
+  );
 
   const onSearch = async () => {
     await initPages();

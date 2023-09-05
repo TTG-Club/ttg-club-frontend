@@ -9,9 +9,7 @@
         class="filter-item__trigger"
         @click.left.exact.prevent="opened = !opened"
       >
-        <div class="filter-item__name">
-          Источники
-        </div>
+        <div class="filter-item__name">Источники</div>
 
         <button
           class="filter-item__button filter-item__button--toggle"
@@ -53,9 +51,10 @@
 
           <ui-checkbox
             v-tippy="{
-              content: `${
-                isGroupActive(groupKey) ? 'Выключить' : 'Включить'
-              } «` + group.name + '»',
+              content:
+                `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «` +
+                group.name +
+                '»'
             }"
             :model-value="isGroupActive(groupKey)"
             type="toggle"
@@ -81,11 +80,11 @@
 
 <script>
   import cloneDeep from 'lodash/cloneDeep';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
 
   export default {
-
     components: {
       UiCheckbox,
       SvgIcon
@@ -147,14 +146,13 @@
       },
 
       resetSources() {
-        const sources = cloneDeep(this.modelValue)
-          .map(group => ({
-            ...group,
-            values: group.values.map(value => ({
-              ...value,
-              value: value.default
-            }))
-          }));
+        const sources = cloneDeep(this.modelValue).map(group => ({
+          ...group,
+          values: group.values.map(value => ({
+            ...value,
+            value: value.default
+          }))
+        }));
 
         this.emitSources(sources);
       },
@@ -175,7 +173,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "FilterItem.module";
+  @import 'FilterItem.module';
 
   .filter-item {
     border-color: var(--primary);

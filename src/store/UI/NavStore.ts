@@ -1,36 +1,38 @@
-import { computed, ref } from 'vue';
-import { defineStore } from 'pinia';
 import orderBy from 'lodash/orderBy';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+
+import { useAxios } from '@/shared/composition/useAxios';
+import isDev from '@/shared/helpers/isDev';
+import type { Maybe } from '@/shared/types/Utility';
+
 import type { RouteLocationNormalized } from 'vue-router';
-import { useAxios } from '@/common/composition/useAxios';
-import isDev from '@/common/helpers/isDev';
-import type { Maybe } from '@/types/Shared/Utility.types';
 
 export type TNavItem = {
-  name: string
-  icon?: string
-  url?: string
-  onlyDev?: boolean
-  external?: boolean
-  children?: Array<TNavItem>
-  order: number
-  onIndex?: boolean
-  indexOrder?: number
-}
+  name: string;
+  icon?: string;
+  url?: string;
+  onlyDev?: boolean;
+  external?: boolean;
+  children?: Array<TNavItem>;
+  order: number;
+  onIndex?: boolean;
+  indexOrder?: number;
+};
 
 export type TPartner = {
-  name: string
-  description?: string
-  img: string
-  url: string
-  order: number
-}
+  name: string;
+  description?: string;
+  img: string;
+  url: string;
+  order: number;
+};
 
 export type TMetaInfo = {
-    title: string;
-    description: string;
-    menu: string;
-}
+  title: string;
+  description: string;
+  menu: string;
+};
 
 export const useNavStore = defineStore('NavStore', () => {
   const http = useAxios();
@@ -40,7 +42,7 @@ export const useNavStore = defineStore('NavStore', () => {
   /* Menu */
   const navItems = ref<Array<TNavItem>>([]);
 
-  const showedNavItems = computed(() => (
+  const showedNavItems = computed(() =>
     orderBy(
       navItems.value
         .filter(group => {
@@ -67,7 +69,7 @@ export const useNavStore = defineStore('NavStore', () => {
       ['order'],
       ['asc']
     )
-  ));
+  );
 
   const initNavItems = async () => {
     if (navItems.value.length) {
@@ -94,13 +96,9 @@ export const useNavStore = defineStore('NavStore', () => {
   /* Partners */
   const partners = ref<TPartner[]>([]);
 
-  const showedPartners = computed(() => (
-    orderBy(
-      partners.value,
-      ['order'],
-      ['asc']
-    )
-  ));
+  const showedPartners = computed(() =>
+    orderBy(partners.value, ['order'], ['asc'])
+  );
 
   const initPartners = async () => {
     if (partners.value.length) {
@@ -135,7 +133,7 @@ export const useNavStore = defineStore('NavStore', () => {
   const getMetaByURL = async (url: string) => {
     try {
       const resp = await http.get<TMetaInfo>({
-        url: `/meta${ url }`
+        url: `/meta${url}`
       });
 
       if (resp.status === 200) {
@@ -151,7 +149,9 @@ export const useNavStore = defineStore('NavStore', () => {
   };
 
   const getMetaTag = (name: string): HTMLMetaElement => {
-    let el: HTMLMetaElement | null = document.querySelector(`meta[name="${ name }"]`);
+    let el: HTMLMetaElement | null = document.querySelector(
+      `meta[name="${name}"]`
+    );
 
     if (!el) {
       const meta = document.createElement('meta');
@@ -177,7 +177,10 @@ export const useNavStore = defineStore('NavStore', () => {
     }
   };
 
-  const updateMetaByURL = async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+  const updateMetaByURL = async (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized
+  ) => {
     if (to.path === from.path) {
       return Promise.resolve();
     }

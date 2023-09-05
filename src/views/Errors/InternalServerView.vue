@@ -5,9 +5,7 @@
 
       <h4>
         Вселенная не отвечает, надо подумать
-        <router-link :to="{ path: 'index' }">
-          над другим
-        </router-link>
+        <router-link :to="{ path: 'index' }"> над другим </router-link>
       </h4>
     </div>
   </div>

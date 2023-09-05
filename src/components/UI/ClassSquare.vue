@@ -5,9 +5,7 @@
     :to="{ path: url }"
     class="class-square"
   >
-    <svg-icon
-      :icon="icon"
-    />
+    <svg-icon :icon="icon" />
   </router-link>
 </template>
 

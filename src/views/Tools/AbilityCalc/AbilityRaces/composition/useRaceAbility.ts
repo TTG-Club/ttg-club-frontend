@@ -1,26 +1,26 @@
-import type { ComputedRef, Ref } from 'vue';
 import { computed, ref } from 'vue';
-import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
+
+import type { ComputedRef, Ref } from 'vue';
+
+import type { TRaceLink } from '@/types/Character/Races.d';
+import type { AbilityRoll } from '@/types/Tools/AbilityCalc.d';
 import {
-  AbilityChoiceDouble, AbilityChoiceDoubleKey, AbilityTypeKey
-} from '@/types/Tools/AbilityCalc.types';
-import type { TRaceLink } from '@/types/Character/Races.types';
+  AbilityChoiceDouble,
+  AbilityChoiceDoubleKey,
+  AbilityTypeKey
+} from '@/types/Tools/AbilityCalc.d';
 
 type TConfig = {
-  isChoiceDouble: ComputedRef<boolean>
+  isChoiceDouble: ComputedRef<boolean>;
   selectedChoiceDouble: Ref<{
-    key: AbilityChoiceDoubleKey
-    label: AbilityChoiceDouble
-  } | null>
-  checkInstance: ComputedRef<TRaceLink | null>
-}
+    key: AbilityChoiceDoubleKey;
+    label: AbilityChoiceDouble;
+  } | null>;
+  checkInstance: ComputedRef<TRaceLink | null>;
+};
 
 export function useRaceAbility(config: TConfig) {
-  const {
-    isChoiceDouble,
-    selectedChoiceDouble,
-    checkInstance
-  } = config;
+  const { isChoiceDouble, selectedChoiceDouble, checkInstance } = config;
 
   // First
   const firstValue = ref<AbilityRoll | null>(null);
@@ -30,27 +30,37 @@ export function useRaceAbility(config: TConfig) {
       return !selectedChoiceDouble.value;
     }
 
-    return !checkInstance.value?.abilities.find(ability => [
-      AbilityTypeKey.ONE,
-      AbilityTypeKey.CHOICE,
-      AbilityTypeKey.CHOICE_UNIQUE
-    ].includes(ability.key as AbilityTypeKey));
+    return !checkInstance.value?.abilities.find(ability =>
+      [
+        AbilityTypeKey.ONE,
+        AbilityTypeKey.CHOICE,
+        AbilityTypeKey.CHOICE_UNIQUE
+      ].includes(ability.key as AbilityTypeKey)
+    );
   });
 
   const firstLabel = computed(() => {
-    if (isChoiceDouble.value && selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_TWO) {
+    if (
+      isChoiceDouble.value &&
+      selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_TWO
+    ) {
       return 2;
     }
 
-    if (isChoiceDouble.value && selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_THREE) {
+    if (
+      isChoiceDouble.value &&
+      selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_THREE
+    ) {
       return 1;
     }
 
-    const ability = checkInstance.value?.abilities.find(item => [
-      AbilityTypeKey.ONE,
-      AbilityTypeKey.CHOICE,
-      AbilityTypeKey.CHOICE_UNIQUE
-    ].includes(item.key as AbilityTypeKey));
+    const ability = checkInstance.value?.abilities.find(item =>
+      [
+        AbilityTypeKey.ONE,
+        AbilityTypeKey.CHOICE,
+        AbilityTypeKey.CHOICE_UNIQUE
+      ].includes(item.key as AbilityTypeKey)
+    );
 
     if (ability) {
       return ability.value;
@@ -64,8 +74,12 @@ export function useRaceAbility(config: TConfig) {
 
   const isSecondDisabled = computed(() => {
     if (
-      checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.CHOICE))
-      && checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.ONE))
+      checkInstance.value?.abilities.find(
+        ability => (ability.key as AbilityTypeKey) === AbilityTypeKey.CHOICE
+      ) &&
+      checkInstance.value?.abilities.find(
+        ability => (ability.key as AbilityTypeKey) === AbilityTypeKey.ONE
+      )
     ) {
       return false;
     }
@@ -74,9 +88,10 @@ export function useRaceAbility(config: TConfig) {
       return !selectedChoiceDouble.value;
     }
 
-    return !checkInstance.value?.abilities.find(ability => (
-      ability.key as AbilityTypeKey === AbilityTypeKey.CHOICE_UNIQUE
-    ));
+    return !checkInstance.value?.abilities.find(
+      ability =>
+        (ability.key as AbilityTypeKey) === AbilityTypeKey.CHOICE_UNIQUE
+    );
   });
 
   const secondLabel = computed(() => {
@@ -85,17 +100,23 @@ export function useRaceAbility(config: TConfig) {
     }
 
     if (
-      checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.CHOICE))
-      && checkInstance.value?.abilities.find(ability => (ability.key as AbilityTypeKey === AbilityTypeKey.ONE))
+      checkInstance.value?.abilities.find(
+        ability => (ability.key as AbilityTypeKey) === AbilityTypeKey.CHOICE
+      ) &&
+      checkInstance.value?.abilities.find(
+        ability => (ability.key as AbilityTypeKey) === AbilityTypeKey.ONE
+      )
     ) {
-      const ability = checkInstance.value?.abilities
-        .find(item => (item.key as AbilityTypeKey === AbilityTypeKey.CHOICE));
+      const ability = checkInstance.value?.abilities.find(
+        item => (item.key as AbilityTypeKey) === AbilityTypeKey.CHOICE
+      );
 
       return ability?.value || null;
     }
 
-    const ability = checkInstance.value?.abilities
-      .find(item => [AbilityTypeKey.CHOICE_UNIQUE].includes(item.key as AbilityTypeKey));
+    const ability = checkInstance.value?.abilities.find(item =>
+      [AbilityTypeKey.CHOICE_UNIQUE].includes(item.key as AbilityTypeKey)
+    );
 
     if (ability) {
       return ability.value;
@@ -107,12 +128,19 @@ export function useRaceAbility(config: TConfig) {
   // Third
   const thirdValue = ref<AbilityRoll | null>(null);
 
-  const isThirdDisabled = computed(() => !(
-    isChoiceDouble.value && selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_THREE
-  ));
+  const isThirdDisabled = computed(
+    () =>
+      !(
+        isChoiceDouble.value &&
+        selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_THREE
+      )
+  );
 
   const thirdLabel = computed(() => {
-    if (isChoiceDouble.value && selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_THREE) {
+    if (
+      isChoiceDouble.value &&
+      selectedChoiceDouble.value?.key === AbilityChoiceDoubleKey.FOR_THREE
+    ) {
       return 1;
     }
 

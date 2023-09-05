@@ -36,33 +36,40 @@
 </template>
 
 <script setup lang="ts">
+  import { toValue } from '@vueuse/shared';
+  import cloneDeep from 'lodash/cloneDeep';
+  import groupBy from 'lodash/groupBy';
+  import sortBy from 'lodash/sortBy';
   import { storeToRefs } from 'pinia';
   import {
-    computed, defineComponent, nextTick, onBeforeMount, ref, watch, provide
+    computed,
+    defineComponent,
+    nextTick,
+    onBeforeMount,
+    ref,
+    watch,
+    provide
   } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import sortBy from 'lodash/sortBy';
-  import groupBy from 'lodash/groupBy';
-  import cloneDeep from 'lodash/cloneDeep';
-  import { toValue } from '@vueuse/shared';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import RaceLink from '@/views/Character/Races/RaceLink.vue';
+
+  import type { TRaceLink, TRaceList } from '@/types/Character/Races.d';
+  import { RacesFilterDefaults } from '@/types/Character/Races.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import type { TRaceLink, TRaceList } from '@/types/Character/Races.types';
-  import { RacesFilterDefaults } from '@/types/Character/Races.types';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/common/const';
+  import RaceLink from '@/views/Character/Races/RaceLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const showRightSide = ref(false);
 
@@ -71,10 +78,7 @@
     url: RacesFilterDefaults.url
   });
 
-  const {
-    initPages,
-    items: races
-  } = usePagination({
+  const { initPages, items: races } = usePagination({
     url: '/races',
     limit: -1,
     filter: {
@@ -94,7 +98,8 @@
     [races, () => route.name],
     () => {
       nextTick(() => {
-        showRightSide.value = !!races.value.length && route.name === 'raceDetail';
+        showRightSide.value =
+          !!races.value.length && route.name === 'raceDetail';
       });
     },
     { flush: 'post' }
@@ -113,14 +118,14 @@
       return [];
     }
 
-    const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> => sortBy(
-      Object.values(groupBy(list, o => o.type.name))
-        .map(value => ({
+    const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> =>
+      sortBy(
+        Object.values(groupBy(list, o => o.type.name)).map(value => ({
           group: value[0].type,
           list: value
         })),
-      [o => o.group.order]
-    );
+        [o => o.group.order]
+      );
 
     const getGroupClasses = (): Array<TRaceList> => {
       const newClasses: Array<TRaceLink> = races.value.map(race => ({
@@ -136,17 +141,15 @@
       };
 
       const mapped: Array<TRaceList> = sortBy(
-        Object.values(groupBy(
-          cloneDeep(newClasses.filter((item: TRaceLink) => 'group' in item)),
-          (o: TRaceLink) => o.group?.name
-        ) as { [key: string]: Array<TRaceLink> })
-          .map(classList => ({
-            group: classList[0].group!,
-            list: sortBy(
-              classList,
-              [o => o.name.rus]
-            )
-          })),
+        Object.values(
+          groupBy(
+            cloneDeep(newClasses.filter((item: TRaceLink) => 'group' in item)),
+            (o: TRaceLink) => o.group?.name
+          ) as { [key: string]: Array<TRaceLink> }
+        ).map(classList => ({
+          group: classList[0].group!,
+          list: sortBy(classList, [o => o.name.rus])
+        })),
         [o => o.group!.order]
       );
 

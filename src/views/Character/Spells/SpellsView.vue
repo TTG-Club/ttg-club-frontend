@@ -26,52 +26,53 @@
 </template>
 
 <script lang="ts" setup>
-  import {
-    computed, onBeforeMount, watch
-  } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useRoute, useRouter } from 'vue-router';
   import { toValue } from '@vueuse/shared';
+  import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
-  import SpellLink from '@/views/Character/Spells/SpellLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { SpellsFilterDefaults, TSpellLink } from '@/types/Character/Spells.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
 
-  const props = withDefaults(defineProps<{
-    inTab?: boolean;
-    storeKey?: string;
-    filterUrl?: string;
-    queryBooks?: Array<string>;
-  }>(), {
-    inTab: false,
-    storeKey: '',
-    filterUrl: '',
-    queryBooks: undefined
-  });
+  import {
+    SpellsFilterDefaults,
+    type TSpellLink
+  } from '@/types/Character/Spells.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import SpellLink from '@/views/Character/Spells/SpellLink.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      inTab?: boolean;
+      storeKey?: string;
+      filterUrl?: string;
+      queryBooks?: Array<string>;
+    }>(),
+    {
+      inTab: false,
+      storeKey: '',
+      filterUrl: '',
+      queryBooks: undefined
+    }
+  );
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-  const layout = computed(() => (
-    props.inTab
-      ? TabLayout
-      : ContentLayout
-  ));
+  const layout = computed(() => (props.inTab ? TabLayout : ContentLayout));
 
   const filter = useFilter({
     dbName: SpellsFilterDefaults.dbName,
@@ -79,7 +80,9 @@
     url: computed(() => props.filterUrl || SpellsFilterDefaults.url)
   });
 
-  const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
+  const isCustomized = computed(
+    () => !!props.queryBooks || filter.isCustomized.value
+  );
 
   const queryParams = computed(() => {
     const params = toValue(filter.queryParams);
@@ -133,11 +136,7 @@
   });
 
   watch(
-    [
-      () => props.queryBooks,
-      () => props.filterUrl,
-      () => props.storeKey
-    ],
+    [() => props.queryBooks, () => props.filterUrl, () => props.storeKey],
     async () => {
       await resetPages();
       await filter.initFilter();
@@ -149,13 +148,11 @@
   );
 
   /* TODO: Добавить тип заклинания */
-  const getSpellGroup = ({ level }: AnyObject) => (
-    {
-      url: `${ level }`,
-      name: level ? `${ level } уровень` : 'Заговоры',
-      order: level
-    }
-  );
+  const getSpellGroup = ({ level }: AnyObject) => ({
+    url: `${level}`,
+    name: level ? `${level} уровень` : 'Заговоры',
+    order: level
+  });
 
   const showRightSide = computed(() => route.name === 'spellDetail');
 

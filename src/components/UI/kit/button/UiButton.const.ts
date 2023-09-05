@@ -1,4 +1,7 @@
-import type { InjectionKey } from 'vue';
-import type { TButtonGroupContext } from '@/components/UI/kit/button/UiButton.types';
+import type { TButtonGroupContext } from '@/components/UI/kit/button/UiButton.d';
 
-export const buttonGroupContextKey: InjectionKey<TButtonGroupContext | undefined> = Symbol('buttonGroupContextKey');
+import type { InjectionKey } from 'vue';
+
+export const buttonGroupContextKey: InjectionKey<
+  TButtonGroupContext | undefined
+> = Symbol('buttonGroupContextKey');

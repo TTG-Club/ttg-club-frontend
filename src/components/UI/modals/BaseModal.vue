@@ -50,9 +50,7 @@
         v-else-if="typeConfirm"
         class="base-modal__footer"
       >
-        <ui-button @click.left.exact.prevent="onConfirm">
-          Применить
-        </ui-button>
+        <ui-button @click.left.exact.prevent="onConfirm"> Применить </ui-button>
 
         <ui-button
           type-outline
@@ -66,9 +64,7 @@
         v-else-if="typeRemove"
         class="base-modal__footer"
       >
-        <ui-button @click.left.exact.prevent="onConfirm">
-          Удалить
-        </ui-button>
+        <ui-button @click.left.exact.prevent="onConfirm"> Удалить </ui-button>
 
         <ui-button
           type-outline
@@ -106,32 +102,37 @@
 </template>
 
 <script lang="ts" setup>
-  import { VueFinalModal } from 'vue-final-modal';
-  import { computed } from 'vue';
   import { useVModel } from '@vueuse/core';
+  import { computed } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal';
+
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   interface IEmits {
     (e: 'close'): void;
     (e: 'confirm'): void;
   }
 
-  const props = withDefaults(defineProps<{
-    modelValue: boolean;
-    typeConfirm?: boolean;
-    typeRemove?: boolean;
-    typeNotify?: boolean;
-    typeError?: boolean;
-    bookmark?: any;
-  }>(), {
-    typeConfirm: false,
-    typeRemove: false,
-    typeNotify: false,
-    typeError: false,
-    bookmark: undefined
-  });
+  const props = withDefaults(
+    defineProps<{
+      modelValue: boolean;
+      typeConfirm?: boolean;
+      typeRemove?: boolean;
+      typeNotify?: boolean;
+      typeError?: boolean;
+      bookmark?: any;
+    }>(),
+    {
+      typeConfirm: false,
+      typeRemove: false,
+      typeNotify: false,
+      typeError: false,
+      bookmark: undefined
+    }
+  );
 
   const emit = defineEmits<IEmits>();
 

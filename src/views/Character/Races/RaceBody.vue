@@ -1,8 +1,6 @@
 <template>
   <div class="race-body">
-    <detail-top-bar
-      :source="race.source"
-    />
+    <detail-top-bar :source="race.source" />
 
     <div class="content-padding">
       <ui-easy-lightbox
@@ -13,9 +11,7 @@
       <div class="scores">
         <div class="scores__stats">
           <h4>
-            <strong
-              v-tippy="'Тип существа'"
-            >ТИП</strong>
+            <strong v-tippy="'Тип существа'">ТИП</strong>
           </h4>
 
           <p>{{ race.type || '' }}</p>
@@ -23,9 +19,7 @@
 
         <div class="scores__stats">
           <h4>
-            <strong
-              v-tippy="'Увеличение характеристик'"
-            >ХАР</strong>
+            <strong v-tippy="'Увеличение характеристик'">ХАР</strong>
           </h4>
 
           <p v-if="abilities">
@@ -35,9 +29,7 @@
 
         <div class="scores__stats">
           <h4>
-            <strong
-              v-tippy="'Размер'"
-            >РАЗ</strong>
+            <strong v-tippy="'Размер'">РАЗ</strong>
           </h4>
 
           <p>{{ race.size }}</p>
@@ -45,9 +37,7 @@
 
         <div class="scores__stats">
           <h4>
-            <strong
-              v-tippy="'Скорость'"
-            >СКР</strong>
+            <strong v-tippy="'Скорость'">СКР</strong>
           </h4>
 
           <p>{{ speed }}</p>
@@ -58,12 +48,10 @@
           class="scores__stats"
         >
           <h4>
-            <strong
-              v-tippy="'Темное зрение'"
-            >ТЗ</strong>
+            <strong v-tippy="'Темное зрение'">ТЗ</strong>
           </h4>
 
-          <p>{{ `${ race.darkvision } фт.` }}</p>
+          <p>{{ `${race.darkvision} фт.` }}</p>
         </div>
       </div>
 
@@ -99,9 +87,7 @@
       </details>
 
       <template v-if="race.subraces">
-        <h4>
-          Разновидности
-        </h4>
+        <h4>Разновидности</h4>
 
         <details
           v-for="(subrace, subraceKey) in race.subraces"
@@ -142,6 +128,7 @@
 
 <script>
   import sortBy from 'lodash/sortBy';
+
   import RawContent from '@/components/content/RawContent.vue';
   import DetailTopBar from '@/components/UI/DetailTopBar.vue';
   import UiEasyLightbox from '@/components/UI/kit/UiEasyLightbox.vue';
@@ -169,9 +156,13 @@
         const abilities = [];
 
         for (const ability of this.race.abilities) {
-          abilities.push(ability.value
-            ? `${ ability.shortName } ${ ability.value > 0 ? `+${ ability.value }` : ability.value }`
-            : ability.name);
+          abilities.push(
+            ability.value
+              ? `${ability.shortName} ${
+                  ability.value > 0 ? `+${ability.value}` : ability.value
+                }`
+              : ability.name
+          );
         }
 
         return abilities.join(', ');
@@ -185,7 +176,9 @@
         const speeds = [];
 
         for (const speed of this.race.speed) {
-          speeds.push(`${ speed.name ? `${ speed.name } ` : '' }${ speed.value } фт.`);
+          speeds.push(
+            `${speed.name ? `${speed.name} ` : ''}${speed.value} фт.`
+          );
         }
 
         return speeds.join(', ');

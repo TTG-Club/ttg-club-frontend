@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { routes } from '@/router/routes';
-import { useNavStore } from '@/store/UI/NavStore';
+
+import { useMetrics } from '@/shared/composition/useMetrics';
+
 import { useRouterHelpers } from '@/router/composition/useRouterHelpers';
+import { routes } from '@/router/routes';
 import pinia from '@/store';
-import { useMetrics } from '@/common/composition/useMetrics';
+import { useNavStore } from '@/store/UI/NavStore';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,8 +29,7 @@ router.beforeResolve(async () => {
 router.afterEach((to, from) => {
   sendPageViewMetrics(to);
 
-  navStore.updateMetaByURL(to, from)
-    .finally();
+  navStore.updateMetaByURL(to, from).finally();
 });
 
 export default router;

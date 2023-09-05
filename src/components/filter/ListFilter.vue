@@ -31,7 +31,9 @@
         type="button"
         @click.left.exact.prevent="showed = !showed"
       >
-        <svg-icon :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`" />
+        <svg-icon
+          :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`"
+        />
 
         <span>Фильтр</span>
       </button>
@@ -52,9 +54,7 @@
       v-if="!!filter"
       v-model="showed"
     >
-      <template #title>
-        Фильтр
-      </template>
+      <template #title> Фильтр </template>
 
       <template #default>
         <div class="filter__dropdown">
@@ -79,28 +79,32 @@
       </template>
 
       <template #footer>
-        <h5>
-          Фильтры применяются автоматически!
-        </h5>
+        <h5>Фильтры применяются автоматически!</h5>
       </template>
     </base-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-  import cloneDeep from 'lodash/cloneDeep';
-  import type { PropType } from 'vue';
-  import { computed, ref } from 'vue';
   import { useDebounceFn } from '@vueuse/core';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
-  import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import BaseModal from '@/components/UI/modals/BaseModal.vue';
+  import cloneDeep from 'lodash/cloneDeep';
+  import { computed, ref } from 'vue';
+
   import type {
-    Filter, FilterComposable, FilterGroup, FilterItem
-  } from '@/common/composition/useFilter';
+    Filter,
+    FilterComposable,
+    FilterGroup,
+    FilterItem
+  } from '@/shared/composition/useFilter';
+  import errorHandler from '@/shared/helpers/errorHandler';
+
+  import FilterItemCheckboxes from '@/components/filter/FilterItem/FilterItemCheckboxes.vue';
+  import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
+  import BaseModal from '@/components/UI/modals/BaseModal.vue';
+
+  import type { PropType } from 'vue';
 
   const props = defineProps({
     filterInstance: {
@@ -176,8 +180,13 @@
     }
   });
 
-  const otherFiltered = computed(() => otherFilters.value.filter((group: FilterGroup) => !group.hidden));
-  const isFilterCustomized = computed(() => props.filterInstance.isCustomized.value);
+  const otherFiltered = computed(() =>
+    otherFilters.value.filter((group: FilterGroup) => !group.hidden)
+  );
+
+  const isFilterCustomized = computed(
+    () => props.filterInstance.isCustomized.value
+  );
 
   const setSourcesValue = (value: Array<FilterGroup>) => {
     if (!filter.value || Array.isArray(filter.value)) {
@@ -251,7 +260,7 @@
             border: {
               top-right-radius: 0;
               bottom-right-radius: 0;
-            };
+            }
           }
         }
       }

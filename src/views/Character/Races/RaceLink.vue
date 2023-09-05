@@ -16,7 +16,7 @@
           v-lazy="raceItem.image"
           alt="img-bg"
           class="link-item-expand__content__img-bg"
-        >
+        />
 
         <div class="link-item-expand__content__gradient" />
 
@@ -26,7 +26,6 @@
             class="link-item-expand__link"
             @click.left.prevent.exact="selectRace"
           >
-
             <span class="link-item-expand__body">
               <span class="link-item-expand__body_row">
                 <span class="link-item-expand__name">
@@ -66,9 +65,7 @@
             type="button"
             @click.left.exact.prevent="submenu = !submenu"
           >
-            <svg-icon
-              :icon="submenu ? 'minus' : 'plus'"
-            />
+            <svg-icon :icon="submenu ? 'minus' : 'plus'" />
           </button>
         </div>
 
@@ -93,7 +90,9 @@
                 :to="{ path: subRace.url }"
                 class="link-item-expand__arch-item"
               >
-                <span class="link-item-expand__arch-item_name">{{ subRace.name.rus }}</span>
+                <span class="link-item-expand__arch-item_name">{{
+                  subRace.name.rus
+                }}</span>
 
                 <span class="link-item-expand__arch-item_book">
                   <span v-tippy-lazy="{ content: subRace.source.name }">
@@ -114,21 +113,21 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
-  import type { RouteLocationPathRaw } from 'vue-router';
-  import {
-    useLink, useRoute, useRouter
-  } from 'vue-router';
+  import groupBy from 'lodash/groupBy';
   import isArray from 'lodash/isArray';
   import sortBy from 'lodash/sortBy';
-  import groupBy from 'lodash/groupBy';
-  import type { TRaceLink } from '@/types/Character/Races.types';
+  import { computed, defineComponent, ref } from 'vue';
+  import { useLink, useRoute, useRouter } from 'vue-router';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  import type { TRaceLink } from '@/types/Character/Races.d';
+  import { AbilityType } from '@/types/Tools/AbilityCalc.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import { AbilityType } from '@/types/Tools/AbilityCalc.types';
 
   export default defineComponent({
     components: { SvgIcon },
@@ -151,11 +150,7 @@
       const route = useRoute();
       const router = useRouter();
 
-      const {
-        isActive,
-        navigate,
-        href
-      } = useLink(props);
+      const { isActive, navigate, href } = useLink(props);
 
       const uiStore = useUIStore();
       const submenu = ref(false);
@@ -172,9 +167,13 @@
         const abilitiesList = [];
 
         for (const ability of props.raceItem.abilities) {
-          abilitiesList.push(ability.value
-            ? `${ ability.shortName } ${ ability.value > 0 ? `+${ ability.value }` : ability.value }`
-            : ability.name);
+          abilitiesList.push(
+            ability.value
+              ? `${ability.shortName} ${
+                  ability.value > 0 ? `+${ability.value}` : ability.value
+                }`
+              : ability.name
+          );
         }
 
         return abilitiesList.join(', ');
@@ -187,11 +186,12 @@
 
         if (isArray(props.raceItem.subraces)) {
           return sortBy(
-            Object.values(groupBy(props.raceItem.subraces, o => o.type.name))
-              .map(value => ({
-                name: value[0].type,
-                list: value
-              })),
+            Object.values(
+              groupBy(props.raceItem.subraces, o => o.type.name)
+            ).map(value => ({
+              name: value[0].type,
+              list: value
+            })),
             [o => o.name.order]
           );
         }
@@ -202,8 +202,10 @@
       const hasSubRaces = computed(() => !!subRaces.value);
 
       const parentClassList = computed(() => ({
-        'router-link-active': isActive.value
-          || route.params.raceName === router.resolve(props.raceItem.url).params.raceName,
+        'router-link-active':
+          isActive.value ||
+          route.params.raceName ===
+            router.resolve(props.raceItem.url).params.raceName,
         'is-selected': route.name === 'raceDetail',
         'is-green': props.raceItem.type.name.toLowerCase() === 'homebrew',
         'is-fullscreen': uiStore.fullscreen,
@@ -221,8 +223,7 @@
           return;
         }
 
-        window.open(href.value, '_blank')
-          ?.focus();
+        window.open(href.value, '_blank')?.focus();
       };
 
       return {
@@ -238,7 +239,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item-expand";
+  @import '../../../assets/styles/modules/link-item-expand';
 
   .link-item-expand {
     &__main {

@@ -9,7 +9,10 @@
     <virtual-grouped-list
       :list="getListProps({ items: traits })"
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
     >
       <template #default="{ item: trait }">
         <trait-link
@@ -22,48 +25,46 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import { getGroupByFirstLetter } from '@/shared/helpers/list';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import TraitLink from '@/views/Character/Traits/TraitLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { TraitsFilterDefaults } from '@/types/Character/Traits.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from '@/common/helpers/list';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { TraitsFilterDefaults } from '@/types/Character/Traits.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import TraitLink from '@/views/Character/Traits/TraitLink.vue';
 
   type TProps = {
     storeKey?: string;
-  }
+  };
 
-  const props = (withDefaults(defineProps<TProps>(), {
+  const props = withDefaults(defineProps<TProps>(), {
     storeKey: ''
-  }));
+  });
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: TraitsFilterDefaults.dbName,
     url: TraitsFilterDefaults.url
   });
 
-  const {
-    initPages,
-    items: traits
-  } = usePagination({
+  const { initPages, items: traits } = usePagination({
     url: '/traits',
     limit: -1,
     filter: {

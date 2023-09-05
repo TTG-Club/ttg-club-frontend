@@ -29,7 +29,9 @@
           </router-link>
 
           <div class="nav-menu__info">
-            <span class="nav-menu__info--desc">Онлайн справочник по D&D 5e</span>
+            <span class="nav-menu__info--desc"
+              >Онлайн справочник по D&D 5e</span
+            >
 
             <span class="nav-menu__info--title">TTG Club</span>
           </div>
@@ -68,7 +70,8 @@
                   :href="link.url"
                   :target="link.external ? '_blank' : '_self'"
                   class="nav-menu__link_label"
-                >{{ link.name }}</a>
+                  >{{ link.name }}</a
+                >
 
                 <router-link
                   v-else
@@ -87,16 +90,17 @@
 </template>
 
 <script lang="ts">
-  import {
-    defineComponent, ref, watch
-  } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { defineComponent, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import type { TNavItem } from '@/store/UI/NavStore';
-  import { useNavStore } from '@/store/UI/NavStore';
-  import NavPopover from '@/components/UI/menu/NavPopover.vue';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+
   import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import NavPopover from '@/components/UI/menu/NavPopover.vue';
+
+  import type { TNavItem } from '@/store/UI/NavStore';
+
+  import { useNavStore } from '@/store/UI/NavStore';
 
   export default defineComponent({
     name: 'NavMenu',

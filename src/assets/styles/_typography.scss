@@ -1,4 +1,4 @@
-@import "fonts";
+@use 'fonts';
 
 :root {
   --main-font-size: 14px;
@@ -84,7 +84,7 @@ a {
 
   &:hover {
     color: var(--link-color-hover);
-    transition: all .5s;
+    transition: all 0.5s;
   }
 }
 
@@ -212,7 +212,6 @@ h5.header_separator {
   margin-right: 8px;
 }
 
-
 /********* Сворачивание текста / details  *********/
 details {
   margin-left: -8px;
@@ -302,7 +301,7 @@ summary::marker {
 summary:before {
   right: 32px;
   position: absolute;
-  content: "➕";
+  content: '➕';
   width: 0;
   height: 0;
   font-size: 14px;
@@ -312,7 +311,7 @@ summary:before {
 }
 
 details[open] > summary::before {
-  content: "➖";
+  content: '➖';
 }
 
 @media (max-width: 800px) {
@@ -408,7 +407,6 @@ details[open].spoiler div > details {
   margin-bottom: 0;
 }
 
-
 /********* Выделение в тексте *********/
 dnd5club-dice-text,
 dnd5club-saving-throw,
@@ -447,7 +445,6 @@ dnd5club-saving-throw,
 span.saving_throw {
   color: var(--bg-saving_throw);
 }
-
 
 /********* Таблицы *********/
 .table-responsive {

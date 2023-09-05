@@ -16,9 +16,7 @@
                 label="name"
                 track-by="value"
               >
-                <template #placeholder>
-                  Уровень
-                </template>
+                <template #placeholder> Уровень </template>
               </ui-select>
             </div>
 
@@ -31,9 +29,7 @@
                 label="name"
                 track-by="value"
               >
-                <template #placeholder>
-                  Окружение
-                </template>
+                <template #placeholder> Окружение </template>
               </ui-select>
             </div>
           </div>
@@ -64,15 +60,11 @@
         :key="key"
         class="madness-item"
       >
-        <div>
-          <b>Источник:</b> {{ item.source.name }}
-        </div>
+        <div><b>Источник:</b> {{ item.source.name }}</div>
 
-        <div>
-          <b>Таблица:</b> {{ item.tableName }}
-        </div>
+        <div><b>Таблица:</b> {{ item.tableName }}</div>
 
-        <br>
+        <br />
 
         <div>
           <raw-content :template="item.description" />
@@ -100,11 +92,13 @@
 <script>
   import throttle from 'lodash/throttle';
   import { reactive } from 'vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
   import RawContent from '@/components/content/RawContent.vue';
-  import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import BaseModal from '@/components/UI/modals/BaseModal.vue';
   import RollTable from '@/components/UI/RollTable.vue';
 
@@ -157,7 +151,9 @@
             return '';
           }
 
-          return this.environments.find(env => env.value === this.form.environment);
+          return this.environments.find(
+            env => env.value === this.form.environment
+          );
         },
 
         set(e) {
@@ -189,7 +185,7 @@
       },
 
       // eslint-disable-next-line func-names
-      sendForm: throttle(async function() {
+      sendForm: throttle(async function () {
         if (this.controller) {
           this.controller.abort();
         }

@@ -1,8 +1,8 @@
-import type { AnyObject, Maybe } from '@/types/Shared/Utility.types';
+import type { AnyObject, Maybe } from '@/shared/types/Utility';
 
 export type TVirtualListProps = {
   items: AnyObject[];
-  keyField?: string,
+  keyField?: string;
   minItemSize?: number;
   pageMode?: boolean;
   buffer?: number;
@@ -19,7 +19,6 @@ export type TVirtualListProps = {
 };
 
 export type TVirtualListRef = {
-
   /**
    * Реф виртуального списка для доступа к его API
    */
@@ -28,5 +27,5 @@ export type TVirtualListRef = {
   /**
    * Функция для прокрутки списка к элементу по ключу
    */
-  scrollToItemByKey: (key: string) => {scrolled: boolean, index: number};
+  scrollToItemByKey: (key: string) => { scrolled: boolean; index: number };
 };

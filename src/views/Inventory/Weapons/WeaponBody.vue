@@ -12,13 +12,13 @@
 
     <div class="grid_stat_block">
       <div class="block">
-        <p>Стоимость: </p>
+        <p>Стоимость:</p>
 
         <span>{{ weapon.price ? weapon.price : '—' }}</span>
       </div>
 
       <div class="block">
-        <p>Урон: </p>
+        <p>Урон:</p>
 
         <span>
           <dice-roller :formula="weapon.damage.dice">
@@ -30,7 +30,7 @@
       </div>
 
       <div class="block">
-        <p>Вес (в фунтах): </p>
+        <p>Вес (в фунтах):</p>
 
         <span>{{ weapon.weight }}</span>
       </div>
@@ -39,7 +39,7 @@
         v-if="weapon.properties?.length"
         class="block"
       >
-        <p>Свойства: </p>
+        <p>Свойства:</p>
 
         <span
           v-for="(property, propKey) in weapon.properties"
@@ -48,12 +48,15 @@
           <router-link
             v-tippy="{ content: property.description }"
             :to="{ path: property.url }"
-          >{{ property.name }}</router-link>
+            >{{ property.name }}</router-link
+          >
 
           <span
             v-if="property.twoHandDice"
             v-tippy="{ content: 'При атаке двумя руками' }"
-          > ({{ property.twoHandDice }})</span>
+          >
+            ({{ property.twoHandDice }})</span
+          >
 
           <span v-if="property.distance"> (дис. {{ property.distance }})</span>
 
@@ -62,7 +65,7 @@
       </div>
     </div>
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <raw-content
         v-if="weapon.description"
         :template="weapon.description"
@@ -79,8 +82,8 @@
 
 <script>
   import RawContent from '@/components/content/RawContent.vue';
-  import DiceRoller from '@/components/UI/DiceRoller.vue';
   import DetailTopBar from '@/components/UI/DetailTopBar.vue';
+  import DiceRoller from '@/components/UI/DiceRoller.vue';
 
   export default {
     name: 'WeaponBody',

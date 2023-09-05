@@ -55,11 +55,11 @@
 
 <script>
   import cloneDeep from 'lodash/cloneDeep';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
 
   export default {
-
     components: {
       UiCheckbox,
       SvgIcon
@@ -108,11 +108,10 @@
     },
     methods: {
       resetValues() {
-        const values = cloneDeep(this.modelValue)
-          .map(value => ({
-            ...value,
-            value: value.default
-          }));
+        const values = cloneDeep(this.modelValue).map(value => ({
+          ...value,
+          value: value.default
+        }));
 
         this.emitValues(values);
       },
@@ -142,5 +141,5 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "FilterItem.module";
+  @import 'FilterItem.module';
 </style>

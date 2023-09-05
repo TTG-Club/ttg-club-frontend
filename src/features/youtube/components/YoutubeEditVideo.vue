@@ -11,9 +11,7 @@
     <div :class="$style.container">
       <div :class="$style.wrapper">
         <div :class="$style.header">
-          <h2 :class="$style.title">
-            Изменение видео
-          </h2>
+          <h2 :class="$style.title">Изменение видео</h2>
 
           <ui-button
             icon="close"
@@ -63,25 +61,26 @@
 </template>
 
 <script lang="ts" setup>
-  import { VueFinalModal } from 'vue-final-modal';
-  import {
-    ref, watch, reactive
-  } from 'vue';
-  import { useVModel } from '@vueuse/core';
-  import { useToast } from 'vue-toastification';
-  import { helpers, required } from '@vuelidate/validators';
   import useVuelidate from '@vuelidate/core';
+  import { helpers, required } from '@vuelidate/validators';
+  import { useVModel } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
+  import { ref, watch, reactive } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal';
+  import { useToast } from 'vue-toastification';
+
+  import { YoutubeApi } from '@/features/youtube/api';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
+
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import UiInput from '@/components/UI/kit/UiInput.vue';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-  import { YoutubeApi } from '@/features/youtube/api';
 
   type TProp = {
     modelValue: boolean;
     video: TYoutubeVideo;
-  }
+  };
 
   const props = withDefaults(defineProps<TProp>(), {
     modelValue: false
@@ -91,7 +90,7 @@
     (e: 'update:modelValue', v: boolean): void;
     (e: 'saved', v: TYoutubeVideo): void;
     (e: 'close'): void;
-  }
+  };
 
   const emit = defineEmits<TEmit>();
 
@@ -103,10 +102,7 @@
 
   const rules = {
     name: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required
-      )
+      required: helpers.withMessage('Поле обязательно для заполнения', required)
     }
   };
 
@@ -154,9 +150,12 @@
     }
   };
 
-  watch(() => props.modelValue, () => {
-    reset();
-  });
+  watch(
+    () => props.modelValue,
+    () => {
+      reset();
+    }
+  );
 </script>
 
 <style lang="scss" module>

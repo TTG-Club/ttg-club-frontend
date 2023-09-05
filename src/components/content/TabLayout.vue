@@ -38,13 +38,15 @@
 <script lang="ts" setup>
   import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
   import { onMounted, ref } from 'vue';
-  import type { FilterComposable } from '@/common/composition/useFilter';
+
+  import type { FilterComposable } from '@/shared/composition/useFilter';
+
   import ListFilter from '@/components/filter/ListFilter.vue';
 
   const props = withDefaults(
     defineProps<{
       filterInstance?: FilterComposable;
-      onLoadMore?:() => Promise<void>;
+      onLoadMore?: () => Promise<void>;
       isEnd?: boolean;
     }>(),
     {

@@ -2,7 +2,7 @@
   <div
     :class="{
       'ui-group-button': true,
-      'is-full-width': fullWidth,
+      'is-full-width': fullWidth
     }"
   >
     <slot />
@@ -10,11 +10,13 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    provide, reactive, toRef
-  } from 'vue';
-  import type { ISharedButtonProps, TButtonType } from '@/components/UI/kit/button/UiButton.types';
+  import { provide, reactive, toRef } from 'vue';
+
   import { buttonGroupContextKey } from '@/components/UI/kit/button/UiButton.const';
+  import type {
+    ISharedButtonProps,
+    TButtonType
+  } from '@/components/UI/kit/button/UiButton.d';
 
   const props = withDefaults(defineProps<ISharedButtonProps>(), {
     size: 'md',
@@ -24,13 +26,16 @@
     fullWidth: false
   });
 
-  provide(buttonGroupContextKey, reactive({
-    type: 'default' as TButtonType,
-    size: toRef(props, 'size'),
-    color: toRef(props, 'color'),
-    nativeType: toRef(props, 'nativeType'),
-    disabled: toRef(props, 'disabled')
-  }));
+  provide(
+    buttonGroupContextKey,
+    reactive({
+      type: 'default' as TButtonType,
+      size: toRef(props, 'size'),
+      color: toRef(props, 'color'),
+      nativeType: toRef(props, 'nativeType'),
+      disabled: toRef(props, 'disabled')
+    })
+  );
 </script>
 
 <style lang="scss" scoped>
@@ -55,7 +60,7 @@
           border: {
             top-right-radius: 0;
             bottom-right-radius: 0;
-          };
+          }
         }
       }
 
@@ -63,7 +68,7 @@
         > button {
           border: {
             radius: 0;
-          };
+          }
         }
       }
 
@@ -72,7 +77,7 @@
           border: {
             top-left-radius: 0;
             bottom-left-radius: 0;
-          };
+          }
         }
       }
     }

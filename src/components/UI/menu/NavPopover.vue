@@ -34,22 +34,26 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, watch } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
+  import { computed, watch } from 'vue';
+
   import { useNavStore } from '@/store/UI/NavStore';
 
-  const props = withDefaults(defineProps<{
-    modelValue?: boolean;
-    isMenu?: boolean;
-    isLeft?: boolean;
-    innerScroll?: boolean;
-  }>(), {
-    modelValue: false,
-    isMenu: false,
-    isLeft: false,
-    innerScroll: false
-  });
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: boolean;
+      isMenu?: boolean;
+      isLeft?: boolean;
+      innerScroll?: boolean;
+    }>(),
+    {
+      modelValue: false,
+      isMenu: false,
+      isLeft: false,
+      innerScroll: false
+    }
+  );
 
   interface IEmit {
     (e: 'close'): void;
@@ -62,13 +66,11 @@
   const navStore = useNavStore();
   const { isShowPopover } = storeToRefs(navStore);
 
-  const classes = computed(() => (
-    {
-      'is-left': props.isLeft,
-      'is-menu': props.isMenu,
-      'inner-scroll': props.innerScroll
-    }
-  ));
+  const classes = computed(() => ({
+    'is-left': props.isLeft,
+    'is-menu': props.isMenu,
+    'inner-scroll': props.innerScroll
+  }));
 
   const onClose = () => {
     isShow.value = false;
@@ -161,20 +163,26 @@
   }
 
   .nav-popover-animation {
-    &-enter-from, &-leave-to {
+    &-enter-from,
+    &-leave-to {
       opacity: 0;
       transform: scale(0) translate3d(0, 0, 0);
       z-index: -1;
     }
 
-    &-enter-to, &-leave-from {
+    &-enter-to,
+    &-leave-from {
       opacity: 1;
       transform: scale(1) translate3d(0, 0, 0);
       z-index: 111;
     }
 
-    &-enter-active, &-leave-active {
-      @include css_anim($time: .25s, $style: cubic-bezier(0.215, 0.61, 0.355, 1));
+    &-enter-active,
+    &-leave-active {
+      @include css_anim(
+        $time: 0.25s,
+        $style: cubic-bezier(0.215, 0.61, 0.355, 1)
+      );
     }
   }
 

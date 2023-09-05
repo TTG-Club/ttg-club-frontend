@@ -11,7 +11,7 @@
       <div
         :class="{
           'is-fullscreen': fullscreenState,
-          'is-showed-right-side': showRightSide,
+          'is-showed-right-side': showRightSide
         }"
         class="content-layout__side--left"
       >
@@ -83,22 +83,27 @@
 
 <script lang="ts" setup>
   import {
-    computed, onMounted, ref
-  } from 'vue';
-  import type { MaybeRef } from '@vueuse/core';
-  import {
-    useElementBounding, useInfiniteScroll, useResizeObserver, useScroll
+    useElementBounding,
+    useInfiniteScroll,
+    useResizeObserver,
+    useScroll
   } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
   import throttle from 'lodash/throttle';
-  import { useUIStore } from '@/store/UI/UIStore';
+  import { storeToRefs } from 'pinia';
+  import { computed, onMounted, ref } from 'vue';
+
+  import type { FilterComposable } from '@/shared/composition/useFilter';
+
   import ListFilter from '@/components/filter/ListFilter.vue';
-  import type { FilterComposable } from '@/common/composition/useFilter';
+
+  import type { MaybeRef } from '@vueuse/core';
+
+  import { useUIStore } from '@/store/UI/UIStore';
 
   type TEmit = {
     (e: 'update'): void;
     (e: 'search', v: MaybeRef<string>): void;
-  }
+  };
 
   const props = withDefaults(
     defineProps<{
@@ -106,7 +111,7 @@
       title?: string | null;
       forceFullscreenState?: boolean;
       filterInstance?: FilterComposable;
-      onLoadMore?:() => Promise<void>;
+      onLoadMore?: () => Promise<void>;
       isEnd?: boolean;
     }>(),
     {
@@ -123,11 +128,7 @@
 
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen,
-    bodyElement
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen, bodyElement } = storeToRefs(uiStore);
 
   const container = ref<HTMLDivElement | null>(null);
   const leftSide = ref<HTMLDivElement | null>(null);
@@ -147,8 +148,9 @@
       return;
     }
 
-    shadow.value
-      = uiStore.bodyScroll.y + bodyElement.value.offsetHeight < container.value.offsetHeight - 24;
+    shadow.value =
+      uiStore.bodyScroll.y + bodyElement.value.offsetHeight <
+      container.value.offsetHeight - 24;
   };
 
   const scrollHandler = throttle(() => {
@@ -182,13 +184,14 @@
 
     const rect = link.getBoundingClientRect();
 
-    if (!bodyElement.value || !rect?.top && rect?.top !== 0) {
+    if (!bodyElement.value || (!rect?.top && rect?.top !== 0)) {
       return;
     }
 
     fixedContainerRect.update();
 
-    bodyScroll.y.value = rect.top + bodyScroll.y.value - fixedContainerRect.height.value;
+    bodyScroll.y.value =
+      rect.top + bodyScroll.y.value - fixedContainerRect.height.value;
   };
 
   const scrollToLastActive = (url: string) => {
@@ -200,7 +203,8 @@
       return;
     }
 
-    const link = leftSide.value.querySelector(`[href="${ url }"]`)
+    const link = leftSide.value
+      .querySelector(`[href="${url}"]`)
       ?.closest('.link-item-expand');
 
     if (!link) {
@@ -285,12 +289,12 @@
         height: 16px;
         width: 100%;
         background: linear-gradient(
-            180deg,
-            var(--bg-main) 0,
-            var(--bg-main) 15%,
-            transparent 80%,
-            transparent 90%,
-            transparent 100%
+          180deg,
+          var(--bg-main) 0,
+          var(--bg-main) 15%,
+          transparent 80%,
+          transparent 90%,
+          transparent 100%
         );
       }
 
@@ -358,7 +362,7 @@
             border: {
               top-left-radius: 20%;
               top-right-radius: 20%;
-            };
+            }
           }
 
           &.is-shadow {

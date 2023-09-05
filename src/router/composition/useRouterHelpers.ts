@@ -1,9 +1,14 @@
-import type {
-  NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw
-} from 'vue-router';
 import { AxiosError } from 'axios';
+
+import { useAxios } from '@/shared/composition/useAxios';
+
+import type {
+  NavigationGuardNext,
+  RouteLocationNormalized,
+  RouteRecordRaw
+} from 'vue-router';
+
 import { routes } from '@/router/routes';
-import { useAxios } from '@/common/composition/useAxios';
 
 export const useRouterHelpers = () => {
   const isUrlAvailable = async (to: RouteLocationNormalized) => {
@@ -27,7 +32,10 @@ export const useRouterHelpers = () => {
     const getAvailRoute = (route: RouteRecordRaw): Array<string | symbol> => {
       const list = [];
 
-      if (route.name && (route.name === 'profile' || !route.path.includes(':'))) {
+      if (
+        route.name &&
+        (route.name === 'profile' || !route.path.includes(':'))
+      ) {
         list.push(route.name);
       }
 
@@ -47,7 +55,10 @@ export const useRouterHelpers = () => {
     return !!to.name && availRoutes.includes(to.name);
   };
 
-  const nextAvailable = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
+  const nextAvailable = async (
+    to: RouteLocationNormalized,
+    next: NavigationGuardNext
+  ) => {
     if (isStaticUrl(to)) {
       next();
 

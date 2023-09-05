@@ -23,10 +23,9 @@
 </template>
 
 <script>
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
 
   export default {
-
     directives: {
       CapitalizeFirst
     },

@@ -28,12 +28,15 @@
 
 <script>
   import { mapState } from 'pinia';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
   import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
   import ScreensGroup from '@/views/Workshop/Screens/ScreensGroup.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
 
   export default {
     components: {

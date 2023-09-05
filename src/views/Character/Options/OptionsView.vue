@@ -26,25 +26,27 @@
 </template>
 
 <script lang="ts" setup>
-  import {
-    computed, onBeforeMount, watch
-  } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useRoute, useRouter } from 'vue-router';
   import { toValue } from '@vueuse/shared';
+  import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import { getGroupByFirstLetter } from '@/shared/helpers/list';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
   import TabLayout from '@/components/content/TabLayout.vue';
-  import OptionLink from '@/views/Character/Options/OptionLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { OptionsFilterDefaults } from '@/types/Character/Options.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from '@/common/helpers/list';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { getListGridInTabProps } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { OptionsFilterDefaults } from '@/types/Character/Options.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import OptionLink from '@/views/Character/Options/OptionLink.vue';
 
   type TProps = {
     inTab?: boolean;
@@ -64,16 +66,9 @@
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
-  const layout = computed(() => (
-    props.inTab
-      ? TabLayout
-      : ContentLayout
-  ));
+  const layout = computed(() => (props.inTab ? TabLayout : ContentLayout));
 
   const filter = useFilter({
     dbName: OptionsFilterDefaults.dbName,
@@ -81,7 +76,9 @@
     url: computed(() => props.filterUrl || OptionsFilterDefaults.url)
   });
 
-  const isCustomized = computed(() => !!props.queryBooks || filter.isCustomized.value);
+  const isCustomized = computed(
+    () => !!props.queryBooks || filter.isCustomized.value
+  );
 
   const queryParams = computed(() => {
     const params = toValue(filter.queryParams);
@@ -136,11 +133,7 @@
   });
 
   watch(
-    [
-      () => props.queryBooks,
-      () => props.filterUrl,
-      () => props.storeKey
-    ],
+    [() => props.queryBooks, () => props.filterUrl, () => props.storeKey],
     async () => {
       await resetPages();
       await filter.initFilter();

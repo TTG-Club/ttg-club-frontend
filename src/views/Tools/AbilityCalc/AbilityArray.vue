@@ -23,29 +23,30 @@
         {{ roll.name || 'Выбрать хар-ку' }}
       </template>
 
-      <template #placeholder>
-        Выбрать хар-ку
-      </template>
+      <template #placeholder> Выбрать хар-ку </template>
 
       <template #option="{ option }">
         <span
           :class="{ 'is-selected': isSelected(option.key) }"
           class="ability-array__select_option"
-        >{{ option.name }}</span>
+          >{{ option.name }}</span
+        >
       </template>
     </ui-select>
   </div>
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, onActivated, ref
-  } from 'vue';
-  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
-  import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
+  import { computed, defineComponent, onActivated, ref } from 'vue';
+
+  import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
+
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/common/helpers/abilityTransforms';
+
+  import type { PropType } from 'vue';
+
+  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.d';
+  import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.d';
 
   export default defineComponent({
     components: {
@@ -103,15 +104,14 @@
         emit('update:model-value', rolls.value);
       });
 
-      const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
+      const isSelected = (key: AbilityKey) =>
+        rolls.value.find(roll => roll.key === key);
 
       const onSelect = (key: AbilityKey | null, index: number) => {
         const setValue = (value: typeof key, i: number) => {
           rolls.value[i].key = value;
 
-          rolls.value[i].name = value
-            ? AbilityName[value]
-            : null;
+          rolls.value[i].name = value ? AbilityName[value] : null;
         };
 
         for (let i = 0; i < rolls.value.length; i++) {
@@ -137,12 +137,12 @@
       };
 
       return {
-        abilities: computed(() => Object
-          .keys(AbilityKey)
-          .map(key => ({
+        abilities: computed(() =>
+          Object.keys(AbilityKey).map(key => ({
             key,
             name: AbilityName[key as AbilityKey]
-          }))),
+          }))
+        ),
         getFormattedModifier,
         isSelected,
         onSelect,
@@ -173,7 +173,7 @@
 
         &.is-selected {
           &::before {
-            content: "";
+            content: '';
             width: 10px;
             height: 10px;
             border-radius: 50%;
@@ -186,7 +186,6 @@
       }
 
       &_roll {
-
       }
     }
 

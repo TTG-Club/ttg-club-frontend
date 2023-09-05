@@ -7,7 +7,11 @@
     <div class="form__row">
       <ui-input
         v-model.trim="v$.usernameOrEmail.$model"
-        :error-text="v$.usernameOrEmail.$dirty ? v$.usernameOrEmail.$errors?.[0]?.$message : ''"
+        :error-text="
+          v$.usernameOrEmail.$dirty
+            ? v$.usernameOrEmail.$errors?.[0]?.$message
+            : ''
+        "
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
@@ -21,7 +25,9 @@
     <div class="form__row">
       <ui-input
         v-model.trim="v$.password.$model"
-        :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
+        :error-text="
+          v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''
+        "
         autocapitalize="off"
         autocomplete="current-password"
         autocorrect="off"
@@ -72,21 +78,22 @@
 <script lang="ts">
   import useVuelidate from '@vuelidate/core';
   import { helpers, or } from '@vuelidate/validators';
-  import {
-    defineComponent, reactive, ref
-  } from 'vue';
+  import { defineComponent, reactive, ref } from 'vue';
   import { useToast } from 'vue-toastification';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import { useUserStore } from '@/store/UI/UserStore';
+
   import {
     validateEmailFormat,
     validatePwdSpecial,
     validateRequired,
     validateUsernameSpecialChars
-  } from '@/common/helpers/authChecks';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
+  } from '@/shared/helpers/authChecks';
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
+
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
+
+  import { useUserStore } from '@/store/UI/UserStore';
 
   export default defineComponent({
     components: {
@@ -108,10 +115,7 @@
           required: validateRequired(),
           format: helpers.withMessage(
             'Поле заполнено неверно',
-            or(
-              validateUsernameSpecialChars(),
-              validateEmailFormat()
-            )
+            or(validateUsernameSpecialChars(), validateEmailFormat())
           )
         },
         password: {

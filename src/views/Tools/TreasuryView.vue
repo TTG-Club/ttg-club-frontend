@@ -17,18 +17,14 @@
             label="name"
             track-by="value"
           >
-            <template #placeholder>
-              Показатель опасности
-            </template>
+            <template #placeholder> Показатель опасности </template>
           </ui-select>
         </div>
 
         <transition-group name="fade">
           <template v-if="settings.opened">
             <div class="tools_settings__row">
-              <h5 class="label">
-                Настройки предметов:
-              </h5>
+              <h5 class="label">Настройки предметов:</h5>
 
               <div class="tools_settings__column">
                 <div class="row">
@@ -77,12 +73,10 @@
               </div>
             </div>
 
-            <hr class="hr_main">
+            <hr class="hr_main" />
 
             <div class="tools_settings__row">
-              <h5 class="label">
-                Настройки вида:
-              </h5>
+              <h5 class="label">Настройки вида:</h5>
 
               <div class="tools_settings__column">
                 <div class="row">
@@ -128,15 +122,17 @@
                     </ui-checkbox>
                   </div>
 
-                  <div
-                    class="tools_settings__row"
-                  >
+                  <div class="tools_settings__row">
                     <ui-checkbox
                       :model-value="settings.max"
                       type="toggle"
                       @update:model-value="settings.max = $event"
                     >
-                      {{ `Отображать ${ settings.max ? 'максимальную' : 'среднюю' } цену` }}
+                      {{
+                        `Отображать ${
+                          settings.max ? 'максимальную' : 'среднюю'
+                        } цену`
+                      }}
                     </ui-checkbox>
                   </div>
                 </div>
@@ -146,9 +142,7 @@
         </transition-group>
 
         <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
-            Создать
-          </ui-button>
+          <ui-button @click.left.exact.prevent="sendForm"> Создать </ui-button>
 
           <ui-button
             @click.left.exact.prevent="settings.opened = !settings.opened"
@@ -287,29 +281,30 @@
 </template>
 
 <script lang="ts" setup>
-  import {
-    computed, onBeforeMount, ref
-  } from 'vue';
-  import sortedUniq from 'lodash/sortedUniq';
   import groupBy from 'lodash/groupBy';
   import max from 'lodash/max';
   import mean from 'lodash/mean';
+  import sortedUniq from 'lodash/sortedUniq';
   import throttle from 'lodash/throttle';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount, ref } from 'vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import errorHandler from '@/shared/helpers/errorHandler';
+
+  import ContentDetail from '@/components/content/ContentDetail.vue';
   import ContentLayout from '@/components/content/ContentLayout.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
-  import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
-  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
-  import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
-  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import ContentDetail from '@/components/content/ContentDetail.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import { useAxios } from '@/common/composition/useAxios';
+  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+  import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
+  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
+  import TreasureItem from '@/views/Inventory/Treasures/TreasureItem.vue';
 
   interface CrListItem {
     name: string;
@@ -355,16 +350,16 @@
   const result = ref({});
 
   const detailCard = ref<{
-    item?: any
-    spell?: any
+    item?: any;
+    spell?: any;
   }>({
     item: undefined,
     spell: undefined
   });
 
   const selected = ref<{
-    index?: number
-    item?: any
+    index?: number;
+    item?: any;
   }>({
     index: undefined,
     item: undefined
@@ -375,8 +370,8 @@
   const showRightSide = ref(false);
 
   const controllers = ref<{
-    list?: AbortController
-    detail?: AbortController
+    list?: AbortController;
+    detail?: AbortController;
   }>({
     list: undefined,
     detail: undefined
@@ -385,10 +380,7 @@
   const http = useAxios();
   const uiStore = useUIStore();
 
-  const {
-    fullscreen,
-    isMobile
-  } = storeToRefs(uiStore);
+  const { fullscreen, isMobile } = storeToRefs(uiStore);
 
   const crValue = computed<CrListItem>({
     get() {
@@ -466,11 +458,12 @@
       cr: form.value.cr || 1
     };
 
-    http.post({
-      url: '/tools/treasury',
-      payload: options,
-      signal: controllers.value.list.signal
-    })
+    http
+      .post({
+        url: '/tools/treasury',
+        payload: options,
+        signal: controllers.value.list.signal
+      })
       .then(res => {
         if (res.status !== 200) {
           errorHandler(res.statusText);

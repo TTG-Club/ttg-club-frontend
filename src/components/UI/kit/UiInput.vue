@@ -23,16 +23,14 @@
         v-bind="attrs"
         @keydown="typeValidate($event)"
         @blur="$emit('blur')"
-      >
+      />
 
       <span
         v-if="type === 'password'"
         class="ui-input__control_icon"
         @click.left.exact.prevent="togglePass"
       >
-        <svg-icon
-          :icon="`password/${showedPass ? 'show' : 'hide'}`"
-        />
+        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
       </span>
 
       <ui-erase-button
@@ -53,9 +51,8 @@
 
 <script setup>
   import { useVModel } from '@vueuse/core';
-  import {
-    computed, onMounted, ref, useAttrs
-  } from 'vue';
+  import { computed, onMounted, ref, useAttrs } from 'vue';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiEraseButton from '@/components/UI/kit/button/UiEraseButton.vue';
 

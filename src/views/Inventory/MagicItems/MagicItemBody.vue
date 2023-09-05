@@ -9,7 +9,7 @@
       :source="magicItem.source"
     />
 
-    <div class=" content-padding">
+    <div class="content-padding">
       <ui-easy-lightbox
         :images="magicItem.images"
         :use-bg-hide="false"
@@ -19,28 +19,26 @@
         <li>
           <b>Настройка: </b>
 
-          <span>{{ magicItem.customization ? 'требуется настройка' : 'нет' }}</span>
+          <span>{{
+            magicItem.customization ? 'требуется настройка' : 'нет'
+          }}</span>
 
           <span v-if="magicItem.detailCustamization?.length">
-            ({{
-              magicItem.detailCustamization.join(', ')
-                .toLowerCase()
-            }})
+            ({{ magicItem.detailCustamization.join(', ').toLowerCase() }})
           </span>
         </li>
 
         <li v-if="magicItem.cost">
-          <b>Стоимость по <span
-            v-tippy="'Руководство Мастера'"
-          >DMG</span>: </b>
+          <b>Стоимость по <span v-tippy="'Руководство Мастера'">DMG</span>: </b>
 
           <span>{{ magicItem.cost.dmg }}</span>
         </li>
 
         <li v-if="magicItem.cost">
-          <b>Стоимость по <span
-            v-tippy="'Руководство Зантара обо всем'"
-          >XGE</span>: </b>
+          <b
+            >Стоимость по
+            <span v-tippy="'Руководство Зантара обо всем'">XGE</span>:
+          </b>
 
           <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
         </li>
@@ -56,6 +54,7 @@
 
 <script>
   import upperFirst from 'lodash/upperFirst';
+
   import RawContent from '@/components/content/RawContent.vue';
   import DetailTopBar from '@/components/UI/DetailTopBar.vue';
   import DiceRoller from '@/components/UI/DiceRoller.vue';
@@ -85,10 +84,12 @@
         let detail = '';
 
         if (this.magicItem.detailType?.length) {
-          detail = ` (${ this.magicItem.detailType.join(', ') })`;
+          detail = ` (${this.magicItem.detailType.join(', ')})`;
         }
 
-        return `${ upperFirst(this.magicItem.type.name) }${ detail }, ${ this.magicItem.rarity.name }`;
+        return `${upperFirst(this.magicItem.type.name)}${detail}, ${
+          this.magicItem.rarity.name
+        }`;
       }
     }
   };

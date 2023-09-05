@@ -27,7 +27,9 @@
     >
       <ui-input
         v-model.trim="v$.password.$model"
-        :error-text="v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''"
+        :error-text="
+          v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''
+        "
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
@@ -80,19 +82,12 @@
 
 <script lang="ts">
   import useVuelidate from '@vuelidate/core';
-  import {
-    helpers, or, sameAs
-  } from '@vuelidate/validators';
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, reactive, ref
-  } from 'vue';
+  import { helpers, or, sameAs } from '@vuelidate/validators';
   import { storeToRefs } from 'pinia';
-  import { useToast } from 'vue-toastification';
+  import { computed, defineComponent, reactive, ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import { useUserStore } from '@/store/UI/UserStore';
+  import { useToast } from 'vue-toastification';
+
   import {
     validateEmailFormat,
     validateMinLength,
@@ -102,8 +97,15 @@
     validatePwdUpperCase,
     validateRequired,
     validateUsernameSpecialChars
-  } from '@/common/helpers/authChecks';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
+  } from '@/shared/helpers/authChecks';
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
+
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
+
+  import type { PropType } from 'vue';
+
+  import { useUserStore } from '@/store/UI/UserStore';
 
   export default defineComponent({
     components: {
@@ -117,8 +119,8 @@
       },
       tokenValidate: {
         type: Object as PropType<{
-          correct: boolean
-          message: string
+          correct: boolean;
+          message: string;
         }>,
         default: () => ({
           correct: true,
@@ -142,16 +144,15 @@
         repeat: ''
       });
 
-      const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
+      const isOnlyPassword = computed(
+        () => props.token || isAuthenticated.value
+      );
 
       const validations = computed(() => {
         if (isOnlyPassword.value) {
           return {
             email: {
-              format: or(
-                validateUsernameSpecialChars(),
-                validateEmailFormat()
-              )
+              format: or(validateUsernameSpecialChars(), validateEmailFormat())
             },
             password: {
               required: validateRequired(),
@@ -163,7 +164,10 @@
             },
             repeat: {
               required: validateRequired(),
-              sameAs: helpers.withMessage('Пароли не совпадают', sameAs(computed(() => state.password)))
+              sameAs: helpers.withMessage(
+                'Пароли не совпадают',
+                sameAs(computed(() => state.password))
+              )
             }
           };
         }
@@ -183,9 +187,8 @@
           try {
             const payload = {
               password: state.password,
-              [isAuthenticated.value ? 'userToken' : 'resetToken']: isAuthenticated.value
-                ? userStore.getUserToken()
-                : props.token
+              [isAuthenticated.value ? 'userToken' : 'resetToken']:
+                isAuthenticated.value ? userStore.getUserToken() : props.token
             };
 
             await userStore.changePassword(payload);
@@ -211,7 +214,9 @@
         try {
           await userStore.resetPassword(state.email);
 
-          toast.success('Ссылка для изменения пароля отправлена на указанный e-mail');
+          toast.success(
+            'Ссылка для изменения пароля отправлена на указанный e-mail'
+          );
 
           emit('close');
 
@@ -266,6 +271,4 @@
   });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

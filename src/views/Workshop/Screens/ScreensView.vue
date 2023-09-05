@@ -31,25 +31,24 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
-  import {
-    computed, defineComponent, onBeforeMount
-  } from 'vue';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
+
+  import { ScreensFilterDefaults } from '@/types/Workshop/Screens.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { ScreensFilterDefaults } from '@/types/Workshop/Screens.types';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: ScreensFilterDefaults.dbName,

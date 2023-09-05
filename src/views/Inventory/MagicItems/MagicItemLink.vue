@@ -38,7 +38,7 @@
               v-if="magicItem.custom?.count > 1"
               class="link-item__count"
             >
-              {{ `x${ magicItem.custom.count }` }}
+              {{ `x${magicItem.custom.count}` }}
             </div>
 
             <div
@@ -52,7 +52,7 @@
               v-if="inTrader && magicItem.custom"
               class="link-item__price"
             >
-              {{ `${ price }` }}
+              {{ `${price}` }}
             </div>
           </div>
         </div>
@@ -62,31 +62,33 @@
 </template>
 
 <script setup lang="ts" generic="T extends TGroupedTraderLink">
-  import type { RouteLocationPathRaw } from 'vue-router';
-  import { useLink } from 'vue-router';
   import { computed } from 'vue';
-  import { CapitalizeFirst as vCapitalizeFirst } from '@/common/directives/CapitalizeFirst';
-  import type { TGroupedTraderLink } from '@/types/Tools/Trader.types';
+  import { useLink } from 'vue-router';
 
-  const props = withDefaults(defineProps<{
-    to: RouteLocationPathRaw;
-    magicItem: T;
-    inTools?: boolean;
-    inTrader?: boolean;
-    isActive?: boolean;
-  }>(), {
-    inTools: false,
-    inTrader: false,
-    isActive: false
-  });
+  import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
 
-  const emit = defineEmits<{(e: 'select-item'): void }>();
+  import type { RouteLocationPathRaw } from 'vue-router';
 
-  const {
-    navigate,
-    isActive,
-    href
-  } = useLink(props);
+  import type { TGroupedTraderLink } from '@/types/Tools/Trader.d';
+
+  const props = withDefaults(
+    defineProps<{
+      to: RouteLocationPathRaw;
+      magicItem: T;
+      inTools?: boolean;
+      inTrader?: boolean;
+      isActive?: boolean;
+    }>(),
+    {
+      inTools: false,
+      inTrader: false,
+      isActive: false
+    }
+  );
+
+  const emit = defineEmits<{ (e: 'select-item'): void }>();
+
+  const { navigate, isActive, href } = useLink(props);
 
   const classList = computed(() => ({
     'router-link-active': props.isActive || isActive.value,
@@ -105,7 +107,7 @@
 
   const price = computed(() => {
     if (typeof props.magicItem.custom?.price === 'number') {
-      return `${ props.magicItem.custom.price } зм`;
+      return `${props.magicItem.custom.price} зм`;
     }
 
     if (props.magicItem.price) {
@@ -117,7 +119,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/styles/modules/link-item";
+  @import '../../../assets/styles/modules/link-item';
 
   .link-item {
     &__type {
@@ -180,9 +182,9 @@
       &.is-varies {
         &:after {
           background: linear-gradient(
-              90deg,
-              var(--common) 10%,
-              var(--artifact) 100%
+            90deg,
+            var(--common) 10%,
+            var(--artifact) 100%
           );
         }
       }

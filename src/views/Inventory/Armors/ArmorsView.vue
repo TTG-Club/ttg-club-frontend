@@ -7,7 +7,10 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
       :get-group="getArmorGroup"
       :list="getListProps({ items: armors, size: 'medium' })"
     >
@@ -22,40 +25,38 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import ArmorLink from '@/views/Inventory/Armors/ArmorLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { ArmorsFilterDefaults } from '@/types/Inventory/Armors.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import ArmorLink from '@/views/Inventory/Armors/ArmorLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: ArmorsFilterDefaults.dbName,
     url: ArmorsFilterDefaults.url
   });
 
-  const {
-    initPages,
-    items: armors
-  } = usePagination({
+  const { initPages, items: armors } = usePagination({
     url: '/armors',
     limit: -1,
     search: filter.search,
@@ -75,7 +76,7 @@
     }
   };
 
-  const getArmorGroup = ({ type }: AnyObject & {type: AnyObject}) => ({
+  const getArmorGroup = ({ type }: AnyObject & { type: AnyObject }) => ({
     url: type.name,
     name: type.name,
     order: type.order

@@ -24,21 +24,21 @@
 
 <script lang="ts">
   import { storeToRefs } from 'pinia';
-  import {
-    defineComponent, onBeforeMount, ref
-  } from 'vue';
-  import {
-    onBeforeRouteUpdate, useRoute, useRouter
-  } from 'vue-router';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import CreatureBody from '@/views/Workshop/Bestiary/CreatureBody.vue';
+  import { defineComponent, onBeforeMount, ref } from 'vue';
+  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { downloadByUrl } from '@/shared/helpers/download';
+  import errorHandler from '@/shared/helpers/errorHandler';
+  import type { Maybe } from '@/shared/types/Utility';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
+  import type { ICreature } from '@/types/Workshop/Bestiary.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { ICreature } from '@/types/Workshop/Bestiary.types';
-  import type { Maybe } from '@/types/Shared/Utility.types';
-  import { downloadByUrl } from '@/common/helpers/download';
+  import CreatureBody from '@/views/Workshop/Bestiary/CreatureBody.vue';
 
   export default defineComponent({
     components: {
@@ -52,10 +52,7 @@
       const router = useRouter();
       const uiStore = useUIStore();
 
-      const {
-        fullscreen,
-        isMobile
-      } = storeToRefs(uiStore);
+      const { fullscreen, isMobile } = storeToRefs(uiStore);
 
       const creature = ref<Maybe<ICreature>>(undefined);
       const loading = ref(true);
@@ -68,7 +65,7 @@
         }
 
         try {
-          return downloadByUrl(`/api/fvtt/v1/bestiary/${ creature.value.id }`);
+          return downloadByUrl(`/api/fvtt/v1/bestiary/${creature.value.id}`);
         } catch (err) {
           return Promise.reject(err);
         }

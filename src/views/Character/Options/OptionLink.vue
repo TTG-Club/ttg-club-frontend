@@ -47,18 +47,21 @@
 </template>
 
 <script lang="ts">
-  import type { RouteLocationPathRaw } from 'vue-router';
+  import { computed, defineComponent, ref } from 'vue';
   import { useLink } from 'vue-router';
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
-  import { CapitalizeFirst } from '@/common/directives/CapitalizeFirst';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+  import type { Maybe } from '@/shared/types/Utility';
+
   import BaseModal from '@/components/UI/modals/BaseModal.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  import type { OptionDetail, OptionLink } from '@/types/Character/Options.d';
+
   import OptionBody from '@/views/Character/Options/OptionBody.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { OptionDetail, OptionLink } from '@/types/Character/Options.types';
-  import type { Maybe } from '@/types/Shared/Utility.types';
 
   export default defineComponent({
     components: {
@@ -86,15 +89,11 @@
     setup(props) {
       const http = useAxios();
 
-      const {
-        navigate,
-        isActive,
-        href
-      } = useLink(props);
+      const { navigate, isActive, href } = useLink(props);
 
       const modal = ref<{
         show: boolean;
-        data: Maybe<OptionDetail>
+        data: Maybe<OptionDetail>;
       }>({
         show: false,
         data: undefined

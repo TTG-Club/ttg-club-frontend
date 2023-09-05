@@ -1,12 +1,13 @@
-import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
-import { computed, ref } from 'vue';
 import fromPairs from 'lodash/fromPairs';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { USER_TOKEN_COOKIE } from '@/common/const/UI';
-import { useAxios } from '@/common/composition/useAxios';
-import { useIsDev } from '@/common/helpers/isDev';
-import { useMetrics } from '@/common/composition/useMetrics';
+
+import { useAxios } from '@/shared/composition/useAxios';
+import { useMetrics } from '@/shared/composition/useMetrics';
+import { USER_TOKEN_COOKIE } from '@/shared/const/UI';
+import { useIsDev } from '@/shared/helpers/isDev';
 
 export enum EUserRoles {
   USER = 'USER',
@@ -25,35 +26,35 @@ export enum EUserRolesRus {
 }
 
 export type TUser = {
-  username: string
-  name: string
-  email: string
-  roles: EUserRoles[]
-  avatar: string
-}
+  username: string;
+  name: string;
+  email: string;
+  roles: EUserRoles[];
+  avatar: string;
+};
 
 export type TRegBody = {
-  username: string
-  password: string
-  email: string
-}
+  username: string;
+  password: string;
+  email: string;
+};
 
 export type TAuthBody = {
-  usernameOrEmail: string
-  password: string
-  remember: boolean
-}
+  usernameOrEmail: string;
+  password: string;
+  remember: boolean;
+};
 
 export type TChangePassBody = {
-  userToken?: string
-  resetToken?: string
-  password: string
-}
+  userToken?: string;
+  resetToken?: string;
+  password: string;
+};
 
 export type TAuthResponse = {
-    accessToken: string;
-    tokenType: string;
-}
+  accessToken: string;
+  tokenType: string;
+};
 
 export const useUserStore = defineStore('UserStore', () => {
   const route = useRoute();
@@ -61,10 +62,7 @@ export const useUserStore = defineStore('UserStore', () => {
   const http = useAxios();
   const isDev = useIsDev();
 
-  const {
-    sendSignUpMetrics,
-    sendLoginMetrics
-  } = useMetrics();
+  const { sendSignUpMetrics, sendLoginMetrics } = useMetrics();
 
   const user = ref<TUser | null>(null);
   const isAuthenticated = ref<boolean>(false);
@@ -74,8 +72,14 @@ export const useUserStore = defineStore('UserStore', () => {
       return [];
     }
 
-    const entries = Object.entries(EUserRolesRus) as [EUserRoles, EUserRolesRus][];
-    const availRoles: { [key in EUserRoles]?: EUserRolesRus } = fromPairs(entries);
+    const entries = Object.entries(EUserRolesRus) as [
+      EUserRoles,
+      EUserRolesRus
+    ][];
+
+    const availRoles: { [key in EUserRoles]?: EUserRolesRus } =
+      fromPairs(entries);
+
     const { roles: userRoles } = user.value;
 
     const translated = userRoles
@@ -133,8 +137,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const registration = async (body: TRegBody) => {
     try {
-      if (Object.values(body)
-        .find(item => !item)) {
+      if (Object.values(body).find(item => !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
@@ -158,8 +161,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const authorization = async (body: TAuthBody) => {
     try {
-      if (Object.values(body)
-        .find(item => typeof item === 'string' && !item)) {
+      if (Object.values(body).find(item => typeof item === 'string' && !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
@@ -171,13 +173,9 @@ export const useUserStore = defineStore('UserStore', () => {
       switch (resp.status) {
         case 200:
           if (isDev) {
-            Cookies.set(
-              USER_TOKEN_COOKIE,
-              resp.data.accessToken,
-              {
-                expires: 365
-              }
-            );
+            Cookies.set(USER_TOKEN_COOKIE, resp.data.accessToken, {
+              expires: 365
+            });
           }
 
           sendLoginMetrics();

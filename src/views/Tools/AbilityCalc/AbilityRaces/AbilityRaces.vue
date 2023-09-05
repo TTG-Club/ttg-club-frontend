@@ -31,9 +31,7 @@
         @remove="onSelectRace"
         @select="onSelectRace"
       >
-        <template #label>
-          Раса
-        </template>
+        <template #label> Раса </template>
 
         <template #singleLabel="{ option }">
           {{ option.name.rus }}
@@ -43,9 +41,7 @@
           {{ option.name.rus }}
         </template>
 
-        <template #placeholder>
-          Выбрать расу
-        </template>
+        <template #placeholder> Выбрать расу </template>
       </ui-select>
 
       <ui-select
@@ -57,9 +53,7 @@
         track-by="url"
         @select="onSelectSubRace"
       >
-        <template #label>
-          Подраса
-        </template>
+        <template #label> Подраса </template>
 
         <template #singleLabel="{ option }">
           {{ option.name.rus }}
@@ -69,9 +63,7 @@
           {{ option.name.rus }}
         </template>
 
-        <template #placeholder>
-          Выбрать подрасу
-        </template>
+        <template #placeholder> Выбрать подрасу </template>
       </ui-select>
 
       <ui-select
@@ -82,9 +74,7 @@
         track-by="key"
         @select="onSelectChoiceDouble"
       >
-        <template #label>
-          Набор характеристик
-        </template>
+        <template #label> Набор характеристик </template>
       </ui-select>
 
       <ui-select
@@ -111,15 +101,14 @@
           {{ firstValue?.name || 'Выбрать хар-ку' }}
         </template>
 
-        <template #placeholder>
-          Выбери хар-ку
-        </template>
+        <template #placeholder> Выбери хар-ку </template>
 
         <template #option="{ option }">
           <span
             :class="{ 'is-used': isAbilitySelected(option.key) }"
             class="ability-races__select_option"
-          >{{ option.name }}</span>
+            >{{ option.name }}</span
+          >
         </template>
       </ui-select>
 
@@ -145,15 +134,14 @@
           {{ secondValue?.name || 'Выбрать хар-ку' }}
         </template>
 
-        <template #placeholder>
-          Выбери хар-ку
-        </template>
+        <template #placeholder> Выбери хар-ку </template>
 
         <template #option="{ option }">
           <span
             :class="{ 'is-used': isAbilitySelected(option.key) }"
             class="ability-races__select_option"
-          >{{ option.name }}</span>
+            >{{ option.name }}</span
+          >
         </template>
       </ui-select>
 
@@ -179,15 +167,14 @@
           {{ thirdValue?.name || 'Выбрать хар-ку' }}
         </template>
 
-        <template #placeholder>
-          Выбери хар-ку
-        </template>
+        <template #placeholder> Выбери хар-ку </template>
 
         <template #option="{ option }">
           <span
             :class="{ 'is-used': isAbilitySelected(option.key) }"
             class="ability-races__select_option"
-          >{{ option.name }}</span>
+            >{{ option.name }}</span
+          >
         </template>
       </ui-select>
     </div>
@@ -195,24 +182,27 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, onBeforeMount, ref, watch
-  } from 'vue';
   import cloneDeep from 'lodash/cloneDeep';
   import reverse from 'lodash/reverse';
-  import type { TRaceLink } from '@/types/Character/Races.types';
-  import RaceLink from '@/views/Character/Races/RaceLink.vue';
-  import { usePagination } from '@/common/composition/usePagination';
+  import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
+
+  import { usePagination } from '@/shared/composition/usePagination';
+
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import type { AbilityRoll, ChoiceDouble } from '@/types/Tools/AbilityCalc.types';
+
+  import type { PropType } from 'vue';
+
+  import type { TRaceLink } from '@/types/Character/Races.d';
+  import type { AbilityRoll, ChoiceDouble } from '@/types/Tools/AbilityCalc.d';
   import {
     AbilityChoiceDouble,
     AbilityChoiceDoubleKey,
     AbilityKey,
     AbilityName,
     AbilityTypeKey
-  } from '@/types/Tools/AbilityCalc.types';
+  } from '@/types/Tools/AbilityCalc.d';
+
+  import RaceLink from '@/views/Character/Races/RaceLink.vue';
   import { useRaceAbility } from '@/views/Tools/AbilityCalc/AbilityRaces/composition/useRaceAbility';
 
   export default defineComponent({
@@ -231,14 +221,11 @@
       const selectedSubRace = ref<TRaceLink | null>(null);
 
       const selectedChoiceDouble = ref<{
-        key: AbilityChoiceDoubleKey
-        label: AbilityChoiceDouble
+        key: AbilityChoiceDoubleKey;
+        label: AbilityChoiceDouble;
       } | null>(null);
 
-      const {
-        initPages,
-        items
-      } = usePagination({
+      const { initPages, items } = usePagination({
         url: '/races',
         limit: -1,
         order: [
@@ -249,50 +236,58 @@
         ]
       });
 
-      const races = computed(() => items.value.map((race: TRaceLink) => {
-        const raceItem = cloneDeep(race);
+      const races = computed(() =>
+        items.value.map((race: TRaceLink) => {
+          const raceItem = cloneDeep(race);
 
-        if (raceItem.subraces?.length) {
-          raceItem.subraces = raceItem.subraces.map(item => ({
-            ...item,
-            image: raceItem.image
-          }));
-        }
+          if (raceItem.subraces?.length) {
+            raceItem.subraces = raceItem.subraces.map(item => ({
+              ...item,
+              image: raceItem.image
+            }));
+          }
 
-        if (items.value.filter((item: TRaceLink) => raceItem.name.rus === item.name.rus).length >= 2) {
-          return {
-            ...raceItem,
-            name: {
-              ...raceItem.name,
-              rus: `${ raceItem.name.rus } (${ raceItem.source.shortName })`
-            }
-          };
-        }
+          if (
+            items.value.filter(
+              (item: TRaceLink) => raceItem.name.rus === item.name.rus
+            ).length >= 2
+          ) {
+            return {
+              ...raceItem,
+              name: {
+                ...raceItem.name,
+                rus: `${raceItem.name.rus} (${raceItem.source.shortName})`
+              }
+            };
+          }
 
-        return raceItem;
-      }));
+          return raceItem;
+        })
+      );
 
       const subRaces = computed(() => selectedRace.value?.subraces || []);
 
-      const choiceDouble = computed((): Array<ChoiceDouble> => reverse(Object
-        .entries(AbilityChoiceDouble)
-        .map(entry => ({
-          key: entry[0] as AbilityChoiceDoubleKey,
-          label: entry[1] as AbilityChoiceDouble
-        }))));
-
-      const getIsChoiceDouble = (race: TRaceLink) => (
-        race.abilities.length === 1
-        && race.abilities[0].key === AbilityTypeKey.CHOICE_DOUBLE
+      const choiceDouble = computed(
+        (): Array<ChoiceDouble> =>
+          reverse(
+            Object.entries(AbilityChoiceDouble).map(entry => ({
+              key: entry[0] as AbilityChoiceDoubleKey,
+              label: entry[1] as AbilityChoiceDouble
+            }))
+          )
       );
 
-      const checkInstance = computed(() => selectedSubRace.value || selectedRace.value);
+      const getIsChoiceDouble = (race: TRaceLink) =>
+        race.abilities.length === 1 &&
+        race.abilities[0].key === AbilityTypeKey.CHOICE_DOUBLE;
 
-      const isChoiceDouble = computed(() => (
-        checkInstance.value
-          ? getIsChoiceDouble(checkInstance.value)
-          : false
-      ));
+      const checkInstance = computed(
+        () => selectedSubRace.value || selectedRace.value
+      );
+
+      const isChoiceDouble = computed(() =>
+        checkInstance.value ? getIsChoiceDouble(checkInstance.value) : false
+      );
 
       const {
         firstValue,
@@ -324,11 +319,10 @@
         }));
       });
 
-      const isAbilitySelected = (key: AbilityKey) => (
-        firstValue.value?.key === key
-        || secondValue.value?.key === key
-        || thirdValue.value?.key === key
-      );
+      const isAbilitySelected = (key: AbilityKey) =>
+        firstValue.value?.key === key ||
+        secondValue.value?.key === key ||
+        thirdValue.value?.key === key;
 
       onBeforeMount(async () => {
         await initPages();
@@ -336,24 +330,27 @@
 
       const emitValue = () => {
         if (
-          !isChoiceDouble.value
-          && checkInstance.value?.abilities.length
-          && !checkInstance.value?.abilities.find(ability => (
-            Object.values(AbilityTypeKey)
-              .includes(ability.key as AbilityTypeKey)
-            && ability.key !== AbilityTypeKey.ALL
-          ))) {
+          !isChoiceDouble.value &&
+          checkInstance.value?.abilities.length &&
+          !checkInstance.value?.abilities.find(
+            ability =>
+              Object.values(AbilityTypeKey).includes(
+                ability.key as AbilityTypeKey
+              ) && ability.key !== AbilityTypeKey.ALL
+          )
+        ) {
           emit('update:model-value', checkInstance.value?.abilities);
 
           return;
         }
 
         const value = [
-          ...checkInstance.value?.abilities.filter(ability => (
-            !Object.values(AbilityTypeKey)
-              .includes(ability.key as AbilityTypeKey)
-            || ability.key === AbilityTypeKey.ALL
-          )) as Array<AbilityRoll>
+          ...(checkInstance.value?.abilities.filter(
+            ability =>
+              !Object.values(AbilityTypeKey).includes(
+                ability.key as AbilityTypeKey
+              ) || ability.key === AbilityTypeKey.ALL
+          ) as Array<AbilityRoll>)
         ];
 
         if (firstValue.value) {
@@ -383,7 +380,9 @@
       const onSelectSubRace = (subRace: TRaceLink | null) => {
         selectedSubRace.value = subRace;
 
-        onSelectChoiceDouble(isChoiceDouble.value ? choiceDouble.value[0] : null);
+        onSelectChoiceDouble(
+          isChoiceDouble.value ? choiceDouble.value[0] : null
+        );
       };
 
       const onSelectRace = (race: TRaceLink | null) => {
@@ -398,11 +397,7 @@
         onSelectSubRace(null);
       };
 
-      watch([
-        firstValue,
-        secondValue,
-        thirdValue
-      ], () => {
+      watch([firstValue, secondValue, thirdValue], () => {
         emitValue();
       });
 
@@ -476,7 +471,7 @@
           radius: 8px;
           style: dashed;
           color: var(--primary);
-        };
+        }
       }
 
       @media (max-width: 991px) {
@@ -514,7 +509,7 @@
 
               &.is-used {
                 &::before {
-                  content: "";
+                  content: '';
                   width: 10px;
                   height: 10px;
                   border-radius: 50%;

@@ -1,14 +1,19 @@
+@use 'variables' as *;
+
 // <transition name="<class>"/>
 .fade {
-  &-enter-from, &-leave-to {
+  &-enter-from,
+  &-leave-to {
     opacity: 0;
   }
 
-  &-enter-to, &-leave-from {
+  &-enter-to,
+  &-leave-from {
     opacity: 1;
   }
 
-  &-enter-active, &-leave-active {
+  &-enter-active,
+  &-leave-active {
     @include css_anim;
   }
 }
@@ -22,4 +27,3 @@
     transition: none;
   }
 }
-

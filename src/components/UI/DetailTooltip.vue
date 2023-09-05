@@ -15,25 +15,27 @@
 
 <script setup lang="ts">
   import cloneDeep from 'lodash/cloneDeep';
-  import type { Component } from 'vue';
-  import {
-    computed, h, ref, useSlots
-  } from 'vue';
+  import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
-  import { useAxios } from '@/common/composition/useAxios';
-  import errorHandler from '@/common/helpers/errorHandler';
-  import { DefaultTippyProps } from '@/common/utils/TippyConfig';
-  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
-  import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
-  import ItemBody from '@/views/Inventory/Items/ItemBody.vue';
-  import ArmorBody from '@/views/Inventory/Armors/ArmorBody.vue';
-  import WeaponBody from '@/views/Inventory/Weapons/WeaponBody.vue';
-  import CreatureBody from '@/views/Workshop/Bestiary/CreatureBody.vue';
-  import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
-  import OptionBody from '@/views/Character/Options/OptionBody.vue';
-  import TraitBody from '@/views/Character/Traits/TraitBody.vue';
-  import GodBody from '@/views/Wiki/Gods/GodBody.vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import errorHandler from '@/shared/helpers/errorHandler';
+  import { DefaultTippyProps } from '@/shared/utils/TippyConfig';
+
   import RawContent from '@/components/content/RawContent.vue';
+
+  import type { Component } from 'vue';
+
+  import OptionBody from '@/views/Character/Options/OptionBody.vue';
+  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+  import TraitBody from '@/views/Character/Traits/TraitBody.vue';
+  import ArmorBody from '@/views/Inventory/Armors/ArmorBody.vue';
+  import ItemBody from '@/views/Inventory/Items/ItemBody.vue';
+  import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
+  import WeaponBody from '@/views/Inventory/Weapons/WeaponBody.vue';
+  import GodBody from '@/views/Wiki/Gods/GodBody.vue';
+  import CreatureBody from '@/views/Workshop/Bestiary/CreatureBody.vue';
+  import ScreenBody from '@/views/Workshop/Screens/ScreenBody.vue';
 
   type TDetailType =
     | 'option'
@@ -47,13 +49,16 @@
     | 'spell'
     | 'god';
 
-  const props = withDefaults(defineProps<{
-    url?: string;
-    type?: TDetailType
-  }>(), {
-    url: undefined,
-    type: undefined
-  });
+  const props = withDefaults(
+    defineProps<{
+      url?: string;
+      type?: TDetailType;
+    }>(),
+    {
+      url: undefined,
+      type: undefined
+    }
+  );
 
   const slots = useSlots();
   const http = useAxios();
@@ -66,8 +71,7 @@
       return props.url;
     }
 
-    const el = slots.default?.()
-      .find(node => node?.props?.href);
+    const el = slots.default?.().find(node => node?.props?.href);
 
     if (el?.props?.href) {
       return el.props.href;

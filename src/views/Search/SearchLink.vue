@@ -9,7 +9,9 @@
     <div class="search-link__body">
       <div class="search-link__label">
         {{ searchLink.name }}
-        <span class="search-link__label--eng">[{{ searchLink.englishName }}]</span>
+        <span class="search-link__label--eng"
+          >[{{ searchLink.englishName }}]</span
+        >
       </div>
 
       <div class="search-link__section">
@@ -34,12 +36,12 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref, watch
-  } from 'vue';
   import { useFocus } from '@vueuse/core';
-  import type { TSearchResult } from '@/types/Search/Search.types';
+  import { computed, defineComponent, ref, watch } from 'vue';
+
+  import type { PropType } from 'vue';
+
+  import type { TSearchResult } from '@/types/Search/Search.d';
 
   export default defineComponent({
     props: {
@@ -108,10 +110,9 @@
       margin-top: 4px;
       font-style: italic;
       font-size: 13px;
-      opacity: .4;
+      opacity: 0.4;
       color: var(--text-color);
       display: flex;
-
     }
 
     &__source {

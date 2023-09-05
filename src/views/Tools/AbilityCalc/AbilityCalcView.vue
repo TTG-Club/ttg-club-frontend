@@ -3,9 +3,7 @@
     :use-social-links="false"
     class="ability-calc"
   >
-    <template #title>
-      Калькулятор характеристик
-    </template>
+    <template #title> Калькулятор характеристик </template>
 
     <template #default>
       <ability-races
@@ -44,24 +42,26 @@
 </template>
 
 <script lang="ts">
-  import type { Component } from 'vue';
-  import {
-    computed, defineComponent, ref, shallowRef
-  } from 'vue';
+  import { computed, defineComponent, ref, shallowRef } from 'vue';
+
   import PageLayout from '@/components/content/PageLayout.vue';
   import UiSwitch from '@/components/UI/kit/UiSwitch.vue';
-  import AbilityTable from '@/views/Tools/AbilityCalc/AbilityTable.vue';
-  import AbilityRandom from '@/views/Tools/AbilityCalc/AbilityRandom.vue';
+
+  import type { Component } from 'vue';
+
+  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.d';
+
   import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
   import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
   import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces/AbilityRaces.vue';
-  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
+  import AbilityRandom from '@/views/Tools/AbilityCalc/AbilityRandom.vue';
+  import AbilityTable from '@/views/Tools/AbilityCalc/AbilityTable.vue';
 
   type TCalcTab = {
-    id: string
-    name: string
-    component: Component
-  }
+    id: string;
+    name: string;
+    component: Component;
+  };
 
   export default defineComponent({
     components: {

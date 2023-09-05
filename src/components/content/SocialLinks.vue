@@ -15,9 +15,7 @@
         rel="noopener noreferrer"
         target="_blank"
       >
-        <svg-icon
-          :icon="link.icon"
-        />
+        <svg-icon :icon="link.icon" />
       </a>
     </div>
   </div>
@@ -25,6 +23,7 @@
 
 <script>
   import { defineComponent } from 'vue';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   export default defineComponent({

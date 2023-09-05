@@ -11,7 +11,10 @@
     <virtual-grouped-list
       :list="getListProps({ items: bestiary, size: 'medium' })"
       :get-group="getGroupByChallengeRating"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
     >
       <template #default="{ item: creature }">
         <creature-link
@@ -24,21 +27,25 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import type { AnyObject } from '@/shared/types/Utility';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import CreatureLink from '@/views/Workshop/Bestiary/CreatureLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import type { AnyObject } from '@/types/Shared/Utility.types';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { BestiaryFilterDefaults } from '@/types/Workshop/Bestiary.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import CreatureLink from '@/views/Workshop/Bestiary/CreatureLink.vue';
 
   const route = useRoute();
   const router = useRouter();

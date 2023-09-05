@@ -3,7 +3,7 @@
     :class="{
       'ui-switch': true,
       [$style['ui-switch']]: true,
-      [$style['is-full-width']]: fullWidth,
+      [$style['is-full-width']]: fullWidth
     }"
   >
     <button
@@ -11,7 +11,7 @@
       :key="`${option[trackBy]}_${index}`"
       :class="{
         [$style.option]: true,
-        [$style['is-active']]: selected?.[trackBy] === option[trackBy],
+        [$style['is-active']]: selected?.[trackBy] === option[trackBy]
       }"
       type="button"
       @click.left.exact.prevent="selected = option"
@@ -21,7 +21,8 @@
       <span
         v-if="!$slots.option"
         :class="$style.text"
-      >{{ option[label] }}</span>
+        >{{ option[label] }}</span
+      >
 
       <slot
         v-else
@@ -32,24 +33,31 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="OptionType extends Record<string | 'id' | 'name', any>">
-  import { onBeforeMount } from 'vue';
+<script
+  setup
+  lang="ts"
+  generic="OptionType extends Record<string | 'id' | 'name', any>"
+>
   import { useVModel } from '@vueuse/core';
   import cloneDeep from 'lodash/cloneDeep';
+  import { onBeforeMount } from 'vue';
 
-  const props = withDefaults(defineProps<{
-    modelValue: OptionType;
-    options: Array<OptionType>;
-    trackBy?: keyof OptionType;
-    label?: keyof OptionType;
-    preSelectFirst?: boolean;
-    fullWidth?: boolean;
-  }>(), {
-    trackBy: 'id',
-    label: 'name',
-    preSelectFirst: false,
-    fullWidth: false
-  });
+  const props = withDefaults(
+    defineProps<{
+      modelValue: OptionType;
+      options: Array<OptionType>;
+      trackBy?: keyof OptionType;
+      label?: keyof OptionType;
+      preSelectFirst?: boolean;
+      fullWidth?: boolean;
+    }>(),
+    {
+      trackBy: 'id',
+      label: 'name',
+      preSelectFirst: false,
+      fullWidth: false
+    }
+  );
 
   const selected = useVModel(props, 'modelValue');
 
@@ -104,14 +112,14 @@
       border: {
         top-left-radius: $radius;
         top-right-radius: $radius;
-      };
+      }
 
       @include media-min($lg) {
         border: {
           top-left-radius: $radius;
           top-right-radius: 0;
           bottom-left-radius: $radius;
-        };
+        }
       }
     }
 
@@ -119,14 +127,14 @@
       border: {
         bottom-left-radius: $radius;
         bottom-right-radius: $radius;
-      };
+      }
 
       @include media-min($lg) {
         border: {
           top-right-radius: $radius;
           bottom-left-radius: 0;
           bottom-right-radius: $radius;
-        };
+        }
       }
     }
 

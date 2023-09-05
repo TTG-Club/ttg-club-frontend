@@ -23,11 +23,14 @@
 
 <script>
   import { mapState } from 'pinia';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import ArmorBody from '@/views/Inventory/Armors/ArmorBody.vue';
+
+  import errorHandler from '@/shared/helpers/errorHandler';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
   import { useUIStore } from '@/store/UI/UIStore';
-  import errorHandler from '@/common/helpers/errorHandler';
+  import ArmorBody from '@/views/Inventory/Armors/ArmorBody.vue';
 
   export default {
     components: {
@@ -86,6 +89,4 @@
   };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

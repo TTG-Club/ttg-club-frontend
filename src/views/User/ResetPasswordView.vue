@@ -3,9 +3,7 @@
     :show-separator="false"
     :use-social-links="false"
   >
-    <template #title>
-      Сброс пароля
-    </template>
+    <template #title> Сброс пароля </template>
 
     <template
       v-if="!tokenValidation.correct"
@@ -24,15 +22,16 @@
 </template>
 
 <script lang="ts">
-  import {
-    computed, defineComponent, onBeforeMount, ref
-  } from 'vue';
-  import { useRoute } from 'vue-router';
   import { storeToRefs } from 'pinia';
+  import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+
   import ChangePasswordView from '@/components/account/ChangePasswordView.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import { useUserStore } from '@/store/UI/UserStore';
   import PageLayout from '@/components/content/PageLayout.vue';
+
+  import { useUserStore } from '@/store/UI/UserStore';
 
   interface ITokenValidation {
     correct: boolean;
@@ -62,7 +61,7 @@
 
         try {
           const resp = await http.get<ITokenValidation>({
-            url: `/auth/token/validate?token=${ route.query.token }`
+            url: `/auth/token/validate?token=${route.query.token}`
           });
 
           if (resp.status !== 200) {
@@ -92,13 +91,11 @@
       });
 
       return {
-        token: computed(() => route.query.token as string || ''),
+        token: computed(() => (route.query.token as string) || ''),
         tokenValidation
       };
     }
   });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

@@ -1,9 +1,13 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { useAxios } from '@/common/composition/useAxios';
+
 import type {
-  IBookmarkCategoryInfo, TBookmark, TQueryAddBookmark
-} from '@/features/bookmarks/types/Bookmark.types';
-import type { Maybe } from '@/types/Shared/Utility.types';
+  IBookmarkCategoryInfo,
+  TBookmark,
+  TQueryAddBookmark
+} from '@/features/bookmarks/types/Bookmark.d';
+
+import { useAxios } from '@/shared/composition/useAxios';
+import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {
   static getCategoryByURL(url: string) {
@@ -29,7 +33,10 @@ export default class BookmarksApi {
   static getCategory({
     code,
     url
-  }: { code?: Maybe<string>, url?: Maybe<string> }) {
+  }: {
+    code?: Maybe<string>;
+    url?: Maybe<string>;
+  }) {
     if (code) {
       return this.getCategoryByCode(code);
     }
@@ -79,7 +86,7 @@ export default class BookmarksApi {
     const http = useAxios();
 
     return http.delete({
-      url: `/bookmarks/${ uuid }`
+      url: `/bookmarks/${uuid}`
     });
   }
 }

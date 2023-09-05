@@ -13,7 +13,7 @@
         :alt="title"
         class="auth-reg-modal__bg"
         src="/img/bg_login.png"
-      >
+      />
 
       <div class="auth-reg-modal__content">
         <ui-button
@@ -39,21 +39,25 @@
 </template>
 
 <script lang="ts" setup>
-  import { VueFinalModal } from 'vue-final-modal';
   import { useVModel } from '@vueuse/core';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import { VueFinalModal } from 'vue-final-modal';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import UiButton from '@/components/UI/kit/button/UiButton.vue';
 
   interface IEmit {
     (e: 'close'): void;
   }
 
-  const props = withDefaults(defineProps<{
-    modelValue: boolean;
-    title?: string;
-  }>(), {
-    title: ''
-  });
+  const props = withDefaults(
+    defineProps<{
+      modelValue: boolean;
+      title?: string;
+    }>(),
+    {
+      title: ''
+    }
+  );
 
   const emit = defineEmits<IEmit>();
 

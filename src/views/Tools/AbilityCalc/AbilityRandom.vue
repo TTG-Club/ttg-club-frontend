@@ -1,9 +1,7 @@
 <template>
   <div class="ability-random">
     <div class="ability-random__blocks">
-      <div class="ability-random__block">
-        Сумма: {{ sum }}
-      </div>
+      <div class="ability-random__block">Сумма: {{ sum }}</div>
 
       <ui-button
         class="ability-random__block is-btn"
@@ -35,7 +33,8 @@
           <span
             :class="{ 'is-selected': isSelected(option.key) }"
             class="ability-random__select_option"
-          >{{ option.name }}</span>
+            >{{ option.name }}</span
+          >
         </template>
 
         <template #left-slot>
@@ -46,30 +45,31 @@
           {{ roll.name || 'Выбрать хар-ку' }}
         </template>
 
-        <template #placeholder>
-          Выбрать хар-ку
-        </template>
+        <template #placeholder> Выбрать хар-ку </template>
       </ui-select>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, onActivated, ref
-  } from 'vue';
-  import { useToast } from 'vue-toastification';
   import orderBy from 'lodash/orderBy';
   import reverse from 'lodash/reverse';
   import { storeToRefs } from 'pinia';
+  import { computed, defineComponent, onActivated, ref } from 'vue';
+  import { useToast } from 'vue-toastification';
+
+  import { useDiceRoller } from '@/shared/composition/useDiceRoller';
+  import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
+  import { ToastEventBus } from '@/shared/utils/ToastConfig';
+
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import { useDiceRoller } from '@/common/composition/useDiceRoller';
-  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
-  import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.types';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/common/helpers/abilityTransforms';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
+
+  import type { PropType } from 'vue';
+
+  import { AbilityKey, AbilityName } from '@/types/Tools/AbilityCalc.d';
+  import type { AbilityRoll } from '@/types/Tools/AbilityCalc.d';
+
   import { useUIStore } from '@/store/UI/UIStore';
 
   export default defineComponent({
@@ -88,10 +88,7 @@
       const uiStore = useUIStore();
       const { isMobile } = storeToRefs(uiStore);
 
-      const {
-        doRoll,
-        notifyResult
-      } = useDiceRoller();
+      const { doRoll, notifyResult } = useDiceRoller();
 
       const rolls = ref<Array<AbilityRoll>>([]);
 
@@ -113,7 +110,7 @@
             if (!isMobile.value) {
               notifyResult({
                 roll,
-                label: `Бросок №${ i + 1 }`,
+                label: `Бросок №${i + 1}`,
                 toastOptions: {
                   timeout: 5000 + 1000 * i
                 }
@@ -136,15 +133,14 @@
         }
       };
 
-      const isSelected = (key: AbilityKey) => rolls.value.find(roll => roll.key === key);
+      const isSelected = (key: AbilityKey) =>
+        rolls.value.find(roll => roll.key === key);
 
       const onSelect = (key: AbilityKey | null, index: number) => {
         const setValue = (value: typeof key, i: number) => {
           rolls.value[i].key = value;
 
-          rolls.value[i].name = value
-            ? AbilityName[value]
-            : null;
+          rolls.value[i].name = value ? AbilityName[value] : null;
         };
 
         for (let i = 0; i < rolls.value.length; i++) {
@@ -170,12 +166,12 @@
       };
 
       return {
-        abilities: computed(() => Object
-          .keys(AbilityKey)
-          .map(key => ({
+        abilities: computed(() =>
+          Object.keys(AbilityKey).map(key => ({
             key,
             name: AbilityName[key as AbilityKey]
-          }))),
+          }))
+        ),
         sum: computed(() => {
           let result = 0;
 
@@ -261,7 +257,7 @@
 
         &.is-selected {
           &::before {
-            content: "";
+            content: '';
             width: 10px;
             height: 10px;
             border-radius: 50%;
@@ -274,7 +270,6 @@
       }
 
       &_roll {
-
       }
     }
 

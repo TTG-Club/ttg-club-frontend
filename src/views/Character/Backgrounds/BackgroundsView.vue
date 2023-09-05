@@ -9,7 +9,10 @@
     <virtual-grouped-list
       :list="getListProps({ items: backgrounds, size: 'small' })"
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
     >
       <template #default="{ item: background }">
         <background-link
@@ -22,40 +25,38 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import { getGroupByFirstLetter } from '@/shared/helpers/list';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import BackgroundLink from '@/views/Character/Backgrounds/BackgroundLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.types';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from '@/common/helpers/list';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { BackgroundsFilterDefaults } from '@/types/Character/Backgrounds.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import BackgroundLink from '@/views/Character/Backgrounds/BackgroundLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: BackgroundsFilterDefaults.dbName,
     url: BackgroundsFilterDefaults.url
   });
 
-  const {
-    initPages,
-    items: backgrounds
-  } = usePagination({
+  const { initPages, items: backgrounds } = usePagination({
     url: '/backgrounds',
     limit: -1,
     filter: {

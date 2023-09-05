@@ -24,29 +24,30 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import RuleLink from '@/views/Wiki/Rules/RuleLink.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
-  import { RulesFilterDefaults } from '@/types/Wiki/Rules.types';
+  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
   import VirtualGridList from '@/components/list/VirtualGridList/VirtualGridList.vue';
   import { getListProps } from '@/components/list/VirtualList/helpers';
-  import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+
+  import { RulesFilterDefaults } from '@/types/Wiki/Rules.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import RuleLink from '@/views/Wiki/Rules/RuleLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: RulesFilterDefaults.dbName,

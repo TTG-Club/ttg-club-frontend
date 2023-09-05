@@ -1,15 +1,13 @@
 <template>
   <a
-    :class="[`is-${ socialName.toLowerCase() }`]"
+    :class="[`is-${socialName.toLowerCase()}`]"
     :href="url"
     class="ui-social-button"
     rel="noopener noreferrer"
     target="_blank"
   >
     <span class="ui-social-button__icon">
-      <svg-icon
-        :icon="socialName.toLowerCase()"
-      />
+      <svg-icon :icon="socialName.toLowerCase()" />
     </span>
 
     <span
@@ -30,6 +28,7 @@
 
 <script>
   import { defineComponent } from 'vue';
+
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   export default defineComponent({
@@ -53,7 +52,7 @@
 
 <style lang="scss" scoped>
   .ui-social-button {
-    @include css_anim($time: .2s);
+    @include css_anim($time: 0.2s);
 
     padding: 8px 16px;
     border-radius: 30px;

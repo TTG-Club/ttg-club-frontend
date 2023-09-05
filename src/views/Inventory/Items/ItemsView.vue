@@ -10,7 +10,10 @@
   >
     <virtual-grouped-list
       :get-group="getGroupByFirstLetter"
-      :grid="{ flat: checkIsListGridFlat({ showRightSide, fullscreen }), reference: setReference }"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference
+      }"
       :list="getListProps({ items, size: 'small' })"
     >
       <template #default="{ item }">
@@ -27,39 +30,35 @@
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { useFilter } from '@/common/composition/useFilter';
-  import { usePagination } from '@/common/composition/usePagination';
+
+  import { useFilter } from '@/shared/composition/useFilter';
+  import { usePagination } from '@/shared/composition/usePagination';
+  import { useScrollToPathInList } from '@/shared/composition/useScrollToPathInList';
+  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
+  import { getGroupByFirstLetter } from '@/shared/helpers/list';
+
   import ContentLayout from '@/components/content/ContentLayout.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import { ItemsFilterDefaults } from '@/types/Inventory/Items.types';
-  import ItemLink from '@/views/Inventory/Items/ItemLink.vue';
-  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
-  import { getGroupByFirstLetter } from '@/common/helpers/list';
-  import { getListProps } from '@/components/list/VirtualList/helpers';
   import { checkIsListGridFlat } from '@/components/list/VirtualGridList/helpers';
-  import { isAutoOpenAvailable } from '@/common/helpers/isAutoOpenAvailable';
-  import { useScrollToPathInList } from '@/common/composition/useScrollToPathInList';
+  import VirtualGroupedList from '@/components/list/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getListProps } from '@/components/list/VirtualList/helpers';
+
+  import { ItemsFilterDefaults } from '@/types/Inventory/Items.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import ItemLink from '@/views/Inventory/Items/ItemLink.vue';
 
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
 
-  const {
-    isMobile,
-    fullscreen
-  } = storeToRefs(uiStore);
+  const { isMobile, fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
     dbName: ItemsFilterDefaults.dbName,
     url: ItemsFilterDefaults.url
   });
 
-  const {
-    initPages,
-    nextPage,
-    isEnd,
-    items
-  } = usePagination({
+  const { initPages, nextPage, isEnd, items } = usePagination({
     url: '/items',
     filter: {
       isCustomized: filter.isCustomized,

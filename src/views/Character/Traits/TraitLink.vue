@@ -30,7 +30,6 @@
 
 <script>
   export default {
-
     inheritAttrs: false,
     props: {
       traitItem: {

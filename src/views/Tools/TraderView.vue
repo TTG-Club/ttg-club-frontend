@@ -19,9 +19,7 @@
                 label="name"
                 track-by="value"
               >
-                <template #placeholder>
-                  Количество
-                </template>
+                <template #placeholder> Количество </template>
               </ui-select>
             </div>
 
@@ -109,7 +107,9 @@
             Найти торговца
           </ui-button>
 
-          <ui-button @click.left.exact.prevent="settings.opened = !settings.opened">
+          <ui-button
+            @click.left.exact.prevent="settings.opened = !settings.opened"
+          >
             Настройки
           </ui-button>
         </div>
@@ -165,42 +165,44 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    computed, ref, toRaw
-  } from 'vue';
+  import { tryOnBeforeMount } from '@vueuse/core';
+  import localforage from 'localforage';
+  import groupBy from 'lodash/groupBy';
   import max from 'lodash/max';
   import mean from 'lodash/mean';
   import sortedUniq from 'lodash/sortedUniq';
   import throttle from 'lodash/throttle';
-  import groupBy from 'lodash/groupBy';
-  import { storeToRefs } from 'pinia';
-  import { tryOnBeforeMount } from '@vueuse/core';
   import toNumber from 'lodash/toNumber';
-  import localforage from 'localforage';
-  import ContentLayout from '@/components/content/ContentLayout.vue';
-  import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import SectionHeader from '@/components/UI/SectionHeader.vue';
-  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
-  import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
-  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
-  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
-  import errorHandler from '@/common/helpers/errorHandler';
+  import { storeToRefs } from 'pinia';
+  import { computed, ref, toRaw } from 'vue';
+
+  import { useAxios } from '@/shared/composition/useAxios';
+  import { DB_NAME } from '@/shared/const/UI';
+  import errorHandler from '@/shared/helpers/errorHandler';
+  import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
+
   import ContentDetail from '@/components/content/ContentDetail.vue';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
+  import ContentLayout from '@/components/content/ContentLayout.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
+  import UiInput from '@/components/UI/kit/UiInput.vue';
+  import UiSelect from '@/components/UI/kit/UiSelect.vue';
   import UiSwitch from '@/components/UI/kit/UiSwitch.vue';
-  import { useAxios } from '@/common/composition/useAxios';
-  import type { TNameValue, TSource } from '@/types/Shared/BaseApiFields.types';
-  import type { TSpellItem } from '@/types/Character/Spells.types';
-  import type { TArtifactItem } from '@/types/Inventory/MagicItems.types';
-  import type { TGroupedTraderLink, TTraderLink } from '@/types/Tools/Trader.types';
-  import { DB_NAME } from '@/common/const/UI';
+  import SectionHeader from '@/components/UI/SectionHeader.vue';
+
+  import type { TSpellItem } from '@/types/Character/Spells.d';
+  import type { TArtifactItem } from '@/types/Inventory/MagicItems.d';
+  import type { TGroupedTraderLink, TTraderLink } from '@/types/Tools/Trader.d';
+
+  import { useUIStore } from '@/store/UI/UIStore';
+  import SpellBody from '@/views/Character/Spells/SpellBody.vue';
+  import MagicItemBody from '@/views/Inventory/MagicItems/MagicItemBody.vue';
+  import MagicItemLink from '@/views/Inventory/MagicItems/MagicItemLink.vue';
 
   type TConfig = {
     magicLevels: Array<TNameValue<number>>;
-    sources: Array<TSource>
-  }
+    sources: Array<TSource>;
+  };
 
   const http = useAxios();
   const uiStore = useUIStore();
@@ -230,7 +232,7 @@
     opened: boolean;
     grouping: boolean;
     max: boolean;
-    priceSource?: TSource
+    priceSource?: TSource;
   }>({
     opened: !isMobile.value,
     grouping: true,
@@ -241,12 +243,12 @@
 
   const detailCard = ref<{
     item?: TArtifactItem;
-    spell?: TSpellItem
+    spell?: TSpellItem;
   }>({});
 
   const selected = ref<{
     index?: number;
-    item?: TArtifactItem
+    item?: TArtifactItem;
   }>({});
 
   const loading = ref(false);
@@ -257,7 +259,8 @@
   const showRightSide = ref(false);
 
   const magicLevel = computed<TNameValue<number>>({
-    get: () => config.value.magicLevels.find(el => el.value === form.value.magicLevel),
+    get: () =>
+      config.value.magicLevels.find(el => el.value === form.value.magicLevel),
     set: v => {
       form.value.magicLevel = v.value;
     }
@@ -278,9 +281,7 @@
       const currentPrice = price[priceKey.toLowerCase()];
       const formatted = toNumber(currentPrice);
 
-      return Number.isNaN(formatted)
-        ? null
-        : formatted;
+      return Number.isNaN(formatted) ? null : formatted;
     };
 
     if (!settings.value.grouping) {
@@ -299,22 +300,25 @@
     }
 
     const getGroupPrice = (group: Array<TTraderLink>) => {
-      const prices = sortedUniq(group
-        .map(o => {
-          if (!o.price) {
-            return null;
-          }
+      const prices = sortedUniq(
+        group
+          .map(o => {
+            if (!o.price) {
+              return null;
+            }
 
-          return getCurrentPrice(toRaw(o.price));
-        })
-        .filter(price => typeof price === 'number'));
+            return getCurrentPrice(toRaw(o.price));
+          })
+          .filter(price => typeof price === 'number')
+      );
 
-      return settings.value.max
-        ? max(prices)
-        : Math.round(mean(prices));
+      return settings.value.max ? max(prices) : Math.round(mean(prices));
     };
 
-    const groups = Object.values<Array<TTraderLink>>(groupBy(results.value, o => o.name.rus));
+    const groups = Object.values<Array<TTraderLink>>(
+      groupBy(results.value, o => o.name.rus)
+    );
+
     const res: Array<TGroupedTraderLink> = [];
 
     for (const group of groups) {
@@ -432,7 +436,8 @@
 
       await store.ready();
 
-      const sourceKey = await store.getItem<TSource['shortName']>('priceSource');
+      const sourceKey =
+        await store.getItem<TSource['shortName']>('priceSource');
 
       if (!sourceKey) {
         return sources[0];
@@ -458,7 +463,10 @@
 
       settings.value.priceSource = source;
 
-      return store.setItem<TSource['shortName']>('priceSource', source.shortName);
+      return store.setItem<TSource['shortName']>(
+        'priceSource',
+        source.shortName
+      );
     } catch (err) {
       return Promise.reject(err);
     }
@@ -498,9 +506,7 @@
     };
 
     try {
-      const {
-        status, statusText, data
-      } = await http.post<Array<TTraderLink>>({
+      const { status, statusText, data } = await http.post<Array<TTraderLink>>({
         url: '/tools/trader',
         payload: options,
         signal: controllers.value.signal
@@ -524,9 +530,7 @@
 
   const getItemDetail = async <T, L>(url: L['url']): Promise<T> => {
     try {
-      const {
-        status, statusText, data
-      } = await http.post<T>({ url });
+      const { status, statusText, data } = await http.post<T>({ url });
 
       if (status !== 200) {
         error.value = true;
@@ -548,10 +552,15 @@
 
       const item = groupedResults.value[index];
 
-      detailCard.value.item = await getItemDetail<TArtifactItem, TTraderLink>(item.url);
+      detailCard.value.item = await getItemDetail<TArtifactItem, TTraderLink>(
+        item.url
+      );
 
       if (item.spell?.url) {
-        detailCard.value.spell = await getItemDetail<TSpellItem, TTraderLink['spell']>(item.spell.url);
+        detailCard.value.spell = await getItemDetail<
+          TSpellItem,
+          TTraderLink['spell']
+        >(item.spell.url);
       }
 
       selected.value = {

@@ -86,11 +86,7 @@
     },
     setup(props) {
       return {
-        currentSize: computed(() => (
-          props.size
-            ? `${ props.size }px`
-            : '100%'
-        ))
+        currentSize: computed(() => (props.size ? `${props.size}px` : '100%'))
       };
     }
   });
