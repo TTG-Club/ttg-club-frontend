@@ -308,7 +308,7 @@
     }
 
     &__body {
-      padding: 8px 8px 8px 8px;
+      padding: 8px 8px 32px 8px;
       display: flex;
       flex-wrap: wrap;
       gap: 48px;
