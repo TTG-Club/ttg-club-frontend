@@ -24,7 +24,24 @@
           }}</span>
 
           <span v-if="creature.armors?.length">
-            ({{ creature.armors.join(', ') }})
+            (<span
+              v-for="(armor, key) in creature.armors"
+              :key="key"
+            >
+              <detail-tooltip
+                v-if="armor.url?.length"
+                type="armor"
+                :url="armor.url"
+              >
+                {{ armor.name }}
+              </detail-tooltip>
+
+              <span v-else>
+                {{ armor.name }}
+              </span>
+
+              <span v-if="key < creature.armors?.length - 1">, </span>
+            </span>)
           </span>
         </p>
 
@@ -330,10 +347,8 @@
         <p v-if="!creature.legendary.description">
           <span>{{ creature.name.rus }}</span> может совершить 3 легендарных
           действия, выбирая из представленных ниже вариантов. За один раз можно
-          использовать только одно легендарное
-          <!-- eslint-disable-next-line max-len -->
-          действие, и только в конце хода другого существа.
-          <span>{{ creature.name.rus }}</span>
+          использовать только одно легендарное действие, и только в конце хода
+          другого существа. <span>{{ creature.name.rus }}</span>
           восстанавливает использованные легендарные действия в начале своего
           хода.
         </p>
@@ -446,6 +461,7 @@
   import RawContent from '@/shared/ui/content/RawContent.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import DetailTooltip from '@/components/UI/DetailTooltip.vue';
 
   const props = defineProps({
     creature: {
