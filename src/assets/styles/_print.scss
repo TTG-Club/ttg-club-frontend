@@ -19,6 +19,10 @@
     --h5-line-height: 1.1;
   }
 
+  hr {
+    margin: 8px 0 !important;
+  }
+
   body {
     background: white !important;
     color: black !important;
@@ -112,6 +116,15 @@
   p,
   .section-header__title--text {
     color: var(--text-print-color) !important;
+  }
+
+  p {
+    margin: 0 0 8px 0 !important;
+  }
+
+  .header_separator {
+    margin: 16px 0 0 0 !important;
+    border-bottom: none !important;
   }
 
   .section-header__title--text {
