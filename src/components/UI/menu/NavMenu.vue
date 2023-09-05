@@ -89,18 +89,21 @@
 
               <ui-social-button
                 hide-label
+                transparent
                 social-name="vk"
                 url="https://vk.com/ttg.club"
               />
 
               <ui-social-button
                 hide-label
+                :transparent="true"
                 social-name="discord"
                 url="https://discord.gg/zqBnMJVf3z"
               />
 
               <ui-social-button
                 hide-label
+                :transparent="true"
                 social-name="youtube"
                 url="https://www.youtube.com/channel/UCpFse6-P2IBXYfkesAxZbfA"
               />
@@ -111,6 +114,7 @@
 
               <ui-social-button
                 hide-label
+                :transparent="true"
                 social-name="boosty"
                 url="https://boosty.to/dnd5club"
               />
@@ -214,22 +218,22 @@
       border-radius: 8px;
       padding: 4px 8px;
 
-      &.is-vk {
-        background-color: transparent;
-      }
+      // &.is-vk {
+      //   background-color: transparent;
+      // }
 
-      &.is-discord {
-        background-color: transparent;
-      }
+      // &.is-discord {
+      //   background-color: transparent;
+      // }
 
-      &.is-boosty {
-        background-color: transparent;
-      }
+      // &.is-boosty {
+      //   background-color: transparent;
+      // }
 
-      &:hover {
-        background-color: var(--hover);
-        opacity: 100%;
-      }
+      // &:hover {
+      //   background-color: var(--hover);
+      //   opacity: 100%;
+      // }
     }
 
     &__bottom {

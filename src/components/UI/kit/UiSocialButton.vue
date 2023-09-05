@@ -46,6 +46,10 @@
       hideLabel: {
         type: Boolean,
         default: false
+      },
+      transparent: {
+        type: Boolean,
+        default: false
       }
     }
   });
@@ -114,6 +118,16 @@
       @include media-min($md) {
         &:hover {
           background-color: var(--boosty-hover);
+        }
+      }
+    }
+
+    &.is-transparent {
+      background-color: transparent;
+
+      @include media-min($md) {
+        &:hover {
+          background-color: var(--hover);
         }
       }
     }
