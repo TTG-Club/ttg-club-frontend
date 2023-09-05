@@ -1,9 +1,9 @@
 import { storeToRefs } from 'pinia';
 import { unref } from 'vue';
 
-import type { MaybeRef } from '@vueuse/core';
+import { useUIStore } from '@/shared/stores/UIStore';
 
-import { useUIStore } from '@/store/UI/UIStore';
+import type { MaybeRef } from '@vueuse/core';
 
 export const isAutoOpenAvailable = <T extends Array<unknown>>(
   list: MaybeRef<T>,

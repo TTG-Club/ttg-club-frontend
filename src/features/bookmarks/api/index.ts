@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash-es';
 
 import type {
   IBookmarkCategoryInfo,
@@ -6,7 +6,7 @@ import type {
   TQueryAddBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
 
-import { useAxios } from '@/shared/composition/useAxios';
+import { useAxios } from '@/shared/compositions/useAxios';
 import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {

@@ -1,6 +1,6 @@
-import chunk from 'lodash/chunk';
+import { chunk } from 'lodash-es';
 
-import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/const';
+import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/constants';
 import type { TName } from '@/shared/types/BaseApiFields';
 import type { TGetListRowsOptions, TListRow } from '@/shared/types/List';
 

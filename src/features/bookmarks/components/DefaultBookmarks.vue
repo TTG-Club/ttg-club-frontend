@@ -95,7 +95,7 @@
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   const bookmarksStore = useDefaultBookmarkStore();
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);

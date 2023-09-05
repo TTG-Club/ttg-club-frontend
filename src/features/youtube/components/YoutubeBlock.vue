@@ -54,7 +54,7 @@
   import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-  import BaseModal from '@/components/UI/modals/BaseModal.vue';
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
 
   const youtube = ref<HTMLElement>();
   const videos = ref<Array<TYoutubeVideo>>([]);

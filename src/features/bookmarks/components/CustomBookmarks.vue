@@ -111,9 +111,9 @@
   import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
 
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
 
   const customBookmarkStore = useCustomBookmarkStore();
   const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);

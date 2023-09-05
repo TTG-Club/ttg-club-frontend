@@ -6,8 +6,8 @@ import {
   required
 } from '@vuelidate/validators';
 
-import { useAxios } from '@/shared/composition/useAxios';
-import errorHandler from '@/shared/helpers/errorHandler';
+import { useAxios } from '@/shared/compositions/useAxios';
+import { errorHandler } from '@/shared/helpers/errorHandler';
 import { useIsDev } from '@/shared/helpers/isDev';
 
 const http = useAxios();

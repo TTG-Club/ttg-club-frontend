@@ -43,11 +43,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "esnext",
-    "typeRoots": [
-      "./src/vite-env.d.ts",
-      "./node_modules/@types",
-      "./node_modules"
-    ],
+    "typeRoots": ["./vite-env.d.ts", "./node_modules/@types", "./node_modules"],
     "types": ["node", "vite/client", "vite-plugin-svg-icons/client.d.ts"],
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": true

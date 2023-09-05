@@ -31,11 +31,10 @@
   import DefaultBookmarks from '@/features/bookmarks/components/DefaultBookmarks.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+  import NavPopover from '@/features/menu/NavPopover.vue';
 
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import NavPopover from '@/components/UI/menu/NavPopover.vue';
-
-  import { useUserStore } from '@/store/UI/UserStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   const opened = ref(false);
   const userStore = useUserStore();

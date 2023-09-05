@@ -2,10 +2,10 @@ import { toValue } from '@vueuse/shared';
 import { computed, readonly, ref } from 'vue';
 import { useToast } from 'vue-toastification';
 
+import { ToastEventBus } from '@/app/configs/ToastConfig';
+
 import { YoutubeApi } from '@/features/youtube/api';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-import { ToastEventBus } from '@/shared/utils/ToastConfig';
 
 import type { MaybeRef } from '@vueuse/core';
 

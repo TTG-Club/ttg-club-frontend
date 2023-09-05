@@ -140,15 +140,13 @@
   import { useYoutubeActive } from '@/features/youtube/composition/useYoutubeActive';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-  import { getFormattedDate } from '@/shared/composition/useDayjs';
-
-  import PageLayout from '@/components/content/PageLayout.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import UiCheckbox from '@/components/UI/kit/UiCheckbox.vue';
-  import UiPaginate from '@/components/UI/kit/UiPaginate.vue';
-  import UiSelect from '@/components/UI/kit/UiSelect.vue';
-
-  import { useUIStore } from '@/store/UI/UIStore';
+  import { getFormattedDate } from '@/shared/compositions/useDayjs';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import PageLayout from '@/shared/ui/content/PageLayout.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+  import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
+  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
 
   const { isMobile } = storeToRefs(useUIStore());
 

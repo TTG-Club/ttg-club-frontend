@@ -34,12 +34,12 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
+  import { ToastEventBus } from '@/app/configs/ToastConfig';
+
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.d';
 
-  import { ToastEventBus } from '@/shared/utils/ToastConfig';
-
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const props = withDefaults(
     defineProps<{

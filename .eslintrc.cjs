@@ -1,22 +1,56 @@
 require('@rushstack/eslint-patch/modern-module-resolution');
 
+const boundaries = [
+  'app',
+  'processes',
+  'router',
+  'store',
+  'pages',
+  'widgets',
+  'features',
+  'entities',
+  'shared'
+];
+
 module.exports = {
   root: true,
   env: { browser: true, es2021: true, node: true },
-  ignorePatterns: ['!(src|.storybook|public)/**/*'],
+  ignorePatterns: ['!(src|.storybook|public)/**'],
   extends: [
     'plugin:vue/vue3-recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
+    'plugin:boundaries/recommended',
     '@vue/airbnb',
     '@vue/eslint-config-typescript',
     '@vue/eslint-config-prettier'
   ],
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'boundaries'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
     sourceType: 'module',
     ecmaVersion: 'latest',
-    ecmaFeatures: { jsx: true }
+    ecmaFeatures: { jsx: true, modules: true }
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        directory: '.',
+        alwaysTryTypes: true,
+        project: 'tsconfig.json'
+      },
+      node: {
+        paths: 'src'
+      }
+    },
+    'boundaries/elements': boundaries.map(name => ({
+      pattern: `${name}/*`,
+      type: name
+    })),
+    'boundaries/include': ['src/**/*'],
+    'boundaries/ignore': ['**/*.test.*']
   },
   rules: {
     'prettier/prettier': ['error'],
@@ -28,6 +62,7 @@ module.exports = {
     'no-use-before-define': 'off',
     'no-debugger': 'error',
     'no-alert': ['error'],
+    'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1, maxBOF: 1 }],
     'consistent-return': [1],
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
@@ -38,37 +73,44 @@ module.exports = {
       'error',
       {
         'newlines-between': 'always',
-        'warnOnUnassignedImports': true,
+        'warnOnUnassignedImports': false,
+        'pathGroupsExcludedImportTypes': ['builtin'],
         'alphabetize': {
           order: 'asc',
+          orderImportKind: 'asc',
           caseInsensitive: true
         },
         'groups': [
           'builtin',
           'external',
           'internal',
-          'object',
           'parent',
           'sibling',
           'index',
-          'type'
+          'unknown',
+          'type',
+          'object'
         ],
-        'pathGroups': [
-          { pattern: '@/app/**', group: 'parent', position: 'before' },
-          { pattern: '@/processes/**', group: 'parent', position: 'before' },
-          { pattern: '@/pages/**', group: 'parent', position: 'before' },
-          { pattern: '@/widgets/**', group: 'parent', position: 'before' },
-          { pattern: '@/features/**', group: 'parent', position: 'before' },
-          { pattern: '@/entities/**', group: 'parent', position: 'before' },
-          { pattern: '@/shared/**', group: 'parent', position: 'before' },
-          { pattern: '@/services/**', group: 'parent', position: 'before' },
-          { pattern: '@/utils/**', group: 'parent', position: 'before' },
-          { pattern: '@/helpers/**', group: 'parent', position: 'before' },
-          { pattern: '@/stores/**', group: 'parent', position: 'before' },
-          { pattern: '@/layouts/**', group: 'parent', position: 'before' },
-          { pattern: '@/components/**', group: 'parent', position: 'before' },
-          { pattern: '*/types/**', group: 'type', position: 'after' }
-        ]
+        'pathGroups': boundaries.map(name => ({
+          pattern: `@/${name}/**`,
+          group: 'internal',
+          position: 'after'
+        }))
+      }
+    ],
+    'import/no-cycle': [2, { maxDepth: 1 }],
+    'boundaries/element-types': [
+      'warn', // TODO: Это будет 'error'.
+      {
+        default: 'disallow',
+        // eslint-disable-next-line no-template-curly-in-string
+        message: '${file.type} is not allowed to import ${dependency.type}',
+        rules: boundaries.map((name, index) => ({
+          from: name,
+          allow: boundaries.slice(
+            index + 1 >= boundaries.length ? index : index + 1
+          )
+        }))
       }
     ],
     'no-continue': 'off',
@@ -83,6 +125,7 @@ module.exports = {
       'LabeledStatement',
       'WithStatement'
     ],
+    'no-unused-vars': 'off',
     'no-param-reassign': [
       'error',
       { props: true, ignorePropertyModificationsFor: ['state'] }
@@ -91,7 +134,6 @@ module.exports = {
     'require-await': ['error'],
     'spaced-comment': ['error', 'always'],
     'camelcase': ['error'],
-    'line-comment-position': ['error', { position: 'above' }],
     'lines-between-class-members': [
       'error',
       'always',
@@ -193,10 +235,20 @@ module.exports = {
     '@typescript-eslint/no-shadow': ['error'],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { args: 'after-used', ignoreRestSiblings: true }
+    ],
     '@typescript-eslint/no-use-before-define': [
       'error',
       { typedefs: false, enums: false }
     ]
-  }
+  },
+
+  overrides: [
+    {
+      files: ['**/*.test.*'],
+      rules: { 'boundaries/element-types': 'off' }
+    }
+  ]
 };

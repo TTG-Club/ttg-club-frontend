@@ -5,7 +5,7 @@ import { computed, readonly, ref, watch } from 'vue';
 import { YoutubeApi } from '@/features/youtube/api';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-import { useUIStore } from '@/store/UI/UIStore';
+import { useUIStore } from '@/shared/stores/UIStore';
 
 export const useYoutube = () => {
   const { bodyElement } = storeToRefs(useUIStore());

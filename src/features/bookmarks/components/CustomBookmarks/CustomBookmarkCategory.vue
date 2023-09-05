@@ -90,13 +90,11 @@
     IBookmarkItem
   } from '@/features/bookmarks/types/Bookmark.d';
 
+  import { useUIStore } from '@/shared/stores/UIStore';
   import type { WithChildren } from '@/shared/types/Utility';
-
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   import type { PropType } from 'vue';
-
-  import { useUIStore } from '@/store/UI/UIStore';
 
   export default defineComponent({
     components: {

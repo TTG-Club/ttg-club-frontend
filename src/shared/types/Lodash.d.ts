@@ -1,3 +1,3 @@
-import type { LoDashStatic } from 'lodash';
+import type { LoDashStatic } from 'lodash-es';
 
 export type ListIteratee = Parameters<LoDashStatic['sortBy']>[1];

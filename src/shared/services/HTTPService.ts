@@ -1,12 +1,11 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { USER_TOKEN_COOKIE } from '@/shared/const/UI';
+import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
 import { getBaseURL } from '@/shared/helpers/request';
+import { useUserStore } from '@/shared/stores/UserStore';
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-
-import { useUserStore } from '@/store/UI/UserStore';
 
 export type RequestConfig = {
   url: AxiosRequestConfig['url'];

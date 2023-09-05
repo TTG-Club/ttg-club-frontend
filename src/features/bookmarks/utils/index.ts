@@ -1,5 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
-import sortBy from 'lodash/sortBy';
+import { cloneDeep, sortBy } from 'lodash-es';
 
 import type {
   IBookmarkCategory,

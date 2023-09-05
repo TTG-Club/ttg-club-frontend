@@ -18,10 +18,7 @@
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
   import { toast } from '@/shared/helpers/toast';
-
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-
-  import { useUserStore } from '@/store/UI/UserStore';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const props = withDefaults(
     defineProps<{
@@ -35,7 +32,6 @@
   );
 
   const route = useRoute();
-  const userStore = useUserStore();
   const bookmarkStore = useDefaultBookmarkStore();
   const inProgress = ref(false);
 

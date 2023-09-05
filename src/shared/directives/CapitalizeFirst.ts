@@ -1,4 +1,4 @@
-import upperFirst from 'lodash/upperFirst';
+import { upperFirst } from 'lodash-es';
 
 import type { Directive } from 'vue';
 

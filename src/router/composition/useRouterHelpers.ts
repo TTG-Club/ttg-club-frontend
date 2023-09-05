@@ -1,14 +1,14 @@
 import { AxiosError } from 'axios';
 
-import { useAxios } from '@/shared/composition/useAxios';
+import { routes } from '@/router/routes';
+
+import { useAxios } from '@/shared/compositions/useAxios';
 
 import type {
   NavigationGuardNext,
   RouteLocationNormalized,
   RouteRecordRaw
 } from 'vue-router';
-
-import { routes } from '@/router/routes';
 
 export const useRouterHelpers = () => {
   const isUrlAvailable = async (to: RouteLocationNormalized) => {

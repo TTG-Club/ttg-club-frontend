@@ -1,11 +1,10 @@
 import { toValue } from '@vueuse/shared';
-import { toPairs } from 'lodash';
-import fromPairs from 'lodash/fromPairs';
+import { toPairs, fromPairs } from 'lodash-es';
 
 import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeAddVideo.vue';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-import { useAxios } from '@/shared/composition/useAxios';
+import { useAxios } from '@/shared/compositions/useAxios';
 import { getOrderString } from '@/shared/helpers/request';
 import type { RequestConfig } from '@/shared/services/HTTPService';
 import type {

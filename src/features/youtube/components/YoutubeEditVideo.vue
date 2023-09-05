@@ -64,18 +64,18 @@
   import useVuelidate from '@vuelidate/core';
   import { helpers, required } from '@vuelidate/validators';
   import { useVModel } from '@vueuse/core';
-  import cloneDeep from 'lodash/cloneDeep';
+  import { cloneDeep } from 'lodash-es';
   import { ref, watch, reactive } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
+  import { ToastEventBus } from '@/app/configs/ToastConfig';
+
   import { YoutubeApi } from '@/features/youtube/api';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-  import { ToastEventBus } from '@/shared/utils/ToastConfig';
-
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
 
   type TProp = {
     modelValue: boolean;
