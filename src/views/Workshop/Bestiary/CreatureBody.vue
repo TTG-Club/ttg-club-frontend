@@ -31,7 +31,7 @@
                 type="armor"
                 :url="armor.url"
               >
-                {{ armor.name }}
+                <a :href="armor.url">{{ armor.name }}</a>
               </detail-tooltip>
 
               <span v-else>
