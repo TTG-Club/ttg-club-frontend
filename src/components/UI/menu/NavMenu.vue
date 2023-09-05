@@ -217,23 +217,6 @@
       opacity: 70%;
       border-radius: 8px;
       padding: 4px 8px;
-
-      // &.is-vk {
-      //   background-color: transparent;
-      // }
-
-      // &.is-discord {
-      //   background-color: transparent;
-      // }
-
-      // &.is-boosty {
-      //   background-color: transparent;
-      // }
-
-      // &:hover {
-      //   background-color: var(--hover);
-      //   opacity: 100%;
-      // }
     }
 
     &__bottom {
