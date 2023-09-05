@@ -81,6 +81,47 @@
             </div>
           </div>
         </div>
+
+        <div class="nav-menu__bottom">
+          <div class="nav-menu__bottom--block">
+            <div class="contacts">
+              Контакты:
+
+              <ui-social-button
+                hide-label
+                social-name="vk"
+                url="https://vk.com/ttg.club"
+              />
+
+              <ui-social-button
+                hide-label
+                social-name="discord"
+                url="https://discord.gg/zqBnMJVf3z"
+              />
+
+              <ui-social-button
+                hide-label
+                social-name="youtube"
+                url="https://www.youtube.com/channel/UCpFse6-P2IBXYfkesAxZbfA"
+              />
+            </div>
+
+            <div class="support">
+              Поддержка:
+
+              <ui-social-button
+                hide-label
+                social-name="boosty"
+                url="https://boosty.to/dnd5club"
+              />
+
+              <ui-social-button
+                social-name="Мастер Boosty"
+                url="https://boosty.to/dnd5eclub"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </template>
   </nav-popover>
@@ -97,13 +138,15 @@
   import NavPopover from '@/components/UI/menu/NavPopover.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import SiteLogo from '@/components/UI/icons/SiteLogo.vue';
+  import UiSocialButton from '@/components/UI/kit/UiSocialButton.vue';
 
   export default defineComponent({
     name: 'NavMenu',
     components: {
       NavPopover,
       SvgIcon,
-      SiteLogo
+      SiteLogo,
+      UiSocialButton
     },
     setup() {
       const navStore = useNavStore();
@@ -163,7 +206,63 @@
 
 <style lang="scss" scoped>
   .nav-menu {
-    padding: 16px 16px 8px 16px;
+    padding: 4px 0px 0px 0px;
+
+    .ui-social-button {
+      opacity: 70%;
+      border-radius: 8px;
+      padding: 4px 8px;
+
+      &.is-vk {
+        background-color: transparent;
+      }
+      &.is-discord {
+        background-color: transparent;
+      }
+      &.is-boosty {
+        background-color: transparent;
+      }
+
+      &__icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover {
+        background-color: var(--hover);
+        opacity: 100%;
+      }
+    }
+
+    &__bottom {
+      border-top: 1px solid var(--hover);
+      padding: 16px 16px;
+
+      &--block {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+
+        .contacts,
+        .support {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .support {
+          border-left: none;
+          padding-left: 0;
+
+          @include media-min($sm) {
+            border-left: 1px solid var(--border);
+            padding-left: 16px;
+          }
+        }
+      }
+    }
 
     &__header {
       padding: 16px 16px 16px 16px;
@@ -209,7 +308,7 @@
     }
 
     &__body {
-      padding: 8px 8px 0 8px;
+      padding: 8px 8px 8px 8px;
       display: flex;
       flex-wrap: wrap;
       gap: 48px;
