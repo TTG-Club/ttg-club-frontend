@@ -90,8 +90,8 @@
       UiEasyLightbox,
       DetailTopBar,
       RawContent,
-      DetailTooltip,
-      DiceRoller
+      DiceRoller,
+      DetailTooltip
     },
     props: {
       magicItem: {
