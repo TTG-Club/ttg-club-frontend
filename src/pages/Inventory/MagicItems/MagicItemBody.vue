@@ -17,7 +17,7 @@
               <router-link :to="magicUrl.url">{{ magicUrl.name }}</router-link>
             </span>
 
-            <span v-else> {{ magicUrl.name }}" </span>
+            <span v-else>{{ magicUrl.name }}"</span>
 
             <span v-if="key < magicUrl.detailType?.length - 1">, </span> </span
           >)
