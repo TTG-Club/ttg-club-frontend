@@ -19,7 +19,7 @@
 
             <span v-else> {{ magicUrl.name }}" </span>
 
-            <span v-if="key < creature.armors?.length - 1">, </span> </span
+            <span v-if="key < magicUrl.detailType?.length - 1">, </span> </span
           >)
         </span>
         ,
@@ -71,8 +71,6 @@
 </template>
 
 <script>
-  import { upperFirst } from 'lodash-es';
-
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
   import RawContent from '@/shared/ui/content/RawContent.vue';
@@ -96,19 +94,6 @@
       inTooltip: {
         type: Boolean,
         default: false
-      }
-    },
-    computed: {
-      topBarLeftString() {
-        let detail = '';
-
-        if (this.magicItem.detailType?.length) {
-          detail = ` (${this.magicItem.detailType.join(', ')})`;
-        }
-
-        return `${upperFirst(this.magicItem.type.name)}${detail}, ${
-          this.magicItem.rarity.name
-        }`;
       }
     }
   };
