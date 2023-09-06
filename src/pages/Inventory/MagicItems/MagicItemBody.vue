@@ -4,10 +4,32 @@
     :class="{ 'in-tooltip': inTooltip }"
     class="magic-item_wrapper magic-item-body bestiary"
   >
-    <detail-top-bar
-      :left="topBarLeftString"
-      :source="magicItem.source"
-    />
+    <detail-top-bar :source="magicItem.source">
+      <template #left>
+        <span>{{ magicItem.type.rus }} </span>
+
+        <span v-if="magicItem.detailType?.length">
+          (<span
+            v-for="(magicUrl, key) in magicItem.detailType"
+            :key="key + magicUrl.url"
+          >
+            <detail-tooltip
+              v-if="magicUrl.url?.length"
+              :type="magicUrl.type"
+              :url="magicUrl.url"
+            >
+              <router-link :to="magicUrl.url">{{ magicUrl.name }}</router-link>
+            </detail-tooltip>
+
+            <span v-else> {{ magicUrl.name }}" </span>
+
+            <span v-if="key < creature.armors?.length - 1">, </span> </span
+          >)
+        </span>
+        ,
+        <span>{{ magicItem.rarity.name }}</span>
+      </template>
+    </detail-top-bar>
 
     <div class="content-padding">
       <ui-easy-lightbox
@@ -58,12 +80,14 @@
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
   import RawContent from '@/shared/ui/content/RawContent.vue';
+  import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
 
   export default {
     name: 'MagicItemBody',
     components: {
+      DetailTooltip,
       UiEasyLightbox,
       DetailTopBar,
       RawContent,
