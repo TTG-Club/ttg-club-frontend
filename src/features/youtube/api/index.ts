@@ -91,7 +91,6 @@ export class YoutubeApi {
       await http.delete({ url: `/youtube?id=${ _id }` });
 
       // eslint-disable-next-line consistent-return
-      return;
     } catch (err) {
       return Promise.reject(err);
     }

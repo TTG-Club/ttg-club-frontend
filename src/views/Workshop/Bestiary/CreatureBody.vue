@@ -35,7 +35,7 @@
               </detail-tooltip>
 
               <span v-else>
-                {{ armor.name }}
+                <raw-content :template="armor.name" />
               </span>
 
               <span v-if="key < creature.armors?.length - 1">, </span>
