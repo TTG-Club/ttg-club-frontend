@@ -4,10 +4,20 @@
     :class="{ 'in-tooltip': inTooltip }"
     class="creature_wrapper creature-body bestiary"
   >
-    <detail-top-bar
-      :left="topBarLeftString"
-      :source="creature.source"
-    />
+    <detail-top-bar :source="creature.source">
+      <template #left>
+        <span>{{ creature.size.rus }} {{ creature.type.name }}</span>
+
+        <span v-if="creature.type.tags?.length">
+          ({{ creature.type.tags.join(', ') }})</span
+        >
+
+        <span
+          >, {{ creature.alignment }} / {{ creature.size.eng }}
+          {{ creature.size.cell }}</span
+        >
+      </template>
+    </detail-top-bar>
 
     <div class="content-padding">
       <ui-easy-lightbox :images="creature.images" />
@@ -474,17 +484,6 @@
       default: false
     }
   });
-
-  const topBarLeftString = computed(
-    () =>
-      `${props.creature.size.rus} ${props.creature.type.name}${
-        props.creature.type.tags?.length
-          ? ` (${props.creature.type.tags.join(', ')})`
-          : ''
-      }, ${props.creature.alignment} / ${props.creature.size.eng} ${
-        props.creature.size.cell
-      }`
-  );
 
   const speed = computed(() => {
     if (!(props.creature.speed instanceof Array)) {
