@@ -13,13 +13,9 @@
             v-for="(magicUrl, key) in magicItem.detailType"
             :key="key + magicUrl.url"
           >
-            <detail-tooltip
-              v-if="magicUrl.url?.length"
-              :type="magicUrl.type"
-              :url="magicUrl.url"
-            >
+            <span v-if="magicUrl.url?.length">
               <router-link :to="magicUrl.url">{{ magicUrl.name }}</router-link>
-            </detail-tooltip>
+            </span>
 
             <span v-else> {{ magicUrl.name }}" </span>
 
@@ -80,7 +76,6 @@
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
   import RawContent from '@/shared/ui/content/RawContent.vue';
-  import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
 
@@ -90,8 +85,7 @@
       UiEasyLightbox,
       DetailTopBar,
       RawContent,
-      DiceRoller,
-      DetailTooltip
+      DiceRoller
     },
     props: {
       magicItem: {
