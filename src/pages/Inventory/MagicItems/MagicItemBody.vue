@@ -87,10 +87,10 @@
   export default {
     name: 'MagicItemBody',
     components: {
-      DetailTooltip,
       UiEasyLightbox,
       DetailTopBar,
       RawContent,
+      DetailTooltip,
       DiceRoller
     },
     props: {
