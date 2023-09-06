@@ -1,16 +1,9 @@
-// Old Styles
-@import "old/editor.css";
-
 // Dependencies
-@import "dependencies";
-
-// Themes
-@import "_theme";
-
-// Base styles
-@import "typography";
-@import "base";
-@import "main";
-@import "modules";
-@import "print";
-@import "animation";
+@use 'dependencies' as *;
+@use 'theme' as *;
+@use 'typography' as *;
+@use 'base' as *;
+@use 'main' as *;
+@use 'modules' as *;
+@use 'print' as *;
+@use 'animation' as *;

@@ -1,12 +1,13 @@
-import {
-  computed, readonly, ref
-} from 'vue';
-import type { MaybeRef } from '@vueuse/core';
 import { toValue } from '@vueuse/shared';
+import { computed, readonly, ref } from 'vue';
 import { useToast } from 'vue-toastification';
-import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-import { ToastEventBus } from '@/common/utils/ToastConfig';
+
+import { ToastEventBus } from '@/app/configs/ToastConfig';
+
 import { YoutubeApi } from '@/features/youtube/api';
+import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+import type { MaybeRef } from '@vueuse/core';
 
 export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
   const { error } = useToast(ToastEventBus);
@@ -14,7 +15,10 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
   const count = ref<number>(0);
   const _limit = readonly(ref(toValue(limit)));
   const isSuccess = computed(() => count.value <= _limit.value);
-  const isDisabled = (active: TYoutubeVideo['active']) => !active && count.value >= _limit.value;
+
+  const isDisabled = (active: TYoutubeVideo['active']) =>
+    !active && count.value >= _limit.value;
+
   const isLoaded = ref(false);
 
   const updateCount = async () => {
@@ -56,7 +60,10 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
     }
   };
 
-  const updateActiveStatus = (id: TYoutubeVideo['id'], status: MaybeRef<boolean>) => {
+  const updateActiveStatus = (
+    id: TYoutubeVideo['id'],
+    status: MaybeRef<boolean>
+  ) => {
     const _status = toValue(status);
 
     if (_status) {

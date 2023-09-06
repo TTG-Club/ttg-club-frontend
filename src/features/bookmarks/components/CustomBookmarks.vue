@@ -2,9 +2,8 @@
   <div class="bookmarks">
     <div class="bookmarks__header">
       <div class="bookmarks__info">
-        <span
-          class="bookmarks__info--title"
-        >Закладки <sup class="beta">β</sup>
+        <span class="bookmarks__info--title"
+          >Закладки <sup class="beta">β</sup>
         </span>
       </div>
 
@@ -106,15 +105,15 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    computed, onBeforeMount, ref
-  } from 'vue';
   import { storeToRefs } from 'pinia';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+  import { computed, onBeforeMount, ref } from 'vue';
+
   import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
 
   const customBookmarkStore = useCustomBookmarkStore();
   const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);

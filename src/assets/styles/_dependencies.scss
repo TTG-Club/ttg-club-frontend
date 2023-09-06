@@ -1,21 +1,37 @@
-@import "normalize.css";
-@import "vue-multiselect/dist/vue-multiselect.css";
-@import "tippy.js/dist/tippy.css";
-@import "vue-toastification/src/scss/_variables";
-@import "vue-toastification/src/scss/_toastContainer";
-@import "vue-toastification/src/scss/_toast";
-@import "vue-toastification/src/scss/_closeButton";
-@import "vue-toastification/src/scss/_progressBar";
-@import "vue-toastification/src/scss/_icon";
-@import "vue-toastification/src/scss/animations/_bounce";
-@import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+@use 'normalize.css';
+@use 'vue-multiselect/dist/vue-multiselect.css';
+@use 'tippy.js/dist/tippy.css';
+@use 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+
+@forward 'vue-toastification/src/scss/_variables' with (
+    $vt-font-family: 'Open Sans' \,
+    sans-serif,
+    $vt-color-default: var(--bg-sub-menu),
+    $vt-text-color-default: var(--text-color),
+    $vt-color-info: var(--primary),
+    $vt-color-success: var(--success),
+    $vt-color-warning: var(--warning),
+    $vt-color-error: var(--error),
+    $vt-color-progress-default:
+      linear-gradient(
+        to right,
+        #4cd964,
+        #5ac8fa,
+        #007aff,
+        #34aadc,
+        #5856d6,
+        #ff2d55
+      )
+  );
+
+@use 'vue-toastification/src/scss' as *;
 
 [data-tippy-root] {
   display: inline;
   cursor: auto;
 
   .tippy-box {
-    &[data-theme~=dnd5club] {
+    &[data-theme~='dnd5club'] {
       background-color: var(--bg-main);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -37,24 +53,24 @@
         fill: var(--bg-main);
       }
 
-      &[data-placement^=top] > .tippy-arrow:before {
+      &[data-placement^='top'] > .tippy-arrow:before {
         border-top-color: var(--bg-main);
       }
 
-      &[data-placement^=bottom] > .tippy-arrow:before {
+      &[data-placement^='bottom'] > .tippy-arrow:before {
         border-bottom-color: var(--bg-main);
       }
 
-      &[data-placement^=left] > .tippy-arrow:before {
+      &[data-placement^='left'] > .tippy-arrow:before {
         border-left-color: var(--bg-main);
       }
 
-      &[data-placement^=right] > .tippy-arrow:before {
+      &[data-placement^='right'] > .tippy-arrow:before {
         border-right-color: var(--bg-main);
       }
     }
 
-    &[data-theme~=no-padding] {
+    &[data-theme~='no-padding'] {
       & > .tippy-content {
         padding: 0;
       }
@@ -223,7 +239,7 @@
               display: block;
               height: 100%;
               width: 100%;
-              opacity: .7;
+              opacity: 0.7;
               background-color: currentColor;
             }
           }

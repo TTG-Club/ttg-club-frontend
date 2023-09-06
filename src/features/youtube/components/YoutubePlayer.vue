@@ -2,7 +2,7 @@
   <div
     :class="{
       [$style['youtube-player']]: true,
-      [$style['is-active']]: iframe,
+      [$style['is-active']]: iframe
     }"
   >
     <link
@@ -38,9 +38,9 @@
       <div
         :class="{
           [$style.video]: true,
-          [$style.radius]: hasRadius,
+          [$style.radius]: hasRadius
         }"
-        :style="{ backgroundImage: `url(${ posterUrl })` }"
+        :style="{ backgroundImage: `url(${posterUrl})` }"
       >
         <iframe
           v-if="iframe"
@@ -66,37 +66,37 @@
       <span
         v-if="props.showName"
         :class="$style.name"
-      >{{ video.name }}</span>
+        >{{ video.name }}</span
+      >
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import {
-    computed, ref, useCssModule
-  } from 'vue';
+  import { computed, ref, useCssModule } from 'vue';
+
   import YoutubePlayIcon from '@/features/youtube/components/YoutubePlayIcon.vue';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
   export type ImageResolution =
     | 'default'
     | 'mqdefault'
     | 'hqdefault'
     | 'sddefault'
-    | 'maxresdefault'
+    | 'maxresdefault';
 
   const $style = useCssModule();
 
   const props = withDefaults(
     defineProps<{
-      video: TYoutubeVideo
-      showName?: boolean
-      params?: string
-      poster?: ImageResolution
-      muted?: boolean
-      rel?: 'prefetch' | 'preload'
-      announce?: string
-      hasRadius?: boolean
+      video: TYoutubeVideo;
+      showName?: boolean;
+      params?: string;
+      poster?: ImageResolution;
+      muted?: boolean;
+      rel?: 'prefetch' | 'preload';
+      announce?: string;
+      hasRadius?: boolean;
     }>(),
     {
       showName: false,
@@ -115,22 +115,34 @@
   const iframeElement = ref<HTMLIFrameElement | null>(null);
 
   const videoId = computed(() => encodeURIComponent(props.video.id));
-  const posterUrl = computed(() => `https://i.ytimg.com/vi_webp/${ videoId.value }/${ props.poster }.webp`);
 
-  const embedUrl = computed(() => (
-    `https://www.youtube.com/embed/${ videoId.value }`
-  ));
+  const posterUrl = computed(
+    () => `https://i.ytimg.com/vi_webp/${videoId.value}/${props.poster}.webp`
+  );
 
-  const urlWithParams = computed(() => (
-    `${ embedUrl.value }?autoplay=1&enablejsapi=1&state=1&mute=${ props.muted ? 1 : 0 }`
-  ));
+  const embedUrl = computed(
+    () => `https://www.youtube.com/embed/${videoId.value}`
+  );
 
-  const runCommand = (player: HTMLIFrameElement | null, func: 'stopVideo' | 'pauseVideo' | 'playVideo') => {
+  const urlWithParams = computed(
+    () =>
+      `${embedUrl.value}?autoplay=1&enablejsapi=1&state=1&mute=${
+        props.muted ? 1 : 0
+      }`
+  );
+
+  const runCommand = (
+    player: HTMLIFrameElement | null,
+    func: 'stopVideo' | 'pauseVideo' | 'playVideo'
+  ) => {
     if (player === null) {
       throw new Error('iframe element not instantiated.');
     }
 
-    player.contentWindow?.postMessage(`{"event":"command","func":"${ func }","args":""}`, '*');
+    player.contentWindow?.postMessage(
+      `{"event":"command","func":"${func}","args":""}`,
+      '*'
+    );
   };
 
   const initIframe = () => {
@@ -181,7 +193,7 @@
       background: {
         size: cover;
         position: center;
-      };
+      }
 
       &.radius {
         border-top-left-radius: 8px;
@@ -198,7 +210,11 @@
     }
 
     .btn {
-      @include css_anim($item: color, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
+      @include css_anim(
+        $item: color,
+        $time: 0.2s,
+        $style: cubic-bezier(0, 0, 0.2, 1)
+      );
 
       display: block;
       width: 68px;
@@ -223,7 +239,11 @@
     &:hover,
     &:focus-within {
       .btn {
-        @include css_anim($item: color, $time: .2s, $style: cubic-bezier(0, 0, 0.2, 1));
+        @include css_anim(
+          $item: color,
+          $time: 0.2s,
+          $style: cubic-bezier(0, 0, 0.2, 1)
+        );
 
         color: var(--bg-main);
       }

@@ -1,7 +1,9 @@
+import IndexView from '@/pages/IndexView.vue';
+
+import { useNavStore } from '@/shared/stores/NavStore';
+import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+
 import type { RouteRecordRaw } from 'vue-router';
-import { EUserRoles, useUserStore } from '@/store/UI/UserStore';
-import { useNavStore } from '@/store/UI/NavStore';
-import IndexView from '@/views/IndexView.vue';
 
 /* eslint-disable max-len,vue/max-len */
 export const routes: Readonly<RouteRecordRaw[]> = [
@@ -12,231 +14,233 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     beforeEnter: (to, from, next) => {
       const navStore = useNavStore();
 
-      navStore.initPartners()
-        .then(() => {
-          next();
-        });
+      navStore.initPartners().then(() => {
+        next();
+      });
     }
   },
   {
     name: 'classes',
     path: '/classes',
-    component: () => import('@/views/Character/Classes/ClassesView.vue'),
+    component: () => import('@/pages/Character/Classes/ClassesView.vue'),
     children: [
       {
         name: 'classDetail',
         path: ':className/:classArchetype?',
-        component: () => import('@/views/Character/Classes/ClassDetail.vue')
+        component: () => import('@/pages/Character/Classes/ClassDetail.vue')
       }
     ]
   },
   {
     name: 'races',
     path: '/races',
-    component: () => import('@/views/Character/Races/RacesView.vue'),
+    component: () => import('@/pages/Character/Races/RacesView.vue'),
     children: [
       {
         name: 'raceDetail',
         path: ':raceName/:subrace?',
-        component: () => import('@/views/Character/Races/RaceDetail.vue')
+        component: () => import('@/pages/Character/Races/RaceDetail.vue')
       }
     ]
   },
   {
     name: 'traits',
     path: '/traits',
-    component: () => import('@/views/Character/Traits/TraitsView.vue'),
+    component: () => import('@/pages/Character/Traits/TraitsView.vue'),
     children: [
       {
         name: 'traitDetail',
         path: ':traitName',
-        component: () => import('@/views/Character/Traits/TraitDetail.vue')
+        component: () => import('@/pages/Character/Traits/TraitDetail.vue')
       }
     ]
   },
   {
     name: 'backgrounds',
     path: '/backgrounds',
-    component: () => import('@/views/Character/Backgrounds/BackgroundsView.vue'),
+    component: () =>
+      import('@/pages/Character/Backgrounds/BackgroundsView.vue'),
     children: [
       {
         name: 'backgroundDetail',
         path: ':backgroundName',
-        component: () => import('@/views/Character/Backgrounds/BackgroundDetail.vue')
+        component: () =>
+          import('@/pages/Character/Backgrounds/BackgroundDetail.vue')
       }
     ]
   },
   {
     name: 'options',
     path: '/options',
-    component: () => import('@/views/Character/Options/OptionsView.vue'),
+    component: () => import('@/pages/Character/Options/OptionsView.vue'),
     children: [
       {
         name: 'optionDetail',
         path: ':optionName',
-        component: () => import('@/views/Character/Options/OptionDetail.vue')
+        component: () => import('@/pages/Character/Options/OptionDetail.vue')
       }
     ]
   },
   {
     name: 'spells',
     path: '/spells',
-    component: () => import('@/views/Character/Spells/SpellsView.vue'),
+    component: () => import('@/pages/Character/Spells/SpellsView.vue'),
     children: [
       {
         name: 'spellDetail',
         path: ':spellName',
-        component: () => import('@/views/Character/Spells/SpellDetail.vue')
+        component: () => import('@/pages/Character/Spells/SpellDetail.vue')
       }
     ]
   },
   {
     name: 'weapons',
     path: '/weapons',
-    component: () => import('@/views/Inventory/Weapons/WeaponsView.vue'),
+    component: () => import('@/pages/Inventory/Weapons/WeaponsView.vue'),
     children: [
       {
         name: 'weaponDetail',
         path: ':weaponName',
-        component: () => import('@/views/Inventory/Weapons/WeaponDetail.vue')
+        component: () => import('@/pages/Inventory/Weapons/WeaponDetail.vue')
       }
     ]
   },
   {
     name: 'armors',
     path: '/armors',
-    component: () => import('@/views/Inventory/Armors/ArmorsView.vue'),
+    component: () => import('@/pages/Inventory/Armors/ArmorsView.vue'),
     children: [
       {
         name: 'armorDetail',
         path: ':armorName',
-        component: () => import('@/views/Inventory/Armors/ArmorDetail.vue')
+        component: () => import('@/pages/Inventory/Armors/ArmorDetail.vue')
       }
     ]
   },
   {
     name: 'magicItems',
     path: '/items/magic',
-    component: () => import('@/views/Inventory/MagicItems/MagicItemsView.vue'),
+    component: () => import('@/pages/Inventory/MagicItems/MagicItemsView.vue'),
     children: [
       {
         name: 'magicItemDetail',
         path: ':magicItemName',
-        component: () => import('@/views/Inventory/MagicItems/MagicItemDetail.vue')
+        component: () =>
+          import('@/pages/Inventory/MagicItems/MagicItemDetail.vue')
       }
     ]
   },
   {
     name: 'items',
     path: '/items',
-    component: () => import('@/views/Inventory/Items/ItemsView.vue'),
+    component: () => import('@/pages/Inventory/Items/ItemsView.vue'),
     children: [
       {
         name: 'itemDetail',
         path: ':itemName',
-        component: () => import('@/views/Inventory/Items/ItemDetail.vue')
+        component: () => import('@/pages/Inventory/Items/ItemDetail.vue')
       }
     ]
   },
   {
     name: 'treasures',
     path: '/treasures',
-    component: () => import('@/views/Inventory/Treasures/TreasuresView.vue')
+    component: () => import('@/pages/Inventory/Treasures/TreasuresView.vue')
   },
   {
     name: 'bestiary',
     path: '/bestiary',
-    component: () => import('@/views/Workshop/Bestiary/BestiaryView.vue'),
+    component: () => import('@/pages/Workshop/Bestiary/BestiaryView.vue'),
     children: [
       {
         name: 'creatureDetail',
         path: ':creatureName',
-        component: () => import('@/views/Workshop/Bestiary/CreatureDetail.vue')
+        component: () => import('@/pages/Workshop/Bestiary/CreatureDetail.vue')
       }
     ]
   },
   {
     name: 'screens',
     path: '/screens',
-    component: () => import('@/views/Workshop/Screens/ScreensView.vue'),
+    component: () => import('@/pages/Workshop/Screens/ScreensView.vue'),
     children: [
       {
         name: 'screenDetail',
         path: ':screenName',
-        component: () => import('@/views/Workshop/Screens/ScreenDetail.vue')
+        component: () => import('@/pages/Workshop/Screens/ScreenDetail.vue')
       }
     ]
   },
   {
     name: 'gods',
     path: '/gods',
-    component: () => import('@/views/Wiki/Gods/GodsView.vue'),
+    component: () => import('@/pages/Wiki/Gods/GodsView.vue'),
     children: [
       {
         name: 'godDetail',
         path: ':godName',
-        component: () => import('@/views/Wiki/Gods/GodDetail.vue')
+        component: () => import('@/pages/Wiki/Gods/GodDetail.vue')
       }
     ]
   },
   {
     name: 'rules',
     path: '/rules',
-    component: () => import('@/views/Wiki/Rules/RulesView.vue'),
+    component: () => import('@/pages/Wiki/Rules/RulesView.vue'),
     children: [
       {
         name: 'ruleDetail',
         path: ':ruleName',
-        component: () => import('@/views/Wiki/Rules/RuleDetail.vue')
+        component: () => import('@/pages/Wiki/Rules/RuleDetail.vue')
       }
     ]
   },
   {
     name: 'books',
     path: '/books',
-    component: () => import('@/views/Wiki/Books/BooksView.vue'),
+    component: () => import('@/pages/Wiki/Books/BooksView.vue'),
     children: [
       {
         name: 'bookDetail',
         path: ':bookName',
-        component: () => import('@/views/Wiki/Books/BookDetail.vue')
+        component: () => import('@/pages/Wiki/Books/BookDetail.vue')
       }
     ]
   },
   {
     name: 'trader',
     path: '/tools/trader',
-    component: () => import('@/views/Tools/TraderView.vue')
+    component: () => import('@/pages/Tools/TraderView.vue')
   },
   {
     name: 'treasury',
     path: '/tools/treasury',
-    component: () => import('@/views/Tools/TreasuryView.vue')
+    component: () => import('@/pages/Tools/TreasuryView.vue')
   },
   {
     name: 'wild-magic',
     path: '/tools/wildmagic',
-    component: () => import('@/views/Tools/WildMagicView.vue')
+    component: () => import('@/pages/Tools/WildMagicView.vue')
   },
   {
     name: 'madness',
     path: '/tools/madness',
-    component: () => import('@/views/Tools/MadnessView.vue')
+    component: () => import('@/pages/Tools/MadnessView.vue')
   },
   {
     name: 'encounters',
     path: '/tools/encounters',
-    component: () => import('@/views/Tools/EncountersView.vue')
+    component: () => import('@/pages/Tools/EncountersView.vue')
   },
   {
     name: 'ability-calc',
     path: '/tools/ability-calc',
-    component: () => import('@/views/Tools/AbilityCalc/AbilityCalcView.vue')
+    component: () => import('@/pages/Tools/AbilityCalc/AbilityCalcView.vue')
   },
   {
     name: 'search-page',
     path: '/search',
-    component: () => import('@/views/Search/SearchView.vue')
+    component: () => import('@/pages/Search/SearchView.vue')
   },
   {
     name: 'profile',
@@ -245,7 +249,7 @@ export const routes: Readonly<RouteRecordRaw[]> = [
       {
         name: 'profile-index',
         path: '',
-        component: () => import('@/views/User/Profile/ProfileView.vue'),
+        component: () => import('@/pages/User/Profile/ProfileView.vue'),
         beforeEnter: async (to, from, next) => {
           const userStore = useUserStore();
 
@@ -286,7 +290,10 @@ export const routes: Readonly<RouteRecordRaw[]> = [
               return;
             }
 
-            if (user.roles.includes(EUserRoles.MODERATOR) || user.roles.includes(EUserRoles.ADMIN)) {
+            if (
+              user.roles.includes(EUserRoles.MODERATOR) ||
+              user.roles.includes(EUserRoles.ADMIN)
+            ) {
               next();
 
               return;
@@ -303,7 +310,7 @@ export const routes: Readonly<RouteRecordRaw[]> = [
   {
     name: 'reset-password',
     path: '/reset/password',
-    component: () => import('@/views/User/ResetPasswordView.vue'),
+    component: () => import('@/pages/User/ResetPasswordView.vue'),
     beforeEnter: async (to, from, next) => {
       const userStore = useUserStore();
 
@@ -323,7 +330,7 @@ export const routes: Readonly<RouteRecordRaw[]> = [
   {
     name: 'info-page',
     path: '/info/:path',
-    component: () => import('@/views/InfoPageView.vue')
+    component: () => import('@/pages/InfoPageView.vue')
   },
   {
     name: 'unknown-error',
@@ -332,27 +339,27 @@ export const routes: Readonly<RouteRecordRaw[]> = [
       {
         name: 'unknown-error',
         path: '',
-        component: () => import('@/views/Errors/UnknownView.vue')
+        component: () => import('@/pages/Errors/UnknownView.vue')
       },
       {
         name: 'not-found',
         path: '/404',
-        component: () => import('@/views/Errors/NotFoundView.vue')
+        component: () => import('@/pages/Errors/NotFoundView.vue')
       },
       {
         name: 'unauthorized',
         path: '/401',
-        component: () => import('@/views/Errors/UnauthorizedView.vue')
+        component: () => import('@/pages/Errors/UnauthorizedView.vue')
       },
       {
         name: 'forbidden',
         path: '/403',
-        component: () => import('@/views/Errors/ForbiddenView.vue')
+        component: () => import('@/pages/Errors/ForbiddenView.vue')
       },
       {
         name: 'internal-server',
         path: '/500',
-        component: () => import('@/views/Errors/InternalServerView.vue')
+        component: () => import('@/pages/Errors/InternalServerView.vue')
       }
     ]
   },

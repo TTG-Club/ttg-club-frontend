@@ -11,9 +11,7 @@
     <div :class="$style.container">
       <div :class="$style.wrapper">
         <div :class="$style.header">
-          <h2 :class="$style.title">
-            Новое видео
-          </h2>
+          <h2 :class="$style.title">Новое видео</h2>
 
           <ui-button
             icon="close"
@@ -78,25 +76,26 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    reactive, ref, watch
-  } from 'vue';
-  import { VueFinalModal } from 'vue-final-modal';
-  import { useVModel } from '@vueuse/core';
-  import { helpers, required } from '@vuelidate/validators';
   import useVuelidate from '@vuelidate/core';
+  import { helpers, required } from '@vuelidate/validators';
+  import { useVModel } from '@vueuse/core';
+  import { reactive, ref, watch } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import { ToastEventBus } from '@/common/utils/ToastConfig';
+
+  import { ToastEventBus } from '@/app/configs/ToastConfig';
+
   import { YoutubeApi } from '@/features/youtube/api';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
 
   export type TYoutubeVideoCreate = Pick<TYoutubeVideo, 'id' | 'name'>;
 
   type TProp = {
     modelValue: boolean;
-  }
+  };
 
   const props = withDefaults(defineProps<TProp>(), {
     modelValue: false
@@ -106,7 +105,7 @@
     (e: 'update:modelValue', v: boolean): void;
     (e: 'added', v: TYoutubeVideo): void;
     (e: 'close'): void;
-  }
+  };
 
   const emit = defineEmits<TEmit>();
 
@@ -126,18 +125,12 @@
         'Поле обязательно для заполнения',
         required
       ),
-      format: helpers.withMessage(
-        'Поле заполнено неверно',
-        value => (
-          /([^"&?/\s]{11})/gi
-        ).test(value as string)
+      format: helpers.withMessage('Поле заполнено неверно', value =>
+        /([^"&?/\s]{11})/gi.test(value as string)
       )
     },
     name: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required
-      )
+      required: helpers.withMessage('Поле обязательно для заполнения', required)
     }
   };
 
@@ -186,9 +179,12 @@
     }
   };
 
-  watch(() => props.modelValue, () => {
-    clear();
-  });
+  watch(
+    () => props.modelValue,
+    () => {
+      clear();
+    }
+  );
 </script>
 
 <style module lang="scss">
