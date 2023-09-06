@@ -6,7 +6,7 @@
   >
     <detail-top-bar :source="magicItem.source">
       <template #left>
-        <span>{{ magicItem.type.rus }} </span>
+        <span>{{ magicItem.type.name }} </span>
 
         <span v-if="magicItem.detailType?.length">
           (<span
