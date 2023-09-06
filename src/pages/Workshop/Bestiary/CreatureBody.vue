@@ -26,7 +26,7 @@
           <span v-if="creature.armors?.length">
             (<span
               v-for="(armor, key) in creature.armors"
-              :key="key"
+              :key="key + armor.url"
             >
               <detail-tooltip
                 v-if="armor.url?.length"
