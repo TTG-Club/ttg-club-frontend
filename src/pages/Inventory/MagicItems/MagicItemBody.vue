@@ -19,7 +19,7 @@
 
             <span v-else>{{ magicUrl.name }}</span>
 
-            <span v-if="key < magicUrl.detailType?.length - 1">, </span> </span
+            <span v-if="key < magicItem.detailType?.length - 1">, </span> </span
           >)
         </span>
 
