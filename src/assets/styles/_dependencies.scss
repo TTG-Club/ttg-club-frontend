@@ -98,6 +98,11 @@
 
   .grid_stat_block {
     margin: 16px 0 0 0;
+
+    .block {
+      flex: 1 0 calc(50% - 49px);
+      min-width: calc(50% - 49px);
+    }
   }
 }
 
