@@ -1,11 +1,11 @@
-import { storeToRefs } from 'pinia';
 import { useScroll } from '@vueuse/core';
-import {
-  computed, readonly, ref, watch
-} from 'vue';
-import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-import { useUIStore } from '@/store/UI/UIStore';
+import { storeToRefs } from 'pinia';
+import { computed, readonly, ref, watch } from 'vue';
+
 import { YoutubeApi } from '@/features/youtube/api';
+import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+import { useUIStore } from '@/shared/stores/UIStore';
 
 export const useYoutube = () => {
   const { bodyElement } = storeToRefs(useUIStore());
@@ -14,20 +14,22 @@ export const useYoutube = () => {
     behavior: 'smooth'
   });
 
-  const itemsPerPage = readonly(ref([
-    {
-      name: 9,
-      value: 9
-    },
-    {
-      name: 27,
-      value: 27
-    },
-    {
-      name: 54,
-      value: 54
-    }
-  ]));
+  const itemsPerPage = readonly(
+    ref([
+      {
+        name: 9,
+        value: 9
+      },
+      {
+        name: 27,
+        value: 27
+      },
+      {
+        name: 54,
+        value: 54
+      }
+    ])
+  );
 
   const isLoaded = ref(false);
 
@@ -108,18 +110,15 @@ export const useYoutube = () => {
     }
   );
 
-  watch(
-    limit,
-    async () => {
-      if (page.value === 1) {
-        await load();
+  watch(limit, async () => {
+    if (page.value === 1) {
+      await load();
 
-        return;
-      }
-
-      page.value = 1;
+      return;
     }
-  );
+
+    page.value = 1;
+  });
 
   return {
     isLoaded: readonly(isLoaded),

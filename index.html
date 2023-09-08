@@ -1,84 +1,198 @@
-<!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
-<head th:fragment="head">
-  <meta name="robots" content="<%= mode === 'production' ? 'all' : 'noindex' %>">
+<!doctype html>
 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html
+  lang="ru"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/layout}"
+>
+  <head th:fragment="head">
+    <meta
+      name="robots"
+      content="<%= mode === 'production' ? 'all' : 'noindex' %>"
+    />
 
-  <meta name="author" content="Peterko - https://www.behance.net/peterko, Magistrus"/>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
+    />
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
 
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="ttg.club">
+    <meta
+      name="author"
+      content="Peterko - https://www.behance.net/peterko, Magistrus"
+    />
 
-  <link rel="preconnect" href="https://img.ttg.club/" crossorigin/>
-  <link rel="dns-prefetch" href="https://img.ttg.club/" crossorigin/>
+    <meta
+      property="og:type"
+      content="website"
+    />
+    <meta
+      property="og:site_name"
+      content="ttg.club"
+    />
 
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
+    <link
+      rel="preconnect"
+      href="https://img.ttg.club/"
+      crossorigin
+    />
+    <link
+      rel="dns-prefetch"
+      href="https://img.ttg.club/"
+      crossorigin
+    />
 
-  <link rel="icon" type="image/svg+xml" href="/favicon_ttg_v3.svg"/>
-  <link rel="icon" type="image/png" href="/favicon_ttg_v3.svg"/>
+    <meta
+      name="apple-mobile-web-app-capable"
+      content="yes"
+    />
+    <meta
+      name="mobile-web-app-capable"
+      content="yes"
+    />
 
-  <link rel="icon" sizes="192x192" href="/style/icons/192.png">
-  <link rel="manifest" href="/manifest.json" crossorigin="anonymous">
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicon_ttg_v3.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/favicon_ttg_v3.svg"
+    />
 
-  <link rel="apple-touch-icon" sizes="48x48" href="/style/icons/48.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="/style/icons/72.png">
-  <link rel="apple-touch-icon" sizes="96x96" href="/style/icons/96.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="/style/icons/144.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="/style/icons/192.png">
-  <link rel="apple-touch-icon" sizes="256x256" href="/style/icons/256.png">
-  <link rel="apple-touch-icon" sizes="384x384" href="/style/icons/384.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="/style/icons/512.png">
-</head>
-<body id="body" th:fragment="body">
-<% if (mode === 'production') { %>
-<script type="text/javascript">
-  (function(m, e, t, r, i, k, a) {
-    m[i] = m[i] || function() {
-      (m[i].a = m[i].a || []).push(arguments);
-    };
-    m[i].l = 1 * new Date();
-    for (var j = 0; j < document.scripts.length; j++) {
-      if (document.scripts[j].src === r) {
-        return;
+    <link
+      rel="icon"
+      sizes="192x192"
+      href="/style/icons/192.png"
+    />
+    <link
+      rel="manifest"
+      href="/manifest.json"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="48x48"
+      href="/style/icons/48.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="/style/icons/72.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="96x96"
+      href="/style/icons/96.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="/style/icons/144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="192x192"
+      href="/style/icons/192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="256x256"
+      href="/style/icons/256.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="384x384"
+      href="/style/icons/384.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="512x512"
+      href="/style/icons/512.png"
+    />
+  </head>
+  <body
+    id="body"
+    th:fragment="body"
+  >
+    <% if (mode === 'production') { %>
+    <script type="text/javascript">
+      (function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+          if (document.scripts[j].src === r) {
+            return;
+          }
+        }
+        (k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a);
+      })(
+        window,
+        document,
+        'script',
+        'https://mc.yandex.ru/metrika/tag.js',
+        'ym'
+      );
+
+      ym('<%= env.VITE_YM_ID %>', 'init', {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true,
+        trackHash: true
+      });
+    </script>
+
+    <noscript>
+      <div>
+        <img
+          src="https://mc.yandex.ru/watch/<%= env.VITE_YM_ID %>"
+          style="position: absolute; left: -9999px"
+          alt=""
+        />
+      </div>
+    </noscript>
+
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id='<%= env.VITE_GTAG_ID %>'"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
       }
-    }
-    k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
-  })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
 
-  ym('<%= env.VITE_YM_ID %>', 'init', {
-    clickmap: true,
-    trackLinks: true,
-    accurateTrackBounce: true,
-    webvisor: true,
-    trackHash: true
-  });
-</script>
-
-<noscript>
-  <div>
-    <img src="https://mc.yandex.ru/watch/<%= env.VITE_YM_ID %>" style="position:absolute; left:-9999px;" alt=""/>
-  </div>
-</noscript>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id='<%= env.VITE_GTAG_ID %>'"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-  gtag('config', '<%= env.VITE_GTAG_ID %>', {
-    send_page_view: false
-  });
-</script>
-<% } %>
-<div id="dnd5club" class="dnd5club"></div>
-<script type="module" src="./src/main.ts"></script>
-</body>
+      gtag('js', new Date());
+      gtag('config', '<%= env.VITE_GTAG_ID %>', {
+        send_page_view: false
+      });
+    </script>
+    <% } %>
+    <div
+      id="dnd5club"
+      class="dnd5club"
+    ></div>
+    <script
+      type="module"
+      src="./src/app/main.ts"
+    ></script>
+  </body>
 </html>

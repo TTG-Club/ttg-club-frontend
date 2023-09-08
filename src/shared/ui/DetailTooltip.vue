@@ -1,0 +1,152 @@
+<template>
+  <tippy
+    theme="dnd5club no-padding"
+    v-bind="tippyConfig"
+  >
+    <template #default>
+      <slot name="default" />
+    </template>
+
+    <template #content>
+      <render />
+    </template>
+  </tippy>
+</template>
+
+<script setup lang="ts">
+  import { cloneDeep } from 'lodash-es';
+  import { computed, h, ref, useSlots } from 'vue';
+  import { Tippy } from 'vue-tippy';
+
+  import { DefaultTippyProps } from '@/app/configs/TippyConfig';
+
+  import OptionBody from '@/pages/Character/Options/OptionBody.vue';
+  import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
+  import TraitBody from '@/pages/Character/Traits/TraitBody.vue';
+  import ArmorBody from '@/pages/Inventory/Armors/ArmorBody.vue';
+  import ItemBody from '@/pages/Inventory/Items/ItemBody.vue';
+  import MagicItemBody from '@/pages/Inventory/MagicItems/MagicItemBody.vue';
+  import WeaponBody from '@/pages/Inventory/Weapons/WeaponBody.vue';
+  import GodBody from '@/pages/Wiki/Gods/GodBody.vue';
+  import CreatureBody from '@/pages/Workshop/Bestiary/CreatureBody.vue';
+  import ScreenBody from '@/pages/Workshop/Screens/ScreenBody.vue';
+
+  import { useAxios } from '@/shared/compositions/useAxios';
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import RawContent from '@/shared/ui/content/RawContent.vue';
+
+  import type { Component } from 'vue';
+
+  type TDetailType =
+    | 'option'
+    | 'trait'
+    | 'armor'
+    | 'weapon'
+    | 'magic-item'
+    | 'item'
+    | 'screen'
+    | 'creature'
+    | 'spell'
+    | 'god';
+
+  const props = withDefaults(
+    defineProps<{
+      url?: string;
+      type?: TDetailType;
+    }>(),
+    {
+      url: undefined,
+      type: undefined
+    }
+  );
+
+  const slots = useSlots();
+  const http = useAxios();
+
+  const content = ref();
+  const error = ref(false);
+
+  const computedUrl = computed(() => {
+    if (props.url) {
+      return props.url;
+    }
+
+    const el = slots.default?.().find(node => node?.props?.href);
+
+    if (el?.props?.href) {
+      return el.props.href;
+    }
+
+    return null;
+  });
+
+  const components: Record<TDetailType, Component> = {
+    'option': OptionBody,
+    'trait': TraitBody,
+    'armor': ArmorBody,
+    'weapon': WeaponBody,
+    'magic-item': MagicItemBody,
+    'item': ItemBody,
+    'screen': ScreenBody,
+    'creature': CreatureBody,
+    'spell': SpellBody,
+    'god': GodBody
+  };
+
+  const getContent = async () => {
+    error.value = false;
+
+    if (content.value) {
+      return true;
+    }
+
+    if (!computedUrl.value) {
+      error.value = true;
+
+      return false;
+    }
+
+    const res = !props.type
+      ? await http.rawGet({ url: computedUrl.value })
+      : await http.post({ url: computedUrl.value });
+
+    if (res.status !== 200) {
+      errorHandler(res.statusText);
+
+      error.value = true;
+
+      return false;
+    }
+
+    content.value = res.data;
+
+    return true;
+  };
+
+  const tippyConfig = computed(() => {
+    const config = cloneDeep(DefaultTippyProps);
+
+    config.onTrigger = () => getContent();
+
+    return config;
+  });
+
+  const render = computed(() => {
+    if (!content.value && error.value) {
+      return h('span', null, 'Произошла непредвиденная ошибка');
+    }
+
+    if (!content.value && !error.value) {
+      return h('span', null, 'Загрузка...');
+    }
+
+    if (!props.type) {
+      return h(RawContent, { template: content.value || 'Загрузка...' });
+    }
+
+    return h(components[props.type], {
+      [props.type]: content.value,
+      'in-tooltip': true
+    });
+  });
+</script>

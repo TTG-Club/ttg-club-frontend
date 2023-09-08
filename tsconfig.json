@@ -11,14 +11,10 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "importsNotUsedAsValues": "remove",
-    "incremental": true,
+    "incremental": false,
     "isolatedModules": true,
     "jsx": "preserve",
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -28,9 +24,7 @@
     "noImplicitThis": true,
     "outDir": "./dist/",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "plugins": [
       {
@@ -49,26 +43,18 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "esnext",
-    "typeRoots": [
-      "./src/vite-env.d.ts",
-      "./node_modules/@types"
-    ],
-    "types": [
-      "node",
-      "vite/client",
-      "vite-plugin-svg-icons/client"
-    ],
+    "typeRoots": ["./vite-env.d.ts", "./node_modules/@types", "./node_modules"],
+    "types": ["node", "vite/client", "vite-plugin-svg-icons/client.d.ts"],
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": true
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
+  "exclude": ["node_modules", "dist"],
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": [
     "vite.config.*",
     "src/**/*",
-    "src/**/*.vue"
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/**/*.d.ts"
   ]
 }
