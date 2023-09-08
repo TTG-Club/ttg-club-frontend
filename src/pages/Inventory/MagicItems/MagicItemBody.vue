@@ -4,10 +4,28 @@
     :class="{ 'in-tooltip': inTooltip }"
     class="magic-item_wrapper magic-item-body bestiary"
   >
-    <detail-top-bar
-      :left="topBarLeftString"
-      :source="magicItem.source"
-    />
+    <detail-top-bar :source="magicItem.source">
+      <template #left>
+        <span>{{ magicItem.type.name }}</span>
+
+        <span v-if="magicItem.detailType?.length">
+          (<span
+            v-for="(magicUrl, key) in magicItem.detailType"
+            :key="key + magicUrl.url"
+          >
+            <span v-if="magicUrl.url?.length">
+              <router-link :to="magicUrl.url">{{ magicUrl.name }}</router-link>
+            </span>
+
+            <span v-else>{{ magicUrl.name }}</span>
+
+            <span v-if="key < magicItem.detailType?.length - 1">, </span> </span
+          >)
+        </span>
+
+        <span>, {{ magicItem.rarity.name }}</span>
+      </template>
+    </detail-top-bar>
 
     <div class="content-padding">
       <ui-easy-lightbox
@@ -53,8 +71,6 @@
 </template>
 
 <script>
-  import { upperFirst } from 'lodash-es';
-
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
   import RawContent from '@/shared/ui/content/RawContent.vue';
@@ -78,19 +94,6 @@
       inTooltip: {
         type: Boolean,
         default: false
-      }
-    },
-    computed: {
-      topBarLeftString() {
-        let detail = '';
-
-        if (this.magicItem.detailType?.length) {
-          detail = ` (${this.magicItem.detailType.join(', ')})`;
-        }
-
-        return `${upperFirst(this.magicItem.type.name)}${detail}, ${
-          this.magicItem.rarity.name
-        }`;
       }
     }
   };
