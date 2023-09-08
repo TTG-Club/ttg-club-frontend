@@ -1,13 +1,16 @@
 <template>
   <a
-    :class="[`is-${socialName.toLowerCase()}`]"
+    :class="{
+      [`is-${socialName}`]: true,
+      'is-transparent': transparent
+    }"
     :href="url"
     class="ui-social-button"
     rel="noopener noreferrer"
     target="_blank"
   >
     <span class="ui-social-button__icon">
-      <svg-icon :icon="socialName.toLowerCase()" />
+      <svg-icon :icon="socialName" />
     </span>
 
     <span
@@ -26,28 +29,21 @@
   </a>
 </template>
 
-<script>
-  import { defineComponent } from 'vue';
-
+<script setup lang="ts">
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
-  export default defineComponent({
-    components: { SvgIcon },
-    props: {
-      url: {
-        type: String,
-        required: true
-      },
-      socialName: {
-        type: String,
-        required: true
-      },
-      hideLabel: {
-        type: Boolean,
-        default: false
-      }
+  withDefaults(
+    defineProps<{
+      url: string;
+      socialName: string;
+      hideLabel?: boolean;
+      transparent?: boolean;
+    }>(),
+    {
+      hideLabel: false,
+      transparent: false
     }
-  });
+  );
 </script>
 
 <style lang="scss" scoped>
@@ -113,6 +109,18 @@
       @include media-min($md) {
         &:hover {
           background-color: var(--boosty-hover);
+        }
+      }
+    }
+
+    &.is-transparent {
+      background-color: transparent;
+      color: var(--text-color);
+
+      @include media-min($md) {
+        &:hover {
+          background-color: var(--hover);
+          opacity: 100%;
         }
       }
     }
