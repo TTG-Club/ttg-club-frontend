@@ -46,7 +46,9 @@
                 <router-link :to="armor.url">{{ armor.name }}</router-link>
               </detail-tooltip>
 
-              <span v-else>{{ armor.name }}</span>
+              <span v-else>
+                <raw-content :template="armor.name" />
+              </span>
 
               <span v-if="key < creature.armors?.length - 1">, </span> </span
             >)
