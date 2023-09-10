@@ -130,7 +130,6 @@
               </ui-social-button>
 
               <ui-social-button
-                v-if="isDev"
                 social-name="boosty"
                 transparent
                 url="https://boosty.to/dnd5eclub"
