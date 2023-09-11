@@ -151,7 +151,6 @@
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 
-  import { useIsDev } from '@/shared/helpers/isDev';
   import type { TNavItem } from '@/shared/stores/NavStore';
   import { useNavStore } from '@/shared/stores/NavStore';
   import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
@@ -163,7 +162,6 @@
   const router = useRouter();
   const route = useRoute();
   const isShowMenu = ref(false);
-  const isDev = useIsDev();
 
   const isRouteExist = (link: TNavItem) => {
     if (!link.url) {
