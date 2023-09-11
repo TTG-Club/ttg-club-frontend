@@ -4,26 +4,6 @@
 @use 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 @use 'vue-toastification/src/scss' as *;
 
-@forward 'vue-toastification/src/scss/_variables' with (
-    $vt-font-family: 'Open Sans'\, sans-serif,
-    $vt-color-default: var(--bg-sub-menu),
-    $vt-text-color-default: var(--text-color),
-    $vt-color-info: var(--primary),
-    $vt-color-success: var(--success),
-    $vt-color-warning: var(--warning),
-    $vt-color-error: var(--error),
-    $vt-color-progress-default:
-      linear-gradient(
-        to right,
-        #4cd964,
-        #5ac8fa,
-        #007aff,
-        #34aadc,
-        #5856d6,
-        #ff2d55
-      )
-  );
-
 [data-tippy-root] {
   display: inline;
   cursor: auto;
@@ -211,7 +191,7 @@
     padding: 12px 16px;
     border-radius: 12px;
     min-height: 48px;
-    font-family: "Open Sans", sans-serif;
+    font-family: 'Open Sans', sans-serif;
 
     @media only screen and (max-width: 600px) {
       border-radius: 0;
