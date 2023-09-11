@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 .navbar {
   display: flex;
   height: calc(56px + var(--safe-area-inset-bottom));

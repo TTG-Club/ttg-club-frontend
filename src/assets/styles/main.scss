@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 .beta {
   color: var(--primary);
 }
@@ -42,7 +44,6 @@
 }
 
 .main_block {
-
   .header {
     display: flex;
     align-items: center;
@@ -86,7 +87,7 @@
           style: solid;
           color: var(--border);
           radius: 4px;
-        };
+        }
       }
     }
 
@@ -116,10 +117,13 @@
       overflow: hidden;
       height: 56px;
       align-items: center;
-      mask-image: radial-gradient(white, black); // Не удалять, это фикс для Safari, чтобы не вылазили углы картинки
+      mask-image: radial-gradient(
+        white,
+        black
+      ); // Не удалять, это фикс для Safari, чтобы не вылазили углы картинки
 
       &::before {
-        content: "";
+        content: '';
         transition: transform 0.6s;
         background-size: cover;
         display: block;
@@ -137,7 +141,7 @@
       }
 
       @for $i from 1 through 11 {
-        &:nth-child(#{$i+1}) {
+        &:nth-child(#{$i + 1}) {
           &::before {
             background-position: 0 $i * -56px;
 
@@ -157,7 +161,7 @@
         left: 0;
         display: block;
         background: var(--bg-liner-main-page);
-        content: "";
+        content: '';
       }
 
       .title {
@@ -170,7 +174,7 @@
           color: var(--text-color-title);
           font-size: calc(var(--h4-font-size) - 8px);
           line-height: 16px;
-          font-family: "Open Sans";
+          font-family: 'Open Sans';
           font-weight: 600;
           margin-right: 50%;
           margin-top: 0;
@@ -256,7 +260,7 @@
 
         h4 {
           margin-top: 0;
-          font-family: "Open Sans", sans-serif;
+          font-family: 'Open Sans', sans-serif;
           font-weight: 500;
         }
 
@@ -282,13 +286,13 @@
           &:hover {
             background-color: var(--primary-hover);
             color: var(--text-btn-color);
-            transition: all .5s;
+            transition: all 0.5s;
           }
         }
       }
 
       .bg_img {
-        transition: transform .6s;
+        transition: transform 0.6s;
         background-position: 50%;
         background-size: cover;
         display: block;
@@ -307,7 +311,7 @@
         bottom: 0;
         left: 0;
         display: block;
-        content: "";
+        content: '';
         background: var(--bg-liner-main-page);
       }
 
@@ -342,7 +346,7 @@
   h3 {
     font-size: calc(var(--h3-font-size) - 12px);
     margin-top: 0;
-    font-family: "Open Sans", sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-weight: 400;
     opacity: 0.6;
     margin-bottom: 12px;
@@ -520,7 +524,7 @@
       text-transform: uppercase;
       color: var(--text-color-title);
       background-color: var(--hover);
-      font-family: "Open Sans", sans-serif;
+      font-family: 'Open Sans', sans-serif;
     }
 
     p {
@@ -557,7 +561,6 @@
     }
   }
 }
-
 
 .content-padding {
   padding: 16px;

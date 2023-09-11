@@ -24,7 +24,8 @@
           :href="`//youtu.be/${video.id}`"
           :class="$style.link"
           @click.left.exact.prevent="activeVideo = video.id"
-        >{{ video.name }}</a>
+          >{{ video.name }}</a
+        >
       </div>
     </div>
   </transition>
@@ -46,12 +47,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue';
   import { tryOnBeforeMount } from '@vueuse/core';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube.types';
-  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
-  import BaseModal from '@/components/UI/modals/BaseModal.vue';
+  import { computed, ref } from 'vue';
+
   import { YoutubeApi } from '@/features/youtube/api';
+  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
 
   const youtube = ref<HTMLElement>();
   const videos = ref<Array<TYoutubeVideo>>([]);
@@ -65,7 +68,9 @@
     return null;
   });
 
-  const oldVideos = computed<Array<TYoutubeVideo>>(() => videos.value.slice(1, videos.value.length));
+  const oldVideos = computed<Array<TYoutubeVideo>>(() =>
+    videos.value.slice(1, videos.value.length)
+  );
 
   const getVideos = async () => {
     try {
@@ -115,7 +120,7 @@
   }
 
   .link {
-    @include css_anim($time: .5s);
+    @include css_anim($time: 0.5s);
 
     display: flex;
     padding: 8px 8px;
