@@ -279,7 +279,6 @@
     --btn-error: var(--error);
     --btn-warning: var(--warning);
     --btn-info: var(--info);
-    --btn-text: var(--text-b-color);
   }
 
   .ui-button {

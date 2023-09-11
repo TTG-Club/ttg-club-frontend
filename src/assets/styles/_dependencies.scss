@@ -2,10 +2,10 @@
 @use 'vue-multiselect/dist/vue-multiselect.css';
 @use 'tippy.js/dist/tippy.css';
 @use 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+@use 'vue-toastification/src/scss' as *;
 
 @forward 'vue-toastification/src/scss/_variables' with (
-    $vt-font-family: 'Open Sans' \,
-    sans-serif,
+    $vt-font-family: 'Open Sans'\, sans-serif,
     $vt-color-default: var(--bg-sub-menu),
     $vt-text-color-default: var(--text-color),
     $vt-color-info: var(--primary),
@@ -23,8 +23,6 @@
         #ff2d55
       )
   );
-
-@use 'vue-toastification/src/scss' as *;
 
 [data-tippy-root] {
   display: inline;
@@ -181,6 +179,12 @@
     height: 20px;
   }
 
+  &__close {
+    &-button {
+      color: currentColor;
+    }
+  }
+
   &__close-button {
     width: 24px;
     height: 24px;
@@ -188,10 +192,26 @@
     margin: 0 0 0 16px;
   }
 
+  &__progress {
+    &-bar {
+      background-color: transparent;
+
+      &:before {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 100%;
+        opacity: 0.7;
+        background-color: currentColor;
+      }
+    }
+  }
+
   &__toast {
     padding: 12px 16px;
     border-radius: 12px;
     min-height: 48px;
+    font-family: "Open Sans", sans-serif;
 
     @media only screen and (max-width: 600px) {
       border-radius: 0;
@@ -205,47 +225,13 @@
           align-items: center;
           font-size: var(--main-font-size);
           line-height: var(--main-line-height);
-        }
-      }
-    }
 
-    &--default,
-    &--info,
-    &--success,
-    &--warning,
-    &--error {
-      .Vue-Toastification {
-        &__toast {
-          &-component {
-            &-body {
-              a {
-                font-weight: bold;
+          a {
+            font-weight: 600;
+            color: var(--text-btn-color);
 
-                &:hover {
-                  border-bottom: 1px solid currentColor;
-                }
-              }
-            }
-          }
-        }
-
-        &__close {
-          &-button {
-            color: currentColor;
-          }
-        }
-
-        &__progress {
-          &-bar {
-            background-color: transparent;
-
-            &:before {
-              content: '';
-              display: block;
-              height: 100%;
-              width: 100%;
-              opacity: 0.7;
-              background-color: currentColor;
+            &:hover {
+              border-bottom: 1px solid currentColor;
             }
           }
         }
@@ -253,12 +239,15 @@
     }
 
     &--default {
+      background-color: var(--bg-sub-menu);
+      color: var(--text-color);
+
       .Vue-Toastification {
         &__toast {
           &-component {
             &-body {
               a {
-                color: $vt-text-color-default;
+                color: var(--text-color);
               }
             }
           }
@@ -267,59 +256,19 @@
     }
 
     &--info {
-      .Vue-Toastification {
-        &__toast {
-          &-component {
-            &-body {
-              a {
-                color: $vt-text-color-info;
-              }
-            }
-          }
-        }
-      }
+      background-color: var(--primary);
     }
 
     &--success {
-      .Vue-Toastification {
-        &__toast {
-          &-component {
-            &-body {
-              a {
-                color: $vt-text-color-success;
-              }
-            }
-          }
-        }
-      }
+      background-color: var(--success);
     }
 
     &--warning {
-      .Vue-Toastification {
-        &__toast {
-          &-component {
-            &-body {
-              a {
-                color: $vt-text-color-warning;
-              }
-            }
-          }
-        }
-      }
+      background-color: var(--warning);
     }
 
     &--error {
-      .Vue-Toastification {
-        &__toast {
-          &-component {
-            &-body {
-              a {
-                color: $vt-text-color-error;
-              }
-            }
-          }
-        }
-      }
+      background-color: var(--error);
     }
   }
 }

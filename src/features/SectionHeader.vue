@@ -170,22 +170,20 @@
         });
       })
       .catch(() =>
-        toast.error(() => [
-          h(
-            'span',
-            null,
-            'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем'
-          ),
-          h(
-            'a',
-            {
-              target: '_blank',
-              href: 'https://discord.gg/zqBnMJVf3z',
-              rel: 'noopener'
-            },
-            'Discord-канале'
-          )
-        ])
+        toast.error(() =>
+          h('span', null, [
+            'Произошла какая-то ошибка... попробуйте еще раз или обратитесь за помощью на нашем ',
+            h(
+              'a',
+              {
+                target: '_blank',
+                href: 'https://discord.gg/zqBnMJVf3z',
+                rel: 'noopener'
+              },
+              'Discord-канале'
+            )
+          ])
+        )
       );
   };
 
