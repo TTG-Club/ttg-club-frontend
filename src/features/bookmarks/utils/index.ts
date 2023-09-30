@@ -105,3 +105,11 @@ export const setBookmarks = ({
   // eslint-disable-next-line no-param-reassign
   bookmarks.value = cloneDeep(newBookmarks);
 };
+
+export const shouldDeleteWithoutConfirm = () => {
+  return localStorage.getItem('shouldDeleteWithoutConfirm') === 'true';
+};
+
+export const setShouldDeleteWithoutConfirm = (value: boolean) => {
+  localStorage.setItem('shouldDeleteWithoutConfirm', String(value));
+};

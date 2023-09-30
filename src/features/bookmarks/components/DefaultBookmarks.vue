@@ -91,10 +91,15 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
   import { useModal, useModalSlot } from 'vue-final-modal';
+  import { ref } from 'vue';
 
   import BookmarkDeleteModalContent from '@/features/bookmarks/components/BookmarkDeleteModalContent.vue';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
   import type { IBookmarkItem } from '@/features/bookmarks/types/Bookmark';
+  import {
+    shouldDeleteWithoutConfirm,
+    setShouldDeleteWithoutConfirm
+  } from '@/features/bookmarks/utils';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import DialogModal from '@/shared/ui/modals/DialogModal.vue';
@@ -102,6 +107,8 @@
   const bookmarksStore = useDefaultBookmarkStore();
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');
+
+  const isNeedToAskConfirmation = ref(false);
 
   const { open, close, patchOptions } = useModal({
     defaultModelValue: false,
@@ -115,10 +122,16 @@
   });
 
   const handleBookmarkClose = (bookmark: IBookmarkItem) => {
+    if (shouldDeleteWithoutConfirm()) {
+      bookmarksStore.removeBookmark(bookmark.uuid);
+      return;
+    }
+
     patchOptions({
       attrs: {
         modelValue: true,
         onConfirm: () => {
+          setShouldDeleteWithoutConfirm(isNeedToAskConfirmation.value);
           bookmarksStore.removeBookmark(bookmark.uuid);
           close();
         }
@@ -127,7 +140,11 @@
         content: useModalSlot({
           component: BookmarkDeleteModalContent,
           attrs: {
-            bookmarkName: bookmark.name
+            bookmarkName: bookmark.name,
+            isNeedToAskConfirmation: isNeedToAskConfirmation.value,
+            onToggleConfirmation: (value: boolean) => {
+              isNeedToAskConfirmation.value = value;
+            }
           }
         })
       }
