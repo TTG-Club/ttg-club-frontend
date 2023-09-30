@@ -52,9 +52,7 @@
 
                     <div
                       class="bookmarks__item_icon only-hover is-right"
-                      @click.left.exact.prevent="
-                        bookmarksStore.removeBookmark(bookmark.uuid)
-                      "
+                      @click.left.exact.prevent="handleBookmarkClose(bookmark)"
                     >
                       <svg-icon icon="close" />
                     </div>
@@ -92,14 +90,50 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
+  import { useModal, useModalSlot } from 'vue-final-modal';
 
+  import BookmarkDeleteModalContent from '@/features/bookmarks/components/BookmarkDeleteModalContent.vue';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+  import type { IBookmarkItem } from '@/features/bookmarks/types/Bookmark';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import DialogModal from '@/shared/ui/modals/DialogModal.vue';
 
   const bookmarksStore = useDefaultBookmarkStore();
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');
+
+  const { open, close, patchOptions } = useModal({
+    defaultModelValue: false,
+    component: DialogModal,
+    slots: {
+      title: 'Удаление закладки',
+      content: 'Вы уверены, что хотите удалить закладку?',
+      cancelCaption: 'Отмена',
+      confirmCaption: 'Удалить'
+    }
+  });
+
+  const handleBookmarkClose = (bookmark: IBookmarkItem) => {
+    patchOptions({
+      attrs: {
+        modelValue: true,
+        onConfirm: () => {
+          bookmarksStore.removeBookmark(bookmark.uuid);
+          close();
+        }
+      },
+      slots: {
+        content: useModalSlot({
+          component: BookmarkDeleteModalContent,
+          attrs: {
+            bookmarkName: bookmark.name
+          }
+        })
+      }
+    });
+    open();
+  };
 </script>
 
 <style lang="scss" scoped>
