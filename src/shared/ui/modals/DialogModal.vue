@@ -161,6 +161,11 @@
       position: absolute;
       top: 12px;
       right: 12px;
+
+      @media (max-width: 1200px) {
+        top: 8px;
+        right: 8px;
+      }
     }
 
     &__content {
