@@ -52,7 +52,7 @@
 
                     <div
                       class="bookmarks__item_icon only-hover is-right"
-                      @click.left.exact.prevent="handleBookmarkClose(bookmark)"
+                      @click.left.exact.prevent="handleBookmarkDelete(bookmark)"
                     >
                       <svg-icon icon="close" />
                     </div>
@@ -90,8 +90,8 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
-  import { useModal, useModalSlot } from 'vue-final-modal';
   import { ref } from 'vue';
+  import { useModal, useModalSlot } from 'vue-final-modal';
 
   import BookmarkDeleteModalContent from '@/features/bookmarks/components/BookmarkDeleteModalContent.vue';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
@@ -121,9 +121,10 @@
     }
   });
 
-  const handleBookmarkClose = (bookmark: IBookmarkItem) => {
+  const handleBookmarkDelete = (bookmark: IBookmarkItem) => {
     if (shouldDeleteWithoutConfirm()) {
       bookmarksStore.removeBookmark(bookmark.uuid);
+
       return;
     }
 

@@ -71,25 +71,12 @@
   interface IEmits {
     (e: 'close'): void;
     (e: 'confirm'): void;
+    (e: 'update:modelValue'): void;
   }
 
-  const props = withDefaults(
-    defineProps<{
-      modelValue: boolean;
-      typeConfirm?: boolean;
-      typeRemove?: boolean;
-      typeNotify?: boolean;
-      typeError?: boolean;
-      bookmark?: any;
-    }>(),
-    {
-      typeConfirm: false,
-      typeRemove: false,
-      typeNotify: false,
-      typeError: false,
-      bookmark: undefined
-    }
-  );
+  const props = defineProps<{
+    modelValue: boolean;
+  }>();
 
   const emit = defineEmits<IEmits>();
 

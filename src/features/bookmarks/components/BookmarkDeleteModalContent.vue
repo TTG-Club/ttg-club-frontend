@@ -4,9 +4,9 @@
   </p>
 
   <ui-checkbox
+    v-model="isNeedToAskConfirmation"
     class="checkbox"
     type="toggle"
-    v-model="isNeedToAskConfirmation"
     @update:model-value="onToggle"
   >
     Удалять без подтверждения
@@ -14,8 +14,9 @@
 </template>
 
 <script setup lang="ts">
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import { ref } from 'vue';
+
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
 
   const props = defineProps<{
     bookmarkName: string;
