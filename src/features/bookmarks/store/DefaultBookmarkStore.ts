@@ -28,6 +28,7 @@ export const useDefaultBookmarkStore = defineStore(
     const groups = ref<IBookmarkGroup[]>([]);
     const categories = ref<IBookmarkCategory[]>([]);
     const bookmarks = ref<IBookmarkItem[]>([]);
+    const dontAskAgain = ref<boolean>(false);
 
     const isBookmarkSaved = (url: IBookmarkItem['url']) =>
       bookmarks.value.findIndex(bookmark => bookmark.url === url) >= 0;
@@ -247,11 +248,34 @@ export const useDefaultBookmarkStore = defineStore(
       return addBookmark(url, name, category);
     };
 
+    const setDontAskAgainPreference = async (checked: boolean) => {
+      dontAskAgain.value = checked;
+
+      try {
+        await store.ready();
+
+        store.setItem('dontAskAgain', dontAskAgain.value);
+      } catch (err) {
+        errorHandler(err);
+      }
+    };
+
+    const getDontAskAgainPreference = async () => {
+      try {
+        await store.ready();
+
+        dontAskAgain.value =
+          (await store.getItem<boolean>('dontAskAgain')) || false;
+      } catch (err) {
+        errorHandler(err);
+      }
+    };
+
     return {
       groups,
       categories,
       bookmarks,
-
+      dontAskAgain,
       isBookmarkSaved,
       getGroupBookmarks: computed(() =>
         getGroupBookmarks({
@@ -269,7 +293,9 @@ export const useDefaultBookmarkStore = defineStore(
       saveBookmarks,
       addBookmark,
       removeBookmark,
-      updateBookmark
+      updateBookmark,
+      setDontAskAgainPreference,
+      getDontAskAgainPreference
     };
   }
 );

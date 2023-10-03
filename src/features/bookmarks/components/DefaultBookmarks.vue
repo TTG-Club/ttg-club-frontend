@@ -52,9 +52,7 @@
 
                     <div
                       class="bookmarks__item_icon only-hover is-right"
-                      @click.left.exact.prevent="
-                        bookmarksStore.removeBookmark(bookmark.uuid)
-                      "
+                      @click.left.exact.prevent="removeBookmark(bookmark)"
                     >
                       <svg-icon icon="close" />
                     </div>
@@ -88,16 +86,52 @@
       </div>
     </div>
   </div>
+
+  <bookmark-remove-modal
+    v-model="isShowModal"
+    :name="selectedBookmark.name"
+    @confirm="confirm"
+    @close="close"
+  >
+  </bookmark-remove-modal>
 </template>
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
+  import { onBeforeMount, ref } from 'vue';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import BookmarkRemoveModal from '@/shared/ui/modals/BookmarkRemoveModal.vue';
+
+  import type { IBookmarkItem } from '../types/Bookmark';
 
   const bookmarksStore = useDefaultBookmarkStore();
+  const isShowModal = ref<boolean>(false);
+  const selectedBookmark = ref<IBookmarkItem>({} as IBookmarkItem);
+
+  onBeforeMount(async () => {
+    await bookmarksStore.getDontAskAgainPreference();
+  });
+
+  const removeBookmark = (bookmark: IBookmarkItem) => {
+    if (bookmarksStore.dontAskAgain) {
+      bookmarksStore.removeBookmark(bookmark.uuid);
+    } else {
+      isShowModal.value = true;
+      selectedBookmark.value = bookmark;
+    }
+  };
+
+  const confirm = (checked: boolean) => {
+    isShowModal.value = false;
+    bookmarksStore.setDontAskAgainPreference(checked);
+    bookmarksStore.removeBookmark(selectedBookmark.value.uuid);
+  };
+
+  const close = () => (isShowModal.value = false);
+
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');
 </script>
