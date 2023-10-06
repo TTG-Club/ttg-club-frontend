@@ -15,7 +15,7 @@
 
       <div class="bookmark-remove-modal__wrapper">
         <h2 class="bookmark-remove-modal__wrapper-title">
-          Вы действительно хотите удалить {{ props.name }} ?
+          Вы действительно хотите удалить {{ props.bookmarkName }} ?
         </h2>
 
         <ui-checkbox
@@ -57,7 +57,7 @@
 
   interface IEmits {
     (e: 'close'): void;
-    (e: 'confirm', dontAskAgainCheckbox: boolean): void;
+    (e: 'confirm', checked: boolean): void;
   }
 
   const emit = defineEmits<IEmits>();
@@ -65,10 +65,10 @@
   const props = withDefaults(
     defineProps<{
       modelValue: boolean;
-      name: TBookmark['name'];
+      bookmarkName: TBookmark['name'];
     }>(),
     {
-      name: ''
+      bookmarkName: ''
     }
   );
 
@@ -77,6 +77,7 @@
 
   const close = () => {
     dontAskAgainCheckbox.value = false;
+    isShowModal.value = false;
     emit('close');
   };
 

@@ -86,57 +86,52 @@
       </div>
     </div>
   </div>
-
-  <bookmark-remove-modal
-    v-model="isShowModal"
-    :name="selectedBookmark?.name ?? ''"
-    @confirm="confirm"
-    @close="close"
-  >
-  </bookmark-remove-modal>
 </template>
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
-  import { onBeforeMount, ref } from 'vue';
-
+  import { onBeforeMount } from 'vue';
+  import { useModal } from 'vue-final-modal';
+  
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
-
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import BookmarkRemoveModal from '@/shared/ui/modals/BookmarkRemoveModal.vue';
 
   import type { IBookmarkItem } from '../types/Bookmark';
 
   const bookmarksStore = useDefaultBookmarkStore();
-  const isShowModal = ref<boolean>(false);
-  const selectedBookmark = ref<IBookmarkItem | null>(null);
 
   onBeforeMount(async () => {
     await bookmarksStore.getDontAskAgainPreference();
+  });
+
+  const { getGroupBookmarks } = storeToRefs(bookmarksStore);
+  const isExternal = (url: string) => url.startsWith('http');
+
+  const { open, close, patchOptions } = useModal({
+    defaultModelValue: false,
+    component: BookmarkRemoveModal,
   });
 
   const removeBookmark = (bookmark: IBookmarkItem) => {
     if (bookmarksStore.dontAskAgain) {
       bookmarksStore.removeBookmark(bookmark.uuid);
     } else {
-      isShowModal.value = true;
-      selectedBookmark.value = bookmark;
+    patchOptions({
+      attrs: {
+        modelValue: true,
+        bookmarkName: bookmark.name,
+        onConfirm: (checked: boolean) => {
+          bookmarksStore.setDontAskAgainPreference(checked);
+          bookmarksStore.removeBookmark(bookmark.uuid);
+          close();
+        },
+        onClose: close
+      },
+    });
+    open();
     }
   };
-
-  const confirm = (checked: boolean) => {
-    isShowModal.value = false;
-    bookmarksStore.setDontAskAgainPreference(checked);
-
-    if (selectedBookmark.value) {
-      bookmarksStore.removeBookmark(selectedBookmark.value.uuid);
-    }
-  };
-
-  const close = () => (isShowModal.value = false);
-
-  const { getGroupBookmarks } = storeToRefs(bookmarksStore);
-  const isExternal = (url: string) => url.startsWith('http');
 </script>
 
 <style lang="scss" scoped>
