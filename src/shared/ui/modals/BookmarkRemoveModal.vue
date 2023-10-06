@@ -15,7 +15,7 @@
 
       <div class="bookmark-remove-modal__wrapper">
         <h2 class="bookmark-remove-modal__wrapper-title">
-          Вы действительно хотите удалить {{ props.bookmarkName }} ?
+          Вы действительно хотите удалить "{{ props.bookmarkName }}" ?
         </h2>
 
         <ui-checkbox

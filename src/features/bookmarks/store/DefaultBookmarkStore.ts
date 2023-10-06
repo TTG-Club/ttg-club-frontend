@@ -3,6 +3,7 @@ import { cloneDeep, isArray } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { v4 as uuidV4 } from 'uuid';
 import { computed, ref } from 'vue';
+import { useModal } from 'vue-final-modal';
 
 import BookmarksApi from '@/features/bookmarks/api';
 import type {
@@ -16,10 +17,16 @@ import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
 
 import { DB_NAME } from '@/shared/constants/UI';
 import { errorHandler } from '@/shared/helpers/errorHandler';
+import BookmarkRemoveModal from '@/shared/ui/modals/BookmarkRemoveModal.vue';
 
 export const useDefaultBookmarkStore = defineStore(
   'DefaultBookmarkStore',
   () => {
+    const { open, close, patchOptions } = useModal({
+      defaultModelValue: false,
+      component: BookmarkRemoveModal
+    });
+
     const store = localforage.createInstance({
       name: DB_NAME,
       storeName: 'bookmarks'
@@ -271,6 +278,29 @@ export const useDefaultBookmarkStore = defineStore(
       }
     };
 
+    const removeBookmarkWithConfirmationModal = (bookmark: IBookmarkItem) => {
+      if (dontAskAgain.value) {
+        removeBookmark(bookmark.uuid);
+      } else {
+        patchOptions({
+          attrs: {
+            modelValue: true,
+            bookmarkName: bookmark.name,
+            onConfirm: (checked: boolean) => {
+              setDontAskAgainPreference(checked);
+              removeBookmark(bookmark.uuid);
+              close();
+            },
+            onClose: () => {
+              dontAskAgain.value = false;
+              close();
+            }
+          }
+        });
+        open();
+      }
+    };
+
     return {
       groups,
       categories,
@@ -295,7 +325,8 @@ export const useDefaultBookmarkStore = defineStore(
       removeBookmark,
       updateBookmark,
       setDontAskAgainPreference,
-      getDontAskAgainPreference
+      getDontAskAgainPreference,
+      removeBookmarkWithConfirmationModal
     };
   }
 );

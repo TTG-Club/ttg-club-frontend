@@ -52,7 +52,11 @@
 
                     <div
                       class="bookmarks__item_icon only-hover is-right"
-                      @click.left.exact.prevent="removeBookmark(bookmark)"
+                      @click.left.exact.prevent="
+                        bookmarksStore.removeBookmarkWithConfirmationModal(
+                          bookmark
+                        )
+                      "
                     >
                       <svg-icon icon="close" />
                     </div>
@@ -91,14 +95,10 @@
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
   import { onBeforeMount } from 'vue';
-  import { useModal } from 'vue-final-modal';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import BookmarkRemoveModal from '@/shared/ui/modals/BookmarkRemoveModal.vue';
-
-  import type { IBookmarkItem } from '../types/Bookmark';
 
   const bookmarksStore = useDefaultBookmarkStore();
 
@@ -108,31 +108,6 @@
 
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');
-
-  const { open, close, patchOptions } = useModal({
-    defaultModelValue: false,
-    component: BookmarkRemoveModal
-  });
-
-  const removeBookmark = (bookmark: IBookmarkItem) => {
-    if (bookmarksStore.dontAskAgain) {
-      bookmarksStore.removeBookmark(bookmark.uuid);
-    } else {
-      patchOptions({
-        attrs: {
-          modelValue: true,
-          bookmarkName: bookmark.name,
-          onConfirm: (checked: boolean) => {
-            bookmarksStore.setDontAskAgainPreference(checked);
-            bookmarksStore.removeBookmark(bookmark.uuid);
-            close();
-          },
-          onClose: close
-        }
-      });
-      open();
-    }
-  };
 </script>
 
 <style lang="scss" scoped>
