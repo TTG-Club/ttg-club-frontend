@@ -50,9 +50,10 @@
   import { ref } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
 
+  import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
+
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
 
   interface IEmits {
     (e: 'close'): void;
@@ -96,7 +97,7 @@ import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
       flex-direction: column;
       margin: 0 24px;
     }
-    
+
     &__header {
       display: flex;
       align-items: center;
@@ -109,7 +110,7 @@ import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
         padding: 12px 16px;
       }
     }
-    
+
     &__wrapper {
       padding: 24px;
       &-title {

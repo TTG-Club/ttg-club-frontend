@@ -127,6 +127,7 @@
   const confirm = (checked: boolean) => {
     isShowModal.value = false;
     bookmarksStore.setDontAskAgainPreference(checked);
+
     if (selectedBookmark.value) {
       bookmarksStore.removeBookmark(selectedBookmark.value.uuid);
     }
