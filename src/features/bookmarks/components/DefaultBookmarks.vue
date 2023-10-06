@@ -92,8 +92,9 @@
   import { storeToRefs } from 'pinia';
   import { onBeforeMount } from 'vue';
   import { useModal } from 'vue-final-modal';
-  
+
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import BookmarkRemoveModal from '@/shared/ui/modals/BookmarkRemoveModal.vue';
 
@@ -110,26 +111,26 @@
 
   const { open, close, patchOptions } = useModal({
     defaultModelValue: false,
-    component: BookmarkRemoveModal,
+    component: BookmarkRemoveModal
   });
 
   const removeBookmark = (bookmark: IBookmarkItem) => {
     if (bookmarksStore.dontAskAgain) {
       bookmarksStore.removeBookmark(bookmark.uuid);
     } else {
-    patchOptions({
-      attrs: {
-        modelValue: true,
-        bookmarkName: bookmark.name,
-        onConfirm: (checked: boolean) => {
-          bookmarksStore.setDontAskAgainPreference(checked);
-          bookmarksStore.removeBookmark(bookmark.uuid);
-          close();
-        },
-        onClose: close
-      },
-    });
-    open();
+      patchOptions({
+        attrs: {
+          modelValue: true,
+          bookmarkName: bookmark.name,
+          onConfirm: (checked: boolean) => {
+            bookmarksStore.setDontAskAgainPreference(checked);
+            bookmarksStore.removeBookmark(bookmark.uuid);
+            close();
+          },
+          onClose: close
+        }
+      });
+      open();
     }
   };
 </script>
