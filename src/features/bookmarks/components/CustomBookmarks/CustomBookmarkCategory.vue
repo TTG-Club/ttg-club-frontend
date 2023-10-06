@@ -66,7 +66,9 @@
               :class="{ 'only-hover': !isMobile }"
               class="bookmarks__item_icon is-right"
               @click.left.exact.prevent="
-                customBookmarkStore.queryDeleteBookmark(bookmark.uuid)
+                customBookmarkStore.removeBookmarkWithConfirmationModal(
+                  bookmark
+                )
               "
             >
               <svg-icon icon="close" />
