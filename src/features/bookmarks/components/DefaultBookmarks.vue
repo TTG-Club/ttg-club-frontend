@@ -89,7 +89,7 @@
 
   <bookmark-remove-modal
     v-model="isShowModal"
-    :name="selectedBookmark.name"
+    :name="selectedBookmark?.name ?? ''"
     @confirm="confirm"
     @close="close"
   >
@@ -109,7 +109,7 @@
 
   const bookmarksStore = useDefaultBookmarkStore();
   const isShowModal = ref<boolean>(false);
-  const selectedBookmark = ref<IBookmarkItem>({} as IBookmarkItem);
+  const selectedBookmark = ref<IBookmarkItem | null>(null);
 
   onBeforeMount(async () => {
     await bookmarksStore.getDontAskAgainPreference();
@@ -127,7 +127,9 @@
   const confirm = (checked: boolean) => {
     isShowModal.value = false;
     bookmarksStore.setDontAskAgainPreference(checked);
-    bookmarksStore.removeBookmark(selectedBookmark.value.uuid);
+    if (selectedBookmark.value) {
+      bookmarksStore.removeBookmark(selectedBookmark.value.uuid);
+    }
   };
 
   const close = () => (isShowModal.value = false);

@@ -1,20 +1,20 @@
 <template>
   <vue-final-modal
     v-model="isShowModal"
-    class="base-modal"
+    class="bookmark-remove-modal"
     content-transition="vfm-fade"
     esc-to-close
     focus-trap
     overlay-transition="vfm-fade"
     v-bind="$attrs"
   >
-    <div class="base-modal__container">
-      <div class="base-modal__header">
-        <h1 class="base-modal__title">Удалить закладку</h1>
+    <div class="bookmark-remove-modal__container">
+      <div class="bookmark-remove-modal__header">
+        <h1 class="bookmark-remove-modal__title">Удалить закладку</h1>
       </div>
 
-      <div class="base-modal__wrapper">
-        <h2 class="base-modal__wrapper-title">
+      <div class="bookmark-remove-modal__wrapper">
+        <h2 class="bookmark-remove-modal__wrapper-title">
           Вы действительно хотите удалить {{ props.name }} ?
         </h2>
 
@@ -25,7 +25,7 @@
           Больше не спрашивать
         </ui-checkbox>
 
-        <div class="base-modal__buttons">
+        <div class="bookmark-remove-modal__buttons">
           <ui-button
             type-outline
             @click.left.exact.prevent="confirm"
@@ -52,6 +52,7 @@
 
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
 
   interface IEmits {
     (e: 'close'): void;
@@ -63,9 +64,7 @@
   const props = withDefaults(
     defineProps<{
       modelValue: boolean;
-      name: any;
-      onConfirm: (dontAskAgainCheckbox: boolean) => void;
-      onClose: undefined;
+      name: TBookmark['name'];
     }>(),
     {
       name: ''
@@ -84,7 +83,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .base-modal {
+  .bookmark-remove-modal {
     &__container {
       background-color: var(--bg-secondary);
       width: 100%;
@@ -97,6 +96,7 @@
       flex-direction: column;
       margin: 0 24px;
     }
+    
     &__header {
       display: flex;
       align-items: center;
@@ -109,6 +109,7 @@
         padding: 12px 16px;
       }
     }
+    
     &__wrapper {
       padding: 24px;
       &-title {
@@ -117,12 +118,14 @@
         margin-right: auto;
       }
     }
+
     &__title {
       color: var(--text-color-title);
       font-size: 20px;
       line-height: 28px;
       margin-right: auto;
     }
+
     &__buttons {
       display: flex;
       flex-direction: row;
@@ -132,6 +135,7 @@
         width: 120px;
       }
     }
+
     .ui-checkbox {
       margin: 20px 0;
     }
