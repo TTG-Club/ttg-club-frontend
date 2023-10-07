@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 import { useModal } from 'vue-final-modal';
 
 import BookmarksApi from '@/features/bookmarks/api';
+import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 import type {
   IBookmarkCategory,
   IBookmarkCategoryInfo,
@@ -17,7 +18,6 @@ import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
 
 import { DB_NAME } from '@/shared/constants/UI';
 import { errorHandler } from '@/shared/helpers/errorHandler';
-import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 
 const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
 
