@@ -17,14 +17,14 @@ import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
 
 import { DB_NAME } from '@/shared/constants/UI';
 import { errorHandler } from '@/shared/helpers/errorHandler';
-import BookmarkRemoveModal from '@/shared/ui/modals/BookmarkRemoveModal.vue';
+import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 
 const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
 
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
   const { open, close, patchOptions } = useModal({
     defaultModelValue: false,
-    component: BookmarkRemoveModal
+    component: BookmarkRemoveConfirmationModal
   });
 
   const store = localforage.createInstance({
