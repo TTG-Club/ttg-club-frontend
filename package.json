@@ -29,6 +29,7 @@
     "lodash-es": "^4.17.21",
     "normalize.css": "^8.0.1",
     "pinia": "^2.1.6",
+    "pinia-plugin-persistedstate": "^3.2.0",
     "tippy.js": "^6.3.7",
     "ua-parser-js": "^1.0.35",
     "uuid": "^9.0.0",
