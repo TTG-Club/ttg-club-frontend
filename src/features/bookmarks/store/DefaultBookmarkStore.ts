@@ -7,6 +7,7 @@ import { useModal } from 'vue-final-modal';
 
 import BookmarksApi from '@/features/bookmarks/api';
 import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
+import { useConfirmationRemoveBookmarkStore } from '@/features/bookmarks/store/ConfirmationRemoveBookmarkStore';
 import type {
   IBookmarkCategory,
   IBookmarkCategoryInfo,
@@ -32,10 +33,11 @@ export const useDefaultBookmarkStore = defineStore(
       storeName: 'bookmarks'
     });
 
+    const confirmationModalStore = useConfirmationRemoveBookmarkStore();
+
     const groups = ref<IBookmarkGroup[]>([]);
     const categories = ref<IBookmarkCategory[]>([]);
     const bookmarks = ref<IBookmarkItem[]>([]);
-    const dontAskAgain = ref<boolean>(false);
 
     const isBookmarkSaved = (url: IBookmarkItem['url']) =>
       bookmarks.value.findIndex(bookmark => bookmark.url === url) >= 0;
@@ -255,46 +257,19 @@ export const useDefaultBookmarkStore = defineStore(
       return addBookmark(url, name, category);
     };
 
-    const setDontAskAgainPreference = async (checked: boolean) => {
-      dontAskAgain.value = checked;
-
-      try {
-        await store.ready();
-
-        store.setItem('dontAskAgain', dontAskAgain.value);
-      } catch (err) {
-        errorHandler(err);
-      }
-    };
-
-    const getDontAskAgainPreference = async () => {
-      try {
-        await store.ready();
-
-        dontAskAgain.value =
-          (await store.getItem<boolean>('dontAskAgain')) || false;
-      } catch (err) {
-        errorHandler(err);
-      }
-    };
-
     const removeBookmarkWithConfirmationModal = (bookmark: IBookmarkItem) => {
-      if (dontAskAgain.value) {
+      if (confirmationModalStore.dontAskAgain) {
         removeBookmark(bookmark.uuid);
       } else {
         patchOptions({
           attrs: {
             modelValue: true,
             bookmarkName: bookmark.name,
-            onConfirm: (checked: boolean) => {
-              setDontAskAgainPreference(checked);
+            onConfirm: () => {
               removeBookmark(bookmark.uuid);
               close();
             },
-            onClose: () => {
-              dontAskAgain.value = false;
-              close();
-            }
+            onClose: close
           }
         });
         open();
@@ -305,7 +280,6 @@ export const useDefaultBookmarkStore = defineStore(
       groups,
       categories,
       bookmarks,
-      dontAskAgain,
       isBookmarkSaved,
       getGroupBookmarks: computed(() =>
         getGroupBookmarks({
@@ -324,8 +298,6 @@ export const useDefaultBookmarkStore = defineStore(
       addBookmark,
       removeBookmark,
       updateBookmark,
-      setDontAskAgainPreference,
-      getDontAskAgainPreference,
       removeBookmarkWithConfirmationModal
     };
   }

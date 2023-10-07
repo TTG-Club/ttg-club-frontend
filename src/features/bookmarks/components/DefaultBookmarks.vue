@@ -94,17 +94,12 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
-  import { onBeforeMount } from 'vue';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   const bookmarksStore = useDefaultBookmarkStore();
-
-  onBeforeMount(async () => {
-    await bookmarksStore.getDontAskAgainPreference();
-  });
 
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');

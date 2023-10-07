@@ -47,9 +47,10 @@
 
 <script lang="ts" setup>
   import { useVModel } from '@vueuse/core';
-  import { ref } from 'vue';
+  import { ref, onBeforeMount } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
 
+  import { useConfirmationRemoveBookmarkStore } from '@/features/bookmarks/store/ConfirmationRemoveBookmarkStore';
   import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
 
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
@@ -57,7 +58,7 @@
 
   interface IEmits {
     (e: 'close'): void;
-    (e: 'confirm', checked: boolean): void;
+    (e: 'confirm'): void;
   }
 
   const emit = defineEmits<IEmits>();
@@ -72,6 +73,7 @@
     }
   );
 
+  const confirmationModalStore = useConfirmationRemoveBookmarkStore();
   const isShowModal = useVModel(props, 'modelValue');
   const dontAskAgainCheckbox = ref(false);
 
@@ -81,7 +83,16 @@
     emit('close');
   };
 
-  const confirm = () => emit('confirm', dontAskAgainCheckbox.value);
+  const confirm = () => {
+    confirmationModalStore.$patch({ dontAskAgain: dontAskAgainCheckbox.value });
+    emit('confirm');
+  };
+
+  onBeforeMount(() => {
+    const dontAskAgainPreference = confirmationModalStore.dontAskAgain;
+
+    dontAskAgainCheckbox.value = dontAskAgainPreference;
+  });
 </script>
 
 <style lang="scss" scoped>

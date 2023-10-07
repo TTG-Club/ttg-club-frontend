@@ -1,4 +1,3 @@
-import localforage from 'localforage';
 import { sortBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -6,6 +5,7 @@ import { useModal } from 'vue-final-modal';
 
 import BookmarksApi from '@/features/bookmarks/api';
 import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
+import { useConfirmationRemoveBookmarkStore } from '@/features/bookmarks/store/ConfirmationRemoveBookmarkStore';
 import type {
   IBookmarkCategory,
   IBookmarkCategoryInfo,
@@ -16,9 +16,6 @@ import type {
 } from '@/features/bookmarks/types/Bookmark.d';
 import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
 
-import { DB_NAME } from '@/shared/constants/UI';
-import { errorHandler } from '@/shared/helpers/errorHandler';
-
 const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
 
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
@@ -27,16 +24,12 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     component: BookmarkRemoveConfirmationModal
   });
 
-  const store = localforage.createInstance({
-    name: DB_NAME,
-    storeName: 'customBookmarks'
-  });
+  const confirmationModalStore = useConfirmationRemoveBookmarkStore();
 
   const groups = ref<IBookmarkGroup[]>([]);
   const categories = ref<IBookmarkCategory[]>([]);
   const bookmarks = ref<IBookmarkItem[]>([]);
   const openedGroups = ref<IBookmarkGroup['uuid'][]>([]);
-  const dontAskAgain = ref<boolean>(false);
 
   const isAllGroupsOpened = computed(
     () => openedGroups.value.length === groups.value.length
@@ -353,46 +346,19 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     updateSessionStorage();
   };
 
-  const setDontAskAgainPreference = async (checked: boolean) => {
-    dontAskAgain.value = checked;
-
-    try {
-      await store.ready();
-
-      store.setItem('dontAskAgain', dontAskAgain.value);
-    } catch (err) {
-      errorHandler(err);
-    }
-  };
-
-  const getDontAskAgainPreference = async () => {
-    try {
-      await store.ready();
-
-      dontAskAgain.value =
-        (await store.getItem<boolean>('dontAskAgain')) || false;
-    } catch (err) {
-      errorHandler(err);
-    }
-  };
-
   const removeBookmarkWithConfirmationModal = (bookmark: IBookmarkItem) => {
-    if (dontAskAgain.value) {
+    if (confirmationModalStore.dontAskAgain) {
       queryDeleteBookmark(bookmark.uuid);
     } else {
       patchOptions({
         attrs: {
           modelValue: true,
           bookmarkName: bookmark.name,
-          onConfirm: (checked: boolean) => {
-            setDontAskAgainPreference(checked);
+          onConfirm: () => {
             queryDeleteBookmark(bookmark.uuid);
             close();
           },
-          onClose: () => {
-            dontAskAgain.value = false;
-            close();
-          }
+          onClose: close
         }
       });
       open();
@@ -435,8 +401,6 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     restoreOpenedGroupsFromSession,
     toggleGroup,
     toggleAll,
-    setDontAskAgainPreference,
-    getDontAskAgainPreference,
     removeBookmarkWithConfirmationModal
   };
 });
