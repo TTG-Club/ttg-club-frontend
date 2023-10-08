@@ -84,6 +84,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .navbar__header_left {
     .navbar__logo {
       width: 52px;

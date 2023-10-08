@@ -205,6 +205,9 @@
 </script>
 
 <style module lang="scss">
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .container {
     min-height: 100%;
     display: flex;

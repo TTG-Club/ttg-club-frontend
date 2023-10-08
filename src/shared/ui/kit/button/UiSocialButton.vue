@@ -47,6 +47,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ui-social-button {
     @include css_anim($time: 0.2s);
 

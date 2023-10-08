@@ -82,6 +82,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .screen-group {
     width: 100%;
 

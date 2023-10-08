@@ -102,6 +102,9 @@
 </script>
 
 <style module lang="scss">
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .youtube-block {
     flex: 1 1 calc(33% - 10px);
     background-color: var(--bg-table-list);

@@ -234,6 +234,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .nav-profile {
     width: 100vw;
     max-width: 260px;

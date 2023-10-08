@@ -1,11 +1,8 @@
-import localforage from 'localforage';
 import { sortBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { useModal } from 'vue-final-modal';
 
 import BookmarksApi from '@/features/bookmarks/api';
-import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 import type {
   IBookmarkCategory,
   IBookmarkCategoryInfo,
@@ -14,29 +11,19 @@ import type {
   TBookmark,
   TQueryAddBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
-import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
-
-import { DB_NAME } from '@/shared/constants/UI';
-import { errorHandler } from '@/shared/helpers/errorHandler';
+import {
+  getGroupBookmarks,
+  isBookmarkRemoveAvailable,
+  setBookmarks
+} from '@/features/bookmarks/utils';
 
 const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
 
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
-  const { open, close, patchOptions } = useModal({
-    defaultModelValue: false,
-    component: BookmarkRemoveConfirmationModal
-  });
-
-  const store = localforage.createInstance({
-    name: DB_NAME,
-    storeName: 'customBookmarks'
-  });
-
   const groups = ref<IBookmarkGroup[]>([]);
   const categories = ref<IBookmarkCategory[]>([]);
   const bookmarks = ref<IBookmarkItem[]>([]);
   const openedGroups = ref<IBookmarkGroup['uuid'][]>([]);
-  const dontAskAgain = ref<boolean>(false);
 
   const isAllGroupsOpened = computed(
     () => openedGroups.value.length === groups.value.length
@@ -134,10 +121,16 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     }
   };
 
-  const queryDeleteBookmark = async (uuid: TBookmark['uuid']) => {
+  const queryDeleteBookmark = async (bookmark: TBookmark, dontAsk = false) => {
     try {
-      if (!uuid) {
+      if (!bookmark?.uuid) {
         return Promise.reject(new Error('UUID is undefined'));
+      }
+
+      const { uuid } = bookmark;
+
+      if (!dontAsk && !(await isBookmarkRemoveAvailable(bookmark))) {
+        return Promise.resolve();
       }
 
       await BookmarksApi.deleteBookmark(uuid);
@@ -276,7 +269,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
       });
 
       if (bookmark) {
-        return queryDeleteBookmark(bookmark.uuid);
+        return queryDeleteBookmark(bookmark, true);
       }
 
       return addBookmarkInGroup({
@@ -353,52 +346,6 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     updateSessionStorage();
   };
 
-  const setDontAskAgainPreference = async (checked: boolean) => {
-    dontAskAgain.value = checked;
-
-    try {
-      await store.ready();
-
-      store.setItem('dontAskAgain', dontAskAgain.value);
-    } catch (err) {
-      errorHandler(err);
-    }
-  };
-
-  const getDontAskAgainPreference = async () => {
-    try {
-      await store.ready();
-
-      dontAskAgain.value =
-        (await store.getItem<boolean>('dontAskAgain')) || false;
-    } catch (err) {
-      errorHandler(err);
-    }
-  };
-
-  const removeBookmarkWithConfirmationModal = (bookmark: IBookmarkItem) => {
-    if (dontAskAgain.value) {
-      queryDeleteBookmark(bookmark.uuid);
-    } else {
-      patchOptions({
-        attrs: {
-          modelValue: true,
-          bookmarkName: bookmark.name,
-          onConfirm: (checked: boolean) => {
-            setDontAskAgainPreference(checked);
-            queryDeleteBookmark(bookmark.uuid);
-            close();
-          },
-          onClose: () => {
-            dontAskAgain.value = false;
-            close();
-          }
-        }
-      });
-      open();
-    }
-  };
-
   return {
     groups,
     categories,
@@ -434,9 +381,6 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     clearBookmarks,
     restoreOpenedGroupsFromSession,
     toggleGroup,
-    toggleAll,
-    setDontAskAgainPreference,
-    getDontAskAgainPreference,
-    removeBookmarkWithConfirmationModal
+    toggleAll
   };
 });

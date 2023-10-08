@@ -158,6 +158,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .class-items {
     &__group {
       &_name {

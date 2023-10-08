@@ -31,7 +31,7 @@
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__group_icon is-right"
         @click.left.exact.prevent.stop="
-          customBookmarkStore.queryDeleteBookmark(group.uuid)
+          customBookmarkStore.queryDeleteBookmark(group)
         "
       >
         <svg-icon icon="close" />

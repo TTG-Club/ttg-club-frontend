@@ -161,8 +161,7 @@
     customBookmarkStore.toggleAll();
   };
 
-  onBeforeMount(async () => {
+  onBeforeMount(() => {
     customBookmarkStore.restoreOpenedGroupsFromSession();
-    await customBookmarkStore.getDontAskAgainPreference();
   });
 </script>
