@@ -21,7 +21,7 @@
 
       <div class="base-modal__content">
         <div class="base-modal__body">
-          Вы действительно хотите удалить "{{ bookmark.name }}"?
+          Вы действительно хотите удалить «{{ bookmark.name }}»?
 
           <ui-checkbox
             v-model="dontAsk"
