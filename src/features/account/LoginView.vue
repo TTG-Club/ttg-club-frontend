@@ -1,8 +1,8 @@
 <template>
   <form
     class="login form"
-    @keyup.enter.exact.prevent="onSubmit"
     @submit.prevent="onSubmit"
+    @keyup.enter.prevent.stop
   >
     <div class="form__row">
       <ui-input

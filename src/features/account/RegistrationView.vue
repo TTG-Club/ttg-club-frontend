@@ -2,7 +2,7 @@
   <form
     class="registration form"
     @submit.prevent="onSubmit"
-    @keyup.enter.exact.prevent="onSubmit"
+    @keyup.enter.prevent.stop
   >
     <div class="form__row">
       <ui-input

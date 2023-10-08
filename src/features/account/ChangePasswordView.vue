@@ -1,8 +1,8 @@
 <template>
   <form
     class="change-password form"
-    @keyup.enter.exact.prevent="onSubmit"
     @submit.prevent="onSubmit"
+    @keyup.enter.prevent.stop
   >
     <div
       :class="{ 'is-hidden': isOnlyPassword }"
