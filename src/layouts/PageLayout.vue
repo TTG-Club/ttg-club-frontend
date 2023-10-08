@@ -62,7 +62,7 @@
 
   import { useDayjs } from '@/shared/compositions/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import SocialLinks from '@/shared/ui/content/SocialLinks.vue';
+  import SocialLinks from '@/shared/ui/SocialLinks.vue';
 
   const props = withDefaults(
     defineProps<{

@@ -34,6 +34,8 @@
 
   import MagicItemLink from '@/pages/Inventory/MagicItems/MagicItemLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
@@ -41,7 +43,6 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import { MagicItemsFilterDefaults } from '@/shared/types/Inventory/MagicItems.d';
   import type { AnyObject } from '@/shared/types/Utility';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';

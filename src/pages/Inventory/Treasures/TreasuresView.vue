@@ -23,11 +23,12 @@
 
   import TreasureItem from '@/pages/Inventory/Treasures/TreasureItem.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { getGroupWithIdByFirstLetter } from '@/shared/helpers/list';
   import { TreasuresFilterDefaults } from '@/shared/types/Inventory/Treasures.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
 
   const filter = useFilter({

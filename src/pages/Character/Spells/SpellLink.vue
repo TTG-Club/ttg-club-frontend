@@ -116,6 +116,10 @@
       {{ modal.data!.name.rus }}
     </template>
 
+    <template #topButtons>
+      <bookmark-save-button v-bind="bookmarkObj" />
+    </template>
+
     <template #default>
       <spell-body :spell="modal.data" />
     </template>
@@ -127,6 +131,8 @@
   import { useLink } from 'vue-router';
 
   import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
+
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';

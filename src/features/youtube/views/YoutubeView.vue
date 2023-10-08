@@ -133,6 +133,8 @@
   import { storeToRefs } from 'pinia';
   import { ref } from 'vue';
 
+  import PageLayout from '@/layouts/PageLayout.vue';
+
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
   import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
   import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
@@ -142,7 +144,6 @@
 
   import { getFormattedDate } from '@/shared/compositions/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import PageLayout from '@/shared/ui/content/PageLayout.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';

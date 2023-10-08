@@ -69,12 +69,13 @@
   import { throttle } from 'lodash-es';
   import { defineComponent, reactive } from 'vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
   import FieldCheckbox from '@/shared/ui/kit/FieldType/FieldCheckbox.vue';
   import FieldInput from '@/shared/ui/kit/FieldType/FieldInput.vue';
   import FormButton from '@/shared/ui/kit/FormButton.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   export default defineComponent({
     components: {

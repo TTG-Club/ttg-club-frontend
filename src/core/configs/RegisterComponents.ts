@@ -1,14 +1,15 @@
+import PageLayout from '@/layouts/PageLayout.vue';
+
 import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
 import NavBar from '@/features/menu/NavBar.vue';
 import MenuThemeSwitcher from '@/features/MenuThemeSwitcher.vue';
 
-import PageLayout from '@/shared/ui/content/PageLayout.vue';
-import RawContent from '@/shared/ui/content/RawContent.vue';
-import SocialLinks from '@/shared/ui/content/SocialLinks.vue';
 import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
 import DiceRoller from '@/shared/ui/DiceRoller.vue';
 import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
 import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+import RawContent from '@/shared/ui/RawContent.vue';
+import SocialLinks from '@/shared/ui/SocialLinks.vue';
 
 import type { App } from 'vue';
 
