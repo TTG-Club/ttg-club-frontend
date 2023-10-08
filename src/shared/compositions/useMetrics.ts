@@ -1,7 +1,7 @@
 import { unref } from 'vue';
 import { event, pageview } from 'vue-gtag';
 
-import { routes } from '@/router/routes';
+import { routes } from '@/core/router/routes';
 
 import { useIsDev } from '@/shared/helpers/isDev';
 

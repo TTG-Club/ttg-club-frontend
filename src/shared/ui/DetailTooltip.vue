@@ -14,11 +14,11 @@
 </template>
 
 <script setup lang="ts">
-  import { cloneDeep } from 'lodash-es';
+  import { cloneDeep, omit } from 'lodash-es';
   import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
-  import { DefaultTippyProps } from '@/app/configs/TippyConfig';
+  import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
   import OptionBody from '@/pages/Character/Options/OptionBody.vue';
   import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
@@ -33,7 +33,7 @@
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { Component } from 'vue';
 
@@ -124,7 +124,7 @@
   };
 
   const tippyConfig = computed(() => {
-    const config = cloneDeep(DefaultTippyProps);
+    const config = omit(cloneDeep(DefaultTippyProps), 'theme');
 
     config.onTrigger = () => getContent();
 

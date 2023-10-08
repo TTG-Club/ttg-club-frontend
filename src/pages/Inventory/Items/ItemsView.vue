@@ -33,6 +33,8 @@
 
   import ItemLink from '@/pages/Inventory/Items/ItemLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
@@ -40,7 +42,6 @@
   import { getGroupByFirstLetter } from '@/shared/helpers/list';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { ItemsFilterDefaults } from '@/shared/types/Inventory/Items.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';

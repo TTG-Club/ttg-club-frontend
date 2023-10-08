@@ -45,6 +45,8 @@
 
   import ClassLink from '@/pages/Character/Classes/ClassLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
@@ -56,7 +58,6 @@
     TClassList
   } from '@/shared/types/Character/Classes.d';
   import { ClassesFilterDefaults } from '@/shared/types/Character/Classes.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
 
   const uiStore = useUIStore();
   const route = useRoute();

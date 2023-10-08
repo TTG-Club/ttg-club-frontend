@@ -83,8 +83,8 @@
 <script>
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
-  import RawContent from '@/shared/ui/content/RawContent.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   export default {
     name: 'WeaponBody',

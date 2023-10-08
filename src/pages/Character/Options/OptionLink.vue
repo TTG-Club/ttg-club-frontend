@@ -34,10 +34,13 @@
   <base-modal
     v-if="modal.data"
     v-model="modal.show"
-    :bookmark="bookmarkObj"
   >
     <template #title>
       {{ modal.data?.name.rus || '' }}
+    </template>
+
+    <template #topButtons>
+      <bookmark-save-button v-bind="bookmarkObj" />
     </template>
 
     <template #default>
@@ -51,6 +54,8 @@
   import { useLink } from 'vue-router';
 
   import OptionBody from '@/pages/Character/Options/OptionBody.vue';
+
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
@@ -66,6 +71,7 @@
 
   export default defineComponent({
     components: {
+      BookmarkSaveButton,
       OptionBody,
       BaseModal
     },

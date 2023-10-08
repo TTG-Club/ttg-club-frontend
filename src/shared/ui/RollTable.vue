@@ -33,7 +33,7 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
 
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   export default defineComponent({
     name: 'RollTable',

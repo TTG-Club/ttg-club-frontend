@@ -131,8 +131,8 @@
 
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
-  import RawContent from '@/shared/ui/content/RawContent.vue';
   import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   export default {
     name: 'RaceBody',

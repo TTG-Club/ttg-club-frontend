@@ -93,12 +93,13 @@
   import { throttle } from 'lodash-es';
   import { reactive } from 'vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
   import RollTable from '@/shared/ui/RollTable.vue';
 
   export default {

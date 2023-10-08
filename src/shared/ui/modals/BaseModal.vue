@@ -14,11 +14,14 @@
           <slot name="title" />
         </div>
 
-        <bookmark-save-button
-          v-if="bookmark?.name"
-          :name="bookmark.name"
-          :url="bookmark?.url"
-        />
+        <ui-group-button
+          v-if="$slots.topButtons"
+          size="md"
+          color="text"
+          class="base-modal__buttons_top"
+        >
+          <slot name="topButtons" />
+        </ui-group-button>
 
         <ui-button
           class="base-modal__close"
@@ -105,9 +108,8 @@
   import { useVModel } from '@vueuse/core';
   import { VueFinalModal } from 'vue-final-modal';
 
-  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
-
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiGroupButton from '@/shared/ui/kit/button/UiGroupButton.vue';
 
   interface IEmits {
     (e: 'close'): void;
@@ -189,14 +191,14 @@
       margin-right: auto;
     }
 
-    &__bookmark {
-      margin: {
-        left: 16px;
-        top: -6px;
-        right: -6px;
-        bottom: -6px;
-      }
-    }
+    //&__bookmark {
+    //  margin: {
+    //    left: 16px;
+    //    top: -6px;
+    //    right: -6px;
+    //    bottom: -6px;
+    //  }
+    //}
 
     &__close {
       margin: {

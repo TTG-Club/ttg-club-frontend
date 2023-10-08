@@ -33,6 +33,9 @@
 
   import OptionLink from '@/pages/Character/Options/OptionLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+  import TabLayout from '@/layouts/TabLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
@@ -40,8 +43,6 @@
   import { getGroupByFirstLetter } from '@/shared/helpers/list';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { OptionsFilterDefaults } from '@/shared/types/Character/Options.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
-  import TabLayout from '@/shared/ui/content/TabLayout.vue';
   import { getListGridInTabProps } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';

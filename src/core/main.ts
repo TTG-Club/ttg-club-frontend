@@ -7,8 +7,8 @@ import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
 import Toast from 'vue-toastification';
 
-import router from '@/router';
-import pinia from '@/store';
+import router from '@/core/router';
+import pinia from '@/core/store';
 
 import { useAxios } from '@/shared/compositions/useAxios';
 import { TippyLazy } from '@/shared/directives/TippyLazy';

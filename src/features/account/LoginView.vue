@@ -81,7 +81,7 @@
   import { defineComponent, reactive, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useMetrics } from '@/shared/compositions/useMetrics';
   import {

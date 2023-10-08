@@ -290,13 +290,14 @@
   import MagicItemLink from '@/pages/Inventory/MagicItems/MagicItemLink.vue';
   import TreasureItem from '@/pages/Inventory/Treasures/TreasureItem.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';

@@ -50,8 +50,9 @@
   import AbilityRandom from '@/pages/Tools/AbilityCalc/AbilityRandom.vue';
   import AbilityTable from '@/pages/Tools/AbilityCalc/AbilityTable.vue';
 
+  import PageLayout from '@/layouts/PageLayout.vue';
+
   import type { AbilityRoll } from '@/shared/types/Tools/AbilityCalc.d';
-  import PageLayout from '@/shared/ui/content/PageLayout.vue';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
 
   import type { Component } from 'vue';

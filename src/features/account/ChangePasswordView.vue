@@ -88,7 +88,7 @@
   import { useRouter } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import {
     validateEmailFormat,
