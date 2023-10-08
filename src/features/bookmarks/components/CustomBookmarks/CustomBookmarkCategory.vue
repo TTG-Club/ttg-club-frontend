@@ -16,9 +16,7 @@
         v-if="!isMobile || (isMobile && isEdit)"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__cat_label_icon is-right"
-        @click.left.exact.prevent="
-          customBookmarkStore.queryDeleteBookmark(category.uuid)
-        "
+        @click.left.exact.prevent="handleCategoryDeleteClick(category)"
       >
         <svg-icon icon="close" />
       </div>
@@ -65,9 +63,7 @@
               v-if="!isMobile || (isMobile && isEdit)"
               :class="{ 'only-hover': !isMobile }"
               class="bookmarks__item_icon is-right"
-              @click.left.exact.prevent="
-                customBookmarkStore.queryDeleteBookmark(bookmark.uuid)
-              "
+              @click.left.exact.prevent="handleBookmarkDeleteClick(bookmark)"
             >
               <svg-icon icon="close" />
             </div>
@@ -81,14 +77,17 @@
 <script lang="ts">
   import { storeToRefs } from 'pinia';
   import { defineComponent } from 'vue';
+  import { useModal } from 'vue-final-modal';
   import draggableComponent from 'vuedraggable';
 
+  import BookmarkDeleteModal from '@/features/bookmarks/components/BookmarkDeleteModal.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import type {
     IBookmarkCategory,
     IBookmarkGroup,
     IBookmarkItem
   } from '@/features/bookmarks/types/Bookmark.d';
+  import { shouldDeleteWithoutConfirm } from '@/features/bookmarks/utils';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { WithChildren } from '@/shared/types/Utility';
@@ -145,6 +144,53 @@
         });
       };
 
+      const { open, close, patchOptions } = useModal({
+        defaultModelValue: false,
+        component: BookmarkDeleteModal
+      });
+
+      const handleCategoryDeleteClick = (category: IBookmarkCategory) => {
+        if (shouldDeleteWithoutConfirm()) {
+          customBookmarkStore.queryDeleteBookmark(category.uuid);
+
+          return;
+        }
+
+        patchOptions({
+          attrs: {
+            isNeedToAskConfirmation: false,
+            title: 'Удаление категории',
+            text: `Вы уверены, что хотите удалить категорию «${category.name}»?`,
+            onConfirm: () => {
+              customBookmarkStore.queryDeleteBookmark(category.uuid);
+              close();
+            }
+          }
+        });
+        open();
+      };
+
+      const handleBookmarkDeleteClick = (bookmark: IBookmarkItem) => {
+        if (shouldDeleteWithoutConfirm()) {
+          customBookmarkStore.queryDeleteBookmark(bookmark.uuid);
+
+          return;
+        }
+
+        patchOptions({
+          attrs: {
+            isNeedToAskConfirmation: false,
+            title: 'Удаление закладки',
+            text: `Вы уверены, что хотите удалить закладку «${bookmark.name}»?`,
+            onConfirm: () => {
+              customBookmarkStore.queryDeleteBookmark(bookmark.uuid);
+              close();
+            }
+          }
+        });
+        open();
+      };
+
       const onChangeHandler = async (e: { added: any; moved: any }) => {
         const { added, moved } = e;
 
@@ -154,6 +200,8 @@
       return {
         customBookmarkStore,
         onChangeHandler,
+        handleBookmarkDeleteClick,
+        handleCategoryDeleteClick,
         isMobile
       };
     }

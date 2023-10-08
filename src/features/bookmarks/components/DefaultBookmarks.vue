@@ -90,35 +90,22 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-  import { useModal, useModalSlot } from 'vue-final-modal';
+  import { useModal } from 'vue-final-modal';
 
-  import BookmarkDeleteModalContent from '@/features/bookmarks/components/BookmarkDeleteModalContent.vue';
+  import BookmarkDeleteModal from '@/features/bookmarks/components/BookmarkDeleteModal.vue';
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
   import type { IBookmarkItem } from '@/features/bookmarks/types/Bookmark';
-  import {
-    shouldDeleteWithoutConfirm,
-    setShouldDeleteWithoutConfirm
-  } from '@/features/bookmarks/utils';
+  import { shouldDeleteWithoutConfirm } from '@/features/bookmarks/utils';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import DialogModal from '@/shared/ui/modals/DialogModal.vue';
 
   const bookmarksStore = useDefaultBookmarkStore();
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');
 
-  const isNeedToAskConfirmation = ref(false);
-
   const { open, close, patchOptions } = useModal({
     defaultModelValue: false,
-    component: DialogModal,
-    slots: {
-      title: 'Удаление закладки',
-      content: 'Вы уверены, что хотите удалить закладку?',
-      cancelCaption: 'Отмена',
-      confirmCaption: 'Удалить'
-    }
+    component: BookmarkDeleteModal
   });
 
   const handleBookmarkDelete = (bookmark: IBookmarkItem) => {
@@ -130,24 +117,12 @@
 
     patchOptions({
       attrs: {
-        modelValue: true,
+        title: 'Удаление закладки',
+        text: `Вы уверены, что хотите удалить закладку «${bookmark.name}»?`,
         onConfirm: () => {
-          setShouldDeleteWithoutConfirm(isNeedToAskConfirmation.value);
           bookmarksStore.removeBookmark(bookmark.uuid);
           close();
         }
-      },
-      slots: {
-        content: useModalSlot({
-          component: BookmarkDeleteModalContent,
-          attrs: {
-            bookmarkName: bookmark.name,
-            isNeedToAskConfirmation: isNeedToAskConfirmation.value,
-            onToggleConfirmation: (value: boolean) => {
-              isNeedToAskConfirmation.value = value;
-            }
-          }
-        })
       }
     });
     open();

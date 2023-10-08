@@ -30,9 +30,7 @@
         v-if="!isMobile || (isMobile && isEdit)"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__group_icon is-right"
-        @click.left.exact.prevent.stop="
-          customBookmarkStore.queryDeleteBookmark(group.uuid)
-        "
+        @click.left.exact.prevent.stop="handleDeleteGroupClick(group)"
       >
         <svg-icon icon="close" />
       </div>
@@ -95,14 +93,17 @@
 <script lang="ts">
   import { storeToRefs } from 'pinia';
   import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+  import { useModal } from 'vue-final-modal';
   import draggableComponent from 'vuedraggable';
 
+  import BookmarkDeleteModal from '@/features/bookmarks/components/BookmarkDeleteModal.vue';
   import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import type {
     IBookmarkCategory,
     IBookmarkGroup
   } from '@/features/bookmarks/types/Bookmark.d';
+  import { shouldDeleteWithoutConfirm } from '@/features/bookmarks/utils';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { WithChildren } from '@/shared/types/Utility';
@@ -147,6 +148,31 @@
       const isOpened = computed(() =>
         customBookmarkStore.isGroupOpened(props.group.uuid)
       );
+
+      const { open, close, patchOptions } = useModal({
+        defaultModelValue: false,
+        component: BookmarkDeleteModal
+      });
+
+      const handleDeleteGroupClick = (group: IBookmarkGroup) => {
+        if (shouldDeleteWithoutConfirm()) {
+          customBookmarkStore.queryDeleteBookmark(group.uuid);
+
+          return;
+        }
+
+        patchOptions({
+          attrs: {
+            title: 'Удаление группы',
+            text: `Вы уверены, что хотите удалить группу «${group.name}»?`,
+            onConfirm: () => {
+              customBookmarkStore.queryDeleteBookmark(group.uuid);
+              close();
+            }
+          }
+        });
+        open();
+      };
 
       const enableCategoryCreating = () => {
         if (props.group.order > -1) {
@@ -220,6 +246,7 @@
         createCategory,
         onChangeHandler,
         customBookmarkStore,
+        handleDeleteGroupClick,
         isMobile
       };
     }
