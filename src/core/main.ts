@@ -15,9 +15,9 @@ import { TippyLazy } from '@/shared/directives/TippyLazy';
 import isDev from '@/shared/helpers/isDev';
 
 import App from './App.vue';
-import registerComponents from './configs/RegisterComponents';
 import { TippyOptions } from './configs/TippyConfig';
 import { ToastEventBus, ToastOptions } from './configs/ToastConfig';
+import registerComponents from './utils/RegisterComponents';
 
 import 'vue-final-modal/style.css';
 import '@/assets/styles/index.scss';
