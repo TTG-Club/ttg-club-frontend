@@ -17,9 +17,7 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    onKeyStroke, useActiveElement
-  } from '@vueuse/core';
+  import { onKeyStroke, useActiveElement } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
   import NavPopover from '@/components/UI/menu/NavPopover.vue';
   import SearchModal from '@/components/UI/modals/SearchModal.vue';

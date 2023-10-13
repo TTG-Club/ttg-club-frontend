@@ -109,7 +109,6 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { computed } from 'vue';
   import { useVModel } from '@vueuse/core';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 

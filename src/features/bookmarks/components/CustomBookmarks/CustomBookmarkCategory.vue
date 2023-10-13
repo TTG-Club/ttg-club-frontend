@@ -87,9 +87,7 @@
   import { useUIStore } from '@/store/UI/UIStore';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import type {
-    IBookmarkCategory,
-    IBookmarkGroup,
-    IBookmarkItem
+    IBookmarkCategory, IBookmarkGroup, IBookmarkItem
   } from '@/features/bookmarks/types/Bookmark.types';
   import type { WithChildren } from '@/types/Shared/Utility.types';
 

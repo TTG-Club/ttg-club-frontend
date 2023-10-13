@@ -1,5 +1,5 @@
 import type {
-  TName, TSource, IAbilitiesValue
+  IAbilitiesValue, TName, TSource
 } from '@/types/Shared/BaseApiFields.types';
 
 export enum BestiaryFilterDefaults {

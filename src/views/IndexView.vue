@@ -161,9 +161,7 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
+  import { computed, ref } from 'vue';
   import { storeToRefs } from 'pinia';
   import orderBy from 'lodash/orderBy';
   import { tryOnBeforeMount } from '@vueuse/core';

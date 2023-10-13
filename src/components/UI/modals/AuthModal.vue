@@ -42,7 +42,6 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { useVModel } from '@vueuse/core';
   import UiButton from '@/components/UI/kit/button/UiButton.vue';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   interface IEmit {
     (e: 'close'): void;

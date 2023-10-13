@@ -97,8 +97,7 @@
 <script lang="ts">
   import type { PropType } from 'vue';
   import {
-    computed,
-    defineComponent, onBeforeMount, ref
+    computed, defineComponent, onBeforeMount, ref
   } from 'vue';
   import draggableComponent from 'vuedraggable';
   import { storeToRefs } from 'pinia';
@@ -108,9 +107,7 @@
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import { useUIStore } from '@/store/UI/UIStore';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import type {
-    IBookmarkCategory, IBookmarkGroup
-  } from '@/features/bookmarks/types/Bookmark.types';
+  import type { IBookmarkCategory, IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
   import type { WithChildren } from '@/types/Shared/Utility.types';
 
   export default defineComponent({

@@ -55,7 +55,6 @@
   import AbilityArray from '@/views/Tools/AbilityCalc/AbilityArray.vue';
   import AbilityPointBuy from '@/views/Tools/AbilityCalc/AbilityPointBuy.vue';
   import AbilityRaces from '@/views/Tools/AbilityCalc/AbilityRaces/AbilityRaces.vue';
-  import UiDropdown from '@/components/UI/kit/UiDropdown.vue';
   import type { AbilityRoll } from '@/types/Tools/AbilityCalc.types';
 
   type TCalcTab = {

@@ -1,5 +1,5 @@
-import JsFileDownloader from 'js-file-downloader';
 import type { OptionalParams } from 'js-file-downloader';
+import JsFileDownloader from 'js-file-downloader';
 
 export const downloadByUrl = (
   url: string,

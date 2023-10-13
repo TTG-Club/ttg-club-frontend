@@ -90,9 +90,7 @@
 <script setup lang="ts">
   import cloneDeep from 'lodash/cloneDeep';
   import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, ref
-  } from 'vue';
+  import { computed, ref } from 'vue';
   import { useDebounceFn } from '@vueuse/core';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
   import FilterItemSources from '@/components/filter/FilterItem/FilterItemSources.vue';
