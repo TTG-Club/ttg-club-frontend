@@ -11,9 +11,9 @@
     </div>
 
     <div
+      ref="dropdownHeader"
       class="ui-select__wrapper"
       @focusin="toggleFocus"
-      @focusout="toggleFocus"
     >
       <ui-input
         ref="input"
@@ -30,7 +30,7 @@
     </div>
 
     <div
-      v-if="true"
+      v-if="focused"
       class="ui-select__content-wrapper"
     >
       <ul class="ui-select__content">
@@ -50,9 +50,8 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    computed, ref
-  } from 'vue';
+  import { computed, ref } from 'vue';
+  import { onClickOutside } from '@vueuse/core';
   import UiInput from '@/components/UI/kit/UiInput.vue';
 
   const props = defineProps({
@@ -67,20 +66,23 @@
   });
 
   const input = ref(null);
-  const selectedOption = ref<String>('');
+  const dropdownHeader = ref(null);
   const focused = ref<Boolean>(false);
+  onClickOutside(dropdownHeader, e => {
+    focused.value = false;
+  });
 
   const toggleFocus = e => {
     if (e.type === 'focusin') {
       focused.value = true;
     }
 
-    if (e.type === 'focusout') {
-      focused.value = false;
-    }
-
     if (e.type === 'click') {
       focused.value = !focused.value;
+
+      if (focused.value) {
+        input.value.focusInput();
+      }
     }
   };
 
@@ -163,7 +165,7 @@
       line-height: var(--main-line-height);
       position: absolute;
       height: calc(43.2px * 5);
-      overflow: scroll;
+      overflow: auto;
       bottom: auto;
       margin: 5px 0 0;
       border: 1px solid var(--border);
@@ -229,6 +231,9 @@
 :deep(.ui-input__input) {
   color: var(--text-color-active);
   cursor: pointer;
+  &[placeholder=''] {
+    cursor: text;
+  }
 }
 
 :deep(.ui-input__control) {

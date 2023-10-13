@@ -214,7 +214,7 @@
   import RaceLink from '@/views/Character/Races/RaceLink.vue';
   import { usePagination } from '@/common/composition/usePagination';
   import UiSelect from '@/components/UI/kit/UiSelect.vue';
-  import UiDropdown from "@/components/UI/kit/UiDropdown.vue";
+  import UiDropdown from '@/components/UI/kit/UiDropdown.vue';
   import type { AbilityRoll, ChoiceDouble } from '@/types/Tools/AbilityCalc.types';
   import {
     AbilityChoiceDouble,
@@ -232,7 +232,7 @@
     }
   });
 
-  const emits = defineEmits(["update:model-value"]);
+  const emits = defineEmits(['update:model-value']);
 
   const selectedRace = ref<TRaceLink | null>(null);
   const selectedSubRace = ref<TRaceLink | null>(null);

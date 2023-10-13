@@ -177,6 +177,10 @@
     }
   };
 
+  defineExpose({
+    focusInput
+  });
+
   onMounted(() => {
     if (props.autofocus) {
       focusInput();
