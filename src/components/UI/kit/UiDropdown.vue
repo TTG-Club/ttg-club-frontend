@@ -57,7 +57,9 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue';
+  import {
+    computed, ref, watch
+  } from 'vue';
   import { onClickOutside } from '@vueuse/core';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
@@ -94,8 +96,6 @@
         input.value.focusInput();
       }
     }
-
-    filter.value = '';
   };
 
   const togglePlaceholder = computed(() => (focused.value ? '' : props.placeholder));
@@ -115,6 +115,12 @@
   const onSearch = (e: string) => {
     filter.value = e;
   };
+
+  watch(focused, f => {
+    if (!f) {
+      filter.value = '';
+    }
+  });
 
   const filteredOptions = computed(() => props.options?.filter(el => {
     if (!filter.value) {
