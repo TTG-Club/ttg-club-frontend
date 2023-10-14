@@ -1,91 +1,96 @@
 <template>
   <div
-    style="
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: bisque;
-    "
+    ref="container"
+    :class="{
+      [$style['ui-search']]: true,
+      [$style['focused']]: inputFocus,
+      [$style['hovered']]: !disabled && isHovered,
+      [$style['disabled']]: disabled
+    }"
+    @click="inputFocus = true"
   >
-    <div
-      class="ui-search"
-      :class="{ focused }"
-    >
-      <input
-        ref="input"
-        v-model="searchText"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        class="ui-search__input"
-        @focus="focused = true"
-        @blur="focused = false"
-      />
+    <input
+      ref="input"
+      v-model="inputValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :class="$style['ui-search__input']"
+      @click="inputFocus = true"
+    />
 
-      <div class="ui-search__container">
-        <span
-          v-show="searchText.length > 0"
-          class="ui-search__container--icon"
-          @click="clearInput"
-        >
-          <svg-icon icon="close" />
-        </span>
+    <div :class="$style['ui-search__container']">
+      <span
+        v-show="inputValue.length > 0"
+        :class="[
+          $style['ui-search__container--icon'],
+          $style['cursor-pointer']
+        ]"
+        @click="clearInput"
+      >
+        <svg-icon icon="close" />
+      </span>
 
-        <span
-          class="ui-search__container--icon"
-          @click="search"
-        >
-          <svg-icon icon="search" />
-        </span>
-      </div>
+      <span :class="$style['ui-search__container--icon']">
+        <svg-icon icon="search" />
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { useElementHover, useFocus, useVModel } from '@vueuse/core';
   import { ref } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   type Emit = {
-    (e: 'handle:search', value: string): void;
+    (e: 'update:modelValue', value: string): void;
   };
 
   const emit = defineEmits<Emit>();
 
   const props = withDefaults(
     defineProps<{
+      modelValue: string;
       disabled: boolean;
       placeholder: string;
     }>(),
     {
+      modelValue: '',
       disabled: false,
       placeholder: 'Placeholder'
     }
   );
 
   const { disabled, placeholder } = props;
-
-  const searchText = ref<string>('');
-  const focused = ref<boolean>(false);
+  const container = ref<HTMLDivElement | null>(null);
+  const input = ref<HTMLInputElement | null>(null);
+  const isHovered = useElementHover(container);
+  const { focused: inputFocus } = useFocus(input, { initialValue: false });
+  const inputValue = useVModel(props, 'modelValue', emit);
 
   const clearInput = () => {
-    searchText.value = '';
-  };
-
-  const search = () => {
-    emit('handle:search', searchText.value);
+    inputValue.value = '';
   };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
   .ui-search.focused {
     border-color: var(--primary);
   }
+
   .ui-search.hovered {
     border-color: var(--text-color);
   }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .disabled {
+    opacity: 0.6;
+  }
+
   .ui-search {
     min-width: 230px;
     width: 280px;
@@ -99,21 +104,22 @@
     border-width: 1px;
     border-style: solid;
     border-color: var(--border);
-    &:hover {
-      border-color: var(--text-color);
-    }
+
     @include media-min($md) {
       padding: 10px 12px;
       border-radius: 12px;
     }
+
     @include media-min($lg) {
       padding: 12px 16px;
       border-radius: 12px;
     }
+
     @include media-min($xl) {
       padding: 16px 16px;
       border-radius: 16px;
     }
+
     &__input {
       padding: 0;
       border: none;
@@ -130,9 +136,8 @@
     &__container {
       display: flex;
       align-items: center;
-      &--icon {
-        cursor: pointer;
 
+      &--icon {
         svg {
           width: 20px;
           height: 20px;
