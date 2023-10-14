@@ -76,11 +76,11 @@
 
 <style lang="scss" module>
   .ui-search.focused {
-    border-color: var(--primary);
+    border-color: var(--border-active);
   }
 
   .ui-search.hovered {
-    border-color: var(--text-color);
+    border-color: var(--border-hover);
   }
 
   .cursor-pointer {
