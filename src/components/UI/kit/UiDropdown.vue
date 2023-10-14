@@ -17,8 +17,8 @@
     >
       <ui-input
         ref="input"
-        v-model="selectedOption"
         :placeholder="togglePlaceholder"
+        @update:model-value="onSearch"
       />
 
       <div
@@ -35,14 +35,21 @@
     >
       <ul class="ui-select__content">
         <li
-          v-for="option in options"
+          v-for="option in filteredOptions"
           :key="option.url"
           class="ui-select__element"
-          @click="selectOption()"
+          @click="selectOption($event)"
         >
           <span class="ui-select__option">
             {{ option.name.rus }}
           </span>
+        </li>
+
+        <li
+          v-if="filteredOptions.length === 0"
+          class="ui-select__element"
+        >
+          Боги не знают ответа на твой запрос
         </li>
       </ul>
     </div>
@@ -53,6 +60,7 @@
   import { computed, ref } from 'vue';
   import { onClickOutside } from '@vueuse/core';
   import UiInput from '@/components/UI/kit/UiInput.vue';
+  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   const props = defineProps({
     placeholder: {
@@ -68,7 +76,9 @@
   const input = ref(null);
   const dropdownHeader = ref(null);
   const focused = ref<Boolean>(false);
-  onClickOutside(dropdownHeader, e => {
+  const filter = ref<String>('');
+
+  onClickOutside(dropdownHeader, () => {
     focused.value = false;
   });
 
@@ -84,15 +94,35 @@
         input.value.focusInput();
       }
     }
-  };
 
-  const selectOption = () => {
-    // p.target.classList.add('ui-select-eleKment--selected');
+    filter.value = '';
   };
 
   const togglePlaceholder = computed(() => (focused.value ? '' : props.placeholder));
 
   const toggleIcon = computed(() => (focused.value ? 'arrow/up' : 'arrow/down'));
+
+  const selectOption = e => {
+    let el = e.target;
+
+    if (el.tagName === 'SPAN') {
+      el = el.parentElement;
+    }
+
+    el.classList.toggle('ui-select__element--selected');
+  };
+
+  const onSearch = (e: string) => {
+    filter.value = e;
+  };
+
+  const filteredOptions = computed(() => props.options?.filter(el => {
+    if (!filter.value) {
+      return el;
+    }
+
+    return el.name.rus.toLowerCase().includes(filter.value);
+  }));
 </script>
 
 <style lang="scss" scoped>
