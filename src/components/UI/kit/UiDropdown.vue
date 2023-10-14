@@ -47,7 +47,7 @@
 
         <li
           v-if="filteredOptions.length === 0"
-          class="ui-select__element"
+          class="ui-select__element ui-select__element--empty"
         >
           Боги не знают ответа на твой запрос
         </li>
@@ -187,6 +187,7 @@
   &__content {
     width: 100%;
     padding: 0;
+    margin: 0;
 
     &-wrapper {
       background: var(--bg-secondary);
@@ -194,7 +195,7 @@
       font-size: var(--main-font-size);
       line-height: var(--main-line-height);
       position: absolute;
-      height: calc(43.2px * 5);
+      max-height: calc(43.2px * 5);
       overflow: auto;
       bottom: auto;
       margin: 5px 0 0;
@@ -220,6 +221,7 @@
         background: transparent;
       }
     }
+
     &--selected {
       font-weight: 400;
       color: var(--text-color-active);
@@ -232,6 +234,13 @@
             background: var(--primary-hover);
           }
         }
+      }
+    }
+
+    &--empty {
+      cursor: default;
+      &:hover {
+        background: none  ;
       }
     }
   }
