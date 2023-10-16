@@ -58,7 +58,6 @@
   const container = ref<HTMLDivElement | null>(null);
   const input = ref<HTMLInputElement | null>(null);
   const isHovered = useElementHover(container);
-
   const { focused: inputFocus } = useFocus(input);
 
   const clearInput = () => {
