@@ -124,9 +124,10 @@
     background-color: inherit;
     color: var(--text-color);
     width: 100%;
-    font-size: 14px;
+    font-size: var(--main-font-size);
+    line-height: var(--main-line-height);
     @include media-min($lg) {
-      font-size: 16px;
+      font-size: calc(var(--main-font-size) + 2px);
     }
   }
 
