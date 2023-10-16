@@ -24,7 +24,7 @@
         type="button"
         :class="[$style.icon]"
         :disabled="disabled"
-        @click="clearInput"
+        @click.prevent="clearInput"
       >
         <svg-icon icon="close" />
       </button>
@@ -33,7 +33,7 @@
         type="button"
         :class="$style.icon"
         :disabled="disabled"
-        @click="props.onSearch"
+        @click.prevent="handleSearch"
       >
         <svg-icon icon="search" />
       </button>
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
   import { useElementHover, useFocus } from '@vueuse/core';
+  import { debounce } from 'lodash-es';
   import { ref, toRefs, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
@@ -71,6 +72,8 @@
   const clearInput = () => {
     inputValue.value = '';
   };
+
+  const handleSearch = debounce(props.onSearch, 300);
 
   watch(isFocused, () => {
     inputFocus.value = isFocused.value;
