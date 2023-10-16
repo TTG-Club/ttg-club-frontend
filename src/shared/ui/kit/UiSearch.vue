@@ -66,11 +66,11 @@
 </script>
 
 <style lang="scss" module>
-  .focused {
+  .ui-search.focused {
     border-color: var(--primary);
   }
 
-  .hovered {
+  .ui-search.hovered {
     border-color: var(--border-hover);
   }
 
