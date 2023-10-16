@@ -18,11 +18,12 @@
   import { onKeyStroke, useActiveElement } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
 
+  import SearchModal from '@/pages/Search/SearchModal.vue';
+
   import NavPopover from '@/features/menu/NavPopover.vue';
 
   import { useNavStore } from '@/shared/stores/NavStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import SearchModal from '@/shared/ui/modals/SearchModal.vue';
 
   const navStore = useNavStore();
   const { isShowSearch } = storeToRefs(navStore);

@@ -26,6 +26,11 @@ class HTTPService {
     });
 
     this.instance.interceptors.request.use(req => {
+      // eslint-disable-next-line no-param-reassign
+      req.paramsSerializer = {
+        indexes: null
+      };
+
       if (Cookies.get(USER_TOKEN_COOKIE)) {
         // eslint-disable-next-line no-param-reassign
         req.headers.Authorization = `Bearer ${Cookies.get(USER_TOKEN_COOKIE)}`;

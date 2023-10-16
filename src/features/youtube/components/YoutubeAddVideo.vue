@@ -83,7 +83,7 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { YoutubeApi } from '@/features/youtube/api';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';

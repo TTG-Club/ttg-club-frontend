@@ -94,7 +94,7 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 

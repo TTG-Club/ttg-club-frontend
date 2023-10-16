@@ -1,8 +1,8 @@
 <template>
   <form
     class="change-password form"
-    @keyup.enter.exact.prevent="onSubmit"
     @submit.prevent="onSubmit"
+    @keyup.enter.prevent.stop
   >
     <div
       :class="{ 'is-hidden': isOnlyPassword }"
@@ -88,7 +88,7 @@
   import { useRouter } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import {
     validateEmailFormat,

@@ -36,7 +36,7 @@
 
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
 
   export default {
     components: {

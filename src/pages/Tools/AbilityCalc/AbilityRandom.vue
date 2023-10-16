@@ -57,7 +57,7 @@
   import { computed, defineComponent, onActivated, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useDiceRoller } from '@/shared/compositions/useDiceRoller';
   import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';

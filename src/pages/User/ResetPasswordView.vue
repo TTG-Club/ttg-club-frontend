@@ -26,11 +26,12 @@
   import { computed, defineComponent, onBeforeMount, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
+  import PageLayout from '@/layouts/PageLayout.vue';
+
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { useUserStore } from '@/shared/stores/UserStore';
-  import PageLayout from '@/shared/ui/content/PageLayout.vue';
 
   interface ITokenValidation {
     correct: boolean;

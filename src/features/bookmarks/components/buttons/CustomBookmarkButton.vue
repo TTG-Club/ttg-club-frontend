@@ -34,7 +34,7 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.d';

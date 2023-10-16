@@ -116,11 +116,12 @@
 
   import SearchLink from '@/pages/Search/SearchLink.vue';
 
+  import PageLayout from '@/layouts/PageLayout.vue';
+
   import { useAxios } from '@/shared/compositions/useAxios';
   import { useMetrics } from '@/shared/compositions/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TSearchResultList } from '@/shared/types/Search/Search.d';
-  import PageLayout from '@/shared/ui/content/PageLayout.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';

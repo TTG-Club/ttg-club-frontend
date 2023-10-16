@@ -32,10 +32,13 @@
   <base-modal
     v-if="modal.data"
     v-model="modal.show"
-    :bookmark="bookmarkObj"
   >
     <template #title>
       {{ screen.name.rus }}
+    </template>
+
+    <template #topButtons>
+      <bookmark-save-button v-bind="bookmarkObj" />
     </template>
 
     <template #default>
@@ -50,6 +53,8 @@
 
   import ScreenBody from '@/pages/Workshop/Screens/ScreenBody.vue';
 
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
   import { useAxios } from '@/shared/compositions/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import type { Maybe } from '@/shared/types/Utility';
@@ -57,14 +62,15 @@
     IScreenItem,
     IScreenLink
   } from '@/shared/types/Workshop/Screens.d';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { PropType } from 'vue';
   import type { RouteLocationPathRaw } from 'vue-router';
 
   export default defineComponent({
     components: {
+      BookmarkSaveButton,
       ScreenBody,
       BaseModal,
       RawContent
