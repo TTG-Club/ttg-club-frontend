@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
   import { useElementHover, useFocus } from '@vueuse/core';
-  import { ref, toRefs } from 'vue';
+  import { ref, toRefs, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
@@ -44,25 +44,30 @@
     defineProps<{
       disabled: boolean;
       placeholder: string;
+      isFocused: boolean;
     }>(),
     {
       disabled: false,
-      placeholder: 'Поиск...'
+      placeholder: 'Поиск...',
+      isFocused: false
     }
   );
 
-  const { disabled, placeholder } = toRefs(props);
-
+  const { disabled, placeholder, isFocused } = toRefs(props);
   const inputValue = defineModel<string>({ required: true });
   const container = ref<HTMLDivElement | null>(null);
   const input = ref<HTMLInputElement | null>(null);
   const isHovered = useElementHover(container);
 
-  const { focused: inputFocus } = useFocus(input, { initialValue: false });
+  const { focused: inputFocus } = useFocus(input);
 
   const clearInput = () => {
     inputValue.value = '';
   };
+
+  watch(isFocused, () => {
+    if (isFocused.value) inputFocus.value = true;
+  });
 </script>
 
 <style lang="scss" module>
