@@ -19,17 +19,24 @@
     />
 
     <div :class="$style.container">
-      <span
+      <button
         v-show="inputValue.length > 0"
-        :class="[$style.icon, $style['cursor-pointer']]"
+        type="button"
+        :class="[$style.icon]"
+        :disabled="disabled"
         @click="clearInput"
       >
         <svg-icon icon="close" />
-      </span>
+      </button>
 
-      <span :class="$style.icon">
+      <button
+        type="button"
+        :class="$style.icon"
+        :disabled="disabled"
+        @click="props.onSearch"
+      >
         <svg-icon icon="search" />
-      </span>
+      </button>
     </div>
   </div>
 </template>
@@ -42,9 +49,10 @@
 
   const props = withDefaults(
     defineProps<{
-      disabled: boolean;
-      placeholder: string;
-      isFocused: boolean;
+      disabled?: boolean;
+      placeholder?: string;
+      isFocused?: boolean;
+      onSearch: () => void;
     }>(),
     {
       disabled: false,
@@ -65,7 +73,7 @@
   };
 
   watch(isFocused, () => {
-    if (isFocused.value) inputFocus.value = true;
+    inputFocus.value = isFocused.value;
   });
 </script>
 
@@ -78,18 +86,17 @@
     border-color: var(--border-hover);
   }
 
-  .cursor-pointer {
-    cursor: pointer;
-  }
-
-  .disabled {
-    opacity: 0.6;
+  .ui-search.disabled {
+    button {
+      cursor: default;
+    }
   }
 
   .ui-search {
     min-width: 230px;
     width: 280px;
     background-color: var(--bg-sub-menu);
+    color: var(--text-color);
     padding: 8px 8px;
     height: fit-content;
     border-radius: 8px;
@@ -114,6 +121,13 @@
       padding: 16px 16px;
       border-radius: 16px;
     }
+    button {
+      padding: 0;
+      color: inherit;
+      svg {
+        color: var(--text-g-color);
+      }
+    }
   }
 
   .input {
@@ -121,7 +135,7 @@
     border: none;
     outline: none;
     background-color: inherit;
-    color: var(--text-color);
+    color: inherit;
     width: 100%;
     font-size: var(--main-font-size);
     line-height: var(--main-line-height);
