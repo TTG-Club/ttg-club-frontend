@@ -87,6 +87,7 @@
   }
 
   .ui-search.disabled {
+    opacity: 0.6;
     button {
       cursor: default;
     }
