@@ -3,9 +3,9 @@
     ref="container"
     :class="{
       [$style['ui-search']]: true,
-      [$style['focused']]: inputFocus,
-      [$style['hovered']]: !disabled && isHovered,
-      [$style['disabled']]: disabled
+      [$style.focused]: inputFocus,
+      [$style.hovered]: !disabled && isHovered,
+      [$style.disabled]: disabled
     }"
     @click="inputFocus = true"
   >
@@ -14,23 +14,20 @@
       v-model="inputValue"
       :placeholder="placeholder"
       :disabled="disabled"
-      :class="$style['ui-search__input']"
+      :class="$style.input"
       @click="inputFocus = true"
     />
 
-    <div :class="$style['ui-search__container']">
+    <div :class="$style.container">
       <span
         v-show="inputValue.length > 0"
-        :class="[
-          $style['ui-search__container--icon'],
-          $style['cursor-pointer']
-        ]"
+        :class="[$style.icon, $style['cursor-pointer']]"
         @click="clearInput"
       >
         <svg-icon icon="close" />
       </span>
 
-      <span :class="$style['ui-search__container--icon']">
+      <span :class="$style.icon">
         <svg-icon icon="search" />
       </span>
     </div>
@@ -38,36 +35,30 @@
 </template>
 
 <script setup lang="ts">
-  import { useElementHover, useFocus, useVModel } from '@vueuse/core';
-  import { ref } from 'vue';
+  import { useElementHover, useFocus } from '@vueuse/core';
+  import { ref, toRefs } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
-  type Emit = {
-    (e: 'update:modelValue', value: string): void;
-  };
-
-  const emit = defineEmits<Emit>();
-
   const props = withDefaults(
     defineProps<{
-      modelValue: string;
       disabled: boolean;
       placeholder: string;
     }>(),
     {
-      modelValue: '',
       disabled: false,
-      placeholder: 'Placeholder'
+      placeholder: 'Поиск...'
     }
   );
 
-  const { disabled, placeholder } = props;
+  const { disabled, placeholder } = toRefs(props);
+
+  const inputValue = defineModel<string>({ required: true });
   const container = ref<HTMLDivElement | null>(null);
   const input = ref<HTMLInputElement | null>(null);
   const isHovered = useElementHover(container);
+
   const { focused: inputFocus } = useFocus(input, { initialValue: false });
-  const inputValue = useVModel(props, 'modelValue', emit);
 
   const clearInput = () => {
     inputValue.value = '';
@@ -75,11 +66,11 @@
 </script>
 
 <style lang="scss" module>
-  .ui-search.focused {
-    border-color: var(--border-active);
+  .focused {
+    border-color: var(--primary);
   }
 
-  .ui-search.hovered {
+  .hovered {
     border-color: var(--border-hover);
   }
 
@@ -119,33 +110,32 @@
       padding: 16px 16px;
       border-radius: 16px;
     }
+  }
 
-    &__input {
-      padding: 0;
-      border: none;
-      outline: none;
-      background-color: inherit;
-      color: var(--text-color);
-      width: 100%;
-      font-size: 14px;
-      @include media-min($lg) {
-        font-size: 16px;
-      }
+  .input {
+    padding: 0;
+    border: none;
+    outline: none;
+    background-color: inherit;
+    color: var(--text-color);
+    width: 100%;
+    font-size: 14px;
+    @include media-min($lg) {
+      font-size: 16px;
     }
+  }
 
-    &__container {
-      display: flex;
-      align-items: center;
-
-      &--icon {
-        svg {
-          width: 20px;
-          height: 20px;
-          @include media-min($md) {
-            width: 24px;
-            height: 24px;
-          }
-        }
+  .container {
+    display: flex;
+    align-items: center;
+  }
+  .icon {
+    svg {
+      width: 20px;
+      height: 20px;
+      @include media-min($md) {
+        width: 24px;
+        height: 24px;
       }
     }
   }
