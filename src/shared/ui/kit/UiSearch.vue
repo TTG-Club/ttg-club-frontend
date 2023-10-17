@@ -27,7 +27,7 @@
       <button
         v-show="inputValue.length > 0"
         type="button"
-        :class="[$style.icon]"
+        :class="$style.button"
         :disabled="disabled"
         @click.prevent="clearInput"
       >
@@ -36,7 +36,7 @@
 
       <button
         type="button"
-        :class="$style.icon"
+        :class="$style.button"
         :disabled="disabled"
         @click.prevent="handleSearch"
       >
@@ -140,9 +140,11 @@
       padding: 16px 16px;
       border-radius: 16px;
     }
+
     button {
       padding: 0;
       color: inherit;
+
       svg {
         color: var(--text-g-color);
       }
@@ -158,6 +160,7 @@
     width: 100%;
     font-size: var(--main-font-size);
     line-height: var(--main-line-height);
+
     @include media-min($lg) {
       font-size: calc(var(--main-font-size) + 2px);
     }
@@ -167,10 +170,12 @@
     display: flex;
     align-items: center;
   }
-  .icon {
+
+  .button {
     svg {
       width: 20px;
       height: 20px;
+
       @include media-min($md) {
         width: 24px;
         height: 24px;
