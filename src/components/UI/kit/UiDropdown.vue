@@ -36,12 +36,13 @@
       <ul class="ui-select__content">
         <li
           v-for="option in filteredOptions"
-          :key="option.url"
+          :id="option.value"
+          :key="option.value"
           class="ui-select__element"
           @click="selectOption($event)"
         >
           <span class="ui-select__option">
-            {{ option.name.rus }}
+            {{ option.name }}
           </span>
         </li>
 
@@ -61,10 +62,15 @@
     computed, ref, watch
   } from 'vue';
   import { onClickOutside } from '@vueuse/core';
+  import { xor } from 'lodash';
   import UiInput from '@/components/UI/kit/UiInput.vue';
   import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
 
   const props = defineProps({
+    modelValue: {
+      type: String,
+      default: ''
+    },
     placeholder: {
       type: String,
       default: ''
@@ -75,10 +81,13 @@
     }
   });
 
+  const emits = defineEmits(['update:model-value']);
+
   const input = ref(null);
   const dropdownHeader = ref(null);
   const focused = ref<Boolean>(false);
   const filter = ref<String>('');
+  const selectedOptions = ref([]);
 
   onClickOutside(dropdownHeader, () => {
     focused.value = false;
@@ -110,6 +119,9 @@
     }
 
     el.classList.toggle('ui-select__element--selected');
+
+    selectedOptions.value = xor(selectedOptions.value, [el.id]);
+    emits('update:model-value', selectedOptions);
   };
 
   const onSearch = (e: string) => {
@@ -127,7 +139,7 @@
       return el;
     }
 
-    return el.name.rus.toLowerCase().includes(filter.value);
+    return el.name.toLowerCase().includes(filter.value);
   }));
 </script>
 

@@ -1,7 +1,13 @@
 <template>
   <ui-dropdown
     placeholder="Выбрать расу"
-    :options="races"
+    :options="races.map(el => {
+      return {
+        name: el.name.rus,
+        value: el.url,
+      }
+    })"
+    @update:model-value="onSelectRace"
   >
     <template #label>
       Расы
