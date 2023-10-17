@@ -1,9 +1,11 @@
 .DS_Store
+
+# Generated files and dirs
 node_modules
 /dist
 /public_html
 
-# local env files
+# Local env files
 .env.local
 .env.*.local
 

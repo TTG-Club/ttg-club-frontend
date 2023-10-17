@@ -1,0 +1,35 @@
+@use 'sass:map';
+@use 'sass:string';
+@use 'variables' as *;
+
+// Генерация CSS переменных на основе переменных SCSS.
+// Обход по темам.
+@each $theme-name in map.keys($theme-colors) {
+  $theme: map.get($theme-colors, $theme-name);
+  $is-name-success: string.length($theme-name) > 0;
+
+  :root#{if($is-name-success, '[data-theme="theme-#{$theme-name}"]', '')} {
+    // Обход по цветам в теме
+    @each $name, $color in $theme {
+      --#{$name}: #{$color};
+    }
+
+    // Background image
+    --bg-img: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-main-hall.webp');
+  }
+}
+
+:root {
+  --max-vh: 100vh;
+  --max-content: 1320px;
+
+  // Backgrounds
+  --bg-img-bestiary-forest: url('/img/bg-forest.webp');
+  --bg-img-bard: url('/img/bg-bard.webp');
+
+  // Safe area
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-left: env(safe-area-inset-left);
+  --safe-area-inset-right: env(safe-area-inset-right);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+}

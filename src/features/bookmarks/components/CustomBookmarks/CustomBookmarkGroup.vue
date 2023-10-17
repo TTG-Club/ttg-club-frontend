@@ -23,20 +23,18 @@
         class="bookmarks__group_icon is-right"
         @click.left.exact.prevent.stop="enableCategoryCreating"
       >
-        <svg-icon
-          icon="plus"
-        />
+        <svg-icon icon="plus" />
       </div>
 
       <div
         v-if="!isMobile || (isMobile && isEdit)"
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__group_icon is-right"
-        @click.left.exact.prevent.stop="customBookmarkStore.queryDeleteBookmark(group.uuid)"
+        @click.left.exact.prevent.stop="
+          customBookmarkStore.queryDeleteBookmark(group.uuid)
+        "
       >
-        <svg-icon
-          icon="close"
-        />
+        <svg-icon icon="close" />
       </div>
     </div>
 
@@ -95,20 +93,24 @@
 </template>
 
 <script lang="ts">
-  import type { PropType } from 'vue';
-  import {
-    computed, defineComponent, onBeforeMount, ref
-  } from 'vue';
-  import draggableComponent from 'vuedraggable';
   import { storeToRefs } from 'pinia';
-  import UiInput from '@/components/UI/kit/UiInput.vue';
-  import UiButton from '@/components/UI/kit/button/UiButton.vue';
+  import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+  import draggableComponent from 'vuedraggable';
+
   import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
-  import { useUIStore } from '@/store/UI/UIStore';
-  import SvgIcon from '@/components/UI/icons/SvgIcon.vue';
-  import type { IBookmarkCategory, IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.types';
-  import type { WithChildren } from '@/types/Shared/Utility.types';
+  import type {
+    IBookmarkCategory,
+    IBookmarkGroup
+  } from '@/features/bookmarks/types/Bookmark.d';
+
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import type { WithChildren } from '@/shared/types/Utility';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+
+  import type { PropType } from 'vue';
 
   export default defineComponent({
     components: {
@@ -120,7 +122,9 @@
     },
     props: {
       group: {
-        type: Object as PropType<WithChildren<IBookmarkGroup, IBookmarkCategory>>,
+        type: Object as PropType<
+          WithChildren<IBookmarkGroup, IBookmarkCategory>
+        >,
         required: true
       },
       isFirst: {
@@ -140,7 +144,9 @@
       const { openedGroups } = storeToRefs(customBookmarkStore);
       const { isMobile } = storeToRefs(uiStore);
 
-      const isOpened = computed(() => customBookmarkStore.isGroupOpened(props.group.uuid));
+      const isOpened = computed(() =>
+        customBookmarkStore.isGroupOpened(props.group.uuid)
+      );
 
       const enableCategoryCreating = () => {
         if (props.group.order > -1) {
@@ -164,16 +170,16 @@
         disableCategoryCreating();
       };
 
-      const updateBookmark = async (change: { element: { uuid: any; name: any; }; newIndex: any; }) => {
+      const updateBookmark = async (change: {
+        element: { uuid: any; name: any };
+        newIndex: any;
+      }) => {
         if (!change) {
           return;
         }
 
         const {
-          element: {
-            uuid,
-            name
-          },
+          element: { uuid, name },
           newIndex: order
         } = change;
 
@@ -185,11 +191,8 @@
         });
       };
 
-      const onChangeHandler = async (e: { added: any; moved: any; }) => {
-        const {
-          added,
-          moved
-        } = e;
+      const onChangeHandler = async (e: { added: any; moved: any }) => {
+        const { added, moved } = e;
 
         await updateBookmark(added || moved);
       };
@@ -223,6 +226,4 @@
   });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
