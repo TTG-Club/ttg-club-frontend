@@ -9,6 +9,11 @@
     }"
     @click="inputFocus = true"
   >
+    <div
+      v-if="disabled"
+      :class="$style.wrapper"
+    />
+
     <input
       ref="input"
       v-model="inputValue"
@@ -90,13 +95,23 @@
   }
 
   .ui-search.disabled {
-    opacity: 0.6;
     button {
       cursor: default;
     }
   }
 
+  .wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-light-main);
+  }
+
   .ui-search {
+    position: relative;
+    overflow: hidden;
     min-width: 230px;
     width: 280px;
     background-color: var(--bg-sub-menu);
