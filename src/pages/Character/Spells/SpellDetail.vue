@@ -9,6 +9,7 @@
         bookmark
         print
         @close="close"
+        @export-foundry="exportFoundry"
       />
     </template>
 
@@ -28,6 +29,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import { downloadByUrl } from '@/shared/helpers/download';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -79,6 +81,18 @@
         } finally {
           this.loading = false;
           this.abortController = null;
+        }
+      },
+
+      exportFoundry() {
+        if (!this.spell) {
+          return Promise.reject();
+        }
+
+        try {
+          return downloadByUrl(`/api/fvtt/v1/spell/${this.spell.id}`);
+        } catch (err) {
+          return Promise.reject(err);
         }
       },
 
