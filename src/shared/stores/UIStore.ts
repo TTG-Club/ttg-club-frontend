@@ -10,9 +10,11 @@ import {
   THEME_DB_KEY
 } from '@/shared/constants/UI';
 import { errorHandler } from '@/shared/helpers/errorHandler';
+import { ThemePreference } from '@/shared/types/Theme';
 
 export const useUIStore = defineStore('UIStore', () => {
   const theme = ref('');
+  const themePreference = ref('');
   const fullscreen = ref(false);
 
   const bodyElement = ref<HTMLElement | null>(
@@ -112,6 +114,10 @@ export const useUIStore = defineStore('UIStore', () => {
     updateThemeMeta();
   };
 
+  const setThemePreference = (preference: ThemePreference) => {
+    console.log('preference', preference);
+  };
+
   const restoreFullscreenState = async () => {
     try {
       await store.ready();
@@ -164,6 +170,7 @@ export const useUIStore = defineStore('UIStore', () => {
 
   return {
     theme,
+    themePreference,
     fullscreen,
     bodyElement,
 
@@ -174,6 +181,7 @@ export const useUIStore = defineStore('UIStore', () => {
     getCookieTheme,
     removeOldTheme,
     setTheme,
+    setThemePreference,
     restoreFullscreenState,
     updateFullscreen,
     toggleFullscreen
