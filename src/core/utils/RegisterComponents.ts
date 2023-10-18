@@ -9,6 +9,7 @@ import DiceRoller from '@/shared/ui/DiceRoller.vue';
 import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
 import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 import RawContent from '@/shared/ui/RawContent.vue';
+import RollTable from '@/shared/ui/RollTable.vue';
 import SocialLinks from '@/shared/ui/SocialLinks.vue';
 
 import type { App } from 'vue';
@@ -26,5 +27,6 @@ export default function registerComponents(app: App) {
   app.component('ChangePasswordView', ChangePasswordView);
   app.component('PageLayout', PageLayout);
   app.component('SocialLinks', SocialLinks);
+  app.component('RollTable', RollTable);
 }
 /* eslint-enable vue/match-component-file-name */
