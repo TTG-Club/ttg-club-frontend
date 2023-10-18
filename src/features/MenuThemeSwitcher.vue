@@ -3,9 +3,9 @@
     <template #trigger="{ isActive }">
       <div @click="popover = !popover">
         <div
-          class="navbar__btn"
           :class="{
-            ['is-active']: isActive
+            [$style.navbar__btn]: true,
+            [$style['is-active']]: isActive
           }"
         >
           <svg-icon :icon="`theme/${uiStore.theme}`" />
@@ -14,45 +14,48 @@
     </template>
 
     <template #default>
-      <div class="theme__container">
-        <div class="title">
-          <span class="text"> Тема </span>
+      <div :class="$style.theme__container">
+        <div :class="$style.title">
+          <span :class="$style.text"> Тема </span>
         </div>
 
-        <div class="theme__wrapper">
+        <div :class="$style.theme__wrapper">
           <button
             type="button"
-            class="button"
             :class="{
-              selected: uiStore.themePreference === ThemePreference.auto
+              [$style.button]: true,
+              [$style.selected]:
+                uiStore.themePreference === ThemePreference.auto
             }"
             @click.left.exact.prevent="setThemePreference(ThemePreference.auto)"
           >
-            <span class="text"> Авто </span>
+            <span :class="$style.text"> Авто </span>
           </button>
 
           <button
             type="button"
-            class="button"
             :class="{
-              selected: uiStore.themePreference === ThemePreference.light
+              [$style.button]: true,
+              [$style.selected]:
+                uiStore.themePreference === ThemePreference.light
             }"
             @click.left.exact.prevent="
               setThemePreference(ThemePreference.light)
             "
           >
-            <span class="text"> Светлая </span>
+            <span :class="$style.text"> Светлая </span>
           </button>
 
           <button
             type="button"
-            class="button"
             :class="{
-              selected: uiStore.themePreference === ThemePreference.dark
+              [$style.button]: true,
+              [$style.selected]:
+                uiStore.themePreference === ThemePreference.dark
             }"
             @click.left.exact.prevent="setThemePreference(ThemePreference.dark)"
           >
-            <span class="text"> Тёмная </span>
+            <span :class="$style.text"> Тёмная </span>
           </button>
         </div>
       </div>
@@ -79,10 +82,7 @@
   };
 </script>
 
-<style lang="scss" scoped>
-  .navbar__header_right .nav-popover__body {
-    width: fit-content;
-  }
+<style lang="scss" module>
   .navbar__btn {
     @include css_anim();
 
@@ -103,43 +103,41 @@
   .theme__container {
     width: 100vw;
     max-width: 300px;
+  }
+  .title {
+    @include css_anim();
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: var(--bg-sub-menu);
+    color: var(--text-color-title);
+    cursor: default;
+  }
 
-    .title {
-      @include css_anim();
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      background-color: var(--bg-sub-menu);
-      cursor: default;
-      .text {
-        padding: 12px;
-        color: var(--text-color-title);
-      }
-    }
+  .text {
+    padding: 12px;
+    color: inherit;
   }
 
   .theme__wrapper {
     display: flex;
     padding: 10px;
     gap: 8px;
-    .button {
-      @include css_anim();
-      width: 85px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-color-title);
-      background-color: var(--bg-transparent);
+  }
 
-      &:hover {
-        border-color: var(--primary-hover);
-      }
-      .text {
-        color: inherit;
-      }
+  .button {
+    @include css_anim();
+    width: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-color-title);
+    background-color: var(--bg-transparent);
+
+    &:hover {
+      border-color: var(--primary-hover);
     }
   }
 
