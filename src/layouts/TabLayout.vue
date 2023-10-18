@@ -88,6 +88,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .tab-layout {
     width: 100%;
     height: 100%;

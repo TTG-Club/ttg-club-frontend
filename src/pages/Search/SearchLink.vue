@@ -90,6 +90,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .search-link {
     display: block;
     color: var(--text-color-title);

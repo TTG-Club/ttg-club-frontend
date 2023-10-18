@@ -235,7 +235,8 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../assets/styles/modules/link-item-expand';
+  @use '@/assets/styles/modules/link-item-expand' as *;
+  @use '@/assets/styles/variables/breakpoints' as *;
 
   .link-item-expand {
     &__main {

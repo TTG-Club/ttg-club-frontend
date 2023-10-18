@@ -159,6 +159,8 @@
 </script>
 
 <style lang="scss" module>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .modal {
   }
 

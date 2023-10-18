@@ -17,6 +17,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .icon-toast-close {
     @include css_anim();
 

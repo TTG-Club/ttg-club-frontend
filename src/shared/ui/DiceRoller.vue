@@ -121,6 +121,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .dice-roller {
     @include css_anim();
 

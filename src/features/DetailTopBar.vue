@@ -61,6 +61,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .row_info {
     display: flex;
     padding: 12px;

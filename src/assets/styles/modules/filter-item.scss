@@ -1,3 +1,6 @@
+@use '@/assets/styles/variables/breakpoints' as *;
+@use '@/assets/styles/variables/mixins' as *;
+
 .filter-item {
   width: 100%;
   overflow: hidden;

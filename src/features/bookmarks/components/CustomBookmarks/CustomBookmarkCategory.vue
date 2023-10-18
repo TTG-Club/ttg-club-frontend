@@ -17,7 +17,7 @@
         :class="{ 'only-hover': !isMobile }"
         class="bookmarks__cat_label_icon is-right"
         @click.left.exact.prevent="
-          customBookmarkStore.queryDeleteBookmark(category.uuid)
+          customBookmarkStore.queryDeleteBookmark(category)
         "
       >
         <svg-icon icon="close" />
@@ -66,7 +66,7 @@
               :class="{ 'only-hover': !isMobile }"
               class="bookmarks__item_icon is-right"
               @click.left.exact.prevent="
-                customBookmarkStore.queryDeleteBookmark(bookmark.uuid)
+                customBookmarkStore.queryDeleteBookmark(bookmark)
               "
             >
               <svg-icon icon="close" />

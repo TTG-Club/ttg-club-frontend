@@ -1,8 +1,5 @@
 <template>
-  <tippy
-    theme="dnd5club no-padding"
-    v-bind="tippyConfig"
-  >
+  <tippy v-bind="tippyConfig">
     <template #default>
       <slot name="default" />
     </template>
@@ -14,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-  import { cloneDeep, omit } from 'lodash-es';
+  import { cloneDeep } from 'lodash-es';
   import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
@@ -35,6 +32,7 @@
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import RawContent from '@/shared/ui/RawContent.vue';
 
+  import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';
 
   type TDetailType =
@@ -123,8 +121,8 @@
     return true;
   };
 
-  const tippyConfig = computed(() => {
-    const config = omit(cloneDeep(DefaultTippyProps), 'theme');
+  const tippyConfig = computed<DefaultProps>(() => {
+    const config = cloneDeep<DefaultProps>(DefaultTippyProps);
 
     config.onTrigger = () => getContent();
 

@@ -1,5 +1,8 @@
+import localforage from 'localforage';
 import { cloneDeep, sortBy } from 'lodash-es';
+import { useModal } from 'vue-final-modal';
 
+import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 import type {
   IBookmarkCategory,
   IBookmarkGroup,
@@ -7,6 +10,7 @@ import type {
   TBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
 
+import { DB_NAME } from '@/shared/constants/UI';
 import type { WithChildren } from '@/shared/types/Utility';
 
 import type { Ref } from 'vue';
@@ -20,6 +24,11 @@ export const isBookmarkCategory = (
 
 export const isBookmarkGroup = (item: TBookmark): item is IBookmarkGroup =>
   !('url' in item) && !('parentUUID' in item);
+
+const storage = localforage.createInstance({
+  name: DB_NAME,
+  storeName: 'bookmarks'
+});
 
 /**
  * Метод обходит все группы, добавляет в них поле children и кладет туда категории (заклинания, классы, черты и т.д.).
@@ -104,4 +113,37 @@ export const setBookmarks = ({
   categories.value = cloneDeep(newCategories);
   // eslint-disable-next-line no-param-reassign
   bookmarks.value = cloneDeep(newBookmarks);
+};
+
+export const isBookmarkRemoveAvailable = async (bookmark: TBookmark) => {
+  try {
+    await storage.ready();
+
+    if (await storage.getItem<boolean>('dont_ask_again')) {
+      return true;
+    }
+
+    return new Promise<boolean>(resolve => {
+      const { open, close } = useModal({
+        component: BookmarkRemoveConfirmationModal,
+        attrs: {
+          bookmark,
+          onConfirm: async () => {
+            await close();
+
+            resolve(true);
+          },
+          onClose: async () => {
+            await close();
+
+            resolve(false);
+          }
+        }
+      });
+
+      open();
+    });
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };

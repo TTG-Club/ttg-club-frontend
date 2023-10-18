@@ -438,6 +438,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ability-races {
     display: flex;
     gap: 32px;

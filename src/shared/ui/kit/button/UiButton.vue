@@ -271,6 +271,8 @@
 </script>
 
 <style lang="scss" module>
+  @use '@/assets/styles/variables/mixins' as *;
+
   $radius: 8px;
 
   :root {

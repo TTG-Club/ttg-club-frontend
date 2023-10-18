@@ -95,6 +95,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .page-layout {
     display: flex;
     min-height: 100%;

@@ -228,5 +228,5 @@
 <style
   lang="scss"
   scoped
-  src="../../../assets/styles/modules/link-item-expand.scss"
+  src="@/assets/styles/modules/link-item-expand.scss"
 ></style>

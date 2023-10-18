@@ -188,7 +188,7 @@ blockquote {
   margin-top: 32px;
   border-bottom: 1px solid;
   border-color: var(--border);
-  padding: 6px 0px;
+  padding: 6px 0;
 }
 
 h5.header_separator {
@@ -197,10 +197,7 @@ h5.header_separator {
 }
 
 .filter_crumbs_box .header_separator {
-  margin-left: 4px;
-  margin-right: 4px;
-  margin-bottom: 4px;
-  margin-top: 16px;
+  margin: 16px 4px 4px;
   font-weight: 400;
 }
 
@@ -384,10 +381,7 @@ details[open].spoiler > summary.h4 {
   margin: 0 0 4px 0;
   padding: 8px 8px;
   background: var(--hover);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+  border-radius: 8px 8px 0 0;
 }
 
 details[open].spoiler > summary::after {
