@@ -24,7 +24,9 @@
 
   @each $property in $item {
     $transition: append(
-        $transition, ($property $time $style), $separator: comma
+      $transition,
+      ($property $time $style),
+      $separator: comma
     );
   }
 
