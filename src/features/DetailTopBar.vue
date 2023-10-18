@@ -29,7 +29,9 @@
         >Homebrew</span
       >
 
-      <span v-tippy="{ content: source.name }"
+      <span
+        v-tippy="{ touch: true }"
+        :content="source.name"
         >&nbsp;{{ source.shortName }}</span
       >
     </span>

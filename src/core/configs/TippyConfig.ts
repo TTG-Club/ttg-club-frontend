@@ -9,7 +9,7 @@ export const DefaultTippyProps: DefaultProps = {
   interactive: true,
   hideOnClick: false,
   sticky: true,
-  touch: true,
+  touch: false,
   theme: 'dnd5club',
   strategy: 'fixed',
   maxWidth: 450,
