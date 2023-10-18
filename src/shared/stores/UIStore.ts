@@ -9,6 +9,7 @@ import {
   FULLSCREEN_DB_KEY,
   THEME_DB_KEY
 } from '@/shared/constants/UI';
+import { autoDetectTheme } from '@/shared/helpers/autoDetectTheme';
 import { errorHandler } from '@/shared/helpers/errorHandler';
 import { ThemePreference } from '@/shared/types/Theme';
 
@@ -16,6 +17,8 @@ export const useUIStore = defineStore('UIStore', () => {
   const theme = ref('');
   const themePreference = ref('');
   const fullscreen = ref(false);
+
+  let unsubscribe: any = null;
 
   const bodyElement = ref<HTMLElement | null>(
     document.getElementById('container')
@@ -41,9 +44,13 @@ export const useUIStore = defineStore('UIStore', () => {
 
   const getCookieTheme = () =>
     Cookies.get(THEME_DB_KEY) &&
-    ['light', 'dark'].includes(<string>Cookies.get(THEME_DB_KEY))
+    [
+      ThemePreference.auto,
+      ThemePreference.light,
+      ThemePreference.dark
+    ].includes(<ThemePreference>Cookies.get(THEME_DB_KEY))
       ? Cookies.get(THEME_DB_KEY)
-      : 'dark';
+      : ThemePreference.dark;
 
   const removeOldTheme = async () => {
     try {
@@ -98,24 +105,51 @@ export const useUIStore = defineStore('UIStore', () => {
     document.getElementsByTagName('head')[0].appendChild(el);
   };
 
-  const setTheme = ({ name = '', avoidHtmlUpdate = false }) => {
-    const themeName = name || 'dark';
-
-    theme.value = themeName;
-
-    Cookies.set(THEME_DB_KEY, themeName, {
-      expires: 365
-    });
+  const setTheme = ({
+    name,
+    avoidHtmlUpdate = false
+  }: {
+    name: ThemePreference;
+    avoidHtmlUpdate?: boolean;
+  }) => {
+    theme.value = name;
 
     if (!avoidHtmlUpdate) {
-      updateHTMLDataset(themeName);
+      updateHTMLDataset(name);
     }
 
     updateThemeMeta();
   };
 
-  const setThemePreference = (preference: ThemePreference) => {
-    console.log('preference', preference);
+  const listenSystemAppearance = (event: MediaQueryListEvent) =>
+    setTheme({
+      name: event.matches ? ThemePreference.dark : ThemePreference.light
+    });
+
+  const setThemePreference = (
+    preference: ThemePreference,
+    avoidHtmlUpdate = false
+  ) => {
+    themePreference.value = preference || ThemePreference.dark;
+
+    Cookies.set(THEME_DB_KEY, themePreference.value, {
+      expires: 365
+    });
+
+    if (themePreference.value === ThemePreference.auto) {
+      unsubscribe = autoDetectTheme(
+        (value: ThemePreference) => setTheme({ name: value, avoidHtmlUpdate }),
+        listenSystemAppearance
+      );
+
+      return;
+    }
+
+    if (unsubscribe) {
+      unsubscribe = unsubscribe();
+    }
+
+    setTheme({ name: preference, avoidHtmlUpdate });
   };
 
   const restoreFullscreenState = async () => {
