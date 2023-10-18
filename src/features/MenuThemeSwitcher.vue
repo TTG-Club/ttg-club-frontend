@@ -1,5 +1,8 @@
 <template>
-  <nav-popover v-model="popover">
+  <nav-popover
+    v-model="popover"
+    :body-style="{ width: 'fit-content' }"
+  >
     <template #trigger="{ isActive }">
       <div @click="popover = !popover">
         <div

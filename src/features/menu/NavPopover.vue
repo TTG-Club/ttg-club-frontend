@@ -23,6 +23,7 @@
         v-if="isShow"
         :class="classes"
         class="nav-popover__body"
+        :style="bodyStyle"
       >
         <slot
           :close="onClose"
@@ -46,12 +47,14 @@
       isMenu?: boolean;
       isLeft?: boolean;
       innerScroll?: boolean;
+      bodyStyle?: any;
     }>(),
     {
       modelValue: false,
       isMenu: false,
       isLeft: false,
-      innerScroll: false
+      innerScroll: false,
+      bodyStyle: {}
     }
   );
 
