@@ -275,7 +275,7 @@
 
   $radius: 8px;
 
-  :root {
+  html {
     --btn-primary: var(--primary);
     --btn-success: var(--success);
     --btn-error: var(--error);

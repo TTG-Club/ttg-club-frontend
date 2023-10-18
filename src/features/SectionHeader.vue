@@ -67,13 +67,13 @@
       <ui-button
         v-if="fullscreen"
         v-tippy="{
-          content: uiStore.fullscreen ? 'Свернуть окно' : 'Развернуть окно'
+          content: fullscreenState ? 'Свернуть окно' : 'Развернуть окно'
         }"
         class="section-header__control is-only-desktop"
-        :icon="`expand/${uiStore.fullscreen ? 'exit' : 'enter'}`"
+        :icon="`expand/${fullscreenState ? 'exit' : 'enter'}`"
         type="text"
         color="text"
-        @click.left.exact.prevent.stop="toggleFullscreen"
+        @click.left.exact.prevent.stop="fullscreenState = !fullscreenState"
       />
 
       <ui-button
@@ -90,6 +90,7 @@
 
 <script setup lang="ts">
   import { useClipboard } from '@vueuse/core';
+  import { storeToRefs } from 'pinia';
   import { computed, h } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
@@ -139,7 +140,7 @@
   const clipboard = useClipboard();
   const { sendShareMetrics } = useMetrics();
   const toast = useToast(ToastEventBus);
-  const { toggleFullscreen } = uiStore;
+  const { fullscreen: fullscreenState } = storeToRefs(uiStore);
 
   const urlForCopy = computed(() => window.location.origin + route.path);
 

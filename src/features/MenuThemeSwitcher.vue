@@ -6,7 +6,7 @@
           class="navbar__btn"
           :class="{ 'is-active': isActive }"
         >
-          <svg-icon :icon="`theme/${uiStore.theme}`" />
+          <svg-icon :icon="`theme/${theme}`" />
         </div>
       </div>
     </template>
@@ -19,22 +19,20 @@
 
         <div :class="$style.wrapper">
           <ui-button
-            :type="getButtonType(ThemePreference.auto)"
-            @click.left.exact.prevent="setThemePreference(ThemePreference.auto)"
+            :type="getButtonType('auto')"
+            @click.left.exact.prevent="storedTheme = 'auto'"
             >Авто</ui-button
           >
 
           <ui-button
-            :type="getButtonType(ThemePreference.light)"
-            @click.left.exact.prevent="
-              setThemePreference(ThemePreference.light)
-            "
+            :type="getButtonType('light')"
+            @click.left.exact.prevent="storedTheme = 'light'"
             >Светлая</ui-button
           >
 
           <ui-button
-            :type="getButtonType(ThemePreference.dark)"
-            @click.left.exact.prevent="setThemePreference(ThemePreference.dark)"
+            :type="getButtonType('dark')"
+            @click.left.exact.prevent="storedTheme = 'dark'"
             >Тёмная</ui-button
           >
         </div>
@@ -44,29 +42,24 @@
 </template>
 
 <script setup lang="ts">
+  import { storeToRefs } from 'pinia';
   import { ref } from 'vue';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { ThemePreference } from '@/shared/types/Theme';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import type { TButtonType } from '@/shared/ui/kit/button/UiButton';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
+  import type { BasicColorSchema } from '@vueuse/core';
+
   const uiStore = useUIStore();
+  const { theme, storedTheme } = storeToRefs(uiStore);
   const popover = ref<boolean>(false);
 
-  const getButtonType = (name: ThemePreference): TButtonType =>
-    uiStore.themePreference === name ? 'default' : 'secondary';
-
-  const setThemePreference = (preference: ThemePreference) => {
-    if (uiStore.themePreference === preference) {
-      return;
-    }
-
-    uiStore.setThemePreference(preference);
-  };
+  const getButtonType = (name: BasicColorSchema): TButtonType =>
+    storedTheme.value === name ? 'default' : 'secondary';
 </script>
 
 <style lang="scss" module>
