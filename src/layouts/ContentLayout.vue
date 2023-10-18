@@ -246,6 +246,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .content-layout {
     width: 100%;
     max-width: var(--max-content);

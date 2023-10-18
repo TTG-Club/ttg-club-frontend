@@ -90,6 +90,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .nav-popover {
     // position: relative; // Нужно будет включать, если нужно относительно кнопки позиционирование
     width: 40px;

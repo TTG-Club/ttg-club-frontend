@@ -51,6 +51,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .social-links {
     background-color: var(--hover);
     border-radius: 12px;

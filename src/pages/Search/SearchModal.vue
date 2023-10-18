@@ -398,6 +398,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   :deep(.search-modal) {
     pointer-events: none;
   }

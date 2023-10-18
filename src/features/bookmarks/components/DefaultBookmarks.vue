@@ -98,6 +98,7 @@
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   const bookmarksStore = useDefaultBookmarkStore();
+
   const { getGroupBookmarks } = storeToRefs(bookmarksStore);
   const isExternal = (url: string) => url.startsWith('http');
 </script>

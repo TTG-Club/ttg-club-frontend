@@ -167,6 +167,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .race-items {
     &__group {
       &_name {

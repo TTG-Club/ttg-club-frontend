@@ -43,6 +43,8 @@
 </script>
 
 <style lang="scss">
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ui-paginate {
     display: inline-flex;
     gap: 8px;

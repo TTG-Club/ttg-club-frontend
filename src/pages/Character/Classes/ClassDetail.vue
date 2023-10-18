@@ -470,6 +470,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .class-detail {
     overflow: hidden;
     width: 100%;

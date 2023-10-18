@@ -188,6 +188,8 @@
 </script>
 
 <style module lang="scss">
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .modal {
   }
 

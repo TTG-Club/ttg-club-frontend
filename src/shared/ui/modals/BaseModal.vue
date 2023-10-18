@@ -50,13 +50,23 @@
       </div>
 
       <div
-        v-else-if="typeConfirm"
-        class="base-modal__footer"
+        v-if="type === 'default' && $slots.controls"
+        class="base-modal__controls"
+      >
+        <slot
+          name="controls"
+          @close="onClose"
+        />
+      </div>
+
+      <div
+        v-else-if="type === 'confirm'"
+        class="base-modal__controls"
       >
         <ui-button @click.left.exact.prevent="onConfirm"> Применить </ui-button>
 
         <ui-button
-          type-outline
+          type="secondary"
           @click.left.exact.prevent="onClose"
         >
           Отменить
@@ -64,37 +74,32 @@
       </div>
 
       <div
-        v-else-if="typeRemove"
-        class="base-modal__footer"
+        v-else-if="type === 'remove'"
+        class="base-modal__controls"
       >
+        <ui-button
+          type="secondary"
+          @click.left.exact.prevent="onClose"
+        >
+          Отменить
+        </ui-button>
+
         <ui-button @click.left.exact.prevent="onConfirm"> Удалить </ui-button>
-
-        <ui-button
-          type-outline
-          @click.left.exact.prevent="onClose"
-        >
-          Отменить
-        </ui-button>
       </div>
 
       <div
-        v-else-if="typeNotify"
-        class="base-modal__footer"
+        v-else-if="type === 'notify'"
+        class="base-modal__controls"
       >
-        <ui-button
-          type-outline
-          @click.left.exact.prevent="onClose"
-        >
-          Закрыть
-        </ui-button>
+        <ui-button @click.left.exact.prevent="onClose"> Закрыть </ui-button>
       </div>
 
       <div
-        v-else-if="typeError"
-        class="base-modal__footer"
+        v-else-if="type === 'error'"
+        class="base-modal__controls"
       >
         <ui-button
-          outline
+          type="secondary"
           @click.left.exact.prevent="onClose"
         >
           Закрыть
@@ -118,19 +123,12 @@
 
   const props = withDefaults(
     defineProps<{
-      modelValue: boolean;
-      typeConfirm?: boolean;
-      typeRemove?: boolean;
-      typeNotify?: boolean;
-      typeError?: boolean;
-      bookmark?: any;
+      modelValue?: boolean;
+      type?: 'default' | 'confirm' | 'remove' | 'notify' | 'error';
     }>(),
     {
-      typeConfirm: false,
-      typeRemove: false,
-      typeNotify: false,
-      typeError: false,
-      bookmark: undefined
+      modelValue: true,
+      type: 'default'
     }
   );
 
@@ -152,6 +150,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .base-modal {
     &__container {
       background-color: var(--bg-secondary);
@@ -191,15 +191,6 @@
       margin-right: auto;
     }
 
-    //&__bookmark {
-    //  margin: {
-    //    left: 16px;
-    //    top: -6px;
-    //    right: -6px;
-    //    bottom: -6px;
-    //  }
-    //}
-
     &__close {
       margin: {
         left: 16px;
@@ -230,6 +221,16 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+    }
+
+    &__controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      flex-shrink: 0;
+      background-color: var(--bg-sub-menu);
     }
   }
 </style>

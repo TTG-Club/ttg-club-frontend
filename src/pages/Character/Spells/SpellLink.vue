@@ -110,7 +110,6 @@
   <base-modal
     v-if="modal.data"
     v-model="modal.show"
-    :bookmark="bookmarkObj"
   >
     <template #title>
       {{ modal.data!.name.rus }}

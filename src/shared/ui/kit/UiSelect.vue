@@ -258,6 +258,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   :deep(.multiselect) {
     @include css_anim();
 

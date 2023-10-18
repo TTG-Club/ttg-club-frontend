@@ -157,6 +157,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .screen-link {
     @include css_anim();
 
