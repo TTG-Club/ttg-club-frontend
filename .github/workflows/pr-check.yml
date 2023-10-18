@@ -32,4 +32,4 @@ jobs:
   type-check-pr:
     name: Type check PR
     if: ${{ !github.event.pull_request.draft }}
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/type-check.yml
