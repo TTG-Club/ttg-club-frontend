@@ -46,10 +46,7 @@
       );
     }
 
-    uiStore.setTheme({
-      name: uiStore.getCookieTheme(),
-      avoidHtmlUpdate
-    });
+    uiStore.setThemePreference(uiStore.getCookieTheme(), avoidHtmlUpdate);
   };
 
   const initFullscreen = async () => {
