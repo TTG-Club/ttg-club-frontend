@@ -17,7 +17,7 @@ import {
   setBookmarks
 } from '@/features/bookmarks/utils';
 
-const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
+const SESSION_OPENED_GROUPS_KEY = 'ttg_opened_bookmark_groups';
 
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
   const groups = ref<IBookmarkGroup[]>([]);
