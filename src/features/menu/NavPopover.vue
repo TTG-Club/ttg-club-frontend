@@ -196,7 +196,7 @@
     .nav-popover {
       &__body {
         top: auto;
-        left: 8px;
+        left: initial;
         right: 8px;
         bottom: 64px;
         width: auto;

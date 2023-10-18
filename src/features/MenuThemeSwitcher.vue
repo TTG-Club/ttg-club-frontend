@@ -1,15 +1,10 @@
 <template>
-  <nav-popover
-    v-model="popover"
-    :body-style="{ width: 'fit-content' }"
-  >
+  <nav-popover v-model="popover">
     <template #trigger="{ isActive }">
       <div @click="popover = !popover">
         <div
-          :class="{
-            [$style.navbar__btn]: true,
-            [$style['is-active']]: isActive
-          }"
+          class="navbar__btn"
+          :class="{ 'is-active': isActive }"
         >
           <svg-icon :icon="`theme/${uiStore.theme}`" />
         </div>
@@ -17,49 +12,31 @@
     </template>
 
     <template #default>
-      <div :class="$style.theme__container">
+      <div :class="$style.container">
         <div :class="$style.title">
-          <span :class="$style.text"> Тема </span>
+          <span :class="$style.text"> Переключение темы </span>
         </div>
 
-        <div :class="$style.theme__wrapper">
-          <button
-            type="button"
-            :class="{
-              [$style.button]: true,
-              [$style.selected]:
-                uiStore.themePreference === ThemePreference.auto
-            }"
+        <div :class="$style.wrapper">
+          <ui-button
+            :type="getButtonType(ThemePreference.auto)"
             @click.left.exact.prevent="setThemePreference(ThemePreference.auto)"
+            >Авто</ui-button
           >
-            <span :class="$style.text"> Авто </span>
-          </button>
 
-          <button
-            type="button"
-            :class="{
-              [$style.button]: true,
-              [$style.selected]:
-                uiStore.themePreference === ThemePreference.light
-            }"
+          <ui-button
+            :type="getButtonType(ThemePreference.light)"
             @click.left.exact.prevent="
               setThemePreference(ThemePreference.light)
             "
+            >Светлая</ui-button
           >
-            <span :class="$style.text"> Светлая </span>
-          </button>
 
-          <button
-            type="button"
-            :class="{
-              [$style.button]: true,
-              [$style.selected]:
-                uiStore.themePreference === ThemePreference.dark
-            }"
+          <ui-button
+            :type="getButtonType(ThemePreference.dark)"
             @click.left.exact.prevent="setThemePreference(ThemePreference.dark)"
+            >Тёмная</ui-button
           >
-            <span :class="$style.text"> Тёмная </span>
-          </button>
         </div>
       </div>
     </template>
@@ -74,41 +51,28 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import { ThemePreference } from '@/shared/types/Theme';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  const popover = ref<boolean>(false);
+  import type { TButtonType } from '@/shared/ui/kit/button/UiButton';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const uiStore = useUIStore();
+  const popover = ref<boolean>(false);
 
-  const setThemePreference = async (preference: ThemePreference) => {
-    if (uiStore.themePreference === preference) return;
-    await uiStore.setThemePreference(preference);
+  const getButtonType = (name: ThemePreference): TButtonType =>
+    uiStore.themePreference === name ? 'default' : 'secondary';
+
+  const setThemePreference = (preference: ThemePreference) => {
+    if (uiStore.themePreference === preference) {
+      return;
+    }
+
+    uiStore.setThemePreference(preference);
   };
 </script>
 
 <style lang="scss" module>
-  .navbar__btn {
-    @include css_anim();
-
-    cursor: pointer;
-    height: 40px;
-    width: 40px;
-    border-radius: 8px;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    color: var(--text-color);
-
-    &:hover {
-      color: var(--text-b-color);
-      background-color: var(--hover);
-    }
-  }
-  .theme__container {
-    width: 100vw;
-    max-width: 300px;
-  }
   .title {
     @include css_anim();
+
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -122,10 +86,10 @@
     color: inherit;
   }
 
-  .theme__wrapper {
+  .wrapper {
     display: flex;
+    justify-content: flex-start;
     padding: 10px;
-    gap: 8px;
   }
 
   .button {
@@ -148,7 +112,7 @@
     background-color: var(--hover);
   }
 
-  .button.selected {
+  .selected {
     background-color: var(--bg-theme-selected);
     color: var(--bg-main);
     border: none;

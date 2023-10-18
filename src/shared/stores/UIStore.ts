@@ -15,7 +15,7 @@ import { ThemePreference } from '@/shared/types/Theme';
 
 export const useUIStore = defineStore('UIStore', () => {
   const theme = ref('');
-  const themePreference = ref('');
+  const themePreference = ref<ThemePreference>(ThemePreference.auto);
   const fullscreen = ref(false);
 
   let unsubscribe: any = null;

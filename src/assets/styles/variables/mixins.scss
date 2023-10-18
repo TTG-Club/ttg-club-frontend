@@ -20,11 +20,19 @@
 }
 
 @mixin css_anim($time: 0.15s, $item: all, $style: ease-in-out) {
-  transition: $item $style $time;
+  $transition: ();
+
+  @each $property in $item {
+    $transition: append(
+        $transition, ($property $time $style), $separator: comma
+    );
+  }
+
+  transition: $transition;
 
   @include media-min($md) {
     &:hover {
-      transition: $item $style $time;
+      transition: $transition;
     }
   }
 }

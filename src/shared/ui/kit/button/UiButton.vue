@@ -306,7 +306,9 @@
   }
 
   .body {
-    @include css_anim();
+    $items: background-color, border-color;
+
+    @include css_anim($item: $items);
 
     display: flex;
     align-items: center;
