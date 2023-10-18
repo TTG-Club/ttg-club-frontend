@@ -107,7 +107,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../assets/styles/modules/link-item';
+  @use '@/assets/styles/modules/link-item' as *;
 
   .link-item {
     &__type,

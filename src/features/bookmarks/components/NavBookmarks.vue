@@ -78,7 +78,7 @@
 </script>
 
 <style lang="scss">
-  @import '../styles/bookmarks';
+  @use '@/assets/styles/modules/bookmarks';
 
   .nav-bookmarks {
     display: flex;
