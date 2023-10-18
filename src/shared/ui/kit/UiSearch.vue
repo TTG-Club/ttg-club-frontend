@@ -1,10 +1,7 @@
 <template>
   <div
-    ref="container"
     :class="{
       [$style['ui-search']]: true,
-      [$style.focused]: inputFocus,
-      [$style.hovered]: !disabled && isHovered,
       [$style.disabled]: disabled
     }"
     @click="inputFocus = true"
@@ -47,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useElementHover, useFocus } from '@vueuse/core';
+  import { useFocus } from '@vueuse/core';
   import { debounce } from 'lodash-es';
   import { ref, toRefs, watch } from 'vue';
 
@@ -69,9 +66,7 @@
 
   const { disabled, placeholder, isFocused } = toRefs(props);
   const inputValue = defineModel<string>({ required: true });
-  const container = ref<HTMLDivElement | null>(null);
   const input = ref<HTMLInputElement | null>(null);
-  const isHovered = useElementHover(container);
   const { focused: inputFocus } = useFocus(input);
 
   const clearInput = () => {
@@ -86,15 +81,8 @@
 </script>
 
 <style lang="scss" module>
-  .ui-search.focused {
-    border-color: var(--primary);
-  }
-
-  .ui-search.hovered {
-    border-color: var(--border-hover);
-  }
-
   .ui-search.disabled {
+    pointer-events: none;
     button {
       cursor: default;
     }
@@ -125,6 +113,14 @@
     border-width: 1px;
     border-style: solid;
     border-color: var(--border);
+
+    &:focus-within {
+      border-color: var(--primary);
+    }
+
+    &:hover {
+      border-color: var(--border-hover);
+    }
 
     @include media-min($md) {
       padding: 10px 12px;
