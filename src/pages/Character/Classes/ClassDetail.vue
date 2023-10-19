@@ -437,7 +437,9 @@
   };
 
   const close = () => {
-    router.push({ name: 'classes' });
+    const classToCollapse = currentClass.value?.name?.eng;
+
+    router.push({ name: 'classes', query: { classToCollapse } });
   };
 
   onMounted(async () => {

@@ -149,6 +149,10 @@
         type: Object as PropType<RouteLocationPathRaw>,
         required: true
       },
+      collapse: {
+        type: Boolean,
+        required: true
+      },
       classItem: {
         type: Object as PropType<TClassItem>,
         default: () => null,
@@ -200,6 +204,15 @@
             router.resolve(props.classItem.url)?.params?.className;
         });
       });
+
+      watch(
+        () => props.collapse,
+        value => {
+          if (value) {
+            submenu.value = !submenu.value;
+          }
+        }
+      );
 
       watch(
         () => props.afterSearch,
