@@ -273,9 +273,5 @@
         background-color: var(--bg-sub-menu);
       }
     }
-
-    @media (max-width: 600px) {
-      max-width: 100%;
-    }
   }
 </style>
