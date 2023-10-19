@@ -57,7 +57,7 @@
 
   const { initPages, items: armors } = usePagination({
     url: '/armors',
-    limit: -1,
+    size: -1,
     search: filter.search,
     order: [
       {

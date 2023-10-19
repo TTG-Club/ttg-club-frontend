@@ -12,11 +12,11 @@
             <span>Количество видео на странице</span>
 
             <ui-select
-              :model-value="itemsPerPage.find(item => item.value === limit)"
+              :model-value="itemsPerPage.find(item => item.value === size)"
               :options="itemsPerPage"
               label="name"
               track-by="value"
-              @update:model-value="limit = $event.value"
+              @update:model-value="size = $event.value"
             />
           </div>
 
@@ -152,7 +152,7 @@
   const { isMobile } = storeToRefs(useUIStore());
 
   const {
-    limit,
+    size,
     page,
     pages,
     itemsPerPage,

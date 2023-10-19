@@ -72,7 +72,7 @@
 
   const { initPages, items: classes } = usePagination({
     url: '/classes',
-    limit: -1,
+    size: -1,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
