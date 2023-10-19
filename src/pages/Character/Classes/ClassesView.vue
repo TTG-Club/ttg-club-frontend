@@ -60,14 +60,9 @@
   } from '@/shared/types/Character/Classes.d';
   import { ClassesFilterDefaults } from '@/shared/types/Character/Classes.d';
 
-  withDefaults(
-    defineProps<{
-      classToCollapse?: string;
-    }>(),
-    {
-      classToCollapse: ''
-    }
-  );
+  defineProps<{
+    classToCollapse: string;
+  }>();
 
   const uiStore = useUIStore();
   const route = useRoute();
