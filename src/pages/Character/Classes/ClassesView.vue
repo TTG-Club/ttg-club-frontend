@@ -29,7 +29,6 @@
             :after-search="!!filter.search.value"
             :class-item="el"
             :to="{ path: el.url }"
-            :collapse="classToCollapse === el.name.eng"
           />
         </div>
       </div>
@@ -59,10 +58,6 @@
     TClassList
   } from '@/shared/types/Character/Classes.d';
   import { ClassesFilterDefaults } from '@/shared/types/Character/Classes.d';
-
-  defineProps<{
-    classToCollapse: string;
-  }>();
 
   const uiStore = useUIStore();
   const route = useRoute();

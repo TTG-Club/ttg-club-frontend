@@ -23,9 +23,6 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     name: 'classes',
     path: '/classes',
     component: () => import('@/pages/Character/Classes/ClassesView.vue'),
-    props({ query }) {
-      return { classToCollapse: query.classToCollapse };
-    },
     children: [
       {
         name: 'classDetail',

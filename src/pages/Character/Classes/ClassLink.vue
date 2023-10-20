@@ -149,10 +149,6 @@
         type: Object as PropType<RouteLocationPathRaw>,
         required: true
       },
-      collapse: {
-        type: Boolean,
-        required: true
-      },
       classItem: {
         type: Object as PropType<TClassItem>,
         default: () => null,
@@ -206,9 +202,9 @@
       });
 
       watch(
-        () => props.collapse,
+        () => isActive.value,
         value => {
-          if (value) {
+          if (!value) {
             submenu.value = !submenu.value;
           }
         }
