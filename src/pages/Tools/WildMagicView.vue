@@ -75,12 +75,13 @@
   import { throttle } from 'lodash-es';
   import { reactive } from 'vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   export default {
     name: 'WildMagicView',

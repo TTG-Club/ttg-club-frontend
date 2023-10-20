@@ -217,6 +217,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .filter {
     position: relative;
 

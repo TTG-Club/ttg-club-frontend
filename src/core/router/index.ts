@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import pinia from '@/store';
+import pinia from '@/core/store';
 
 import { useMetrics } from '@/shared/compositions/useMetrics';
 import { useNavStore } from '@/shared/stores/NavStore';

@@ -37,7 +37,7 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/Workshop/Bestiary.d';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
 
   export default defineComponent({
     components: {

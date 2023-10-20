@@ -33,11 +33,12 @@
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { ScreensFilterDefaults } from '@/shared/types/Workshop/Screens.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
 
   const route = useRoute();
   const router = useRouter();
@@ -87,6 +88,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .screen-items {
     width: 100%;
     display: grid;

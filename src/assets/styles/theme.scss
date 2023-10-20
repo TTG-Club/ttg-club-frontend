@@ -8,18 +8,18 @@
   $theme: map.get($theme-colors, $theme-name);
   $is-name-success: string.length($theme-name) > 0;
 
-  :root#{if($is-name-success, '[data-theme="theme-#{$theme-name}"]', '')} {
+  html#{if($is-name-success, '.#{$theme-name}', '')} {
     // Обход по цветам в теме
     @each $name, $color in $theme {
       --#{$name}: #{$color};
     }
 
     // Background image
-    --bg-img: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-main.webp');
+    --bg-img: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-main-hall.webp');
   }
 }
 
-:root {
+html {
   --max-vh: 100vh;
   --max-content: 1320px;
 

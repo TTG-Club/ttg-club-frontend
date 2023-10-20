@@ -183,6 +183,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ui-input {
     display: inline-flex;
     width: 100%;

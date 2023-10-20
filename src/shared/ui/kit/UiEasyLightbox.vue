@@ -210,6 +210,8 @@
 </style>
 
 <style lang="scss">
+  @use '@/assets/styles/variables/mixins' as *;
+
   .vel-modal {
     @include css_anim($item: background-color);
     z-index: 10000;

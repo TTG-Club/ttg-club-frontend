@@ -12,7 +12,11 @@ import type {
   IBookmarkItem,
   TBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
-import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
+import {
+  getGroupBookmarks,
+  isBookmarkRemoveAvailable,
+  setBookmarks
+} from '@/features/bookmarks/utils';
 
 import { DB_NAME } from '@/shared/constants/UI';
 import { errorHandler } from '@/shared/helpers/errorHandler';
@@ -28,6 +32,7 @@ export const useDefaultBookmarkStore = defineStore(
     const groups = ref<IBookmarkGroup[]>([]);
     const categories = ref<IBookmarkCategory[]>([]);
     const bookmarks = ref<IBookmarkItem[]>([]);
+    const dontAskAgain = ref<boolean>(false);
 
     const isBookmarkSaved = (url: IBookmarkItem['url']) =>
       bookmarks.value.findIndex(bookmark => bookmark.url === url) >= 0;
@@ -165,7 +170,10 @@ export const useDefaultBookmarkStore = defineStore(
       }
     };
 
-    const removeCategory = (uuid: IBookmarkCategory['uuid']) => {
+    const removeCategory = async (
+      uuid: IBookmarkCategory['uuid'],
+      dontAsk = false
+    ) => {
       if (!uuid) {
         console.error('No UUID present.');
 
@@ -177,6 +185,10 @@ export const useDefaultBookmarkStore = defineStore(
 
         if (!category) {
           return Promise.reject();
+        }
+
+        if (!dontAsk && !(await isBookmarkRemoveAvailable(category))) {
+          return Promise.resolve();
         }
 
         categories.value = categories.value.filter(item => item.uuid !== uuid);
@@ -191,7 +203,10 @@ export const useDefaultBookmarkStore = defineStore(
       }
     };
 
-    const removeBookmark = async (uuid: IBookmarkItem['uuid']) => {
+    const removeBookmark = async (
+      uuid: IBookmarkItem['uuid'],
+      dontAsk = false
+    ) => {
       if (!uuid) {
         console.error('No UUID present.');
 
@@ -205,6 +220,10 @@ export const useDefaultBookmarkStore = defineStore(
           console.error("Can't find bookmark.");
 
           return Promise.reject();
+        }
+
+        if (!dontAsk && !(await isBookmarkRemoveAvailable(bookmark))) {
+          return Promise.resolve();
         }
 
         bookmarks.value = bookmarks.value.filter(item => item.uuid !== uuid);
@@ -222,7 +241,7 @@ export const useDefaultBookmarkStore = defineStore(
         );
 
         if (!siblings.length) {
-          await removeCategory(parent.uuid);
+          await removeCategory(parent.uuid, true);
         }
 
         return saveBookmarks();
@@ -239,7 +258,7 @@ export const useDefaultBookmarkStore = defineStore(
       const bookmark = bookmarks.value.find(item => item.url === url);
 
       if (bookmark) {
-        await removeBookmark(bookmark.uuid);
+        await removeBookmark(bookmark.uuid, true);
 
         return null;
       }
@@ -251,7 +270,7 @@ export const useDefaultBookmarkStore = defineStore(
       groups,
       categories,
       bookmarks,
-
+      dontAskAgain,
       isBookmarkSaved,
       getGroupBookmarks: computed(() =>
         getGroupBookmarks({

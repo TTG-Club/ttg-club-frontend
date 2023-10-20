@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import { fromPairs } from 'lodash-es';
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { useAxios } from '@/shared/compositions/useAxios';
@@ -63,6 +63,12 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const user = ref<TUser | null>(null);
   const isAuthenticated = ref<boolean>(false);
+
+  const controllers = reactive<{
+    registration?: AbortController;
+    authorization?: AbortController;
+    changePassword?: AbortController;
+  }>({});
 
   const roles = computed(() => {
     if (!user.value?.roles || !Array.isArray(user.value.roles)) {
@@ -133,14 +139,21 @@ export const useUserStore = defineStore('UserStore', () => {
   };
 
   const registration = async (body: TRegBody) => {
+    if (controllers.registration instanceof AbortController) {
+      controllers.registration.abort();
+    }
+
     try {
       if (Object.values(body).find(item => !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
+      controllers.registration = new AbortController();
+
       const resp = await http.post({
         url: '/auth/signup',
-        payload: body
+        payload: body,
+        signal: controllers.registration.signal
       });
 
       switch (resp.status) {
@@ -151,18 +164,27 @@ export const useUserStore = defineStore('UserStore', () => {
       }
     } catch (err) {
       return Promise.reject(err);
+    } finally {
+      controllers.registration = undefined;
     }
   };
 
   const authorization = async (body: TAuthBody) => {
+    if (controllers.authorization instanceof AbortController) {
+      controllers.authorization.abort();
+    }
+
     try {
       if (Object.values(body).find(item => typeof item === 'string' && !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
+      controllers.authorization = new AbortController();
+
       const resp = await http.post<TAuthResponse>({
         url: '/auth/signin',
-        payload: body
+        payload: body,
+        signal: controllers.authorization.signal
       });
 
       switch (resp.status) {
@@ -184,6 +206,8 @@ export const useUserStore = defineStore('UserStore', () => {
       }
     } catch (err) {
       return Promise.reject(err);
+    } finally {
+      controllers.authorization = undefined;
     }
   };
 
@@ -206,10 +230,17 @@ export const useUserStore = defineStore('UserStore', () => {
   };
 
   const changePassword = async (payload: TChangePassBody) => {
+    if (controllers.changePassword instanceof AbortController) {
+      controllers.changePassword.abort();
+    }
+
     try {
+      controllers.changePassword = new AbortController();
+
       const resp = await http.post({
         url: '/auth/change/password',
-        payload
+        payload,
+        signal: controllers.changePassword.signal
       });
 
       switch (resp.status) {
@@ -220,6 +251,8 @@ export const useUserStore = defineStore('UserStore', () => {
       }
     } catch (err) {
       return Promise.reject(err);
+    } finally {
+      controllers.changePassword = undefined;
     }
   };
 

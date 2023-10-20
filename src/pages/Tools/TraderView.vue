@@ -182,6 +182,8 @@
   import MagicItemBody from '@/pages/Inventory/MagicItems/MagicItemBody.vue';
   import MagicItemLink from '@/pages/Inventory/MagicItems/MagicItemLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
@@ -195,8 +197,7 @@
     TGroupedTraderLink,
     TTraderLink
   } from '@/shared/types/Tools/Trader.d';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';

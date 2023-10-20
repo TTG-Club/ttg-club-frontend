@@ -1,3 +1,5 @@
+@use 'breakpoints' as *;
+
 @mixin empty-block($width, $height: $width, $display: block) {
   content: '';
   display: $display;
@@ -15,4 +17,24 @@
   background-position-x: $posX;
   background-position-y: $posY;
   background-repeat: $repeat;
+}
+
+@mixin css_anim($time: 0.15s, $item: all, $style: ease-in-out) {
+  $transition: ();
+
+  @each $property in $item {
+    $transition: append(
+      $transition,
+      ($property $time $style),
+      $separator: comma
+    );
+  }
+
+  transition: $transition;
+
+  @include media-min($md) {
+    &:hover {
+      transition: $transition;
+    }
+  }
 }

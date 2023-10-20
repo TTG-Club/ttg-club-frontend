@@ -11,15 +11,18 @@ import type {
   TBookmark,
   TQueryAddBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
-import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
+import {
+  getGroupBookmarks,
+  isBookmarkRemoveAvailable,
+  setBookmarks
+} from '@/features/bookmarks/utils';
 
-const SESSION_OPENED_GROUPS_KEY = 'dnd5club_opened_bookmark_groups';
+const SESSION_OPENED_GROUPS_KEY = 'ttg_opened_bookmark_groups';
 
 export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
   const groups = ref<IBookmarkGroup[]>([]);
   const categories = ref<IBookmarkCategory[]>([]);
   const bookmarks = ref<IBookmarkItem[]>([]);
-
   const openedGroups = ref<IBookmarkGroup['uuid'][]>([]);
 
   const isAllGroupsOpened = computed(
@@ -118,10 +121,16 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
     }
   };
 
-  const queryDeleteBookmark = async (uuid: TBookmark['uuid']) => {
+  const queryDeleteBookmark = async (bookmark: TBookmark, dontAsk = false) => {
     try {
-      if (!uuid) {
+      if (!bookmark?.uuid) {
         return Promise.reject(new Error('UUID is undefined'));
+      }
+
+      const { uuid } = bookmark;
+
+      if (!dontAsk && !(await isBookmarkRemoveAvailable(bookmark))) {
+        return Promise.resolve();
       }
 
       await BookmarksApi.deleteBookmark(uuid);
@@ -260,7 +269,7 @@ export const useCustomBookmarkStore = defineStore('CustomBookmarkStore', () => {
       });
 
       if (bookmark) {
-        return queryDeleteBookmark(bookmark.uuid);
+        return queryDeleteBookmark(bookmark, true);
       }
 
       return addBookmarkInGroup({

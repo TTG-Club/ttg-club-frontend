@@ -13,119 +13,116 @@
   </span>
 </template>
 
-<script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
+<script setup lang="ts">
+  import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useDiceRoller } from '@/shared/compositions/useDiceRoller';
   import { useIsDev } from '@/shared/helpers/isDev';
 
-  export default defineComponent({
-    props: {
-      formula: {
-        type: String,
-        default: '',
-        required: true
-      },
-      label: {
-        type: String,
-        default: 'Бросок'
-      },
-      isAdvantage: {
-        type: Boolean,
-        default: false
-      },
-      isDisadvantage: {
-        type: Boolean,
-        default: false
-      },
-      isSavingThrow: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const isDev = useIsDev();
-      const toast = useToast(ToastEventBus);
+  import type { RollBase } from 'dice-roller-parser';
 
-      const { doRoll, notifyResult } = useDiceRoller();
-
-      const error = ref(false);
-
-      const classByType = computed(() => {
-        if (props.isAdvantage) {
-          return 'is-advantage';
-        }
-
-        if (props.isDisadvantage) {
-          return 'is-disadvantage';
-        }
-
-        if (props.isSavingThrow) {
-          return 'is-saving-throw';
-        }
-
-        return 'is-dice';
-      });
-
-      const classes = computed(() => {
-        const result = [classByType.value];
-
-        if (error.value) {
-          result.push('is-error');
-        }
-
-        return result;
-      });
-
-      const clearSelection = () => {
-        // @ts-ignore
-        if (document.selection && document.selection.empty) {
-          // @ts-ignore
-          document.selection.empty();
-
-          return;
-        }
-
-        if (window.getSelection) {
-          const sel = window.getSelection();
-
-          sel?.removeAllRanges();
-        }
-      };
-
-      const tryRoll = (type?: 'advantage' | 'disadvantage') => {
-        clearSelection();
-
-        try {
-          notifyResult({
-            label: props.label,
-            roll: doRoll({
-              formula: props.formula,
-              type
-            }),
-            type
-          });
-        } catch (err) {
-          if (isDev) {
-            console.error(err);
-          }
-
-          toast.error('Произошла ошибка, попробуйте еще раз...');
-        }
-      };
-
-      return {
-        tryRoll,
-        classes
-      };
+  const props = withDefaults(
+    defineProps<{
+      formula: string;
+      label?: string;
+      isAdvantage?: boolean;
+      isDisadvantage?: boolean;
+      isSavingThrow?: boolean;
+    }>(),
+    {
+      label: 'Бросок',
+      isAdvantage: false,
+      isDisadvantage: false,
+      isSavingThrow: false
     }
+  );
+
+  const emit = defineEmits<{
+    (e: 'roll-result', v: RollBase['value']): void;
+    (e: 'roll', v: RollBase): void;
+  }>();
+
+  const isDev = useIsDev();
+  const toast = useToast(ToastEventBus);
+
+  const { doRoll, notifyResult } = useDiceRoller();
+
+  const error = ref(false);
+
+  const classByType = computed(() => {
+    if (props.isAdvantage) {
+      return 'is-advantage';
+    }
+
+    if (props.isDisadvantage) {
+      return 'is-disadvantage';
+    }
+
+    if (props.isSavingThrow) {
+      return 'is-saving-throw';
+    }
+
+    return 'is-dice';
   });
+
+  const classes = computed(() => {
+    const result = [classByType.value];
+
+    if (error.value) {
+      result.push('is-error');
+    }
+
+    return result;
+  });
+
+  const clearSelection = () => {
+    // @ts-ignore
+    if (document.selection && document.selection.empty) {
+      // @ts-ignore
+      document.selection.empty();
+
+      return;
+    }
+
+    if (window.getSelection) {
+      const sel = window.getSelection();
+
+      sel?.removeAllRanges();
+    }
+  };
+
+  const tryRoll = (type?: 'advantage' | 'disadvantage') => {
+    clearSelection();
+
+    try {
+      const roll = doRoll({
+        formula: props.formula,
+        type
+      });
+
+      notifyResult({
+        label: props.label,
+        roll,
+        type
+      });
+
+      emit('roll-result', roll.value);
+    } catch (err) {
+      if (isDev) {
+        console.error(err);
+      }
+
+      toast.error('Произошла ошибка, попробуйте еще раз...');
+    }
+  };
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .dice-roller {
     @include css_anim();
 

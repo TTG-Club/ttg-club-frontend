@@ -38,7 +38,7 @@
   import { useAxios } from '@/shared/compositions/useAxios';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
 
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
 

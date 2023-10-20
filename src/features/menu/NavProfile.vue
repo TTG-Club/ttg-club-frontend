@@ -234,6 +234,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .nav-profile {
     width: 100vw;
     max-width: 260px;
@@ -270,10 +272,6 @@
       &:hover {
         background-color: var(--bg-sub-menu);
       }
-    }
-
-    @media (max-width: 600px) {
-      max-width: 100%;
     }
   }
 </style>

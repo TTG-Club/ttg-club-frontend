@@ -62,7 +62,7 @@
 
   import { useDayjs } from '@/shared/compositions/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import SocialLinks from '@/shared/ui/content/SocialLinks.vue';
+  import SocialLinks from '@/shared/ui/SocialLinks.vue';
 
   const props = withDefaults(
     defineProps<{
@@ -95,6 +95,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .page-layout {
     display: flex;
     min-height: 100%;

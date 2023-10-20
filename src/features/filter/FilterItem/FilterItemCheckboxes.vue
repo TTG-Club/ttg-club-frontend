@@ -141,5 +141,5 @@
 </script>
 
 <style lang="scss" scoped>
-  @import 'FilterItem.module';
+  @use '@/assets/styles/modules/filter-item' as *;
 </style>

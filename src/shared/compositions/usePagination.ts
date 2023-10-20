@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import { useAxios } from '@/shared/compositions/useAxios';
 import type { FilterQueryParams } from '@/shared/compositions/useFilter';
 import { useMetrics } from '@/shared/compositions/useMetrics';
-import { DEFAULT_PAGINATION_ITEMS_LIMIT } from '@/shared/constants';
+import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
 import { errorHandler } from '@/shared/helpers/errorHandler';
 import { useIsDev } from '@/shared/helpers/isDev';
 import type { RequestConfig } from '@/shared/services/HTTPService';
@@ -28,7 +28,7 @@ export type PaginationQuery = {
   /**
    * -1 для получения всего списка
    */
-  limit?: number;
+  size?: number;
   filter?: FilterQueryParams;
   search?: PaginationSearch;
   order?: PaginationOrder;
@@ -42,7 +42,7 @@ export type PaginationFilter = {
 export type PaginationConfig = {
   url: MaybeRef<string>;
   page?: MaybeRef<number>;
-  limit?: MaybeRef<number>;
+  size?: MaybeRef<number>;
   search?: MaybeRef<PaginationSearch>;
   order?: MaybeRef<PaginationOrder>;
   filter?: MaybeRef<PaginationFilter>;
@@ -62,16 +62,16 @@ export function usePagination<T>(config: PaginationConfig) {
   const items = ref<Array<any>>([]);
   const page = ref(unref(config.page) || 0);
 
-  const limit = computed(
-    () => unref(config.limit) || DEFAULT_PAGINATION_ITEMS_LIMIT
+  const size = computed(
+    () => unref(config.size) || DEFAULT_PAGINATION_ITEMS_SIZE
   );
 
-  const isEnd = ref<boolean>(unref(config.limit) === -1 || true);
+  const isEnd = ref<boolean>(unref(config.size) === -1 || true);
 
   const payload = computed((): PaginationQuery => {
     const request: PaginationQuery = {
       page: unref(page),
-      limit: unref(limit)
+      size: unref(size)
     };
 
     const search = unref(config.search);
@@ -131,7 +131,7 @@ export function usePagination<T>(config: PaginationConfig) {
       }
 
       isEnd.value =
-        !(resp.data instanceof Array) || resp.data.length < limit.value;
+        !(resp.data instanceof Array) || resp.data.length < size.value;
 
       return Promise.resolve();
     } catch (err: any) {
@@ -162,7 +162,7 @@ export function usePagination<T>(config: PaginationConfig) {
   };
 
   const nextPage = async () => {
-    if (limit.value === -1 || isEnd.value) {
+    if (size.value === -1 || isEnd.value) {
       return;
     }
 
@@ -190,7 +190,7 @@ export function usePagination<T>(config: PaginationConfig) {
     isEnd,
     items,
     page,
-    limit,
+    size,
     payload,
     abort,
     initPages,

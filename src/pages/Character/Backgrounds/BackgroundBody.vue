@@ -14,7 +14,7 @@
 <script>
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   export default {
     name: 'BackgroundBody',

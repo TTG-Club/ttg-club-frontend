@@ -161,10 +161,10 @@
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
@@ -470,6 +470,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .class-detail {
     overflow: hidden;
     width: 100%;

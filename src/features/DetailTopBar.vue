@@ -29,7 +29,7 @@
         >Homebrew</span
       >
 
-      <span v-tippy="{ content: source.name }"
+      <span v-tippy="{ content: source.name, touch: true }"
         >&nbsp;{{ source.shortName }}</span
       >
     </span>
@@ -61,6 +61,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .row_info {
     display: flex;
     padding: 12px;

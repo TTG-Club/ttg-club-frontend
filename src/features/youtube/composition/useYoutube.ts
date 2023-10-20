@@ -1,6 +1,6 @@
 import { useScroll } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { computed, readonly, ref, watch } from 'vue';
+import { computed, readonly, ref, unref, watch } from 'vue';
 
 import { YoutubeApi } from '@/features/youtube/api';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
@@ -34,24 +34,24 @@ export const useYoutube = () => {
   const isLoaded = ref(false);
 
   const page = ref(1);
-  const limit = ref(9);
+  const size = ref(9);
 
   const count = ref(0);
   const videos = ref<Array<TYoutubeVideo>>([]);
 
   const pages = computed(() => {
-    if (count.value <= limit.value) {
+    if (count.value <= size.value) {
       return 0;
     }
 
-    return Math.ceil(count.value / limit.value);
+    return Math.ceil(count.value / size.value);
   });
 
   const load = async (scrollToTop = true) => {
     try {
       const data = await YoutubeApi.load({
-        page: page.value - 1,
-        limit: limit.value,
+        page: unref(page) - 1,
+        size: unref(size),
         order: [
           {
             field: 'created',
@@ -64,15 +64,15 @@ export const useYoutube = () => {
         ]
       });
 
-      count.value = data.count;
-      videos.value = data.list;
+      count.value = data.total;
+      videos.value = data.items;
       isLoaded.value = true;
 
       if (scrollToTop) {
         bodyScroll.y.value = 0;
       }
 
-      return data.list;
+      return data.items;
     } catch (err) {
       return Promise.reject(err);
     }
@@ -110,7 +110,7 @@ export const useYoutube = () => {
     }
   );
 
-  watch(limit, async () => {
+  watch(size, async () => {
     if (page.value === 1) {
       await load();
 
@@ -124,7 +124,7 @@ export const useYoutube = () => {
     isLoaded: readonly(isLoaded),
     isRemoving,
     itemsPerPage,
-    limit,
+    size,
     page,
     pages,
     videos,

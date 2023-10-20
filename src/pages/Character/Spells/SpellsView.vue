@@ -33,6 +33,9 @@
 
   import SpellLink from '@/pages/Character/Spells/SpellLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+  import TabLayout from '@/layouts/TabLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
@@ -43,8 +46,6 @@
     type TSpellLink
   } from '@/shared/types/Character/Spells.d';
   import type { AnyObject } from '@/shared/types/Utility';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
-  import TabLayout from '@/shared/ui/content/TabLayout.vue';
   import { getListGridInTabProps } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';

@@ -44,6 +44,8 @@
 
   import RaceLink from '@/pages/Character/Races/RaceLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
@@ -51,7 +53,6 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink, TRaceList } from '@/shared/types/Character/Races.d';
   import { RacesFilterDefaults } from '@/shared/types/Character/Races.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
 
   const route = useRoute();
   const router = useRouter();
@@ -68,7 +69,7 @@
 
   const { initPages, items: races } = usePagination({
     url: '/races',
-    limit: -1,
+    size: -1,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
@@ -166,6 +167,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .race-items {
     &__group {
       &_name {
