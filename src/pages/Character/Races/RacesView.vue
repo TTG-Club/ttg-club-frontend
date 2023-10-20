@@ -69,7 +69,7 @@
 
   const { initPages, items: races } = usePagination({
     url: '/races',
-    limit: -1,
+    size: -1,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

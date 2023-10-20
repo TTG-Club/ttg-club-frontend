@@ -62,7 +62,7 @@
 
   const { initPages, items: weapons } = usePagination({
     url: '/weapons',
-    limit: -1,
+    size: -1,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

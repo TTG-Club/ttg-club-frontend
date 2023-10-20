@@ -57,6 +57,9 @@ export interface IOrderItem {
 }
 
 export interface IPaginatedResponse<T> {
-  count: number;
-  list: Array<T>;
+  items: Array<T>;
+  total: number;
+  page?: number;
+  size?: number;
+  pages?: number;
 }

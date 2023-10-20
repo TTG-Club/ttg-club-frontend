@@ -61,7 +61,7 @@
   const activeVideo = ref<TYoutubeVideo['id'] | null>(null);
 
   const currentVideo = computed<TYoutubeVideo | null>(() => {
-    if (videos.value.length) {
+    if (videos.value?.length) {
       return videos.value[0];
     }
 
@@ -69,14 +69,14 @@
   });
 
   const oldVideos = computed<Array<TYoutubeVideo>>(() =>
-    videos.value.slice(1, videos.value.length)
+    videos.value.slice(1, videos.value?.length)
   );
 
   const getVideos = async () => {
     try {
-      const { list } = await YoutubeApi.load({
+      const { items } = await YoutubeApi.load({
         page: 0,
-        limit: 5,
+        size: 5,
         activeStatus: true,
         order: [
           {
@@ -90,7 +90,7 @@
         ]
       });
 
-      return Promise.resolve(list);
+      return Promise.resolve(items);
     } catch (err) {
       return Promise.reject(err);
     }
