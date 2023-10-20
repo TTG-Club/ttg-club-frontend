@@ -115,7 +115,7 @@
 <script lang="ts">
   import { groupBy, isArray, sortBy } from 'lodash-es';
   import { computed, defineComponent, ref } from 'vue';
-  import { useLink, useRoute, useRouter } from 'vue-router';
+  import { useLink, useRoute } from 'vue-router';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink } from '@/shared/types/Character/Races.d';
@@ -144,7 +144,6 @@
     },
     setup(props) {
       const route = useRoute();
-      const router = useRouter();
 
       const { isActive, navigate, href } = useLink(props);
 
@@ -195,13 +194,10 @@
         return null;
       });
 
-      const hasSubRaces = computed(() => !!subRaces.value);
+      const hasSubRaces = computed(() => !!subRaces.value?.length);
 
       const parentClassList = computed(() => ({
-        'router-link-active':
-          isActive.value ||
-          route.params.raceName ===
-            router.resolve(props.raceItem.url).params.raceName,
+        'router-link-active': isActive.value,
         'is-selected': route.name === 'raceDetail',
         'is-green': props.raceItem.type.name.toLowerCase() === 'homebrew',
         'is-fullscreen': uiStore.fullscreen,
