@@ -328,6 +328,37 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     }
   },
   {
+    name: 'tokens',
+    path: '/tokens',
+    component: () => import('@/features/tokens/TokensPage.vue'),
+    beforeEnter: async (to, from, next) => {
+      const userStore = useUserStore();
+
+      try {
+        const user = await userStore.getUserInfo();
+
+        if (!user) {
+          next({ name: 'unauthorized' });
+
+          return;
+        }
+
+        if (
+          user.roles.includes(EUserRoles.MODERATOR) ||
+          user.roles.includes(EUserRoles.ADMIN)
+        ) {
+          next();
+
+          return;
+        }
+
+        next({ name: 'forbidden' });
+      } catch (err) {
+        next({ name: 'internal-server' });
+      }
+    }
+  },
+  {
     name: 'info-page',
     path: '/info/:path',
     component: () => import('@/pages/InfoPageView.vue')
