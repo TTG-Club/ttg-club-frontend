@@ -227,7 +227,7 @@
 
       const { initPages, items } = usePagination({
         url: '/races',
-        limit: -1,
+        size: -1,
         order: [
           {
             field: 'name',

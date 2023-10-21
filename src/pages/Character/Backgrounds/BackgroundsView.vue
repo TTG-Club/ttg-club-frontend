@@ -57,7 +57,7 @@
 
   const { initPages, items: backgrounds } = usePagination({
     url: '/backgrounds',
-    limit: -1,
+    size: -1,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams

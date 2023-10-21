@@ -19,7 +19,7 @@ export class YoutubeApi {
   static async load(
     payload: MaybeRef<{
       page?: MaybeRef<number>;
-      limit?: MaybeRef<number>;
+      size?: MaybeRef<number>;
       order?: MaybeRef<Array<IOrderItem>>;
       activeStatus?: MaybeRef<boolean>;
     }>
@@ -29,7 +29,7 @@ export class YoutubeApi {
 
       const config: RequestConfig['payload'] = {
         page: 0,
-        limit: -1,
+        size: -1,
         ...fromPairs(
           toPairs(toValue(payload)).map(([key, value]) => {
             const _value = toValue(value);

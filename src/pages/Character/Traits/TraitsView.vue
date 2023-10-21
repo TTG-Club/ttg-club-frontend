@@ -65,7 +65,7 @@
 
   const { initPages, items: traits } = usePagination({
     url: '/traits',
-    limit: -1,
+    size: -1,
     filter: {
       isCustomized: filter.isCustomized,
       value: filter.queryParams
