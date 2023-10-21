@@ -20,6 +20,14 @@
     </div>
 
     <div class="ability-races__fields">
+      <ui-dropdown
+        placeholder="Выбрать расу"
+        :options="races.map(el => ({ name: el.name.rus, value: el.url }))"
+        @update:model-value="onSelectRace"
+      >
+        <template #label> Раса </template>
+      </ui-dropdown>
+
       <ui-select
         :custom-label="({ name: { rus } }) => rus"
         :disabled="!races?.length"
@@ -201,12 +209,14 @@
     AbilityName,
     AbilityTypeKey
   } from '@/shared/types/Tools/AbilityCalc.d';
+  import UiDropdown from '@/shared/ui/kit/UiDropdown.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
 
   import type { PropType } from 'vue';
 
   export default defineComponent({
     components: {
+      UiDropdown,
       UiSelect,
       RaceLink
     },
@@ -385,8 +395,8 @@
         );
       };
 
-      const onSelectRace = (race: TRaceLink | null) => {
-        const value = cloneDeep(race);
+      const onSelectRace = (race: any) => {
+        const value = cloneDeep(races.value.find(el => el.url === race[0]));
 
         if (value) {
           value.name.rus = value.name.rus.replace(/\(.+\)$/i, '');
