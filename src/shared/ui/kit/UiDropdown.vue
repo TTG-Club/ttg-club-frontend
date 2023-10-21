@@ -18,6 +18,7 @@
       <div class="ui-select__input-wrapper">
         <ui-input
           ref="input"
+          v-model="filter"
           :disabled="disabled"
           :placeholder="togglePlaceholder"
           @update:model-value="onSearch"
