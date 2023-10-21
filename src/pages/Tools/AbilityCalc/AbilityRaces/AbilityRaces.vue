@@ -21,36 +21,13 @@
 
     <div class="ability-races__fields">
       <ui-dropdown
+        disabled
         placeholder="Выбрать расу"
         :options="races.map(el => ({ name: el.name.rus, value: el.url }))"
         @update:model-value="onSelectRace"
       >
         <template #label> Раса </template>
       </ui-dropdown>
-
-      <ui-select
-        :custom-label="({ name: { rus } }) => rus"
-        :disabled="!races?.length"
-        :model-value="selectedRace"
-        :options="races"
-        allow-empty
-        searchable
-        track-by="url"
-        @remove="onSelectRace"
-        @select="onSelectRace"
-      >
-        <template #label> Раса </template>
-
-        <template #singleLabel="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #option="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #placeholder> Выбрать расу </template>
-      </ui-select>
 
       <ui-select
         :disabled="!subRaces?.length"

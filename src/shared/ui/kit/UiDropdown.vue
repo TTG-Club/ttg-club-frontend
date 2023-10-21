@@ -9,12 +9,16 @@
 
     <div
       ref="dropdownHeader"
-      class="ui-select__wrapper"
+      :class="[
+        'ui-select__wrapper',
+        { 'ui-select__wrapper--disabled': disabled }
+      ]"
       @focusin="toggleFocus"
     >
       <div class="ui-select__input-wrapper">
         <ui-input
           ref="input"
+          :disabled="disabled"
           :placeholder="togglePlaceholder"
           @update:model-value="onSearch"
         />
@@ -29,7 +33,10 @@
       </div>
 
       <div
-        class="ui-select__select"
+        :class="[
+          'ui-select__select',
+          { 'ui-select__select--disabled': disabled }
+        ]"
         @click="toggleFocus"
       >
         <svg-icon :icon="toggleIcon" />
@@ -45,7 +52,10 @@
           v-for="option in filteredOptions"
           :id="option.value"
           :key="option.value"
-          :class="`ui-select__element ${isSelectedClass(option)}`"
+          :class="[
+            'ui-select__element',
+            { 'ui-select__element--selected': isSelectedClass(option) }
+          ]"
           @click="selectOption($event)"
         >
           <span class="ui-select__option">
@@ -89,6 +99,10 @@
     isMultiple: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   });
 
@@ -127,9 +141,7 @@
   );
 
   const isSelectedClass = (e: any) => {
-    return selectedOptions.value.includes(e.value)
-      ? 'ui-select__element--selected'
-      : '';
+    return selectedOptions.value.includes(e.value);
   };
 
   const selectOption = (e: any) => {
@@ -223,6 +235,10 @@
         display: none;
       }
 
+      &--disabled {
+        background: var(--hover) !important;
+      }
+
       svg {
         @include css_anim();
 
@@ -249,6 +265,10 @@
         style: solid;
         color: var(--border);
         radius: 8px;
+      }
+      &--disabled {
+        pointer-events: none;
+        opacity: 0.6;
       }
     }
 

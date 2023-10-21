@@ -17,6 +17,7 @@
         :autocomplete="inputAutocomplete"
         :placeholder="placeholder"
         :maxlength="maxLength"
+        :disabled="disabled"
         :spellcheck="false"
         :type="inputType"
         class="ui-input__input"
@@ -98,6 +99,10 @@
       default: 255
     },
     required: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     },
