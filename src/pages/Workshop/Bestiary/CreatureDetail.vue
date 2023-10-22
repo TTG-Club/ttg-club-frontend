@@ -33,6 +33,7 @@
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
+  import { downloadByUrl } from '@/shared/helpers/download';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { Maybe } from '@/shared/types/Utility';
@@ -60,18 +61,17 @@
       const abortController = ref<AbortController | null>(null);
 
       const exportFoundry = (version: number) => {
-        console.log(
-          `/api/fvtt/v1/bestiary?version=${version}&id=${creature.value.id}`
-        );
-        // if (!creature.value) {
-        //   return Promise.reject();
-        // }
+        if (!creature.value) {
+          return Promise.reject();
+        }
 
-        // try {
-        //   return downloadByUrl(`/api/fvtt/v1/bestiary?version=${version}&id=${creature.value.id}`);
-        // } catch (err) {
-        //   return Promise.reject(err);
-        // }
+        try {
+          return downloadByUrl(
+            `/api/fvtt/v1/bestiary?version=${version}&id=${creature.value.id}`
+          );
+        } catch (err) {
+          return Promise.reject(err);
+        }
       };
 
       const creatureInfoQuery = async (url: string) => {

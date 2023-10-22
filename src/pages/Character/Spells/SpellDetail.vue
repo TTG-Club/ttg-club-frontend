@@ -30,6 +30,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import { downloadByUrl } from '@/shared/helpers/download';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -86,19 +87,17 @@
       },
 
       exportFoundry(version) {
-        console.log(
-          `/api/fvtt/v1/spell?version=${version}&id=${this.spell.id}`
-        );
+        if (!this.spell) {
+          return Promise.reject();
+        }
 
-        // if (!this.spell) {
-        //   return Promise.reject();
-        // }
-
-        // try {
-        //   return downloadByUrl(`/api/fvtt/v1/spell?version=${version}&id=${this.spell.id}`);
-        // } catch (err) {
-        //   return Promise.reject(err);
-        // }
+        try {
+          return downloadByUrl(
+            `/api/fvtt/v1/spell?version=${version}&id=${this.spell.id}`
+          );
+        } catch (err) {
+          return Promise.reject(err);
+        }
       },
 
       close() {
