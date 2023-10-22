@@ -21,7 +21,6 @@
           v-model="filter"
           :disabled="disabled"
           :placeholder="togglePlaceholder"
-          @update:model-value="onSearch"
         />
 
         <div
@@ -112,7 +111,7 @@
   const input = ref(null);
   const dropdownHeader = ref(null);
   const focused = ref<Boolean>(false);
-  const filter = ref<String>('');
+  const filter = ref<string | number | undefined>('');
   const selectedOptions = ref([]);
 
   onClickOutside(dropdownHeader, () => {
@@ -174,10 +173,6 @@
       .map(el => el.name.replace(/\(.+\)$/i, ''))
       .join(', ');
   });
-
-  const onSearch = (e: string) => {
-    filter.value = e;
-  };
 
   watch(focused, f => {
     if (!f) {
