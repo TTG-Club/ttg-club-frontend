@@ -169,9 +169,7 @@
       'value'
     );
 
-    return optionsToDisplay
-      .map(el => el.name.replace(/\(.+\)$/i, ''))
-      .join(', ');
+    return optionsToDisplay.map(el => el.name).join(', ');
   });
 
   watch(focused, f => {
@@ -204,6 +202,9 @@
       padding: 11px;
       top: 0;
       width: 100%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
 
     &__select {
@@ -244,6 +245,7 @@
     &__input-wrapper {
       position: relative;
       cursor: pointer;
+      width: 100%;
     }
     &__wrapper {
       @include css_anim();
