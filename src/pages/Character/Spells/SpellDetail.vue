@@ -8,6 +8,7 @@
         :title="spell?.name?.rus || ''"
         bookmark
         print
+        :foundry-versions="foundryVersions"
         @close="close"
         @export-foundry="exportFoundry"
       />
@@ -29,7 +30,6 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { downloadByUrl } from '@/shared/helpers/download';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -49,7 +49,8 @@
       spell: undefined,
       loading: false,
       error: false,
-      abortController: null
+      abortController: null,
+      foundryVersions: [11]
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile'])
@@ -84,16 +85,20 @@
         }
       },
 
-      exportFoundry() {
-        if (!this.spell) {
-          return Promise.reject();
-        }
+      exportFoundry(version) {
+        console.log(
+          `/api/fvtt/v1/spell?version=${version}&id=${this.spell.id}`
+        );
 
-        try {
-          return downloadByUrl(`/api/fvtt/v1/spell/${this.spell.id}`);
-        } catch (err) {
-          return Promise.reject(err);
-        }
+        // if (!this.spell) {
+        //   return Promise.reject();
+        // }
+
+        // try {
+        //   return downloadByUrl(`/api/fvtt/v1/spell?version=${version}&id=${this.spell.id}`);
+        // } catch (err) {
+        //   return Promise.reject(err);
+        // }
       },
 
       close() {
