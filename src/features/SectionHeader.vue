@@ -54,8 +54,7 @@
         v-if="onExportFoundry"
         v-tippy="
           !withFoundryDropdown && {
-            // eslint-disable-next-line vue/max-len
-            content: `<span>Импорт в Foundry VTT ${foundryVersions[0]}.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>`
+            content: getFVTTContent(foundryVersions[0])
           }
         "
         class="section-header__control is-only-desktop"
@@ -74,10 +73,7 @@
           <div
             v-for="(version, key) in foundryVersions"
             :key="key"
-            v-tippy="{
-              // eslint-disable-next-line vue/max-len
-              content: `<span>Импорт в Foundry VTT ${version}.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>`
-            }"
+            v-tippy="{ content: getFVTTContent(version) }"
             class="section-header__dropdown"
             @click.left.exact.prevent="exportToFoundry(version)"
             @dblclick.prevent.stop
@@ -180,6 +176,9 @@
   );
 
   const closeAvailable = computed(() => props.onClose);
+
+  const getFVTTContent = (version: number): string =>
+    `<span>Импорт в Foundry VTT ${version}.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>`;
 
   const copyURL = () => {
     if (!clipboard.isSupported) {
