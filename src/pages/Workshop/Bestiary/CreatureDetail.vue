@@ -8,6 +8,7 @@
         :title="creature?.name?.rus || ''"
         bookmark
         print
+        :foundry-versions="foundryVersions"
         @close="onClose"
         @export-foundry="exportFoundry"
       />
@@ -22,9 +23,9 @@
   </content-detail>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
   import { storeToRefs } from 'pinia';
-  import { defineComponent, onBeforeMount, ref } from 'vue';
+  import { onBeforeMount, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import CreatureBody from '@/pages/Workshop/Bestiary/CreatureBody.vue';
@@ -39,87 +40,71 @@
   import type { ICreature } from '@/shared/types/Workshop/Bestiary.d';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
 
-  export default defineComponent({
-    components: {
-      ContentDetail,
-      CreatureBody,
-      SectionHeader
-    },
-    setup() {
-      const http = useAxios();
-      const route = useRoute();
-      const router = useRouter();
-      const uiStore = useUIStore();
+  const http = useAxios();
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-      const { fullscreen, isMobile } = storeToRefs(uiStore);
+  const { isMobile } = storeToRefs(uiStore);
+  const foundryVersions = [10, 11];
 
-      const creature = ref<Maybe<ICreature>>(undefined);
-      const loading = ref(true);
-      const error = ref(false);
-      const abortController = ref<AbortController | null>(null);
+  const creature = ref<Maybe<ICreature>>(undefined);
+  const loading = ref(true);
+  const error = ref(false);
+  const abortController = ref<AbortController | null>(null);
 
-      const exportFoundry = () => {
-        if (!creature.value) {
-          return Promise.reject();
-        }
-
-        try {
-          return downloadByUrl(`/api/fvtt/v1/bestiary/${creature.value.id}`);
-        } catch (err) {
-          return Promise.reject(err);
-        }
-      };
-
-      const creatureInfoQuery = async (url: string) => {
-        if (abortController.value) {
-          abortController.value.abort();
-        }
-
-        try {
-          error.value = false;
-          loading.value = true;
-          abortController.value = new AbortController();
-
-          const resp = await http.post<ICreature>({
-            url,
-            signal: abortController.value.signal
-          });
-
-          creature.value = resp.data;
-        } catch (err) {
-          errorHandler(err);
-
-          error.value = true;
-        } finally {
-          loading.value = false;
-          abortController.value = null;
-        }
-      };
-
-      const onClose = () => {
-        router.push({ name: 'bestiary' });
-      };
-
-      onBeforeMount(async () => {
-        await creatureInfoQuery(route.path);
-      });
-
-      onBeforeRouteUpdate(async (to, from, next) => {
-        await creatureInfoQuery(to.path);
-
-        next();
-      });
-
-      return {
-        creature,
-        fullscreen,
-        isMobile,
-        loading,
-        error,
-        exportFoundry,
-        onClose
-      };
+  const exportFoundry = (version: number) => {
+    if (!creature.value) {
+      return Promise.reject();
     }
+
+    try {
+      return downloadByUrl(
+        `/api/fvtt/v1/bestiary?version=${version}&id=${creature.value.id}`
+      );
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const creatureInfoQuery = async (url: string) => {
+    if (abortController.value) {
+      abortController.value.abort();
+    }
+
+    try {
+      error.value = false;
+      loading.value = true;
+      abortController.value = new AbortController();
+
+      const resp = await http.post<ICreature>({
+        url,
+        signal: abortController.value.signal
+      });
+
+      creature.value = resp.data;
+    } catch (err) {
+      errorHandler(err);
+
+      error.value = true;
+    } finally {
+      loading.value = false;
+      abortController.value = null;
+    }
+  };
+
+  const onClose = () => {
+    router.push({ name: 'bestiary' });
+  };
+
+  onBeforeMount(async () => {
+    await creatureInfoQuery(route.path);
+  });
+
+  onBeforeRouteUpdate(async (to, _from, next) => {
+    await creatureInfoQuery(to.path);
+
+    next();
   });
 </script>
 

@@ -52,17 +52,34 @@
 
       <ui-button
         v-if="onExportFoundry"
-        v-tippy="{
-          // eslint-disable-next-line vue/max-len
+        :tooltip="{
           content:
-            '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>'
+            '<span>Импорт в Foundry VTT.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>'
         }"
         class="section-header__control is-only-desktop"
         icon="export-foundry"
         type="text"
         color="text"
-        @click.left.exact.prevent.stop="exportToFoundry"
-      />
+        split
+        @click.left.exact.prevent.stop="
+          !withFoundryDropdown && exportToFoundry()
+        "
+      >
+        <template
+          v-if="withFoundryDropdown"
+          #dropdown
+        >
+          <div
+            v-for="(version, key) in foundryVersions"
+            :key="key"
+            class="section-header__dropdown"
+            @click.left.exact.prevent="exportToFoundry(version)"
+            @dblclick.prevent.stop
+          >
+            FVTT {{ version }}
+          </div>
+        </template>
+      </ui-button>
 
       <ui-button
         v-if="fullscreen"
@@ -113,7 +130,8 @@
       bookmark?: boolean;
       print?: boolean;
       fullscreen?: boolean;
-      onExportFoundry?: () => void;
+      onExportFoundry?: (version: number) => void;
+      foundryVersions: Array<number>;
       onClose?: () => void;
     }>(),
     {
@@ -129,7 +147,7 @@
   );
 
   type Emit = {
-    (e: 'exportFoundry'): void;
+    (e: 'exportFoundry', version: number): void;
     (e: 'close'): void;
   };
 
@@ -143,6 +161,8 @@
   const { fullscreen: fullscreenState } = storeToRefs(uiStore);
 
   const urlForCopy = computed(() => window.location.origin + route.path);
+
+  const withFoundryDropdown = computed(() => props.foundryVersions.length > 1);
 
   const hasControls = computed(
     () =>
@@ -200,13 +220,13 @@
     window.print();
   };
 
-  const exportToFoundry = () => {
+  const exportToFoundry = (version: number = 11) => {
     sendShareMetrics({
       method: 'export_foundry',
       id: route.path
     });
 
-    emit('exportFoundry');
+    emit('exportFoundry', version);
   };
 </script>
 
@@ -222,6 +242,20 @@
     flex-wrap: nowrap;
     flex-shrink: 0;
     padding: 12px 16px 12px 16px;
+
+    &__dropdown {
+      padding: 6px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      min-width: 100px;
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+      text-overflow: ellipsis;
+      line-height: 18px;
+      font-size: var(--main-font-size);
+    }
 
     @include media-min($xl) {
       padding: 16px 24px 16px 24px;
