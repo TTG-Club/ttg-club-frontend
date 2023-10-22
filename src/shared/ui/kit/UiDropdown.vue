@@ -243,6 +243,7 @@
     }
     &__input-wrapper {
       position: relative;
+      cursor: pointer;
     }
     &__wrapper {
       @include css_anim();
@@ -254,7 +255,6 @@
       display: flex;
       flex-direction: row;
       background: var(--bg-sub-menu);
-      cursor: pointer;
       min-height: 38px;
       border: {
         width: 1px;
