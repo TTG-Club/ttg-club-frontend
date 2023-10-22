@@ -106,13 +106,7 @@
   import { debounce } from 'lodash-es';
   import { storeToRefs } from 'pinia';
   import { computed, ref } from 'vue';
-  import {
-    onBeforeRouteUpdate,
-    useRoute,
-    useRouter,
-    type LocationQueryValue,
-    type RouteLocationNormalized
-  } from 'vue-router';
+  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import SearchLink from '@/pages/Search/SearchLink.vue';
 
@@ -127,6 +121,8 @@
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
+
+  import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
 
   const http = useAxios();
   const route = useRoute();
