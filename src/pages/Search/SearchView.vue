@@ -69,7 +69,7 @@
             v-if="!search.trim().length && !results?.items.length"
             class="search-view__results_text"
           >
-            Введите текст, что бы начать
+            Введите текст, чтобы начать
           </div>
 
           <div
@@ -107,11 +107,11 @@
   import { storeToRefs } from 'pinia';
   import { computed, ref } from 'vue';
   import {
-    type LocationQueryValue,
     onBeforeRouteUpdate,
-    type RouteLocationNormalized,
     useRoute,
-    useRouter
+    useRouter,
+    type LocationQueryValue,
+    type RouteLocationNormalized
   } from 'vue-router';
 
   import SearchLink from '@/pages/Search/SearchLink.vue';
