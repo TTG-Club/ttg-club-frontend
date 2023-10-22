@@ -52,11 +52,11 @@
 
       <ui-button
         v-if="onExportFoundry"
-        v-tippy="
-          !withFoundryDropdown && {
-            content: getFVTTContent(foundryVersions[0])
-          }
-        "
+        :tooltip="{
+          content:
+            '<span>Импорт в Foundry VTT.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>',
+          hideOnClick: true
+        }"
         class="section-header__control is-only-desktop"
         icon="export-foundry"
         type="text"
@@ -73,7 +73,6 @@
           <div
             v-for="(version, key) in foundryVersions"
             :key="key"
-            v-tippy="{ content: getFVTTContent(version) }"
             class="section-header__dropdown"
             @click.left.exact.prevent="exportToFoundry(version)"
             @dblclick.prevent.stop
@@ -176,9 +175,6 @@
   );
 
   const closeAvailable = computed(() => props.onClose);
-
-  const getFVTTContent = (version: number): string =>
-    `<span>Импорт в Foundry VTT ${version}.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>`;
 
   const copyURL = () => {
     if (!clipboard.isSupported) {
