@@ -60,7 +60,7 @@
 
     try {
       return downloadByUrl(
-        `/api/fvtt/v1/bestiary?version=${version}&id=${creature.value.id}`
+        `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`
       );
     } catch (err) {
       return Promise.reject(err);
