@@ -128,7 +128,10 @@
       bookmark?: boolean;
       print?: boolean;
       fullscreen?: boolean;
-      onExportFoundry?: (version: number) => void;
+      onExportFoundry?: (
+        version: number,
+        showErrorToast: (msg: string) => void
+      ) => void;
       foundryVersions?: Array<10 | 11 | 12>;
       defaultFoundry?: 10 | 11 | 12;
       onClose?: () => void;
@@ -148,7 +151,11 @@
   );
 
   type Emit = {
-    (e: 'exportFoundry', version: number): void;
+    (
+      e: 'exportFoundry',
+      version: number,
+      showErrorToast: (msg: string) => void
+    ): void;
     (e: 'close'): void;
   };
 
@@ -236,7 +243,7 @@
       id: route.path
     });
 
-    emit('exportFoundry', ver);
+    emit('exportFoundry', ver, toast.error);
   };
 </script>
 
