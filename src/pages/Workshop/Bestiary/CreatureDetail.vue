@@ -46,25 +46,27 @@
   const uiStore = useUIStore();
 
   const { isMobile } = storeToRefs(uiStore);
-  const foundryVersions = [10, 11];
+  const foundryVersions: Array<10 | 11> = [10, 11];
 
   const creature = ref<Maybe<ICreature>>(undefined);
   const loading = ref(true);
   const error = ref(false);
   const abortController = ref<AbortController | null>(null);
 
-  const exportFoundry = (version: number) => {
+  const exportFoundry = (
+    version: number,
+    showErrorToast: (msg: string) => void
+  ) => {
     if (!creature.value) {
       return Promise.reject();
     }
 
-    try {
-      return downloadByUrl(
-        `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`
-      );
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    return downloadByUrl(
+      `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`
+    ).catch(err => {
+      showErrorToast(`${creature.value?.name.rus} ещё в пути.`);
+      Promise.reject(err);
+    });
   };
 
   const creatureInfoQuery = async (url: string) => {
