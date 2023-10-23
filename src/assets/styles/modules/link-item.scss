@@ -156,6 +156,12 @@
       &__price {
         color: var(--text-btn-color);
       }
+
+      &__damage {
+        &_dice {
+          color: var(--text-btn-color) !important;
+        }
+      }
     }
   }
 

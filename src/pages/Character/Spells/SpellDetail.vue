@@ -60,7 +60,7 @@
 
     try {
       return downloadByUrl(
-        `/api/fvtt/v1/spell?version=${version}&id=${spell.value.id}`
+        `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`
       );
     } catch (err) {
       return Promise.reject(err);
