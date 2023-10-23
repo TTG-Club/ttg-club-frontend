@@ -70,6 +70,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .auth-reg-modal {
     &__container {
       background-color: var(--bg-secondary);

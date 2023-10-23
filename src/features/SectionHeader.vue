@@ -52,28 +52,43 @@
 
       <ui-button
         v-if="onExportFoundry"
-        v-tippy="{
-          // eslint-disable-next-line vue/max-len
+        :tooltip="{
           content:
-            '<span>Импорт в Foundry VTT 10.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>'
+            '<span>Импорт в Foundry VTT.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>'
         }"
         class="section-header__control is-only-desktop"
         icon="export-foundry"
         type="text"
         color="text"
-        @click.left.exact.prevent.stop="exportToFoundry"
-      />
+        split
+        @click.left.exact.prevent="exportToFoundry(defaultFoundry)"
+      >
+        <template
+          v-if="withFoundryDropdown"
+          #dropdown
+        >
+          <div
+            v-for="(version, key) in foundryVersions"
+            :key="key"
+            class="section-header__dropdown"
+            @click.left.exact.prevent="exportToFoundry(version)"
+            @dblclick.prevent.stop
+          >
+            FVTT {{ version }}
+          </div>
+        </template>
+      </ui-button>
 
       <ui-button
         v-if="fullscreen"
         v-tippy="{
-          content: uiStore.fullscreen ? 'Свернуть окно' : 'Развернуть окно'
+          content: fullscreenState ? 'Свернуть окно' : 'Развернуть окно'
         }"
         class="section-header__control is-only-desktop"
-        :icon="`expand/${uiStore.fullscreen ? 'exit' : 'enter'}`"
+        :icon="`expand/${fullscreenState ? 'exit' : 'enter'}`"
         type="text"
         color="text"
-        @click.left.exact.prevent.stop="toggleFullscreen"
+        @click.left.exact.prevent.stop="fullscreenState = !fullscreenState"
       />
 
       <ui-button
@@ -90,11 +105,12 @@
 
 <script setup lang="ts">
   import { useClipboard } from '@vueuse/core';
+  import { storeToRefs } from 'pinia';
   import { computed, h } from 'vue';
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
@@ -112,7 +128,9 @@
       bookmark?: boolean;
       print?: boolean;
       fullscreen?: boolean;
-      onExportFoundry?: () => void;
+      onExportFoundry?: (version: number) => void;
+      foundryVersions?: Array<10 | 11 | 12>;
+      defaultFoundry?: 10 | 11 | 12;
       onClose?: () => void;
     }>(),
     {
@@ -122,13 +140,15 @@
       bookmark: false,
       print: false,
       fullscreen: false,
+      foundryVersions: () => [11],
+      defaultFoundry: 11,
       onExportFoundry: undefined,
       onClose: undefined
     }
   );
 
   type Emit = {
-    (e: 'exportFoundry'): void;
+    (e: 'exportFoundry', version: number): void;
     (e: 'close'): void;
   };
 
@@ -139,9 +159,10 @@
   const clipboard = useClipboard();
   const { sendShareMetrics } = useMetrics();
   const toast = useToast(ToastEventBus);
-  const { toggleFullscreen } = uiStore;
+  const { fullscreen: fullscreenState } = storeToRefs(uiStore);
 
   const urlForCopy = computed(() => window.location.origin + route.path);
+  const withFoundryDropdown = computed(() => props.foundryVersions.length > 1);
 
   const hasControls = computed(
     () =>
@@ -199,17 +220,30 @@
     window.print();
   };
 
-  const exportToFoundry = () => {
+  const exportToFoundry = (version?: typeof props.defaultFoundry) => {
+    let ver = props.defaultFoundry || 11;
+
+    if (props.foundryVersions.length === 1) {
+      [ver] = props.foundryVersions;
+    }
+
+    if (props.foundryVersions.length > 1 && version) {
+      ver = version;
+    }
+
     sendShareMetrics({
       method: 'export_foundry',
       id: route.path
     });
 
-    emit('exportFoundry');
+    emit('exportFoundry', ver);
   };
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .section-header {
     width: 100%;
     display: flex;
@@ -218,6 +252,26 @@
     flex-wrap: nowrap;
     flex-shrink: 0;
     padding: 12px 16px 12px 16px;
+
+    &__dropdown {
+      @include css_anim();
+
+      padding: 6px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      min-width: 100px;
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+      text-overflow: ellipsis;
+      line-height: 18px;
+      font-size: var(--main-font-size);
+
+      &:hover {
+        background-color: var(--hover);
+      }
+    }
 
     @include media-min($xl) {
       padding: 16px 24px 16px 24px;

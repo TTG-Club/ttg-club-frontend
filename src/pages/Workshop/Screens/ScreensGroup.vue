@@ -35,7 +35,7 @@
 
   import ScreenLink from '@/pages/Workshop/Screens/ScreenLink.vue';
 
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   defineOptions({
     inheritAttrs: false
@@ -82,6 +82,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .screen-group {
     width: 100%;
 

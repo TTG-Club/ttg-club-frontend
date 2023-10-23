@@ -1,8 +1,8 @@
 <template>
   <form
     class="login form"
-    @keyup.enter.exact.prevent="onSubmit"
     @submit.prevent="onSubmit"
+    @keyup.enter.prevent.stop
   >
     <div class="form__row">
       <ui-input
@@ -81,7 +81,7 @@
   import { defineComponent, reactive, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/app/configs/ToastConfig';
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useMetrics } from '@/shared/compositions/useMetrics';
   import {

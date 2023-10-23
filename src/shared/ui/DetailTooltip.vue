@@ -1,8 +1,5 @@
 <template>
-  <tippy
-    theme="dnd5club no-padding"
-    v-bind="tippyConfig"
-  >
+  <tippy v-bind="tippyConfig">
     <template #default>
       <slot name="default" />
     </template>
@@ -18,7 +15,7 @@
   import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
-  import { DefaultTippyProps } from '@/app/configs/TippyConfig';
+  import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
   import OptionBody from '@/pages/Character/Options/OptionBody.vue';
   import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
@@ -33,8 +30,9 @@
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
+  import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';
 
   type TDetailType =
@@ -123,8 +121,8 @@
     return true;
   };
 
-  const tippyConfig = computed(() => {
-    const config = cloneDeep(DefaultTippyProps);
+  const tippyConfig = computed<DefaultProps>(() => {
+    const config = cloneDeep<DefaultProps>(DefaultTippyProps);
 
     config.onTrigger = () => getContent();
 

@@ -1,4 +1,5 @@
-@use '../variables' as *;
+@use '@/assets/styles/variables/breakpoints' as *;
+@use '@/assets/styles/variables/mixins' as *;
 
 .navbar {
   display: flex;
@@ -97,7 +98,7 @@
       @include media-min($md) {
         width: auto;
         height: 100%;
-        margin-left: 0px;
+        margin-left: 0;
       }
     }
 
@@ -111,7 +112,7 @@
       }
 
       @include media-min($md) {
-        margin-left: 0px;
+        margin-left: 0;
         height: auto;
       }
     }

@@ -16,13 +16,13 @@ concurrency:
 
 jobs:
   lint:
-    name: Lint Job
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           repository: TTG-Club/ttg-club-frontend
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-node@v3
         with:

@@ -17,10 +17,8 @@
 
   import NavBar from '@/features/menu/NavBar.vue';
 
-  import { useUIStore } from '@/shared/stores/UIStore';
   import { useUserStore } from '@/shared/stores/UserStore';
 
-  const uiStore = useUIStore();
   const userStore = useUserStore();
 
   const initUser = async () => {
@@ -33,32 +31,7 @@
     }
   };
 
-  const initTheme = async () => {
-    await uiStore.removeOldTheme();
-
-    const html = document.querySelector('html');
-
-    let avoidHtmlUpdate = false;
-
-    if (html?.dataset?.theme) {
-      avoidHtmlUpdate = ['theme-light', 'theme-dark'].includes(
-        html?.dataset?.theme
-      );
-    }
-
-    uiStore.setTheme({
-      name: uiStore.getCookieTheme(),
-      avoidHtmlUpdate
-    });
-  };
-
-  const initFullscreen = async () => {
-    await uiStore.restoreFullscreenState();
-  };
-
   tryOnBeforeMount(async () => {
-    await initTheme();
     await initUser();
-    await initFullscreen();
   });
 </script>

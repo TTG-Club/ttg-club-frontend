@@ -30,9 +30,10 @@
   import { defineComponent, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
+  import PageLayout from '@/layouts/PageLayout.vue';
+
   import { useAxios } from '@/shared/compositions/useAxios';
-  import PageLayout from '@/shared/ui/content/PageLayout.vue';
-  import RawContent from '@/shared/ui/content/RawContent.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { RouteLocationNormalized } from 'vue-router';
 

@@ -30,13 +30,14 @@
 
   import RuleLink from '@/pages/Wiki/Rules/RuleLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
   import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { RulesFilterDefaults } from '@/shared/types/Wiki/Rules.d';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGridList from '@/shared/ui/virtual-views/VirtualGridList/VirtualGridList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';

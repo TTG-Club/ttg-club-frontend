@@ -36,6 +36,7 @@ export type TSpellLink = {
 };
 
 export type TSpellItem = {
+  id: number;
   name: TName;
   level: number;
   school: string;

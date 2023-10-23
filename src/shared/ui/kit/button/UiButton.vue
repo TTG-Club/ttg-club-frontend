@@ -271,9 +271,11 @@
 </script>
 
 <style lang="scss" module>
+  @use '@/assets/styles/variables/mixins' as *;
+
   $radius: 8px;
 
-  :root {
+  html {
     --btn-primary: var(--primary);
     --btn-success: var(--success);
     --btn-error: var(--error);
@@ -304,7 +306,9 @@
   }
 
   .body {
-    @include css_anim();
+    $items: background-color, border-color;
+
+    @include css_anim($item: $items);
 
     display: flex;
     align-items: center;

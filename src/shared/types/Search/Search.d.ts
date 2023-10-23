@@ -11,8 +11,3 @@ export type TSearchResult = {
   url: string;
   source?: TSearchResultSource;
 };
-
-export type TSearchResultList = {
-  count: number;
-  list: TSearchResult[];
-};

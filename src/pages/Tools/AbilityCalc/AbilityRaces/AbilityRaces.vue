@@ -227,7 +227,7 @@
 
       const { initPages, items } = usePagination({
         url: '/races',
-        limit: -1,
+        size: -1,
         order: [
           {
             field: 'name',
@@ -438,6 +438,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ability-races {
     display: flex;
     gap: 32px;

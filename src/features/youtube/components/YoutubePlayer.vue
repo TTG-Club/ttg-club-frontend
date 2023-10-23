@@ -173,6 +173,8 @@
 </script>
 
 <style module lang="scss">
+  @use '@/assets/styles/variables/mixins' as *;
+
   .youtube-player {
     width: 100%;
     position: relative;

@@ -23,6 +23,7 @@
         v-if="isShow"
         :class="classes"
         class="nav-popover__body"
+        :style="bodyStyle"
       >
         <slot
           :close="onClose"
@@ -46,12 +47,14 @@
       isMenu?: boolean;
       isLeft?: boolean;
       innerScroll?: boolean;
+      bodyStyle?: any;
     }>(),
     {
       modelValue: false,
       isMenu: false,
       isLeft: false,
-      innerScroll: false
+      innerScroll: false,
+      bodyStyle: {}
     }
   );
 
@@ -90,6 +93,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .nav-popover {
     // position: relative; // Нужно будет включать, если нужно относительно кнопки позиционирование
     width: 40px;
@@ -190,7 +196,7 @@
     .nav-popover {
       &__body {
         top: auto;
-        left: 8px;
+        left: initial;
         right: 8px;
         bottom: 64px;
         width: auto;

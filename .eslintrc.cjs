@@ -1,16 +1,6 @@
 require('@rushstack/eslint-patch/modern-module-resolution');
 
-const boundaries = [
-  'app',
-  'processes',
-  'router',
-  'store',
-  'pages',
-  'widgets',
-  'features',
-  'entities',
-  'shared'
-];
+const boundaries = ['app', 'pages', 'layouts', 'features', 'shared'];
 
 module.exports = {
   root: true,
@@ -107,9 +97,7 @@ module.exports = {
         message: '${file.type} is not allowed to import ${dependency.type}',
         rules: boundaries.map((name, index) => ({
           from: name,
-          allow: boundaries.slice(
-            index + 1 >= boundaries.length ? index : index + 1
-          )
+          allow: boundaries.slice(index)
         }))
       }
     ],
@@ -221,6 +209,18 @@ module.exports = {
     'vue/no-setup-props-destructure': 'off',
     'vue/script-setup-uses-vars': 'error',
     'vue/valid-v-slot': 'off',
+    'vue/html-self-closing': [
+      'error',
+      {
+        html: {
+          void: 'any',
+          normal: 'always',
+          component: 'always'
+        },
+        svg: 'always',
+        math: 'always'
+      }
+    ],
 
     // Vue.js Accessibility
     'vuejs-accessibility/anchor-has-content': 'off',

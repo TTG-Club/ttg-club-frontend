@@ -131,6 +131,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .ability-table {
     width: 100%;
     display: grid;

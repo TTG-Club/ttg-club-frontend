@@ -8,7 +8,9 @@
         :title="spell?.name?.rus || ''"
         bookmark
         print
-        @close="close"
+        :foundry-versions="foundryVersions"
+        @close="onClose"
+        @export-foundry="exportFoundry"
       />
     </template>
 
@@ -21,72 +23,89 @@
   </content-detail>
 </template>
 
-<script>
-  import { mapState } from 'pinia';
+<script lang="ts" setup>
+  import { storeToRefs } from 'pinia';
+  import { onBeforeMount, ref } from 'vue';
+  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import { useAxios } from '@/shared/compositions/useAxios';
+  import { downloadByUrl } from '@/shared/helpers/download';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/content/ContentDetail.vue';
+  import type { TSpellItem } from '@/shared/types/Character/Spells';
+  import type { Maybe } from '@/shared/types/Utility';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
 
-  export default {
-    components: {
-      ContentDetail,
-      SpellBody,
-      SectionHeader
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.spellInfoQuery(to.path);
+  const http = useAxios();
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
 
-      next();
-    },
-    data: () => ({
-      spell: undefined,
-      loading: false,
-      error: false,
-      abortController: null
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile'])
-    },
-    async mounted() {
-      await this.spellInfoQuery(this.$route.path);
-    },
-    methods: {
-      async spellInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
+  const { isMobile } = storeToRefs(uiStore);
+  const foundryVersions = [11];
 
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
+  const spell = ref<Maybe<TSpellItem>>(undefined);
+  const loading = ref(true);
+  const error = ref(false);
+  const abortController = ref<AbortController | null>(null);
 
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal
-          });
+  const exportFoundry = (version: number) => {
+    if (!spell.value) {
+      return Promise.reject();
+    }
 
-          this.spell = resp.data;
-        } catch (err) {
-          errorHandler(err);
-
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
-
-      close() {
-        this.$router.push({ name: 'spells' });
-      }
+    try {
+      return downloadByUrl(
+        `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`
+      );
+    } catch (err) {
+      return Promise.reject(err);
     }
   };
+
+  const spellInfoQuery = async (url: string) => {
+    if (abortController.value) {
+      abortController.value.abort();
+    }
+
+    try {
+      error.value = false;
+      loading.value = true;
+      abortController.value = new AbortController();
+
+      const resp = await http.post<TSpellItem>({
+        url,
+        signal: abortController.value.signal
+      });
+
+      spell.value = resp.data;
+    } catch (err) {
+      errorHandler(err);
+
+      error.value = true;
+    } finally {
+      loading.value = false;
+      abortController.value = null;
+    }
+  };
+
+  const onClose = () => {
+    router.push({ name: 'spells' });
+  };
+
+  onBeforeMount(async () => {
+    await spellInfoQuery(route.path);
+  });
+
+  onBeforeRouteUpdate(async (to, _from, next) => {
+    await spellInfoQuery(to.path);
+
+    next();
+  });
 </script>
 
 <style lang="scss" scoped>

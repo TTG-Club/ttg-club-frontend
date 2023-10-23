@@ -2,7 +2,7 @@ import { DiceRoller } from 'dice-roller-parser';
 import { h } from 'vue';
 import { POSITION, useToast } from 'vue-toastification';
 
-import { ToastEventBus } from '@/app/configs/ToastConfig';
+import { ToastEventBus } from '@/core/configs/ToastConfig';
 
 import type {
   DiceExpressionRoll,

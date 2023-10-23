@@ -31,6 +31,8 @@
 
   import ArmorLink from '@/pages/Inventory/Armors/ArmorLink.vue';
 
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
   import { useFilter } from '@/shared/compositions/useFilter';
   import { usePagination } from '@/shared/compositions/usePagination';
   import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
@@ -38,7 +40,6 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import { ArmorsFilterDefaults } from '@/shared/types/Inventory/Armors.d';
   import type { AnyObject } from '@/shared/types/Utility';
-  import ContentLayout from '@/shared/ui/content/ContentLayout.vue';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
@@ -56,7 +57,7 @@
 
   const { initPages, items: armors } = usePagination({
     url: '/armors',
-    limit: -1,
+    size: -1,
     search: filter.search,
     order: [
       {

@@ -40,10 +40,10 @@
           </form>
 
           <div
-            v-if="!inProgress && results?.count"
+            v-if="!inProgress && results?.total"
             class="search-modal__control__count"
           >
-            Найдено: {{ results?.count }}
+            Найдено: {{ results?.total }}
           </div>
 
           <ui-button
@@ -57,16 +57,16 @@
 
         <div class="search-modal__results">
           <div
-            v-if="!search.length && !results?.list.length"
+            v-if="!search.length && !results?.items.length"
             class="search-modal__text"
             @mouseenter.self="selectedIndex = null"
             @focusin.self="selectedIndex = null"
           >
-            Введите текст, что бы начать
+            Введите текст, чтобы начать
           </div>
 
           <div
-            v-else-if="search.length && !results?.list.length && inProgress"
+            v-else-if="search.length && !results?.items.length && inProgress"
             class="search-modal__text"
             @mouseenter.self="selectedIndex = null"
             @focusin.self="selectedIndex = null"
@@ -75,7 +75,7 @@
           </div>
 
           <div
-            v-else-if="!results?.list.length && !inProgress"
+            v-else-if="!results?.items.length && !inProgress"
             class="search-modal__text"
             @mouseenter.self="selectedIndex = null"
             @focusin.self="selectedIndex = null"
@@ -84,7 +84,7 @@
           </div>
 
           <search-link
-            v-for="(res, key) in results?.list || []"
+            v-for="(res, key) in results?.items || []"
             :key="key"
             :search-link="res"
             :selected="selectedIndex === key"
@@ -128,7 +128,8 @@
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { useMetrics } from '@/shared/compositions/useMetrics';
-  import type { TSearchResultList } from '@/shared/types/Search/Search';
+  import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
+  import type { TSearchResult } from '@/shared/types/Search/Search';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
@@ -147,7 +148,7 @@
   const http = useAxios();
   const controller = ref<AbortController | null>(null);
   const search = ref('');
-  const results = ref<TSearchResultList | null>(null);
+  const results = ref<IPaginatedResponse<TSearchResult> | null>(null);
   const inProgress = ref(false);
   const input = ref<HTMLElement | null>(null);
   const { focused } = useFocus(input, { initialValue: true });
@@ -177,11 +178,11 @@
       inProgress.value = true;
       controller.value = new AbortController();
 
-      const resp = await http.post({
+      const resp = await http.post<IPaginatedResponse<TSearchResult>>({
         url: '/search',
         payload: {
           page: 0,
-          limit: 5,
+          size: 5,
           search: {
             value: search.value,
             exact: false
@@ -197,14 +198,14 @@
 
       sendSearchMetrics(search);
 
-      const result = resp.data as TSearchResultList;
+      const result = resp.data;
 
       results.value = result;
       selectedIndex.value = null;
 
       sendSearchViewResultsMetrics(
         search,
-        result.list.map(item => ({
+        result.items.map(item => ({
           item_id: item.url,
           item_name: item.name,
           item_category: item.section,
@@ -233,11 +234,11 @@
       inProgress.value = true;
       controller.value = new AbortController();
 
-      const resp = await http.post<TSearchResultList>({
+      const resp = await http.post<IPaginatedResponse<TSearchResult>>({
         url: '/search/random',
         payload: {
           page: 0,
-          limit: 5,
+          size: 5,
           search: null,
           order: []
         },
@@ -257,7 +258,7 @@
 
       sendSearchViewResultsMetrics(
         'random',
-        result.list.map(item => ({
+        result.items.map(item => ({
           item_id: item.url,
           item_name: item.name,
           item_category: item.section,
@@ -294,13 +295,13 @@
 
     focused.value = false;
 
-    if (!results.value?.list.length) {
+    if (!results.value?.items.length) {
       return;
     }
 
     if (
       selectedIndex.value === null ||
-      selectedIndex.value === results.value.list.length - 1
+      selectedIndex.value === results.value.items.length - 1
     ) {
       selectedIndex.value = 0;
 
@@ -319,12 +320,12 @@
 
     focused.value = false;
 
-    if (!results.value?.list.length) {
+    if (!results.value?.items.length) {
       return;
     }
 
     if (!selectedIndex.value) {
-      selectedIndex.value = results.value.list.length - 1;
+      selectedIndex.value = results.value.items.length - 1;
 
       return;
     }
@@ -351,12 +352,12 @@
 
     if (
       typeof selectedIndex.value !== 'number' ||
-      !results.value?.list.length
+      !results.value?.items.length
     ) {
       return;
     }
 
-    const result = results.value.list[selectedIndex.value];
+    const result = results.value.items[selectedIndex.value];
 
     if (!result) {
       return;
@@ -370,8 +371,8 @@
       return;
     }
 
-    if (results.value?.list.length === 1) {
-      router.push({ path: results.value.list[0].url });
+    if (results.value?.items.length === 1) {
+      router.push({ path: results.value.items[0].url });
 
       return;
     }
@@ -398,6 +399,9 @@
 </script>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   :deep(.search-modal) {
     pointer-events: none;
   }

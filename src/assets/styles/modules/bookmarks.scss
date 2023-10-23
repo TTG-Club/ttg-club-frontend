@@ -1,3 +1,6 @@
+@use '@/assets/styles/variables/mixins' as *;
+@use '@/assets/styles/variables/breakpoints' as *;
+
 .bookmarks {
   width: 100%;
   overflow: hidden;

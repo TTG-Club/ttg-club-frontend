@@ -1,4 +1,5 @@
-@use '../variables' as *;
+@use '@/assets/styles/variables/breakpoints' as *;
+@use '@/assets/styles/variables/mixins' as *;
 
 .link-item-expand {
   width: 100%;

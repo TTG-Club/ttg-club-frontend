@@ -51,30 +51,30 @@
 
         <div
           v-if="resultsNumbers"
-          class="search-view__count"
+          class="search-view__total"
         >
           Результат: {{ resultsNumbers.min }}-{{ resultsNumbers.max }} из
-          {{ results?.count }}
+          {{ results?.total }}
         </div>
 
         <div class="search-view__results">
           <search-link
-            v-for="(res, key) in results?.list || []"
+            v-for="(res, key) in results?.items || []"
             :key="key"
             :search-link="res"
             show-desc
           />
 
           <div
-            v-if="!search.trim().length && !results?.list.length"
+            v-if="!search.trim().length && !results?.items.length"
             class="search-view__results_text"
           >
-            Введите текст, что бы начать
+            Введите текст, чтобы начать
           </div>
 
           <div
             v-else-if="
-              search.trim().length && inProgress && !results?.list.length
+              search.trim().length && inProgress && !results?.items.length
             "
             class="search-view__results_text"
           >
@@ -82,7 +82,7 @@
           </div>
 
           <div
-            v-else-if="!results?.list.length && !inProgress"
+            v-else-if="!results?.items.length && !inProgress"
             class="search-view__results_text"
           >
             Боги не нашли ответа на твой запрос
@@ -106,25 +106,23 @@
   import { debounce } from 'lodash-es';
   import { storeToRefs } from 'pinia';
   import { computed, ref } from 'vue';
-  import {
-    type LocationQueryValue,
-    onBeforeRouteUpdate,
-    type RouteLocationNormalized,
-    useRoute,
-    useRouter
-  } from 'vue-router';
+  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import SearchLink from '@/pages/Search/SearchLink.vue';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { useMetrics } from '@/shared/compositions/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import type { TSearchResultList } from '@/shared/types/Search/Search.d';
-  import PageLayout from '@/shared/ui/content/PageLayout.vue';
+  import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
+  import type { TSearchResult } from '@/shared/types/Search/Search';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
+
+  import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
 
   const http = useAxios();
   const route = useRoute();
@@ -199,17 +197,17 @@
     resolveQueryPage(to?.query.page);
   };
 
-  const results = ref<TSearchResultList>({
-    count: 0,
-    list: []
+  const results = ref<IPaginatedResponse<TSearchResult>>({
+    total: 0,
+    items: []
   });
 
   const pages = computed(() => {
-    if (results.value?.count <= 20) {
+    if (results.value?.total <= 20) {
       return 0;
     }
 
-    return Math.ceil(results.value.count / 20);
+    return Math.ceil(results.value.total / 20);
   });
 
   const resultsNumbers = ref<null | { min: number; max: number }>(null);
@@ -232,11 +230,11 @@
 
   const searchQuery = async () => {
     try {
-      const resp = await http.post({
+      const resp = await http.post<IPaginatedResponse<TSearchResult>>({
         url: '/search',
         payload: {
           page: page.value - 1,
-          limit: 20,
+          size: 20,
           search: {
             value: search.value.trim(),
             exact: false
@@ -252,7 +250,7 @@
 
       sendSearchMetrics(search);
 
-      return Promise.resolve(resp.data as TSearchResultList);
+      return Promise.resolve(resp.data);
     } catch (err) {
       return Promise.reject(err);
     }
@@ -268,7 +266,7 @@
 
       const result = await searchQuery();
 
-      if (result.count && !result.list.length && page.value !== 1) {
+      if (result.total && !result.items.length && page.value !== 1) {
         page.value = 1;
 
         await onUpdateRoute(true);
@@ -297,7 +295,7 @@
 
       sendSearchViewResultsMetrics(
         search,
-        result.list.map(item => ({
+        result.items.map(item => ({
           item_id: item.url,
           item_name: item.name,
           item_category: item.section,
@@ -311,17 +309,17 @@
     } finally {
       inProgress.value = false;
 
-      if (results.value?.count) {
+      if (results.value?.total) {
         resultsNumbers.value = {
           min: page.value > 1 ? 20 * (page.value - 1) + 1 : 1,
           max:
-            page.value < pages.value && results.value.count > 20
+            page.value < pages.value && results.value.total > 20
               ? 20 * page.value
-              : results.value.count
+              : results.value.total
         };
       }
 
-      if (!results.value?.count) {
+      if (!results.value?.total) {
         resultsNumbers.value = null;
       }
     }
@@ -430,7 +428,7 @@
       }
     }
 
-    &__count {
+    &__total {
       padding: 16px 12px 16px;
     }
 
