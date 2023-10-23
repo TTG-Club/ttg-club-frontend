@@ -61,9 +61,7 @@
         type="text"
         color="text"
         split
-        @click.left.exact.prevent.stop="
-          !withFoundryDropdown && exportToFoundry()
-        "
+        @click.left.exact.prevent="exportToFoundry(defaultFoundry)"
       >
         <template
           v-if="withFoundryDropdown"
@@ -131,7 +129,8 @@
       print?: boolean;
       fullscreen?: boolean;
       onExportFoundry?: (version: number) => void;
-      foundryVersions: Array<number>;
+      foundryVersions?: Array<10 | 11 | 12>;
+      defaultFoundry?: 10 | 11 | 12;
       onClose?: () => void;
     }>(),
     {
@@ -141,6 +140,8 @@
       bookmark: false,
       print: false,
       fullscreen: false,
+      foundryVersions: () => [11],
+      defaultFoundry: 11,
       onExportFoundry: undefined,
       onClose: undefined
     }
@@ -161,7 +162,6 @@
   const { fullscreen: fullscreenState } = storeToRefs(uiStore);
 
   const urlForCopy = computed(() => window.location.origin + route.path);
-
   const withFoundryDropdown = computed(() => props.foundryVersions.length > 1);
 
   const hasControls = computed(
@@ -220,13 +220,23 @@
     window.print();
   };
 
-  const exportToFoundry = (version: number = 11) => {
+  const exportToFoundry = (version?: typeof props.defaultFoundry) => {
+    let ver = props.defaultFoundry || 11;
+
+    if (props.foundryVersions.length === 1) {
+      [ver] = props.foundryVersions;
+    }
+
+    if (props.foundryVersions.length > 1 && version) {
+      ver = version;
+    }
+
     sendShareMetrics({
       method: 'export_foundry',
       id: route.path
     });
 
-    emit('exportFoundry', version);
+    emit('exportFoundry', ver);
   };
 </script>
 
@@ -244,6 +254,8 @@
     padding: 12px 16px 12px 16px;
 
     &__dropdown {
+      @include css_anim();
+
       padding: 6px 6px;
       border-radius: 6px;
       cursor: pointer;
@@ -255,6 +267,10 @@
       text-overflow: ellipsis;
       line-height: 18px;
       font-size: var(--main-font-size);
+
+      &:hover {
+        background-color: var(--hover);
+      }
     }
 
     @include media-min($xl) {
