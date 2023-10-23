@@ -46,14 +46,17 @@
   const uiStore = useUIStore();
 
   const { isMobile } = storeToRefs(uiStore);
-  const foundryVersions = [11];
+  const foundryVersions: Array<11> = [11];
 
   const spell = ref<Maybe<TSpellItem>>(undefined);
   const loading = ref(true);
   const error = ref(false);
   const abortController = ref<AbortController | null>(null);
 
-  const exportFoundry = (version: number) => {
+  const exportFoundry = (
+    version: number,
+    showErrorToast: (msg: string) => void
+  ) => {
     if (!spell.value) {
       return Promise.reject();
     }
@@ -63,6 +66,8 @@
         `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`
       );
     } catch (err) {
+      showErrorToast('Этот свиток ещё не подготовлен.');
+
       return Promise.reject(err);
     }
   };
