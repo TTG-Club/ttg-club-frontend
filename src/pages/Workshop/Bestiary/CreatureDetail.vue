@@ -61,15 +61,12 @@
       return Promise.reject();
     }
 
-    try {
-      return downloadByUrl(
-        `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`
-      );
-    } catch (err) {
-      showErrorToast(`${creature.value.name.rus} ещё в пути.`);
-
-      return Promise.reject(err);
-    }
+    return downloadByUrl(
+      `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`
+    ).catch(err => {
+      showErrorToast(`${creature.value?.name.rus} ещё в пути.`);
+      Promise.reject(err);
+    });
   };
 
   const creatureInfoQuery = async (url: string) => {

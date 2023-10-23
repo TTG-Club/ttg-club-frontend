@@ -61,15 +61,12 @@
       return Promise.reject();
     }
 
-    try {
-      return downloadByUrl(
-        `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`
-      );
-    } catch (err) {
+    return downloadByUrl(
+      `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`
+    ).catch(err => {
       showErrorToast('Этот свиток ещё не подготовлен.');
-
-      return Promise.reject(err);
-    }
+      Promise.reject(err);
+    });
   };
 
   const spellInfoQuery = async (url: string) => {
