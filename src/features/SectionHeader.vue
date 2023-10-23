@@ -220,8 +220,16 @@
     window.print();
   };
 
-  const exportToFoundry = (version?: number) => {
-    const ver = version || props.defaultFoundry || 11;
+  const exportToFoundry = (version?: typeof props.defaultFoundry) => {
+    let ver = props.defaultFoundry || 11;
+
+    if (props.foundryVersions.length === 1) {
+      [ver] = props.foundryVersions;
+    }
+
+    if (props.foundryVersions.length > 1 && version) {
+      ver = version;
+    }
 
     sendShareMetrics({
       method: 'export_foundry',
