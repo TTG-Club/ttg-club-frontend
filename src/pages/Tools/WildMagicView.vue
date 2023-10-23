@@ -174,6 +174,7 @@
     align-items: flex-start;
     margin-bottom: 12px;
     padding: 12px;
+    gap: 16px;
 
     &__body {
       flex: 1 1 100%;
