@@ -254,6 +254,8 @@
     padding: 12px 16px 12px 16px;
 
     &__dropdown {
+      @include css_anim();
+
       padding: 6px 6px;
       border-radius: 6px;
       cursor: pointer;
@@ -265,6 +267,10 @@
       text-overflow: ellipsis;
       line-height: 18px;
       font-size: var(--main-font-size);
+
+      &:hover {
+        background-color: var(--hover);
+      }
     }
 
     @include media-min($xl) {
