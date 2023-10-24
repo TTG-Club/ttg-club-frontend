@@ -53,9 +53,9 @@
           :key="option.value"
           :class="[
             'ui-select__element',
-            { 'ui-select__element--selected': isSelectedClass(option) }
+            { 'ui-select__element--selected': isSelectedClass(option.value) }
           ]"
-          @click="selectOption(option)"
+          @click="selectOption(option.value)"
         >
           <span class="ui-select__option">
             {{ option.name }}
@@ -81,7 +81,7 @@
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
-  const modelValue = defineModel<{ modelValue: Array<String> }>();
+  const modelValue = defineModel<Array<string | number>>();
 
   const props = defineProps({
     placeholder: {
@@ -89,7 +89,10 @@
       default: ''
     },
     options: {
-      type: Array,
+      type: Array<{
+        value: string | number;
+        name: String;
+      }>,
       default: () => []
     },
     isMultiple: {
@@ -102,17 +105,17 @@
     }
   });
 
-  const input = ref(null);
-  const dropdownHeader = ref(null);
+  const input = ref<typeof UiInput | null>(null);
+  const dropdownHeader = ref<HTMLDivElement | null>(null);
   const focused = ref<Boolean>(false);
-  const filter = ref<string | number | undefined>('');
-  const selectedOptions = ref([]);
+  const filter = ref<string>('');
+  const selectedOptions = ref<Array<string | number>>([]);
 
   onClickOutside(dropdownHeader, () => {
     focused.value = false;
   });
 
-  const toggleFocus = e => {
+  const toggleFocus = (e: Event) => {
     if (e.type === 'focusin') {
       focused.value = true;
     }
@@ -121,7 +124,7 @@
       focused.value = !focused.value;
 
       if (focused.value) {
-        input.value.focusInput();
+        input.value?.focusInput();
       }
     }
   };
@@ -134,15 +137,15 @@
     focused.value ? 'arrow/up' : 'arrow/down'
   );
 
-  const isSelectedClass = (e: any) => {
-    return selectedOptions.value.includes(e.value);
+  const isSelectedClass = (option: string | number) => {
+    return selectedOptions.value.includes(option);
   };
 
-  const selectOption = (e: any) => {
+  const selectOption = (option: string | number) => {
     if (props.isMultiple) {
-      selectedOptions.value = xor(selectedOptions.value, [e.value]);
+      selectedOptions.value = xor(selectedOptions.value, [option]);
     } else {
-      selectedOptions.value[0] = e.value;
+      selectedOptions.value[0] = option;
     }
 
     modelValue.value = selectedOptions.value;
@@ -172,15 +175,14 @@
     }
   });
 
-  const filteredOptions = computed(
-    () =>
-      props.options?.filter(el => {
-        if (!filter.value) {
-          return el;
-        }
+  const filteredOptions = computed(() =>
+    props.options.filter(el => {
+      if (!filter.value) {
+        return el;
+      }
 
-        return el.name.toLowerCase().includes(filter.value);
-      })
+      return el.name.toLowerCase().includes(String(filter.value));
+    })
   );
 </script>
 
