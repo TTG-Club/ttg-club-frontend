@@ -50,13 +50,12 @@
       <ul class="ui-select__content">
         <li
           v-for="option in filteredOptions"
-          :id="option.value"
           :key="option.value"
           :class="[
             'ui-select__element',
             { 'ui-select__element--selected': isSelectedClass(option) }
           ]"
-          @click="selectOption($event)"
+          @click="selectOption(option)"
         >
           <span class="ui-select__option">
             {{ option.name }}
@@ -76,18 +75,15 @@
 
 <script setup lang="ts">
   import { onClickOutside } from '@vueuse/core';
-  import { xor } from 'lodash';
-  import { intersectionBy } from 'lodash-es';
+  import { intersectionBy, xor } from 'lodash-es';
   import { computed, ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
+  const modelValue = defineModel<{ modelValue: Array<String> }>();
+
   const props = defineProps({
-    modelValue: {
-      type: String,
-      default: ''
-    },
     placeholder: {
       type: String,
       default: ''
@@ -105,8 +101,6 @@
       default: false
     }
   });
-
-  const emits = defineEmits(['update:model-value']);
 
   const input = ref(null);
   const dropdownHeader = ref(null);
@@ -145,19 +139,13 @@
   };
 
   const selectOption = (e: any) => {
-    let el = e.target;
-
-    if (el.tagName === 'SPAN') {
-      el = el.parentElement;
-    }
-
     if (props.isMultiple) {
-      selectedOptions.value = xor(selectedOptions.value, [el.id]);
+      selectedOptions.value = xor(selectedOptions.value, [e.value]);
     } else {
-      selectedOptions.value[0] = el.id;
+      selectedOptions.value[0] = e.value;
     }
 
-    emits('update:model-value', selectedOptions.value);
+    modelValue.value = selectedOptions.value;
   };
 
   const displaySelectedOptions = computed(() => {
@@ -175,6 +163,12 @@
   watch(focused, f => {
     if (!f) {
       filter.value = '';
+    }
+  });
+
+  watch(modelValue, mv => {
+    if (!mv) {
+      selectedOptions.value = [];
     }
   });
 
