@@ -15,8 +15,9 @@
       ]"
       @focusin="toggleFocus"
     >
-      <div class="ui-select__input-wrapper">
+      <div class="ui-select__slotted-wrapper">
         <ui-input
+          v-if="isSearchable"
           ref="input"
           v-model="filter"
           :disabled="disabled"
@@ -24,11 +25,16 @@
         />
 
         <div
-          v-if="selectedOptions.length && !focused"
-          class="ui-select__selected"
+          class="ui-select__slot"
           @click="toggleFocus"
         >
-          {{ displaySelectedOptions }}
+          <div v-if="!selectedOptions.length && !isSearchable">
+            {{ placeholder }}
+          </div>
+
+          <div v-if="selectedOptions.length && (!focused || !isSearchable)">
+            {{ displaySelectedOptions }}
+          </div>
         </div>
       </div>
 
@@ -86,22 +92,26 @@
     name: String;
   };
 
-  const modelValue = defineModel<Option>();
+  const modelValue = defineModel<Array<Option>>();
 
   const props = defineProps({
+    options: {
+      type: Array<Option>,
+      default: () => []
+    },
     placeholder: {
       type: String,
       default: ''
     },
-    options: {
-      type: Array<Option>,
-      default: () => []
+    disabled: {
+      type: Boolean,
+      default: false
     },
     isMultiple: {
       type: Boolean,
       default: false
     },
-    disabled: {
+    isSearchable: {
       type: Boolean,
       default: false
     }
@@ -140,7 +150,7 @@
   );
 
   const isSelectedClass = (option: Option) => {
-    return selectedOptions.value.includes(option);
+    return selectedOptions.value.filter(o => o.value === option.value).length;
   };
 
   const selectOption = (option: Option) => {
@@ -191,7 +201,7 @@
       padding: 0 8px;
     }
 
-    &__selected {
+    &__slot {
       position: absolute;
       padding: 11px;
       top: 0;
@@ -236,7 +246,7 @@
         color: var(--primary);
       }
     }
-    &__input-wrapper {
+    &__slotted-wrapper {
       position: relative;
       cursor: pointer;
       width: 100%;
