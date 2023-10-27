@@ -32,7 +32,6 @@
 
         <ui-button
           type="default"
-          :disabled="disabled"
           @click.left.exact.prevent="props.downloadFile()"
         >
           Скачать
@@ -47,7 +46,6 @@
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const props = defineProps<{
-    disabled: boolean;
     openFile: () => void;
     downloadFile: () => void;
   }>();

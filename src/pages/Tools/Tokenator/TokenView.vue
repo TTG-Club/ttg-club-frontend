@@ -7,10 +7,12 @@
         <token-details
           :open-file="open"
           :download-file="download"
-          :disabled="true"
         />
 
-        <token-stamp :source="files && files[0]" />
+        <token-stamp
+          :source="files && files[0]"
+          :download="download"
+        />
       </div>
     </template>
   </page-layout>
@@ -29,7 +31,20 @@
   });
 
   const download = () => {
-    console.log('downloaded item');
+    const canvas = document.getElementById('canvasToken') as HTMLCanvasElement;
+
+    if (canvas) {
+      const canvasDataUrl = canvas.toDataURL('image/webp');
+
+      const a = document.createElement('a');
+
+      a.href = canvasDataUrl;
+      a.download = 'token.webp';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 </script>
 <style lang="scss" module>

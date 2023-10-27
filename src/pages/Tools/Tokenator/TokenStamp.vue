@@ -1,6 +1,7 @@
 <template>
   <div :class="$style.container">
     <canvas
+      id="canvasToken"
       ref="canvasRef"
       width="280"
       height="280"
@@ -61,12 +62,13 @@
           const y = (canvas.height - newHeight) / 2;
 
           if (context) {
+            context.save();
             context.beginPath();
 
             context.arc(
               canvas.width / 2,
               canvas.height / 2,
-              canvas.width / 2,
+              canvas.width / 2.4,
               0,
               Math.PI * 2
             );
@@ -78,6 +80,7 @@
           }
         })
         .catch(err => {
+          // думаю здесь можно toast добавить
           console.log('ЧТО-ТО ПОШЛО НЕ ТАК', err);
         });
     }
