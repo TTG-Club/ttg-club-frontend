@@ -10,10 +10,12 @@
 <script lang="ts" setup>
   import { ref, onMounted, computed } from 'vue';
 
+  import backgorundImage from '@/pages/Tools/Tokenator/assets/token-bg.webp';
   import defaultImage from '@/pages/Tools/Tokenator/assets/token-border.webp';
 
   const canvasRef = ref<HTMLCanvasElement | null>(null);
   const defaultImageRef = ref(new Image());
+  const bgImageRef = ref(new Image());
 
   defineProps<{
     source: File | null;
@@ -38,20 +40,46 @@
       const context = canvas.getContext('2d');
 
       defaultImageRef.value.src = defaultImage;
+      bgImageRef.value.src = backgorundImage;
 
-      defaultImageRef.value.onload = () => {
-        const scale = scaleToFitFactor.value;
+      Promise.all([
+        new Promise(resolve => {
+          bgImageRef.value.onload = resolve;
+        }),
+        new Promise(resolve => {
+          defaultImageRef.value.onload = resolve;
+        })
+      ])
+        .then(() => {
+          const scale = scaleToFitFactor.value;
 
-        const newWidth = defaultImageRef.value.width * scale;
-        const newHeight = defaultImageRef.value.height * scale;
+          // так как размеры порядочные, нет смысла считать тоже самое для
+          const newWidth = defaultImageRef.value.width * scale;
+          const newHeight = defaultImageRef.value.height * scale;
 
-        const x = (canvas.width - newWidth) / 2;
-        const y = (canvas.height - newHeight) / 2;
+          const x = (canvas.width - newWidth) / 2;
+          const y = (canvas.height - newHeight) / 2;
 
-        if (context) {
-          context.drawImage(defaultImageRef.value, x, y, newWidth, newHeight);
-        }
-      };
+          if (context) {
+            context.beginPath();
+
+            context.arc(
+              canvas.width / 2,
+              canvas.height / 2,
+              canvas.width / 2,
+              0,
+              Math.PI * 2
+            );
+            context.clip();
+            context.drawImage(bgImageRef.value, x, y, newWidth, newHeight);
+            context.restore();
+
+            context.drawImage(defaultImageRef.value, x, y, newWidth, newHeight);
+          }
+        })
+        .catch(err => {
+          console.log('ЧТО-ТО ПОШЛО НЕ ТАК', err);
+        });
     }
   });
 </script>
