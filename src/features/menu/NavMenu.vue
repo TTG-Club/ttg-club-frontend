@@ -146,7 +146,7 @@
 
 <script setup lang="ts">
   import { storeToRefs } from 'pinia';
-  import { ref, watch } from 'vue';
+  import { ref, watch, computed } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
@@ -158,10 +158,30 @@
   import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
 
   const navStore = useNavStore();
-  const { showedNavItems } = storeToRefs(navStore);
+  const { showedNavItems: items } = storeToRefs(navStore);
   const router = useRouter();
   const route = useRoute();
   const isShowMenu = ref(false);
+
+  const showedNavItems = computed(() => {
+    return items.value.map((item: any) => {
+      if (item.name === 'Инструменты') {
+        return {
+          ...item,
+          children: [
+            ...item.children,
+            {
+              name: 'Токенатор',
+              url: '/tools/tokenator',
+              order: 7
+            }
+          ]
+        };
+      }
+
+      return item;
+    });
+  });
 
   const isRouteExist = (link: TNavItem) => {
     if (!link.url) {

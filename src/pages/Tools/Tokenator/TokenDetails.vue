@@ -1,0 +1,115 @@
+<template>
+  <div :class="$style.wrapper">
+    <div :class="$style.header">Описание</div>
+
+    <div :class="$style.text_container">
+      <span :class="$style.text"> Вес загружаемой картинки не более 50mb </span>
+
+      <span :class="$style.text">
+        Размер картинки не должен привышать 2000px на 2000px
+      </span>
+    </div>
+
+    <div :class="$style.handlers">
+      <div :class="$style.resize_wrapper">
+        <span :class="$style.icon">
+          <svg-icon icon="zoom/zoom-out" />
+        </span>
+
+        <span :class="$style.icon">
+          <svg-icon icon="zoom/zoom-in" />
+        </span>
+      </div>
+
+      <div :class="$style.buttons">
+        <ui-button
+          type="outline"
+          :body-class="$style.button"
+          @click.left.exact.prevent="props.openFile()"
+        >
+          Загрузить картинку
+        </ui-button>
+
+        <ui-button
+          type="default"
+          :disabled="disabled"
+          @click.left.exact.prevent="props.downloadFile()"
+        >
+          Скачать
+        </ui-button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  const props = defineProps<{
+    disabled: boolean;
+    openFile: () => void;
+    downloadFile: () => void;
+  }>();
+</script>
+
+<style lang="scss" module>
+  .wrapper {
+    border-radius: 16px;
+    padding: 24px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    width: fit-content;
+    height: fit-content;
+  }
+
+  .header {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: var(--h4-font-size);
+    color: var(--text-color-title);
+    line-height: 30px;
+  }
+
+  .text_container {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 290px;
+  }
+
+  .text {
+    font-family: 'Open Sans', sans-serif;
+    font-size: var(--main-font-size);
+    line-height: 19px;
+  }
+
+  .handlers {
+    margin-top: 42px;
+  }
+
+  .resize_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin: -3px;
+  }
+
+  .buttons {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .button {
+    margin: 6px !important;
+  }
+</style>
