@@ -93,13 +93,13 @@
 
   .color {
     &-primary {
+      color: var(--text-btn-color);
+
       &.is-active {
-        color: var(--text-btn-color);
         background-color: var(--primary);
       }
 
       &:hover {
-        color: var(--text-btn-color);
         background-color: var(--primary-hover);
       }
     }
