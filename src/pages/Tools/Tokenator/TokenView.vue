@@ -6,12 +6,22 @@
       <div :class="$style.container">
         <token-details
           :open-file="open"
-          :download-file="download"
-        />
+          :download-file="downloadCanvas"
+          :change-scale="changeScale"
+        >
+          <template #slider>
+            <custom-slider
+              v-model="scale"
+              :min="0"
+              :max="2"
+              :step="0.1"
+            />
+          </template>
+        </token-details>
 
         <token-stamp
-          :source="files && files[0]"
-          :download="download"
+          :source="files"
+          :scale="scale"
         />
       </div>
     </template>
@@ -19,34 +29,24 @@
 </template>
 <script lang="ts" setup>
   import { useFileDialog } from '@vueuse/core';
+  import { ref } from 'vue';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
+  import { downloadCanvas } from '@/shared/helpers/downloadCanvas';
+  import CustomSlider from '@/shared/ui/CustomSlider.vue';
+
   import TokenDetails from './TokenDetails.vue';
   import TokenStamp from './TokenStamp.vue';
+
+  const scale = ref<number>(1);
 
   const { files, open } = useFileDialog({
     accept: 'image/*',
     multiple: false
   });
-
-  const download = () => {
-    const canvas = document.getElementById('canvasToken') as HTMLCanvasElement;
-
-    if (canvas) {
-      const canvasDataUrl = canvas.toDataURL('image/webp');
-
-      const a = document.createElement('a');
-
-      a.href = canvasDataUrl;
-      a.download = 'token.webp';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  };
 </script>
+
 <style lang="scss" module>
   .container {
     display: flex;

@@ -11,10 +11,14 @@
     </div>
 
     <div :class="$style.handlers">
-      <div :class="$style.resize_wrapper">
+      <div :class="$style['resize-container']">
         <span :class="$style.icon">
           <svg-icon icon="zoom/zoom-out" />
         </span>
+
+        <div :class="$style['slider-container']">
+          <slot name="slider" />
+        </div>
 
         <span :class="$style.icon">
           <svg-icon icon="zoom/zoom-in" />
@@ -87,9 +91,13 @@
     margin-top: 42px;
   }
 
-  .resize_wrapper {
+  .resize-container {
     display: flex;
     justify-content: space-between;
+  }
+
+  .slider-container {
+    width: 80%;
   }
 
   .icon {
@@ -108,6 +116,6 @@
   }
 
   .button {
-    margin: 6px !important;
+    color: var(--text-color-title);
   }
 </style>

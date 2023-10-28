@@ -9,17 +9,19 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, onMounted, computed } from 'vue';
+  import { ref, onMounted, computed, watch } from 'vue';
 
   import backgorundImage from '@/pages/Tools/Tokenator/assets/token-bg.webp';
   import defaultImage from '@/pages/Tools/Tokenator/assets/token-border.webp';
 
   const canvasRef = ref<HTMLCanvasElement | null>(null);
+  const contextRef = ref<CanvasRenderingContext2D | null>(null);
   const defaultImageRef = ref(new Image());
   const bgImageRef = ref(new Image());
 
-  defineProps<{
-    source: File | null;
+  const props = defineProps<{
+    source: FileList | null;
+    scale: number;
     // tokenBorder?: File, // на будущее
   }>();
 
@@ -73,16 +75,45 @@
               Math.PI * 2
             );
             context.clip();
+            context.clearRect(0, 0, canvas.width, canvas.height);
             context.drawImage(bgImageRef.value, x, y, newWidth, newHeight);
             context.restore();
 
             context.drawImage(defaultImageRef.value, x, y, newWidth, newHeight);
+            contextRef.value = context;
           }
         })
         .catch(err => {
           // думаю здесь можно toast добавить
           console.log('ЧТО-ТО ПОШЛО НЕ ТАК', err);
         });
+    }
+  });
+
+  watch([() => props.source, () => props.scale], ([source, scale]) => {
+    console.log('test', source);
+
+    if (source) {
+      const selectedFile = source[0] as File;
+      const img = new Image();
+
+      console.log('test', selectedFile);
+      img.src = URL.createObjectURL(selectedFile);
+      console.log('img.src', img.src);
+
+      img.onload = () => {
+        if (canvasRef.value) {
+          const newWidth = canvasRef.value.width * scale;
+          const newHeight = canvasRef.value.height * scale;
+
+          const x = (canvasRef.value.width - newWidth) / 2;
+          const y = (canvasRef.value.height - newHeight) / 2;
+
+          if (contextRef.value) {
+            contextRef.value.drawImage(img, x, y, newWidth, newHeight);
+          }
+        }
+      };
     }
   });
 </script>
