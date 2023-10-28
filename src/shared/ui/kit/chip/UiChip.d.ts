@@ -9,6 +9,7 @@ export interface IChipProps {
   size?: TChipSize;
   color?: TChipColor;
   variant?: TChipVariant;
+  clickable?: boolean;
   button?: boolean;
   badge?: boolean;
 }

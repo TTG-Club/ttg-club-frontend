@@ -98,6 +98,32 @@
       >Label XS</ui-chip
     >
   </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
+      :clickable="false"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      :clickable="false"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      :clickable="false"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      :clickable="false"
+      >Label XS</ui-chip
+    >
+  </div>
 </template>
 
 <script setup lang="ts">

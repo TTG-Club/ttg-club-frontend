@@ -1,6 +1,7 @@
 <template>
   <button
     type="button"
+    :disabled="!clickable"
     :class="{
       [$style.chip]: true,
       [$style['is-active']]: value,
@@ -27,7 +28,8 @@
     size: 'm',
     variant: 'round',
     color: 'primary',
-    modelValue: false
+    clickable: true,
+    modelValue: true
   });
 
   const chipSize = computed(() => props.size);
@@ -46,8 +48,11 @@
     background-color: var(--hover);
     color: var(--text-color);
     font-weight: 400;
-    position: relative;
     overflow: hidden;
+
+    &:disabled {
+      cursor: initial;
+    }
   }
 
   .size {
@@ -93,13 +98,13 @@
 
   .color {
     &-primary {
-      color: var(--text-btn-color);
-
       &.is-active {
+        color: var(--text-btn-color);
         background-color: var(--primary);
       }
 
-      &:hover {
+      &:not(:disabled):hover {
+        color: var(--text-btn-color);
         background-color: var(--primary-hover);
       }
     }
@@ -109,7 +114,7 @@
         background-color: var(--bg-sub-menu);
       }
 
-      &:hover {
+      &:not(:disabled):hover {
         background-color: var(--bg-secondary);
       }
     }
