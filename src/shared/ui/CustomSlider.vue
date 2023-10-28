@@ -1,6 +1,6 @@
 <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
 <template>
-  <div :class="[$style['custom-slider'], $style.default]">
+  <div :class="$style['custom-slider']">
     <input
       ref="slider"
       :value="sliderValue"
@@ -84,68 +84,63 @@
     --trackHeight: 0.25rem;
     --thumbRadius: 1.25rem;
     width: 100%;
-  }
 
-  /* style the input element with type "range" */
-  .custom-slider input[type='range'] {
-    position: relative;
-    appearance: none;
-    background: none;
-    border-radius: 999px;
-    z-index: 0;
-    height: 100%;
-    width: inherit;
-    pointer-events: none;
-  }
-
-  /* ::before element to replace the slider track */
-  .custom-slider input[type='range']::before {
-    content: '';
-    display: block;
-    position: absolute;
-    width: var(--ProgressPercent, 100%);
-    height: 100%;
-    background: var(--primary);
-    border-radius: 999px;
-  }
-
-  .custom-slider input[type='range']::-webkit-slider-runnable-track {
-    appearance: none;
-    background: var(--bg-sub-menu);
-    height: var(--trackHeight);
-    border-radius: 999px;
-  }
-
-  .custom-slider input[type='range']::-webkit-slider-thumb {
-    position: relative;
-    width: var(--thumbRadius);
-    height: var(--thumbRadius);
-    margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
-    background: var(--primary);
-    border: 1px solid var(--bg-sub-menu);
-    border-radius: 999px;
-    pointer-events: all;
-    appearance: none;
-    z-index: 1;
-  }
-  .custom-slider.default input[type='range']::-moz-range-track {
-    appearance: none;
-    background: var(--primary);
-    height: var(--trackHeight);
-    border-radius: 999px;
-  }
-
-  .custom-slider input[type='range']::-moz-range-thumb {
-    position: relative;
-    box-sizing: border-box;
-    width: var(--thumbRadius);
-    height: var(--thumbRadius);
-    margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
-    background: var(--primary);
-    border: 1px solid var(--bg-sub-menu);
-    border-radius: 999px;
-    pointer-events: all;
-    appearance: none;
-    z-index: 1;
+    /* style the input element with type "range" */
+    & input[type='range'] {
+      position: relative;
+      appearance: none;
+      background: none;
+      border-radius: 999px;
+      z-index: 0;
+      height: 100%;
+      width: inherit;
+      pointer-events: none;
+      &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        width: var(--ProgressPercent, 100%);
+        height: 100%;
+        background: var(--primary);
+        border-radius: 999px;
+      }
+      &::-webkit-slider-runnable-track {
+        appearance: none;
+        background: var(--bg-sub-menu);
+        height: var(--trackHeight);
+        border-radius: 999px;
+      }
+      &::-webkit-slider-thumb {
+        position: relative;
+        width: var(--thumbRadius);
+        height: var(--thumbRadius);
+        margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+        background: var(--primary);
+        border: 1px solid var(--bg-sub-menu);
+        border-radius: 999px;
+        pointer-events: all;
+        appearance: none;
+        z-index: 1;
+      }
+      &::-moz-range-track {
+        appearance: none;
+        background: var(--primary);
+        height: var(--trackHeight);
+        border-radius: 999px;
+      }
+      &::-moz-range-thumb {
+        position: relative;
+        box-sizing: border-box;
+        width: var(--thumbRadius);
+        height: var(--thumbRadius);
+        margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+        background: var(--primary);
+        border: 1px solid var(--bg-sub-menu);
+        border-radius: 999px;
+        pointer-events: all;
+        appearance: none;
+        z-index: 1;
+      }
+    }
   }
 </style>

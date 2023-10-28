@@ -12,7 +12,7 @@
             <custom-slider
               v-model="scale"
               :min="0.1"
-              :max="2"
+              :max="2.1"
               :step="0.05"
             />
           </template>
@@ -46,7 +46,7 @@
 
   const toast = useToast(ToastEventBus);
 
-  const DEFAULT_SCALE = 1;
+  const DEFAULT_SCALE = 1.1;
   const MAX_FILE_SIZE = 50; // размер в мегабайтах
 
   const scale = ref<number>(DEFAULT_SCALE);
