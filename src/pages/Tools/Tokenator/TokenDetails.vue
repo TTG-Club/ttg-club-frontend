@@ -57,12 +57,16 @@
 
 <style lang="scss" module>
   .wrapper {
+    margin: 24px 0 0;
     border-radius: 16px;
     padding: 24px;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
     width: fit-content;
     height: fit-content;
+    @include media-min($md) {
+      margin: 0;
+    }
   }
 
   .header {

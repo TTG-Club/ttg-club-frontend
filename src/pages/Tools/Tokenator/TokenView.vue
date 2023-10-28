@@ -50,9 +50,18 @@
 <style lang="scss" module>
   .container {
     display: flex;
-    background: url('./assets/bg.png') no-repeat;
-    width: 100%;
-    height: 100%;
-    padding: 50px 0;
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+
+    @include media-min($md) {
+      background: url('./assets/bg.png') no-repeat;
+      flex-direction: row;
+      justify-content: start;
+      align-items: start;
+      width: 100%;
+      height: 100%;
+      padding: 50px 0;
+    }
   }
 </style>

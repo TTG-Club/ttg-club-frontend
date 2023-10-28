@@ -120,12 +120,15 @@
 <style lang="scss" module>
   .container {
     position: relative;
-    margin: 14px 42px;
+    margin: 14px 0 0;
     height: fit-content;
     background-size: contain;
     width: 280px;
     height: 280px;
     overflow: hidden;
+    @include media-min($md) {
+      margin: 14px 42px;
+    }
   }
   .image {
   }
