@@ -5,7 +5,7 @@
       [$style.chip]: true,
       [$style['is-active']]: value,
       [$style[`size-${chipSize}`]]: true,
-      [$style[`type-${chipType}`]]: true,
+      [$style[`color-${chipColor}`]]: true,
       [$style[`variant-${chipVariant}`]]: true
     }"
   >
@@ -26,13 +26,13 @@
   const props = withDefaults(defineProps<IChipProps>(), {
     size: 'm',
     variant: 'round',
-    type: 'primary',
-    modelValue: true
+    color: 'primary',
+    modelValue: false
   });
 
   const chipSize = computed(() => props.size);
   const chipVariant = computed(() => props.variant);
-  const chipType = computed(() => props.type);
+  const chipColor = computed(() => props.color);
   const value = computed(() => props.modelValue);
 </script>
 
@@ -40,21 +40,14 @@
   @use 'src/assets/styles/variables/mixins' as mixins;
 
   .chip {
-    @include mixins.css_anim($item: background-color);
+    $items: background-color, color;
+    @include mixins.css_anim($item: $items);
 
-    background-color: var(--primary);
-    color: var(--text-btn-color);
+    background-color: var(--hover);
+    color: var(--text-color);
     font-weight: 400;
     position: relative;
     overflow: hidden;
-
-    &.is-active {
-      background-color: var(--primary);
-    }
-
-    &:hover {
-      background-color: var(--primary-hover);
-    }
   }
 
   .size {
@@ -95,6 +88,30 @@
 
     &-rectangle {
       border-radius: 8px;
+    }
+  }
+
+  .color {
+    &-primary {
+      &.is-active {
+        color: var(--text-btn-color);
+        background-color: var(--primary);
+      }
+
+      &:hover {
+        color: var(--text-btn-color);
+        background-color: var(--primary-hover);
+      }
+    }
+
+    &-secondary {
+      &.is-active {
+        background-color: var(--bg-sub-menu);
+      }
+
+      &:hover {
+        background-color: var(--bg-secondary);
+      }
     }
   }
 

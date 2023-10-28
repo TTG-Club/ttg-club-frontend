@@ -12,6 +12,70 @@
   <div :class="$style.div">
     <ui-chip
       size="l"
+      :model-value="value"
+      @click="onClick"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      :model-value="value"
+      @click="onClick"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      :model-value="value"
+      @click="onClick"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      :model-value="value"
+      @click="onClick"
+      >Label XS</ui-chip
+    >
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
+      :model-value="value"
+      color="secondary"
+      @click="onClick"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      color="secondary"
+      :model-value="value"
+      @click="onClick"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      color="secondary"
+      :model-value="value"
+      @click="onClick"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      color="secondary"
+      :model-value="value"
+      @click="onClick"
+      >Label XS</ui-chip
+    >
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
       variant="rectangle"
       >Label L</ui-chip
     >
@@ -37,7 +101,15 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue';
+
   import UiChip from '@/shared/ui/kit/chip/UiChip.vue';
+
+  const value = ref(false);
+
+  const onClick = () => {
+    value.value = !value.value;
+  };
 </script>
 
 <style lang="scss" module>
