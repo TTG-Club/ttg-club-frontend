@@ -5,6 +5,9 @@
       ref="canvasRef"
       width="280"
       height="280"
+      @mousedown="startDragging"
+      @mouseup="stopDragging"
+      @mousemove="dragElement"
     />
   </div>
 </template>
@@ -16,10 +19,16 @@
 
   import { redrawToken } from './redrawToken';
 
+  import type { Events } from 'vue';
+
   const canvasRef = ref<HTMLCanvasElement | null>(null);
   const contextRef = ref<CanvasRenderingContext2D | null>(null);
   const borderImageRef = ref<HTMLImageElement>(new Image());
   const bgImageRef = ref<HTMLImageElement>(new Image());
+  const loadedImageRef = ref<HTMLImageElement | null>(null);
+  const isDragging = ref<boolean>(false);
+  const offsetX = ref<number>(0);
+  const offsetY = ref<number>(0);
 
   const props = defineProps<{
     source: FileList | null;
@@ -27,6 +36,49 @@
     resetScale: () => void;
     // tokenBorder?: File, // на будущее
   }>();
+
+  const startDragging = (event: Events['onMousedown']) => {
+    const canvas = canvasRef.value;
+
+    if (canvas) {
+      isDragging.value = true;
+
+      const rect = canvas.getBoundingClientRect();
+
+      offsetX.value = event.clientX - rect.left;
+      offsetY.value = event.clientY - rect.top;
+    }
+  };
+
+  const stopDragging = () => {
+    isDragging.value = false;
+  };
+
+  const dragElement = (event: Events['onMousemove']) => {
+    if (isDragging.value) {
+      const canvas = canvasRef.value;
+      const context = contextRef.value;
+
+      if (canvas && context) {
+        const rect = canvas.getBoundingClientRect();
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        const x = event.clientX - rect.left - offsetX.value;
+        const y = event.clientY - rect.top - offsetY.value;
+
+        redrawToken(
+          canvasRef.value!,
+          contextRef.value!,
+          borderImageRef.value,
+          bgImageRef.value,
+          loadedImageRef.value,
+          props.scale,
+          { x, y }
+        );
+      }
+    }
+  };
 
   onMounted(() => {
     const canvas = canvasRef.value;
@@ -75,13 +127,12 @@
         const selectedFile = source[0] as File;
         const img = new Image();
 
-        console.log('test', selectedFile);
         img.src = URL.createObjectURL(selectedFile);
-        console.log('img.src', img.src);
 
         img.onload = () => {
           const context = contextRef.value;
 
+          loadedImageRef.value = img;
           borderImageRef.value.src = borderImage;
           bgImageRef.value.src = backgorundImage;
 
@@ -100,7 +151,7 @@
                   contextRef.value!,
                   borderImageRef.value,
                   bgImageRef.value,
-                  img,
+                  loadedImageRef.value,
                   scale
                 );
               }

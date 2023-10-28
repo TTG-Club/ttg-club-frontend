@@ -1,4 +1,12 @@
 /* eslint-disable no-param-reassign */
+
+type ImageOptions = {
+  width?: number;
+  height?: number;
+  x: number;
+  y: number;
+};
+
 export const redrawToken = (
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
@@ -6,7 +14,7 @@ export const redrawToken = (
   bgLayout: HTMLImageElement,
   image: HTMLImageElement | null,
   scale: number,
-  imageOptions = { width: 0, height: 0, x: 0, y: 0 }
+  imageOptions: ImageOptions = { width: 0, height: 0, x: 0, y: 0 }
 ) => {
   const borderScaleFactor = Math.min(
     canvas.width / borderImage.width,
@@ -28,8 +36,10 @@ export const redrawToken = (
   if (image) {
     imageOptions.width = image.width * scale;
     imageOptions.height = image.height * scale;
-    imageOptions.x = (canvas.width - imageOptions.width) / 2;
-    imageOptions.y = (canvas.height - imageOptions.height) / 2;
+    imageOptions.x = imageOptions.x || (canvas.width - imageOptions.width) / 2;
+
+    imageOptions.y =
+      imageOptions.y || (canvas.height - imageOptions.height) / 2;
   }
 
   const borderWidth = borderImage.width * borderScaleFactor;
@@ -37,8 +47,6 @@ export const redrawToken = (
 
   const x = (canvas.width - borderWidth) / 2;
   const y = (canvas.height - borderHeight) / 2;
-
-  // context.clearRect(0, 0, canvas?.width, canvas.height);
 
   context.drawImage(bgLayout, 0, 0, canvas?.width, canvas?.height);
 
