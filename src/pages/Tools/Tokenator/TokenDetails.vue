@@ -3,10 +3,10 @@
     <div :class="$style.header">Описание</div>
 
     <div :class="$style.text_container">
-      <span :class="$style.text"> Вес загружаемой картинки не более 50mb </span>
+      <span :class="$style.text">Вес загружаемой картинки не более 50mb</span>
 
       <span :class="$style.text">
-        Размер картинки не должен привышать 2000px на 2000px
+        Размер картинки не должен превышать 2000px на 2000px
       </span>
     </div>
 
@@ -57,15 +57,16 @@
 
 <style lang="scss" module>
   .wrapper {
-    margin: 24px 0 0;
     border-radius: 16px;
     padding: 24px;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
     width: fit-content;
     height: fit-content;
+    transform: translateY(-45%);
     @include media-min($md) {
       margin: 0;
+      transform: none;
     }
   }
 

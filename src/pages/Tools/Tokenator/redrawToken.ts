@@ -14,8 +14,16 @@ export const redrawToken = (
   bgLayout: HTMLImageElement,
   image: HTMLImageElement | null,
   scale: number,
-  imageOptions: ImageOptions = { width: 0, height: 0, x: 0, y: 0 }
+  options: ImageOptions | null
 ) => {
+  const imageOptions = {
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0,
+    ...options
+  };
+
   const borderScaleFactor = Math.min(
     canvas.width / borderImage.width,
     canvas.height / borderImage.height

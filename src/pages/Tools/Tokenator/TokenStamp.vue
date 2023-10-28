@@ -3,8 +3,8 @@
     <canvas
       id="canvasToken"
       ref="canvasRef"
-      width="280"
-      height="280"
+      width="512"
+      height="512"
       @mousedown="startDragging"
       @mouseup="stopDragging"
       @mousemove="dragElement"
@@ -29,11 +29,13 @@
   const isDragging = ref<boolean>(false);
   const offsetX = ref<number>(0);
   const offsetY = ref<number>(0);
+  const loadedImagePosition = ref({ x: 0, y: 0 });
 
   const props = defineProps<{
-    source: FileList | null;
+    source: File | null;
     scale: number;
     resetScale: () => void;
+    showError: (msg: string) => void;
     // tokenBorder?: File, // на будущее
   }>();
 
@@ -45,8 +47,8 @@
 
       const rect = canvas.getBoundingClientRect();
 
-      offsetX.value = event.clientX - rect.left;
-      offsetY.value = event.clientY - rect.top;
+      offsetX.value = event.clientX - rect.left - loadedImagePosition.value.x;
+      offsetY.value = event.clientY - rect.top - loadedImagePosition.value.y;
     }
   };
 
@@ -62,14 +64,15 @@
       if (canvas && context) {
         const rect = canvas.getBoundingClientRect();
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
         const x = event.clientX - rect.left - offsetX.value;
         const y = event.clientY - rect.top - offsetY.value;
 
+        loadedImagePosition.value.x = x;
+        loadedImagePosition.value.y = y;
+
         redrawToken(
-          canvasRef.value!,
-          contextRef.value!,
+          canvas,
+          context,
           borderImageRef.value,
           bgImageRef.value,
           loadedImageRef.value,
@@ -80,104 +83,82 @@
     }
   };
 
+  const loadAndDrawAssets = (
+    context: CanvasRenderingContext2D,
+    image: HTMLImageElement | null = null
+  ) => {
+    borderImageRef.value.src = borderImage;
+    bgImageRef.value.src = backgorundImage;
+
+    Promise.all([
+      new Promise(resolve => {
+        bgImageRef.value.onload = resolve;
+      }),
+      new Promise(resolve => {
+        borderImageRef.value.onload = resolve;
+      })
+    ])
+      .then(() => {
+        if (context) {
+          redrawToken(
+            canvasRef.value,
+            context,
+            borderImageRef.value,
+            bgImageRef.value,
+            image,
+            props.scale,
+            loadedImagePosition.value
+          );
+        }
+      })
+      .catch(() => {
+        props.showError('Токенатор провалил спасбросок смерти.');
+      });
+  };
+
   onMounted(() => {
     const canvas = canvasRef.value;
 
     if (canvas) {
       const context = canvas.getContext('2d');
 
-      contextRef.value = context;
-
-      borderImageRef.value.src = borderImage;
-      bgImageRef.value.src = backgorundImage;
-
-      Promise.all([
-        new Promise(resolve => {
-          bgImageRef.value.onload = resolve;
-        }),
-        new Promise(resolve => {
-          borderImageRef.value.onload = resolve;
-        })
-      ])
-        .then(() => {
-          if (context) {
-            redrawToken(
-              canvasRef.value!,
-              contextRef.value!,
-              borderImageRef.value,
-              bgImageRef.value,
-              null,
-              props.scale
-            );
-          }
-        })
-        .catch(err => {
-          // думаю здесь можно toast добавить
-          console.log('ЧТО-ТО ПОШЛО НЕ ТАК', err);
-        });
+      if (context) {
+        contextRef.value = context;
+        loadAndDrawAssets(contextRef.value);
+      }
     }
   });
 
-  watch(
-    [() => props.source, () => props.scale],
-    ([source, scale], [oldSource]) => {
-      if (source !== oldSource) props.resetScale();
+  watch([() => props.source, () => props.scale], ([source], [oldSource]) => {
+    if (source !== oldSource) props.resetScale();
 
-      if (source) {
-        const selectedFile = source[0] as File;
-        const img = new Image();
+    if (source) {
+      const selectedFile = source;
+      const img = new Image();
 
-        img.src = URL.createObjectURL(selectedFile);
+      img.src = URL.createObjectURL(selectedFile);
 
-        img.onload = () => {
-          const context = contextRef.value;
+      img.onload = () => {
+        const context = contextRef.value;
 
-          loadedImageRef.value = img;
-          borderImageRef.value.src = borderImage;
-          bgImageRef.value.src = backgorundImage;
+        loadedImageRef.value = img;
 
-          Promise.all([
-            new Promise(resolve => {
-              bgImageRef.value.onload = resolve;
-            }),
-            new Promise(resolve => {
-              borderImageRef.value.onload = resolve;
-            })
-          ])
-            .then(() => {
-              if (context) {
-                redrawToken(
-                  canvasRef.value!,
-                  contextRef.value!,
-                  borderImageRef.value,
-                  bgImageRef.value,
-                  loadedImageRef.value,
-                  scale
-                );
-              }
-            })
-            .catch(err => {
-              // думаю здесь можно toast добавить
-              console.log('ЧТО-ТО ПОШЛО НЕ ТАК', err);
-            });
-        };
-      }
+        if (context) {
+          loadAndDrawAssets(context, loadedImageRef.value);
+        }
+      };
     }
-  );
+  });
 </script>
 <style lang="scss" module>
   .container {
-    position: relative;
-    margin: 14px 0 0;
     height: fit-content;
     background-size: contain;
-    width: 280px;
-    height: 280px;
-    overflow: hidden;
+    width: 512px;
+    height: 512px;
+    transform: scale(0.5) translateY(-30%);
     @include media-min($md) {
-      margin: 14px 42px;
+      transform: scale(0.5) translateY(-45%) translateX(-30%);
     }
-  }
-  .image {
   }
 </style>

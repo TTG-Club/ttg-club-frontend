@@ -11,17 +11,18 @@
           <template #slider>
             <custom-slider
               v-model="scale"
-              :min="0"
+              :min="0.1"
               :max="2"
-              :step="0.02"
+              :step="0.05"
             />
           </template>
         </token-details>
 
         <token-stamp
-          :source="files"
+          :source="file"
           :scale="scale"
           :reset-scale="resetScale"
+          :show-error="toast.error"
         />
       </div>
     </template>
@@ -31,6 +32,9 @@
   import { useFileDialog } from '@vueuse/core';
   import debounce from 'lodash-es/debounce';
   import { ref } from 'vue';
+  import { useToast } from 'vue-toastification';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
@@ -40,13 +44,30 @@
   import TokenDetails from './TokenDetails.vue';
   import TokenStamp from './TokenStamp.vue';
 
+  const toast = useToast(ToastEventBus);
+
   const DEFAULT_SCALE = 1;
+  const MAX_FILE_SIZE = 50; // размер в мегабайтах
 
   const scale = ref<number>(DEFAULT_SCALE);
+  const file = ref<File | null>(null);
 
-  const { files, open } = useFileDialog({
+  const { open, onChange } = useFileDialog({
     accept: 'image/*',
     multiple: false
+  });
+
+  onChange((param: FileList | null) => {
+    const fileItem = param?.[0] as File;
+    const fileSize = fileItem.size / 1024 ** 2; // размер в мегабайтах
+
+    if (fileSize >= MAX_FILE_SIZE) {
+      toast.error('Используйте заклинание по уменьшению размер файла.');
+
+      return;
+    }
+
+    file.value = fileItem;
   });
 
   const resetScale = () => {
@@ -64,7 +85,10 @@
     align-items: center;
 
     @include media-min($md) {
-      background: url('./assets/bg.png') no-repeat;
+      background: {
+        image: var(--bg-token);
+        repeat: no-repeat;
+      }
       flex-direction: row;
       justify-content: start;
       align-items: start;
