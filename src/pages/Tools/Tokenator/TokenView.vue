@@ -6,8 +6,7 @@
       <div :class="$style.container">
         <token-details
           :open-file="open"
-          :download-file="downloadCanvas"
-          :change-scale="changeScale"
+          :download-file="handleDownloadCanvas"
         >
           <template #slider>
             <custom-slider
@@ -22,6 +21,7 @@
         <token-stamp
           :source="files"
           :scale="scale"
+          :reset-scale="resetScale"
         />
       </div>
     </template>
@@ -29,6 +29,7 @@
 </template>
 <script lang="ts" setup>
   import { useFileDialog } from '@vueuse/core';
+  import debounce from 'lodash-es/debounce';
   import { ref } from 'vue';
 
   import PageLayout from '@/layouts/PageLayout.vue';
@@ -39,12 +40,20 @@
   import TokenDetails from './TokenDetails.vue';
   import TokenStamp from './TokenStamp.vue';
 
-  const scale = ref<number>(1);
+  const DEFAULT_SCALE = 1;
+
+  const scale = ref<number>(DEFAULT_SCALE);
 
   const { files, open } = useFileDialog({
     accept: 'image/*',
     multiple: false
   });
+
+  const resetScale = () => {
+    scale.value = DEFAULT_SCALE;
+  };
+
+  const handleDownloadCanvas = debounce(downloadCanvas, 300);
 </script>
 
 <style lang="scss" module>

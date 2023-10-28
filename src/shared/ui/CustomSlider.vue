@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, watchEffect } from 'vue';
+  import { ref, watchEffect, watch } from 'vue';
 
   import type { Events } from 'vue';
 
@@ -56,6 +56,13 @@
   const setCSSProgress = (progress: number) => {
     slider.value?.style.setProperty('--ProgressPercent', `${progress}%`);
   };
+
+  watch(
+    () => modelValue,
+    value => {
+      sliderValue.value = value;
+    }
+  );
 
   watchEffect(() => {
     if (slider.value) {

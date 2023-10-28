@@ -2,7 +2,7 @@ export const downloadCanvas = () => {
   const canvas = document.getElementById('canvasToken') as HTMLCanvasElement;
 
   if (canvas) {
-    const canvasDataUrl = canvas.toDataURL('image/webp');
+    const canvasDataUrl = canvas.toDataURL('image/webp', 1);
 
     const a = document.createElement('a');
 
