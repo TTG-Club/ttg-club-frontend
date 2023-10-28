@@ -13,7 +13,7 @@
     <div :class="$style.handlers">
       <div :class="$style['resize-container']">
         <span :class="$style.icon">
-          <svg-icon icon="zoom/zoom-out" />
+          <svg-icon icon="zoom/out" />
         </span>
 
         <div :class="$style['slider-container']">
@@ -21,7 +21,7 @@
         </div>
 
         <span :class="$style.icon">
-          <svg-icon icon="zoom/zoom-in" />
+          <svg-icon icon="zoom/in" />
         </span>
       </div>
 
