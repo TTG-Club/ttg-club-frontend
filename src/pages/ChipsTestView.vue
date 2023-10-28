@@ -95,6 +95,7 @@
     <ui-chip
       size="xs"
       variant="rectangle"
+      count="18"
       >Label XS</ui-chip
     >
   </div>

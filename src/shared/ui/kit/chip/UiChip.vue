@@ -16,6 +16,12 @@
     >
       <slot name="default" />
     </span>
+
+    <span
+      v-if="count !== undefined"
+      :class="$style.counter"
+      >{{ count }}</span
+    >
   </button>
 </template>
 
@@ -101,6 +107,11 @@
       &.is-active {
         color: var(--text-btn-color);
         background-color: var(--primary);
+
+        .counter {
+          color: #1d282f;
+          background-color: var(--text-btn-color);
+        }
       }
 
       &:not(:disabled):hover {
@@ -123,5 +134,11 @@
   .caption {
     position: relative;
     z-index: 2;
+  }
+
+  .counter {
+    padding: 0 6px;
+    border-radius: 100px;
+    margin-left: 8px;
   }
 </style>

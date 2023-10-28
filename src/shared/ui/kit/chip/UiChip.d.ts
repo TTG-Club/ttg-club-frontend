@@ -11,5 +11,5 @@ export interface IChipProps {
   variant?: TChipVariant;
   clickable?: boolean;
   button?: boolean;
-  badge?: boolean;
+  count?: number | string;
 }
