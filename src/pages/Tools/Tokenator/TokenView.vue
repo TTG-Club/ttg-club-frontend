@@ -14,7 +14,7 @@
               v-model="scale"
               :min="0"
               :max="2"
-              :step="0.1"
+              :step="0.02"
             />
           </template>
         </token-details>
