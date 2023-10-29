@@ -19,12 +19,6 @@ export const routes: Readonly<RouteRecordRaw[]> = [
       });
     }
   },
-  // For testing purposes
-  {
-    name: 'chips',
-    path: '/chips',
-    component: () => import('@/pages/ChipsTestView.vue')
-  },
   {
     name: 'classes',
     path: '/classes',
