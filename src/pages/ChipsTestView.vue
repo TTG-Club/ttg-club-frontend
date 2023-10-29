@@ -12,63 +12,25 @@
   <div :class="$style.div">
     <ui-chip
       size="l"
-      :model-value="value"
-      @click="onClick"
+      count="18"
       >Label L</ui-chip
     >
 
     <ui-chip
       size="m"
-      :model-value="value"
-      @click="onClick"
+      count="18"
       >Label M</ui-chip
     >
 
     <ui-chip
       size="s"
-      :model-value="value"
-      @click="onClick"
+      count="18"
       >Label S</ui-chip
     >
 
     <ui-chip
       size="xs"
-      :model-value="value"
-      @click="onClick"
-      >Label XS</ui-chip
-    >
-  </div>
-
-  <div :class="$style.div">
-    <ui-chip
-      size="l"
-      :model-value="value"
-      color="secondary"
-      @click="onClick"
-      >Label L</ui-chip
-    >
-
-    <ui-chip
-      size="m"
-      color="secondary"
-      :model-value="value"
-      @click="onClick"
-      >Label M</ui-chip
-    >
-
-    <ui-chip
-      size="s"
-      color="secondary"
-      :model-value="value"
-      @click="onClick"
-      >Label S</ui-chip
-    >
-
-    <ui-chip
-      size="xs"
-      color="secondary"
-      :model-value="value"
-      @click="onClick"
+      count="18"
       >Label XS</ui-chip
     >
   </div>
@@ -77,18 +39,21 @@
     <ui-chip
       size="l"
       variant="rectangle"
+      count="18"
       >Label L</ui-chip
     >
 
     <ui-chip
       size="m"
       variant="rectangle"
+      count="18"
       >Label M</ui-chip
     >
 
     <ui-chip
       size="s"
       variant="rectangle"
+      count="18"
       >Label S</ui-chip
     >
 
@@ -96,6 +61,96 @@
       size="xs"
       variant="rectangle"
       count="18"
+      >Label XS</ui-chip
+    >
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
+      :model-value="value"
+      @click="onClick"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      :model-value="value"
+      @click="onClick"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      :model-value="value"
+      @click="onClick"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      :model-value="value"
+      @click="onClick"
+      >Label XS</ui-chip
+    >
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
+      :model-value="value"
+      color="secondary"
+      @click="onClick"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      color="secondary"
+      :model-value="value"
+      @click="onClick"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      color="secondary"
+      :model-value="value"
+      @click="onClick"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      color="secondary"
+      :model-value="value"
+      @click="onClick"
+      >Label XS</ui-chip
+    >
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
+      variant="rectangle"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      variant="rectangle"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      variant="rectangle"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      variant="rectangle"
       >Label XS</ui-chip
     >
   </div>

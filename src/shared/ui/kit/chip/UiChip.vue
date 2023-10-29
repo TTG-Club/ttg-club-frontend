@@ -138,7 +138,19 @@
 
   .counter {
     padding: 0 6px;
-    border-radius: 100px;
     margin-left: 8px;
+
+    .variant-round & {
+      border-radius: 100px;
+    }
+
+    .variant-rectangle & {
+      border-radius: 8px;
+    }
+
+    .size-l &,
+    .size-m & {
+      padding: 2px 8px;
+    }
   }
 </style>
