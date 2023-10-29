@@ -66,6 +66,25 @@
   </div>
 
   <div :class="$style.div">
+    <ui-chip size="l"
+      >Label L<template #icon><svg-icon icon="edit" /></template
+    ></ui-chip>
+
+    <ui-chip size="m"
+      >Label M<template #icon><svg-icon icon="edit" /></template
+    ></ui-chip>
+
+    <ui-chip size="s"
+      >Label S<template #icon><svg-icon icon="edit" /></template
+    ></ui-chip>
+
+    <ui-chip size="xs"
+      >Label XS
+      <template #icon><svg-icon icon="edit" /></template>
+    </ui-chip>
+  </div>
+
+  <div :class="$style.div">
     <ui-chip
       size="l"
       :model-value="value"
@@ -185,6 +204,7 @@
 <script setup lang="ts">
   import { ref } from 'vue';
 
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiChip from '@/shared/ui/kit/chip/UiChip.vue';
 
   const value = ref(false);

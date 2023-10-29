@@ -7,7 +7,8 @@
       [$style['is-active']]: value,
       [$style[`size-${chipSize}`]]: true,
       [$style[`color-${chipColor}`]]: true,
-      [$style[`variant-${chipVariant}`]]: true
+      [$style[`variant-${chipVariant}`]]: true,
+      [$style['with-icon']]: $slots.icon
     }"
   >
     <span
@@ -22,6 +23,13 @@
       :class="$style.counter"
       >{{ count }}</span
     >
+
+    <span
+      v-if="$slots.icon && count === undefined"
+      :class="$style.icon"
+    >
+      <slot name="icon" />
+    </span>
   </button>
 </template>
 
@@ -55,6 +63,8 @@
     color: var(--text-color);
     font-weight: 400;
     overflow: hidden;
+    display: flex;
+    align-items: center;
 
     &:disabled {
       cursor: initial;
@@ -67,6 +77,10 @@
       font-size: 16px;
       line-height: 24px;
       letter-spacing: 0.16px;
+
+      &.with-icon {
+        padding-right: 20px;
+      }
     }
 
     &-m,
@@ -78,17 +92,29 @@
 
     &-m {
       padding: 10px 20px;
+
+      &.with-icon {
+        padding-right: 16px;
+      }
     }
 
     &-s {
       padding: 8px 16px;
+
+      &.with-icon {
+        padding-right: 12px;
+      }
     }
 
     &-xs {
-      padding: 2px 8px;
+      padding: 4px 8px;
       font-size: 13px;
-      line-height: 20px;
+      line-height: 16px;
       letter-spacing: 0.13px;
+
+      &.with-icon {
+        padding-right: 4px;
+      }
     }
   }
 
@@ -151,6 +177,33 @@
     .size-l &,
     .size-m & {
       padding: 2px 8px;
+    }
+  }
+
+  .icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin-left: 8px;
+
+    .size-l & {
+      width: 24px;
+      height: 24px;
+    }
+
+    .size-m & {
+      width: 22px;
+      height: 22px;
+    }
+
+    .size-xs & {
+      width: 16px;
+      height: 16px;
+    }
+
+    .size-s & {
+      width: 20px;
+      height: 20px;
     }
   }
 </style>
