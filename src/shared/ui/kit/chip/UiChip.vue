@@ -8,7 +8,7 @@
       [$style[`size-${chipSize}`]]: true,
       [$style[`color-${chipColor}`]]: true,
       [$style[`variant-${chipVariant}`]]: true,
-      [$style['with-icon']]: $slots.icon
+      [$style['has-icon']]: $slots.icon
     }"
   >
     <span
@@ -72,17 +72,6 @@
   }
 
   .size {
-    &-l {
-      padding: 12px 24px;
-      font-size: 16px;
-      line-height: 24px;
-      letter-spacing: 0.16px;
-
-      &.with-icon {
-        padding-right: 20px;
-      }
-    }
-
     &-m,
     &-s {
       font-size: 14px;
@@ -90,19 +79,53 @@
       letter-spacing: 0.14px;
     }
 
+    &-l {
+      padding: 12px 24px;
+      font-size: 16px;
+      line-height: 24px;
+      letter-spacing: 0.16px;
+
+      &.has-icon {
+        padding-right: 20px;
+      }
+
+      .icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      .counter {
+        padding: 2px 8px;
+      }
+    }
+
     &-m {
       padding: 10px 20px;
 
-      &.with-icon {
+      &.has-icon {
         padding-right: 16px;
+      }
+
+      .icon {
+        width: 22px;
+        height: 22px;
+      }
+
+      .counter {
+        padding: 2px 8px;
       }
     }
 
     &-s {
       padding: 8px 16px;
 
-      &.with-icon {
+      &.has-icon {
         padding-right: 12px;
+      }
+
+      .icon {
+        width: 20px;
+        height: 20px;
       }
     }
 
@@ -112,8 +135,13 @@
       line-height: 16px;
       letter-spacing: 0.13px;
 
-      &.with-icon {
+      &.has-icon {
         padding-right: 4px;
+      }
+
+      .icon {
+        width: 16px;
+        height: 16px;
       }
     }
   }
@@ -121,10 +149,18 @@
   .variant {
     &-round {
       border-radius: 100px;
+
+      .counter {
+        border-radius: 100px;
+      }
     }
 
     &-rectangle {
       border-radius: 8px;
+
+      .counter {
+        border-radius: 8px;
+      }
     }
   }
 
@@ -173,19 +209,6 @@
   .counter {
     padding: 0 6px;
     margin-left: 8px;
-
-    .variant-round & {
-      border-radius: 100px;
-    }
-
-    .variant-rectangle & {
-      border-radius: 8px;
-    }
-
-    .size-l &,
-    .size-m & {
-      padding: 2px 8px;
-    }
   }
 
   .icon {
@@ -193,25 +216,5 @@
     width: 24px;
     height: 24px;
     margin-left: 8px;
-
-    .size-l & {
-      width: 24px;
-      height: 24px;
-    }
-
-    .size-m & {
-      width: 22px;
-      height: 22px;
-    }
-
-    .size-xs & {
-      width: 16px;
-      height: 16px;
-    }
-
-    .size-s & {
-      width: 20px;
-      height: 20px;
-    }
   }
 </style>
