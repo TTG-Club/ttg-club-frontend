@@ -32,6 +32,7 @@ export const redrawToken = (
   context.save();
   context.beginPath();
 
+  // округляем все слои
   context.arc(
     canvas.width / 2,
     canvas.height / 2,

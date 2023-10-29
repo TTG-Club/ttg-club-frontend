@@ -36,7 +36,6 @@
     scale: number;
     resetScale: () => void;
     showError: (msg: string) => void;
-    // tokenBorder?: File, // на будущее
   }>();
 
   const startDragging = (event: Events['onMousedown']) => {
@@ -47,6 +46,7 @@
 
       const rect = canvas.getBoundingClientRect();
 
+      // считаем точку старта
       offsetX.value = event.clientX - rect.left - loadedImagePosition.value.x;
       offsetY.value = event.clientY - rect.top - loadedImagePosition.value.y;
     }
@@ -64,6 +64,7 @@
       if (canvas && context) {
         const rect = canvas.getBoundingClientRect();
 
+        // двигаем изображение за курсором
         const x = event.clientX - rect.left - offsetX.value;
         const y = event.clientY - rect.top - offsetY.value;
 
@@ -84,6 +85,7 @@
   };
 
   const loadAndDrawAssets = (
+    canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
     image: HTMLImageElement | null = null
   ) => {
@@ -99,17 +101,15 @@
       })
     ])
       .then(() => {
-        if (context) {
-          redrawToken(
-            canvasRef.value,
-            context,
-            borderImageRef.value,
-            bgImageRef.value,
-            image,
-            props.scale,
-            loadedImagePosition.value
-          );
-        }
+        redrawToken(
+          canvas,
+          context,
+          borderImageRef.value,
+          bgImageRef.value,
+          image,
+          props.scale,
+          loadedImagePosition.value
+        );
       })
       .catch(() => {
         props.showError('Токенатор провалил спасбросок смерти.');
@@ -124,7 +124,7 @@
 
       if (context) {
         contextRef.value = context;
-        loadAndDrawAssets(contextRef.value);
+        loadAndDrawAssets(canvas, context);
       }
     }
   });
@@ -144,7 +144,7 @@
         loadedImageRef.value = img;
 
         if (context) {
-          loadAndDrawAssets(context, loadedImageRef.value);
+          loadAndDrawAssets(canvasRef.value!, context, loadedImageRef.value);
         }
       };
     }

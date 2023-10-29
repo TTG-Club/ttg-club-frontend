@@ -36,6 +36,7 @@
 
         <ui-button
           type="default"
+          :disabled="props.disabled"
           @click.left.exact.prevent="props.downloadFile()"
         >
           Скачать
@@ -52,6 +53,7 @@
   const props = defineProps<{
     openFile: () => void;
     downloadFile: () => void;
+    disabled: boolean;
   }>();
 </script>
 

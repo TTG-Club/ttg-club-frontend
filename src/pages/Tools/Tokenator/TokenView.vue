@@ -7,9 +7,10 @@
         <token-details
           :open-file="open"
           :download-file="handleDownloadCanvas"
+          :disabled="!file"
         >
           <template #slider>
-            <custom-slider
+            <ui-slider
               v-model="scale"
               :min="0.1"
               :max="2.1"
@@ -39,7 +40,7 @@
   import PageLayout from '@/layouts/PageLayout.vue';
 
   import { downloadCanvas } from '@/shared/helpers/downloadCanvas';
-  import CustomSlider from '@/shared/ui/CustomSlider.vue';
+  import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
   import TokenDetails from './TokenDetails.vue';
   import TokenStamp from './TokenStamp.vue';
