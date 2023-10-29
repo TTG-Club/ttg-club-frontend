@@ -10,6 +10,5 @@ export interface IChipProps {
   color?: TChipColor;
   variant?: TChipVariant;
   clickable?: boolean;
-  button?: boolean;
   count?: number | string;
 }
