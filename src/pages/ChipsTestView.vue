@@ -38,6 +38,36 @@
   <div :class="$style.div">
     <ui-chip
       size="l"
+      count="18"
+      color="secondary"
+      >Label L</ui-chip
+    >
+
+    <ui-chip
+      size="m"
+      count="18"
+      color="secondary"
+      >Label M</ui-chip
+    >
+
+    <ui-chip
+      size="s"
+      count="18"
+      color="secondary"
+      >Label S</ui-chip
+    >
+
+    <ui-chip
+      size="xs"
+      count="18"
+      color="secondary"
+      >Label XS</ui-chip
+    >
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
       variant="rectangle"
       count="18"
       >Label L</ui-chip
@@ -79,6 +109,33 @@
     ></ui-chip>
 
     <ui-chip size="xs"
+      >Label XS
+      <template #icon><svg-icon icon="edit" /></template>
+    </ui-chip>
+  </div>
+
+  <div :class="$style.div">
+    <ui-chip
+      size="l"
+      color="secondary"
+      >Label L<template #icon><svg-icon icon="edit" /></template
+    ></ui-chip>
+
+    <ui-chip
+      size="m"
+      color="secondary"
+      >Label M<template #icon><svg-icon icon="edit" /></template
+    ></ui-chip>
+
+    <ui-chip
+      size="s"
+      color="secondary"
+      >Label S<template #icon><svg-icon icon="edit" /></template
+    ></ui-chip>
+
+    <ui-chip
+      size="xs"
+      color="secondary"
       >Label XS
       <template #icon><svg-icon icon="edit" /></template>
     </ui-chip>

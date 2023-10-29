@@ -147,8 +147,16 @@
     }
 
     &-secondary {
+      .counter {
+        color: currentColor;
+      }
+
       &.is-active {
         background-color: var(--bg-sub-menu);
+
+        .counter {
+          background-color: var(--bg-secondary);
+        }
       }
 
       &:not(:disabled):hover {
