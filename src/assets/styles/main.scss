@@ -172,17 +172,13 @@
 
         h4 {
           color: var(--text-color-title);
-          font-size: calc(var(--h4-font-size) - 8px);
+          font-size: var(--h5-font-size);
           line-height: 16px;
           font-family: 'Open Sans';
           font-weight: 600;
           margin-right: 50%;
           margin-top: 0;
           margin-bottom: 0;
-
-          @media (max-width: 800px) {
-            font-size: calc(var(--h4-font-size) - 6px);
-          }
         }
       }
 
@@ -223,12 +219,6 @@
       @include media-max($lg) {
         flex-direction: column;
       }
-
-      &.reverse {
-        @include media-max($lg) {
-          flex-direction: column-reverse;
-        }
-      }
     }
 
     .column {
@@ -252,11 +242,14 @@
       width: 100%;
       position: relative;
       overflow: hidden;
+      min-height: 120px;
 
       .info {
         z-index: 1;
         display: flex;
         flex-direction: column;
+        justify-content: flex-end;
+        padding-bottom: 4px;
 
         h4 {
           margin-top: 0;
@@ -264,34 +257,12 @@
           font-weight: 500;
         }
 
-        .bottom {
-          margin-top: auto;
-        }
-
-        a {
-          margin-right: 8px;
-          margin-bottom: 16px;
-          display: inline-block;
-          background-color: var(--hover);
-          color: var(--text-color);
-          padding: 6px 8px;
-          border-radius: 8px;
-          border: 1px solid var(--border);
-
-          &.main {
-            background-color: var(--primary);
-            color: var(--text-btn-color);
-          }
-
-          &:hover {
-            background-color: var(--primary-hover);
-            color: var(--text-btn-color);
-            transition: all 0.5s;
-          }
+        p {
+          margin-bottom: 0;
         }
       }
 
-      .bg_img {
+      &:before {
         transition: transform 0.6s;
         background-position: 50%;
         background-size: cover;
@@ -301,6 +272,14 @@
         height: 100%;
         top: 0;
         left: 0;
+        content: '';
+      }
+
+      &:hover {
+        &::before {
+          transition: transform 0.6s;
+          transform: scale(1.15);
+        }
       }
 
       &:after {
@@ -312,7 +291,7 @@
         left: 0;
         display: block;
         content: '';
-        background: var(--bg-liner-main-page);
+        background: var(--bg-liner-top-main-page);
       }
 
       @media (max-width: 1000px) {
@@ -321,18 +300,20 @@
     }
 
     .dnd5club_tel_bot {
-      min-height: 124px;
-
-      .bg_img {
+      &:before {
         background-image: url(/img/bg_telegram_bot.webp?v=2);
       }
     }
 
     .discord_bot {
-      height: 100%;
-
-      .bg_img {
+      &:before {
         background-image: url(/img/bg_discord_bot.webp?v=2);
+      }
+    }
+
+    .token_library {
+      &:before {
+        background-image: url(/img/bg_token_library.webp?v=1);
       }
     }
   }
