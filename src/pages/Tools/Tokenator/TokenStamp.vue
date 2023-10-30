@@ -25,7 +25,7 @@
           fill="lightgray"
         />
 
-        <image :xlink:href="backgorundImage" />
+        <image :xlink:href="getImageSource(backgroundImage)" />
 
         <image
           ref="loadedImageRef"
@@ -41,7 +41,7 @@
       </g>
 
       <image
-        :xlink:href="borderImage"
+        :xlink:href="getImageSource(borderImage)"
         :class="$style.borderImage"
       />
     </svg>
@@ -50,7 +50,7 @@
 <script lang="ts" setup>
   import { ref, watch } from 'vue';
 
-  import backgorundImage from '@/pages/Tools/Tokenator/assets/token-bg.webp';
+  import backgroundImage from '@/pages/Tools/Tokenator/assets/token-bg.webp';
   import borderImage from '@/pages/Tools/Tokenator/assets/token-border.webp';
 
   import type { Events } from 'vue';
@@ -73,6 +73,14 @@
   const startPos = ref<Position>({ x: 0, y: 0 });
   const offsetPos = ref<Position>({ x: 0, y: 0 });
   const loadedImagePosition = ref({ cx: TOKEN_SIZE / 2, cy: TOKEN_SIZE / 2 });
+
+  const getImageSource = (file: string) => {
+    const img = new Image();
+
+    img.src = file;
+
+    return img.src;
+  };
 
   const startDragging = (event: Events['onMousedown']) => {
     isDragging.value = true;
@@ -97,18 +105,15 @@
     }
   };
 
-  watch([() => props.source, () => props.scale], ([source], [oldSource]) => {
-    if (source !== oldSource) props.resetScale();
-
+  watch([() => props.source], ([source]) => {
     if (source) {
-      const selectedFile = source;
-      const img = new Image();
+      const reader = new FileReader();
 
-      img.src = URL.createObjectURL(selectedFile);
-
-      img.onload = () => {
-        sourceImage.value = img.src;
+      reader.onload = () => {
+        sourceImage.value = reader.result;
       };
+
+      reader.readAsDataURL(source);
     }
   });
 </script>

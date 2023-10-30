@@ -41,6 +41,7 @@
 
   import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
+  import { downloadSVG } from './downloadSVG';
   import TokenDetails from './TokenDetails.vue';
   import TokenStamp from './TokenStamp.vue';
 
@@ -75,13 +76,9 @@
   };
 
   const handleDownloadToken = debounce(() => {
-    const svgElement = document.getElementById('downloadable-token-svg');
+    const svgNode = document.getElementById('downloadable-token-svg');
 
-    if (svgElement) {
-      // download element
-    } else {
-      console.log('Ошибка');
-    }
+    if (svgNode) downloadSVG(svgNode);
   }, 300);
 </script>
 
