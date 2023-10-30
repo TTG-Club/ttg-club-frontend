@@ -34,49 +34,45 @@
         <div class="row">
           <div class="column">
             <div class="row">
-              <a
-                href="/info/telegram_spells_bot"
-                class="block dnd5club_tel_bot"
-              >
-                <div class="info">
-                  <p>Книга заклинаний у вас в руках!</p>
+              <div class="column">
+                <a
+                  href="/info/discord_bot"
+                  class="block token_library"
+                >
+                  <div class="info">
+                    <p>Всегда под рукой!</p>
 
-                  <h4>Telegram Spells Bot</h4>
-                </div>
+                    <h4>Библиотека токинов</h4>
+                  </div>
 
-                <div class="bg_img" />
-              </a>
+                  <div class="bg_img" />
+                </a>
 
-              <a
-                href="/info/discord_bot"
-                class="block discord_bot"
-              >
-                <div class="info">
-                  <p>Весь сайт у вас на сервере!</p>
+                <a
+                  href="/info/discord_bot"
+                  class="block discord_bot"
+                >
+                  <div class="info">
+                    <p>Весь сайт у вас на сервере!</p>
 
-                  <h4>Discord Bot</h4>
-                </div>
+                    <h4>Discord Bot</h4>
+                  </div>
 
-                <div class="bg_img" />
-              </a>
+                  <div class="bg_img" />
+                </a>
 
-              <a
-                href="/info/discord_bot"
-                class="block token_library"
-              >
-                <div class="info">
-                  <p>Всегда под рукой!</p>
+                <a
+                  href="/info/telegram_spells_bot"
+                  class="block dnd5club_tel_bot"
+                >
+                  <div class="info">
+                    <p>Книга заклинаний у вас в руках!</p>
 
-                  <h4>Библиотека токинов</h4>
-                </div>
+                    <h4>Telegram Spells Bot</h4>
+                  </div>
 
-                <div class="bg_img" />
-              </a>
-            </div>
-
-            <div class="row">
-              <div class="column youtube-block">
-                <youtube-block />
+                  <div class="bg_img" />
+                </a>
               </div>
 
               <div class="column">
@@ -95,10 +91,12 @@
                   </div>
                 </div>
               </div>
+            </div>
 
+            <div class="row">
               <div
                 v-if="showedPartners.length"
-                class="column"
+                class="row"
               >
                 <div class="links_block">
                   <h3>Наши друзья:</h3>
@@ -127,6 +125,10 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <div class="column youtube-block">
+            <youtube-block />
           </div>
         </div>
       </div>
