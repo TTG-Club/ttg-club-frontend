@@ -236,13 +236,13 @@
     .block {
       display: flex;
       flex-direction: row;
-      padding: 16px 16px 0 16px;
+      padding: 0 16px 0 16px;
       background-color: var(--bg-table-list);
       border-radius: 12px;
       width: 100%;
       position: relative;
       overflow: hidden;
-      min-height: 120px;
+      min-height: 100px;
 
       .info {
         z-index: 1;
