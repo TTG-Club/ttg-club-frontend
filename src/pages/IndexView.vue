@@ -35,8 +35,8 @@
           <div class="column">
             <div class="row">
               <div class="column">
-                <a
-                  href="/info/discord_bot"
+                <router-link
+                  to="/info/discord_bot"
                   class="block token_library"
                 >
                   <div class="info">
@@ -46,10 +46,10 @@
                   </div>
 
                   <div class="bg_img" />
-                </a>
+                </router-link>
 
-                <a
-                  href="/info/discord_bot"
+                <router-link
+                  to="/info/discord_bot"
                   class="block discord_bot"
                 >
                   <div class="info">
@@ -59,10 +59,10 @@
                   </div>
 
                   <div class="bg_img" />
-                </a>
+                </router-link>
 
-                <a
-                  href="/info/telegram_spells_bot"
+                <router-link
+                  to="/info/telegram_spells_bot"
                   class="block dnd5club_tel_bot"
                 >
                   <div class="info">
@@ -72,7 +72,7 @@
                   </div>
 
                   <div class="bg_img" />
-                </a>
+                </router-link>
               </div>
 
               <div class="column">
