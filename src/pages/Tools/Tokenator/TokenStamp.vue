@@ -1,54 +1,55 @@
 <template>
-  <div>
+  <div :class="$style.container">
     <svg
-      id="downloadable-token-svg"
-      :width="TOKEN_SIZE"
-      :height="TOKEN_SIZE"
-      @mousedown="startDragging"
-      @mouseup="stopDragging"
-      @mousemove="dragElement"
+      width="512"
+      height="512"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <defs>
-        <clipPath id="circle-clip">
-          <circle
-            :cx="TOKEN_SIZE / 2"
-            :cy="TOKEN_SIZE / 2"
-            r="210"
-          />
-        </clipPath>
-      </defs>
+      <clipPath id="circle-clip">
+        <circle
+          :cx="TOKEN_SIZE / 2"
+          :cy="TOKEN_SIZE / 2"
+          r="210"
+        />
+      </clipPath>
+
+      <g clip-path="url(#circle-clip)">
+        <circle
+          :cx="TOKEN_SIZE / 2"
+          :cy="TOKEN_SIZE / 2"
+          r="210"
+          fill="lightgray"
+        />
+
+        <image :xlink:href="backgorundImage" />
+
+        <image
+          ref="loadedImageRef"
+          :width="TOKEN_SIZE * props.scale"
+          :height="TOKEN_SIZE * props.scale"
+          :cx="loadedImagePosition.cx"
+          :cy="loadedImagePosition.cy"
+          :xlink:href="sourceImage"
+          @mousedown.prevent.capture="startDragging"
+          @mouseup.prevent.capture="stopDragging"
+          @mousemove.prevent.capture="dragElement"
+        />
+      </g>
 
       <image
-        ref="backgroundImgRef"
-        :width="TOKEN_SIZE"
-        :height="TOKEN_SIZE"
-        clip-path="url(#circle-clip)"
-      />
-
-      <image
-        ref="loadedImageRef"
-        :width="TOKEN_SIZE * props.scale"
-        :height="TOKEN_SIZE * props.scale"
-        :cx="loadedImagePosition.cx"
-        :cy="loadedImagePosition.cy"
-        clip-path="url(#circle-clip)"
-      />
-
-      <image
-        ref="borderImgRef"
-        :width="TOKEN_SIZE"
-        :height="TOKEN_SIZE"
+        :xlink:href="borderImage"
+        :class="$style.borderImage"
       />
     </svg>
   </div>
 </template>
 <script lang="ts" setup>
-  import { ref, onMounted, watch } from 'vue';
+  import { ref, watch } from 'vue';
 
   import backgorundImage from '@/pages/Tools/Tokenator/assets/token-bg.webp';
   import borderImage from '@/pages/Tools/Tokenator/assets/token-border.webp';
 
-  import type { Events, Ref } from 'vue';
+  import type { Events } from 'vue';
 
   type Position = { x: number; y: number };
 
@@ -61,17 +62,13 @@
     showError: (msg: string) => void;
   }>();
 
-  const backgroundImgRef = ref<HTMLImageElement | null>(null);
-  const borderImgRef = ref<HTMLImageElement | null>(null);
   const loadedImageRef = ref<HTMLImageElement | null>(null);
+  const sourceImage = ref();
 
   const isDragging = ref<boolean>(false);
   const startPos = ref<Position>({ x: 0, y: 0 });
   const offsetPos = ref<Position>({ x: 0, y: 0 });
   const loadedImagePosition = ref({ cx: TOKEN_SIZE / 2, cy: TOKEN_SIZE / 2 });
-
-  const setImage = (elementRef: Ref<HTMLImageElement | null>, source: string) =>
-    elementRef?.value?.setAttribute('href', source);
 
   const startDragging = (event: Events['onMousedown']) => {
     isDragging.value = true;
@@ -96,11 +93,6 @@
     }
   };
 
-  onMounted(() => {
-    setImage(borderImgRef, borderImage);
-    setImage(backgroundImgRef, backgorundImage);
-  });
-
   watch([() => props.source, () => props.scale], ([source], [oldSource]) => {
     if (source !== oldSource) props.resetScale();
 
@@ -111,7 +103,7 @@
       img.src = URL.createObjectURL(selectedFile);
 
       img.onload = () => {
-        setImage(loadedImageRef, img.src);
+        sourceImage.value = img.src;
       };
     }
   });
@@ -124,7 +116,10 @@
     height: 512px;
     transform: scale(0.5) translateY(-30%);
     @include media-min($md) {
-      transform: scale(0.5) translateY(-45%) translateX(-30%);
+      transform: scale(0.5) translateY(-43%) translateX(-38%);
     }
+  }
+  .borderImage {
+    pointer-events: none;
   }
 </style>
