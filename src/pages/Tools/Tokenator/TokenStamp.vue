@@ -1,14 +1,45 @@
 <template>
-  <div :class="$style.container">
-    <canvas
-      id="canvasToken"
-      ref="canvasRef"
-      width="512"
-      height="512"
+  <div>
+    <svg
+      id="downloadable-token-svg"
+      :width="TOKEN_SIZE"
+      :height="TOKEN_SIZE"
       @mousedown="startDragging"
       @mouseup="stopDragging"
       @mousemove="dragElement"
-    />
+    >
+      <defs>
+        <clipPath id="circle-clip">
+          <circle
+            :cx="TOKEN_SIZE / 2"
+            :cy="TOKEN_SIZE / 2"
+            r="210"
+          />
+        </clipPath>
+      </defs>
+
+      <image
+        ref="backgroundImgRef"
+        :width="TOKEN_SIZE"
+        :height="TOKEN_SIZE"
+        clip-path="url(#circle-clip)"
+      />
+
+      <image
+        ref="loadedImageRef"
+        :width="TOKEN_SIZE * props.scale"
+        :height="TOKEN_SIZE * props.scale"
+        :cx="loadedImagePosition.cx"
+        :cy="loadedImagePosition.cy"
+        clip-path="url(#circle-clip)"
+      />
+
+      <image
+        ref="borderImgRef"
+        :width="TOKEN_SIZE"
+        :height="TOKEN_SIZE"
+      />
+    </svg>
   </div>
 </template>
 <script lang="ts" setup>
@@ -17,19 +48,11 @@
   import backgorundImage from '@/pages/Tools/Tokenator/assets/token-bg.webp';
   import borderImage from '@/pages/Tools/Tokenator/assets/token-border.webp';
 
-  import { redrawToken } from './redrawToken';
+  import type { Events, Ref } from 'vue';
 
-  import type { Events } from 'vue';
+  type Position = { x: number; y: number };
 
-  const canvasRef = ref<HTMLCanvasElement | null>(null);
-  const contextRef = ref<CanvasRenderingContext2D | null>(null);
-  const borderImageRef = ref<HTMLImageElement>(new Image());
-  const bgImageRef = ref<HTMLImageElement>(new Image());
-  const loadedImageRef = ref<HTMLImageElement | null>(null);
-  const isDragging = ref<boolean>(false);
-  const offsetX = ref<number>(0);
-  const offsetY = ref<number>(0);
-  const loadedImagePosition = ref({ x: 0, y: 0 });
+  const TOKEN_SIZE = 512;
 
   const props = defineProps<{
     source: File | null;
@@ -38,18 +61,24 @@
     showError: (msg: string) => void;
   }>();
 
+  const backgroundImgRef = ref<HTMLImageElement | null>(null);
+  const borderImgRef = ref<HTMLImageElement | null>(null);
+  const loadedImageRef = ref<HTMLImageElement | null>(null);
+
+  const isDragging = ref<boolean>(false);
+  const startPos = ref<Position>({ x: 0, y: 0 });
+  const offsetPos = ref<Position>({ x: 0, y: 0 });
+  const loadedImagePosition = ref({ cx: TOKEN_SIZE / 2, cy: TOKEN_SIZE / 2 });
+
+  const setImage = (elementRef: Ref<HTMLImageElement | null>, source: string) =>
+    elementRef?.value?.setAttribute('href', source);
+
   const startDragging = (event: Events['onMousedown']) => {
-    const canvas = canvasRef.value;
+    isDragging.value = true;
 
-    if (canvas) {
-      isDragging.value = true;
-
-      const rect = canvas.getBoundingClientRect();
-
-      // считаем точку старта
-      offsetX.value = event.clientX - rect.left - loadedImagePosition.value.x;
-      offsetY.value = event.clientY - rect.top - loadedImagePosition.value.y;
-    }
+    // считаем точку старта
+    startPos.value.x = event.clientX - offsetPos.value.x;
+    startPos.value.y = event.clientY - offsetPos.value.y;
   };
 
   const stopDragging = () => {
@@ -58,75 +87,18 @@
 
   const dragElement = (event: Events['onMousemove']) => {
     if (isDragging.value) {
-      const canvas = canvasRef.value;
-      const context = contextRef.value;
+      offsetPos.value.x = event.clientX - startPos.value.x;
+      offsetPos.value.y = event.clientY - startPos.value.y;
 
-      if (canvas && context) {
-        const rect = canvas.getBoundingClientRect();
-
-        // двигаем изображение за курсором
-        const x = event.clientX - rect.left - offsetX.value;
-        const y = event.clientY - rect.top - offsetY.value;
-
-        loadedImagePosition.value.x = x;
-        loadedImagePosition.value.y = y;
-
-        redrawToken(
-          canvas,
-          context,
-          borderImageRef.value,
-          bgImageRef.value,
-          loadedImageRef.value,
-          props.scale,
-          { x, y }
-        );
+      if (loadedImageRef.value) {
+        loadedImageRef.value.style.transform = `translate(${offsetPos.value.x}px, ${offsetPos.value.y}px)`;
       }
     }
-  };
-
-  const loadAndDrawAssets = (
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
-    image: HTMLImageElement | null = null
-  ) => {
-    borderImageRef.value.src = borderImage;
-    bgImageRef.value.src = backgorundImage;
-
-    Promise.all([
-      new Promise(resolve => {
-        bgImageRef.value.onload = resolve;
-      }),
-      new Promise(resolve => {
-        borderImageRef.value.onload = resolve;
-      })
-    ])
-      .then(() => {
-        redrawToken(
-          canvas,
-          context,
-          borderImageRef.value,
-          bgImageRef.value,
-          image,
-          props.scale,
-          loadedImagePosition.value
-        );
-      })
-      .catch(() => {
-        props.showError('Токенатор провалил спасбросок смерти.');
-      });
   };
 
   onMounted(() => {
-    const canvas = canvasRef.value;
-
-    if (canvas) {
-      const context = canvas.getContext('2d');
-
-      if (context) {
-        contextRef.value = context;
-        loadAndDrawAssets(canvas, context);
-      }
-    }
+    setImage(borderImgRef, borderImage);
+    setImage(backgroundImgRef, backgorundImage);
   });
 
   watch([() => props.source, () => props.scale], ([source], [oldSource]) => {
@@ -139,13 +111,7 @@
       img.src = URL.createObjectURL(selectedFile);
 
       img.onload = () => {
-        const context = contextRef.value;
-
-        loadedImageRef.value = img;
-
-        if (context) {
-          loadAndDrawAssets(canvasRef.value!, context, loadedImageRef.value);
-        }
+        setImage(loadedImageRef, img.src);
       };
     }
   });

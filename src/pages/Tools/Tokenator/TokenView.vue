@@ -6,7 +6,7 @@
       <div :class="$style.container">
         <token-details
           :open-file="open"
-          :download-file="handleDownloadCanvas"
+          :download-file="handleDownloadToken"
           :disabled="!file"
         >
           <template #slider>
@@ -39,7 +39,6 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import { downloadCanvas } from '@/shared/helpers/downloadCanvas';
   import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
   import TokenDetails from './TokenDetails.vue';
@@ -75,7 +74,15 @@
     scale.value = DEFAULT_SCALE;
   };
 
-  const handleDownloadCanvas = debounce(downloadCanvas, 300);
+  const handleDownloadToken = debounce(() => {
+    const svgElement = document.getElementById('downloadable-token-svg');
+
+    if (svgElement) {
+      // download element
+    } else {
+      console.log('Ошибка');
+    }
+  }, 300);
 </script>
 
 <style lang="scss" module>
