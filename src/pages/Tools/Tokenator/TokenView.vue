@@ -63,7 +63,7 @@
     const fileSize = fileItem.size / 1024 ** 2; // размер в мегабайтах
 
     if (fileSize >= MAX_FILE_SIZE) {
-      toast.error('Используйте заклинание по уменьшению размер файла.');
+      toast.error('Размер файл больше допустимого.');
 
       return;
     }

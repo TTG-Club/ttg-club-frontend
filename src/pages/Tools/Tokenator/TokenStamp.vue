@@ -11,16 +11,16 @@
     >
       <clipPath id="circle-clip">
         <circle
-          :cx="TOKEN_SIZE / 2"
-          :cy="TOKEN_SIZE / 2"
+          :cx="HALF_TOKEN_SIZE"
+          :cy="HALF_TOKEN_SIZE"
           r="210"
         />
       </clipPath>
 
       <g clip-path="url(#circle-clip)">
         <circle
-          :cx="TOKEN_SIZE / 2"
-          :cy="TOKEN_SIZE / 2"
+          :cx="HALF_TOKEN_SIZE"
+          :cy="HALF_TOKEN_SIZE"
           r="210"
           fill="lightgray"
         />
@@ -58,6 +58,8 @@
   type Position = { x: number; y: number };
 
   const TOKEN_SIZE = 512;
+  const HALF_TOKEN_SIZE = TOKEN_SIZE / 2;
+  const MAX_DIMENSION = 2000;
 
   const props = defineProps<{
     source: File | null;
@@ -107,13 +109,26 @@
 
   watch([() => props.source], ([source]) => {
     if (source) {
-      const reader = new FileReader();
+      const img = new Image();
+      const file = URL.createObjectURL(source);
 
-      reader.onload = () => {
-        sourceImage.value = reader.result;
+      img.src = file;
+
+      // eslint-disable-next-line func-names
+      img.onload = function () {
+        // проверяем размеры изображения, когда оно загрузилось
+        if (img.height >= MAX_DIMENSION || img.width >= MAX_DIMENSION) {
+          props.showError('Ширина или высота файла выше допустимого.');
+        } else {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            sourceImage.value = reader.result;
+          };
+
+          reader.readAsDataURL(source);
+        }
       };
-
-      reader.readAsDataURL(source);
     }
   });
 </script>
