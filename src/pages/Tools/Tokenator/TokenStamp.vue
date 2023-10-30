@@ -1,8 +1,12 @@
 <template>
-  <div :class="$style.container">
+  <div
+    :class="$style.container"
+    @mouseleave="stopDragging"
+  >
     <svg
-      width="512"
-      height="512"
+      id="downloadable-token-svg"
+      :width="TOKEN_SIZE"
+      :height="TOKEN_SIZE"
       xmlns="http://www.w3.org/2000/svg"
     >
       <clipPath id="circle-clip">
