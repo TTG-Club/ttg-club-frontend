@@ -3,12 +3,12 @@
     ref="token"
     :class="$style.container"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 512 512"
+    :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
   >
     <clipPath id="circle-clip">
       <circle
-        :cx="256"
-        :cy="256"
+        :cx="SVG_SIZE / 2"
+        :cy="SVG_SIZE / 2"
         r="210"
       />
     </clipPath>
@@ -19,14 +19,14 @@
     >
       <image
         :href="background"
-        :width="512"
-        :height="512"
+        :width="SVG_SIZE"
+        :height="SVG_SIZE"
       />
 
       <image
         ref="image"
-        :width="512 * scale"
-        :height="512 * scale"
+        :width="SVG_SIZE * scale"
+        :height="SVG_SIZE * scale"
         :x="offsetPos.x * scale"
         :y="offsetPos.y * scale"
         :href="file"
@@ -36,8 +36,8 @@
     <image
       :href="border"
       :class="$style.border"
-      :width="512"
-      :height="512"
+      :width="SVG_SIZE"
+      :height="SVG_SIZE"
     />
   </svg>
 </template>
@@ -49,7 +49,7 @@
 
   type Position = { x: number; y: number };
 
-  const { token, border, background, scale, file } = useTokenator();
+  const { token, border, background, scale, file, SVG_SIZE } = useTokenator();
 
   const container = ref<SVGGElement>();
   const image = ref<HTMLImageElement>();

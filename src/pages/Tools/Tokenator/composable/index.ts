@@ -3,6 +3,7 @@ import { useFileDialog } from '@vueuse/core/index';
 import { ref, unref } from 'vue';
 
 const DEFAULT_SCALE = 1.1;
+const SVG_SIZE = 512;
 
 const file = ref();
 const scale = ref<number>(DEFAULT_SCALE);
@@ -53,7 +54,7 @@ export const useTokenator = () => {
     }
   }).blob();
 
-  const load = (): Promise<void> =>
+  const load = (format: 'webp' | 'png' = 'png'): Promise<void> =>
     new Promise((resolve, reject) => {
       const svg = unref(token);
 
@@ -66,23 +67,23 @@ export const useTokenator = () => {
       const svgText = new XMLSerializer().serializeToString(svg);
       const canvas = document.createElement('canvas');
 
-      canvas.width = 512;
-      canvas.height = 512;
+      canvas.width = SVG_SIZE;
+      canvas.height = SVG_SIZE;
 
       const context = canvas.getContext('2d');
       const img = new Image();
 
-      img.width = 512;
-      img.height = 512;
+      img.width = SVG_SIZE;
+      img.height = SVG_SIZE;
       img.src = `data:image/svg+xml;base64,${btoa(svgText)}`;
 
       img.onload = () => {
-        context?.drawImage(img, 0, 0, 512, 512);
+        context?.drawImage(img, 0, 0, SVG_SIZE, SVG_SIZE);
 
         const a = document.createElement('a');
 
-        a.href = canvas.toDataURL('image/webp', 1);
-        a.download = 'token.webp';
+        a.href = canvas.toDataURL(`image/${format}`, 1);
+        a.download = `token.${format}`;
 
         document.body.appendChild(a);
         a.click();
@@ -100,6 +101,7 @@ export const useTokenator = () => {
     border,
     background,
 
+    SVG_SIZE,
     scale,
     file,
 

@@ -36,8 +36,10 @@
 
         <ui-button
           type="default"
+          split
           :disabled="!file"
-          @click.left.exact.prevent="load"
+          :options="variants"
+          @click.left.exact.prevent="load('png')"
         >
           Скачать
         </ui-button>
@@ -50,9 +52,23 @@
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import type { TButtonOption } from '@/shared/ui/kit/button/UiButton';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const { open, load, file } = useTokenator();
+
+  const variants: Array<TButtonOption> = [
+    {
+      key: 'webp',
+      label: 'WEBP',
+      callback: () => load('webp')
+    },
+    {
+      key: 'png',
+      label: 'PNG',
+      callback: () => load('png')
+    }
+  ];
 </script>
 
 <style lang="scss" module>
