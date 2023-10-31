@@ -31,65 +31,48 @@
       </div>
 
       <div class="main-page-blocks">
-        <div class="row reverse">
+        <div class="row">
           <div class="column">
             <div class="row">
               <div class="column">
-                <div class="block dnd5club_tel_bot">
+                <router-link
+                  to="/info/discord_bot"
+                  class="block token_library"
+                >
                   <div class="info">
-                    <h4>Telegram Spells Bot</h4>
+                    <p>Всегда под рукой!</p>
 
-                    <p>Книга заклинаний у вас в руках!</p>
-
-                    <div class="bottom">
-                      <a
-                        class="main"
-                        href="https://t.me/ttg_club_bot"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        >Подключить</a
-                      >
-
-                      <router-link
-                        :to="{ path: '/info/telegram_spells_bot' }"
-                        rel="noopener noreferrer"
-                      >
-                        Описание
-                      </router-link>
-                    </div>
+                    <h4>Библиотека токинов</h4>
                   </div>
 
                   <div class="bg_img" />
-                </div>
+                </router-link>
 
-                <div class="block discord_bot">
+                <router-link
+                  to="/info/discord_bot"
+                  class="block discord_bot"
+                >
                   <div class="info">
-                    <h4>Discord Bot <sup class="beta">β</sup></h4>
-
                     <p>Весь сайт у вас на сервере!</p>
 
-                    <div class="bottom">
-                      <!-- eslint-disable vue/max-len -->
-                      <a
-                        class="main"
-                        href="https://discord.com/api/oauth2/authorize?client_id=1074095730265964654&permissions=274878032896&scope=bot%20applications.commands"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        >Пригласить</a
-                      >
-                      <!-- eslint-enable vue/max-len -->
-
-                      <router-link
-                        :to="{ path: '/info/discord_bot' }"
-                        rel="noopener noreferrer"
-                      >
-                        Описание
-                      </router-link>
-                    </div>
+                    <h4>Discord Bot</h4>
                   </div>
 
                   <div class="bg_img" />
-                </div>
+                </router-link>
+
+                <router-link
+                  to="/info/telegram_spells_bot"
+                  class="block dnd5club_tel_bot"
+                >
+                  <div class="info">
+                    <p>Книга заклинаний у вас в руках!</p>
+
+                    <h4>Telegram Spells Bot</h4>
+                  </div>
+
+                  <div class="bg_img" />
+                </router-link>
               </div>
 
               <div class="column">
@@ -110,33 +93,35 @@
               </div>
             </div>
 
-            <div
-              v-if="showedPartners.length"
-              class="row"
-            >
-              <div class="links_block">
-                <h3>Наши друзья:</h3>
+            <div class="row">
+              <div
+                v-if="showedPartners.length"
+                class="row"
+              >
+                <div class="links_block">
+                  <h3>Наши друзья:</h3>
 
-                <div class="list">
-                  <a
-                    v-for="(partner, key) in showedPartners"
-                    :key="key"
-                    v-tippy="{
-                      content: partner.description
-                    }"
-                    :href="partner.url"
-                    class="chips tip"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <img
-                      :alt="partner.name"
-                      :src="partner.img"
-                      height="20px"
-                      width="20px"
-                    />
-                    {{ partner.name }}
-                  </a>
+                  <div class="list">
+                    <a
+                      v-for="(partner, key) in showedPartners"
+                      :key="key"
+                      v-tippy="{
+                        content: partner.description
+                      }"
+                      :href="partner.url"
+                      class="chips tip"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <img
+                        :alt="partner.name"
+                        :src="partner.img"
+                        height="20px"
+                        width="20px"
+                      />
+                      {{ partner.name }}
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
