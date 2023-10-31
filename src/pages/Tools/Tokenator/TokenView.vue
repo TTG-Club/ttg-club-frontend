@@ -4,82 +4,33 @@
 
     <template #default>
       <div :class="$style.container">
-        <token-details
-          :open-file="open"
-          :download-file="handleDownloadToken"
-          :disabled="!file"
-        >
+        <token-details>
           <template #slider>
             <ui-slider
               v-model="scale"
               :min="0.1"
-              :max="2.1"
+              :max="2"
               :step="0.05"
             />
           </template>
         </token-details>
 
-        <token-stamp
-          :source="file"
-          :scale="scale"
-          :reset-scale="resetScale"
-          :show-error="toast.error"
-        />
+        <token-stamp />
       </div>
     </template>
   </page-layout>
 </template>
 <script lang="ts" setup>
-  import { useFileDialog } from '@vueuse/core';
-  import debounce from 'lodash-es/debounce';
-  import { ref } from 'vue';
-  import { useToast } from 'vue-toastification';
-
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
+  import { useTokenator } from '@/pages/Tools/Tokenator/composable';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
   import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
-  import { downloadSVG } from './downloadSVG';
   import TokenDetails from './TokenDetails.vue';
   import TokenStamp from './TokenStamp.vue';
 
-  const toast = useToast(ToastEventBus);
-
-  const DEFAULT_SCALE = 1.1;
-  const MAX_FILE_SIZE = 50; // размер в мегабайтах
-
-  const scale = ref<number>(DEFAULT_SCALE);
-  const file = ref<File | null>(null);
-
-  const { open, onChange } = useFileDialog({
-    accept: 'image/*',
-    multiple: false
-  });
-
-  onChange((param: FileList | null) => {
-    const fileItem = param?.[0] as File;
-    const fileSize = fileItem.size / 1024 ** 2; // размер в мегабайтах
-
-    if (fileSize >= MAX_FILE_SIZE) {
-      toast.error('Размер файл больше допустимого.');
-
-      return;
-    }
-
-    file.value = fileItem;
-  });
-
-  const resetScale = () => {
-    scale.value = DEFAULT_SCALE;
-  };
-
-  const handleDownloadToken = debounce(() => {
-    const svgNode = document.getElementById('downloadable-token-svg');
-
-    if (svgNode) downloadSVG(svgNode);
-  }, 300);
+  const { scale } = useTokenator();
 </script>
 
 <style lang="scss" module>

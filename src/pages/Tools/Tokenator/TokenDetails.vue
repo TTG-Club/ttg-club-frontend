@@ -29,15 +29,15 @@
         <ui-button
           type="outline"
           :body-class="$style.button"
-          @click.left.exact.prevent="props.openFile()"
+          @click.left.exact.prevent="open"
         >
           Загрузить картинку
         </ui-button>
 
         <ui-button
           type="default"
-          :disabled="props.disabled"
-          @click.left.exact.prevent="props.downloadFile()"
+          :disabled="!file"
+          @click.left.exact.prevent="load"
         >
           Скачать
         </ui-button>
@@ -47,14 +47,12 @@
 </template>
 
 <script lang="ts" setup>
+  import { useTokenator } from '@/pages/Tools/Tokenator/composable';
+
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
-  const props = defineProps<{
-    openFile: () => void;
-    downloadFile: () => void;
-    disabled: boolean;
-  }>();
+  const { open, load, file } = useTokenator();
 </script>
 
 <style lang="scss" module>
@@ -66,6 +64,7 @@
     width: fit-content;
     height: fit-content;
     transform: translateY(-45%);
+
     @include media-min($md) {
       margin: 0;
       transform: none;
