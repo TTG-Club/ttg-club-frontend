@@ -21,46 +21,38 @@
 
     <div class="ability-races__fields">
       <ui-dropdown
-        disabled
+        v-model="selectedRace"
+        :track-by="({ url }) => url"
+        :label="({ name: { rus } }) => rus"
+        is-searchable
         placeholder="Выбрать расу"
-        :options="races.map(el => ({ name: el.name.rus, value: el.url }))"
+        :options="races"
         @update:model-value="onSelectRace"
       >
         <template #label> Раса </template>
       </ui-dropdown>
 
-      <ui-select
+      <ui-dropdown
+        v-model="selectedSubRace"
+        :track-by="({ url }) => url"
+        :label="({ name: { rus } }) => rus"
         :disabled="!subRaces?.length"
-        :model-value="selectedSubRace"
+        placeholder="Выбрать подрасу"
         :options="subRaces"
-        allow-empty
-        is-wrap-disabled
-        track-by="url"
-        @select="onSelectSubRace"
       >
         <template #label> Подраса </template>
+      </ui-dropdown>
 
-        <template #singleLabel="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #option="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #placeholder> Выбрать подрасу </template>
-      </ui-select>
-
-      <ui-select
+      <ui-dropdown
         :disabled="!isChoiceDouble"
-        :model-value="selectedChoiceDouble"
+        :track-by="({ key }) => key"
+        :label="({ label }) => label"
+        placeholder="Выбери что-нибудь"
         :options="choiceDouble"
-        label="label"
-        track-by="key"
-        @select="onSelectChoiceDouble"
+        @update:model-value="onSelectChoiceDouble"
       >
         <template #label> Набор характеристик </template>
-      </ui-select>
+      </ui-dropdown>
 
       <ui-select
         :disabled="isFirstDisabled"
@@ -166,9 +158,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
   import { cloneDeep, reverse } from 'lodash-es';
-  import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
+  import { computed, onBeforeMount, ref, watch } from 'vue';
 
   import RaceLink from '@/pages/Character/Races/RaceLink.vue';
   import { useRaceAbility } from '@/pages/Tools/AbilityCalc/AbilityRaces/composition/useRaceAbility';
@@ -189,238 +181,183 @@
   import UiDropdown from '@/shared/ui/kit/UiDropdown.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
 
-  import type { PropType } from 'vue';
+  const modelValue = defineModel({
+    required: true
+  });
 
-  export default defineComponent({
-    components: {
-      UiDropdown,
-      UiSelect,
-      RaceLink
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true
+  const selectedRace = ref<TRaceLink | null>(null);
+  const selectedSubRace = ref<TRaceLink | null>(null);
+
+  const selectedChoiceDouble = ref<{
+    key: AbilityChoiceDoubleKey;
+    label: AbilityChoiceDouble;
+  } | null>(null);
+
+  const { initPages, items } = usePagination({
+    url: '/races',
+    limit: -1,
+    order: [
+      {
+        field: 'name',
+        direction: 'asc'
       }
-    },
-    setup(props, { emit }) {
-      const selectedRace = ref<TRaceLink | null>(null);
-      const selectedSubRace = ref<TRaceLink | null>(null);
+    ]
+  });
 
-      const selectedChoiceDouble = ref<{
-        key: AbilityChoiceDoubleKey;
-        label: AbilityChoiceDouble;
-      } | null>(null);
+  const races = computed(() =>
+    items.value.map((race: TRaceLink) => {
+      const raceItem = cloneDeep(race);
 
-      const { initPages, items } = usePagination({
-        url: '/races',
-        limit: -1,
-        order: [
-          {
-            field: 'name',
-            direction: 'asc'
-          }
-        ]
-      });
-
-      const races = computed(() =>
-        items.value.map((race: TRaceLink) => {
-          const raceItem = cloneDeep(race);
-
-          if (raceItem.subraces?.length) {
-            raceItem.subraces = raceItem.subraces.map(item => ({
-              ...item,
-              image: raceItem.image
-            }));
-          }
-
-          if (
-            items.value.filter(
-              (item: TRaceLink) => raceItem.name.rus === item.name.rus
-            ).length >= 2
-          ) {
-            return {
-              ...raceItem,
-              name: {
-                ...raceItem.name,
-                rus: `${raceItem.name.rus} (${raceItem.source.shortName})`
-              }
-            };
-          }
-
-          return raceItem;
-        })
-      );
-
-      const subRaces = computed(() => selectedRace.value?.subraces || []);
-
-      const choiceDouble = computed(
-        (): Array<ChoiceDouble> =>
-          reverse(
-            Object.entries(AbilityChoiceDouble).map(entry => ({
-              key: entry[0] as AbilityChoiceDoubleKey,
-              label: entry[1] as AbilityChoiceDouble
-            }))
-          )
-      );
-
-      const getIsChoiceDouble = (race: TRaceLink) =>
-        race.abilities.length === 1 &&
-        race.abilities[0].key === AbilityTypeKey.CHOICE_DOUBLE;
-
-      const checkInstance = computed(
-        () => selectedSubRace.value || selectedRace.value
-      );
-
-      const isChoiceDouble = computed(() =>
-        checkInstance.value ? getIsChoiceDouble(checkInstance.value) : false
-      );
-
-      const {
-        firstValue,
-        firstLabel,
-        isFirstDisabled,
-        onFirstSelect,
-
-        secondValue,
-        secondLabel,
-        isSecondDisabled,
-        onSecondSelect,
-
-        thirdValue,
-        thirdLabel,
-        isThirdDisabled,
-        onThirdSelect
-      } = useRaceAbility({
-        isChoiceDouble,
-        selectedChoiceDouble,
-        checkInstance
-      });
-
-      const abilities = computed(() => {
-        const keys: Array<AbilityKey> = Object.values(AbilityKey);
-
-        return keys.map(key => ({
-          key,
-          name: AbilityName[key]
+      if (raceItem.subraces?.length) {
+        raceItem.subraces = raceItem.subraces.map(item => ({
+          ...item,
+          image: raceItem.image
         }));
-      });
+      }
 
-      const isAbilitySelected = (key: AbilityKey) =>
-        firstValue.value?.key === key ||
-        secondValue.value?.key === key ||
-        thirdValue.value?.key === key;
+      if (
+        items.value.filter(
+          (item: TRaceLink) => raceItem.name.rus === item.name.rus
+        ).length >= 2
+      ) {
+        return {
+          ...raceItem,
+          name: {
+            ...raceItem.name,
+            rus: `${raceItem.name.rus} (${raceItem.source.shortName})`
+          }
+        };
+      }
 
-      onBeforeMount(async () => {
-        await initPages();
-      });
+      return raceItem;
+    })
+  );
 
-      const emitValue = () => {
-        if (
-          !isChoiceDouble.value &&
-          checkInstance.value?.abilities.length &&
-          !checkInstance.value?.abilities.find(
-            ability =>
-              Object.values(AbilityTypeKey).includes(
-                ability.key as AbilityTypeKey
-              ) && ability.key !== AbilityTypeKey.ALL
-          )
-        ) {
-          emit('update:model-value', checkInstance.value?.abilities);
+  const subRaces = computed(() => selectedRace.value?.subraces || []);
 
-          return;
-        }
+  const choiceDouble = computed(
+    (): Array<ChoiceDouble> =>
+      reverse(
+        Object.entries(AbilityChoiceDouble).map(entry => ({
+          key: entry[0] as AbilityChoiceDoubleKey,
+          label: entry[1] as AbilityChoiceDouble
+        }))
+      )
+  );
 
-        const value = [
-          ...(checkInstance.value?.abilities.filter(
-            ability =>
-              !Object.values(AbilityTypeKey).includes(
-                ability.key as AbilityTypeKey
-              ) || ability.key === AbilityTypeKey.ALL
-          ) as Array<AbilityRoll>)
-        ];
+  const getIsChoiceDouble = (race: TRaceLink) =>
+    race.abilities.length === 1 &&
+    race.abilities[0].key === AbilityTypeKey.CHOICE_DOUBLE;
 
-        if (firstValue.value) {
-          value.push(firstValue.value);
-        }
+  const checkInstance = computed(
+    () => selectedSubRace.value || selectedRace.value
+  );
 
-        if (secondValue.value) {
-          value.push(secondValue.value);
-        }
+  const isChoiceDouble = computed(() =>
+    checkInstance.value ? getIsChoiceDouble(checkInstance.value) : false
+  );
 
-        if (thirdValue.value) {
-          value.push(thirdValue.value);
-        }
+  const {
+    firstValue,
+    firstLabel,
+    isFirstDisabled,
+    onFirstSelect,
 
-        emit('update:model-value', value);
-      };
+    secondValue,
+    secondLabel,
+    isSecondDisabled,
+    onSecondSelect,
 
-      const onSelectChoiceDouble = (choice: ChoiceDouble | null) => {
-        selectedChoiceDouble.value = choice;
-        firstValue.value = null;
-        secondValue.value = null;
-        thirdValue.value = null;
+    thirdValue,
+    thirdLabel,
+    isThirdDisabled,
+    onThirdSelect
+  } = useRaceAbility({
+    isChoiceDouble,
+    selectedChoiceDouble,
+    checkInstance
+  });
 
-        emitValue();
-      };
+  const abilities = computed(() => {
+    const keys: Array<AbilityKey> = Object.values(AbilityKey);
 
-      const onSelectSubRace = (subRace: TRaceLink | null) => {
-        selectedSubRace.value = subRace;
+    return keys.map(key => ({
+      key,
+      name: AbilityName[key]
+    }));
+  });
 
-        onSelectChoiceDouble(
-          isChoiceDouble.value ? choiceDouble.value[0] : null
-        );
-      };
+  const isAbilitySelected = (key: AbilityKey) =>
+    firstValue.value?.key === key ||
+    secondValue.value?.key === key ||
+    thirdValue.value?.key === key;
 
-      const onSelectRace = (race: any) => {
-        const value = cloneDeep(races.value.find(el => el.url === race[0]));
+  onBeforeMount(async () => {
+    await initPages();
+  });
 
-        if (value) {
-          value.name.rus = value.name.rus.replace(/\(.+\)$/i, '');
-        }
+  const emitValue = () => {
+    if (
+      !isChoiceDouble.value &&
+      checkInstance.value?.abilities.length &&
+      !checkInstance.value?.abilities.find(
+        ability =>
+          Object.values(AbilityTypeKey).includes(
+            ability.key as AbilityTypeKey
+          ) && ability.key !== AbilityTypeKey.ALL
+      )
+    ) {
+      modelValue.value = checkInstance.value?.abilities;
 
-        selectedRace.value = value;
-
-        onSelectSubRace(null);
-      };
-
-      watch([firstValue, secondValue, thirdValue], () => {
-        emitValue();
-      });
-
-      return {
-        races,
-        selectedRace,
-        isChoiceDouble,
-        subRaces,
-        selectedSubRace,
-        checkInstance,
-        choiceDouble,
-        selectedChoiceDouble,
-        abilities,
-
-        firstValue,
-        firstLabel,
-        isFirstDisabled,
-        onFirstSelect,
-
-        secondValue,
-        secondLabel,
-        isSecondDisabled,
-        onSecondSelect,
-
-        thirdValue,
-        thirdLabel,
-        isThirdDisabled,
-        onThirdSelect,
-
-        isAbilitySelected,
-
-        onSelectRace,
-        onSelectSubRace,
-        onSelectChoiceDouble
-      };
+      return;
     }
+
+    const value = [
+      ...(checkInstance.value?.abilities.filter(
+        ability =>
+          !Object.values(AbilityTypeKey).includes(
+            ability.key as AbilityTypeKey
+          ) || ability.key === AbilityTypeKey.ALL
+      ) as Array<AbilityRoll>)
+    ];
+
+    if (firstValue.value) {
+      value.push(firstValue.value);
+    }
+
+    if (secondValue.value) {
+      value.push(secondValue.value);
+    }
+
+    if (thirdValue.value) {
+      value.push(thirdValue.value);
+    }
+
+    modelValue.value = value;
+  };
+
+  const onSelectChoiceDouble = (choice: any) => {
+    selectedChoiceDouble.value = choice;
+
+    firstValue.value = null;
+    secondValue.value = null;
+    thirdValue.value = null;
+
+    emitValue();
+  };
+
+  const onSelectSubRace = () => {
+    selectedSubRace.value = null;
+
+    onSelectChoiceDouble(isChoiceDouble.value ? choiceDouble.value[0] : null);
+  };
+
+  const onSelectRace = () => {
+    onSelectSubRace();
+  };
+
+  watch([firstValue, secondValue, thirdValue], () => {
+    emitValue();
   });
 </script>
 
