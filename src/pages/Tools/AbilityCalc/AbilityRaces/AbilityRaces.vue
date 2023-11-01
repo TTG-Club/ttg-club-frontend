@@ -20,7 +20,7 @@
     </div>
 
     <div class="ability-races__fields">
-      <ui-dropdown
+      <ui-multiselect
         v-model="selectedRace"
         track-by="url"
         label="name.rus"
@@ -30,9 +30,9 @@
         @update:model-value="onSelectRace"
       >
         <template #label> Раса</template>
-      </ui-dropdown>
+      </ui-multiselect>
 
-      <ui-dropdown
+      <ui-multiselect
         v-model="selectedSubRace"
         track-by="url"
         label="name.rus"
@@ -41,9 +41,9 @@
         :options="subRaces"
       >
         <template #label> Подраса</template>
-      </ui-dropdown>
+      </ui-multiselect>
 
-      <ui-dropdown
+      <ui-multiselect
         v-model="selectedChoiceDouble"
         track-by="key"
         label="label"
@@ -52,9 +52,9 @@
         :options="choiceDouble"
       >
         <template #label> Набор характеристик</template>
-      </ui-dropdown>
+      </ui-multiselect>
 
-      <ui-dropdown
+      <ui-multiselect
         v-model="firstValue"
         track-by="key"
         label="name"
@@ -77,9 +77,9 @@
             >{{ name }}</span
           >
         </template>
-      </ui-dropdown>
+      </ui-multiselect>
 
-      <ui-dropdown
+      <ui-multiselect
         v-model="secondValue"
         track-by="key"
         label="name"
@@ -102,9 +102,9 @@
             >{{ name }}</span
           >
         </template>
-      </ui-dropdown>
+      </ui-multiselect>
 
-      <ui-dropdown
+      <ui-multiselect
         v-model="thirdValue"
         track-by="key"
         label="name"
@@ -127,7 +127,7 @@
             >{{ name }}</span
           >
         </template>
-      </ui-dropdown>
+      </ui-multiselect>
     </div>
   </div>
 </template>
@@ -152,7 +152,7 @@
     AbilityName,
     AbilityTypeKey
   } from '@/shared/types/Tools/AbilityCalc.d';
-  import UiDropdown from '@/shared/ui/kit/UiDropdown.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
   const modelValue = defineModel({
     required: true

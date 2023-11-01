@@ -8,7 +8,7 @@
     </div>
 
     <div
-      ref="dropdownHeader"
+      ref="header"
       :class="[
         'ui-select__wrapper',
         { 'ui-select__wrapper--disabled': props.disabled }
@@ -127,12 +127,12 @@
   }>();
 
   const input = ref<typeof UiInput | null>(null);
-  const dropdownHeader = ref<HTMLDivElement>();
+  const header = ref<HTMLDivElement>();
   const focused = ref<Boolean>(false);
   const filter = ref<string>('');
   const selectedOptions = ref<Array<T>>([]) as Ref<Array<T>>;
 
-  onClickOutside(dropdownHeader, () => {
+  onClickOutside(header, () => {
     focused.value = false;
   });
 
