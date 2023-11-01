@@ -56,7 +56,7 @@
       <ul class="ui-select__content">
         <li
           v-for="option in filteredOptions"
-          :key="option.value"
+          :key="trackBy(option)"
           :class="[
             'ui-select__element',
             { 'ui-select__element--selected': isSelectedClass(option) }
@@ -64,7 +64,7 @@
           @click="selectOption(option)"
         >
           <span class="ui-select__option">
-            {{ option.name }}
+            {{ label(option) }}
           </span>
         </li>
 
@@ -87,16 +87,19 @@
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
-  type Option = {
-    value: string | number;
-    name: String;
-  };
-
-  const modelValue = defineModel<Array<Option>>();
+  const modelValue = defineModel();
 
   const props = defineProps({
+    trackBy: {
+      type: Function,
+      required: true
+    },
+    label: {
+      type: Function,
+      required: true
+    },
     options: {
-      type: Array<Option>,
+      type: Array,
       default: () => []
     },
     placeholder: {
@@ -121,7 +124,7 @@
   const dropdownHeader = ref<HTMLDivElement | null>(null);
   const focused = ref<Boolean>(false);
   const filter = ref<string>('');
-  const selectedOptions = ref<Array<Option>>([]);
+  const selectedOptions = ref<Array<Object>>([]);
 
   onClickOutside(dropdownHeader, () => {
     focused.value = false;
@@ -149,26 +152,30 @@
     focused.value ? 'arrow/up' : 'arrow/down'
   );
 
-  const isSelectedClass = (option: Option) => {
-    return selectedOptions.value.filter(o => o.value === option.value).length;
+  const isSelectedClass = (option: Object) => {
+    return selectedOptions.value.filter(
+      o => props.trackBy(o) === props.trackBy(option)
+    ).length;
   };
 
-  const selectOption = (option: Option) => {
+  const selectOption = (option: Object) => {
     selectedOptions.value = props.isMultiple
       ? xor(selectedOptions.value, [option])
       : [option];
 
-    modelValue.value = selectedOptions.value;
+    modelValue.value = props.isMultiple
+      ? selectedOptions.value
+      : selectedOptions.value[0];
   };
 
   const displaySelectedOptions = computed(() => {
     const optionsToDisplay = intersectionBy(
       props.options,
       selectedOptions.value,
-      'value'
+      props.trackBy
     );
 
-    return optionsToDisplay.map(el => el.name).join(', ');
+    return optionsToDisplay.map(el => props.label(el)).join(', ');
   });
 
   watch(focused, f => {
@@ -189,7 +196,7 @@
         return el;
       }
 
-      return el.name.toLowerCase().includes(String(filter.value));
+      return props.label(el).toLowerCase().includes(String(filter.value));
     })
   );
 </script>
