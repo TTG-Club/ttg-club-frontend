@@ -19,7 +19,7 @@ export const useTokenator = () => {
     scale.value = DEFAULT_SCALE;
   };
 
-  const getBase64 = (blob?: Blob): Promise<string> =>
+  const getBase64 = (blob?: Blob): Promise<string | undefined> =>
     new Promise((resolve, reject) => {
       if (!blob) {
         resolve('');

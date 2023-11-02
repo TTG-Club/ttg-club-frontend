@@ -25,10 +25,10 @@
 
       <image
         ref="image"
-        :width="SVG_SIZE * scale"
-        :height="SVG_SIZE * scale"
-        :x="offsetPos.x * scale"
-        :y="offsetPos.y * scale"
+        :width="size.width"
+        :height="size.height"
+        :x="offsetPos.x"
+        :y="offsetPos.y"
         :href="file"
       />
     </g>
@@ -59,6 +59,11 @@
 
   const offsetPos = ref<Position>({ x: 0, y: 0 });
 
+  const size = computed(() => ({
+    width: SVG_SIZE * scale.value,
+    height: SVG_SIZE * scale.value
+  }));
+
   const delta = computed(() => ({
     x: SVG_SIZE / imageRect.width.value,
     y: SVG_SIZE / imageRect.height.value
@@ -69,8 +74,8 @@
     stopPropagation: true,
     onMove(position) {
       offsetPos.value = {
-        x: (position.x - tokenRect.x.value) * delta.value.x,
-        y: (position.y - tokenRect.y.value) * delta.value.y
+        x: (position.x - tokenRect.x.value) * delta.value.x * scale.value,
+        y: (position.y - tokenRect.y.value) * delta.value.y * scale.value
       };
     }
   });
@@ -82,14 +87,21 @@
       const height = image.value?.height.baseVal.value || 0;
 
       offsetPos.value = {
-        x: (SVG_SIZE - width) / 2 / scale.value,
-        y: (SVG_SIZE - height) / 2 / scale.value
+        x: (SVG_SIZE - width) / 2,
+        y: (SVG_SIZE - height) / 2
       };
     },
     {
       immediate: true
     }
   );
+
+  watch(size, (value, oldValue) => {
+    offsetPos.value = {
+      x: offsetPos.value.x - (value.width - oldValue.width) / 2,
+      y: offsetPos.value.y - (value.height - oldValue.height) / 2
+    };
+  });
 </script>
 <style lang="scss" module>
   .container {
