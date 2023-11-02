@@ -5,7 +5,7 @@ import { ref, unref } from 'vue';
 const DEFAULT_SCALE = 1.1;
 const SVG_SIZE = 512;
 
-const file = ref();
+const file = ref<string>();
 const scale = ref<number>(DEFAULT_SCALE);
 const token = ref<SVGElement>();
 
@@ -19,13 +19,29 @@ export const useTokenator = () => {
     scale.value = DEFAULT_SCALE;
   };
 
-  const getBase64 = (blob: Blob) =>
+  const getBase64 = (blob?: Blob): Promise<string> =>
     new Promise((resolve, reject) => {
+      if (!blob) {
+        resolve('');
+
+        return;
+      }
+
       const reader = new FileReader();
 
-      reader.readAsDataURL(blob);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => {
+        if (typeof reader.result !== 'string') {
+          reject();
+
+          return;
+        }
+
+        resolve(reader.result);
+      };
+
       reader.onerror = error => reject(error);
+
+      reader.readAsDataURL(blob);
     });
 
   onChange(async (param: FileList | null) => {
@@ -111,6 +127,11 @@ export const useTokenator = () => {
         accept: 'image/*',
         multiple: false
       }),
+    reset: () => {
+      file.value = undefined;
+
+      resetScale();
+    },
     load
   };
 };

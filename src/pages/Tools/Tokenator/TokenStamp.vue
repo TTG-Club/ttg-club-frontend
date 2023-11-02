@@ -42,8 +42,8 @@
   </svg>
 </template>
 <script lang="ts" setup>
-  import { useDraggable } from '@vueuse/core';
-  import { ref, watch } from 'vue';
+  import { useDraggable, useElementBounding } from '@vueuse/core';
+  import { computed, ref, watch } from 'vue';
 
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
 
@@ -52,29 +52,44 @@
   const { token, border, background, scale, file, SVG_SIZE } = useTokenator();
 
   const container = ref<SVGGElement>();
-  const image = ref<HTMLImageElement>();
+  const image = ref<SVGImageElement>();
 
-  const startPos = ref<Position>({ x: 0, y: 0 });
+  const tokenRect = useElementBounding(token);
+  const imageRect = useElementBounding(image);
+
   const offsetPos = ref<Position>({ x: 0, y: 0 });
+
+  const delta = computed(() => ({
+    x: SVG_SIZE / imageRect.width.value,
+    y: SVG_SIZE / imageRect.height.value
+  }));
 
   useDraggable(image, {
     preventDefault: true,
     stopPropagation: true,
-    onStart(_position, e) {
-      startPos.value.x = e.offsetX;
-      startPos.value.y = e.offsetY;
-    },
-    onMove(_position, e) {
-      offsetPos.value.x = (e.offsetX - startPos.value.x) * scale.value;
-      offsetPos.value.y = (e.offsetY - startPos.value.y) * scale.value;
+    onMove(position) {
+      offsetPos.value = {
+        x: (position.x - tokenRect.x.value) * delta.value.x,
+        y: (position.y - tokenRect.y.value) * delta.value.y
+      };
     }
   });
 
-  watch(file, source => {
-    if (source) {
-      offsetPos.value = { x: 0, y: 0 };
+  watch(
+    file,
+    () => {
+      const width = image.value?.width.baseVal.value || 0;
+      const height = image.value?.height.baseVal.value || 0;
+
+      offsetPos.value = {
+        x: (SVG_SIZE - width) / 2 / scale.value,
+        y: (SVG_SIZE - height) / 2 / scale.value
+      };
+    },
+    {
+      immediate: true
     }
-  });
+  );
 </script>
 <style lang="scss" module>
   .container {
