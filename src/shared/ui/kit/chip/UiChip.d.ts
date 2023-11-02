@@ -1,4 +1,4 @@
-export type TChipSize = 'l' | 'm' | 's' | 'xs';
+export type TChipSize = 'lg' | 'md' | 'sm' | 'xs';
 
 export type TChipColor = 'primary' | 'secondary';
 

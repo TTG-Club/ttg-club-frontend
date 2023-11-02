@@ -39,7 +39,7 @@
   import type { IChipProps } from './UiChip';
 
   const props = withDefaults(defineProps<IChipProps>(), {
-    size: 'm',
+    size: 'md',
     variant: 'round',
     color: 'primary',
     clickable: true,
@@ -72,14 +72,14 @@
   }
 
   .size {
-    &-m,
-    &-s {
+    &-md,
+    &-sm {
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.14px;
     }
 
-    &-l {
+    &-lg {
       padding: 12px 24px;
       font-size: 16px;
       line-height: 24px;
@@ -99,7 +99,7 @@
       }
     }
 
-    &-m {
+    &-md {
       padding: 10px 20px;
 
       &.has-icon {
@@ -116,7 +116,7 @@
       }
     }
 
-    &-s {
+    &-sm {
       padding: 8px 16px;
 
       &.has-icon {
