@@ -228,6 +228,11 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     component: () => import('@/pages/Tools/MadnessView.vue')
   },
   {
+    name: 'tokenator',
+    path: '/tools/tokenator',
+    component: () => import('@/pages/Tools/Tokenator/TokenView.vue')
+  },
+  {
     name: 'encounters',
     path: '/tools/encounters',
     component: () => import('@/pages/Tools/EncountersView.vue')

@@ -62,7 +62,7 @@
             @mouseenter.self="selectedIndex = null"
             @focusin.self="selectedIndex = null"
           >
-            Введите текст, что бы начать
+            Введите текст, чтобы начать
           </div>
 
           <div
