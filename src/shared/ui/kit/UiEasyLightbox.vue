@@ -179,7 +179,7 @@
 
     &__container {
       overflow: hidden;
-      border-radius: 100px;
+      border-radius: 50%;
       height: auto;
       position: relative;
       width: 100%;
