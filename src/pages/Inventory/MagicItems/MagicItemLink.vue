@@ -198,7 +198,8 @@
         &__rating,
         &__type,
         &__count,
-        &__price {
+        &__price,
+        &__customization {
           color: var(--text-btn-color);
         }
       }
