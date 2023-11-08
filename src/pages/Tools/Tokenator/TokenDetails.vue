@@ -75,14 +75,13 @@
   .wrapper {
     border-radius: 16px;
     padding: 24px;
+    margin-top: 24px;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
     width: fit-content;
     height: fit-content;
-    transform: translateY(-45%);
-
     @include media-min($md) {
-      margin: 0;
+      margin: 0 24px 0 0;
       transform: none;
     }
   }
