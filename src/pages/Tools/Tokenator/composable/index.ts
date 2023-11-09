@@ -68,10 +68,14 @@ export const useTokenator = () => {
 
         if (fileSize >= MAX_SIZE) {
           reject(new Error('Размер файла больше допустимого.'));
+          
+          return;
         }
 
         if (img.height > MAX_DIMENSION || img.width > MAX_DIMENSION) {
           reject(new Error('Ширина или высота файла выше допустимого.'));
+
+          return;
         }
 
         resolve();
