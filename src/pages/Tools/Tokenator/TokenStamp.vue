@@ -1,7 +1,10 @@
 <template>
   <svg
     ref="token"
-    :class="$style.container"
+    :class="{
+      [$style.container]: true,
+      [$style.cursor]: !!file
+    }"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
   >
@@ -105,8 +108,17 @@
 </script>
 <style lang="scss" module>
   .container {
-    width: 256px;
-    height: 256px;
+    width: 280px;
+    height: 280px;
+  }
+
+  .cursor {
+    &:hover {
+      cursor: grab;
+    }
+    &:active {
+      cursor: grabbing;
+    }
   }
 
   .border {
