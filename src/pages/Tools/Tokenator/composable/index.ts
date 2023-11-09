@@ -50,14 +50,13 @@ export const useTokenator = () => {
       reader.readAsDataURL(blob);
     });
 
-  const showError = (fileItem: File): Promise<boolean> =>
-    new Promise(resolve => {
+  const checkFile = (fileItem: File): Promise<void> =>
+    new Promise((resolve, reject) => {
       const img = new Image();
       const url = useObjectUrl(fileItem);
 
       if (!url.value) {
-        toast.error('Упс, что-то пошло не так.');
-        resolve(true);
+        reject(new Error('Упс, что-то пошло не так.'));
 
         return;
       }
@@ -68,31 +67,33 @@ export const useTokenator = () => {
         const fileSize = fileItem.size / 1024 ** 2;
 
         if (fileSize >= MAX_SIZE) {
-          toast.error('Размер файла больше допустимого.');
-          resolve(true);
-
-          return;
+          reject(new Error('Размер файла больше допустимого.'));
         }
 
         if (img.height > MAX_DIMENSION || img.width > MAX_DIMENSION) {
-          toast.error('Ширина или высота файла выше допустимого.');
-          resolve(true);
-
-          return;
+          reject(new Error('Ширина или высота файла выше допустимого.'));
         }
 
-        resolve(false);
+        resolve();
       };
     });
 
   onChange(async (param: FileList | null) => {
     const fileItem = param?.[0] as File;
 
-    if (await showError(fileItem)) return;
+    try {
+      await checkFile(fileItem);
 
-    file.value = await getBase64(fileItem);
+      file.value = await getBase64(fileItem);
 
-    resetScale();
+      resetScale();
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      }
+
+      console.error(err);
+    }
   });
 
   useFetch('/img/token/token-border.webp', {
