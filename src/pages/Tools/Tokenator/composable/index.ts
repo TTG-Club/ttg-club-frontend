@@ -74,7 +74,7 @@ export const useTokenator = () => {
           return;
         }
 
-        if (img.height >= MAX_DIMENSION || img.width >= MAX_DIMENSION) {
+        if (img.height > MAX_DIMENSION || img.width > MAX_DIMENSION) {
           toast.error('Ширина или высота файла выше допустимого.');
           resolve(true);
 
