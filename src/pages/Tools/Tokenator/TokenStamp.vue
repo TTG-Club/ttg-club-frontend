@@ -1,7 +1,11 @@
 <template>
   <svg
     ref="token"
-    :class="$style.container"
+    :class="{
+      [$style.container]: true,
+      [$style.draggable]: !!file,
+      [$style.dragging]: !!file && isDragging
+    }"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
   >
@@ -69,7 +73,7 @@
     y: SVG_SIZE / imageRect.height.value
   }));
 
-  useDraggable(image, {
+  const { isDragging } = useDraggable(image, {
     preventDefault: true,
     stopPropagation: true,
     onMove(position) {
@@ -105,8 +109,16 @@
 </script>
 <style lang="scss" module>
   .container {
-    width: 256px;
-    height: 256px;
+    width: 280px;
+    height: 280px;
+  }
+
+  .draggable {
+    cursor: grab;
+  }
+
+  .dragging {
+    cursor: grabbing;
   }
 
   .border {

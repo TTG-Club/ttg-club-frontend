@@ -4,18 +4,20 @@
 
     <template #default>
       <div :class="$style.container">
-        <token-details>
-          <template #slider>
-            <ui-slider
-              v-model="scale"
-              :min="0.1"
-              :max="2"
-              :step="0.05"
-            />
-          </template>
-        </token-details>
+        <div :class="$style.wrapper">
+          <token-details>
+            <template #slider>
+              <ui-slider
+                v-model="scale"
+                :min="0.1"
+                :max="2"
+                :step="0.05"
+              />
+            </template>
+          </token-details>
 
-        <token-stamp />
+          <token-stamp />
+        </div>
       </div>
     </template>
   </page-layout>
@@ -36,21 +38,29 @@
 <style lang="scss" module>
   .container {
     display: flex;
-    flex-direction: column-reverse;
     justify-content: center;
-    align-items: center;
-
     @include media-min($md) {
       background: {
         image: var(--bg-token);
         repeat: no-repeat;
       }
-      flex-direction: row;
       justify-content: start;
-      align-items: start;
       width: 100%;
       height: 100%;
       padding: 50px 0;
+    }
+  }
+  .wrapper {
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+    @include media-min($md) {
+      flex-direction: row;
+      justify-content: start;
+      align-items: center;
     }
   }
 </style>
