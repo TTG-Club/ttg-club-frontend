@@ -3,7 +3,8 @@
     ref="token"
     :class="{
       [$style.container]: true,
-      [$style.cursor]: !!file
+      [$style.draggable]: !!file,
+      [$style.dragging]: !!file && isDragging
     }"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
@@ -72,7 +73,7 @@
     y: SVG_SIZE / imageRect.height.value
   }));
 
-  useDraggable(image, {
+  const { isDragging } = useDraggable(image, {
     preventDefault: true,
     stopPropagation: true,
     onMove(position) {
@@ -112,13 +113,12 @@
     height: 280px;
   }
 
-  .cursor {
-    &:hover {
-      cursor: grab;
-    }
-    &:active {
-      cursor: grabbing;
-    }
+  .draggable {
+    cursor: grab;
+  }
+
+  .dragging {
+    cursor: grabbing;
   }
 
   .border {
