@@ -1,9 +1,14 @@
-import { useFetch } from '@vueuse/core';
+import { useFetch, useObjectUrl } from '@vueuse/core';
 import { useFileDialog } from '@vueuse/core/index';
 import { ref, unref } from 'vue';
+import { useToast } from 'vue-toastification';
+
+import { ToastEventBus } from '@/core/configs/ToastConfig';
 
 const DEFAULT_SCALE = 1.1;
 const SVG_SIZE = 512;
+const MAX_SIZE = 50;
+const MAX_DIMENSION = 2000;
 
 const file = ref<string>();
 const scale = ref<number>(DEFAULT_SCALE);
@@ -14,6 +19,7 @@ export const useTokenator = () => {
   const background = ref();
 
   const { open, onChange } = useFileDialog();
+  const toast = useToast(ToastEventBus);
 
   const resetScale = () => {
     scale.value = DEFAULT_SCALE;
@@ -44,8 +50,45 @@ export const useTokenator = () => {
       reader.readAsDataURL(blob);
     });
 
+  const showError = (fileItem: File): Promise<boolean> =>
+    new Promise(resolve => {
+      const img = new Image();
+      const url = useObjectUrl(fileItem);
+
+      if (!url.value) {
+        toast.error('Упс, что-то пошло не так.');
+        resolve(true);
+
+        return;
+      }
+
+      img.src = url.value;
+
+      img.onload = () => {
+        const fileSize = fileItem.size / 1024 ** 2;
+
+        if (fileSize >= MAX_SIZE) {
+          toast.error('Размер файла больше допустимого.');
+          resolve(true);
+
+          return;
+        }
+
+        if (img.height >= MAX_DIMENSION || img.width >= MAX_DIMENSION) {
+          toast.error('Ширина или высота файла выше допустимого.');
+          resolve(true);
+
+          return;
+        }
+
+        resolve(false);
+      };
+    });
+
   onChange(async (param: FileList | null) => {
     const fileItem = param?.[0] as File;
+
+    if (await showError(fileItem)) return;
 
     file.value = await getBase64(fileItem);
 
