@@ -1,9 +1,14 @@
-import { useFetch } from '@vueuse/core';
+import { useFetch, useObjectUrl } from '@vueuse/core';
 import { useFileDialog } from '@vueuse/core/index';
 import { ref, unref } from 'vue';
+import { useToast } from 'vue-toastification';
+
+import { ToastEventBus } from '@/core/configs/ToastConfig';
 
 const DEFAULT_SCALE = 1.1;
 const SVG_SIZE = 512;
+const MAX_SIZE = 50;
+const MAX_DIMENSION = 2000;
 
 const file = ref<string>();
 const scale = ref<number>(DEFAULT_SCALE);
@@ -14,6 +19,7 @@ export const useTokenator = () => {
   const background = ref();
 
   const { open, onChange } = useFileDialog();
+  const toast = useToast(ToastEventBus);
 
   const resetScale = () => {
     scale.value = DEFAULT_SCALE;
@@ -44,12 +50,54 @@ export const useTokenator = () => {
       reader.readAsDataURL(blob);
     });
 
+  const checkFile = (fileItem: File): Promise<void> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = useObjectUrl(fileItem);
+
+      if (!url.value) {
+        reject(new Error('Упс, что-то пошло не так.'));
+
+        return;
+      }
+
+      img.src = url.value;
+
+      img.onload = () => {
+        const fileSize = fileItem.size / 1024 ** 2;
+
+        if (fileSize >= MAX_SIZE) {
+          reject(new Error('Размер файла больше допустимого.'));
+          
+          return;
+        }
+
+        if (img.height > MAX_DIMENSION || img.width > MAX_DIMENSION) {
+          reject(new Error('Ширина или высота файла выше допустимого.'));
+
+          return;
+        }
+
+        resolve();
+      };
+    });
+
   onChange(async (param: FileList | null) => {
     const fileItem = param?.[0] as File;
 
-    file.value = await getBase64(fileItem);
+    try {
+      await checkFile(fileItem);
 
-    resetScale();
+      file.value = await getBase64(fileItem);
+
+      resetScale();
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      }
+
+      console.error(err);
+    }
   });
 
   useFetch('/img/token/token-border.webp', {
