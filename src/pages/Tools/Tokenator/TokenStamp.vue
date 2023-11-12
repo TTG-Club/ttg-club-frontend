@@ -48,7 +48,7 @@
 </template>
 <script lang="ts" setup>
   import { useDraggable, useElementBounding } from '@vueuse/core';
-  import { computed, ref, watch } from 'vue';
+  import { computed, ref, watch, onMounted } from 'vue';
 
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
 
@@ -62,6 +62,7 @@
     file,
     reflectImage,
     centerImage,
+    initDropZone,
     SVG_SIZE
   } = useTokenator();
 
@@ -135,6 +136,8 @@
       y: offsetPos.value.y - (value.height - oldValue.height) / 2
     };
   });
+
+  onMounted(() => initDropZone());
 </script>
 <style lang="scss" module>
   .container {

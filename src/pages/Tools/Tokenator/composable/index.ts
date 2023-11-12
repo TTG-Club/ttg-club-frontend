@@ -1,5 +1,9 @@
-import { useFetch, useObjectUrl } from '@vueuse/core';
-import { useFileDialog } from '@vueuse/core/index';
+import {
+  useFetch,
+  useFileDialog,
+  useObjectUrl,
+  useDropZone
+} from '@vueuse/core';
 import { ref, unref } from 'vue';
 import { useToast } from 'vue-toastification';
 
@@ -12,7 +16,7 @@ const MAX_DIMENSION = 2000;
 
 const file = ref<string>();
 const scale = ref<number>(DEFAULT_SCALE);
-const token = ref<SVGElement>();
+const token = ref<HTMLElement>();
 const reflectImage = ref<boolean>(false);
 const centerImage = ref<boolean>(false);
 
@@ -84,9 +88,7 @@ export const useTokenator = () => {
       };
     });
 
-  onChange(async (param: FileList | null) => {
-    const fileItem = param?.[0] as File;
-
+  const processFile = async (fileItem: File) => {
     try {
       await checkFile(fileItem);
 
@@ -100,6 +102,10 @@ export const useTokenator = () => {
 
       console.error(err);
     }
+  };
+
+  onChange((param: FileList | null) => {
+    processFile(param?.[0] as File);
   });
 
   useFetch('/img/token/token-border.webp', {
@@ -162,6 +168,20 @@ export const useTokenator = () => {
       img.onerror = e => reject(e);
     });
 
+  const initDropZone = () => {
+    useDropZone(token, {
+      onDrop: (files: File[] | null) => {
+        if (files && !files[0].type.includes('image')) {
+          toast.error('Токенатор поддерживает только изображения.');
+
+          return;
+        }
+
+        processFile(files?.[0] as File);
+      }
+    });
+  };
+
   return {
     token,
     border,
@@ -183,6 +203,7 @@ export const useTokenator = () => {
 
       resetScale();
     },
-    load
+    load,
+    initDropZone
   };
 };
