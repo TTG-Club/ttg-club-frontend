@@ -13,6 +13,8 @@ const MAX_DIMENSION = 2000;
 const file = ref<string>();
 const scale = ref<number>(DEFAULT_SCALE);
 const token = ref<SVGElement>();
+const reflectImage = ref<boolean>(false);
+const centerImage = ref<boolean>(false);
 
 export const useTokenator = () => {
   const border = ref();
@@ -68,7 +70,7 @@ export const useTokenator = () => {
 
         if (fileSize >= MAX_SIZE) {
           reject(new Error('Размер файла больше допустимого.'));
-          
+
           return;
         }
 
@@ -168,7 +170,8 @@ export const useTokenator = () => {
     SVG_SIZE,
     scale,
     file,
-
+    reflectImage,
+    centerImage,
     getBase64,
     open: () =>
       open({

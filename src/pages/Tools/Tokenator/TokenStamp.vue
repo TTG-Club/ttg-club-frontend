@@ -34,6 +34,7 @@
         :x="offsetPos.x"
         :y="offsetPos.y"
         :href="file"
+        :transform="transformScale"
       />
     </g>
 
@@ -53,7 +54,16 @@
 
   type Position = { x: number; y: number };
 
-  const { token, border, background, scale, file, SVG_SIZE } = useTokenator();
+  const {
+    token,
+    border,
+    background,
+    scale,
+    file,
+    reflectImage,
+    centerImage,
+    SVG_SIZE
+  } = useTokenator();
 
   const container = ref<SVGGElement>();
   const image = ref<SVGImageElement>();
@@ -73,25 +83,44 @@
     y: SVG_SIZE / imageRect.height.value
   }));
 
+  const REFLECTED_SVG_SIZE = computed(() =>
+    reflectImage.value ? -SVG_SIZE : SVG_SIZE
+  );
+
+  const transformScale = computed(() =>
+    reflectImage.value ? 'scale(-1, 1)' : 'scale(1, 1)'
+  );
+
   const { isDragging } = useDraggable(image, {
     preventDefault: true,
     stopPropagation: true,
     onMove(position) {
+      const xAxisValue =
+        (position.x - tokenRect.x.value) * delta.value.x * scale.value;
+
       offsetPos.value = {
-        x: (position.x - tokenRect.x.value) * delta.value.x * scale.value,
+        // НАДО для зеркального отображение движение сделать
+        x: reflectImage.value ? xAxisValue : xAxisValue,
         y: (position.y - tokenRect.y.value) * delta.value.y * scale.value
       };
     }
   });
 
+  watch(reflectImage, () => {
+    offsetPos.value = {
+      x: offsetPos.value.x + REFLECTED_SVG_SIZE.value,
+      y: offsetPos.value.y
+    };
+  });
+
   watch(
-    file,
+    [file, centerImage],
     () => {
       const width = image.value?.width.baseVal.value || 0;
       const height = image.value?.height.baseVal.value || 0;
 
       offsetPos.value = {
-        x: (SVG_SIZE - width) / 2,
+        x: (REFLECTED_SVG_SIZE.value - width) / 2,
         y: (SVG_SIZE - height) / 2
       };
     },
