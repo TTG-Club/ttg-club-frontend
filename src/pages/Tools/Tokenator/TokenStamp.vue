@@ -27,6 +27,51 @@
         :height="SVG_SIZE"
       />
 
+      <text
+        v-if="!file"
+        x="50%"
+        y="43%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-size="24"
+        fill="#6a6a6a"
+        font-family="Lora"
+        font-weight="bold"
+        font-stretch="100%"
+      >
+        Перетащите
+      </text>
+
+      <text
+        v-if="!file"
+        x="50%"
+        y="50%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-size="24"
+        fill="#6a6a6a"
+        font-family="Lora"
+        font-weight="bold"
+        font-stretch="100%"
+      >
+        ваше изображение
+      </text>
+
+      <text
+        v-if="!file"
+        x="50%"
+        y="57%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-size="24"
+        fill="#6a6a6a"
+        font-family="Lora"
+        font-weight="bold"
+        font-stretch="100%"
+      >
+        сюда
+      </text>
+
       <image
         ref="image"
         :width="size.width"
