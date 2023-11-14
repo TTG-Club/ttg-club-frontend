@@ -35,9 +35,6 @@
         text-anchor="middle"
         font-size="24"
         fill="#6a6a6a"
-        font-family="Lora"
-        font-weight="bold"
-        font-stretch="100%"
       >
         Перетащите
       </text>
@@ -50,9 +47,6 @@
         text-anchor="middle"
         font-size="24"
         fill="#6a6a6a"
-        font-family="Lora"
-        font-weight="bold"
-        font-stretch="100%"
       >
         ваше изображение
       </text>
@@ -65,22 +59,25 @@
         text-anchor="middle"
         font-size="24"
         fill="#6a6a6a"
-        font-family="Lora"
-        font-weight="bold"
-        font-stretch="100%"
       >
         сюда
       </text>
 
-      <image
-        ref="image"
-        :width="size.width"
-        :height="size.height"
+      <svg
         :x="offsetPos.x"
         :y="offsetPos.y"
-        :href="file"
-        :transform="transformScale"
-      />
+        :width="size.width"
+        :height="size.height"
+      >
+        <image
+          ref="image"
+          :width="size.width"
+          :height="size.height"
+          :href="file"
+          :x="REFLECTED_IMAGE_POSITION"
+          :transform="transformScale"
+        />
+      </svg>
     </g>
 
     <image
@@ -129,8 +126,8 @@
     y: SVG_SIZE / imageRect.height.value
   }));
 
-  const REFLECTED_SVG_SIZE = computed(() =>
-    reflectImage.value ? -SVG_SIZE : SVG_SIZE
+  const REFLECTED_IMAGE_POSITION = computed(() =>
+    reflectImage.value ? -SVG_SIZE * scale.value : 0
   );
 
   const transformScale = computed(() =>
@@ -141,22 +138,11 @@
     preventDefault: true,
     stopPropagation: true,
     onMove(position) {
-      const xAxisValue =
-        (position.x - tokenRect.x.value) * delta.value.x * scale.value;
-
       offsetPos.value = {
-        // НАДО для зеркального отображение движение сделать
-        x: reflectImage.value ? xAxisValue : xAxisValue,
+        x: (position.x - tokenRect.x.value) * delta.value.x * scale.value,
         y: (position.y - tokenRect.y.value) * delta.value.y * scale.value
       };
     }
-  });
-
-  watch(reflectImage, () => {
-    offsetPos.value = {
-      x: offsetPos.value.x + REFLECTED_SVG_SIZE.value,
-      y: offsetPos.value.y
-    };
   });
 
   watch(
@@ -166,7 +152,7 @@
       const height = image.value?.height.baseVal.value || 0;
 
       offsetPos.value = {
-        x: (REFLECTED_SVG_SIZE.value - width) / 2,
+        x: (SVG_SIZE - width) / 2,
         y: (SVG_SIZE - height) / 2
       };
     },
