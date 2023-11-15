@@ -15,6 +15,16 @@
       ]"
       @focusin="toggleFocus"
     >
+      <div
+        v-if="$slots['left-slot']"
+        class="ui-select__slotted--left"
+      >
+        <slot
+          :option="option"
+          name="left-slot"
+        />
+      </div>
+
       <div class="ui-select__slotted-wrapper">
         <ui-input
           v-if="isSearchable"
@@ -25,7 +35,7 @@
         />
 
         <div
-          class="ui-select__slot"
+          class="ui-select__slotted--body"
           @click="toggleFocus"
         >
           <div v-if="!selectedOptions.length && !isSearchable">
@@ -36,6 +46,16 @@
             {{ displaySelectedOptions }}
           </div>
         </div>
+      </div>
+
+      <div
+        v-if="$slots['right-slot']"
+        class="ui-select__slotted--right"
+      >
+        <slot
+          :option="option"
+          name="right-slot"
+        />
       </div>
 
       <div
@@ -63,9 +83,14 @@
           ]"
           @click="selectOption(option)"
         >
-          <span class="ui-select__option">
-            {{ label(option) }}
-          </span>
+          <slot
+            name="option"
+            v-bind="option"
+          >
+            <span class="ui-select__option">
+              {{ label(option) }}
+            </span>
+          </slot>
         </li>
 
         <li
@@ -208,16 +233,6 @@
       padding: 0 8px;
     }
 
-    &__slot {
-      position: absolute;
-      padding: 11px;
-      top: 0;
-      width: 100%;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
     &__select {
       @include css_anim();
 
@@ -269,6 +284,7 @@
       flex-direction: row;
       background: var(--bg-sub-menu);
       min-height: 38px;
+      overflow: hidden;
       border: {
         width: 1px;
         style: solid;
@@ -361,6 +377,37 @@
 
       &--disabled {
         background: var(--hover) !important;
+      }
+    }
+
+    &__slotted {
+      display: flex;
+      height: 100%;
+      min-height: 36px;
+
+      &--left,
+      &--right {
+        padding: 8px;
+        background-color: var(--primary);
+        color: var(--text-btn-color);
+        font-size: var(--main-font-size);
+        line-height: calc(var(--main-line-height) + 1px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-weight: 600;
+        min-width: 38px;
+      }
+
+      &--body {
+        position: absolute;
+        padding: 11px;
+        top: 0;
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
   }
