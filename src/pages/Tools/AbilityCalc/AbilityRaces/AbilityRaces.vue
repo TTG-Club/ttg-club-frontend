@@ -29,7 +29,7 @@
         :options="races"
         @update:model-value="onSelectRace"
       >
-        <template #label> Раса </template>
+        <template #label> Раса</template>
       </ui-dropdown>
 
       <ui-dropdown
@@ -40,32 +40,28 @@
         placeholder="Выбрать подрасу"
         :options="subRaces"
       >
-        <template #label> Подраса </template>
+        <template #label> Подраса</template>
       </ui-dropdown>
 
       <ui-dropdown
-        :disabled="!isChoiceDouble"
+        v-model="selectedChoiceDouble"
         :track-by="({ key }) => key"
         :label="({ label }) => label"
+        :disabled="!isChoiceDouble"
         placeholder="Выбери что-нибудь"
         :options="choiceDouble"
-        @update:model-value="onSelectChoiceDouble"
       >
-        <template #label> Набор характеристик </template>
+        <template #label> Набор характеристик</template>
       </ui-dropdown>
 
-      <ui-select
+      <ui-dropdown
+        v-model="firstValue"
+        :track-by="({ key }) => key"
+        :label="({ name }) => name"
         :disabled="isFirstDisabled"
-        :model-value="firstValue"
         :options="abilities"
-        allow-empty
-        class="ability-races__select"
-        clear-on-select
-        is-wrap-disabled
-        label="name"
-        track-by="key"
-        @remove="onFirstSelect"
-        @select="onFirstSelect"
+        placeholder="Выбери хар-ку"
+        @update:model-value="onFirstSelect"
       >
         <template
           v-if="firstLabel"
@@ -74,31 +70,23 @@
           {{ firstLabel }}
         </template>
 
-        <template #singleLabel>
-          {{ firstValue?.name || 'Выбрать хар-ку' }}
-        </template>
-
-        <template #placeholder> Выбери хар-ку </template>
-
-        <template #option="{ option }">
+        <template #option="{ name, key }">
           <span
-            :class="{ 'is-used': isAbilitySelected(option.key) }"
-            class="ability-races__select_option"
-            >{{ option.name }}</span
+            :class="{ 'in-use': isAbilitySelected(key) }"
+            class="ui-select__option"
+            >{{ name }}</span
           >
         </template>
-      </ui-select>
+      </ui-dropdown>
 
-      <ui-select
+      <ui-dropdown
+        v-model="secondValue"
+        :track-by="({ key }) => key"
+        :label="({ name }) => name"
         :disabled="isSecondDisabled"
-        :model-value="secondValue"
         :options="abilities"
-        allow-empty
-        class="ability-races__select"
-        is-wrap-disabled
-        label="name"
-        track-by="key"
-        @select="onSecondSelect"
+        placeholder="Выбери хар-ку"
+        @update:model-value="onSecondSelect"
       >
         <template
           v-if="secondLabel"
@@ -107,31 +95,23 @@
           {{ secondLabel }}
         </template>
 
-        <template #singleLabel>
-          {{ secondValue?.name || 'Выбрать хар-ку' }}
-        </template>
-
-        <template #placeholder> Выбери хар-ку </template>
-
-        <template #option="{ option }">
+        <template #option="{ name, key }">
           <span
-            :class="{ 'is-used': isAbilitySelected(option.key) }"
-            class="ability-races__select_option"
-            >{{ option.name }}</span
+            :class="{ 'in-use': isAbilitySelected(key) }"
+            class="ui-select__option"
+            >{{ name }}</span
           >
         </template>
-      </ui-select>
+      </ui-dropdown>
 
-      <ui-select
+      <ui-dropdown
+        v-model="thirdValue"
+        :track-by="({ key }) => key"
+        :label="({ name }) => name"
         :disabled="isThirdDisabled"
-        :model-value="thirdValue"
         :options="abilities"
-        allow-empty
-        class="ability-races__select"
-        is-wrap-disabled
-        label="name"
-        track-by="key"
-        @select="onThirdSelect"
+        placeholder="Выбери хар-ку"
+        @update:model-value="onThirdSelect"
       >
         <template
           v-if="thirdLabel"
@@ -140,20 +120,14 @@
           {{ thirdLabel }}
         </template>
 
-        <template #singleLabel>
-          {{ thirdValue?.name || 'Выбрать хар-ку' }}
-        </template>
-
-        <template #placeholder> Выбери хар-ку </template>
-
-        <template #option="{ option }">
+        <template #option="{ name, key }">
           <span
-            :class="{ 'is-used': isAbilitySelected(option.key) }"
-            class="ability-races__select_option"
-            >{{ option.name }}</span
+            :class="{ 'in-use': isAbilitySelected(key) }"
+            class="ui-select__option"
+            >{{ name }}</span
           >
         </template>
-      </ui-select>
+      </ui-dropdown>
     </div>
   </div>
 </template>
@@ -179,7 +153,6 @@
     AbilityTypeKey
   } from '@/shared/types/Tools/AbilityCalc.d';
   import UiDropdown from '@/shared/ui/kit/UiDropdown.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
 
   const modelValue = defineModel({
     required: true
@@ -336,8 +309,8 @@
     modelValue.value = value;
   };
 
-  const onSelectChoiceDouble = (choice: any) => {
-    selectedChoiceDouble.value = choice;
+  const onSelectChoiceDouble = () => {
+    selectedChoiceDouble.value = null;
 
     firstValue.value = null;
     secondValue.value = null;
@@ -349,7 +322,7 @@
   const onSelectSubRace = () => {
     selectedSubRace.value = null;
 
-    onSelectChoiceDouble(isChoiceDouble.value ? choiceDouble.value[0] : null);
+    onSelectChoiceDouble();
   };
 
   const onSelectRace = () => {
@@ -362,6 +335,22 @@
 </script>
 
 <style lang="scss" scoped>
+  .ui-select__option {
+    position: relative;
+    &.in-use {
+      &::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        position: absolute;
+        top: calc(50% - 4px);
+        left: calc(-14px - 5px); // half of span's padding
+      }
+    }
+  }
+
   .ability-races {
     display: flex;
     gap: 32px;
@@ -419,37 +408,6 @@
 
       @media (max-width: 576px) {
         gap: 16px 24px;
-      }
-    }
-
-    &__select {
-      :deep(.multiselect__option) {
-        padding: 0;
-
-        .ability-races {
-          &__select {
-            &_option {
-              padding: 12px 12px 12px 28px;
-
-              &.is-used {
-                &::before {
-                  content: '';
-                  width: 10px;
-                  height: 10px;
-                  border-radius: 50%;
-                  background-color: var(--primary);
-                  position: absolute;
-                  top: calc(50% - 5px);
-                  left: 10px;
-                }
-
-                &:hover {
-                  color: var(--text-btn-color);
-                }
-              }
-            }
-          }
-        }
       }
     }
   }
