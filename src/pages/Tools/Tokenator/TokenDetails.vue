@@ -11,18 +11,38 @@
     </div>
 
     <div :class="$style.handlers">
-      <div :class="$style['resize-container']">
-        <span :class="$style.icon">
-          <svg-icon icon="zoom/out" />
-        </span>
+      <div :class="$style['configuration-container']">
+        <div :class="$style['resize-container']">
+          <span :class="$style.icon">
+            <svg-icon icon="zoom/out" />
+          </span>
 
-        <div :class="$style['slider-container']">
-          <slot name="slider" />
+          <div :class="$style['slider-container']">
+            <slot name="slider" />
+          </div>
+
+          <span :class="$style.icon">
+            <svg-icon icon="zoom/in" />
+          </span>
         </div>
 
-        <span :class="$style.icon">
-          <svg-icon icon="zoom/in" />
-        </span>
+        <ui-button
+          v-tippy="{ content: 'Зеркальное отображение' }"
+          type="outline"
+          :body-class="$style.button"
+          :disabled="!file"
+          icon="reflect"
+          @click.left.exact.prevent="reflectImage = !reflectImage"
+        />
+
+        <ui-button
+          v-tippy="{ content: 'Центрировать изображение' }"
+          type="outline"
+          :body-class="$style.button"
+          :disabled="!file"
+          icon="centerAxis"
+          @click.left.exact.prevent="centerImage = !centerImage"
+        />
       </div>
 
       <div :class="$style.buttons">
@@ -55,7 +75,7 @@
   import type { TButtonOption } from '@/shared/ui/kit/button/UiButton';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
-  const { open, load, file } = useTokenator();
+  const { open, load, file, reflectImage, centerImage } = useTokenator();
 
   const variants: Array<TButtonOption> = [
     {
@@ -117,8 +137,14 @@
     justify-content: space-between;
   }
 
+  .configuration-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .slider-container {
-    width: 80%;
+    padding: 0 10px;
   }
 
   .icon {

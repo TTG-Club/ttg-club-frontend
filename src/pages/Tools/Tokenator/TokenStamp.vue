@@ -27,14 +27,57 @@
         :height="SVG_SIZE"
       />
 
-      <image
-        ref="image"
-        :width="size.width"
-        :height="size.height"
+      <text
+        v-if="!file"
+        x="50%"
+        y="43%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-size="24"
+        fill="#6a6a6a"
+      >
+        Перетащите
+      </text>
+
+      <text
+        v-if="!file"
+        x="50%"
+        y="50%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-size="24"
+        fill="#6a6a6a"
+      >
+        ваше изображение
+      </text>
+
+      <text
+        v-if="!file"
+        x="50%"
+        y="57%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        font-size="24"
+        fill="#6a6a6a"
+      >
+        сюда
+      </text>
+
+      <svg
         :x="offsetPos.x"
         :y="offsetPos.y"
-        :href="file"
-      />
+        :width="size.width"
+        :height="size.height"
+      >
+        <image
+          ref="image"
+          :width="size.width"
+          :height="size.height"
+          :href="file"
+          :x="REFLECTED_IMAGE_POSITION"
+          :transform="transformScale"
+        />
+      </svg>
     </g>
 
     <image
@@ -47,13 +90,23 @@
 </template>
 <script lang="ts" setup>
   import { useDraggable, useElementBounding } from '@vueuse/core';
-  import { computed, ref, watch } from 'vue';
+  import { computed, ref, watch, onMounted } from 'vue';
 
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
 
   type Position = { x: number; y: number };
 
-  const { token, border, background, scale, file, SVG_SIZE } = useTokenator();
+  const {
+    token,
+    border,
+    background,
+    scale,
+    file,
+    reflectImage,
+    centerImage,
+    initDropZone,
+    SVG_SIZE
+  } = useTokenator();
 
   const container = ref<SVGGElement>();
   const image = ref<SVGImageElement>();
@@ -73,6 +126,14 @@
     y: SVG_SIZE / imageRect.height.value
   }));
 
+  const REFLECTED_IMAGE_POSITION = computed(() =>
+    reflectImage.value ? -SVG_SIZE * scale.value : 0
+  );
+
+  const transformScale = computed(() =>
+    reflectImage.value ? 'scale(-1, 1)' : 'scale(1, 1)'
+  );
+
   const { isDragging } = useDraggable(image, {
     preventDefault: true,
     stopPropagation: true,
@@ -85,7 +146,7 @@
   });
 
   watch(
-    file,
+    [file, centerImage],
     () => {
       const width = image.value?.width.baseVal.value || 0;
       const height = image.value?.height.baseVal.value || 0;
@@ -106,6 +167,8 @@
       y: offsetPos.value.y - (value.height - oldValue.height) / 2
     };
   });
+
+  onMounted(() => initDropZone());
 </script>
 <style lang="scss" module>
   .container {
