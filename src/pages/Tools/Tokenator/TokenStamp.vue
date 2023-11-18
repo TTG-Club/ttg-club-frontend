@@ -27,41 +27,43 @@
         :height="SVG_SIZE"
       />
 
-      <text
-        v-if="!file"
-        x="50%"
-        y="43%"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="24"
-        fill="#6a6a6a"
-      >
-        Перетащите
-      </text>
+      <g v-if="isLargeScreen">
+        <text
+          v-if="!file"
+          x="50%"
+          y="43%"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          font-size="24"
+          fill="#6a6a6a"
+        >
+          Перетащите
+        </text>
 
-      <text
-        v-if="!file"
-        x="50%"
-        y="50%"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="24"
-        fill="#6a6a6a"
-      >
-        ваше изображение
-      </text>
+        <text
+          v-if="!file"
+          x="50%"
+          y="50%"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          font-size="24"
+          fill="#6a6a6a"
+        >
+          ваше изображение
+        </text>
 
-      <text
-        v-if="!file"
-        x="50%"
-        y="57%"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="24"
-        fill="#6a6a6a"
-      >
-        сюда
-      </text>
+        <text
+          v-if="!file"
+          x="50%"
+          y="57%"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          font-size="24"
+          fill="#6a6a6a"
+        >
+          сюда
+        </text>
+      </g>
 
       <svg
         :x="offsetPos.x"
@@ -89,7 +91,11 @@
   </svg>
 </template>
 <script lang="ts" setup>
-  import { useDraggable, useElementBounding } from '@vueuse/core';
+  import {
+    useDraggable,
+    useElementBounding,
+    useMediaQuery
+  } from '@vueuse/core';
   import { computed, ref, watch, onMounted } from 'vue';
 
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
@@ -107,6 +113,8 @@
     initDropZone,
     SVG_SIZE
   } = useTokenator();
+
+  const isLargeScreen = useMediaQuery('(min-width: 1200px)');
 
   const container = ref<SVGGElement>();
   const image = ref<SVGImageElement>();
