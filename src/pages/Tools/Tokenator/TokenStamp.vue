@@ -27,7 +27,7 @@
         :height="SVG_SIZE"
       />
 
-      <g v-if="isLargeScreen">
+      <g v-if="!isMobile">
         <text
           v-if="!file"
           x="50%"
@@ -91,14 +91,13 @@
   </svg>
 </template>
 <script lang="ts" setup>
-  import {
-    useDraggable,
-    useElementBounding,
-    useMediaQuery
-  } from '@vueuse/core';
+  import { useDraggable, useElementBounding } from '@vueuse/core';
+  import { storeToRefs } from 'pinia';
   import { computed, ref, watch, onMounted } from 'vue';
 
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
+
+  import { useUIStore } from '@/shared/stores/UIStore';
 
   type Position = { x: number; y: number };
 
@@ -114,7 +113,7 @@
     SVG_SIZE
   } = useTokenator();
 
-  const isLargeScreen = useMediaQuery('(min-width: 1200px)');
+  const { isMobile } = storeToRefs(useUIStore());
 
   const container = ref<SVGGElement>();
   const image = ref<SVGImageElement>();
