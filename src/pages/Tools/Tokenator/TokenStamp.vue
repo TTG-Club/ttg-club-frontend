@@ -27,41 +27,43 @@
         :height="SVG_SIZE"
       />
 
-      <text
-        v-if="!file"
-        x="50%"
-        y="43%"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="24"
-        fill="#6a6a6a"
-      >
-        Перетащите
-      </text>
+      <g v-if="!isMobile">
+        <text
+          v-if="!file"
+          x="50%"
+          y="43%"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          font-size="24"
+          fill="#6a6a6a"
+        >
+          Перетащите
+        </text>
 
-      <text
-        v-if="!file"
-        x="50%"
-        y="50%"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="24"
-        fill="#6a6a6a"
-      >
-        ваше изображение
-      </text>
+        <text
+          v-if="!file"
+          x="50%"
+          y="50%"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          font-size="24"
+          fill="#6a6a6a"
+        >
+          ваше изображение
+        </text>
 
-      <text
-        v-if="!file"
-        x="50%"
-        y="57%"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="24"
-        fill="#6a6a6a"
-      >
-        сюда
-      </text>
+        <text
+          v-if="!file"
+          x="50%"
+          y="57%"
+          dominant-baseline="middle"
+          text-anchor="middle"
+          font-size="24"
+          fill="#6a6a6a"
+        >
+          сюда
+        </text>
+      </g>
 
       <svg
         :x="offsetPos.x"
@@ -90,9 +92,12 @@
 </template>
 <script lang="ts" setup>
   import { useDraggable, useElementBounding } from '@vueuse/core';
+  import { storeToRefs } from 'pinia';
   import { computed, ref, watch, onMounted } from 'vue';
 
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
+
+  import { useUIStore } from '@/shared/stores/UIStore';
 
   type Position = { x: number; y: number };
 
@@ -107,6 +112,8 @@
     initDropZone,
     SVG_SIZE
   } = useTokenator();
+
+  const { isMobile } = storeToRefs(useUIStore());
 
   const container = ref<SVGGElement>();
   const image = ref<SVGImageElement>();
