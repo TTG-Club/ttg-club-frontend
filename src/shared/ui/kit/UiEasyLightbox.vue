@@ -88,8 +88,8 @@
       });
 
       const previewObj = computed(() => ({
-        src: props.preview || props.images[0] || '/img/no-img.png',
-        error: '/img/no-img.png'
+        src: props.preview || props.images[0] || '/img/no-img.webp',
+        error: '/img/no-img.webp'
       }));
 
       const isNoImages = computed(() => !props.images.length);
@@ -178,17 +178,11 @@
     }
 
     &__container {
-      background: var(--bg-sub-menu);
-      box-shadow: 0 6px 21px rgb(0 0 0 / 21%);
       overflow: hidden;
-      border-radius: 12px;
+      border-radius: 50%;
       height: auto;
       position: relative;
       width: 100%;
-
-      @media (max-width: 500px) {
-        height: 100%;
-      }
     }
 
     &__img {

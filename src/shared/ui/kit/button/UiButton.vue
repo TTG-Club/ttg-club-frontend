@@ -17,7 +17,7 @@
         [$style[`type-${buttonType}`]]: true,
         [$style[`size-${buttonSize}`]]: true,
         [$style[`icon-${iconPosition}`]]: true,
-        [$style['with-split']]: split && $slots.dropdown,
+        [$style['with-split']]: split && hasDropdown,
         [$style['no-text']]: !$slots.default,
         [$style['is-disabled']]: isDisabled
       }"
@@ -74,7 +74,7 @@
     </button>
 
     <button
-      v-if="split && $slots.dropdown"
+      v-if="split && hasDropdown"
       ref="dropdownTrigger"
       type="button"
       :class="{
@@ -114,6 +114,22 @@
       >
         <slot name="dropdown" />
       </span>
+
+      <span
+        v-else-if="!!options.length && isDropdownShow"
+        ref="dropdown"
+        :class="$style.dropdown"
+      >
+        <span
+          v-for="option in options"
+          :key="option.key"
+          :class="$style.option"
+          @click.left.exact.prevent="option.callback(option.key)"
+          @dblclick.prevent.stop
+        >
+          {{ option.label }}
+        </span>
+      </span>
     </transition>
   </span>
 </template>
@@ -126,9 +142,10 @@
   import IconLoader from '@/shared/ui/icons/IconLoader.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import type {
+    TButtonType,
+    TButtonOption,
     ISharedButtonProps,
-    TButtonIconPosition,
-    TButtonType
+    TButtonIconPosition
   } from '@/shared/ui/kit/button/UiButton';
   import { buttonGroupContextKey } from '@/shared/ui/kit/button/UiButton.const';
 
@@ -142,6 +159,7 @@
     loading?: boolean;
     split?: boolean;
     tooltip?: TippyOptions;
+    options?: Array<TButtonOption>;
     bodyClass?: string;
     beforeDropdownShow?: () => void;
     beforeDropdownHide?: () => void;
@@ -168,6 +186,7 @@
     nativeType: 'button',
     split: false,
     tooltip: undefined,
+    options: () => [],
     beforeDropdownShow: undefined,
     beforeDropdownHide: undefined
   });
@@ -194,6 +213,10 @@
 
   const isDisabled = computed(
     () => groupContext?.disabled || props.disabled || props.loading
+  );
+
+  const hasDropdown = computed(
+    () => !!slots.dropdown || !!props.options.length
   );
 
   const isDropdownShow = ref(false);
@@ -484,5 +507,28 @@
     z-index: 1;
     max-height: calc(16px + 30px * 4); // TODO: fix (padding + 4 elements)
     overflow: auto;
+  }
+
+  .option {
+    padding: 6px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 100px;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    text-overflow: ellipsis;
+    line-height: 18px;
+    font-size: 14px;
+    display: block;
+
+    &:hover {
+      background-color: var(--hover);
+    }
+
+    & + & {
+      margin-top: 4px;
+    }
   }
 </style>

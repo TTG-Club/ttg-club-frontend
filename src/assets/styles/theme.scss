@@ -16,6 +16,7 @@
 
     // Background image
     --bg-img: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-main-ng.webp');
+    --bg-token: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-token.webp');
   }
 }
 
