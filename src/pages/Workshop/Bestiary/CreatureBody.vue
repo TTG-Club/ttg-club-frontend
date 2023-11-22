@@ -335,6 +335,10 @@
           <span>Реакции</span>
         </h4>
 
+        <p v-if="creature.reaction">
+          <raw-content :template="creature.reaction" />
+        </p>
+
         <div
           v-for="(reaction, key) in creature.reactions"
           :key="key"

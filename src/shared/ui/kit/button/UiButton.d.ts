@@ -14,6 +14,12 @@ export type TButtonNativeType = 'button' | 'submit' | 'reset';
 
 export type TButtonIconPosition = 'left' | 'right';
 
+export type TButtonOption = {
+  key: string;
+  label: string;
+  callback: (key?: TButtonOption['key']) => void | Promise<void>;
+};
+
 export interface ISharedButtonProps {
   size?: TButtonSize;
   color?: TButtonColor;
