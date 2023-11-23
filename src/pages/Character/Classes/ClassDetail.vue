@@ -219,7 +219,7 @@
       currentClass.value.name.eng +
       currentTab.value.type +
       currentTab.value.order
-    }`.replaceAll(' ', '')
+    }`.replace(/\s/g, '')
   );
 
   const currentArchetypes = computed(() => {

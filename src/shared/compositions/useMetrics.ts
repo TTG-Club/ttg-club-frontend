@@ -1,9 +1,9 @@
 import { unref } from 'vue';
 import { event, pageview } from 'vue-gtag';
 
-import { useIsDev } from '@/shared/helpers/isDev';
-
 import { routes } from '@/core/router/routes';
+
+import { useIsDev } from '@/shared/helpers/isDev';
 
 import type { MaybeRef } from '@vueuse/core';
 import type { RouteLocationNormalized } from 'vue-router';

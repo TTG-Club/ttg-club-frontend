@@ -92,6 +92,8 @@
   import { defineComponent, reactive, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
+
   import { useMetrics } from '@/shared/compositions/useMetrics';
   import {
     validateEmailExist,
@@ -108,8 +110,6 @@
   import { useUserStore } from '@/shared/stores/UserStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
-
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   export default defineComponent({
     components: {

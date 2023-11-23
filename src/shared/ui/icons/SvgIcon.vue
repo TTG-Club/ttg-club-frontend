@@ -25,7 +25,7 @@
     }
   );
 
-  const iconName = computed(() => `#ttg-${props.icon.replaceAll('/', '-')}`);
+  const iconName = computed(() => `#ttg-${props.icon.replace(/\//g, '-')}`);
 
   const sizeCalculated = computed(() => {
     if (!props.size) {
