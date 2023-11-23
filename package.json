@@ -75,7 +75,7 @@
     "typescript": "^5.3.2",
     "typescript-plugin-css-modules": "^5.0.1",
     "vite": "^5.0.2",
-    "vite-plugin-ejs": "^1.6.4",
+    "vite-plugin-ejs": "^1.7.0",
     "vite-plugin-svg-icons": "^2.0.1",
     "vue-eslint-parser": "^9.3.1",
     "vue-tsc": "^1.8.22"
