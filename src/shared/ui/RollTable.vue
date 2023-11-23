@@ -62,12 +62,12 @@
   import { ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
   import { useUIStore } from '@/shared/stores/UIStore';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import type { RollBase } from 'dice-roller-parser';
 

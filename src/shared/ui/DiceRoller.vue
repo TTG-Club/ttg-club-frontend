@@ -17,10 +17,10 @@
   import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
   import { useDiceRoller } from '@/shared/compositions/useDiceRoller';
   import { useIsDev } from '@/shared/helpers/isDev';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import type { RollBase } from 'dice-roller-parser';
 

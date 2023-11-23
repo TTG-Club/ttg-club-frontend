@@ -69,13 +69,13 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
   import { YoutubeApi } from '@/features/youtube/api';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   type TProp = {
     modelValue: boolean;

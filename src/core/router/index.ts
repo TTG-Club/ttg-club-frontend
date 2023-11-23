@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import pinia from '@/core/store';
-
 import { useMetrics } from '@/shared/compositions/useMetrics';
 import { useNavStore } from '@/shared/stores/NavStore';
 
 import { useRouterHelpers } from './composition/useRouterHelpers';
 import { routes } from './routes';
+
+import pinia from '@/core/store';
 
 const router = createRouter({
   history: createWebHistory(),

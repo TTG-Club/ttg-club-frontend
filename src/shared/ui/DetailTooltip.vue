@@ -15,8 +15,6 @@
   import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
-  import { DefaultTippyProps } from '@/core/configs/TippyConfig';
-
   import OptionBody from '@/pages/Character/Options/OptionBody.vue';
   import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
   import TraitBody from '@/pages/Character/Traits/TraitBody.vue';
@@ -31,6 +29,8 @@
   import { useAxios } from '@/shared/compositions/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import RawContent from '@/shared/ui/RawContent.vue';
+
+  import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
   import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';

@@ -57,8 +57,6 @@
   import { computed, defineComponent, onActivated, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
   import { useDiceRoller } from '@/shared/compositions/useDiceRoller';
   import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
   import { useUIStore } from '@/shared/stores/UIStore';
@@ -66,6 +64,8 @@
   import { AbilityKey, AbilityName } from '@/shared/types/Tools/AbilityCalc.d';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import type { PropType } from 'vue';
 

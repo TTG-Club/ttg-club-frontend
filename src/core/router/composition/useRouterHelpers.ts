@@ -1,8 +1,8 @@
 import { AxiosError } from 'axios';
 
-import { routes } from '@/core/router/routes';
-
 import { useAxios } from '@/shared/compositions/useAxios';
+
+import { routes } from '@/core/router/routes';
 
 import type {
   NavigationGuardNext,

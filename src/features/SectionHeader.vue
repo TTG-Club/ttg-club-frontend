@@ -110,14 +110,14 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   import { useMetrics } from '@/shared/compositions/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   const props = withDefaults(
     defineProps<{

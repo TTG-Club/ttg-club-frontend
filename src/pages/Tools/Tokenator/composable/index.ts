@@ -104,9 +104,7 @@ export const useTokenator = () => {
     }
   };
 
-  onChange((param: FileList | null) => {
-    processFile(param?.[0] as File);
-  });
+  onChange((param: FileList | null) => processFile(param?.[0] as File));
 
   useFetch('/img/token/token-border.webp', {
     refetch: true,
@@ -170,14 +168,14 @@ export const useTokenator = () => {
 
   const initDropZone = () => {
     useDropZone(token, {
-      onDrop: (files: File[] | null) => {
+      onDrop: async (files: File[] | null) => {
         if (files && !files[0].type.includes('image')) {
           toast.error('Токенатор поддерживает только изображения.');
 
           return;
         }
 
-        processFile(files?.[0] as File);
+        await processFile(files?.[0] as File);
       }
     });
   };
