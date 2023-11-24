@@ -233,6 +233,12 @@
   }
 
   .dropText {
+    display: none;
+
+    @include media-min($md) {
+      display: block;
+    }
+
     span {
       font-size: calc(var(--main-font-size) * 2);
       display: flex;
