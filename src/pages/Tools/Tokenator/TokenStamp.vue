@@ -8,6 +8,8 @@
     }"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
+    @click.left.exact.prevent="openHandler"
+    @touchend.prevent="openHandler"
   >
     <clipPath id="circle-clip">
       <circle
@@ -89,8 +91,9 @@
     reflectImage,
     centerImage,
     SVG_SIZE,
-    SCALE_STEP,
-    processFile
+    scaleConfig,
+    processFile,
+    open
   } = useTokenator();
 
   const container = ref<SVGGElement>();
@@ -150,7 +153,7 @@
         return;
       }
 
-      scale.value += (SCALE_STEP / delta.value) * (velocity || 1) * dir;
+      scale.value += (scaleConfig.step / delta.value) * (velocity || 1) * dir;
     },
     {
       domTarget: token,
@@ -172,7 +175,7 @@
         return;
       }
 
-      scale.value += (SCALE_STEP / delta.value) * (velocity || 1) * dir;
+      scale.value += (scaleConfig.step / delta.value) * (velocity || 1) * dir;
     },
     {
       domTarget: token,
@@ -213,11 +216,23 @@
   useDropZone(token, {
     onDrop: files => processFile(files?.[0])
   });
+
+  const openHandler = () => {
+    console.log('cl');
+
+    if (file.value) {
+      return;
+    }
+
+    open();
+  };
 </script>
 <style lang="scss" module>
   .container {
     width: 280px;
     height: 280px;
+    cursor: pointer;
+    pointer-events: initial;
   }
 
   .draggable {
@@ -228,9 +243,9 @@
     cursor: grabbing;
   }
 
-  .border {
-    pointer-events: none;
-  }
+  //.border {
+  //  pointer-events: none;
+  //}
 
   .dropText {
     display: none;

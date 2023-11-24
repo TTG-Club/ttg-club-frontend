@@ -1,21 +1,37 @@
 <template>
-  <div :class="$style['custom-slider']">
-    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-    <input
-      ref="slider"
-      v-model.number="modelValue"
-      type="range"
-      :min="min"
-      :max="max"
-      :step="step"
+  <div :class="$style['ui-slider']">
+    <ui-button
+      type="text"
+      color="text"
+      icon="zoom/out"
+      @click.left.exact.prevent="modelValue -= step"
+    />
+
+    <label :class="$style.input">
+      <input
+        v-model.number="modelValue"
+        type="range"
+        :min="min"
+        :max="max"
+        :step="step"
+      />
+    </label>
+
+    <ui-button
+      type="text"
+      color="text"
+      icon="zoom/in"
+      @click.left.exact.prevent="modelValue += step"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, toRefs, unref } from 'vue';
+  import { computed, toRefs, unref } from 'vue';
 
-  const modelValue = defineModel<number>({ default: 1.1, required: true });
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  const modelValue = defineModel<number>({ required: true });
 
   const props = withDefaults(
     defineProps<{
@@ -31,7 +47,6 @@
   );
 
   const { min, max, step } = toRefs(props);
-  const slider = ref<HTMLInputElement>();
 
   const progress = computed(
     () => ((unref(modelValue) - unref(min)) / (unref(max) - unref(min))) * 100
@@ -39,11 +54,14 @@
 </script>
 
 <style lang="scss" module>
-  .custom-slider {
+  .ui-slider {
     --track-height: 0.25rem;
     --thumb-radius: 1.25rem;
 
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
     /* style the input element with type "range" */
     & input[type='range'] {
@@ -52,8 +70,8 @@
       background: none;
       border-radius: 999px;
       z-index: 0;
+      width: 100%;
       height: 100%;
-      width: inherit;
       pointer-events: none;
 
       &::before {
@@ -107,5 +125,11 @@
         z-index: 1;
       }
     }
+  }
+
+  .input {
+    display: flex;
+    align-items: center;
+    flex: 1 1 100%;
   }
 </style>

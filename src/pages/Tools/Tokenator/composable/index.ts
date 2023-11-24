@@ -5,13 +5,19 @@ import { ref, unref } from 'vue';
 import { toast } from '@/shared/helpers/toast';
 
 const DEFAULT_SCALE = 1.1;
-const SCALE_STEP = 0.07;
+
+const scaleConfig = {
+  max: 2,
+  min: 0.1,
+  step: 0.07
+};
+
 const SVG_SIZE = 512;
 const MAX_SIZE = 50;
-const MAX_DIMENSION = 2000;
+const MAX_DIMENSION = 8064;
 
 const file = ref<string>();
-const scale = useClamp(DEFAULT_SCALE, 0.1, 2);
+const scale = useClamp(DEFAULT_SCALE, scaleConfig.min, scaleConfig.max);
 const token = ref<HTMLElement>();
 const reflectImage = ref<boolean>(false);
 const centerImage = ref<boolean>(false);
@@ -178,8 +184,10 @@ export const useTokenator = () => {
     border,
     background,
 
+    MAX_SIZE,
+    MAX_DIMENSION,
     SVG_SIZE,
-    SCALE_STEP,
+    scaleConfig,
     scale,
     file,
     reflectImage,
