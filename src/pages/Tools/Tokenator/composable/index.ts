@@ -1,21 +1,17 @@
-import {
-  useFetch,
-  useFileDialog,
-  useObjectUrl,
-  useDropZone
-} from '@vueuse/core';
+import { useFetch, useFileDialog, useObjectUrl } from '@vueuse/core';
+import { useClamp } from '@vueuse/math';
 import { ref, unref } from 'vue';
-import { useToast } from 'vue-toastification';
 
-import { ToastEventBus } from '@/core/configs/ToastConfig';
+import { toast } from '@/shared/helpers/toast';
 
 const DEFAULT_SCALE = 1.1;
+const SCALE_STEP = 0.07;
 const SVG_SIZE = 512;
 const MAX_SIZE = 50;
 const MAX_DIMENSION = 2000;
 
 const file = ref<string>();
-const scale = ref<number>(DEFAULT_SCALE);
+const scale = useClamp(DEFAULT_SCALE, 0.1, 2);
 const token = ref<HTMLElement>();
 const reflectImage = ref<boolean>(false);
 const centerImage = ref<boolean>(false);
@@ -25,7 +21,6 @@ export const useTokenator = () => {
   const background = ref();
 
   const { open, onChange } = useFileDialog();
-  const toast = useToast(ToastEventBus);
 
   const resetScale = () => {
     scale.value = DEFAULT_SCALE;
@@ -56,8 +51,20 @@ export const useTokenator = () => {
       reader.readAsDataURL(blob);
     });
 
-  const checkFile = (fileItem: File): Promise<void> =>
+  const checkFile = (fileItem: File | null | undefined): Promise<void> =>
     new Promise((resolve, reject) => {
+      if (!fileItem) {
+        reject(new Error('Упс, что-то пошло не так.'));
+
+        return;
+      }
+
+      if (!fileItem?.type.includes('image')) {
+        reject(new Error('Токенатор поддерживает только изображения.'));
+
+        return;
+      }
+
       const img = new Image();
       const url = useObjectUrl(fileItem);
 
@@ -88,11 +95,11 @@ export const useTokenator = () => {
       };
     });
 
-  const processFile = async (fileItem: File) => {
+  const processFile = async (fileItem: File | null | undefined) => {
     try {
       await checkFile(fileItem);
 
-      file.value = await getBase64(fileItem);
+      file.value = await getBase64(fileItem!);
 
       resetScale();
     } catch (err) {
@@ -166,31 +173,20 @@ export const useTokenator = () => {
       img.onerror = e => reject(e);
     });
 
-  const initDropZone = () => {
-    useDropZone(token, {
-      onDrop: async (files: File[] | null) => {
-        if (files && !files[0].type.includes('image')) {
-          toast.error('Токенатор поддерживает только изображения.');
-
-          return;
-        }
-
-        await processFile(files?.[0] as File);
-      }
-    });
-  };
-
   return {
     token,
     border,
     background,
 
     SVG_SIZE,
+    SCALE_STEP,
     scale,
     file,
     reflectImage,
     centerImage,
     getBase64,
+    processFile,
+    load,
     open: () =>
       open({
         accept: 'image/*',
@@ -200,8 +196,6 @@ export const useTokenator = () => {
       file.value = undefined;
 
       resetScale();
-    },
-    load,
-    initDropZone
+    }
   };
 };

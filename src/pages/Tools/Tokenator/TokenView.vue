@@ -7,12 +7,7 @@
         <div :class="$style.wrapper">
           <token-details>
             <template #slider>
-              <ui-slider
-                v-model="scale"
-                :min="0.1"
-                :max="2"
-                :step="0.05"
-              />
+              <ui-slider v-model="scale" />
             </template>
           </token-details>
 
