@@ -3,11 +3,9 @@
     <div :class="$style.header">Описание</div>
 
     <div :class="$style.text_container">
-      <p :class="$style.text">
-        Вес загружаемой картинки не более {{ MAX_SIZE }}&nbsp;MB
-      </p>
+      <p>Вес загружаемой картинки не более {{ MAX_SIZE }}&nbsp;MB</p>
 
-      <p :class="$style.text">
+      <p>
         Размер картинки не должен превышать {{ MAX_DIMENSION }}px на
         {{ MAX_DIMENSION }}px
       </p>
@@ -104,8 +102,6 @@
     margin-top: 24px;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
-    width: fit-content;
-    height: fit-content;
 
     @include media-min($md) {
       margin: 0 24px 0 0;
@@ -130,12 +126,12 @@
   }
 
   .resize-container {
-    margin-right: 8px;
+    flex: 1 1 auto;
+    margin: 0 8px 0 0;
   }
 
   .configuration-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
   }
 

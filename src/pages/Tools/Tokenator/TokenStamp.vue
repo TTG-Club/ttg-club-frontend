@@ -9,6 +9,7 @@
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
     @click.left.exact.prevent="openHandler"
+    @touchend.prevent="openHandler"
   >
     <clipPath id="circle-clip">
       <circle
@@ -217,6 +218,8 @@
   });
 
   const openHandler = () => {
+    console.log('cl');
+
     if (file.value) {
       return;
     }
@@ -229,6 +232,7 @@
     width: 280px;
     height: 280px;
     cursor: pointer;
+    pointer-events: initial;
   }
 
   .draggable {
@@ -239,9 +243,9 @@
     cursor: grabbing;
   }
 
-  .border {
-    pointer-events: none;
-  }
+  //.border {
+  //  pointer-events: none;
+  //}
 
   .dropText {
     display: none;
