@@ -3,13 +3,14 @@
     <div :class="$style.header">Описание</div>
 
     <div :class="$style.text_container">
-      <span :class="$style.text"
-        >Вес загружаемой картинки не более 50&nbsp;MB</span
-      >
+      <p :class="$style.text">
+        Вес загружаемой картинки не более {{ MAX_SIZE }}&nbsp;MB
+      </p>
 
-      <span :class="$style.text">
-        Размер картинки не должен превышать 2000px на 2000px
-      </span>
+      <p :class="$style.text">
+        Размер картинки не должен превышать {{ MAX_DIMENSION }}px на
+        {{ MAX_DIMENSION }}px
+      </p>
     </div>
 
     <div :class="$style.handlers">
@@ -70,8 +71,17 @@
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
-  const { open, load, file, reflectImage, centerImage, scale, scaleConfig } =
-    useTokenator();
+  const {
+    open,
+    load,
+    file,
+    reflectImage,
+    centerImage,
+    scale,
+    scaleConfig,
+    MAX_SIZE,
+    MAX_DIMENSION
+  } = useTokenator();
 
   const variants: Array<TButtonOption> = [
     {
@@ -104,7 +114,6 @@
   }
 
   .header {
-    font-family: 'Open Sans', sans-serif;
     font-weight: 600;
     font-size: var(--h4-font-size);
     color: var(--text-color-title);
@@ -113,16 +122,7 @@
 
   .text_container {
     margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
     max-width: 290px;
-  }
-
-  .text {
-    font-family: 'Open Sans', sans-serif;
-    font-size: var(--main-font-size);
-    line-height: 19px;
   }
 
   .handlers {

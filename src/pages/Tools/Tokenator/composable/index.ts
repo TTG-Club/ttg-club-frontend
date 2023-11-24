@@ -14,7 +14,7 @@ const scaleConfig = {
 
 const SVG_SIZE = 512;
 const MAX_SIZE = 50;
-const MAX_DIMENSION = 2000;
+const MAX_DIMENSION = 8064;
 
 const file = ref<string>();
 const scale = useClamp(DEFAULT_SCALE, scaleConfig.min, scaleConfig.max);
@@ -184,6 +184,8 @@ export const useTokenator = () => {
     border,
     background,
 
+    MAX_SIZE,
+    MAX_DIMENSION,
     SVG_SIZE,
     scaleConfig,
     scale,
