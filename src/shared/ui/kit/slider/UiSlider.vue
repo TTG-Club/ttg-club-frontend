@@ -7,7 +7,6 @@
       @click.left.exact.prevent="modelValue -= step"
     />
 
-    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
     <label :class="$style.input">
       <input
         v-model.number="modelValue"
