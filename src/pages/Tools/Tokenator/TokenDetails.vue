@@ -3,7 +3,9 @@
     <div :class="$style.header">Описание</div>
 
     <div :class="$style.text_container">
-      <span :class="$style.text">Вес загружаемой картинки не более 50mb</span>
+      <span :class="$style.text"
+        >Вес загружаемой картинки не более 50&nbsp;MB</span
+      >
 
       <span :class="$style.text">
         Размер картинки не должен превышать 2000px на 2000px
@@ -13,17 +15,10 @@
     <div :class="$style.handlers">
       <div :class="$style['configuration-container']">
         <div :class="$style['resize-container']">
-          <span :class="$style.icon">
-            <svg-icon icon="zoom/out" />
-          </span>
-
-          <div :class="$style['slider-container']">
-            <slot name="slider" />
-          </div>
-
-          <span :class="$style.icon">
-            <svg-icon icon="zoom/in" />
-          </span>
+          <ui-slider
+            v-model="scale"
+            v-bind="scaleConfig"
+          />
         </div>
 
         <ui-button
@@ -71,11 +66,12 @@
 <script lang="ts" setup>
   import { useTokenator } from '@/pages/Tools/Tokenator/composable';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import type { TButtonOption } from '@/shared/ui/kit/button/UiButton';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
-  const { open, load, file, reflectImage, centerImage } = useTokenator();
+  const { open, load, file, reflectImage, centerImage, scale, scaleConfig } =
+    useTokenator();
 
   const variants: Array<TButtonOption> = [
     {
@@ -100,6 +96,7 @@
     border: 1px solid var(--border);
     width: fit-content;
     height: fit-content;
+
     @include media-min($md) {
       margin: 0 24px 0 0;
       transform: none;
@@ -133,27 +130,13 @@
   }
 
   .resize-container {
-    display: flex;
-    justify-content: space-between;
+    margin-right: 8px;
   }
 
   .configuration-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .slider-container {
-    padding: 0 10px;
-  }
-
-  .icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    margin: -3px;
   }
 
   .buttons {

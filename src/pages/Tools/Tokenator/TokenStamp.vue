@@ -89,7 +89,7 @@
     reflectImage,
     centerImage,
     SVG_SIZE,
-    SCALE_STEP,
+    scaleConfig,
     processFile
   } = useTokenator();
 
@@ -150,7 +150,7 @@
         return;
       }
 
-      scale.value += (SCALE_STEP / delta.value) * (velocity || 1) * dir;
+      scale.value += (scaleConfig.step / delta.value) * (velocity || 1) * dir;
     },
     {
       domTarget: token,
@@ -172,7 +172,7 @@
         return;
       }
 
-      scale.value += (SCALE_STEP / delta.value) * (velocity || 1) * dir;
+      scale.value += (scaleConfig.step / delta.value) * (velocity || 1) * dir;
     },
     {
       domTarget: token,
