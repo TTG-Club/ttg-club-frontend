@@ -8,6 +8,7 @@
     }"
     xmlns="http://www.w3.org/2000/svg"
     :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE}`"
+    @click.left.exact.prevent="openHandler"
   >
     <clipPath id="circle-clip">
       <circle
@@ -90,7 +91,8 @@
     centerImage,
     SVG_SIZE,
     scaleConfig,
-    processFile
+    processFile,
+    open
   } = useTokenator();
 
   const container = ref<SVGGElement>();
@@ -213,11 +215,20 @@
   useDropZone(token, {
     onDrop: files => processFile(files?.[0])
   });
+
+  const openHandler = () => {
+    if (file.value) {
+      return;
+    }
+
+    open();
+  };
 </script>
 <style lang="scss" module>
   .container {
     width: 280px;
     height: 280px;
+    cursor: pointer;
   }
 
   .draggable {
