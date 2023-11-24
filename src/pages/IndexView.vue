@@ -36,13 +36,13 @@
             <div class="row">
               <div class="column">
                 <router-link
-                  to="/info/discord_bot"
+                  to="/tools/tokenator"
                   class="block token_library"
                 >
                   <div class="info">
                     <p>Всегда под рукой!</p>
 
-                    <h4>Библиотека токинов</h4>
+                    <h4>Токенатор</h4>
                   </div>
 
                   <div class="bg_img" />
