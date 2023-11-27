@@ -474,6 +474,10 @@
   p {
     margin-bottom: 6px;
   }
+
+  @include media-max($sm) {
+    min-height: 120px;
+  }
 }
 
 .bestiary {
@@ -535,11 +539,6 @@
     @media (max-width: 600px) {
       max-width: calc(50% - 8px);
       flex: 1 0 calc(50% - 8px);
-    }
-
-    @media (max-width: 360px) {
-      max-width: calc(100% - 8px);
-      flex: 1 0 calc(100% - 8px);
     }
   }
 }
