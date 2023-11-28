@@ -28,7 +28,7 @@
           >
             <ui-input
               ref="input"
-              :value="search"
+              :model-value="search"
               autocapitalize="off"
               autocomplete="off"
               autofocus="autofocus"

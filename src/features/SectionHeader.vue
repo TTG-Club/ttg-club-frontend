@@ -304,6 +304,9 @@
         color: var(--text-color-title);
         font-weight: 400;
         cursor: pointer;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
       }
 
       &--copy {
@@ -342,10 +345,6 @@
       white-space: nowrap;
       line-height: normal;
       cursor: pointer;
-
-      @media (max-width: 1200px) {
-        margin-top: 4px;
-      }
     }
 
     &__controls {
