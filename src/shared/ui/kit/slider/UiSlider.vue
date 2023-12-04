@@ -1,89 +1,67 @@
-<!-- eslint-disable vuejs-accessibility/form-control-has-label -->
 <template>
-  <div :class="$style['custom-slider']">
-    <input
-      ref="slider"
-      :value="sliderValue"
-      type="range"
-      :min="min"
-      :max="max"
-      :step="step"
-      :class="$style.slider"
-      @input="handleInput"
+  <div :class="$style['ui-slider']">
+    <ui-button
+      type="text"
+      color="text"
+      icon="zoom/out"
+      @click.left.exact.prevent="modelValue -= step"
+    />
+
+    <label :class="$style.input">
+      <input
+        v-model.number="modelValue"
+        type="range"
+        :min="min"
+        :max="max"
+        :step="step"
+      />
+    </label>
+
+    <ui-button
+      type="text"
+      color="text"
+      icon="zoom/in"
+      @click.left.exact.prevent="modelValue += step"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, watchEffect, watch } from 'vue';
+  import { computed, toRefs, unref } from 'vue';
 
-  import type { Events } from 'vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
-  const { min, max, step, modelValue } = defineProps({
-    min: {
-      type: Number,
-      default: 0
-    },
-    max: {
-      type: Number,
-      default: 100
-    },
-    step: {
-      type: Number,
-      default: 1
-    },
-    modelValue: {
-      type: Number,
-      default: 50
-    }
-  });
+  const modelValue = defineModel<number>({ required: true });
 
-  const emit = defineEmits(['update:modelValue']);
-
-  const sliderValue = ref(modelValue);
-  const slider = ref<HTMLInputElement | null>(null);
-
-  const handleInput = (event: Events['onInput']) => {
-    const { value } = event.target as HTMLInputElement;
-
-    sliderValue.value = parseFloat(value);
-  };
-
-  const getProgress = (value: number, minValue: number, maxValue: number) => {
-    return ((value - minValue) / (maxValue - minValue)) * 100;
-  };
-
-  const setCSSProgress = (progress: number) => {
-    slider.value?.style.setProperty('--ProgressPercent', `${progress}%`);
-  };
-
-  watch(
-    () => modelValue,
-    value => {
-      sliderValue.value = value;
+  const props = withDefaults(
+    defineProps<{
+      min?: number;
+      max?: number;
+      step?: number;
+    }>(),
+    {
+      min: 0.1,
+      max: 2,
+      step: 0.05
     }
   );
 
-  watchEffect(() => {
-    if (slider.value) {
-      emit('update:modelValue', sliderValue.value);
+  const { min, max, step } = toRefs(props);
 
-      const progress = getProgress(
-        sliderValue.value,
-        Number(slider.value.min),
-        Number(slider.value.max)
-      );
-
-      setCSSProgress(progress);
-    }
-  });
+  const progress = computed(
+    () => ((unref(modelValue) - unref(min)) / (unref(max) - unref(min))) * 100
+  );
 </script>
 
 <style lang="scss" module>
-  .custom-slider {
-    --trackHeight: 0.25rem;
-    --thumbRadius: 1.25rem;
+  .ui-slider {
+    --track-height: 0.25rem;
+    --thumb-radius: 1.25rem;
+
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
     /* style the input element with type "range" */
     & input[type='range'] {
@@ -92,29 +70,32 @@
       background: none;
       border-radius: 999px;
       z-index: 0;
+      width: 100%;
       height: 100%;
-      width: inherit;
       pointer-events: none;
+
       &::before {
         content: '';
         display: block;
         position: absolute;
-        width: var(--ProgressPercent, 100%);
+        width: calc(v-bind(progress) * 1%);
         height: 100%;
         background: var(--primary);
         border-radius: 999px;
       }
+
       &::-webkit-slider-runnable-track {
         appearance: none;
         background: var(--bg-sub-menu);
-        height: var(--trackHeight);
+        height: var(--track-height);
         border-radius: 999px;
       }
+
       &::-webkit-slider-thumb {
         position: relative;
-        width: var(--thumbRadius);
-        height: var(--thumbRadius);
-        margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+        width: var(--thumb-radius);
+        height: var(--thumb-radius);
+        margin-top: calc((var(--track-height) - var(--thumb-radius)) / 2);
         background: var(--primary);
         border: 1px solid var(--bg-sub-menu);
         border-radius: 999px;
@@ -122,18 +103,20 @@
         appearance: none;
         z-index: 1;
       }
+
       &::-moz-range-track {
         appearance: none;
         background: var(--primary);
-        height: var(--trackHeight);
+        height: var(--track-height);
         border-radius: 999px;
       }
+
       &::-moz-range-thumb {
         position: relative;
         box-sizing: border-box;
-        width: var(--thumbRadius);
-        height: var(--thumbRadius);
-        margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+        width: var(--thumb-radius);
+        height: var(--thumb-radius);
+        margin-top: calc((var(--track-height) - var(--thumb-radius)) / 2);
         background: var(--primary);
         border: 1px solid var(--bg-sub-menu);
         border-radius: 999px;
@@ -142,5 +125,11 @@
         z-index: 1;
       }
     }
+  }
+
+  .input {
+    display: flex;
+    align-items: center;
+    flex: 1 1 100%;
   }
 </style>
