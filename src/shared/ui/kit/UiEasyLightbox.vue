@@ -183,6 +183,7 @@
       height: auto;
       position: relative;
       width: 100%;
+      max-height: 180px;
     }
 
     &__img {
