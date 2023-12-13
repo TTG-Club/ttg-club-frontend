@@ -182,8 +182,18 @@
       border-radius: 50%;
       height: auto;
       position: relative;
-      width: 100%;
-      max-height: 180px;
+      width: 200px;
+      height: 200px;
+
+      @media (max-width: 1400px) {
+        width: 180px;
+        height: 180px;
+      }
+
+      @media (max-width: 500px) {
+        width: 120px;
+        height: 120px;
+      }
     }
 
     &__img {
