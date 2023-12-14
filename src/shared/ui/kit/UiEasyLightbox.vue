@@ -156,7 +156,7 @@
   .ui-easy-lightbox {
     position: relative;
     width: 200px;
-    min-height: 100px;
+    height: 200px;
     float: right;
     margin: 0 0 32px 32px;
     cursor: pointer;
@@ -167,6 +167,7 @@
 
     @media (max-width: 1400px) {
       width: 180px;
+      height: 180px;
     }
 
     @media (max-width: 500px) {
@@ -182,18 +183,8 @@
       border-radius: 50%;
       height: auto;
       position: relative;
-      width: 200px;
-      height: 200px;
-
-      @media (max-width: 1400px) {
-        width: 180px;
-        height: 180px;
-      }
-
-      @media (max-width: 500px) {
-        width: 120px;
-        height: 120px;
-      }
+      height: 100%;
+      width: 100%;
     }
 
     &__img {
