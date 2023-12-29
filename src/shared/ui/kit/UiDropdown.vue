@@ -106,15 +106,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
   import { intersectionBy, xor } from 'lodash-es';
-  import { computed, ref, watch } from 'vue';
+  import { computed, ref, type Ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
-  const modelValue = defineModel();
+  const modelValue = defineModel<T | T[]>();
 
   const props = defineProps<{
     label: Function;
@@ -127,10 +127,10 @@
   }>();
 
   const input = ref<typeof UiInput | null>(null);
-  const dropdownHeader = ref<HTMLDivElement | null>(null);
+  const dropdownHeader = ref<HTMLDivElement>();
   const focused = ref<Boolean>(false);
   const filter = ref<string>('');
-  const selectedOptions = ref<Array<Object>>([]);
+  const selectedOptions = ref<Array<T>>([]) as Ref<Array<T>>;
 
   onClickOutside(dropdownHeader, () => {
     focused.value = false;
@@ -151,20 +151,22 @@
   };
 
   const togglePlaceholder = computed(() =>
-    focused.value || selectedOptions.value.length ? '' : props.placeholder
+    focused.value || selectedOptions.value.length
+      ? undefined
+      : props.placeholder
   );
 
   const toggleIcon = computed(() =>
     focused.value ? 'arrow/up' : 'arrow/down'
   );
 
-  const isSelectedClass = (option: Object) => {
+  const isSelectedClass = (option: T) => {
     return selectedOptions.value.filter(
-      o => props.trackBy(o) === props.trackBy(option)
+      selectedOption => props.trackBy(selectedOption) === props.trackBy(option)
     ).length;
   };
 
-  const selectOption = (option: Object) => {
+  const selectOption = (option: T) => {
     selectedOptions.value = props.isMultiple
       ? xor(selectedOptions.value, [option])
       : [option];
@@ -184,14 +186,14 @@
     return optionsToDisplay.map(el => props.label(el)).join(', ');
   });
 
-  watch(focused, f => {
-    if (!f) {
+  watch(focused, isFocused => {
+    if (!isFocused) {
       filter.value = '';
     }
   });
 
-  watch(modelValue, mv => {
-    if (!mv) {
+  watch(modelValue, value => {
+    if (!value) {
       selectedOptions.value = [];
     }
   });
