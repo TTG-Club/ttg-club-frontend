@@ -22,8 +22,8 @@
     <div class="ability-races__fields">
       <ui-dropdown
         v-model="selectedRace"
-        :track-by="({ url }) => url"
-        :label="({ name: { rus } }) => rus"
+        track-by="url"
+        label="name.rus"
         is-searchable
         placeholder="Выбрать расу"
         :options="races"
@@ -34,8 +34,8 @@
 
       <ui-dropdown
         v-model="selectedSubRace"
-        :track-by="({ url }) => url"
-        :label="({ name: { rus } }) => rus"
+        track-by="url"
+        label="name.rus"
         :disabled="!subRaces?.length"
         placeholder="Выбрать подрасу"
         :options="subRaces"
@@ -45,8 +45,8 @@
 
       <ui-dropdown
         v-model="selectedChoiceDouble"
-        :track-by="({ key }) => key"
-        :label="({ label }) => label"
+        track-by="key"
+        label="label"
         :disabled="!isChoiceDouble"
         placeholder="Выбери что-нибудь"
         :options="choiceDouble"
@@ -56,8 +56,8 @@
 
       <ui-dropdown
         v-model="firstValue"
-        :track-by="({ key }) => key"
-        :label="({ name }) => name"
+        track-by="key"
+        label="name"
         :disabled="isFirstDisabled"
         :options="abilities"
         placeholder="Выбери хар-ку"
@@ -81,8 +81,8 @@
 
       <ui-dropdown
         v-model="secondValue"
-        :track-by="({ key }) => key"
-        :label="({ name }) => name"
+        track-by="key"
+        label="name"
         :disabled="isSecondDisabled"
         :options="abilities"
         placeholder="Выбери хар-ку"
@@ -106,8 +106,8 @@
 
       <ui-dropdown
         v-model="thirdValue"
-        :track-by="({ key }) => key"
-        :label="({ name }) => name"
+        track-by="key"
+        label="name"
         :disabled="isThirdDisabled"
         :options="abilities"
         placeholder="Выбери хар-ку"

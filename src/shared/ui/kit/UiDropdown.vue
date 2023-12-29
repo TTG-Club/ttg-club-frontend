@@ -78,7 +78,7 @@
       <ul class="ui-select__content">
         <li
           v-for="option in filteredOptions"
-          :key="trackBy(option)"
+          :key="getOption(option)"
           :class="[
             'ui-select__element',
             { 'ui-select__element--selected': isSelectedClass(option) }
@@ -90,7 +90,7 @@
             v-bind="option"
           >
             <span class="ui-select__option">
-              {{ label(option) }}
+              {{ get(option, props.label) }}
             </span>
           </slot>
         </li>
@@ -108,7 +108,7 @@
 
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
-  import { intersectionBy, xor } from 'lodash-es';
+  import { get, intersectionBy, xor } from 'lodash-es';
   import { computed, ref, type Ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
@@ -117,8 +117,8 @@
   const modelValue = defineModel<T | T[]>();
 
   const props = defineProps<{
-    label: Function;
-    trackBy: Function;
+    label: string;
+    trackBy: string;
     options: Array<T>;
     disabled?: boolean;
     placeholder: string;
@@ -160,9 +160,11 @@
     focused.value ? 'arrow/up' : 'arrow/down'
   );
 
+  const getOption = (option: T) => get(option, props.trackBy);
+
   const isSelectedClass = (option: T) => {
     return selectedOptions.value.filter(
-      selectedOption => props.trackBy(selectedOption) === props.trackBy(option)
+      selectedOption => getOption(selectedOption) === getOption(option)
     ).length;
   };
 
@@ -180,10 +182,10 @@
     const optionsToDisplay = intersectionBy(
       props.options,
       selectedOptions.value,
-      props.trackBy
+      getOption
     );
 
-    return optionsToDisplay.map(el => props.label(el)).join(', ');
+    return optionsToDisplay.map(el => get(el, props.label)).join(', ');
   });
 
   watch(focused, isFocused => {
@@ -204,7 +206,7 @@
         return el;
       }
 
-      return props.label(el).toLowerCase().includes(String(filter.value));
+      return get(el, props.label).toLowerCase().includes(String(filter.value));
     })
   );
 </script>
