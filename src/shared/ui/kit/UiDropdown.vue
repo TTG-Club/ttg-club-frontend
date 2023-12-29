@@ -11,7 +11,7 @@
       ref="dropdownHeader"
       :class="[
         'ui-select__wrapper',
-        { 'ui-select__wrapper--disabled': disabled }
+        { 'ui-select__wrapper--disabled': props.disabled }
       ]"
       @focusin="toggleFocus"
     >
@@ -27,10 +27,10 @@
 
       <div class="ui-select__slotted-wrapper">
         <ui-input
-          v-if="isSearchable"
+          v-if="props.isSearchable"
           ref="input"
           v-model="filter"
-          :disabled="disabled"
+          :disabled="props.disabled"
           :placeholder="togglePlaceholder"
         />
 
@@ -38,11 +38,13 @@
           class="ui-select__slotted--body"
           @click="toggleFocus"
         >
-          <div v-if="!selectedOptions.length && !isSearchable">
-            {{ placeholder }}
+          <div v-if="!selectedOptions.length && !props.isSearchable">
+            {{ props.placeholder }}
           </div>
 
-          <div v-if="selectedOptions.length && (!focused || !isSearchable)">
+          <div
+            v-if="selectedOptions.length && (!focused || !props.isSearchable)"
+          >
             {{ displaySelectedOptions }}
           </div>
         </div>
@@ -61,7 +63,7 @@
       <div
         :class="[
           'ui-select__select',
-          { 'ui-select__select--disabled': disabled }
+          { 'ui-select__select--disabled': props.disabled }
         ]"
         @click="toggleFocus"
       >
@@ -114,36 +116,15 @@
 
   const modelValue = defineModel();
 
-  const props = defineProps({
-    trackBy: {
-      type: Function,
-      required: true
-    },
-    label: {
-      type: Function,
-      required: true
-    },
-    options: {
-      type: Array,
-      default: () => []
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    isMultiple: {
-      type: Boolean,
-      default: false
-    },
-    isSearchable: {
-      type: Boolean,
-      default: false
-    }
-  });
+  const props = defineProps<{
+    label: Function;
+    trackBy: Function;
+    options: Array<T>;
+    disabled?: boolean;
+    placeholder: string;
+    isMultiple?: boolean;
+    isSearchable?: boolean;
+  }>();
 
   const input = ref<typeof UiInput | null>(null);
   const dropdownHeader = ref<HTMLDivElement | null>(null);
@@ -402,12 +383,14 @@
 
       &--body {
         position: absolute;
-        padding: 11px;
         top: 0;
         width: 100%;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+        div {
+          padding: 11px;
+        }
       }
     }
   }
