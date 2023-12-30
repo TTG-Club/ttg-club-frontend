@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst.ts';
 
   export default {
     directives: {

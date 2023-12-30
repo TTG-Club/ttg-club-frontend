@@ -39,7 +39,7 @@
   import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { getGroupByFirstLetter } from '@/shared/helpers/list';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { BackgroundsFilterDefaults } from '@/shared/types/Character/Backgrounds.d';
+  import { BackgroundsFilterDefaults } from '@/shared/types/Character/Backgrounds';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';

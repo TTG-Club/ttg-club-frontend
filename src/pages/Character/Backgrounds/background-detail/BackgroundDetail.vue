@@ -24,12 +24,12 @@
 <script>
   import { mapState } from 'pinia';
 
-  import BackgroundBody from '@/pages/Character/Backgrounds/BackgroundBody.vue';
+  import BackgroundBody from '@/pages/Character/Backgrounds/background-detail/BackgroundBody.vue';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import { useUIStore } from '@/shared/stores/UIStore';
+  import { errorHandler } from '@/shared/helpers/errorHandler.js';
+  import { useUIStore } from '@/shared/stores/UIStore.js';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
 
   export default {

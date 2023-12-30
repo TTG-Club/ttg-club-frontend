@@ -1,4 +1,5 @@
-import IndexView from '@/pages/IndexView.vue';
+import { BackgroundsPage } from '@/pages/Character/Backgrounds/backgrounds';
+import IndexView from '@/pages/IndexView/IndexView.vue';
 
 import { useNavStore } from '@/shared/stores/NavStore';
 import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
@@ -19,6 +20,7 @@ export const routes: Readonly<RouteRecordRaw[]> = [
       });
     }
   },
+  BackgroundsPage,
   {
     name: 'classes',
     path: '/classes',
@@ -52,20 +54,6 @@ export const routes: Readonly<RouteRecordRaw[]> = [
         name: 'traitDetail',
         path: ':traitName',
         component: () => import('@/pages/Character/Traits/TraitDetail.vue')
-      }
-    ]
-  },
-  {
-    name: 'backgrounds',
-    path: '/backgrounds',
-    component: () =>
-      import('@/pages/Character/Backgrounds/BackgroundsView.vue'),
-    children: [
-      {
-        name: 'backgroundDetail',
-        path: ':backgroundName',
-        component: () =>
-          import('@/pages/Character/Backgrounds/BackgroundDetail.vue')
       }
     ]
   },
@@ -335,7 +323,7 @@ export const routes: Readonly<RouteRecordRaw[]> = [
   {
     name: 'info-page',
     path: '/info/:path',
-    component: () => import('@/pages/InfoPageView.vue')
+    component: () => import('@/pages/InfoPageView/InfoPageView.vue')
   },
   {
     name: 'unknown-error',
