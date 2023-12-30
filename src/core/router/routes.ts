@@ -369,6 +369,11 @@ export const routes: Readonly<RouteRecordRaw[]> = [
     ]
   },
   {
+    name: 'markup-render',
+    path: '/markup-render',
+    component: () => import('@/pages/Markup/MarkupTestView.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: {
       name: 'not-found',
