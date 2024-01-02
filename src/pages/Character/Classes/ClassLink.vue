@@ -202,6 +202,15 @@
       });
 
       watch(
+        () => isActive.value,
+        value => {
+          if (!value) {
+            submenu.value = !submenu.value;
+          }
+        }
+      );
+
+      watch(
         () => props.afterSearch,
         value => {
           if (value) {

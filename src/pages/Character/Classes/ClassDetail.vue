@@ -137,7 +137,7 @@
 <script setup lang="ts">
   import {
     computedInject,
-    resolveUnref,
+    toValue,
     useElementBounding,
     useScroll
   } from '@vueuse/core';
@@ -186,7 +186,7 @@
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
-    source => resolveUnref(source),
+    source => toValue(source),
     []
   );
 
@@ -329,7 +329,7 @@
         url,
         payload: {
           filter: {
-            book: resolveUnref<Array<string>>(queryBooks)
+            book: toValue<Array<string>>(queryBooks)
           }
         },
         signal: abortController.value.signal
