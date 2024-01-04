@@ -18,7 +18,7 @@
   import { onKeyStroke, useActiveElement } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
 
-  import SearchModal from '@/pages/Search/SearchModal.vue';
+  import SearchModal from '@/pages/search/SearchModal.vue';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 

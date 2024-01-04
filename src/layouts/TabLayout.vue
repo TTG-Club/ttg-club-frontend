@@ -41,7 +41,7 @@
 
   import ListFilter from '@/features/filter/ListFilter.vue';
 
-  import type { FilterComposable } from '@/shared/compositions/useFilter';
+  import type { FilterComposable } from '@/shared/composables/useFilter';
 
   const props = withDefaults(
     defineProps<{

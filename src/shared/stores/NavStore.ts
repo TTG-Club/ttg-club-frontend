@@ -2,7 +2,7 @@ import { orderBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import isDev from '@/shared/helpers/isDev';
 import type { Maybe } from '@/shared/types/Utility';
 

@@ -7,16 +7,15 @@ import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
 import Toast from 'vue-toastification';
 
-import router from '@/core/router';
-import pinia from '@/core/store';
-
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import { TippyLazy } from '@/shared/directives/TippyLazy';
 import isDev from '@/shared/helpers/isDev';
 
 import App from './App.vue';
 import { TippyOptions } from './configs/TippyConfig';
 import { ToastEventBus, ToastOptions } from './configs/ToastConfig';
+import router from './router';
+import pinia from './store';
 import registerComponents from './utils/RegisterComponents';
 
 import 'vue-final-modal/style.css';

@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
 import { useIsDev } from '@/shared/helpers/isDev';
 

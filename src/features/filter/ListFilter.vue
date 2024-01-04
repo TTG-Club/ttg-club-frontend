@@ -98,7 +98,7 @@
     FilterComposable,
     FilterGroup,
     FilterItem
-  } from '@/shared/compositions/useFilter';
+  } from '@/shared/composables/useFilter';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';

@@ -4,7 +4,7 @@ import { toPairs, fromPairs } from 'lodash-es';
 import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeAddVideo.vue';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import { getOrderString } from '@/shared/helpers/request';
 import type { RequestConfig } from '@/shared/services/HTTPService';
 import type {
