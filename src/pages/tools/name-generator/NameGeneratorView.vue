@@ -8,7 +8,7 @@
         <div class="tools_settings__row">
           <span class="label">Расы:</span>
 
-          <field-checkbox
+          <ui-checkbox
             v-for="(source, key) in tables"
             :key="key"
             v-tippy="{ content: source.name }"
@@ -17,13 +17,13 @@
             @update:model-value="source.value = $event"
           >
             {{ source.shortName }}
-          </field-checkbox>
+          </ui-checkbox>
         </div>
 
         <div class="tools_settings__row">
           <span class="label">Количество:</span>
 
-          <field-input
+          <ui-input
             v-model="count"
             :min="1"
             class="form-control select"
@@ -33,13 +33,13 @@
         </div>
 
         <div class="tools_settings__row btn-wrapper">
-          <form-button @click.left.exact.prevent="sendForm">
+          <ui-button @click.left.exact.prevent="sendForm">
             Сгенерировать
-          </form-button>
+          </ui-button>
 
-          <form-button @click.left.exact.prevent="results = []">
+          <ui-button @click.left.exact.prevent="results = []">
             Очистить
-          </form-button>
+          </ui-button>
         </div>
       </form>
     </template>
@@ -71,19 +71,19 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  import { errorHandler } from '@/shared/helpers/errorHandler.js';
-  import FieldCheckbox from '@/shared/ui/kit/FieldType/FieldCheckbox.vue';
-  import FieldInput from '@/shared/ui/kit/FieldType/FieldInput.vue';
-  import FormButton from '@/shared/ui/kit/FormButton.vue';
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   export default defineComponent({
     components: {
+      UiButton,
+      UiInput,
+      UiCheckbox,
       RawContent,
-      FieldCheckbox,
-      ContentLayout,
-      FieldInput,
-      FormButton
+      ContentLayout
     },
     data: () => ({
       count: 1,

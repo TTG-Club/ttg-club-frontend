@@ -16,9 +16,7 @@ const { nextAvailable } = useRouterHelpers();
 const { sendPageViewMetrics } = useMetrics();
 const navStore = useNavStore(pinia);
 
-router.beforeEach(async (to, from, next) => {
-  await nextAvailable(to, next);
-});
+router.beforeEach(nextAvailable);
 
 router.beforeResolve(async () => {
   navStore.hidePopovers();

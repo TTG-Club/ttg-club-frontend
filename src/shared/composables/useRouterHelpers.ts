@@ -4,11 +4,7 @@ import { routes } from '@/pages';
 
 import { useAxios } from '@/shared/composables/useAxios';
 
-import type {
-  NavigationGuardNext,
-  RouteLocationNormalized,
-  RouteRecordRaw
-} from 'vue-router';
+import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 
 export const useRouterHelpers = () => {
   const isUrlAvailable = async (to: RouteLocationNormalized) => {
@@ -55,14 +51,9 @@ export const useRouterHelpers = () => {
     return !!to.name && availRoutes.includes(to.name);
   };
 
-  const nextAvailable = async (
-    to: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
+  const nextAvailable = async (to: RouteLocationNormalized) => {
     if (isStaticUrl(to)) {
-      next();
-
-      return;
+      return true;
     }
 
     try {
@@ -70,36 +61,24 @@ export const useRouterHelpers = () => {
 
       switch (status) {
         case 200:
-          next();
-
-          break;
+          return true;
 
         default:
-          next({ name: 'internal-server' });
-
-          break;
+          return { name: 'internal-server' };
       }
     } catch (errStatus) {
       switch (errStatus) {
         case 401:
-          next({ name: 'unauthorized' });
-
-          break;
+          return { name: 'unauthorized' };
 
         case 403:
-          next({ name: 'forbidden' });
-
-          break;
+          return { name: 'forbidden' };
 
         case 404:
-          next({ name: 'not-found' });
-
-          break;
+          return { name: 'not-found' };
 
         default:
-          next({ name: 'internal-server' });
-
-          break;
+          return { name: 'internal-server' };
       }
     }
   };

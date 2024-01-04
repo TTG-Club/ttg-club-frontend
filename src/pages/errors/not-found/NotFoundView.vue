@@ -5,13 +5,7 @@
 
       <h4>
         Вы не прокинули проверку выживания, стоит вернуться к
-        <router-link
-          :to="{
-            name: 'index'
-          }"
-        >
-          началу
-        </router-link>
+        <router-link :to="{ name: 'index' }">началу</router-link>
       </h4>
     </div>
   </div>

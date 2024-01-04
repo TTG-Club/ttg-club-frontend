@@ -70,6 +70,6 @@ export const routes: Readonly<RouteRecordRaw[]> = [
   ...customRoutes,
   {
     path: '/:pathMatch(.*)*',
-    redirect: () => 'not-found'
+    redirect: () => ({ name: 'not-found' })
   }
 ];

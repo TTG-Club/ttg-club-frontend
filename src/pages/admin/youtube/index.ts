@@ -13,7 +13,7 @@ export const AdminYoutubePage: RouteRecordRaw = {
       const user = await userStore.getUserInfo();
 
       if (!user) {
-        return 'unauthorized';
+        return { name: 'unauthorized' };
       }
 
       if (
@@ -23,9 +23,9 @@ export const AdminYoutubePage: RouteRecordRaw = {
         return true;
       }
 
-      return 'forbidden';
+      return { name: 'forbidden' };
     } catch (err) {
-      return 'internal-server';
+      return { name: 'internal-server' };
     }
   }
 };
