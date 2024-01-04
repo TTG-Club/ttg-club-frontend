@@ -64,7 +64,6 @@ export default ({ mode }: ConfigEnv) => {
       }),
       vue({
         script: {
-          defineModel: true,
           propsDestructure: true
         }
       }),
