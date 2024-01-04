@@ -35,7 +35,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';

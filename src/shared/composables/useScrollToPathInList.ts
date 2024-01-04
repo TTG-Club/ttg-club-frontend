@@ -2,7 +2,7 @@ import { storeToRefs } from 'pinia';
 import { computed, ref, unref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { useReference } from '@/shared/compositions/useReference';
+import { useReference } from '@/shared/composables/useReference';
 import { CONTENT_LAYOUT_FIXED_HEADER_SELECTOR } from '@/shared/constants/UI';
 import { asyncAnimationFrame } from '@/shared/helpers/dom';
 import { useUIStore } from '@/shared/stores/UIStore';

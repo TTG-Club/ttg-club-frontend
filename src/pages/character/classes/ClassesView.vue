@@ -47,8 +47,8 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  import { useFilter } from '@/shared/compositions/useFilter';
-  import { usePagination } from '@/shared/compositions/usePagination';
+  import { useFilter } from '@/shared/composables/useFilter';
+  import { usePagination } from '@/shared/composables/usePagination';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type {

@@ -3,8 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import pinia from '@/core/store';
 import { routes } from '@/pages';
 
-import { useMetrics } from '@/shared/compositions/useMetrics';
-import { useRouterHelpers } from '@/shared/compositions/useRouterHelpers';
+import { useMetrics } from '@/shared/composables/useMetrics';
+import { useRouterHelpers } from '@/shared/composables/useRouterHelpers';
 import { useNavStore } from '@/shared/stores/NavStore';
 
 const router = createRouter({

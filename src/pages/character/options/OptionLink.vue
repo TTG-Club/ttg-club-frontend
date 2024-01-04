@@ -57,7 +57,7 @@
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
   import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type {
     OptionDetail,

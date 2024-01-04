@@ -2,12 +2,12 @@ import localforage from 'localforage';
 import { cloneDeep } from 'lodash-es';
 import { computed, ref, unref } from 'vue';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import type {
   SearchComposable,
   SearchConfig
-} from '@/shared/compositions/useSearch';
-import { useSearch } from '@/shared/compositions/useSearch';
+} from '@/shared/composables/useSearch';
+import { useSearch } from '@/shared/composables/useSearch';
 
 import type { MaybeRef } from '@vueuse/core';
 import type { ComputedRef, Ref } from 'vue';

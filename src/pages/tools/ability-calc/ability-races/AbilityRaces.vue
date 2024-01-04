@@ -186,9 +186,9 @@
   import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
 
   import RaceLink from '@/pages/character/races/RaceLink.vue';
-  import { useRaceAbility } from '@/pages/tools/ability-calc/ability-races/composition/useRaceAbility';
+  import { useRaceAbility } from '@/pages/tools/ability-calc/ability-races/composables/useRaceAbility';
 
-  import { usePagination } from '@/shared/compositions/usePagination';
+  import { usePagination } from '@/shared/composables/usePagination';
   import type { TRaceLink } from '@/shared/types/character/Races.d';
   import type {
     AbilityRoll,

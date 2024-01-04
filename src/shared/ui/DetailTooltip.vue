@@ -28,7 +28,7 @@
   import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
   import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import RawContent from '@/shared/ui/RawContent.vue';
 

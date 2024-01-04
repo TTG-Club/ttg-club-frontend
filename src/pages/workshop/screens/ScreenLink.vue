@@ -55,7 +55,7 @@
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import type { Maybe } from '@/shared/types/Utility';
   import type {

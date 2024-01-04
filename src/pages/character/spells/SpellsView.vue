@@ -36,9 +36,9 @@
   import ContentLayout from '@/layouts/ContentLayout.vue';
   import TabLayout from '@/layouts/TabLayout.vue';
 
-  import { useFilter } from '@/shared/compositions/useFilter';
-  import { usePagination } from '@/shared/compositions/usePagination';
-  import { useScrollToPathInList } from '@/shared/compositions/useScrollToPathInList';
+  import { useFilter } from '@/shared/composables/useFilter';
+  import { usePagination } from '@/shared/composables/usePagination';
+  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
   import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { useUIStore } from '@/shared/stores/UIStore';
   import {

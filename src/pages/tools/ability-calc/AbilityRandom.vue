@@ -59,7 +59,7 @@
 
   import { ToastEventBus } from '@/core/configs/ToastConfig';
 
-  import { useDiceRoller } from '@/shared/compositions/useDiceRoller';
+  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
   import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';

@@ -94,7 +94,7 @@
 
   import ListFilter from '@/features/filter/ListFilter.vue';
 
-  import type { FilterComposable } from '@/shared/compositions/useFilter';
+  import type { FilterComposable } from '@/shared/composables/useFilter';
   import { useUIStore } from '@/shared/stores/UIStore';
 
   import type { MaybeRef } from '@vueuse/core';

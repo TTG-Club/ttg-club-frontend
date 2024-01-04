@@ -32,7 +32,7 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { RouteLocationNormalized } from 'vue-router';

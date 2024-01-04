@@ -112,8 +112,8 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
-  import { useMetrics } from '@/shared/compositions/useMetrics';
+  import { useAxios } from '@/shared/composables/useAxios';
+  import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';

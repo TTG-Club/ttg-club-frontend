@@ -6,7 +6,7 @@ import {
   required
 } from '@vuelidate/validators';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import { errorHandler } from '@/shared/helpers/errorHandler';
 import { useIsDev } from '@/shared/helpers/isDev';
 

@@ -2,9 +2,9 @@ import { toValue } from '@vueuse/core';
 import { computed, ref, unref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { useAxios } from '@/shared/compositions/useAxios';
-import type { FilterQueryParams } from '@/shared/compositions/useFilter';
-import { useMetrics } from '@/shared/compositions/useMetrics';
+import { useAxios } from '@/shared/composables/useAxios';
+import type { FilterQueryParams } from '@/shared/composables/useFilter';
+import { useMetrics } from '@/shared/composables/useMetrics';
 import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
 import { errorHandler } from '@/shared/helpers/errorHandler';
 import { useIsDev } from '@/shared/helpers/isDev';

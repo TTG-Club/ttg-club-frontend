@@ -35,8 +35,8 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  import { useFilter } from '@/shared/compositions/useFilter';
-  import { usePagination } from '@/shared/compositions/usePagination';
+  import { useFilter } from '@/shared/composables/useFilter';
+  import { usePagination } from '@/shared/composables/usePagination';
   import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { ScreensFilterDefaults } from '@/shared/types/workshop/Screens.d';
 

@@ -138,11 +138,11 @@
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
   import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
   import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
-  import { useYoutube } from '@/features/youtube/composition/useYoutube';
-  import { useYoutubeActive } from '@/features/youtube/composition/useYoutubeActive';
+  import { useYoutube } from '@/features/youtube/composables/useYoutube';
+  import { useYoutubeActive } from '@/features/youtube/composables/useYoutubeActive';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
-  import { getFormattedDate } from '@/shared/compositions/useDayjs';
+  import { getFormattedDate } from '@/shared/composables/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';

@@ -12,7 +12,7 @@
     watch
   } from 'vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
 
   const props = withDefaults(
     defineProps<{

@@ -1,4 +1,4 @@
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import { errorHandler } from '@/shared/helpers/errorHandler';
 
 import type { DefaultProps } from 'tippy.js';

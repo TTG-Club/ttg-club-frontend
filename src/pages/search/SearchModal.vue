@@ -126,8 +126,8 @@
 
   import SearchLink from '@/pages/search/SearchLink.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
-  import { useMetrics } from '@/shared/compositions/useMetrics';
+  import { useAxios } from '@/shared/composables/useAxios';
+  import { useMetrics } from '@/shared/composables/useMetrics';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';

@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 
 import { routes } from '@/pages';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 
 import type {
   NavigationGuardNext,

@@ -6,7 +6,7 @@ import type {
   TQueryAddBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {

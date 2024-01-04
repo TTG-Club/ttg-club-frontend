@@ -28,7 +28,7 @@
   import { omit } from 'lodash-es';
   import { computed } from 'vue';
 
-  import { useResponsiveValues } from '@/shared/compositions/useResponsiveValues';
+  import { useResponsiveValues } from '@/shared/composables/useResponsiveValues';
   import { DEFAULT_KEY_FIELD } from '@/shared/constants';
   import { getListRows } from '@/shared/helpers/list';
   import type { AnyObject } from '@/shared/types/Utility';

@@ -7,7 +7,7 @@ import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
 import Toast from 'vue-toastification';
 
-import { useAxios } from '@/shared/compositions/useAxios';
+import { useAxios } from '@/shared/composables/useAxios';
 import { TippyLazy } from '@/shared/directives/TippyLazy';
 import isDev from '@/shared/helpers/isDev';
 

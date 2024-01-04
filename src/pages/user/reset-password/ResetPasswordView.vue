@@ -30,7 +30,7 @@
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { useAxios } from '@/shared/composables/useAxios';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   interface ITokenValidation {
