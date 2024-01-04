@@ -17,16 +17,16 @@
 
   import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
-  import OptionBody from '@/pages/Character/Options/OptionBody.vue';
-  import SpellBody from '@/pages/Character/Spells/SpellBody.vue';
-  import TraitBody from '@/pages/Character/Traits/TraitBody.vue';
-  import ArmorBody from '@/pages/Inventory/Armors/ArmorBody.vue';
-  import ItemBody from '@/pages/Inventory/Items/ItemBody.vue';
-  import MagicItemBody from '@/pages/Inventory/MagicItems/MagicItemBody.vue';
-  import WeaponBody from '@/pages/Inventory/Weapons/WeaponBody.vue';
-  import GodBody from '@/pages/Wiki/Gods/GodBody.vue';
-  import CreatureBody from '@/pages/Workshop/Bestiary/CreatureBody.vue';
-  import ScreenBody from '@/pages/Workshop/Screens/ScreenBody.vue';
+  import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
+  import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
+  import TraitBody from '@/pages/character/traits/traits-detail/TraitBody.vue';
+  import ArmorBody from '@/pages/inventory/armors/armors-detail/ArmorBody.vue';
+  import ItemBody from '@/pages/inventory/items/items-detail/ItemBody.vue';
+  import MagicItemBody from '@/pages/inventory/magic-items/magic-items-detail/MagicItemBody.vue';
+  import WeaponBody from '@/pages/inventory/weapons/weapons-detail/WeaponBody.vue';
+  import GodBody from '@/pages/wiki/gods/gods-detail/GodBody.vue';
+  import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
+  import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
 
   import { useAxios } from '@/shared/compositions/useAxios';
   import { errorHandler } from '@/shared/helpers/errorHandler';
