@@ -227,7 +227,7 @@
       top: 50%;
       left: 50%;
       border: none;
-      color: var(--text-color);
+      color: var(--youtube-base);
     }
 
     .name {
@@ -247,7 +247,7 @@
           $style: cubic-bezier(0, 0, 0.2, 1)
         );
 
-        color: var(--bg-main);
+        color: var(--youtube-hover);
       }
     }
 

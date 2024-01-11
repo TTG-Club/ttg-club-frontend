@@ -100,13 +100,12 @@
     display: flex;
     flex-wrap: wrap;
     padding: 0;
-    margin: 8px 0 0 0;
-    gap: 16px;
+    margin: 16px 0 0 0;
+    gap: 12px;
 
     .card {
       flex: 1 1 15%;
       min-width: 15%;
-      margin: 8px 0 0 0;
       background-color: var(--bg-secondary);
       border-radius: 12px;
       display: grid;
@@ -129,7 +128,7 @@
         display: block;
         position: absolute;
         width: 220px;
-        height: 56px;
+        height: 52px;
         right: 0;
         background-image: url(/img/bg_main_page_button_nav_3.png);
         background-position: 0 0;
@@ -175,7 +174,7 @@
           font-size: var(--h5-font-size);
           line-height: 16px;
           font-family: 'Open Sans';
-          font-weight: 600;
+          font-weight: 500;
           margin-right: 50%;
           margin-top: 0;
           margin-bottom: 0;
@@ -183,7 +182,6 @@
       }
 
       @media (max-width: 1200px) {
-        margin: 16px 0 0 0;
         height: 48px;
       }
 
@@ -209,12 +207,13 @@
   }
 
   .main-page-blocks {
-    margin-top: 32px;
+    margin-top: 24px;
+    margin-bottom: 16px;
 
     .row {
       display: flex;
       flex-direction: row;
-      gap: 16px;
+      gap: 12px;
 
       @include media-max($lg) {
         flex-direction: column;
@@ -224,12 +223,14 @@
     .column {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       flex: 1 0;
 
       &.youtube-block {
-        flex: 0 0 calc(33% - 10px);
+        flex: 0 0 calc(33% - 4px);
         height: fit-content;
+        border: 1px solid var(--border);
+        border-radius: 12px;
       }
     }
 
@@ -324,6 +325,7 @@
   background: var(--bg-secondary);
   padding: 16px;
   border-radius: 12px;
+  border: 1px solid var(--border);
 
   h3 {
     font-size: calc(var(--h3-font-size) - 12px);
@@ -527,7 +529,6 @@
     }
 
     @media (max-width: 1200px) {
-      // max-width: calc(16% - 8px);
       flex: 1 0 calc(16% - 8px);
     }
 
