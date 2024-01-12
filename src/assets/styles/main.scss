@@ -4,6 +4,20 @@
   color: var(--primary);
 }
 
+.custom_link {
+  color: var(--text-btn-color);
+  background-color: var(--primary);
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: inline-block;
+
+  &:hover {
+    border: 0;
+    background-color: var(--primary-hover);
+    color: var(--text-btn-color);
+  }
+}
+
 .video-container {
   overflow: hidden;
   position: relative;
