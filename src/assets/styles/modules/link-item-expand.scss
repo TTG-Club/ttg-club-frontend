@@ -210,7 +210,7 @@
         }
 
         &::after {
-          content: "";
+          content: '';
           display: block;
           width: 1px;
           position: absolute;
@@ -250,9 +250,8 @@
       }
 
       &.router-link-active {
-
         &::after {
-          content: "";
+          content: '';
           display: block;
           width: 3px;
           position: absolute;
