@@ -3,6 +3,7 @@
     :ref="reference"
     v-bind="listProps"
     :items="items"
+    class="virtual-grid-list"
   >
     <template #default="{ item: row, index, active }">
       <slot
@@ -86,8 +87,8 @@
   );
 </script>
 
-<style lang="scss" scoped>
-  :deep {
+<style lang="scss">
+  .virtual-grid-list {
     .vue-recycle-scroller__item-view {
       margin: 0;
       padding: 0;

@@ -91,9 +91,10 @@
   };
 </script>
 
-<style lang="scss" scoped>
-  .virtual-grouped-list :deep {
+<style lang="scss">
+  .virtual-grouped-list {
     --group-spacing: calc(var(--item-spacing) * 2);
+
     // Добавляем отрицательный margin для родителя, чтобы не было лишнего отступа
     margin-top: calc(-1 * var(--group-spacing));
 
