@@ -50,7 +50,7 @@
           url: props.url
         });
 
-        templateString.value = data as string;
+        templateString.value = data;
       }
 
       loading.value = false;
@@ -81,7 +81,7 @@
           mounted() {
             emit('loaded');
           },
-          template: templateString.value as string
+          template: templateString.value
         })
       )
     );
