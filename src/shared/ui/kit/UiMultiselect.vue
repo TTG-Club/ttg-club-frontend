@@ -35,13 +35,11 @@
           class="ui-select__slotted--body"
           @click="toggleFocus"
         >
-          <div v-if="!selectedOptions.length && !props.isSearchable">
+          <div v-if="!modelValue && !props.isSearchable">
             {{ props.placeholder }}
           </div>
 
-          <div
-            v-if="selectedOptions.length && (!focused || !props.isSearchable)"
-          >
+          <div v-if="modelValue && (!focused || !props.isSearchable)">
             {{ displaySelectedOptions }}
           </div>
         </div>
@@ -102,8 +100,8 @@
 
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
-  import { get, intersectionBy, xor } from 'lodash-es';
-  import { computed, ref, type Ref, watch } from 'vue';
+  import { get } from 'lodash-es';
+  import { computed, ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
@@ -124,7 +122,6 @@
   const header = ref<HTMLDivElement>();
   const focused = ref<Boolean>(false);
   const filter = ref<string>('');
-  const selectedOptions = ref<Array<T>>([]) as Ref<Array<T>>;
 
   onClickOutside(header, () => {
     focused.value = false;
@@ -145,9 +142,7 @@
   };
 
   const togglePlaceholder = computed(() =>
-    focused.value || selectedOptions.value.length
-      ? undefined
-      : props.placeholder
+    focused.value || modelValue.value ? undefined : props.placeholder
   );
 
   const toggleIcon = computed(() =>
@@ -156,31 +151,15 @@
 
   const getOption = (option: T) => get(option, props.trackBy);
 
-  const isSelectedClass = (option: T) => {
-    return selectedOptions.value.filter(
-      selectedOption => getOption(selectedOption) === getOption(option)
-    ).length;
-  };
+  const isSelectedClass = (option: T) => modelValue.value === option;
 
   const selectOption = (option: T) => {
-    selectedOptions.value = props.isMultiple
-      ? xor(selectedOptions.value, [option])
-      : [option];
-
-    modelValue.value = props.isMultiple
-      ? selectedOptions.value
-      : selectedOptions.value[0];
+    modelValue.value = option;
   };
 
-  const displaySelectedOptions = computed(() => {
-    const optionsToDisplay = intersectionBy(
-      props.options,
-      selectedOptions.value,
-      getOption
-    );
-
-    return optionsToDisplay.map(el => get(el, props.label)).join(', ');
-  });
+  const displaySelectedOptions = computed(() =>
+    get(modelValue.value, props.label)
+  );
 
   watch(focused, isFocused => {
     if (!isFocused) {
@@ -188,20 +167,10 @@
     }
   });
 
-  watch(modelValue, value => {
-    if (!value) {
-      selectedOptions.value = [];
-    }
-  });
-
   const filteredOptions = computed(() =>
-    props.options.filter(el => {
-      if (!filter.value) {
-        return el;
-      }
-
-      return get(el, props.label).toLowerCase().includes(String(filter.value));
-    })
+    props.options.filter(el =>
+      get(el, props.label).toLowerCase().includes(String(filter.value))
+    )
   );
 </script>
 

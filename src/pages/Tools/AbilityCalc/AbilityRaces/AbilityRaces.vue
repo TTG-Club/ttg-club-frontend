@@ -39,6 +39,7 @@
         :disabled="!subRaces?.length"
         placeholder="Выбрать подрасу"
         :options="subRaces"
+        @update:model-value="onSelectSubRace"
       >
         <template #label>Подраса</template>
       </ui-multiselect>
@@ -50,6 +51,7 @@
         :disabled="!isChoiceDouble"
         placeholder="Выбери что-нибудь"
         :options="choiceDouble"
+        @update:model-value="onSelectChoiceDouble"
       >
         <template #label>Набор характеристик</template>
       </ui-multiselect>
@@ -310,8 +312,6 @@
   };
 
   const onSelectChoiceDouble = () => {
-    selectedChoiceDouble.value = null;
-
     firstValue.value = null;
     secondValue.value = null;
     thirdValue.value = null;
@@ -320,12 +320,16 @@
   };
 
   const onSelectSubRace = () => {
-    selectedSubRace.value = null;
+    selectedChoiceDouble.value = isChoiceDouble.value
+      ? choiceDouble.value[0]
+      : null;
 
     onSelectChoiceDouble();
   };
 
   const onSelectRace = () => {
+    selectedSubRace.value = null;
+
     onSelectSubRace();
   };
 
