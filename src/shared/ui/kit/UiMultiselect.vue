@@ -19,10 +19,7 @@
         v-if="$slots['left-slot']"
         class="ui-select__slotted--left"
       >
-        <slot
-          :option="option"
-          name="left-slot"
-        />
+        <slot name="left-slot" />
       </div>
 
       <div class="ui-select__slotted-wrapper">
@@ -54,10 +51,7 @@
         v-if="$slots['right-slot']"
         class="ui-select__slotted--right"
       >
-        <slot
-          :option="option"
-          name="right-slot"
-        />
+        <slot name="right-slot" />
       </div>
 
       <div
@@ -253,11 +247,13 @@
         color: var(--primary);
       }
     }
+
     &__slotted-wrapper {
       position: relative;
       cursor: pointer;
       width: 100%;
     }
+
     &__wrapper {
       @include css_anim();
 
@@ -276,6 +272,7 @@
         color: var(--border);
         radius: 8px;
       }
+
       &--disabled {
         pointer-events: none;
         opacity: 0.6;
@@ -338,6 +335,7 @@
 
       &--empty {
         cursor: default;
+
         &:hover {
           background: none;
         }
@@ -392,6 +390,7 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+
         div {
           padding: 11px;
         }
@@ -402,6 +401,7 @@
   :deep(.ui-input__input) {
     color: var(--text-color-active);
     cursor: pointer;
+
     &[placeholder=''] {
       cursor: text;
     }

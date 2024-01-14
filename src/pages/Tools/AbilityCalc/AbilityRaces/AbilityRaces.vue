@@ -29,7 +29,7 @@
         :options="races"
         @update:model-value="onSelectRace"
       >
-        <template #label> Раса</template>
+        <template #label>Раса</template>
       </ui-multiselect>
 
       <ui-multiselect
@@ -40,7 +40,7 @@
         placeholder="Выбрать подрасу"
         :options="subRaces"
       >
-        <template #label> Подраса</template>
+        <template #label>Подраса</template>
       </ui-multiselect>
 
       <ui-multiselect
@@ -51,7 +51,7 @@
         placeholder="Выбери что-нибудь"
         :options="choiceDouble"
       >
-        <template #label> Набор характеристик</template>
+        <template #label>Набор характеристик</template>
       </ui-multiselect>
 
       <ui-multiselect
