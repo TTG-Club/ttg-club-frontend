@@ -205,7 +205,7 @@
               'a',
               {
                 target: '_blank',
-                href: 'https://discord.gg/zqBnMJVf3z',
+                href: 'https://discord.gg/JqFKMKRtxv',
                 rel: 'noopener'
               },
               'Discord-канале'

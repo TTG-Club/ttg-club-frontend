@@ -107,7 +107,7 @@
                 hide-label
                 transparent
                 social-name="discord"
-                url="https://discord.gg/zqBnMJVf3z"
+                url="https://discord.gg/JqFKMKRtxv"
               />
 
               <ui-social-button

@@ -33,7 +33,7 @@
           <ui-social-button
             hide-label
             social-name="discord"
-            url="https://discord.gg/zqBnMJVf3z"
+            url="https://discord.gg/JqFKMKRtxv"
           />
 
           <hr />
