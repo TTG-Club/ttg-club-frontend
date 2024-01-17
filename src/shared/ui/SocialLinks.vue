@@ -36,7 +36,7 @@
         default: () => [
           {
             name: 'Discord',
-            url: 'https://discord.gg/zqBnMJVf3z',
+            url: 'https://discord.gg/JqFKMKRtxv',
             icon: 'discord'
           },
           {

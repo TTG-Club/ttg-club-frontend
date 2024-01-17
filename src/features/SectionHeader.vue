@@ -114,7 +114,7 @@
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
-  import { useMetrics } from '@/shared/compositions/useMetrics';
+  import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
@@ -205,7 +205,7 @@
               'a',
               {
                 target: '_blank',
-                href: 'https://discord.gg/zqBnMJVf3z',
+                href: 'https://discord.gg/JqFKMKRtxv',
                 rel: 'noopener'
               },
               'Discord-канале'

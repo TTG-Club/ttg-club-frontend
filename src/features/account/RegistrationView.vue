@@ -94,7 +94,7 @@
 
   import { ToastEventBus } from '@/core/configs/ToastConfig';
 
-  import { useMetrics } from '@/shared/compositions/useMetrics';
+  import { useMetrics } from '@/shared/composables/useMetrics';
   import {
     validateEmailExist,
     validateEmailFormat,

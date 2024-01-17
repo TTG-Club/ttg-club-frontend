@@ -83,16 +83,14 @@
   });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   $item-spacing: 12px;
 
   .virtual-list {
     --item-spacing: #{$item-spacing};
-  }
 
-  :deep {
-    &.vue-recycle-scroller {
-      // Добавляем отрицательный margin для родителя, чтобы не было лишнего отступа
+    // Добавляем отрицательный margin для родителя, чтобы не было лишнего отступа
+    .vue-recycle-scroller {
       margin-bottom: calc(-1 * var(--item-spacing, #{$item-spacing}));
     }
 
@@ -104,11 +102,6 @@
     .vue-recycle-scroller__item-view {
       margin: 0;
       padding: 0;
-
-      // Добавляем отступ между элементами
-      > .virtual-list__item {
-        padding-bottom: var(--item-spacing, #{$item-spacing});
-      }
     }
   }
 </style>

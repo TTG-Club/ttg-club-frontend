@@ -3,6 +3,7 @@
     :ref="reference"
     v-bind="listProps"
     :items="items"
+    class="virtual-grid-list"
   >
     <template #default="{ item: row, index, active }">
       <slot
@@ -28,7 +29,7 @@
   import { omit } from 'lodash-es';
   import { computed } from 'vue';
 
-  import { useResponsiveValues } from '@/shared/compositions/useResponsiveValues';
+  import { useResponsiveValues } from '@/shared/composables/useResponsiveValues';
   import { DEFAULT_KEY_FIELD } from '@/shared/constants';
   import { getListRows } from '@/shared/helpers/list';
   import type { AnyObject } from '@/shared/types/Utility';
@@ -86,8 +87,8 @@
   );
 </script>
 
-<style lang="scss" scoped>
-  :deep {
+<style lang="scss">
+  .virtual-grid-list {
     .vue-recycle-scroller__item-view {
       margin: 0;
       padding: 0;

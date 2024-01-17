@@ -60,7 +60,7 @@
   import { storeToRefs } from 'pinia';
   import { computed } from 'vue';
 
-  import { useDayjs } from '@/shared/compositions/useDayjs';
+  import { useDayjs } from '@/shared/composables/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
   import SocialLinks from '@/shared/ui/SocialLinks.vue';
 

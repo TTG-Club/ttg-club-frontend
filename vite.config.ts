@@ -33,7 +33,7 @@ export default ({ mode }: ConfigEnv) => {
     },
     build: {
       outDir: env.VITE_APP_BUILD_PATH || 'dist',
-      sourcemap: 'inline',
+      sourcemap: true,
       minify: 'terser',
       rollupOptions: {
         output: {
@@ -64,7 +64,6 @@ export default ({ mode }: ConfigEnv) => {
       }),
       vue({
         script: {
-          defineModel: true,
           propsDestructure: true
         }
       }),
@@ -94,7 +93,9 @@ export default ({ mode }: ConfigEnv) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
-        'vue': 'vue/dist/vue.esm-bundler.js'
+        'vue': fileURLToPath(
+          new URL('./node_modules/vue/dist/vue.esm-bundler.js', import.meta.url)
+        )
       }
     },
     css: {
