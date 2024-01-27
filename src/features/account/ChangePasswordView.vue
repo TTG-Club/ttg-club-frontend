@@ -90,6 +90,9 @@
 
   import { ToastEventBus } from '@/core/configs/ToastConfig';
 
+  import { useUserStore } from '@/shared/stores/UserStore';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import {
     validateEmailFormat,
     validateMinLength,
@@ -99,10 +102,7 @@
     validatePwdUpperCase,
     validateRequired,
     validateUsernameSpecialChars
-  } from '@/shared/helpers/authChecks';
-  import { useUserStore } from '@/shared/stores/UserStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  } from '@/shared/utils/authChecks';
 
   import type { PropType } from 'vue';
 

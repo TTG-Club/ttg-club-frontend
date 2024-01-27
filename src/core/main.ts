@@ -9,7 +9,7 @@ import Toast from 'vue-toastification';
 
 import { useAxios } from '@/shared/composables/useAxios';
 import { TippyLazy } from '@/shared/directives/TippyLazy';
-import isDev from '@/shared/helpers/isDev';
+import isDev from '@/shared/utils/isDev';
 
 import App from './App.vue';
 import { TippyOptions } from './configs/TippyConfig';

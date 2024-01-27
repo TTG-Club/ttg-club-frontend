@@ -29,8 +29,8 @@
   import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import RawContent from '@/shared/ui/RawContent.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';

@@ -33,12 +33,12 @@
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
-  import { downloadByUrl } from '@/shared/helpers/download';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+  import { downloadByUrl } from '@/shared/utils/download';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   const http = useAxios();
   const route = useRoute();

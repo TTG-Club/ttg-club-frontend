@@ -41,13 +41,13 @@
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
   import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { WeaponsFilterDefaults } from '@/shared/types/inventory/Weapons.d';
   import type { AnyObject } from '@/shared/types/Utility';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
 
   const route = useRoute();
   const router = useRouter();

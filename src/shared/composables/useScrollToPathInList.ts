@@ -4,10 +4,10 @@ import { useRoute } from 'vue-router';
 
 import { useReference } from '@/shared/composables/useReference';
 import { CONTENT_LAYOUT_FIXED_HEADER_SELECTOR } from '@/shared/constants/UI';
-import { asyncAnimationFrame } from '@/shared/helpers/dom';
 import { useUIStore } from '@/shared/stores/UIStore';
 import type { Maybe } from '@/shared/types/Utility';
 import type { TVirtualListRef } from '@/shared/ui/virtual-views/VirtualList/types';
+import { asyncAnimationFrame } from '@/shared/utils/dom';
 
 import type { MaybeRef } from '@vueuse/core';
 import type { Ref } from 'vue';

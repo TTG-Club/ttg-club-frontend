@@ -45,13 +45,13 @@
 <script lang="ts">
   import { computed, defineComponent } from 'vue';
 
-  import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import {
     AbilityKey,
     AbilityName,
     AbilityShortName
   } from '@/shared/types/tools/AbilityCalc.d';
+  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
 
   import type { PropType } from 'vue';
 

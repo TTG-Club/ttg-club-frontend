@@ -1,5 +1,5 @@
 import { useAxios } from '@/shared/composables/useAxios';
-import { errorHandler } from '@/shared/helpers/errorHandler';
+import { errorHandler } from '@/shared/utils/errorHandler';
 
 import type { DefaultProps } from 'tippy.js';
 import type { TippyPluginOptions } from 'vue-tippy';

@@ -159,12 +159,12 @@
 
   import { useAxios } from '@/shared/composables/useAxios';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
 

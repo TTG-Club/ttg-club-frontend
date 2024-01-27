@@ -99,10 +99,10 @@
     FilterGroup,
     FilterItem
   } from '@/shared/composables/useFilter';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import type { PropType } from 'vue';
 

@@ -56,7 +56,6 @@
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import type { Maybe } from '@/shared/types/Utility';
   import type {
     IScreenItem,
@@ -64,6 +63,7 @@
   } from '@/shared/types/workshop/Screens.d';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import type { PropType } from 'vue';
   import type { RouteLocationPathRaw } from 'vue-router';

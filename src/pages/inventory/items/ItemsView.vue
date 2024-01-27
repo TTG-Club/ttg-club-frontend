@@ -38,13 +38,13 @@
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
   import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
-  import { getGroupByFirstLetter } from '@/shared/helpers/list';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { ItemsFilterDefaults } from '@/shared/types/inventory/Items.d';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
+  import { getGroupByFirstLetter } from '@/shared/utils/list';
 
   const route = useRoute();
   const router = useRouter();

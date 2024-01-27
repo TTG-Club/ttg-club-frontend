@@ -39,7 +39,6 @@
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
   import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { useUIStore } from '@/shared/stores/UIStore';
   import {
     SpellsFilterDefaults,
@@ -49,6 +48,7 @@
   import { getListGridInTabProps } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
 
   const props = withDefaults(
     defineProps<{

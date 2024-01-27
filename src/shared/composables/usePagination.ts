@@ -6,9 +6,9 @@ import { useAxios } from '@/shared/composables/useAxios';
 import type { FilterQueryParams } from '@/shared/composables/useFilter';
 import { useMetrics } from '@/shared/composables/useMetrics';
 import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
-import { errorHandler } from '@/shared/helpers/errorHandler';
-import { useIsDev } from '@/shared/helpers/isDev';
 import type { RequestConfig } from '@/shared/services/HTTPService';
+import { errorHandler } from '@/shared/utils/errorHandler';
+import { useIsDev } from '@/shared/utils/isDev';
 
 import type { MaybeRefOrGetter, MaybeRef } from '@vueuse/core';
 

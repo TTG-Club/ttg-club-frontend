@@ -5,13 +5,13 @@ import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeA
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
 import { useAxios } from '@/shared/composables/useAxios';
-import { getOrderString } from '@/shared/helpers/request';
 import type { RequestConfig } from '@/shared/services/HTTPService';
 import type {
   IOrderItem,
   IPaginatedResponse
 } from '@/shared/types/BaseApiFields';
 import type { Maybe } from '@/shared/types/Utility';
+import { getOrderString } from '@/shared/utils/request';
 
 import type { MaybeRef } from '@vueuse/core';
 

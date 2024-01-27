@@ -60,12 +60,12 @@
   import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
-  import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
 
   import type { PropType } from 'vue';
 

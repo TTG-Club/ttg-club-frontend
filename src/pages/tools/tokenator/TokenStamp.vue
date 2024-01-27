@@ -78,7 +78,7 @@
 
   import { useTokenator } from '@/pages/tools/tokenator/composable';
 
-  import isAppleDevice from '@/shared/helpers/isAppleDevice';
+  import isAppleDevice from '@/shared/utils/isAppleDevice';
 
   type Position = { x: number; y: number };
 

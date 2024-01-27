@@ -188,7 +188,6 @@
 
   import { useAxios } from '@/shared/composables/useAxios';
   import { DB_NAME } from '@/shared/constants/UI';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
   import type { TSpellItem } from '@/shared/types/character/Spells';
@@ -203,6 +202,7 @@
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   type TConfig = {
     magicLevels: Array<TNameValue<number>>;

@@ -48,7 +48,6 @@
 <script lang="ts">
   import { computed, defineComponent, onActivated, ref } from 'vue';
 
-  import { getPlural } from '@/shared/helpers/string';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import {
     AbilityKey,
@@ -57,6 +56,7 @@
   } from '@/shared/types/tools/AbilityCalc.d';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { getPlural } from '@/shared/utils/string';
 
   import type { PropType } from 'vue';
 

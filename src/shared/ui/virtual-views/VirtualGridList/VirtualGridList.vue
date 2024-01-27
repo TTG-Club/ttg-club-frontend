@@ -31,12 +31,12 @@
 
   import { useResponsiveValues } from '@/shared/composables/useResponsiveValues';
   import { DEFAULT_KEY_FIELD } from '@/shared/constants';
-  import { getListRows } from '@/shared/helpers/list';
   import type { AnyObject } from '@/shared/types/Utility';
   import ListRow from '@/shared/ui/virtual-views/ListRow.vue';
   import type { TVirtualGridListProps } from '@/shared/ui/virtual-views/VirtualGridList/types';
   import type { TVirtualListProps } from '@/shared/ui/virtual-views/VirtualList/types';
   import VirtualList from '@/shared/ui/virtual-views/VirtualList/VirtualList.vue';
+  import { getListRows } from '@/shared/utils/list';
 
   /* TODO: Добавить generic-типизацию по выходу Vue 3.3 */
   type TItem = AnyObject;

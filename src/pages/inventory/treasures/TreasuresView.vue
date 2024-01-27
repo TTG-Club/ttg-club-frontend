@@ -27,9 +27,9 @@
 
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
-  import { getGroupWithIdByFirstLetter } from '@/shared/helpers/list';
   import { TreasuresFilterDefaults } from '@/shared/types/inventory/Treasures.d';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
+  import { getGroupWithIdByFirstLetter } from '@/shared/utils/list';
 
   const filter = useFilter({
     dbName: TreasuresFilterDefaults.dbName,

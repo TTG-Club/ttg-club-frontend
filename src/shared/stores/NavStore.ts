@@ -3,8 +3,8 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 import { useAxios } from '@/shared/composables/useAxios';
-import isDev from '@/shared/helpers/isDev';
 import type { Maybe } from '@/shared/types/Utility';
+import isDev from '@/shared/utils/isDev';
 
 import type { RouteLocationNormalized } from 'vue-router';
 

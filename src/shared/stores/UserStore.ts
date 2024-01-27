@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { useAxios } from '@/shared/composables/useAxios';
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
-import { useIsDev } from '@/shared/helpers/isDev';
+import { useIsDev } from '@/shared/utils/isDev';
 
 export enum EUserRoles {
   USER = 'USER',
@@ -98,6 +98,10 @@ export const useUserStore = defineStore('UserStore', () => {
 
     return translated;
   });
+
+  const isAdmin = computed(() =>
+    roles.value.map(role => role.role).includes(EUserRoles.ADMIN)
+  );
 
   const avatar = computed(() => ({
     src: user.value?.avatar || null,
@@ -304,6 +308,8 @@ export const useUserStore = defineStore('UserStore', () => {
     isAuthenticated,
     roles,
     avatar,
+
+    isAdmin,
 
     clearUser,
     getUserToken,

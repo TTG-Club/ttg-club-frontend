@@ -19,7 +19,7 @@ import {
 } from '@/features/bookmarks/utils';
 
 import { DB_NAME } from '@/shared/constants/UI';
-import { errorHandler } from '@/shared/helpers/errorHandler';
+import { errorHandler } from '@/shared/utils/errorHandler';
 
 export const useDefaultBookmarkStore = defineStore(
   'DefaultBookmarkStore',

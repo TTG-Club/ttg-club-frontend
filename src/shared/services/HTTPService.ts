@@ -2,8 +2,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
-import { getBaseURL } from '@/shared/helpers/request';
 import { useUserStore } from '@/shared/stores/UserStore';
+import { getBaseURL } from '@/shared/utils/request';
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 

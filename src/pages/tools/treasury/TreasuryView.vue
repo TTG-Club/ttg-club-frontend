@@ -295,12 +295,12 @@
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   interface CrListItem {
     name: string;

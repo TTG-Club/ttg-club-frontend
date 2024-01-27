@@ -465,15 +465,15 @@
 
   import DetailTopBar from '@/features/DetailTopBar.vue';
 
-  import {
-    getFormattedModifier,
-    getFormula
-  } from '@/shared/helpers/abilityTransforms';
-  import { getIterableString } from '@/shared/helpers/string';
   import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
+  import {
+    getFormattedModifier,
+    getFormula
+  } from '@/shared/utils/abilityTransforms';
+  import { getIterableString } from '@/shared/utils/string';
 
   const props = defineProps({
     creature: {

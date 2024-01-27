@@ -204,8 +204,8 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import isDev from '@/shared/helpers/isDev';
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import isDev from '@/shared/utils/isDev';
 
   const userStore = useUserStore();
 

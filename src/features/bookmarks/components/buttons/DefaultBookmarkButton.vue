@@ -17,8 +17,8 @@
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
-  import { toast } from '@/shared/helpers/toast';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { toast } from '@/shared/utils/toast';
 
   const props = withDefaults(
     defineProps<{

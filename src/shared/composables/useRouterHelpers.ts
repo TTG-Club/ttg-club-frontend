@@ -28,10 +28,7 @@ export const useRouterHelpers = () => {
     const getAvailRoute = (route: RouteRecordRaw): Array<string | symbol> => {
       const list = [];
 
-      if (
-        route.name &&
-        (route.name === 'profile' || !route.path.includes(':'))
-      ) {
+      if (route.name && (route.meta?.isStatic || !route.path.includes(':'))) {
         list.push(route.name);
       }
 
