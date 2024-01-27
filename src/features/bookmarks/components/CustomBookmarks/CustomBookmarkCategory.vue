@@ -5,7 +5,10 @@
         v-if="isEdit"
         class="bookmarks__cat_label_icon is-left js-drag-category"
       >
-        <svg-icon icon="sandwich" />
+        <svg-icon
+          icon="sandwich"
+          size="16"
+        />
       </div>
 
       <div class="bookmarks__cat_label_name">
@@ -20,7 +23,10 @@
           customBookmarkStore.queryDeleteBookmark(category)
         "
       >
-        <svg-icon icon="close" />
+        <svg-icon
+          icon="close"
+          size="20"
+        />
       </div>
     </div>
 
@@ -46,7 +52,10 @@
               v-if="isEdit"
               class="bookmarks__cat_label_icon is-left js-drag-bookmark"
             >
-              <svg-icon icon="sandwich" />
+              <svg-icon
+                icon="sandwich"
+                size="20"
+              />
             </div>
 
             <component
@@ -69,7 +78,10 @@
                 customBookmarkStore.queryDeleteBookmark(bookmark)
               "
             >
-              <svg-icon icon="close" />
+              <svg-icon
+                icon="close"
+                size="20"
+              />
             </div>
           </div>
         </div>

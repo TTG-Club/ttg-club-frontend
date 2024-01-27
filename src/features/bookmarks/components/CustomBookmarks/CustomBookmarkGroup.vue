@@ -9,7 +9,10 @@
       @click.left.exact.prevent="customBookmarkStore.toggleGroup(group.uuid)"
     >
       <div class="bookmarks__group_icon">
-        <svg-icon :icon="`arrow/${isOpened ? 'down' : 'right'}`" />
+        <svg-icon
+          :icon="`arrow/${isOpened ? 'down' : 'right'}`"
+          size="20"
+        />
       </div>
 
       <div class="bookmarks__group_label">
@@ -23,7 +26,10 @@
         class="bookmarks__group_icon is-right"
         @click.left.exact.prevent.stop="enableCategoryCreating"
       >
-        <svg-icon icon="plus" />
+        <svg-icon
+          icon="plus"
+          size="20"
+        />
       </div>
 
       <div
@@ -34,7 +40,10 @@
           customBookmarkStore.queryDeleteBookmark(group)
         "
       >
-        <svg-icon icon="close" />
+        <svg-icon
+          icon="close"
+          size="20"
+        />
       </div>
     </div>
 

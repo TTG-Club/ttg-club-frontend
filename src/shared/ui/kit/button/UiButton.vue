@@ -45,6 +45,7 @@
         <svg-icon
           v-if="icon"
           :icon="icon"
+          size="1em"
         />
 
         <slot
@@ -64,7 +65,10 @@
         v-if="!split && $slots.dropdown"
         :class="$style.icon"
       >
-        <svg-icon icon="arrow/filled/down-mini" />
+        <svg-icon
+          icon="arrow/filled/down-mini"
+          size="1em"
+        />
       </span>
 
       <span
@@ -486,6 +490,7 @@
     justify-content: center;
     width: 24px;
     height: 24px;
+    font-size: 24px;
     margin: -3px;
   }
 

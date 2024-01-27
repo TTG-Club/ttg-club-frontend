@@ -279,20 +279,16 @@
       padding: 6px 8px;
       border-left: 1px solid var(--border);
       background-color: var(--primary);
+      color: var(--text-btn-color);
 
       svg {
         @include css_anim();
-
-        width: 24px;
-        height: 24px;
-        color: var(--text-btn-color);
       }
 
       span {
         @include css_anim();
 
         margin-left: 4px;
-        color: var(--text-btn-color);
       }
 
       &.is-active {

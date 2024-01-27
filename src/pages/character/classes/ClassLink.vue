@@ -29,10 +29,13 @@
             <span class="link-item-expand__body">
               <span class="link-item-expand__body_row">
                 <span
-                  v-if="classItem.icon"
+                  v-if="isIconExist(classItem.icon)"
                   class="link-item-expand__icon"
                 >
-                  <svg-icon :icon="classItem.icon" />
+                  <svg-icon
+                    :icon="classItem.icon"
+                    size="32"
+                  />
                 </span>
 
                 <span class="link-item-expand__name">
@@ -137,6 +140,7 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TClassItem } from '@/shared/types/character/Classes.d';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { isIconExist } from '@/shared/utils/icons';
 
   import type { PropType } from 'vue';
   import type { RouteLocationPathRaw } from 'vue-router';
@@ -221,7 +225,8 @@
         toggleArch,
         selectClass
       };
-    }
+    },
+    methods: { isIconExist }
   });
 </script>
 

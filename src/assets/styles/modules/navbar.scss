@@ -28,6 +28,10 @@
     align-items: center;
     color: var(--text-color);
 
+    svg {
+      font-size: 28px;
+    }
+
     &:hover {
       color: var(--text-b-color);
       background-color: var(--hover);

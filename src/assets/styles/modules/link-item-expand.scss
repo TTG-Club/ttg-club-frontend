@@ -89,12 +89,7 @@
     border-radius: 8px;
     padding: 6px;
     margin: -2px 8px 0 0;
-
-    :deep(> svg) {
-      width: 32px;
-      height: 32px;
-      color: var(--primary);
-    }
+    color: var(--primary);
 
     & + .link-item-expand {
       &__body {
