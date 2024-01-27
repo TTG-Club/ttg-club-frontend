@@ -79,7 +79,7 @@
                 :video="video"
                 :model-value="editID === video.id"
                 @saved="load()"
-                @close="editID = undefined"
+                @close="editID = ''"
               />
             </div>
 
@@ -174,7 +174,7 @@
   } = useYoutubeActive();
 
   const isAdding = ref(false);
-  const editID = ref<TYoutubeVideo['id']>();
+  const editID = ref<TYoutubeVideo['id']>('');
 
   const init = async () => {
     try {
