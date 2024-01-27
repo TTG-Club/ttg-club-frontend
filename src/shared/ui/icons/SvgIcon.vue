@@ -1,9 +1,11 @@
 <template>
+  <!-- eslint-disable vue/no-v-html -->
   <i
     v-if="icon && raw"
     :class="$style['svg-icon']"
     v-html="icon"
   />
+  <!-- eslint-enable vue/no-v-html -->
 
   <i
     v-else-if="!error"
