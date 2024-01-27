@@ -1,3 +1,4 @@
+import { IconsPreviewPage } from './icons-preview';
 import { AdminYoutubePage } from './youtube';
 
 import type { RouteRecordRaw } from 'vue-router';
@@ -5,5 +6,5 @@ import type { RouteRecordRaw } from 'vue-router';
 export const AdminPage: RouteRecordRaw = {
   name: 'admin',
   path: '/admin',
-  children: [AdminYoutubePage]
+  children: [AdminYoutubePage, IconsPreviewPage]
 };

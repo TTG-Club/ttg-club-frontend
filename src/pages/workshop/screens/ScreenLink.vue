@@ -10,7 +10,11 @@
       @click.left.exact.prevent="clickHandler"
     >
       <div class="screen-link__icon">
-        <raw-content :template="screen.icon" />
+        <svg-icon
+          :icon="screen.icon"
+          size="40"
+          raw
+        />
       </div>
 
       <div class="screen-link__body">
@@ -61,8 +65,8 @@
     IScreenItem,
     IScreenLink
   } from '@/shared/types/workshop/Screens.d';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import type { PropType } from 'vue';
@@ -70,10 +74,10 @@
 
   export default defineComponent({
     components: {
+      SvgIcon,
       BookmarkSaveButton,
       ScreenBody,
-      BaseModal,
-      RawContent
+      BaseModal
     },
     inheritAttrs: false,
     props: {
@@ -180,13 +184,14 @@
       width: 40px;
       height: 40px;
       flex-shrink: 0;
+      color: var(--primary);
 
       :deep(svg) {
         width: 100% !important;
         height: 100% !important;
 
         path {
-          fill: var(--primary);
+          fill: currentColor;
         }
       }
     }
