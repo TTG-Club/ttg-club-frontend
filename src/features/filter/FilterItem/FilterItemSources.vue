@@ -17,8 +17,8 @@
           @click.self.left.exact.prevent="opened = !opened"
         >
           <svg-icon
-            :icon="`arrow/${opened ? 'down' : 'right'}`"
-            size="28"
+            :icon="`arrow/${opened ? 'up' : 'down'}`"
+            size="24"
           />
         </button>
       </div>
@@ -32,7 +32,7 @@
       >
         <svg-icon
           icon="close"
-          size="28"
+          size="24"
         />
       </button>
     </div>
