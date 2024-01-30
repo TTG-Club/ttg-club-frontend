@@ -32,7 +32,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
@@ -40,7 +40,6 @@
   import { downloadByUrl } from '@/shared/utils/download';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
-  const http = useAxios();
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
@@ -79,7 +78,7 @@
       loading.value = true;
       abortController.value = new AbortController();
 
-      const resp = await http.post<ICreature>({
+      const resp = await httpClient.post<ICreature>({
         url,
         signal: abortController.value.signal
       });

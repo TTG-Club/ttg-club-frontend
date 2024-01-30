@@ -32,7 +32,7 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { RouteLocationNormalized } from 'vue-router';
@@ -45,7 +45,7 @@
     setup() {
       const route = useRoute();
       const router = useRouter();
-      const http = useAxios();
+
       const infoPage = ref();
       const error = ref(false);
 
@@ -75,7 +75,7 @@
 
       const queryInfoPage = async (to: RouteLocationNormalized) => {
         try {
-          const resp = await http.get({ url: to.path });
+          const resp = await httpClient.get({ url: to.path });
 
           if (resp.status !== 200) {
             await router.replace({ name: 'not-found' });

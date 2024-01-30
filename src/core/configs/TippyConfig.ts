@@ -1,4 +1,3 @@
-import { useAxios } from '@/shared/composables/useAxios';
 import { errorHandler } from '@/shared/utils/errorHandler';
 
 import type { DefaultProps } from 'tippy.js';
@@ -43,8 +42,6 @@ export const DefaultTippyProps: DefaultProps = {
     if (!canShow) {
       return canShow;
     }
-
-    const http = useAxios();
 
     if (attr) {
       http

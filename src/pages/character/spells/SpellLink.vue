@@ -133,7 +133,7 @@
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type {
     TSpellItem,
@@ -154,8 +154,6 @@
       inTab: false
     }
   );
-
-  const http = useAxios();
 
   const { navigate, isActive, href } = useLink(props);
 
@@ -187,7 +185,7 @@
 
     try {
       if (!modal.value.data) {
-        const resp = await http.post<TSpellItem>({
+        const resp = await httpClient.post<TSpellItem>({
           url: props.spell.url
         });
 

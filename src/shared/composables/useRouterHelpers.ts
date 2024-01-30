@@ -2,16 +2,14 @@ import { AxiosError } from 'axios';
 
 import { routes } from '@/pages';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api/httpClient';
 
 import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 
 export const useRouterHelpers = () => {
   const isUrlAvailable = async (to: RouteLocationNormalized) => {
-    const axios = useAxios();
-
     try {
-      const resp = await axios.rawHead({ url: to.fullPath });
+      const resp = await httpClient.rawHead({ url: to.fullPath });
 
       return Promise.resolve(resp.status);
     } catch (err) {

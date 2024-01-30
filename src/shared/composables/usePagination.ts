@@ -2,11 +2,10 @@ import { toValue } from '@vueuse/core';
 import { computed, ref, unref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient, type RequestConfig } from '@/shared/api/httpClient';
 import type { FilterQueryParams } from '@/shared/composables/useFilter';
 import { useMetrics } from '@/shared/composables/useMetrics';
 import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
-import type { RequestConfig } from '@/shared/services/HTTPService';
 import { errorHandler } from '@/shared/utils/errorHandler';
 import { useIsDev } from '@/shared/utils/isDev';
 
@@ -52,7 +51,7 @@ export function usePagination<T>(config: PaginationConfig) {
   let abortController: AbortController | null;
 
   const route = useRoute();
-  const http = useAxios();
+
   const isDev = useIsDev();
   const { sendPageViewMetrics } = useMetrics();
 
@@ -120,7 +119,7 @@ export function usePagination<T>(config: PaginationConfig) {
         signal: abortController.signal
       };
 
-      const resp = await http.post<Array<T>>(apiConfig);
+      const resp = await httpClient.post<Array<T>>(apiConfig);
 
       if (nextPage) {
         items.value.push(...resp.data);

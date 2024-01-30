@@ -2,7 +2,7 @@ import { orderBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api/httpClient';
 import type { Maybe } from '@/shared/types/Utility';
 import isDev from '@/shared/utils/isDev';
 
@@ -35,7 +35,6 @@ export type TMetaInfo = {
 };
 
 export const useNavStore = defineStore('NavStore', () => {
-  const http = useAxios();
   const isShowPopover = ref(false);
   const isShowSearch = ref(false);
 
@@ -77,7 +76,7 @@ export const useNavStore = defineStore('NavStore', () => {
     }
 
     try {
-      const resp = await http.get<Array<TNavItem>>({
+      const resp = await httpClient.get<Array<TNavItem>>({
         url: '/menu'
       });
 
@@ -106,7 +105,7 @@ export const useNavStore = defineStore('NavStore', () => {
     }
 
     try {
-      const resp = await http.get<Array<TPartner>>({
+      const resp = await httpClient.get<Array<TPartner>>({
         url: '/partners'
       });
 
@@ -132,7 +131,7 @@ export const useNavStore = defineStore('NavStore', () => {
 
   const getMetaByURL = async (url: string) => {
     try {
-      const resp = await http.get<TMetaInfo>({
+      const resp = await httpClient.get<TMetaInfo>({
         url: `/meta${url}`
       });
 

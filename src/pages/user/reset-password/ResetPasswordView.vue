@@ -30,7 +30,7 @@
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   interface ITokenValidation {
@@ -45,7 +45,7 @@
     },
     setup() {
       const route = useRoute();
-      const http = useAxios();
+
       const userStore = useUserStore();
       const { isAuthenticated } = storeToRefs(userStore);
 
@@ -60,7 +60,7 @@
         }
 
         try {
-          const resp = await http.get<ITokenValidation>({
+          const resp = await httpClient.get<ITokenValidation>({
             url: `/auth/token/validate?token=${route.query.token}`
           });
 

@@ -157,7 +157,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -180,7 +180,6 @@
 
   const route = useRoute();
   const router = useRouter();
-  const http = useAxios();
 
   const { isMobile } = storeToRefs(useUIStore());
 
@@ -325,7 +324,7 @@
       loading.value = true;
       abortController.value = new AbortController();
 
-      const resp = await http.post({
+      const resp = await httpClient.post({
         url,
         payload: {
           filter: {

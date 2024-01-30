@@ -12,7 +12,7 @@
     watch
   } from 'vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
 
   const props = withDefaults(
     defineProps<{
@@ -29,7 +29,6 @@
 
   const emit = defineEmits(['loaded', 'before-unmount']);
 
-  const http = useAxios();
   const templateString = ref<string | null>(null);
   const error = ref(false);
   const loading = ref(true);
@@ -46,7 +45,7 @@
       templateString.value = props.template || '';
 
       if (!templateString.value && !props.template) {
-        const { data } = await http.rawGet({
+        const { data } = await httpClient.rawGet({
           url: props.url
         });
 

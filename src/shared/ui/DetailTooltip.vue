@@ -28,7 +28,7 @@
   import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
   import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -59,7 +59,6 @@
   );
 
   const slots = useSlots();
-  const http = useAxios();
 
   const content = ref();
   const error = ref(false);
@@ -105,8 +104,8 @@
     }
 
     const res = !props.type
-      ? await http.rawGet({ url: computedUrl.value })
-      : await http.post({ url: computedUrl.value });
+      ? await httpClient.rawGet({ url: computedUrl.value })
+      : await httpClient.post({ url: computedUrl.value });
 
     if (res.status !== 200) {
       errorHandler(res.statusText);

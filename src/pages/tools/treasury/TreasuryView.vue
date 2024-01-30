@@ -294,7 +294,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
@@ -373,7 +373,6 @@
     detail: undefined
   });
 
-  const http = useAxios();
   const uiStore = useUIStore();
 
   const { isMobile } = storeToRefs(uiStore);
@@ -496,7 +495,7 @@
 
       const item = groupedResult.value[group][index];
 
-      const resMagicItem = await http.post({
+      const resMagicItem = await httpClient.post({
         url: item.url,
         signal: controllers.value.detail.signal
       });
@@ -514,7 +513,7 @@
       controllers.value.detail = new AbortController();
 
       if (item.spell?.url) {
-        const resSpell = await http.post({
+        const resSpell = await httpClient.post({
           url: item.spell.url,
           signal: controllers.value.detail.signal
         });

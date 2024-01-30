@@ -57,13 +57,13 @@
         />
 
         <ui-select
-          v-model="hitDice"
+          v-model="form.hits.dice"
           label="label"
           track-by="value"
-          :options="dices"
+          :options="[]"
           required
         >
-          <template #label>Куб хитов</template>
+          <template #label>Кость хитов</template>
         </ui-select>
 
         <ui-input
@@ -95,21 +95,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, reactive } from 'vue';
+  import { reactive } from 'vue';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
+  import { referenceService } from '@/shared/api/referenceService';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-
-  const dices = [
-    { label: 'к4', value: 4 },
-    { label: 'к6', value: 6 },
-    { label: 'к8', value: 8 },
-    { label: 'к10', value: 10 },
-    { label: 'к12', value: 12 },
-    { label: 'к20', value: 20 }
-  ];
 
   const form = reactive({
     name: {
@@ -117,15 +109,23 @@
       eng: ''
     },
     hits: {
-      dice: 'к4',
-      count: '1',
-      bonus: 300
+      dice: null,
+      count: '',
+      bonus: ''
     }
   });
 
-  const hitDice = computed({
-    get: () => dices.find(dice => dice.value === form.hits.dice),
-    set: (v: { label: string; value: number }) => (form.hits.dice = v.value)
+  Promise.all([
+    referenceService.getSizes(),
+    referenceService.getEnvironments(),
+    referenceService.getDices(),
+    referenceService.getDamageTypes(),
+    referenceService.getConditions(),
+    referenceService.getBeastTypes(),
+    referenceService.getArmorTypes(),
+    referenceService.getAlignments()
+  ]).then(references => {
+    console.log(references);
   });
 </script>
 
@@ -133,6 +133,7 @@
   .creature {
     display: grid;
     gap: 12px 12px;
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .row {

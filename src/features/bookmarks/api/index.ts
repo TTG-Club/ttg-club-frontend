@@ -6,14 +6,12 @@ import type {
   TQueryAddBookmark
 } from '@/features/bookmarks/types/Bookmark.d';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api/httpClient';
 import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {
   static getCategoryByURL(url: string) {
-    const http = useAxios();
-
-    return http.get<Maybe<IBookmarkCategoryInfo>>({
+    return httpClient.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
       payload: {
         url: encodeURIComponent(url)
@@ -22,9 +20,7 @@ export default class BookmarksApi {
   }
 
   static getCategoryByCode(code: string) {
-    const http = useAxios();
-
-    return http.get<Maybe<IBookmarkCategoryInfo>>({
+    return httpClient.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
       payload: { code }
     });
@@ -49,43 +45,33 @@ export default class BookmarksApi {
   }
 
   static getCategories() {
-    const http = useAxios();
-
-    return http.get<Array<IBookmarkCategoryInfo>>({
+    return httpClient.get<Array<IBookmarkCategoryInfo>>({
       url: '/bookmarks/categories'
     });
   }
 
   static getBookmarks() {
-    const http = useAxios();
-
-    return http.get<Array<TBookmark>>({
+    return httpClient.get<Array<TBookmark>>({
       url: '/bookmarks'
     });
   }
 
   static addBookmark<T>(payload: TQueryAddBookmark) {
-    const http = useAxios();
-
-    return http.post<T>({
+    return httpClient.post<T>({
       url: '/bookmarks',
       payload: cloneDeep(payload)
     });
   }
 
   static updateBookmark(payload: TBookmark) {
-    const http = useAxios();
-
-    return http.put({
+    return httpClient.put({
       url: '/bookmarks',
       payload: cloneDeep(payload)
     });
   }
 
   static deleteBookmark(uuid: TBookmark['uuid']) {
-    const http = useAxios();
-
-    return http.delete({
+    return httpClient.delete({
       url: `/bookmarks/${uuid}`
     });
   }

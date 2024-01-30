@@ -186,7 +186,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api/httpClient';
   import { DB_NAME } from '@/shared/constants/UI';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
@@ -209,7 +209,6 @@
     sources: Array<TSource>;
   };
 
-  const http = useAxios();
   const uiStore = useUIStore();
   const { isMobile } = storeToRefs(uiStore);
 
@@ -479,7 +478,7 @@
 
   const getConfig = async () => {
     try {
-      const resp = await http.get<TConfig>({
+      const resp = await httpClient.get<TConfig>({
         url: '/tools/trader'
       });
 
@@ -511,7 +510,9 @@
     };
 
     try {
-      const { status, statusText, data } = await http.post<Array<TTraderLink>>({
+      const { status, statusText, data } = await httpClient.post<
+        Array<TTraderLink>
+      >({
         url: '/tools/trader',
         payload: options,
         signal: controllers.value.signal
@@ -535,7 +536,7 @@
 
   const getItemDetail = async <T, L>(url: L['url']): Promise<T> => {
     try {
-      const { status, statusText, data } = await http.post<T>({ url });
+      const { status, statusText, data } = await httpClient.post<T>({ url });
 
       if (status !== 200) {
         error.value = true;

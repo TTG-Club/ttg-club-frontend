@@ -2,25 +2,26 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
-import { useUserStore } from '@/shared/stores/UserStore';
-import { getBaseURL } from '@/shared/utils/request';
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+
+export type ApiVersion = 'v1' | 'v2';
 
 export type RequestConfig = {
   url: AxiosRequestConfig['url'];
   payload?: AxiosRequestConfig['params'] | AxiosRequestConfig['data'];
   signal?: AbortSignal;
+  version?: ApiVersion;
 };
 
-class HTTPService {
+class HttpClient {
   readonly instance: AxiosInstance;
 
   constructor() {
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
-      baseURL: getBaseURL('/api/v1'),
+      baseURL: this.getBaseURL(),
       withCredentials: true,
       headers: {}
     });
@@ -38,24 +39,20 @@ class HTTPService {
 
       return req;
     });
-
-    this.instance.interceptors.response.use(async resp => {
-      if (resp.status === 401) {
-        const userStore = useUserStore();
-
-        await userStore.clearUser();
-      }
-
-      return resp;
-    });
   }
+
+  private getProxyURL = () => (import.meta.env.DEV ? '/proxy' : '');
+
+  private getBaseURL = (version: ApiVersion = 'v1') =>
+    `${this.getProxyURL()}/api/${version}`;
 
   get<T>(config: RequestConfig) {
     return this.instance<T>({
       method: 'get',
       url: config.url,
       params: config.payload,
-      signal: config.signal
+      signal: config.signal,
+      baseURL: this.getBaseURL(config.version)
     });
   }
 
@@ -64,7 +61,8 @@ class HTTPService {
       method: 'post',
       url: config.url,
       data: config.payload,
-      signal: config.signal
+      signal: config.signal,
+      baseURL: this.getBaseURL(config.version)
     });
   }
 
@@ -73,7 +71,8 @@ class HTTPService {
       method: 'put',
       url: config.url,
       data: config.payload,
-      signal: config.signal
+      signal: config.signal,
+      baseURL: this.getBaseURL(config.version)
     });
   }
 
@@ -82,7 +81,8 @@ class HTTPService {
       method: 'patch',
       url: config.url,
       data: config.payload,
-      signal: config.signal
+      signal: config.signal,
+      baseURL: this.getBaseURL(config.version)
     });
   }
 
@@ -91,14 +91,15 @@ class HTTPService {
       method: 'delete',
       url: config.url,
       params: config.payload,
-      signal: config.signal
+      signal: config.signal,
+      baseURL: this.getBaseURL(config.version)
     });
   }
 
   rawHead(config: Omit<RequestConfig, 'payload'>) {
     return this.instance({
       method: 'head',
-      baseURL: getBaseURL(),
+      baseURL: this.getProxyURL(),
       url: config.url,
       signal: config.signal
     });
@@ -107,7 +108,7 @@ class HTTPService {
   rawGet(config: RequestConfig): Promise<AxiosResponse<string>> {
     return this.instance({
       method: 'get',
-      baseURL: getBaseURL(),
+      baseURL: this.getProxyURL(),
       url: config.url,
       params: config.payload,
       signal: config.signal
@@ -115,4 +116,4 @@ class HTTPService {
   }
 }
 
-export default new HTTPService();
+export const httpClient = new HttpClient();
