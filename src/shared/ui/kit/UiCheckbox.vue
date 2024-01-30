@@ -77,7 +77,7 @@
           @include css_anim();
 
           display: inline-block;
-          padding: 6px 10px;
+          padding: 4px 8px;
           border-radius: 16px;
           background-color: var(--hover);
           color: var(--text-color);
