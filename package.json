@@ -12,7 +12,7 @@
     "lint:workflow": "eslint \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --quiet",
     "prettier:check": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --check",
     "prettier:write": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --write",
-    "prettier:workflow": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --check --log-level error",
+    "prettier:workflow": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --log-level error --check",
     "pre-commit": "lint-staged",
     "prepare": "is-ci || husky install"
   },
