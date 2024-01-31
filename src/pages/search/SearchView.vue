@@ -252,11 +252,7 @@
 </script>
 
 <template>
-  <page-layout
-    :use-social-links="false"
-    :show-separator="false"
-    class="search-view"
-  >
+  <page-layout class="search-view">
     <template #title> Поиск по сайту </template>
 
     <template #default>

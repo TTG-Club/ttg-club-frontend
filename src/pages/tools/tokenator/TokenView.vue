@@ -6,7 +6,7 @@
 </script>
 
 <template>
-  <page-layout :use-social-links="false">
+  <page-layout>
     <template #title> Токенатор</template>
 
     <template #default>

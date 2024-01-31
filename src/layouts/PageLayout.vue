@@ -13,8 +13,8 @@
       dateTime?: string;
     }>(),
     {
-      useSocialLinks: true,
-      showSeparator: true,
+      useSocialLinks: false,
+      showSeparator: false,
       dateTime: undefined,
     },
   );

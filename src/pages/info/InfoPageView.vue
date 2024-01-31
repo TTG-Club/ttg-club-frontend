@@ -82,7 +82,10 @@
 </script>
 
 <template>
-  <page-layout>
+  <page-layout
+    use-social-links
+    show-separator
+  >
     <template #title>
       {{ infoPage?.title || 'Заголовок' }}
     </template>

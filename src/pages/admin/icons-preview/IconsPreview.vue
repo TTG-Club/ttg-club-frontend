@@ -32,10 +32,7 @@
 </script>
 
 <template>
-  <page-layout
-    :use-social-links="false"
-    :show-separator="false"
-  >
+  <page-layout>
     <template #title>Предпросмотр иконок</template>
 
     <template #default>

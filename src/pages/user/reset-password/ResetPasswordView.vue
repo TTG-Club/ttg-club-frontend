@@ -76,10 +76,7 @@
 </script>
 
 <template>
-  <page-layout
-    :show-separator="false"
-    :use-social-links="false"
-  >
+  <page-layout>
     <template #title> Сброс пароля </template>
 
     <template

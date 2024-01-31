@@ -65,7 +65,7 @@
 
 <template>
   <page-layout
-    :use-social-links="false"
+    show-separator
     class="ability-calc"
   >
     <template #title> Калькулятор характеристик </template>
