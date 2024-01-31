@@ -46,7 +46,7 @@ export const useUIStore = defineStore('UIStore', () => {
   const theme = computed({
     get: () =>
       storedTheme.value === 'auto' ? systemTheme.value : storedTheme.value,
-    set: value => {
+    set: (value) => {
       storedTheme.value = value;
     },
   });
@@ -70,7 +70,7 @@ export const useUIStore = defineStore('UIStore', () => {
 
   watch(
     windowSize.height,
-    value => {
+    (value) => {
       document.documentElement.style.setProperty('--max-vh', `${value}px`);
     },
     {

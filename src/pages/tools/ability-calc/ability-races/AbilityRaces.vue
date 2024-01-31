@@ -58,7 +58,7 @@
           const raceItem = cloneDeep(race);
 
           if (raceItem.subraces?.length) {
-            raceItem.subraces = raceItem.subraces.map(item => ({
+            raceItem.subraces = raceItem.subraces.map((item) => ({
               ...item,
               image: raceItem.image,
             }));
@@ -87,7 +87,7 @@
       const choiceDouble = computed(
         (): Array<ChoiceDouble> =>
           reverse(
-            Object.entries(AbilityChoiceDouble).map(entry => ({
+            Object.entries(AbilityChoiceDouble).map((entry) => ({
               key: entry[0] as AbilityChoiceDoubleKey,
               label: entry[1] as AbilityChoiceDouble,
             })),
@@ -130,7 +130,7 @@
       const abilities = computed(() => {
         const keys: Array<AbilityKey> = Object.values(AbilityKey);
 
-        return keys.map(key => ({
+        return keys.map((key) => ({
           key,
           name: AbilityName[key],
         }));
@@ -150,7 +150,7 @@
           !isChoiceDouble.value &&
           checkInstance.value?.abilities.length &&
           !checkInstance.value?.abilities.find(
-            ability =>
+            (ability) =>
               Object.values(AbilityTypeKey).includes(
                 ability.key as AbilityTypeKey,
               ) && ability.key !== AbilityTypeKey.ALL,
@@ -163,7 +163,7 @@
 
         const value = [
           ...(checkInstance.value?.abilities.filter(
-            ability =>
+            (ability) =>
               !Object.values(AbilityTypeKey).includes(
                 ability.key as AbilityTypeKey,
               ) || ability.key === AbilityTypeKey.ALL,

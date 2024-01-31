@@ -21,7 +21,7 @@
   const getItemIndexByKey = computed(
     () =>
       props.getItemIndexByKey ||
-      ((items, key) => items.findIndex(item => item[props.keyField] === key)),
+      ((items, key) => items.findIndex((item) => item[props.keyField] === key)),
   );
 
   const scroller = ref<Record<string, any>>();

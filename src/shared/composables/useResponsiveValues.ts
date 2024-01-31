@@ -18,12 +18,12 @@ export const useResponsiveValues = <T>({
 
   const current = computed(() => {
     const breakpointKeys = Object.keys(values.value).filter(
-      breakpoint => breakpoint !== 'base',
+      (breakpoint) => breakpoint !== 'base',
     ) as TBreakpoint[];
 
     const currentValueBreakpoint =
       breakpointKeys.find(
-        breakpoint => breakpoints.smaller(breakpoint).value,
+        (breakpoint) => breakpoints.smaller(breakpoint).value,
       ) ?? 'base';
 
     return values.value[currentValueBreakpoint] as T;

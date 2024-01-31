@@ -58,7 +58,7 @@
       },
 
       skills() {
-        return sortBy(this.race.skills, [o => o.opened, o => !o.subrace]);
+        return sortBy(this.race.skills, [(o) => o.opened, (o) => !o.subrace]);
       },
     },
   };

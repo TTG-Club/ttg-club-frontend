@@ -51,7 +51,7 @@ export const DefaultTippyProps: DefaultProps = {
         .rawGet({
           url: attr,
         })
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200) {
             errorHandler(res.statusText);
 
@@ -62,7 +62,7 @@ export const DefaultTippyProps: DefaultProps = {
 
           canShow = true;
         })
-        .catch(err => {
+        .catch((err) => {
           errorHandler(err);
 
           canShow = false;

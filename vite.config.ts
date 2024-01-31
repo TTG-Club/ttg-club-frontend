@@ -22,9 +22,9 @@ export default ({ mode }: ConfigEnv) => {
           changeOrigin: true,
           ws: false,
           secure: false,
-          rewrite: path => path.replace(/^\/proxy/, ''),
-          configure: proxy => {
-            proxy.on('proxyReq', req => {
+          rewrite: (path) => path.replace(/^\/proxy/, ''),
+          configure: (proxy) => {
+            proxy.on('proxyReq', (req) => {
               req.setHeader('origin', API_HOST);
             });
           },
@@ -39,7 +39,7 @@ export default ({ mode }: ConfigEnv) => {
         output: {
           entryFileNames: 'js/app.[hash:8].js',
           chunkFileNames: 'js/[name].[hash:8].js',
-          assetFileNames: chunkInfo => {
+          assetFileNames: (chunkInfo) => {
             if (['index.css', 'main.css'].includes(chunkInfo.name!)) {
               return 'css/app.[hash:8].css';
             }

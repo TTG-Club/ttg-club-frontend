@@ -79,7 +79,7 @@
 
       watch(
         () => props.afterSearch,
-        value => {
+        (value) => {
           if (value) {
             submenu.value = value;
 

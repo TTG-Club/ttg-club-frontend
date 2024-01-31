@@ -17,5 +17,5 @@ export const downloadByUrl = (
       ...opts,
     })
       .then(() => resolve)
-      .catch(error => reject(error));
+      .catch((error) => reject(error));
   });

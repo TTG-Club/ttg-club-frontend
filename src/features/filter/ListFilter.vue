@@ -34,7 +34,7 @@
 
   const showed = ref(false);
 
-  const emitSearch = useDebounceFn(value => {
+  const emitSearch = useDebounceFn((value) => {
     emit('search', value);
   }, 500);
 
@@ -53,7 +53,7 @@
 
   const filter = computed<Filter | Array<FilterGroup> | undefined>({
     get: () => props.filterInstance.filter.value,
-    set: async value => {
+    set: async (value) => {
       try {
         if (!value) {
           return;
@@ -114,7 +114,7 @@
 
   const setOtherValue = (value: Array<FilterItem>, key: string) => {
     const otherFiltersCopy = cloneDeep(otherFilters.value);
-    const index = otherFiltersCopy.findIndex(group => group.key === key);
+    const index = otherFiltersCopy.findIndex((group) => group.key === key);
 
     if (index > -1) {
       otherFiltersCopy[index].values = value;

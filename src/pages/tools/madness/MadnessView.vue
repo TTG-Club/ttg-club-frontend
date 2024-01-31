@@ -41,7 +41,7 @@
             return;
           }
 
-          this.types = resp.data.map(type => ({
+          this.types = resp.data.map((type) => ({
             ...type,
             toggled: false,
           }));
@@ -63,7 +63,7 @@
             count: this.count || 1,
           };
 
-          const type = this.types.find(el => el.toggled);
+          const type = this.types.find((el) => el.toggled);
 
           if (type) {
             options.type = type.value;

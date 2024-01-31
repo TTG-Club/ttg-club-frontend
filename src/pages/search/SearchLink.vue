@@ -38,7 +38,7 @@
 
       watch(
         () => props.selected,
-        value => {
+        (value) => {
           focused.value = value;
         },
       );

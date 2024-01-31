@@ -37,7 +37,7 @@
 
   /* Для добавления идентификатора к элементам */
   const treasures = computed(() =>
-    items.value.map(item => ({
+    items.value.map((item) => ({
       ...item,
       id: item.id || `${item.name.eng || item.name.rus} ${item.type.name}`,
     })),

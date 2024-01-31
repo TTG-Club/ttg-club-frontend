@@ -49,25 +49,27 @@ export const getGroupBookmarks = ({
 }) =>
   sortBy(
     groups.value.map<WithChildren<IBookmarkGroup, IBookmarkCategory>>(
-      group => ({
+      (group) => ({
         ...group,
         children: sortBy(
           categories.value
-            .filter(category => category.parentUUID === group.uuid)
-            .map<WithChildren<IBookmarkCategory, IBookmarkItem>>(category => ({
-              ...category,
-              children: sortBy(
-                bookmarks.value.filter(
-                  bookmark => bookmark.parentUUID === category.uuid,
+            .filter((category) => category.parentUUID === group.uuid)
+            .map<WithChildren<IBookmarkCategory, IBookmarkItem>>(
+              (category) => ({
+                ...category,
+                children: sortBy(
+                  bookmarks.value.filter(
+                    (bookmark) => bookmark.parentUUID === category.uuid,
+                  ),
+                  [(o) => o.order],
                 ),
-                [o => o.order],
-              ),
-            })),
-          [o => o.order],
+              }),
+            ),
+          [(o) => o.order],
         ),
       }),
     ),
-    [o => o.order],
+    [(o) => o.order],
   );
 
 export const setBookmarks = ({
@@ -123,7 +125,7 @@ export const isBookmarkRemoveAvailable = async (bookmark: TBookmark) => {
       return true;
     }
 
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve) => {
       const { open, close } = useModal({
         component: BookmarkRemoveConfirmationModal,
         attrs: {

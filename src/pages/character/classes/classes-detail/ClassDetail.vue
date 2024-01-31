@@ -50,7 +50,7 @@
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
-    source => resolveUnref(source),
+    (source) => resolveUnref(source),
     [],
   );
 
@@ -87,16 +87,16 @@
   );
 
   const currentArchetypes = computed(() => {
-    const getArchetypes = list =>
+    const getArchetypes = (list) =>
       sortBy(
-        Object.values(groupBy(list, o => o.type.name)).map(value => ({
+        Object.values(groupBy(list, (o) => o.type.name)).map((value) => ({
           group: value[0].type,
-          list: value.map(el => ({
+          list: value.map((el) => ({
             name: `${el.name.rus} [${el.source.shortName}]`,
             url: el.url,
           })),
         })),
-        [o => o.group.order],
+        [(o) => o.group.order],
       );
 
     return isArray(currentClass.value?.archetypes) &&
@@ -123,7 +123,7 @@
     return selected;
   });
 
-  const getUpdatedClass = classInfo => {
+  const getUpdatedClass = (classInfo) => {
     const updatedClass = cloneDeep(classInfo);
 
     if (!updatedClass.images || !Array.isArray(updatedClass.images)) {
@@ -137,7 +137,7 @@
     return updatedClass;
   };
 
-  const setTab = index => {
+  const setTab = (index) => {
     try {
       loading.value = true;
 
@@ -164,7 +164,7 @@
     gallery.value.index = 0;
   };
 
-  const initTabs = async loadedClass => {
+  const initTabs = async (loadedClass) => {
     tabs.value = sortBy(loadedClass.tabs, ['order']);
 
     if (isArray(loadedClass.images) && loadedClass.images?.length) {
@@ -179,7 +179,7 @@
     await setTab(0);
   };
 
-  const classInfoQuery = async url => {
+  const classInfoQuery = async (url) => {
     if (abortController.value instanceof AbortController) {
       abortController.value.abort();
     }
@@ -224,7 +224,7 @@
     await setTab(index);
   };
 
-  const goToArchetype = path => {
+  const goToArchetype = (path) => {
     router.push({ path });
   };
 
@@ -251,7 +251,7 @@
     bodyScroll.value = section.offsetTop - fixedHeight.value;
   };
 
-  const anchorClickHandler = e => {
+  const anchorClickHandler = (e) => {
     if (e.button) {
       return;
     }
@@ -276,7 +276,7 @@
     const nodeList = classBody.value.querySelectorAll('[href^="#"]');
 
     return Array.from(nodeList).filter(
-      link => !!link.getAttribute('href').replace('#', '').trim(),
+      (link) => !!link.getAttribute('href').replace('#', '').trim(),
     );
   };
 

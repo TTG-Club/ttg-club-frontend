@@ -107,7 +107,7 @@
 
       const sum = computed(() =>
         rolls.value.reduce((partialSum, roll) => {
-          const costItem = cost.find(item => item.key === roll.value);
+          const costItem = cost.find((item) => item.key === roll.value);
 
           if (!costItem) {
             return partialSum;
@@ -118,14 +118,14 @@
       );
 
       const getOptions = (roll: AbilityRoll) => {
-        const rollValue = cost.find(costItem => costItem.key === roll.value);
+        const rollValue = cost.find((costItem) => costItem.key === roll.value);
 
         if (!rollValue) {
           return 'wtf?!';
         }
 
         return cost.filter(
-          item => sum.value + item.value - rollValue.value <= 27,
+          (item) => sum.value + item.value - rollValue.value <= 27,
         );
       };
 
@@ -135,7 +135,7 @@
       ) => {
         let result = `${option.key}`;
 
-        const costItem = cost.find(item => item.key === roll.value);
+        const costItem = cost.find((item) => item.key === roll.value);
 
         if (!costItem) {
           return 'wtf?!';
@@ -167,7 +167,7 @@
 
       return {
         abilities: computed(() =>
-          Object.keys(AbilityKey).map(key => ({
+          Object.keys(AbilityKey).map((key) => ({
             key,
             name: AbilityName[key as AbilityKey],
           })),

@@ -85,7 +85,7 @@
 
       watchArray(
         () => props.images,
-        value => {
+        (value) => {
           imgs.value = value;
           index.value = 0;
         },

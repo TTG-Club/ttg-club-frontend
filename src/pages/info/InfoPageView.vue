@@ -65,7 +65,7 @@
         }
       };
 
-      onBeforeRouteUpdate(async to => {
+      onBeforeRouteUpdate(async (to) => {
         await queryInfoPage(to);
       });
 

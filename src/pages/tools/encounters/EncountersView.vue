@@ -46,7 +46,7 @@
             return '';
           }
 
-          return this.levels.find(level => level.value === this.form.level);
+          return this.levels.find((level) => level.value === this.form.level);
         },
 
         set(e) {
@@ -61,7 +61,7 @@
           }
 
           return this.environments.find(
-            env => env.value === this.form.environment,
+            (env) => env.value === this.form.environment,
           );
         },
 

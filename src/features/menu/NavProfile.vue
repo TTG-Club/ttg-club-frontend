@@ -47,14 +47,14 @@
       ]);
 
       const modalInfo = computed(() =>
-        modals.value.find(item => item.eng === modal.value),
+        modals.value.find((item) => item.eng === modal.value),
       );
 
       const modalComponent = computed(() => modalInfo.value?.component());
 
       const isModalOpened = computed({
         get: () => !!modal.value,
-        set: e => {
+        set: (e) => {
           modal.value = typeof e === 'string' ? e : false;
         },
       });

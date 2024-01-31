@@ -192,7 +192,7 @@
 
       sendSearchViewResultsMetrics(
         search,
-        result.items.map(item => ({
+        result.items.map((item) => ({
           item_id: item.url,
           item_name: item.name,
           item_category: item.section,

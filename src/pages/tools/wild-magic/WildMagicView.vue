@@ -41,7 +41,7 @@
             return;
           }
 
-          this.tables = resp.data.map(source => ({
+          this.tables = resp.data.map((source) => ({
             ...source,
             value: source.shortName === 'PHB',
           }));
@@ -62,8 +62,8 @@
           const options = {
             count: this.count || 1,
             sources: this.tables
-              .filter(source => source.value)
-              .map(source => source.shortName),
+              .filter((source) => source.value)
+              .map((source) => source.shortName),
           };
 
           const resp = await this.$http.post({

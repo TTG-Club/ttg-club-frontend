@@ -72,23 +72,23 @@
 
     const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> =>
       sortBy(
-        Object.values(groupBy(list, o => o.type.name)).map(value => ({
+        Object.values(groupBy(list, (o) => o.type.name)).map((value) => ({
           group: value[0].type,
           list: value,
         })),
-        [o => o.group.order],
+        [(o) => o.group.order],
       );
 
     const getGroupClasses = (): Array<TRaceList> => {
-      const newClasses: Array<TRaceLink> = races.value.map(race => ({
+      const newClasses: Array<TRaceLink> = races.value.map((race) => ({
         ...race,
         archetypes: getGroupArchetypes(race.archetypes),
       }));
 
       const defaultGroup: TRaceList = {
         list: sortBy(
-          newClasses.filter(item => !('group' in item)),
-          [o => o.name.rus],
+          newClasses.filter((item) => !('group' in item)),
+          [(o) => o.name.rus],
         ),
       };
 
@@ -98,11 +98,11 @@
             cloneDeep(newClasses.filter((item: TRaceLink) => 'group' in item)),
             (o: TRaceLink) => o.group?.name,
           ) as { [key: string]: Array<TRaceLink> },
-        ).map(classList => ({
+        ).map((classList) => ({
           group: classList[0].group!,
-          list: sortBy(classList, [o => o.name.rus]),
+          list: sortBy(classList, [(o) => o.name.rus]),
         })),
-        [o => o.group!.order],
+        [(o) => o.group!.order],
       );
 
       return [defaultGroup, ...mapped];

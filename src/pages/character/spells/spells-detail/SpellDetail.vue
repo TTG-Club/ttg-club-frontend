@@ -38,7 +38,7 @@
 
     return downloadByUrl(
       `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`,
-    ).catch(err => {
+    ).catch((err) => {
       showErrorToast('Этот свиток ещё не подготовлен.');
       Promise.reject(err);
     });

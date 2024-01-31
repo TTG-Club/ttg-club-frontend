@@ -98,7 +98,7 @@
 
   const crValue = computed<CrListItem>({
     get() {
-      return crList.find(el => el.value === form.value.cr) || crList[0];
+      return crList.find((el) => el.value === form.value.cr) || crList[0];
     },
 
     set(e: CrListItem) {
@@ -120,7 +120,7 @@
         continue;
       }
 
-      const groups = Object.values(groupBy(value, o => o.name.rus));
+      const groups = Object.values(groupBy(value, (o) => o.name.rus));
       const entryRes = [];
 
       for (const group of groups) {
@@ -132,7 +132,7 @@
           continue;
         }
 
-        const prices = sortedUniq(group.map(o => o.price));
+        const prices = sortedUniq(group.map((o) => o.price));
 
         entryRes.push({
           ...el,
@@ -178,7 +178,7 @@
         payload: options,
         signal: controllers.value.list.signal,
       })
-      .then(res => {
+      .then((res) => {
         if (res.status !== 200) {
           errorHandler(res.statusText);
 
@@ -191,7 +191,7 @@
 
         result.value = res.data as never;
       })
-      .catch(err => {
+      .catch((err) => {
         errorHandler(err);
       })
       .finally(() => {

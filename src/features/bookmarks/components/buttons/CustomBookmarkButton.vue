@@ -30,7 +30,7 @@
   );
 
   const groups = computed(() =>
-    bookmarksStore.getGroups.filter(group => group.order > -1),
+    bookmarksStore.getGroups.filter((group) => group.order > -1),
   );
 
   const isSaved = (uuid?: IBookmarkGroup['uuid']) =>

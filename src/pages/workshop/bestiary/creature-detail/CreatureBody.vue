@@ -32,7 +32,7 @@
 
     return props.creature.speed
       .map(
-        item =>
+        (item) =>
           `${item.name ? `${item.name} ` : ''}${
             item.value || item.value === 0 ? `${item.value} фт.` : ''
           }${item.additional ? ` (${item.additional})` : ''}`,
@@ -45,7 +45,7 @@
       return [];
     }
 
-    return props.creature.savingThrows.map(save => ({
+    return props.creature.savingThrows.map((save) => ({
       formula: `к20+${save.value}`,
       label: save.shortName,
       name: save.name,
@@ -58,7 +58,7 @@
       return [];
     }
 
-    return props.creature.skills.map(skill => ({
+    return props.creature.skills.map((skill) => ({
       formula: `к20+${skill.value}`,
       label: skill.name,
       value: `+${skill.value}${skill.additional ? skill.additional : ''}`,

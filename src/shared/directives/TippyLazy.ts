@@ -38,14 +38,14 @@ export const TippyLazy: Directive = {
 
     el.tippyLazy = tippyLazy;
 
-    enterEvents.forEach(event => {
+    enterEvents.forEach((event) => {
       el.addEventListener(event, tippyLazy.handleMounted);
     });
   },
   unmounted(...args) {
     const [el] = args;
 
-    enterEvents.forEach(event => {
+    enterEvents.forEach((event) => {
       el.removeEventListener(event, el.tippyLazy?.handleMounted);
     });
 

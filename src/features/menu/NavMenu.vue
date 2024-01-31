@@ -47,7 +47,7 @@
 
   watch(
     isShowMenu,
-    async value => {
+    async (value) => {
       if (value) {
         await navStore.initNavItems();
       }

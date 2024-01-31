@@ -146,7 +146,7 @@
     ignore: [dropdownTrigger],
   });
 
-  watch(isDropdownShow, value => {
+  watch(isDropdownShow, (value) => {
     if (value) {
       emit('dropdown-show');
 

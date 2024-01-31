@@ -45,17 +45,17 @@ export const useNavStore = defineStore('NavStore', () => {
   const showedNavItems = computed(() =>
     orderBy(
       navItems.value
-        .filter(group => {
+        .filter((group) => {
           if (isDev) {
             return true;
           }
 
           return !group.onlyDev;
         })
-        .map(group => ({
+        .map((group) => ({
           ...group,
           children: orderBy(
-            group.children?.filter(link => {
+            group.children?.filter((link) => {
               if (isDev) {
                 return true;
               }

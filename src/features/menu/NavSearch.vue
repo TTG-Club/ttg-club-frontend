@@ -16,7 +16,7 @@
     isShowSearch.value = true;
   };
 
-  onKeyStroke(['/', '\\', 'Find'], e => {
+  onKeyStroke(['/', '\\', 'Find'], (e) => {
     const activeElement = useActiveElement();
 
     if (

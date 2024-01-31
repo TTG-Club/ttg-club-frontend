@@ -15,7 +15,7 @@
   const roles = computed(() =>
     upperFirst(
       orderBy(userRoles.value)
-        .map(role => role.name)
+        .map((role) => role.name)
         .join(', '),
     ),
   );

@@ -39,7 +39,7 @@
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
-    source => toValue(source),
+    (source) => toValue(source),
     [],
   );
 

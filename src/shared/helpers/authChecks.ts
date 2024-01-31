@@ -49,7 +49,7 @@ export const validateRequired = () =>
 export const validateUsernameSpecialChars = () =>
   helpers.withMessage(
     'Допустимы латинские буквы, 0-9 - _ .',
-    value => !/[^\w\-.]/g.test(value as string),
+    (value) => !/[^\w\-.]/g.test(value as string),
   );
 
 export const validateUsernameExist = () =>
@@ -84,24 +84,24 @@ export const validateEmailExist = () =>
   );
 
 export const validatePwdLowerCase = () =>
-  helpers.withMessage('Хотя бы одна буква в нижнем регистре', value =>
+  helpers.withMessage('Хотя бы одна буква в нижнем регистре', (value) =>
     /[a-z]+/g.test(value as string),
   );
 
 export const validatePwdUpperCase = () =>
-  helpers.withMessage('Хотя бы одна буква в верхнем регистре', value =>
+  helpers.withMessage('Хотя бы одна буква в верхнем регистре', (value) =>
     /[A-Z]+/g.test(value as string),
   );
 
 export const validatePwdNumber = () =>
-  helpers.withMessage('Хотя бы одна цифра', value =>
+  helpers.withMessage('Хотя бы одна цифра', (value) =>
     /\d+/g.test(value as string),
   );
 
 export const validatePwdSpecial = () =>
   helpers.withMessage(
     'Допустимые спец. символы: ! @ # $ % ^ & * _ -',
-    value => !/[^\w\-!@#$%^&*]+/g.test(value as string),
+    (value) => !/[^\w\-!@#$%^&*]+/g.test(value as string),
   );
 
 export const validateMinLength = (number: number) =>

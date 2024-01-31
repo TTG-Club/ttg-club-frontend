@@ -86,11 +86,11 @@ export const useUserStore = defineStore('UserStore', () => {
     const { roles: userRoles } = user.value;
 
     const translated = userRoles
-      .map(role => ({
+      .map((role) => ({
         role,
         name: availRoles[role],
       }))
-      .filter(role => !!role.name);
+      .filter((role) => !!role.name);
 
     if (!translated.length) {
       return [];
@@ -144,7 +144,7 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     try {
-      if (Object.values(body).find(item => !item)) {
+      if (Object.values(body).find((item) => !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
@@ -175,7 +175,9 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     try {
-      if (Object.values(body).find(item => typeof item === 'string' && !item)) {
+      if (
+        Object.values(body).find((item) => typeof item === 'string' && !item)
+      ) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 

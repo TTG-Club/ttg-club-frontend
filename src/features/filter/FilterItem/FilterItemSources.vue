@@ -66,9 +66,9 @@
       },
 
       resetSources() {
-        const sources = cloneDeep(this.modelValue).map(group => ({
+        const sources = cloneDeep(this.modelValue).map((group) => ({
           ...group,
-          values: group.values.map(value => ({
+          values: group.values.map((value) => ({
             ...value,
             value: value.default,
           })),

@@ -45,11 +45,11 @@
     emit('close');
   };
 
-  watch(isShow, value => {
+  watch(isShow, (value) => {
     isShowPopover.value = value;
   });
 
-  watch(isShowPopover, value => {
+  watch(isShowPopover, (value) => {
     if (!value && isShow.value) {
       isShow.value = false;
     }

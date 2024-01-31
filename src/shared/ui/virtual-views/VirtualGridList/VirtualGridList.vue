@@ -38,13 +38,13 @@
 
   const listProps = computed<TVirtualListProps>(() => ({
     ...omit(props.list, 'reference'),
-    getItemClass: item =>
+    getItemClass: (item) =>
       clsx(props.list.getItemClass?.(item), 'virtual-grid-list__item'),
 
     // Ищем в колонках, т.к. именно в них содержаться элементы
     getItemIndexByKey: (rows, key) =>
-      rows.findIndex(row =>
-        row.columns?.find(item => item[itemKeyField.value] === key),
+      rows.findIndex((row) =>
+        row.columns?.find((item) => item[itemKeyField.value] === key),
       ),
   }));
 

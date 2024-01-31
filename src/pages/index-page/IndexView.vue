@@ -35,8 +35,8 @@
 
   const tools = computed<TNavItem[]>(() => {
     const navTools = navItems.value
-      .flatMap(group => group.children)
-      .filter(item => item.url?.startsWith('/tools'));
+      .flatMap((group) => group.children)
+      .filter((item) => item.url?.startsWith('/tools'));
 
     return orderBy(navTools, ['order'], ['asc']);
   });

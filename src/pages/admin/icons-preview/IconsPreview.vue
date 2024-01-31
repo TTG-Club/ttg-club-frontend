@@ -13,7 +13,7 @@
   const search = ref('');
 
   const newIcons = computed<Array<string>>(() =>
-    icons.filter(name => {
+    icons.filter((name) => {
       const regex = new RegExp(search.value, 'gi');
 
       return regex.test(name);

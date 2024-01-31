@@ -38,7 +38,7 @@
 
     return downloadByUrl(
       `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`,
-    ).catch(err => {
+    ).catch((err) => {
       showErrorToast(`${creature.value?.name.rus} ещё в пути.`);
       Promise.reject(err);
     });

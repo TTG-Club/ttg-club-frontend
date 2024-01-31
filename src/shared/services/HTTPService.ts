@@ -25,7 +25,7 @@ class HTTPService {
       headers: {},
     });
 
-    this.instance.interceptors.request.use(req => {
+    this.instance.interceptors.request.use((req) => {
       // eslint-disable-next-line no-param-reassign
       req.paramsSerializer = {
         indexes: null,
@@ -39,7 +39,7 @@ class HTTPService {
       return req;
     });
 
-    this.instance.interceptors.response.use(async resp => {
+    this.instance.interceptors.response.use(async (resp) => {
       if (resp.status === 401) {
         const userStore = useUserStore();
 

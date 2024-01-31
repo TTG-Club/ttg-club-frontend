@@ -9,10 +9,10 @@ export const getListRows = <Item, KeyField extends keyof Item>(
   { chunks, keyField }: TGetListRowsOptions<Item, KeyField>,
 ): TListRow<Item, KeyField>[] =>
   chunk(items, chunks).map(
-    columns =>
+    (columns) =>
       ({
         /* ID for row combined from columns ids */
-        [keyField]: columns.map(column => column[keyField]).join(''),
+        [keyField]: columns.map((column) => column[keyField]).join(''),
         columns,
       }) as TListRow<Item, KeyField>,
   );

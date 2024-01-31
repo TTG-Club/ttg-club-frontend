@@ -99,8 +99,8 @@
 
   const magicLevel = computed<TNameValue<number>>({
     get: () =>
-      config.value.magicLevels.find(el => el.value === form.value.magicLevel),
-    set: v => {
+      config.value.magicLevels.find((el) => el.value === form.value.magicLevel),
+    set: (v) => {
       form.value.magicLevel = v.value;
     },
   });
@@ -124,7 +124,7 @@
     };
 
     if (!settings.value.grouping) {
-      return results.value.map(item => {
+      return results.value.map((item) => {
         if (!item.price) {
           return item;
         }
@@ -141,21 +141,21 @@
     const getGroupPrice = (group: Array<TTraderLink>) => {
       const prices = sortedUniq(
         group
-          .map(o => {
+          .map((o) => {
             if (!o.price) {
               return null;
             }
 
             return getCurrentPrice(toRaw(o.price));
           })
-          .filter(price => typeof price === 'number'),
+          .filter((price) => typeof price === 'number'),
       );
 
       return settings.value.max ? max(prices) : Math.round(mean(prices));
     };
 
     const groups = Object.values<Array<TTraderLink>>(
-      groupBy(results.value, o => o.name.rus),
+      groupBy(results.value, (o) => o.name.rus),
     );
 
     const res: Array<TGroupedTraderLink> = [];
@@ -282,7 +282,9 @@
         return sources[0];
       }
 
-      const oldSource = sources.find(source => source.shortName === sourceKey);
+      const oldSource = sources.find(
+        (source) => source.shortName === sourceKey,
+      );
 
       if (!oldSource) {
         return sources[0];
@@ -383,7 +385,7 @@
     }
   };
 
-  const selectItem = async index => {
+  const selectItem = async (index) => {
     try {
       error.value = false;
 

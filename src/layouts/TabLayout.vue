@@ -39,7 +39,7 @@
       },
     );
 
-    useResizeObserver(list, entries => {
+    useResizeObserver(list, (entries) => {
       if (Array.isArray(entries) && entries.length) {
         const entry = entries[0];
         const { height } = entry.contentRect;

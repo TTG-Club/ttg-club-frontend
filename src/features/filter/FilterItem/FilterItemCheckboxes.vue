@@ -22,7 +22,7 @@
       type: {
         type: String,
         default: 'crumb',
-        validator: value => ['crumb', 'toggle'].includes(value),
+        validator: (value) => ['crumb', 'toggle'].includes(value),
       },
       modelValue: {
         type: Array,
@@ -53,7 +53,7 @@
     },
     methods: {
       resetValues() {
-        const values = cloneDeep(this.modelValue).map(value => ({
+        const values = cloneDeep(this.modelValue).map((value) => ({
           ...value,
           value: value.default,
         }));

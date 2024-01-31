@@ -62,23 +62,23 @@
       list: Array<TClassArchetype>,
     ): Array<TClassArchetypeList> =>
       sortBy(
-        Object.values(groupBy(list, o => o.type.name)).map(value => ({
+        Object.values(groupBy(list, (o) => o.type.name)).map((value) => ({
           group: value[0].type,
           list: value,
         })),
-        [o => o.group.order],
+        [(o) => o.group.order],
       );
 
     const getGroupClasses = (): Array<TClassList> => {
-      const newClasses: Array<TClassItem> = classes.value.map(classItem => ({
+      const newClasses: Array<TClassItem> = classes.value.map((classItem) => ({
         ...classItem,
         archetypes: getGroupArchetypes(classItem.archetypes),
       }));
 
       const defaultGroup: TClassList = {
         list: sortBy(
-          newClasses.filter(item => !('group' in item)),
-          [o => o.name.rus],
+          newClasses.filter((item) => !('group' in item)),
+          [(o) => o.name.rus],
         ),
       };
 
@@ -88,11 +88,11 @@
             cloneDeep(newClasses.filter((item: TClassItem) => 'group' in item)),
             (o: TClassItem) => o.group?.name,
           ) as { [key: string]: Array<TClassItem> },
-        ).map(classList => ({
+        ).map((classList) => ({
           group: classList[0].group!,
-          list: sortBy(classList, [o => o.name.rus]),
+          list: sortBy(classList, [(o) => o.name.rus]),
         })),
-        [o => o.group!.order],
+        [(o) => o.group!.order],
       );
 
       return [defaultGroup, ...mapped];

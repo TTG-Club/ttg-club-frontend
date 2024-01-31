@@ -25,22 +25,22 @@
     const hasGroups = sortBy(
       Object.values(
         groupBy(
-          props.childList.filter(item => item.group),
-          o => o.group,
+          props.childList.filter((item) => item.group),
+          (o) => o.group,
         ),
-      ).map(list => ({
+      ).map((list) => ({
         name: list[0].group,
-        list: sortBy(list, [o => o.order, o => o.name.rus]),
+        list: sortBy(list, [(o) => o.order, (o) => o.name.rus]),
       })),
-      [o => o.group],
+      [(o) => o.group],
     );
 
-    const noGroup = props.childList.filter(item => !item.group);
+    const noGroup = props.childList.filter((item) => !item.group);
 
     if (noGroup.length) {
       return [
         {
-          list: sortBy(noGroup, [o => o.order, o => o.name.rus]),
+          list: sortBy(noGroup, [(o) => o.order, (o) => o.name.rus]),
         },
         ...hasGroups,
       ];

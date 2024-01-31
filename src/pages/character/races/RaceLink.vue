@@ -68,12 +68,12 @@
         if (isArray(props.raceItem.subraces)) {
           return sortBy(
             Object.values(
-              groupBy(props.raceItem.subraces, o => o.type.name),
-            ).map(value => ({
+              groupBy(props.raceItem.subraces, (o) => o.type.name),
+            ).map((value) => ({
               name: value[0].type,
               list: value,
             })),
-            [o => o.name.order],
+            [(o) => o.name.order],
           );
         }
 

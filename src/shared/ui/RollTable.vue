@@ -34,14 +34,14 @@
   const showResult = (result: RollBase['value']) => {
     const { tbody } = props.table;
 
-    const index = tbody.findIndex(row => {
+    const index = tbody.findIndex((row) => {
       const results = row[0];
 
       if (!results.includes('-')) {
         return result === toNumber(results);
       }
 
-      const [min, max] = results.split('-').map(item => toNumber(item));
+      const [min, max] = results.split('-').map((item) => toNumber(item));
 
       return min <= result && result <= max;
     });

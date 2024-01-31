@@ -57,7 +57,7 @@
       return props.url;
     }
 
-    const el = slots.default?.().find(node => node?.props?.href);
+    const el = slots.default?.().find((node) => node?.props?.href);
 
     if (el?.props?.href) {
       return el.props.href;

@@ -7,4 +7,4 @@ export const getBaseURL = (url = '') => {
 };
 
 export const getOrderString = (orders: Array<IOrderItem>) =>
-  orders.map(order => `${order.field} ${order.direction}`).join(',');
+  orders.map((order) => `${order.field} ${order.direction}`).join(',');

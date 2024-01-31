@@ -96,7 +96,7 @@ export const useYoutube = () => {
     } catch (err) {
       return Promise.reject(err);
     } finally {
-      removeList.value = removeList.value.filter(item => item !== id);
+      removeList.value = removeList.value.filter((item) => item !== id);
     }
   };
 

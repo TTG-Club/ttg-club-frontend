@@ -111,7 +111,7 @@
     focusInput();
   };
 
-  const typeValidate = e => {
+  const typeValidate = (e) => {
     const isControlKey = e.key.length > 1;
     const key = Number(e.key);
     const isNum = Number.isInteger(key);

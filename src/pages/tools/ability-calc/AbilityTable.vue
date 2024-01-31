@@ -25,7 +25,7 @@
     setup(props) {
       const abilities = computed(() =>
         Object.values(AbilityKey).map((key: AbilityKey) => {
-          const roll = props.rolls.find(item => item.key === key);
+          const roll = props.rolls.find((item) => item.key === key);
 
           const getValue = () => {
             if (typeof roll?.value !== 'number') {
@@ -37,7 +37,7 @@
 
           const getRaceBonus = () => {
             const bonus = props.raceBonuses.find(
-              item => item.key === key,
+              (item) => item.key === key,
             )?.value;
 
             if (!bonus && bonus !== 0) {

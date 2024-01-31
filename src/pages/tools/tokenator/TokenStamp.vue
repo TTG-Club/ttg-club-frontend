@@ -146,7 +146,7 @@
   });
 
   useDropZone(token, {
-    onDrop: files => processFile(files?.[0]),
+    onDrop: (files) => processFile(files?.[0]),
   });
 
   const openHandler = () => {

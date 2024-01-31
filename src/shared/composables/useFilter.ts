@@ -89,21 +89,21 @@ export function useFilter(config: FilterConfig): FilterComposable {
     }
 
     const isValuesCustomized = (values?: Array<FilterItem>) =>
-      !!values?.some(item => item.default !== item.value);
+      !!values?.some((item) => item.default !== item.value);
 
     const isGroupCustomized = (group: FilterGroup) =>
       isValuesCustomized(group.values);
 
     if (Array.isArray(filter.value)) {
-      return filter.value.some(group => isGroupCustomized(group));
+      return filter.value.some((group) => isGroupCustomized(group));
     }
 
-    return Object.values(filter.value).some(value => {
+    return Object.values(filter.value).some((value) => {
       if (!Array.isArray(value)) {
         return false;
       }
 
-      return value.some(group => isGroupCustomized(group));
+      return value.some((group) => isGroupCustomized(group));
     });
   });
 
@@ -177,12 +177,12 @@ export function useFilter(config: FilterConfig): FilterComposable {
       let savedGroup: FilterGroup | undefined;
 
       if (Array.isArray(saved)) {
-        savedGroup = saved.find(group => group.key === key);
+        savedGroup = saved.find((group) => group.key === key);
       }
 
       if (filterKey && !Array.isArray(saved)) {
         savedGroup = saved[filterKey as keyof Filter]!.find(
-          group => group.key === key,
+          (group) => group.key === key,
         );
       }
 
@@ -190,7 +190,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
         return value.default;
       }
 
-      const savedValue = savedGroup.values.find(val => val.key === value.key);
+      const savedValue = savedGroup.values.find((val) => val.key === value.key);
 
       if (!savedValue) {
         return value.default;

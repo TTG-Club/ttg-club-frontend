@@ -48,7 +48,7 @@
         'Поле обязательно для заполнения',
         required,
       ),
-      format: helpers.withMessage('Поле заполнено неверно', value =>
+      format: helpers.withMessage('Поле заполнено неверно', (value) =>
         /([^"&?/\s]{11})/gi.test(value as string),
       ),
     },

@@ -88,7 +88,7 @@
             <span>Количество видео на странице</span>
 
             <ui-select
-              :model-value="itemsPerPage.find(item => item.value === size)"
+              :model-value="itemsPerPage.find((item) => item.value === size)"
               :options="itemsPerPage"
               label="name"
               track-by="value"

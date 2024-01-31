@@ -92,7 +92,7 @@
 
       sendSearchViewResultsMetrics(
         search,
-        result.items.map(item => ({
+        result.items.map((item) => ({
           item_id: item.url,
           item_name: item.name,
           item_category: item.section,
@@ -145,7 +145,7 @@
 
       sendSearchViewResultsMetrics(
         'random',
-        result.items.map(item => ({
+        result.items.map((item) => ({
           item_id: item.url,
           item_name: item.name,
           item_category: item.section,
@@ -173,7 +173,7 @@
     focused.value = true;
   });
 
-  onKeyStroke('ArrowDown', e => {
+  onKeyStroke('ArrowDown', (e) => {
     if (!isShowModal.value) {
       return;
     }
@@ -198,7 +198,7 @@
     selectedIndex.value++;
   });
 
-  onKeyStroke('ArrowUp', e => {
+  onKeyStroke('ArrowUp', (e) => {
     if (!isShowModal.value) {
       return;
     }
@@ -226,7 +226,7 @@
       activeElement.value?.tagName !== 'TEXTAREA',
   );
 
-  onKeyStroke('Enter', e => {
+  onKeyStroke('Enter', (e) => {
     if (!isShowModal.value) {
       return;
     }
@@ -277,7 +277,7 @@
     onSearchDebounce();
   };
 
-  watch(isShowModal, value => {
+  watch(isShowModal, (value) => {
     if (!value) {
       search.value = '';
       results.value = null;

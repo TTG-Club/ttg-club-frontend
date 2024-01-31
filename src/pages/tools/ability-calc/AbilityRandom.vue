@@ -78,7 +78,7 @@
       };
 
       const isSelected = (key: AbilityKey) =>
-        rolls.value.find(roll => roll.key === key);
+        rolls.value.find((roll) => roll.key === key);
 
       const onSelect = (key: AbilityKey | null, index: number) => {
         const setValue = (value: typeof key, i: number) => {
@@ -111,7 +111,7 @@
 
       return {
         abilities: computed(() =>
-          Object.keys(AbilityKey).map(key => ({
+          Object.keys(AbilityKey).map((key) => ({
             key,
             name: AbilityName[key as AbilityKey],
           })),

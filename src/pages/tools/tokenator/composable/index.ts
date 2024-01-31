@@ -52,7 +52,7 @@ export const useTokenator = () => {
         resolve(reader.result);
       };
 
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
 
       reader.readAsDataURL(blob);
     });
@@ -176,7 +176,7 @@ export const useTokenator = () => {
         resolve();
       };
 
-      img.onerror = e => reject(e);
+      img.onerror = (e) => reject(e);
     });
 
   return {

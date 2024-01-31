@@ -60,10 +60,11 @@ export const useMetrics = () => {
       return;
     }
 
-    const errGroup = routes.find(route => route.name === 'unknown-error');
+    const errGroup = routes.find((route) => route.name === 'unknown-error');
 
     const exclude =
-      errGroup?.children?.map(child => child.name).filter(name => !!name) || [];
+      errGroup?.children?.map((child) => child.name).filter((name) => !!name) ||
+      [];
 
     exclude.push('profile');
     exclude.push('reset-password');
