@@ -1,54 +1,3 @@
-<template>
-  <label class="ui-input">
-    <span
-      v-if="label"
-      class="ui-input__label"
-    >
-      {{ label }}
-    </span>
-
-    <span
-      :class="{ 'is-error': errorText }"
-      class="ui-input__control"
-    >
-      <input
-        ref="input"
-        v-model="value"
-        :autocomplete="inputAutocomplete"
-        :placeholder="placeholder"
-        :maxlength="maxLength"
-        :spellcheck="false"
-        :type="inputType"
-        class="ui-input__input"
-        v-bind="attrs"
-        @keydown="typeValidate($event)"
-        @blur="$emit('blur')"
-      />
-
-      <span
-        v-if="type === 'password'"
-        class="ui-input__control_icon"
-        @click.left.exact.prevent="togglePass"
-      >
-        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
-      </span>
-
-      <ui-erase-button
-        v-if="isClearable && value"
-        v-model="value"
-        body-class="ui-input__erase-body"
-      />
-    </span>
-
-    <span
-      v-if="!!errorText"
-      class="ui-input__error"
-    >
-      {{ errorText }}
-    </span>
-  </label>
-</template>
-
 <script setup>
   import { useVModel } from '@vueuse/core';
   import { computed, onMounted, ref, useAttrs } from 'vue';
@@ -59,58 +8,58 @@
   const props = defineProps({
     modelValue: {
       type: [String, Number],
-      default: ''
+      default: '',
     },
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     placeholder: {
       type: String,
-      default: ''
+      default: '',
     },
     autofocus: {
       type: Boolean,
-      default: false
+      default: false,
     },
     autocomplete: {
       type: [Boolean, String],
-      default: false
+      default: false,
     },
     type: {
       type: String,
-      default: 'text'
+      default: 'text',
     },
     isError: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isClearable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     min: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     maxLength: {
       type: Number,
-      default: 255
+      default: 255,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     errorText: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   });
 
   defineEmits(['update:modelValue', 'blur']);
 
   defineOptions({
-    inheritAttrs: false
+    inheritAttrs: false,
   });
 
   const showedPass = ref(false);
@@ -181,6 +130,57 @@
     }
   });
 </script>
+
+<template>
+  <label class="ui-input">
+    <span
+      v-if="label"
+      class="ui-input__label"
+    >
+      {{ label }}
+    </span>
+
+    <span
+      :class="{ 'is-error': errorText }"
+      class="ui-input__control"
+    >
+      <input
+        ref="input"
+        v-model="value"
+        :autocomplete="inputAutocomplete"
+        :placeholder="placeholder"
+        :maxlength="maxLength"
+        :spellcheck="false"
+        :type="inputType"
+        class="ui-input__input"
+        v-bind="attrs"
+        @keydown="typeValidate($event)"
+        @blur="$emit('blur')"
+      />
+
+      <span
+        v-if="type === 'password'"
+        class="ui-input__control_icon"
+        @click.left.exact.prevent="togglePass"
+      >
+        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
+      </span>
+
+      <ui-erase-button
+        v-if="isClearable && value"
+        v-model="value"
+        body-class="ui-input__erase-body"
+      />
+    </span>
+
+    <span
+      v-if="!!errorText"
+      class="ui-input__error"
+    >
+      {{ errorText }}
+    </span>
+  </label>
+</template>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;

@@ -2,16 +2,16 @@ import localforage from 'localforage';
 import { cloneDeep, sortBy } from 'lodash-es';
 import { useModal } from 'vue-final-modal';
 
+import { DB_NAME } from '@/shared/constants/UI';
+import type { WithChildren } from '@/shared/types/Utility';
+
 import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 import type {
   IBookmarkCategory,
   IBookmarkGroup,
   IBookmarkItem,
-  TBookmark
+  TBookmark,
 } from '@/features/bookmarks/types/Bookmark.d';
-
-import { DB_NAME } from '@/shared/constants/UI';
-import type { WithChildren } from '@/shared/types/Utility';
 
 import type { Ref } from 'vue';
 
@@ -19,7 +19,7 @@ export const isBookmarkItem = (item: TBookmark): item is IBookmarkItem =>
   'url' in item && 'parentUUID' in item;
 
 export const isBookmarkCategory = (
-  item: TBookmark
+  item: TBookmark,
 ): item is IBookmarkCategory => !('url' in item) && 'parentUUID' in item;
 
 export const isBookmarkGroup = (item: TBookmark): item is IBookmarkGroup =>
@@ -27,7 +27,7 @@ export const isBookmarkGroup = (item: TBookmark): item is IBookmarkGroup =>
 
 const storage = localforage.createInstance({
   name: DB_NAME,
-  storeName: 'bookmarks'
+  storeName: 'bookmarks',
 });
 
 /**
@@ -41,7 +41,7 @@ const storage = localforage.createInstance({
 export const getGroupBookmarks = ({
   groups,
   categories,
-  bookmarks
+  bookmarks,
 }: {
   groups: Ref<IBookmarkGroup[]>;
   categories: Ref<IBookmarkCategory[]>;
@@ -58,23 +58,23 @@ export const getGroupBookmarks = ({
               ...category,
               children: sortBy(
                 bookmarks.value.filter(
-                  bookmark => bookmark.parentUUID === category.uuid
+                  bookmark => bookmark.parentUUID === category.uuid,
                 ),
-                [o => o.order]
-              )
+                [o => o.order],
+              ),
             })),
-          [o => o.order]
-        )
-      })
+          [o => o.order],
+        ),
+      }),
     ),
-    [o => o.order]
+    [o => o.order],
   );
 
 export const setBookmarks = ({
   items,
   groups,
   categories,
-  bookmarks
+  bookmarks,
 }: {
   items: TBookmark[];
   groups: Ref<IBookmarkGroup[]>;
@@ -137,8 +137,8 @@ export const isBookmarkRemoveAvailable = async (bookmark: TBookmark) => {
             await close();
 
             resolve(false);
-          }
-        }
+          },
+        },
       });
 
       open();

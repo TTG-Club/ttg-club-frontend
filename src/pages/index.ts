@@ -5,7 +5,7 @@ import {
   OptionsPage,
   RacesPage,
   SpellsPage,
-  TraitsPage
+  TraitsPage,
 } from './character';
 import { ErrorPage } from './errors';
 import { IndexPage } from './index-page';
@@ -15,7 +15,7 @@ import {
   ItemsPage,
   MagicItemsPage,
   TreasuresPage,
-  WeaponsPage
+  WeaponsPage,
 } from './inventory';
 import { SearchPage } from './search';
 import {
@@ -25,7 +25,7 @@ import {
   TokenatorPage,
   TraderPage,
   TreasuryPage,
-  WildMagicPage
+  WildMagicPage,
 } from './tools';
 import { ProfilePage, ResetPasswordPage } from './user';
 import { BooksPage, GodsPage, RulesPage } from './wiki';
@@ -63,13 +63,13 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   ResetPasswordPage,
   AdminPage,
   InfoPage,
-  ErrorPage
+  ErrorPage,
 ];
 
 export const routes: Readonly<RouteRecordRaw[]> = [
   ...customRoutes,
   {
     path: '/:pathMatch(.*)*',
-    redirect: () => ({ name: 'not-found' })
-  }
+    redirect: () => ({ name: 'not-found' }),
+  },
 ];

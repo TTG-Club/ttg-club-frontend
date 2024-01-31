@@ -6,5 +6,5 @@ export const BackgroundsPage: RouteRecordRaw = {
   name: 'backgrounds',
   path: '/backgrounds',
   component: () => import('./BackgroundsView.vue'),
-  children: [BackgroundDetailPage]
+  children: [BackgroundDetailPage],
 };

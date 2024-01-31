@@ -4,17 +4,17 @@ import type { OptionalParams } from 'js-file-downloader';
 
 export const downloadByUrl = (
   url: string,
-  options?: Exclude<OptionalParams, 'autoStart'>
+  options?: Exclude<OptionalParams, 'autoStart'>,
 ) =>
   new Promise<void>((resolve, reject) => {
     const opts: OptionalParams = {
       autoStart: true,
-      ...options
+      ...options,
     };
 
     new JsFileDownloader({
       url,
-      ...opts
+      ...opts,
     })
       .then(() => resolve)
       .catch(error => reject(error));

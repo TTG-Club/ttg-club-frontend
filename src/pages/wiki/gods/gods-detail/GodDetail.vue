@@ -1,3 +1,71 @@
+<script>
+  import { mapState } from 'pinia';
+
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
+
+  import SectionHeader from '@/features/SectionHeader.vue';
+
+  import GodBody from '@/pages/wiki/gods/gods-detail/GodBody.vue';
+
+  export default {
+    components: {
+      ContentDetail,
+      GodBody,
+      SectionHeader,
+    },
+    async beforeRouteUpdate(to, from, next) {
+      await this.godInfoQuery(to.path);
+
+      next();
+    },
+    data: () => ({
+      god: undefined,
+      loading: false,
+      error: false,
+      abortController: null,
+    }),
+    computed: {
+      ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+    },
+    async mounted() {
+      await this.godInfoQuery(this.$route.path);
+    },
+    methods: {
+      async godInfoQuery(url) {
+        if (this.abortController) {
+          this.abortController.abort();
+        }
+
+        try {
+          this.error = false;
+          this.loading = true;
+          this.abortController = new AbortController();
+
+          const resp = await this.$http.post({
+            url,
+            signal: this.abortController.signal,
+          });
+
+          this.god = resp.data;
+        } catch (err) {
+          errorHandler(err);
+
+          this.error = true;
+        } finally {
+          this.loading = false;
+          this.abortController = null;
+        }
+      },
+
+      close() {
+        this.$router.push({ name: 'gods' });
+      },
+    },
+  };
+</script>
+
 <template>
   <content-detail class="god-detail">
     <template #fixed>
@@ -19,74 +87,6 @@
     </template>
   </content-detail>
 </template>
-
-<script>
-  import { mapState } from 'pinia';
-
-  import GodBody from '@/pages/wiki/gods/gods-detail/GodBody.vue';
-
-  import SectionHeader from '@/features/SectionHeader.vue';
-
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/ContentDetail.vue';
-
-  export default {
-    components: {
-      ContentDetail,
-      GodBody,
-      SectionHeader
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.godInfoQuery(to.path);
-
-      next();
-    },
-    data: () => ({
-      god: undefined,
-      loading: false,
-      error: false,
-      abortController: null
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile'])
-    },
-    async mounted() {
-      await this.godInfoQuery(this.$route.path);
-    },
-    methods: {
-      async godInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
-
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
-
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal
-          });
-
-          this.god = resp.data;
-        } catch (err) {
-          errorHandler(err);
-
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
-
-      close() {
-        this.$router.push({ name: 'gods' });
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   .god-detail {

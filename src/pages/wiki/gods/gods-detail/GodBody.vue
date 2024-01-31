@@ -1,3 +1,31 @@
+<script>
+  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'GodBody',
+    components: {
+      UiEasyLightbox,
+      DetailTopBar,
+      RawContent,
+    },
+    props: {
+      god: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+    },
+    computed: {
+      topBarLeftString() {
+        return ` `;
+      },
+    },
+  };
+</script>
+
 <template>
   <div
     v-if="god"
@@ -69,31 +97,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'GodBody',
-    components: {
-      UiEasyLightbox,
-      DetailTopBar,
-      RawContent
-    },
-    props: {
-      god: {
-        type: Object,
-        default: undefined,
-        required: true
-      }
-    },
-    computed: {
-      topBarLeftString() {
-        return ` `;
-      }
-    }
-  };
-</script>

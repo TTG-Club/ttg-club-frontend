@@ -1,36 +1,7 @@
-<template>
-  <content-detail class="spell-detail">
-    <template #fixed>
-      <section-header
-        :copy="!error && !loading"
-        :fullscreen="!isMobile"
-        :subtitle="spell?.name?.eng || ''"
-        :title="spell?.name?.rus || ''"
-        bookmark
-        print
-        :foundry-versions="foundryVersions"
-        @close="onClose"
-        @export-foundry="exportFoundry"
-      />
-    </template>
-
-    <template #default>
-      <spell-body
-        v-if="spell"
-        :spell="spell"
-      />
-    </template>
-  </content-detail>
-</template>
-
 <script lang="ts" setup>
   import { storeToRefs } from 'pinia';
   import { onBeforeMount, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-
-  import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
-
-  import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
   import { downloadByUrl } from '@/shared/helpers/download';
@@ -39,6 +10,10 @@
   import type { TSpellItem } from '@/shared/types/character/Spells';
   import type { Maybe } from '@/shared/types/Utility';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+
+  import SectionHeader from '@/features/SectionHeader.vue';
+
+  import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
 
   const http = useAxios();
   const route = useRoute();
@@ -55,14 +30,14 @@
 
   const exportFoundry = (
     version: number,
-    showErrorToast: (msg: string) => void
+    showErrorToast: (msg: string) => void,
   ) => {
     if (!spell.value) {
       return Promise.reject();
     }
 
     return downloadByUrl(
-      `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`
+      `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`,
     ).catch(err => {
       showErrorToast('Этот свиток ещё не подготовлен.');
       Promise.reject(err);
@@ -81,7 +56,7 @@
 
       const resp = await http.post<TSpellItem>({
         url,
-        signal: abortController.value.signal
+        signal: abortController.value.signal,
       });
 
       spell.value = resp.data;
@@ -109,6 +84,31 @@
     next();
   });
 </script>
+
+<template>
+  <content-detail class="spell-detail">
+    <template #fixed>
+      <section-header
+        :copy="!error && !loading"
+        :fullscreen="!isMobile"
+        :subtitle="spell?.name?.eng || ''"
+        :title="spell?.name?.rus || ''"
+        bookmark
+        print
+        :foundry-versions="foundryVersions"
+        @close="onClose"
+        @export-foundry="exportFoundry"
+      />
+    </template>
+
+    <template #default>
+      <spell-body
+        v-if="spell"
+        :spell="spell"
+      />
+    </template>
+  </content-detail>
+</template>
 
 <style lang="scss" scoped>
   .spell-detail {

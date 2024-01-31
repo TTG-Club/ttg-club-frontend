@@ -22,5 +22,5 @@ export const ProfileMainPage: RouteRecordRaw = {
     } catch (err) {
       next({ name: 'internal-server' });
     }
-  }
+  },
 };

@@ -1,3 +1,49 @@
+<script>
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'ItemBody',
+    components: {
+      DetailTopBar,
+      RawContent,
+    },
+    props: {
+      item: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+      inTooltip: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    computed: {
+      categoriesString() {
+        if (!this.item.categories?.length) {
+          return '';
+        }
+
+        let str = '';
+
+        if (this.item.categories.length === 1) {
+          str += 'Категория: ';
+        }
+
+        if (this.item.categories.length > 1) {
+          str += 'Категории: ';
+        }
+
+        str += this.item.categories.join(', ');
+
+        return str;
+      },
+    },
+  };
+</script>
+
 <template>
   <div
     :class="{ 'in-tooltip': inTooltip }"
@@ -30,49 +76,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'ItemBody',
-    components: {
-      DetailTopBar,
-      RawContent
-    },
-    props: {
-      item: {
-        type: Object,
-        default: undefined,
-        required: true
-      },
-      inTooltip: {
-        type: Boolean,
-        default: false
-      }
-    },
-    computed: {
-      categoriesString() {
-        if (!this.item.categories?.length) {
-          return '';
-        }
-
-        let str = '';
-
-        if (this.item.categories.length === 1) {
-          str += 'Категория: ';
-        }
-
-        if (this.item.categories.length > 1) {
-          str += 'Категории: ';
-        }
-
-        str += this.item.categories.join(', ');
-
-        return str;
-      }
-    }
-  };
-</script>

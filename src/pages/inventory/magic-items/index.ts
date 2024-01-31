@@ -6,5 +6,5 @@ export const MagicItemsPage: RouteRecordRaw = {
   name: 'magicItems',
   path: '/items/magic',
   component: () => import('@/pages/inventory/magic-items/MagicItemsView.vue'),
-  children: [MagicItemsDetailPage]
+  children: [MagicItemsDetailPage],
 };

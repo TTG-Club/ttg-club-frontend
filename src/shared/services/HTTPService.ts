@@ -22,13 +22,13 @@ class HTTPService {
     this.instance = axios.create({
       baseURL: getBaseURL('/api/v1'),
       withCredentials: true,
-      headers: {}
+      headers: {},
     });
 
     this.instance.interceptors.request.use(req => {
       // eslint-disable-next-line no-param-reassign
       req.paramsSerializer = {
-        indexes: null
+        indexes: null,
       };
 
       if (Cookies.get(USER_TOKEN_COOKIE)) {
@@ -55,7 +55,7 @@ class HTTPService {
       method: 'get',
       url: config.url,
       params: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -64,7 +64,7 @@ class HTTPService {
       method: 'post',
       url: config.url,
       data: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -73,7 +73,7 @@ class HTTPService {
       method: 'put',
       url: config.url,
       data: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -82,7 +82,7 @@ class HTTPService {
       method: 'patch',
       url: config.url,
       data: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -91,7 +91,7 @@ class HTTPService {
       method: 'delete',
       url: config.url,
       params: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -100,7 +100,7 @@ class HTTPService {
       method: 'head',
       baseURL: getBaseURL(),
       url: config.url,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -110,7 +110,7 @@ class HTTPService {
       baseURL: getBaseURL(),
       url: config.url,
       params: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 }

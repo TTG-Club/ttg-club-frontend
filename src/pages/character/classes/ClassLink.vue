@@ -1,3 +1,107 @@
+<script lang="ts">
+  import {
+    computed,
+    defineComponent,
+    nextTick,
+    onMounted,
+    ref,
+    watch,
+  } from 'vue';
+  import { useLink, useRoute, useRouter } from 'vue-router';
+
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import type { TClassItem } from '@/shared/types/character/Classes.d';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { isIconExist } from '@/shared/utils/icons';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  export default defineComponent({
+    components: { SvgIcon },
+    inheritAttrs: false,
+    props: {
+      to: {
+        type: Object as PropType<RouteLocationPathRaw>,
+        required: true,
+      },
+      classItem: {
+        type: Object as PropType<TClassItem>,
+        default: () => null,
+        required: true,
+      },
+      afterSearch: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props) {
+      const route = useRoute();
+      const router = useRouter();
+      const uiStore = useUIStore();
+
+      const { isActive, navigate } = useLink(props);
+
+      const submenu = ref(false);
+
+      const getClassList = computed(() => ({
+        'router-link-active':
+          isActive.value ||
+          route.params.className ===
+            router.resolve(props.classItem.url)?.params?.className,
+        'is-selected': route.name === 'classDetail',
+        'is-green': props.classItem?.source?.homebrew,
+      }));
+
+      const hasArchetypes = computed(
+        () => !!props.classItem?.archetypes?.length,
+      );
+
+      const toggleArch = () => {
+        submenu.value = !submenu.value;
+      };
+
+      const selectClass = () => {
+        if (!uiStore.isMobile) {
+          submenu.value = true;
+        }
+
+        navigate();
+      };
+
+      onMounted(() => {
+        nextTick(() => {
+          submenu.value =
+            route.params.className ===
+            router.resolve(props.classItem.url)?.params?.className;
+        });
+      });
+
+      watch(
+        () => props.afterSearch,
+        value => {
+          if (value) {
+            submenu.value = value;
+
+            return;
+          }
+
+          submenu.value = false;
+        },
+      );
+
+      return {
+        submenu,
+        getClassList,
+        hasArchetypes,
+        toggleArch,
+        selectClass,
+      };
+    },
+    methods: { isIconExist },
+  });
+</script>
+
 <template>
   <router-link
     v-slot="{ href }"
@@ -68,7 +172,7 @@
             v-if="hasArchetypes"
             v-tippy-lazy="{
               content: classItem.archetypeName,
-              placement: 'left'
+              placement: 'left',
             }"
             class="link-item-expand__toggle"
             type="button"
@@ -125,110 +229,6 @@
     </div>
   </router-link>
 </template>
-
-<script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    nextTick,
-    onMounted,
-    ref,
-    watch
-  } from 'vue';
-  import { useLink, useRoute, useRouter } from 'vue-router';
-
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import type { TClassItem } from '@/shared/types/character/Classes.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import { isIconExist } from '@/shared/utils/icons';
-
-  import type { PropType } from 'vue';
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  export default defineComponent({
-    components: { SvgIcon },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      classItem: {
-        type: Object as PropType<TClassItem>,
-        default: () => null,
-        required: true
-      },
-      afterSearch: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const route = useRoute();
-      const router = useRouter();
-      const uiStore = useUIStore();
-
-      const { isActive, navigate } = useLink(props);
-
-      const submenu = ref(false);
-
-      const getClassList = computed(() => ({
-        'router-link-active':
-          isActive.value ||
-          route.params.className ===
-            router.resolve(props.classItem.url)?.params?.className,
-        'is-selected': route.name === 'classDetail',
-        'is-green': props.classItem?.source?.homebrew
-      }));
-
-      const hasArchetypes = computed(
-        () => !!props.classItem?.archetypes?.length
-      );
-
-      const toggleArch = () => {
-        submenu.value = !submenu.value;
-      };
-
-      const selectClass = () => {
-        if (!uiStore.isMobile) {
-          submenu.value = true;
-        }
-
-        navigate();
-      };
-
-      onMounted(() => {
-        nextTick(() => {
-          submenu.value =
-            route.params.className ===
-            router.resolve(props.classItem.url)?.params?.className;
-        });
-      });
-
-      watch(
-        () => props.afterSearch,
-        value => {
-          if (value) {
-            submenu.value = value;
-
-            return;
-          }
-
-          submenu.value = false;
-        }
-      );
-
-      return {
-        submenu,
-        getClassList,
-        hasArchetypes,
-        toggleArch,
-        selectClass
-      };
-    },
-    methods: { isIconExist }
-  });
-</script>
 
 <style
   lang="scss"

@@ -1,29 +1,13 @@
-<template>
-  <nav-popover>
-    <template #trigger="{ isActive }">
-      <div
-        :class="{ 'is-active': isActive }"
-        class="navbar__btn"
-        @click.left.exact.prevent="isShowSearch = !isShowSearch"
-      >
-        <svg-icon icon="search" />
-      </div>
-    </template>
-  </nav-popover>
-
-  <search-modal v-model="isShowSearch" />
-</template>
-
 <script setup lang="ts">
   import { onKeyStroke, useActiveElement } from '@vueuse/core';
   import { storeToRefs } from 'pinia';
 
-  import SearchModal from '@/pages/search/SearchModal.vue';
+  import { useNavStore } from '@/shared/stores/NavStore';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 
-  import { useNavStore } from '@/shared/stores/NavStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import SearchModal from '@/pages/search/SearchModal.vue';
 
   const navStore = useNavStore();
   const { isShowSearch } = storeToRefs(navStore);
@@ -48,3 +32,19 @@
     onOpenSearch();
   });
 </script>
+
+<template>
+  <nav-popover>
+    <template #trigger="{ isActive }">
+      <div
+        :class="{ 'is-active': isActive }"
+        class="navbar__btn"
+        @click.left.exact.prevent="isShowSearch = !isShowSearch"
+      >
+        <svg-icon icon="search" />
+      </div>
+    </template>
+  </nav-popover>
+
+  <search-modal v-model="isShowSearch" />
+</template>

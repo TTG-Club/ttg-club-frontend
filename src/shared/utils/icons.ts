@@ -3,8 +3,8 @@ const iconAvailList = Object.fromEntries(
     import.meta.glob('@/assets/icons/svg/**/*.svg', {
       import: 'default',
       as: 'raw',
-      eager: true
-    })
+      eager: true,
+    }),
   )
     .map(([path, icon]): [string, boolean] => {
       const match = path.match(/.+?svg\/(.+?)\.svg/i);
@@ -16,7 +16,7 @@ const iconAvailList = Object.fromEntries(
 
       return [name, true];
     })
-    .filter(([path, exist]) => !!path && exist)
+    .filter(([path, exist]) => !!path && exist),
 );
 
 const icons = Object.keys(iconAvailList);

@@ -49,7 +49,7 @@ export const DefaultTippyProps: DefaultProps = {
     if (attr) {
       http
         .rawGet({
-          url: attr
+          url: attr,
         })
         .then(res => {
           if (res.status !== 200) {
@@ -70,14 +70,14 @@ export const DefaultTippyProps: DefaultProps = {
     }
 
     return canShow;
-  }
+  },
 };
 
 export const TippyOptions: TippyPluginOptions = {
-  defaultProps: DefaultTippyProps
+  defaultProps: DefaultTippyProps,
 };
 
 export default {
   DefaultTippyProps,
-  TippyOptions
+  TippyOptions,
 };

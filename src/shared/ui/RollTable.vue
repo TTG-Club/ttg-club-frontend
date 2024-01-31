@@ -1,60 +1,3 @@
-<template>
-  <table :class="$style.rollTable">
-    <thead>
-      <th>
-        <dice-roller
-          :formula="table.formula"
-          @roll-result="showResult"
-        />
-      </th>
-
-      <th
-        v-for="(th, key) in table.thead"
-        :key="key"
-      >
-        <raw-content
-          :template="th"
-          tag="span"
-        />
-      </th>
-    </thead>
-
-    <tr
-      v-for="(tr, rowIndex) in table.tbody"
-      :key="rowIndex"
-      ref="tableRow"
-      :class="{ [$style.highlighted]: rowIndex === highlighted }"
-    >
-      <component
-        :is="!cellIndex ? 'th' : 'td'"
-        v-for="(td, cellIndex) in tr"
-        :key="cellIndex"
-      >
-        <transition
-          name="fade"
-          mode="out-in"
-        >
-          <span
-            v-if="!cellIndex && rowIndex === highlighted"
-            :class="$style.dice"
-          >
-            <svg-icon
-              icon="dice/d20"
-              size="18"
-            />
-          </span>
-
-          <raw-content
-            v-else
-            :template="td"
-            tag="span"
-          />
-        </transition>
-      </component>
-    </tr>
-  </table>
-</template>
-
 <script setup lang="ts">
   import { refAutoReset } from '@vueuse/core';
   import { toNumber } from 'lodash-es';
@@ -120,11 +63,68 @@
 
       el.scrollIntoView({
         block: 'center',
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
 </script>
+
+<template>
+  <table :class="$style.rollTable">
+    <thead>
+      <th>
+        <dice-roller
+          :formula="table.formula"
+          @roll-result="showResult"
+        />
+      </th>
+
+      <th
+        v-for="(th, key) in table.thead"
+        :key="key"
+      >
+        <raw-content
+          :template="th"
+          tag="span"
+        />
+      </th>
+    </thead>
+
+    <tr
+      v-for="(tr, rowIndex) in table.tbody"
+      :key="rowIndex"
+      ref="tableRow"
+      :class="{ [$style.highlighted]: rowIndex === highlighted }"
+    >
+      <component
+        :is="!cellIndex ? 'th' : 'td'"
+        v-for="(td, cellIndex) in tr"
+        :key="cellIndex"
+      >
+        <transition
+          name="fade"
+          mode="out-in"
+        >
+          <span
+            v-if="!cellIndex && rowIndex === highlighted"
+            :class="$style.dice"
+          >
+            <svg-icon
+              icon="dice/d20"
+              size="18"
+            />
+          </span>
+
+          <raw-content
+            v-else
+            :template="td"
+            tag="span"
+          />
+        </transition>
+      </component>
+    </tr>
+  </table>
+</template>
 
 <style lang="scss" module>
   @use '@/assets/styles/variables/mixins' as *;

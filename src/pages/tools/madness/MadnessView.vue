@@ -1,3 +1,111 @@
+<script>
+  import { throttle } from 'lodash-es';
+  import { reactive } from 'vue';
+
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
+  export default {
+    name: 'MadnessView',
+    components: {
+      RawContent,
+      UiCheckbox,
+      ContentLayout,
+      UiButton,
+      UiInput,
+    },
+    data: () => ({
+      count: 1,
+      types: [],
+      results: [],
+      controller: undefined,
+    }),
+    async beforeMount() {
+      await this.getTables();
+    },
+    methods: {
+      async getTables() {
+        try {
+          const resp = await this.$http.get({
+            url: '/tools/madness',
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          this.types = resp.data.map(type => ({
+            ...type,
+            toggled: false,
+          }));
+        } catch (err) {
+          errorHandler(err);
+        }
+      },
+
+      // eslint-disable-next-line func-names
+      sendForm: throttle(async function () {
+        if (this.controller) {
+          this.controller.abort();
+        }
+
+        this.controller = new AbortController();
+
+        try {
+          const options = {
+            count: this.count || 1,
+          };
+
+          const type = this.types.find(el => el.toggled);
+
+          if (type) {
+            options.type = type.value;
+          }
+
+          const resp = await this.$http.post({
+            url: '/tools/madness',
+            payload: options,
+            signal: this.controller.signal,
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          for (const el of resp.data) {
+            this.results.unshift(reactive(el));
+          }
+        } catch (err) {
+          errorHandler(err);
+        } finally {
+          this.controller = undefined;
+        }
+      }, 300),
+
+      toggleType(e, type) {
+        for (let i = 0; i < this.types.length; i++) {
+          if (this.types[i].value !== type.value) {
+            this.types[i].toggled = false;
+
+            continue;
+          }
+
+          this.types[i].toggled = e;
+        }
+      },
+    },
+  };
+</script>
+
 <template>
   <content-layout>
     <template #fixed>
@@ -68,114 +176,6 @@
     </template>
   </content-layout>
 </template>
-
-<script>
-  import { throttle } from 'lodash-es';
-  import { reactive } from 'vue';
-
-  import ContentLayout from '@/layouts/ContentLayout.vue';
-
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'MadnessView',
-    components: {
-      RawContent,
-      UiCheckbox,
-      ContentLayout,
-      UiButton,
-      UiInput
-    },
-    data: () => ({
-      count: 1,
-      types: [],
-      results: [],
-      controller: undefined
-    }),
-    async beforeMount() {
-      await this.getTables();
-    },
-    methods: {
-      async getTables() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/madness'
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.types = resp.data.map(type => ({
-            ...type,
-            toggled: false
-          }));
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
-
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
-
-        this.controller = new AbortController();
-
-        try {
-          const options = {
-            count: this.count || 1
-          };
-
-          const type = this.types.find(el => el.toggled);
-
-          if (type) {
-            options.type = type.value;
-          }
-
-          const resp = await this.$http.post({
-            url: '/tools/madness',
-            payload: options,
-            signal: this.controller.signal
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          for (const el of resp.data) {
-            this.results.unshift(reactive(el));
-          }
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-
-      toggleType(e, type) {
-        for (let i = 0; i < this.types.length; i++) {
-          if (this.types[i].value !== type.value) {
-            this.types[i].toggled = false;
-
-            continue;
-          }
-
-          this.types[i].toggled = e;
-        }
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   .madness-item {

@@ -5,7 +5,7 @@ import { computed, ref, unref } from 'vue';
 import { useAxios } from '@/shared/composables/useAxios';
 import type {
   SearchComposable,
-  SearchConfig
+  SearchConfig,
 } from '@/shared/composables/useSearch';
 import { useSearch } from '@/shared/composables/useSearch';
 
@@ -66,20 +66,20 @@ export function useFilter(config: FilterConfig): FilterComposable {
 
   const search = useSearch({
     initial: config.search?.initial || '',
-    exact: !!config.search?.exact
+    exact: !!config.search?.exact,
   });
 
   const store = ref<LocalForage>(
     localforage.createInstance({
       name: unref(dbName),
-      storeName
-    })
+      storeName,
+    }),
   );
 
   const setStoreInstance = () => {
     store.value = localforage.createInstance({
       name: unref(dbName),
-      storeName
+      storeName,
     });
   };
 
@@ -152,7 +152,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
   });
 
   const getRestored = async (
-    filterDefault: Filter | Array<FilterGroup>
+    filterDefault: Filter | Array<FilterGroup>,
   ): Promise<Filter | Array<FilterGroup>> => {
     let restoredFilter: Filter | Array<FilterGroup>;
     let filterKey: keyof Filter;
@@ -162,7 +162,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
     const copy = cloneDeep(filterDefault);
 
     const saved: Filter | Array<FilterGroup> | null = await store.value.getItem(
-      unref(storeKey)
+      unref(storeKey),
     );
 
     const copyIsNewType =
@@ -182,7 +182,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
 
       if (filterKey && !Array.isArray(saved)) {
         savedGroup = saved[filterKey as keyof Filter]!.find(
-          group => group.key === key
+          group => group.key === key,
         );
       }
 
@@ -205,13 +205,13 @@ export function useFilter(config: FilterConfig): FilterComposable {
       for (let i = 0; i < group.values.length; i++) {
         values.push({
           ...group.values[i],
-          value: getRestoredValue(group.values[i], group.key)
+          value: getRestoredValue(group.values[i], group.key),
         });
       }
 
       return {
         ...group,
-        values
+        values,
       };
     };
 
@@ -272,7 +272,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
 
     const getValueWithDefaults = (item: FilterItem): FilterItem => ({
       ...item,
-      value: item.default
+      value: item.default,
     });
 
     const getGroupWithDefaults = (group: FilterGroup): FilterGroup => {
@@ -284,7 +284,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
 
       return {
         ...group,
-        values
+        values,
       };
     };
 
@@ -332,7 +332,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
       };
 
       const resp = await http.post<Filter | Array<FilterGroup>>({
-        url: unref(url)
+        url: unref(url),
       });
 
       if (!resp.data || resp.status !== 200) {
@@ -359,6 +359,6 @@ export function useFilter(config: FilterConfig): FilterComposable {
 
     initFilter,
     saveFilter,
-    resetFilter
+    resetFilter,
   };
 }

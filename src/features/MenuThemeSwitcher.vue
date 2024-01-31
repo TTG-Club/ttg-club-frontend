@@ -1,3 +1,24 @@
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+  import { ref } from 'vue';
+
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import type { TButtonType } from '@/shared/ui/kit/button/UiButton';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  import NavPopover from '@/features/menu/NavPopover.vue';
+
+  import type { BasicColorSchema } from '@vueuse/core';
+
+  const uiStore = useUIStore();
+  const { theme, storedTheme } = storeToRefs(uiStore);
+  const popover = ref<boolean>(false);
+
+  const getButtonType = (name: BasicColorSchema): TButtonType =>
+    storedTheme.value === name ? 'default' : 'secondary';
+</script>
+
 <template>
   <nav-popover v-model="popover">
     <template #trigger="{ isActive }">
@@ -40,27 +61,6 @@
     </template>
   </nav-popover>
 </template>
-
-<script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-
-  import NavPopover from '@/features/menu/NavPopover.vue';
-
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import type { TButtonType } from '@/shared/ui/kit/button/UiButton';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-
-  import type { BasicColorSchema } from '@vueuse/core';
-
-  const uiStore = useUIStore();
-  const { theme, storedTheme } = storeToRefs(uiStore);
-  const popover = ref<boolean>(false);
-
-  const getButtonType = (name: BasicColorSchema): TButtonType =>
-    storedTheme.value === name ? 'default' : 'secondary';
-</script>
 
 <style lang="scss" module>
   .title {

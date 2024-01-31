@@ -4,7 +4,7 @@ export const getCSSPropertyValue = (element: Element, property: string) => {
 
   return {
     style,
-    value
+    value,
   };
 };
 

@@ -1,41 +1,3 @@
-<template>
-  <div
-    v-if="modelValue.length"
-    class="ability-array"
-  >
-    <ui-select
-      v-for="(roll, index) in modelValue"
-      :key="index"
-      :model-value="roll"
-      :options="abilities"
-      allow-empty
-      class="ability-array__select"
-      label="name"
-      track-by="key"
-      @remove="onRemove(index)"
-      @select="onSelect($event.key, index)"
-    >
-      <template #left-slot>
-        {{ roll.value }}
-      </template>
-
-      <template #singleLabel>
-        {{ roll.name || 'Выбрать хар-ку' }}
-      </template>
-
-      <template #placeholder> Выбрать хар-ку </template>
-
-      <template #option="{ option }">
-        <span
-          :class="{ 'is-selected': isSelected(option.key) }"
-          class="ability-array__select_option"
-          >{{ option.name }}</span
-        >
-      </template>
-    </ui-select>
-  </div>
-</template>
-
 <script lang="ts">
   import { computed, defineComponent, onActivated, ref } from 'vue';
 
@@ -48,13 +10,13 @@
 
   export default defineComponent({
     components: {
-      UiSelect
+      UiSelect,
     },
     props: {
       modelValue: {
         type: Array as PropType<Array<AbilityRoll>>,
-        required: true
-      }
+        required: true,
+      },
     },
     setup(props, { emit }) {
       const rolls = ref<Array<AbilityRoll>>([
@@ -62,38 +24,38 @@
           name: null,
           key: null,
           shortName: null,
-          value: 15
+          value: 15,
         },
         {
           name: null,
           key: null,
           shortName: null,
-          value: 14
+          value: 14,
         },
         {
           name: null,
           key: null,
           shortName: null,
-          value: 13
+          value: 13,
         },
         {
           name: null,
           key: null,
           shortName: null,
-          value: 12
+          value: 12,
         },
         {
           name: null,
           key: null,
           shortName: null,
-          value: 10
+          value: 10,
         },
         {
           name: null,
           key: null,
           shortName: null,
-          value: 8
-        }
+          value: 8,
+        },
       ]);
 
       emit('update:model-value', rolls.value);
@@ -138,17 +100,55 @@
         abilities: computed(() =>
           Object.keys(AbilityKey).map(key => ({
             key,
-            name: AbilityName[key as AbilityKey]
-          }))
+            name: AbilityName[key as AbilityKey],
+          })),
         ),
         getFormattedModifier,
         isSelected,
         onSelect,
-        onRemove
+        onRemove,
       };
-    }
+    },
   });
 </script>
+
+<template>
+  <div
+    v-if="modelValue.length"
+    class="ability-array"
+  >
+    <ui-select
+      v-for="(roll, index) in modelValue"
+      :key="index"
+      :model-value="roll"
+      :options="abilities"
+      allow-empty
+      class="ability-array__select"
+      label="name"
+      track-by="key"
+      @remove="onRemove(index)"
+      @select="onSelect($event.key, index)"
+    >
+      <template #left-slot>
+        {{ roll.value }}
+      </template>
+
+      <template #singleLabel>
+        {{ roll.name || 'Выбрать хар-ку' }}
+      </template>
+
+      <template #placeholder> Выбрать хар-ку </template>
+
+      <template #option="{ option }">
+        <span
+          :class="{ 'is-selected': isSelected(option.key) }"
+          class="ability-array__select_option"
+          >{{ option.name }}</span
+        >
+      </template>
+    </ui-select>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   .ability-array {

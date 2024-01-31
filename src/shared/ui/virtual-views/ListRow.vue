@@ -1,15 +1,3 @@
-<template>
-  <div class="list-row">
-    <div
-      v-for="item in items"
-      :key="item[itemKey]"
-      class="list-row__column"
-    >
-      <slot v-bind="{ item }" />
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
   import { isArray } from 'lodash-es';
   import { computed } from 'vue';
@@ -23,11 +11,23 @@
   };
 
   const props = withDefaults(defineProps<TListRowProps>(), {
-    columns: 1
+    columns: 1,
   });
 
   const items = computed(() => (isArray(props.row) ? props.row : [props.row]));
 </script>
+
+<template>
+  <div class="list-row">
+    <div
+      v-for="item in items"
+      :key="item[itemKey]"
+      class="list-row__column"
+    >
+      <slot v-bind="{ item }" />
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   $item-spacing: 12px;

@@ -1,3 +1,42 @@
+<script lang="ts">
+  import { computed, defineComponent } from 'vue';
+  import { useLink } from 'vue-router';
+
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  export default defineComponent({
+    directives: {
+      CapitalizeFirst,
+    },
+    inheritAttrs: false,
+    props: {
+      to: {
+        type: Object as PropType<RouteLocationPathRaw>,
+        required: true,
+      },
+      book: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    setup(props) {
+      const { isActive, href, navigate } = useLink(props);
+
+      return {
+        href,
+        navigate,
+        classList: computed(() => ({
+          'router-link-active': isActive.value,
+          'is-green': props.book?.source?.homebrew,
+        })),
+      };
+    },
+  });
+</script>
+
 <template>
   <router-link
     custom
@@ -27,44 +66,5 @@
     </a>
   </router-link>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent } from 'vue';
-  import { useLink } from 'vue-router';
-
-  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
-
-  import type { PropType } from 'vue';
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  export default defineComponent({
-    directives: {
-      CapitalizeFirst
-    },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      book: {
-        type: Object,
-        default: () => ({})
-      }
-    },
-    setup(props) {
-      const { isActive, href, navigate } = useLink(props);
-
-      return {
-        href,
-        navigate,
-        classList: computed(() => ({
-          'router-link-active': isActive.value,
-          'is-green': props.book?.source?.homebrew
-        }))
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss" />

@@ -86,6 +86,6 @@ export const useRouterHelpers = () => {
   return {
     isUrlAvailable,
     isStaticUrl,
-    nextAvailable
+    nextAvailable,
   };
 };

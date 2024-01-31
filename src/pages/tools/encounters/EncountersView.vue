@@ -1,3 +1,171 @@
+<script>
+  import { throttle } from 'lodash-es';
+  import { reactive } from 'vue';
+
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+  import RollTable from '@/shared/ui/RollTable.vue';
+
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
+  export default {
+    name: 'EncountersView',
+    components: {
+      RollTable,
+      BaseModal,
+      UiButton,
+      UiSelect,
+      RawContent,
+      ContentLayout,
+    },
+    data: () => ({
+      controller: undefined,
+      environments: [],
+      levels: [],
+      results: [],
+      table: {
+        show: false,
+        data: undefined,
+      },
+      form: {
+        level: '',
+        environment: '',
+      },
+    }),
+    computed: {
+      isTableDisabled() {
+        return this.form.level && this.form.environment;
+      },
+
+      level: {
+        get() {
+          if (!this.form.level) {
+            return '';
+          }
+
+          return this.levels.find(level => level.value === this.form.level);
+        },
+
+        set(e) {
+          this.form.level = e.value;
+        },
+      },
+
+      env: {
+        get() {
+          if (!this.form.environment) {
+            return '';
+          }
+
+          return this.environments.find(
+            env => env.value === this.form.environment,
+          );
+        },
+
+        set(e) {
+          this.form.environment = e.value;
+        },
+      },
+    },
+    async beforeMount() {
+      await this.getOptions();
+    },
+    methods: {
+      async getOptions() {
+        try {
+          const resp = await this.$http.get({
+            url: '/tools/encounters',
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          this.environments = resp.data.environments;
+          this.levels = resp.data.levels;
+        } catch (err) {
+          errorHandler(err);
+        }
+      },
+
+      // eslint-disable-next-line func-names
+      sendForm: throttle(async function () {
+        if (this.controller) {
+          this.controller.abort();
+        }
+
+        this.controller = new AbortController();
+
+        try {
+          const options = {};
+
+          for (const [key, value] of Object.entries(this.form)) {
+            if (!value) {
+              continue;
+            }
+
+            options[key] = value;
+          }
+
+          const resp = await this.$http.post({
+            url: '/tools/encounters',
+            payload: options,
+            signal: this.controller.signal,
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          this.results.unshift(reactive(resp.data));
+        } catch (err) {
+          errorHandler(err);
+        } finally {
+          this.controller = undefined;
+        }
+      }, 300),
+
+      async getTable() {
+        if (this.controller) {
+          this.controller.abort();
+        }
+
+        this.controller = new AbortController();
+
+        try {
+          const resp = await this.$http.post({
+            url: '/tools/encounters/table',
+            payload: this.form,
+            signal: this.controller.signal,
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          this.table = {
+            show: true,
+            data: resp.data,
+          };
+        } catch (err) {
+          errorHandler(err);
+        } finally {
+          this.controller = undefined;
+        }
+      },
+    },
+  };
+</script>
+
 <template>
   <content-layout>
     <template #fixed>
@@ -88,174 +256,6 @@
     </template>
   </base-modal>
 </template>
-
-<script>
-  import { throttle } from 'lodash-es';
-  import { reactive } from 'vue';
-
-  import ContentLayout from '@/layouts/ContentLayout.vue';
-
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-  import RollTable from '@/shared/ui/RollTable.vue';
-
-  export default {
-    name: 'EncountersView',
-    components: {
-      RollTable,
-      BaseModal,
-      UiButton,
-      UiSelect,
-      RawContent,
-      ContentLayout
-    },
-    data: () => ({
-      controller: undefined,
-      environments: [],
-      levels: [],
-      results: [],
-      table: {
-        show: false,
-        data: undefined
-      },
-      form: {
-        level: '',
-        environment: ''
-      }
-    }),
-    computed: {
-      isTableDisabled() {
-        return this.form.level && this.form.environment;
-      },
-
-      level: {
-        get() {
-          if (!this.form.level) {
-            return '';
-          }
-
-          return this.levels.find(level => level.value === this.form.level);
-        },
-
-        set(e) {
-          this.form.level = e.value;
-        }
-      },
-
-      env: {
-        get() {
-          if (!this.form.environment) {
-            return '';
-          }
-
-          return this.environments.find(
-            env => env.value === this.form.environment
-          );
-        },
-
-        set(e) {
-          this.form.environment = e.value;
-        }
-      }
-    },
-    async beforeMount() {
-      await this.getOptions();
-    },
-    methods: {
-      async getOptions() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/encounters'
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.environments = resp.data.environments;
-          this.levels = resp.data.levels;
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
-
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
-
-        this.controller = new AbortController();
-
-        try {
-          const options = {};
-
-          for (const [key, value] of Object.entries(this.form)) {
-            if (!value) {
-              continue;
-            }
-
-            options[key] = value;
-          }
-
-          const resp = await this.$http.post({
-            url: '/tools/encounters',
-            payload: options,
-            signal: this.controller.signal
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.results.unshift(reactive(resp.data));
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-
-      async getTable() {
-        if (this.controller) {
-          this.controller.abort();
-        }
-
-        this.controller = new AbortController();
-
-        try {
-          const resp = await this.$http.post({
-            url: '/tools/encounters/table',
-            payload: this.form,
-            signal: this.controller.signal
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.table = {
-            show: true,
-            data: resp.data
-          };
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   .madness-item {

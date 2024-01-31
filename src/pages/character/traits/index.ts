@@ -6,5 +6,5 @@ export const TraitsPage: RouteRecordRaw = {
   name: 'traits',
   path: '/traits',
   component: () => import('./TraitsView.vue'),
-  children: [TraitsDetailPage]
+  children: [TraitsDetailPage],
 };

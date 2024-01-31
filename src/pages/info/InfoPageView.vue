@@ -1,46 +1,20 @@
-<template>
-  <page-layout>
-    <template #title>
-      {{ infoPage?.title || 'Заголовок' }}
-    </template>
-
-    <template
-      v-if="infoPage?.subtitle"
-      #subtitle
-    >
-      {{ infoPage?.subtitle || '' }}
-    </template>
-
-    <template #default>
-      <raw-content
-        v-if="infoPage?.description"
-        :template="infoPage.description"
-      />
-
-      <span v-else-if="error">Произошла ошибка</span>
-
-      <span v-else>Загрузка...</span>
-    </template>
-  </page-layout>
-</template>
-
 <script lang="ts">
   import { tryOnBeforeMount } from '@vueuse/core';
   import { AxiosError } from 'axios';
   import { defineComponent, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import PageLayout from '@/layouts/PageLayout.vue';
-
   import { useAxios } from '@/shared/composables/useAxios';
   import RawContent from '@/shared/ui/RawContent.vue';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
 
   import type { RouteLocationNormalized } from 'vue-router';
 
   export default defineComponent({
     components: {
       RawContent,
-      PageLayout
+      PageLayout,
     },
     setup() {
       const route = useRoute();
@@ -101,10 +75,34 @@
 
       return {
         infoPage,
-        error
+        error,
       };
-    }
+    },
   });
 </script>
 
-<style lang="scss" scoped></style>
+<template>
+  <page-layout>
+    <template #title>
+      {{ infoPage?.title || 'Заголовок' }}
+    </template>
+
+    <template
+      v-if="infoPage?.subtitle"
+      #subtitle
+    >
+      {{ infoPage?.subtitle || '' }}
+    </template>
+
+    <template #default>
+      <raw-content
+        v-if="infoPage?.description"
+        :template="infoPage.description"
+      />
+
+      <span v-else-if="error">Произошла ошибка</span>
+
+      <span v-else>Загрузка...</span>
+    </template>
+  </page-layout>
+</template>

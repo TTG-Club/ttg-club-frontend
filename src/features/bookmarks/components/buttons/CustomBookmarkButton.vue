@@ -1,8 +1,90 @@
+<script setup lang="ts">
+  import { computed, ref } from 'vue';
+  import { useRoute } from 'vue-router';
+  import { useToast } from 'vue-toastification';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
+
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+  import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.d';
+
+  const props = withDefaults(
+    defineProps<{
+      name?: string;
+      url?: string;
+    }>(),
+    {
+      name: '',
+      url: '',
+    },
+  );
+
+  const toast = useToast(ToastEventBus);
+  const bookmarksStore = useCustomBookmarkStore();
+  const route = useRoute();
+
+  const bookmarkUrl = computed(() =>
+    props.url !== '' ? props.url : route.path,
+  );
+
+  const groups = computed(() =>
+    bookmarksStore.getGroups.filter(group => group.order > -1),
+  );
+
+  const isSaved = (uuid?: IBookmarkGroup['uuid']) =>
+    uuid
+      ? bookmarksStore.isBookmarkSavedInGroup(bookmarkUrl.value, uuid)
+      : !!bookmarksStore.isBookmarkSavedInDefault(bookmarkUrl.value);
+
+  const onOpenDropdown = () => bookmarksStore.queryGetBookmarks();
+
+  const inProgress = ref(false);
+
+  const updateBookmark = async (groupUUID?: IBookmarkGroup['uuid']) => {
+    if (inProgress.value) {
+      return;
+    }
+
+    const updateInGroup = (uuid: IBookmarkGroup['uuid']) =>
+      bookmarksStore.updateBookmarkInGroup({
+        url: bookmarkUrl.value,
+        name: props.name,
+        groupUUID: uuid,
+      });
+
+    const updateInDefault = async () => {
+      const defaultGroup = await bookmarksStore.getDefaultGroup();
+
+      return bookmarksStore.updateBookmarkInGroup({
+        url: bookmarkUrl.value,
+        name: props.name,
+        groupUUID: defaultGroup.uuid,
+      });
+    };
+
+    try {
+      inProgress.value = true;
+
+      const bookmark = groupUUID
+        ? await updateInGroup(groupUUID)
+        : await updateInDefault();
+
+      toast.success(`Закладка ${bookmark ? 'добавлена' : 'удалена'}!`);
+    } catch (err) {
+      toast.error('Произошла какая-то ошибка...');
+    } finally {
+      inProgress.value = false;
+    }
+  };
+</script>
+
 <template>
   <ui-button
     :tooltip="{
       content: isSaved() ? 'Удалить из закладок' : 'Добавить в закладки',
-      hideOnClick: true
+      hideOnClick: true,
     }"
     :icon="`bookmark/${isSaved() ? 'filled' : 'outline'}`"
     :before-dropdown-show="onOpenDropdown"
@@ -28,88 +110,6 @@
     </template>
   </ui-button>
 </template>
-
-<script setup lang="ts">
-  import { computed, ref } from 'vue';
-  import { useRoute } from 'vue-router';
-  import { useToast } from 'vue-toastification';
-
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
-  import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.d';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-
-  const props = withDefaults(
-    defineProps<{
-      name?: string;
-      url?: string;
-    }>(),
-    {
-      name: '',
-      url: ''
-    }
-  );
-
-  const toast = useToast(ToastEventBus);
-  const bookmarksStore = useCustomBookmarkStore();
-  const route = useRoute();
-
-  const bookmarkUrl = computed(() =>
-    props.url !== '' ? props.url : route.path
-  );
-
-  const groups = computed(() =>
-    bookmarksStore.getGroups.filter(group => group.order > -1)
-  );
-
-  const isSaved = (uuid?: IBookmarkGroup['uuid']) =>
-    uuid
-      ? bookmarksStore.isBookmarkSavedInGroup(bookmarkUrl.value, uuid)
-      : !!bookmarksStore.isBookmarkSavedInDefault(bookmarkUrl.value);
-
-  const onOpenDropdown = () => bookmarksStore.queryGetBookmarks();
-
-  const inProgress = ref(false);
-
-  const updateBookmark = async (groupUUID?: IBookmarkGroup['uuid']) => {
-    if (inProgress.value) {
-      return;
-    }
-
-    const updateInGroup = (uuid: IBookmarkGroup['uuid']) =>
-      bookmarksStore.updateBookmarkInGroup({
-        url: bookmarkUrl.value,
-        name: props.name,
-        groupUUID: uuid
-      });
-
-    const updateInDefault = async () => {
-      const defaultGroup = await bookmarksStore.getDefaultGroup();
-
-      return bookmarksStore.updateBookmarkInGroup({
-        url: bookmarkUrl.value,
-        name: props.name,
-        groupUUID: defaultGroup.uuid
-      });
-    };
-
-    try {
-      inProgress.value = true;
-
-      const bookmark = groupUUID
-        ? await updateInGroup(groupUUID)
-        : await updateInDefault();
-
-      toast.success(`Закладка ${bookmark ? 'добавлена' : 'удалена'}!`);
-    } catch (err) {
-      toast.error('Произошла какая-то ошибка...');
-    } finally {
-      inProgress.value = false;
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   .custom-bookmark-button {

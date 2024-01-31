@@ -33,7 +33,7 @@ export const TippyLazy: Directive = {
             e.target?.dispatchEvent(e);
           });
         }
-      }
+      },
     };
 
     el.tippyLazy = tippyLazy;
@@ -50,5 +50,5 @@ export const TippyLazy: Directive = {
     });
 
     tippyDirective.unmounted?.(...args);
-  }
+  },
 };

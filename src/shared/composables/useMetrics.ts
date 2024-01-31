@@ -26,13 +26,13 @@ export const useMetrics = () => {
     const term = unref(search);
 
     event('search', {
-      search_term: term
+      search_term: term,
     });
   };
 
   const sendSearchViewResultsMetrics = (
     search: MaybeRef<string>,
-    items?: MaybeRef<Array<ISearchItem>>
+    items?: MaybeRef<Array<ISearchItem>>,
   ) => {
     if (isDev) {
       return;
@@ -45,7 +45,7 @@ export const useMetrics = () => {
       search_term: string;
       items?: Array<ISearchItem>;
     } = {
-      search_term: term
+      search_term: term,
     };
 
     if (list instanceof Array) {
@@ -74,7 +74,7 @@ export const useMetrics = () => {
 
     pageview({
       page_path: to.path,
-      page_location: window.location.origin + to.fullPath
+      page_location: window.location.origin + to.fullPath,
     });
   };
 
@@ -84,7 +84,7 @@ export const useMetrics = () => {
     }
 
     event('sign_up', {
-      method: unref(method)
+      method: unref(method),
     });
   };
 
@@ -94,7 +94,7 @@ export const useMetrics = () => {
     }
 
     event('login', {
-      method: unref(method)
+      method: unref(method),
     });
   };
 
@@ -103,7 +103,7 @@ export const useMetrics = () => {
       method: MaybeRef<string>;
       id?: MaybeRef<string>;
       category?: MaybeRef<string>;
-    } = { method: 'link_copy' }
+    } = { method: 'link_copy' },
   ) => {
     if (isDev) {
       return;
@@ -136,6 +136,6 @@ export const useMetrics = () => {
     sendPageViewMetrics,
     sendSignUpMetrics,
     sendLoginMetrics,
-    sendShareMetrics
+    sendShareMetrics,
   };
 };

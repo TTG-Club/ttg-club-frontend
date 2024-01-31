@@ -1,3 +1,32 @@
+<script>
+  import DiceRoller from '@/shared/ui/DiceRoller.vue';
+  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'MagicItemBody',
+    components: {
+      UiEasyLightbox,
+      DetailTopBar,
+      RawContent,
+      DiceRoller,
+    },
+    props: {
+      magicItem: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+      inTooltip: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  };
+</script>
+
 <template>
   <div
     v-if="magicItem"
@@ -69,32 +98,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import DiceRoller from '@/shared/ui/DiceRoller.vue';
-  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'MagicItemBody',
-    components: {
-      UiEasyLightbox,
-      DetailTopBar,
-      RawContent,
-      DiceRoller
-    },
-    props: {
-      magicItem: {
-        type: Object,
-        default: undefined,
-        required: true
-      },
-      inTooltip: {
-        type: Boolean,
-        default: false
-      }
-    }
-  };
-</script>

@@ -1,3 +1,32 @@
+<script setup lang="ts">
+  import { orderBy, upperFirst } from 'lodash-es';
+  import { storeToRefs } from 'pinia';
+  import { computed } from 'vue';
+
+  import isDev from '@/shared/helpers/isDev';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
+
+  const userStore = useUserStore();
+
+  const { user, avatar, roles: userRoles } = storeToRefs(userStore);
+
+  const roles = computed(() =>
+    upperFirst(
+      orderBy(userRoles.value)
+        .map(role => role.name)
+        .join(', '),
+    ),
+  );
+
+  const isYoutubeRole = computed(
+    () =>
+      user.value?.roles.includes(EUserRoles.MODERATOR) ||
+      user.value?.roles.includes(EUserRoles.ADMIN),
+  );
+</script>
+
 <template>
   <page-layout
     :show-separator="false"
@@ -196,35 +225,6 @@
     </template>
   </page-layout>
 </template>
-
-<script setup lang="ts">
-  import { orderBy, upperFirst } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
-
-  import PageLayout from '@/layouts/PageLayout.vue';
-
-  import isDev from '@/shared/helpers/isDev';
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
-
-  const userStore = useUserStore();
-
-  const { user, avatar, roles: userRoles } = storeToRefs(userStore);
-
-  const roles = computed(() =>
-    upperFirst(
-      orderBy(userRoles.value)
-        .map(role => role.name)
-        .join(', ')
-    )
-  );
-
-  const isYoutubeRole = computed(
-    () =>
-      user.value?.roles.includes(EUserRoles.MODERATOR) ||
-      user.value?.roles.includes(EUserRoles.ADMIN)
-  );
-</script>
 
 <style lang="scss" scoped>
   .profile {

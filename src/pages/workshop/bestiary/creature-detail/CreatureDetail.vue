@@ -1,36 +1,7 @@
-<template>
-  <content-detail class="creature-detail">
-    <template #fixed>
-      <section-header
-        :copy="!error && !loading"
-        :fullscreen="!isMobile"
-        :subtitle="creature?.name?.eng || ''"
-        :title="creature?.name?.rus || ''"
-        bookmark
-        print
-        :foundry-versions="foundryVersions"
-        @close="onClose"
-        @export-foundry="exportFoundry"
-      />
-    </template>
-
-    <template #default>
-      <creature-body
-        v-if="creature"
-        :creature="creature"
-      />
-    </template>
-  </content-detail>
-</template>
-
 <script lang="ts" setup>
   import { storeToRefs } from 'pinia';
   import { onBeforeMount, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-
-  import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
-
-  import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
   import { downloadByUrl } from '@/shared/helpers/download';
@@ -39,6 +10,10 @@
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+
+  import SectionHeader from '@/features/SectionHeader.vue';
+
+  import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
 
   const http = useAxios();
   const route = useRoute();
@@ -55,14 +30,14 @@
 
   const exportFoundry = (
     version: number,
-    showErrorToast: (msg: string) => void
+    showErrorToast: (msg: string) => void,
   ) => {
     if (!creature.value) {
       return Promise.reject();
     }
 
     return downloadByUrl(
-      `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`
+      `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`,
     ).catch(err => {
       showErrorToast(`${creature.value?.name.rus} ещё в пути.`);
       Promise.reject(err);
@@ -81,7 +56,7 @@
 
       const resp = await http.post<ICreature>({
         url,
-        signal: abortController.value.signal
+        signal: abortController.value.signal,
       });
 
       creature.value = resp.data;
@@ -109,6 +84,31 @@
     next();
   });
 </script>
+
+<template>
+  <content-detail class="creature-detail">
+    <template #fixed>
+      <section-header
+        :copy="!error && !loading"
+        :fullscreen="!isMobile"
+        :subtitle="creature?.name?.eng || ''"
+        :title="creature?.name?.rus || ''"
+        bookmark
+        print
+        :foundry-versions="foundryVersions"
+        @close="onClose"
+        @export-foundry="exportFoundry"
+      />
+    </template>
+
+    <template #default>
+      <creature-body
+        v-if="creature"
+        :creature="creature"
+      />
+    </template>
+  </content-detail>
+</template>
 
 <style lang="scss" scoped>
   .creature-detail {

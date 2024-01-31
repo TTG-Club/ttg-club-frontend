@@ -6,5 +6,5 @@ export const ClassesPage: RouteRecordRaw = {
   name: 'classes',
   path: '/classes',
   component: () => import('./ClassesView.vue'),
-  children: [ClassDetailPage]
+  children: [ClassDetailPage],
 };

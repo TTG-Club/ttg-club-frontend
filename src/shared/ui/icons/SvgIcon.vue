@@ -1,34 +1,3 @@
-<template>
-  <!-- eslint-disable vue/no-v-html -->
-  <i
-    v-if="icon && raw"
-    :class="$style['svg-icon']"
-    v-html="icon"
-  />
-  <!-- eslint-enable vue/no-v-html -->
-
-  <i
-    v-else-if="!error"
-    :class="$style['svg-icon']"
-    role="img"
-  >
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <use :href="iconName" />
-    </svg>
-  </i>
-
-  <span
-    v-else
-    :class="$style.error"
-  >
-    {{ error }}
-  </span>
-</template>
-
 <script setup lang="ts">
   import { computed } from 'vue';
 
@@ -42,8 +11,8 @@
     }>(),
     {
       size: 24,
-      raw: false
-    }
+      raw: false,
+    },
   );
 
   const iconName = computed(() => (!props.raw ? getIconName(props.icon) : ''));
@@ -74,6 +43,37 @@
     return '';
   });
 </script>
+
+<template>
+  <!-- eslint-disable vue/no-v-html -->
+  <i
+    v-if="icon && raw"
+    :class="$style['svg-icon']"
+    v-html="icon"
+  />
+  <!-- eslint-enable vue/no-v-html -->
+
+  <i
+    v-else-if="!error"
+    :class="$style['svg-icon']"
+    role="img"
+  >
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <use :href="iconName" />
+    </svg>
+  </i>
+
+  <span
+    v-else
+    :class="$style.error"
+  >
+    {{ error }}
+  </span>
+</template>
 
 <style lang="scss" module>
   .svg-icon {

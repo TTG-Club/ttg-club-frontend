@@ -1,3 +1,66 @@
+<script lang="ts" setup>
+  import clsx from 'clsx';
+  import { omit } from 'lodash-es';
+  import { computed, ref } from 'vue';
+  import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+
+  import { DEFAULT_KEY_FIELD } from '@/shared/constants';
+  import type {
+    TVirtualListProps,
+    TVirtualListRef,
+  } from '@/shared/ui/virtual-views/VirtualList/types';
+
+  const props = withDefaults(defineProps<TVirtualListProps>(), {
+    keyField: DEFAULT_KEY_FIELD,
+    pageMode: true,
+    minItemSize: 55,
+    getItemClass: () => undefined,
+    getItemIndexByKey: undefined,
+  });
+
+  const getItemIndexByKey = computed(
+    () =>
+      props.getItemIndexByKey ||
+      ((items, key) => items.findIndex(item => item[props.keyField] === key)),
+  );
+
+  const scroller = ref<Record<string, any>>();
+
+  const scrollerProps = computed(() =>
+    omit(props, 'getItemIndexByKey', 'getItemClass'),
+  );
+
+  const getItemClasses = (item: unknown) =>
+    clsx('virtual-list__item', props.getItemClass?.(item));
+
+  /**
+   * Метод для прокрутки к элементу по ключу
+   * т.к. индекс элемента может меняться
+   */
+  const scrollToItemByKey = (key: string) => {
+    const scrollIndex = getItemIndexByKey.value(props.items, key);
+
+    if (!scroller.value || scrollIndex === -1) {
+      return {
+        scrolled: false,
+        index: scrollIndex,
+      };
+    }
+
+    scroller.value?.scrollToItem?.(scrollIndex);
+
+    return {
+      scrolled: true,
+      index: scrollIndex,
+    };
+  };
+
+  defineExpose<TVirtualListRef>({
+    scroller,
+    scrollToItemByKey,
+  });
+</script>
+
 <template>
   <dynamic-scroller
     ref="scroller"
@@ -19,69 +82,6 @@
     </template>
   </dynamic-scroller>
 </template>
-
-<script lang="ts" setup>
-  import clsx from 'clsx';
-  import { omit } from 'lodash-es';
-  import { computed, ref } from 'vue';
-  import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
-
-  import { DEFAULT_KEY_FIELD } from '@/shared/constants';
-  import type {
-    TVirtualListProps,
-    TVirtualListRef
-  } from '@/shared/ui/virtual-views/VirtualList/types';
-
-  const props = withDefaults(defineProps<TVirtualListProps>(), {
-    keyField: DEFAULT_KEY_FIELD,
-    pageMode: true,
-    minItemSize: 55,
-    getItemClass: () => undefined,
-    getItemIndexByKey: undefined
-  });
-
-  const getItemIndexByKey = computed(
-    () =>
-      props.getItemIndexByKey ||
-      ((items, key) => items.findIndex(item => item[props.keyField] === key))
-  );
-
-  const scroller = ref<Record<string, any>>();
-
-  const scrollerProps = computed(() =>
-    omit(props, 'getItemIndexByKey', 'getItemClass')
-  );
-
-  const getItemClasses = (item: unknown) =>
-    clsx('virtual-list__item', props.getItemClass?.(item));
-
-  /**
-   * Метод для прокрутки к элементу по ключу
-   * т.к. индекс элемента может меняться
-   */
-  const scrollToItemByKey = (key: string) => {
-    const scrollIndex = getItemIndexByKey.value(props.items, key);
-
-    if (!scroller.value || scrollIndex === -1) {
-      return {
-        scrolled: false,
-        index: scrollIndex
-      };
-    }
-
-    scroller.value?.scrollToItem?.(scrollIndex);
-
-    return {
-      scrolled: true,
-      index: scrollIndex
-    };
-  };
-
-  defineExpose<TVirtualListRef>({
-    scroller,
-    scrollToItemByKey
-  });
-</script>
 
 <style lang="scss">
   $item-spacing: 12px;

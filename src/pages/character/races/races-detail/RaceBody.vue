@@ -1,3 +1,69 @@
+<script>
+  import { sortBy } from 'lodash-es';
+
+  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'RaceBody',
+    components: {
+      UiEasyLightbox,
+      DetailTopBar,
+      RawContent,
+    },
+    props: {
+      race: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+    },
+    computed: {
+      abilities() {
+        if (!this.race.abilities?.length) {
+          return '';
+        }
+
+        const abilities = [];
+
+        for (const ability of this.race.abilities) {
+          abilities.push(
+            ability.value
+              ? `${ability.shortName} ${
+                  ability.value > 0 ? `+${ability.value}` : ability.value
+                }`
+              : ability.name,
+          );
+        }
+
+        return abilities.join(', ');
+      },
+
+      speed() {
+        if (!this.race.speed?.length) {
+          return '';
+        }
+
+        const speeds = [];
+
+        for (const speed of this.race.speed) {
+          speeds.push(
+            `${speed.name ? `${speed.name} ` : ''}${speed.value} фт.`,
+          );
+        }
+
+        return speeds.join(', ');
+      },
+
+      skills() {
+        return sortBy(this.race.skills, [o => o.opened, o => !o.subrace]);
+      },
+    },
+  };
+</script>
+
 <template>
   <div class="race-body">
     <detail-top-bar :source="race.source" />
@@ -125,69 +191,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import { sortBy } from 'lodash-es';
-
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'RaceBody',
-    components: {
-      UiEasyLightbox,
-      DetailTopBar,
-      RawContent
-    },
-    props: {
-      race: {
-        type: Object,
-        default: undefined,
-        required: true
-      }
-    },
-    computed: {
-      abilities() {
-        if (!this.race.abilities?.length) {
-          return '';
-        }
-
-        const abilities = [];
-
-        for (const ability of this.race.abilities) {
-          abilities.push(
-            ability.value
-              ? `${ability.shortName} ${
-                  ability.value > 0 ? `+${ability.value}` : ability.value
-                }`
-              : ability.name
-          );
-        }
-
-        return abilities.join(', ');
-      },
-
-      speed() {
-        if (!this.race.speed?.length) {
-          return '';
-        }
-
-        const speeds = [];
-
-        for (const speed of this.race.speed) {
-          speeds.push(
-            `${speed.name ? `${speed.name} ` : ''}${speed.value} фт.`
-          );
-        }
-
-        return speeds.join(', ');
-      },
-
-      skills() {
-        return sortBy(this.race.skills, [o => o.opened, o => !o.subrace]);
-      }
-    }
-  };
-</script>

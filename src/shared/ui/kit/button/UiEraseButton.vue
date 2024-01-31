@@ -1,15 +1,3 @@
-<template>
-  <ui-button
-    v-tippy="{ content: 'Стереть строку поиска' }"
-    :class="$style['ui-erase-button']"
-    :body-class="bodyClasses"
-    type="text"
-    icon="close"
-    color="text"
-    @click.prevent="value = ''"
-  />
-</template>
-
 <script setup lang="ts">
   import { useVModel } from '@vueuse/core';
   import clsx from 'clsx';
@@ -29,6 +17,18 @@
 
   const value = useVModel(props, 'modelValue');
 </script>
+
+<template>
+  <ui-button
+    v-tippy="{ content: 'Стереть строку поиска' }"
+    :class="$style['ui-erase-button']"
+    :body-class="bodyClasses"
+    type="text"
+    icon="close"
+    color="text"
+    @click.prevent="value = ''"
+  />
+</template>
 
 <style lang="scss" module>
   .ui-erase-button {

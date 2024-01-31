@@ -34,7 +34,7 @@ jobs:
         run: npm ci
 
       - name: ESLint
-        run: npm run lint:write
+        run: npm run lint:workflow
 
       - name: Prettier
-        run: npm run prettier:write
+        run: npm run prettier:workflow

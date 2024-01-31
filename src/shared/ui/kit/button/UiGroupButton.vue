@@ -1,20 +1,9 @@
-<template>
-  <div
-    :class="{
-      'ui-group-button': true,
-      'is-full-width': fullWidth
-    }"
-  >
-    <slot />
-  </div>
-</template>
-
 <script setup lang="ts">
   import { provide, reactive, toRef } from 'vue';
 
   import type {
     ISharedButtonProps,
-    TButtonType
+    TButtonType,
   } from '@/shared/ui/kit/button/UiButton';
   import { buttonGroupContextKey } from '@/shared/ui/kit/button/UiButton.const';
 
@@ -23,7 +12,7 @@
     color: 'primary',
     nativeType: 'button',
     disabled: false,
-    fullWidth: false
+    fullWidth: false,
   });
 
   provide(
@@ -33,10 +22,21 @@
       size: toRef(props, 'size'),
       color: toRef(props, 'color'),
       nativeType: toRef(props, 'nativeType'),
-      disabled: toRef(props, 'disabled')
-    })
+      disabled: toRef(props, 'disabled'),
+    }),
   );
 </script>
+
+<template>
+  <div
+    :class="{
+      'ui-group-button': true,
+      'is-full-width': fullWidth,
+    }"
+  >
+    <slot />
+  </div>
+</template>
 
 <style lang="scss" scoped>
   .ui-group-button {

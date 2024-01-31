@@ -1,3 +1,79 @@
+<script setup lang="ts">
+  import { type MaybeRef, tryOnBeforeMount } from '@vueuse/core';
+  import { storeToRefs } from 'pinia';
+  import { ref } from 'vue';
+
+  import { getFormattedDate } from '@/shared/composables/useDayjs';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+  import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
+  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+
+  import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
+  import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
+  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
+  import { useYoutube } from '@/features/youtube/composables/useYoutube';
+  import { useYoutubeActive } from '@/features/youtube/composables/useYoutubeActive';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
+
+  const { isMobile } = storeToRefs(useUIStore());
+
+  const {
+    size,
+    page,
+    pages,
+    itemsPerPage,
+    isLoaded,
+    load,
+    videos,
+    remove,
+    isRemoving,
+  } = useYoutube();
+
+  const {
+    limit: activeLimit,
+    count: activeCount,
+    isDisabled: isActivationDisabled,
+    isSuccess: isActiveSuccess,
+    isLoaded: isActiveLoaded,
+    updateCount,
+    updateActiveStatus,
+  } = useYoutubeActive();
+
+  const isAdding = ref(false);
+  const editID = ref<TYoutubeVideo['id']>('');
+
+  const init = async () => {
+    try {
+      await load();
+
+      return updateCount();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updateVideoStatus = async (
+    id: TYoutubeVideo['id'],
+    status: MaybeRef<boolean>,
+  ) => {
+    try {
+      await updateActiveStatus(id, status);
+
+      return load(false);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  tryOnBeforeMount(async () => {
+    await init();
+  });
+</script>
+
 <template>
   <page-layout
     :use-social-links="false"
@@ -24,7 +100,7 @@
             v-if="isActiveLoaded"
             :class="{
               [$style.active]: true,
-              [$style.error]: !isActiveSuccess
+              [$style.error]: !isActiveSuccess,
             }"
           >
             На главной {{ activeCount }} из {{ activeLimit }}
@@ -86,7 +162,7 @@
             <div
               :class="{
                 [$style.controls]: true,
-                [$style.editing]: editID === video.id
+                [$style.editing]: editID === video.id,
               }"
             >
               <ui-button
@@ -127,82 +203,6 @@
     @added="load()"
   />
 </template>
-
-<script setup lang="ts">
-  import { type MaybeRef, tryOnBeforeMount } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-
-  import PageLayout from '@/layouts/PageLayout.vue';
-
-  import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
-  import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
-  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
-  import { useYoutube } from '@/features/youtube/composables/useYoutube';
-  import { useYoutubeActive } from '@/features/youtube/composables/useYoutubeActive';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-  import { getFormattedDate } from '@/shared/composables/useDayjs';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-
-  const { isMobile } = storeToRefs(useUIStore());
-
-  const {
-    size,
-    page,
-    pages,
-    itemsPerPage,
-    isLoaded,
-    load,
-    videos,
-    remove,
-    isRemoving
-  } = useYoutube();
-
-  const {
-    limit: activeLimit,
-    count: activeCount,
-    isDisabled: isActivationDisabled,
-    isSuccess: isActiveSuccess,
-    isLoaded: isActiveLoaded,
-    updateCount,
-    updateActiveStatus
-  } = useYoutubeActive();
-
-  const isAdding = ref(false);
-  const editID = ref<TYoutubeVideo['id']>('');
-
-  const init = async () => {
-    try {
-      await load();
-
-      return updateCount();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const updateVideoStatus = async (
-    id: TYoutubeVideo['id'],
-    status: MaybeRef<boolean>
-  ) => {
-    try {
-      await updateActiveStatus(id, status);
-
-      return load(false);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  tryOnBeforeMount(async () => {
-    await init();
-  });
-</script>
 
 <style module lang="scss">
   @use '@/assets/styles/variables/breakpoints' as *;

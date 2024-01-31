@@ -1,3 +1,104 @@
+<script lang="ts">
+  import { computed, defineComponent, ref } from 'vue';
+  import { useLink } from 'vue-router';
+
+  import { useAxios } from '@/shared/composables/useAxios';
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+  import type {
+    OptionDetail,
+    OptionLink,
+  } from '@/shared/types/character/Options.d';
+  import type { Maybe } from '@/shared/types/Utility';
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
+  import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  export default defineComponent({
+    components: {
+      BookmarkSaveButton,
+      OptionBody,
+      BaseModal,
+    },
+    directives: {
+      CapitalizeFirst,
+    },
+    inheritAttrs: false,
+    props: {
+      to: {
+        type: Object as PropType<RouteLocationPathRaw>,
+        required: true,
+      },
+      optionItem: {
+        type: Object as PropType<OptionLink>,
+        default: null,
+      },
+      inTab: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props) {
+      const http = useAxios();
+
+      const { navigate, isActive, href } = useLink(props);
+
+      const modal = ref<{
+        show: boolean;
+        data: Maybe<OptionDetail>;
+      }>({
+        show: false,
+        data: undefined,
+      });
+
+      const bookmarkObj = computed(() => ({
+        url: props.optionItem.url,
+        name: props.optionItem.name.rus,
+      }));
+
+      const classList = computed(() => ({
+        'router-link-active': isActive.value,
+        'is-green': props.optionItem?.homebrew,
+        'is-sub-item': props.inTab,
+      }));
+
+      const clickHandler = async () => {
+        if (!props.inTab) {
+          await navigate();
+
+          return;
+        }
+
+        try {
+          if (!modal.value.data) {
+            const resp = await http.post<OptionDetail>({
+              url: props.optionItem.url,
+            });
+
+            modal.value.data = resp.data;
+          }
+
+          modal.value.show = true;
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      return {
+        href,
+        modal,
+        bookmarkObj,
+        classList,
+        clickHandler,
+      };
+    },
+  });
+</script>
+
 <template>
   <router-link
     v-if="optionItem"
@@ -48,106 +149,5 @@
     </template>
   </base-modal>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink } from 'vue-router';
-
-  import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
-
-  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
-
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
-  import type {
-    OptionDetail,
-    OptionLink
-  } from '@/shared/types/character/Options.d';
-  import type { Maybe } from '@/shared/types/Utility';
-  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-
-  import type { PropType } from 'vue';
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  export default defineComponent({
-    components: {
-      BookmarkSaveButton,
-      OptionBody,
-      BaseModal
-    },
-    directives: {
-      CapitalizeFirst
-    },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      optionItem: {
-        type: Object as PropType<OptionLink>,
-        default: null
-      },
-      inTab: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const http = useAxios();
-
-      const { navigate, isActive, href } = useLink(props);
-
-      const modal = ref<{
-        show: boolean;
-        data: Maybe<OptionDetail>;
-      }>({
-        show: false,
-        data: undefined
-      });
-
-      const bookmarkObj = computed(() => ({
-        url: props.optionItem.url,
-        name: props.optionItem.name.rus
-      }));
-
-      const classList = computed(() => ({
-        'router-link-active': isActive.value,
-        'is-green': props.optionItem?.homebrew,
-        'is-sub-item': props.inTab
-      }));
-
-      const clickHandler = async () => {
-        if (!props.inTab) {
-          await navigate();
-
-          return;
-        }
-
-        try {
-          if (!modal.value.data) {
-            const resp = await http.post<OptionDetail>({
-              url: props.optionItem.url
-            });
-
-            modal.value.data = resp.data;
-          }
-
-          modal.value.show = true;
-        } catch (err) {
-          console.error(err);
-        }
-      };
-
-      return {
-        href,
-        modal,
-        bookmarkObj,
-        classList,
-        clickHandler
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss" />

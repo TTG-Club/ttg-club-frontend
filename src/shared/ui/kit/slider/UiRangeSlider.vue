@@ -1,37 +1,4 @@
 <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
-<template>
-  <div
-    ref="slider"
-    :class="[$style['custom-slider'], $style.minmax]"
-  >
-    <div :class="$style['minmax-indicator']" />
-
-    <input
-      id="min"
-      ref="inputMin"
-      type="range"
-      name="min"
-      :min="min"
-      :max="max"
-      :value="minValue"
-      :step="step"
-      @input="onInput"
-    />
-
-    <input
-      id="max"
-      ref="inputMax"
-      type="range"
-      name="max"
-      :min="min"
-      :max="max"
-      :value="maxValue"
-      :step="step"
-      @input="onInput"
-    />
-  </div>
-</template>
-
 <script lang="ts" setup>
   import { ref, watchEffect } from 'vue';
 
@@ -40,24 +7,24 @@
   const { min, max, step, minValue, maxValue } = defineProps({
     min: {
       type: Number,
-      default: 0
+      default: 0,
     },
     max: {
       type: Number,
-      default: 100
+      default: 100,
     },
     step: {
       type: Number,
-      default: 1
+      default: 1,
     },
     minValue: {
       type: Number,
-      default: 50
+      default: 50,
     },
     maxValue: {
       type: Number,
-      default: 80
-    }
+      default: 80,
+    },
   });
 
   const emit = defineEmits(['update:minValue', 'update:maxValue']);
@@ -109,6 +76,40 @@
     }
   };
 </script>
+
+<template>
+  <div
+    ref="slider"
+    :class="[$style['custom-slider'], $style.minmax]"
+  >
+    <div :class="$style['minmax-indicator']" />
+
+    <input
+      id="min"
+      ref="inputMin"
+      type="range"
+      name="min"
+      :min="min"
+      :max="max"
+      :value="minValue"
+      :step="step"
+      @input="onInput"
+    />
+
+    <input
+      id="max"
+      ref="inputMax"
+      type="range"
+      name="max"
+      :min="min"
+      :max="max"
+      :value="maxValue"
+      :step="step"
+      @input="onInput"
+    />
+  </div>
+</template>
+
 <style lang="scss" module>
   .custom-slider {
     --trackHeight: 0.25rem;
