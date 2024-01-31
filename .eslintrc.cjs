@@ -275,7 +275,12 @@ module.exports = {
     ],
     '@typescript-eslint/no-use-before-define': [
       'error',
-      { typedefs: false, enums: false },
+      {
+        functions: false,
+        enums: false,
+        typedefs: false,
+        ignoreTypeReferences: true,
+      },
     ],
     '@typescript-eslint/consistent-type-assertions': [
       'warn',

@@ -3,17 +3,16 @@
 
   import { getIconName } from '@/shared/utils/icons';
 
-  const props = withDefaults(
-    defineProps<{
-      icon: string;
-      size?: string | number;
-      raw?: boolean;
-    }>(),
-    {
-      size: 24,
-      raw: false,
-    },
-  );
+  interface Props {
+    icon: string;
+    size?: string | number;
+    raw?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    size: 24,
+    raw: false,
+  });
 
   const iconName = computed(() => (!props.raw ? getIconName(props.icon) : ''));
 
