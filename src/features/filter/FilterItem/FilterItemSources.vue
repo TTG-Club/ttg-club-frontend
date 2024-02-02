@@ -1,3 +1,97 @@
+<script>
+  import { cloneDeep } from 'lodash-es';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+
+  export default {
+    components: {
+      UiCheckbox,
+      SvgIcon,
+    },
+    props: {
+      modelValue: {
+        type: Array,
+        default: undefined,
+      },
+    },
+    emits: ['update:model-value'],
+    data: () => ({
+      opened: true,
+    }),
+    computed: {
+      isFilterCustomized() {
+        if (!this.modelValue) {
+          return false;
+        }
+
+        for (const group of this.modelValue) {
+          for (const value of group.values) {
+            if (value.value !== value.default) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      },
+    },
+    methods: {
+      setGroupStatus(e, index) {
+        if (!this.modelValue[index]?.values?.length) {
+          return;
+        }
+
+        const sources = cloneDeep(this.modelValue);
+
+        for (let i = 0; i < sources[index].values.length; i++) {
+          sources[index].values[i].value = e;
+        }
+
+        this.emitSources(sources);
+      },
+
+      isGroupActive(index) {
+        if (!this.modelValue[index]?.values?.length) {
+          return false;
+        }
+
+        for (let i = 0; i < this.modelValue[index].values.length; i++) {
+          if (this.modelValue[index].values[i].value) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+
+      resetSources() {
+        const sources = cloneDeep(this.modelValue).map((group) => ({
+          ...group,
+          values: group.values.map((value) => ({
+            ...value,
+            value: value.default,
+          })),
+        }));
+
+        this.emitSources(sources);
+      },
+
+      setSourceValue(newValue, groupKey, checkboxKey) {
+        const sources = cloneDeep(this.modelValue);
+
+        sources[groupKey].values[checkboxKey].value = newValue;
+
+        this.emitSources(sources);
+      },
+
+      emitSources(sources) {
+        this.$emit('update:model-value', sources);
+      },
+    },
+  };
+</script>
+
 <template>
   <div
     v-if="modelValue?.length"
@@ -57,10 +151,9 @@
 
           <ui-checkbox
             v-tippy="{
-              content:
-                `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «` +
-                group.name +
-                '»'
+              content: `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «${
+                group.name
+              }»`,
             }"
             :model-value="isGroupActive(groupKey)"
             type="toggle"
@@ -83,100 +176,6 @@
     </div>
   </div>
 </template>
-
-<script>
-  import { cloneDeep } from 'lodash-es';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-
-  export default {
-    components: {
-      UiCheckbox,
-      SvgIcon
-    },
-    props: {
-      modelValue: {
-        type: Array,
-        default: undefined
-      }
-    },
-    emits: ['update:model-value'],
-    data: () => ({
-      opened: true
-    }),
-    computed: {
-      isFilterCustomized() {
-        if (!this.modelValue) {
-          return false;
-        }
-
-        for (const group of this.modelValue) {
-          for (const value of group.values) {
-            if (value.value !== value.default) {
-              return true;
-            }
-          }
-        }
-
-        return false;
-      }
-    },
-    methods: {
-      setGroupStatus(e, index) {
-        if (!this.modelValue[index]?.values?.length) {
-          return;
-        }
-
-        const sources = cloneDeep(this.modelValue);
-
-        for (let i = 0; i < sources[index].values.length; i++) {
-          sources[index].values[i].value = e;
-        }
-
-        this.emitSources(sources);
-      },
-
-      isGroupActive(index) {
-        if (!this.modelValue[index]?.values?.length) {
-          return false;
-        }
-
-        for (let i = 0; i < this.modelValue[index].values.length; i++) {
-          if (this.modelValue[index].values[i].value) {
-            return true;
-          }
-        }
-
-        return false;
-      },
-
-      resetSources() {
-        const sources = cloneDeep(this.modelValue).map(group => ({
-          ...group,
-          values: group.values.map(value => ({
-            ...value,
-            value: value.default
-          }))
-        }));
-
-        this.emitSources(sources);
-      },
-
-      setSourceValue(newValue, groupKey, checkboxKey) {
-        const sources = cloneDeep(this.modelValue);
-
-        sources[groupKey].values[checkboxKey].value = newValue;
-
-        this.emitSources(sources);
-      },
-
-      emitSources(sources) {
-        this.$emit('update:model-value', sources);
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/filter-item' as *;

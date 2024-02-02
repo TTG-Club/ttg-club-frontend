@@ -1,3 +1,71 @@
+<script>
+  import { mapState } from 'pinia';
+
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
+
+  import SectionHeader from '@/features/SectionHeader.vue';
+
+  import RuleBody from '@/pages/wiki/rules/rules-detail/RuleBody.vue';
+
+  export default {
+    components: {
+      ContentDetail,
+      RuleBody,
+      SectionHeader,
+    },
+    async beforeRouteUpdate(to, from, next) {
+      await this.ruleInfoQuery(to.path);
+
+      next();
+    },
+    data: () => ({
+      rule: undefined,
+      loading: false,
+      error: false,
+      abortController: null,
+    }),
+    computed: {
+      ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+    },
+    async mounted() {
+      await this.ruleInfoQuery(this.$route.path);
+    },
+    methods: {
+      async ruleInfoQuery(url) {
+        if (this.abortController) {
+          this.abortController.abort();
+        }
+
+        try {
+          this.error = false;
+          this.loading = true;
+          this.abortController = new AbortController();
+
+          const resp = await this.$http.post({
+            url,
+            signal: this.abortController.signal,
+          });
+
+          this.rule = resp.data;
+        } catch (err) {
+          errorHandler(err);
+
+          this.error = true;
+        } finally {
+          this.loading = false;
+          this.abortController = null;
+        }
+      },
+
+      close() {
+        this.$router.push({ name: 'rules' });
+      },
+    },
+  };
+</script>
+
 <template>
   <content-detail class="rule-detail">
     <template #fixed>
@@ -19,73 +87,3 @@
     </template>
   </content-detail>
 </template>
-
-<script>
-  import { mapState } from 'pinia';
-
-  import RuleBody from '@/pages/wiki/rules/rules-detail/RuleBody.vue';
-
-  import SectionHeader from '@/features/SectionHeader.vue';
-
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/ContentDetail.vue';
-
-  export default {
-    components: {
-      ContentDetail,
-      RuleBody,
-      SectionHeader
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.ruleInfoQuery(to.path);
-
-      next();
-    },
-    data: () => ({
-      rule: undefined,
-      loading: false,
-      error: false,
-      abortController: null
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile'])
-    },
-    async mounted() {
-      await this.ruleInfoQuery(this.$route.path);
-    },
-    methods: {
-      async ruleInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
-
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
-
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal
-          });
-
-          this.rule = resp.data;
-        } catch (err) {
-          errorHandler(err);
-
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
-
-      close() {
-        this.$router.push({ name: 'rules' });
-      }
-    }
-  };
-</script>
-
-<style lang="scss" scoped></style>

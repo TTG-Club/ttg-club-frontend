@@ -1,3 +1,36 @@
+<script>
+  import { defineComponent } from 'vue';
+
+  export default defineComponent({
+    props: {
+      modelValue: {
+        type: Boolean,
+        default: false,
+      },
+      type: {
+        type: String,
+        default: 'crumb',
+        validator: (value) => ['crumb', 'toggle'].includes(value),
+      },
+      tooltip: {
+        type: String,
+        default: '',
+      },
+    },
+    emits: ['update:model-value'],
+    computed: {
+      value: {
+        get() {
+          return this.modelValue;
+        },
+        set(value) {
+          this.$emit('update:model-value', value);
+        },
+      },
+    },
+  });
+</script>
+
 <template>
   <div
     v-if="type === 'crumb'"
@@ -27,39 +60,6 @@
     </div>
   </div>
 </template>
-
-<script>
-  import { defineComponent } from 'vue';
-
-  export default defineComponent({
-    props: {
-      modelValue: {
-        type: Boolean,
-        default: false
-      },
-      type: {
-        type: String,
-        default: 'crumb',
-        validator: value => ['crumb', 'toggle'].includes(value)
-      },
-      tooltip: {
-        type: String,
-        default: ''
-      }
-    },
-    emits: ['update:model-value'],
-    computed: {
-      value: {
-        get() {
-          return this.modelValue;
-        },
-        set(value) {
-          this.$emit('update:model-value', value);
-        }
-      }
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

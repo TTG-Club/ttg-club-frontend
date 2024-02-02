@@ -8,7 +8,7 @@
         стоит вернуться к
         <router-link
           :to="{
-            name: 'index'
+            name: 'index',
           }"
         >
           началу

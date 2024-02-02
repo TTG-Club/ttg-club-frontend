@@ -1,3 +1,30 @@
+<script lang="ts" setup>
+  import { computed, toRefs, unref } from 'vue';
+
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  const modelValue = defineModel<number>({ required: true });
+
+  const props = withDefaults(
+    defineProps<{
+      min?: number;
+      max?: number;
+      step?: number;
+    }>(),
+    {
+      min: 0.1,
+      max: 2,
+      step: 0.05,
+    },
+  );
+
+  const { min, max, step } = toRefs(props);
+
+  const progress = computed(
+    () => ((unref(modelValue) - unref(min)) / (unref(max) - unref(min))) * 100,
+  );
+</script>
+
 <template>
   <div :class="$style['ui-slider']">
     <ui-button
@@ -25,33 +52,6 @@
     />
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { computed, toRefs, unref } from 'vue';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-
-  const modelValue = defineModel<number>({ required: true });
-
-  const props = withDefaults(
-    defineProps<{
-      min?: number;
-      max?: number;
-      step?: number;
-    }>(),
-    {
-      min: 0.1,
-      max: 2,
-      step: 0.05
-    }
-  );
-
-  const { min, max, step } = toRefs(props);
-
-  const progress = computed(
-    () => ((unref(modelValue) - unref(min)) / (unref(max) - unref(min))) * 100
-  );
-</script>
 
 <style lang="scss" module>
   .ui-slider {

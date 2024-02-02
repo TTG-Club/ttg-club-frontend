@@ -1,3 +1,41 @@
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+  import { computed } from 'vue';
+
+  import { useDayjs } from '@/shared/composables/useDayjs';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import SocialLinks from '@/shared/ui/SocialLinks.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      useSocialLinks?: boolean;
+      showSeparator?: boolean;
+      dateTime?: string;
+    }>(),
+    {
+      useSocialLinks: false,
+      showSeparator: false,
+      dateTime: undefined,
+    },
+  );
+
+  const { isMobile } = storeToRefs(useUIStore());
+
+  const dateTimeFormatted = computed(() => {
+    if (!props.dateTime) {
+      return '';
+    }
+
+    const datetime = useDayjs(props.dateTime);
+
+    if (!datetime.isValid()) {
+      return '';
+    }
+
+    return datetime.format('LL');
+  });
+</script>
+
 <template>
   <div class="page-layout">
     <div
@@ -55,44 +93,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
-
-  import { useDayjs } from '@/shared/composables/useDayjs';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import SocialLinks from '@/shared/ui/SocialLinks.vue';
-
-  const props = withDefaults(
-    defineProps<{
-      useSocialLinks?: boolean;
-      showSeparator?: boolean;
-      dateTime?: string;
-    }>(),
-    {
-      useSocialLinks: true,
-      showSeparator: true,
-      dateTime: undefined
-    }
-  );
-
-  const { isMobile } = storeToRefs(useUIStore());
-
-  const dateTimeFormatted = computed(() => {
-    if (!props.dateTime) {
-      return '';
-    }
-
-    const datetime = useDayjs(props.dateTime);
-
-    if (!datetime.isValid()) {
-      return '';
-    }
-
-    return datetime.format('LL');
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

@@ -1,3 +1,29 @@
+<script>
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'ScreenBody',
+    components: {
+      RawContent,
+      DetailTopBar,
+    },
+    props: {
+      screen: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+      inTooltip: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data: () => ({}),
+  };
+</script>
+
 <template>
   <div
     v-if="screen"
@@ -24,32 +50,6 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'ScreenBody',
-    components: {
-      RawContent,
-      DetailTopBar
-    },
-    props: {
-      screen: {
-        type: Object,
-        default: undefined,
-        required: true
-      },
-      inTooltip: {
-        type: Boolean,
-        default: false
-      }
-    },
-    data: () => ({})
-  };
-</script>
 
 <style lang="scss" scoped>
   .screen-body {

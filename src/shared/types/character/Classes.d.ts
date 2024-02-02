@@ -50,5 +50,5 @@ export type TClassList = {
 
 export enum ClassesFilterDefaults {
   dbName = 'classes',
-  url = '/filters/classes'
+  url = '/filters/classes',
 }

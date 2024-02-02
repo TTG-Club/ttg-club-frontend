@@ -2,12 +2,12 @@ import type {
   TName,
   TPrice,
   TSource,
-  TType
+  TType,
 } from '@/shared/types/BaseApiFields';
 
 export enum MagicItemsFilterDefaults {
   dbName = 'magicItems',
-  url = '/filters/items/magic'
+  url = '/filters/items/magic',
 }
 
 export type TArtifactLink = {

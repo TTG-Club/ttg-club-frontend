@@ -7,7 +7,7 @@ import type { MaybeRef } from '@vueuse/core';
 
 export const isAutoOpenAvailable = <T extends Array<unknown>>(
   list: MaybeRef<T>,
-  inTab: MaybeRef<boolean> = false
+  inTab: MaybeRef<boolean> = false,
 ) => {
   const { fullscreen, isMobile } = storeToRefs(useUIStore());
   const unwrappedList = unref<T>(list);

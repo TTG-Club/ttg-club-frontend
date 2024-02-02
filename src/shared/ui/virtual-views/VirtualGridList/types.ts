@@ -33,7 +33,7 @@ export type TVirtualGridListProps = {
    */
   getRows?: (
     items: TItem[],
-    context: TVirtualGridListContext
+    context: TVirtualGridListContext,
   ) => TListRow<TItem, RecordKey>[];
 
   /**

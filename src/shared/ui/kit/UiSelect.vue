@@ -1,3 +1,116 @@
+<script>
+  import { defineComponent } from 'vue';
+  import Multiselect, { multiselectMixin } from 'vue-multiselect';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  // TODO: Создать свой селект компонент
+  export default defineComponent({
+    components: {
+      Multiselect,
+      SvgIcon,
+    },
+    mixins: [multiselectMixin],
+    props: {
+      ...Multiselect.props,
+      name: {
+        type: String,
+        default: 'select',
+      },
+      placeholder: {
+        type: String,
+        default: '',
+      },
+      tagPlaceholder: {
+        type: String,
+        default: '',
+      },
+      searchable: {
+        type: Boolean,
+        default: false,
+      },
+      required: {
+        type: Boolean,
+        default: false,
+      },
+      iconBlock: {
+        type: String,
+        default: '',
+      },
+      allowEmpty: {
+        type: Boolean,
+        default: false,
+      },
+      selectGroupLabel: {
+        type: String,
+        default: '',
+      },
+      selectLabel: {
+        type: String,
+        default: '',
+      },
+      selectedLabel: {
+        type: String,
+        default: '',
+      },
+      deselectLabel: {
+        type: String,
+        default: '',
+      },
+      deselectGroupLabel: {
+        type: String,
+        default: '',
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+      isWrapDisabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    emits: [
+      'open',
+      'search-change',
+      'close',
+      'select',
+      'update:model-value',
+      'remove',
+      'tag',
+    ],
+    methods: {
+      onUpdate(event) {
+        this.$emit('update:model-value', event);
+      },
+
+      onSelect(event) {
+        this.$emit('select', event);
+      },
+
+      onRemove(event) {
+        this.$emit('remove', event);
+      },
+
+      onSearch(event) {
+        this.$emit('search-change', event);
+      },
+
+      onTag(event) {
+        this.$emit('tag', event);
+      },
+
+      onOpen(event) {
+        this.$emit('open', event);
+      },
+
+      onClose(event) {
+        this.$emit('close', event);
+      },
+    },
+  });
+</script>
+
 <template>
   <div class="ui-select">
     <div
@@ -143,119 +256,6 @@
     </multiselect>
   </div>
 </template>
-
-<script>
-  import { defineComponent } from 'vue';
-  import Multiselect, { multiselectMixin } from 'vue-multiselect';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  // TODO: Создать свой селект компонент
-  export default defineComponent({
-    components: {
-      Multiselect,
-      SvgIcon
-    },
-    mixins: [multiselectMixin],
-    props: {
-      ...Multiselect.props,
-      name: {
-        type: String,
-        default: 'select'
-      },
-      placeholder: {
-        type: String,
-        default: ''
-      },
-      tagPlaceholder: {
-        type: String,
-        default: ''
-      },
-      searchable: {
-        type: Boolean,
-        default: false
-      },
-      required: {
-        type: Boolean,
-        default: false
-      },
-      iconBlock: {
-        type: String,
-        default: ''
-      },
-      allowEmpty: {
-        type: Boolean,
-        default: false
-      },
-      selectGroupLabel: {
-        type: String,
-        default: ''
-      },
-      selectLabel: {
-        type: String,
-        default: ''
-      },
-      selectedLabel: {
-        type: String,
-        default: ''
-      },
-      deselectLabel: {
-        type: String,
-        default: ''
-      },
-      deselectGroupLabel: {
-        type: String,
-        default: ''
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      isWrapDisabled: {
-        type: Boolean,
-        default: false
-      }
-    },
-    emits: [
-      'open',
-      'search-change',
-      'close',
-      'select',
-      'update:model-value',
-      'remove',
-      'tag'
-    ],
-    methods: {
-      onUpdate(event) {
-        this.$emit('update:model-value', event);
-      },
-
-      onSelect(event) {
-        this.$emit('select', event);
-      },
-
-      onRemove(event) {
-        this.$emit('remove', event);
-      },
-
-      onSearch(event) {
-        this.$emit('search-change', event);
-      },
-
-      onTag(event) {
-        this.$emit('tag', event);
-      },
-
-      onOpen(event) {
-        this.$emit('open', event);
-      },
-
-      onClose(event) {
-        this.$emit('close', event);
-      }
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;

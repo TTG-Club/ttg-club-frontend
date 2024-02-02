@@ -1,3 +1,36 @@
+<script lang="ts" setup>
+  import type { TButtonOption } from '@/shared/ui/kit/button/UiButton';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
+
+  import { useTokenator } from '@/pages/tools/tokenator/composable';
+
+  const {
+    open,
+    load,
+    file,
+    reflectImage,
+    centerImage,
+    scale,
+    scaleConfig,
+    MAX_SIZE,
+    MAX_DIMENSION,
+  } = useTokenator();
+
+  const variants: Array<TButtonOption> = [
+    {
+      key: 'webp',
+      label: 'WEBP',
+      callback: () => load('webp'),
+    },
+    {
+      key: 'png',
+      label: 'PNG',
+      callback: () => load('png'),
+    },
+  ];
+</script>
+
 <template>
   <div :class="$style.wrapper">
     <div :class="$style.header">Описание</div>
@@ -61,39 +94,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { useTokenator } from '@/pages/tools/tokenator/composable';
-
-  import type { TButtonOption } from '@/shared/ui/kit/button/UiButton';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
-
-  const {
-    open,
-    load,
-    file,
-    reflectImage,
-    centerImage,
-    scale,
-    scaleConfig,
-    MAX_SIZE,
-    MAX_DIMENSION
-  } = useTokenator();
-
-  const variants: Array<TButtonOption> = [
-    {
-      key: 'webp',
-      label: 'WEBP',
-      callback: () => load('webp')
-    },
-    {
-      key: 'png',
-      label: 'PNG',
-      callback: () => load('png')
-    }
-  ];
-</script>
 
 <style lang="scss" module>
   .wrapper {

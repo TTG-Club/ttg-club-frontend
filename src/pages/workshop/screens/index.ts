@@ -6,5 +6,5 @@ export const ScreensPage: RouteRecordRaw = {
   name: 'screens',
   path: '/screens',
   component: () => import('./ScreensView.vue'),
-  children: [ScreensDetailPage]
+  children: [ScreensDetailPage],
 };

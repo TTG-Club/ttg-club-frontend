@@ -1,5 +1,12 @@
+<script lang="ts" setup>
+  import PageLayout from '@/layouts/PageLayout.vue';
+
+  import TokenDetails from './TokenDetails.vue';
+  import TokenStamp from './TokenStamp.vue';
+</script>
+
 <template>
-  <page-layout :use-social-links="false">
+  <page-layout>
     <template #title> Токенатор</template>
 
     <template #default>
@@ -13,12 +20,6 @@
     </template>
   </page-layout>
 </template>
-<script lang="ts" setup>
-  import PageLayout from '@/layouts/PageLayout.vue';
-
-  import TokenDetails from './TokenDetails.vue';
-  import TokenStamp from './TokenStamp.vue';
-</script>
 
 <style lang="scss" module>
   .container {

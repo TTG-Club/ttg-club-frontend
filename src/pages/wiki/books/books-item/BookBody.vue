@@ -1,3 +1,24 @@
+<script>
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'BookBody',
+    components: {
+      DetailTopBar,
+      RawContent,
+    },
+    props: {
+      book: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+    },
+  };
+</script>
+
 <template>
   <div class="book-body">
     <detail-top-bar :left="book.type.name">
@@ -17,24 +38,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'BookBody',
-    components: {
-      DetailTopBar,
-      RawContent
-    },
-    props: {
-      book: {
-        type: Object,
-        default: undefined,
-        required: true
-      }
-    }
-  };
-</script>

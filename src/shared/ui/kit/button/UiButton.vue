@@ -1,10 +1,169 @@
+<script setup lang="ts">
+  import { onClickOutside } from '@vueuse/core';
+  import { computed, inject, ref, useSlots, watch } from 'vue';
+  import { useTippy } from 'vue-tippy';
+
+  import IconLoader from '@/shared/ui/icons/IconLoader.vue';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import type {
+    TButtonType,
+    TButtonOption,
+    ISharedButtonProps,
+    TButtonIconPosition,
+  } from '@/shared/ui/kit/button/UiButton';
+  import { buttonGroupContextKey } from '@/shared/ui/kit/button/UiButton.const';
+
+  import type { Events } from 'vue';
+  import type { TippyOptions } from 'vue-tippy';
+
+  interface IProps extends ISharedButtonProps {
+    type?: TButtonType;
+    iconPosition?: TButtonIconPosition;
+    icon?: string;
+    loading?: boolean;
+    split?: boolean;
+    tooltip?: TippyOptions;
+    options?: Array<TButtonOption>;
+    bodyClass?: string;
+    beforeDropdownShow?: () => void;
+    beforeDropdownHide?: () => void;
+  }
+
+  interface IEmit {
+    (e: 'click', v: Events['onClick']): void;
+    (e: 'dropdown-show'): void;
+    (e: 'dropdown-hide'): void;
+  }
+
+  const emit = defineEmits<IEmit>();
+
+  const props = withDefaults(defineProps<IProps>(), {
+    bodyClass: undefined,
+    type: 'default',
+    size: 'md',
+    color: 'primary',
+    iconPosition: 'left',
+    icon: undefined,
+    disabled: false,
+    loading: false,
+    fullWidth: false,
+    nativeType: 'button',
+    split: false,
+    tooltip: undefined,
+    options: () => [],
+    beforeDropdownShow: undefined,
+    beforeDropdownHide: undefined,
+  });
+
+  const button = ref<Element>();
+
+  if (props.tooltip) {
+    useTippy(button, props.tooltip);
+  }
+
+  const slots = useSlots();
+
+  const groupContext = inject(buttonGroupContextKey, undefined);
+
+  const buttonType = computed(
+    () => groupContext?.type || props.type || 'default',
+  );
+
+  const buttonColor = computed(
+    () => `var(--btn-${groupContext?.color || props.color || 'primary'})`,
+  );
+
+  const buttonSize = computed(() => groupContext?.size || props.size || 'md');
+
+  const isDisabled = computed(
+    () => groupContext?.disabled || props.disabled || props.loading,
+  );
+
+  const hasDropdown = computed(
+    () => !!slots.dropdown || !!props.options.length,
+  );
+
+  const isDropdownShow = ref(false);
+  const dropdownTrigger = ref<HTMLButtonElement | null>(null);
+  const dropdown = ref<HTMLElement | null>(null);
+
+  const onDropdownShow = async () => {
+    if (isDisabled.value) {
+      return;
+    }
+
+    if (props.beforeDropdownShow) {
+      try {
+        await props.beforeDropdownShow();
+
+        isDropdownShow.value = true;
+      } catch (err) {
+        isDropdownShow.value = false;
+
+        console.error(err);
+      }
+
+      return;
+    }
+
+    isDropdownShow.value = true;
+  };
+
+  const onDropdownHide = async () => {
+    if (props.beforeDropdownHide) {
+      try {
+        await props.beforeDropdownHide();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        isDropdownShow.value = false;
+      }
+
+      return;
+    }
+
+    isDropdownShow.value = false;
+  };
+
+  const toggleDropdown = () =>
+    isDropdownShow.value ? onDropdownHide() : onDropdownShow();
+
+  const onClick = async (e: Events['onClick']) => {
+    if (isDisabled.value) {
+      return;
+    }
+
+    if (!props.split && slots.dropdown) {
+      await toggleDropdown();
+
+      return;
+    }
+
+    emit('click', e);
+  };
+
+  onClickOutside(dropdown, onDropdownHide, {
+    ignore: [dropdownTrigger],
+  });
+
+  watch(isDropdownShow, (value) => {
+    if (value) {
+      emit('dropdown-show');
+
+      return;
+    }
+
+    emit('dropdown-hide');
+  });
+</script>
+
 <template>
   <span
     :class="{
       'ui-button': true,
       [$style['ui-button']]: true,
       [$style['is-full-width']]: fullWidth,
-      [$style['is-disabled']]: isDisabled
+      [$style['is-disabled']]: isDisabled,
     }"
     @click.prevent.stop
   >
@@ -19,7 +178,7 @@
         [$style[`icon-${iconPosition}`]]: true,
         [$style['with-split']]: split && hasDropdown,
         [$style['no-text']]: !$slots.default,
-        [$style['is-disabled']]: isDisabled
+        [$style['is-disabled']]: isDisabled,
       }"
       :type="nativeType"
       :disabled="isDisabled"
@@ -86,7 +245,7 @@
         [$style.split]: true,
         [$style[`type-${buttonType}`]]: true,
         [$style[`size-${buttonSize}`]]: true,
-        [$style['is-disabled']]: isDisabled
+        [$style['is-disabled']]: isDisabled,
       }"
       :aria-disabled="isDisabled"
       :disabled="isDisabled"
@@ -137,165 +296,6 @@
     </transition>
   </span>
 </template>
-
-<script setup lang="ts">
-  import { onClickOutside } from '@vueuse/core';
-  import { computed, inject, ref, useSlots, watch } from 'vue';
-  import { useTippy } from 'vue-tippy';
-
-  import IconLoader from '@/shared/ui/icons/IconLoader.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import type {
-    TButtonType,
-    TButtonOption,
-    ISharedButtonProps,
-    TButtonIconPosition
-  } from '@/shared/ui/kit/button/UiButton';
-  import { buttonGroupContextKey } from '@/shared/ui/kit/button/UiButton.const';
-
-  import type { Events } from 'vue';
-  import type { TippyOptions } from 'vue-tippy';
-
-  interface IProps extends ISharedButtonProps {
-    type?: TButtonType;
-    iconPosition?: TButtonIconPosition;
-    icon?: string;
-    loading?: boolean;
-    split?: boolean;
-    tooltip?: TippyOptions;
-    options?: Array<TButtonOption>;
-    bodyClass?: string;
-    beforeDropdownShow?: () => void;
-    beforeDropdownHide?: () => void;
-  }
-
-  interface IEmit {
-    (e: 'click', v: Events['onClick']): void;
-    (e: 'dropdown-show'): void;
-    (e: 'dropdown-hide'): void;
-  }
-
-  const emit = defineEmits<IEmit>();
-
-  const props = withDefaults(defineProps<IProps>(), {
-    bodyClass: undefined,
-    type: 'default',
-    size: 'md',
-    color: 'primary',
-    iconPosition: 'left',
-    icon: undefined,
-    disabled: false,
-    loading: false,
-    fullWidth: false,
-    nativeType: 'button',
-    split: false,
-    tooltip: undefined,
-    options: () => [],
-    beforeDropdownShow: undefined,
-    beforeDropdownHide: undefined
-  });
-
-  const button = ref<Element>();
-
-  if (props.tooltip) {
-    useTippy(button, props.tooltip);
-  }
-
-  const slots = useSlots();
-
-  const groupContext = inject(buttonGroupContextKey, undefined);
-
-  const buttonType = computed(
-    () => groupContext?.type || props.type || 'default'
-  );
-
-  const buttonColor = computed(
-    () => `var(--btn-${groupContext?.color || props.color || 'primary'})`
-  );
-
-  const buttonSize = computed(() => groupContext?.size || props.size || 'md');
-
-  const isDisabled = computed(
-    () => groupContext?.disabled || props.disabled || props.loading
-  );
-
-  const hasDropdown = computed(
-    () => !!slots.dropdown || !!props.options.length
-  );
-
-  const isDropdownShow = ref(false);
-  const dropdownTrigger = ref<HTMLButtonElement | null>(null);
-  const dropdown = ref<HTMLElement | null>(null);
-
-  const onDropdownShow = async () => {
-    if (isDisabled.value) {
-      return;
-    }
-
-    if (props.beforeDropdownShow) {
-      try {
-        await props.beforeDropdownShow();
-
-        isDropdownShow.value = true;
-      } catch (err) {
-        isDropdownShow.value = false;
-
-        console.error(err);
-      }
-
-      return;
-    }
-
-    isDropdownShow.value = true;
-  };
-
-  const onDropdownHide = async () => {
-    if (props.beforeDropdownHide) {
-      try {
-        await props.beforeDropdownHide();
-      } catch (err) {
-        console.error(err);
-      } finally {
-        isDropdownShow.value = false;
-      }
-
-      return;
-    }
-
-    isDropdownShow.value = false;
-  };
-
-  const toggleDropdown = () =>
-    isDropdownShow.value ? onDropdownHide() : onDropdownShow();
-
-  const onClick = async (e: Events['onClick']) => {
-    if (isDisabled.value) {
-      return;
-    }
-
-    if (!props.split && slots.dropdown) {
-      await toggleDropdown();
-
-      return;
-    }
-
-    emit('click', e);
-  };
-
-  onClickOutside(dropdown, onDropdownHide, {
-    ignore: [dropdownTrigger]
-  });
-
-  watch(isDropdownShow, value => {
-    if (value) {
-      emit('dropdown-show');
-
-      return;
-    }
-
-    emit('dropdown-hide');
-  });
-</script>
 
 <style lang="scss" module>
   @use '@/assets/styles/variables/mixins' as *;

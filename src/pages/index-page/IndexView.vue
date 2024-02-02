@@ -1,8 +1,54 @@
+<script setup lang="ts">
+  import { orderBy } from 'lodash-es';
+  import { storeToRefs } from 'pinia';
+  import { computed } from 'vue';
+
+  import type { TNavItem } from '@/shared/stores/NavStore';
+  import { useNavStore } from '@/shared/stores/NavStore';
+
+  import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
+
+  const navStore = useNavStore();
+
+  const { navItems, showedNavItems, showedPartners, isShowSearch } =
+    storeToRefs(navStore);
+
+  const mainNavItems = computed(() => {
+    const items: TNavItem[] = [];
+
+    const iterate = (childList: TNavItem[]) => {
+      for (const child of childList) {
+        if (child.children instanceof Array && child.children.length) {
+          iterate(child.children);
+        }
+
+        if (child.onIndex) {
+          items.push(child);
+        }
+      }
+    };
+
+    iterate(showedNavItems.value);
+
+    return orderBy(items, ['indexOrder'], ['asc']);
+  });
+
+  const tools = computed<TNavItem[]>(() => {
+    const navTools = navItems.value
+      .flatMap((group) => group.children)
+      .filter((item) => item.url?.startsWith('/tools'));
+
+    return orderBy(navTools, ['order'], ['asc']);
+  });
+
+  const openSearchModal = () => {
+    isShowSearch.value = true;
+  };
+</script>
+
 <template>
   <div class="main_page_wrapper">
-    <h1 style="height: 0; opacity: 0; overflow: hidden">
-      TTG.Club Oнлайн-справочник
-    </h1>
+    <h1 class="site-name">TTG.Club Oнлайн-справочник</h1>
 
     <div class="main_block">
       <div class="header">
@@ -106,7 +152,7 @@
                       v-for="(partner, key) in showedPartners"
                       :key="key"
                       v-tippy="{
-                        content: partner.description
+                        content: partner.description,
                       }"
                       :href="partner.url"
                       class="chips tip"
@@ -136,52 +182,10 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import { orderBy } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
-
-  import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
-
-  import type { TNavItem } from '@/shared/stores/NavStore';
-  import { useNavStore } from '@/shared/stores/NavStore';
-
-  const navStore = useNavStore();
-
-  const { navItems, showedNavItems, showedPartners, isShowSearch } =
-    storeToRefs(navStore);
-
-  const mainNavItems = computed(() => {
-    const items: TNavItem[] = [];
-
-    const iterate = (childList: TNavItem[]) => {
-      for (const child of childList) {
-        if (child.children instanceof Array && child.children.length) {
-          iterate(child.children);
-        }
-
-        if (child.onIndex) {
-          items.push(child);
-        }
-      }
-    };
-
-    iterate(showedNavItems.value);
-
-    return orderBy(items, ['indexOrder'], ['asc']);
-  });
-
-  const tools = computed<TNavItem[]>(() => {
-    const navTools = navItems.value
-      .flatMap(group => group.children)
-      .filter(item => item.url?.startsWith('/tools'));
-
-    return orderBy(navTools, ['order'], ['asc']);
-  });
-
-  const openSearchModal = () => {
-    isShowSearch.value = true;
-  };
-</script>
-
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .site-name {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+</style>

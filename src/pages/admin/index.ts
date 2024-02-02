@@ -30,5 +30,5 @@ export const AdminPage: RouteRecordRaw = {
     } catch (err) {
       return { name: 'internal-server' };
     }
-  }
+  },
 };
