@@ -6,5 +6,5 @@ export const OptionsPage: RouteRecordRaw = {
   name: 'options',
   path: '/options',
   component: () => import('./OptionsView.vue'),
-  children: [OptionsDetailPage]
+  children: [OptionsDetailPage],
 };

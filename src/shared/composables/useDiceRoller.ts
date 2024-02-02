@@ -12,7 +12,7 @@ import type {
   FateDieRoll,
   GroupRoll,
   MathFunctionRoll,
-  RollBase
+  RollBase,
 } from 'dice-roller-parser';
 import type { VNode } from 'vue';
 import type { ToastOptions } from 'vue-toastification/dist/types/types';
@@ -55,7 +55,7 @@ export function useDiceRoller() {
       case 'number':
         return h(
           'span',
-          `${roll.value}${roll.label ? ` (${roll.label})` : ''}`
+          `${roll.value}${roll.label ? ` (${roll.label})` : ''}`,
         );
       case 'fate':
         return h('span', 'F');
@@ -103,8 +103,8 @@ export function useDiceRoller() {
         h('span', [
           '[',
           h('i', ['Rolling: ', doRender(die.count), 'd', doRender(die.die)]),
-          ']'
-        ])
+          ']',
+        ]),
       );
     }
 
@@ -145,10 +145,10 @@ export function useDiceRoller() {
             (!roll.success && roll.critical === 'success'),
           disadvantage:
             (roll.success && roll.value === -1) ||
-            (!roll.success && roll.critical === 'failure')
-        }
+            (!roll.success && roll.critical === 'failure'),
+        },
       },
-      roll.roll
+      roll.roll,
     );
 
     if (roll.matched) {
@@ -174,10 +174,10 @@ export function useDiceRoller() {
       {
         class: {
           advantage: roll.success && roll.value === 1,
-          disadvantage: roll.success && roll.value === -1
-        }
+          disadvantage: roll.success && roll.value === -1,
+        },
       },
-      rollDisplay
+      rollDisplay,
     );
 
     if (roll.matched) {
@@ -198,7 +198,7 @@ export function useDiceRoller() {
       | FateDieRoll
       | GroupRoll
       | MathFunctionRoll,
-    type: 'success' | 'failure'
+    type: 'success' | 'failure',
   ) => {
     // @ts-ignore
     if (roll.dice?.[0] && roll.dice?.[0]?.die?.value === 20) {
@@ -219,7 +219,7 @@ export function useDiceRoller() {
   const getRendered = ({
     roll,
     label,
-    type
+    type,
   }: {
     roll: RollBase;
     label?: string;
@@ -241,15 +241,15 @@ export function useDiceRoller() {
     const rendered = h(
       'span',
       {
-        class: 'dice-roll__rendered'
+        class: 'dice-roll__rendered',
       },
-      doRender(roll)
+      doRender(roll),
     );
 
     return h(
       'span',
       {
-        class: 'dice-roll'
+        class: 'dice-roll',
       },
       [
         h(
@@ -258,30 +258,30 @@ export function useDiceRoller() {
             class: {
               'dice-roll__result': true,
               'is-success': isCritical(roll, 'success'),
-              'is-failure': isCritical(roll, 'failure')
-            }
+              'is-failure': isCritical(roll, 'failure'),
+            },
           },
-          Math.max(0, Math.floor(roll.value))
+          Math.max(0, Math.floor(roll.value)),
         ),
         h(
           'span',
           {
-            class: 'dice-roll__body'
+            class: 'dice-roll__body',
           },
           label
             ? [
                 h(
                   'span',
                   {
-                    class: 'dice-roll__label'
+                    class: 'dice-roll__label',
                   },
-                  `${label}${labelSuffix}`
+                  `${label}${labelSuffix}`,
                 ),
-                rendered
+                rendered,
               ]
-            : rendered
-        )
-      ]
+            : rendered,
+        ),
+      ],
     );
   };
 
@@ -293,7 +293,7 @@ export function useDiceRoller() {
    */
   const getFormattedFormula = ({
     formula,
-    type
+    type,
   }: {
     formula: string;
     type?: 'advantage' | 'disadvantage';
@@ -327,7 +327,7 @@ export function useDiceRoller() {
    */
   const doRoll = ({
     formula,
-    type
+    type,
   }: {
     formula: string;
     type?: 'advantage' | 'disadvantage';
@@ -335,15 +335,15 @@ export function useDiceRoller() {
     roller.roll(
       getFormattedFormula({
         formula,
-        type
-      })
+        type,
+      }),
     );
 
   const notifyResult = ({
     roll,
     label,
     type,
-    toastOptions
+    toastOptions,
   }: {
     roll: RollBase;
     label?: string;
@@ -354,16 +354,16 @@ export function useDiceRoller() {
       position: POSITION.BOTTOM_RIGHT,
       timeout: 5000,
       icon: false,
-      ...toastOptions
+      ...toastOptions,
     };
 
     toast(
       getRendered({
         roll,
         label,
-        type
+        type,
       }),
-      toastOpts
+      toastOpts,
     );
   };
 
@@ -372,10 +372,10 @@ export function useDiceRoller() {
     doRoll,
     getFormattedFormula,
     getRendered,
-    notifyResult
+    notifyResult,
   };
 }
 
 export default {
-  useDiceRoller
+  useDiceRoller,
 };

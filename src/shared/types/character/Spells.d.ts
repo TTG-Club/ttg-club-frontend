@@ -3,12 +3,12 @@ import type {
   TName,
   TRaceBadge,
   TSource,
-  TSubclassBadge
+  TSubclassBadge,
 } from '@/shared/types/BaseApiFields';
 
 export enum SpellsFilterDefaults {
   dbName = 'spells',
-  url = '/filters/spells'
+  url = '/filters/spells',
 }
 
 export type TSpellLinkComponents = {

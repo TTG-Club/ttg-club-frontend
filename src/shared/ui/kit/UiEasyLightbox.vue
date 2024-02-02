@@ -1,3 +1,114 @@
+<script lang="ts">
+  import { watchArray } from '@vueuse/core';
+  import { computed, defineComponent, ref } from 'vue';
+  import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  import type { PropType } from 'vue';
+
+  export default defineComponent({
+    components: {
+      VueEasyLightbox,
+      SvgIcon,
+    },
+    props: {
+      images: {
+        type: Array as PropType<string[]>,
+        required: true,
+        default: () => [],
+      },
+      preview: {
+        type: String,
+        default: null,
+      },
+      alt: {
+        type: String,
+        default: '',
+      },
+      useBgHide: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    setup(props) {
+      const bgHide = ref(false);
+
+      const {
+        show,
+        onHide,
+        visibleRef: isShow,
+        indexRef: index,
+        imgsRef: imgs,
+      } = useEasyLightbox({
+        imgs: props.images,
+      });
+
+      const previewObj = computed(() => ({
+        src: props.preview || props.images[0] || '/img/no-img.webp',
+        error: '/img/no-img.webp',
+      }));
+
+      const isNoImages = computed(() => !props.images.length);
+
+      const classes = computed(() => ({
+        'ui-easy-lightbox': true,
+        'is-disabled': isNoImages.value,
+      }));
+
+      const onToggleBg = () => {
+        const modal = document.querySelector('.vel-modal');
+        const className = 'is-bg-hide';
+
+        bgHide.value = !bgHide.value;
+
+        if (!modal) {
+          return;
+        }
+
+        if (bgHide.value) {
+          modal.classList.add(className);
+
+          return;
+        }
+
+        modal.classList.remove(className);
+      };
+
+      const onShow = () => {
+        if (isNoImages.value) {
+          return;
+        }
+
+        show();
+      };
+
+      watchArray(
+        () => props.images,
+        (value) => {
+          imgs.value = value;
+          index.value = 0;
+        },
+        { flush: 'post' },
+      );
+
+      return {
+        isNoImages,
+        isShow,
+        bgHide,
+        index,
+        imgs,
+        previewObj,
+        classes,
+
+        onToggleBg,
+        onShow,
+        onHide,
+      };
+    },
+  });
+</script>
+
 <template>
   <div
     :class="classes"
@@ -40,117 +151,6 @@
     </template>
   </vue-easy-lightbox>
 </template>
-
-<script lang="ts">
-  import { watchArray } from '@vueuse/core';
-  import { computed, defineComponent, ref } from 'vue';
-  import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  import type { PropType } from 'vue';
-
-  export default defineComponent({
-    components: {
-      VueEasyLightbox,
-      SvgIcon
-    },
-    props: {
-      images: {
-        type: Array as PropType<string[]>,
-        required: true,
-        default: () => []
-      },
-      preview: {
-        type: String,
-        default: null
-      },
-      alt: {
-        type: String,
-        default: ''
-      },
-      useBgHide: {
-        type: Boolean,
-        default: true
-      }
-    },
-    setup(props) {
-      const bgHide = ref(false);
-
-      const {
-        show,
-        onHide,
-        visibleRef: isShow,
-        indexRef: index,
-        imgsRef: imgs
-      } = useEasyLightbox({
-        imgs: props.images
-      });
-
-      const previewObj = computed(() => ({
-        src: props.preview || props.images[0] || '/img/no-img.webp',
-        error: '/img/no-img.webp'
-      }));
-
-      const isNoImages = computed(() => !props.images.length);
-
-      const classes = computed(() => ({
-        'ui-easy-lightbox': true,
-        'is-disabled': isNoImages.value
-      }));
-
-      const onToggleBg = () => {
-        const modal = document.querySelector('.vel-modal');
-        const className = 'is-bg-hide';
-
-        bgHide.value = !bgHide.value;
-
-        if (!modal) {
-          return;
-        }
-
-        if (bgHide.value) {
-          modal.classList.add(className);
-
-          return;
-        }
-
-        modal.classList.remove(className);
-      };
-
-      const onShow = () => {
-        if (isNoImages.value) {
-          return;
-        }
-
-        show();
-      };
-
-      watchArray(
-        () => props.images,
-        value => {
-          imgs.value = value;
-          index.value = 0;
-        },
-        { flush: 'post' }
-      );
-
-      return {
-        isNoImages,
-        isShow,
-        bgHide,
-        index,
-        imgs,
-        previewObj,
-        classes,
-
-        onToggleBg,
-        onShow,
-        onHide
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   .ui-easy-lightbox {

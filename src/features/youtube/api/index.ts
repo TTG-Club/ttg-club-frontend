@@ -1,17 +1,17 @@
 import { toValue } from '@vueuse/shared';
 import { toPairs, fromPairs } from 'lodash-es';
 
-import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeAddVideo.vue';
-import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
 import { useAxios } from '@/shared/composables/useAxios';
 import { getOrderString } from '@/shared/helpers/request';
 import type { RequestConfig } from '@/shared/services/HTTPService';
 import type {
   IOrderItem,
-  IPaginatedResponse
+  IPaginatedResponse,
 } from '@/shared/types/BaseApiFields';
 import type { Maybe } from '@/shared/types/Utility';
+
+import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeAddVideo.vue';
+import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
 import type { MaybeRef } from '@vueuse/core';
 
@@ -22,7 +22,7 @@ export class YoutubeApi {
       size?: MaybeRef<number>;
       order?: MaybeRef<Array<IOrderItem>>;
       activeStatus?: MaybeRef<boolean>;
-    }>
+    }>,
   ): Promise<IPaginatedResponse<TYoutubeVideo>> {
     try {
       const http = useAxios();
@@ -39,13 +39,13 @@ export class YoutubeApi {
             }
 
             return [key, _value];
-          })
-        )
+          }),
+        ),
       };
 
       const { data } = await http.get<IPaginatedResponse<TYoutubeVideo>>({
         url: '/youtube',
-        payload: config
+        payload: config,
       });
 
       return data;
@@ -55,7 +55,7 @@ export class YoutubeApi {
   }
 
   static async add(
-    video: MaybeRef<TYoutubeVideoCreate>
+    video: MaybeRef<TYoutubeVideoCreate>,
   ): Promise<TYoutubeVideo> {
     const http = useAxios();
     const _video = toValue(video);
@@ -63,7 +63,7 @@ export class YoutubeApi {
     try {
       const { data } = await http.post<TYoutubeVideo>({
         url: '/youtube',
-        payload: _video
+        payload: _video,
       });
 
       return data;
@@ -79,7 +79,7 @@ export class YoutubeApi {
     try {
       const { data } = await http.patch<TYoutubeVideo>({
         url: '/youtube',
-        payload: _video
+        payload: _video,
       });
 
       return data;
@@ -113,7 +113,7 @@ export class YoutubeApi {
     try {
       const { data } = await http.get<number>({
         url: '/youtube/count',
-        payload: { active: _active }
+        payload: { active: _active },
       });
 
       return data;
@@ -124,7 +124,7 @@ export class YoutubeApi {
 
   static async changeStatus(
     id: MaybeRef<TYoutubeVideo['id']>,
-    status: MaybeRef<boolean>
+    status: MaybeRef<boolean>,
   ): Promise<TYoutubeVideo> {
     const _id = toValue(id);
     const _status = toValue(status);
@@ -132,7 +132,7 @@ export class YoutubeApi {
 
     try {
       const { data } = await http.patch<TYoutubeVideo>({
-        url: `/youtube/active?id=${_id}&activeStatus=${_status}`
+        url: `/youtube/active?id=${_id}&activeStatus=${_status}`,
       });
 
       return data;

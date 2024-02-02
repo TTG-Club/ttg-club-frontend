@@ -1,3 +1,73 @@
+<script>
+  import { mapState } from 'pinia';
+
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import ContentDetail from '@/shared/ui/ContentDetail.vue';
+
+  import SectionHeader from '@/features/SectionHeader.vue';
+
+  import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
+  import ScreensGroup from '@/pages/workshop/screens/screens-detail/ScreensGroup.vue';
+
+  export default {
+    components: {
+      ScreensGroup,
+      ScreenBody,
+      ContentDetail,
+      SectionHeader,
+    },
+    async beforeRouteUpdate(to, from, next) {
+      await this.screenInfoQuery(to.path);
+
+      next();
+    },
+    data: () => ({
+      screen: undefined,
+      loading: false,
+      error: false,
+      abortController: null,
+    }),
+    computed: {
+      ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+    },
+    async mounted() {
+      await this.screenInfoQuery(this.$route.path);
+    },
+    methods: {
+      async screenInfoQuery(url) {
+        if (this.abortController) {
+          this.abortController.abort();
+        }
+
+        try {
+          this.error = false;
+          this.loading = true;
+          this.abortController = new AbortController();
+
+          const resp = await this.$http.post({
+            url,
+            signal: this.abortController.signal,
+          });
+
+          this.screen = resp.data;
+        } catch (err) {
+          errorHandler(err);
+
+          this.error = true;
+        } finally {
+          this.loading = false;
+          this.abortController = null;
+        }
+      },
+
+      close() {
+        this.$router.push({ name: 'screens' });
+      },
+    },
+  };
+</script>
+
 <template>
   <content-detail class="screen-detail">
     <template #fixed>
@@ -25,76 +95,6 @@
     </template>
   </content-detail>
 </template>
-
-<script>
-  import { mapState } from 'pinia';
-
-  import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
-  import ScreensGroup from '@/pages/workshop/screens/screens-detail/ScreensGroup.vue';
-
-  import SectionHeader from '@/features/SectionHeader.vue';
-
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import ContentDetail from '@/shared/ui/ContentDetail.vue';
-
-  export default {
-    components: {
-      ScreensGroup,
-      ScreenBody,
-      ContentDetail,
-      SectionHeader
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.screenInfoQuery(to.path);
-
-      next();
-    },
-    data: () => ({
-      screen: undefined,
-      loading: false,
-      error: false,
-      abortController: null
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile'])
-    },
-    async mounted() {
-      await this.screenInfoQuery(this.$route.path);
-    },
-    methods: {
-      async screenInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
-
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
-
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal
-          });
-
-          this.screen = resp.data;
-        } catch (err) {
-          errorHandler(err);
-
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
-
-      close() {
-        this.$router.push({ name: 'screens' });
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   .screen-detail {

@@ -23,10 +23,14 @@
     height: 40px;
     width: 40px;
     border-radius: 8px;
-    padding: 6px;
     display: flex;
     align-items: center;
+    justify-content: center;
     color: var(--text-color);
+
+    svg {
+      font-size: 24px;
+    }
 
     &:hover {
       color: var(--text-b-color);

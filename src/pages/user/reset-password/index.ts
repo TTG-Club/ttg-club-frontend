@@ -20,5 +20,5 @@ export const ResetPasswordPage: RouteRecordRaw = {
     } catch (err) {
       next();
     }
-  }
+  },
 };

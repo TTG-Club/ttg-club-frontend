@@ -9,7 +9,7 @@ import { useNavStore } from '@/shared/stores/NavStore';
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
 const { nextAvailable } = useRouterHelpers();

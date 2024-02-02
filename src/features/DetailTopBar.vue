@@ -1,3 +1,20 @@
+<script setup lang="ts">
+  import type { TSource } from '@/shared/types/BaseApiFields';
+
+  withDefaults(
+    defineProps<{
+      left?: string;
+      source?: TSource;
+      bgGrey?: boolean;
+    }>(),
+    {
+      left: '',
+      source: undefined,
+      bgGrey: true,
+    },
+  );
+</script>
+
 <template>
   <div
     :class="{ bg_grey: bgGrey }"
@@ -42,23 +59,6 @@
     </span>
   </div>
 </template>
-
-<script setup lang="ts">
-  import type { TSource } from '@/shared/types/BaseApiFields';
-
-  withDefaults(
-    defineProps<{
-      left?: string;
-      source?: TSource;
-      bgGrey?: boolean;
-    }>(),
-    {
-      left: '',
-      source: undefined,
-      bgGrey: true
-    }
-  );
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

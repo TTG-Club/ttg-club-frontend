@@ -1,26 +1,3 @@
-<template>
-  <content-detail class="race-detail">
-    <template #fixed>
-      <section-header
-        :copy="!error && !loading"
-        :subtitle="race?.name?.eng || ''"
-        :title="race?.name?.rus || ''"
-        bookmark
-        fullscreen
-        print
-        @close="close"
-      />
-    </template>
-
-    <template #default>
-      <race-body
-        v-if="race"
-        :race="race"
-      />
-    </template>
-  </content-detail>
-</template>
-
 <script setup lang="ts">
   import { computedInject, toValue, tryOnMounted } from '@vueuse/core';
   import { ref, watch } from 'vue';
@@ -28,17 +5,17 @@
     onBeforeRouteLeave,
     onBeforeRouteUpdate,
     useRoute,
-    useRouter
+    useRouter,
   } from 'vue-router';
-
-  import RaceBody from '@/pages/character/races/races-detail/RaceBody.vue';
-
-  import SectionHeader from '@/features/SectionHeader.vue';
 
   import { useAxios } from '@/shared/composables/useAxios';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import { errorHandler } from '@/shared/helpers/errorHandler';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+
+  import SectionHeader from '@/features/SectionHeader.vue';
+
+  import RaceBody from '@/pages/character/races/races-detail/RaceBody.vue';
 
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
@@ -46,7 +23,7 @@
     (e: 'scroll-to-active'): void;
     (
       e: 'scroll-to-last-active',
-      v: RouteLocationNormalizedLoaded['path']
+      v: RouteLocationNormalizedLoaded['path'],
     ): void;
   };
 
@@ -62,8 +39,8 @@
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
-    source => toValue(source),
-    []
+    (source) => toValue(source),
+    [],
   );
 
   const raceInfoQuery = async (url: string) => {
@@ -80,10 +57,10 @@
         url,
         payload: {
           filter: {
-            book: toValue(queryBooks)
-          }
+            book: toValue(queryBooks),
+          },
         },
-        signal: abortController.value.signal
+        signal: abortController.value.signal,
       });
 
       race.value = resp.data;
@@ -125,4 +102,25 @@
   });
 </script>
 
-<style lang="scss" scoped></style>
+<template>
+  <content-detail class="race-detail">
+    <template #fixed>
+      <section-header
+        :copy="!error && !loading"
+        :subtitle="race?.name?.eng || ''"
+        :title="race?.name?.rus || ''"
+        bookmark
+        fullscreen
+        print
+        @close="close"
+      />
+    </template>
+
+    <template #default>
+      <race-body
+        v-if="race"
+        :race="race"
+      />
+    </template>
+  </content-detail>
+</template>

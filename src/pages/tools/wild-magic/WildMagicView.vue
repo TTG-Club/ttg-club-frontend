@@ -1,3 +1,96 @@
+<script>
+  import { throttle } from 'lodash-es';
+  import { reactive } from 'vue';
+
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
+  export default {
+    name: 'WildMagicView',
+    components: {
+      RawContent,
+      UiCheckbox,
+      ContentLayout,
+      UiInput,
+      UiButton,
+    },
+    data: () => ({
+      count: 1,
+      tables: [],
+      results: [],
+      controller: undefined,
+    }),
+    async beforeMount() {
+      await this.getTables();
+    },
+    methods: {
+      async getTables() {
+        try {
+          const resp = await this.$http.get({
+            url: '/tools/wildmagic',
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          this.tables = resp.data.map((source) => ({
+            ...source,
+            value: source.shortName === 'PHB',
+          }));
+        } catch (err) {
+          errorHandler(err);
+        }
+      },
+
+      // eslint-disable-next-line func-names
+      sendForm: throttle(async function () {
+        if (this.controller) {
+          this.controller.abort();
+        }
+
+        this.controller = new AbortController();
+
+        try {
+          const options = {
+            count: this.count || 1,
+            sources: this.tables
+              .filter((source) => source.value)
+              .map((source) => source.shortName),
+          };
+
+          const resp = await this.$http.post({
+            url: '/tools/wildmagic',
+            payload: options,
+            signal: this.controller.signal,
+          });
+
+          if (resp.status !== 200) {
+            errorHandler(resp.statusText);
+
+            return;
+          }
+
+          for (const el of resp.data) {
+            this.results.unshift(reactive(el));
+          }
+        } catch (err) {
+          errorHandler(err);
+        } finally {
+          this.controller = undefined;
+        }
+      }, 300),
+    },
+  };
+</script>
+
 <template>
   <content-layout>
     <template #fixed>
@@ -70,99 +163,6 @@
     </template>
   </content-layout>
 </template>
-
-<script>
-  import { throttle } from 'lodash-es';
-  import { reactive } from 'vue';
-
-  import ContentLayout from '@/layouts/ContentLayout.vue';
-
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'WildMagicView',
-    components: {
-      RawContent,
-      UiCheckbox,
-      ContentLayout,
-      UiInput,
-      UiButton
-    },
-    data: () => ({
-      count: 1,
-      tables: [],
-      results: [],
-      controller: undefined
-    }),
-    async beforeMount() {
-      await this.getTables();
-    },
-    methods: {
-      async getTables() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/wildmagic'
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.tables = resp.data.map(source => ({
-            ...source,
-            value: source.shortName === 'PHB'
-          }));
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
-
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
-
-        this.controller = new AbortController();
-
-        try {
-          const options = {
-            count: this.count || 1,
-            sources: this.tables
-              .filter(source => source.value)
-              .map(source => source.shortName)
-          };
-
-          const resp = await this.$http.post({
-            url: '/tools/wildmagic',
-            payload: options,
-            signal: this.controller.signal
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          for (const el of resp.data) {
-            this.results.unshift(reactive(el));
-          }
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300)
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   .wild-magic-item {

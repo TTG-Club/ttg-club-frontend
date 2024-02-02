@@ -1,3 +1,32 @@
+<script>
+  import { defineComponent } from 'vue';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  export default defineComponent({
+    components: {
+      SvgIcon,
+    },
+    props: {
+      links: {
+        type: Array,
+        default: () => [
+          {
+            name: 'Discord',
+            url: 'https://discord.gg/JqFKMKRtxv',
+            icon: 'discord',
+          },
+          {
+            name: 'ВКонтакте',
+            url: 'https://vk.com/ttg.club',
+            icon: 'vk',
+          },
+        ],
+      },
+    },
+  });
+</script>
+
 <template>
   <div class="social-links">
     <h5 class="social-links__text">
@@ -20,35 +49,6 @@
     </div>
   </div>
 </template>
-
-<script>
-  import { defineComponent } from 'vue';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  export default defineComponent({
-    components: {
-      SvgIcon
-    },
-    props: {
-      links: {
-        type: Array,
-        default: () => [
-          {
-            name: 'Discord',
-            url: 'https://discord.gg/JqFKMKRtxv',
-            icon: 'discord'
-          },
-          {
-            name: 'ВКонтакте',
-            url: 'https://vk.com/ttg.club',
-            icon: 'vk'
-          }
-        ]
-      }
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;

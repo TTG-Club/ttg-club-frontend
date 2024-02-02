@@ -1,18 +1,3 @@
-<template>
-  <span
-    v-tippy="{ content: `Нажмите для броска: <b>${formula}</b>` }"
-    :class="classes"
-    class="dice-roller"
-    @dblclick.prevent.stop
-    @click.left.exact.prevent.stop="tryRoll()"
-    @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
-    @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
-    @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
-  >
-    <slot>{{ formula }}</slot>
-  </span>
-</template>
-
 <script setup lang="ts">
   import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
@@ -36,8 +21,8 @@
       label: 'Бросок',
       isAdvantage: false,
       isDisadvantage: false,
-      isSavingThrow: false
-    }
+      isSavingThrow: false,
+    },
   );
 
   const emit = defineEmits<{
@@ -100,13 +85,13 @@
     try {
       const roll = doRoll({
         formula: props.formula,
-        type
+        type,
       });
 
       notifyResult({
         label: props.label,
         roll,
-        type
+        type,
       });
 
       emit('roll-result', roll.value);
@@ -119,6 +104,21 @@
     }
   };
 </script>
+
+<template>
+  <span
+    v-tippy="{ content: `Нажмите для броска: <b>${formula}</b>` }"
+    :class="classes"
+    class="dice-roller"
+    @dblclick.prevent.stop
+    @click.left.exact.prevent.stop="tryRoll()"
+    @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
+    @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
+    @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
+  >
+    <slot>{{ formula }}</slot>
+  </span>
+</template>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;

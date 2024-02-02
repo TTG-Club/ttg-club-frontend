@@ -33,7 +33,7 @@ app
   .use(VueLazyLoad)
   .use(Toast, {
     ...ToastOptions,
-    eventBus: ToastEventBus
+    eventBus: ToastEventBus,
   })
   .use(vfm)
   .directive('tippy-lazy', TippyLazy);

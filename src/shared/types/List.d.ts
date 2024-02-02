@@ -2,12 +2,12 @@ import type { DefaultKeyField } from '@/shared/constants';
 import type {
   AnyObject,
   RecordKey,
-  WithProperty
+  WithProperty,
 } from '@/shared/types/Utility';
 
 export type TListRow<
   Item = AnyObject,
-  KeyField extends RecordKey = DefaultKeyField
+  KeyField extends RecordKey = DefaultKeyField,
 > = WithProperty<KeyField, string> & {
   columns: Item[];
 };

@@ -1,12 +1,12 @@
 import type {
   TName,
   TSource,
-  IAbilitiesValue
+  IAbilitiesValue,
 } from '@/shared/types/BaseApiFields';
 
 export enum BestiaryFilterDefaults {
   dbName = 'bestiary',
-  url = '/filters/bestiary'
+  url = '/filters/bestiary',
 }
 
 export interface ICreatureAction {

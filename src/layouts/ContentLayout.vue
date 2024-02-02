@@ -1,101 +1,18 @@
-<template>
-  <div
-    ref="container"
-    :class="{ 'is-showed-right-side': showRightSide }"
-    class="content-layout"
-  >
-    <div
-      :class="{ 'is-fullscreen': fullscreenState }"
-      class="content-layout__body"
-    >
-      <div
-        :class="{
-          'is-fullscreen': fullscreenState,
-          'is-showed-right-side': showRightSide
-        }"
-        class="content-layout__side--left"
-      >
-        <div
-          ref="fixedContainer"
-          class="content-layout__fixed"
-        >
-          <div class="content-layout__fixed_body">
-            <h1
-              v-if="$slots.title"
-              class="content-layout__title"
-            >
-              <slot name="title" />
-            </h1>
-
-            <h1
-              v-else-if="title"
-              class="content-layout__title"
-            >
-              {{ title }}
-            </h1>
-
-            <div
-              v-if="filterInstance"
-              class="content-layout__filter"
-            >
-              <list-filter
-                :filter-instance="filterInstance"
-                @search="onUpdateSearch"
-                @update="onUpdateFilter"
-              />
-            </div>
-
-            <div
-              v-if="$slots.fixed"
-              class="content-layout__fixed_slot"
-            >
-              <slot name="fixed" />
-            </div>
-          </div>
-        </div>
-
-        <div
-          ref="leftSide"
-          :class="{ 'is-shadow': shadow || (showRightSide && fullscreenState) }"
-          class="content-layout__side--left_body"
-        >
-          <slot name="default" />
-        </div>
-      </div>
-
-      <div
-        v-if="showRightSide"
-        ref="detail"
-        :class="{ 'is-fullscreen': fullscreenState }"
-        class="content-layout__side--right"
-      >
-        <router-view
-          v-if="!$slots['right-side']"
-          @scroll-to-active="scrollToActive"
-          @scroll-to-last-active="scrollToLastActive"
-        />
-
-        <slot name="right-side" />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
   import {
     useElementBounding,
     useInfiniteScroll,
     useResizeObserver,
-    useScroll
+    useScroll,
   } from '@vueuse/core';
   import { throttle } from 'lodash-es';
   import { storeToRefs } from 'pinia';
   import { computed, onMounted, ref } from 'vue';
 
-  import ListFilter from '@/features/filter/ListFilter.vue';
-
   import type { FilterComposable } from '@/shared/composables/useFilter';
   import { useUIStore } from '@/shared/stores/UIStore';
+
+  import ListFilter from '@/features/filter/ListFilter.vue';
 
   import type { MaybeRef } from '@vueuse/core';
 
@@ -119,8 +36,8 @@
       forceFullscreenState: undefined,
       filterInstance: undefined,
       onLoadMore: undefined,
-      isEnd: false
-    }
+      isEnd: false,
+    },
   );
 
   const emit = defineEmits<TEmit>();
@@ -161,7 +78,7 @@
   const bodyScroll = useScroll(bodyElement, {
     behavior: 'smooth',
     throttle: 300,
-    onScroll: scrollHandler
+    onScroll: scrollHandler,
   });
 
   useResizeObserver(bodyElement, scrollHandler);
@@ -239,11 +156,94 @@
       },
       {
         distance: 1080,
-        interval: 1000
-      }
+        interval: 1000,
+      },
     );
   });
 </script>
+
+<template>
+  <div
+    ref="container"
+    :class="{ 'is-showed-right-side': showRightSide }"
+    class="content-layout"
+  >
+    <div
+      :class="{ 'is-fullscreen': fullscreenState }"
+      class="content-layout__body"
+    >
+      <div
+        :class="{
+          'is-fullscreen': fullscreenState,
+          'is-showed-right-side': showRightSide,
+        }"
+        class="content-layout__side--left"
+      >
+        <div
+          ref="fixedContainer"
+          class="content-layout__fixed"
+        >
+          <div class="content-layout__fixed_body">
+            <h1
+              v-if="$slots.title"
+              class="content-layout__title"
+            >
+              <slot name="title" />
+            </h1>
+
+            <h1
+              v-else-if="title"
+              class="content-layout__title"
+            >
+              {{ title }}
+            </h1>
+
+            <div
+              v-if="filterInstance"
+              class="content-layout__filter"
+            >
+              <list-filter
+                :filter-instance="filterInstance"
+                @search="onUpdateSearch"
+                @update="onUpdateFilter"
+              />
+            </div>
+
+            <div
+              v-if="$slots.fixed"
+              class="content-layout__fixed_slot"
+            >
+              <slot name="fixed" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          ref="leftSide"
+          :class="{ 'is-shadow': shadow || (showRightSide && fullscreenState) }"
+          class="content-layout__side--left_body"
+        >
+          <slot name="default" />
+        </div>
+      </div>
+
+      <div
+        v-if="showRightSide"
+        ref="detail"
+        :class="{ 'is-fullscreen': fullscreenState }"
+        class="content-layout__side--right"
+      >
+        <router-view
+          v-if="!$slots['right-side']"
+          @scroll-to-active="scrollToActive"
+          @scroll-to-last-active="scrollToLastActive"
+        />
+
+        <slot name="right-side" />
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

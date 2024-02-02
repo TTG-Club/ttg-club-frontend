@@ -1,3 +1,112 @@
+<script lang="ts">
+  import { computed, defineComponent, ref } from 'vue';
+  import { useLink } from 'vue-router';
+
+  import { useAxios } from '@/shared/composables/useAxios';
+  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import type { Maybe } from '@/shared/types/Utility';
+  import type {
+    IScreenItem,
+    IScreenLink,
+  } from '@/shared/types/workshop/Screens.d';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
+  import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  export default defineComponent({
+    components: {
+      SvgIcon,
+      BookmarkSaveButton,
+      ScreenBody,
+      BaseModal,
+    },
+    inheritAttrs: false,
+    props: {
+      to: {
+        type: Object as PropType<RouteLocationPathRaw>,
+        required: true,
+      },
+      screen: {
+        type: Object as PropType<IScreenLink>,
+        default: () => ({}),
+        required: true,
+      },
+    },
+    setup(props) {
+      const http = useAxios();
+      const { href } = useLink(props);
+
+      const modal = ref<{
+        show: boolean;
+        data: Maybe<IScreenItem>;
+      }>({
+        data: undefined,
+        show: false,
+      });
+
+      const error = ref(false);
+      const loading = ref(false);
+      const abortController = ref<AbortController | null>(null);
+
+      const screenInfoQuery = async () => {
+        if (abortController.value) {
+          abortController.value.abort();
+        }
+
+        try {
+          error.value = false;
+          loading.value = true;
+          abortController.value = new AbortController();
+
+          const resp = await http.post<IScreenItem>({
+            url: href.value,
+            signal: abortController.value.signal,
+          });
+
+          return resp.data;
+        } catch (err) {
+          errorHandler(err);
+
+          error.value = true;
+
+          return undefined;
+        } finally {
+          loading.value = false;
+          abortController.value = null;
+        }
+      };
+
+      const clickHandler = async () => {
+        try {
+          if (!modal.value.data) {
+            modal.value.data = await screenInfoQuery();
+          }
+
+          modal.value.show = true;
+        } catch (err) {
+          errorHandler(err);
+        }
+      };
+
+      return {
+        href,
+        modal,
+        bookmarkObj: computed(() => ({
+          url: props.screen.url,
+          name: props.screen.name.rus,
+        })),
+        clickHandler,
+      };
+    },
+  });
+</script>
+
 <template>
   <router-link
     custom
@@ -10,7 +119,11 @@
       @click.left.exact.prevent="clickHandler"
     >
       <div class="screen-link__icon">
-        <raw-content :template="screen.icon" />
+        <svg-icon
+          :icon="screen.icon"
+          size="40"
+          raw
+        />
       </div>
 
       <div class="screen-link__body">
@@ -47,115 +160,6 @@
   </base-modal>
 </template>
 
-<script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink } from 'vue-router';
-
-  import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
-
-  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
-
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import type { Maybe } from '@/shared/types/Utility';
-  import type {
-    IScreenItem,
-    IScreenLink
-  } from '@/shared/types/workshop/Screens.d';
-  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  import type { PropType } from 'vue';
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  export default defineComponent({
-    components: {
-      BookmarkSaveButton,
-      ScreenBody,
-      BaseModal,
-      RawContent
-    },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      screen: {
-        type: Object as PropType<IScreenLink>,
-        default: () => ({}),
-        required: true
-      }
-    },
-    setup(props) {
-      const http = useAxios();
-      const { href } = useLink(props);
-
-      const modal = ref<{
-        show: boolean;
-        data: Maybe<IScreenItem>;
-      }>({
-        data: undefined,
-        show: false
-      });
-
-      const error = ref(false);
-      const loading = ref(false);
-      const abortController = ref<AbortController | null>(null);
-
-      const screenInfoQuery = async () => {
-        if (abortController.value) {
-          abortController.value.abort();
-        }
-
-        try {
-          error.value = false;
-          loading.value = true;
-          abortController.value = new AbortController();
-
-          const resp = await http.post<IScreenItem>({
-            url: href.value,
-            signal: abortController.value.signal
-          });
-
-          return resp.data;
-        } catch (err) {
-          errorHandler(err);
-
-          error.value = true;
-
-          return undefined;
-        } finally {
-          loading.value = false;
-          abortController.value = null;
-        }
-      };
-
-      const clickHandler = async () => {
-        try {
-          if (!modal.value.data) {
-            modal.value.data = await screenInfoQuery();
-          }
-
-          modal.value.show = true;
-        } catch (err) {
-          errorHandler(err);
-        }
-      };
-
-      return {
-        href,
-        modal,
-        bookmarkObj: computed(() => ({
-          url: props.screen.url,
-          name: props.screen.name.rus
-        })),
-        clickHandler
-      };
-    }
-  });
-</script>
-
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;
 
@@ -180,13 +184,14 @@
       width: 40px;
       height: 40px;
       flex-shrink: 0;
+      color: var(--primary);
 
       :deep(svg) {
         width: 100% !important;
         height: 100% !important;
 
         path {
-          fill: var(--primary);
+          fill: currentColor;
         }
       }
     }

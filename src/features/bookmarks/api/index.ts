@@ -1,13 +1,13 @@
 import { cloneDeep } from 'lodash-es';
 
+import { useAxios } from '@/shared/composables/useAxios';
+import type { Maybe } from '@/shared/types/Utility';
+
 import type {
   IBookmarkCategoryInfo,
   TBookmark,
-  TQueryAddBookmark
+  TQueryAddBookmark,
 } from '@/features/bookmarks/types/Bookmark.d';
-
-import { useAxios } from '@/shared/composables/useAxios';
-import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {
   static getCategoryByURL(url: string) {
@@ -16,8 +16,8 @@ export default class BookmarksApi {
     return http.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
       payload: {
-        url: encodeURIComponent(url)
-      }
+        url: encodeURIComponent(url),
+      },
     });
   }
 
@@ -26,13 +26,13 @@ export default class BookmarksApi {
 
     return http.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
-      payload: { code }
+      payload: { code },
     });
   }
 
   static getCategory({
     code,
-    url
+    url,
   }: {
     code?: Maybe<string>;
     url?: Maybe<string>;
@@ -52,7 +52,7 @@ export default class BookmarksApi {
     const http = useAxios();
 
     return http.get<Array<IBookmarkCategoryInfo>>({
-      url: '/bookmarks/categories'
+      url: '/bookmarks/categories',
     });
   }
 
@@ -60,7 +60,7 @@ export default class BookmarksApi {
     const http = useAxios();
 
     return http.get<Array<TBookmark>>({
-      url: '/bookmarks'
+      url: '/bookmarks',
     });
   }
 
@@ -69,7 +69,7 @@ export default class BookmarksApi {
 
     return http.post<T>({
       url: '/bookmarks',
-      payload: cloneDeep(payload)
+      payload: cloneDeep(payload),
     });
   }
 
@@ -78,7 +78,7 @@ export default class BookmarksApi {
 
     return http.put({
       url: '/bookmarks',
-      payload: cloneDeep(payload)
+      payload: cloneDeep(payload),
     });
   }
 
@@ -86,7 +86,7 @@ export default class BookmarksApi {
     const http = useAxios();
 
     return http.delete({
-      url: `/bookmarks/${uuid}`
+      url: `/bookmarks/${uuid}`,
     });
   }
 }

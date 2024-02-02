@@ -4,7 +4,7 @@ export const getCSSPropertyValue = (element: Element, property: string) => {
 
   return {
     style,
-    value
+    value,
   };
 };
 
@@ -21,6 +21,6 @@ export const cssValueToNumber = (value: string): number => {
 };
 
 export const asyncAnimationFrame = () =>
-  new Promise(resolve => {
+  new Promise((resolve) => {
     requestAnimationFrame(resolve);
   });

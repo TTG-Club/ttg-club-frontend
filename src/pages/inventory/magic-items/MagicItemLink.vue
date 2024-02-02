@@ -1,3 +1,59 @@
+<script setup lang="ts" generic="T extends TGroupedTraderLink">
+  import { computed } from 'vue';
+  import { useLink } from 'vue-router';
+
+  import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+  import type { TGroupedTraderLink } from '@/shared/types/tools/Trader.d';
+
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  const props = withDefaults(
+    defineProps<{
+      to: RouteLocationPathRaw;
+      magicItem: T;
+      inTools?: boolean;
+      inTrader?: boolean;
+      isActive?: boolean;
+    }>(),
+    {
+      inTools: false,
+      inTrader: false,
+      isActive: false,
+    },
+  );
+
+  const emit = defineEmits<{ (e: 'select-item'): void }>();
+
+  const { navigate, isActive, href } = useLink(props);
+
+  const classList = computed(() => ({
+    'router-link-active': props.isActive || isActive.value,
+    'is-green': props.magicItem?.source?.homebrew,
+  }));
+
+  const clickHandler = () => {
+    if (props.inTools) {
+      emit('select-item');
+
+      return;
+    }
+
+    navigate();
+  };
+
+  const price = computed(() => {
+    if (typeof props.magicItem.custom?.price === 'number') {
+      return `${props.magicItem.custom.price} зм`;
+    }
+
+    if (props.magicItem.price) {
+      return props.magicItem.price;
+    }
+
+    return null;
+  });
+</script>
+
 <template>
   <router-link
     :to="{ path: magicItem.url }"
@@ -60,62 +116,6 @@
     </a>
   </router-link>
 </template>
-
-<script setup lang="ts" generic="T extends TGroupedTraderLink">
-  import { computed } from 'vue';
-  import { useLink } from 'vue-router';
-
-  import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
-  import type { TGroupedTraderLink } from '@/shared/types/tools/Trader.d';
-
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  const props = withDefaults(
-    defineProps<{
-      to: RouteLocationPathRaw;
-      magicItem: T;
-      inTools?: boolean;
-      inTrader?: boolean;
-      isActive?: boolean;
-    }>(),
-    {
-      inTools: false,
-      inTrader: false,
-      isActive: false
-    }
-  );
-
-  const emit = defineEmits<{ (e: 'select-item'): void }>();
-
-  const { navigate, isActive, href } = useLink(props);
-
-  const classList = computed(() => ({
-    'router-link-active': props.isActive || isActive.value,
-    'is-green': props.magicItem?.source?.homebrew
-  }));
-
-  const clickHandler = () => {
-    if (props.inTools) {
-      emit('select-item');
-
-      return;
-    }
-
-    navigate();
-  };
-
-  const price = computed(() => {
-    if (typeof props.magicItem.custom?.price === 'number') {
-      return `${props.magicItem.custom.price} зм`;
-    }
-
-    if (props.magicItem.price) {
-      return props.magicItem.price;
-    }
-
-    return null;
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/link-item' as *;

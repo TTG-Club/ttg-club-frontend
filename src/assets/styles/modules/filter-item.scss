@@ -49,7 +49,7 @@
     justify-content: center;
     width: 42px;
     height: 42px;
-    color: var(--primary);
+    color: var(--text-color);
 
     @include media-min($md) {
       &:hover {

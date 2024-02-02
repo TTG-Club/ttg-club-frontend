@@ -3,7 +3,7 @@ import {
   useCssVar,
   useScroll,
   useStorage,
-  useWindowSize
+  useWindowSize,
 } from '@vueuse/core';
 import Cookies from 'js-cookie';
 import { defineStore } from 'pinia';
@@ -14,7 +14,7 @@ import { FULLSCREEN_DB_KEY, THEME_DB_KEY } from '@/shared/constants/UI';
 export const useUIStore = defineStore('UIStore', () => {
   const updateThemeMeta = () => {
     let el: HTMLMetaElement | null = document.querySelector(
-      'meta[name="theme-color"]'
+      'meta[name="theme-color"]',
     );
 
     if (!el) {
@@ -38,21 +38,21 @@ export const useUIStore = defineStore('UIStore', () => {
       updateThemeMeta();
 
       Cookies.set(THEME_DB_KEY, mode, {
-        expires: 365
+        expires: 365,
       });
-    }
+    },
   });
 
   const theme = computed({
     get: () =>
       storedTheme.value === 'auto' ? systemTheme.value : storedTheme.value,
-    set: value => {
+    set: (value) => {
       storedTheme.value = value;
-    }
+    },
   });
 
   const bodyElement = ref<HTMLElement | null>(
-    document.getElementById('container')
+    document.getElementById('container'),
   );
 
   const windowSize = useWindowSize();
@@ -70,12 +70,12 @@ export const useUIStore = defineStore('UIStore', () => {
 
   watch(
     windowSize.height,
-    value => {
+    (value) => {
       document.documentElement.style.setProperty('--max-vh', `${value}px`);
     },
     {
-      immediate: true
-    }
+      immediate: true,
+    },
   );
 
   return {
@@ -86,6 +86,6 @@ export const useUIStore = defineStore('UIStore', () => {
 
     isMobile,
     windowSize,
-    bodyScroll
+    bodyScroll,
   };
 });

@@ -27,6 +27,6 @@ export function useSearch(config?: SearchConfig): SearchComposable {
     value,
     exact: computed(() => !!unref(config?.exact)),
 
-    updateSearch
+    updateSearch,
   };
 }

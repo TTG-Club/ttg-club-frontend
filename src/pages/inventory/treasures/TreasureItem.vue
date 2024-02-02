@@ -1,3 +1,14 @@
+<script>
+  export default {
+    props: {
+      treasure: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+  };
+</script>
+
 <template>
   <div
     ref="treasure"
@@ -38,17 +49,6 @@
     </div>
   </div>
 </template>
-
-<script>
-  export default {
-    props: {
-      treasure: {
-        type: Object,
-        default: () => ({})
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/link-item' as *;

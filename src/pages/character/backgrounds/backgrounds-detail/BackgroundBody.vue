@@ -1,3 +1,29 @@
+<script>
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'BackgroundBody',
+    components: {
+      DetailTopBar,
+      RawContent,
+    },
+    props: {
+      background: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+    },
+    computed: {
+      topBarLeftString() {
+        return ` `;
+      },
+    },
+  };
+</script>
+
 <template>
   <div class="background-body">
     <detail-top-bar
@@ -10,29 +36,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'BackgroundBody',
-    components: {
-      DetailTopBar,
-      RawContent
-    },
-    props: {
-      background: {
-        type: Object,
-        default: undefined,
-        required: true
-      }
-    },
-    computed: {
-      topBarLeftString() {
-        return ` `;
-      }
-    }
-  };
-</script>

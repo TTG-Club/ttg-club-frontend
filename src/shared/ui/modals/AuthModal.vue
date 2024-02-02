@@ -1,3 +1,34 @@
+<script lang="ts" setup>
+  import { useVModel } from '@vueuse/core';
+  import { VueFinalModal } from 'vue-final-modal';
+
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+
+  interface IEmit {
+    (e: 'close'): void;
+  }
+
+  const props = withDefaults(
+    defineProps<{
+      modelValue: boolean;
+      title?: string;
+    }>(),
+    {
+      title: '',
+    },
+  );
+
+  const emit = defineEmits<IEmit>();
+
+  const isShowModal = useVModel(props, 'modelValue');
+
+  const onClose = () => {
+    isShowModal.value = false;
+
+    emit('close');
+  };
+</script>
+
 <template>
   <vue-final-modal
     v-model="isShowModal"
@@ -37,37 +68,6 @@
     </div>
   </vue-final-modal>
 </template>
-
-<script lang="ts" setup>
-  import { useVModel } from '@vueuse/core';
-  import { VueFinalModal } from 'vue-final-modal';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-
-  interface IEmit {
-    (e: 'close'): void;
-  }
-
-  const props = withDefaults(
-    defineProps<{
-      modelValue: boolean;
-      title?: string;
-    }>(),
-    {
-      title: ''
-    }
-  );
-
-  const emit = defineEmits<IEmit>();
-
-  const isShowModal = useVModel(props, 'modelValue');
-
-  const onClose = () => {
-    isShowModal.value = false;
-
-    emit('close');
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;
