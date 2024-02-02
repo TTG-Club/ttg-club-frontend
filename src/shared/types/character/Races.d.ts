@@ -3,7 +3,7 @@ import type {
   AbilityName,
   AbilityShortName,
   AbilityType,
-  AbilityTypeKey
+  AbilityTypeKey,
 } from '@/shared/types/tools/AbilityCalc';
 
 export type TRaceAbility = {
@@ -51,5 +51,5 @@ export type TRaceList = {
 
 export enum RacesFilterDefaults {
   dbName = 'races',
-  url = '/filters/races'
+  url = '/filters/races',
 }

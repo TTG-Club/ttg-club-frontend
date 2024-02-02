@@ -1,3 +1,28 @@
+<script>
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  export default {
+    name: 'ClassSquare',
+    components: {
+      SvgIcon,
+    },
+    props: {
+      name: {
+        type: String,
+        default: '',
+      },
+      icon: {
+        type: String,
+        default: '',
+      },
+      url: {
+        type: String,
+        default: '',
+      },
+    },
+  };
+</script>
+
 <template>
   <router-link
     v-if="icon && url"
@@ -8,31 +33,6 @@
     <svg-icon :icon="icon" />
   </router-link>
 </template>
-
-<script>
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  export default {
-    name: 'ClassSquare',
-    components: {
-      SvgIcon
-    },
-    props: {
-      name: {
-        type: String,
-        default: ''
-      },
-      icon: {
-        type: String,
-        default: ''
-      },
-      url: {
-        type: String,
-        default: ''
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   // .class-square {

@@ -1,3 +1,92 @@
+<script lang="ts">
+  import { computed, defineComponent } from 'vue';
+
+  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
+  import {
+    AbilityKey,
+    AbilityName,
+    AbilityShortName,
+  } from '@/shared/types/tools/AbilityCalc.d';
+  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
+
+  import type { PropType } from 'vue';
+
+  export default defineComponent({
+    props: {
+      rolls: {
+        type: Array as PropType<Array<AbilityRoll>>,
+        required: true,
+      },
+      raceBonuses: {
+        type: Array as PropType<Array<AbilityRoll>>,
+        required: true,
+      },
+    },
+    setup(props) {
+      const abilities = computed(() =>
+        Object.values(AbilityKey).map((key: AbilityKey) => {
+          const roll = props.rolls.find((item) => item.key === key);
+
+          const getValue = () => {
+            if (typeof roll?.value !== 'number') {
+              return '−';
+            }
+
+            return roll.value;
+          };
+
+          const getRaceBonus = () => {
+            const bonus = props.raceBonuses.find(
+              (item) => item.key === key,
+            )?.value;
+
+            if (!bonus && bonus !== 0) {
+              return '−';
+            }
+
+            return bonus;
+          };
+
+          const getResult = () => {
+            let result = 0;
+
+            if (typeof roll?.value === 'number') {
+              result += roll.value;
+            }
+
+            const raceBonus = getRaceBonus();
+
+            if (typeof raceBonus === 'number') {
+              result += raceBonus;
+            }
+
+            return result;
+          };
+
+          const getModifier = () => getFormattedModifier(getResult());
+
+          return {
+            key,
+            name: AbilityName[key],
+            shortName: AbilityShortName[key],
+            value: getValue(),
+            raceBonus: getRaceBonus(),
+            result: getResult(),
+            modifier: getModifier(),
+          };
+        }),
+      );
+
+      return {
+        AbilityKey,
+        AbilityShortName,
+
+        abilities,
+      };
+    },
+  });
+</script>
+
 <template>
   <div class="ability-table">
     <div class="ability-table__col is-aside">
@@ -41,94 +130,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent } from 'vue';
-
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
-  import {
-    AbilityKey,
-    AbilityName,
-    AbilityShortName
-  } from '@/shared/types/tools/AbilityCalc.d';
-  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
-
-  import type { PropType } from 'vue';
-
-  export default defineComponent({
-    props: {
-      rolls: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true
-      },
-      raceBonuses: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true
-      }
-    },
-    setup(props) {
-      const abilities = computed(() =>
-        Object.values(AbilityKey).map((key: AbilityKey) => {
-          const roll = props.rolls.find(item => item.key === key);
-
-          const getValue = () => {
-            if (typeof roll?.value !== 'number') {
-              return '−';
-            }
-
-            return roll.value;
-          };
-
-          const getRaceBonus = () => {
-            const bonus = props.raceBonuses.find(item => item.key === key)
-              ?.value;
-
-            if (!bonus && bonus !== 0) {
-              return '−';
-            }
-
-            return bonus;
-          };
-
-          const getResult = () => {
-            let result = 0;
-
-            if (typeof roll?.value === 'number') {
-              result += roll.value;
-            }
-
-            const raceBonus = getRaceBonus();
-
-            if (typeof raceBonus === 'number') {
-              result += raceBonus;
-            }
-
-            return result;
-          };
-
-          const getModifier = () => getFormattedModifier(getResult());
-
-          return {
-            key,
-            name: AbilityName[key],
-            shortName: AbilityShortName[key],
-            value: getValue(),
-            raceBonus: getRaceBonus(),
-            result: getResult(),
-            modifier: getModifier()
-          };
-        })
-      );
-
-      return {
-        AbilityKey,
-        AbilityShortName,
-
-        abilities
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

@@ -10,7 +10,7 @@ enum ReferenceApi {
   CONDITIONS = 'conditions',
   BEAST_TYPES = 'beast/types',
   ARMOR_TYPES = 'armor/types',
-  ALIGNMENTS = 'alignments'
+  ALIGNMENTS = 'alignments',
 }
 
 class ReferenceService {
@@ -20,7 +20,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.SIZES)
+        url: this.getUrl(ReferenceApi.SIZES),
       });
 
       return data;
@@ -33,7 +33,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.ENVIRONMENTS)
+        url: this.getUrl(ReferenceApi.ENVIRONMENTS),
       });
 
       return data;
@@ -46,7 +46,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.DICES)
+        url: this.getUrl(ReferenceApi.DICES),
       });
 
       return data;
@@ -59,7 +59,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.DAMAGE_TYPES)
+        url: this.getUrl(ReferenceApi.DAMAGE_TYPES),
       });
 
       return data;
@@ -72,7 +72,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.CONDITIONS)
+        url: this.getUrl(ReferenceApi.CONDITIONS),
       });
 
       return data;
@@ -85,7 +85,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.BEAST_TYPES)
+        url: this.getUrl(ReferenceApi.BEAST_TYPES),
       });
 
       return data;
@@ -98,7 +98,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.ARMOR_TYPES)
+        url: this.getUrl(ReferenceApi.ARMOR_TYPES),
       });
 
       return data;
@@ -111,7 +111,7 @@ class ReferenceService {
     try {
       const { data } = await httpClient.get<Array<ReferenceDice>>({
         version: 'v2',
-        url: this.getUrl(ReferenceApi.ALIGNMENTS)
+        url: this.getUrl(ReferenceApi.ALIGNMENTS),
       });
 
       return data;

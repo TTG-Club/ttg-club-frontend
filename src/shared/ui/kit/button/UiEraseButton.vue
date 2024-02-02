@@ -1,15 +1,3 @@
-<template>
-  <ui-button
-    v-tippy="{ content: 'Стереть строку поиска' }"
-    :class="$style['ui-erase-button']"
-    :body-class="bodyClasses"
-    type="text"
-    icon="close"
-    color="text"
-    @click="$emit('click', $event)"
-  />
-</template>
-
 <script setup lang="ts">
   import clsx from 'clsx';
   import { useCssModule } from 'vue';
@@ -25,6 +13,18 @@
 
   const bodyClasses = clsx([props.bodyClass, $style.body]);
 </script>
+
+<template>
+  <ui-button
+    v-tippy="{ content: 'Стереть строку поиска' }"
+    :class="$style['ui-erase-button']"
+    :body-class="bodyClasses"
+    type="text"
+    icon="close"
+    color="text"
+    @click="$emit('click', $event)"
+  />
+</template>
 
 <style lang="scss" module>
   .ui-erase-button {

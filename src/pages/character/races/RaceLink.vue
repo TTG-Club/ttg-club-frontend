@@ -1,3 +1,121 @@
+<script lang="ts">
+  import { groupBy, isArray, sortBy } from 'lodash-es';
+  import { computed, defineComponent, ref } from 'vue';
+  import { useLink, useRoute } from 'vue-router';
+
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import type { TRaceLink } from '@/shared/types/character/Races.d';
+  import { AbilityType } from '@/shared/types/tools/AbilityCalc.d';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  import type { PropType } from 'vue';
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  export default defineComponent({
+    components: { SvgIcon },
+    inheritAttrs: false,
+    props: {
+      to: {
+        type: Object as PropType<RouteLocationPathRaw>,
+        required: true,
+      },
+      raceItem: {
+        type: Object as PropType<TRaceLink>,
+        required: true,
+      },
+      isAbilityCalc: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props) {
+      const route = useRoute();
+
+      const { isActive, navigate, href } = useLink(props);
+
+      const uiStore = useUIStore();
+      const submenu = ref(false);
+
+      const abilities = computed(() => {
+        if (!props.raceItem.abilities.length) {
+          return '';
+        }
+
+        if (props.raceItem.abilities.length === 6) {
+          return AbilityType.ALL;
+        }
+
+        const abilitiesList = [];
+
+        for (const ability of props.raceItem.abilities) {
+          abilitiesList.push(
+            ability.value
+              ? `${ability.shortName} ${
+                  ability.value > 0 ? `+${ability.value}` : ability.value
+                }`
+              : ability.name,
+          );
+        }
+
+        return abilitiesList.join(', ');
+      });
+
+      const subRaces = computed(() => {
+        if (props.isAbilityCalc) {
+          return null;
+        }
+
+        if (isArray(props.raceItem.subraces)) {
+          return sortBy(
+            Object.values(
+              groupBy(props.raceItem.subraces, (o) => o.type.name),
+            ).map((value) => ({
+              name: value[0].type,
+              list: value,
+            })),
+            [(o) => o.name.order],
+          );
+        }
+
+        return null;
+      });
+
+      const hasSubRaces = computed(() => !!subRaces.value?.length);
+
+      const parentClassList = computed(() => ({
+        'router-link-active': isActive.value,
+        'is-selected': route.name === 'raceDetail',
+        'is-green': props.raceItem.type.name.toLowerCase() === 'homebrew',
+        'is-fullscreen': uiStore.fullscreen,
+        'is-ability-calc': props.isAbilityCalc,
+      }));
+
+      const selectRace = async () => {
+        if (!props.isAbilityCalc) {
+          if (!uiStore.isMobile) {
+            submenu.value = true;
+          }
+
+          await navigate();
+
+          return;
+        }
+
+        window.open(href.value, '_blank')?.focus();
+      };
+
+      return {
+        submenu,
+        abilities,
+        subRaces,
+        hasSubRaces,
+        parentClassList,
+        selectRace,
+      };
+    },
+  });
+</script>
+
 <template>
   <router-link
     v-slot="{ href }"
@@ -111,124 +229,6 @@
     </div>
   </router-link>
 </template>
-
-<script lang="ts">
-  import { groupBy, isArray, sortBy } from 'lodash-es';
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink, useRoute } from 'vue-router';
-
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import type { TRaceLink } from '@/shared/types/character/Races.d';
-  import { AbilityType } from '@/shared/types/tools/AbilityCalc.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  import type { PropType } from 'vue';
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  export default defineComponent({
-    components: { SvgIcon },
-    inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true
-      },
-      raceItem: {
-        type: Object as PropType<TRaceLink>,
-        required: true
-      },
-      isAbilityCalc: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const route = useRoute();
-
-      const { isActive, navigate, href } = useLink(props);
-
-      const uiStore = useUIStore();
-      const submenu = ref(false);
-
-      const abilities = computed(() => {
-        if (!props.raceItem.abilities.length) {
-          return '';
-        }
-
-        if (props.raceItem.abilities.length === 6) {
-          return AbilityType.ALL;
-        }
-
-        const abilitiesList = [];
-
-        for (const ability of props.raceItem.abilities) {
-          abilitiesList.push(
-            ability.value
-              ? `${ability.shortName} ${
-                  ability.value > 0 ? `+${ability.value}` : ability.value
-                }`
-              : ability.name
-          );
-        }
-
-        return abilitiesList.join(', ');
-      });
-
-      const subRaces = computed(() => {
-        if (props.isAbilityCalc) {
-          return null;
-        }
-
-        if (isArray(props.raceItem.subraces)) {
-          return sortBy(
-            Object.values(
-              groupBy(props.raceItem.subraces, o => o.type.name)
-            ).map(value => ({
-              name: value[0].type,
-              list: value
-            })),
-            [o => o.name.order]
-          );
-        }
-
-        return null;
-      });
-
-      const hasSubRaces = computed(() => !!subRaces.value?.length);
-
-      const parentClassList = computed(() => ({
-        'router-link-active': isActive.value,
-        'is-selected': route.name === 'raceDetail',
-        'is-green': props.raceItem.type.name.toLowerCase() === 'homebrew',
-        'is-fullscreen': uiStore.fullscreen,
-        'is-ability-calc': props.isAbilityCalc
-      }));
-
-      const selectRace = async () => {
-        if (!props.isAbilityCalc) {
-          if (!uiStore.isMobile) {
-            submenu.value = true;
-          }
-
-          await navigate();
-
-          return;
-        }
-
-        window.open(href.value, '_blank')?.focus();
-      };
-
-      return {
-        submenu,
-        abilities,
-        subRaces,
-        hasSubRaces,
-        parentClassList,
-        selectRace
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/link-item-expand' as *;

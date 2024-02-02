@@ -23,13 +23,13 @@ class HttpClient {
     this.instance = axios.create({
       baseURL: this.getBaseURL(),
       withCredentials: true,
-      headers: {}
+      headers: {},
     });
 
-    this.instance.interceptors.request.use(req => {
+    this.instance.interceptors.request.use((req) => {
       // eslint-disable-next-line no-param-reassign
       req.paramsSerializer = {
-        indexes: null
+        indexes: null,
       };
 
       if (Cookies.get(USER_TOKEN_COOKIE)) {
@@ -52,7 +52,7 @@ class HttpClient {
       url: config.url,
       params: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version)
+      baseURL: this.getBaseURL(config.version),
     });
   }
 
@@ -62,7 +62,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version)
+      baseURL: this.getBaseURL(config.version),
     });
   }
 
@@ -72,7 +72,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version)
+      baseURL: this.getBaseURL(config.version),
     });
   }
 
@@ -82,7 +82,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version)
+      baseURL: this.getBaseURL(config.version),
     });
   }
 
@@ -92,7 +92,7 @@ class HttpClient {
       url: config.url,
       params: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version)
+      baseURL: this.getBaseURL(config.version),
     });
   }
 
@@ -101,7 +101,7 @@ class HttpClient {
       method: 'head',
       baseURL: this.getProxyURL(),
       url: config.url,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 
@@ -111,7 +111,7 @@ class HttpClient {
       baseURL: this.getProxyURL(),
       url: config.url,
       params: config.payload,
-      signal: config.signal
+      signal: config.signal,
     });
   }
 }

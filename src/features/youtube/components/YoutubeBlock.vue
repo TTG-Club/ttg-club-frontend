@@ -1,3 +1,58 @@
+<script setup lang="ts">
+  import { tryOnBeforeMount } from '@vueuse/core';
+  import { computed, ref } from 'vue';
+
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+
+  import { YoutubeApi } from '@/features/youtube/api';
+  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  const youtube = ref<HTMLElement>();
+  const videos = ref<Array<TYoutubeVideo>>([]);
+  const activeVideo = ref<TYoutubeVideo['id'] | null>(null);
+
+  const currentVideo = computed<TYoutubeVideo | null>(() => {
+    if (videos.value?.length) {
+      return videos.value[0];
+    }
+
+    return null;
+  });
+
+  const oldVideos = computed<Array<TYoutubeVideo>>(() =>
+    videos.value.slice(1, videos.value?.length),
+  );
+
+  const getVideos = async () => {
+    try {
+      const { items } = await YoutubeApi.load({
+        page: 0,
+        size: 5,
+        activeStatus: true,
+        order: [
+          {
+            field: 'created',
+            direction: 'desc',
+          },
+          {
+            field: 'name',
+            direction: 'asc',
+          },
+        ],
+      });
+
+      return Promise.resolve(items);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  tryOnBeforeMount(async () => {
+    videos.value = await getVideos();
+  });
+</script>
+
 <template>
   <transition
     mode="out-in"
@@ -45,61 +100,6 @@
     </template>
   </base-modal>
 </template>
-
-<script setup lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
-  import { computed, ref } from 'vue';
-
-  import { YoutubeApi } from '@/features/youtube/api';
-  import YoutubePlayer from '@/features/youtube/components/YoutubePlayer.vue';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-
-  const youtube = ref<HTMLElement>();
-  const videos = ref<Array<TYoutubeVideo>>([]);
-  const activeVideo = ref<TYoutubeVideo['id'] | null>(null);
-
-  const currentVideo = computed<TYoutubeVideo | null>(() => {
-    if (videos.value?.length) {
-      return videos.value[0];
-    }
-
-    return null;
-  });
-
-  const oldVideos = computed<Array<TYoutubeVideo>>(() =>
-    videos.value.slice(1, videos.value?.length)
-  );
-
-  const getVideos = async () => {
-    try {
-      const { items } = await YoutubeApi.load({
-        page: 0,
-        size: 5,
-        activeStatus: true,
-        order: [
-          {
-            field: 'created',
-            direction: 'desc'
-          },
-          {
-            field: 'name',
-            direction: 'asc'
-          }
-        ]
-      });
-
-      return Promise.resolve(items);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  tryOnBeforeMount(async () => {
-    videos.value = await getVideos();
-  });
-</script>
 
 <style module lang="scss">
   @use '@/assets/styles/variables/breakpoints' as *;

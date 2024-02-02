@@ -10,5 +10,5 @@ export const IndexPage: RouteRecordRaw = {
     const navStore = useNavStore();
 
     await navStore.initPartners();
-  }
+  },
 };

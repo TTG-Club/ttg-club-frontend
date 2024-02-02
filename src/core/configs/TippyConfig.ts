@@ -46,9 +46,9 @@ export const DefaultTippyProps: DefaultProps = {
     if (attr) {
       http
         .rawGet({
-          url: attr
+          url: attr,
         })
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200) {
             errorHandler(res.statusText);
 
@@ -59,7 +59,7 @@ export const DefaultTippyProps: DefaultProps = {
 
           canShow = true;
         })
-        .catch(err => {
+        .catch((err) => {
           errorHandler(err);
 
           canShow = false;
@@ -67,14 +67,14 @@ export const DefaultTippyProps: DefaultProps = {
     }
 
     return canShow;
-  }
+  },
 };
 
 export const TippyOptions: TippyPluginOptions = {
-  defaultProps: DefaultTippyProps
+  defaultProps: DefaultTippyProps,
 };
 
 export default {
   DefaultTippyProps,
-  TippyOptions
+  TippyOptions,
 };

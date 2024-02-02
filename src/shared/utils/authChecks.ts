@@ -3,7 +3,7 @@ import {
   helpers,
   maxLength,
   minLength,
-  required
+  required,
 } from '@vuelidate/validators';
 
 import { httpClient } from '@/shared/api/httpClient';
@@ -17,8 +17,8 @@ const checkExist = async (value: string, type: 'username' | 'email') => {
     const resp = await httpClient.post({
       url: '/auth/exist',
       payload: {
-        [type]: value
-      }
+        [type]: value,
+      },
     });
 
     if (resp.status !== 200 && isDev) {
@@ -48,7 +48,7 @@ export const validateRequired = () =>
 export const validateUsernameSpecialChars = () =>
   helpers.withMessage(
     'Допустимы латинские буквы, 0-9 - _ .',
-    value => !/[^\w\-.]/g.test(value as string)
+    (value) => !/[^\w\-.]/g.test(value as string),
   );
 
 export const validateUsernameExist = () =>
@@ -62,7 +62,7 @@ export const validateUsernameExist = () =>
       } catch (err) {
         return false;
       }
-    })
+    }),
   );
 
 export const validateEmailFormat = () =>
@@ -79,40 +79,40 @@ export const validateEmailExist = () =>
       } catch (err) {
         return false;
       }
-    })
+    }),
   );
 
 export const validatePwdLowerCase = () =>
-  helpers.withMessage('Хотя бы одна буква в нижнем регистре', value =>
-    /[a-z]+/g.test(value as string)
+  helpers.withMessage('Хотя бы одна буква в нижнем регистре', (value) =>
+    /[a-z]+/g.test(value as string),
   );
 
 export const validatePwdUpperCase = () =>
-  helpers.withMessage('Хотя бы одна буква в верхнем регистре', value =>
-    /[A-Z]+/g.test(value as string)
+  helpers.withMessage('Хотя бы одна буква в верхнем регистре', (value) =>
+    /[A-Z]+/g.test(value as string),
   );
 
 export const validatePwdNumber = () =>
-  helpers.withMessage('Хотя бы одна цифра', value =>
-    /\d+/g.test(value as string)
+  helpers.withMessage('Хотя бы одна цифра', (value) =>
+    /\d+/g.test(value as string),
   );
 
 export const validatePwdSpecial = () =>
   helpers.withMessage(
     'Допустимые спец. символы: ! @ # $ % ^ & * _ -',
-    value => !/[^\w\-!@#$%^&*]+/g.test(value as string)
+    (value) => !/[^\w\-!@#$%^&*]+/g.test(value as string),
   );
 
 export const validateMinLength = (number: number) =>
   helpers.withMessage(
     ({ $params }) => `Не менее ${$params.min} символов`,
-    minLength(number)
+    minLength(number),
   );
 
 export const validateMaxLength = (number: number) =>
   helpers.withMessage(
     ({ $params }) => `Не более ${$params.max} символов`,
-    maxLength(number)
+    maxLength(number),
   );
 
 export default {
@@ -126,5 +126,5 @@ export default {
   validatePwdNumber,
   validatePwdSpecial,
   validateMinLength,
-  validateMaxLength
+  validateMaxLength,
 };

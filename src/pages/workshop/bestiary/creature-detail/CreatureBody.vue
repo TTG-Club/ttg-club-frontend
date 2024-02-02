@@ -1,3 +1,115 @@
+<script setup>
+  import { computed } from 'vue';
+
+  import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
+  import DiceRoller from '@/shared/ui/DiceRoller.vue';
+  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+  import {
+    getFormattedModifier,
+    getFormula,
+  } from '@/shared/utils/abilityTransforms';
+  import { getIterableString } from '@/shared/utils/string';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  const props = defineProps({
+    creature: {
+      type: Object,
+      default: undefined,
+      required: true,
+    },
+    inTooltip: {
+      type: Boolean,
+      default: false,
+    },
+  });
+
+  const speed = computed(() => {
+    if (!(props.creature.speed instanceof Array)) {
+      return '';
+    }
+
+    return props.creature.speed
+      .map(
+        (item) =>
+          `${item.name ? `${item.name} ` : ''}${
+            item.value || item.value === 0 ? `${item.value} фт.` : ''
+          }${item.additional ? ` (${item.additional})` : ''}`,
+      )
+      .join(', ');
+  });
+
+  const savingThrows = computed(() => {
+    if (!(props.creature.savingThrows instanceof Array)) {
+      return [];
+    }
+
+    return props.creature.savingThrows.map((save) => ({
+      formula: `к20+${save.value}`,
+      label: save.shortName,
+      name: save.name,
+      value: `+${save.value}${save.additional ? save.additional : ''}`,
+    }));
+  });
+
+  const skills = computed(() => {
+    if (!(props.creature.skills instanceof Array)) {
+      return [];
+    }
+
+    return props.creature.skills.map((skill) => ({
+      formula: `к20+${skill.value}`,
+      label: skill.name,
+      value: `+${skill.value}${skill.additional ? skill.additional : ''}`,
+    }));
+  });
+
+  const senses = computed(() => {
+    const list = [];
+
+    if (props.creature.senses?.senses?.length) {
+      for (const sense of props.creature.senses.senses) {
+        const index = list.push(`${sense.name} ${sense.value} фт.`);
+
+        if (sense.additional) {
+          list[index - 1] += ` (${sense.additional})`;
+        }
+      }
+    }
+
+    if (props.creature.senses?.passivePerception) {
+      list.push(
+        `пассивная Внимательность ${props.creature.senses.passivePerception}`,
+      );
+    }
+
+    return list.join(', ');
+  });
+
+  const challengeRating = computed(() => {
+    if (props.creature.challengeRating === '—') {
+      return props.creature.challengeRating;
+    }
+
+    if (props.creature.experience === 0) {
+      return `${props.creature.challengeRating} (0 или 10 опыта)`;
+    }
+
+    return `${
+      props.creature.challengeRating
+    } (${props.creature.experience.toLocaleString()} опыта)`;
+  });
+
+  const hitDiceFormula = computed(() =>
+    props.creature.hits.bonus
+      ? `${props.creature.hits.formula} ${props.creature.hits.sign} ${Math.abs(
+          props.creature.hits.bonus,
+        )}`
+      : props.creature.hits.formula,
+  );
+</script>
+
 <template>
   <div
     v-if="creature"
@@ -459,115 +571,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-  import { computed } from 'vue';
-
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
-  import DiceRoller from '@/shared/ui/DiceRoller.vue';
-  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-  import {
-    getFormattedModifier,
-    getFormula
-  } from '@/shared/utils/abilityTransforms';
-  import { getIterableString } from '@/shared/utils/string';
-
-  const props = defineProps({
-    creature: {
-      type: Object,
-      default: undefined,
-      required: true
-    },
-    inTooltip: {
-      type: Boolean,
-      default: false
-    }
-  });
-
-  const speed = computed(() => {
-    if (!(props.creature.speed instanceof Array)) {
-      return '';
-    }
-
-    return props.creature.speed
-      .map(
-        item =>
-          `${item.name ? `${item.name} ` : ''}${
-            item.value || item.value === 0 ? `${item.value} фт.` : ''
-          }${item.additional ? ` (${item.additional})` : ''}`
-      )
-      .join(', ');
-  });
-
-  const savingThrows = computed(() => {
-    if (!(props.creature.savingThrows instanceof Array)) {
-      return [];
-    }
-
-    return props.creature.savingThrows.map(save => ({
-      formula: `к20+${save.value}`,
-      label: save.shortName,
-      name: save.name,
-      value: `+${save.value}${save.additional ? save.additional : ''}`
-    }));
-  });
-
-  const skills = computed(() => {
-    if (!(props.creature.skills instanceof Array)) {
-      return [];
-    }
-
-    return props.creature.skills.map(skill => ({
-      formula: `к20+${skill.value}`,
-      label: skill.name,
-      value: `+${skill.value}${skill.additional ? skill.additional : ''}`
-    }));
-  });
-
-  const senses = computed(() => {
-    const list = [];
-
-    if (props.creature.senses?.senses?.length) {
-      for (const sense of props.creature.senses.senses) {
-        const index = list.push(`${sense.name} ${sense.value} фт.`);
-
-        if (sense.additional) {
-          list[index - 1] += ` (${sense.additional})`;
-        }
-      }
-    }
-
-    if (props.creature.senses?.passivePerception) {
-      list.push(
-        `пассивная Внимательность ${props.creature.senses.passivePerception}`
-      );
-    }
-
-    return list.join(', ');
-  });
-
-  const challengeRating = computed(() => {
-    if (props.creature.challengeRating === '—') {
-      return props.creature.challengeRating;
-    }
-
-    if (props.creature.experience === 0) {
-      return `${props.creature.challengeRating} (0 или 10 опыта)`;
-    }
-
-    return `${
-      props.creature.challengeRating
-    } (${props.creature.experience.toLocaleString()} опыта)`;
-  });
-
-  const hitDiceFormula = computed(() =>
-    props.creature.hits.bonus
-      ? `${props.creature.hits.formula} ${props.creature.hits.sign} ${Math.abs(
-          props.creature.hits.bonus
-        )}`
-      : props.creature.hits.formula
-  );
-</script>

@@ -1,3 +1,19 @@
+<script>
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst.ts';
+
+  export default {
+    directives: {
+      CapitalizeFirst,
+    },
+    props: {
+      backgroundItem: {
+        type: Object,
+        required: true,
+      },
+    },
+  };
+</script>
+
 <template>
   <router-link
     :class="{ 'is-green': backgroundItem?.homebrew }"
@@ -21,21 +37,5 @@
     </div>
   </router-link>
 </template>
-
-<script>
-  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst.ts';
-
-  export default {
-    directives: {
-      CapitalizeFirst
-    },
-    props: {
-      backgroundItem: {
-        type: Object,
-        required: true
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped src="../../../assets/styles/modules/link-item.scss" />

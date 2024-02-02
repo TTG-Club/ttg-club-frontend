@@ -1,3 +1,77 @@
+<script lang="ts" setup>
+  import { computed, ref } from 'vue';
+  import { useLink } from 'vue-router';
+
+  import { httpClient } from '@/shared/api/httpClient';
+  import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+  import type {
+    TSpellItem,
+    TSpellLink,
+  } from '@/shared/types/character/Spells.d';
+  import type { Maybe } from '@/shared/types/Utility';
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+
+  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
+
+  import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
+
+  import type { RouteLocationPathRaw } from 'vue-router';
+
+  const props = withDefaults(
+    defineProps<{
+      to: RouteLocationPathRaw;
+      spell: TSpellLink;
+      inTab?: boolean;
+    }>(),
+    {
+      inTab: false,
+    },
+  );
+
+  const { navigate, isActive, href } = useLink(props);
+
+  const modal = ref<{
+    show: boolean;
+    data: Maybe<TSpellItem>;
+  }>({
+    show: false,
+    data: undefined,
+  });
+
+  const bookmarkObj = computed(() => ({
+    url: props.spell.url,
+    name: props.spell.name.rus,
+  }));
+
+  const classList = computed(() => ({
+    'router-link-active': isActive.value,
+    'is-green': props.spell?.source?.homebrew,
+    'is-sub-item': props.inTab,
+  }));
+
+  const clickHandler = async () => {
+    if (!props.inTab) {
+      await navigate();
+
+      return;
+    }
+
+    try {
+      if (!modal.value.data) {
+        const resp = await httpClient.post<TSpellItem>({
+          url: props.spell.url,
+        });
+
+        modal.value.data = resp.data;
+      }
+
+      modal.value.show = true;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+</script>
+
 <template>
   <router-link
     :to="{ path: spell.url }"
@@ -17,7 +91,7 @@
           v-tippy-lazy="{
             content: spell.level
               ? `${spell.level} уровень заклинания`
-              : 'Заговор'
+              : 'Заговор',
           }"
           class="link-item__lvl"
         >
@@ -70,7 +144,7 @@
                   content: 'Вербальный',
                   onShow() {
                     return !!spell.components?.v;
-                  }
+                  },
                 }"
                 class="link-item__component"
               >
@@ -82,7 +156,7 @@
                   content: 'Соматический',
                   onShow() {
                     return !!spell.components?.s;
-                  }
+                  },
                 }"
                 class="link-item__component"
               >
@@ -94,7 +168,7 @@
                   content: 'Материальный',
                   onShow() {
                     return !!spell.components?.m;
-                  }
+                  },
                 }"
                 class="link-item__component"
               >
@@ -124,80 +198,6 @@
     </template>
   </base-modal>
 </template>
-
-<script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useLink } from 'vue-router';
-
-  import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
-
-  import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
-
-  import { httpClient } from '@/shared/api/httpClient';
-  import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
-  import type {
-    TSpellItem,
-    TSpellLink
-  } from '@/shared/types/character/Spells.d';
-  import type { Maybe } from '@/shared/types/Utility';
-  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-
-  import type { RouteLocationPathRaw } from 'vue-router';
-
-  const props = withDefaults(
-    defineProps<{
-      to: RouteLocationPathRaw;
-      spell: TSpellLink;
-      inTab?: boolean;
-    }>(),
-    {
-      inTab: false
-    }
-  );
-
-  const { navigate, isActive, href } = useLink(props);
-
-  const modal = ref<{
-    show: boolean;
-    data: Maybe<TSpellItem>;
-  }>({
-    show: false,
-    data: undefined
-  });
-
-  const bookmarkObj = computed(() => ({
-    url: props.spell.url,
-    name: props.spell.name.rus
-  }));
-
-  const classList = computed(() => ({
-    'router-link-active': isActive.value,
-    'is-green': props.spell?.source?.homebrew,
-    'is-sub-item': props.inTab
-  }));
-
-  const clickHandler = async () => {
-    if (!props.inTab) {
-      await navigate();
-
-      return;
-    }
-
-    try {
-      if (!modal.value.data) {
-        const resp = await httpClient.post<TSpellItem>({
-          url: props.spell.url
-        });
-
-        modal.value.data = resp.data;
-      }
-
-      modal.value.show = true;
-    } catch (err) {
-      console.error(err);
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/link-item' as *;

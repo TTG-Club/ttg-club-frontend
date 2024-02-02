@@ -5,6 +5,6 @@ export const WorkshopCreatureEditPage: RouteRecordRaw = {
   path: 'edit/:id',
   component: () => import('./WorkshopCreatureEdit.vue'),
   meta: {
-    isStatic: true
-  }
+    isStatic: true,
+  },
 };

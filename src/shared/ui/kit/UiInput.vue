@@ -1,62 +1,3 @@
-<template>
-  <label
-    :class="{
-      'ui-input': true,
-      'is-vertical': labelPosition === 'top'
-    }"
-  >
-    <span
-      v-if="label"
-      :class="{
-        'ui-input__label': true,
-        'is-top': labelPosition === 'top'
-      }"
-    >
-      {{ label }}
-    </span>
-
-    <span
-      :class="{ 'is-error': errorText }"
-      class="ui-input__control"
-    >
-      <input
-        ref="input"
-        v-model="value"
-        :autocomplete="inputAutocomplete"
-        :placeholder="placeholder"
-        :maxlength="maxLength"
-        :spellcheck="false"
-        :type="inputType"
-        class="ui-input__input"
-        v-bind="attrs"
-        @keydown="typeValidate($event)"
-        @blur="$emit('blur')"
-      />
-
-      <span
-        v-if="type === 'password'"
-        class="ui-input__control_icon"
-        @click.left.exact.prevent="togglePass"
-      >
-        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
-      </span>
-
-      <ui-erase-button
-        v-if="isClearable && value"
-        body-class="ui-input__erase-body"
-        @click.stop.prevent="value = ''"
-      />
-    </span>
-
-    <span
-      v-if="!!errorText"
-      class="ui-input__error"
-    >
-      {{ errorText }}
-    </span>
-  </label>
-</template>
-
 <script setup lang="ts">
   import { useVModel } from '@vueuse/core';
   import { computed, onMounted, ref, useAttrs } from 'vue';
@@ -92,14 +33,14 @@
       min: undefined,
       maxLength: 255,
       required: false,
-      errorText: ''
-    }
+      errorText: '',
+    },
   );
 
   defineEmits(['update:modelValue', 'blur']);
 
   defineOptions({
-    inheritAttrs: false
+    inheritAttrs: false,
   });
 
   const showedPass = ref(false);
@@ -171,6 +112,65 @@
     }
   });
 </script>
+
+<template>
+  <label
+    :class="{
+      'ui-input': true,
+      'is-vertical': labelPosition === 'top',
+    }"
+  >
+    <span
+      v-if="label"
+      :class="{
+        'ui-input__label': true,
+        'is-top': labelPosition === 'top',
+      }"
+    >
+      {{ label }}
+    </span>
+
+    <span
+      :class="{ 'is-error': errorText }"
+      class="ui-input__control"
+    >
+      <input
+        ref="input"
+        v-model="value"
+        :autocomplete="inputAutocomplete"
+        :placeholder="placeholder"
+        :maxlength="maxLength"
+        :spellcheck="false"
+        :type="inputType"
+        class="ui-input__input"
+        v-bind="attrs"
+        @keydown="typeValidate($event)"
+        @blur="$emit('blur')"
+      />
+
+      <span
+        v-if="type === 'password'"
+        class="ui-input__control_icon"
+        @click.left.exact.prevent="togglePass"
+      >
+        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
+      </span>
+
+      <ui-erase-button
+        v-if="isClearable && value"
+        body-class="ui-input__erase-body"
+        @click.stop.prevent="value = ''"
+      />
+    </span>
+
+    <span
+      v-if="!!errorText"
+      class="ui-input__error"
+    >
+      {{ errorText }}
+    </span>
+  </label>
+</template>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;

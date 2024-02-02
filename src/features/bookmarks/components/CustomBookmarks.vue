@@ -1,3 +1,65 @@
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount, ref } from 'vue';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+
+  import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
+  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
+
+  const customBookmarkStore = useCustomBookmarkStore();
+  const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
+  const isEdit = ref(false);
+  const isGroupCreating = ref(false);
+  const newGroupName = ref('');
+  const wrapper = ref<HTMLDivElement>();
+  const { isAllGroupsOpened } = storeToRefs(customBookmarkStore);
+
+  const isShowScrollBtn = computed(() => {
+    if (!wrapper.value) {
+      return false;
+    }
+
+    return wrapper.value?.scrollTop > 15;
+  });
+
+  const enableGroupCreating = () => {
+    isGroupCreating.value = true;
+    newGroupName.value = '';
+  };
+
+  const disableGroupCreating = () => {
+    isGroupCreating.value = false;
+    newGroupName.value = '';
+  };
+
+  const createGroup = async () => {
+    await customBookmarkStore.queryAddBookmark({
+      name: newGroupName.value,
+      order: customBookmarkStore.getGroupBookmarks.length,
+    });
+
+    disableGroupCreating();
+  };
+
+  const scrollToTop = () => {
+    wrapper.value?.scroll({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  const toggleAll = () => {
+    customBookmarkStore.toggleAll();
+  };
+
+  onBeforeMount(() => {
+    customBookmarkStore.restoreOpenedGroupsFromSession();
+  });
+</script>
+
 <template>
   <div class="bookmarks">
     <div class="bookmarks__header">
@@ -103,65 +165,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, ref } from 'vue';
-
-  import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
-  import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-
-  const customBookmarkStore = useCustomBookmarkStore();
-  const bookmarks = computed(() => customBookmarkStore.getGroupBookmarks);
-  const isEdit = ref(false);
-  const isGroupCreating = ref(false);
-  const newGroupName = ref('');
-  const wrapper = ref<HTMLDivElement>();
-  const { isAllGroupsOpened } = storeToRefs(customBookmarkStore);
-
-  const isShowScrollBtn = computed(() => {
-    if (!wrapper.value) {
-      return false;
-    }
-
-    return wrapper.value?.scrollTop > 15;
-  });
-
-  const enableGroupCreating = () => {
-    isGroupCreating.value = true;
-    newGroupName.value = '';
-  };
-
-  const disableGroupCreating = () => {
-    isGroupCreating.value = false;
-    newGroupName.value = '';
-  };
-
-  const createGroup = async () => {
-    await customBookmarkStore.queryAddBookmark({
-      name: newGroupName.value,
-      order: customBookmarkStore.getGroupBookmarks.length
-    });
-
-    disableGroupCreating();
-  };
-
-  const scrollToTop = () => {
-    wrapper.value?.scroll({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  const toggleAll = () => {
-    customBookmarkStore.toggleAll();
-  };
-
-  onBeforeMount(() => {
-    customBookmarkStore.restoreOpenedGroupsFromSession();
-  });
-</script>

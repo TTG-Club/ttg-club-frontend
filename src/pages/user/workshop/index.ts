@@ -6,5 +6,5 @@ import type { RouteRecordRaw } from 'vue-router';
 export const WorkshopPage: RouteRecordRaw = {
   name: 'workshop',
   path: '/workshop',
-  children: [WorkshopMainPage, WorkshopBestiaryPage]
+  children: [WorkshopMainPage, WorkshopBestiaryPage],
 };

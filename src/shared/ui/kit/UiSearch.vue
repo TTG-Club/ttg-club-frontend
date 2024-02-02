@@ -1,8 +1,45 @@
+<script setup lang="ts">
+  import { useFocus } from '@vueuse/core';
+  import { debounce } from 'lodash-es';
+  import { ref, toRefs, watch } from 'vue';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      disabled?: boolean;
+      placeholder?: string;
+      isFocused?: boolean;
+      onSearch: () => void;
+    }>(),
+    {
+      disabled: false,
+      placeholder: 'Поиск...',
+      isFocused: false,
+    },
+  );
+
+  const { disabled, placeholder, isFocused } = toRefs(props);
+  const inputValue = defineModel<string>({ required: true });
+  const input = ref<HTMLInputElement | null>(null);
+  const { focused: inputFocus } = useFocus(input);
+
+  const clearInput = () => {
+    inputValue.value = '';
+  };
+
+  const handleSearch = debounce(props.onSearch, 300);
+
+  watch(isFocused, () => {
+    inputFocus.value = isFocused.value;
+  });
+</script>
+
 <template>
   <div
     :class="{
       [$style['ui-search']]: true,
-      [$style.disabled]: disabled
+      [$style.disabled]: disabled,
     }"
     @click="inputFocus = true"
   >
@@ -42,43 +79,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { useFocus } from '@vueuse/core';
-  import { debounce } from 'lodash-es';
-  import { ref, toRefs, watch } from 'vue';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  const props = withDefaults(
-    defineProps<{
-      disabled?: boolean;
-      placeholder?: string;
-      isFocused?: boolean;
-      onSearch: () => void;
-    }>(),
-    {
-      disabled: false,
-      placeholder: 'Поиск...',
-      isFocused: false
-    }
-  );
-
-  const { disabled, placeholder, isFocused } = toRefs(props);
-  const inputValue = defineModel<string>({ required: true });
-  const input = ref<HTMLInputElement | null>(null);
-  const { focused: inputFocus } = useFocus(input);
-
-  const clearInput = () => {
-    inputValue.value = '';
-  };
-
-  const handleSearch = debounce(props.onSearch, 300);
-
-  watch(isFocused, () => {
-    inputFocus.value = isFocused.value;
-  });
-</script>
 
 <style lang="scss" module>
   .ui-search.disabled {

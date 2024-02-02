@@ -13,7 +13,7 @@ export enum EUserRoles {
   WRITER = 'WRITER',
   SUBSCRIBER = 'SUBSCRIBER',
   MODERATOR = 'MODERATOR',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
 }
 
 export enum EUserRolesRus {
@@ -21,7 +21,7 @@ export enum EUserRolesRus {
   WRITER = 'писатель',
   SUBSCRIBER = 'подписчик',
   MODERATOR = 'модератор',
-  ADMIN = 'администратор'
+  ADMIN = 'администратор',
 }
 
 export type TUser = {
@@ -76,7 +76,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
     const entries = Object.entries(EUserRolesRus) as [
       EUserRoles,
-      EUserRolesRus
+      EUserRolesRus,
     ][];
 
     const availRoles: { [key in EUserRoles]?: EUserRolesRus } =
@@ -85,11 +85,11 @@ export const useUserStore = defineStore('UserStore', () => {
     const { roles: userRoles } = user.value;
 
     const translated = userRoles
-      .map(role => ({
+      .map((role) => ({
         role,
-        name: availRoles[role]
+        name: availRoles[role],
       }))
-      .filter(role => !!role.name);
+      .filter((role) => !!role.name);
 
     if (!translated.length) {
       return [];
@@ -99,13 +99,13 @@ export const useUserStore = defineStore('UserStore', () => {
   });
 
   const isAdmin = computed(() =>
-    roles.value.map(role => role.role).includes(EUserRoles.ADMIN)
+    roles.value.map((role) => role.role).includes(EUserRoles.ADMIN),
   );
 
   const avatar = computed(() => ({
     src: user.value?.avatar || null,
     error: '/icon/avatar.png',
-    loading: '/icon/avatar.png'
+    loading: '/icon/avatar.png',
   }));
 
   const clearUser = async () => {
@@ -118,7 +118,7 @@ export const useUserStore = defineStore('UserStore', () => {
     }
   };
 
-  httpClient.instance.interceptors.response.use(async resp => {
+  httpClient.instance.interceptors.response.use(async (resp) => {
     if (resp.status === 401) {
       await clearUser();
     }
@@ -131,7 +131,7 @@ export const useUserStore = defineStore('UserStore', () => {
   const getUserInfo = async (): Promise<TUser> => {
     try {
       const resp = await httpClient.get<TUser>({
-        url: '/user/info'
+        url: '/user/info',
       });
 
       switch (resp.status) {
@@ -153,7 +153,7 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     try {
-      if (Object.values(body).find(item => !item)) {
+      if (Object.values(body).find((item) => !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
@@ -162,7 +162,7 @@ export const useUserStore = defineStore('UserStore', () => {
       const resp = await httpClient.post({
         url: '/auth/signup',
         payload: body,
-        signal: controllers.registration.signal
+        signal: controllers.registration.signal,
       });
 
       switch (resp.status) {
@@ -184,7 +184,9 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     try {
-      if (Object.values(body).find(item => typeof item === 'string' && !item)) {
+      if (
+        Object.values(body).find((item) => typeof item === 'string' && !item)
+      ) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
@@ -193,14 +195,14 @@ export const useUserStore = defineStore('UserStore', () => {
       const resp = await httpClient.post<TAuthResponse>({
         url: '/auth/signin',
         payload: body,
-        signal: controllers.authorization.signal
+        signal: controllers.authorization.signal,
       });
 
       switch (resp.status) {
         case 200:
           if (isDev) {
             Cookies.set(USER_TOKEN_COOKIE, resp.data.accessToken, {
-              expires: 365
+              expires: 365,
             });
           }
 
@@ -224,7 +226,7 @@ export const useUserStore = defineStore('UserStore', () => {
     try {
       const resp = await httpClient.get({
         url: '/auth/change/password',
-        payload: { email }
+        payload: { email },
       });
 
       switch (resp.status) {
@@ -249,7 +251,7 @@ export const useUserStore = defineStore('UserStore', () => {
       const resp = await httpClient.post({
         url: '/auth/change/password',
         payload,
-        signal: controllers.changePassword.signal
+        signal: controllers.changePassword.signal,
       });
 
       switch (resp.status) {
@@ -289,7 +291,7 @@ export const useUserStore = defineStore('UserStore', () => {
   const getUserStatus = async () => {
     try {
       const resp = await httpClient.get({
-        url: '/user/status'
+        url: '/user/status',
       });
 
       if (resp.status !== 200 || !resp.data) {
@@ -322,6 +324,6 @@ export const useUserStore = defineStore('UserStore', () => {
     authorization,
     resetPassword,
     changePassword,
-    logout
+    logout,
   };
 });

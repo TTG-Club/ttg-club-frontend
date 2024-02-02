@@ -1,3 +1,7 @@
+<script setup lang="ts">
+  import PageLayout from '@/layouts/PageLayout.vue';
+</script>
+
 <template>
   <page-layout :use-social-links="false">
     <template #title> Мастерская </template>
@@ -53,10 +57,6 @@
     </template>
   </page-layout>
 </template>
-
-<script setup lang="ts">
-  import PageLayout from '@/layouts/PageLayout.vue';
-</script>
 
 <style scoped lang="scss">
   .workshop {

@@ -1,3 +1,43 @@
+<script lang="ts" setup>
+  import { useVModel } from '@vueuse/core';
+  import { VueFinalModal } from 'vue-final-modal';
+
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiGroupButton from '@/shared/ui/kit/button/UiGroupButton.vue';
+
+  interface IEmits {
+    (e: 'close'): void;
+    (e: 'confirm'): void;
+  }
+
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: boolean;
+      type?: 'default' | 'confirm' | 'remove' | 'notify' | 'error';
+    }>(),
+    {
+      modelValue: true,
+      type: 'default',
+    },
+  );
+
+  const emit = defineEmits<IEmits>();
+
+  const isShowModal = useVModel(props, 'modelValue');
+
+  const onConfirm = () => {
+    isShowModal.value = false;
+
+    emit('confirm');
+  };
+
+  const onClose = () => {
+    isShowModal.value = false;
+
+    emit('close');
+  };
+</script>
+
 <template>
   <vue-final-modal
     v-model="isShowModal"
@@ -108,46 +148,6 @@
     </div>
   </vue-final-modal>
 </template>
-
-<script lang="ts" setup>
-  import { useVModel } from '@vueuse/core';
-  import { VueFinalModal } from 'vue-final-modal';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiGroupButton from '@/shared/ui/kit/button/UiGroupButton.vue';
-
-  interface IEmits {
-    (e: 'close'): void;
-    (e: 'confirm'): void;
-  }
-
-  const props = withDefaults(
-    defineProps<{
-      modelValue?: boolean;
-      type?: 'default' | 'confirm' | 'remove' | 'notify' | 'error';
-    }>(),
-    {
-      modelValue: true,
-      type: 'default'
-    }
-  );
-
-  const emit = defineEmits<IEmits>();
-
-  const isShowModal = useVModel(props, 'modelValue');
-
-  const onConfirm = () => {
-    isShowModal.value = false;
-
-    emit('confirm');
-  };
-
-  const onClose = () => {
-    isShowModal.value = false;
-
-    emit('close');
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

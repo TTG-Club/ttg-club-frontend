@@ -1,11 +1,3 @@
-<template>
-  <page-layout :use-social-links="false">
-    <template #title> Редактирование существа </template>
-
-    <template #subtitle>{{ creatureId }}</template>
-  </page-layout>
-</template>
-
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute } from 'vue-router';
@@ -17,4 +9,10 @@
   const creatureId = computed(() => route.params.id);
 </script>
 
-<style module lang="scss"></style>
+<template>
+  <page-layout :use-social-links="false">
+    <template #title> Редактирование существа </template>
+
+    <template #subtitle>{{ creatureId }}</template>
+  </page-layout>
+</template>

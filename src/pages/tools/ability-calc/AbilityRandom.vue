@@ -1,3 +1,142 @@
+<script lang="ts">
+  import { orderBy, reverse } from 'lodash-es';
+  import { storeToRefs } from 'pinia';
+  import { computed, defineComponent, onActivated, ref } from 'vue';
+  import { useToast } from 'vue-toastification';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
+
+  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
+  import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
+
+  import type { PropType } from 'vue';
+
+  export default defineComponent({
+    components: {
+      UiSelect,
+      UiButton,
+    },
+    props: {
+      modelValue: {
+        type: Array as PropType<Array<AbilityRoll>>,
+        required: true,
+      },
+    },
+    setup(props, { emit }) {
+      const toast = useToast(ToastEventBus);
+      const uiStore = useUIStore();
+      const { isMobile } = storeToRefs(uiStore);
+
+      const { doRoll, notifyResult } = useDiceRoller();
+
+      const rolls = ref<Array<AbilityRoll>>([]);
+
+      emit('update:model-value', rolls.value);
+
+      onActivated(() => {
+        emit('update:model-value', rolls.value);
+      });
+
+      const tryRoll = () => {
+        try {
+          const rolled = [];
+
+          for (let i = 0; i < 6; i++) {
+            const roll = doRoll({
+              formula: '4d6kh3',
+            });
+
+            if (!isMobile.value) {
+              notifyResult({
+                roll,
+                label: `Бросок №${i + 1}`,
+                toastOptions: {
+                  timeout: 5000 + 1000 * i,
+                },
+              });
+            }
+
+            rolled.push({
+              name: null,
+              key: null,
+              shortName: null,
+              value: Number(roll.value),
+            });
+          }
+
+          rolls.value = reverse(orderBy(rolled, ['value']));
+
+          emit('update:model-value', rolls.value);
+        } catch (err) {
+          toast.error('Произошла какая-то ошибка... попробуй еще раз');
+        }
+      };
+
+      const isSelected = (key: AbilityKey) =>
+        rolls.value.find((roll) => roll.key === key);
+
+      const onSelect = (key: AbilityKey | null, index: number) => {
+        const setValue = (value: typeof key, i: number) => {
+          rolls.value[i].key = value;
+
+          rolls.value[i].name = value ? AbilityName[value] : null;
+        };
+
+        for (let i = 0; i < rolls.value.length; i++) {
+          if (i === index) {
+            setValue(key, i);
+
+            continue;
+          }
+
+          if (rolls.value[i].key === key) {
+            setValue(null, i);
+          }
+        }
+
+        emit('update:model-value', rolls.value);
+      };
+
+      const onRemove = (index: number) => {
+        rolls.value[index].key = null;
+        rolls.value[index].name = null;
+
+        emit('update:model-value', rolls.value);
+      };
+
+      return {
+        abilities: computed(() =>
+          Object.keys(AbilityKey).map((key) => ({
+            key,
+            name: AbilityName[key as AbilityKey],
+          })),
+        ),
+        sum: computed(() => {
+          let result = 0;
+
+          for (const roll of rolls.value) {
+            if (roll.value) {
+              result += roll.value;
+            }
+          }
+
+          return result;
+        }),
+        tryRoll,
+        getFormattedModifier,
+        isSelected,
+        onSelect,
+        onRemove,
+      };
+    },
+  });
+</script>
+
 <template>
   <div class="ability-random">
     <div class="ability-random__blocks">
@@ -50,145 +189,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-  import { orderBy, reverse } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, onActivated, ref } from 'vue';
-  import { useToast } from 'vue-toastification';
-
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
-  import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
-
-  import type { PropType } from 'vue';
-
-  export default defineComponent({
-    components: {
-      UiSelect,
-      UiButton
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true
-      }
-    },
-    setup(props, { emit }) {
-      const toast = useToast(ToastEventBus);
-      const uiStore = useUIStore();
-      const { isMobile } = storeToRefs(uiStore);
-
-      const { doRoll, notifyResult } = useDiceRoller();
-
-      const rolls = ref<Array<AbilityRoll>>([]);
-
-      emit('update:model-value', rolls.value);
-
-      onActivated(() => {
-        emit('update:model-value', rolls.value);
-      });
-
-      const tryRoll = () => {
-        try {
-          const rolled = [];
-
-          for (let i = 0; i < 6; i++) {
-            const roll = doRoll({
-              formula: '4d6kh3'
-            });
-
-            if (!isMobile.value) {
-              notifyResult({
-                roll,
-                label: `Бросок №${i + 1}`,
-                toastOptions: {
-                  timeout: 5000 + 1000 * i
-                }
-              });
-            }
-
-            rolled.push({
-              name: null,
-              key: null,
-              shortName: null,
-              value: Number(roll.value)
-            });
-          }
-
-          rolls.value = reverse(orderBy(rolled, ['value']));
-
-          emit('update:model-value', rolls.value);
-        } catch (err) {
-          toast.error('Произошла какая-то ошибка... попробуй еще раз');
-        }
-      };
-
-      const isSelected = (key: AbilityKey) =>
-        rolls.value.find(roll => roll.key === key);
-
-      const onSelect = (key: AbilityKey | null, index: number) => {
-        const setValue = (value: typeof key, i: number) => {
-          rolls.value[i].key = value;
-
-          rolls.value[i].name = value ? AbilityName[value] : null;
-        };
-
-        for (let i = 0; i < rolls.value.length; i++) {
-          if (i === index) {
-            setValue(key, i);
-
-            continue;
-          }
-
-          if (rolls.value[i].key === key) {
-            setValue(null, i);
-          }
-        }
-
-        emit('update:model-value', rolls.value);
-      };
-
-      const onRemove = (index: number) => {
-        rolls.value[index].key = null;
-        rolls.value[index].name = null;
-
-        emit('update:model-value', rolls.value);
-      };
-
-      return {
-        abilities: computed(() =>
-          Object.keys(AbilityKey).map(key => ({
-            key,
-            name: AbilityName[key as AbilityKey]
-          }))
-        ),
-        sum: computed(() => {
-          let result = 0;
-
-          for (const roll of rolls.value) {
-            if (roll.value) {
-              result += roll.value;
-            }
-          }
-
-          return result;
-        }),
-        tryRoll,
-        getFormattedModifier,
-        isSelected,
-        onSelect,
-        onRemove
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   .ability-random {

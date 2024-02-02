@@ -14,6 +14,6 @@ export const ErrorPage: RouteRecordRaw = {
     InternalServerErrorPage,
     NotFoundErrorPage,
     UnauthorizedErrorPage,
-    UnknownErrorPage
-  ]
+    UnknownErrorPage,
+  ],
 };

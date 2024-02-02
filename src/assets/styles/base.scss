@@ -1,6 +1,13 @@
 @use 'variables' as *;
 
-@media screen and (hover: hover) {
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-color: var(--background-color-thumb) var(--hover);
+    scrollbar-width: thin;
+  }
+}
+
+@supports not (scrollbar-width: thin) {
   ::-webkit-scrollbar {
     width: 14px;
   }
@@ -43,7 +50,6 @@
   outline: none;
   appearance: none;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
 
   &::selection {
     background: var(--primary);

@@ -1,24 +1,11 @@
-<template>
-  <ui-button
-    :icon="`bookmark/${isSaved ? 'filled' : 'outline'}`"
-    :tooltip="{
-      content: isSaved ? 'Удалить из закладок' : 'Добавить в закладки'
-    }"
-    :loading="inProgress"
-    type="text"
-    @click.left.exact.prevent.stop="updateBookmark"
-    @dblclick.prevent.stop
-  />
-</template>
-
 <script lang="ts" setup>
   import { computed, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
-  import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
-
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import { toast } from '@/shared/utils/toast';
+
+  import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
   const props = withDefaults(
     defineProps<{
@@ -27,8 +14,8 @@
     }>(),
     {
       name: '',
-      url: ''
-    }
+      url: '',
+    },
   );
 
   const route = useRoute();
@@ -36,11 +23,11 @@
   const inProgress = ref(false);
 
   const bookmarkUrl = computed(() =>
-    props.url !== '' ? props.url : route.path
+    props.url !== '' ? props.url : route.path,
   );
 
   const isSaved = computed(() =>
-    bookmarkStore.isBookmarkSaved(bookmarkUrl.value)
+    bookmarkStore.isBookmarkSaved(bookmarkUrl.value),
   );
 
   const updateBookmark = async () => {
@@ -53,7 +40,7 @@
 
       const bookmark = await bookmarkStore.updateBookmark(
         bookmarkUrl.value,
-        props.name
+        props.name,
       );
 
       toast.success(`Закладка ${bookmark ? 'добавлена' : 'удалена'}!`);
@@ -64,6 +51,19 @@
     }
   };
 </script>
+
+<template>
+  <ui-button
+    :icon="`bookmark/${isSaved ? 'filled' : 'outline'}`"
+    :tooltip="{
+      content: isSaved ? 'Удалить из закладок' : 'Добавить в закладки',
+    }"
+    :loading="inProgress"
+    type="text"
+    @click.left.exact.prevent.stop="updateBookmark"
+    @dblclick.prevent.stop
+  />
+</template>
 
 <style lang="scss" scoped>
   .default-bookmark-button {

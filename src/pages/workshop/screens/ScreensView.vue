@@ -1,3 +1,61 @@
+<script setup lang="ts">
+  import { computed, onBeforeMount } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composables/useFilter';
+  import { usePagination } from '@/shared/composables/usePagination';
+  import { ScreensFilterDefaults } from '@/shared/types/workshop/Screens.d';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
+
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
+  const route = useRoute();
+  const router = useRouter();
+
+  const filter = useFilter({
+    dbName: ScreensFilterDefaults.dbName,
+    url: ScreensFilterDefaults.url,
+  });
+
+  const {
+    initPages,
+    nextPage,
+    isEnd,
+    items: screens,
+  } = usePagination({
+    url: '/screens',
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams,
+    },
+    search: filter.search,
+    order: [
+      {
+        field: 'ordering',
+        direction: 'asc',
+      },
+      {
+        field: 'name',
+        direction: 'asc',
+      },
+    ],
+  });
+
+  const onSearch = async () => {
+    await initPages();
+
+    if (isAutoOpenAvailable(screens)) {
+      await router.push({ path: screens.value[0].url });
+    }
+  };
+
+  onBeforeMount(async () => {
+    await initPages();
+  });
+
+  const showRightSide = computed(() => route.name === 'screenDetail');
+</script>
+
 <template>
   <content-layout
     :filter-instance="filter"
@@ -28,64 +86,6 @@
     </div>
   </content-layout>
 </template>
-
-<script setup lang="ts">
-  import { computed, onBeforeMount } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-
-  import ContentLayout from '@/layouts/ContentLayout.vue';
-
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { ScreensFilterDefaults } from '@/shared/types/workshop/Screens.d';
-  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
-
-  const route = useRoute();
-  const router = useRouter();
-
-  const filter = useFilter({
-    dbName: ScreensFilterDefaults.dbName,
-    url: ScreensFilterDefaults.url
-  });
-
-  const {
-    initPages,
-    nextPage,
-    isEnd,
-    items: screens
-  } = usePagination({
-    url: '/screens',
-    filter: {
-      isCustomized: filter.isCustomized,
-      value: filter.queryParams
-    },
-    search: filter.search,
-    order: [
-      {
-        field: 'ordering',
-        direction: 'asc'
-      },
-      {
-        field: 'name',
-        direction: 'asc'
-      }
-    ]
-  });
-
-  const onSearch = async () => {
-    await initPages();
-
-    if (isAutoOpenAvailable(screens)) {
-      await router.push({ path: screens.value[0].url });
-    }
-  };
-
-  onBeforeMount(async () => {
-    await initPages();
-  });
-
-  const showRightSide = computed(() => route.name === 'screenDetail');
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

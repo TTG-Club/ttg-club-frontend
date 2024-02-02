@@ -25,7 +25,7 @@ export const useScrollToPathInList = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   items,
   disabled,
-  showRightSide
+  showRightSide,
 }: UseScrollToPathInListParams) => {
   const route = useRoute();
   const uiStore = useUIStore();
@@ -73,13 +73,13 @@ export const useScrollToPathInList = ({
     }
 
     const item = reference.value?.scroller.$el.querySelector(
-      `[data-index="${index}"]`
+      `[data-index="${index}"]`,
     )?.parentElement;
 
     const itemRect = item.getBoundingClientRect();
 
     const fixedHeader = bodyElement.value.querySelector(
-      CONTENT_LAYOUT_FIXED_HEADER_SELECTOR
+      CONTENT_LAYOUT_FIXED_HEADER_SELECTOR,
     );
 
     const headerHeight = fixedHeader?.clientHeight || 0;
@@ -113,12 +113,12 @@ export const useScrollToPathInList = ({
     },
     {
       immediate: true,
-      flush: 'post'
-    }
+      flush: 'post',
+    },
   );
 
   return {
     reference,
-    setReference
+    setReference,
   };
 };

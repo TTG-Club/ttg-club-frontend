@@ -1,3 +1,290 @@
+<script lang="ts" setup>
+  import {
+    onKeyStroke,
+    onStartTyping,
+    useActiveElement,
+    useFocus,
+    useVModel,
+  } from '@vueuse/core';
+  import { debounce } from 'lodash-es';
+  import { computed, onMounted, ref, watch } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal';
+  import { useRouter } from 'vue-router';
+
+  import { httpClient } from '@/shared/api/httpClient';
+  import { useMetrics } from '@/shared/composables/useMetrics';
+  import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
+  import type { TSearchResult } from '@/shared/types/search/Search';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+
+  import SearchLink from '@/pages/search/SearchLink.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: boolean;
+    }>(),
+    {
+      modelValue: false,
+    },
+  );
+
+  const isShowModal = useVModel(props, 'modelValue');
+  const router = useRouter();
+
+  const controller = ref<AbortController | null>(null);
+  const search = ref('');
+  const results = ref<IPaginatedResponse<TSearchResult> | null>(null);
+  const inProgress = ref(false);
+  const input = ref<HTMLElement | null>(null);
+  const { focused } = useFocus(input, { initialValue: true });
+  const selectedIndex = ref<number | null>(null);
+  const activeElement = useActiveElement();
+
+  const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
+
+  const searchUrl = computed(() => ({
+    path: '/search',
+    query: {
+      search: search.value,
+      page: 1,
+    },
+  }));
+
+  const onSearch = async () => {
+    if (controller.value !== null) {
+      controller.value.abort();
+    }
+
+    if (!search.value.trim()) {
+      return Promise.resolve();
+    }
+
+    try {
+      inProgress.value = true;
+      controller.value = new AbortController();
+
+      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
+        url: '/search',
+        payload: {
+          page: 0,
+          size: 5,
+          search: {
+            value: search.value,
+            exact: false,
+          },
+          order: [],
+        },
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        return Promise.reject(resp.statusText);
+      }
+
+      sendSearchMetrics(search);
+
+      const result = resp.data;
+
+      results.value = result;
+      selectedIndex.value = null;
+
+      sendSearchViewResultsMetrics(
+        search,
+        result.items.map((item) => ({
+          item_id: item.url,
+          item_name: item.name,
+          item_category: item.section,
+          item_brand: item.source?.name,
+        })),
+      );
+
+      return Promise.resolve();
+    } catch (err) {
+      results.value = null;
+
+      return Promise.reject(err);
+    } finally {
+      controller.value = null;
+      inProgress.value = false;
+    }
+  };
+
+  const onSearchRandom = async () => {
+    if (controller.value !== null) {
+      controller.value.abort();
+    }
+
+    try {
+      search.value = '';
+      inProgress.value = true;
+      controller.value = new AbortController();
+
+      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
+        url: '/search/random',
+        payload: {
+          page: 0,
+          size: 5,
+          search: null,
+          order: [],
+        },
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        return Promise.reject(resp.statusText);
+      }
+
+      sendSearchMetrics('random');
+
+      const result = resp.data;
+
+      results.value = result;
+      selectedIndex.value = null;
+
+      sendSearchViewResultsMetrics(
+        'random',
+        result.items.map((item) => ({
+          item_id: item.url,
+          item_name: item.name,
+          item_category: item.section,
+          item_brand: item.source?.name,
+        })),
+      );
+
+      return Promise.resolve();
+    } catch (err) {
+      results.value = null;
+
+      return Promise.reject(err);
+    } finally {
+      controller.value = null;
+      inProgress.value = false;
+    }
+  };
+
+  onStartTyping(() => {
+    focused.value = true;
+    selectedIndex.value = null;
+  });
+
+  onMounted(() => {
+    focused.value = true;
+  });
+
+  onKeyStroke('ArrowDown', (e) => {
+    if (!isShowModal.value) {
+      return;
+    }
+
+    e.preventDefault();
+
+    focused.value = false;
+
+    if (!results.value?.items.length) {
+      return;
+    }
+
+    if (
+      selectedIndex.value === null ||
+      selectedIndex.value === results.value.items.length - 1
+    ) {
+      selectedIndex.value = 0;
+
+      return;
+    }
+
+    selectedIndex.value++;
+  });
+
+  onKeyStroke('ArrowUp', (e) => {
+    if (!isShowModal.value) {
+      return;
+    }
+
+    e.preventDefault();
+
+    focused.value = false;
+
+    if (!results.value?.items.length) {
+      return;
+    }
+
+    if (!selectedIndex.value) {
+      selectedIndex.value = results.value.items.length - 1;
+
+      return;
+    }
+
+    selectedIndex.value--;
+  });
+
+  const notUsingInput = computed(
+    () =>
+      activeElement.value?.tagName !== 'INPUT' &&
+      activeElement.value?.tagName !== 'TEXTAREA',
+  );
+
+  onKeyStroke('Enter', (e) => {
+    if (!isShowModal.value) {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (!notUsingInput.value) {
+      return;
+    }
+
+    if (
+      typeof selectedIndex.value !== 'number' ||
+      !results.value?.items.length
+    ) {
+      return;
+    }
+
+    const result = results.value.items[selectedIndex.value];
+
+    if (!result) {
+      return;
+    }
+
+    router.push({ path: result.url });
+  });
+
+  const onSubmit = () => {
+    if (!focused.value) {
+      return;
+    }
+
+    if (results.value?.items.length === 1) {
+      router.push({ path: results.value.items[0].url });
+
+      return;
+    }
+
+    router.push(searchUrl.value);
+  };
+
+  const onSearchDebounce = debounce(async () => {
+    await onSearch();
+  }, 300);
+
+  const onSearchUpdate = (e: string) => {
+    search.value = e;
+
+    onSearchDebounce();
+  };
+
+  watch(isShowModal, (value) => {
+    if (!value) {
+      search.value = '';
+      results.value = null;
+    }
+  });
+</script>
+
 <template>
   <vue-final-modal
     v-model="isShowModal"
@@ -110,293 +397,6 @@
     </div>
   </vue-final-modal>
 </template>
-
-<script lang="ts" setup>
-  import {
-    onKeyStroke,
-    onStartTyping,
-    useActiveElement,
-    useFocus,
-    useVModel
-  } from '@vueuse/core';
-  import { debounce } from 'lodash-es';
-  import { computed, onMounted, ref, watch } from 'vue';
-  import { VueFinalModal } from 'vue-final-modal';
-  import { useRouter } from 'vue-router';
-
-  import SearchLink from '@/pages/search/SearchLink.vue';
-
-  import { httpClient } from '@/shared/api/httpClient';
-  import { useMetrics } from '@/shared/composables/useMetrics';
-  import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
-  import type { TSearchResult } from '@/shared/types/search/Search';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-
-  const props = withDefaults(
-    defineProps<{
-      modelValue?: boolean;
-    }>(),
-    {
-      modelValue: false
-    }
-  );
-
-  const isShowModal = useVModel(props, 'modelValue');
-  const router = useRouter();
-
-  const controller = ref<AbortController | null>(null);
-  const search = ref('');
-  const results = ref<IPaginatedResponse<TSearchResult> | null>(null);
-  const inProgress = ref(false);
-  const input = ref<HTMLElement | null>(null);
-  const { focused } = useFocus(input, { initialValue: true });
-  const selectedIndex = ref<number | null>(null);
-  const activeElement = useActiveElement();
-
-  const { sendSearchMetrics, sendSearchViewResultsMetrics } = useMetrics();
-
-  const searchUrl = computed(() => ({
-    path: '/search',
-    query: {
-      search: search.value,
-      page: 1
-    }
-  }));
-
-  const onSearch = async () => {
-    if (controller.value !== null) {
-      controller.value.abort();
-    }
-
-    if (!search.value.trim()) {
-      return Promise.resolve();
-    }
-
-    try {
-      inProgress.value = true;
-      controller.value = new AbortController();
-
-      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
-        url: '/search',
-        payload: {
-          page: 0,
-          size: 5,
-          search: {
-            value: search.value,
-            exact: false
-          },
-          order: []
-        },
-        signal: controller.value.signal
-      });
-
-      if (resp.status !== 200) {
-        return Promise.reject(resp.statusText);
-      }
-
-      sendSearchMetrics(search);
-
-      const result = resp.data;
-
-      results.value = result;
-      selectedIndex.value = null;
-
-      sendSearchViewResultsMetrics(
-        search,
-        result.items.map(item => ({
-          item_id: item.url,
-          item_name: item.name,
-          item_category: item.section,
-          item_brand: item.source?.name
-        }))
-      );
-
-      return Promise.resolve();
-    } catch (err) {
-      results.value = null;
-
-      return Promise.reject(err);
-    } finally {
-      controller.value = null;
-      inProgress.value = false;
-    }
-  };
-
-  const onSearchRandom = async () => {
-    if (controller.value !== null) {
-      controller.value.abort();
-    }
-
-    try {
-      search.value = '';
-      inProgress.value = true;
-      controller.value = new AbortController();
-
-      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
-        url: '/search/random',
-        payload: {
-          page: 0,
-          size: 5,
-          search: null,
-          order: []
-        },
-        signal: controller.value.signal
-      });
-
-      if (resp.status !== 200) {
-        return Promise.reject(resp.statusText);
-      }
-
-      sendSearchMetrics('random');
-
-      const result = resp.data;
-
-      results.value = result;
-      selectedIndex.value = null;
-
-      sendSearchViewResultsMetrics(
-        'random',
-        result.items.map(item => ({
-          item_id: item.url,
-          item_name: item.name,
-          item_category: item.section,
-          item_brand: item.source?.name
-        }))
-      );
-
-      return Promise.resolve();
-    } catch (err) {
-      results.value = null;
-
-      return Promise.reject(err);
-    } finally {
-      controller.value = null;
-      inProgress.value = false;
-    }
-  };
-
-  onStartTyping(() => {
-    focused.value = true;
-    selectedIndex.value = null;
-  });
-
-  onMounted(() => {
-    focused.value = true;
-  });
-
-  onKeyStroke('ArrowDown', e => {
-    if (!isShowModal.value) {
-      return;
-    }
-
-    e.preventDefault();
-
-    focused.value = false;
-
-    if (!results.value?.items.length) {
-      return;
-    }
-
-    if (
-      selectedIndex.value === null ||
-      selectedIndex.value === results.value.items.length - 1
-    ) {
-      selectedIndex.value = 0;
-
-      return;
-    }
-
-    selectedIndex.value++;
-  });
-
-  onKeyStroke('ArrowUp', e => {
-    if (!isShowModal.value) {
-      return;
-    }
-
-    e.preventDefault();
-
-    focused.value = false;
-
-    if (!results.value?.items.length) {
-      return;
-    }
-
-    if (!selectedIndex.value) {
-      selectedIndex.value = results.value.items.length - 1;
-
-      return;
-    }
-
-    selectedIndex.value--;
-  });
-
-  const notUsingInput = computed(
-    () =>
-      activeElement.value?.tagName !== 'INPUT' &&
-      activeElement.value?.tagName !== 'TEXTAREA'
-  );
-
-  onKeyStroke('Enter', e => {
-    if (!isShowModal.value) {
-      return;
-    }
-
-    e.preventDefault();
-
-    if (!notUsingInput.value) {
-      return;
-    }
-
-    if (
-      typeof selectedIndex.value !== 'number' ||
-      !results.value?.items.length
-    ) {
-      return;
-    }
-
-    const result = results.value.items[selectedIndex.value];
-
-    if (!result) {
-      return;
-    }
-
-    router.push({ path: result.url });
-  });
-
-  const onSubmit = () => {
-    if (!focused.value) {
-      return;
-    }
-
-    if (results.value?.items.length === 1) {
-      router.push({ path: results.value.items[0].url });
-
-      return;
-    }
-
-    router.push(searchUrl.value);
-  };
-
-  const onSearchDebounce = debounce(async () => {
-    await onSearch();
-  }, 300);
-
-  const onSearchUpdate = (e: string) => {
-    search.value = e;
-
-    onSearchDebounce();
-  };
-
-  watch(isShowModal, value => {
-    if (!value) {
-      search.value = '';
-      results.value = null;
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

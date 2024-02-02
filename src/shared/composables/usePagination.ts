@@ -62,7 +62,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const page = ref(unref(config.page) || 0);
 
   const size = computed(
-    () => unref(config.size) || DEFAULT_PAGINATION_ITEMS_SIZE
+    () => unref(config.size) || DEFAULT_PAGINATION_ITEMS_SIZE,
   );
 
   const isEnd = ref<boolean>(unref(config.size) === -1 || true);
@@ -70,7 +70,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const payload = computed((): PaginationQuery => {
     const request: PaginationQuery = {
       page: unref(page),
-      size: unref(size)
+      size: unref(size),
     };
 
     const search = unref(config.search);
@@ -78,7 +78,7 @@ export function usePagination<T>(config: PaginationConfig) {
     if (search?.value) {
       request.search = {
         value: unref(search.value),
-        exact: unref(search.exact)
+        exact: unref(search.exact),
       };
     }
 
@@ -116,7 +116,7 @@ export function usePagination<T>(config: PaginationConfig) {
       const apiConfig: RequestConfig = {
         url: unref(config.url),
         payload: unref(payload),
-        signal: abortController.signal
+        signal: abortController.signal,
       };
 
       const resp = await httpClient.post<Array<T>>(apiConfig);
@@ -194,6 +194,6 @@ export function usePagination<T>(config: PaginationConfig) {
     abort,
     initPages,
     nextPage,
-    resetPages
+    resetPages,
   };
 }

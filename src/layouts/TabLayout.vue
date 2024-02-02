@@ -1,3 +1,55 @@
+<script lang="ts" setup>
+  import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
+  import { onMounted, ref } from 'vue';
+
+  import type { FilterComposable } from '@/shared/composables/useFilter';
+
+  import ListFilter from '@/features/filter/ListFilter.vue';
+
+  const props = withDefaults(
+    defineProps<{
+      filterInstance?: FilterComposable;
+      onLoadMore?: () => Promise<void>;
+      isEnd?: boolean;
+    }>(),
+    {
+      filterInstance: undefined,
+      onLoadMore: undefined,
+      isEnd: false,
+    },
+  );
+
+  const dropdownHeight = ref(0);
+
+  const list = ref<HTMLDivElement | null>(null);
+
+  onMounted(() => {
+    useInfiniteScroll(
+      list,
+      async () => {
+        if (props.isEnd || !props.onLoadMore) {
+          return;
+        }
+
+        await props.onLoadMore();
+      },
+      {
+        distance: 1080,
+        interval: 1000,
+      },
+    );
+
+    useResizeObserver(list, (entries) => {
+      if (Array.isArray(entries) && entries.length) {
+        const entry = entries[0];
+        const { height } = entry.contentRect;
+
+        dropdownHeight.value = height || 0;
+      }
+    });
+  });
+</script>
+
 <template>
   <div
     ref="layout"
@@ -34,58 +86,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
-  import { onMounted, ref } from 'vue';
-
-  import ListFilter from '@/features/filter/ListFilter.vue';
-
-  import type { FilterComposable } from '@/shared/composables/useFilter';
-
-  const props = withDefaults(
-    defineProps<{
-      filterInstance?: FilterComposable;
-      onLoadMore?: () => Promise<void>;
-      isEnd?: boolean;
-    }>(),
-    {
-      filterInstance: undefined,
-      onLoadMore: undefined,
-      isEnd: false
-    }
-  );
-
-  const dropdownHeight = ref(0);
-
-  const list = ref<HTMLDivElement | null>(null);
-
-  onMounted(() => {
-    useInfiniteScroll(
-      list,
-      async () => {
-        if (props.isEnd || !props.onLoadMore) {
-          return;
-        }
-
-        await props.onLoadMore();
-      },
-      {
-        distance: 1080,
-        interval: 1000
-      }
-    );
-
-    useResizeObserver(list, entries => {
-      if (Array.isArray(entries) && entries.length) {
-        const entry = entries[0];
-        const { height } = entry.contentRect;
-
-        dropdownHeight.value = height || 0;
-      }
-    });
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

@@ -10,6 +10,6 @@ export const WorkshopBestiaryPage: RouteRecordRaw = {
   children: [
     WorkshopCreatureNewPage,
     WorkshopCreatureEditPage,
-    WorkshopCreaturesPage
-  ]
+    WorkshopCreaturesPage,
+  ],
 };

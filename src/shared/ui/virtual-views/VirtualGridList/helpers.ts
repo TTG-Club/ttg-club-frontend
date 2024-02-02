@@ -16,16 +16,16 @@ export type GetListGridInTabProps = {
 export const getListGridInTabProps = ({
   showRightSide,
   fullscreen,
-  inTab
+  inTab,
 }: CheckIsListGridFlatParams & GetListGridInTabProps) => ({
   flat: checkIsListGridFlat({
     showRightSide,
-    fullscreen
+    fullscreen,
   }),
   columns: inTab
     ? {
         base: 2,
-        sm: 1
+        sm: 1,
       }
-    : undefined
+    : undefined,
 });

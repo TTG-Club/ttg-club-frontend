@@ -1,3 +1,117 @@
+<script lang="ts">
+  import { computed, defineComponent, onActivated, ref } from 'vue';
+
+  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
+  import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
+  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
+
+  import type { PropType } from 'vue';
+
+  export default defineComponent({
+    components: {
+      UiSelect,
+    },
+    props: {
+      modelValue: {
+        type: Array as PropType<Array<AbilityRoll>>,
+        required: true,
+      },
+    },
+    setup(props, { emit }) {
+      const rolls = ref<Array<AbilityRoll>>([
+        {
+          name: null,
+          key: null,
+          shortName: null,
+          value: 15,
+        },
+        {
+          name: null,
+          key: null,
+          shortName: null,
+          value: 14,
+        },
+        {
+          name: null,
+          key: null,
+          shortName: null,
+          value: 13,
+        },
+        {
+          name: null,
+          key: null,
+          shortName: null,
+          value: 12,
+        },
+        {
+          name: null,
+          key: null,
+          shortName: null,
+          value: 10,
+        },
+        {
+          name: null,
+          key: null,
+          shortName: null,
+          value: 8,
+        },
+      ]);
+
+      emit('update:model-value', rolls.value);
+
+      onActivated(() => {
+        emit('update:model-value', rolls.value);
+      });
+
+      const isSelected = (key: AbilityKey) =>
+        rolls.value.find((roll) => roll.key === key);
+
+      const onSelect = (key: AbilityKey | null, index: number) => {
+        const setValue = (value: typeof key, i: number) => {
+          rolls.value[i].key = value;
+
+          rolls.value[i].name = value ? AbilityName[value] : null;
+        };
+
+        for (let i = 0; i < rolls.value.length; i++) {
+          if (i === index) {
+            setValue(key, i);
+
+            continue;
+          }
+
+          if (rolls.value[i].key === key) {
+            setValue(null, i);
+          }
+        }
+
+        emit('update:model-value', rolls.value);
+      };
+
+      const onRemove = (index: number) => {
+        rolls.value[index].key = null;
+        rolls.value[index].name = null;
+
+        emit('update:model-value', rolls.value);
+      };
+
+      return {
+        abilities: computed(() =>
+          Object.keys(AbilityKey).map((key) => ({
+            key,
+            name: AbilityName[key as AbilityKey],
+          })),
+        ),
+        getFormattedModifier,
+        isSelected,
+        onSelect,
+        onRemove,
+      };
+    },
+  });
+</script>
+
 <template>
   <div
     v-if="modelValue.length"
@@ -35,120 +149,6 @@
     </ui-select>
   </div>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent, onActivated, ref } from 'vue';
-
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
-  import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
-
-  import type { PropType } from 'vue';
-
-  export default defineComponent({
-    components: {
-      UiSelect
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true
-      }
-    },
-    setup(props, { emit }) {
-      const rolls = ref<Array<AbilityRoll>>([
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 15
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 14
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 13
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 12
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 10
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 8
-        }
-      ]);
-
-      emit('update:model-value', rolls.value);
-
-      onActivated(() => {
-        emit('update:model-value', rolls.value);
-      });
-
-      const isSelected = (key: AbilityKey) =>
-        rolls.value.find(roll => roll.key === key);
-
-      const onSelect = (key: AbilityKey | null, index: number) => {
-        const setValue = (value: typeof key, i: number) => {
-          rolls.value[i].key = value;
-
-          rolls.value[i].name = value ? AbilityName[value] : null;
-        };
-
-        for (let i = 0; i < rolls.value.length; i++) {
-          if (i === index) {
-            setValue(key, i);
-
-            continue;
-          }
-
-          if (rolls.value[i].key === key) {
-            setValue(null, i);
-          }
-        }
-
-        emit('update:model-value', rolls.value);
-      };
-
-      const onRemove = (index: number) => {
-        rolls.value[index].key = null;
-        rolls.value[index].name = null;
-
-        emit('update:model-value', rolls.value);
-      };
-
-      return {
-        abilities: computed(() =>
-          Object.keys(AbilityKey).map(key => ({
-            key,
-            name: AbilityName[key as AbilityKey]
-          }))
-        ),
-        getFormattedModifier,
-        isSelected,
-        onSelect,
-        onRemove
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   .ability-array {

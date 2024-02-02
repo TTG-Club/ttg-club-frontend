@@ -9,7 +9,7 @@ const DEFAULT_SCALE = 1.1;
 const scaleConfig = {
   max: 2,
   min: 0.1,
-  step: 0.07
+  step: 0.07,
 };
 
 const SVG_SIZE = 512;
@@ -52,7 +52,7 @@ export const useTokenator = () => {
         resolve(reader.result);
       };
 
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
 
       reader.readAsDataURL(blob);
     });
@@ -125,7 +125,7 @@ export const useTokenator = () => {
       border.value = await getBase64(ctx.data);
 
       return ctx;
-    }
+    },
   }).blob();
 
   useFetch('/img/token/token-bg.webp', {
@@ -134,7 +134,7 @@ export const useTokenator = () => {
       background.value = await getBase64(ctx.data);
 
       return ctx;
-    }
+    },
   }).blob();
 
   const load = (format: 'webp' | 'png' = 'png'): Promise<void> =>
@@ -176,7 +176,7 @@ export const useTokenator = () => {
         resolve();
       };
 
-      img.onerror = e => reject(e);
+      img.onerror = (e) => reject(e);
     });
 
   return {
@@ -198,12 +198,12 @@ export const useTokenator = () => {
     open: () =>
       open({
         accept: 'image/*',
-        multiple: false
+        multiple: false,
       }),
     reset: () => {
       file.value = undefined;
 
       resetScale();
-    }
+    },
   };
 };

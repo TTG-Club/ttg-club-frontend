@@ -40,8 +40,8 @@ export const useRouterHelpers = () => {
     };
 
     const availRoutes = routes
-      .flatMap(route => getAvailRoute(route))
-      .filter(route => !!route);
+      .flatMap((route) => getAvailRoute(route))
+      .filter((route) => !!route);
 
     return !!to.name && availRoutes.includes(to.name);
   };
@@ -81,6 +81,6 @@ export const useRouterHelpers = () => {
   return {
     isUrlAvailable,
     isStaticUrl,
-    nextAvailable
+    nextAvailable,
   };
 };

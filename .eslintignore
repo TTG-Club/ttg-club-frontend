@@ -4,6 +4,7 @@
 node_modules
 /dist
 /public_html
+package-lock.json
 .eslintcache
 
 # Local env files

@@ -6,5 +6,5 @@ export const RulesPage: RouteRecordRaw = {
   name: 'rules',
   path: '/rules',
   component: () => import('./RulesView.vue'),
-  children: [RulesDetailPage]
+  children: [RulesDetailPage],
 };

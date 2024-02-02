@@ -1,3 +1,15 @@
+<script>
+  export default {
+    inheritAttrs: false,
+    props: {
+      traitItem: {
+        type: Object,
+        required: true,
+      },
+    },
+  };
+</script>
+
 <template>
   <router-link
     :class="{ 'is-green': traitItem?.homebrew }"
@@ -27,18 +39,6 @@
     </div>
   </router-link>
 </template>
-
-<script>
-  export default {
-    inheritAttrs: false,
-    props: {
-      traitItem: {
-        type: Object,
-        required: true
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/link-item' as *;

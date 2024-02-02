@@ -147,7 +147,7 @@
         document,
         'script',
         'https://mc.yandex.ru/metrika/tag.js',
-        'ym'
+        'ym',
       );
 
       ym('<%= env.VITE_YM_ID %>', 'init', {
@@ -155,7 +155,7 @@
         trackLinks: true,
         accurateTrackBounce: true,
         webvisor: true,
-        trackHash: true
+        trackHash: true,
       });
     </script>
 
@@ -182,7 +182,7 @@
 
       gtag('js', new Date());
       gtag('config', '<%= env.VITE_GTAG_ID %>', {
-        send_page_view: false
+        send_page_view: false,
       });
     </script>
     <% } %>

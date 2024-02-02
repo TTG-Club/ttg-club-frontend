@@ -1,9 +1,12 @@
 import { cloneDeep } from 'lodash-es';
 
+import { useAxios } from '@/shared/composables/useAxios';
+import type { Maybe } from '@/shared/types/Utility';
+
 import type {
   IBookmarkCategoryInfo,
   TBookmark,
-  TQueryAddBookmark
+  TQueryAddBookmark,
 } from '@/features/bookmarks/types/Bookmark.d';
 
 import { httpClient } from '@/shared/api/httpClient';
@@ -14,21 +17,21 @@ export default class BookmarksApi {
     return httpClient.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
       payload: {
-        url: encodeURIComponent(url)
-      }
+        url: encodeURIComponent(url),
+      },
     });
   }
 
   static getCategoryByCode(code: string) {
     return httpClient.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
-      payload: { code }
+      payload: { code },
     });
   }
 
   static getCategory({
     code,
-    url
+    url,
   }: {
     code?: Maybe<string>;
     url?: Maybe<string>;
@@ -46,33 +49,33 @@ export default class BookmarksApi {
 
   static getCategories() {
     return httpClient.get<Array<IBookmarkCategoryInfo>>({
-      url: '/bookmarks/categories'
+      url: '/bookmarks/categories',
     });
   }
 
   static getBookmarks() {
     return httpClient.get<Array<TBookmark>>({
-      url: '/bookmarks'
+      url: '/bookmarks',
     });
   }
 
   static addBookmark<T>(payload: TQueryAddBookmark) {
     return httpClient.post<T>({
       url: '/bookmarks',
-      payload: cloneDeep(payload)
+      payload: cloneDeep(payload),
     });
   }
 
   static updateBookmark(payload: TBookmark) {
     return httpClient.put({
       url: '/bookmarks',
-      payload: cloneDeep(payload)
+      payload: cloneDeep(payload),
     });
   }
 
   static deleteBookmark(uuid: TBookmark['uuid']) {
     return httpClient.delete({
-      url: `/bookmarks/${uuid}`
+      url: `/bookmarks/${uuid}`,
     });
   }
 }

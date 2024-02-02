@@ -1,7 +1,3 @@
-<template>
-  <render />
-</template>
-
 <script lang="ts" setup>
   import {
     computed,
@@ -9,7 +5,7 @@
     h,
     onBeforeUnmount,
     ref,
-    watch
+    watch,
   } from 'vue';
 
   import { httpClient } from '@/shared/api/httpClient';
@@ -23,8 +19,8 @@
     {
       template: undefined,
       url: undefined,
-      tag: 'div'
-    }
+      tag: 'div',
+    },
   );
 
   const emit = defineEmits(['loaded', 'before-unmount']);
@@ -46,7 +42,7 @@
 
       if (!templateString.value && !props.template) {
         const { data } = await httpClient.rawGet({
-          url: props.url
+          url: props.url,
         });
 
         templateString.value = data;
@@ -80,9 +76,9 @@
           mounted() {
             emit('loaded');
           },
-          template: templateString.value
-        })
-      )
+          template: templateString.value,
+        }),
+      ),
     );
   });
 
@@ -92,11 +88,15 @@
       await updateTemplate();
     },
     {
-      immediate: true
-    }
+      immediate: true,
+    },
   );
 
   onBeforeUnmount(() => {
     emit('before-unmount');
   });
 </script>
+
+<template>
+  <render />
+</template>

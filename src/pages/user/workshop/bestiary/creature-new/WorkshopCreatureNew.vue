@@ -1,3 +1,38 @@
+<script setup lang="ts">
+  import { reactive } from 'vue';
+
+  import { referenceService } from '@/shared/api/referenceService';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
+
+  const form = reactive({
+    name: {
+      rus: '',
+      eng: '',
+    },
+    hits: {
+      dice: null,
+      count: '',
+      bonus: '',
+    },
+  });
+
+  Promise.all([
+    referenceService.getSizes(),
+    referenceService.getEnvironments(),
+    referenceService.getDices(),
+    referenceService.getDamageTypes(),
+    referenceService.getConditions(),
+    referenceService.getBeastTypes(),
+    referenceService.getArmorTypes(),
+    referenceService.getAlignments(),
+  ]).then((references) => {
+    console.log(references);
+  });
+</script>
+
 <template>
   <page-layout :use-social-links="false">
     <template #title> Создание существа </template>
@@ -93,41 +128,6 @@
     </template>
   </page-layout>
 </template>
-
-<script setup lang="ts">
-  import { reactive } from 'vue';
-
-  import PageLayout from '@/layouts/PageLayout.vue';
-
-  import { referenceService } from '@/shared/api/referenceService';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-
-  const form = reactive({
-    name: {
-      rus: '',
-      eng: ''
-    },
-    hits: {
-      dice: null,
-      count: '',
-      bonus: ''
-    }
-  });
-
-  Promise.all([
-    referenceService.getSizes(),
-    referenceService.getEnvironments(),
-    referenceService.getDices(),
-    referenceService.getDamageTypes(),
-    referenceService.getConditions(),
-    referenceService.getBeastTypes(),
-    referenceService.getArmorTypes(),
-    referenceService.getAlignments()
-  ]).then(references => {
-    console.log(references);
-  });
-</script>
 
 <style module lang="scss">
   .creature {

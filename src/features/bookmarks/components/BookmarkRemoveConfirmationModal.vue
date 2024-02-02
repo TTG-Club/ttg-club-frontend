@@ -1,3 +1,51 @@
+<script lang="ts" setup>
+  import localforage from 'localforage';
+  import { ref } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal';
+
+  import { DB_NAME } from '@/shared/constants/UI';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+
+  import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
+
+  interface IEmits {
+    (e: 'close'): void;
+    (e: 'confirm'): void;
+  }
+
+  defineProps<{
+    bookmark: TBookmark;
+  }>();
+
+  const emit = defineEmits<IEmits>();
+
+  const storage = localforage.createInstance({
+    name: DB_NAME,
+    storeName: 'bookmarks',
+  });
+
+  const dontAsk = ref(false);
+
+  const updateStorageDontAsk = async () => {
+    if (dontAsk.value) {
+      await storage.ready();
+
+      await storage.setItem('dont_ask_again', true);
+    }
+  };
+
+  const close = () => {
+    emit('close');
+  };
+
+  const confirm = async () => {
+    await updateStorageDontAsk();
+
+    emit('confirm');
+  };
+</script>
+
 <template>
   <vue-final-modal
     class="base-modal"
@@ -45,54 +93,6 @@
     </div>
   </vue-final-modal>
 </template>
-
-<script lang="ts" setup>
-  import localforage from 'localforage';
-  import { ref } from 'vue';
-  import { VueFinalModal } from 'vue-final-modal';
-
-  import type { TBookmark } from '@/features/bookmarks/types/Bookmark';
-
-  import { DB_NAME } from '@/shared/constants/UI';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-
-  interface IEmits {
-    (e: 'close'): void;
-    (e: 'confirm'): void;
-  }
-
-  defineProps<{
-    bookmark: TBookmark;
-  }>();
-
-  const emit = defineEmits<IEmits>();
-
-  const storage = localforage.createInstance({
-    name: DB_NAME,
-    storeName: 'bookmarks'
-  });
-
-  const dontAsk = ref(false);
-
-  const updateStorageDontAsk = async () => {
-    if (dontAsk.value) {
-      await storage.ready();
-
-      await storage.setItem('dont_ask_again', true);
-    }
-  };
-
-  const close = () => {
-    emit('close');
-  };
-
-  const confirm = async () => {
-    await updateStorageDontAsk();
-
-    emit('confirm');
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;
