@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <page-layout :use-social-links="false">
+  <page-layout show-separator>
     <template #title> Мастерская </template>
 
     <template #default>

@@ -28,10 +28,7 @@
 </script>
 
 <template>
-  <page-layout
-    :show-separator="false"
-    :use-social-links="false"
-  >
+  <page-layout>
     <template #title> Личный кабинет </template>
 
     <template #default>
