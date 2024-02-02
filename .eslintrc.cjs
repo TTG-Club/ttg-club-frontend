@@ -37,7 +37,7 @@ module.exports = {
         paths: 'src',
       },
     },
-    'boundaries/elements': boundaries.map(name => ({
+    'boundaries/elements': boundaries.map((name) => ({
       pattern: `${name}/*`,
       type: name,
     })),
@@ -83,7 +83,7 @@ module.exports = {
           'type',
           'object',
         ],
-        'pathGroups': boundaries.map(name => ({
+        'pathGroups': boundaries.map((name) => ({
           pattern: `@/${name}/**`,
           group: 'internal',
           position: 'after',
