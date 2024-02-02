@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash-es';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api/httpClient';
 import type { Maybe } from '@/shared/types/Utility';
 
 import type {
@@ -8,9 +8,6 @@ import type {
   TBookmark,
   TQueryAddBookmark,
 } from '@/features/bookmarks/types/Bookmark.d';
-
-import { httpClient } from '@/shared/api/httpClient';
-import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {
   static getCategoryByURL(url: string) {
