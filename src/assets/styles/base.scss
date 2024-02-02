@@ -1,49 +1,59 @@
 @use 'variables' as *;
 
-@media screen and (hover: hover) {
-  ::-webkit-scrollbar {
-    width: 14px;
+@mixin scrollbar {
+  @supports (scrollbar-width: auto) {
+    scrollbar-color: var(--background-color-thumb) var(--hover);
+    scrollbar-width: thin;
   }
 
-  ::-webkit-scrollbar-track {
-    background: transparent;
-    transition: background 100ms ease;
+  @supports selector(::-webkit-scrollbar) {
+    @media screen and (hover: hover) {
+      ::-webkit-scrollbar {
+        width: 14px;
+      }
 
-    &:hover {
-      background: var(--hover);
+      ::-webkit-scrollbar-track {
+        background: transparent;
+        transition: background 100ms ease;
+
+        &:hover {
+          background: var(--hover);
+        }
+      }
+
+      ::-webkit-scrollbar-thumb {
+        border: 5px solid transparent;
+        background-clip: content-box;
+        border-radius: 10px;
+        box-shadow: inset 0 0 0 10px var(--background-color-thumb);
+
+        &:hover {
+          box-shadow: inset 0 0 0 10px var(--background-color-thumb-hover);
+        }
+      }
+
+      ::-webkit-scrollbar-button {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      ::-webkit-scrollbar-corner {
+        background-color: transparent;
+      }
     }
-  }
-
-  ::-webkit-scrollbar-thumb {
-    border: 5px solid transparent;
-    background-clip: content-box;
-    border-radius: 10px;
-    box-shadow: inset 0 0 0 10px var(--background-color-thumb);
-
-    &:hover {
-      box-shadow: inset 0 0 0 10px var(--background-color-thumb-hover);
-    }
-  }
-
-  ::-webkit-scrollbar-button {
-    display: none;
-    width: 0;
-    height: 0;
-  }
-
-  ::-webkit-scrollbar-corner {
-    background-color: transparent;
   }
 }
 
 *,
 *:before,
 *:after {
+  @include scrollbar;
+
   box-sizing: border-box;
   outline: none;
   appearance: none;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
 
   &::selection {
     background: var(--primary);
