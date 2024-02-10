@@ -1,8 +1,10 @@
 import { useFetch, useFileDialog, useObjectUrl } from '@vueuse/core';
 import { useClamp } from '@vueuse/math';
-import { ref, unref } from 'vue';
+import { onMounted, ref, unref } from 'vue';
 
+// import { useAxios } from '@/shared/composables/useAxios';
 import { toast } from '@/shared/helpers/toast';
+import type { TokenFrame } from '@/shared/types/tools/Tokenator.d';
 
 const DEFAULT_SCALE = 1.1;
 
@@ -17,10 +19,12 @@ const MAX_SIZE = 50;
 const MAX_DIMENSION = 8064;
 
 const file = ref<string>();
+const tokenFrames = ref<Array<TokenFrame>>([]);
 const scale = useClamp(DEFAULT_SCALE, scaleConfig.min, scaleConfig.max);
 const token = ref<HTMLElement>();
 const reflectImage = ref<boolean>(false);
 const centerImage = ref<boolean>(false);
+// const http = useAxios();
 
 export const useTokenator = () => {
   const border = ref();
@@ -137,7 +141,7 @@ export const useTokenator = () => {
     },
   }).blob();
 
-  const load = (format: 'webp' | 'png' = 'png'): Promise<void> =>
+  const loadFile = (format: 'webp' | 'png' = 'png'): Promise<void> =>
     new Promise((resolve, reject) => {
       const svg = unref(token);
 
@@ -179,11 +183,39 @@ export const useTokenator = () => {
       img.onerror = (e) => reject(e);
     });
 
+  onMounted(() => {
+    try {
+      // const response = await http.get<Array<TokenFrame>>({
+      //   url: 'tokens/borders',
+      // });
+
+      tokenFrames.value = [
+        {
+          id: 0,
+          userId: 0,
+          name: 'без рамки',
+          type: 'круглый',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1600px-HD_transparent_picture.png',
+        },
+        {
+          id: 0,
+          userId: 0,
+          name: 'ЗАЧЕМ ВООБЩЕ',
+          type: 'круглый',
+          url: 'https://gallery.yopriceville.com/var/albums/Free-Clipart-Pictures/Decorative-Elements-PNG/Round_Border_Frame_PNG_Clip_Art_Image-875500664.png?m=1529754265',
+        },
+      ];
+      // response.data;
+    } catch (err) {
+      toast.error('Произошла ошибка при загрузке токенов');
+    }
+  });
+
   return {
     token,
     border,
     background,
-
+    tokenFrames,
     MAX_SIZE,
     MAX_DIMENSION,
     SVG_SIZE,
@@ -194,7 +226,7 @@ export const useTokenator = () => {
     centerImage,
     getBase64,
     processFile,
-    load,
+    loadFile,
     open: () =>
       open({
         accept: 'image/*',
