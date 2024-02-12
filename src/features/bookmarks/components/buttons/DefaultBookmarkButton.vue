@@ -2,8 +2,8 @@
   import { computed, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
-  import { toast } from '@/shared/helpers/toast';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { toast } from '@/shared/utils/toast';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 

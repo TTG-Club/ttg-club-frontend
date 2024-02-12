@@ -6,16 +6,15 @@ import {
   required,
 } from '@vuelidate/validators';
 
-import { useAxios } from '@/shared/composables/useAxios';
-import { errorHandler } from '@/shared/helpers/errorHandler';
-import { useIsDev } from '@/shared/helpers/isDev';
+import { httpClient } from '@/shared/api';
+import { errorHandler } from '@/shared/utils/errorHandler';
+import { useIsDev } from '@/shared/utils/isDev';
 
-const http = useAxios();
 const isDev = useIsDev();
 
 const checkExist = async (value: string, type: 'username' | 'email') => {
   try {
-    const resp = await http.post({
+    const resp = await httpClient.post({
       url: '/auth/exist',
       payload: {
         [type]: value,

@@ -1,10 +1,10 @@
-import { getListRows } from '@/shared/helpers/list';
 import type {
   TFilterItemsByGroupIdOptions,
   TGetGroupedListItemsOptions,
   TGroupedListGroup,
   TGroupedListItem,
 } from '@/shared/ui/virtual-views/VirtualGroupedList/types';
+import { getListRows } from '@/shared/utils/list';
 
 export const filterItemsByGroupId = <Item, Group, KeyField extends keyof Group>(
   items: Item[],

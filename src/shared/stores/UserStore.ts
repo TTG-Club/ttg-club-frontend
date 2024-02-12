@@ -4,9 +4,9 @@ import { defineStore } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api';
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
-import { useIsDev } from '@/shared/helpers/isDev';
+import { useIsDev } from '@/shared/utils/isDev';
 
 export enum EUserRoles {
   USER = 'USER',
@@ -58,11 +58,10 @@ export type TAuthResponse = {
 export const useUserStore = defineStore('UserStore', () => {
   const route = useRoute();
   const router = useRouter();
-  const http = useAxios();
   const isDev = useIsDev();
 
   const user = ref<TUser | null>(null);
-  const isAuthenticated = ref<boolean>(false);
+  const isAuthenticated = computed(() => !!user.value);
 
   const controllers = reactive<{
     registration?: AbortController;
@@ -99,6 +98,10 @@ export const useUserStore = defineStore('UserStore', () => {
     return translated;
   });
 
+  const isAdmin = computed(() =>
+    roles.value.map((role) => role.role).includes(EUserRoles.ADMIN),
+  );
+
   const avatar = computed(() => ({
     src: user.value?.avatar || null,
     error: '/icon/avatar.png',
@@ -106,28 +109,34 @@ export const useUserStore = defineStore('UserStore', () => {
   }));
 
   const clearUser = async () => {
-    user.value = null;
-    isAuthenticated.value = false;
-
     Cookies.remove(USER_TOKEN_COOKIE);
+
+    user.value = null;
 
     if (route.name === 'profile') {
       await router.push({ name: 'index' });
     }
   };
 
+  httpClient.instance.interceptors.response.use(async (resp) => {
+    if (resp.status === 401) {
+      await clearUser();
+    }
+
+    return resp;
+  });
+
   const getUserToken = () => Cookies.get(USER_TOKEN_COOKIE);
 
   const getUserInfo = async (): Promise<TUser> => {
     try {
-      const resp = await http.get<TUser>({
+      const resp = await httpClient.get<TUser>({
         url: '/user/info',
       });
 
       switch (resp.status) {
         case 200:
           user.value = resp.data;
-          isAuthenticated.value = true;
 
           return Promise.resolve(resp.data);
         default:
@@ -150,7 +159,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
       controllers.registration = new AbortController();
 
-      const resp = await http.post({
+      const resp = await httpClient.post({
         url: '/auth/signup',
         payload: body,
         signal: controllers.registration.signal,
@@ -183,7 +192,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
       controllers.authorization = new AbortController();
 
-      const resp = await http.post<TAuthResponse>({
+      const resp = await httpClient.post<TAuthResponse>({
         url: '/auth/signin',
         payload: body,
         signal: controllers.authorization.signal,
@@ -215,7 +224,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const resetPassword = async (email: string) => {
     try {
-      const resp = await http.get({
+      const resp = await httpClient.get({
         url: '/auth/change/password',
         payload: { email },
       });
@@ -239,7 +248,7 @@ export const useUserStore = defineStore('UserStore', () => {
     try {
       controllers.changePassword = new AbortController();
 
-      const resp = await http.post({
+      const resp = await httpClient.post({
         url: '/auth/change/password',
         payload,
         signal: controllers.changePassword.signal,
@@ -260,7 +269,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const logout = async () => {
     try {
-      const resp = await http.post({ url: '/auth/signout' });
+      const resp = await httpClient.post({ url: '/auth/signout' });
 
       switch (resp.status) {
         case 200:
@@ -281,7 +290,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const getUserStatus = async () => {
     try {
-      const resp = await http.get({
+      const resp = await httpClient.get({
         url: '/user/status',
       });
 
@@ -290,8 +299,6 @@ export const useUserStore = defineStore('UserStore', () => {
 
         return Promise.resolve(false);
       }
-
-      isAuthenticated.value = true;
 
       return Promise.resolve(resp.data as boolean);
     } catch (err) {
@@ -303,9 +310,11 @@ export const useUserStore = defineStore('UserStore', () => {
 
   return {
     user,
-    isAuthenticated,
     roles,
     avatar,
+
+    isAuthenticated,
+    isAdmin,
 
     clearUser,
     getUserToken,

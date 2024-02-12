@@ -3,19 +3,18 @@
   import { onBeforeMount, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { downloadByUrl } from '@/shared/helpers/download';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TSpellItem } from '@/shared/types/character/Spells';
   import type { Maybe } from '@/shared/types/Utility';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+  import { downloadByUrl } from '@/shared/utils/download';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
 
-  const http = useAxios();
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
@@ -54,7 +53,7 @@
       loading.value = true;
       abortController.value = new AbortController();
 
-      const resp = await http.post<TSpellItem>({
+      const resp = await httpClient.post<TSpellItem>({
         url,
         signal: abortController.value.signal,
       });

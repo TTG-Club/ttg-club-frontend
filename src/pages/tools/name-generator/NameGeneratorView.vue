@@ -2,11 +2,11 @@
   import { throttle } from 'lodash-es';
   import { defineComponent, reactive } from 'vue';
 
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 

@@ -2,8 +2,7 @@
   import { computed, defineComponent, ref } from 'vue';
   import { useLink } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { httpClient } from '@/shared/api';
   import type { Maybe } from '@/shared/types/Utility';
   import type {
     IScreenItem,
@@ -11,6 +10,7 @@
   } from '@/shared/types/workshop/Screens.d';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
@@ -39,7 +39,6 @@
       },
     },
     setup(props) {
-      const http = useAxios();
       const { href } = useLink(props);
 
       const modal = ref<{
@@ -64,7 +63,7 @@
           loading.value = true;
           abortController.value = new AbortController();
 
-          const resp = await http.post<IScreenItem>({
+          const resp = await httpClient.post<IScreenItem>({
             url: href.value,
             signal: abortController.value.signal,
           });

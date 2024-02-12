@@ -5,7 +5,7 @@
   import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
-  import { useIsDev } from '@/shared/helpers/isDev';
+  import { useIsDev } from '@/shared/utils/isDev';
 
   import type { RollBase } from 'dice-roller-parser';
 

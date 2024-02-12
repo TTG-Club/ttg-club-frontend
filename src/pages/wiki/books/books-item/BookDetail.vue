@@ -1,9 +1,9 @@
 <script>
   import { mapState } from 'pinia';
 
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 

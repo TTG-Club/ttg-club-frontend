@@ -5,7 +5,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { computed, ref } from 'vue';
 
 import { DB_NAME } from '@/shared/constants/UI';
-import { errorHandler } from '@/shared/helpers/errorHandler';
+import { errorHandler } from '@/shared/utils/errorHandler';
 
 import BookmarksApi from '@/features/bookmarks/api';
 import type {

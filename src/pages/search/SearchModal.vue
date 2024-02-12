@@ -11,7 +11,7 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { useRouter } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composables/useMetrics';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';
@@ -32,7 +32,7 @@
 
   const isShowModal = useVModel(props, 'modelValue');
   const router = useRouter();
-  const http = useAxios();
+
   const controller = ref<AbortController | null>(null);
   const search = ref('');
   const results = ref<IPaginatedResponse<TSearchResult> | null>(null);
@@ -65,7 +65,7 @@
       inProgress.value = true;
       controller.value = new AbortController();
 
-      const resp = await http.post<IPaginatedResponse<TSearchResult>>({
+      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
         url: '/search',
         payload: {
           page: 0,
@@ -121,7 +121,7 @@
       inProgress.value = true;
       controller.value = new AbortController();
 
-      const resp = await http.post<IPaginatedResponse<TSearchResult>>({
+      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
         url: '/search/random',
         payload: {
           page: 0,

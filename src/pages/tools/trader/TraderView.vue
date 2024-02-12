@@ -12,9 +12,8 @@
   import { storeToRefs } from 'pinia';
   import { computed, ref, toRaw } from 'vue';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { DB_NAME } from '@/shared/constants/UI';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
   import type { TSpellItem } from '@/shared/types/character/Spells';
@@ -29,6 +28,7 @@
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
@@ -43,7 +43,6 @@
     sources: Array<TSource>;
   };
 
-  const http = useAxios();
   const uiStore = useUIStore();
   const { isMobile } = storeToRefs(uiStore);
 
@@ -315,7 +314,7 @@
 
   const getConfig = async () => {
     try {
-      const resp = await http.get<TConfig>({
+      const resp = await httpClient.get<TConfig>({
         url: '/tools/trader',
       });
 
@@ -347,7 +346,9 @@
     };
 
     try {
-      const { status, statusText, data } = await http.post<Array<TTraderLink>>({
+      const { status, statusText, data } = await httpClient.post<
+        Array<TTraderLink>
+      >({
         url: '/tools/trader',
         payload: options,
         signal: controllers.value.signal,
@@ -371,7 +372,7 @@
 
   const getItemDetail = async <T, L>(url: L['url']): Promise<T> => {
     try {
-      const { status, statusText, data } = await http.post<T>({ url });
+      const { status, statusText, data } = await httpClient.post<T>({ url });
 
       if (status !== 200) {
         error.value = true;

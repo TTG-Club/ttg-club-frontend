@@ -5,7 +5,7 @@
   import { computed, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
@@ -21,7 +21,6 @@
 
   import type { LocationQueryValue, RouteLocationNormalized } from 'vue-router';
 
-  const http = useAxios();
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
@@ -127,7 +126,7 @@
 
   const searchQuery = async () => {
     try {
-      const resp = await http.post<IPaginatedResponse<TSearchResult>>({
+      const resp = await httpClient.post<IPaginatedResponse<TSearchResult>>({
         url: '/search',
         payload: {
           page: page.value - 1,
