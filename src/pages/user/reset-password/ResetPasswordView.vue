@@ -3,7 +3,7 @@
   import { computed, defineComponent, onBeforeMount, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';

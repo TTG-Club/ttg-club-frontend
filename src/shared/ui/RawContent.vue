@@ -8,7 +8,7 @@
     watch,
   } from 'vue';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
 
   const props = withDefaults(
     defineProps<{

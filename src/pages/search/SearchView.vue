@@ -5,7 +5,7 @@
   import { computed, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';

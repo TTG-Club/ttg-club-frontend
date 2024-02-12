@@ -1,7 +1,7 @@
 import { toValue } from '@vueuse/shared';
 import { toPairs, fromPairs } from 'lodash-es';
 
-import { httpClient, type RequestConfig } from '@/shared/api/httpClient';
+import { httpClient, type RequestConfig } from '@/shared/api';
 import type {
   IOrderItem,
   IPaginatedResponse,

@@ -7,7 +7,7 @@ import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
 import Toast from 'vue-toastification';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 import { TippyLazy } from '@/shared/directives/TippyLazy';
 import isDev from '@/shared/utils/isDev';
 

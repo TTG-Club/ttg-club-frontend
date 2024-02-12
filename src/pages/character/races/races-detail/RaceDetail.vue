@@ -8,7 +8,7 @@
     useRouter,
   } from 'vue-router';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';

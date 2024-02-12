@@ -11,7 +11,7 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { useRouter } from 'vue-router';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composables/useMetrics';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';

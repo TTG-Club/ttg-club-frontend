@@ -12,7 +12,7 @@
   import { storeToRefs } from 'pinia';
   import { computed, ref, toRaw } from 'vue';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { DB_NAME } from '@/shared/constants/UI';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';

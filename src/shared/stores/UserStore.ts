@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
 import { useIsDev } from '@/shared/utils/isDev';
 

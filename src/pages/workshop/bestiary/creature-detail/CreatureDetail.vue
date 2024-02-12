@@ -3,7 +3,7 @@
   import { onBeforeMount, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';

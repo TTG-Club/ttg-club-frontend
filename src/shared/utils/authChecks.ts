@@ -6,7 +6,7 @@ import {
   required,
 } from '@vuelidate/validators';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 import { errorHandler } from '@/shared/utils/errorHandler';
 import { useIsDev } from '@/shared/utils/isDev';
 

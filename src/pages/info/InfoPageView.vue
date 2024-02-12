@@ -4,7 +4,7 @@
   import { defineComponent, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import PageLayout from '@/layouts/PageLayout.vue';

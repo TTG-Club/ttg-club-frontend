@@ -2,7 +2,7 @@ import localforage from 'localforage';
 import { cloneDeep } from 'lodash-es';
 import { computed, ref, unref } from 'vue';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 import type {
   SearchComposable,
   SearchConfig,

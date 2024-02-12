@@ -2,7 +2,7 @@ import { orderBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 import type { Maybe } from '@/shared/types/Utility';
 import isDev from '@/shared/utils/isDev';
 

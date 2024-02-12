@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 
 import { routes } from '@/pages';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 
 import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 

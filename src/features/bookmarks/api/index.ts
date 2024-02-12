@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash-es';
 
-import { httpClient } from '@/shared/api/httpClient';
+import { httpClient } from '@/shared/api';
 import type { Maybe } from '@/shared/types/Utility';
 
 import type {

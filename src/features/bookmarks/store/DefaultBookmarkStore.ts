@@ -4,6 +4,9 @@ import { defineStore } from 'pinia';
 import { v4 as uuidV4 } from 'uuid';
 import { computed, ref } from 'vue';
 
+import { DB_NAME } from '@/shared/constants/UI';
+import { errorHandler } from '@/shared/utils/errorHandler';
+
 import BookmarksApi from '@/features/bookmarks/api';
 import type {
   IBookmarkCategory,
@@ -17,9 +20,6 @@ import {
   isBookmarkRemoveAvailable,
   setBookmarks,
 } from '@/features/bookmarks/utils';
-
-import { DB_NAME } from '@/shared/constants/UI';
-import { errorHandler } from '@/shared/utils/errorHandler';
 
 export const useDefaultBookmarkStore = defineStore(
   'DefaultBookmarkStore',

@@ -5,7 +5,7 @@
 
   import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 

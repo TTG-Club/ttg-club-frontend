@@ -3,7 +3,7 @@
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount, ref } from 'vue';
 
-  import { httpClient } from '@/shared/api/httpClient';
+  import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
