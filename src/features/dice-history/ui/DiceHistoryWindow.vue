@@ -1,33 +1,10 @@
-<template>
-  <div
-    ref="container"
-    :class="$style['history-window']"
-  >
-    <div :class="$style['history-window__content']">
-      <div
-        ref="resizeTrigger"
-        :class="$style['history-window__resize-trigger']"
-      />
-
-      <slot />
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
   import {
     useEventListener,
     useLocalStorage,
-    useResizeObserver
+    useResizeObserver,
   } from '@vueuse/core';
-  import {
-    onMounted,
-    onUnmounted,
-    ref,
-    useCssModule,
-    nextTick,
-    watchEffect
-  } from 'vue';
+  import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue';
 
   import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
 
@@ -36,8 +13,6 @@
     (event: 'resize', deltaHeight: number): void;
     (event: 'resize:end', height: number): void;
   }>();
-
-  const $style = useCssModule();
 
   const container = ref<HTMLElement>();
   const resizeTrigger = ref<HTMLElement>();
@@ -148,7 +123,23 @@
   });
 </script>
 
-<style module lang="scss">
+<template>
+  <div
+    ref="container"
+    class="history-window"
+  >
+    <div class="'history-window__content">
+      <div
+        ref="resizeTrigger"
+        class="history-window__resize-trigger"
+      />
+
+      <slot />
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;
   @use 'variables' as *;
 

@@ -1,20 +1,3 @@
-<template>
-  <button
-    :class="{
-      [$style['ui-fab']]: true
-    }"
-    :type="nativeType"
-    v-bind="$attrs"
-  >
-    <span :class="$style['ui-fab__inner']">
-      <svg-icon
-        :size="greaterThanXl ? 32 : 24"
-        :icon="icon"
-      />
-    </span>
-  </button>
-</template>
-
 <script lang="ts" setup>
   import { useCssModule } from 'vue';
 
@@ -29,13 +12,30 @@
 
   withDefaults(defineProps<IFabProps>(), {
     nativeType: 'button',
-    disabled: false
+    disabled: false,
   });
 
   const greaterThanXl = useAppBreakpoints().greater('xl');
 
   const $style = useCssModule();
 </script>
+
+<template>
+  <button
+    :class="{
+      [$style['ui-fab']]: true,
+    }"
+    :type="nativeType"
+    v-bind="$attrs"
+  >
+    <span :class="$style['ui-fab__inner']">
+      <svg-icon
+        :size="greaterThanXl ? 32 : 24"
+        :icon="icon"
+      />
+    </span>
+  </button>
+</template>
 
 <style lang="scss" module>
   @use '@/assets/styles/variables/breakpoints' as *;

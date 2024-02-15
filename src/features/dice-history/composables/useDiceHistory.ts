@@ -1,16 +1,18 @@
 import { useBroadcastChannel, useLocalStorage } from '@vueuse/core';
 import { ref } from 'vue';
 
-import type { TRollType } from '../../../shared/helpers/roll';
+import type { RollType } from '@/shared/utils/roll';
+import type { PartialBy } from '@/shared/utils/types';
+
 import type { RollBase } from 'dice-roller-parser';
 
-export type TRollHistoryItem = {
+export type DiceHistoryItem = {
   id: string;
   date: string;
   roll: RollBase;
   source: string;
   label?: string;
-  type?: TRollType;
+  type?: RollType;
 };
 
 const limit = 100;
@@ -24,19 +26,18 @@ const toggle = () => {
 let fallbackSource = 'Бросок';
 
 // TODO: Different keys for different rolls channels
-const rolls = useLocalStorage<TRollHistoryItem[]>('rolls', []);
+const rolls = useLocalStorage<DiceHistoryItem[]>('rolls', []);
 
 const addRoll = (
-  item: Omit<TRollHistoryItem, 'source'> &
-    Partial<Pick<TRollHistoryItem, 'source'>>
-): TRollHistoryItem | undefined => {
-  if (rolls.value.find(roll => roll.id === item.id)) {
+  item: PartialBy<DiceHistoryItem, 'source'>,
+): DiceHistoryItem | undefined => {
+  if (rolls.value.find((roll) => roll.id === item.id)) {
     return undefined;
   }
 
   rolls.value.push({
     ...item,
-    source: item.source ?? fallbackSource
+    source: item.source ?? fallbackSource,
   });
 
   if (rolls.value.length > limit) {
@@ -47,20 +48,17 @@ const addRoll = (
 };
 
 const { channel, post: broadcast } = useBroadcastChannel({
-  name: 'rolls-history'
+  name: 'rolls-history',
 });
 
 export const useDiceHistory = () => {
-  const registerRoll = (
-    item: Omit<TRollHistoryItem, 'source'> &
-      Partial<Pick<TRollHistoryItem, 'source'>>
-  ) => {
+  const registerRoll = (item: PartialBy<DiceHistoryItem, 'source'>) => {
     addRoll(item);
     broadcast(item);
     // TODO: Send to external services
   };
 
-  channel.value?.addEventListener('message', event => {
+  channel.value?.addEventListener('message', (event) => {
     addRoll(event.data);
   });
 

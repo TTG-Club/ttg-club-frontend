@@ -38,16 +38,3 @@
 
   <modals-container />
 </template>
-
-<template>
-  <nav-bar />
-
-  <div
-    id="container"
-    class="container"
-  >
-    <router-view />
-  </div>
-
-  <modals-container />
-</template>

@@ -1,41 +1,5 @@
-<template>
-  <div :class="$style['dice-history']">
-    <transition name="popover-animation">
-      <dice-history-window v-show="isOpen">
-        <div :class="$style.history">
-          <div :class="$style.history__heading">
-            История бросков
-            <clear-button @click="clear" />
-          </div>
-
-          <div
-            ref="content"
-            :class="$style.history__content"
-          >
-            <dice-history-item
-              v-for="roll in rolls"
-              :key="roll.id"
-              v-bind="roll"
-            />
-          </div>
-
-          <div :class="$style.history__input">
-            <dice-history-input @roll="scrollDown()" />
-          </div>
-        </div>
-      </dice-history-window>
-    </transition>
-
-    <ui-fab
-      :class="$style['dice-history__fab']"
-      :icon="isOpen ? 'close' : 'dice/d20'"
-      @click="toggle()"
-    />
-  </div>
-</template>
-
 <script lang="ts" setup>
-  import { ref, watch, nextTick, onMounted, useCssModule } from 'vue';
+  import { ref, watch, nextTick, onMounted } from 'vue';
 
   import UiFab from '@/shared/ui/kit/button/UiFab.vue';
 
@@ -45,8 +9,6 @@
   import DiceHistoryInput from './DiceHistoryInput.vue';
   import DiceHistoryItem from './DiceHistoryItem.vue';
   import DiceHistoryWindow from './DiceHistoryWindow.vue';
-
-  const $style = useCssModule();
 
   const content = ref<HTMLElement>();
 
@@ -67,7 +29,43 @@
   });
 </script>
 
-<style module lang="scss">
+<template>
+  <div class="dice-history">
+    <transition name="popover-animation">
+      <dice-history-window v-show="isOpen">
+        <div class="history">
+          <div class="history__heading">
+            История бросков
+            <clear-button @click="clear" />
+          </div>
+
+          <div
+            ref="content"
+            class="history__content"
+          >
+            <dice-history-item
+              v-for="roll in rolls"
+              :key="roll.id"
+              v-bind="roll"
+            />
+          </div>
+
+          <div class="history__input">
+            <dice-history-input @roll="scrollDown()" />
+          </div>
+        </div>
+      </dice-history-window>
+    </transition>
+
+    <ui-fab
+      class="dice-history__fab"
+      :icon="isOpen ? 'close' : 'dice/d20'"
+      @click="toggle()"
+    />
+  </div>
+</template>
+
+<style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;
   @use '@/assets/styles/variables/colors' as *;
   @use 'variables' as *;
@@ -117,9 +115,7 @@
       }
     }
   }
-</style>
 
-<style lang="scss" scoped>
   .popover-animation {
     &-enter-from,
     &-leave-to {
@@ -141,4 +137,3 @@
     }
   }
 </style>
-../composables/useDiceHistory

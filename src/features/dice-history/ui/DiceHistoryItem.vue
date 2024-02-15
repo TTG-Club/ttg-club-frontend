@@ -1,29 +1,62 @@
+<script lang="ts" setup>
+  import dayjs from 'dayjs';
+  import { type GroupedRollBase, type RollBase } from 'dice-roller-parser';
+  import { computed } from 'vue';
+
+  import {
+    isCritical,
+    DiceRollRenderer,
+    type RollType,
+  } from '@/shared/utils/roll';
+
+  const props = defineProps<{
+    roll: GroupedRollBase | RollBase;
+    type?: RollType;
+    source?: string;
+    label?: string;
+    date: string;
+  }>();
+
+  const type = computed(() => {
+    if (isCritical(props.roll, 'success')) {
+      return 'success';
+    }
+
+    if (isCritical(props.roll, 'failure')) {
+      return 'failure';
+    }
+
+    return 'normal';
+  });
+
+  const description = computed(
+    () =>
+      `${props.label || ''}${DiceRollRenderer.getLabelSuffix(
+        props.roll,
+        props.type,
+      )}`,
+  );
+</script>
+
 <template>
-  <div
-    :class="{
-      [$style.roll]: true
-    }"
-  >
+  <div class="roll">
     <div
-      :class="{
-        [$style.roll__result]: true,
-        [$style['roll__result--success']]: isCritical(roll, 'success'),
-        [$style['roll__result--failure']]: isCritical(roll, 'failure')
-      }"
+      class="roll__result"
+      :class="[`roll__result--type-${type}`]"
     >
       {{ roll.value }}
     </div>
 
-    <div :class="$style.roll__content">
-      <div :class="$style.roll__title">{{ source }}</div>
+    <div class="roll__content">
+      <div class="roll__title">{{ source }}</div>
 
-      <div :class="$style.roll__description">
-        <div :class="$style['roll__description-text']">
+      <div class="roll__description">
+        <div class="roll__description-text">
           {{ description }}
           <component :is="DiceRollRenderer.render(roll)" />
         </div>
 
-        <div :class="$style.roll__time">
+        <div class="roll__time">
           {{ dayjs(date).format('HH:mm') }}
         </div>
       </div>
@@ -31,37 +64,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-  import dayjs from 'dayjs';
-  import { type GroupedRollBase, type RollBase } from 'dice-roller-parser';
-  import { computed, useCssModule } from 'vue';
-
-  import {
-    isCritical,
-    DiceRollRenderer,
-    type TRollType
-  } from '@/shared/helpers/roll';
-
-  const $style = useCssModule();
-
-  const props = defineProps<{
-    roll: GroupedRollBase | RollBase;
-    type?: TRollType;
-    source?: string;
-    label?: string;
-    date: string;
-  }>();
-
-  const description = computed(
-    () =>
-      `${props.label || ''}${DiceRollRenderer.getLabelSuffix(
-        props.roll,
-        props.type
-      )}`
-  );
-</script>
-
-<style module lang="scss">
+<style lang="scss" scoped>
   @use '@/assets/styles/variables/colors' as *;
 
   .roll {
@@ -79,12 +82,14 @@
       text-align: center;
       color: var(--text-color-title);
 
-      &--success {
-        color: var(--bg-advantage);
-      }
+      &--type {
+        &-success {
+          color: var(--bg-advantage);
+        }
 
-      &--failure {
-        color: red;
+        &-failure {
+          color: red;
+        }
       }
     }
 

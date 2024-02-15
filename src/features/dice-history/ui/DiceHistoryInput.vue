@@ -28,7 +28,7 @@
 
     notifyResult({
       roll: result,
-      source: 'Бросок по формуле'
+      source: 'Бросок по формуле',
     });
 
     if (history[0] !== formula) {

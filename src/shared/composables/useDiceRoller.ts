@@ -5,14 +5,14 @@ import { POSITION, useToast } from 'vue-toastification';
 
 import { ToastEventBus } from '@/core/configs/ToastConfig';
 
-import { useDiceHistory } from '@/features/dice-history/composables';
-
 import {
   DiceRollRenderer,
   getFormattedFormula,
   isCritical,
-  type TRollType,
-} from '../helpers/roll';
+  type RollType,
+} from '@/shared/utils/roll';
+
+import { useDiceHistory } from '@/features/dice-history/composables';
 
 import type { RollBase } from 'dice-roller-parser';
 import type { ToastOptions } from 'vue-toastification/dist/types/types';
@@ -33,7 +33,7 @@ export function useDiceRoller() {
     type,
   }: {
     formula: string;
-    type?: TRollType;
+    type?: RollType;
   }): RollBase =>
     roller.roll(
       getFormattedFormula({
@@ -49,7 +49,7 @@ export function useDiceRoller() {
   }: {
     roll: RollBase;
     label?: string;
-    type?: TRollType;
+    type?: RollType;
   }) => {
     if (!roll) {
       throw new Error('roll is not defined');
@@ -112,7 +112,7 @@ export function useDiceRoller() {
     roll: RollBase;
     source?: string;
     label?: string;
-    type?: TRollType;
+    type?: RollType;
     toastOptions?: ToastOptions;
   }) => {
     history.registerRoll({

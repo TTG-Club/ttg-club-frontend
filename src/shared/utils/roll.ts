@@ -11,7 +11,7 @@ import type {
   RollBase,
 } from 'dice-roller-parser';
 
-export type TRollType = 'advantage' | 'disadvantage';
+export type RollType = 'advantage' | 'disadvantage';
 
 export class DiceRollRenderer {
   public static render(roll: RollBase): VNode {
@@ -58,7 +58,7 @@ export class DiceRollRenderer {
     return h(!roll.valid ? 'u' : 'span', render);
   }
 
-  public static getLabelSuffix(roll: RollBase, type?: TRollType) {
+  public static getLabelSuffix(roll: RollBase, type?: RollType) {
     // @ts-expect-error
     if (type && (roll.dice?.[0]?.die?.value === 20 || roll.die?.value === 20)) {
       return type === 'disadvantage' ? ' (помеха)' : ' (преимущество)';
@@ -210,7 +210,7 @@ export function getFormattedFormula({
   type,
 }: {
   formula: string;
-  type?: TRollType;
+  type?: RollType;
 }): string {
   const formatted = formula.replace(/к/gim, 'd').replace(/−/gim, '-');
 
