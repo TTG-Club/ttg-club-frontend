@@ -8,6 +8,8 @@
     <router-view />
   </div>
 
+  <dice-history />
+
   <modals-container />
 </template>
 
@@ -15,6 +17,7 @@
   import { tryOnBeforeMount } from '@vueuse/core';
   import { ModalsContainer } from 'vue-final-modal';
 
+  import { DiceHistory } from '@/features/dice-history/ui';
   import NavBar from '@/features/menu/NavBar.vue';
 
   import { useUserStore } from '@/shared/stores/UserStore';

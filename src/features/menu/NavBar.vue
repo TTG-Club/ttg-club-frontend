@@ -39,6 +39,8 @@
           <hr />
         </div>
 
+        <nav-dice-history-button />
+
         <nav-profile />
 
         <menu-theme-switcher />
@@ -52,6 +54,7 @@
   import { useRoute } from 'vue-router';
 
   import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
+  import NavDiceHistoryButton from '@/features/menu/NavDiceHistoryButton.vue';
   import NavMenu from '@/features/menu/NavMenu.vue';
   import NavProfile from '@/features/menu/NavProfile.vue';
   import NavSearch from '@/features/menu/NavSearch.vue';
@@ -69,7 +72,8 @@
       NavBookmarks,
       NavProfile,
       MenuThemeSwitcher,
-      UiSocialButton
+      UiSocialButton,
+      NavDiceHistoryButton
     },
     setup() {
       const route = useRoute();
