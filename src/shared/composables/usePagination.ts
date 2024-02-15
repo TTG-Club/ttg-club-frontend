@@ -2,13 +2,12 @@ import { toValue } from '@vueuse/core';
 import { computed, ref, unref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient, type RequestConfig } from '@/shared/api';
 import type { FilterQueryParams } from '@/shared/composables/useFilter';
 import { useMetrics } from '@/shared/composables/useMetrics';
 import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
-import { errorHandler } from '@/shared/helpers/errorHandler';
-import { useIsDev } from '@/shared/helpers/isDev';
-import type { RequestConfig } from '@/shared/services/HTTPService';
+import { errorHandler } from '@/shared/utils/errorHandler';
+import { useIsDev } from '@/shared/utils/isDev';
 
 import type { MaybeRefOrGetter, MaybeRef } from '@vueuse/core';
 
@@ -52,7 +51,7 @@ export function usePagination<T>(config: PaginationConfig) {
   let abortController: AbortController | null;
 
   const route = useRoute();
-  const http = useAxios();
+
   const isDev = useIsDev();
   const { sendPageViewMetrics } = useMetrics();
 
@@ -63,7 +62,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const page = ref(unref(config.page) || 0);
 
   const size = computed(
-    () => unref(config.size) || DEFAULT_PAGINATION_ITEMS_SIZE
+    () => unref(config.size) || DEFAULT_PAGINATION_ITEMS_SIZE,
   );
 
   const isEnd = ref<boolean>(unref(config.size) === -1 || true);
@@ -71,7 +70,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const payload = computed((): PaginationQuery => {
     const request: PaginationQuery = {
       page: unref(page),
-      size: unref(size)
+      size: unref(size),
     };
 
     const search = unref(config.search);
@@ -79,7 +78,7 @@ export function usePagination<T>(config: PaginationConfig) {
     if (search?.value) {
       request.search = {
         value: unref(search.value),
-        exact: unref(search.exact)
+        exact: unref(search.exact),
       };
     }
 
@@ -117,10 +116,10 @@ export function usePagination<T>(config: PaginationConfig) {
       const apiConfig: RequestConfig = {
         url: unref(config.url),
         payload: unref(payload),
-        signal: abortController.signal
+        signal: abortController.signal,
       };
 
-      const resp = await http.post<Array<T>>(apiConfig);
+      const resp = await httpClient.post<Array<T>>(apiConfig);
 
       if (nextPage) {
         items.value.push(...resp.data);
@@ -195,6 +194,6 @@ export function usePagination<T>(config: PaginationConfig) {
     abort,
     initPages,
     nextPage,
-    resetPages
+    resetPages,
   };
 }

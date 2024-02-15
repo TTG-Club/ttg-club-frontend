@@ -1,120 +1,50 @@
-<template>
-  <label class="ui-input">
-    <span
-      v-if="label"
-      class="ui-input__label"
-    >
-      {{ label }}
-    </span>
-
-    <span
-      :class="{ 'is-error': errorText }"
-      class="ui-input__control"
-    >
-      <input
-        ref="input"
-        v-model="value"
-        :autocomplete="inputAutocomplete"
-        :placeholder="placeholder"
-        :maxlength="maxLength"
-        :spellcheck="false"
-        :type="inputType"
-        class="ui-input__input"
-        v-bind="attrs"
-        @keydown="typeValidate($event)"
-        @blur="$emit('blur')"
-      />
-
-      <span
-        v-if="type === 'password'"
-        class="ui-input__control_icon"
-        @click.left.exact.prevent="togglePass"
-      >
-        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
-      </span>
-
-      <ui-erase-button
-        v-if="isClearable && value"
-        v-model="value"
-        body-class="ui-input__erase-body"
-      />
-    </span>
-
-    <span
-      v-if="!!errorText"
-      class="ui-input__error"
-    >
-      {{ errorText }}
-    </span>
-  </label>
-</template>
-
-<script setup>
+<script setup lang="ts">
   import { useVModel } from '@vueuse/core';
   import { computed, onMounted, ref, useAttrs } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiEraseButton from '@/shared/ui/kit/button/UiEraseButton.vue';
 
-  const props = defineProps({
-    modelValue: {
-      type: [String, Number],
-      default: ''
+  const props = withDefaults(
+    defineProps<{
+      modelValue: string | number;
+      label?: string;
+      labelPosition?: 'left' | 'top';
+      placeholder?: string;
+      autofocus?: boolean;
+      autocomplete?: boolean | 'on' | 'off';
+      type?: 'text' | 'password' | 'email' | 'search' | 'tel' | 'number';
+      isError?: boolean;
+      isClearable?: boolean;
+      min?: number;
+      maxLength?: number;
+      required?: boolean;
+      errorText?: string;
+    }>(),
+    {
+      label: '',
+      labelPosition: 'top',
+      placeholder: '',
+      autofocus: false,
+      autocomplete: 'off',
+      type: 'text',
+      isError: false,
+      isClearable: false,
+      min: undefined,
+      maxLength: 255,
+      required: false,
+      errorText: '',
     },
-    label: {
-      type: String,
-      default: ''
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
-    autofocus: {
-      type: Boolean,
-      default: false
-    },
-    autocomplete: {
-      type: [Boolean, String],
-      default: false
-    },
-    type: {
-      type: String,
-      default: 'text'
-    },
-    isError: {
-      type: Boolean,
-      default: false
-    },
-    isClearable: {
-      type: Boolean,
-      default: false
-    },
-    min: {
-      type: Number,
-      default: undefined
-    },
-    maxLength: {
-      type: Number,
-      default: 255
-    },
-    required: {
-      type: Boolean,
-      default: false
-    },
-    errorText: {
-      type: String,
-      default: ''
-    }
-  });
+  );
 
   defineEmits(['update:modelValue', 'blur']);
 
   defineOptions({
-    inheritAttrs: false
+    inheritAttrs: false,
   });
 
   const showedPass = ref(false);
-  const input = ref(null);
+  const input = ref<HTMLInputElement>();
   const value = useVModel(props, 'modelValue');
 
   const inputType = computed(() => {
@@ -162,11 +92,12 @@
     focusInput();
   };
 
-  const typeValidate = e => {
+  const typeValidate = (e: KeyboardEvent) => {
     const isControlKey = e.key.length > 1;
     const key = Number(e.key);
     const isNum = Number.isInteger(key);
-    const isValueEmpty = e.target.value;
+    const target = e.target as HTMLInputElement | null;
+    const isValueEmpty = target?.value;
 
     if (props.type === 'number' && !isControlKey) {
       if (!isNum || (!isValueEmpty && !key)) {
@@ -182,6 +113,65 @@
   });
 </script>
 
+<template>
+  <label
+    :class="{
+      'ui-input': true,
+      'is-vertical': labelPosition === 'top',
+    }"
+  >
+    <span
+      v-if="label"
+      :class="{
+        'ui-input__label': true,
+        'is-top': labelPosition === 'top',
+      }"
+    >
+      {{ label }}
+    </span>
+
+    <span
+      :class="{ 'is-error': errorText }"
+      class="ui-input__control"
+    >
+      <input
+        ref="input"
+        v-model="value"
+        :autocomplete="inputAutocomplete"
+        :placeholder="placeholder"
+        :maxlength="maxLength"
+        :spellcheck="false"
+        :type="inputType"
+        class="ui-input__input"
+        v-bind="attrs"
+        @keydown="typeValidate($event)"
+        @blur="$emit('blur')"
+      />
+
+      <span
+        v-if="type === 'password'"
+        class="ui-input__control_icon"
+        @click.left.exact.prevent="togglePass"
+      >
+        <svg-icon :icon="`password/${showedPass ? 'show' : 'hide'}`" />
+      </span>
+
+      <ui-erase-button
+        v-if="isClearable && value"
+        body-class="ui-input__erase-body"
+        @click.stop.prevent="value = ''"
+      />
+    </span>
+
+    <span
+      v-if="!!errorText"
+      class="ui-input__error"
+    >
+      {{ errorText }}
+    </span>
+  </label>
+</template>
+
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;
 
@@ -190,9 +180,17 @@
     width: 100%;
     position: relative;
 
+    &.is-vertical {
+      flex-direction: column;
+    }
+
     &__label {
       margin-bottom: 8px;
       display: block;
+
+      &.is-top {
+        padding: 0 8px;
+      }
     }
 
     &__control {
@@ -239,6 +237,16 @@
       text-overflow: ellipsis;
       border: 0;
       flex: 1 1 auto;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      &[type='number'] {
+        appearance: textfield; /* Firefox */
+      }
     }
 
     &__error {

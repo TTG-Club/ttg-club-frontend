@@ -1,3 +1,48 @@
+<script setup lang="ts">
+  import { computed } from 'vue';
+
+  import { getIconName } from '@/shared/utils/icons';
+
+  interface Props {
+    icon: string;
+    size?: string | number;
+    raw?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    size: 24,
+    raw: false,
+  });
+
+  const iconName = computed(() => (!props.raw ? getIconName(props.icon) : ''));
+
+  const sizeCalculated = computed(() => {
+    if (/^\d+$/i.test(String(props.size))) {
+      return `${props.size}px`;
+    }
+
+    if (/^\d+(px|em)$/i.test(String(props.size))) {
+      return props.size;
+    }
+
+    console.error(`[SvgIcon]: size "${String(props.size)}" is incorrect.`);
+
+    return undefined;
+  });
+
+  const error = computed(() => {
+    if (!iconName.value) {
+      return `[SvgIcon]: icon "${String(props.icon)}" not found.`;
+    }
+
+    if (!sizeCalculated.value) {
+      return `[SvgIcon]: size "${String(props.size)}" is incorrect.`;
+    }
+
+    return '';
+  });
+</script>
+
 <template>
   <!-- eslint-disable vue/no-v-html -->
   <i
@@ -28,52 +73,6 @@
     {{ error }}
   </span>
 </template>
-
-<script setup lang="ts">
-  import { computed } from 'vue';
-
-  import { getIconName } from '@/shared/utils/icons';
-
-  const props = withDefaults(
-    defineProps<{
-      icon: string;
-      size?: string | number;
-      raw?: boolean;
-    }>(),
-    {
-      size: 24,
-      raw: false
-    }
-  );
-
-  const iconName = computed(() => (!props.raw ? getIconName(props.icon) : ''));
-
-  const sizeCalculated = computed(() => {
-    if (/^\d+$/i.test(String(props.size))) {
-      return `${props.size}px`;
-    }
-
-    if (/^\d+(px|em)$/i.test(String(props.size))) {
-      return props.size;
-    }
-
-    console.error(`[SvgIcon]: size "${String(props.size)}" is incorrect.`);
-
-    return undefined;
-  });
-
-  const error = computed(() => {
-    if (!iconName.value) {
-      return `[SvgIcon]: icon "${String(props.icon)}" not found.`;
-    }
-
-    if (!sizeCalculated.value) {
-      return `[SvgIcon]: size "${String(props.size)}" is incorrect.`;
-    }
-
-    return '';
-  });
-</script>
 
 <style lang="scss" module>
   .svg-icon {

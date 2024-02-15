@@ -1,3 +1,74 @@
+<script lang="ts" setup>
+  import { storeToRefs } from 'pinia';
+  import { computed, onBeforeMount } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import { useFilter } from '@/shared/composables/useFilter';
+  import { usePagination } from '@/shared/composables/usePagination';
+  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
+  import { useUIStore } from '@/shared/stores/UIStore';
+  import { RulesFilterDefaults } from '@/shared/types/wiki/Rules.d';
+  import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
+  import VirtualGridList from '@/shared/ui/virtual-views/VirtualGridList/VirtualGridList.vue';
+  import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
+
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
+  import RuleLink from '@/pages/wiki/rules/RuleLink.vue';
+
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
+
+  const { fullscreen } = storeToRefs(uiStore);
+
+  const filter = useFilter({
+    dbName: RulesFilterDefaults.dbName,
+    url: RulesFilterDefaults.url,
+  });
+
+  const {
+    initPages,
+    nextPage,
+    isEnd,
+    items: rules,
+  } = usePagination({
+    url: '/rules',
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams,
+    },
+    search: filter.search,
+    order: [
+      {
+        field: 'name',
+        direction: 'asc',
+      },
+    ],
+  });
+
+  const onSearch = async () => {
+    await initPages();
+
+    if (isAutoOpenAvailable(rules)) {
+      await router.push({ path: rules.value[0].url });
+    }
+  };
+
+  onBeforeMount(async () => {
+    await filter.initFilter();
+    await initPages();
+  });
+
+  const showRightSide = computed(() => route.name === 'ruleDetail');
+
+  const { setReference } = useScrollToPathInList({
+    items: rules,
+    showRightSide,
+  });
+</script>
+
 <template>
   <content-layout
     :filter-instance="filter"
@@ -22,74 +93,3 @@
     </virtual-grid-list>
   </content-layout>
 </template>
-
-<script lang="ts" setup>
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-
-  import RuleLink from '@/pages/wiki/rules/RuleLink.vue';
-
-  import ContentLayout from '@/layouts/ContentLayout.vue';
-
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
-  import { useUIStore } from '@/shared/stores/UIStore';
-  import { RulesFilterDefaults } from '@/shared/types/wiki/Rules.d';
-  import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
-  import VirtualGridList from '@/shared/ui/virtual-views/VirtualGridList/VirtualGridList.vue';
-  import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
-
-  const route = useRoute();
-  const router = useRouter();
-  const uiStore = useUIStore();
-
-  const { fullscreen } = storeToRefs(uiStore);
-
-  const filter = useFilter({
-    dbName: RulesFilterDefaults.dbName,
-    url: RulesFilterDefaults.url
-  });
-
-  const {
-    initPages,
-    nextPage,
-    isEnd,
-    items: rules
-  } = usePagination({
-    url: '/rules',
-    filter: {
-      isCustomized: filter.isCustomized,
-      value: filter.queryParams
-    },
-    search: filter.search,
-    order: [
-      {
-        field: 'name',
-        direction: 'asc'
-      }
-    ]
-  });
-
-  const onSearch = async () => {
-    await initPages();
-
-    if (isAutoOpenAvailable(rules)) {
-      await router.push({ path: rules.value[0].url });
-    }
-  };
-
-  onBeforeMount(async () => {
-    await filter.initFilter();
-    await initPages();
-  });
-
-  const showRightSide = computed(() => route.name === 'ruleDetail');
-
-  const { setReference } = useScrollToPathInList({
-    items: rules,
-    showRightSide
-  });
-</script>

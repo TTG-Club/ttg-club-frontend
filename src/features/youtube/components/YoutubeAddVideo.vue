@@ -1,3 +1,118 @@
+<script setup lang="ts">
+  import useVuelidate from '@vuelidate/core';
+  import { helpers, required } from '@vuelidate/validators';
+  import { useVModel } from '@vueuse/core';
+  import { reactive, ref, watch } from 'vue';
+  import { VueFinalModal } from 'vue-final-modal';
+  import { useToast } from 'vue-toastification';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
+
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+
+  import { YoutubeApi } from '@/features/youtube/api';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  export type TYoutubeVideoCreate = Pick<TYoutubeVideo, 'id' | 'name'>;
+
+  type TProp = {
+    modelValue: boolean;
+  };
+
+  const props = withDefaults(defineProps<TProp>(), {
+    modelValue: false,
+  });
+
+  type TEmit = {
+    (e: 'update:modelValue', v: boolean): void;
+    (e: 'added', v: TYoutubeVideo): void;
+    (e: 'close'): void;
+  };
+
+  const emit = defineEmits<TEmit>();
+
+  const isShow = useVModel(props, 'modelValue', emit);
+  const toast = useToast(ToastEventBus);
+
+  const isLoading = ref(false);
+
+  const video = reactive<TYoutubeVideoCreate>({
+    id: '',
+    name: '',
+  });
+
+  const rules = {
+    id: {
+      required: helpers.withMessage(
+        'Поле обязательно для заполнения',
+        required,
+      ),
+      format: helpers.withMessage('Поле заполнено неверно', (value) =>
+        /([^"&?/\s]{11})/gi.test(value as string),
+      ),
+    },
+    name: {
+      required: helpers.withMessage(
+        'Поле обязательно для заполнения',
+        required,
+      ),
+    },
+  };
+
+  const v$ = useVuelidate(rules, video);
+
+  const clear = () => {
+    video.id = '';
+    video.name = '';
+  };
+
+  const close = () => {
+    clear();
+    emit('close');
+
+    isShow.value = false;
+  };
+
+  const add = async () => {
+    if (isLoading.value) {
+      return Promise.resolve();
+    }
+
+    isLoading.value = true;
+
+    try {
+      await v$.value.$reset();
+
+      const result = await v$.value.$validate();
+
+      if (!result) {
+        toast.error('Проверьте правильность заполнения полей');
+
+        return Promise.resolve();
+      }
+
+      const data = await YoutubeApi.add(video);
+
+      emit('added', data);
+      close();
+
+      return data;
+    } catch (err) {
+      return Promise.reject(err);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  watch(
+    () => props.modelValue,
+    () => {
+      clear();
+    },
+  );
+</script>
+
 <template>
   <vue-final-modal
     v-model="isShow"
@@ -74,118 +189,6 @@
     </div>
   </vue-final-modal>
 </template>
-
-<script setup lang="ts">
-  import useVuelidate from '@vuelidate/core';
-  import { helpers, required } from '@vuelidate/validators';
-  import { useVModel } from '@vueuse/core';
-  import { reactive, ref, watch } from 'vue';
-  import { VueFinalModal } from 'vue-final-modal';
-  import { useToast } from 'vue-toastification';
-
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { YoutubeApi } from '@/features/youtube/api';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-
-  export type TYoutubeVideoCreate = Pick<TYoutubeVideo, 'id' | 'name'>;
-
-  type TProp = {
-    modelValue: boolean;
-  };
-
-  const props = withDefaults(defineProps<TProp>(), {
-    modelValue: false
-  });
-
-  type TEmit = {
-    (e: 'update:modelValue', v: boolean): void;
-    (e: 'added', v: TYoutubeVideo): void;
-    (e: 'close'): void;
-  };
-
-  const emit = defineEmits<TEmit>();
-
-  const isShow = useVModel(props, 'modelValue', emit);
-  const toast = useToast(ToastEventBus);
-
-  const isLoading = ref(false);
-
-  const video = reactive<TYoutubeVideoCreate>({
-    id: '',
-    name: ''
-  });
-
-  const rules = {
-    id: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required
-      ),
-      format: helpers.withMessage('Поле заполнено неверно', value =>
-        /([^"&?/\s]{11})/gi.test(value as string)
-      )
-    },
-    name: {
-      required: helpers.withMessage('Поле обязательно для заполнения', required)
-    }
-  };
-
-  const v$ = useVuelidate(rules, video);
-
-  const clear = () => {
-    video.id = '';
-    video.name = '';
-  };
-
-  const close = () => {
-    clear();
-    emit('close');
-
-    isShow.value = false;
-  };
-
-  const add = async () => {
-    if (isLoading.value) {
-      return Promise.resolve();
-    }
-
-    isLoading.value = true;
-
-    try {
-      await v$.value.$reset();
-
-      const result = await v$.value.$validate();
-
-      if (!result) {
-        toast.error('Проверьте правильность заполнения полей');
-
-        return Promise.resolve();
-      }
-
-      const data = await YoutubeApi.add(video);
-
-      emit('added', data);
-      close();
-
-      return data;
-    } catch (err) {
-      return Promise.reject(err);
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  watch(
-    () => props.modelValue,
-    () => {
-      clear();
-    }
-  );
-</script>
 
 <style module lang="scss">
   @use '@/assets/styles/variables/breakpoints' as *;

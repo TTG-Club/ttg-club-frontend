@@ -6,5 +6,5 @@ export const GodsPage: RouteRecordRaw = {
   name: 'gods',
   path: '/gods',
   component: () => import('./GodsView.vue'),
-  children: [GodsDetailPage]
+  children: [GodsDetailPage],
 };

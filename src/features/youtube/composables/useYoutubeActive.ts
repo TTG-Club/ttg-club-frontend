@@ -62,7 +62,7 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
 
   const updateActiveStatus = (
     id: TYoutubeVideo['id'],
-    status: MaybeRef<boolean>
+    status: MaybeRef<boolean>,
   ) => {
     const _status = toValue(status);
 
@@ -82,6 +82,6 @@ export const useYoutubeActive = (limit: MaybeRef<number> = 5) => {
     updateCount,
     updateActiveStatus,
     activate,
-    deactivate
+    deactivate,
   };
 };

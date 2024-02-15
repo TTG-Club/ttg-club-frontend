@@ -1,3 +1,19 @@
+<script>
+  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
+
+  export default {
+    directives: {
+      CapitalizeFirst,
+    },
+    props: {
+      creature: {
+        type: Object,
+        required: true,
+      },
+    },
+  };
+</script>
+
 <template>
   <router-link
     :class="{ 'is-green': creature?.source?.homebrew }"
@@ -36,22 +52,6 @@
     </div>
   </router-link>
 </template>
-
-<script>
-  import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
-
-  export default {
-    directives: {
-      CapitalizeFirst
-    },
-    props: {
-      creature: {
-        type: Object,
-        required: true
-      }
-    }
-  };
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/modules/link-item' as *;

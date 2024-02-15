@@ -4,10 +4,10 @@ import { useRoute } from 'vue-router';
 
 import { useReference } from '@/shared/composables/useReference';
 import { CONTENT_LAYOUT_FIXED_HEADER_SELECTOR } from '@/shared/constants/UI';
-import { asyncAnimationFrame } from '@/shared/helpers/dom';
 import { useUIStore } from '@/shared/stores/UIStore';
 import type { Maybe } from '@/shared/types/Utility';
 import type { TVirtualListRef } from '@/shared/ui/virtual-views/VirtualList/types';
+import { asyncAnimationFrame } from '@/shared/utils/dom';
 
 import type { MaybeRef } from '@vueuse/core';
 import type { Ref } from 'vue';
@@ -25,7 +25,7 @@ export const useScrollToPathInList = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   items,
   disabled,
-  showRightSide
+  showRightSide,
 }: UseScrollToPathInListParams) => {
   const route = useRoute();
   const uiStore = useUIStore();
@@ -73,13 +73,13 @@ export const useScrollToPathInList = ({
     }
 
     const item = reference.value?.scroller.$el.querySelector(
-      `[data-index="${index}"]`
+      `[data-index="${index}"]`,
     )?.parentElement;
 
     const itemRect = item.getBoundingClientRect();
 
     const fixedHeader = bodyElement.value.querySelector(
-      CONTENT_LAYOUT_FIXED_HEADER_SELECTOR
+      CONTENT_LAYOUT_FIXED_HEADER_SELECTOR,
     );
 
     const headerHeight = fixedHeader?.clientHeight || 0;
@@ -113,12 +113,12 @@ export const useScrollToPathInList = ({
     },
     {
       immediate: true,
-      flush: 'post'
-    }
+      flush: 'post',
+    },
   );
 
   return {
     reference,
-    setReference
+    setReference,
   };
 };

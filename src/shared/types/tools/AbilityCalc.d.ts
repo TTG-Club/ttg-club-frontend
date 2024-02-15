@@ -4,7 +4,7 @@ export enum AbilityName {
   CONSTITUTION = 'Телосложение',
   INTELLIGENCE = 'Интеллект',
   WISDOM = 'Мудрость',
-  CHARISMA = 'Харизма'
+  CHARISMA = 'Харизма',
 }
 
 export enum AbilityShortName {
@@ -13,7 +13,7 @@ export enum AbilityShortName {
   CONSTITUTION = 'тел',
   INTELLIGENCE = 'инт',
   WISDOM = 'мдр',
-  CHARISMA = 'хар'
+  CHARISMA = 'хар',
 }
 
 export enum AbilityKey {
@@ -22,7 +22,7 @@ export enum AbilityKey {
   CONSTITUTION = 'CONSTITUTION',
   INTELLIGENCE = 'INTELLIGENCE',
   WISDOM = 'WISDOM',
-  CHARISMA = 'CHARISMA'
+  CHARISMA = 'CHARISMA',
 }
 
 export enum AbilityShortKey {
@@ -31,7 +31,7 @@ export enum AbilityShortKey {
   CONSTITUTION = 'con',
   INTELLIGENCE = 'int',
   WISDOM = 'wis',
-  CHARISMA = 'cha'
+  CHARISMA = 'cha',
 }
 
 export enum AbilityType {
@@ -39,7 +39,7 @@ export enum AbilityType {
   ONE = 'к одной',
   CHOICE_UNIQUE = 'к 2 другим',
   CHOICE_DOUBLE = '+2 и +1 / +1 к трем',
-  ALL = '+1 к каждой'
+  ALL = '+1 к каждой',
 }
 
 export enum AbilityTypeKey {
@@ -47,17 +47,17 @@ export enum AbilityTypeKey {
   ONE = 'ONE',
   CHOICE_UNIQUE = 'CHOICE_UNIQUE',
   CHOICE_DOUBLE = 'CHOICE_DOUBLE',
-  ALL = 'ALL'
+  ALL = 'ALL',
 }
 
 export enum AbilityChoiceDouble {
   FOR_THREE = '+1 к трем',
-  FOR_TWO = '+2 и +1'
+  FOR_TWO = '+2 и +1',
 }
 
 export enum AbilityChoiceDoubleKey {
   FOR_THREE = 'FOR_THREE',
-  FOR_TWO = 'FOR_TWO'
+  FOR_TWO = 'FOR_TWO',
 }
 
 export type AbilityRoll = {

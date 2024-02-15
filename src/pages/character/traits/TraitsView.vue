@@ -1,55 +1,29 @@
-<template>
-  <content-layout
-    :filter-instance="filter"
-    :show-right-side="showRightSide"
-    title="Черты"
-    @search="onSearch"
-    @update="initPages"
-  >
-    <virtual-grouped-list
-      :list="getListProps({ items: traits })"
-      :get-group="getGroupByFirstLetter"
-      :grid="{
-        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
-        reference: setReference
-      }"
-    >
-      <template #default="{ item: trait }">
-        <trait-link
-          :to="{ path: trait.url }"
-          :trait-item="trait"
-        />
-      </template>
-    </virtual-grouped-list>
-  </content-layout>
-</template>
-
 <script lang="ts" setup>
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import TraitLink from '@/pages/character/traits/TraitLink.vue';
-
-  import ContentLayout from '@/layouts/ContentLayout.vue';
-
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
   import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
-  import { getGroupByFirstLetter } from '@/shared/helpers/list';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { TraitsFilterDefaults } from '@/shared/types/character/Traits.d';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
+  import { getGroupByFirstLetter } from '@/shared/utils/list';
+
+  import ContentLayout from '@/layouts/ContentLayout.vue';
+
+  import TraitLink from '@/pages/character/traits/TraitLink.vue';
 
   type TProps = {
     storeKey?: string;
   };
 
   withDefaults(defineProps<TProps>(), {
-    storeKey: ''
+    storeKey: '',
   });
 
   const route = useRoute();
@@ -60,7 +34,7 @@
 
   const filter = useFilter({
     dbName: TraitsFilterDefaults.dbName,
-    url: TraitsFilterDefaults.url
+    url: TraitsFilterDefaults.url,
   });
 
   const { initPages, items: traits } = usePagination({
@@ -68,15 +42,15 @@
     size: -1,
     filter: {
       isCustomized: filter.isCustomized,
-      value: filter.queryParams
+      value: filter.queryParams,
     },
     search: filter.search,
     order: [
       {
         field: 'name',
-        direction: 'asc'
-      }
-    ]
+        direction: 'asc',
+      },
+    ],
   });
 
   const onSearch = async () => {
@@ -96,6 +70,32 @@
 
   const { setReference } = useScrollToPathInList({
     items: traits,
-    showRightSide
+    showRightSide,
   });
 </script>
+
+<template>
+  <content-layout
+    :filter-instance="filter"
+    :show-right-side="showRightSide"
+    title="Черты"
+    @search="onSearch"
+    @update="initPages"
+  >
+    <virtual-grouped-list
+      :list="getListProps({ items: traits })"
+      :get-group="getGroupByFirstLetter"
+      :grid="{
+        flat: checkIsListGridFlat({ showRightSide, fullscreen }),
+        reference: setReference,
+      }"
+    >
+      <template #default="{ item: trait }">
+        <trait-link
+          :to="{ path: trait.url }"
+          :trait-item="trait"
+        />
+      </template>
+    </virtual-grouped-list>
+  </content-layout>
+</template>

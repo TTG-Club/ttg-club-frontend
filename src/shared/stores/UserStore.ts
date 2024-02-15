@@ -4,16 +4,16 @@ import { defineStore } from 'pinia';
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api';
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
-import { useIsDev } from '@/shared/helpers/isDev';
+import { useIsDev } from '@/shared/utils/isDev';
 
 export enum EUserRoles {
   USER = 'USER',
   WRITER = 'WRITER',
   SUBSCRIBER = 'SUBSCRIBER',
   MODERATOR = 'MODERATOR',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
 }
 
 export enum EUserRolesRus {
@@ -21,7 +21,7 @@ export enum EUserRolesRus {
   WRITER = 'писатель',
   SUBSCRIBER = 'подписчик',
   MODERATOR = 'модератор',
-  ADMIN = 'администратор'
+  ADMIN = 'администратор',
 }
 
 export type TUser = {
@@ -58,11 +58,10 @@ export type TAuthResponse = {
 export const useUserStore = defineStore('UserStore', () => {
   const route = useRoute();
   const router = useRouter();
-  const http = useAxios();
   const isDev = useIsDev();
 
   const user = ref<TUser | null>(null);
-  const isAuthenticated = ref<boolean>(false);
+  const isAuthenticated = computed(() => !!user.value);
 
   const controllers = reactive<{
     registration?: AbortController;
@@ -77,7 +76,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
     const entries = Object.entries(EUserRolesRus) as [
       EUserRoles,
-      EUserRolesRus
+      EUserRolesRus,
     ][];
 
     const availRoles: { [key in EUserRoles]?: EUserRolesRus } =
@@ -86,11 +85,11 @@ export const useUserStore = defineStore('UserStore', () => {
     const { roles: userRoles } = user.value;
 
     const translated = userRoles
-      .map(role => ({
+      .map((role) => ({
         role,
-        name: availRoles[role]
+        name: availRoles[role],
       }))
-      .filter(role => !!role.name);
+      .filter((role) => !!role.name);
 
     if (!translated.length) {
       return [];
@@ -99,35 +98,45 @@ export const useUserStore = defineStore('UserStore', () => {
     return translated;
   });
 
+  const isAdmin = computed(() =>
+    roles.value.map((role) => role.role).includes(EUserRoles.ADMIN),
+  );
+
   const avatar = computed(() => ({
     src: user.value?.avatar || null,
     error: '/icon/avatar.png',
-    loading: '/icon/avatar.png'
+    loading: '/icon/avatar.png',
   }));
 
   const clearUser = async () => {
-    user.value = null;
-    isAuthenticated.value = false;
-
     Cookies.remove(USER_TOKEN_COOKIE);
+
+    user.value = null;
 
     if (route.name === 'profile') {
       await router.push({ name: 'index' });
     }
   };
 
+  httpClient.instance.interceptors.response.use(async (resp) => {
+    if (resp.status === 401) {
+      await clearUser();
+    }
+
+    return resp;
+  });
+
   const getUserToken = () => Cookies.get(USER_TOKEN_COOKIE);
 
   const getUserInfo = async (): Promise<TUser> => {
     try {
-      const resp = await http.get<TUser>({
-        url: '/user/info'
+      const resp = await httpClient.get<TUser>({
+        url: '/user/info',
       });
 
       switch (resp.status) {
         case 200:
           user.value = resp.data;
-          isAuthenticated.value = true;
 
           return Promise.resolve(resp.data);
         default:
@@ -144,16 +153,16 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     try {
-      if (Object.values(body).find(item => !item)) {
+      if (Object.values(body).find((item) => !item)) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
       controllers.registration = new AbortController();
 
-      const resp = await http.post({
+      const resp = await httpClient.post({
         url: '/auth/signup',
         payload: body,
-        signal: controllers.registration.signal
+        signal: controllers.registration.signal,
       });
 
       switch (resp.status) {
@@ -175,23 +184,25 @@ export const useUserStore = defineStore('UserStore', () => {
     }
 
     try {
-      if (Object.values(body).find(item => typeof item === 'string' && !item)) {
+      if (
+        Object.values(body).find((item) => typeof item === 'string' && !item)
+      ) {
         return Promise.reject(new Error('All fields are required to fill'));
       }
 
       controllers.authorization = new AbortController();
 
-      const resp = await http.post<TAuthResponse>({
+      const resp = await httpClient.post<TAuthResponse>({
         url: '/auth/signin',
         payload: body,
-        signal: controllers.authorization.signal
+        signal: controllers.authorization.signal,
       });
 
       switch (resp.status) {
         case 200:
           if (isDev) {
             Cookies.set(USER_TOKEN_COOKIE, resp.data.accessToken, {
-              expires: 365
+              expires: 365,
             });
           }
 
@@ -213,9 +224,9 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const resetPassword = async (email: string) => {
     try {
-      const resp = await http.get({
+      const resp = await httpClient.get({
         url: '/auth/change/password',
-        payload: { email }
+        payload: { email },
       });
 
       switch (resp.status) {
@@ -237,10 +248,10 @@ export const useUserStore = defineStore('UserStore', () => {
     try {
       controllers.changePassword = new AbortController();
 
-      const resp = await http.post({
+      const resp = await httpClient.post({
         url: '/auth/change/password',
         payload,
-        signal: controllers.changePassword.signal
+        signal: controllers.changePassword.signal,
       });
 
       switch (resp.status) {
@@ -258,7 +269,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const logout = async () => {
     try {
-      const resp = await http.post({ url: '/auth/signout' });
+      const resp = await httpClient.post({ url: '/auth/signout' });
 
       switch (resp.status) {
         case 200:
@@ -279,8 +290,8 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const getUserStatus = async () => {
     try {
-      const resp = await http.get({
-        url: '/user/status'
+      const resp = await httpClient.get({
+        url: '/user/status',
       });
 
       if (resp.status !== 200 || !resp.data) {
@@ -288,8 +299,6 @@ export const useUserStore = defineStore('UserStore', () => {
 
         return Promise.resolve(false);
       }
-
-      isAuthenticated.value = true;
 
       return Promise.resolve(resp.data as boolean);
     } catch (err) {
@@ -301,9 +310,11 @@ export const useUserStore = defineStore('UserStore', () => {
 
   return {
     user,
-    isAuthenticated,
     roles,
     avatar,
+
+    isAuthenticated,
+    isAdmin,
 
     clearUser,
     getUserToken,
@@ -313,6 +324,6 @@ export const useUserStore = defineStore('UserStore', () => {
     authorization,
     resetPassword,
     changePassword,
-    logout
+    logout,
   };
 });

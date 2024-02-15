@@ -1,17 +1,16 @@
 import { toValue } from '@vueuse/shared';
 import { toPairs, fromPairs } from 'lodash-es';
 
-import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeAddVideo.vue';
-import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-import { useAxios } from '@/shared/composables/useAxios';
-import { getOrderString } from '@/shared/helpers/request';
-import type { RequestConfig } from '@/shared/services/HTTPService';
+import { httpClient, type RequestConfig } from '@/shared/api';
 import type {
   IOrderItem,
-  IPaginatedResponse
+  IPaginatedResponse,
 } from '@/shared/types/BaseApiFields';
 import type { Maybe } from '@/shared/types/Utility';
+import { getOrderString } from '@/shared/utils/request';
+
+import type { TYoutubeVideoCreate } from '@/features/youtube/components/YoutubeAddVideo.vue';
+import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
 import type { MaybeRef } from '@vueuse/core';
 
@@ -22,11 +21,9 @@ export class YoutubeApi {
       size?: MaybeRef<number>;
       order?: MaybeRef<Array<IOrderItem>>;
       activeStatus?: MaybeRef<boolean>;
-    }>
+    }>,
   ): Promise<IPaginatedResponse<TYoutubeVideo>> {
     try {
-      const http = useAxios();
-
       const config: RequestConfig['payload'] = {
         page: 0,
         size: -1,
@@ -39,13 +36,13 @@ export class YoutubeApi {
             }
 
             return [key, _value];
-          })
-        )
+          }),
+        ),
       };
 
-      const { data } = await http.get<IPaginatedResponse<TYoutubeVideo>>({
+      const { data } = await httpClient.get<IPaginatedResponse<TYoutubeVideo>>({
         url: '/youtube',
-        payload: config
+        payload: config,
       });
 
       return data;
@@ -55,15 +52,14 @@ export class YoutubeApi {
   }
 
   static async add(
-    video: MaybeRef<TYoutubeVideoCreate>
+    video: MaybeRef<TYoutubeVideoCreate>,
   ): Promise<TYoutubeVideo> {
-    const http = useAxios();
     const _video = toValue(video);
 
     try {
-      const { data } = await http.post<TYoutubeVideo>({
+      const { data } = await httpClient.post<TYoutubeVideo>({
         url: '/youtube',
-        payload: _video
+        payload: _video,
       });
 
       return data;
@@ -73,13 +69,12 @@ export class YoutubeApi {
   }
 
   static async edit(video: MaybeRef<TYoutubeVideo>): Promise<TYoutubeVideo> {
-    const http = useAxios();
     const _video = toValue(video);
 
     try {
-      const { data } = await http.patch<TYoutubeVideo>({
+      const { data } = await httpClient.patch<TYoutubeVideo>({
         url: '/youtube',
-        payload: _video
+        payload: _video,
       });
 
       return data;
@@ -95,10 +90,8 @@ export class YoutubeApi {
       return Promise.reject(new Error('You must specify the ID'));
     }
 
-    const http = useAxios();
-
     try {
-      await http.delete({ url: `/youtube?id=${_id}` });
+      await httpClient.delete({ url: `/youtube?id=${_id}` });
 
       return Promise.resolve();
     } catch (err) {
@@ -107,13 +100,12 @@ export class YoutubeApi {
   }
 
   static async getCount(active?: Maybe<MaybeRef<boolean>>): Promise<number> {
-    const http = useAxios();
     const _active = toValue(active);
 
     try {
-      const { data } = await http.get<number>({
+      const { data } = await httpClient.get<number>({
         url: '/youtube/count',
-        payload: { active: _active }
+        payload: { active: _active },
       });
 
       return data;
@@ -124,15 +116,14 @@ export class YoutubeApi {
 
   static async changeStatus(
     id: MaybeRef<TYoutubeVideo['id']>,
-    status: MaybeRef<boolean>
+    status: MaybeRef<boolean>,
   ): Promise<TYoutubeVideo> {
     const _id = toValue(id);
     const _status = toValue(status);
-    const http = useAxios();
 
     try {
-      const { data } = await http.patch<TYoutubeVideo>({
-        url: `/youtube/active?id=${_id}&activeStatus=${_status}`
+      const { data } = await httpClient.patch<TYoutubeVideo>({
+        url: `/youtube/active?id=${_id}&activeStatus=${_status}`,
       });
 
       return data;

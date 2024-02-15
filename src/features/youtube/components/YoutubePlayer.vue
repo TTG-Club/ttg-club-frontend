@@ -1,8 +1,108 @@
+<script lang="ts" setup>
+  import { computed, ref, useCssModule } from 'vue';
+
+  import YoutubePlayIcon from '@/features/youtube/components/YoutubePlayIcon.vue';
+  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  export type ImageResolution =
+    | 'default'
+    | 'mqdefault'
+    | 'hqdefault'
+    | 'sddefault'
+    | 'maxresdefault';
+
+  const $style = useCssModule();
+
+  const props = withDefaults(
+    defineProps<{
+      video: TYoutubeVideo;
+      showName?: boolean;
+      params?: string;
+      poster?: ImageResolution;
+      muted?: boolean;
+      rel?: 'prefetch' | 'preload';
+      announce?: string;
+      hasRadius?: boolean;
+    }>(),
+    {
+      showName: false,
+      params: '',
+      poster: 'hqdefault',
+      muted: false,
+      rel: 'preload',
+      announce: 'Смотреть',
+      hasRadius: false,
+    },
+  );
+
+  const emit = defineEmits(['init']);
+
+  const iframe = ref(false);
+  const iframeElement = ref<HTMLIFrameElement | null>(null);
+
+  const videoId = computed(() => encodeURIComponent(props.video.id));
+
+  const posterUrl = computed(
+    () => `https://i.ytimg.com/vi_webp/${videoId.value}/${props.poster}.webp`,
+  );
+
+  const embedUrl = computed(
+    () => `https://www.youtube.com/embed/${videoId.value}`,
+  );
+
+  const urlWithParams = computed(
+    () =>
+      `${embedUrl.value}?autoplay=1&enablejsapi=1&state=1&mute=${
+        props.muted ? 1 : 0
+      }`,
+  );
+
+  const runCommand = (
+    player: HTMLIFrameElement | null,
+    func: 'stopVideo' | 'pauseVideo' | 'playVideo',
+  ) => {
+    if (player === null) {
+      throw new Error('iframe element not instantiated.');
+    }
+
+    player.contentWindow?.postMessage(
+      `{"event":"command","func":"${func}","args":""}`,
+      '*',
+    );
+  };
+
+  const initIframe = () => {
+    if (iframe.value) {
+      return;
+    }
+
+    iframe.value = true;
+
+    emit('init');
+  };
+
+  defineExpose({
+    getInstance() {
+      return iframeElement.value;
+    },
+    stopVideo() {
+      runCommand(iframeElement.value, 'stopVideo');
+    },
+    pauseVideo() {
+      runCommand(iframeElement.value, 'pauseVideo');
+    },
+    playVideo() {
+      runCommand(iframeElement.value, 'playVideo');
+    },
+    initIframe,
+  });
+</script>
+
 <template>
   <div
     :class="{
       [$style['youtube-player']]: true,
-      [$style['is-active']]: iframe
+      [$style['is-active']]: iframe,
     }"
   >
     <link
@@ -38,7 +138,7 @@
       <div
         :class="{
           [$style.video]: true,
-          [$style.radius]: hasRadius
+          [$style.radius]: hasRadius,
         }"
         :style="{ backgroundImage: `url(${posterUrl})` }"
       >
@@ -71,106 +171,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { computed, ref, useCssModule } from 'vue';
-
-  import YoutubePlayIcon from '@/features/youtube/components/YoutubePlayIcon.vue';
-  import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-  export type ImageResolution =
-    | 'default'
-    | 'mqdefault'
-    | 'hqdefault'
-    | 'sddefault'
-    | 'maxresdefault';
-
-  const $style = useCssModule();
-
-  const props = withDefaults(
-    defineProps<{
-      video: TYoutubeVideo;
-      showName?: boolean;
-      params?: string;
-      poster?: ImageResolution;
-      muted?: boolean;
-      rel?: 'prefetch' | 'preload';
-      announce?: string;
-      hasRadius?: boolean;
-    }>(),
-    {
-      showName: false,
-      params: '',
-      poster: 'hqdefault',
-      muted: false,
-      rel: 'preload',
-      announce: 'Смотреть',
-      hasRadius: false
-    }
-  );
-
-  const emit = defineEmits(['init']);
-
-  const iframe = ref(false);
-  const iframeElement = ref<HTMLIFrameElement | null>(null);
-
-  const videoId = computed(() => encodeURIComponent(props.video.id));
-
-  const posterUrl = computed(
-    () => `https://i.ytimg.com/vi_webp/${videoId.value}/${props.poster}.webp`
-  );
-
-  const embedUrl = computed(
-    () => `https://www.youtube.com/embed/${videoId.value}`
-  );
-
-  const urlWithParams = computed(
-    () =>
-      `${embedUrl.value}?autoplay=1&enablejsapi=1&state=1&mute=${
-        props.muted ? 1 : 0
-      }`
-  );
-
-  const runCommand = (
-    player: HTMLIFrameElement | null,
-    func: 'stopVideo' | 'pauseVideo' | 'playVideo'
-  ) => {
-    if (player === null) {
-      throw new Error('iframe element not instantiated.');
-    }
-
-    player.contentWindow?.postMessage(
-      `{"event":"command","func":"${func}","args":""}`,
-      '*'
-    );
-  };
-
-  const initIframe = () => {
-    if (iframe.value) {
-      return;
-    }
-
-    iframe.value = true;
-
-    emit('init');
-  };
-
-  defineExpose({
-    getInstance() {
-      return iframeElement.value;
-    },
-    stopVideo() {
-      runCommand(iframeElement.value, 'stopVideo');
-    },
-    pauseVideo() {
-      runCommand(iframeElement.value, 'pauseVideo');
-    },
-    playVideo() {
-      runCommand(iframeElement.value, 'playVideo');
-    },
-    initIframe
-  });
-</script>
 
 <style module lang="scss">
   @use '@/assets/styles/variables/mixins' as *;

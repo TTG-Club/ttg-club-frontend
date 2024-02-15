@@ -1,3 +1,57 @@
+<script lang="ts">
+  import { useFocus } from '@vueuse/core';
+  import { computed, defineComponent, ref, watch } from 'vue';
+
+  import type { TSearchResult } from '@/shared/types/search/Search.d';
+
+  import type { PropType } from 'vue';
+
+  export default defineComponent({
+    props: {
+      searchLink: {
+        type: Object as PropType<TSearchResult>,
+        default: null,
+        required: true,
+      },
+      showDesc: {
+        type: Boolean,
+        default: false,
+      },
+      disableHover: {
+        type: Boolean,
+        default: false,
+      },
+      selected: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props) {
+      const link = ref<HTMLElement | null>(null);
+      const { focused } = useFocus(link);
+
+      const classes = computed(() => ({
+        'is-selected': props.selected,
+        'is-hover-disabled': props.disableHover,
+        'is-homebrew': props.searchLink.source?.homebrew,
+      }));
+
+      watch(
+        () => props.selected,
+        (value) => {
+          focused.value = value;
+        },
+      );
+
+      return {
+        link,
+        focused,
+        classes,
+      };
+    },
+  });
+</script>
+
 <template>
   <router-link
     v-if="searchLink"
@@ -34,60 +88,6 @@
     </div>
   </router-link>
 </template>
-
-<script lang="ts">
-  import { useFocus } from '@vueuse/core';
-  import { computed, defineComponent, ref, watch } from 'vue';
-
-  import type { TSearchResult } from '@/shared/types/search/Search.d';
-
-  import type { PropType } from 'vue';
-
-  export default defineComponent({
-    props: {
-      searchLink: {
-        type: Object as PropType<TSearchResult>,
-        default: null,
-        required: true
-      },
-      showDesc: {
-        type: Boolean,
-        default: false
-      },
-      disableHover: {
-        type: Boolean,
-        default: false
-      },
-      selected: {
-        type: Boolean,
-        default: false
-      }
-    },
-    setup(props) {
-      const link = ref<HTMLElement | null>(null);
-      const { focused } = useFocus(link);
-
-      const classes = computed(() => ({
-        'is-selected': props.selected,
-        'is-hover-disabled': props.disableHover,
-        'is-homebrew': props.searchLink.source?.homebrew
-      }));
-
-      watch(
-        () => props.selected,
-        value => {
-          focused.value = value;
-        }
-      );
-
-      return {
-        link,
-        focused,
-        classes
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

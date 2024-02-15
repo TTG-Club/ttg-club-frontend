@@ -9,7 +9,7 @@ export type TGroupedListGroup<Group = AnyObject> = Group & {
 export type TGroupedListItem<
   Item,
   Group,
-  KeyField extends RecordKey = DefaultKeyField
+  KeyField extends RecordKey = DefaultKeyField,
 > = TListRow<Item, KeyField> | TGroupedListGroup<Group>;
 
 export type TGetGroup<Item, Group> = (item: Item) => Group;
@@ -22,6 +22,6 @@ export type TFilterItemsByGroupIdOptions<Item, Group, KeyField> = {
 export type TGetGroupedListItemsOptions<
   Item,
   Group,
-  KeyField extends keyof Item
+  KeyField extends keyof Item,
 > = TFilterItemsByGroupIdOptions<Item, Group, KeyField> &
   TGetListRowsOptions<Item, KeyField>;

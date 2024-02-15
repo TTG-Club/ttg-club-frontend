@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-
 import { h, type VNode } from 'vue';
 
 import type {
@@ -10,7 +8,7 @@ import type {
   FateDieRoll,
   GroupRoll,
   MathFunctionRoll,
-  RollBase
+  RollBase,
 } from 'dice-roller-parser';
 
 export type TRollType = 'advantage' | 'disadvantage';
@@ -49,7 +47,7 @@ export class DiceRollRenderer {
       case 'number':
         return h(
           'span',
-          `${roll.value}${roll.label ? ` (${roll.label})` : ''}`
+          `${roll.value}${roll.label ? ` (${roll.label})` : ''}`,
         );
       case 'fate':
         return h('span', 'F');
@@ -97,10 +95,10 @@ export class DiceRollRenderer {
             'Rolling: ',
             this.render(die.count),
             'd',
-            this.render(die.die)
+            this.render(die.die),
           ]),
-          ']'
-        ])
+          ']',
+        ]),
       );
     }
 
@@ -158,10 +156,10 @@ export class DiceRollRenderer {
             (!roll.success && roll.critical === 'success'),
           disadvantage:
             (roll.success && roll.value === -1) ||
-            (!roll.success && roll.critical === 'failure')
-        }
+            (!roll.success && roll.critical === 'failure'),
+        },
       },
-      roll.roll
+      roll.roll,
     );
 
     if (roll.matched) {
@@ -187,10 +185,10 @@ export class DiceRollRenderer {
       {
         class: {
           advantage: roll.success && roll.value === 1,
-          disadvantage: roll.success && roll.value === -1
-        }
+          disadvantage: roll.success && roll.value === -1,
+        },
       },
-      rollDisplay
+      rollDisplay,
     );
 
     if (roll.matched) {
@@ -209,7 +207,7 @@ export class DiceRollRenderer {
  */
 export function getFormattedFormula({
   formula,
-  type
+  type,
 }: {
   formula: string;
   type?: TRollType;

@@ -6,5 +6,5 @@ export const ArmorsPage: RouteRecordRaw = {
   name: 'armors',
   path: '/armors',
   component: () => import('./ArmorsView.vue'),
-  children: [ArmorsDetailPage]
+  children: [ArmorsDetailPage],
 };

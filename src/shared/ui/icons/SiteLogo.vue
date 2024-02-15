@@ -1,3 +1,21 @@
+<script lang="ts">
+  import { computed, defineComponent } from 'vue';
+
+  export default defineComponent({
+    props: {
+      size: {
+        type: Number,
+        default: undefined,
+      },
+    },
+    setup(props) {
+      return {
+        currentSize: computed(() => (props.size ? `${props.size}px` : '100%')),
+      };
+    },
+  });
+</script>
+
 <template>
   <svg
     :style="{ width: currentSize, height: currentSize }"
@@ -73,24 +91,6 @@
     <!-- eslint-enable max-len, vue/max-len -->
   </svg>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent } from 'vue';
-
-  export default defineComponent({
-    props: {
-      size: {
-        type: Number,
-        default: undefined
-      }
-    },
-    setup(props) {
-      return {
-        currentSize: computed(() => (props.size ? `${props.size}px` : '100%'))
-      };
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   .site-logo {

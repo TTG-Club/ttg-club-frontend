@@ -1,21 +1,13 @@
-<template>
-  <tippy v-bind="tippyConfig">
-    <template #default>
-      <slot name="default" />
-    </template>
-
-    <template #content>
-      <render />
-    </template>
-  </tippy>
-</template>
-
 <script setup lang="ts">
   import { cloneDeep } from 'lodash-es';
   import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
   import { DefaultTippyProps } from '@/core/configs/TippyConfig';
+
+  import { httpClient } from '@/shared/api';
+  import RawContent from '@/shared/ui/RawContent.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
   import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
@@ -27,10 +19,6 @@
   import GodBody from '@/pages/wiki/gods/gods-detail/GodBody.vue';
   import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
   import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
-
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';
@@ -54,12 +42,11 @@
     }>(),
     {
       url: undefined,
-      type: undefined
-    }
+      type: undefined,
+    },
   );
 
   const slots = useSlots();
-  const http = useAxios();
 
   const content = ref();
   const error = ref(false);
@@ -69,7 +56,7 @@
       return props.url;
     }
 
-    const el = slots.default?.().find(node => node?.props?.href);
+    const el = slots.default?.().find((node) => node?.props?.href);
 
     if (el?.props?.href) {
       return el.props.href;
@@ -88,7 +75,7 @@
     'screen': ScreenBody,
     'creature': CreatureBody,
     'spell': SpellBody,
-    'god': GodBody
+    'god': GodBody,
   };
 
   const getContent = async () => {
@@ -105,8 +92,8 @@
     }
 
     const res = !props.type
-      ? await http.rawGet({ url: computedUrl.value })
-      : await http.post({ url: computedUrl.value });
+      ? await httpClient.rawGet({ url: computedUrl.value })
+      : await httpClient.post({ url: computedUrl.value });
 
     if (res.status !== 200) {
       errorHandler(res.statusText);
@@ -144,7 +131,19 @@
 
     return h(components[props.type], {
       [props.type]: content.value,
-      'in-tooltip': true
+      'in-tooltip': true,
     });
   });
 </script>
+
+<template>
+  <tippy v-bind="tippyConfig">
+    <template #default>
+      <slot name="default" />
+    </template>
+
+    <template #content>
+      <render />
+    </template>
+  </tippy>
+</template>

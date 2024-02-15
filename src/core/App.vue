@@ -1,26 +1,11 @@
-<template>
-  <nav-bar />
-
-  <div
-    id="container"
-    class="container"
-  >
-    <router-view />
-  </div>
-
-  <dice-history />
-
-  <modals-container />
-</template>
-
 <script setup lang="ts">
   import { tryOnBeforeMount } from '@vueuse/core';
   import { ModalsContainer } from 'vue-final-modal';
 
+  import { useUserStore } from '@/shared/stores/UserStore';
+
   import { DiceHistory } from '@/features/dice-history/ui';
   import NavBar from '@/features/menu/NavBar.vue';
-
-  import { useUserStore } from '@/shared/stores/UserStore';
 
   const userStore = useUserStore();
 
@@ -38,3 +23,31 @@
     await initUser();
   });
 </script>
+
+<template>
+  <nav-bar />
+
+  <div
+    id="container"
+    class="container"
+  >
+    <router-view />
+  </div>
+
+  <dice-history />
+
+  <modals-container />
+</template>
+
+<template>
+  <nav-bar />
+
+  <div
+    id="container"
+    class="container"
+  >
+    <router-view />
+  </div>
+
+  <modals-container />
+</template>

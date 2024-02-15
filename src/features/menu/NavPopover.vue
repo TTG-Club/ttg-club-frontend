@@ -1,3 +1,61 @@
+<script setup lang="ts">
+  import { useVModel } from '@vueuse/core';
+  import { storeToRefs } from 'pinia';
+  import { computed, watch } from 'vue';
+
+  import { useNavStore } from '@/shared/stores/NavStore';
+
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: boolean;
+      isMenu?: boolean;
+      isLeft?: boolean;
+      innerScroll?: boolean;
+      bodyStyle?: any;
+    }>(),
+    {
+      modelValue: false,
+      isMenu: false,
+      isLeft: false,
+      innerScroll: false,
+      bodyStyle: {},
+    },
+  );
+
+  interface IEmit {
+    (e: 'close'): void;
+    (e: 'update:modelValue', v: typeof props.modelValue): void;
+  }
+
+  const emit = defineEmits<IEmit>();
+
+  const isShow = useVModel(props, 'modelValue');
+  const navStore = useNavStore();
+  const { isShowPopover } = storeToRefs(navStore);
+
+  const classes = computed(() => ({
+    'is-left': props.isLeft,
+    'is-menu': props.isMenu,
+    'inner-scroll': props.innerScroll,
+  }));
+
+  const onClose = () => {
+    isShow.value = false;
+
+    emit('close');
+  };
+
+  watch(isShow, (value) => {
+    isShowPopover.value = value;
+  });
+
+  watch(isShowPopover, (value) => {
+    if (!value && isShow.value) {
+      isShow.value = false;
+    }
+  });
+</script>
+
 <template>
   <div class="nav-popover">
     <div
@@ -33,64 +91,6 @@
     </transition>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { useVModel } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
-  import { computed, watch } from 'vue';
-
-  import { useNavStore } from '@/shared/stores/NavStore';
-
-  const props = withDefaults(
-    defineProps<{
-      modelValue?: boolean;
-      isMenu?: boolean;
-      isLeft?: boolean;
-      innerScroll?: boolean;
-      bodyStyle?: any;
-    }>(),
-    {
-      modelValue: false,
-      isMenu: false,
-      isLeft: false,
-      innerScroll: false,
-      bodyStyle: {}
-    }
-  );
-
-  interface IEmit {
-    (e: 'close'): void;
-    (e: 'update:modelValue', v: typeof props.modelValue): void;
-  }
-
-  const emit = defineEmits<IEmit>();
-
-  const isShow = useVModel(props, 'modelValue');
-  const navStore = useNavStore();
-  const { isShowPopover } = storeToRefs(navStore);
-
-  const classes = computed(() => ({
-    'is-left': props.isLeft,
-    'is-menu': props.isMenu,
-    'inner-scroll': props.innerScroll
-  }));
-
-  const onClose = () => {
-    isShow.value = false;
-
-    emit('close');
-  };
-
-  watch(isShow, value => {
-    isShowPopover.value = value;
-  });
-
-  watch(isShowPopover, value => {
-    if (!value && isShow.value) {
-      isShow.value = false;
-    }
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

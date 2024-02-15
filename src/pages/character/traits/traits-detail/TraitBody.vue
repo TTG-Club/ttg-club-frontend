@@ -1,3 +1,24 @@
+<script>
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'TraitBody',
+    components: {
+      DetailTopBar,
+      RawContent,
+    },
+    props: {
+      trait: {
+        type: Object,
+        default: undefined,
+        required: true,
+      },
+    },
+  };
+</script>
+
 <template>
   <div class="trait-body">
     <detail-top-bar
@@ -10,24 +31,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'TraitBody',
-    components: {
-      DetailTopBar,
-      RawContent
-    },
-    props: {
-      trait: {
-        type: Object,
-        default: undefined,
-        required: true
-      }
-    }
-  };
-</script>

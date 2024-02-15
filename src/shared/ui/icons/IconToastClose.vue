@@ -1,9 +1,3 @@
-<template>
-  <div class="icon-toast-close">
-    <svg-icon icon="close" />
-  </div>
-</template>
-
 <script>
   import { defineComponent } from 'vue';
 
@@ -11,10 +5,16 @@
 
   export default defineComponent({
     components: {
-      SvgIcon
-    }
+      SvgIcon,
+    },
   });
 </script>
+
+<template>
+  <div class="icon-toast-close">
+    <svg-icon icon="close" />
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/mixins' as *;

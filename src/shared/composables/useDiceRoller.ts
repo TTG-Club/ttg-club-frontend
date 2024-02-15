@@ -11,7 +11,7 @@ import {
   DiceRollRenderer,
   getFormattedFormula,
   isCritical,
-  type TRollType
+  type TRollType,
 } from '../helpers/roll';
 
 import type { RollBase } from 'dice-roller-parser';
@@ -30,7 +30,7 @@ export function useDiceRoller() {
    */
   const doRoll = ({
     formula,
-    type
+    type,
   }: {
     formula: string;
     type?: TRollType;
@@ -38,14 +38,14 @@ export function useDiceRoller() {
     roller.roll(
       getFormattedFormula({
         formula,
-        type
-      })
+        type,
+      }),
     );
 
   const getRendered = ({
     roll,
     label,
-    type
+    type,
   }: {
     roll: RollBase;
     label?: string;
@@ -58,15 +58,15 @@ export function useDiceRoller() {
     const rendered = h(
       'span',
       {
-        class: 'dice-roll__rendered'
+        class: 'dice-roll__rendered',
       },
-      DiceRollRenderer.render(roll)
+      DiceRollRenderer.render(roll),
     );
 
     return h(
       'span',
       {
-        class: 'dice-roll'
+        class: 'dice-roll',
       },
       [
         h(
@@ -75,30 +75,30 @@ export function useDiceRoller() {
             class: {
               'dice-roll__result': true,
               'is-success': isCritical(roll, 'success'),
-              'is-failure': isCritical(roll, 'failure')
-            }
+              'is-failure': isCritical(roll, 'failure'),
+            },
           },
-          Math.max(0, Math.floor(roll.value))
+          Math.max(0, Math.floor(roll.value)),
         ),
         h(
           'span',
           {
-            class: 'dice-roll__body'
+            class: 'dice-roll__body',
           },
           label
             ? [
                 h(
                   'span',
                   {
-                    class: 'dice-roll__label'
+                    class: 'dice-roll__label',
                   },
-                  `${label}${DiceRollRenderer.getLabelSuffix(roll, type)}`
+                  `${label}${DiceRollRenderer.getLabelSuffix(roll, type)}`,
                 ),
-                rendered
+                rendered,
               ]
-            : rendered
-        )
-      ]
+            : rendered,
+        ),
+      ],
     );
   };
 
@@ -107,7 +107,7 @@ export function useDiceRoller() {
     source,
     label,
     type,
-    toastOptions
+    toastOptions,
   }: {
     roll: RollBase;
     source?: string;
@@ -121,7 +121,7 @@ export function useDiceRoller() {
       roll,
       source,
       label,
-      type
+      type,
     });
 
     if (history.isOpen.value) {
@@ -132,16 +132,16 @@ export function useDiceRoller() {
       position: POSITION.BOTTOM_RIGHT,
       timeout: 5000,
       icon: false,
-      ...toastOptions
+      ...toastOptions,
     };
 
     toast(
       getRendered({
         roll,
         label,
-        type
+        type,
       }),
-      toastOpts
+      toastOpts,
     );
   };
 
@@ -149,10 +149,10 @@ export function useDiceRoller() {
     roller,
     doRoll,
     getFormattedFormula,
-    notifyResult
+    notifyResult,
   };
 }
 
 export default {
-  useDiceRoller
+  useDiceRoller,
 };

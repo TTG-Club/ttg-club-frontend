@@ -1,3 +1,30 @@
+<script>
+  import DiceRoller from '@/shared/ui/DiceRoller.vue';
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import DetailTopBar from '@/features/DetailTopBar.vue';
+
+  export default {
+    name: 'WeaponBody',
+    components: {
+      DetailTopBar,
+      DiceRoller,
+      RawContent,
+    },
+    props: {
+      weapon: {
+        type: Object,
+        required: true,
+        default: undefined,
+      },
+      inTooltip: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  };
+</script>
+
 <template>
   <div
     v-if="weapon"
@@ -79,30 +106,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import DetailTopBar from '@/features/DetailTopBar.vue';
-
-  import DiceRoller from '@/shared/ui/DiceRoller.vue';
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  export default {
-    name: 'WeaponBody',
-    components: {
-      DetailTopBar,
-      DiceRoller,
-      RawContent
-    },
-    props: {
-      weapon: {
-        type: Object,
-        required: true,
-        default: undefined
-      },
-      inTooltip: {
-        type: Boolean,
-        default: false
-      }
-    }
-  };
-</script>

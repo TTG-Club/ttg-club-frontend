@@ -7,9 +7,9 @@ import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
 import Toast from 'vue-toastification';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api';
 import { TippyLazy } from '@/shared/directives/TippyLazy';
-import isDev from '@/shared/helpers/isDev';
+import isDev from '@/shared/utils/isDev';
 
 import App from './App.vue';
 import { TippyOptions } from './configs/TippyConfig';
@@ -24,7 +24,7 @@ import '@/assets/styles/index.scss';
 const app = createApp(App);
 const vfm = createVfm();
 
-app.config.globalProperties.$http = useAxios();
+app.config.globalProperties.$http = httpClient;
 
 app
   .use(pinia)
@@ -33,7 +33,7 @@ app
   .use(VueLazyLoad)
   .use(Toast, {
     ...ToastOptions,
-    eventBus: ToastEventBus
+    eventBus: ToastEventBus,
   })
   .use(vfm)
   .directive('tippy-lazy', TippyLazy);

@@ -1,3 +1,9 @@
+<script>
+  export default {
+    name: 'ContentDetail',
+  };
+</script>
+
 <template>
   <div class="content-detail">
     <div class="content-detail__fixed">
@@ -9,12 +15,6 @@
     </div>
   </div>
 </template>
-
-<script>
-  export default {
-    name: 'ContentDetail'
-  };
-</script>
 
 <style lang="scss" scoped>
   .content-detail {

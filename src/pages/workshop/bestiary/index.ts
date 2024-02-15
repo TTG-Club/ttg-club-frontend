@@ -6,5 +6,5 @@ export const BestiaryPage: RouteRecordRaw = {
   name: 'bestiary',
   path: '/bestiary',
   component: () => import('./BestiaryView.vue'),
-  children: [CreatureDetailPage]
+  children: [CreatureDetailPage],
 };

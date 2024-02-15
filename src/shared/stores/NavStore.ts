@@ -2,9 +2,9 @@ import { orderBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import { useAxios } from '@/shared/composables/useAxios';
-import isDev from '@/shared/helpers/isDev';
+import { httpClient } from '@/shared/api';
 import type { Maybe } from '@/shared/types/Utility';
+import isDev from '@/shared/utils/isDev';
 
 import type { RouteLocationNormalized } from 'vue-router';
 
@@ -35,7 +35,6 @@ export type TMetaInfo = {
 };
 
 export const useNavStore = defineStore('NavStore', () => {
-  const http = useAxios();
   const isShowPopover = ref(false);
   const isShowSearch = ref(false);
 
@@ -45,17 +44,17 @@ export const useNavStore = defineStore('NavStore', () => {
   const showedNavItems = computed(() =>
     orderBy(
       navItems.value
-        .filter(group => {
+        .filter((group) => {
           if (isDev) {
             return true;
           }
 
           return !group.onlyDev;
         })
-        .map(group => ({
+        .map((group) => ({
           ...group,
           children: orderBy(
-            group.children?.filter(link => {
+            group.children?.filter((link) => {
               if (isDev) {
                 return true;
               }
@@ -63,12 +62,12 @@ export const useNavStore = defineStore('NavStore', () => {
               return !link.onlyDev;
             }) || [],
             ['order'],
-            ['asc']
-          )
+            ['asc'],
+          ),
         })),
       ['order'],
-      ['asc']
-    )
+      ['asc'],
+    ),
   );
 
   const initNavItems = async () => {
@@ -77,8 +76,8 @@ export const useNavStore = defineStore('NavStore', () => {
     }
 
     try {
-      const resp = await http.get<Array<TNavItem>>({
-        url: '/menu'
+      const resp = await httpClient.get<Array<TNavItem>>({
+        url: '/menu',
       });
 
       if (resp.status === 200) {
@@ -97,7 +96,7 @@ export const useNavStore = defineStore('NavStore', () => {
   const partners = ref<TPartner[]>([]);
 
   const showedPartners = computed(() =>
-    orderBy(partners.value, ['order'], ['asc'])
+    orderBy(partners.value, ['order'], ['asc']),
   );
 
   const initPartners = async () => {
@@ -106,8 +105,8 @@ export const useNavStore = defineStore('NavStore', () => {
     }
 
     try {
-      const resp = await http.get<Array<TPartner>>({
-        url: '/partners'
+      const resp = await httpClient.get<Array<TPartner>>({
+        url: '/partners',
       });
 
       if (resp.status === 200) {
@@ -132,8 +131,8 @@ export const useNavStore = defineStore('NavStore', () => {
 
   const getMetaByURL = async (url: string) => {
     try {
-      const resp = await http.get<TMetaInfo>({
-        url: `/meta${url}`
+      const resp = await httpClient.get<TMetaInfo>({
+        url: `/meta${url}`,
       });
 
       if (resp.status === 200) {
@@ -150,7 +149,7 @@ export const useNavStore = defineStore('NavStore', () => {
 
   const getMetaTag = (name: string): HTMLMetaElement => {
     let el: HTMLMetaElement | null = document.querySelector(
-      `meta[name="${name}"]`
+      `meta[name="${name}"]`,
     );
 
     if (!el) {
@@ -179,7 +178,7 @@ export const useNavStore = defineStore('NavStore', () => {
 
   const updateMetaByURL = async (
     to: RouteLocationNormalized,
-    from: RouteLocationNormalized
+    from: RouteLocationNormalized,
   ) => {
     if (to.path === from.path) {
       return Promise.resolve();
@@ -212,6 +211,6 @@ export const useNavStore = defineStore('NavStore', () => {
 
     // Meta
     metaInfo,
-    updateMetaByURL
+    updateMetaByURL,
   };
 });

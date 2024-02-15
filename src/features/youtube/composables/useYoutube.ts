@@ -2,33 +2,33 @@ import { useScroll } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { computed, readonly, ref, unref, watch } from 'vue';
 
+import { useUIStore } from '@/shared/stores/UIStore';
+
 import { YoutubeApi } from '@/features/youtube/api';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
-
-import { useUIStore } from '@/shared/stores/UIStore';
 
 export const useYoutube = () => {
   const { bodyElement } = storeToRefs(useUIStore());
 
   const bodyScroll = useScroll(bodyElement, {
-    behavior: 'smooth'
+    behavior: 'smooth',
   });
 
   const itemsPerPage = readonly(
     ref([
       {
         name: 9,
-        value: 9
+        value: 9,
       },
       {
         name: 27,
-        value: 27
+        value: 27,
       },
       {
         name: 54,
-        value: 54
-      }
-    ])
+        value: 54,
+      },
+    ]),
   );
 
   const isLoaded = ref(false);
@@ -55,13 +55,13 @@ export const useYoutube = () => {
         order: [
           {
             field: 'created',
-            direction: 'desc'
+            direction: 'desc',
           },
           {
             field: 'name',
-            direction: 'asc'
-          }
-        ]
+            direction: 'asc',
+          },
+        ],
       });
 
       count.value = data.total;
@@ -96,7 +96,7 @@ export const useYoutube = () => {
     } catch (err) {
       return Promise.reject(err);
     } finally {
-      removeList.value = removeList.value.filter(item => item !== id);
+      removeList.value = removeList.value.filter((item) => item !== id);
     }
   };
 
@@ -106,8 +106,8 @@ export const useYoutube = () => {
       await load();
     },
     {
-      flush: 'post'
-    }
+      flush: 'post',
+    },
   );
 
   watch(size, async () => {
@@ -129,6 +129,6 @@ export const useYoutube = () => {
     pages,
     videos,
     load,
-    remove
+    remove,
   };
 };

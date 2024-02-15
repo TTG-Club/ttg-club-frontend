@@ -1,8 +1,82 @@
+<script lang="ts">
+  import { storeToRefs } from 'pinia';
+  import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  import { httpClient } from '@/shared/api';
+  import { useUserStore } from '@/shared/stores/UserStore';
+
+  import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
+
+  interface ITokenValidation {
+    correct: boolean;
+    message: string;
+  }
+
+  export default defineComponent({
+    components: {
+      PageLayout,
+      ChangePasswordView,
+    },
+    setup() {
+      const route = useRoute();
+
+      const userStore = useUserStore();
+      const { isAuthenticated } = storeToRefs(userStore);
+
+      const tokenValidation = ref<ITokenValidation>({
+        correct: true,
+        message: '',
+      });
+
+      const checkToken = async () => {
+        if (isAuthenticated.value || !route.query.token) {
+          return Promise.resolve();
+        }
+
+        try {
+          const resp = await httpClient.get<ITokenValidation>({
+            url: `/auth/token/validate?token=${route.query.token}`,
+          });
+
+          if (resp.status !== 200) {
+            tokenValidation.value = {
+              correct: false,
+              message: 'Неизвестная ошибка',
+            };
+
+            return Promise.resolve();
+          }
+
+          tokenValidation.value = resp.data;
+
+          return Promise.resolve();
+        } catch (err) {
+          tokenValidation.value = {
+            correct: false,
+            message: 'Неизвестная ошибка',
+          };
+
+          return Promise.resolve();
+        }
+      };
+
+      onBeforeMount(async () => {
+        await checkToken();
+      });
+
+      return {
+        token: computed(() => (route.query.token as string) || ''),
+        tokenValidation,
+      };
+    },
+  });
+</script>
+
 <template>
-  <page-layout
-    :show-separator="false"
-    :use-social-links="false"
-  >
+  <page-layout>
     <template #title> Сброс пароля </template>
 
     <template
@@ -20,82 +94,3 @@
     </template>
   </page-layout>
 </template>
-
-<script lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-  import { useRoute } from 'vue-router';
-
-  import PageLayout from '@/layouts/PageLayout.vue';
-
-  import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
-
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { useUserStore } from '@/shared/stores/UserStore';
-
-  interface ITokenValidation {
-    correct: boolean;
-    message: string;
-  }
-
-  export default defineComponent({
-    components: {
-      PageLayout,
-      ChangePasswordView
-    },
-    setup() {
-      const route = useRoute();
-      const http = useAxios();
-      const userStore = useUserStore();
-      const { isAuthenticated } = storeToRefs(userStore);
-
-      const tokenValidation = ref<ITokenValidation>({
-        correct: true,
-        message: ''
-      });
-
-      const checkToken = async () => {
-        if (isAuthenticated.value || !route.query.token) {
-          return Promise.resolve();
-        }
-
-        try {
-          const resp = await http.get<ITokenValidation>({
-            url: `/auth/token/validate?token=${route.query.token}`
-          });
-
-          if (resp.status !== 200) {
-            tokenValidation.value = {
-              correct: false,
-              message: 'Неизвестная ошибка'
-            };
-
-            return Promise.resolve();
-          }
-
-          tokenValidation.value = resp.data;
-
-          return Promise.resolve();
-        } catch (err) {
-          tokenValidation.value = {
-            correct: false,
-            message: 'Неизвестная ошибка'
-          };
-
-          return Promise.resolve();
-        }
-      };
-
-      onBeforeMount(async () => {
-        await checkToken();
-      });
-
-      return {
-        token: computed(() => (route.query.token as string) || ''),
-        tokenValidation
-      };
-    }
-  });
-</script>
-
-<style lang="scss" scoped></style>

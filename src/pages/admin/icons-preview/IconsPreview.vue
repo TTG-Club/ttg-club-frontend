@@ -2,22 +2,22 @@
   import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import PageLayout from '@/layouts/PageLayout.vue';
-
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import { icons } from '@/shared/utils/icons';
+
+  import PageLayout from '@/layouts/PageLayout.vue';
 
   const toast = useToast();
 
   const search = ref('');
 
   const newIcons = computed<Array<string>>(() =>
-    icons.filter(name => {
+    icons.filter((name) => {
       const regex = new RegExp(search.value, 'gi');
 
       return regex.test(name);
-    })
+    }),
   );
 
   const copyName = async (name: string) => {
@@ -32,10 +32,7 @@
 </script>
 
 <template>
-  <page-layout
-    :use-social-links="false"
-    :show-separator="false"
-  >
+  <page-layout>
     <template #title>Предпросмотр иконок</template>
 
     <template #default>

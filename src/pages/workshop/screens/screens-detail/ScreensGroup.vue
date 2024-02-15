@@ -1,3 +1,55 @@
+<script setup lang="ts">
+  import { groupBy, sortBy } from 'lodash-es';
+  import { computed } from 'vue';
+
+  import RawContent from '@/shared/ui/RawContent.vue';
+
+  import ScreenLink from '@/pages/workshop/screens/ScreenLink.vue';
+
+  defineOptions({
+    inheritAttrs: false,
+  });
+
+  const props = withDefaults(
+    defineProps<{
+      description?: '';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      childList: any[];
+    }>(),
+    {
+      description: '',
+    },
+  );
+
+  const groups = computed(() => {
+    const hasGroups = sortBy(
+      Object.values(
+        groupBy(
+          props.childList.filter((item) => item.group),
+          (o) => o.group,
+        ),
+      ).map((list) => ({
+        name: list[0].group,
+        list: sortBy(list, [(o) => o.order, (o) => o.name.rus]),
+      })),
+      [(o) => o.group],
+    );
+
+    const noGroup = props.childList.filter((item) => !item.group);
+
+    if (noGroup.length) {
+      return [
+        {
+          list: sortBy(noGroup, [(o) => o.order, (o) => o.name.rus]),
+        },
+        ...hasGroups,
+      ];
+    }
+
+    return hasGroups;
+  });
+</script>
+
 <template>
   <div
     v-if="description"
@@ -28,58 +80,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { groupBy, sortBy } from 'lodash-es';
-  import { computed } from 'vue';
-
-  import ScreenLink from '@/pages/workshop/screens/ScreenLink.vue';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
-
-  defineOptions({
-    inheritAttrs: false
-  });
-
-  const props = withDefaults(
-    defineProps<{
-      description?: '';
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      childList: any[];
-    }>(),
-    {
-      description: ''
-    }
-  );
-
-  const groups = computed(() => {
-    const hasGroups = sortBy(
-      Object.values(
-        groupBy(
-          props.childList.filter(item => item.group),
-          o => o.group
-        )
-      ).map(list => ({
-        name: list[0].group,
-        list: sortBy(list, [o => o.order, o => o.name.rus])
-      })),
-      [o => o.group]
-    );
-
-    const noGroup = props.childList.filter(item => !item.group);
-
-    if (noGroup.length) {
-      return [
-        {
-          list: sortBy(noGroup, [o => o.order, o => o.name.rus])
-        },
-        ...hasGroups
-      ];
-    }
-
-    return hasGroups;
-  });
-</script>
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;

@@ -2,7 +2,7 @@ import type { TName, TSource } from '@/shared/types/BaseApiFields';
 
 export enum ScreensFilterDefaults {
   dbName = 'screens',
-  url = '/filters/screens'
+  url = '/filters/screens',
 }
 
 export interface IScreenGroupLink {
