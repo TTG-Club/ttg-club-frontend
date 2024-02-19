@@ -1,123 +1,3 @@
-<template>
-  <span
-    :class="{
-      'ui-button': true,
-      [$style['ui-button']]: true,
-      [$style['is-full-width']]: fullWidth,
-      [$style['is-disabled']]: isDisabled
-    }"
-    @click.prevent.stop
-  >
-    <button
-      ref="button"
-      :class="{
-        [props.bodyClass]: !!props.bodyClass,
-        [$style.body]: true,
-        [$style.main]: true,
-        [$style[`type-${buttonType}`]]: true,
-        [$style[`size-${buttonSize}`]]: true,
-        [$style[`icon-${iconPosition}`]]: true,
-        [$style['with-split']]: split && $slots.dropdown,
-        [$style['no-text']]: !$slots.default,
-        [$style['is-disabled']]: isDisabled
-      }"
-      :type="nativeType"
-      :disabled="isDisabled"
-      :aria-disabled="isDisabled"
-      @click.stop="onClick"
-    >
-      <span
-        v-if="!isDisabled"
-        :class="$style.hover"
-      />
-
-      <span
-        v-if="loading"
-        :class="$style.icon"
-      >
-        <icon-loader />
-      </span>
-
-      <span
-        v-else-if="icon || !!$slots.icon"
-        :class="$style.icon"
-      >
-        <svg-icon
-          v-if="icon"
-          :icon="icon"
-        />
-
-        <slot
-          v-else
-          name="icon"
-        />
-      </span>
-
-      <span
-        v-if="$slots.default"
-        :class="$style.text"
-      >
-        <slot name="default" />
-      </span>
-
-      <span
-        v-if="!split && $slots.dropdown"
-        :class="$style.icon"
-      >
-        <svg-icon icon="arrow/filled/down-mini" />
-      </span>
-
-      <span
-        v-if="isDisabled"
-        :class="$style.disabled"
-      />
-    </button>
-
-    <button
-      v-if="split && $slots.dropdown"
-      ref="dropdownTrigger"
-      type="button"
-      :class="{
-        [$style.body]: true,
-        [$style.split]: true,
-        [$style[`type-${buttonType}`]]: true,
-        [$style[`size-${buttonSize}`]]: true,
-        [$style['is-disabled']]: isDisabled
-      }"
-      :aria-disabled="isDisabled"
-      :disabled="isDisabled"
-      @click.left.exact.prevent.stop="toggleDropdown"
-    >
-      <span
-        v-if="!isDisabled"
-        :class="$style.hover"
-      />
-
-      <span :class="$style.icon">
-        <svg-icon icon="arrow/down" />
-      </span>
-
-      <span
-        v-if="isDisabled"
-        :class="$style.disabled"
-      />
-    </button>
-
-    <transition
-      name="fade"
-      mode="out-in"
-    >
-      <span
-        v-if="$slots.dropdown && isDropdownShow"
-        ref="dropdown"
-        :class="$style.dropdown"
-      >
-        <slot name="dropdown" />
-      </span>
-    </transition>
-  </span>
-</template>
-
 <script setup lang="ts">
   import { onClickOutside } from '@vueuse/core';
   import { computed, inject, ref, useSlots, watch } from 'vue';
@@ -126,9 +6,10 @@
   import IconLoader from '@/shared/ui/icons/IconLoader.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import type {
+    TButtonType,
+    TButtonOption,
     ISharedButtonProps,
     TButtonIconPosition,
-    TButtonType
   } from '@/shared/ui/kit/button/UiButton';
   import { buttonGroupContextKey } from '@/shared/ui/kit/button/UiButton.const';
 
@@ -142,6 +23,7 @@
     loading?: boolean;
     split?: boolean;
     tooltip?: TippyOptions;
+    options?: Array<TButtonOption>;
     bodyClass?: string;
     beforeDropdownShow?: () => void;
     beforeDropdownHide?: () => void;
@@ -168,8 +50,9 @@
     nativeType: 'button',
     split: false,
     tooltip: undefined,
+    options: () => [],
     beforeDropdownShow: undefined,
-    beforeDropdownHide: undefined
+    beforeDropdownHide: undefined,
   });
 
   const button = ref<Element>();
@@ -183,17 +66,21 @@
   const groupContext = inject(buttonGroupContextKey, undefined);
 
   const buttonType = computed(
-    () => groupContext?.type || props.type || 'default'
+    () => groupContext?.type || props.type || 'default',
   );
 
   const buttonColor = computed(
-    () => `var(--btn-${groupContext?.color || props.color || 'primary'})`
+    () => `var(--btn-${groupContext?.color || props.color || 'primary'})`,
   );
 
   const buttonSize = computed(() => groupContext?.size || props.size || 'md');
 
   const isDisabled = computed(
-    () => groupContext?.disabled || props.disabled || props.loading
+    () => groupContext?.disabled || props.disabled || props.loading,
+  );
+
+  const hasDropdown = computed(
+    () => !!slots.dropdown || !!props.options.length,
   );
 
   const isDropdownShow = ref(false);
@@ -256,10 +143,10 @@
   };
 
   onClickOutside(dropdown, onDropdownHide, {
-    ignore: [dropdownTrigger]
+    ignore: [dropdownTrigger],
   });
 
-  watch(isDropdownShow, value => {
+  watch(isDropdownShow, (value) => {
     if (value) {
       emit('dropdown-show');
 
@@ -270,10 +157,152 @@
   });
 </script>
 
+<template>
+  <span
+    :class="{
+      'ui-button': true,
+      [$style['ui-button']]: true,
+      [$style['is-full-width']]: fullWidth,
+      [$style['is-disabled']]: isDisabled,
+    }"
+    @click.prevent.stop
+  >
+    <button
+      ref="button"
+      :class="{
+        [props.bodyClass]: !!props.bodyClass,
+        [$style.body]: true,
+        [$style.main]: true,
+        [$style[`type-${buttonType}`]]: true,
+        [$style[`size-${buttonSize}`]]: true,
+        [$style[`icon-${iconPosition}`]]: true,
+        [$style['with-split']]: split && hasDropdown,
+        [$style['no-text']]: !$slots.default,
+        [$style['is-disabled']]: isDisabled,
+      }"
+      :type="nativeType"
+      :disabled="isDisabled"
+      :aria-disabled="isDisabled"
+      @click.stop="onClick"
+    >
+      <span
+        v-if="!isDisabled"
+        :class="$style.hover"
+      />
+
+      <span
+        v-if="loading"
+        :class="$style.icon"
+      >
+        <icon-loader />
+      </span>
+
+      <span
+        v-else-if="icon || !!$slots.icon"
+        :class="$style.icon"
+      >
+        <svg-icon
+          v-if="icon"
+          :icon="icon"
+          size="1em"
+        />
+
+        <slot
+          v-else
+          name="icon"
+        />
+      </span>
+
+      <span
+        v-if="$slots.default"
+        :class="$style.text"
+      >
+        <slot name="default" />
+      </span>
+
+      <span
+        v-if="!split && $slots.dropdown"
+        :class="$style.icon"
+      >
+        <svg-icon
+          icon="arrow/filled/down-mini"
+          size="1em"
+        />
+      </span>
+
+      <span
+        v-if="isDisabled"
+        :class="$style.disabled"
+      />
+    </button>
+
+    <button
+      v-if="split && hasDropdown"
+      ref="dropdownTrigger"
+      type="button"
+      :class="{
+        [$style.body]: true,
+        [$style.split]: true,
+        [$style[`type-${buttonType}`]]: true,
+        [$style[`size-${buttonSize}`]]: true,
+        [$style['is-disabled']]: isDisabled,
+      }"
+      :aria-disabled="isDisabled"
+      :disabled="isDisabled"
+      @click.left.exact.prevent.stop="toggleDropdown"
+    >
+      <span
+        v-if="!isDisabled"
+        :class="$style.hover"
+      />
+
+      <span :class="$style.icon">
+        <svg-icon icon="arrow/down" />
+      </span>
+
+      <span
+        v-if="isDisabled"
+        :class="$style.disabled"
+      />
+    </button>
+
+    <transition
+      name="fade"
+      mode="out-in"
+    >
+      <span
+        v-if="$slots.dropdown && isDropdownShow"
+        ref="dropdown"
+        :class="$style.dropdown"
+      >
+        <slot name="dropdown" />
+      </span>
+
+      <span
+        v-else-if="!!options.length && isDropdownShow"
+        ref="dropdown"
+        :class="$style.dropdown"
+      >
+        <span
+          v-for="option in options"
+          :key="option.key"
+          :class="$style.option"
+          @click.left.exact.prevent="option.callback(option.key)"
+          @dblclick.prevent.stop
+        >
+          {{ option.label }}
+        </span>
+      </span>
+    </transition>
+  </span>
+</template>
+
 <style lang="scss" module>
+  @use '@/assets/styles/variables/mixins' as *;
+
   $radius: 8px;
 
-  :root {
+  html {
     --btn-primary: var(--primary);
     --btn-success: var(--success);
     --btn-error: var(--error);
@@ -304,7 +333,9 @@
   }
 
   .body {
-    @include css_anim();
+    $items: background-color, border-color;
+
+    @include css_anim($item: $items);
 
     display: flex;
     align-items: center;
@@ -459,6 +490,7 @@
     justify-content: center;
     width: 24px;
     height: 24px;
+    font-size: 24px;
     margin: -3px;
   }
 
@@ -480,5 +512,28 @@
     z-index: 1;
     max-height: calc(16px + 30px * 4); // TODO: fix (padding + 4 elements)
     overflow: auto;
+  }
+
+  .option {
+    padding: 6px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 100px;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    text-overflow: ellipsis;
+    line-height: 18px;
+    font-size: 14px;
+    display: block;
+
+    &:hover {
+      background-color: var(--hover);
+    }
+
+    & + & {
+      margin-top: 4px;
+    }
   }
 </style>

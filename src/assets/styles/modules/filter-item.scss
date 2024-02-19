@@ -1,0 +1,75 @@
+@use '@/assets/styles/variables/breakpoints' as *;
+@use '@/assets/styles/variables/mixins' as *;
+
+.filter-item {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+
+  & + & {
+    margin-top: 16px;
+  }
+
+  &__header {
+    @include css_anim();
+
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+
+    @include media-min($md) {
+      &:hover {
+        background-color: var(--hover);
+      }
+    }
+  }
+
+  &__trigger {
+    width: 100%;
+    display: flex;
+    flex: 1;
+  }
+
+  &__name {
+    color: var(--text-color-title);
+    font-weight: 500;
+    flex: 1;
+    padding: 10px 12px;
+    font-size: var(--h5-font-size);
+    line-height: var(--h5-line-height);
+  }
+
+  &__button {
+    @include css_anim();
+
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    color: var(--text-color);
+
+    @include media-min($md) {
+      &:hover {
+        @include css_anim();
+
+        color: var(--text-btn-color);
+        background-color: var(--primary-hover);
+      }
+    }
+  }
+
+  &__body {
+    padding: 4px 12px 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    &.is-toggle {
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+  }
+}

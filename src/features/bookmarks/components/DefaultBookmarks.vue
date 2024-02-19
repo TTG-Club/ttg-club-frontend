@@ -1,3 +1,16 @@
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
+
+  const bookmarksStore = useDefaultBookmarkStore();
+
+  const { getGroupBookmarks } = storeToRefs(bookmarksStore);
+  const isExternal = (url: string) => url.startsWith('http');
+</script>
+
 <template>
   <div class="bookmarks is-default">
     <div class="bookmarks__header">
@@ -6,7 +19,7 @@
 
         <a
           v-tippy="{
-            content: 'Больше возможностей.'
+            content: 'Больше возможностей.',
           }"
           class="bookmarks__info--info"
           href="/info/bookmarks"
@@ -89,18 +102,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-
-  import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  const bookmarksStore = useDefaultBookmarkStore();
-  const { getGroupBookmarks } = storeToRefs(bookmarksStore);
-  const isExternal = (url: string) => url.startsWith('http');
-</script>
 
 <style lang="scss" scoped>
   .bookmarks {

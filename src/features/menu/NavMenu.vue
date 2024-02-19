@@ -1,3 +1,63 @@
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+  import { ref, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import type { TNavItem } from '@/shared/stores/NavStore';
+  import { useNavStore } from '@/shared/stores/NavStore';
+  import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
+
+  import NavPopover from '@/features/menu/NavPopover.vue';
+
+  const navStore = useNavStore();
+  const { showedNavItems } = storeToRefs(navStore);
+  const router = useRouter();
+  const route = useRoute();
+  const isShowMenu = ref(false);
+
+  const isRouteExist = (link: TNavItem) => {
+    if (!link.url) {
+      return false;
+    }
+
+    if (link.external || link.url.startsWith('http')) {
+      return false;
+    }
+
+    const currentResolved = router.resolve(route.path);
+
+    if (!currentResolved.name) {
+      return false;
+    }
+
+    if (!router.hasRoute(currentResolved.name)) {
+      return false;
+    }
+
+    const resolved = router.resolve(link.url);
+
+    if (!resolved.name) {
+      return false;
+    }
+
+    return router.hasRoute(resolved.name);
+  };
+
+  watch(
+    isShowMenu,
+    async (value) => {
+      if (value) {
+        await navStore.initNavItems();
+      }
+    },
+    {
+      immediate: true,
+    },
+  );
+</script>
+
 <template>
   <nav-popover
     v-model="isShowMenu"
@@ -107,7 +167,7 @@
                 hide-label
                 transparent
                 social-name="discord"
-                url="https://discord.gg/zqBnMJVf3z"
+                url="https://discord.gg/JqFKMKRtxv"
               />
 
               <ui-social-button
@@ -144,67 +204,10 @@
   </nav-popover>
 </template>
 
-<script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { ref, watch } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-
-  import NavPopover from '@/features/menu/NavPopover.vue';
-
-  import type { TNavItem } from '@/shared/stores/NavStore';
-  import { useNavStore } from '@/shared/stores/NavStore';
-  import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
-
-  const navStore = useNavStore();
-  const { showedNavItems } = storeToRefs(navStore);
-  const router = useRouter();
-  const route = useRoute();
-  const isShowMenu = ref(false);
-
-  const isRouteExist = (link: TNavItem) => {
-    if (!link.url) {
-      return false;
-    }
-
-    if (link.external || link.url.startsWith('http')) {
-      return false;
-    }
-
-    const currentResolved = router.resolve(route.path);
-
-    if (!currentResolved.name) {
-      return false;
-    }
-
-    if (!router.hasRoute(currentResolved.name)) {
-      return false;
-    }
-
-    const resolved = router.resolve(link.url);
-
-    if (!resolved.name) {
-      return false;
-    }
-
-    return router.hasRoute(resolved.name);
-  };
-
-  watch(
-    isShowMenu,
-    async value => {
-      if (value) {
-        await navStore.initNavItems();
-      }
-    },
-    {
-      immediate: true
-    }
-  );
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .nav-menu {
     padding: 4px 0;
 

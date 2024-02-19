@@ -1,7 +1,3 @@
-<template>
-  <render />
-</template>
-
 <script lang="ts" setup>
   import {
     computed,
@@ -9,10 +5,10 @@
     h,
     onBeforeUnmount,
     ref,
-    watch
+    watch,
   } from 'vue';
 
-  import { useAxios } from '@/shared/compositions/useAxios';
+  import { httpClient } from '@/shared/api';
 
   const props = withDefaults(
     defineProps<{
@@ -23,13 +19,12 @@
     {
       template: undefined,
       url: undefined,
-      tag: 'div'
-    }
+      tag: 'div',
+    },
   );
 
   const emit = defineEmits(['loaded', 'before-unmount']);
 
-  const http = useAxios();
   const templateString = ref<string | null>(null);
   const error = ref(false);
   const loading = ref(true);
@@ -46,11 +41,11 @@
       templateString.value = props.template || '';
 
       if (!templateString.value && !props.template) {
-        const { data } = await http.rawGet({
-          url: props.url
+        const { data } = await httpClient.rawGet({
+          url: props.url,
         });
 
-        templateString.value = data as string;
+        templateString.value = data;
       }
 
       loading.value = false;
@@ -81,9 +76,9 @@
           mounted() {
             emit('loaded');
           },
-          template: templateString.value as string
-        })
-      )
+          template: templateString.value,
+        }),
+      ),
     );
   });
 
@@ -93,11 +88,15 @@
       await updateTemplate();
     },
     {
-      immediate: true
-    }
+      immediate: true,
+    },
   );
 
   onBeforeUnmount(() => {
     emit('before-unmount');
   });
 </script>
+
+<template>
+  <render />
+</template>

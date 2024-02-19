@@ -1,3 +1,36 @@
+<script>
+  import { defineComponent } from 'vue';
+
+  export default defineComponent({
+    props: {
+      modelValue: {
+        type: Boolean,
+        default: false,
+      },
+      type: {
+        type: String,
+        default: 'crumb',
+        validator: (value) => ['crumb', 'toggle'].includes(value),
+      },
+      tooltip: {
+        type: String,
+        default: '',
+      },
+    },
+    emits: ['update:model-value'],
+    computed: {
+      value: {
+        get() {
+          return this.modelValue;
+        },
+        set(value) {
+          this.$emit('update:model-value', value);
+        },
+      },
+    },
+  });
+</script>
+
 <template>
   <div
     v-if="type === 'crumb'"
@@ -28,40 +61,10 @@
   </div>
 </template>
 
-<script>
-  import { defineComponent } from 'vue';
-
-  export default defineComponent({
-    props: {
-      modelValue: {
-        type: Boolean,
-        default: false
-      },
-      type: {
-        type: String,
-        default: 'crumb',
-        validator: value => ['crumb', 'toggle'].includes(value)
-      },
-      tooltip: {
-        type: String,
-        default: ''
-      }
-    },
-    emits: ['update:model-value'],
-    computed: {
-      value: {
-        get() {
-          return this.modelValue;
-        },
-        set(value) {
-          this.$emit('update:model-value', value);
-        }
-      }
-    }
-  });
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ui-checkbox {
     cursor: pointer;
 
@@ -74,7 +77,7 @@
           @include css_anim();
 
           display: inline-block;
-          padding: 6px 10px;
+          padding: 4px 8px;
           border-radius: 16px;
           background-color: var(--hover);
           color: var(--text-color);

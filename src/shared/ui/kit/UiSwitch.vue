@@ -1,38 +1,3 @@
-<template>
-  <div
-    :class="{
-      'ui-switch': true,
-      [$style['ui-switch']]: true,
-      [$style['is-full-width']]: fullWidth
-    }"
-  >
-    <button
-      v-for="(option, index) in options"
-      :key="`${option[trackBy]}_${index}`"
-      :class="{
-        [$style.option]: true,
-        [$style['is-active']]: selected?.[trackBy] === option[trackBy]
-      }"
-      type="button"
-      @click.left.exact.prevent="selected = option"
-    >
-      <span :class="$style.hover" />
-
-      <span
-        v-if="!$slots.option"
-        :class="$style.text"
-        >{{ option[label] }}</span
-      >
-
-      <slot
-        v-else
-        name="option"
-        :option="option"
-      />
-    </button>
-  </div>
-</template>
-
 <script
   setup
   lang="ts"
@@ -55,8 +20,8 @@
       trackBy: 'id',
       label: 'name',
       preSelectFirst: false,
-      fullWidth: false
-    }
+      fullWidth: false,
+    },
   );
 
   const selected = useVModel(props, 'modelValue');
@@ -68,7 +33,45 @@
   });
 </script>
 
+<template>
+  <div
+    :class="{
+      'ui-switch': true,
+      [$style['ui-switch']]: true,
+      [$style['is-full-width']]: fullWidth,
+    }"
+  >
+    <button
+      v-for="(option, index) in options"
+      :key="`${option[trackBy]}_${index}`"
+      :class="{
+        [$style.option]: true,
+        [$style['is-active']]: selected?.[trackBy] === option[trackBy],
+      }"
+      type="button"
+      @click.left.exact.prevent="selected = option"
+    >
+      <span :class="$style.hover" />
+
+      <span
+        v-if="!$slots.option"
+        :class="$style.text"
+        >{{ option[label] }}</span
+      >
+
+      <slot
+        v-else
+        name="option"
+        :option="option"
+      />
+    </button>
+  </div>
+</template>
+
 <style lang="scss" module>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   $radius: 8px;
 
   .ui-switch {

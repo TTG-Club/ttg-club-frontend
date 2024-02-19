@@ -1,0 +1,28 @@
+.DS_Store
+
+# Generated files and dirs
+node_modules
+/dist
+/public_html
+package-lock.json
+.eslintcache
+
+# Local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.fleet
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

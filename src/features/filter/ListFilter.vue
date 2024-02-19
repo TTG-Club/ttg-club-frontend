@@ -1,3 +1,134 @@
+<script setup lang="ts">
+  import { useDebounceFn } from '@vueuse/core';
+  import { cloneDeep } from 'lodash-es';
+  import { computed, ref } from 'vue';
+
+  import type {
+    Filter,
+    FilterComposable,
+    FilterGroup,
+    FilterItem,
+  } from '@/shared/composables/useFilter';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
+
+  import FilterItemCheckboxes from '@/features/filter/FilterItem/FilterItemCheckboxes.vue';
+  import FilterItemSources from '@/features/filter/FilterItem/FilterItemSources.vue';
+
+  import type { PropType } from 'vue';
+
+  const props = defineProps({
+    filterInstance: {
+      type: Object as PropType<FilterComposable>,
+      required: true,
+    },
+    inTab: {
+      type: Boolean,
+      default: false,
+    },
+  });
+
+  const emit = defineEmits(['search', 'update']);
+
+  const showed = ref(false);
+
+  const emitSearch = useDebounceFn((value) => {
+    emit('search', value);
+  }, 500);
+
+  const emitFilter = useDebounceFn(() => {
+    emit('update');
+  }, 500);
+
+  const search = computed({
+    get() {
+      return props.filterInstance.search.value.value;
+    },
+    set(value: string) {
+      emitSearch(props.filterInstance.search.updateSearch(value));
+    },
+  });
+
+  const filter = computed<Filter | Array<FilterGroup> | undefined>({
+    get: () => props.filterInstance.filter.value,
+    set: async (value) => {
+      try {
+        if (!value) {
+          return;
+        }
+
+        await props.filterInstance.saveFilter(value);
+
+        await emitFilter();
+      } catch (err) {
+        errorHandler(err);
+      }
+    },
+  });
+
+  const otherFilters = computed({
+    get(): Array<FilterGroup> {
+      if (Array.isArray(filter.value)) {
+        return filter.value;
+      }
+
+      return filter.value?.other || [];
+    },
+
+    set(value: Array<FilterGroup>) {
+      if (Array.isArray(filter.value)) {
+        filter.value = value;
+
+        return;
+      }
+
+      if (filter.value?.other) {
+        filter.value = {
+          ...filter.value,
+          other: value as Array<FilterGroup>,
+        };
+      }
+    },
+  });
+
+  const otherFiltered = computed(() =>
+    otherFilters.value.filter((group: FilterGroup) => !group.hidden),
+  );
+
+  const isFilterCustomized = computed(
+    () => props.filterInstance.isCustomized.value,
+  );
+
+  const setSourcesValue = (value: Array<FilterGroup>) => {
+    if (!filter.value || Array.isArray(filter.value)) {
+      return;
+    }
+
+    filter.value = {
+      ...filter.value,
+      sources: value,
+    };
+  };
+
+  const setOtherValue = (value: Array<FilterItem>, key: string) => {
+    const otherFiltersCopy = cloneDeep(otherFilters.value);
+    const index = otherFiltersCopy.findIndex((group) => group.key === key);
+
+    if (index > -1) {
+      otherFiltersCopy[index].values = value;
+
+      otherFilters.value = otherFiltersCopy;
+    }
+  };
+
+  const resetFilter = async () => {
+    await props.filterInstance.resetFilter();
+    await emitFilter();
+  };
+</script>
+
 <template>
   <div
     :class="{ 'in-tab': inTab }"
@@ -85,138 +216,10 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import { useDebounceFn } from '@vueuse/core';
-  import { cloneDeep } from 'lodash-es';
-  import { computed, ref } from 'vue';
-
-  import FilterItemCheckboxes from '@/features/filter/FilterItem/FilterItemCheckboxes.vue';
-  import FilterItemSources from '@/features/filter/FilterItem/FilterItemSources.vue';
-
-  import type {
-    Filter,
-    FilterComposable,
-    FilterGroup,
-    FilterItem
-  } from '@/shared/compositions/useFilter';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import BaseModal from '@/shared/ui/modals/BaseModal.vue';
-
-  import type { PropType } from 'vue';
-
-  const props = defineProps({
-    filterInstance: {
-      type: Object as PropType<FilterComposable>,
-      required: true
-    },
-    inTab: {
-      type: Boolean,
-      default: false
-    }
-  });
-
-  const emit = defineEmits(['search', 'update']);
-
-  const showed = ref(false);
-
-  const emitSearch = useDebounceFn(value => {
-    emit('search', value);
-  }, 500);
-
-  const emitFilter = useDebounceFn(() => {
-    emit('update');
-  }, 500);
-
-  const search = computed({
-    get() {
-      return props.filterInstance.search.value.value;
-    },
-    set(value: string) {
-      emitSearch(props.filterInstance.search.updateSearch(value));
-    }
-  });
-
-  const filter = computed<Filter | Array<FilterGroup> | undefined>({
-    get: () => props.filterInstance.filter.value,
-    set: async value => {
-      try {
-        if (!value) {
-          return;
-        }
-
-        await props.filterInstance.saveFilter(value);
-
-        await emitFilter();
-      } catch (err) {
-        errorHandler(err);
-      }
-    }
-  });
-
-  const otherFilters = computed({
-    get(): Array<FilterGroup> {
-      if (Array.isArray(filter.value)) {
-        return filter.value;
-      }
-
-      return filter.value?.other || [];
-    },
-
-    set(value: Array<FilterGroup>) {
-      if (Array.isArray(filter.value)) {
-        filter.value = value;
-
-        return;
-      }
-
-      if (filter.value?.other) {
-        filter.value = {
-          ...filter.value,
-          other: value as Array<FilterGroup>
-        };
-      }
-    }
-  });
-
-  const otherFiltered = computed(() =>
-    otherFilters.value.filter((group: FilterGroup) => !group.hidden)
-  );
-
-  const isFilterCustomized = computed(
-    () => props.filterInstance.isCustomized.value
-  );
-
-  const setSourcesValue = (value: Array<FilterGroup>) => {
-    if (!filter.value || Array.isArray(filter.value)) {
-      return;
-    }
-
-    filter.value = {
-      ...filter.value,
-      sources: value
-    };
-  };
-
-  const setOtherValue = (value: Array<FilterItem>, key: string) => {
-    const otherFiltersCopy = cloneDeep(otherFilters.value);
-    const index = otherFiltersCopy.findIndex(group => group.key === key);
-
-    if (index > -1) {
-      otherFiltersCopy[index].values = value;
-
-      otherFilters.value = otherFiltersCopy;
-    }
-  };
-
-  const resetFilter = async () => {
-    await props.filterInstance.resetFilter();
-    await emitFilter();
-  };
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .filter {
     position: relative;
 
@@ -276,20 +279,16 @@
       padding: 6px 8px;
       border-left: 1px solid var(--border);
       background-color: var(--primary);
+      color: var(--text-btn-color);
 
       svg {
         @include css_anim();
-
-        width: 24px;
-        height: 24px;
-        color: var(--text-btn-color);
       }
 
       span {
         @include css_anim();
 
         margin-left: 4px;
-        color: var(--text-btn-color);
       }
 
       &.is-active {

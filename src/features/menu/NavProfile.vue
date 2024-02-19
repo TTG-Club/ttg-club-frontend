@@ -1,3 +1,132 @@
+<script setup lang="ts">
+  import { storeToRefs } from 'pinia';
+  import { computed, ref } from 'vue';
+
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import AuthModal from '@/shared/ui/modals/AuthModal.vue';
+
+  import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
+  import LoginView from '@/features/account/LoginView.vue';
+  import RegistrationView from '@/features/account/RegistrationView.vue';
+  import NavPopover from '@/features/menu/NavPopover.vue';
+
+  const userStore = useUserStore();
+
+  const { isAuthenticated, user } = storeToRefs(userStore);
+
+  const popover = ref(false);
+  const modal = ref('');
+
+  const modals = computed(() => [
+    {
+      rus: 'Авторизация',
+      eng: 'login',
+      component: () => LoginView,
+    },
+    {
+      rus: 'Регистрация',
+      eng: 'reg',
+      component: () => RegistrationView,
+    },
+    {
+      rus: `${isAuthenticated.value ? 'Изменение' : 'Восстановление'} пароля`,
+      eng: 'change-password',
+      component: () => ChangePasswordView,
+    },
+  ]);
+
+  const modalInfo = computed(() =>
+    modals.value.find((item) => item.eng === modal.value),
+  );
+
+  const modalComponent = computed(() => modalInfo.value?.component());
+
+  const isModalOpened = computed({
+    get: () => !!modal.value,
+    set: (e) => {
+      modal.value = typeof e === 'string' ? e : '';
+    },
+  });
+
+  const greeting = computed(() => {
+    const hours = new Date().getHours();
+
+    if (hours < 6) {
+      return 'Доброй ночи';
+    }
+
+    if (hours < 12) {
+      return 'Доброе утро';
+    }
+
+    if (hours < 18) {
+      return 'Добрый день';
+    }
+
+    return 'Добрый вечер';
+  });
+
+  const hasAccessToProfile = computed(
+    () =>
+      user.value?.roles.includes(EUserRoles.MODERATOR) ||
+      user.value?.roles.includes(EUserRoles.ADMIN),
+  );
+
+  function openPopover() {
+    popover.value = true;
+  }
+
+  function closePopover() {
+    popover.value = false;
+  }
+
+  function togglePopover() {
+    if (!popover.value) {
+      openPopover();
+
+      return;
+    }
+
+    closePopover();
+  }
+
+  function openModal(name = 'login') {
+    modal.value = name;
+  }
+
+  function closeModal() {
+    modal.value = '';
+  }
+
+  function toggleModal() {
+    if (!modal.value) {
+      openModal();
+
+      return;
+    }
+
+    closeModal();
+  }
+
+  async function clickHandler() {
+    if (!(await userStore.getUserStatus())) {
+      toggleModal();
+
+      return;
+    }
+
+    togglePopover();
+  }
+
+  async function userLogout() {
+    closeModal();
+    closePopover();
+
+    await userStore.logout();
+  }
+</script>
+
 <template>
   <nav-popover v-model="popover">
     <template #trigger="{ isActive }">
@@ -18,8 +147,18 @@
         class="nav-profile"
       >
         <div class="nav-profile__line is-main">
-          <span class="nav-profile__line_body">
+          <span
+            v-if="user"
+            class="nav-profile__line_body"
+          >
             {{ greeting }}, <b>{{ user.username }}</b>
+          </span>
+
+          <span
+            v-else
+            class="nav-profile__line_body"
+          >
+            {{ greeting }}
           </span>
         </div>
 
@@ -77,163 +216,9 @@
   </auth-modal>
 </template>
 
-<script>
-  import { storeToRefs } from 'pinia';
-  import { computed, ref } from 'vue';
-
-  import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
-  import LoginView from '@/features/account/LoginView.vue';
-  import RegistrationView from '@/features/account/RegistrationView.vue';
-  import NavPopover from '@/features/menu/NavPopover.vue';
-
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore.ts';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import AuthModal from '@/shared/ui/modals/AuthModal.vue';
-
-  export default {
-    name: 'NavProfile',
-    components: {
-      NavPopover,
-      AuthModal,
-      SvgIcon
-    },
-    setup() {
-      const userStore = useUserStore();
-
-      const { isAuthenticated, user } = storeToRefs(userStore);
-
-      const popover = ref(false);
-      const modal = ref('');
-
-      const modals = computed(() => [
-        {
-          rus: 'Авторизация',
-          eng: 'login',
-          component: () => LoginView
-        },
-        {
-          rus: 'Регистрация',
-          eng: 'reg',
-          component: () => RegistrationView
-        },
-        {
-          rus: `${
-            isAuthenticated.value ? 'Изменение' : 'Восстановление'
-          } пароля`,
-          eng: 'change-password',
-          component: () => ChangePasswordView
-        }
-      ]);
-
-      const modalInfo = computed(() =>
-        modals.value.find(item => item.eng === modal.value)
-      );
-
-      const modalComponent = computed(() => modalInfo.value?.component());
-
-      const isModalOpened = computed({
-        get: () => !!modal.value,
-        set: e => {
-          modal.value = typeof e === 'string' ? e : false;
-        }
-      });
-
-      const greeting = computed(() => {
-        const hours = new Date().getHours();
-
-        if (hours < 6) {
-          return 'Доброй ночи';
-        }
-
-        if (hours < 12) {
-          return 'Доброе утро';
-        }
-
-        if (hours < 18) {
-          return 'Добрый день';
-        }
-
-        return 'Добрый вечер';
-      });
-
-      const hasAccessToProfile = computed(
-        () =>
-          user.value.roles.includes(EUserRoles.MODERATOR) ||
-          user.value.roles.includes(EUserRoles.ADMIN)
-      );
-
-      function openPopover() {
-        popover.value = true;
-      }
-
-      function closePopover() {
-        popover.value = false;
-      }
-
-      function togglePopover() {
-        if (!popover.value) {
-          openPopover();
-
-          return;
-        }
-
-        closePopover();
-      }
-
-      function openModal(name = 'login') {
-        modal.value = name;
-      }
-
-      function closeModal() {
-        modal.value = '';
-      }
-
-      function toggleModal() {
-        if (!modal.value) {
-          openModal();
-
-          return;
-        }
-
-        closeModal();
-      }
-
-      async function clickHandler() {
-        if (!(await userStore.getUserStatus())) {
-          toggleModal();
-
-          return;
-        }
-
-        togglePopover();
-      }
-
-      async function userLogout() {
-        closeModal();
-        closePopover();
-
-        await userStore.logout();
-      }
-
-      return {
-        hasAccessToProfile,
-        isAuthenticated,
-        isModalOpened,
-        greeting,
-        user,
-        popover,
-        userLogout,
-        clickHandler,
-        closeModal,
-        modal,
-        modalInfo,
-        modalComponent
-      };
-    }
-  };
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/mixins' as *;
+
   .nav-profile {
     width: 100vw;
     max-width: 260px;
@@ -270,10 +255,6 @@
       &:hover {
         background-color: var(--bg-sub-menu);
       }
-    }
-
-    @media (max-width: 600px) {
-      max-width: 100%;
     }
   }
 </style>

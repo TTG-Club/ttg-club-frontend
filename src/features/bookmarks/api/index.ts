@@ -1,38 +1,34 @@
 import { cloneDeep } from 'lodash-es';
 
+import { httpClient } from '@/shared/api';
+import type { Maybe } from '@/shared/types/Utility';
+
 import type {
   IBookmarkCategoryInfo,
   TBookmark,
-  TQueryAddBookmark
+  TQueryAddBookmark,
 } from '@/features/bookmarks/types/Bookmark.d';
-
-import { useAxios } from '@/shared/compositions/useAxios';
-import type { Maybe } from '@/shared/types/Utility';
 
 export default class BookmarksApi {
   static getCategoryByURL(url: string) {
-    const http = useAxios();
-
-    return http.get<Maybe<IBookmarkCategoryInfo>>({
+    return httpClient.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
       payload: {
-        url: encodeURIComponent(url)
-      }
+        url: encodeURIComponent(url),
+      },
     });
   }
 
   static getCategoryByCode(code: string) {
-    const http = useAxios();
-
-    return http.get<Maybe<IBookmarkCategoryInfo>>({
+    return httpClient.get<Maybe<IBookmarkCategoryInfo>>({
       url: '/bookmarks/category',
-      payload: { code }
+      payload: { code },
     });
   }
 
   static getCategory({
     code,
-    url
+    url,
   }: {
     code?: Maybe<string>;
     url?: Maybe<string>;
@@ -49,44 +45,34 @@ export default class BookmarksApi {
   }
 
   static getCategories() {
-    const http = useAxios();
-
-    return http.get<Array<IBookmarkCategoryInfo>>({
-      url: '/bookmarks/categories'
+    return httpClient.get<Array<IBookmarkCategoryInfo>>({
+      url: '/bookmarks/categories',
     });
   }
 
   static getBookmarks() {
-    const http = useAxios();
-
-    return http.get<Array<TBookmark>>({
-      url: '/bookmarks'
+    return httpClient.get<Array<TBookmark>>({
+      url: '/bookmarks',
     });
   }
 
   static addBookmark<T>(payload: TQueryAddBookmark) {
-    const http = useAxios();
-
-    return http.post<T>({
+    return httpClient.post<T>({
       url: '/bookmarks',
-      payload: cloneDeep(payload)
+      payload: cloneDeep(payload),
     });
   }
 
   static updateBookmark(payload: TBookmark) {
-    const http = useAxios();
-
-    return http.put({
+    return httpClient.put({
       url: '/bookmarks',
-      payload: cloneDeep(payload)
+      payload: cloneDeep(payload),
     });
   }
 
   static deleteBookmark(uuid: TBookmark['uuid']) {
-    const http = useAxios();
-
-    return http.delete({
-      url: `/bookmarks/${uuid}`
+    return httpClient.delete({
+      url: `/bookmarks/${uuid}`,
     });
   }
 }

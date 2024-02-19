@@ -7,24 +7,19 @@
     "composite": true,
     "declaration": true,
     "downlevelIteration": true,
-    "esModuleInterop": true,
     "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
     "importsNotUsedAsValues": "remove",
     "incremental": false,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "module": "esnext",
-    "moduleResolution": "node",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "outDir": "./dist/",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "plugins": [
       {
@@ -35,21 +30,27 @@
     "preserveValueImports": false,
     "pretty": true,
     "removeComments": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "esnext",
-    "typeRoots": ["./vite-env.d.ts", "./node_modules/@types", "./node_modules"],
-    "types": ["node", "vite/client", "vite-plugin-svg-icons/client.d.ts"],
-    "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true
+    "typeRoots": [
+      "./vite-env.d.ts",
+      "./node_modules/@types",
+      "./node_modules"
+    ],
+    "types": [
+      "node",
+      "vite/client",
+      "vite-plugin-svg-icons/client.d.ts"
+    ]
   },
-  "exclude": ["node_modules", "dist"],
-  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [
     "vite.config.*",
     "src/**/*",

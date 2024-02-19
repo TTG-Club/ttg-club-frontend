@@ -4,6 +4,20 @@
   color: var(--primary);
 }
 
+.custom_link {
+  color: var(--text-btn-color);
+  background-color: var(--primary);
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: inline-block;
+
+  &:hover {
+    border: 0;
+    background-color: var(--primary-hover);
+    color: var(--text-btn-color);
+  }
+}
+
 .video-container {
   overflow: hidden;
   position: relative;
@@ -100,13 +114,12 @@
     display: flex;
     flex-wrap: wrap;
     padding: 0;
-    margin: 8px 0 0 0;
-    gap: 16px;
+    margin: 16px 0 0 0;
+    gap: 12px;
 
     .card {
       flex: 1 1 15%;
       min-width: 15%;
-      margin: 8px 0 0 0;
       background-color: var(--bg-secondary);
       border-radius: 12px;
       display: grid;
@@ -129,7 +142,7 @@
         display: block;
         position: absolute;
         width: 220px;
-        height: 56px;
+        height: 52px;
         right: 0;
         background-image: url(/img/bg_main_page_button_nav_3.png);
         background-position: 0 0;
@@ -172,22 +185,17 @@
 
         h4 {
           color: var(--text-color-title);
-          font-size: calc(var(--h4-font-size) - 8px);
+          font-size: var(--h5-font-size);
           line-height: 16px;
           font-family: 'Open Sans';
-          font-weight: 600;
+          font-weight: 500;
           margin-right: 50%;
           margin-top: 0;
           margin-bottom: 0;
-
-          @media (max-width: 800px) {
-            font-size: calc(var(--h4-font-size) - 6px);
-          }
         }
       }
 
       @media (max-width: 1200px) {
-        margin: 16px 0 0 0;
         height: 48px;
       }
 
@@ -213,50 +221,51 @@
   }
 
   .main-page-blocks {
-    margin-top: 32px;
+    margin-top: 24px;
+    margin-bottom: 16px;
 
     .row {
       display: flex;
       flex-direction: row;
-      gap: 16px;
+      gap: 12px;
 
       @include media-max($lg) {
         flex-direction: column;
-      }
-
-      &.reverse {
-        @include media-max($lg) {
-          flex-direction: column-reverse;
-        }
       }
     }
 
     .column {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       flex: 1 0;
 
       &.youtube-block {
-        flex: 0 0 calc(33% - 10px);
+        flex: 0 0 calc(33% - 4px);
         height: fit-content;
+        border: 1px solid var(--border);
+        border-radius: 12px;
       }
     }
 
     .block {
       display: flex;
       flex-direction: row;
-      padding: 16px 16px 0 16px;
+      padding: 0 16px 0 16px;
       background-color: var(--bg-table-list);
       border-radius: 12px;
       width: 100%;
       position: relative;
       overflow: hidden;
+      min-height: 100px;
+      height: 100%;
 
       .info {
         z-index: 1;
         display: flex;
         flex-direction: column;
+        justify-content: flex-end;
+        padding-bottom: 4px;
 
         h4 {
           margin-top: 0;
@@ -264,34 +273,12 @@
           font-weight: 500;
         }
 
-        .bottom {
-          margin-top: auto;
-        }
-
-        a {
-          margin-right: 8px;
-          margin-bottom: 16px;
-          display: inline-block;
-          background-color: var(--hover);
-          color: var(--text-color);
-          padding: 6px 8px;
-          border-radius: 8px;
-          border: 1px solid var(--border);
-
-          &.main {
-            background-color: var(--primary);
-            color: var(--text-btn-color);
-          }
-
-          &:hover {
-            background-color: var(--primary-hover);
-            color: var(--text-btn-color);
-            transition: all 0.5s;
-          }
+        p {
+          margin-bottom: 0;
         }
       }
 
-      .bg_img {
+      &:before {
         transition: transform 0.6s;
         background-position: 50%;
         background-size: cover;
@@ -301,6 +288,14 @@
         height: 100%;
         top: 0;
         left: 0;
+        content: '';
+      }
+
+      &:hover {
+        &::before {
+          transition: transform 0.6s;
+          transform: scale(1.15);
+        }
       }
 
       &:after {
@@ -321,18 +316,20 @@
     }
 
     .dnd5club_tel_bot {
-      min-height: 124px;
-
-      .bg_img {
+      &:before {
         background-image: url(/img/bg_telegram_bot.webp?v=2);
       }
     }
 
     .discord_bot {
-      height: 100%;
-
-      .bg_img {
+      &:before {
         background-image: url(/img/bg_discord_bot.webp?v=2);
+      }
+    }
+
+    .token_library {
+      &:before {
+        background-image: url(/img/bg_token_library.webp?v=1);
       }
     }
   }
@@ -342,6 +339,7 @@
   background: var(--bg-secondary);
   padding: 16px;
   border-radius: 12px;
+  border: 1px solid var(--border);
 
   h3 {
     font-size: calc(var(--h3-font-size) - 12px);
@@ -492,6 +490,10 @@
   p {
     margin-bottom: 6px;
   }
+
+  @include media-max($sm) {
+    min-height: 120px;
+  }
 }
 
 .bestiary {
@@ -541,7 +543,6 @@
     }
 
     @media (max-width: 1200px) {
-      // max-width: calc(16% - 8px);
       flex: 1 0 calc(16% - 8px);
     }
 
@@ -553,11 +554,6 @@
     @media (max-width: 600px) {
       max-width: calc(50% - 8px);
       flex: 1 0 calc(50% - 8px);
-    }
-
-    @media (max-width: 360px) {
-      max-width: calc(100% - 8px);
-      flex: 1 0 calc(100% - 8px);
     }
   }
 }

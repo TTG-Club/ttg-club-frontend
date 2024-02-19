@@ -1,3 +1,20 @@
+<script setup lang="ts">
+  import type { TSource } from '@/shared/types/BaseApiFields';
+
+  withDefaults(
+    defineProps<{
+      left?: string;
+      source?: TSource;
+      bgGrey?: boolean;
+    }>(),
+    {
+      left: '',
+      source: undefined,
+      bgGrey: true,
+    },
+  );
+</script>
+
 <template>
   <div
     :class="{ bg_grey: bgGrey }"
@@ -29,7 +46,7 @@
         >Homebrew</span
       >
 
-      <span v-tippy="{ content: source.name }"
+      <span v-tippy="{ content: source.name, touch: true }"
         >&nbsp;{{ source.shortName }}</span
       >
     </span>
@@ -43,24 +60,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
-  import type { TSource } from '@/shared/types/BaseApiFields';
-
-  withDefaults(
-    defineProps<{
-      left?: string;
-      source?: TSource;
-      bgGrey?: boolean;
-    }>(),
-    {
-      left: '',
-      source: undefined,
-      bgGrey: true
-    }
-  );
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .row_info {
     display: flex;
     padding: 12px;

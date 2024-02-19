@@ -1,5 +1,4 @@
-import { useAxios } from '@/shared/compositions/useAxios';
-import { errorHandler } from '@/shared/helpers/errorHandler';
+import { errorHandler } from '@/shared/utils/errorHandler';
 
 import type { DefaultProps } from 'tippy.js';
 import type { TippyPluginOptions } from 'vue-tippy';
@@ -44,14 +43,12 @@ export const DefaultTippyProps: DefaultProps = {
       return canShow;
     }
 
-    const http = useAxios();
-
     if (attr) {
       http
         .rawGet({
-          url: attr
+          url: attr,
         })
-        .then(res => {
+        .then((res) => {
           if (res.status !== 200) {
             errorHandler(res.statusText);
 
@@ -62,7 +59,7 @@ export const DefaultTippyProps: DefaultProps = {
 
           canShow = true;
         })
-        .catch(err => {
+        .catch((err) => {
           errorHandler(err);
 
           canShow = false;
@@ -70,14 +67,14 @@ export const DefaultTippyProps: DefaultProps = {
     }
 
     return canShow;
-  }
+  },
 };
 
 export const TippyOptions: TippyPluginOptions = {
-  defaultProps: DefaultTippyProps
+  defaultProps: DefaultTippyProps,
 };
 
 export default {
   DefaultTippyProps,
-  TippyOptions
+  TippyOptions,
 };

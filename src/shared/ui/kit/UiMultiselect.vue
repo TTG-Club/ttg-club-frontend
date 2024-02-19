@@ -1,103 +1,3 @@
-<template>
-  <div class="ui-select">
-    <div
-      v-if="$slots.label"
-      class="ui-select__label"
-    >
-      <slot name="label" />
-    </div>
-
-    <div
-      ref="header"
-      :class="[
-        'ui-select__wrapper',
-        { 'ui-select__wrapper--disabled': props.disabled }
-      ]"
-      @focusin="toggleFocus"
-    >
-      <div
-        v-if="$slots['left-slot']"
-        class="ui-select__slotted--left"
-      >
-        <slot name="left-slot" />
-      </div>
-
-      <div class="ui-select__slotted-wrapper">
-        <ui-input
-          v-if="props.isSearchable"
-          ref="input"
-          v-model="filter"
-          :disabled="props.disabled"
-          :placeholder="togglePlaceholder"
-        />
-
-        <div
-          class="ui-select__slotted--body"
-          @click="toggleFocus"
-        >
-          <div v-if="!modelValue && !props.isSearchable">
-            {{ props.placeholder }}
-          </div>
-
-          <div v-if="modelValue && (!focused || !props.isSearchable)">
-            {{ displaySelectedOptions }}
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="$slots['right-slot']"
-        class="ui-select__slotted--right"
-      >
-        <slot name="right-slot" />
-      </div>
-
-      <div
-        :class="[
-          'ui-select__select',
-          { 'ui-select__select--disabled': props.disabled }
-        ]"
-        @click="toggleFocus"
-      >
-        <svg-icon :icon="toggleIcon" />
-      </div>
-    </div>
-
-    <div
-      v-if="focused"
-      class="ui-select__content-wrapper"
-    >
-      <ul class="ui-select__content">
-        <li
-          v-for="option in filteredOptions"
-          :key="getOption(option)"
-          :class="[
-            'ui-select__element',
-            { 'ui-select__element--selected': isSelectedClass(option) }
-          ]"
-          @click="selectOption(option)"
-        >
-          <slot
-            name="option"
-            v-bind="option"
-          >
-            <span class="ui-select__option">
-              {{ get(option, props.label) }}
-            </span>
-          </slot>
-        </li>
-
-        <li
-          v-if="filteredOptions.length === 0"
-          class="ui-select__element ui-select__element--empty"
-        >
-          Боги не знают ответа на твой запрос
-        </li>
-      </ul>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
   import { get } from 'lodash-es';
@@ -142,11 +42,11 @@
   };
 
   const togglePlaceholder = computed(() =>
-    focused.value || modelValue.value ? undefined : props.placeholder
+    focused.value || modelValue.value ? undefined : props.placeholder,
   );
 
   const toggleIcon = computed(() =>
-    focused.value ? 'arrow/up' : 'arrow/down'
+    focused.value ? 'arrow/up' : 'arrow/down',
   );
 
   const getOption = (option: T) => get(option, props.trackBy);
@@ -158,21 +58,121 @@
   };
 
   const displaySelectedOptions = computed(() =>
-    get(modelValue.value, props.label)
+    get(modelValue.value, props.label),
   );
 
-  watch(focused, isFocused => {
+  watch(focused, (isFocused) => {
     if (!isFocused) {
       filter.value = '';
     }
   });
 
   const filteredOptions = computed(() =>
-    props.options.filter(el =>
-      get(el, props.label).toLowerCase().includes(String(filter.value))
-    )
+    props.options.filter((el) =>
+      get(el, props.label).toLowerCase().includes(String(filter.value)),
+    ),
   );
 </script>
+
+<template>
+  <div class="ui-select">
+    <div
+      v-if="$slots.label"
+      class="ui-select__label"
+    >
+      <slot name="label" />
+    </div>
+
+    <div
+      ref="header"
+      :class="[
+        'ui-select__wrapper',
+        { 'ui-select__wrapper--disabled': props.disabled },
+      ]"
+      @focusin="toggleFocus"
+    >
+      <div
+        v-if="$slots['left-slot']"
+        class="ui-select__slotted--left"
+      >
+        <slot name="left-slot" />
+      </div>
+
+      <div class="ui-select__slotted-wrapper">
+        <ui-input
+          v-if="props.isSearchable"
+          ref="input"
+          v-model="filter"
+          :disabled="props.disabled"
+          :placeholder="togglePlaceholder"
+        />
+
+        <div
+          class="ui-select__slotted--body"
+          @click="toggleFocus"
+        >
+          <div v-if="!modelValue && !props.isSearchable">
+            {{ props.placeholder }}
+          </div>
+
+          <div v-if="modelValue && (!focused || !props.isSearchable)">
+            {{ displaySelectedOptions }}
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="$slots['right-slot']"
+        class="ui-select__slotted--right"
+      >
+        <slot name="right-slot" />
+      </div>
+
+      <div
+        :class="[
+          'ui-select__select',
+          { 'ui-select__select--disabled': props.disabled },
+        ]"
+        @click="toggleFocus"
+      >
+        <svg-icon :icon="toggleIcon" />
+      </div>
+    </div>
+
+    <div
+      v-if="focused"
+      class="ui-select__content-wrapper"
+    >
+      <ul class="ui-select__content">
+        <li
+          v-for="option in filteredOptions"
+          :key="getOption(option)"
+          :class="[
+            'ui-select__element',
+            { 'ui-select__element--selected': isSelectedClass(option) },
+          ]"
+          @click="selectOption(option)"
+        >
+          <slot
+            name="option"
+            v-bind="option"
+          >
+            <span class="ui-select__option">
+              {{ get(option, props.label) }}
+            </span>
+          </slot>
+        </li>
+
+        <li
+          v-if="filteredOptions.length === 0"
+          class="ui-select__element ui-select__element--empty"
+        >
+          Боги не знают ответа на твой запрос
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   .ui-select {
@@ -188,7 +188,7 @@
       min-height: 100%;
       max-height: 100%;
       height: initial;
-      padding: 11px;
+      padding: 7px;
       display: flex;
       align-items: center;
       justify-content: center;

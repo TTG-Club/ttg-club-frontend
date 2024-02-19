@@ -1,3 +1,39 @@
+<script lang="ts">
+  import { computed, defineComponent } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
+  import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
+
+  import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
+  import NavMenu from '@/features/menu/NavMenu.vue';
+  import NavProfile from '@/features/menu/NavProfile.vue';
+  import NavSearch from '@/features/menu/NavSearch.vue';
+  import MenuThemeSwitcher from '@/features/MenuThemeSwitcher.vue';
+
+  export default defineComponent({
+    name: 'NavBar',
+    components: {
+      SiteLogo,
+      NavSearch,
+      NavMenu,
+      NavBookmarks,
+      NavProfile,
+      MenuThemeSwitcher,
+      UiSocialButton,
+    },
+    setup() {
+      const route = useRoute();
+
+      const isShowSearch = computed(() => route.name !== 'search-page');
+
+      return {
+        isShowSearch,
+      };
+    },
+  });
+</script>
+
 <template>
   <div class="navbar">
     <header class="navbar__header">
@@ -33,7 +69,7 @@
           <ui-social-button
             hide-label
             social-name="discord"
-            url="https://discord.gg/zqBnMJVf3z"
+            url="https://discord.gg/JqFKMKRtxv"
           />
 
           <hr />
@@ -47,43 +83,9 @@
   </div>
 </template>
 
-<script lang="ts">
-  import { computed, defineComponent } from 'vue';
-  import { useRoute } from 'vue-router';
-
-  import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
-  import NavMenu from '@/features/menu/NavMenu.vue';
-  import NavProfile from '@/features/menu/NavProfile.vue';
-  import NavSearch from '@/features/menu/NavSearch.vue';
-  import MenuThemeSwitcher from '@/features/MenuThemeSwitcher.vue';
-
-  import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
-  import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
-
-  export default defineComponent({
-    name: 'NavBar',
-    components: {
-      SiteLogo,
-      NavSearch,
-      NavMenu,
-      NavBookmarks,
-      NavProfile,
-      MenuThemeSwitcher,
-      UiSocialButton
-    },
-    setup() {
-      const route = useRoute();
-
-      const isShowSearch = computed(() => route.name !== 'search-page');
-
-      return {
-        isShowSearch
-      };
-    }
-  });
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .navbar__header_left {
     .navbar__logo {
       width: 52px;

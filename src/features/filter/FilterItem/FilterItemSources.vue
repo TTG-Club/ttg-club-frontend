@@ -1,83 +1,3 @@
-<template>
-  <div
-    v-if="modelValue?.length"
-    :class="{ 'is-active': opened }"
-    class="filter-item"
-  >
-    <div class="filter-item__header">
-      <div
-        class="filter-item__trigger"
-        @click.left.exact.prevent="opened = !opened"
-      >
-        <div class="filter-item__name">Источники</div>
-
-        <button
-          class="filter-item__button filter-item__button--toggle"
-          type="button"
-          @click.self.left.exact.prevent="opened = !opened"
-        >
-          <svg-icon :icon="`arrow/${opened ? 'down' : 'right'}`" />
-        </button>
-      </div>
-
-      <button
-        v-if="isFilterCustomized"
-        v-tippy="{ content: 'Сбросить источники' }"
-        class="filter-item__button filter-item__button--reset"
-        type="button"
-        @click.left.exact.prevent="resetSources"
-      >
-        <svg-icon icon="close" />
-      </button>
-    </div>
-
-    <div
-      v-if="opened"
-      class="filter-item__body"
-    >
-      <div
-        v-for="(group, groupKey) in modelValue"
-        v-show="!!group.values?.length"
-        :key="groupKey"
-        class="filter-item__source-group"
-      >
-        <div
-          v-if="group.name"
-          class="filter-item__source-group_head"
-        >
-          <div class="filter-item__source-group_name">
-            {{ group.name }}
-          </div>
-
-          <ui-checkbox
-            v-tippy="{
-              content:
-                `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «` +
-                group.name +
-                '»'
-            }"
-            :model-value="isGroupActive(groupKey)"
-            type="toggle"
-            @update:model-value="setGroupStatus($event, groupKey)"
-          />
-        </div>
-
-        <div class="filter-item__source-group_body">
-          <ui-checkbox
-            v-for="(checkbox, checkboxKey) in group.values"
-            :key="checkboxKey"
-            :model-value="checkbox.value"
-            :tooltip="checkbox.tooltip"
-            @update:model-value="setSourceValue($event, groupKey, checkboxKey)"
-          >
-            {{ checkbox.label }}
-          </ui-checkbox>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
   import { cloneDeep } from 'lodash-es';
 
@@ -87,17 +7,17 @@
   export default {
     components: {
       UiCheckbox,
-      SvgIcon
+      SvgIcon,
     },
     props: {
       modelValue: {
         type: Array,
-        default: undefined
-      }
+        default: undefined,
+      },
     },
     emits: ['update:model-value'],
     data: () => ({
-      opened: true
+      opened: true,
     }),
     computed: {
       isFilterCustomized() {
@@ -114,7 +34,7 @@
         }
 
         return false;
-      }
+      },
     },
     methods: {
       setGroupStatus(e, index) {
@@ -146,12 +66,12 @@
       },
 
       resetSources() {
-        const sources = cloneDeep(this.modelValue).map(group => ({
+        const sources = cloneDeep(this.modelValue).map((group) => ({
           ...group,
-          values: group.values.map(value => ({
+          values: group.values.map((value) => ({
             ...value,
-            value: value.default
-          }))
+            value: value.default,
+          })),
         }));
 
         this.emitSources(sources);
@@ -167,13 +87,98 @@
 
       emitSources(sources) {
         this.$emit('update:model-value', sources);
-      }
-    }
+      },
+    },
   };
 </script>
 
+<template>
+  <div
+    v-if="modelValue?.length"
+    :class="{ 'is-active': opened }"
+    class="filter-item"
+  >
+    <div class="filter-item__header">
+      <div
+        class="filter-item__trigger"
+        @click.left.exact.prevent="opened = !opened"
+      >
+        <div class="filter-item__name">Источники</div>
+
+        <button
+          class="filter-item__button filter-item__button--toggle"
+          type="button"
+          @click.self.left.exact.prevent="opened = !opened"
+        >
+          <svg-icon
+            :icon="`arrow/${opened ? 'up' : 'down'}`"
+            size="24"
+          />
+        </button>
+      </div>
+
+      <button
+        v-if="isFilterCustomized"
+        v-tippy="{ content: 'Сбросить источники' }"
+        class="filter-item__button filter-item__button--reset"
+        type="button"
+        @click.left.exact.prevent="resetSources"
+      >
+        <svg-icon
+          icon="close"
+          size="24"
+        />
+      </button>
+    </div>
+
+    <div
+      v-if="opened"
+      class="filter-item__body"
+    >
+      <div
+        v-for="(group, groupKey) in modelValue"
+        v-show="!!group.values?.length"
+        :key="groupKey"
+        class="filter-item__source-group"
+      >
+        <div
+          v-if="group.name"
+          class="filter-item__source-group_head"
+        >
+          <div class="filter-item__source-group_name">
+            {{ group.name }}
+          </div>
+
+          <ui-checkbox
+            v-tippy="{
+              content: `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «${
+                group.name
+              }»`,
+            }"
+            :model-value="isGroupActive(groupKey)"
+            type="toggle"
+            @update:model-value="setGroupStatus($event, groupKey)"
+          />
+        </div>
+
+        <div class="filter-item__source-group_body">
+          <ui-checkbox
+            v-for="(checkbox, checkboxKey) in group.values"
+            :key="checkboxKey"
+            :model-value="checkbox.value"
+            :tooltip="checkbox.tooltip"
+            @update:model-value="setSourceValue($event, groupKey, checkboxKey)"
+          >
+            {{ checkbox.label }}
+          </ui-checkbox>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import 'FilterItem.module';
+  @use '@/assets/styles/modules/filter-item' as *;
 
   .filter-item {
     border-color: var(--primary);

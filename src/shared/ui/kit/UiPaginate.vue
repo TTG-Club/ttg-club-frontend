@@ -1,25 +1,3 @@
-<template>
-  <vue-paginate
-    :no-li-surround="true"
-    active-class="is-active"
-    container-class="ui-paginate"
-    disabled-class="is-disabled"
-    next-link-class="ui-paginate__next"
-    page-link-class="ui-paginate__page"
-    prev-link-class="ui-paginate__prev"
-    v-bind="props"
-    @update:model-value="$emit('update:model-value', $event)"
-  >
-    <template #prevBtnText>
-      <svg-icon icon="arrow/left" />
-    </template>
-
-    <template #nextBtnText>
-      <svg-icon icon="arrow/right" />
-    </template>
-  </vue-paginate>
-</template>
-
 <script setup lang="ts">
   import { VuePaginate } from '@svifty7/vue-paginate';
 
@@ -42,7 +20,31 @@
     >();
 </script>
 
+<template>
+  <vue-paginate
+    :no-li-surround="true"
+    active-class="is-active"
+    container-class="ui-paginate"
+    disabled-class="is-disabled"
+    next-link-class="ui-paginate__next"
+    page-link-class="ui-paginate__page"
+    prev-link-class="ui-paginate__prev"
+    v-bind="props"
+    @update:model-value="$emit('update:model-value', $event)"
+  >
+    <template #prevBtnText>
+      <svg-icon icon="arrow/left" />
+    </template>
+
+    <template #nextBtnText>
+      <svg-icon icon="arrow/right" />
+    </template>
+  </vue-paginate>
+</template>
+
 <style lang="scss">
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ui-paginate {
     display: inline-flex;
     gap: 8px;

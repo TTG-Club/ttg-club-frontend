@@ -1,8 +1,25 @@
+<script setup lang="ts">
+  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+
+  withDefaults(
+    defineProps<{
+      url: string;
+      socialName: string;
+      hideLabel?: boolean;
+      transparent?: boolean;
+    }>(),
+    {
+      hideLabel: false,
+      transparent: false,
+    },
+  );
+</script>
+
 <template>
   <a
     :class="{
       [`is-${socialName}`]: true,
-      'is-transparent': transparent
+      'is-transparent': transparent,
     }"
     :href="url"
     class="ui-social-button"
@@ -29,24 +46,10 @@
   </a>
 </template>
 
-<script setup lang="ts">
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-
-  withDefaults(
-    defineProps<{
-      url: string;
-      socialName: string;
-      hideLabel?: boolean;
-      transparent?: boolean;
-    }>(),
-    {
-      hideLabel: false,
-      transparent: false
-    }
-  );
-</script>
-
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+  @use '@/assets/styles/variables/mixins' as *;
+
   .ui-social-button {
     @include css_anim($time: 0.2s);
 

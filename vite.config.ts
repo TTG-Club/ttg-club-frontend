@@ -22,24 +22,24 @@ export default ({ mode }: ConfigEnv) => {
           changeOrigin: true,
           ws: false,
           secure: false,
-          rewrite: path => path.replace(/^\/proxy/, ''),
-          configure: proxy => {
-            proxy.on('proxyReq', req => {
+          rewrite: (path) => path.replace(/^\/proxy/, ''),
+          configure: (proxy) => {
+            proxy.on('proxyReq', (req) => {
               req.setHeader('origin', API_HOST);
             });
-          }
-        }
-      }
+          },
+        },
+      },
     },
     build: {
       outDir: env.VITE_APP_BUILD_PATH || 'dist',
-      sourcemap: 'inline',
+      sourcemap: true,
       minify: 'terser',
       rollupOptions: {
         output: {
           entryFileNames: 'js/app.[hash:8].js',
           chunkFileNames: 'js/[name].[hash:8].js',
-          assetFileNames: chunkInfo => {
+          assetFileNames: (chunkInfo) => {
             if (['index.css', 'main.css'].includes(chunkInfo.name!)) {
               return 'css/app.[hash:8].css';
             }
@@ -47,30 +47,29 @@ export default ({ mode }: ConfigEnv) => {
             return `${
               chunkInfo.name?.endsWith('.css') ? 'css' : 'assets'
             }/[name].[hash:8].[ext]`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     plugins: [
       ViteEjsPlugin(() => ({
         env,
-        mode
+        mode,
       })),
       viteLegacyPlugin({
         // eslint-disable-next-line max-len
         targets:
           'last 2 years and not dead and > 0.01% in RU and not chrome < 95 and not and_chr < 95 and not edge < 103 and not firefox < 91 and not opera < 86',
-        modernPolyfills: true
+        modernPolyfills: true,
       }),
       vue({
         script: {
-          defineModel: true,
-          propsDestructure: true
-        }
+          propsDestructure: true,
+        },
       }),
       createSvgIconsPlugin({
         iconDirs: [
-          fileURLToPath(new URL('./src/assets/icons/svg', import.meta.url))
+          fileURLToPath(new URL('./src/assets/icons/svg', import.meta.url)),
         ],
         symbolId: 'ttg-[dir]-[name]',
         svgoOptions: {
@@ -78,38 +77,43 @@ export default ({ mode }: ConfigEnv) => {
             {
               name: 'preset-default',
               params: {
-                overrides: { removeViewBox: false }
-              }
+                overrides: { removeViewBox: false },
+              },
             },
             {
               name: 'removeAttrs',
               params: {
-                attrs: '(width|height|style|color|fill|stroke)'
-              }
-            }
-          ]
-        }
-      })
+                attrs: '(width|height|style|color|fill|stroke)',
+              },
+            },
+          ],
+        },
+      }),
     ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
-        'vue': 'vue/dist/vue.esm-bundler.js'
-      }
+        'vue': fileURLToPath(
+          new URL(
+            './node_modules/vue/dist/vue.esm-bundler.js',
+            import.meta.url,
+          ),
+        ),
+      },
     },
     css: {
       preprocessorOptions: {
         css: {
-          url: false
+          url: false,
         },
         scss: {
           additionalData: '@use "@/assets/styles/variables/index.scss" as *;',
           sassOptions: {
             outputStyle: 'compressed',
-            includePaths: ['./node_modules']
-          }
-        }
-      }
-    }
+            includePaths: ['./node_modules'],
+          },
+        },
+      },
+    },
   });
 };

@@ -4,38 +4,43 @@ import { defineStore } from 'pinia';
 import { v4 as uuidV4 } from 'uuid';
 import { computed, ref } from 'vue';
 
+import { DB_NAME } from '@/shared/constants/UI';
+import { errorHandler } from '@/shared/utils/errorHandler';
+
 import BookmarksApi from '@/features/bookmarks/api';
 import type {
   IBookmarkCategory,
   IBookmarkCategoryInfo,
   IBookmarkGroup,
   IBookmarkItem,
-  TBookmark
+  TBookmark,
 } from '@/features/bookmarks/types/Bookmark.d';
-import { getGroupBookmarks, setBookmarks } from '@/features/bookmarks/utils';
-
-import { DB_NAME } from '@/shared/constants/UI';
-import { errorHandler } from '@/shared/helpers/errorHandler';
+import {
+  getGroupBookmarks,
+  isBookmarkRemoveAvailable,
+  setBookmarks,
+} from '@/features/bookmarks/utils';
 
 export const useDefaultBookmarkStore = defineStore(
   'DefaultBookmarkStore',
   () => {
     const store = localforage.createInstance({
       name: DB_NAME,
-      storeName: 'bookmarks'
+      storeName: 'bookmarks',
     });
 
     const groups = ref<IBookmarkGroup[]>([]);
     const categories = ref<IBookmarkCategory[]>([]);
     const bookmarks = ref<IBookmarkItem[]>([]);
+    const dontAskAgain = ref<boolean>(false);
 
     const isBookmarkSaved = (url: IBookmarkItem['url']) =>
-      bookmarks.value.findIndex(bookmark => bookmark.url === url) >= 0;
+      bookmarks.value.findIndex((bookmark) => bookmark.url === url) >= 0;
 
     const getNewUUID = () => {
       let uuid = uuidV4();
 
-      if (bookmarks.value.find(item => item.uuid === uuid)) {
+      if (bookmarks.value.find((item) => item.uuid === uuid)) {
         uuid = getNewUUID();
       }
 
@@ -46,7 +51,7 @@ export const useDefaultBookmarkStore = defineStore(
       const defaultGroup: IBookmarkGroup = {
         uuid: getNewUUID(),
         name: 'Общие',
-        order: -1
+        order: -1,
       };
 
       groups.value.push(defaultGroup);
@@ -55,23 +60,23 @@ export const useDefaultBookmarkStore = defineStore(
     };
 
     const getDefaultGroup = () =>
-      groups.value.find(bookmark => bookmark.order === -1) ||
+      groups.value.find((bookmark) => bookmark.order === -1) ||
       createDefaultGroup();
 
     const getBookmarkByURL = (url: IBookmarkItem['url']) => {
       const defaultGroup = getDefaultGroup();
 
       const categoriesUUIDs = categories.value
-        .filter(bookmark => bookmark.parentUUID === defaultGroup?.uuid)
-        .map(category => category.uuid);
+        .filter((bookmark) => bookmark.parentUUID === defaultGroup?.uuid)
+        .map((category) => category.uuid);
 
       return bookmarks.value
-        .filter(bookmark => categoriesUUIDs.includes(bookmark.parentUUID))
-        .find(bookmark => bookmark.url === url);
+        .filter((bookmark) => categoriesUUIDs.includes(bookmark.parentUUID))
+        .find((bookmark) => bookmark.url === url);
     };
 
     const createCategory = (
-      category: IBookmarkCategoryInfo
+      category: IBookmarkCategoryInfo,
     ): IBookmarkCategory => {
       const parent = getDefaultGroup();
 
@@ -79,7 +84,7 @@ export const useDefaultBookmarkStore = defineStore(
         uuid: getNewUUID(),
         name: category.name,
         order: category.order,
-        parentUUID: parent.uuid
+        parentUUID: parent.uuid,
       };
 
       categories.value.push(newCategory);
@@ -101,7 +106,7 @@ export const useDefaultBookmarkStore = defineStore(
           items: restored,
           groups,
           categories,
-          bookmarks
+          bookmarks,
         });
       } catch (err) {
         errorHandler(err);
@@ -115,7 +120,7 @@ export const useDefaultBookmarkStore = defineStore(
         return store.setItem<TBookmark[]>('default', [
           ...cloneDeep(groups.value),
           ...cloneDeep(categories.value),
-          ...cloneDeep(bookmarks.value)
+          ...cloneDeep(bookmarks.value),
         ]);
       } catch (err) {
         return Promise.reject(err);
@@ -125,7 +130,7 @@ export const useDefaultBookmarkStore = defineStore(
     const addBookmark = async (
       url: IBookmarkItem['url'],
       name: TBookmark['name'],
-      code?: IBookmarkCategoryInfo['code']
+      code?: IBookmarkCategoryInfo['code'],
     ) => {
       try {
         if (!url || !name) {
@@ -134,7 +139,7 @@ export const useDefaultBookmarkStore = defineStore(
 
         const { data: cat } = await BookmarksApi.getCategory({
           code,
-          url
+          url,
         });
 
         if (!cat) {
@@ -142,7 +147,7 @@ export const useDefaultBookmarkStore = defineStore(
         }
 
         const savedCat =
-          categories.value.find(category => category.name === cat.name) ||
+          categories.value.find((category) => category.name === cat.name) ||
           createCategory(cat);
 
         const newBookmark: IBookmarkItem = cloneDeep({
@@ -150,9 +155,9 @@ export const useDefaultBookmarkStore = defineStore(
           name,
           url,
           order: bookmarks.value.filter(
-            bookmark => bookmark.parentUUID === savedCat.uuid
+            (bookmark) => bookmark.parentUUID === savedCat.uuid,
           ).length,
-          parentUUID: savedCat.uuid
+          parentUUID: savedCat.uuid,
         });
 
         bookmarks.value.push(newBookmark);
@@ -165,7 +170,10 @@ export const useDefaultBookmarkStore = defineStore(
       }
     };
 
-    const removeCategory = (uuid: IBookmarkCategory['uuid']) => {
+    const removeCategory = async (
+      uuid: IBookmarkCategory['uuid'],
+      dontAsk = false,
+    ) => {
       if (!uuid) {
         console.error('No UUID present.');
 
@@ -173,16 +181,22 @@ export const useDefaultBookmarkStore = defineStore(
       }
 
       try {
-        const category = categories.value.find(item => item.uuid === uuid);
+        const category = categories.value.find((item) => item.uuid === uuid);
 
         if (!category) {
           return Promise.reject();
         }
 
-        categories.value = categories.value.filter(item => item.uuid !== uuid);
+        if (!dontAsk && !(await isBookmarkRemoveAvailable(category))) {
+          return Promise.resolve();
+        }
+
+        categories.value = categories.value.filter(
+          (item) => item.uuid !== uuid,
+        );
 
         bookmarks.value = bookmarks.value.filter(
-          item => item.parentUUID !== uuid
+          (item) => item.parentUUID !== uuid,
         );
 
         return saveBookmarks();
@@ -191,7 +205,10 @@ export const useDefaultBookmarkStore = defineStore(
       }
     };
 
-    const removeBookmark = async (uuid: IBookmarkItem['uuid']) => {
+    const removeBookmark = async (
+      uuid: IBookmarkItem['uuid'],
+      dontAsk = false,
+    ) => {
       if (!uuid) {
         console.error('No UUID present.');
 
@@ -199,7 +216,7 @@ export const useDefaultBookmarkStore = defineStore(
       }
 
       try {
-        const bookmark = bookmarks.value.find(item => item.uuid === uuid);
+        const bookmark = bookmarks.value.find((item) => item.uuid === uuid);
 
         if (!bookmark) {
           console.error("Can't find bookmark.");
@@ -207,10 +224,14 @@ export const useDefaultBookmarkStore = defineStore(
           return Promise.reject();
         }
 
-        bookmarks.value = bookmarks.value.filter(item => item.uuid !== uuid);
+        if (!dontAsk && !(await isBookmarkRemoveAvailable(bookmark))) {
+          return Promise.resolve();
+        }
+
+        bookmarks.value = bookmarks.value.filter((item) => item.uuid !== uuid);
 
         const parent = categories.value.find(
-          item => item.uuid === bookmark.parentUUID
+          (item) => item.uuid === bookmark.parentUUID,
         );
 
         if (!parent) {
@@ -218,11 +239,11 @@ export const useDefaultBookmarkStore = defineStore(
         }
 
         const siblings = bookmarks.value.filter(
-          item => item.parentUUID === parent.uuid
+          (item) => item.parentUUID === parent.uuid,
         );
 
         if (!siblings.length) {
-          await removeCategory(parent.uuid);
+          await removeCategory(parent.uuid, true);
         }
 
         return saveBookmarks();
@@ -234,12 +255,12 @@ export const useDefaultBookmarkStore = defineStore(
     const updateBookmark = async (
       url: IBookmarkItem['url'],
       name: IBookmarkItem['name'],
-      category: IBookmarkItem['parentUUID'] | undefined = undefined
+      category: IBookmarkItem['parentUUID'] | undefined = undefined,
     ) => {
-      const bookmark = bookmarks.value.find(item => item.url === url);
+      const bookmark = bookmarks.value.find((item) => item.url === url);
 
       if (bookmark) {
-        await removeBookmark(bookmark.uuid);
+        await removeBookmark(bookmark.uuid, true);
 
         return null;
       }
@@ -251,14 +272,14 @@ export const useDefaultBookmarkStore = defineStore(
       groups,
       categories,
       bookmarks,
-
+      dontAskAgain,
       isBookmarkSaved,
       getGroupBookmarks: computed(() =>
         getGroupBookmarks({
           groups,
           categories,
-          bookmarks
-        })
+          bookmarks,
+        }),
       ),
 
       getBookmarkByURL,
@@ -269,7 +290,7 @@ export const useDefaultBookmarkStore = defineStore(
       saveBookmarks,
       addBookmark,
       removeBookmark,
-      updateBookmark
+      updateBookmark,
     };
-  }
+  },
 );
