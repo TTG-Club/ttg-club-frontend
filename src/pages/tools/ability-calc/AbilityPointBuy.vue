@@ -149,10 +149,7 @@
   const onSelect = (i: number) => {
     modelValue.value[i].value = selectedOption.value[i].value;
 
-    const { label } = selectedOption.value[i];
-
-    // eslint-disable-next-line prefer-destructuring
-    selectedOption.value[i].label = label.split(' ')[0];
+    [selectedOption.value[i].label] = selectedOption.value[i].label.split(' ');
   };
 </script>
 
