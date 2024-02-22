@@ -6,14 +6,16 @@
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
-  const modelValue = defineModel<T | T[]>();
+  const modelValue = defineModel<T | T[]>({
+    required: true,
+  });
 
   const props = defineProps<{
     label: string;
     trackBy: string;
     options: Array<T>;
     disabled?: boolean;
-    placeholder: string;
+    placeholder: string | number;
     isMultiple?: boolean;
     isSearchable?: boolean;
   }>();
@@ -252,6 +254,7 @@
       width: 100%;
       padding: 0;
       margin: 0;
+      white-space: nowrap;
 
       &-wrapper {
         background: var(--bg-secondary);
