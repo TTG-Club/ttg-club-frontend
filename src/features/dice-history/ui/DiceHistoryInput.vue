@@ -1,30 +1,34 @@
 <script lang="ts" setup>
+  import { type RollBase } from 'dice-roller-parser';
   import { ref } from 'vue';
 
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
-
-  import type { RollBase } from 'dice-roller-parser';
 
   const emit = defineEmits<{
     (e: 'roll', roll: RollBase): void;
   }>();
 
+  const currentInput = ref('');
+
   const history: string[] = [];
 
   let historyIndex = -1;
 
-  const currentInput = ref('');
+  const { tryRoll, notifyResult } = useDiceRoller();
 
-  const { doRoll, notifyResult } = useDiceRoller();
-
-  const roll = () => {
+  function roll() {
     const formula = currentInput.value.trim();
 
     if (formula === '') {
       return;
     }
 
-    const result = doRoll({ formula });
+    const result = tryRoll({ formula });
+
+    if (!result) {
+      // TODO: Handle error
+      return;
+    }
 
     notifyResult({
       roll: result,
@@ -38,9 +42,9 @@
     currentInput.value = '';
 
     emit('roll', result);
-  };
+  }
 
-  const traverseHistory = (direction: 'up' | 'down') => {
+  function traverseHistory(direction: 'up' | 'down') {
     if (direction === 'up' && historyIndex < history.length - 1) {
       historyIndex++;
     }
@@ -50,17 +54,17 @@
     }
 
     currentInput.value = historyIndex >= 0 ? history[historyIndex] : '';
-  };
+  }
 </script>
 
 <template>
   <div class="dice-history-input">
-    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
     <input
       v-model="currentInput"
       class="dice-history-input__input"
       type="text"
       placeholder="Введите формулу"
+      aria-label="Формула для броска"
       @keyup.enter="roll()"
       @keyup.up="traverseHistory('up')"
       @keyup.down="traverseHistory('down')"

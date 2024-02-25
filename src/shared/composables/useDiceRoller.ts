@@ -1,7 +1,9 @@
 import { DiceRoller } from 'dice-roller-parser';
+import { type RollBase } from 'dice-roller-parser';
 import { v4 } from 'uuid';
 import { h } from 'vue';
 import { POSITION, useToast } from 'vue-toastification';
+import { type ToastOptions } from 'vue-toastification/src/types';
 
 import { ToastEventBus } from '@/core/configs/ToastConfig';
 
@@ -14,13 +16,14 @@ import {
 
 import { useDiceHistory } from '@/features/dice-history/composables';
 
-import type { RollBase } from 'dice-roller-parser';
-import type { ToastOptions } from 'vue-toastification/dist/types/types';
+import { useRollStore } from '../stores/RollStore';
 
 export function useDiceRoller() {
   const roller = new DiceRoller();
-  const history = useDiceHistory();
   const toast = useToast(ToastEventBus);
+
+  const rollStore = useRollStore();
+  const history = useDiceHistory();
 
   /**
    * Выполнение броска
@@ -41,6 +44,14 @@ export function useDiceRoller() {
         type,
       }),
     );
+
+  const tryRoll = (options: { formula: string; type?: RollType }) => {
+    try {
+      return doRoll(options);
+    } catch {
+      return undefined;
+    }
+  };
 
   const getRendered = ({
     roll,
@@ -115,7 +126,8 @@ export function useDiceRoller() {
     type?: RollType;
     toastOptions?: ToastOptions;
   }) => {
-    history.registerRoll({
+    // TODO: Consider rendering toast and register roll in the according places (DiceHistory feature, DiceToast feature?)
+    rollStore.registerRoll({
       id: v4(),
       date: new Date().toISOString(),
       roll,
@@ -148,6 +160,7 @@ export function useDiceRoller() {
   return {
     roller,
     doRoll,
+    tryRoll,
     getFormattedFormula,
     notifyResult,
   };

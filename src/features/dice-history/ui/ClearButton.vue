@@ -1,5 +1,7 @@
 <template>
+  <!-- TODO: Use UIKit button for this -->
   <button
+    v-tippy="'Очистить историю'"
     class="clear-button"
     type="button"
     v-bind="$attrs"

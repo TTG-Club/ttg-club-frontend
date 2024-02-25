@@ -14,78 +14,15 @@
     (event: 'resize:end', height: number): void;
   }>();
 
+  const MIN_TOP_OFFSET = 24;
+  const MIN_HEIGHT = 221;
+
   const container = ref<HTMLElement>();
   const resizeTrigger = ref<HTMLElement>();
+  const height = useLocalStorage('history-roll-height', MIN_HEIGHT);
 
-  const resizing = ref(false);
-
-  const minTopOffset = 24;
-  const minHeight = 221;
-  const height = useLocalStorage('history-roll-height', minHeight);
-
-  if (height.value <= minHeight) {
-    height.value = minHeight;
-  }
-
-  let y = 0;
-  let prevY = 0;
-
-  function adjustHeight() {
-    if (!container.value) {
-      return;
-    }
-
-    const { top } = container.value!.getBoundingClientRect();
-
-    if (top < minTopOffset) {
-      const newHeight = height.value - minTopOffset + top;
-
-      if (newHeight >= minHeight) {
-        height.value = newHeight;
-      }
-    }
-  }
-
-  function start(event: PointerEvent) {
-    const target = event.target as HTMLElement;
-
-    if (resizeTrigger.value !== target) {
-      return;
-    }
-
-    resizing.value = true;
-    y = event.y;
-    window.document.body.style.userSelect = 'none';
-
-    emit('resize:start', height.value);
-  }
-
-  function move(event: PointerEvent) {
-    if (!resizing.value) {
-      return;
-    }
-
-    const prevHeight = height.value;
-
-    prevY = y;
-    y = Math.max(event.y, minTopOffset);
-
-    height.value += prevY - y;
-
-    if (height.value < minHeight) {
-      height.value = minHeight;
-    }
-
-    emit('resize', height.value - prevHeight);
-  }
-
-  function end() {
-    adjustHeight();
-
-    resizing.value = false;
-    window.document.body.style.userSelect = '';
-
-    emit('resize:end', height.value);
+  if (height.value <= MIN_HEIGHT) {
+    height.value = MIN_HEIGHT;
   }
 
   const mdAndHigher = useAppBreakpoints().greaterOrEqual('md');
@@ -121,6 +58,69 @@
   onUnmounted(() => {
     end();
   });
+
+  let resizing = false;
+
+  let y = 0;
+  let prevY = 0;
+
+  function adjustHeight() {
+    if (!container.value) {
+      return;
+    }
+
+    const { top } = container.value.getBoundingClientRect();
+
+    if (top < MIN_TOP_OFFSET) {
+      const newHeight = height.value - MIN_TOP_OFFSET + top;
+
+      if (newHeight >= MIN_HEIGHT) {
+        height.value = newHeight;
+      }
+    }
+  }
+
+  function start(event: PointerEvent) {
+    const target = event.target as HTMLElement;
+
+    if (resizeTrigger.value !== target) {
+      return;
+    }
+
+    resizing = true;
+    y = event.y;
+    window.document.body.style.userSelect = 'none';
+
+    emit('resize:start', height.value);
+  }
+
+  function move(event: PointerEvent) {
+    if (!resizing) {
+      return;
+    }
+
+    const prevHeight = height.value;
+
+    prevY = y;
+    y = Math.max(event.y, MIN_TOP_OFFSET);
+
+    height.value += prevY - y;
+
+    if (height.value < MIN_HEIGHT) {
+      height.value = MIN_HEIGHT;
+    }
+
+    emit('resize', height.value - prevHeight);
+  }
+
+  function end() {
+    adjustHeight();
+
+    resizing = false;
+    window.document.body.style.userSelect = '';
+
+    emit('resize:end', height.value);
+  }
 </script>
 
 <template>
@@ -128,7 +128,7 @@
     ref="container"
     class="history-window"
   >
-    <div class="'history-window__content">
+    <div class="history-window__content">
       <div
         ref="resizeTrigger"
         class="history-window__resize-trigger"
