@@ -65,8 +65,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @use '@/assets/styles/variables/colors' as *;
-
   .roll {
     $root: &;
 

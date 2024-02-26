@@ -55,10 +55,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @use '@/assets/styles/variables/breakpoints' as *;
-  @use '@/assets/styles/variables/colors' as *;
-  @use 'variables' as *;
-
   .history {
     display: grid;
     grid-template-rows: auto 1fr;

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+  // TODO: Consider renaming this component
   import {
     useEventListener,
     useLocalStorage,
@@ -19,7 +20,7 @@
 
   const container = ref<HTMLElement>();
   const resizeTrigger = ref<HTMLElement>();
-  const height = useLocalStorage('history-roll-height', MIN_HEIGHT);
+  const height = useLocalStorage('bottom-right-window-height', MIN_HEIGHT);
 
   if (height.value <= MIN_HEIGHT) {
     height.value = MIN_HEIGHT;
@@ -81,9 +82,7 @@
   }
 
   function start(event: PointerEvent) {
-    const target = event.target as HTMLElement;
-
-    if (resizeTrigger.value !== target) {
+    if (resizeTrigger.value !== event.target) {
       return;
     }
 
@@ -126,12 +125,12 @@
 <template>
   <div
     ref="container"
-    class="history-window"
+    class="bottom-right-window"
   >
-    <div class="history-window__content">
+    <div class="bottom-right-window__content">
       <div
         ref="resizeTrigger"
-        class="history-window__resize-trigger"
+        class="bottom-right-window__resize-trigger"
       />
 
       <slot />
@@ -141,25 +140,18 @@
 
 <style lang="scss" scoped>
   @use '@/assets/styles/variables/breakpoints' as *;
-  @use 'variables' as *;
 
-  .history-window {
-    --fab-size: 32px;
-
+  .bottom-right-window {
     z-index: 13;
     position: fixed;
     transform-origin: right bottom;
     inset: 8px;
     bottom: calc(56px + 8px + var(--safe-area-inset-bottom));
 
-    @include media-min($xl) {
-      --fab-size: 50px;
-    }
-
     @include media-min($md) {
       top: unset;
-      right: $x-offset;
-      bottom: calc(var(--fab-size) + $y-offset + 8px);
+      right: var(--fab-y-offset);
+      bottom: calc(var(--fab-size) + var(--fab-y-offset) + 8px);
       left: unset;
       width: 300px;
     }

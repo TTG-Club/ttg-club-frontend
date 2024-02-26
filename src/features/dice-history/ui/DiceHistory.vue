@@ -1,44 +1,28 @@
 <script lang="ts" setup>
+  import BottomRightWindow from '@/shared/ui/BottomRightWindow.vue';
   import UiFab from '@/shared/ui/kit/button/UiFab.vue';
 
   import { useDiceHistory } from '../composables';
 
-  import DiceHistoryWindow from './DiceHistoryWindow.vue';
   import DiceHistoryWindowContent from './DiceHistoryWindowContent.vue';
 
   const { isOpen, toggle } = useDiceHistory();
 </script>
 
 <template>
-  <div class="dice-history">
-    <transition name="popover-animation">
-      <dice-history-window v-show="isOpen">
-        <dice-history-window-content />
-      </dice-history-window>
-    </transition>
+  <transition name="popover-animation">
+    <bottom-right-window v-show="isOpen">
+      <dice-history-window-content />
+    </bottom-right-window>
+  </transition>
 
-    <ui-fab
-      class="dice-history__fab"
-      :icon="isOpen ? 'close' : 'dice/d20'"
-      @click="toggle()"
-    />
-  </div>
+  <ui-fab
+    :icon="isOpen ? 'close' : 'dice/d20'"
+    @click="toggle()"
+  />
 </template>
 
 <style lang="scss" scoped>
-  @use '@/assets/styles/variables/breakpoints' as *;
-  @use '@/assets/styles/variables/colors' as *;
-  @use 'variables' as *;
-
-  .dice-history {
-    &__fab {
-      position: fixed;
-      right: $x-offset;
-      bottom: $y-offset;
-      z-index: 50;
-    }
-  }
-
   .popover-animation {
     &-enter-from,
     &-leave-to {

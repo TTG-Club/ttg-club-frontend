@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { useCssModule } from 'vue';
+  import { computed, useCssModule } from 'vue';
 
   import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
 
@@ -8,22 +8,33 @@
   interface IFabProps
     extends Omit<ISharedButtonProps, 'fullWidth' | 'size' | 'color'> {
     icon: string;
+    position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
   }
 
-  withDefaults(defineProps<IFabProps>(), {
+  const props = withDefaults(defineProps<IFabProps>(), {
     nativeType: 'button',
     disabled: false,
+    position: 'bottom-right',
   });
 
-  const greaterThanXl = useAppBreakpoints().greater('xl');
-
   const $style = useCssModule();
+
+  const positionClasses = computed(() =>
+    Object.fromEntries(
+      props.position
+        .split('-')
+        .map((p) => [$style[`ui-fab--position-${p}`], true]),
+    ),
+  );
+
+  const greaterThanXl = useAppBreakpoints().greater('xl');
 </script>
 
 <template>
   <button
     :class="{
       [$style['ui-fab']]: true,
+      ...positionClasses,
     }"
     :type="nativeType"
     v-bind="$attrs"
@@ -40,28 +51,50 @@
 <style lang="scss" module>
   @use '@/assets/styles/variables/breakpoints' as *;
 
+  html {
+    --fab-size: 32px;
+    --fab-x-offset: 16px;
+    --fab-y-offset: 24px;
+
+    @include media-min($xl) {
+      --fab-size: 50px;
+    }
+  }
+
   .ui-fab {
     $root: &;
 
-    --size: 32px;
-
+    position: fixed;
+    z-index: 50;
     padding: 0;
     color: var(--text-b-color);
     border-radius: 50%;
-    width: var(--size);
-    height: var(--size);
+    width: var(--fab-size);
+    height: var(--fab-size);
     background-color: var(--bg-sub-menu);
     border: 1px solid var(--border);
     box-shadow: 0 1px 1px 0 rgb(0 0 0 / 25%);
     overflow: hidden;
 
-    @include media-min($xl) {
-      --size: 50px;
-    }
-
     &:hover {
       #{$root}__inner::before {
         opacity: 15%;
+      }
+    }
+
+    &--position {
+      &-top {
+        top: var(--fab-y-offset);
+      }
+      &-right {
+        right: var(--fab-x-offset);
+      }
+      &-bottom {
+        bottom: var(--fab-y-offset);
+      }
+      &-left {
+        // TODO: Extract navbar width to a variable
+        left: calc(var(--fab-x-offset) + var(--safe-area-inset-bottom) + 56px);
       }
     }
 
@@ -84,3 +117,5 @@
     }
   }
 </style>
+
+:
