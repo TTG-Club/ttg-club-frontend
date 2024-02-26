@@ -37,7 +37,7 @@ export const useRollStore = defineStore('RollStore', () => {
   const rolls = useLocalStorage<RollEntry[]>('rolls', []);
 
   const rollsSortedByDate = computed(() =>
-    rolls.value.sort((a, b) => (a.date < b.date ? 1 : -1)),
+    rolls.value.sort((a, b) => (a.date < b.date ? -1 : 1)),
   );
 
   function registerRoll(item: PartialBy<RollEntry, 'source'>) {
