@@ -1,7 +1,12 @@
 import { useFetch, useFileDialog, useObjectUrl } from '@vueuse/core';
 import { useClamp } from '@vueuse/math';
-import { ref, unref } from 'vue';
+import { onMounted, ref, unref } from 'vue';
 
+// import { useAxios } from '@/shared/composables/useAxios';
+import type {
+  TokenFrames,
+  SelectedFrame,
+} from '@/shared/types/tools/Tokenator.d';
 import { toast } from '@/shared/utils/toast';
 
 const DEFAULT_SCALE = 1.1;
@@ -17,15 +22,22 @@ const MAX_SIZE = 50;
 const MAX_DIMENSION = 8064;
 
 const file = ref<string>();
+
+const frames = ref<TokenFrames>({
+  list: null,
+  selected: { url: undefined, index: 0 },
+  show: false,
+});
+
 const scale = useClamp(DEFAULT_SCALE, scaleConfig.min, scaleConfig.max);
 const token = ref<HTMLElement>();
 const reflectImage = ref<boolean>(false);
 const centerImage = ref<boolean>(false);
+const border = ref<string>();
+const background = ref<string>();
+// const http = useAxios();
 
 export const useTokenator = () => {
-  const border = ref();
-  const background = ref();
-
   const { open, onChange } = useFileDialog();
 
   const resetScale = () => {
@@ -137,7 +149,7 @@ export const useTokenator = () => {
     },
   }).blob();
 
-  const load = (format: 'webp' | 'png' = 'png'): Promise<void> =>
+  const loadFile = (format: 'webp' | 'png' = 'png'): Promise<void> =>
     new Promise((resolve, reject) => {
       const svg = unref(token);
 
@@ -179,11 +191,53 @@ export const useTokenator = () => {
       img.onerror = (e) => reject(e);
     });
 
+  const selectFrame = ({ url: frameURL, index }: SelectedFrame) => {
+    useFetch(frameURL, {
+      refetch: true,
+      async afterFetch(ctx) {
+        border.value = await getBase64(ctx.data);
+
+        return ctx;
+      },
+    }).blob();
+
+    frames.value.selected = { url: frameURL, index };
+    frames.value.show = false;
+  };
+
+  const toggleFramesDropdown = () => {
+    frames.value.show = !frames.value.show;
+  };
+
+  onMounted(() => {
+    try {
+      // const response = await http.get<Array<TokenFrame>>({
+      //   url: 'tokens/borders',
+      // });
+
+      // frames.value.list = response.data;
+
+      frames.value.list = [
+        {
+          id: 0,
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1600px-HD_transparent_picture.png',
+        },
+        {
+          id: 0,
+          url: 'https://static.vecteezy.com/system/resources/previews/001/192/611/original/circle-border-png.png',
+        },
+      ];
+      // response.data;
+    } catch (err) {
+      toast.error('Произошла ошибка при загрузке токенов');
+    }
+  });
+
   return {
     token,
     border,
     background,
-
+    frames,
     MAX_SIZE,
     MAX_DIMENSION,
     SVG_SIZE,
@@ -194,7 +248,7 @@ export const useTokenator = () => {
     centerImage,
     getBase64,
     processFile,
-    load,
+    loadFile,
     open: () =>
       open({
         accept: 'image/*',
@@ -205,5 +259,7 @@ export const useTokenator = () => {
 
       resetScale();
     },
+    selectFrame,
+    toggleFramesDropdown,
   };
 };
