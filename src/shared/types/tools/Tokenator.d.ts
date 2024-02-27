@@ -1,15 +1,14 @@
 export type FrameListItem = {
-  url: string | undefined;
   id: number;
-};
-
-export type SelectedFrame = {
+  name: string;
+  type: string;
   url: string | undefined;
-  index: number;
+  userId: number;
 };
 
 export type TokenFrames = {
   list: FrameListItem[] | null;
-  selected: SelectedFrame;
+  selectedFrame: FrameListItem | null;
+  selectedFrameIndex: number | undefined;
   show: boolean;
 };

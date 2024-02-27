@@ -4,17 +4,22 @@
   import type { TokenFrames } from '@shared/types/tools/Tokenator.d';
 
   defineProps<{
+    frames: TokenFrames;
     selectFrame: Function;
     toggleFramesDropdown: Function;
-    frames: TokenFrames;
   }>();
+
+  const emptyFrameName = 'пустой';
 </script>
 
 <template>
-  <div :class="$style.container">
+  <div
+    v-if="frames.selectedFrame"
+    :class="$style.container"
+  >
     <div :class="$style.wrapper">
       <div
-        v-if="!frames.selected.index"
+        v-if="frames.selectedFrame.name === emptyFrameName"
         :class="[$style.common, $style.details]"
       >
         <svg-icon
@@ -31,12 +36,12 @@
       >
         <img
           :class="$style['option-img']"
-          :src="frames.selected.url"
+          :src="frames.selectedFrame.url"
           alt="token-frame"
         />
 
         <span :class="$style['details-text']"
-          >Рамка №{{ frames.selected.index }}</span
+          >Рамка №{{ frames.selectedFrameIndex }}</span
         >
       </div>
 
@@ -60,9 +65,9 @@
         :key="frame.id"
       >
         <div
-          v-if="!index"
+          v-if="frame.name === emptyFrameName"
           :class="$style.option"
-          @click.left.exact.prevent="selectFrame({ url: frame.url, index })"
+          @click.left.exact.prevent="selectFrame(frame)"
         >
           <svg-icon
             icon="no-frame"
@@ -75,7 +80,7 @@
         <div
           v-else
           :class="$style.option"
-          @click.left.exact.prevent="selectFrame({ url: frame.url, index })"
+          @click.left.exact.prevent="selectFrame(frame)"
         >
           <img
             :class="$style['option-img']"

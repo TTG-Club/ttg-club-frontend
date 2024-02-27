@@ -2,10 +2,10 @@ import { useFetch, useFileDialog, useObjectUrl } from '@vueuse/core';
 import { useClamp } from '@vueuse/math';
 import { onMounted, ref, unref } from 'vue';
 
-// import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api';
 import type {
   TokenFrames,
-  SelectedFrame,
+  FrameListItem,
 } from '@/shared/types/tools/Tokenator.d';
 import { toast } from '@/shared/utils/toast';
 
@@ -25,7 +25,8 @@ const file = ref<string>();
 
 const frames = ref<TokenFrames>({
   list: null,
-  selected: { url: undefined, index: 0 },
+  selectedFrame: null,
+  selectedFrameIndex: 0,
   show: false,
 });
 
@@ -35,7 +36,6 @@ const reflectImage = ref<boolean>(false);
 const centerImage = ref<boolean>(false);
 const border = ref<string>();
 const background = ref<string>();
-// const http = useAxios();
 
 export const useTokenator = () => {
   const { open, onChange } = useFileDialog();
@@ -191,8 +191,8 @@ export const useTokenator = () => {
       img.onerror = (e) => reject(e);
     });
 
-  const selectFrame = ({ url: frameURL, index }: SelectedFrame) => {
-    useFetch(frameURL, {
+  const selectFrame = (frame: FrameListItem) => {
+    useFetch(frame.url, {
       refetch: true,
       async afterFetch(ctx) {
         border.value = await getBase64(ctx.data);
@@ -201,7 +201,11 @@ export const useTokenator = () => {
       },
     }).blob();
 
-    frames.value.selected = { url: frameURL, index };
+    frames.value.selectedFrame = frame;
+
+    frames.value.selectedFrameIndex = frames.value.list?.findIndex(
+      (frm) => frm.name === frame.name,
+    );
     frames.value.show = false;
   };
 
@@ -209,25 +213,20 @@ export const useTokenator = () => {
     frames.value.show = !frames.value.show;
   };
 
-  onMounted(() => {
+  onMounted(async () => {
     try {
-      // const response = await http.get<Array<TokenFrame>>({
-      //   url: 'tokens/borders',
-      // });
+      const defaultFrameName = 'ttg';
 
-      // frames.value.list = response.data;
+      const response = await httpClient.get<FrameListItem[]>({
+        url: 'tokens/borders',
+      });
 
-      frames.value.list = [
-        {
-          id: 0,
-          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1600px-HD_transparent_picture.png',
-        },
-        {
-          id: 0,
-          url: 'https://static.vecteezy.com/system/resources/previews/001/192/611/original/circle-border-png.png',
-        },
-      ];
-      // response.data;
+      const [defaultFrame] = response.data.filter(
+        (frame) => frame.name === defaultFrameName,
+      );
+
+      frames.value.list = response.data;
+      selectFrame(defaultFrame);
     } catch (err) {
       toast.error('Произошла ошибка при загрузке токенов');
     }
