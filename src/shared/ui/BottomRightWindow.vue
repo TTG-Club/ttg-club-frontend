@@ -142,11 +142,11 @@
   @use '@/assets/styles/variables/breakpoints' as *;
 
   .bottom-right-window {
-    z-index: 13;
     position: fixed;
-    transform-origin: right bottom;
     inset: 8px;
-    bottom: calc(56px + 8px + var(--safe-area-inset-bottom));
+    bottom: calc(var(--navbar-height) + 8px);
+    z-index: 13;
+    transform-origin: right bottom;
 
     @include media-min($md) {
       top: unset;
@@ -163,11 +163,11 @@
     }
 
     &__resize-trigger {
-      display: none;
       position: absolute;
       top: -3px;
-      left: 0;
       right: 0;
+      left: 0;
+      display: none;
       height: 7px;
       cursor: n-resize;
 

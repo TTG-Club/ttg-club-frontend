@@ -1,8 +1,7 @@
 <script lang="ts" setup>
   // TODO: Rename component
 
-  import { storeToRefs } from 'pinia';
-  import { ref, watch, nextTick, onMounted } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
 
   import { useRollStore } from '@/shared/stores/RollStore';
 
@@ -13,21 +12,22 @@
   const content = ref<HTMLElement>();
 
   const rollStore = useRollStore();
-  const { rollsSortedByDate } = storeToRefs(rollStore);
 
-  const scrollDown = () => {
-    nextTick(() => {
-      content.value?.scrollTo(0, content.value?.scrollHeight);
-    });
-  };
-
-  watch(rollsSortedByDate, () => {
-    scrollDown();
-  });
+  watch(
+    rollStore.rollsSortedByDate,
+    () => {
+      scrollDown();
+    },
+    { flush: 'post' },
+  );
 
   onMounted(() => {
     scrollDown();
   });
+
+  function scrollDown() {
+    content.value?.scrollTo(0, content.value?.scrollHeight);
+  }
 </script>
 
 <template>
@@ -42,14 +42,14 @@
       class="history__content"
     >
       <dice-history-item
-        v-for="roll in rollsSortedByDate"
+        v-for="roll in rollStore.rollsSortedByDate"
         :key="roll.id"
         v-bind="roll"
       />
     </div>
 
     <div class="history__input">
-      <dice-history-input @roll="scrollDown()" />
+      <dice-history-input />
     </div>
   </div>
 </template>
@@ -59,11 +59,11 @@
     display: grid;
     grid-template-rows: auto 1fr;
     height: 100%;
-    padding: 8px 8px 0 8px;
+    padding: 8px 8px 0;
     background-color: var(--bg-sub-menu);
-    box-shadow: 0px 1px 1px 0px rgb(0 0 0 / 25%);
     border: 1px solid var(--border);
     border-radius: 8px;
+    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 25%);
 
     &__heading {
       display: flex;
@@ -79,7 +79,7 @@
       grid-template-rows: minmax(0, 1fr);
       align-items: end;
       overflow-y: auto;
-      scrollbar-color: var(--text-g-color);
+      scrollbar-color: var(--text-g-color) var(--bg-sub-menu);
       border-bottom: 1px solid rgb(255 255 255 / 8%);
 
       &::-webkit-scrollbar {

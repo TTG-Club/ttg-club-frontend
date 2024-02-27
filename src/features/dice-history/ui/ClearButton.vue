@@ -15,20 +15,20 @@
 
 <style lang="scss" scoped>
   .clear-button {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    padding: 0;
     width: 20px;
     aspect-ratio: 1;
+    padding: 0;
+    overflow: hidden;
     color: var(--text-b-color);
     border-radius: 8px;
-    overflow: hidden;
 
     &:hover {
       &::before {
-        opacity: 15%;
+        opacity: 0.15;
       }
     }
 
@@ -36,8 +36,8 @@
       position: absolute;
       inset: 0;
       content: '';
-      opacity: 0;
       background-color: black;
+      opacity: 0;
       @include css_anim;
     }
   }

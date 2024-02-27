@@ -66,19 +66,19 @@
 
     position: fixed;
     z-index: 50;
-    padding: 0;
-    color: var(--text-b-color);
-    border-radius: 50%;
     width: var(--fab-size);
     height: var(--fab-size);
+    padding: 0;
+    overflow: hidden;
+    color: var(--text-b-color);
     background-color: var(--bg-sub-menu);
     border: 1px solid var(--border);
+    border-radius: 50%;
     box-shadow: 0 1px 1px 0 rgb(0 0 0 / 25%);
-    overflow: hidden;
 
     &:hover {
       #{$root}__inner::before {
-        opacity: 15%;
+        opacity: 0.15;
       }
     }
 
@@ -86,23 +86,25 @@
       &-top {
         top: var(--fab-y-offset);
       }
+
       &-right {
         right: var(--fab-x-offset);
       }
+
       &-bottom {
         bottom: var(--fab-y-offset);
       }
+
       &-left {
-        // TODO: Extract navbar width to a variable
-        left: calc(var(--fab-x-offset) + var(--safe-area-inset-bottom) + 56px);
+        left: calc(var(--fab-x-offset) + var(--navbar-width));
       }
     }
 
     &__inner {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
       width: 100%;
       height: 100%;
 
@@ -110,8 +112,8 @@
         position: absolute;
         inset: 0;
         content: '';
-        opacity: 0;
         background-color: black;
+        opacity: 0;
         @include css_anim;
       }
     }

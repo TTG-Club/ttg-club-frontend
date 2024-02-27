@@ -42,7 +42,7 @@
   <div class="roll">
     <div
       class="roll__result"
-      :class="[`roll__result--type-${type}`]"
+      :class="`roll__result--type-${type}`"
     >
       {{ roll.value }}
     </div>
@@ -77,8 +77,8 @@
       flex: 2.1ch 0 0;
       font-size: var(--h2-font-size);
       line-height: var(--h2-font-size);
-      text-align: center;
       color: var(--text-color-title);
+      text-align: center;
 
       &--type {
         &-success {
@@ -100,10 +100,10 @@
     }
 
     &__description {
-      color: var(--text-g-color);
       display: flex;
       gap: 2px;
       font-size: 0.7em;
+      color: var(--text-g-color);
     }
 
     &__description-text {

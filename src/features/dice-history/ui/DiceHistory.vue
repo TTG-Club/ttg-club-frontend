@@ -28,14 +28,12 @@
     &-leave-to {
       opacity: 0;
       transform: scale(0);
-      z-index: -1;
     }
 
     &-enter-to,
     &-leave-from {
       opacity: 1;
       transform: scale(1);
-      z-index: 111;
     }
 
     &-enter-active,
