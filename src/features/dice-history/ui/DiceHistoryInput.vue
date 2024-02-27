@@ -1,14 +1,10 @@
 <script lang="ts" setup>
-  import { type RollBase } from 'dice-roller-parser';
   import { ref } from 'vue';
 
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
 
-  const emit = defineEmits<{
-    (e: 'roll', roll: RollBase): void;
-  }>();
-
   const currentInput = ref('');
+  const invalid = ref(false);
 
   const history: string[] = [];
 
@@ -26,7 +22,8 @@
     const result = tryRoll({ formula });
 
     if (!result) {
-      // TODO: Handle error
+      flashInvalid();
+
       return;
     }
 
@@ -40,8 +37,6 @@
     }
 
     currentInput.value = '';
-
-    emit('roll', result);
   }
 
   function traverseHistory(direction: 'up' | 'down') {
@@ -55,10 +50,21 @@
 
     currentInput.value = historyIndex >= 0 ? history[historyIndex] : '';
   }
+
+  function flashInvalid() {
+    invalid.value = true;
+
+    setTimeout(() => {
+      invalid.value = false;
+    }, 1000);
+  }
 </script>
 
 <template>
-  <div class="dice-history-input">
+  <div
+    class="dice-history-input"
+    :class="{ 'dice-history-input--invalid': invalid }"
+  >
     <input
       v-model="currentInput"
       class="dice-history-input__input"
@@ -70,20 +76,35 @@
       @keyup.down="traverseHistory('down')"
     />
 
-    <svg-icon icon="dice/d6" />
+    <svg-icon
+      class="dice-history-input__dice-icon"
+      icon="dice/d6"
+    />
   </div>
 </template>
 
 <style lang="scss" scoped>
   .dice-history-input {
+    $root: &;
+
     display: flex;
     align-items: center;
 
+    &--invalid {
+      #{$root}__dice-icon {
+        color: var(--error);
+      }
+    }
+
     &__input {
       all: unset;
-      flex: auto;
       display: block;
+      flex: auto;
       padding: 8px 0 8px 8px;
+    }
+
+    &__dice-icon {
+      @include css_anim($item: color);
     }
   }
 </style>
