@@ -43,8 +43,8 @@
 
     // Ищем в колонках, т.к. именно в них содержаться элементы
     getItemIndexByKey: (rows, key) =>
-      rows.findIndex(
-        (row) => row.columns?.find((item) => item[itemKeyField.value] === key),
+      rows.findIndex((row) =>
+        row.columns?.find((item) => item[itemKeyField.value] === key),
       ),
   }));
 

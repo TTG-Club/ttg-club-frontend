@@ -36,8 +36,9 @@
           };
 
           const getRaceBonus = () => {
-            const bonus = props.raceBonuses.find((item) => item.key === key)
-              ?.value;
+            const bonus = props.raceBonuses.find(
+              (item) => item.key === key,
+            )?.value;
 
             if (!bonus && bonus !== 0) {
               return '−';
