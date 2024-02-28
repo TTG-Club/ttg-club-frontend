@@ -29,8 +29,8 @@ export const useRollStore = defineStore('RollStore', () => {
 
   let fallbackSource = DEFAULT_FALLBACK_SOURCE;
 
-  function setFallbackSource(source: string) {
-    fallbackSource = source;
+  function setFallbackSource(source?: string) {
+    fallbackSource = source ?? DEFAULT_FALLBACK_SOURCE;
   }
 
   // TODO: Different keys for different rolls channels

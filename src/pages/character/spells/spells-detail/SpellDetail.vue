@@ -85,7 +85,10 @@
 </script>
 
 <template>
-  <content-detail class="spell-detail">
+  <content-detail
+    class="spell-detail"
+    :entity-name="spell.value?.name.rus"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

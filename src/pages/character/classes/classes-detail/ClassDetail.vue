@@ -333,7 +333,10 @@
 </script>
 
 <template>
-  <content-detail class="class-detail">
+  <content-detail
+    class="class-detail"
+    :entity-name="currentClass ? `${currentClass.name.rus} (класс)` : undefined"
+  >
     <template #fixed>
       <div
         ref="fixed"

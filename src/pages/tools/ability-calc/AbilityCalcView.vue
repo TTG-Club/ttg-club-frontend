@@ -1,6 +1,7 @@
 <script lang="ts">
   import { computed, defineComponent, ref, shallowRef } from 'vue';
 
+  import { useRollStore } from '@/shared/stores/RollStore';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
 
@@ -51,6 +52,10 @@
       const rolls = ref<Array<AbilityRoll>>([]);
 
       const component = computed(() => currentTab.value?.component || null);
+
+      const rollStore = useRollStore();
+
+      rollStore.setFallbackSource('Калькулятор характеристик');
 
       return {
         tabs,

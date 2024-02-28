@@ -1,7 +1,21 @@
-<script>
-  export default {
-    name: 'ContentDetail',
-  };
+<script lang="ts" setup>
+  import { watch } from 'vue';
+
+  import { useRollStore } from '../stores/RollStore';
+
+  const props = defineProps<{
+    entityName?: string;
+  }>();
+
+  const rollStore = useRollStore();
+
+  watch(
+    () => props.entityName,
+    (name) => {
+      rollStore.setFallbackSource(name);
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
