@@ -3,11 +3,7 @@
   import { type GroupedRollBase, type RollBase } from 'dice-roller-parser';
   import { computed } from 'vue';
 
-  import {
-    isCritical,
-    DiceRollRenderer,
-    type RollType,
-  } from '@/shared/utils/roll';
+  import { isCritical, RollRenderer, type RollType } from '@/shared/utils/roll';
 
   const props = defineProps<{
     roll: GroupedRollBase | RollBase;
@@ -31,7 +27,7 @@
 
   const description = computed(
     () =>
-      `${props.label || ''}${DiceRollRenderer.getLabelSuffix(
+      `${props.label || ''}${RollRenderer.getLabelSuffix(
         props.roll,
         props.type,
       )}`,
@@ -53,7 +49,7 @@
       <div class="roll__description">
         <div class="roll__description-text">
           {{ description }}
-          <component :is="DiceRollRenderer.render(roll)" />
+          <component :is="RollRenderer.render(roll)" />
         </div>
 
         <div class="roll__time">

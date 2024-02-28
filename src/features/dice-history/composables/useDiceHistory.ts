@@ -1,9 +1,19 @@
-import { ref } from 'vue';
+import { computed } from 'vue';
 
-const isOpen = ref(true);
+import { RollNotificationMode, useRollStore } from '@/shared/stores/RollStore';
 
-function toggle() {
-  isOpen.value = !isOpen.value;
+export function useDiceHistory() {
+  const rollStore = useRollStore();
+
+  const isOpen = computed(
+    () => rollStore.notificationMode === RollNotificationMode.History,
+  );
+
+  function toggle() {
+    rollStore.notificationMode = isOpen.value
+      ? RollNotificationMode.Notification
+      : RollNotificationMode.History;
+  }
+
+  return { isOpen, toggle };
 }
-
-export const useDiceHistory = () => ({ isOpen, toggle });

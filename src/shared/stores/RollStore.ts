@@ -1,10 +1,13 @@
 import { useBroadcastChannel, useLocalStorage } from '@vueuse/core';
 import { type RollBase } from 'dice-roller-parser';
 import { defineStore } from 'pinia';
-import { computed, toRaw } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 
+import { eventBus } from '../utils/eventBus';
 import { type RollType } from '../utils/roll';
 import { type PartialBy } from '../utils/types';
+
+import type { ToastOptions } from 'vue-toastification/src/types';
 
 const ROLL_ITEMS_LIMIT = 100;
 const DEFAULT_FALLBACK_SOURCE = 'Бросок';
@@ -18,7 +21,14 @@ export type RollEntry = {
   type?: RollType;
 };
 
+export enum RollNotificationMode {
+  Notification,
+  History,
+}
+
 export const useRollStore = defineStore('RollStore', () => {
+  const notificationMode = ref(RollNotificationMode.Notification);
+
   const { channel, post: broadcast } = useBroadcastChannel({
     name: 'rolls',
   });
@@ -40,10 +50,14 @@ export const useRollStore = defineStore('RollStore', () => {
     rolls.value.sort((a, b) => (a.date < b.date ? -1 : 1)),
   );
 
-  function registerRoll(item: PartialBy<RollEntry, 'source'>) {
+  function registerRoll(
+    item: PartialBy<RollEntry, 'source'>,
+    toastOptions?: ToastOptions,
+  ) {
     const roll = addRoll(item);
 
     if (roll) {
+      eventBus.emit('Roll.New', { entry: roll, toastOptions });
       broadcast(roll);
     }
   }
@@ -70,6 +84,7 @@ export const useRollStore = defineStore('RollStore', () => {
   }
 
   return {
+    notificationMode,
     setFallbackSource,
     rolls,
     rollsSortedByDate,

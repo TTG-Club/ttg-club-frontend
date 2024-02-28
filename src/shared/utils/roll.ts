@@ -13,7 +13,7 @@ import type {
 
 export type RollType = 'advantage' | 'disadvantage';
 
-export class DiceRollRenderer {
+export class RollRenderer {
   public static render(roll: RollBase): VNode {
     let render;
 
@@ -199,12 +199,6 @@ export class DiceRollRenderer {
   }
 }
 
-/**
- * Получение формулы броска
- *
- * @param formula - Формула броска.
- * @param type - Бросок с преимуществом или помехой
- */
 export function getFormattedFormula({
   formula,
   type,

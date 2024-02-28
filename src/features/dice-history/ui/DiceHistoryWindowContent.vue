@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  // TODO: Rename component
+  // TODO: Consider renaming the component
 
   import { ref, watch, onMounted } from 'vue';
 

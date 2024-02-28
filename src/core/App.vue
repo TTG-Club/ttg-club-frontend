@@ -5,6 +5,7 @@
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import { DiceHistory } from '@/features/dice-history/ui';
+  import { useDiceNotification } from '@/features/dice-notification';
   import NavBar from '@/features/menu/NavBar.vue';
 
   const userStore = useUserStore();
@@ -22,6 +23,8 @@
   tryOnBeforeMount(async () => {
     await initUser();
   });
+
+  useDiceNotification().enable();
 </script>
 
 <template>
