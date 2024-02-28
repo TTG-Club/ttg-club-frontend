@@ -89,6 +89,7 @@
 
     display: flex;
     align-items: center;
+    padding-right: 4px;
 
     &--invalid {
       #{$root}__dice-icon {
