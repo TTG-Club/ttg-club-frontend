@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   // TODO: Consider renaming the component
 
-  import { ref, watch, onMounted } from 'vue';
+  import { ref, watch, onMounted, nextTick } from 'vue';
 
   import { useRollStore } from '@/shared/stores/RollStore';
 
@@ -14,14 +14,15 @@
   const rollStore = useRollStore();
 
   watch(
-    rollStore.rollsSortedByDate,
+    () => rollStore.rollsSortedByDate,
     () => {
       scrollDown();
     },
     { flush: 'post' },
   );
 
-  onMounted(() => {
+  onMounted(async () => {
+    await nextTick();
     scrollDown();
   });
 

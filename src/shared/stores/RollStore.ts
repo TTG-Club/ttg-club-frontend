@@ -1,5 +1,6 @@
 import { useBroadcastChannel, useLocalStorage } from '@vueuse/core';
 import { type RollBase } from 'dice-roller-parser';
+import { sortBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, ref, toRaw } from 'vue';
 
@@ -46,9 +47,7 @@ export const useRollStore = defineStore('RollStore', () => {
   // TODO: Different keys for different rolls channels
   const rolls = useLocalStorage<RollEntry[]>('rolls', []);
 
-  const rollsSortedByDate = computed(() =>
-    rolls.value.sort((a, b) => (a.date < b.date ? -1 : 1)),
-  );
+  const rollsSortedByDate = computed(() => sortBy(rolls.value, 'date'));
 
   function registerRoll(
     item: PartialBy<RollEntry, 'source'>,

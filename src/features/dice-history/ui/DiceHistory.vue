@@ -11,7 +11,7 @@
 
 <template>
   <transition name="popover-animation">
-    <bottom-right-window v-show="isOpen">
+    <bottom-right-window v-if="isOpen">
       <dice-history-window-content />
     </bottom-right-window>
   </transition>
