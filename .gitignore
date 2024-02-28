@@ -4,6 +4,7 @@
 node_modules
 /dist
 /public_html
+/_test
 .eslintcache
 
 # Local env files
