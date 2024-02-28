@@ -7,7 +7,7 @@
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
   import { useIsDev } from '@/shared/utils/isDev';
 
-  import type { TRollType } from '../helpers/roll';
+  import type { RollType } from '../utils/roll';
   import type { RollBase } from 'dice-roller-parser';
 
   const props = withDefaults(
@@ -82,7 +82,7 @@
     }
   };
 
-  const tryRoll = (type?: TRollType) => {
+  const tryRoll = (type?: RollType) => {
     clearSelection();
 
     try {
