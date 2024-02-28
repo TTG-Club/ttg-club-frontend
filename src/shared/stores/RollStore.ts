@@ -2,7 +2,7 @@ import { useBroadcastChannel, useLocalStorage } from '@vueuse/core';
 import { type RollBase } from 'dice-roller-parser';
 import { sortBy } from 'lodash-es';
 import { defineStore } from 'pinia';
-import { computed, ref, toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
 
 import { eventBus } from '../utils/eventBus';
 import { type RollType } from '../utils/roll';
@@ -28,7 +28,10 @@ export enum RollNotificationMode {
 }
 
 export const useRollStore = defineStore('RollStore', () => {
-  const notificationMode = ref(RollNotificationMode.Notification);
+  const notificationMode = useLocalStorage(
+    'roll-notification-mode',
+    RollNotificationMode.Notification,
+  );
 
   const { channel, post: broadcast } = useBroadcastChannel({
     name: 'rolls',
