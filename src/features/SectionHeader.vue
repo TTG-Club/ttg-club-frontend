@@ -198,7 +198,7 @@
         v-if="onExportFoundry"
         :tooltip="{
           content:
-            '<span>Импорт в Foundry VTT.&nbsp;<a href=&#34;/info/fvtt_import&#34; target=&#34;_blank&#34;>Инструкция</a>',
+            '<span>Экспорт&nbsp;(<a href=&#34;/info/exporting&#34; target=&#34;_blank&#34;>Инструкция</a>)</span>',
         }"
         class="section-header__control is-only-desktop"
         icon="export-foundry"

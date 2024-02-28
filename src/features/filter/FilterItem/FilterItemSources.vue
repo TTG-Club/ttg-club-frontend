@@ -151,9 +151,9 @@
 
           <ui-checkbox
             v-tippy="{
-              content: `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «${
-                group.name
-              }»`,
+              content: `${
+                isGroupActive(groupKey) ? 'Выключить' : 'Включить'
+              } «${group.name}»`,
             }"
             :model-value="isGroupActive(groupKey)"
             type="toggle"
