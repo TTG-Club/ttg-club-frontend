@@ -6,11 +6,11 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import AbilityRaces from '@/pages/Tools/ability-calc/ability-races/AbilityRaces.vue';
-  import AbilityArray from '@/pages/Tools/ability-calc/AbilityArray.vue';
-  import AbilityPointBuy from '@/pages/Tools/ability-calc/AbilityPointBuy.vue';
-  import AbilityRandom from '@/pages/Tools/ability-calc/AbilityRandom.vue';
-  import AbilityTable from '@/pages/Tools/ability-calc/AbilityTable.vue';
+  import AbilityRaces from '@/pages/tools/ability-calc/ability-races/AbilityRaces.vue';
+  import AbilityArray from '@/pages/tools/ability-calc/AbilityArray.vue';
+  import AbilityPointBuy from '@/pages/tools/ability-calc/AbilityPointBuy.vue';
+  import AbilityRandom from '@/pages/tools/ability-calc/AbilityRandom.vue';
+  import AbilityTable from '@/pages/tools/ability-calc/AbilityTable.vue';
 
   import type { Component } from 'vue';
 
