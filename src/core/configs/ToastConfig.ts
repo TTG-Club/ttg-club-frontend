@@ -1,10 +1,10 @@
 import { orderBy } from 'lodash-es';
 
+import IconToastClose from '@/shared/ui/icons/IconToastClose.vue';
 import {
   toast as toastHelper,
   ToastEventBus as GlobalToastBus,
-} from '@/shared/helpers/toast';
-import IconToastClose from '@/shared/ui/icons/IconToastClose.vue';
+} from '@/shared/utils/toast';
 
 import type {
   PluginOptions,

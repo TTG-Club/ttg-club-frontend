@@ -3,19 +3,18 @@
   import { onBeforeMount, ref } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { downloadByUrl } from '@/shared/helpers/download';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+  import { downloadByUrl } from '@/shared/utils/download';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
 
-  const http = useAxios();
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
@@ -54,7 +53,7 @@
       loading.value = true;
       abortController.value = new AbortController();
 
-      const resp = await http.post<ICreature>({
+      const resp = await httpClient.post<ICreature>({
         url,
         signal: abortController.value.signal,
       });

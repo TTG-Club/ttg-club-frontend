@@ -8,7 +8,7 @@
   } from '@vueuse/gesture';
   import { computed, ref, watch } from 'vue';
 
-  import isAppleDevice from '@/shared/helpers/isAppleDevice';
+  import isAppleDevice from '@/shared/utils/isAppleDevice';
 
   import { useTokenator } from '@/pages/tools/tokenator/composable';
 

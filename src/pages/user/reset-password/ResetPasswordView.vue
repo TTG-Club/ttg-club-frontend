@@ -3,7 +3,7 @@
   import { computed, defineComponent, onBeforeMount, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
@@ -22,7 +22,7 @@
     },
     setup() {
       const route = useRoute();
-      const http = useAxios();
+
       const userStore = useUserStore();
       const { isAuthenticated } = storeToRefs(userStore);
 
@@ -37,7 +37,7 @@
         }
 
         try {
-          const resp = await http.get<ITokenValidation>({
+          const resp = await httpClient.get<ITokenValidation>({
             url: `/auth/token/validate?token=${route.query.token}`,
           });
 

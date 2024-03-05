@@ -1,8 +1,8 @@
-<script>
+<script setup lang="ts">
   import { storeToRefs } from 'pinia';
   import { computed, ref } from 'vue';
 
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore.ts';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import AuthModal from '@/shared/ui/modals/AuthModal.vue';
 
@@ -11,147 +11,120 @@
   import RegistrationView from '@/features/account/RegistrationView.vue';
   import NavPopover from '@/features/menu/NavPopover.vue';
 
-  export default {
-    name: 'NavProfile',
-    components: {
-      NavPopover,
-      AuthModal,
-      SvgIcon,
+  const userStore = useUserStore();
+
+  const { isAuthenticated, user } = storeToRefs(userStore);
+
+  const popover = ref(false);
+  const modal = ref('');
+
+  const modals = computed(() => [
+    {
+      rus: 'Авторизация',
+      eng: 'login',
+      component: () => LoginView,
     },
-    setup() {
-      const userStore = useUserStore();
-
-      const { isAuthenticated, user } = storeToRefs(userStore);
-
-      const popover = ref(false);
-      const modal = ref('');
-
-      const modals = computed(() => [
-        {
-          rus: 'Авторизация',
-          eng: 'login',
-          component: () => LoginView,
-        },
-        {
-          rus: 'Регистрация',
-          eng: 'reg',
-          component: () => RegistrationView,
-        },
-        {
-          rus: `${
-            isAuthenticated.value ? 'Изменение' : 'Восстановление'
-          } пароля`,
-          eng: 'change-password',
-          component: () => ChangePasswordView,
-        },
-      ]);
-
-      const modalInfo = computed(() =>
-        modals.value.find((item) => item.eng === modal.value),
-      );
-
-      const modalComponent = computed(() => modalInfo.value?.component());
-
-      const isModalOpened = computed({
-        get: () => !!modal.value,
-        set: (e) => {
-          modal.value = typeof e === 'string' ? e : false;
-        },
-      });
-
-      const greeting = computed(() => {
-        const hours = new Date().getHours();
-
-        if (hours < 6) {
-          return 'Доброй ночи';
-        }
-
-        if (hours < 12) {
-          return 'Доброе утро';
-        }
-
-        if (hours < 18) {
-          return 'Добрый день';
-        }
-
-        return 'Добрый вечер';
-      });
-
-      const hasAccessToProfile = computed(
-        () =>
-          user.value.roles.includes(EUserRoles.MODERATOR) ||
-          user.value.roles.includes(EUserRoles.ADMIN),
-      );
-
-      function openPopover() {
-        popover.value = true;
-      }
-
-      function closePopover() {
-        popover.value = false;
-      }
-
-      function togglePopover() {
-        if (!popover.value) {
-          openPopover();
-
-          return;
-        }
-
-        closePopover();
-      }
-
-      function openModal(name = 'login') {
-        modal.value = name;
-      }
-
-      function closeModal() {
-        modal.value = '';
-      }
-
-      function toggleModal() {
-        if (!modal.value) {
-          openModal();
-
-          return;
-        }
-
-        closeModal();
-      }
-
-      async function clickHandler() {
-        if (!(await userStore.getUserStatus())) {
-          toggleModal();
-
-          return;
-        }
-
-        togglePopover();
-      }
-
-      async function userLogout() {
-        closeModal();
-        closePopover();
-
-        await userStore.logout();
-      }
-
-      return {
-        hasAccessToProfile,
-        isAuthenticated,
-        isModalOpened,
-        greeting,
-        user,
-        popover,
-        userLogout,
-        clickHandler,
-        closeModal,
-        modal,
-        modalInfo,
-        modalComponent,
-      };
+    {
+      rus: 'Регистрация',
+      eng: 'reg',
+      component: () => RegistrationView,
     },
-  };
+    {
+      rus: `${isAuthenticated.value ? 'Изменение' : 'Восстановление'} пароля`,
+      eng: 'change-password',
+      component: () => ChangePasswordView,
+    },
+  ]);
+
+  const modalInfo = computed(() =>
+    modals.value.find((item) => item.eng === modal.value),
+  );
+
+  const modalComponent = computed(() => modalInfo.value?.component());
+
+  const isModalOpened = computed({
+    get: () => !!modal.value,
+    set: (e) => {
+      modal.value = typeof e === 'string' ? e : '';
+    },
+  });
+
+  const greeting = computed(() => {
+    const hours = new Date().getHours();
+
+    if (hours < 6) {
+      return 'Доброй ночи';
+    }
+
+    if (hours < 12) {
+      return 'Доброе утро';
+    }
+
+    if (hours < 18) {
+      return 'Добрый день';
+    }
+
+    return 'Добрый вечер';
+  });
+
+  const hasAccessToProfile = computed(
+    () =>
+      user.value?.roles.includes(EUserRoles.MODERATOR) ||
+      user.value?.roles.includes(EUserRoles.ADMIN),
+  );
+
+  function openPopover() {
+    popover.value = true;
+  }
+
+  function closePopover() {
+    popover.value = false;
+  }
+
+  function togglePopover() {
+    if (!popover.value) {
+      openPopover();
+
+      return;
+    }
+
+    closePopover();
+  }
+
+  function openModal(name = 'login') {
+    modal.value = name;
+  }
+
+  function closeModal() {
+    modal.value = '';
+  }
+
+  function toggleModal() {
+    if (!modal.value) {
+      openModal();
+
+      return;
+    }
+
+    closeModal();
+  }
+
+  async function clickHandler() {
+    if (!(await userStore.getUserStatus())) {
+      toggleModal();
+
+      return;
+    }
+
+    togglePopover();
+  }
+
+  async function userLogout() {
+    closeModal();
+    closePopover();
+
+    await userStore.logout();
+  }
 </script>
 
 <template>
@@ -174,8 +147,18 @@
         class="nav-profile"
       >
         <div class="nav-profile__line is-main">
-          <span class="nav-profile__line_body">
+          <span
+            v-if="user"
+            class="nav-profile__line_body"
+          >
             {{ greeting }}, <b>{{ user.username }}</b>
+          </span>
+
+          <span
+            v-else
+            class="nav-profile__line_body"
+          >
+            {{ greeting }}
           </span>
         </div>
 

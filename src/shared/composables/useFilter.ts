@@ -2,7 +2,7 @@ import localforage from 'localforage';
 import { cloneDeep } from 'lodash-es';
 import { computed, ref, unref } from 'vue';
 
-import { useAxios } from '@/shared/composables/useAxios';
+import { httpClient } from '@/shared/api';
 import type {
   SearchComposable,
   SearchConfig,
@@ -56,7 +56,6 @@ export type FilterComposable = {
 };
 
 export function useFilter(config: FilterConfig): FilterComposable {
-  const http = useAxios();
   const filter = ref<Filter | Array<FilterGroup> | undefined>(undefined);
 
   const url = computed(() => unref(config.url));
@@ -331,7 +330,7 @@ export function useFilter(config: FilterConfig): FilterComposable {
         await store.value.setItem(unref(storeKey), restored);
       };
 
-      const resp = await http.post<Filter | Array<FilterGroup>>({
+      const resp = await httpClient.post<Filter | Array<FilterGroup>>({
         url: unref(url),
       });
 

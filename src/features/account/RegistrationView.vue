@@ -7,6 +7,9 @@
   import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useUserStore } from '@/shared/stores/UserStore';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import {
     validateEmailExist,
     validateEmailFormat,
@@ -18,10 +21,7 @@
     validateRequired,
     validateUsernameExist,
     validateUsernameSpecialChars,
-  } from '@/shared/helpers/authChecks';
-  import { useUserStore } from '@/shared/stores/UserStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  } from '@/shared/utils/authChecks';
 
   export default defineComponent({
     components: {

@@ -4,8 +4,8 @@
 
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { ScreensFilterDefaults } from '@/shared/types/workshop/Screens.d';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 

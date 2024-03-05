@@ -8,10 +8,10 @@
   import { useFilter } from '@/shared/composables/useFilter';
   import { usePagination } from '@/shared/composables/usePagination';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink, TRaceList } from '@/shared/types/character/Races.d';
   import { RacesFilterDefaults } from '@/shared/types/character/Races.d';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 

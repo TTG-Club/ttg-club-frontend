@@ -8,10 +8,10 @@
     useRouter,
   } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
@@ -31,7 +31,7 @@
 
   const route = useRoute();
   const router = useRouter();
-  const http = useAxios();
+
   const race = ref();
   const loading = ref(false);
   const error = ref(false);
@@ -53,7 +53,7 @@
       loading.value = true;
       abortController.value = new AbortController();
 
-      const resp = await http.post({
+      const resp = await httpClient.post({
         url,
         payload: {
           filter: {

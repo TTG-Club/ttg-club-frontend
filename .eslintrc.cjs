@@ -262,6 +262,7 @@ module.exports = {
     'vuejs-accessibility/mouse-events-have-key-events': 'off',
     'vuejs-accessibility/label-has-for': 'off',
     'vuejs-accessibility/no-autofocus': 'off',
+    'vuejs-accessibility/form-control-has-label': 'off',
 
     // Typescript
     'no-shadow': 'off',

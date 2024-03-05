@@ -2,7 +2,7 @@
   import { computed, ref } from 'vue';
   import { useLink } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type {
     TSpellItem,
@@ -27,8 +27,6 @@
       inTab: false,
     },
   );
-
-  const http = useAxios();
 
   const { navigate, isActive, href } = useLink(props);
 
@@ -60,7 +58,7 @@
 
     try {
       if (!modal.value.data) {
-        const resp = await http.post<TSpellItem>({
+        const resp = await httpClient.post<TSpellItem>({
           url: props.spell.url,
         });
 

@@ -3,7 +3,7 @@ import { event, pageview } from 'vue-gtag';
 
 import { routes } from '@/pages';
 
-import { useIsDev } from '@/shared/helpers/isDev';
+import { useIsDev } from '@/shared/utils/isDev';
 
 import type { MaybeRef } from '@vueuse/core';
 import type { RouteLocationNormalized } from 'vue-router';

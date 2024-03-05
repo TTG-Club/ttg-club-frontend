@@ -3,8 +3,8 @@
   import { storeToRefs } from 'pinia';
   import { computed } from 'vue';
 
-  import isDev from '@/shared/helpers/isDev';
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import isDev from '@/shared/utils/isDev';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 

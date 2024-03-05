@@ -1,10 +1,10 @@
 <script lang="ts">
   import { computed, defineComponent, onActivated, ref } from 'vue';
 
-  import { getFormattedModifier } from '@/shared/helpers/abilityTransforms';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
 
   import type { PropType } from 'vue';
 

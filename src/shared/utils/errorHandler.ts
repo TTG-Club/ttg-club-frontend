@@ -1,4 +1,4 @@
-import isDev from '@/shared/helpers/isDev';
+import isDev from '@/shared/utils/isDev';
 
 export const errorHandler = (err: any) => {
   if (isDev) {

@@ -8,13 +8,13 @@
   import { usePagination } from '@/shared/composables/usePagination';
   import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
   import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/constants';
-  import { isAutoOpenAvailable } from '@/shared/helpers/isAutoOpenAvailable';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { AnyObject } from '@/shared/types/Utility';
   import { GodsFilterDefaults } from '@/shared/types/wiki/Gods.d';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
+  import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 

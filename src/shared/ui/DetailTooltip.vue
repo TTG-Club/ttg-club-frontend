@@ -5,9 +5,9 @@
 
   import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
-  import { useAxios } from '@/shared/composables/useAxios';
-  import { errorHandler } from '@/shared/helpers/errorHandler';
+  import { httpClient } from '@/shared/api';
   import RawContent from '@/shared/ui/RawContent.vue';
+  import { errorHandler } from '@/shared/utils/errorHandler';
 
   import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
   import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
@@ -47,7 +47,6 @@
   );
 
   const slots = useSlots();
-  const http = useAxios();
 
   const content = ref();
   const error = ref(false);
@@ -93,8 +92,8 @@
     }
 
     const res = !props.type
-      ? await http.rawGet({ url: computedUrl.value })
-      : await http.post({ url: computedUrl.value });
+      ? await httpClient.rawGet({ url: computedUrl.value })
+      : await httpClient.post({ url: computedUrl.value });
 
     if (res.status !== 200) {
       errorHandler(res.statusText);

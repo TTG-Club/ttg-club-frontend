@@ -2,7 +2,7 @@ import { useFetch, useFileDialog, useObjectUrl } from '@vueuse/core';
 import { useClamp } from '@vueuse/math';
 import { ref, unref } from 'vue';
 
-import { toast } from '@/shared/helpers/toast';
+import { toast } from '@/shared/utils/toast';
 
 const DEFAULT_SCALE = 1.1;
 

@@ -2,7 +2,7 @@
   import { computed, defineComponent, ref } from 'vue';
   import { useLink } from 'vue-router';
 
-  import { useAxios } from '@/shared/composables/useAxios';
+  import { httpClient } from '@/shared/api';
   import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type {
     OptionDetail,
@@ -43,8 +43,6 @@
       },
     },
     setup(props) {
-      const http = useAxios();
-
       const { navigate, isActive, href } = useLink(props);
 
       const modal = ref<{
@@ -75,7 +73,7 @@
 
         try {
           if (!modal.value.data) {
-            const resp = await http.post<OptionDetail>({
+            const resp = await httpClient.post<OptionDetail>({
               url: props.optionItem.url,
             });
 
