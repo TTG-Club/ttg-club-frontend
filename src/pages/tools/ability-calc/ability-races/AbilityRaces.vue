@@ -349,7 +349,7 @@
         background-color: var(--primary);
         position: absolute;
         top: calc(50% - 4px);
-        left: calc(-14px - 5px); // half of span's padding
+        left: -20px;
       }
     }
   }

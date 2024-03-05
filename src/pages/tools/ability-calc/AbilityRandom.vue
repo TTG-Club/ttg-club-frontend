@@ -11,7 +11,7 @@
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
   import type { PropType } from 'vue';
 
@@ -94,19 +94,12 @@
     modelValue.value = rolls.value;
   };
 
-  const onRemove = (index: number) => {
-    rolls.value[index].key = null;
-    rolls.value[index].name = null;
-
-    modelValue.value = rolls.value;
-  };
-
-  const abilities = computed(() =>
+  const abilities = (value: number) =>
     Object.keys(AbilityKey).map((key) => ({
       key,
       name: AbilityName[key as AbilityKey],
-    })),
-  );
+      value,
+    }));
 
   const sum = computed(() => {
     let result = 0;
@@ -140,36 +133,28 @@
       v-if="modelValue.length"
       class="ability-random__choose"
     >
-      <ui-select
-        v-for="(roll, index) in modelValue"
-        :key="index"
-        :model-value="roll"
-        :options="abilities"
-        allow-empty
+      <ui-multiselect
+        v-for="(roll, i) in rolls"
+        :key="i"
+        :options="abilities(roll.value)"
         class="ability-random__select"
         label="name"
         track-by="key"
-        @remove="onRemove(index)"
-        @select="onSelect($event.key, index)"
+        :placeholder="roll.name || 'Выбрать хар-ку'"
+        @update:model-value="onSelect($event.key, i)"
       >
-        <template #option="{ option }">
-          <span
-            :class="{ 'is-selected': isSelected(option.key) }"
-            class="ability-random__select_option"
-            >{{ option.name }}</span
-          >
-        </template>
-
         <template #left-slot>
           {{ roll.value }}
         </template>
 
-        <template #singleLabel>
-          {{ roll.name || 'Выбрать хар-ку' }}
+        <template #option="{ name, key }">
+          <span
+            :class="{ 'is-selected': isSelected(key) }"
+            class="ability-random__select_option"
+            >{{ name }}</span
+          >
         </template>
-
-        <template #placeholder> Выбрать хар-ку</template>
-      </ui-select>
+      </ui-multiselect>
     </div>
   </div>
 </template>
@@ -234,8 +219,7 @@
       }
 
       &_option {
-        padding: 12px 12px 12px 28px;
-
+        position: relative;
         &.is-selected {
           &::before {
             content: '';
@@ -245,7 +229,7 @@
             background-color: var(--primary);
             position: absolute;
             top: calc(50% - 5px);
-            left: 10px;
+            left: -20px;
           }
         }
       }
