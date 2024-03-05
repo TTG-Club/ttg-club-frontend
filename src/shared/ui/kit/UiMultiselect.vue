@@ -1,14 +1,12 @@
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
   import { get } from 'lodash-es';
-  import { computed, ref, watch } from 'vue';
+  import { computed, ref, toRaw, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
-  const modelValue = defineModel<T | T[]>({
-    required: true,
-  });
+  const modelValue = defineModel<T | T[]>();
 
   const props = defineProps<{
     label: string;
@@ -43,17 +41,13 @@
     }
   };
 
-  const togglePlaceholder = computed(() =>
-    focused.value || modelValue.value ? undefined : props.placeholder,
-  );
-
   const toggleIcon = computed(() =>
     focused.value ? 'arrow/up' : 'arrow/down',
   );
 
   const getOption = (option: T) => get(option, props.trackBy);
 
-  const isSelectedClass = (option: T) => modelValue.value === option;
+  const isSelectedClass = (option: T) => toRaw(modelValue.value) === option;
 
   const selectOption = (option: T) => {
     modelValue.value = option;
@@ -106,19 +100,14 @@
           ref="input"
           v-model="filter"
           :disabled="props.disabled"
-          :placeholder="togglePlaceholder"
         />
 
         <div
           class="ui-select__slotted--body"
           @click="toggleFocus"
         >
-          <div v-if="!modelValue && !props.isSearchable">
-            {{ props.placeholder }}
-          </div>
-
-          <div v-if="modelValue && (!focused || !props.isSearchable)">
-            {{ displaySelectedOptions }}
+          <div v-if="!focused || !props.isSearchable">
+            {{ modelValue ? displaySelectedOptions : props.placeholder }}
           </div>
         </div>
       </div>

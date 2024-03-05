@@ -27,6 +27,7 @@
   const { doRoll, notifyResult } = useDiceRoller();
 
   const rolls = ref<Array<AbilityRoll>>([]);
+  const selectedOption = ref<AbilityRoll | null>(null);
 
   modelValue.value = rolls.value;
 
@@ -92,14 +93,16 @@
     }
 
     modelValue.value = rolls.value;
+
+    selectedOption.value = null;
   };
 
-  const abilities = (value: number) =>
+  const abilities = computed(() =>
     Object.keys(AbilityKey).map((key) => ({
       key,
       name: AbilityName[key as AbilityKey],
-      value,
-    }));
+    })),
+  );
 
   const sum = computed(() => {
     let result = 0;
@@ -136,11 +139,12 @@
       <ui-multiselect
         v-for="(roll, i) in rolls"
         :key="i"
-        :options="abilities(roll.value)"
+        v-model="selectedOption"
+        :options="abilities"
         class="ability-random__select"
         label="name"
         track-by="key"
-        :placeholder="roll.name || 'Выбрать хар-ку'"
+        placeholder="Выбрать хар-ку"
         @update:model-value="onSelect($event.key, i)"
       >
         <template #left-slot>
