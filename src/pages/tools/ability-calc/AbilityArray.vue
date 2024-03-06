@@ -3,7 +3,7 @@
 
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
   import type { PropType } from 'vue';
 
@@ -11,6 +11,8 @@
     type: Array as PropType<Array<AbilityRoll>>,
     required: true,
   });
+
+  const selectedOptions = ref<Array<AbilityRoll | null>>([]);
 
   const rolls = ref<Array<AbilityRoll>>([
     {
@@ -80,13 +82,12 @@
     }
 
     modelValue.value = rolls.value;
-  };
 
-  const onRemove = (index: number) => {
-    rolls.value[index].key = null;
-    rolls.value[index].name = null;
+    const selectedOption = selectedOptions.value[index];
 
-    modelValue.value = rolls.value;
+    selectedOptions.value.forEach((el, i) => {
+      if (el === selectedOption && index !== i) selectedOptions.value[i] = null;
+    });
   };
 
   const abilities = computed(() =>
@@ -102,36 +103,29 @@
     v-if="modelValue.length"
     class="ability-array"
   >
-    <ui-select
-      v-for="(roll, index) in modelValue"
-      :key="index"
-      :model-value="roll"
+    <ui-multiselect
+      v-for="(roll, i) in rolls"
+      :key="i"
+      v-model="selectedOptions[i]"
       :options="abilities"
-      allow-empty
       class="ability-array__select"
       label="name"
       track-by="key"
-      @remove="onRemove(index)"
-      @select="onSelect($event.key, index)"
+      placeholder="Выбрать хар-ку"
+      @update:model-value="onSelect($event.key, i)"
     >
       <template #left-slot>
         {{ roll.value }}
       </template>
 
-      <template #singleLabel>
-        {{ roll.name || 'Выбрать хар-ку' }}
-      </template>
-
-      <template #placeholder> Выбрать хар-ку</template>
-
-      <template #option="{ option }">
+      <template #option="{ name, key }">
         <span
-          :class="{ 'is-selected': isSelected(option.key) }"
+          :class="{ 'is-selected': isSelected(key) }"
           class="ability-array__select_option"
-          >{{ option.name }}</span
+          >{{ name }}</span
         >
       </template>
-    </ui-select>
+    </ui-multiselect>
   </div>
 </template>
 
@@ -152,7 +146,7 @@
       }
 
       &_option {
-        padding: 12px 12px 12px 28px;
+        position: relative;
 
         &.is-selected {
           &::before {
@@ -163,7 +157,7 @@
             background-color: var(--primary);
             position: absolute;
             top: calc(50% - 5px);
-            left: 10px;
+            left: -20px;
           }
         }
       }

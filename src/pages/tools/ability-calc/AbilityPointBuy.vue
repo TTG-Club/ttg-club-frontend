@@ -15,7 +15,7 @@
     required: true,
   });
 
-  const selectedOption = ref<
+  const selectedOptions = ref<
     Array<{ value: number; cost: number; label: string }>
   >([]);
 
@@ -114,7 +114,7 @@
       modelValue.value[i].value = 8;
     }
 
-    selectedOption.value = [];
+    selectedOptions.value = [];
   };
 
   const getOptions = (roll: AbilityRoll) => {
@@ -147,9 +147,10 @@
   };
 
   const onSelect = (i: number) => {
-    modelValue.value[i].value = selectedOption.value[i].value;
+    modelValue.value[i].value = selectedOptions.value[i].value;
 
-    [selectedOption.value[i].label] = selectedOption.value[i].label.split(' ');
+    [selectedOptions.value[i].label] =
+      selectedOptions.value[i].label.split(' ');
   };
 </script>
 
@@ -177,7 +178,7 @@
         :key="i"
       >
         <ui-multiselect
-          v-model="selectedOption[i]"
+          v-model="selectedOptions[i]"
           :options="getOptions(roll)"
           class="ability-point-buy__select"
           label="label"

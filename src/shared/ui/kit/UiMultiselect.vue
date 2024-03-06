@@ -251,7 +251,7 @@
         font-size: var(--main-font-size);
         line-height: var(--main-line-height);
         position: absolute;
-        max-height: calc(43.2px * 5);
+        max-height: calc(43.2px * 6);
         overflow: auto;
         bottom: auto;
         margin: 5px 0 0;

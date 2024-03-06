@@ -27,7 +27,7 @@
   const { doRoll, notifyResult } = useDiceRoller();
 
   const rolls = ref<Array<AbilityRoll>>([]);
-  const selectedOption = ref<AbilityRoll | null>(null);
+  const selectedOptions = ref<AbilityRoll[]>([]);
 
   modelValue.value = rolls.value;
 
@@ -65,6 +65,8 @@
       rolls.value = reverse(orderBy(rolled, ['value']));
 
       modelValue.value = rolls.value;
+
+      selectedOptions.value = [];
     } catch (err) {
       toast.error('Произошла какая-то ошибка... попробуй еще раз');
     }
@@ -93,8 +95,6 @@
     }
 
     modelValue.value = rolls.value;
-
-    selectedOption.value = null;
   };
 
   const abilities = computed(() =>
@@ -139,7 +139,7 @@
       <ui-multiselect
         v-for="(roll, i) in rolls"
         :key="i"
-        v-model="selectedOption"
+        v-model="selectedOptions[i]"
         :options="abilities"
         class="ability-random__select"
         label="name"
