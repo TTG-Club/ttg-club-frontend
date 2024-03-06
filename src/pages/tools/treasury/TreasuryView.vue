@@ -1,14 +1,18 @@
-<script lang="ts" setup>
+<script setup lang="ts">
   import { groupBy, max, mean, sortedUniq, throttle } from 'lodash-es';
   import { storeToRefs } from 'pinia';
   import { computed, onBeforeMount, ref } from 'vue';
 
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import type {
+    CrListItem,
+    TGroupedTreasureLink,
+  } from '@/shared/types/tools/Treasury';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
@@ -20,10 +24,7 @@
   import MagicItemLink from '@/pages/inventory/magic-items/MagicItemLink.vue';
   import TreasureItem from '@/pages/inventory/treasures/TreasureItem.vue';
 
-  interface CrListItem {
-    name: string;
-    value: number;
-  }
+  import type { AxiosError, AxiosResponse } from 'axios';
 
   const crList: CrListItem[] = [
     {
@@ -105,7 +106,7 @@
     },
   });
 
-  const groupedResult = computed(() => {
+  const groupedResult = computed<TGroupedTreasureLink>(() => {
     if (!settings.value.grouping) {
       return result.value;
     }
@@ -196,7 +197,7 @@
       });
   }, 300);
 
-  const selectItem = async (group: number, index: number) => {
+  const selectItem = async (group: string, index: number) => {
     try {
       if (controllers.value.detail) {
         controllers.value.detail.abort();
@@ -286,14 +287,13 @@
         <div class="tools_settings__row">
           <span class="label">Показатель опасности монстров:</span>
 
-          <ui-select
+          <ui-multiselect
             v-model="crValue"
             :options="crList"
             label="name"
             track-by="value"
-          >
-            <template #placeholder> Показатель опасности </template>
-          </ui-select>
+            placeholder="Показатель опасности"
+          />
         </div>
 
         <transition-group name="fade">
