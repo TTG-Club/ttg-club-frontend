@@ -27,7 +27,7 @@
   const { doRoll, notifyResult } = useDiceRoller();
 
   const rolls = ref<Array<AbilityRoll>>([]);
-  const selectedOptions = ref<AbilityRoll[]>([]);
+  const selectedOptions = ref<Array<AbilityRoll | null>>([]);
 
   modelValue.value = rolls.value;
 
@@ -95,6 +95,12 @@
     }
 
     modelValue.value = rolls.value;
+
+    const selectedOption = selectedOptions.value[index];
+
+    selectedOptions.value.forEach((el, i) => {
+      if (el === selectedOption && index !== i) selectedOptions.value[i] = null;
+    });
   };
 
   const abilities = computed(() =>
