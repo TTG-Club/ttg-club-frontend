@@ -267,7 +267,7 @@
       cursor: pointer;
       margin-bottom: initial;
       line-height: initial;
-      padding: 12px 12px 12px 28px;
+      padding: 12px 18px 12px 28px;
 
       &:hover {
         background: var(--hover);

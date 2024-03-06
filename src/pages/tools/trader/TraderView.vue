@@ -26,7 +26,7 @@
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -37,6 +37,8 @@
   import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
   import MagicItemBody from '@/pages/inventory/magic-items/magic-items-detail/MagicItemBody.vue';
   import MagicItemLink from '@/pages/inventory/magic-items/MagicItemLink.vue';
+
+  import type { Ref } from 'vue';
 
   type TConfig = {
     magicLevels: Array<TNameValue<number>>;
@@ -99,7 +101,7 @@
   const magicLevel = computed<TNameValue<number>>({
     get: () =>
       config.value.magicLevels.find((el) => el.value === form.value.magicLevel),
-    set: (v) => {
+    set: (v: Ref<number>) => {
       form.value.magicLevel = v.value;
     },
   });
@@ -386,7 +388,7 @@
     }
   };
 
-  const selectItem = async (index) => {
+  const selectItem = async (index: number) => {
     try {
       error.value = false;
 
@@ -448,14 +450,13 @@
             <div class="row">
               <span class="label">Количество магии в мире:</span>
 
-              <ui-select
+              <ui-multiselect
                 v-model="magicLevel"
                 :options="config.magicLevels"
                 label="name"
                 track-by="value"
-              >
-                <template #placeholder> Количество </template>
-              </ui-select>
+                placeholder="Количество"
+              />
             </div>
 
             <div class="row">
