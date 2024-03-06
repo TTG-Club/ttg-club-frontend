@@ -1,5 +1,5 @@
-<script lang="ts">
-  import { computed, defineComponent, ref, shallowRef } from 'vue';
+<script setup lang="ts">
+  import { computed, ref, shallowRef } from 'vue';
 
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
@@ -20,47 +20,29 @@
     component: Component;
   };
 
-  export default defineComponent({
-    components: {
-      AbilityRaces,
-      AbilityTable,
-      PageLayout,
-      UiSwitch,
+  const tabs: TCalcTab[] = [
+    {
+      id: 'random',
+      name: 'Случайный набор',
+      component: shallowRef(AbilityRandom),
     },
-    setup() {
-      const tabs: TCalcTab[] = [
-        {
-          id: 'random',
-          name: 'Случайный набор',
-          component: shallowRef(AbilityRandom),
-        },
-        {
-          id: 'point-buy',
-          name: '«Покупка» значений',
-          component: shallowRef(AbilityPointBuy),
-        },
-        {
-          id: 'standard',
-          name: 'Стандартный набор',
-          component: shallowRef(AbilityArray),
-        },
-      ];
-
-      const raceBonuses = ref<Array<AbilityRoll>>([]);
-      const currentTab = ref(tabs[0]);
-      const rolls = ref<Array<AbilityRoll>>([]);
-
-      const component = computed(() => currentTab.value?.component || null);
-
-      return {
-        tabs,
-        currentTab,
-        component,
-        rolls,
-        raceBonuses,
-      };
+    {
+      id: 'point-buy',
+      name: '«Покупка» значений',
+      component: shallowRef(AbilityPointBuy),
     },
-  });
+    {
+      id: 'standard',
+      name: 'Стандартный набор',
+      component: shallowRef(AbilityArray),
+    },
+  ];
+
+  const raceBonuses = ref<Array<AbilityRoll>>([]);
+  const currentTab = ref(tabs[0]);
+  const rolls = ref<Array<AbilityRoll>>([]);
+
+  const component = computed(() => currentTab.value?.component || null);
 </script>
 
 <template>

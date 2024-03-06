@@ -1,7 +1,7 @@
-<script lang="ts">
+<script setup lang="ts">
   import { orderBy, reverse } from 'lodash-es';
   import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, onActivated, ref } from 'vue';
+  import { computed, onActivated, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
   import { ToastEventBus } from '@/core/configs/ToastConfig';
@@ -11,129 +11,115 @@
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
   import type { PropType } from 'vue';
 
-  export default defineComponent({
-    components: {
-      UiSelect,
-      UiButton,
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
-      },
-    },
-    setup(props, { emit }) {
-      const toast = useToast(ToastEventBus);
-      const uiStore = useUIStore();
-      const { isMobile } = storeToRefs(uiStore);
+  const modelValue = defineModel({
+    type: Array as PropType<Array<AbilityRoll>>,
+    required: true,
+  });
 
-      const { doRoll, notifyResult } = useDiceRoller();
+  const toast = useToast(ToastEventBus);
+  const uiStore = useUIStore();
+  const { isMobile } = storeToRefs(uiStore);
 
-      const rolls = ref<Array<AbilityRoll>>([]);
+  const { doRoll, notifyResult } = useDiceRoller();
 
-      emit('update:model-value', rolls.value);
+  const rolls = ref<Array<AbilityRoll>>([]);
+  const selectedOptions = ref<Array<AbilityRoll | null>>([]);
 
-      onActivated(() => {
-        emit('update:model-value', rolls.value);
-      });
+  modelValue.value = rolls.value;
 
-      const tryRoll = () => {
-        try {
-          const rolled = [];
+  onActivated(() => {
+    modelValue.value = rolls.value;
+  });
 
-          for (let i = 0; i < 6; i++) {
-            const roll = doRoll({
-              formula: '4d6kh3',
-            });
+  const tryRoll = () => {
+    try {
+      const rolled = [];
 
-            if (!isMobile.value) {
-              notifyResult({
-                roll,
-                label: `Бросок №${i + 1}`,
-                toastOptions: {
-                  timeout: 5000 + 1000 * i,
-                },
-              });
-            }
+      for (let i = 0; i < 6; i++) {
+        const roll = doRoll({
+          formula: '4d6kh3',
+        });
 
-            rolled.push({
-              name: null,
-              key: null,
-              shortName: null,
-              value: Number(roll.value),
-            });
-          }
-
-          rolls.value = reverse(orderBy(rolled, ['value']));
-
-          emit('update:model-value', rolls.value);
-        } catch (err) {
-          toast.error('Произошла какая-то ошибка... попробуй еще раз');
-        }
-      };
-
-      const isSelected = (key: AbilityKey) =>
-        rolls.value.find((roll) => roll.key === key);
-
-      const onSelect = (key: AbilityKey | null, index: number) => {
-        const setValue = (value: typeof key, i: number) => {
-          rolls.value[i].key = value;
-
-          rolls.value[i].name = value ? AbilityName[value] : null;
-        };
-
-        for (let i = 0; i < rolls.value.length; i++) {
-          if (i === index) {
-            setValue(key, i);
-
-            continue;
-          }
-
-          if (rolls.value[i].key === key) {
-            setValue(null, i);
-          }
+        if (!isMobile.value) {
+          notifyResult({
+            roll,
+            label: `Бросок №${i + 1}`,
+            toastOptions: {
+              timeout: 5000 + 1000 * i,
+            },
+          });
         }
 
-        emit('update:model-value', rolls.value);
-      };
+        rolled.push({
+          name: null,
+          key: null,
+          shortName: null,
+          value: Number(roll.value),
+        });
+      }
 
-      const onRemove = (index: number) => {
-        rolls.value[index].key = null;
-        rolls.value[index].name = null;
+      rolls.value = reverse(orderBy(rolled, ['value']));
 
-        emit('update:model-value', rolls.value);
-      };
+      modelValue.value = rolls.value;
 
-      return {
-        abilities: computed(() =>
-          Object.keys(AbilityKey).map((key) => ({
-            key,
-            name: AbilityName[key as AbilityKey],
-          })),
-        ),
-        sum: computed(() => {
-          let result = 0;
+      selectedOptions.value = [];
+    } catch (err) {
+      toast.error('Произошла какая-то ошибка... попробуй еще раз');
+    }
+  };
 
-          for (const roll of rolls.value) {
-            if (roll.value) {
-              result += roll.value;
-            }
-          }
+  const isSelected = (key: AbilityKey) =>
+    rolls.value.find((roll) => roll.key === key);
 
-          return result;
-        }),
-        tryRoll,
-        getFormattedModifier,
-        isSelected,
-        onSelect,
-        onRemove,
-      };
-    },
+  const onSelect = (key: AbilityKey | null, index: number) => {
+    const setValue = (value: typeof key, i: number) => {
+      rolls.value[i].key = value;
+
+      rolls.value[i].name = value ? AbilityName[value] : null;
+    };
+
+    for (let i = 0; i < rolls.value.length; i++) {
+      if (i === index) {
+        setValue(key, i);
+
+        continue;
+      }
+
+      if (rolls.value[i].key === key) {
+        setValue(null, i);
+      }
+    }
+
+    modelValue.value = rolls.value;
+
+    const selectedOption = selectedOptions.value[index];
+
+    selectedOptions.value.forEach((el, i) => {
+      if (el === selectedOption && index !== i) selectedOptions.value[i] = null;
+    });
+  };
+
+  const abilities = computed(() =>
+    Object.keys(AbilityKey).map((key) => ({
+      key,
+      name: AbilityName[key as AbilityKey],
+    })),
+  );
+
+  const sum = computed(() => {
+    let result = 0;
+
+    for (const roll of rolls.value) {
+      if (roll.value) {
+        result += roll.value;
+      }
+    }
+
+    return result;
   });
 </script>
 
@@ -156,36 +142,29 @@
       v-if="modelValue.length"
       class="ability-random__choose"
     >
-      <ui-select
-        v-for="(roll, index) in modelValue"
-        :key="index"
-        :model-value="roll"
+      <ui-multiselect
+        v-for="(roll, i) in rolls"
+        :key="i"
+        v-model="selectedOptions[i]"
         :options="abilities"
-        allow-empty
         class="ability-random__select"
         label="name"
         track-by="key"
-        @remove="onRemove(index)"
-        @select="onSelect($event.key, index)"
+        placeholder="Выбрать хар-ку"
+        @update:model-value="onSelect($event.key, i)"
       >
-        <template #option="{ option }">
-          <span
-            :class="{ 'is-selected': isSelected(option.key) }"
-            class="ability-random__select_option"
-            >{{ option.name }}</span
-          >
-        </template>
-
         <template #left-slot>
           {{ roll.value }}
         </template>
 
-        <template #singleLabel>
-          {{ roll.name || 'Выбрать хар-ку' }}
+        <template #option="{ name, key }">
+          <span
+            :class="{ 'is-selected': isSelected(key) }"
+            class="ability-random__select_option"
+            >{{ name }}</span
+          >
         </template>
-
-        <template #placeholder> Выбрать хар-ку </template>
-      </ui-select>
+      </ui-multiselect>
     </div>
   </div>
 </template>
@@ -250,8 +229,7 @@
       }
 
       &_option {
-        padding: 12px 12px 12px 28px;
-
+        position: relative;
         &.is-selected {
           &::before {
             content: '';
@@ -261,7 +239,7 @@
             background-color: var(--primary);
             position: absolute;
             top: calc(50% - 5px);
-            left: 10px;
+            left: -20px;
           }
         }
       }

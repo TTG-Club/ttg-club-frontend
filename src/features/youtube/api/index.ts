@@ -1,5 +1,5 @@
 import { toValue } from '@vueuse/shared';
-import { toPairs, fromPairs } from 'lodash-es';
+import { fromPairs, toPairs } from 'lodash-es';
 
 import { httpClient, type RequestConfig } from '@/shared/api';
 import type {

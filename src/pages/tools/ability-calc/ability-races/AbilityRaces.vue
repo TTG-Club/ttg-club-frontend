@@ -1,13 +1,13 @@
-<script lang="ts">
+<script setup lang="ts">
   import { cloneDeep, reverse } from 'lodash-es';
-  import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
+  import { computed, onBeforeMount, ref, watch } from 'vue';
 
   import { usePagination } from '@/shared/composables/usePagination';
   import type { TRaceLink } from '@/shared/types/character/Races.d';
   import type {
     AbilityRoll,
     ChoiceDouble,
-  } from '@/shared/types/tools/AbilityCalc.d';
+  } from '@/shared/types/tools/AbilityCalc';
   import {
     AbilityChoiceDouble,
     AbilityChoiceDoubleKey,
@@ -15,242 +15,189 @@
     AbilityName,
     AbilityTypeKey,
   } from '@/shared/types/tools/AbilityCalc.d';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
-  import RaceLink from '@/pages/character/races/RaceLink.vue';
-  import { useRaceAbility } from '@/pages/tools/ability-calc/ability-races/composables/useRaceAbility';
+  import RaceLink from '@/pages/Character/races/RaceLink.vue';
+  import { useRaceAbility } from '@/pages/Tools/ability-calc/ability-races/composables/useRaceAbility';
 
-  import type { PropType } from 'vue';
+  const modelValue = defineModel({
+    required: true,
+  });
 
-  export default defineComponent({
-    components: {
-      UiSelect,
-      RaceLink,
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
+  const selectedRace = ref<TRaceLink | null>(null);
+  const selectedSubRace = ref<TRaceLink | null>(null);
+
+  const selectedChoiceDouble = ref<{
+    key: AbilityChoiceDoubleKey;
+    label: AbilityChoiceDouble;
+  } | null>(null);
+
+  const { initPages, items } = usePagination({
+    url: '/races',
+    order: [
+      {
+        field: 'name',
+        direction: 'asc',
       },
-    },
-    setup(props, { emit }) {
-      const selectedRace = ref<TRaceLink | null>(null);
-      const selectedSubRace = ref<TRaceLink | null>(null);
+    ],
+  });
 
-      const selectedChoiceDouble = ref<{
-        key: AbilityChoiceDoubleKey;
-        label: AbilityChoiceDouble;
-      } | null>(null);
+  const races = computed(() =>
+    items.value.map((race: TRaceLink) => {
+      const raceItem = cloneDeep(race);
 
-      const { initPages, items } = usePagination({
-        url: '/races',
-        size: -1,
-        order: [
-          {
-            field: 'name',
-            direction: 'asc',
-          },
-        ],
-      });
-
-      const races = computed(() =>
-        items.value.map((race: TRaceLink) => {
-          const raceItem = cloneDeep(race);
-
-          if (raceItem.subraces?.length) {
-            raceItem.subraces = raceItem.subraces.map((item) => ({
-              ...item,
-              image: raceItem.image,
-            }));
-          }
-
-          if (
-            items.value.filter(
-              (item: TRaceLink) => raceItem.name.rus === item.name.rus,
-            ).length >= 2
-          ) {
-            return {
-              ...raceItem,
-              name: {
-                ...raceItem.name,
-                rus: `${raceItem.name.rus} (${raceItem.source.shortName})`,
-              },
-            };
-          }
-
-          return raceItem;
-        }),
-      );
-
-      const subRaces = computed(() => selectedRace.value?.subraces || []);
-
-      const choiceDouble = computed(
-        (): Array<ChoiceDouble> =>
-          reverse(
-            Object.entries(AbilityChoiceDouble).map((entry) => ({
-              key: entry[0] as AbilityChoiceDoubleKey,
-              label: entry[1] as AbilityChoiceDouble,
-            })),
-          ),
-      );
-
-      const getIsChoiceDouble = (race: TRaceLink) =>
-        race.abilities.length === 1 &&
-        race.abilities[0].key === AbilityTypeKey.CHOICE_DOUBLE;
-
-      const checkInstance = computed(
-        () => selectedSubRace.value || selectedRace.value,
-      );
-
-      const isChoiceDouble = computed(() =>
-        checkInstance.value ? getIsChoiceDouble(checkInstance.value) : false,
-      );
-
-      const {
-        firstValue,
-        firstLabel,
-        isFirstDisabled,
-        onFirstSelect,
-
-        secondValue,
-        secondLabel,
-        isSecondDisabled,
-        onSecondSelect,
-
-        thirdValue,
-        thirdLabel,
-        isThirdDisabled,
-        onThirdSelect,
-      } = useRaceAbility({
-        isChoiceDouble,
-        selectedChoiceDouble,
-        checkInstance,
-      });
-
-      const abilities = computed(() => {
-        const keys: Array<AbilityKey> = Object.values(AbilityKey);
-
-        return keys.map((key) => ({
-          key,
-          name: AbilityName[key],
+      if (raceItem.subraces?.length) {
+        raceItem.subraces = raceItem.subraces.map((item) => ({
+          ...item,
+          image: raceItem.image,
         }));
-      });
+      }
 
-      const isAbilitySelected = (key: AbilityKey) =>
-        firstValue.value?.key === key ||
-        secondValue.value?.key === key ||
-        thirdValue.value?.key === key;
+      if (
+        items.value.filter(
+          (item: TRaceLink) => raceItem.name.rus === item.name.rus,
+        ).length >= 2
+      ) {
+        return {
+          ...raceItem,
+          name: {
+            ...raceItem.name,
+            rus: `${raceItem.name.rus} (${raceItem.source.shortName})`,
+          },
+        };
+      }
 
-      onBeforeMount(async () => {
-        await initPages();
-      });
+      return raceItem;
+    }),
+  );
 
-      const emitValue = () => {
-        if (
-          !isChoiceDouble.value &&
-          checkInstance.value?.abilities.length &&
-          !checkInstance.value?.abilities.find(
-            (ability) =>
-              Object.values(AbilityTypeKey).includes(
-                ability.key as AbilityTypeKey,
-              ) && ability.key !== AbilityTypeKey.ALL,
-          )
-        ) {
-          emit('update:model-value', checkInstance.value?.abilities);
+  const subRaces = computed(() => selectedRace.value?.subraces || []);
 
-          return;
-        }
+  const choiceDouble = computed(
+    (): Array<ChoiceDouble> =>
+      reverse(
+        Object.entries(AbilityChoiceDouble).map((entry) => ({
+          key: entry[0] as AbilityChoiceDoubleKey,
+          label: entry[1] as AbilityChoiceDouble,
+        })),
+      ),
+  );
 
-        const value = [
-          ...(checkInstance.value?.abilities.filter(
-            (ability) =>
-              !Object.values(AbilityTypeKey).includes(
-                ability.key as AbilityTypeKey,
-              ) || ability.key === AbilityTypeKey.ALL,
-          ) as Array<AbilityRoll>),
-        ];
+  const getIsChoiceDouble = (race: TRaceLink) =>
+    race.abilities.length === 1 &&
+    race.abilities[0].key === AbilityTypeKey.CHOICE_DOUBLE;
 
-        if (firstValue.value) {
-          value.push(firstValue.value);
-        }
+  const checkInstance = computed(
+    () => selectedSubRace.value || selectedRace.value,
+  );
 
-        if (secondValue.value) {
-          value.push(secondValue.value);
-        }
+  const isChoiceDouble = computed(() =>
+    checkInstance.value ? getIsChoiceDouble(checkInstance.value) : false,
+  );
 
-        if (thirdValue.value) {
-          value.push(thirdValue.value);
-        }
+  const {
+    firstValue,
+    firstLabel,
+    isFirstDisabled,
+    onFirstSelect,
 
-        emit('update:model-value', value);
-      };
+    secondValue,
+    secondLabel,
+    isSecondDisabled,
+    onSecondSelect,
 
-      const onSelectChoiceDouble = (choice: ChoiceDouble | null) => {
-        selectedChoiceDouble.value = choice;
-        firstValue.value = null;
-        secondValue.value = null;
-        thirdValue.value = null;
+    thirdValue,
+    thirdLabel,
+    isThirdDisabled,
+    onThirdSelect,
+  } = useRaceAbility({
+    isChoiceDouble,
+    selectedChoiceDouble,
+    checkInstance,
+  });
 
-        emitValue();
-      };
+  const abilities = computed(() => {
+    const keys: Array<AbilityKey> = Object.values(AbilityKey);
 
-      const onSelectSubRace = (subRace: TRaceLink | null) => {
-        selectedSubRace.value = subRace;
+    return keys.map((key) => ({
+      key,
+      name: AbilityName[key],
+    }));
+  });
 
-        onSelectChoiceDouble(
-          isChoiceDouble.value ? choiceDouble.value[0] : null,
-        );
-      };
+  const isAbilitySelected = (key: AbilityKey) =>
+    firstValue.value?.key === key ||
+    secondValue.value?.key === key ||
+    thirdValue.value?.key === key;
 
-      const onSelectRace = (race: TRaceLink | null) => {
-        const value = cloneDeep(race);
+  onBeforeMount(async () => {
+    await initPages();
+  });
 
-        if (value) {
-          value.name.rus = value.name.rus.replace(/\(.+\)$/i, '');
-        }
+  const emitValue = () => {
+    if (
+      !isChoiceDouble.value &&
+      checkInstance.value?.abilities.length &&
+      !checkInstance.value?.abilities.find(
+        (ability) =>
+          Object.values(AbilityTypeKey).includes(
+            ability.key as AbilityTypeKey,
+          ) && ability.key !== AbilityTypeKey.ALL,
+      )
+    ) {
+      modelValue.value = checkInstance.value?.abilities;
 
-        selectedRace.value = value;
+      return;
+    }
 
-        onSelectSubRace(null);
-      };
+    const value = [
+      ...(checkInstance.value?.abilities.filter(
+        (ability) =>
+          !Object.values(AbilityTypeKey).includes(
+            ability.key as AbilityTypeKey,
+          ) || ability.key === AbilityTypeKey.ALL,
+      ) as Array<AbilityRoll>),
+    ];
 
-      watch([firstValue, secondValue, thirdValue], () => {
-        emitValue();
-      });
+    if (firstValue.value) {
+      value.push(firstValue.value);
+    }
 
-      return {
-        races,
-        selectedRace,
-        isChoiceDouble,
-        subRaces,
-        selectedSubRace,
-        checkInstance,
-        choiceDouble,
-        selectedChoiceDouble,
-        abilities,
+    if (secondValue.value) {
+      value.push(secondValue.value);
+    }
 
-        firstValue,
-        firstLabel,
-        isFirstDisabled,
-        onFirstSelect,
+    if (thirdValue.value) {
+      value.push(thirdValue.value);
+    }
 
-        secondValue,
-        secondLabel,
-        isSecondDisabled,
-        onSecondSelect,
+    modelValue.value = value;
+  };
 
-        thirdValue,
-        thirdLabel,
-        isThirdDisabled,
-        onThirdSelect,
+  const onSelectChoiceDouble = () => {
+    firstValue.value = null;
+    secondValue.value = null;
+    thirdValue.value = null;
 
-        isAbilitySelected,
+    emitValue();
+  };
 
-        onSelectRace,
-        onSelectSubRace,
-        onSelectChoiceDouble,
-      };
-    },
+  const onSelectSubRace = () => {
+    selectedChoiceDouble.value = isChoiceDouble.value
+      ? choiceDouble.value[0]
+      : null;
+
+    onSelectChoiceDouble();
+  };
+
+  const onSelectRace = () => {
+    selectedSubRace.value = null;
+
+    onSelectSubRace();
+  };
+
+  watch([firstValue, secondValue, thirdValue], () => {
+    emitValue();
   });
 </script>
 
@@ -276,75 +223,50 @@
     </div>
 
     <div class="ability-races__fields">
-      <ui-select
-        :custom-label="({ name: { rus } }) => rus"
-        :disabled="!races?.length"
-        :model-value="selectedRace"
+      <ui-multiselect
+        v-model="selectedRace"
+        track-by="url"
+        label="name.rus"
+        is-searchable
+        placeholder="Выбрать расу"
         :options="races"
-        allow-empty
-        searchable
-        track-by="url"
-        @remove="onSelectRace"
-        @select="onSelectRace"
+        @update:model-value="onSelectRace"
       >
-        <template #label> Раса </template>
+        <template #label>Раса</template>
+      </ui-multiselect>
 
-        <template #singleLabel="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #option="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #placeholder> Выбрать расу </template>
-      </ui-select>
-
-      <ui-select
+      <ui-multiselect
+        v-model="selectedSubRace"
+        track-by="url"
+        label="name.rus"
         :disabled="!subRaces?.length"
-        :model-value="selectedSubRace"
+        placeholder="Выбрать подрасу"
         :options="subRaces"
-        allow-empty
-        is-wrap-disabled
-        track-by="url"
-        @select="onSelectSubRace"
+        @update:model-value="onSelectSubRace"
       >
-        <template #label> Подраса </template>
+        <template #label>Подраса</template>
+      </ui-multiselect>
 
-        <template #singleLabel="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #option="{ option }">
-          {{ option.name.rus }}
-        </template>
-
-        <template #placeholder> Выбрать подрасу </template>
-      </ui-select>
-
-      <ui-select
-        :disabled="!isChoiceDouble"
-        :model-value="selectedChoiceDouble"
-        :options="choiceDouble"
+      <ui-multiselect
+        v-model="selectedChoiceDouble"
+        track-by="key"
         label="label"
-        track-by="key"
-        @select="onSelectChoiceDouble"
+        :disabled="!isChoiceDouble"
+        placeholder="Выбери что-нибудь"
+        :options="choiceDouble"
+        @update:model-value="onSelectChoiceDouble"
       >
-        <template #label> Набор характеристик </template>
-      </ui-select>
+        <template #label>Набор характеристик</template>
+      </ui-multiselect>
 
-      <ui-select
-        :disabled="isFirstDisabled"
-        :model-value="firstValue"
-        :options="abilities"
-        allow-empty
-        class="ability-races__select"
-        clear-on-select
-        is-wrap-disabled
-        label="name"
+      <ui-multiselect
+        v-model="firstValue"
         track-by="key"
-        @remove="onFirstSelect"
-        @select="onFirstSelect"
+        label="name"
+        :disabled="isFirstDisabled"
+        :options="abilities"
+        placeholder="Выбери хар-ку"
+        @update:model-value="onFirstSelect"
       >
         <template
           v-if="firstLabel"
@@ -353,31 +275,23 @@
           {{ firstLabel }}
         </template>
 
-        <template #singleLabel>
-          {{ firstValue?.name || 'Выбрать хар-ку' }}
-        </template>
-
-        <template #placeholder> Выбери хар-ку </template>
-
-        <template #option="{ option }">
+        <template #option="{ name, key }">
           <span
-            :class="{ 'is-used': isAbilitySelected(option.key) }"
-            class="ability-races__select_option"
-            >{{ option.name }}</span
+            :class="{ 'in-use': isAbilitySelected(key) }"
+            class="ui-select__option"
+            >{{ name }}</span
           >
         </template>
-      </ui-select>
+      </ui-multiselect>
 
-      <ui-select
-        :disabled="isSecondDisabled"
-        :model-value="secondValue"
-        :options="abilities"
-        allow-empty
-        class="ability-races__select"
-        is-wrap-disabled
-        label="name"
+      <ui-multiselect
+        v-model="secondValue"
         track-by="key"
-        @select="onSecondSelect"
+        label="name"
+        :disabled="isSecondDisabled"
+        :options="abilities"
+        placeholder="Выбери хар-ку"
+        @update:model-value="onSecondSelect"
       >
         <template
           v-if="secondLabel"
@@ -386,31 +300,23 @@
           {{ secondLabel }}
         </template>
 
-        <template #singleLabel>
-          {{ secondValue?.name || 'Выбрать хар-ку' }}
-        </template>
-
-        <template #placeholder> Выбери хар-ку </template>
-
-        <template #option="{ option }">
+        <template #option="{ name, key }">
           <span
-            :class="{ 'is-used': isAbilitySelected(option.key) }"
-            class="ability-races__select_option"
-            >{{ option.name }}</span
+            :class="{ 'in-use': isAbilitySelected(key) }"
+            class="ui-select__option"
+            >{{ name }}</span
           >
         </template>
-      </ui-select>
+      </ui-multiselect>
 
-      <ui-select
-        :disabled="isThirdDisabled"
-        :model-value="thirdValue"
-        :options="abilities"
-        allow-empty
-        class="ability-races__select"
-        is-wrap-disabled
-        label="name"
+      <ui-multiselect
+        v-model="thirdValue"
         track-by="key"
-        @select="onThirdSelect"
+        label="name"
+        :disabled="isThirdDisabled"
+        :options="abilities"
+        placeholder="Выбери хар-ку"
+        @update:model-value="onThirdSelect"
       >
         <template
           v-if="thirdLabel"
@@ -419,26 +325,34 @@
           {{ thirdLabel }}
         </template>
 
-        <template #singleLabel>
-          {{ thirdValue?.name || 'Выбрать хар-ку' }}
-        </template>
-
-        <template #placeholder> Выбери хар-ку </template>
-
-        <template #option="{ option }">
+        <template #option="{ name, key }">
           <span
-            :class="{ 'is-used': isAbilitySelected(option.key) }"
-            class="ability-races__select_option"
-            >{{ option.name }}</span
+            :class="{ 'in-use': isAbilitySelected(key) }"
+            class="ui-select__option"
+            >{{ name }}</span
           >
         </template>
-      </ui-select>
+      </ui-multiselect>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-  @use '@/assets/styles/variables/mixins' as *;
+  .ui-select__option {
+    position: relative;
+    &.in-use {
+      &::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        position: absolute;
+        top: calc(50% - 4px);
+        left: -20px;
+      }
+    }
+  }
 
   .ability-races {
     display: flex;
@@ -497,37 +411,6 @@
 
       @media (max-width: 576px) {
         gap: 16px 24px;
-      }
-    }
-
-    &__select {
-      :deep(.multiselect__option) {
-        padding: 0;
-
-        .ability-races {
-          &__select {
-            &_option {
-              padding: 12px 12px 12px 28px;
-
-              &.is-used {
-                &::before {
-                  content: '';
-                  width: 10px;
-                  height: 10px;
-                  border-radius: 50%;
-                  background-color: var(--primary);
-                  position: absolute;
-                  top: calc(50% - 5px);
-                  left: 10px;
-                }
-
-                &:hover {
-                  color: var(--text-btn-color);
-                }
-              }
-            }
-          }
-        }
       }
     }
   }

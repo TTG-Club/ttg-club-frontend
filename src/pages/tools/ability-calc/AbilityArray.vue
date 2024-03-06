@@ -1,115 +1,101 @@
-<script lang="ts">
-  import { computed, defineComponent, onActivated, ref } from 'vue';
+<script setup lang="ts">
+  import { computed, onActivated, ref } from 'vue';
 
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
   import type { PropType } from 'vue';
 
-  export default defineComponent({
-    components: {
-      UiSelect,
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
-      },
-    },
-    setup(props, { emit }) {
-      const rolls = ref<Array<AbilityRoll>>([
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 15,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 14,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 13,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 12,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 10,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 8,
-        },
-      ]);
-
-      emit('update:model-value', rolls.value);
-
-      onActivated(() => {
-        emit('update:model-value', rolls.value);
-      });
-
-      const isSelected = (key: AbilityKey) =>
-        rolls.value.find((roll) => roll.key === key);
-
-      const onSelect = (key: AbilityKey | null, index: number) => {
-        const setValue = (value: typeof key, i: number) => {
-          rolls.value[i].key = value;
-
-          rolls.value[i].name = value ? AbilityName[value] : null;
-        };
-
-        for (let i = 0; i < rolls.value.length; i++) {
-          if (i === index) {
-            setValue(key, i);
-
-            continue;
-          }
-
-          if (rolls.value[i].key === key) {
-            setValue(null, i);
-          }
-        }
-
-        emit('update:model-value', rolls.value);
-      };
-
-      const onRemove = (index: number) => {
-        rolls.value[index].key = null;
-        rolls.value[index].name = null;
-
-        emit('update:model-value', rolls.value);
-      };
-
-      return {
-        abilities: computed(() =>
-          Object.keys(AbilityKey).map((key) => ({
-            key,
-            name: AbilityName[key as AbilityKey],
-          })),
-        ),
-        getFormattedModifier,
-        isSelected,
-        onSelect,
-        onRemove,
-      };
-    },
+  const modelValue = defineModel({
+    type: Array as PropType<Array<AbilityRoll>>,
+    required: true,
   });
+
+  const selectedOptions = ref<Array<AbilityRoll | null>>([]);
+
+  const rolls = ref<Array<AbilityRoll>>([
+    {
+      name: null,
+      key: null,
+      shortName: null,
+      value: 15,
+    },
+    {
+      name: null,
+      key: null,
+      shortName: null,
+      value: 14,
+    },
+    {
+      name: null,
+      key: null,
+      shortName: null,
+      value: 13,
+    },
+    {
+      name: null,
+      key: null,
+      shortName: null,
+      value: 12,
+    },
+    {
+      name: null,
+      key: null,
+      shortName: null,
+      value: 10,
+    },
+    {
+      name: null,
+      key: null,
+      shortName: null,
+      value: 8,
+    },
+  ]);
+
+  modelValue.value = rolls.value;
+
+  onActivated(() => {
+    modelValue.value = rolls.value;
+  });
+
+  const isSelected = (key: AbilityKey) =>
+    rolls.value.find((roll) => roll.key === key);
+
+  const onSelect = (key: AbilityKey | null, index: number) => {
+    const setValue = (value: typeof key, i: number) => {
+      rolls.value[i].key = value;
+
+      rolls.value[i].name = value ? AbilityName[value] : null;
+    };
+
+    for (let i = 0; i < rolls.value.length; i++) {
+      if (i === index) {
+        setValue(key, i);
+
+        continue;
+      }
+
+      if (rolls.value[i].key === key) {
+        setValue(null, i);
+      }
+    }
+
+    modelValue.value = rolls.value;
+
+    const selectedOption = selectedOptions.value[index];
+
+    selectedOptions.value.forEach((el, i) => {
+      if (el === selectedOption && index !== i) selectedOptions.value[i] = null;
+    });
+  };
+
+  const abilities = computed(() =>
+    Object.keys(AbilityKey).map((key) => ({
+      key,
+      name: AbilityName[key as AbilityKey],
+    })),
+  );
 </script>
 
 <template>
@@ -117,36 +103,29 @@
     v-if="modelValue.length"
     class="ability-array"
   >
-    <ui-select
-      v-for="(roll, index) in modelValue"
-      :key="index"
-      :model-value="roll"
+    <ui-multiselect
+      v-for="(roll, i) in rolls"
+      :key="i"
+      v-model="selectedOptions[i]"
       :options="abilities"
-      allow-empty
       class="ability-array__select"
       label="name"
       track-by="key"
-      @remove="onRemove(index)"
-      @select="onSelect($event.key, index)"
+      placeholder="Выбрать хар-ку"
+      @update:model-value="onSelect($event.key, i)"
     >
       <template #left-slot>
         {{ roll.value }}
       </template>
 
-      <template #singleLabel>
-        {{ roll.name || 'Выбрать хар-ку' }}
-      </template>
-
-      <template #placeholder> Выбрать хар-ку </template>
-
-      <template #option="{ option }">
+      <template #option="{ name, key }">
         <span
-          :class="{ 'is-selected': isSelected(option.key) }"
+          :class="{ 'is-selected': isSelected(key) }"
           class="ability-array__select_option"
-          >{{ option.name }}</span
+          >{{ name }}</span
         >
       </template>
-    </ui-select>
+    </ui-multiselect>
   </div>
 </template>
 
@@ -167,7 +146,7 @@
       }
 
       &_option {
-        padding: 12px 12px 12px 28px;
+        position: relative;
 
         &.is-selected {
           &::before {
@@ -178,7 +157,7 @@
             background-color: var(--primary);
             position: absolute;
             top: calc(50% - 5px);
-            left: 10px;
+            left: -20px;
           }
         }
       }
