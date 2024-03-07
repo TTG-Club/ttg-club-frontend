@@ -1,3 +1,4 @@
+import { httpClient } from '@/shared/api';
 import { errorHandler } from '@/shared/utils/errorHandler';
 
 import type { AxiosError, AxiosResponse } from 'axios';
@@ -45,7 +46,7 @@ export const DefaultTippyProps: DefaultProps = {
     }
 
     if (attr) {
-      http
+      httpClient
         .rawGet({
           url: attr,
         })
