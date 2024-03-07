@@ -1,5 +1,7 @@
+import { httpClient } from '@/shared/api';
 import { errorHandler } from '@/shared/utils/errorHandler';
 
+import type { AxiosError, AxiosResponse } from 'axios';
 import type { DefaultProps } from 'tippy.js';
 import type { TippyPluginOptions } from 'vue-tippy';
 
@@ -44,11 +46,11 @@ export const DefaultTippyProps: DefaultProps = {
     }
 
     if (attr) {
-      http
+      httpClient
         .rawGet({
           url: attr,
         })
-        .then((res) => {
+        .then((res: AxiosResponse) => {
           if (res.status !== 200) {
             errorHandler(res.statusText);
 
@@ -59,7 +61,7 @@ export const DefaultTippyProps: DefaultProps = {
 
           canShow = true;
         })
-        .catch((err) => {
+        .catch((err: AxiosError) => {
           errorHandler(err);
 
           canShow = false;
