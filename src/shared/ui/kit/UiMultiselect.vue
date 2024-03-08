@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
-  import { get } from 'lodash-es';
+  import { get, isEqual } from 'lodash-es';
   import { computed, ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
@@ -28,16 +28,12 @@
   });
 
   const toggleFocus = (e: Event) => {
-    if (e.type === 'focusin') {
-      focused.value = true;
-    }
+    if (e.type === 'focusin') focused.value = true;
 
     if (e.type === 'click') {
       focused.value = !focused.value;
 
-      if (focused.value) {
-        input.value?.focusInput();
-      }
+      if (focused.value) input.value?.focusInput();
     }
   };
 
@@ -46,7 +42,8 @@
   );
 
   const isSelectedClass = (option: T) =>
-    String(get(option, props.label)) === String(props.placeholder);
+    String(get(option, props.label)) === String(props.placeholder) ||
+    isEqual(modelValue.value, option);
 
   const selectOption = (option: T) => {
     modelValue.value = option;
@@ -57,9 +54,7 @@
   );
 
   watch(focused, (isFocused) => {
-    if (!isFocused) {
-      filter.value = '';
-    }
+    if (!isFocused) filter.value = '';
   });
 
   const filteredOptions = computed(() =>
