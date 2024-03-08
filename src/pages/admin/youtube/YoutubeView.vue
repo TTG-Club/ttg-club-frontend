@@ -7,8 +7,8 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
   import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
 
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
   import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
@@ -84,11 +84,11 @@
           <div :class="$style.count">
             <span>Количество видео на странице</span>
 
-            <ui-select
-              :model-value="itemsPerPage.find((item) => item.value === size)"
+            <ui-multiselect
               :options="itemsPerPage"
               label="name"
               track-by="value"
+              :placeholder="itemsPerPage[0].name"
               @update:model-value="size = $event.value"
             />
           </div>
