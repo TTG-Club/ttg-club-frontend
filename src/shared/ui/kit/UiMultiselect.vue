@@ -1,12 +1,12 @@
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
   import { get } from 'lodash-es';
-  import { computed, ref, toRaw, watch } from 'vue';
+  import { computed, ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
-  const modelValue = defineModel<T | T[]>();
+  const modelValue = defineModel<T>();
 
   const props = defineProps<{
     label: string;
@@ -45,9 +45,8 @@
     focused.value ? 'arrow/up' : 'arrow/down',
   );
 
-  const getOption = (option: T) => get(option, props.trackBy);
-
-  const isSelectedClass = (option: T) => toRaw(modelValue.value) === option;
+  const isSelectedClass = (option: T) =>
+    String(get(option, props.label)) === String(props.placeholder);
 
   const selectOption = (option: T) => {
     modelValue.value = option;
@@ -64,9 +63,12 @@
   });
 
   const filteredOptions = computed(() =>
-    props.options.filter((el) =>
-      get(el, props.label).toLowerCase().includes(String(filter.value)),
-    ),
+    props.options.filter((el) => {
+      const optionLabel = String(get(el, props.label)).toUpperCase();
+      const currentFilter = String(filter.value).toUpperCase();
+
+      return optionLabel.includes(currentFilter);
+    }),
   );
 </script>
 
@@ -138,7 +140,7 @@
       <ul class="ui-select__content">
         <li
           v-for="option in filteredOptions"
-          :key="getOption(option)"
+          :key="get(option, props.trackBy)"
           :class="[
             'ui-select__element',
             { 'ui-select__element--selected': isSelectedClass(option) },
