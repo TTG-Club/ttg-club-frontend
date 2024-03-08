@@ -95,20 +95,21 @@
       </div>
 
       <div class="ui-select__slotted-wrapper">
-        <ui-input
-          v-if="props.isSearchable"
-          ref="input"
-          v-model="filter"
-          :disabled="props.disabled"
-        />
-
-        <div
-          class="ui-select__slotted--body"
-          @click="toggleFocus"
-        >
-          <div v-if="!focused || !props.isSearchable">
+        <div class="ui-select__slotted--body">
+          <div
+            v-if="!focused || !props.isSearchable"
+            class="ui-select__placeholder"
+            @click="toggleFocus"
+          >
             {{ modelValue ? displaySelectedOptions : props.placeholder }}
           </div>
+
+          <ui-input
+            v-if="props.isSearchable"
+            ref="input"
+            v-model="filter"
+            :disabled="props.disabled"
+          />
         </div>
       </div>
 
@@ -170,6 +171,17 @@
     &__label {
       margin-bottom: 8px;
       padding: 0 8px;
+    }
+
+    &__placeholder {
+      height: 100%;
+      padding: 8px;
+      width: 100%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      z-index: 2;
+      position: absolute;
     }
 
     &__select {
@@ -345,16 +357,7 @@
       }
 
       &--body {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-
-        div {
-          padding: 11px;
-        }
+        min-width: 38px;
       }
     }
   }
