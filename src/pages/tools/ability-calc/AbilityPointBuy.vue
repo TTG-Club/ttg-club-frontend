@@ -180,7 +180,6 @@
         <ui-multiselect
           v-model="selectedOptions[i]"
           :options="getOptions(roll)"
-          class="ability-point-buy__select"
           label="label"
           track-by="value"
           :placeholder="roll.value || 'Выбрать значение'"
@@ -236,15 +235,6 @@
       @media (max-width: 576px) {
         display: flex;
         flex-direction: column;
-      }
-    }
-
-    &__select {
-      &_placeholder {
-        display: flex;
-      }
-
-      &_roll {
       }
     }
 

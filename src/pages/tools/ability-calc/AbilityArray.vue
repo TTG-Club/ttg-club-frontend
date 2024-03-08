@@ -137,14 +137,6 @@
     grid-template-columns: 1fr 1fr 1fr;
 
     &__select {
-      :deep(.multiselect__option) {
-        padding: 0;
-      }
-
-      &_placeholder {
-        display: flex;
-      }
-
       &_option {
         position: relative;
 
@@ -160,9 +152,6 @@
             left: -20px;
           }
         }
-      }
-
-      &_roll {
       }
     }
 

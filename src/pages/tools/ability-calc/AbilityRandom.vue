@@ -147,7 +147,6 @@
         :key="i"
         v-model="selectedOptions[i]"
         :options="abilities"
-        class="ability-random__select"
         label="name"
         track-by="key"
         placeholder="Выбрать хар-ку"
@@ -220,14 +219,6 @@
     }
 
     &__select {
-      :deep(.multiselect__option) {
-        padding: 0;
-      }
-
-      &_placeholder {
-        display: flex;
-      }
-
       &_option {
         position: relative;
         &.is-selected {
@@ -242,9 +233,6 @@
             left: -20px;
           }
         }
-      }
-
-      &_roll {
       }
     }
 
