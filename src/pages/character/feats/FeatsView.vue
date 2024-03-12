@@ -7,7 +7,10 @@
   import { usePagination } from '@/shared/composables/usePagination';
   import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { TraitsFilterDefaults } from '@/shared/types/character/Traits.d';
+  import {
+    FeatsFilterDefaults,
+    type FeatsLinkItem,
+  } from '@/shared/types/character/Feats.d';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';
   import VirtualGroupedList from '@/shared/ui/virtual-views/VirtualGroupedList/VirtualGroupedList.vue';
   import { getListProps } from '@/shared/ui/virtual-views/VirtualList/helpers';
@@ -16,7 +19,7 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  import TraitLink from '@/pages/character/traits/TraitLink.vue';
+  import FeatLink from './FeatLink.vue';
 
   type TProps = {
     storeKey?: string;
@@ -33,12 +36,12 @@
   const { fullscreen } = storeToRefs(uiStore);
 
   const filter = useFilter({
-    dbName: TraitsFilterDefaults.dbName,
-    url: TraitsFilterDefaults.url,
+    dbName: FeatsFilterDefaults.dbName,
+    url: FeatsFilterDefaults.url,
   });
 
-  const { initPages, items: traits } = usePagination({
-    url: '/traits',
+  const { initPages, items: feats } = usePagination<FeatsLinkItem>({
+    url: '/feats',
     size: -1,
     filter: {
       isCustomized: filter.isCustomized,
@@ -56,8 +59,8 @@
   const onSearch = async () => {
     await initPages();
 
-    if (isAutoOpenAvailable(traits)) {
-      await router.push({ path: traits.value[0].url });
+    if (isAutoOpenAvailable(feats)) {
+      await router.push({ path: feats.value[0].url });
     }
   };
 
@@ -66,10 +69,10 @@
     await initPages();
   });
 
-  const showRightSide = computed(() => route.name === 'traitDetail');
+  const showRightSide = computed(() => route.name === 'featDetail');
 
   const { setReference } = useScrollToPathInList({
-    items: traits,
+    items: feats,
     showRightSide,
   });
 </script>
@@ -83,17 +86,17 @@
     @update="initPages"
   >
     <virtual-grouped-list
-      :list="getListProps({ items: traits })"
+      :list="getListProps({ items: feats })"
       :get-group="getGroupByFirstLetter"
       :grid="{
         flat: checkIsListGridFlat({ showRightSide, fullscreen }),
         reference: setReference,
       }"
     >
-      <template #default="{ item: trait }">
-        <trait-link
-          :to="{ path: trait.url }"
-          :trait-item="trait"
+      <template #default="{ item: feat }">
+        <feat-link
+          :to="{ path: feat.url }"
+          :feat="feat"
         />
       </template>
     </virtual-grouped-list>

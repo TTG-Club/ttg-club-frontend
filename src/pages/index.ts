@@ -5,6 +5,7 @@ import {
   OptionsPage,
   RacesPage,
   SpellsPage,
+  FeatsPage,
   TraitsPage,
 } from './character';
 import { ErrorPage } from './errors';
@@ -40,7 +41,8 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   OptionsPage,
   RacesPage,
   SpellsPage,
-  TraitsPage,
+  FeatsPage,
+  TraitsPage, // TODO: remove
   WeaponsPage,
   ArmorsPage,
   ItemsPage,
