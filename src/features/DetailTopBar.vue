@@ -71,7 +71,7 @@
     border-radius: 8px;
     margin: 0 16px;
     gap: 12px;
-    background: var(--bg-sub-menu);
+    background: var(--hover);
 
     @include media-min($xl) {
       flex-direction: row;
@@ -93,7 +93,7 @@
     }
 
     &.bg_grey {
-      background: var(--bg-sub-menu);
+      background: var(--hover);
     }
   }
 </style>
