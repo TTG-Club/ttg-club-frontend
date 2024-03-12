@@ -328,7 +328,6 @@
         align-items: center;
 
         .nav-menu__group_label {
-          background: var(--bg-secondary);
           align-items: center;
 
           &::after {

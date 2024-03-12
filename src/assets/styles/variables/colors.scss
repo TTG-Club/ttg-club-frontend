@@ -52,6 +52,9 @@ $theme-dark: (
   'very_rare': #e770ff,
   'legendary': #f6ff00,
   'artifact': #ff8900,
+  'bg_gradient': linear-gradient(135deg, #23323bc7, #120e16c7),
+  'border_gradient': #1C386B,
+  'card-shadow': rgba(0,0,0,.05),
   // Scroll
   'background-color-thumb': rgba(255, 255, 255, 0.6),
   'background-color-thumb-hover': rgba(255, 255, 255, 0.8),
@@ -120,6 +123,9 @@ $theme-light: (
   'very_rare': #e770ff,
   'legendary': #d1d900,
   'artifact': #ff8900,
+  'bg_gradient': linear-gradient(135deg, #f7f2c5c7, #f7f1e5c7),
+  'border_gradient': #f8c6bb,
+  'card-shadow': rgba(0,0,0,.05),
   // Scroll
   'background-color-thumb': rgba(0, 0, 0, 0.6),
   'background-color-thumb-hover': rgba(0, 0, 0, 0.8),

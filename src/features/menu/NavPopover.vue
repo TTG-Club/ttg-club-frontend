@@ -128,7 +128,8 @@
       pointer-events: auto;
       display: inline-block;
       cursor: auto;
-      background-color: var(--bg-secondary);
+      background-image: var(--bg_gradient);
+      backdrop-filter: blur(16px);
       overflow: auto;
       border-radius: 12px;
       border: 1px solid var(--border);
