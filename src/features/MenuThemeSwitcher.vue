@@ -69,7 +69,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: var(--bg-sub-menu);
     color: var(--text-color-title);
     cursor: default;
   }

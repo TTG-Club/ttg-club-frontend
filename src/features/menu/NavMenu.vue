@@ -233,6 +233,7 @@
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-wrap: wrap;
         }
 
         &--support {
