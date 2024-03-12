@@ -124,6 +124,7 @@ module.exports = {
     'require-await': ['error'],
     'spaced-comment': ['error', 'always'],
     'camelcase': ['error'],
+    'curly': ['error', 'all'],
     'guard-for-in': ['error'],
     'default-param-last': ['error'],
     'lines-between-class-members': [
