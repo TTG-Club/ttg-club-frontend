@@ -120,7 +120,7 @@
     .card {
       flex: 1 1 15%;
       min-width: 15%;
-      background-color: var(--bg-secondary);
+      background-color: var(--bg-sub-menu);
       border-radius: 12px;
       display: grid;
       justify-content: start;
@@ -130,10 +130,12 @@
       overflow: hidden;
       height: 56px;
       align-items: center;
-      mask-image: radial-gradient(
-        white,
-        black
-      ); // Не удалять, это фикс для Safari, чтобы не вылазили углы картинки
+      box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
+      // mask-image: radial-gradient(
+      //   white,
+      //   black
+      // ); // Не удалять, это фикс для Safari, чтобы не вылазили углы картинки
+            // Вопрос решен кардинально! (оставим для истории)
 
       &::before {
         content: '';
@@ -142,39 +144,19 @@
         display: block;
         position: absolute;
         width: 220px;
-        height: 52px;
+        height: 56px;
         right: 0;
-        background-image: url(/img/bg_main_page_button_nav_3.png);
+        background-image: url(/img/bg_main_page_button_nav.webp);
         background-position: 0 0;
-
-        @media (max-width: 1200px) {
-          height: 48px;
-          background-image: url(/img/bg_main_page_button_nav_mobile_3.png);
-        }
+        opacity: 0.8;
       }
 
       @for $i from 1 through 11 {
         &:nth-child(#{$i + 1}) {
           &::before {
             background-position: 0 $i * -56px;
-
-            @media (max-width: 1200px) {
-              background-position: 0 $i * -48px;
-            }
           }
         }
-      }
-
-      &::after {
-        position: absolute;
-        pointer-events: none;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        display: block;
-        background: var(--bg-liner-main-page);
-        content: '';
       }
 
       .title {
@@ -227,7 +209,7 @@
     .row {
       display: flex;
       flex-direction: row;
-      gap: 12px;
+      gap: 16px;
 
       @include media-max($lg) {
         flex-direction: column;
@@ -237,14 +219,16 @@
     .column {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       flex: 1 0;
 
       &.youtube-block {
         flex: 0 0 calc(33% - 4px);
         height: fit-content;
-        border: 1px solid var(--border);
+        box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
+        padding: 1px;
         border-radius: 12px;
+        background: radial-gradient(circle at 100% 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 0% / 12px 12px no-repeat, radial-gradient(circle at 0 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 0% / 12px 12px no-repeat, radial-gradient(circle at 100% 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 100% / 12px 12px no-repeat, radial-gradient(circle at 0 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 100% / 12px 12px no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 2px) calc(100% - 24px) no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 24px) calc(100% - 2px) no-repeat, linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
       }
     }
 
@@ -252,13 +236,15 @@
       display: flex;
       flex-direction: row;
       padding: 0 16px 0 16px;
-      background-color: var(--bg-table-list);
+      background-color: var(--bg-sub-menu);
       border-radius: 12px;
       width: 100%;
       position: relative;
       overflow: hidden;
       min-height: 100px;
       height: 100%;
+      box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
+      
 
       .info {
         z-index: 1;
@@ -284,10 +270,11 @@
         background-size: cover;
         display: block;
         position: absolute;
-        width: 100%;
+        width: 101%;
         height: 100%;
         top: 0;
-        left: 0;
+        left: -1px;
+        opacity: 0.7;
         content: '';
       }
 
@@ -296,18 +283,6 @@
           transition: transform 0.6s;
           transform: scale(1.15);
         }
-      }
-
-      &:after {
-        position: absolute;
-        pointer-events: none;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        display: block;
-        content: '';
-        background: var(--bg-liner-main-page);
       }
 
       @media (max-width: 1000px) {
@@ -336,10 +311,10 @@
 }
 
 .links_block {
-  background: var(--bg-secondary);
   padding: 16px;
   border-radius: 12px;
-  border: 1px solid var(--border);
+  box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
+  background: radial-gradient(circle at 100% 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 0% / 12px 12px no-repeat, radial-gradient(circle at 0 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 0% / 12px 12px no-repeat, radial-gradient(circle at 100% 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 100% / 12px 12px no-repeat, radial-gradient(circle at 0 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 100% / 12px 12px no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 2px) calc(100% - 24px) no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 24px) calc(100% - 2px) no-repeat, linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
 
   h3 {
     font-size: calc(var(--h3-font-size) - 12px);
