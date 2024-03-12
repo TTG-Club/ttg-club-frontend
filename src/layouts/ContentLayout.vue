@@ -382,7 +382,7 @@
         height: calc(var(--max-vh) - 56px);
         overflow: hidden;
         border-radius: 0;
-        background-color: var(--bg-secondary);
+        background: var(--bg-secondary-gradient);
         position: fixed;
         margin-left: auto;
         z-index: 12;
