@@ -237,7 +237,6 @@
       flex-direction: row;
       padding: 0 16px 0 16px;
       background-color: var(--bg-sub-menu);
-      // background-color: #000;
       border-radius: 12px;
       width: 100%;
       position: relative;
@@ -285,18 +284,6 @@
           transform: scale(1.15);
         }
       }
-
-      // &:after {
-      //   position: absolute;
-      //   pointer-events: none;
-      //   top: 0;
-      //   right: 0;
-      //   bottom: 0;
-      //   left: 0;
-      //   display: block;
-      //   content: '';
-      //   background: var(--bg-liner-main-page);
-      // }
 
       @media (max-width: 1000px) {
         max-width: 100%;
