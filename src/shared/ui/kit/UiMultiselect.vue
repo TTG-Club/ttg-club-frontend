@@ -102,10 +102,11 @@
           </div>
 
           <ui-input
-            v-if="props.isSearchable"
+            v-if="focused && props.isSearchable"
             ref="input"
             v-model="filter"
             :disabled="props.disabled"
+            autofocus
           />
         </div>
       </div>
@@ -177,8 +178,6 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      z-index: 2;
-      position: absolute;
     }
 
     &__select {

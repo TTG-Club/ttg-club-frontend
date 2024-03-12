@@ -145,7 +145,6 @@
               <template #label>Средний уровень Группы</template>
             </ui-multiselect>
 
-            <!--fix width-->
             <ui-multiselect
               v-model="environment"
               :options="environments"
