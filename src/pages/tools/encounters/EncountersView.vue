@@ -1,9 +1,10 @@
-<script>
+<script setup lang="ts">
   import { throttle } from 'lodash-es';
-  import { reactive } from 'vue';
+  import { computed, onBeforeMount, reactive, ref } from 'vue';
 
+  import { httpClient } from '@/shared/api';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
   import RollTable from '@/shared/ui/RollTable.vue';
@@ -11,158 +12,116 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  export default {
-    name: 'EncountersView',
-    components: {
-      RollTable,
-      BaseModal,
-      UiButton,
-      UiSelect,
-      RawContent,
-      ContentLayout,
-    },
-    data: () => ({
-      controller: undefined,
-      environments: [],
-      levels: [],
-      results: [],
-      table: {
-        show: false,
-        data: undefined,
-      },
-      form: {
-        level: '',
-        environment: '',
-      },
-    }),
-    computed: {
-      isTableDisabled() {
-        return this.form.level && this.form.environment;
-      },
+  import type { AxiosResponse } from 'axios';
 
-      level: {
-        get() {
-          if (!this.form.level) {
-            return '';
-          }
+  type IOption = { name: string; value: number | string };
 
-          return this.levels.find((level) => level.value === this.form.level);
-        },
+  const controller = ref<AbortController>();
 
-        set(e) {
-          this.form.level = e.value;
-        },
-      },
+  const environments = ref<IOption[]>([]);
+  const levels = ref<IOption[]>([]);
+  const level = ref<IOption>();
+  const environment = ref<IOption>();
 
-      env: {
-        get() {
-          if (!this.form.environment) {
-            return '';
-          }
+  const results = ref([]);
 
-          return this.environments.find(
-            (env) => env.value === this.form.environment,
-          );
-        },
+  const table = ref({
+    show: false,
+    data: undefined,
+  });
 
-        set(e) {
-          this.form.environment = e.value;
-        },
-      },
-    },
-    async beforeMount() {
-      await this.getOptions();
-    },
-    methods: {
-      async getOptions() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/encounters',
-          });
+  const form = ref({
+    level: 0,
+    environment: '',
+  });
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  const isTableDisabled = computed(
+    () => form.value.level && form.value.environment,
+  );
 
-            return;
-          }
+  const getOptions = async () => {
+    try {
+      const resp: AxiosResponse = await httpClient.get({
+        url: '/tools/encounters',
+      });
 
-          this.environments = resp.data.environments;
-          this.levels = resp.data.levels;
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
 
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
+        return;
+      }
 
-        this.controller = new AbortController();
+      environments.value = resp.data.environments;
+      levels.value = resp.data.levels;
+    } catch (err) {
+      errorHandler(err);
+    }
+  };
 
-        try {
-          const options = {};
+  onBeforeMount(() => getOptions());
 
-          for (const [key, value] of Object.entries(this.form)) {
-            if (!value) {
-              continue;
-            }
+  // eslint-disable-next-line func-names
+  const sendForm = throttle(async function () {
+    if (controller.value) controller.value.abort();
 
-            options[key] = value;
-          }
+    controller.value = new AbortController();
 
-          const resp = await this.$http.post({
-            url: '/tools/encounters',
-            payload: options,
-            signal: this.controller.signal,
-          });
+    try {
+      const options = {};
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+      for (const [key, value] of Object.entries(form.value)) {
+        if (!value) continue;
 
-            return;
-          }
+        options[key] = value;
+      }
 
-          this.results.unshift(reactive(resp.data));
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
+      const resp: AxiosResponse = await httpClient.post({
+        url: '/tools/encounters',
+        payload: options,
+        signal: controller.value.signal,
+      });
 
-      async getTable() {
-        if (this.controller) {
-          this.controller.abort();
-        }
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
 
-        this.controller = new AbortController();
+        return;
+      }
 
-        try {
-          const resp = await this.$http.post({
-            url: '/tools/encounters/table',
-            payload: this.form,
-            signal: this.controller.signal,
-          });
+      results.value.unshift(reactive(resp.data));
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
+  }, 300);
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  const getTable = async () => {
+    if (controller.value) controller.value.abort();
 
-            return;
-          }
+    controller.value = new AbortController();
 
-          this.table = {
-            show: true,
-            data: resp.data,
-          };
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      },
-    },
+    try {
+      const resp = await httpClient.post({
+        url: '/tools/encounters/table',
+        payload: form.value,
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      table.value = {
+        show: true,
+        data: resp.data,
+      };
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
   };
 </script>
 
@@ -175,31 +134,27 @@
       >
         <div class="tools_settings__row">
           <div class="tools_settings__column">
-            <div class="row">
-              <span class="label">Средний уровень Группы</span>
+            <ui-multiselect
+              v-model="level"
+              :options="levels"
+              label="name"
+              track-by="value"
+              placeholder="Уровень"
+              @update:model-value="form.level = $event.value"
+            >
+              <template #label>Средний уровень Группы</template>
+            </ui-multiselect>
 
-              <ui-select
-                v-model="level"
-                :options="levels"
-                label="name"
-                track-by="value"
-              >
-                <template #placeholder> Уровень </template>
-              </ui-select>
-            </div>
-
-            <div class="row">
-              <span class="label">Окружение</span>
-
-              <ui-select
-                v-model="env"
-                :options="environments"
-                label="name"
-                track-by="value"
-              >
-                <template #placeholder> Окружение </template>
-              </ui-select>
-            </div>
+            <!--fix width-->
+            <ui-multiselect
+              v-model="environment"
+              :options="environments"
+              label="name"
+              track-by="value"
+              placeholder="Окружение"
+            >
+              <template #label>Окружение</template>
+            </ui-multiselect>
           </div>
         </div>
 
