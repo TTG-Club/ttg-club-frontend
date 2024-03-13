@@ -17,6 +17,9 @@
     placeholder: string | number;
     isMultiple?: boolean;
     isSearchable?: boolean;
+    isGrouped?: boolean;
+    groupLabel?: string;
+    groupValues?: string;
   }>();
 
   const input = ref<typeof UiInput | null>(null);
@@ -58,14 +61,29 @@
     if (!isFocused) filter.value = '';
   });
 
-  const filteredOptions = computed(() =>
-    props.options.filter((el) => {
-      const optionLabel = String(get(el, props.label)).toUpperCase();
-      const currentFilter = String(filter.value).toUpperCase();
+  const filteredOptions = computed(() => {
+    let newOptions: Array<T> = [];
 
-      return optionLabel.includes(currentFilter);
-    }),
-  );
+    if (props.isGrouped) {
+      newOptions = props.options.reduce(
+        (res, el) => [
+          ...res,
+          { ...el[props.groupLabel], groupLabel: true },
+          ...el[props.groupValues],
+        ],
+        newOptions,
+      );
+    } else {
+      newOptions = props.options.filter((el) => {
+        const optionLabel = String(get(el, props.label)).toUpperCase();
+        const currentFilter = String(filter.value).toUpperCase();
+
+        return optionLabel.includes(currentFilter);
+      });
+    }
+
+    return newOptions;
+  });
 </script>
 
 <template>
@@ -140,7 +158,10 @@
           :key="get(option, props.trackBy)"
           :class="[
             'ui-select__element',
-            { 'ui-select__element--selected': isSelectedClass(option) },
+            {
+              'ui-select__element--selected': isSelectedClass(option),
+              'ui-select__element--disabled': option.groupLabel,
+            },
           ]"
           @click="selectOption(option)"
         >
@@ -167,6 +188,8 @@
 
 <style lang="scss" scoped>
   .ui-select {
+    margin: 0 16px;
+
     &__label {
       margin-bottom: 8px;
       padding: 0 8px;
@@ -310,6 +333,14 @@
           background: none;
         }
       }
+
+      &--disabled {
+        color: #a6a6a6 !important;
+        cursor: text;
+        pointer-events: none;
+        background: var(--hover) !important;
+        font-weight: 600;
+      }
     }
 
     &__option {
@@ -320,16 +351,6 @@
         white-space: break-spaces;
         width: 100%;
         display: block;
-      }
-
-      &--group {
-        background: var(--bg-sub-menu);
-        color: var(--text-color);
-        font-weight: 600;
-      }
-
-      &--disabled {
-        background: var(--hover) !important;
       }
     }
 
