@@ -21,7 +21,7 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -59,6 +59,7 @@
   const currentTab = ref(undefined);
   const tabs = ref([]);
   const abortController = ref();
+  const currentSelectArchetype = ref();
 
   const gallery = ref<{
     show: boolean;
@@ -104,7 +105,7 @@
       : [];
   });
 
-  const currentSelectArchetype = computed(() => {
+  const getSelectedArchetype = () => {
     let selected;
 
     for (let i = 0; i < currentArchetypes.value.length && !selected; i++) {
@@ -120,7 +121,7 @@
     }
 
     return selected;
-  });
+  };
 
   const getUpdatedClass = (classInfo) => {
     const updatedClass = cloneDeep(classInfo);
@@ -268,9 +269,7 @@
   };
 
   const getAnchorLinks = () => {
-    if (!(classBody.value instanceof HTMLDivElement)) {
-      return [];
-    }
+    if (!(classBody.value instanceof HTMLDivElement)) return [];
 
     const nodeList = classBody.value.querySelectorAll('[href^="#"]');
 
@@ -305,6 +304,7 @@
 
   onMounted(async () => {
     await classInfoQuery(route.path);
+    currentSelectArchetype.value = getSelectedArchetype();
 
     emit('scroll-to-active');
   });
@@ -353,29 +353,17 @@
           v-if="isMobile && currentArchetypes.length"
           class="class-detail__select"
         >
-          <ui-select
-            :group-select="false"
-            :model-value="currentSelectArchetype"
-            :options="currentArchetypes"
+          <ui-multiselect
+            v-model="currentSelectArchetype"
+            is-grouped
             group-label="group"
             group-values="list"
+            :options="currentArchetypes"
             label="name"
             track-by="url"
-          >
-            <template #placeholder>
-              --- {{ currentClass?.archetypeName }} ---
-            </template>
-
-            <template #option="{ option }">
-              <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
-
-              <span
-                v-else
-                @click.left.exact.prevent="goToArchetype(option.url)"
-                >{{ option.name }}</span
-              >
-            </template>
-          </ui-select>
+            :placeholder="`--- ${currentClass?.archetypeName} ---`"
+            @update:model-value="goToArchetype(currentSelectArchetype.url)"
+          />
         </div>
 
         <div
