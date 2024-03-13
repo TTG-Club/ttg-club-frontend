@@ -228,36 +228,33 @@
         track-by="url"
         label="name.rus"
         is-searchable
+        header-label="Раса"
         placeholder="Выбрать расу"
         :options="races"
         @update:model-value="onSelectRace"
-      >
-        <template #label>Раса</template>
-      </ui-multiselect>
+      />
 
       <ui-multiselect
         v-model="selectedSubRace"
         track-by="url"
         label="name.rus"
         :disabled="!subRaces?.length"
+        header-label="Подраса"
         placeholder="Выбрать подрасу"
         :options="subRaces"
         @update:model-value="onSelectSubRace"
-      >
-        <template #label>Подраса</template>
-      </ui-multiselect>
+      />
 
       <ui-multiselect
         v-model="selectedChoiceDouble"
         track-by="key"
         label="label"
         :disabled="!isChoiceDouble"
+        header-label="Набор характеристик"
         placeholder="Выбери что-нибудь"
         :options="choiceDouble"
         @update:model-value="onSelectChoiceDouble"
-      >
-        <template #label>Набор характеристик</template>
-      </ui-multiselect>
+      />
 
       <ui-multiselect
         v-model="firstValue"

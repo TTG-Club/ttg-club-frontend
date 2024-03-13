@@ -139,21 +139,19 @@
               :options="levels"
               label="name"
               track-by="value"
+              header-label="Средний уровень Группы"
               placeholder="Уровень"
               @update:model-value="form.level = $event.value"
-            >
-              <template #label>Средний уровень Группы</template>
-            </ui-multiselect>
+            />
 
             <ui-multiselect
               v-model="environment"
               :options="environments"
               label="name"
               track-by="value"
+              header-label="Окружение"
               placeholder="Окружение"
-            >
-              <template #label>Окружение</template>
-            </ui-multiselect>
+            />
           </div>
         </div>
 

@@ -13,6 +13,7 @@
     trackBy: string;
     options: Array<T>;
     disabled?: boolean;
+    headerLabel?: string | number;
     placeholder: string | number;
     isMultiple?: boolean;
     isSearchable?: boolean;
@@ -73,7 +74,7 @@
       v-if="$slots.label"
       class="ui-select__label"
     >
-      <slot name="label" />
+      {{ props.headerLabel }}
     </div>
 
     <div
