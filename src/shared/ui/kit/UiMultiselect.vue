@@ -156,13 +156,11 @@
         <li
           v-for="option in filteredOptions"
           :key="get(option, props.trackBy)"
-          :class="[
-            'ui-select__element',
-            {
-              'ui-select__element--selected': isSelectedClass(option),
-              'ui-select__element--disabled': option.groupLabel,
-            },
-          ]"
+          :class="{
+            'ui-select__element': true,
+            'ui-select__element--selected': isSelectedClass(option),
+            'ui-select__element--disabled': option.groupLabel,
+          }"
           @click="selectOption(option)"
         >
           <slot
