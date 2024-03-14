@@ -17,10 +17,10 @@
   } from '@/shared/types/tools/AbilityCalc.d';
   import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
-  import RaceLink from '@/pages/Character/races/RaceLink.vue';
-  import { useRaceAbility } from '@/pages/Tools/ability-calc/ability-races/composables/useRaceAbility';
+  import RaceLink from '@/pages/character/races/RaceLink.vue';
+  import { useRaceAbility } from '@/pages/tools/ability-calc/ability-races/composables/useRaceAbility';
 
-  const modelValue = defineModel({
+  const modelValue = defineModel<Array<AbilityRoll>>({
     required: true,
   });
 

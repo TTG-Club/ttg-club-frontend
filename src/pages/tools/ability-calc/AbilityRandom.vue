@@ -13,10 +13,7 @@
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiMultiselect from '@/shared/ui/kit/UiMultiselect.vue';
 
-  import type { PropType } from 'vue';
-
-  const modelValue = defineModel({
-    type: Array as PropType<Array<AbilityRoll>>,
+  const modelValue = defineModel<Array<AbilityRoll>>({
     required: true,
   });
 

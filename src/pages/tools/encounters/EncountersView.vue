@@ -60,8 +60,7 @@
 
   onBeforeMount(() => getOptions());
 
-  // eslint-disable-next-line func-names
-  const sendForm = throttle(async function () {
+  const sendForm = throttle(async () => {
     if (controller.value) controller.value.abort();
 
     controller.value = new AbortController();

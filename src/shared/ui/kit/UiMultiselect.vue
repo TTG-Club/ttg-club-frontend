@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T">
   import { onClickOutside } from '@vueuse/core';
-  import { get, isEqual } from 'lodash-es';
+  import { cloneDeep, get, isEqual } from 'lodash-es';
   import { computed, ref, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
@@ -22,10 +22,10 @@
     groupValues?: string;
   }>();
 
-  const input = ref<typeof UiInput | null>(null);
+  const input = ref<typeof UiInput>();
   const header = ref<HTMLDivElement>();
-  const focused = ref<Boolean>(false);
-  const filter = ref<string>('');
+  const focused = ref(false);
+  const filter = ref('');
 
   onClickOutside(header, () => {
     focused.value = false;
@@ -50,7 +50,7 @@
     isEqual(modelValue.value, option);
 
   const selectOption = (option: T) => {
-    modelValue.value = option;
+    modelValue.value = cloneDeep(option);
   };
 
   const displaySelectedOptions = computed(() =>
@@ -186,8 +186,6 @@
 
 <style lang="scss" scoped>
   .ui-select {
-    margin: 0 16px;
-
     &__label {
       margin-bottom: 8px;
       padding: 0 8px;

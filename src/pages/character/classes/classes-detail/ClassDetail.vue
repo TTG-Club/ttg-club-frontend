@@ -224,7 +224,7 @@
     await setTab(index);
   };
 
-  const goToArchetype = (path) => {
+  const goToArchetype = (path: string) => {
     router.push({ path });
   };
 
@@ -251,19 +251,17 @@
     bodyScroll.value = section.offsetTop - fixedHeight.value;
   };
 
-  const anchorClickHandler = (e) => {
-    if (e.button) {
-      return;
-    }
+  const anchorClickHandler = (e: MouseEvent) => {
+    if (e.button) return;
 
     e.preventDefault();
     e.stopPropagation();
 
     const { target } = e;
 
-    const hash = target.getAttribute('href').replace('#', '').trim();
+    if (target) {
+      const hash = target.getAttribute('href').replace('#', '').trim();
 
-    if (hash) {
       scrollToSection(hash);
     }
   };
@@ -279,13 +277,9 @@
   };
 
   const initScrollListeners = () => {
-    if (!(classBody.value instanceof HTMLDivElement)) {
-      return;
-    }
+    if (!(classBody.value instanceof HTMLDivElement)) return;
 
-    if (route.hash) {
-      scrollToSection(route.hash);
-    }
+    if (route.hash) scrollToSection(route.hash);
 
     for (const link of getAnchorLinks()) {
       link.addEventListener('click', anchorClickHandler);
@@ -293,9 +287,8 @@
   };
 
   const removeScrollListeners = () => {
-    for (const link of getAnchorLinks()) {
+    for (const link of getAnchorLinks())
       link.removeEventListener('click', anchorClickHandler);
-    }
   };
 
   const close = () => {
@@ -324,9 +317,7 @@
   });
 
   onBeforeRouteLeave((to, from) => {
-    if (to.name !== 'classes') {
-      return;
-    }
+    if (to.name !== 'classes') return;
 
     emit('scroll-to-last-active', from.path);
   });
@@ -569,36 +560,14 @@
 
     &__select {
       :deep(.ui-select) {
-        .multiselect {
-          margin: 0 16px;
-          width: auto;
+        margin: 0 16px;
 
-          &__content {
-            &-wrapper {
-              width: 100%;
-              left: 0;
-              background-color: var(--bg-sub-menu);
-            }
-          }
-
-          &__tags,
-          &__select {
-            border-radius: 0;
-          }
-
-          &:hover,
-          &:focus-within {
-            @include css_anim();
-
-            border-color: var(--border);
-
-            .multiselect {
-              &__content {
-                &-wrapper {
-                  border-color: var(--border);
-                }
-              }
-            }
+        .ui-select__content {
+          &-wrapper {
+            margin: 5px 16px;
+            width: calc(100% - 16px * 2);
+            left: 0;
+            background-color: var(--bg-sub-menu);
           }
         }
       }
