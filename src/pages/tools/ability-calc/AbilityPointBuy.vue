@@ -180,8 +180,8 @@
         <ui-multiselect
           v-model="selectedOptions[i]"
           :options="getOptions(roll)"
-          label="label"
-          track-by="value"
+          label-key="label"
+          value-key="value"
           :placeholder="roll.value || 'Выбрать значение'"
           @update:model-value="onSelect(i)"
         >

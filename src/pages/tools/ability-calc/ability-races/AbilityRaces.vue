@@ -225,10 +225,10 @@
     <div class="ability-races__fields">
       <ui-multiselect
         v-model="selectedRace"
-        track-by="url"
-        label="name.rus"
+        value-key="url"
+        label-key="name.rus"
         is-searchable
-        header-label="Раса"
+        label="Раса"
         placeholder="Выбрать расу"
         :options="races"
         @update:model-value="onSelectRace"
@@ -236,10 +236,10 @@
 
       <ui-multiselect
         v-model="selectedSubRace"
-        track-by="url"
-        label="name.rus"
+        value-key="url"
+        label-key="name.rus"
         :disabled="!subRaces?.length"
-        header-label="Подраса"
+        label="Подраса"
         placeholder="Выбрать подрасу"
         :options="subRaces"
         @update:model-value="onSelectSubRace"
@@ -247,10 +247,10 @@
 
       <ui-multiselect
         v-model="selectedChoiceDouble"
-        track-by="key"
-        label="label"
+        value-key="key"
+        label-key="label"
         :disabled="!isChoiceDouble"
-        header-label="Набор характеристик"
+        label="Набор характеристик"
         placeholder="Выбери что-нибудь"
         :options="choiceDouble"
         @update:model-value="onSelectChoiceDouble"
@@ -258,8 +258,8 @@
 
       <ui-multiselect
         v-model="firstValue"
-        track-by="key"
-        label="name"
+        value-key="key"
+        label-key="name"
         :disabled="isFirstDisabled"
         :options="abilities"
         placeholder="Выбери хар-ку"
@@ -283,8 +283,8 @@
 
       <ui-multiselect
         v-model="secondValue"
-        track-by="key"
-        label="name"
+        value-key="key"
+        label-key="name"
         :disabled="isSecondDisabled"
         :options="abilities"
         placeholder="Выбери хар-ку"
@@ -308,8 +308,8 @@
 
       <ui-multiselect
         v-model="thirdValue"
-        track-by="key"
-        label="name"
+        value-key="key"
+        label-key="name"
         :disabled="isThirdDisabled"
         :options="abilities"
         placeholder="Выбери хар-ку"

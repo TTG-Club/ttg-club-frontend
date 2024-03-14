@@ -453,8 +453,8 @@
               <ui-multiselect
                 v-model="magicLevel"
                 :options="config.magicLevels"
-                label="name"
-                track-by="value"
+                label-key="name"
+                value-key="value"
                 placeholder="Количество"
               />
             </div>

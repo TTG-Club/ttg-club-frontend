@@ -144,8 +144,8 @@
         :key="i"
         v-model="selectedOptions[i]"
         :options="abilities"
-        label="name"
-        track-by="key"
+        label-key="name"
+        value-key="key"
         placeholder="Выбрать хар-ку"
         @update:model-value="onSelect($event.key, i)"
       >

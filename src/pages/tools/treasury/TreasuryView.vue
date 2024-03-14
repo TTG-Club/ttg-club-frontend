@@ -290,8 +290,8 @@
           <ui-multiselect
             v-model="crValue"
             :options="crList"
-            label="name"
-            track-by="value"
+            label-key="name"
+            value-key="value"
             placeholder="Показатель опасности"
           />
         </div>

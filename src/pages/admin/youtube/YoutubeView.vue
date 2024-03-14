@@ -86,8 +86,8 @@
 
             <ui-multiselect
               :options="itemsPerPage"
-              label="name"
-              track-by="value"
+              label-key="name"
+              value-key="value"
               :placeholder="itemsPerPage[0].name"
               @update:model-value="size = $event.value"
             />

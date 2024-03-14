@@ -9,17 +9,17 @@
   const modelValue = defineModel<T>();
 
   const props = defineProps<{
-    label: string;
-    trackBy: string;
+    labelKey: string;
+    valueKey: string;
     options: Array<T>;
     disabled?: boolean;
-    headerLabel?: string | number;
+    label?: string | number;
     placeholder: string | number;
     isMultiple?: boolean;
     isSearchable?: boolean;
     isGrouped?: boolean;
-    groupLabel?: string;
-    groupValues?: string;
+    groupLabelKey?: string;
+    groupValuesKey?: string;
   }>();
 
   const input = ref<typeof UiInput>();
@@ -45,16 +45,18 @@
     focused.value ? 'arrow/up' : 'arrow/down',
   );
 
-  const isSelectedClass = (option: T) =>
-    String(get(option, props.label)) === String(props.placeholder) ||
-    isEqual(modelValue.value, option);
+  const isSelected = (option: T) => {
+    if (modelValue.value) return isEqual(modelValue.value, option);
+
+    return String(get(option, props.labelKey)) === String(props.placeholder);
+  };
 
   const selectOption = (option: T) => {
     modelValue.value = cloneDeep(option);
   };
 
   const displaySelectedOptions = computed(() =>
-    get(modelValue.value, props.label),
+    get(modelValue.value, props.labelKey),
   );
 
   watch(focused, (isFocused) => {
@@ -68,14 +70,14 @@
       newOptions = props.options.reduce(
         (res, el) => [
           ...res,
-          { ...el[props.groupLabel], groupLabel: true },
-          ...el[props.groupValues],
+          { ...el[props.groupLabelKey], groupLabel: true },
+          ...el[props.groupValuesKey],
         ],
         newOptions,
       );
     } else {
       newOptions = props.options.filter((el) => {
-        const optionLabel = String(get(el, props.label)).toUpperCase();
+        const optionLabel = String(get(el, props.labelKey)).toUpperCase();
         const currentFilter = String(filter.value).toUpperCase();
 
         return optionLabel.includes(currentFilter);
@@ -92,7 +94,7 @@
       v-if="$slots.label"
       class="ui-select__label"
     >
-      {{ props.headerLabel }}
+      {{ props.label }}
     </div>
 
     <div
@@ -155,10 +157,10 @@
       <ul class="ui-select__content">
         <li
           v-for="option in filteredOptions"
-          :key="get(option, props.trackBy)"
+          :key="get(option, props.valueKey)"
           :class="{
             'ui-select__element': true,
-            'ui-select__element--selected': isSelectedClass(option),
+            'ui-select__element--selected': isSelected(option),
             'ui-select__element--disabled': option.groupLabel,
           }"
           @click="selectOption(option)"
@@ -168,7 +170,7 @@
             v-bind="option"
           >
             <span class="ui-select__option">
-              {{ get(option, props.label) }}
+              {{ get(option, props.labelKey) }}
             </span>
           </slot>
         </li>

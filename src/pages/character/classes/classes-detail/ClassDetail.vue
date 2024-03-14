@@ -347,11 +347,11 @@
           <ui-multiselect
             v-model="currentSelectArchetype"
             is-grouped
-            group-label="group"
-            group-values="list"
+            group-label-key="group"
+            group-values-key="list"
             :options="currentArchetypes"
-            label="name"
-            track-by="url"
+            label-key="name"
+            value-key="url"
             :placeholder="`--- ${currentClass?.archetypeName} ---`"
             @update:model-value="goToArchetype(currentSelectArchetype.url)"
           />
