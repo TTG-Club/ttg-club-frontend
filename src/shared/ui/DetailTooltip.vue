@@ -25,7 +25,7 @@
 
   type TDetailType =
     | 'option'
-    | 'trait' // TODO: remove
+    | 'trait' // TODO: Удалить тип после индексации нового раздела `feats`
     | 'feat'
     | 'armor'
     | 'weapon'
@@ -68,7 +68,7 @@
 
   const components: Record<TDetailType, Component> = {
     'option': OptionBody,
-    'trait': FeatBody, // TODO: remove
+    'trait': FeatBody, // TODO: Удалить редирект после индексации нового раздела `feats`
     'feat': FeatBody,
     'armor': ArmorBody,
     'weapon': WeaponBody,

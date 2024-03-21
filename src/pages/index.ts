@@ -42,7 +42,7 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   RacesPage,
   SpellsPage,
   FeatsPage,
-  TraitsPage, // TODO: remove
+  TraitsPage, // TODO: Удалить редирект после индексации нового раздела `feats`
   WeaponsPage,
   ArmorsPage,
   ItemsPage,

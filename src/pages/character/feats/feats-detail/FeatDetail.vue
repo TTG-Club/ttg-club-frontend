@@ -28,11 +28,11 @@
       abortController.value.abort();
     }
 
-    try {
-      error.value = false;
-      loading.value = true;
-      abortController.value = new AbortController();
+    error.value = false;
+    loading.value = true;
+    abortController.value = new AbortController();
 
+    try {
       const resp = await httpClient.post<FeatsItem>({
         url,
         signal: abortController.value.signal,
@@ -61,13 +61,15 @@
     }
   });
 
-  onBeforeRouteUpdate(async (to, from, next) => {
+  onBeforeRouteUpdate(async (to) => {
     try {
       await featInfoQuery(to.path);
 
-      next();
+      return to.fullPath;
     } catch (err) {
       errorHandler(err);
+
+      return false;
     }
   });
 </script>
