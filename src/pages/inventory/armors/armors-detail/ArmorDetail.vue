@@ -67,7 +67,7 @@
 </script>
 
 <template>
-  <content-detail>
+  <content-detail :entity-name="armor?.name.rus">
     <template #fixed>
       <section-header
         :fullscreen="!isMobile"

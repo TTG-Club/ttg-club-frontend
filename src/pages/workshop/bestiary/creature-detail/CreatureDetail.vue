@@ -85,7 +85,10 @@
 </script>
 
 <template>
-  <content-detail class="creature-detail">
+  <content-detail
+    class="creature-detail"
+    :entity-name="creature?.name.rus"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

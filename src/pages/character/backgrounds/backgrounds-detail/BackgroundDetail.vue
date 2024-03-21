@@ -67,7 +67,12 @@
 </script>
 
 <template>
-  <content-detail class="background-detail">
+  <content-detail
+    class="background-detail"
+    :entity-name="
+      background ? `${background.name.rus} (предыстория)` : undefined
+    "
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

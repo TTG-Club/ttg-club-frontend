@@ -67,7 +67,12 @@
 </script>
 
 <template>
-  <content-detail class="option-detail">
+  <content-detail
+    class="option-detail"
+    :entity-name="
+      option ? `${option.name.rus} (особенность классов)` : undefined
+    "
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

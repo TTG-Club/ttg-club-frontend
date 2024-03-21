@@ -48,7 +48,10 @@
         <p>Урон:</p>
 
         <span>
-          <dice-roller :formula="weapon.damage.dice">
+          <dice-roller
+            :formula="weapon.damage.dice"
+            label="Урон"
+          >
             {{ weapon.damage.dice }}
           </dice-roller>
 

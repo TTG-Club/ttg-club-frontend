@@ -69,7 +69,10 @@
 </script>
 
 <template>
-  <content-detail class="screen-detail">
+  <content-detail
+    class="screen-detail"
+    :entity-name="screen?.name.rus"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

@@ -1,9 +1,14 @@
 @use '@/assets/styles/variables/breakpoints' as *;
 @use '@/assets/styles/variables/mixins' as *;
 
+html {
+  --navbar-height: calc(56px + var(--safe-area-inset-bottom));
+  --navbar-width: calc(56px + var(--safe-area-inset-left));
+}
+
 .navbar {
   display: flex;
-  height: calc(56px + var(--safe-area-inset-bottom));
+  height: var(--navbar-height);
   padding-bottom: var(--safe-area-inset-bottom);
   min-height: 56px;
   width: 100%;
@@ -153,8 +158,8 @@
     border-right: 1px solid var(--border);
     height: 100%;
     min-height: 100%;
-    width: 56px;
-    min-width: 56px;
+    width: var(--navbar-width);
+    min-width: var(--navbar-width);
     flex-direction: column;
     flex-wrap: nowrap;
   }
