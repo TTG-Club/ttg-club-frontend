@@ -15,27 +15,27 @@
 
   const route = useRoute();
   const router = useRouter();
+  const { isMobile } = storeToRefs(useUIStore());
 
   const feat = ref<FeatsItem>();
   const loading = ref(false);
   const error = ref(false);
-  const abortController = ref<AbortController>();
 
-  const { isMobile } = storeToRefs(useUIStore());
+  let abortController: AbortController | undefined;
 
   const featInfoQuery = async (url: string) => {
-    if (abortController.value) {
-      abortController.value.abort();
+    if (abortController) {
+      abortController.abort();
     }
 
     error.value = false;
     loading.value = true;
-    abortController.value = new AbortController();
+    abortController = new AbortController();
 
     try {
       const resp = await httpClient.post<FeatsItem>({
         url,
-        signal: abortController.value.signal,
+        signal: abortController.signal,
       });
 
       feat.value = resp.data;
@@ -47,7 +47,7 @@
       return err;
     } finally {
       loading.value = false;
-      abortController.value = undefined;
+      abortController = undefined;
     }
   };
 
