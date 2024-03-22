@@ -2,6 +2,7 @@
   import { ref } from 'vue';
 
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const currentInput = ref('');
   const invalid = ref(false);
@@ -61,10 +62,7 @@
 </script>
 
 <template>
-  <div
-    class="dice-history-input"
-    :class="{ 'dice-history-input--invalid': invalid }"
-  >
+  <div class="dice-history-input">
     <input
       v-model="currentInput"
       class="dice-history-input__input"
@@ -76,9 +74,12 @@
       @keyup.down="traverseHistory('down')"
     />
 
-    <svg-icon
-      class="dice-history-input__dice-icon"
+    <ui-button
       icon="dice/d6"
+      type="text"
+      :color="invalid ? 'error' : 'text'"
+      body-class="dice-history-input__dice-button"
+      @click="roll()"
     />
   </div>
 </template>
@@ -89,22 +90,15 @@
 
     display: flex;
     align-items: center;
-    padding-right: 4px;
-
-    &--invalid {
-      #{$root}__dice-icon {
-        color: var(--error);
-      }
-    }
 
     &__input {
       all: unset;
       display: block;
       flex: auto;
-      padding: 8px 0 8px 8px;
+      padding: 10px 0 8px 16px;
     }
 
-    &__dice-icon {
+    &__dice-button {
       @include css_anim($item: color);
     }
   }

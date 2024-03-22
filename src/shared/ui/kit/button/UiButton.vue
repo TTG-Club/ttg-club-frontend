@@ -492,6 +492,7 @@
     height: 24px;
     font-size: 24px;
     margin: -3px;
+    @include css_anim($item: color);
   }
 
   .disabled {
