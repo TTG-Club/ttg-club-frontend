@@ -8,4 +8,4 @@ export * from './races';
 
 export * from './spells';
 
-export * from './traits';
+export * from './feats';
