@@ -13,7 +13,7 @@
 
   const userStore = useUserStore();
 
-  const { isAuthenticated, user } = storeToRefs(userStore);
+  const { isAuthenticated, user, isAdmin } = storeToRefs(userStore);
 
   const popover = ref(false);
   const modal = ref('');
@@ -168,6 +168,14 @@
           class="nav-profile__line"
         >
           <span class="nav-profile__line_body"> Личный кабинет </span>
+        </router-link>
+
+        <router-link
+          v-if="isAdmin"
+          :to="{ path: `/workshop` }"
+          class="nav-profile__line"
+        >
+          <span class="nav-profile__line_body"> Мастерская </span>
         </router-link>
 
         <a
