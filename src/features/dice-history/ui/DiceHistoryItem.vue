@@ -3,7 +3,10 @@
   import { type GroupedRollBase, type RollBase } from 'dice-roller-parser';
   import { computed } from 'vue';
 
+  import { useClassName } from '@/shared/utils/className';
   import { isCritical, RollRenderer, type RollType } from '@/shared/utils/roll';
+
+  const cn = useClassName();
 
   const props = defineProps<{
     roll: GroupedRollBase | RollBase;
@@ -13,7 +16,7 @@
     date: string;
   }>();
 
-  const type = computed(() => {
+  const resultType = computed(() => {
     if (isCritical(props.roll, 'success')) {
       return 'success';
     }
@@ -35,24 +38,21 @@
 </script>
 
 <template>
-  <div class="roll">
-    <div
-      class="roll__result"
-      :class="`roll__result--type-${type}`"
-    >
+  <div :class="cn()">
+    <div :class="cn('result', { type: resultType })">
       {{ roll.value }}
     </div>
 
-    <div class="roll__content">
-      <div class="roll__title">{{ source }}</div>
+    <div :class="cn('content')">
+      <div :class="cn('title')">{{ source }}</div>
 
-      <div class="roll__description">
-        <div class="roll__description-text">
+      <div :class="cn('description')">
+        <div :class="cn('description-text')">
           {{ description }}
           <component :is="RollRenderer.render(roll)" />
         </div>
 
-        <div class="roll__time">
+        <div :class="cn('time')">
           {{ dayjs(date).format('HH:mm') }}
         </div>
       </div>
@@ -60,10 +60,8 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-  .roll {
-    $root: &;
-
+<style lang="scss" module>
+  .dice-history-item {
     display: flex;
     gap: 8px;
     padding: 4px 8px;

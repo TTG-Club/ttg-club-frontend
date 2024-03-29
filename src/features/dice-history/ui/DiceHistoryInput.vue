@@ -3,6 +3,9 @@
 
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { useClassName } from '@/shared/utils/className';
+
+  const cn = useClassName();
 
   const currentInput = ref('');
   const invalid = ref(false);
@@ -62,10 +65,10 @@
 </script>
 
 <template>
-  <div class="dice-history-input">
+  <div :class="cn()">
     <input
       v-model="currentInput"
-      class="dice-history-input__input"
+      :class="cn('input')"
       type="text"
       placeholder="Введите формулу"
       aria-label="Формула для броска"
@@ -78,13 +81,13 @@
       icon="dice/d6"
       type="text"
       :color="invalid ? 'error' : 'text'"
-      body-class="dice-history-input__dice-button"
+      :body-class="cn('dice-button')[0]"
       @click="roll()"
     />
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
   .dice-history-input {
     $root: &;
 

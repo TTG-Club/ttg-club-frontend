@@ -5,9 +5,12 @@
 
   import { useRollStore } from '@/shared/stores/RollStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { useClassName } from '@/shared/utils/className';
 
   import DiceHistoryInput from './DiceHistoryInput.vue';
   import DiceHistoryItem from './DiceHistoryItem.vue';
+
+  const cn = useClassName();
 
   const content = ref<HTMLElement>();
 
@@ -32,9 +35,9 @@
 </script>
 
 <template>
-  <div class="history">
-    <div class="history__heading">
-      <span class="history__heading-text">История бросков</span>
+  <div :class="cn()">
+    <div :class="cn('heading')">
+      <span :class="cn('heading-text')">История бросков</span>
 
       <ui-button
         :tooltip="{ content: 'Очистить историю' }"
@@ -47,7 +50,7 @@
 
     <div
       ref="content"
-      class="history__content"
+      :class="cn('content')"
     >
       <dice-history-item
         v-for="roll in rollStore.rollsSortedByDate"
@@ -56,14 +59,14 @@
       />
     </div>
 
-    <div class="history__input">
+    <div :class="cn('input')">
       <dice-history-input />
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-  .history {
+<style lang="scss" module>
+  .dice-history-window-content {
     display: grid;
     grid-template-rows: auto 1fr;
     height: 100%;
@@ -101,7 +104,7 @@
     }
 
     &__input {
-      border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border);
     }
   }
 </style>

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-  import { computed, useCssModule } from 'vue';
-
   import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
+  import { useClassName } from '@/shared/utils/className';
 
   import type { ISharedButtonProps } from './UiButton';
 
@@ -11,35 +10,24 @@
     position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
   }
 
-  const props = withDefaults(defineProps<IFabProps>(), {
+  withDefaults(defineProps<IFabProps>(), {
     nativeType: 'button',
     disabled: false,
     position: 'bottom-right',
   });
 
-  const $style = useCssModule();
-
-  const positionClasses = computed(() =>
-    Object.fromEntries(
-      props.position
-        .split('-')
-        .map((p) => [$style[`ui-fab--position-${p}`], true]),
-    ),
-  );
+  const cn = useClassName();
 
   const greaterThanXl = useAppBreakpoints().greater('xl');
 </script>
 
 <template>
   <button
-    :class="{
-      [$style['ui-fab']]: true,
-      ...positionClasses,
-    }"
+    :class="cn({ position })"
     :type="nativeType"
     v-bind="$attrs"
   >
-    <span :class="$style['ui-fab__inner']">
+    <span :class="cn('inner')">
       <svg-icon
         :size="greaterThanXl ? 32 : 24"
         :icon="icon"
@@ -83,20 +71,24 @@
     }
 
     &--position {
-      &-top {
+      &-top-right {
         top: var(--fab-y-offset);
-      }
-
-      &-right {
         right: var(--fab-x-offset);
       }
 
-      &-bottom {
+      &-top-left {
+        top: var(--fab-y-offset);
+        left: var(--fab-x-offset);
+      }
+
+      &-bottom-right {
+        right: var(--fab-x-offset);
         bottom: var(--fab-y-offset);
       }
 
-      &-left {
-        left: calc(var(--fab-x-offset) + var(--navbar-width));
+      &-bottom-left {
+        bottom: var(--fab-y-offset);
+        left: var(--fab-x-offset);
       }
     }
 
