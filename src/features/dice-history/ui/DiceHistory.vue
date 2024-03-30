@@ -1,17 +1,23 @@
 <script lang="ts" setup>
   import BottomRightWindow from '@/shared/ui/BottomRightWindow.vue';
   import UiFab from '@/shared/ui/kit/button/UiFab.vue';
+  import { useClassName } from '@/shared/utils/className';
 
   import { useDiceHistory } from '../composables';
 
   import DiceHistoryWindowContent from './DiceHistoryWindowContent.vue';
+
+  const cn = useClassName();
 
   const { isOpen, toggle } = useDiceHistory();
 </script>
 
 <template>
   <transition name="popover-animation">
-    <bottom-right-window v-if="isOpen">
+    <bottom-right-window
+      v-if="isOpen"
+      :class="cn('window')"
+    >
       <dice-history-window-content />
     </bottom-right-window>
   </transition>
@@ -21,6 +27,14 @@
     @click="toggle()"
   />
 </template>
+
+<style lang="scss" module>
+  .dice-history {
+    &__window {
+      transform-origin: right bottom;
+    }
+  }
+</style>
 
 <style lang="scss" scoped>
   .popover-animation {

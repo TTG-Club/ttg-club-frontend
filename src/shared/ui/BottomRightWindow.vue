@@ -151,7 +151,6 @@
     inset: 8px;
     bottom: calc(var(--navbar-height) + 8px);
     z-index: 13;
-    transform-origin: right bottom;
 
     @include media-min($md) {
       top: unset;
