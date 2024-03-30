@@ -22,7 +22,7 @@
 
   .nav-dice-history-button {
     @include media-min($md) {
-      display: none;
+      display: none !important;
     }
   }
 </style>
