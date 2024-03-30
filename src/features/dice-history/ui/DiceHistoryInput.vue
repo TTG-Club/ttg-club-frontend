@@ -40,6 +40,7 @@
       history.unshift(formula);
     }
 
+    historyIndex = -1;
     currentInput.value = '';
   }
 
