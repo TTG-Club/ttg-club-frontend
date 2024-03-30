@@ -1,9 +1,3 @@
-<script>
-  export default {
-    name: 'ContentDetail',
-  };
-</script>
-
 <template>
   <div class="content-detail">
     <div class="content-detail__fixed">
