@@ -36,8 +36,6 @@ const store = localforage.createInstance({
   storeName: 'rolls',
 });
 
-await store.ready();
-
 export const useRollStore = defineStore('RollStore', () => {
   const notificationMode = useLocalforageItem(
     store,
