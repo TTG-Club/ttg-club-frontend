@@ -13,9 +13,13 @@ export function useLocalforageItem<T>(
     }
   });
 
-  watch(r, () => {
-    store.setItem(key, toRaw(r.value)).then();
-  });
+  watch(
+    r,
+    () => {
+      store.setItem(key, toRaw(r.value)).then();
+    },
+    { deep: true },
+  );
 
   return r;
 }
