@@ -1,8 +1,12 @@
-import { useBroadcastChannel, useLocalStorage } from '@vueuse/core';
+import { useBroadcastChannel } from '@vueuse/core';
 import { type RollBase } from 'dice-roller-parser';
+import localforage from 'localforage';
 import { sortBy } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { computed, toRaw } from 'vue';
+
+import { useLocalforageItem } from '@/shared/composables/useLocalforageItem';
+import { DB_NAME } from '@/shared/constants/UI';
 
 import { eventBus } from '../utils/eventBus';
 import { type RollType } from '../utils/roll';
@@ -27,9 +31,17 @@ export enum RollNotificationMode {
   History,
 }
 
+const store = localforage.createInstance({
+  name: DB_NAME,
+  storeName: 'rolls',
+});
+
+await store.ready();
+
 export const useRollStore = defineStore('RollStore', () => {
-  const notificationMode = useLocalStorage(
-    'roll-notification-mode',
+  const notificationMode = useLocalforageItem(
+    store,
+    'notification-mode',
     RollNotificationMode.Notification,
   );
 
@@ -48,7 +60,7 @@ export const useRollStore = defineStore('RollStore', () => {
   }
 
   // TODO: Different keys for different rolls channels
-  const rolls = useLocalStorage<RollEntry[]>('rolls', []);
+  const rolls = useLocalforageItem<RollEntry[]>(store, 'rolls', []);
 
   const rollsSortedByDate = computed(() => sortBy(rolls.value, 'date'));
 
@@ -88,7 +100,6 @@ export const useRollStore = defineStore('RollStore', () => {
   return {
     notificationMode,
     setFallbackSource,
-    rolls,
     rollsSortedByDate,
     registerRoll,
     clearRolls,
