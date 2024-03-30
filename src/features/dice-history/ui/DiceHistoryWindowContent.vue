@@ -82,7 +82,7 @@
 
       &-text {
         line-height: 20px;
-        padding: 12px 16px 8px;
+        padding: 10px 16px 8px;
       }
     }
 
