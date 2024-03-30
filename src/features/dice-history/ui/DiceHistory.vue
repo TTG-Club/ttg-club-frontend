@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+  import { useClassName } from '@/shared/composables/useClassName';
   import BottomRightWindow from '@/shared/ui/BottomRightWindow.vue';
   import UiFab from '@/shared/ui/kit/button/UiFab.vue';
-  import { useClassName } from '@/shared/utils/className';
 
   import { useDiceHistory } from '../composables';
 

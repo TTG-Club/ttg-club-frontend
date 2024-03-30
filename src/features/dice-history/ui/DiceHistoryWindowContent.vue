@@ -3,9 +3,9 @@
 
   import { ref, watch, onMounted, nextTick } from 'vue';
 
+  import { useClassName } from '@/shared/composables/useClassName';
   import { useRollStore } from '@/shared/stores/RollStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import { useClassName } from '@/shared/utils/className';
 
   import DiceHistoryInput from './DiceHistoryInput.vue';
   import DiceHistoryItem from './DiceHistoryItem.vue';

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
 
+  import { useClassName } from '@/shared/composables/useClassName';
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import { useClassName } from '@/shared/utils/className';
 
   const cn = useClassName();
 

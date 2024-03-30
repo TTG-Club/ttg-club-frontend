@@ -7,7 +7,7 @@
   import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue';
 
   import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
-  import { useClassName } from '@/shared/utils/className';
+  import { useClassName } from '@/shared/composables/useClassName';
 
   const emit = defineEmits<{
     (event: 'resize:start', height: number): void;
