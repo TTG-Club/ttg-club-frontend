@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-  // TODO: Consider renaming this component
   import {
     useEventListener,
     useLocalStorage,
@@ -20,7 +19,10 @@
 
   const container = ref<HTMLElement>();
   const resizeTrigger = ref<HTMLElement>();
-  const height = useLocalStorage('bottom-right-window-height', MIN_HEIGHT);
+
+  const height = useLocalStorage('bottom-right-window-height', MIN_HEIGHT, {
+    listenToStorageChanges: false,
+  });
 
   if (height.value <= MIN_HEIGHT) {
     height.value = MIN_HEIGHT;
