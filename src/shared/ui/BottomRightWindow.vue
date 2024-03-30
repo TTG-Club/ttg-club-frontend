@@ -7,12 +7,15 @@
   import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue';
 
   import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
+  import { useClassName } from '@/shared/utils/className';
 
   const emit = defineEmits<{
     (event: 'resize:start', height: number): void;
     (event: 'resize', deltaHeight: number): void;
     (event: 'resize:end', height: number): void;
   }>();
+
+  const cn = useClassName();
 
   const MIN_TOP_OFFSET = 24;
   const MIN_HEIGHT = 221;
@@ -127,12 +130,12 @@
 <template>
   <div
     ref="container"
-    class="bottom-right-window"
+    :class="cn()"
   >
-    <div class="bottom-right-window__content">
+    <div :class="cn('content')">
       <div
         ref="resizeTrigger"
-        class="bottom-right-window__resize-trigger"
+        :class="cn('resize-trigger')"
       />
 
       <slot />
@@ -140,7 +143,7 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
   @use '@/assets/styles/variables/breakpoints' as *;
 
   .bottom-right-window {
