@@ -80,7 +80,7 @@
         }
 
         &-failure {
-          color: red;
+          color: var(--bg-disadvantage);
         }
       }
     }
