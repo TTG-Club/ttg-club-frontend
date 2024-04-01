@@ -4,6 +4,7 @@ import { useToast } from 'vue-toastification';
 import { ToastEventBus } from '@/core/configs/ToastConfig';
 
 import { downloadByUrl } from '@/shared/utils/download';
+import { getBaseUrl } from '@/shared/utils/getApiUrl';
 
 interface UseDetailExport {
   platform: 'fvtt' | 'lss';
@@ -18,10 +19,10 @@ export const detailExport = (options: MaybeRef<UseDetailExport>) => {
 
   const { type, platform, id, version, errorMessage } = unref(options);
 
-  let url = `/api/v1/${platform}/${type}?id=${id}`;
+  let url = `${getBaseUrl()}/${platform}/${type}?id=${id}`;
 
   if (version) {
-    url += `&version=${version}`;
+    url += `&version=v${version}`;
   }
 
   try {
