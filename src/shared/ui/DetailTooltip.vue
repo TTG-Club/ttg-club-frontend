@@ -6,6 +6,7 @@
   import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
   import { httpClient } from '@/shared/api';
+  import type { DetailType } from '@/shared/types/BaseApiFields';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -23,23 +24,10 @@
   import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';
 
-  type TDetailType =
-    | 'option'
-    | 'trait' // TODO: Удалить тип после индексации нового раздела `feats`
-    | 'feat'
-    | 'armor'
-    | 'weapon'
-    | 'magic-item'
-    | 'item'
-    | 'screen'
-    | 'creature'
-    | 'spell'
-    | 'god';
-
   const props = withDefaults(
     defineProps<{
       url?: string;
-      type?: TDetailType;
+      type?: DetailType;
     }>(),
     {
       url: undefined,
@@ -66,7 +54,7 @@
     return null;
   });
 
-  const components: Record<TDetailType, Component> = {
+  const components: Record<DetailType, Component> = {
     'option': OptionBody,
     'trait': FeatBody, // TODO: Удалить редирект после индексации нового раздела `feats`
     'feat': FeatBody,

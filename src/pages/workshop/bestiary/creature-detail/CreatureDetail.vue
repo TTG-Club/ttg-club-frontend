@@ -8,8 +8,8 @@
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
-  import { downloadByUrl } from '@/shared/utils/download';
   import { errorHandler } from '@/shared/utils/errorHandler';
+  import { detailExport } from '@/shared/utils/exportDetail';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
@@ -20,26 +20,23 @@
   const uiStore = useUIStore();
 
   const { isMobile } = storeToRefs(uiStore);
-  const foundryVersions: Array<10 | 11> = [10, 11];
 
   const creature = ref<Maybe<ICreature>>(undefined);
   const loading = ref(true);
   const error = ref(false);
   const abortController = ref<AbortController | null>(null);
 
-  const exportFoundry = (
-    version: number,
-    showErrorToast: (msg: string) => void,
-  ) => {
+  const exportFoundry = (version: number) => {
     if (!creature.value) {
       return Promise.reject();
     }
 
-    return downloadByUrl(
-      `/api/v1/fvtt/bestiary?version=${version}&id=${creature.value.id}`,
-    ).catch((err) => {
-      showErrorToast(`${creature.value?.name.rus} ещё в пути.`);
-      Promise.reject(err);
+    return detailExport({
+      platform: 'fvtt',
+      type: 'bestiary',
+      id: creature.value.id,
+      errorMessage: `${creature.value?.name.rus || 'Существо'} ещё в пути`,
+      version,
     });
   };
 
@@ -94,7 +91,7 @@
         :title="creature?.name?.rus || ''"
         bookmark
         print
-        :foundry-versions="foundryVersions"
+        :foundry-versions="[10, 11]"
         @close="onClose"
         @export-foundry="exportFoundry"
       />

@@ -14,43 +14,39 @@
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
-  const props = withDefaults(
-    defineProps<{
-      title: string;
-      subtitle?: string;
-      url?: string;
-      copy?: boolean;
-      bookmark?: boolean;
-      print?: boolean;
-      fullscreen?: boolean;
-      onExportFoundry?: (
-        version: number,
-        showErrorToast: (msg: string) => void,
-      ) => void;
-      foundryVersions?: Array<10 | 11 | 12>;
-      defaultFoundry?: 10 | 11 | 12;
-      onClose?: () => void;
-    }>(),
-    {
-      subtitle: '',
-      url: '',
-      copy: false,
-      bookmark: false,
-      print: false,
-      fullscreen: false,
-      foundryVersions: () => [11],
-      defaultFoundry: 11,
-      onExportFoundry: undefined,
-      onClose: undefined,
-    },
-  );
+  type Props = {
+    title: string;
+    subtitle?: string;
+    url?: string;
+    copy?: boolean;
+    bookmark?: boolean;
+    print?: boolean;
+    fullscreen?: boolean;
+    foundryVersions?: Array<10 | 11 | 12>;
+    defaultFoundry?: 10 | 11 | 12;
+    exportLss?: boolean;
+    onExportLss?: () => void;
+    onExportFoundry?: (version: number) => void;
+    onClose?: () => void;
+  };
+
+  const props = withDefaults(defineProps<Props>(), {
+    subtitle: '',
+    url: '',
+    copy: false,
+    bookmark: false,
+    print: false,
+    fullscreen: false,
+    foundryVersions: () => [11],
+    defaultFoundry: 11,
+    onExportLss: undefined,
+    onExportFoundry: undefined,
+    onClose: undefined,
+  });
 
   type Emit = {
-    (
-      e: 'exportFoundry',
-      version: number,
-      showErrorToast: (msg: string) => void,
-    ): void;
+    (e: 'exportFoundry', version: number): void;
+    (e: 'exportLss'): void;
     (e: 'close'): void;
   };
 
@@ -64,12 +60,16 @@
   const { fullscreen: fullscreenState } = storeToRefs(uiStore);
 
   const urlForCopy = computed(() => window.location.origin + route.path);
-  const withFoundryDropdown = computed(() => props.foundryVersions.length > 1);
+
+  const withExportDropdown = computed(
+    () => props.foundryVersions.length > 1 || props.onExportLss,
+  );
 
   const hasControls = computed(
     () =>
       props.bookmark ||
       props.print ||
+      !!props.onExportLss ||
       !!props.onExportFoundry ||
       !!props.onClose ||
       props.fullscreen,
@@ -122,7 +122,7 @@
     window.print();
   };
 
-  const exportToFoundry = (version?: typeof props.defaultFoundry) => {
+  const exportToFoundry = (version?: Props['defaultFoundry']) => {
     let ver = props.defaultFoundry || 11;
 
     if (props.foundryVersions.length === 1) {
@@ -138,7 +138,40 @@
       id: route.path,
     });
 
-    emit('exportFoundry', ver, toast.error);
+    emit('exportFoundry', ver);
+  };
+
+  const exportToLss = () => {
+    sendShareMetrics({
+      method: 'export_lss',
+      id: route.path,
+    });
+
+    emit('exportLss');
+  };
+
+  const exportButtonTooltip = computed(() => {
+    let str = 'Экспорт';
+
+    if (props.onExportFoundry) {
+      str += ' для FVTT';
+    } else if (props.onExportLss) {
+      str += ' для LSS';
+    }
+
+    return {
+      content: `<span>${str}&nbsp;(<a href="/info/exporting" target="_blank" rel="noopener noreferrer">Инструкция</a>)</span>`,
+    };
+  });
+
+  const onExport = () => {
+    if (props.onExportFoundry) {
+      exportToFoundry();
+
+      return;
+    }
+
+    exportToLss();
   };
 </script>
 
@@ -186,7 +219,7 @@
 
       <ui-button
         v-if="print"
-        v-tippy="{ content: 'Открыть окно печати' }"
+        :tooltip="{ content: 'Открыть окно печати' }"
         class="section-header__control is-only-desktop"
         icon="print"
         type="text"
@@ -195,20 +228,17 @@
       />
 
       <ui-button
-        v-if="onExportFoundry"
-        :tooltip="{
-          content:
-            '<span>Экспорт&nbsp;(<a href=&#34;/info/exporting&#34; target=&#34;_blank&#34;>Инструкция</a>)</span>',
-        }"
+        v-if="onExportFoundry || onExportLss"
+        :tooltip="exportButtonTooltip"
         class="section-header__control is-only-desktop"
         icon="export-foundry"
         type="text"
         color="text"
         split
-        @click.left.exact.prevent="exportToFoundry(defaultFoundry)"
+        @click.left.exact.prevent="onExport"
       >
         <template
-          v-if="withFoundryDropdown"
+          v-if="withExportDropdown"
           #dropdown
         >
           <div
@@ -220,12 +250,21 @@
           >
             FVTT {{ version }}
           </div>
+
+          <div
+            v-if="onExportLss"
+            class="section-header__dropdown"
+            @click.left.exact.prevent="exportToLss"
+            @dblclick.prevent.stop
+          >
+            LSS
+          </div>
         </template>
       </ui-button>
 
       <ui-button
         v-if="fullscreen"
-        v-tippy="{
+        :tooltip="{
           content: fullscreenState ? 'Свернуть окно' : 'Развернуть окно',
         }"
         class="section-header__control is-only-desktop"
@@ -237,7 +276,7 @@
 
       <ui-button
         v-if="closeAvailable"
-        v-tippy="{ content: 'Закрыть' }"
+        :tooltip="{ content: 'Закрыть' }"
         class="section-header__control"
         icon="close"
         type="secondary"
