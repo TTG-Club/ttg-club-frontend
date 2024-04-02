@@ -1,5 +1,8 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
+  import { useToast } from 'vue-toastification';
+
+  import { ToastEventBus } from '@/core/configs/ToastConfig';
 
   import { useClassName } from '@/shared/composables/useClassName';
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
@@ -14,6 +17,8 @@
 
   let historyIndex = -1;
 
+  const toast = useToast(ToastEventBus);
+
   const { tryRoll, notifyResult } = useDiceRoller();
 
   function roll() {
@@ -26,6 +31,7 @@
     const result = tryRoll({ formula });
 
     if (!result) {
+      toast.error('Неверная формула для броска');
       flashInvalid();
 
       return;
