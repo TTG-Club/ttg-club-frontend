@@ -22,7 +22,7 @@ export const detailExport = (options: MaybeRef<UseDetailExport>) => {
   let url = `${getBaseUrl()}/${platform}/${type}?id=${id}`;
 
   if (version) {
-    url += `&version=v${version}`;
+    url += `&version=V${version}`;
   }
 
   try {
