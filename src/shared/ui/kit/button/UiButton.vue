@@ -397,6 +397,10 @@
         border: {
           width: 0;
         }
+
+        &.size-sm {
+          padding: 7px;
+        }
       }
     }
 

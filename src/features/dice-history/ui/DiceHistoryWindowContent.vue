@@ -37,13 +37,14 @@
 <template>
   <div :class="cn()">
     <div :class="cn('heading')">
-      <span :class="cn('heading-text')">История бросков</span>
+      История бросков
 
       <ui-button
         :tooltip="{ content: 'Очистить историю' }"
         icon="clear"
         type="text"
         color="text"
+        size="sm"
         @click="rollStore.clearRolls()"
       />
     </div>
@@ -77,13 +78,10 @@
 
     &__heading {
       display: flex;
+      align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
-
-      &-text {
-        line-height: 20px;
-        padding: 10px 16px 8px;
-      }
+      padding: 4px 7px 3px 12px;
     }
 
     &__content {
