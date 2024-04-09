@@ -91,6 +91,7 @@
 
       @include media-min($md) {
         flex-direction: column;
+        gap: 8px;
       }
     }
 
@@ -118,6 +119,7 @@
       @include media-min($md) {
         margin-left: 0;
         height: auto;
+        gap: 8px;
       }
     }
 
@@ -130,7 +132,7 @@
 
     @include media-min($md) {
       flex-direction: column;
-      padding: 16px 0;
+      padding: 24px 0;
       height: 100%;
     }
   }
@@ -153,8 +155,8 @@
     border-right: 1px solid var(--border);
     height: 100%;
     min-height: 100%;
-    width: 56px;
-    min-width: 56px;
+    width: 66px;
+    min-width: 66px;
     flex-direction: column;
     flex-wrap: nowrap;
   }
