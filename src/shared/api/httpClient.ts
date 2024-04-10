@@ -2,10 +2,13 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
+import {
+  getBaseUrl,
+  getProxyUrl,
+  type ApiVersion,
+} from '@/shared/utils/getApiUrl';
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-
-export type ApiVersion = 'v1' | 'v2';
 
 export type RequestConfig = {
   url: AxiosRequestConfig['url'];
@@ -21,7 +24,7 @@ class HttpClient {
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
-      baseURL: this.getBaseURL(),
+      baseURL: getBaseUrl(),
       withCredentials: true,
       headers: {},
     });
@@ -41,18 +44,13 @@ class HttpClient {
     });
   }
 
-  private getProxyURL = () => (import.meta.env.DEV ? '/proxy' : '');
-
-  private getBaseURL = (version: ApiVersion = 'v1') =>
-    `${this.getProxyURL()}/api/${version}`;
-
   get<T>(config: RequestConfig) {
     return this.instance<T>({
       method: 'get',
       url: config.url,
       params: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version),
+      baseURL: getBaseUrl(config.version),
     });
   }
 
@@ -62,7 +60,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version),
+      baseURL: getBaseUrl(config.version),
     });
   }
 
@@ -72,7 +70,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version),
+      baseURL: getBaseUrl(config.version),
     });
   }
 
@@ -82,7 +80,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version),
+      baseURL: getBaseUrl(config.version),
     });
   }
 
@@ -92,14 +90,14 @@ class HttpClient {
       url: config.url,
       params: config.payload,
       signal: config.signal,
-      baseURL: this.getBaseURL(config.version),
+      baseURL: getBaseUrl(config.version),
     });
   }
 
   rawHead(config: Omit<RequestConfig, 'payload'>) {
     return this.instance({
       method: 'head',
-      baseURL: this.getProxyURL(),
+      baseURL: getProxyUrl(),
       url: config.url,
       signal: config.signal,
     });
@@ -108,7 +106,7 @@ class HttpClient {
   rawGet(config: RequestConfig): Promise<AxiosResponse<string>> {
     return this.instance({
       method: 'get',
-      baseURL: this.getProxyURL(),
+      baseURL: getProxyUrl(),
       url: config.url,
       params: config.payload,
       signal: config.signal,

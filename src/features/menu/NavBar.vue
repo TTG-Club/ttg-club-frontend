@@ -71,8 +71,6 @@
             social-name="discord"
             url="https://discord.gg/JqFKMKRtxv"
           />
-
-          <hr />
         </div>
 
         <nav-profile />
@@ -96,9 +94,9 @@
       margin: 0 8px 0 0;
 
       @include media-min($md) {
-        width: 36px;
-        height: 52px;
-        padding: 0 0 16px 0;
+        width: 44px;
+        height: 60px;
+        padding: 0 0 24px 0;
         border-bottom: 1px solid var(--border);
         border-right: 0;
         margin: 0 0 8px 0;
@@ -112,6 +110,7 @@
 
       @include media-min($md) {
         display: block;
+        margin-bottom: 24px;
       }
 
       .ui-social-button {

@@ -1,5 +1,5 @@
 import { toValue } from '@vueuse/core';
-import { computed, ref, unref } from 'vue';
+import { computed, type Ref, ref, unref } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { httpClient, type RequestConfig } from '@/shared/api';
@@ -58,7 +58,7 @@ export function usePagination<T>(config: PaginationConfig) {
   const isLoading = ref(false);
   const isFirstLoad = ref(true);
 
-  const items = ref<Array<any>>([]);
+  const items: Ref<Array<T>> = ref([]);
   const page = ref(unref(config.page) || 0);
 
   const size = computed(

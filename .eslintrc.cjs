@@ -124,6 +124,7 @@ module.exports = {
     'require-await': ['error'],
     'spaced-comment': ['error', 'always'],
     'camelcase': ['error'],
+    'curly': ['error', 'all'],
     'guard-for-in': ['error'],
     'default-param-last': ['error'],
     'lines-between-class-members': [
@@ -200,7 +201,7 @@ module.exports = {
       'kebab-case',
       { registeredComponentsOnly: true, ignores: [] },
     ],
-    'vue/component-api-style': ['warn', ['script-setup']],
+    'vue/component-api-style': ['warn', ['script-setup']], // TODO: 'error'
     'vue/block-lang': [
       'warn',
       {
@@ -284,7 +285,7 @@ module.exports = {
       },
     ],
     '@typescript-eslint/consistent-type-assertions': [
-      'warn',
+      'warn', // TODO: 'error'
       { assertionStyle: 'never' },
     ],
   },

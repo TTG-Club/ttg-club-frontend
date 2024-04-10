@@ -144,7 +144,7 @@
       }
 
       &.is-saving-throw {
-        color: var(--bg-saving_throw);
+        color: var(--bg-saving-throw);
       }
     }
 
