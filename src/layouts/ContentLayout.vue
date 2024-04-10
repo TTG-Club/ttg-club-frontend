@@ -388,7 +388,7 @@
         z-index: 12;
 
         @include media-min($md) {
-          left: 66px;
+          left: 64px;
           height: var(--max-vh);
         }
 

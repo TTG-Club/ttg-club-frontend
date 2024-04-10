@@ -94,8 +94,8 @@
       margin: 0 8px 0 0;
 
       @include media-min($md) {
-        width: 46px;
-        height: 62px;
+        width: 44px;
+        height: 60px;
         padding: 0 0 24px 0;
         border-bottom: 1px solid var(--border);
         border-right: 0;
