@@ -25,11 +25,9 @@ export const detailExport = (options: MaybeRef<UseDetailExport>) => {
     url += `&version=V${version}`;
   }
 
-  try {
-    return downloadByUrl(url);
-  } catch (err) {
+  downloadByUrl(url).catch((err) => {
     toast.error(errorMessage || 'Произошла ошибка...');
 
-    return Promise.reject(err);
-  }
+    console.error(err);
+  });
 };
