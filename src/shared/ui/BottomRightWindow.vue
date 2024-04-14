@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-  import {
-    useEventListener,
-    useLocalStorage,
-    useResizeObserver,
-  } from '@vueuse/core';
+  import { useEventListener, useResizeObserver } from '@vueuse/core';
+  import localforage from 'localforage';
   import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue';
 
   import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
   import { useClassName } from '@/shared/composables/useClassName';
+  import { useLocalforageItem } from '@/shared/composables/useLocalforageItem';
+  import { DB_NAME } from '@/shared/constants/UI';
 
   const emit = defineEmits<{
     (event: 'resize:start', height: number): void;
@@ -27,13 +26,13 @@
   const container = ref<HTMLElement>();
   const resizeTrigger = ref<HTMLElement>();
 
-  const height = useLocalStorage('bottom-right-window-height', MIN_HEIGHT, {
-    listenToStorageChanges: false,
-  });
+  const store = localforage.createInstance({ name: DB_NAME });
 
-  if (height.value <= MIN_HEIGHT) {
-    height.value = MIN_HEIGHT;
-  }
+  const height = useLocalforageItem(
+    store,
+    'bottom-right-window-height',
+    MIN_HEIGHT,
+  );
 
   const mdAndHigher = useAppBreakpoints().greaterOrEqual('md');
 
