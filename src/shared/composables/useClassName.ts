@@ -1,7 +1,6 @@
 import { getCurrentInstance, useCssModule } from 'vue';
 
-import type { ModifiersRecord } from '@/shared/utils/className';
-import { className } from '@/shared/utils/className';
+import { className, type ModifiersRecord } from '@/shared/utils/className';
 
 /**
  * Returns a function that generates an array of class names according to the BEM convention, where block is the component name,
