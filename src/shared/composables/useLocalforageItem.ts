@@ -1,3 +1,4 @@
+import { debounce } from 'lodash-es';
 import { type Ref, ref, toRaw, watch } from 'vue';
 
 export function useLocalforageItem<T>(
@@ -5,6 +6,7 @@ export function useLocalforageItem<T>(
   key: string,
   defaultValue: T,
 ) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const r = ref<T>(defaultValue) as Ref<T>;
 
   store.getItem<T>(key).then((value) => {
@@ -15,9 +17,9 @@ export function useLocalforageItem<T>(
 
   watch(
     r,
-    () => {
+    debounce(() => {
       store.setItem(key, toRaw(r.value)).then();
-    },
+    }, 50),
     { deep: true },
   );
 
