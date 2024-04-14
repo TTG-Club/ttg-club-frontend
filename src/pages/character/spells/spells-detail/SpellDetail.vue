@@ -8,8 +8,8 @@
   import type { TSpellItem } from '@/shared/types/character/Spells';
   import type { Maybe } from '@/shared/types/Utility';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
-  import { downloadByUrl } from '@/shared/utils/download';
   import { errorHandler } from '@/shared/utils/errorHandler';
+  import { detailExport } from '@/shared/utils/exportDetail';
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
@@ -20,26 +20,36 @@
   const uiStore = useUIStore();
 
   const { isMobile } = storeToRefs(uiStore);
-  const foundryVersions: Array<11> = [11];
 
   const spell = ref<Maybe<TSpellItem>>(undefined);
   const loading = ref(true);
   const error = ref(false);
   const abortController = ref<AbortController | null>(null);
 
-  const exportFoundry = (
-    version: number,
-    showErrorToast: (msg: string) => void,
-  ) => {
+  const exportFoundry = (version: number) => {
     if (!spell.value) {
       return Promise.reject();
     }
 
-    return downloadByUrl(
-      `/api/v1/fvtt/spell?version=${version}&id=${spell.value.id}`,
-    ).catch((err) => {
-      showErrorToast('Этот свиток ещё не подготовлен.');
-      Promise.reject(err);
+    return detailExport({
+      platform: 'fvtt',
+      type: 'spell',
+      id: spell.value.id,
+      errorMessage: 'Этот свиток еще не готов',
+      version,
+    });
+  };
+
+  const exportLss = () => {
+    if (!spell.value) {
+      return Promise.reject();
+    }
+
+    return detailExport({
+      platform: 'lss',
+      type: 'spell',
+      id: spell.value.id,
+      errorMessage: 'Этот свиток еще не готов',
     });
   };
 
@@ -95,10 +105,11 @@
         :fullscreen="!isMobile"
         :subtitle="spell?.name?.eng || ''"
         :title="spell?.name?.rus || ''"
+        :foundry-versions="[11]"
         bookmark
         print
-        :foundry-versions="foundryVersions"
         @close="onClose"
+        @export-lss="exportLss"
         @export-foundry="exportFoundry"
       />
     </template>

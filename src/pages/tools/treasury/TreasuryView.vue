@@ -20,6 +20,8 @@
   import MagicItemLink from '@/pages/inventory/magic-items/MagicItemLink.vue';
   import TreasureItem from '@/pages/inventory/treasures/TreasureItem.vue';
 
+  import type { AxiosError, AxiosResponse } from 'axios';
+
   interface CrListItem {
     name: string;
     value: number;
@@ -171,26 +173,24 @@
       cr: form.value.cr || 1,
     };
 
-    http
+    httpClient
       .post({
         url: '/tools/treasury',
         payload: options,
         signal: controllers.value.list.signal,
       })
-      .then((res) => {
+      .then((res: AxiosResponse) => {
         if (res.status !== 200) {
           errorHandler(res.statusText);
 
           return;
         }
 
-        result.value = [];
-
         clearSelected();
 
-        result.value = res.data as never;
+        result.value = res.data;
       })
-      .catch((err) => {
+      .catch((err: AxiosError) => {
         errorHandler(err);
       })
       .finally(() => {

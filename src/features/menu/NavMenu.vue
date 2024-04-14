@@ -233,6 +233,7 @@
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-wrap: wrap;
         }
 
         &--support {
@@ -328,7 +329,6 @@
         align-items: center;
 
         .nav-menu__group_label {
-          background: var(--bg-secondary);
           align-items: center;
 
           &::after {

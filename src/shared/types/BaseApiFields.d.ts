@@ -63,3 +63,16 @@ export interface IPaginatedResponse<T> {
   size?: number;
   pages?: number;
 }
+
+export type DetailType =
+  | 'option'
+  | 'trait' // TODO: Удалить тип после индексации нового раздела `feats`
+  | 'feat'
+  | 'armor'
+  | 'weapon'
+  | 'magic-item'
+  | 'item'
+  | 'screen'
+  | 'creature'
+  | 'spell'
+  | 'god';

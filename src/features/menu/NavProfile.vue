@@ -233,11 +233,10 @@
       text-align: left;
       padding: 0;
       color: var(--text-b-color);
-      background-color: var(--bg-secondary);
 
       &.is-main {
-        background-color: var(--bg-sub-menu);
         cursor: default;
+        background-color: var(--hover);
       }
 
       &_body {
@@ -253,7 +252,7 @@
       }
 
       &:hover {
-        background-color: var(--bg-sub-menu);
+        background-color: var(--hover);
       }
     }
   }

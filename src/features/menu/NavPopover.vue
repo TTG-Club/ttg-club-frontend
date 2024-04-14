@@ -128,10 +128,10 @@
       pointer-events: auto;
       display: inline-block;
       cursor: auto;
-      background-color: var(--bg-secondary);
+      background-image: var(--bg-gradient);
+      backdrop-filter: blur(16px);
       overflow: auto;
       border-radius: 12px;
-      border: 1px solid var(--border);
       box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
       transform-origin: bottom left;
       z-index: 111;

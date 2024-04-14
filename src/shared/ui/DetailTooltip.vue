@@ -6,12 +6,13 @@
   import { DefaultTippyProps } from '@/core/configs/TippyConfig';
 
   import { httpClient } from '@/shared/api';
+  import type { DetailType } from '@/shared/types/BaseApiFields';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import FeatBody from '@/pages/character/feats/feats-detail/FeatBody.vue';
   import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
   import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
-  import TraitBody from '@/pages/character/traits/traits-detail/TraitBody.vue';
   import ArmorBody from '@/pages/inventory/armors/armors-detail/ArmorBody.vue';
   import ItemBody from '@/pages/inventory/items/items-detail/ItemBody.vue';
   import MagicItemBody from '@/pages/inventory/magic-items/magic-items-detail/MagicItemBody.vue';
@@ -23,22 +24,10 @@
   import type { DefaultProps } from 'tippy.js';
   import type { Component } from 'vue';
 
-  type TDetailType =
-    | 'option'
-    | 'trait'
-    | 'armor'
-    | 'weapon'
-    | 'magic-item'
-    | 'item'
-    | 'screen'
-    | 'creature'
-    | 'spell'
-    | 'god';
-
   const props = withDefaults(
     defineProps<{
       url?: string;
-      type?: TDetailType;
+      type?: DetailType;
     }>(),
     {
       url: undefined,
@@ -65,9 +54,10 @@
     return null;
   });
 
-  const components: Record<TDetailType, Component> = {
+  const components: Record<DetailType, Component> = {
     'option': OptionBody,
-    'trait': TraitBody,
+    'trait': FeatBody, // TODO: Удалить редирект после индексации нового раздела `feats`
+    'feat': FeatBody,
     'armor': ArmorBody,
     'weapon': WeaponBody,
     'magic-item': MagicItemBody,

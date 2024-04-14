@@ -162,7 +162,7 @@
 
       &.is-very-rare {
         &:after {
-          background-color: var(--very_rare);
+          background-color: var(--very-rare);
         }
       }
 

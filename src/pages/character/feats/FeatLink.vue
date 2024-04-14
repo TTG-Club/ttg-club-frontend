@@ -1,19 +1,17 @@
-<script>
-  export default {
+<script setup lang="ts">
+  import type { FeatsLinkItem } from '@/shared/types/character/Feats';
+
+  defineOptions({
     inheritAttrs: false,
-    props: {
-      traitItem: {
-        type: Object,
-        required: true,
-      },
-    },
-  };
+  });
+
+  defineProps<{ feat: FeatsLinkItem }>();
 </script>
 
 <template>
   <router-link
-    :class="{ 'is-green': traitItem?.homebrew }"
-    :to="{ path: traitItem.url }"
+    :class="{ 'is-green': feat.homebrew }"
+    :to="{ path: feat.url }"
     class="link-item"
   >
     <div class="link-item__content">
@@ -21,18 +19,16 @@
         <div class="link-item__row">
           <div class="link-item__name">
             <span class="link-item__name--rus">
-              {{ traitItem.name.rus }}
+              {{ feat.name.rus }}
             </span>
 
-            <span class="link-item__name--eng">
-              [{{ traitItem.name.eng }}]
-            </span>
+            <span class="link-item__name--eng"> [{{ feat.name.eng }}] </span>
           </div>
         </div>
 
         <div class="link-item__row">
           <div class="link-item__requirements">
-            {{ traitItem.requirements }}
+            {{ feat.requirements }}
           </div>
         </div>
       </div>
