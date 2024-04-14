@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { type RollBase } from 'dice-roller-parser';
   import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
@@ -7,8 +8,7 @@
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
   import { useIsDev } from '@/shared/utils/isDev';
 
-  import type { RollType } from '../utils/roll';
-  import type { RollBase } from 'dice-roller-parser';
+  import { type RollType } from '../utils/roll';
 
   const props = withDefaults(
     defineProps<{
