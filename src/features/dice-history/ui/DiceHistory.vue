@@ -13,46 +13,15 @@
 </script>
 
 <template>
-  <transition name="popover-animation">
-    <bottom-right-window
-      v-if="isOpen"
-      :class="cn('window')"
-    >
-      <dice-history-window-content />
-    </bottom-right-window>
-  </transition>
+  <bottom-right-window
+    :open="isOpen"
+    :class="cn('window')"
+  >
+    <dice-history-window-content />
+  </bottom-right-window>
 
   <ui-fab
     :icon="isOpen ? 'close' : 'dice/d20'"
     @click="toggle()"
   />
 </template>
-
-<style lang="scss" module>
-  .dice-history {
-    &__window {
-      transform-origin: right bottom;
-    }
-  }
-</style>
-
-<style lang="scss" scoped>
-  .popover-animation {
-    &-enter-from,
-    &-leave-to {
-      opacity: 0;
-      transform: scale(0);
-    }
-
-    &-enter-to,
-    &-leave-from {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    &-enter-active,
-    &-leave-active {
-      @include css_anim;
-    }
-  }
-</style>

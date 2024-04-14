@@ -15,6 +15,10 @@
     (event: 'resize:end', height: number): void;
   }>();
 
+  defineProps<{
+    open: boolean;
+  }>();
+
   const cn = useClassName();
 
   const MIN_TOP_OFFSET = 24;
@@ -128,19 +132,25 @@
 </script>
 
 <template>
-  <div
-    ref="container"
-    :class="cn()"
+  <transition
+    name="popover-animation"
+    @after-enter="adjustHeight()"
   >
-    <div :class="cn('content')">
-      <div
-        ref="resizeTrigger"
-        :class="cn('resize-trigger')"
-      />
+    <div
+      v-if="open"
+      ref="container"
+      :class="cn()"
+    >
+      <div :class="cn('content')">
+        <div
+          ref="resizeTrigger"
+          :class="cn('resize-trigger')"
+        />
 
-      <slot />
+        <slot />
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <style lang="scss" module>
@@ -151,6 +161,7 @@
     inset: 8px;
     bottom: calc(var(--navbar-height) + 8px);
     z-index: 13;
+    transform-origin: right bottom;
 
     @include media-min($md) {
       top: unset;
@@ -178,6 +189,27 @@
       @include media-min($md) {
         display: block;
       }
+    }
+  }
+</style>
+
+<style lang="scss" scoped>
+  .popover-animation {
+    &-enter-from,
+    &-leave-to {
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    &-enter-to,
+    &-leave-from {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    &-enter-active,
+    &-leave-active {
+      @include css_anim;
     }
   }
 </style>
