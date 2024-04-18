@@ -30,7 +30,9 @@ function className(blockName: string, ...args: unknown[]): string[] {
   const [arg1, arg2] = args;
 
   // short-circuit if called as className(blockName)
-  if (!arg1) return [bn];
+  if (!arg1) {
+    return [bn];
+  }
 
   let elementName: string | undefined;
   let modifiers: ModifiersRecord | undefined;
@@ -60,7 +62,9 @@ function className(blockName: string, ...args: unknown[]): string[] {
 
       if (typeof value === 'boolean') {
         // false modifier is not returned
-        if (!value) continue;
+        if (!value) {
+          continue;
+        }
 
         // boolean modifier:
         // block-name__element-name--modifier
