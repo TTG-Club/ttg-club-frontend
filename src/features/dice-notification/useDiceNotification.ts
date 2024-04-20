@@ -5,7 +5,7 @@ import { POSITION, useToast } from 'vue-toastification';
 import { ToastEventBus } from '@/core/configs/ToastConfig';
 
 import { RollNotificationMode, useRollStore } from '@/shared/stores/RollStore';
-import { eventBus, type Events } from '@/shared/utils/eventBus';
+import { Event, eventBus, type Events } from '@/shared/utils/eventBus';
 import { RollRenderer, isCritical, type RollType } from '@/shared/utils/roll';
 
 const enabled = ref(false);
@@ -18,7 +18,7 @@ export function useDiceNotification() {
   function onNewRoll({
     entry: { roll, label, type },
     toastOptions,
-  }: Events['Roll.New']) {
+  }: Events[Event.NewRoll]) {
     if (rollStore.notificationMode !== RollNotificationMode.Notification) {
       return;
     }
@@ -44,7 +44,7 @@ export function useDiceNotification() {
     }
 
     enabled.value = true;
-    eventBus.on('Roll.New', onNewRoll);
+    eventBus.on(Event.NewRoll, onNewRoll);
   }
 
   function disable() {
@@ -53,7 +53,7 @@ export function useDiceNotification() {
     }
 
     enabled.value = false;
-    eventBus.off('Roll.New', onNewRoll);
+    eventBus.off(Event.NewRoll, onNewRoll);
   }
 
   return { enable, disable };

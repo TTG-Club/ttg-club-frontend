@@ -4,8 +4,12 @@ import type { RollEntry } from '@/shared/stores/RollStore';
 
 import type { ToastOptions } from 'vue-toastification/src/types';
 
+export enum Event {
+  NewRoll,
+}
+
 export type Events = {
-  'Roll.New': {
+  [Event.NewRoll]: {
     entry: RollEntry;
     toastOptions?: ToastOptions;
   };

@@ -8,7 +8,7 @@ import { computed, toRaw } from 'vue';
 import { useLocalforageItem } from '@/shared/composables/useLocalforageItem';
 import { DB_NAME } from '@/shared/constants/UI';
 
-import { eventBus } from '../utils/eventBus';
+import { Event, eventBus } from '../utils/eventBus';
 import { type RollType } from '../utils/roll';
 import { type PartialBy } from '../utils/types';
 
@@ -69,7 +69,7 @@ export const useRollStore = defineStore('RollStore', () => {
     const roll = addRoll(item);
 
     if (roll) {
-      eventBus.emit('Roll.New', { entry: roll, toastOptions });
+      eventBus.emit(Event.NewRoll, { entry: roll, toastOptions });
       broadcast(roll);
     }
   }
