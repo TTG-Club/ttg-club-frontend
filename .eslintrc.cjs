@@ -215,7 +215,6 @@ module.exports = {
       'error',
       [{ blankLine: 'always', prev: '*', next: '*' }],
     ],
-    'vue/v-on-handler-style': 'warn',
     'vue/valid-v-slot': 'off',
     'vue/html-self-closing': [
       'error',
