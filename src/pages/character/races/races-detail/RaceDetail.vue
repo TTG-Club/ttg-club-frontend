@@ -105,7 +105,7 @@
 <template>
   <content-detail
     class="race-detail"
-    :entity-name="race.value ? `${race.value.name.rus} (раса)` : undefined"
+    :entity-name="race ? `${race.name.rus} (раса)` : undefined"
   >
     <template #fixed>
       <section-header

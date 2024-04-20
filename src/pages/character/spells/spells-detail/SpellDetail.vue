@@ -97,7 +97,7 @@
 <template>
   <content-detail
     class="spell-detail"
-    :entity-name="spell.value?.name.rus"
+    :entity-name="spell?.name.rus"
   >
     <template #fixed>
       <section-header
