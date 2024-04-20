@@ -133,7 +133,7 @@
 <template>
   <transition
     name="popover-animation"
-    @after-enter="adjustHeight()"
+    @after-enter="adjustHeight"
   >
     <div
       v-if="open"

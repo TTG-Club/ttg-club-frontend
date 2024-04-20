@@ -22,6 +22,6 @@
 
   <ui-fab
     :icon="isOpen ? 'close' : 'dice/d20'"
-    @click="toggle()"
+    @click="toggle"
   />
 </template>

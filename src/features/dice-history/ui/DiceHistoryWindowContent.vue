@@ -45,7 +45,7 @@
         type="text"
         color="text"
         size="sm"
-        @click="rollStore.clearRolls()"
+        @click="rollStore.clearRolls"
       />
     </div>
 

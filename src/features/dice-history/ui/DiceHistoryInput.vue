@@ -79,7 +79,7 @@
       type="text"
       placeholder="Введите формулу"
       aria-label="Формула для броска"
-      @keyup.enter="roll()"
+      @keyup.enter="roll"
       @keyup.up="traverseHistory('up')"
       @keyup.down="traverseHistory('down')"
     />
@@ -87,7 +87,7 @@
     <button
       type="button"
       :class="cn('dice-button', { invalid })"
-      @click="roll()"
+      @click="roll"
     >
       <svg-icon icon="dice/d6" />
     </button>
