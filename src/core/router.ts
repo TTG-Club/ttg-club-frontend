@@ -3,7 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 import pinia from '@/core/store';
 import { routes } from '@/pages';
 
+import { useMeta } from '@/shared/composables/useMeta';
 import { useMetrics } from '@/shared/composables/useMetrics';
+import { useNavPopover } from '@/shared/composables/useNavPopover';
 import { useRouterHelpers } from '@/shared/composables/useRouterHelpers';
 import { useNavStore } from '@/shared/stores/NavStore';
 
@@ -14,12 +16,14 @@ const router = createRouter({
 
 const { nextAvailable } = useRouterHelpers();
 const { sendPageViewMetrics } = useMetrics();
+const { hidePopovers } = useNavPopover();
+const { updateMetaByURL } = useMeta();
 const navStore = useNavStore(pinia);
 
 router.beforeEach(nextAvailable);
 
 router.beforeResolve(async () => {
-  navStore.hidePopovers();
+  hidePopovers();
 
   await navStore.initNavItems();
 });
@@ -27,7 +31,7 @@ router.beforeResolve(async () => {
 router.afterEach((to, from) => {
   sendPageViewMetrics(to);
 
-  navStore.updateMetaByURL(to, from).finally();
+  updateMetaByURL(to, from).finally();
 });
 
 export default router;

@@ -1,9 +1,8 @@
 <script setup lang="ts">
   import { useVModel } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
   import { computed, watch } from 'vue';
 
-  import { useNavStore } from '@/shared/stores/NavStore';
+  import { useNavPopover } from '@/shared/composables/useNavPopover';
 
   const props = withDefaults(
     defineProps<{
@@ -30,8 +29,7 @@
   const emit = defineEmits<IEmit>();
 
   const isShow = useVModel(props, 'modelValue');
-  const navStore = useNavStore();
-  const { isShowPopover } = storeToRefs(navStore);
+  const { isShowPopover } = useNavPopover();
 
   const classes = computed(() => ({
     'is-left': props.isLeft,

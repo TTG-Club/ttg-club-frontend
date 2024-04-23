@@ -1,16 +1,14 @@
 <script setup lang="ts">
   import { onKeyStroke, useActiveElement } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
 
-  import { useNavStore } from '@/shared/stores/NavStore';
+  import { useNavPopover } from '@/shared/composables/useNavPopover';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 
   import SearchModal from '@/pages/search/SearchModal.vue';
 
-  const navStore = useNavStore();
-  const { isShowSearch } = storeToRefs(navStore);
+  const { isShowSearch } = useNavPopover();
 
   const onOpenSearch = () => {
     isShowSearch.value = true;
