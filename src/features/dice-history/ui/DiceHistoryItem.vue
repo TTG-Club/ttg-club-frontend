@@ -64,8 +64,9 @@
   .dice-history-item {
     display: flex;
     gap: 8px;
-    padding: 4px 8px;
+    padding: 12px 8px;
     font-size: 16px;
+    border-top: 1px solid var(--border);
 
     &__result {
       flex: 2.1ch 0 0;
@@ -73,6 +74,7 @@
       line-height: var(--h1-font-size);
       color: var(--text-color-title);
       text-align: center;
+      margin-top: -4px;
 
       &--type {
         &-success {
@@ -91,12 +93,13 @@
 
     &__title {
       color: var(--text-color);
+      font-size: var(--main-font-size);
     }
 
     &__description {
       display: flex;
       gap: 2px;
-      font-size: 0.7em;
+      font-size: calc(var(--main-font-size) - 2px);
       color: var(--text-g-color);
     }
 
