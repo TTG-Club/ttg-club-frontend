@@ -103,7 +103,10 @@
 </script>
 
 <template>
-  <content-detail class="race-detail">
+  <content-detail
+    class="race-detail"
+    :entity-name="race ? `${race.name.rus} (раса)` : undefined"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

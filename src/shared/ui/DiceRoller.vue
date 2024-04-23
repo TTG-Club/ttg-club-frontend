@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { type RollBase } from 'dice-roller-parser';
   import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
@@ -7,17 +8,19 @@
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
   import { useIsDev } from '@/shared/utils/isDev';
 
-  import type { RollBase } from 'dice-roller-parser';
+  import { type RollType } from '../utils/roll';
 
   const props = withDefaults(
     defineProps<{
       formula: string;
+      source?: string;
       label?: string;
       isAdvantage?: boolean;
       isDisadvantage?: boolean;
       isSavingThrow?: boolean;
     }>(),
     {
+      source: undefined,
       label: 'Бросок',
       isAdvantage: false,
       isDisadvantage: false,
@@ -79,7 +82,7 @@
     }
   };
 
-  const tryRoll = (type?: 'advantage' | 'disadvantage') => {
+  const tryRoll = (type?: RollType) => {
     clearSelection();
 
     try {
@@ -89,6 +92,7 @@
       });
 
       notifyResult({
+        source: props.source,
         label: props.label,
         roll,
         type,
@@ -187,7 +191,7 @@
     }
 
     .is-failure {
-      color: red;
+      color: var(--bg-disadvantage);
     }
   }
 </style>
