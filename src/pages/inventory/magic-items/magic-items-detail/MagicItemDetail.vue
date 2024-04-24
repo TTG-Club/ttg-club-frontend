@@ -67,7 +67,10 @@
 </script>
 
 <template>
-  <content-detail class="magic-item-detail">
+  <content-detail
+    class="magic-item-detail"
+    :entity-name="magicItem?.name.rus"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

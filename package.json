@@ -31,6 +31,7 @@
     "js-file-downloader": "^1.1.25",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
+    "mitt": "^3.0.1",
     "normalize.css": "^8.0.1",
     "pinia": "^2.1.7",
     "tippy.js": "^6.3.7",

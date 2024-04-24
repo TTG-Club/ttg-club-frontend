@@ -6,6 +6,7 @@
   import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
 
   import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
+  import NavDiceHistoryButton from '@/features/menu/NavDiceHistoryButton.vue';
   import NavMenu from '@/features/menu/NavMenu.vue';
   import NavProfile from '@/features/menu/NavProfile.vue';
   import NavSearch from '@/features/menu/NavSearch.vue';
@@ -21,6 +22,7 @@
       NavProfile,
       MenuThemeSwitcher,
       UiSocialButton,
+      NavDiceHistoryButton,
     },
     setup() {
       const route = useRoute();
@@ -72,6 +74,8 @@
             url="https://discord.gg/JqFKMKRtxv"
           />
         </div>
+
+        <nav-dice-history-button />
 
         <nav-profile />
 
