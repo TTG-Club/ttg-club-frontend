@@ -71,10 +71,9 @@
     &__result {
       flex: 2.1ch 0 0;
       font-size: var(--h2-font-size);
-      line-height: var(--h1-font-size);
+      line-height: var(--h2-font-size);
       color: var(--text-color-title);
       text-align: center;
-      margin-top: -4px;
 
       &--type {
         &-success {
