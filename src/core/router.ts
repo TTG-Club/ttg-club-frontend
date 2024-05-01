@@ -16,14 +16,15 @@ const router = createRouter({
 
 const { nextAvailable } = useRouterHelpers();
 const { sendPageViewMetrics } = useMetrics();
-const { hidePopovers } = useNavPopover();
+const { closeSearch, closePopover } = useNavPopover();
 const { updateMetaByURL } = useMeta();
 const navStore = useNavStore(pinia);
 
 router.beforeEach(nextAvailable);
 
 router.beforeResolve(async () => {
-  hidePopovers();
+  closeSearch();
+  closePopover();
 
   await navStore.initNavItems();
 });

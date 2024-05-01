@@ -86,43 +86,10 @@ export const useNavStore = defineStore('NavStore', () => {
     }
   };
 
-  /* Partners */
-  const partners = ref<TPartner[]>([]);
-
-  const showedPartners = computed(() =>
-    orderBy(partners.value, ['order'], ['asc']),
-  );
-
-  const initPartners = async () => {
-    if (partners.value.length) {
-      return Promise.resolve();
-    }
-
-    try {
-      const resp = await httpClient.get<Array<TPartner>>({
-        url: '/partners',
-      });
-
-      if (resp.status === 200) {
-        partners.value = resp.data;
-
-        return Promise.resolve();
-      }
-
-      return Promise.reject(resp.statusText);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
   return {
     // Menu
     navItems,
     showedNavItems,
     initNavItems,
-
-    // Partners
-    showedPartners,
-    initPartners,
   };
 });

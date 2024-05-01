@@ -1,11 +1,41 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
+  import { orderBy } from 'lodash-es';
+  import { computed, onBeforeMount, ref } from 'vue';
 
-  import { useNavStore } from '@/shared/stores/NavStore';
+  import { httpClient } from '@/shared/api';
+  import type { TPartner } from '@/shared/stores/NavStore';
 
-  const navStore = useNavStore();
+  const partners = ref<TPartner[]>([]);
 
-  const { showedPartners } = storeToRefs(navStore);
+  const showedPartners = computed(() =>
+    orderBy(partners.value, ['order'], ['asc']),
+  );
+
+  const initPartners = async () => {
+    if (partners.value.length) {
+      return Promise.resolve();
+    }
+
+    try {
+      const resp = await httpClient.get<Array<TPartner>>({
+        url: '/partners',
+      });
+
+      if (resp.status === 200) {
+        partners.value = resp.data;
+
+        return Promise.resolve();
+      }
+
+      return Promise.reject(resp.statusText);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  onBeforeMount(() => {
+    initPartners();
+  });
 </script>
 
 <template>
