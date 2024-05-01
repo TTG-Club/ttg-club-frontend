@@ -8,6 +8,7 @@ import { useMetrics } from '@/shared/composables/useMetrics';
 import { useNavPopover } from '@/shared/composables/useNavPopover';
 import { useRouterHelpers } from '@/shared/composables/useRouterHelpers';
 import { useNavStore } from '@/shared/stores/NavStore';
+import { useRollStore } from '@/shared/stores/RollStore';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -19,8 +20,13 @@ const { sendPageViewMetrics } = useMetrics();
 const { closeSearch, closePopover } = useNavPopover();
 const { updateMetaByURL } = useMeta();
 const navStore = useNavStore(pinia);
+const rollStore = useRollStore();
 
 router.beforeEach(nextAvailable);
+
+router.beforeEach(() => {
+  rollStore.setFallbackSource();
+});
 
 router.beforeResolve(async () => {
   closeSearch();

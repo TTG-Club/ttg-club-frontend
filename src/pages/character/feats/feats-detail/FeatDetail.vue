@@ -75,7 +75,10 @@
 </script>
 
 <template>
-  <content-detail class="feat-detail">
+  <content-detail
+    class="feat-detail"
+    :entity-name="feat ? `${feat.name.rus} (черта)` : undefined"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"
