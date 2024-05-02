@@ -65,7 +65,7 @@
     try {
       await featInfoQuery(to.path);
 
-      return to.fullPath;
+      return true;
     } catch (err) {
       errorHandler(err);
 

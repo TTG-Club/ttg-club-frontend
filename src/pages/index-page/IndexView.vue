@@ -3,15 +3,18 @@
   import { storeToRefs } from 'pinia';
   import { computed } from 'vue';
 
+  import { useNavPopover } from '@/shared/composables/useNavPopover';
   import type { TNavItem } from '@/shared/stores/NavStore';
   import { useNavStore } from '@/shared/stores/NavStore';
+  import OurPartners from '@/shared/ui/OurPartners.vue';
 
   import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
 
   const navStore = useNavStore();
 
-  const { navItems, showedNavItems, showedPartners, isShowSearch } =
-    storeToRefs(navStore);
+  const { navItems, showedNavItems } = storeToRefs(navStore);
+
+  const { isShowSearch } = useNavPopover();
 
   const mainNavItems = computed(() => {
     const items: TNavItem[] = [];
@@ -140,36 +143,7 @@
             </div>
 
             <div class="row">
-              <div
-                v-if="showedPartners.length"
-                class="row"
-              >
-                <div class="links_block">
-                  <h3>Наши друзья:</h3>
-
-                  <div class="list">
-                    <a
-                      v-for="(partner, key) in showedPartners"
-                      :key="key"
-                      v-tippy="{
-                        content: partner.description,
-                      }"
-                      :href="partner.url"
-                      class="chips tip"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      <img
-                        :alt="partner.name"
-                        :src="partner.img"
-                        height="20px"
-                        width="20px"
-                      />
-                      {{ partner.name }}
-                    </a>
-                  </div>
-                </div>
-              </div>
+              <our-partners />
             </div>
           </div>
 
