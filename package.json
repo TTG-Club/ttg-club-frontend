@@ -6,7 +6,7 @@
     "serve": "vite --host",
     "build:dev": "vite build --emptyOutDir --mode development",
     "build:prod": "vite build --emptyOutDir --mode production",
-    "type-check": "vue-tsc --noEmit -p tsconfig.json --composite false",
+    "type-check": "vue-tsc -p tsconfig.json",
     "lint:check": "eslint \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore",
     "lint:write": "eslint \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --fix",
     "lint:workflow": "eslint \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --quiet",
