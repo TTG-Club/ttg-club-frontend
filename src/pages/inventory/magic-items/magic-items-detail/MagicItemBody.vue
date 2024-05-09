@@ -87,13 +87,15 @@
             <span v-tippy="'Руководство Зантара обо всем'">XGE</span>:
           </b>
 
-          <span v-if="magicItem.cost.xge.includes('к', 0)"
+          <span v-if="magicItem.cost.xge.includes('купить', 0)"
+            >{{ magicItem.cost.xge }}
+          </span>
+
+          <span v-else
             ><dice-roller
               :formula="magicItem.cost.xge"
               label="Стоимсть предмета по XGE"
           /></span>
-
-          <span v-else>{{ magicItem.cost.xge }} </span>
         </li>
       </ul>
 
