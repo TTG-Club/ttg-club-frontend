@@ -87,7 +87,7 @@
             <span v-tippy="'Руководство Зантара обо всем'">XGE</span>:
           </b>
 
-          <span v-if="magicItem.cost.xge.includes('купить', 0)"
+          <span v-if="magicItem.rarity?.type === 'artifact'"
             >{{ magicItem.cost.xge }}
           </span>
 
