@@ -87,7 +87,12 @@
             <span v-tippy="'Руководство Зантара обо всем'">XGE</span>:
           </b>
 
-          <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
+          <span
+            ><dice-roller
+              :formula="magicItem.cost.xge"
+              label="Стоимсть предмета по XGE"
+          /></span>
+          зм.
         </li>
       </ul>
 
