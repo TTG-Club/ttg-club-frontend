@@ -99,9 +99,10 @@
 
             <div
               v-if="magicItem.customization"
+              v-tippy-lazy="{ content: 'Требуется настройка' }"
               class="link-item__customization"
             >
-              Настройка
+              Н
             </div>
 
             <div
@@ -191,6 +192,15 @@
 
     &__count {
       margin-left: auto;
+    }
+
+    &__customization {
+      border-radius: 6px;
+      background-color: var(--primary);
+      color: var(--text-btn-color);
+      line-height: normal;
+      flex: 0 0 20px;
+      justify-content: center;
     }
 
     &.router-link-active {
