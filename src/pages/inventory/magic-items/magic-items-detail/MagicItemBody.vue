@@ -91,11 +91,12 @@
             >{{ magicItem.cost.xge }}
           </span>
 
-          <span v-else
-            ><dice-roller
+          <span v-else>
+            <dice-roller
               :formula="magicItem.cost.xge"
               label="Стоимсть предмета по XGE"
-          /></span>
+            />
+          </span>
         </li>
       </ul>
 
