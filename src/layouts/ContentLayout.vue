@@ -271,8 +271,12 @@
     }
 
     &__title {
-      font-size: var(--h1-font-size);
+      font-size: var(--h2-font-size);
       font-weight: 400;
+
+      @include media-min($lg) {
+        font-size: var(--h1-font-size);
+      }
     }
 
     &__fixed {

@@ -228,14 +228,15 @@
       display: flex;
       position: relative;
       overflow: hidden;
-      background-color: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      gap: 8px;
     }
 
     &__search {
       flex: 1;
       display: flex;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
 
       &_field {
         flex: 1;
@@ -280,6 +281,7 @@
       border-left: 1px solid var(--border);
       background-color: var(--primary);
       color: var(--text-btn-color);
+      border-radius: 12px;
 
       svg {
         @include css_anim();
