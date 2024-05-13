@@ -87,7 +87,16 @@
             <span v-tippy="'Руководство Зантара обо всем'">XGE</span>:
           </b>
 
-          <span><dice-roller :formula="magicItem.cost.xge" /></span> зм.
+          <span v-if="magicItem.rarity?.type === 'artifact'">
+            {{ magicItem.cost.xge }}
+          </span>
+
+          <span v-else>
+            <dice-roller
+              :formula="magicItem.cost.xge"
+              label="Стоимсть предмета по XGE"
+            />
+          </span>
         </li>
       </ul>
 
