@@ -341,7 +341,7 @@
           width: 100%;
 
           @include media-min($xl) {
-            width: 40%;
+            width: 36%;
           }
         }
 
@@ -396,7 +396,7 @@
           left: 0;
           top: 24px;
           position: sticky;
-          width: calc(60% - 24px);
+          width: calc(64% - 24px);
           height: calc(var(--max-vh) - 24px - 24px);
           border-radius: 12px;
         }
