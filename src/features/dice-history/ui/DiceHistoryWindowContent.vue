@@ -1,6 +1,5 @@
 <script lang="ts" setup>
   // TODO: Consider renaming the component
-
   import { ref, watch, onMounted, nextTick } from 'vue';
 
   import { useClassName } from '@/shared/composables/useClassName';
@@ -86,7 +85,8 @@
 
     &__content {
       display: grid;
-      grid-template-rows: minmax(0, 1fr);
+      grid-template-columns: 100%;
+      grid-template-rows: auto;
       align-items: end;
       overflow-y: auto;
       padding: 0 8px;

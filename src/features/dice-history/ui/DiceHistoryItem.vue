@@ -66,7 +66,10 @@
     gap: 8px;
     padding: 12px 8px;
     font-size: 16px;
-    border-top: 1px solid var(--border);
+
+    & + & {
+      border-top: 1px solid var(--border);
+    }
 
     &__result {
       flex: 2.1ch 0 0;
