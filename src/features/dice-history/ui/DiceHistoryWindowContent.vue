@@ -84,13 +84,16 @@
     }
 
     &__content {
-      display: grid;
-      grid-template-columns: 100%;
-      grid-template-rows: auto;
-      align-items: end;
       overflow-y: auto;
       padding: 0 8px;
       scrollbar-color: var(--text-g-color) var(--bg-sub-menu);
+      display: flex;
+      flex-flow: column nowrap;
+      flex: 1;
+
+      > *:first-child {
+        margin-top: auto;
+      }
 
       &::-webkit-scrollbar {
         width: 6px;

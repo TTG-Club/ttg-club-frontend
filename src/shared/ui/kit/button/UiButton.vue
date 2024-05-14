@@ -69,8 +69,16 @@
     () => groupContext?.type || props.type || 'default',
   );
 
-  const buttonColor = computed(
-    () => `var(--btn-${groupContext?.color || props.color || 'primary'})`,
+  const buttonColor = computed(() =>
+    props.color !== 'text'
+      ? `var(--btn-${groupContext?.color || props.color || 'primary'})`
+      : 'currentColor',
+  );
+
+  const buttonHoverColor = computed(() =>
+    props.color !== 'text'
+      ? `var(--btn-${groupContext?.color || props.color || 'primary'}-hover)`
+      : 'currentColor',
   );
 
   const buttonSize = computed(() => groupContext?.size || props.size || 'md');
@@ -304,10 +312,15 @@
 
   html {
     --btn-primary: var(--primary);
+    --btn-primary-hover: var(--primary-hover);
     --btn-success: var(--success);
+    --btn-success-hover: var(--success-hover);
     --btn-error: var(--error);
+    --btn-error-hover: var(--error-hover);
     --btn-warning: var(--warning);
+    --btn-warning-hover: var(--warning-hover);
     --btn-info: var(--info);
+    --btn-info-hover: var(--info-hover);
   }
 
   .ui-button {
@@ -390,7 +403,8 @@
         padding: 9px;
       }
 
-      &-text {
+      &-text,
+      &-plain {
         background-color: transparent;
         color: v-bind(buttonColor);
         padding: 10px;
@@ -400,6 +414,16 @@
 
         &.size-sm {
           padding: 7px;
+        }
+      }
+
+      &-plain {
+        &:hover {
+          color: v-bind(buttonHoverColor);
+
+          .hover {
+            display: none;
+          }
         }
       }
     }
@@ -424,7 +448,8 @@
       &.no-text {
         &.type {
           &-default,
-          &-text {
+          &-text,
+          &-plain {
             padding: 10px 6px 10px 7px;
           }
 
@@ -446,7 +471,8 @@
 
     &.type {
       &-default,
-      &-text {
+      &-text,
+      &-plain {
         padding: 10px 5px 10px 4px;
       }
 

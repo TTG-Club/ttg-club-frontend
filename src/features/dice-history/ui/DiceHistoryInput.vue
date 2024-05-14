@@ -6,7 +6,7 @@
 
   import { useClassName } from '@/shared/composables/useClassName';
   import { useDiceRoller } from '@/shared/composables/useDiceRoller';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const cn = useClassName();
 
@@ -67,7 +67,7 @@
 
     setTimeout(() => {
       invalid.value = false;
-    }, 1000);
+    }, 2000);
   }
 </script>
 
@@ -84,13 +84,14 @@
       @keyup.down="traverseHistory('down')"
     />
 
-    <button
-      type="button"
-      :class="cn('dice-button', { invalid })"
+    <ui-button
+      type="plain"
+      size="md"
+      icon="dice/d6"
+      color="text"
+      :class="cn('button', { invalid })"
       @click="roll"
-    >
-      <svg-icon icon="dice/d6" />
-    </button>
+    />
   </div>
 </template>
 
@@ -100,33 +101,30 @@
 
     display: flex;
     align-items: center;
-    padding-right: 4px;
+    overflow: hidden;
 
     &__input {
       all: unset;
       display: block;
       flex: auto;
-      padding: 10px 0 8px 16px;
+      padding: 8px 12px;
+      font-size: var(--main-font-size);
+      line-height: 22px;
     }
 
-    &__dice-button {
-      all: unset;
-
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      @include css_anim($item: color);
+    &__button {
+      color: var(--text-b-color);
 
       &:hover {
-        color: var(--btn-primary);
+        color: var(--text-color);
       }
 
       &--invalid {
         color: var(--error);
+
+        &:hover {
+          color: var(--error-hover);
+        }
       }
     }
   }
