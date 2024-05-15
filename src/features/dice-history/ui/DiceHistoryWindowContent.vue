@@ -80,7 +80,7 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
-      padding: 4px 7px 3px 12px;
+      padding: 4px 4px 4px 12px;
     }
 
     &__content {
