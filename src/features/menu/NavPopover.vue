@@ -128,6 +128,7 @@
       cursor: auto;
       background-image: var(--bg-gradient);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       overflow: auto;
       border-radius: 12px;
       box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
