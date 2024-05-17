@@ -283,7 +283,6 @@
       .filter {
         &__body {
           border-radius: 8px;
-          background-color: var(--bg-sub-menu);
         }
       }
 
