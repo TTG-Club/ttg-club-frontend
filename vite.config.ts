@@ -34,7 +34,6 @@ export default ({ mode }: ConfigEnv) => {
     build: {
       outDir: env.VITE_APP_BUILD_PATH || 'dist',
       sourcemap: true,
-      minify: 'terser',
       rollupOptions: {
         output: {
           entryFileNames: 'js/app.[hash:8].js',

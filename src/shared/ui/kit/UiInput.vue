@@ -93,11 +93,16 @@
   };
 
   const typeValidate = (e: KeyboardEvent) => {
-    const isControlKey = e.key.length > 1;
+    const isControlKey = e.key?.length > 1;
     const key = Number(e.key);
     const isNum = Number.isInteger(key);
-    const target = e.target as HTMLInputElement | null;
-    const isValueEmpty = target?.value;
+    const { target } = e;
+
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const isValueEmpty = target.value;
 
     if (props.type === 'number' && !isControlKey) {
       if (!isNum || (!isValueEmpty && !key)) {

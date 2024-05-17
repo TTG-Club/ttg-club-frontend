@@ -67,7 +67,10 @@
 </script>
 
 <template>
-  <content-detail class="item-detail">
+  <content-detail
+    class="item-detail"
+    :entity-name="item?.name.rus"
+  >
     <template #fixed>
       <section-header
         :copy="!error && !loading"

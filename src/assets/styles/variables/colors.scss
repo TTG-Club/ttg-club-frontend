@@ -154,11 +154,13 @@ $base-colors: (
   'youtube-base': #ff0000,
   'youtube-hover': #a80000,
   'success': #67c23a,
+  'success-hover': darken(#67c23a, 7%),
   'warning': #e6a23c,
-  'warning-hover': #bd822a,
-  'danger': #f56c6c,
+  'warning-hover': darken(#e6a23c, 7%),
   'error': #f56c6c,
-  'info': #909399
+  'error-hover': darken(#f56c6c, 7%),
+  'info': #909399,
+  'info-hover': darken(#909399, 7%)
 );
 
 $theme-colors: (

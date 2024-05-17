@@ -1,4 +1,9 @@
-export type TButtonType = 'default' | 'secondary' | 'outline' | 'text';
+export type TButtonType =
+  | 'default'
+  | 'secondary'
+  | 'outline'
+  | 'text'
+  | 'plain';
 
 export type TButtonSize = 'sm' | 'md' | 'lg';
 

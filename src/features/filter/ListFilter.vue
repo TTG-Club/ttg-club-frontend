@@ -10,6 +10,7 @@
     FilterItem,
   } from '@/shared/composables/useFilter';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
@@ -17,20 +18,20 @@
   import FilterItemCheckboxes from '@/features/filter/FilterItem/FilterItemCheckboxes.vue';
   import FilterItemSources from '@/features/filter/FilterItem/FilterItemSources.vue';
 
-  import type { PropType } from 'vue';
-
-  const props = defineProps({
-    filterInstance: {
-      type: Object as PropType<FilterComposable>,
-      required: true,
+  const props = withDefaults(
+    defineProps<{
+      filterInstance: FilterComposable;
+      inTab?: boolean;
+    }>(),
+    {
+      inTab: false,
     },
-    inTab: {
-      type: Boolean,
-      default: false,
-    },
-  });
+  );
 
-  const emit = defineEmits(['search', 'update']);
+  const emit = defineEmits<{
+    (e: 'search', v: string): void;
+    (e: 'update'): void;
+  }>();
 
   const showed = ref(false);
 
@@ -87,7 +88,7 @@
       if (filter.value?.other) {
         filter.value = {
           ...filter.value,
-          other: value as Array<FilterGroup>,
+          other: value,
         };
       }
     },
@@ -154,31 +155,25 @@
         </div>
       </div>
 
-      <button
-        v-if="filter"
-        v-tippy="{ content: showed ? 'Скрыть фильтры' : 'Показать фильтры' }"
-        :class="{ 'is-active': isFilterCustomized }"
-        class="filter__button"
-        type="button"
-        @click.left.exact.prevent="showed = !showed"
-      >
-        <svg-icon
+      <div class="filter__controls">
+        <ui-button
+          v-if="filter"
+          :tooltip="{ content: showed ? 'Скрыть фильтры' : 'Показать фильтры' }"
           :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`"
+          :color="isFilterCustomized ? 'warning' : 'primary'"
+          @click.left.exact.prevent="showed = !showed"
+        >
+          Фильтр
+        </ui-button>
+
+        <ui-button
+          v-if="!!filter && isFilterCustomized"
+          :tooltip="{ content: 'Сбросить все фильтры' }"
+          icon="clear"
+          color="warning"
+          @click.left.exact.prevent="resetFilter"
         />
-
-        <span>Фильтр</span>
-      </button>
-
-      <button
-        v-if="!!filter && isFilterCustomized"
-        v-tippy="'Сбросить все фильтры'"
-        class="filter__button"
-        :class="{ 'is-active': isFilterCustomized }"
-        type="button"
-        @click.left.exact.prevent="resetFilter"
-      >
-        <svg-icon icon="clear" />
-      </button>
+      </div>
     </div>
 
     <base-modal
@@ -228,14 +223,15 @@
       display: flex;
       position: relative;
       overflow: hidden;
-      background-color: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      gap: 8px;
     }
 
     &__search {
       flex: 1;
       display: flex;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
 
       &_field {
         flex: 1;
@@ -269,61 +265,8 @@
       }
     }
 
-    &__button {
-      @include css_anim();
-
+    &__controls {
       display: flex;
-      flex-shrink: 0;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 8px;
-      border-left: 1px solid var(--border);
-      background-color: var(--primary);
-      color: var(--text-btn-color);
-
-      svg {
-        @include css_anim();
-      }
-
-      span {
-        @include css_anim();
-
-        margin-left: 4px;
-      }
-
-      &.is-active {
-        @include css_anim();
-
-        background-color: var(--warning);
-
-        &:hover {
-          background-color: var(--warning-hover);
-        }
-
-        svg {
-          color: var(--text-btn-color);
-        }
-
-        span {
-          color: var(--text-btn-color);
-        }
-      }
-
-      @include media-min($md) {
-        &:hover {
-          @include css_anim();
-
-          background-color: var(--primary-hover);
-
-          svg {
-            color: var(--text-btn-color);
-          }
-
-          span {
-            color: var(--text-btn-color);
-          }
-        }
-      }
     }
 
     &__dropdown {
