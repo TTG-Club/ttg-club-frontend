@@ -10,10 +10,6 @@
     background: var(--bg-sub-menu);
   }
 
-  &.is-green {
-    background: var(--bg-homebrew-gradient-left);
-  }
-
   &__content {
     display: flex;
     flex-direction: row;
@@ -119,6 +115,14 @@
     }
   }
 
+  &__source {
+    font-size: calc(var(--main-font-size) - 4px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 6px;
+    color: var(--text-g-color);
+  }
+
   &__count + &__price,
   &__count + &__customization {
     flex: 0 1 80px;
@@ -126,6 +130,30 @@
 
   &__customization + &__price {
     flex: 0 1 80px;
+  }
+
+  &.is-hb {
+    .link-item{
+      &__source {
+        background: var(--badge-homebrew);
+      }
+    }
+  }
+
+  &.is-3rd {
+    .link-item{
+      &__source {
+        background: var(--badge-3rd);
+      }
+    }
+  }
+
+  &.is-Basic {
+    .link-item{
+      &__source {
+        background: var(--badge-Basic);
+      }
+    }
   }
 
   &:hover {
