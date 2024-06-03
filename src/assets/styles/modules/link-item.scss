@@ -148,14 +148,6 @@
     }
   }
 
-  &.is-Basic {
-    .link-item{
-      &__source {
-        background: var(--badge-Basic);
-      }
-    }
-  }
-
   &:hover {
     .link-item {
       &__content {
