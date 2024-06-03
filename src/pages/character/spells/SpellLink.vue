@@ -45,10 +45,12 @@
 
   const classList = computed(() => ({
     'router-link-active': isActive.value,
-    'is-hb': props.spell?.source?.group?.shortName === 'HB',
-    'is-3rd': props.spell?.source?.group?.shortName === '3rd',
     'is-sub-item': props.inTab,
   }));
+
+  const sourceGroupColor = computed(
+    () => `var(--badge-${props.spell.source.group?.shortName.toLowerCase()})`,
+  );
 
   const clickHandler = async () => {
     if (!props.inTab) {
@@ -109,10 +111,18 @@
               <span class="link-item__name--eng"> [{{ spell.name.eng }}] </span>
             </div>
 
-            <div v-tippy="{ content: spell.source.group.name, touch: true }">
-              <span class="link-item__source">
-                {{ spell.source.group.shortName }}
-              </span>
+            <div
+              v-if="spell.source.group"
+              v-tippy-lazy="{
+                content: spell.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': sourceGroupColor,
+              }"
+              class="link-item__source"
+            >
+              {{ spell.source.group.shortName }}
             </div>
           </div>
 
