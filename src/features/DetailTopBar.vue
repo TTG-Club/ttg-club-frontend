@@ -41,9 +41,15 @@
       Источник:
 
       <span
-        v-if="source.homebrew"
+        v-if="
+          source.group.shortName === '3rd' || source.group.shortName === 'HB'
+        "
+        v-tippy-lazy="{
+          content: source.group.name,
+          touch: true,
+        }"
         class="homebrew_text"
-        >Homebrew</span
+        >{{ source.group.shortName }}</span
       >
 
       <span v-tippy="{ content: source.name, touch: true }"
