@@ -240,7 +240,7 @@
       border-radius: 6px;
       background-color: var(--bg-sub-menu);
       border: 1px solid var(--border);
-      color: var(--text-btn-color);
+      color: var(--text-color);
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
 

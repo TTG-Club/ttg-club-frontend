@@ -210,10 +210,9 @@
     &__customization {
       border-radius: 6px;
       background-color: var(--bg-sub-menu);
-      color: var(--text-btn-color);
-      line-height: normal;
       flex: 0 0 20px;
       justify-content: center;
+      border: 1px solid var(--border);
     }
 
     &.router-link-active {

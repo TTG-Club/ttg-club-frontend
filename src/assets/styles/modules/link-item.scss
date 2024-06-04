@@ -45,13 +45,13 @@
   &__price {
     display: flex;
     flex: 1 0 auto;
-    color: var(--text-g-color);
+    color: var(--text-color);
     font-size: calc(var(--main-font-size) - 1px);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     justify-content: flex-end;
-    height: 18px;
+    height: 20px;
     line-height: normal;
 
     &:first-child {
