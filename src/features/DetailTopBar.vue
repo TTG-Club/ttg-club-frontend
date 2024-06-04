@@ -49,8 +49,9 @@
           touch: true,
         }"
         class="homebrew_text"
-        >{{ source.group.shortName }}</span
       >
+        {{ source.group.shortName }}
+      </span>
 
       <span v-tippy="{ content: source.name, touch: true }"
         >&nbsp;{{ source.shortName }}</span
