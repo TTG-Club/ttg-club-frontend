@@ -1,6 +1,17 @@
 <script setup lang="ts">
   import type { TSource } from '@/shared/types/BaseApiFields';
 
+  defineOptions({
+    computed: {
+      additionalTextSource() {
+        return (
+          this.source.group.shortName === '3rd' ||
+          this.source.group.shortName === 'HB'
+        );
+      },
+    },
+  });
+
   withDefaults(
     defineProps<{
       left?: string;
@@ -41,9 +52,7 @@
       Источник:
 
       <span
-        v-if="
-          source.group.shortName === '3rd' || source.group.shortName === 'HB'
-        "
+        v-if="additionalTextSource"
         v-tippy-lazy="{
           content: source.group.name,
           touch: true,
