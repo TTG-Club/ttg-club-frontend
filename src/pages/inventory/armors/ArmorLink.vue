@@ -77,7 +77,7 @@
                 touch: true,
               }"
               :style="{
-                '--source-group-color': `var(--badge-${armor.source.group?.shortName.toLowerCase()})`,
+                '--source-group-color': `var(--badge-${armor.source.group.shortName.toLowerCase()})`,
               }"
               class="link-item__source"
             >
