@@ -55,6 +55,9 @@ $theme-dark: (
   'bg-gradient': linear-gradient(135deg, #23323bc7, #19141fc7),
   'border-gradient': #1C386B,
   'card-shadow': rgba(0,0,0,.05),
+  // Badge
+  'badge-hb': #5d7e17,
+  'badge-3rd': #301b5f,
   // Scroll
   'background-color-thumb': rgba(255, 255, 255, 0.6),
   'background-color-thumb-hover': rgba(255, 255, 255, 0.8),
@@ -126,6 +129,9 @@ $theme-light: (
   'bg-gradient': linear-gradient(135deg, #f7f2c5c7, #f7f1e5c7),
   'border-gradient': #f8c6bb,
   'card-shadow': rgba(0,0,0,.05),
+  // Badge
+  'badge-hb': #319f52,
+  'badge-3rd': #d4cbe9,
   // Scroll
   'background-color-thumb': rgba(0, 0, 0, 0.6),
   'background-color-thumb-hover': rgba(0, 0, 0, 0.8),

@@ -12,28 +12,36 @@
 <template>
   <div
     ref="treasure"
-    :class="{ 'is-green': treasure?.source?.homebrew }"
     class="link-item"
   >
     <div class="link-item__content">
       <div class="link-item__body">
         <div class="link-item__row">
+          <div class="link-item__name">
+            <span
+              v-tippy="{ content: treasure.name.rus }"
+              class="link-item__name--rus"
+            >
+              {{ treasure.name.rus }}
+            </span>
+          </div>
+
           <div
-            v-tippy="{ content: treasure.name.rus }"
-            class="link-item__name"
+            v-if="treasure.source.group"
+            v-tippy-lazy="{
+              content: treasure.source.group.name,
+              touch: true,
+            }"
+            :style="{
+              '--source-group-color': `var(--badge-${treasure.source.group.shortName.toLowerCase()})`,
+            }"
+            class="link-item__source"
           >
-            {{ treasure.name.rus }}
+            {{ treasure.source.group.shortName }}
           </div>
         </div>
 
         <div class="link-item__row">
-          <div
-            v-tippy="{ content: treasure.source.name }"
-            class="link-item__source"
-          >
-            {{ treasure.source.shortName }}
-          </div>
-
           <div
             v-if="treasure.custom?.count"
             class="link-item__count"
@@ -54,16 +62,6 @@
   @use '@/assets/styles/modules/link-item' as *;
 
   .link-item {
-    &__name {
-      max-width: 100%;
-      width: auto;
-    }
-
-    &__source {
-      display: flex;
-      margin-right: 8px;
-    }
-
     &__count,
     &__price {
       display: flex;

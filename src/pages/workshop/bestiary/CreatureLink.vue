@@ -16,7 +16,6 @@
 
 <template>
   <router-link
-    :class="{ 'is-green': creature?.source?.homebrew }"
     :to="{ path: creature.url }"
     class="link-item"
   >
@@ -37,6 +36,20 @@
             <span class="link-item__name--eng">
               [{{ creature.name.eng }}]
             </span>
+          </div>
+
+          <div
+            v-if="creature.source.group"
+            v-tippy-lazy="{
+              content: creature.source.group.name,
+              touch: true,
+            }"
+            :style="{
+              '--source-group-color': `var(--badge-${creature.source.group.shortName.toLowerCase()})`,
+            }"
+            class="link-item__source"
+          >
+            {{ creature.source.group.shortName }}
           </div>
         </div>
 

@@ -1,7 +1,9 @@
 <script setup lang="ts">
+  import { computed } from 'vue';
+
   import type { TSource } from '@/shared/types/BaseApiFields';
 
-  withDefaults(
+  const props = withDefaults(
     defineProps<{
       left?: string;
       source?: TSource;
@@ -12,6 +14,12 @@
       source: undefined,
       bgGrey: true,
     },
+  );
+
+  const additionalTextSource = computed(
+    () =>
+      props.source?.group?.shortName === '3rd' ||
+      props.source?.group?.shortName === 'HB',
   );
 </script>
 
@@ -41,10 +49,15 @@
       Источник:
 
       <span
-        v-if="source.homebrew"
+        v-if="additionalTextSource"
+        v-tippy-lazy="{
+          content: source.group!.name,
+          touch: true,
+        }"
         class="homebrew_text"
-        >Homebrew</span
       >
+        {{ source.group!.shortName }}
+      </span>
 
       <span v-tippy="{ content: source.name, touch: true }"
         >&nbsp;{{ source.shortName }}</span

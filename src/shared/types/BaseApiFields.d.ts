@@ -8,11 +8,17 @@ export type TName = {
   eng: string;
 };
 
+export type TSourceGroup = {
+  shortName: string;
+  name: string;
+};
+
 export type TSource = {
   shortName: string;
   name: string;
   homebrew?: boolean;
   page?: number;
+  group?: TSourceGroup;
 };
 
 export type TClassBadge = {
