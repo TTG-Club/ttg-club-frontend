@@ -60,7 +60,6 @@
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,
-        'is-green': props.optionItem?.homebrew,
         'is-sub-item': props.inTab,
       }));
 
@@ -123,6 +122,20 @@
               <span class="link-item__name--eng">
                 [{{ optionItem.name.eng }}]
               </span>
+            </div>
+
+            <div
+              v-if="optionItem.source.group"
+              v-tippy-lazy="{
+                content: optionItem.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': `var(--badge-${optionItem.source.group?.shortName.toLowerCase()})`,
+              }"
+              class="link-item__source"
+            >
+              {{ optionItem.source.group.shortName }}
             </div>
           </div>
         </div>

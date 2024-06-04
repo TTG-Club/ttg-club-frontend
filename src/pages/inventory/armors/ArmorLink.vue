@@ -27,7 +27,6 @@
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,
-        'is-green': props.armor?.homebrew,
       }));
 
       return {
@@ -70,16 +69,23 @@
                 [{{ armor.name.eng }}]
               </span>
             </div>
+
+            <div
+              v-if="armor.source.group"
+              v-tippy-lazy="{
+                content: armor.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': `var(--badge-${armor.source.group?.shortName.toLowerCase()})`,
+              }"
+              class="link-item__source"
+            >
+              {{ armor.source.group.shortName }}
+            </div>
           </div>
 
           <div class="link-item__row">
-            <!-- <div
-                            v-if="armor.type?.name"
-                            class="link-item__type"
-                        >
-                            {{ armor.type.name }}
-                        </div> -->
-
             <div
               v-if="armor.armorClass"
               v-tippy-lazy="{ content: 'Класс доспеха (АС)' }"

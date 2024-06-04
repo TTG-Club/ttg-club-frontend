@@ -27,7 +27,6 @@
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,
-        'is-green': props.item?.homebrew,
       }));
 
       return {
@@ -62,6 +61,20 @@
               </span>
 
               <span class="link-item__name--eng"> [{{ item.name.eng }}] </span>
+            </div>
+
+            <div
+              v-if="item.source.group"
+              v-tippy-lazy="{
+                content: item.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': `var(--badge-${item.source.group?.shortName.toLowerCase()})`,
+              }"
+              class="link-item__source"
+            >
+              {{ item.source.group.shortName }}
             </div>
           </div>
         </div>
