@@ -28,7 +28,6 @@
 
   const classList = computed(() => ({
     'router-link-active': props.isActive || isActive.value,
-    'is-green': props.magicItem?.source?.homebrew,
   }));
 
   const clickHandler = () => {
@@ -78,6 +77,20 @@
               <span class="link-item__name--eng">
                 [{{ magicItem.name.eng }}]
               </span>
+            </div>
+
+            <div
+              v-if="magicItem.source.group"
+              v-tippy-lazy="{
+                content: magicItem.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': `var(--badge-${props.magicItem.source.group?.shortName.toLowerCase()})`,
+              }"
+              class="link-item__source"
+            >
+              {{ magicItem.source.group.shortName }}
             </div>
           </div>
 
@@ -196,7 +209,7 @@
 
     &__customization {
       border-radius: 6px;
-      background-color: var(--primary);
+      background-color: var(--bg-sub-menu);
       color: var(--text-btn-color);
       line-height: normal;
       flex: 0 0 20px;
