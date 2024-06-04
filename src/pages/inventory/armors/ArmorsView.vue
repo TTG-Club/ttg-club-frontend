@@ -32,6 +32,10 @@
   const { initPages, items: armors } = usePagination({
     url: '/armors',
     size: -1,
+    filter: {
+      isCustomized: filter.isCustomized,
+      value: filter.queryParams,
+    },
     search: filter.search,
     order: [
       {
@@ -56,6 +60,7 @@
   });
 
   onBeforeMount(async () => {
+    await filter.initFilter();
     await initPages();
   });
 
