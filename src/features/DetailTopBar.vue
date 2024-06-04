@@ -1,18 +1,9 @@
 <script setup lang="ts">
+  import { computed } from 'vue';
+
   import type { TSource } from '@/shared/types/BaseApiFields';
 
-  defineOptions({
-    computed: {
-      additionalTextSource() {
-        return (
-          this.source.group.shortName === '3rd' ||
-          this.source.group.shortName === 'HB'
-        );
-      },
-    },
-  });
-
-  withDefaults(
+  const props = withDefaults(
     defineProps<{
       left?: string;
       source?: TSource;
@@ -23,6 +14,12 @@
       source: undefined,
       bgGrey: true,
     },
+  );
+
+  const additionalTextSource = computed(
+    () =>
+      props.source?.group?.shortName === '3rd' ||
+      props.source?.group?.shortName === 'HB',
   );
 </script>
 
@@ -54,12 +51,12 @@
       <span
         v-if="additionalTextSource"
         v-tippy-lazy="{
-          content: source.group.name,
+          content: source.group!.name,
           touch: true,
         }"
         class="homebrew_text"
       >
-        {{ source.group.shortName }}
+        {{ source.group!.shortName }}
       </span>
 
       <span v-tippy="{ content: source.name, touch: true }"
