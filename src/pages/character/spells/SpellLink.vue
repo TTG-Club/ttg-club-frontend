@@ -267,7 +267,7 @@
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
       color: var(--text-color);
-      width: 10px;
+      width: 12px;
       text-align: center;
 
       & + & {
