@@ -56,7 +56,7 @@ $theme-dark: (
   'border-gradient': #1C386B,
   'card-shadow': rgba(0,0,0,.05),
   // Badge
-  'badge-hb': var(--bg-homebrew),
+  'badge-hb': #405710,
   'badge-3rd': #301b5f,
   'badge-basic': var(--bg-table-list),
   'badge-ua': var(--bg-table-list),
@@ -84,7 +84,7 @@ $theme-light: (
   'bg-secondary-gradient': linear-gradient(135deg, #f5f2cf, #f3f1db),
   'bg-sub-menu': #ebe5d0,
   'bg-dice': #3567c9,
-  'bg-homebrew': #38b65e,
+  'bg-homebrew': #5d7e17,
   'bg-homebrew-gradient':
     linear-gradient(50deg, var(--bg-table-list), var(--bg-homebrew) 140%),
   'bg-homebrew-gradient-left':
@@ -132,7 +132,7 @@ $theme-light: (
   'border-gradient': #f8c6bb,
   'card-shadow': rgba(0,0,0,.05),
   // Badge
-  'badge-hb': var(--bg-homebrew),
+  'badge-hb': #97ca28,
   'badge-3rd': #d4cbe9,
   'badge-basic': var(--bg-table-list),
   'badge-ua': var(--bg-table-list),
