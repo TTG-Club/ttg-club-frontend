@@ -1,29 +1,29 @@
-<script>
-  import { defineComponent } from 'vue';
-
+<script setup lang="ts">
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
-  export default defineComponent({
-    components: {
-      SvgIcon,
-    },
-    props: {
-      links: {
-        type: Array,
-        default: () => [
-          {
-            name: 'Discord',
-            url: 'https://discord.gg/JqFKMKRtxv',
-            icon: 'discord',
-          },
-          {
-            name: 'ВКонтакте',
-            url: 'https://vk.com/ttg.club',
-            icon: 'vk',
-          },
-        ],
+  type SocialLinkItem = {
+    name: string;
+    url: string;
+    icon: string;
+  };
+
+  type Props = {
+    links?: Array<SocialLinkItem>;
+  };
+
+  withDefaults(defineProps<Props>(), {
+    links: () => [
+      {
+        name: 'Discord',
+        url: 'https://discord.gg/JqFKMKRtxv',
+        icon: 'discord',
       },
-    },
+      {
+        name: 'ВКонтакте',
+        url: 'https://vk.com/ttg.club',
+        icon: 'vk',
+      },
+    ],
   });
 </script>
 
@@ -44,7 +44,10 @@
         rel="noopener noreferrer"
         target="_blank"
       >
-        <svg-icon :icon="link.icon" />
+        <svg-icon
+          :icon="link.icon"
+          size="1em"
+        />
       </a>
     </div>
   </div>
@@ -93,6 +96,7 @@
       width: 48px;
       height: 48px;
       color: var(--text-color);
+      font-size: 36px;
 
       &:hover {
         color: var(--primary-hover);
