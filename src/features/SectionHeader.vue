@@ -185,16 +185,6 @@
         >
           {{ title }}
         </div>
-
-        <a
-          v-if="copy"
-          v-tippy="{ content: 'Скопировать ссылку' }"
-          :href="urlForCopy"
-          class="section-header__title--copy"
-          @click.left.exact.prevent.stop="copyURL"
-        >
-          <svg-icon icon="copy" />
-        </a>
       </div>
 
       <div
@@ -210,6 +200,16 @@
       v-if="hasControls"
       class="section-header__controls"
     >
+      <ui-button
+        v-if="copy"
+        :tooltip="{ content: 'Скопировать ссылку' }"
+        class="section-header__control"
+        icon="copy"
+        type="text"
+        color="text"
+        @click.left.exact.prevent.stop="copyURL"
+      />
+
       <bookmark-save-button
         v-if="bookmark"
         :name="title"
