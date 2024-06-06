@@ -390,17 +390,29 @@
         border: {
           width: 0;
         }
+
+        &.size-sm {
+          padding: 7px;
+        }
       }
 
       &-secondary {
         background-color: var(--bg-secondary);
         color: var(--text-b-color);
         padding: 9px;
+
+        &.size-sm {
+          padding: 6px;
+        }
       }
 
       &-outline {
         background-color: transparent;
         padding: 9px;
+
+        &.size-sm {
+          padding: 6px;
+        }
       }
 
       &-text,
@@ -451,11 +463,19 @@
           &-text,
           &-plain {
             padding: 10px 6px 10px 7px;
+
+            &.size-sm {
+              padding: 7px 6px 7px 7px;
+            }
           }
 
           &-secondary,
           &-outline {
             padding: 9px 6px 9px 7px;
+
+            &.size-sm {
+              padding: 6px 6px 6px 7px;
+            }
           }
         }
       }
