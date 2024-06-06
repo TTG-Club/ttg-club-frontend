@@ -9,7 +9,6 @@
 
   import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
@@ -390,6 +389,11 @@
       display: flex;
       align-items: flex-start;
       flex-shrink: 0;
+      gap: 4px;
+
+      .ui-button {
+        margin-left: 0;
+      }
     }
 
     &__control {

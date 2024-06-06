@@ -337,7 +337,7 @@
     }
 
     & + & {
-      margin-left: 4px;
+      margin-left: 8px;
     }
 
     &.is-full-width {
