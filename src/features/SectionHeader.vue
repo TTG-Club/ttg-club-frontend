@@ -335,8 +335,8 @@
     &__title {
       display: flex;
       align-items: center;
-      font-size: var(--h4-font-size);
-      line-height: var(--h4-line-height);
+      font-size: var(--h3-font-size);
+      line-height: var(--h3-line-height);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -344,7 +344,7 @@
       color: var(--text-color-title);
       font-weight: 400;
       cursor: pointer;
-      min-height: var(--h4-line-height);
+      min-height: var(--h3-line-height);
     }
 
     &__subtitle {
