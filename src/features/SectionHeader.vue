@@ -391,7 +391,7 @@
       flex-shrink: 0;
       gap: 4px;
 
-      .ui-button {
+      > .ui-button {
         margin-left: 0;
       }
     }
