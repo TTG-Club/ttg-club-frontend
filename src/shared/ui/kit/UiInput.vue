@@ -12,7 +12,16 @@
       labelPosition?: 'left' | 'top';
       placeholder?: string;
       autofocus?: boolean;
-      autocomplete?: boolean | 'on' | 'off';
+      autocomplete?:
+        | boolean
+        | 'on'
+        | 'off'
+        | 'username'
+        | 'email'
+        | 'password'
+        | 'current-password'
+        | 'new-password'
+        | 'tel';
       type?: 'text' | 'password' | 'email' | 'search' | 'tel' | 'number';
       isError?: boolean;
       isClearable?: boolean;
@@ -37,7 +46,10 @@
     },
   );
 
-  defineEmits(['update:modelValue', 'blur']);
+  defineEmits<{
+    (e: 'update:modelValue', v: string | number): void;
+    (e: 'blur'): void;
+  }>();
 
   defineOptions({
     inheritAttrs: false,
