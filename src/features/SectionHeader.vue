@@ -177,13 +177,11 @@
 <template>
   <div class="section-header">
     <div class="section-header__body">
-      <div class="section-header__title">
-        <div
-          class="section-header__title--text"
-          @click.left.exact.prevent.stop="copyText(title)"
-        >
-          {{ title }}
-        </div>
+      <div
+        class="section-header__title"
+        @click.left.exact.prevent.stop="copyText(title)"
+      >
+        {{ title }}
       </div>
 
       <div
@@ -206,6 +204,7 @@
         icon="copy"
         type="text"
         color="text"
+        size="sm"
         @click.left.exact.prevent.stop="copyURL"
       />
 
@@ -214,6 +213,7 @@
         :name="title"
         :url="url || ''"
         color="text"
+        size="sm"
       />
 
       <ui-button
@@ -223,6 +223,7 @@
         icon="print"
         type="text"
         color="text"
+        size="sm"
         @click.left.exact.prevent.stop="openPrintWindow"
       />
 
@@ -233,6 +234,7 @@
         icon="export-foundry"
         type="text"
         color="text"
+        size="sm"
         split
         @click.left.exact.prevent="onExport"
       >
@@ -270,6 +272,7 @@
         :icon="`expand/${fullscreenState ? 'exit' : 'enter'}`"
         type="text"
         color="text"
+        size="sm"
         @click.left.exact.prevent.stop="fullscreenState = !fullscreenState"
       />
 
@@ -279,6 +282,7 @@
         class="section-header__control"
         icon="close"
         type="secondary"
+        size="sm"
         @click.left.exact.prevent.stop="$emit('close')"
       />
     </div>
@@ -331,25 +335,20 @@
     &__title {
       display: flex;
       align-items: center;
-
-      &--text {
-        font-size: var(--h3-font-size);
-        line-height: var(--h3-line-height);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        position: relative;
-        color: var(--text-color-title);
-        font-weight: 400;
-        cursor: pointer;
-        min-height: 36px;
-        display: flex;
-        align-items: center;
-      }
+      font-size: var(--h4-font-size);
+      line-height: var(--h4-line-height);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      position: relative;
+      color: var(--text-color-title);
+      font-weight: 400;
+      cursor: pointer;
+      min-height: var(--h4-line-height);
     }
 
     &__subtitle {
-      font-size: calc(var(--h2-font-size) - 14px);
+      font-size: var(--h5-font-size);
       color: var(--text-g-color);
       overflow: hidden;
       text-overflow: ellipsis;

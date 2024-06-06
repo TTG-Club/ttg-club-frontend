@@ -271,11 +271,13 @@
     }
 
     &__title {
-      font-size: var(--h2-font-size);
+      font-size: var(--h3-font-size);
+      line-height: var(--h3-line-height);
       font-weight: 400;
 
       @include media-min($lg) {
-        font-size: var(--h1-font-size);
+        font-size: var(--h2-font-size);
+        line-height: var(--h2-line-height);
       }
     }
 
@@ -298,7 +300,7 @@
           var(--bg-main) 0,
           var(--bg-main) 15%,
           transparent 80%,
-          transparent 90%,
+          transparent 95%,
           transparent 100%
         );
       }
