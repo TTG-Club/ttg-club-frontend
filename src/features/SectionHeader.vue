@@ -9,7 +9,6 @@
 
   import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
@@ -185,16 +184,6 @@
         >
           {{ title }}
         </div>
-
-        <a
-          v-if="copy"
-          v-tippy="{ content: 'Скопировать ссылку' }"
-          :href="urlForCopy"
-          class="section-header__title--copy"
-          @click.left.exact.prevent.stop="copyURL"
-        >
-          <svg-icon icon="copy" />
-        </a>
       </div>
 
       <div
@@ -210,6 +199,16 @@
       v-if="hasControls"
       class="section-header__controls"
     >
+      <ui-button
+        v-if="copy"
+        :tooltip="{ content: 'Скопировать ссылку' }"
+        class="section-header__control"
+        icon="copy"
+        type="text"
+        color="text"
+        @click.left.exact.prevent.stop="copyURL"
+      />
+
       <bookmark-save-button
         v-if="bookmark"
         :name="title"
@@ -390,6 +389,11 @@
       display: flex;
       align-items: flex-start;
       flex-shrink: 0;
+      gap: 4px;
+
+      > .ui-button {
+        margin-left: 0;
+      }
     }
 
     &__control {
