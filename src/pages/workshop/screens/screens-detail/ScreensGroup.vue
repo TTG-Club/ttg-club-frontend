@@ -94,7 +94,6 @@
       font-size: var(--h4-font-size);
       font-weight: 300;
       color: var(--text-color-title);
-      font-family: 'Lora';
       margin: 16px 16px 0 16px;
       border-radius: 8px;
       padding: 0 16px;
