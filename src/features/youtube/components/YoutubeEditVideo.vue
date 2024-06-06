@@ -3,7 +3,7 @@
   import { helpers, required } from '@vuelidate/validators';
   import { useVModel } from '@vueuse/core';
   import { cloneDeep } from 'lodash-es';
-  import { ref, watch, reactive } from 'vue';
+  import { ref, watch, reactive, unref } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
@@ -105,7 +105,6 @@
     :class="$style.modal"
     content-transition="vfm-fade"
     esc-to-close
-    focus-trap
     overlay-transition="vfm-fade"
     v-bind="$attrs"
   >
@@ -129,7 +128,9 @@
           <div :class="$style.row">
             <ui-input
               v-model="v$.name.$model"
-              :error-text="v$.name.$dirty ? v$.name.$errors?.[0]?.$message : ''"
+              :error-text="
+                v$.name.$dirty ? unref(v$.name.$errors?.[0]?.$message) : ''
+              "
               :autocomplete="false"
               autocapitalize="off"
               autocorrect="off"
