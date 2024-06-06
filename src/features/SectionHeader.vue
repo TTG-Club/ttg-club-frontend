@@ -346,33 +346,6 @@
         display: flex;
         align-items: center;
       }
-
-      &--copy {
-        @include css_anim();
-
-        display: none;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        margin-left: 6px;
-        padding: 4px;
-        border-radius: 8px;
-        color: var(--primary);
-        background-color: transparent;
-        cursor: pointer;
-        flex-shrink: 0;
-        transform: translateY(2px);
-
-        @media (min-width: 800px) {
-          display: flex;
-
-          &:hover {
-            background-color: var(--primary-hover);
-            color: var(--text-btn-color);
-          }
-        }
-      }
     }
 
     &__subtitle {
