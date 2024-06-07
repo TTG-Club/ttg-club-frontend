@@ -55,6 +55,11 @@ $theme-dark: (
   'bg-gradient': linear-gradient(135deg, #23323bc7, #19141fc7),
   'border-gradient': #1C386B,
   'card-shadow': rgba(0,0,0,.05),
+  // Badge
+  'badge-hb': #405710,
+  'badge-3rd': #483475,
+  'badge-basic': var(--bg-table-list),
+  'badge-ua': var(--bg-table-list),
   // Scroll
   'background-color-thumb': rgba(255, 255, 255, 0.6),
   'background-color-thumb-hover': rgba(255, 255, 255, 0.8),
@@ -79,7 +84,7 @@ $theme-light: (
   'bg-secondary-gradient': linear-gradient(135deg, #f5f2cf, #f3f1db),
   'bg-sub-menu': #ebe5d0,
   'bg-dice': #3567c9,
-  'bg-homebrew': #319f52,
+  'bg-homebrew': #5d7e17,
   'bg-homebrew-gradient':
     linear-gradient(50deg, var(--bg-table-list), var(--bg-homebrew) 140%),
   'bg-homebrew-gradient-left':
@@ -126,6 +131,11 @@ $theme-light: (
   'bg-gradient': linear-gradient(135deg, #f7f2c5c7, #f7f1e5c7),
   'border-gradient': #f8c6bb,
   'card-shadow': rgba(0,0,0,.05),
+  // Badge
+  'badge-hb': #97ca28,
+  'badge-3rd': #d4cbe9,
+  'badge-basic': var(--bg-table-list),
+  'badge-ua': var(--bg-table-list),
   // Scroll
   'background-color-thumb': rgba(0, 0, 0, 0.6),
   'background-color-thumb-hover': rgba(0, 0, 0, 0.8),

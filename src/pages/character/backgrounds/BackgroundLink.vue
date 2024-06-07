@@ -16,7 +16,6 @@
 
 <template>
   <router-link
-    :class="{ 'is-green': backgroundItem?.homebrew }"
     :to="{ path: backgroundItem.url }"
     class="link-item"
   >
@@ -31,6 +30,20 @@
             <span class="link-item__name--eng">
               [{{ backgroundItem.name.eng }}]
             </span>
+          </div>
+
+          <div
+            v-if="backgroundItem.source.group"
+            v-tippy-lazy="{
+              content: backgroundItem.source.group.name,
+              touch: true,
+            }"
+            :style="{
+              '--source-group-color': `var(--badge-${backgroundItem.source.group.shortName.toLowerCase()})`,
+            }"
+            class="link-item__source"
+          >
+            {{ backgroundItem.source.group.shortName }}
           </div>
         </div>
       </div>

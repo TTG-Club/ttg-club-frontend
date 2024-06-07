@@ -27,7 +27,6 @@
 
       const classList = computed(() => ({
         'router-link-active': isActive.value,
-        'is-green': props.weapon?.homebrew,
       }));
 
       return {
@@ -70,16 +69,23 @@
                 [{{ weapon.name.eng }}]
               </span>
             </div>
+
+            <div
+              v-if="weapon.source.group"
+              v-tippy-lazy="{
+                content: weapon.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': `var(--badge-${weapon.source.group.shortName.toLowerCase()})`,
+              }"
+              class="link-item__source"
+            >
+              {{ weapon.source.group.shortName }}
+            </div>
           </div>
 
           <div class="link-item__row">
-            <!-- <div
-                            v-if="weapon.type?.name"
-                            class="link-item__type"
-                        >
-                            {{ weapon.type.name }}
-                        </div> -->
-
             <div
               v-if="weapon.damage"
               class="link-item__damage"

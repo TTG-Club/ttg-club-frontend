@@ -272,10 +272,12 @@
 
     &__title {
       font-size: var(--h2-font-size);
+      line-height: var(--h2-line-height);
       font-weight: 400;
 
       @include media-min($lg) {
         font-size: var(--h1-font-size);
+        line-height: var(--h1-line-height);
       }
     }
 

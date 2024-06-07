@@ -45,7 +45,6 @@
 
   const classList = computed(() => ({
     'router-link-active': isActive.value,
-    'is-green': props.spell?.source?.homebrew,
     'is-sub-item': props.inTab,
   }));
 
@@ -106,6 +105,20 @@
               </span>
 
               <span class="link-item__name--eng"> [{{ spell.name.eng }}] </span>
+            </div>
+
+            <div
+              v-if="spell.source.group"
+              v-tippy-lazy="{
+                content: spell.source.group.name,
+                touch: true,
+              }"
+              :style="{
+                '--source-group-color': `var(--badge-${props.spell.source.group.shortName.toLowerCase()})`,
+              }"
+              class="link-item__source"
+            >
+              {{ spell.source.group.shortName }}
             </div>
           </div>
 
@@ -225,8 +238,9 @@
     &__modification {
       padding: 0 6px;
       border-radius: 6px;
-      background-color: var(--primary);
-      color: var(--text-btn-color);
+      background-color: var(--bg-sub-menu);
+      border: 1px solid var(--border);
+      color: var(--text-color);
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
 
@@ -253,7 +267,7 @@
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
       color: var(--text-color);
-      width: 10px;
+      width: 12px;
       text-align: center;
 
       & + & {

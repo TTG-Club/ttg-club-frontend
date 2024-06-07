@@ -10,7 +10,6 @@
 
 <template>
   <router-link
-    :class="{ 'is-green': feat.homebrew }"
     :to="{ path: feat.url }"
     class="link-item"
   >
@@ -23,6 +22,20 @@
             </span>
 
             <span class="link-item__name--eng"> [{{ feat.name.eng }}] </span>
+          </div>
+
+          <div
+            v-if="feat.source.group"
+            v-tippy-lazy="{
+              content: feat.source.group.name,
+              touch: true,
+            }"
+            :style="{
+              '--source-group-color': `var(--badge-${feat.source.group.shortName.toLowerCase()})`,
+            }"
+            class="link-item__source"
+          >
+            {{ feat.source.group.shortName }}
           </div>
         </div>
 

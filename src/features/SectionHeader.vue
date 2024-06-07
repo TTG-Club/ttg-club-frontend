@@ -9,7 +9,6 @@
 
   import { useMetrics } from '@/shared/composables/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
@@ -178,23 +177,11 @@
 <template>
   <div class="section-header">
     <div class="section-header__body">
-      <div class="section-header__title">
-        <div
-          class="section-header__title--text"
-          @click.left.exact.prevent.stop="copyText(title)"
-        >
-          {{ title }}
-        </div>
-
-        <a
-          v-if="copy"
-          v-tippy="{ content: 'Скопировать ссылку' }"
-          :href="urlForCopy"
-          class="section-header__title--copy"
-          @click.left.exact.prevent.stop="copyURL"
-        >
-          <svg-icon icon="copy" />
-        </a>
+      <div
+        class="section-header__title"
+        @click.left.exact.prevent.stop="copyText(title)"
+      >
+        {{ title }}
       </div>
 
       <div
@@ -210,11 +197,23 @@
       v-if="hasControls"
       class="section-header__controls"
     >
+      <ui-button
+        v-if="copy"
+        :tooltip="{ content: 'Скопировать ссылку' }"
+        class="section-header__control"
+        icon="copy"
+        type="text"
+        color="text"
+        size="sm"
+        @click.left.exact.prevent.stop="copyURL"
+      />
+
       <bookmark-save-button
         v-if="bookmark"
         :name="title"
         :url="url || ''"
         color="text"
+        size="sm"
       />
 
       <ui-button
@@ -224,6 +223,7 @@
         icon="print"
         type="text"
         color="text"
+        size="sm"
         @click.left.exact.prevent.stop="openPrintWindow"
       />
 
@@ -234,6 +234,7 @@
         icon="export-foundry"
         type="text"
         color="text"
+        size="sm"
         split
         @click.left.exact.prevent="onExport"
       >
@@ -271,6 +272,7 @@
         :icon="`expand/${fullscreenState ? 'exit' : 'enter'}`"
         type="text"
         color="text"
+        size="sm"
         @click.left.exact.prevent.stop="fullscreenState = !fullscreenState"
       />
 
@@ -280,6 +282,7 @@
         class="section-header__control"
         icon="close"
         type="secondary"
+        size="sm"
         @click.left.exact.prevent.stop="$emit('close')"
       />
     </div>
@@ -332,52 +335,20 @@
     &__title {
       display: flex;
       align-items: center;
-
-      &--text {
-        font-size: var(--h3-font-size);
-        line-height: var(--h3-line-height);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        position: relative;
-        color: var(--text-color-title);
-        font-weight: 400;
-        cursor: pointer;
-        min-height: 36px;
-        display: flex;
-        align-items: center;
-      }
-
-      &--copy {
-        @include css_anim();
-
-        display: none;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        margin-left: 6px;
-        padding: 4px;
-        border-radius: 8px;
-        color: var(--primary);
-        background-color: transparent;
-        cursor: pointer;
-        flex-shrink: 0;
-        transform: translateY(2px);
-
-        @media (min-width: 800px) {
-          display: flex;
-
-          &:hover {
-            background-color: var(--primary-hover);
-            color: var(--text-btn-color);
-          }
-        }
-      }
+      font-size: var(--h3-font-size);
+      line-height: var(--h3-line-height);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      position: relative;
+      color: var(--text-color-title);
+      font-weight: 400;
+      cursor: pointer;
+      min-height: var(--h3-line-height);
     }
 
     &__subtitle {
-      font-size: calc(var(--h2-font-size) - 14px);
+      font-size: var(--h5-font-size);
       color: var(--text-g-color);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -390,6 +361,11 @@
       display: flex;
       align-items: flex-start;
       flex-shrink: 0;
+      gap: 4px;
+
+      > .ui-button {
+        margin-left: 0;
+      }
     }
 
     &__control {
