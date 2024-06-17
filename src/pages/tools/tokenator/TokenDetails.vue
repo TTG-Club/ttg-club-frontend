@@ -3,30 +3,34 @@
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
-  import { useTokenator } from '@/pages/tools/tokenator/composable';
+  import { useTokenator } from '@/pages/tools/tokenator/composable/index';
+  import TokenFrameDropdown from '@/pages/tools/tokenator/TokenFrameDropdown.vue';
 
   const {
     open,
-    load,
+    loadFile,
     file,
+    frames,
     reflectImage,
     centerImage,
     scale,
     scaleConfig,
     MAX_SIZE,
     MAX_DIMENSION,
+    selectFrame,
+    toggleFramesDropdown,
   } = useTokenator();
 
   const variants: Array<TButtonOption> = [
     {
       key: 'webp',
       label: 'WEBP',
-      callback: () => load('webp'),
+      callback: () => loadFile('webp'),
     },
     {
       key: 'png',
       label: 'PNG',
-      callback: () => load('png'),
+      callback: () => loadFile('png'),
     },
   ];
 </script>
@@ -72,6 +76,12 @@
         />
       </div>
 
+      <token-frame-dropdown
+        :select-frame="selectFrame"
+        :frames="frames"
+        :toggle-frames-dropdown="toggleFramesDropdown"
+      />
+
       <div :class="$style.buttons">
         <ui-button
           type="outline"
@@ -86,7 +96,7 @@
           split
           :disabled="!file"
           :options="variants"
-          @click.left.exact.prevent="load('png')"
+          @click.left.exact.prevent="loadFile('png')"
         >
           Скачать
         </ui-button>
