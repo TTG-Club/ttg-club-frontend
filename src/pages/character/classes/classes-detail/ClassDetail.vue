@@ -17,7 +17,7 @@
   } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { useClassName } from '@/shared/composables/useClassName';
+  import { useClassName } from '@/shared/composable/useClassName';
 
   import { useDiceHistory } from '@/features/dice-history/composables';
 

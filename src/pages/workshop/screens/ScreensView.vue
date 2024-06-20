@@ -2,8 +2,8 @@
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
   import { ScreensFilterDefaults } from '@/shared/types/workshop/Screens.d';
   import { isAutoOpenAvailable } from '@/shared/utils/isAutoOpenAvailable';
 

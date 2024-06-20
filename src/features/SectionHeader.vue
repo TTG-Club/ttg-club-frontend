@@ -5,9 +5,8 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useMetrics } from '@/shared/composable/useMetrics';
+  import { ToastEventBus } from '@/shared/config';
   import { useUIStore } from '@/shared/stores/UIStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 

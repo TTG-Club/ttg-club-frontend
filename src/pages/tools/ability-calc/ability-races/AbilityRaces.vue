@@ -2,7 +2,7 @@
   import { cloneDeep, reverse } from 'lodash-es';
   import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
 
-  import { usePagination } from '@/shared/composables/usePagination';
+  import { usePagination } from '@/shared/composable/usePagination';
   import type { TRaceLink } from '@/shared/types/character/Races.d';
   import type {
     AbilityRoll,

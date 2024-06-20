@@ -5,7 +5,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { httpClient } from '@/shared/api';
-import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
+import { USER_TOKEN_COOKIE } from '@/shared/const/UI';
 import { useIsDev } from '@/shared/utils/isDev';
 
 export enum EUserRoles {

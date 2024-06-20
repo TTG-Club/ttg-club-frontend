@@ -2,7 +2,7 @@ import localforage from 'localforage';
 import { cloneDeep, sortBy } from 'lodash-es';
 import { useModal } from 'vue-final-modal';
 
-import { DB_NAME } from '@/shared/constants/UI';
+import { DB_NAME } from '@/shared/const/UI';
 import type { WithChildren } from '@/shared/types/Utility';
 
 import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';

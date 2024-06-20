@@ -13,7 +13,7 @@
   import { computed, ref, toRaw } from 'vue';
 
   import { httpClient } from '@/shared/api';
-  import { DB_NAME } from '@/shared/constants/UI';
+  import { DB_NAME } from '@/shared/const/UI';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
   import type { TSpellItem } from '@/shared/types/character/Spells';

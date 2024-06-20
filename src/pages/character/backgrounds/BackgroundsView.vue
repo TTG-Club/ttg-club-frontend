@@ -3,9 +3,9 @@
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
+  import { useScrollToPathInList } from '@/shared/composable/useScrollToPathInList';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { BackgroundsFilterDefaults } from '@/shared/types/character/Backgrounds.d';
   import { checkIsListGridFlat } from '@/shared/ui/virtual-views/VirtualGridList/helpers';

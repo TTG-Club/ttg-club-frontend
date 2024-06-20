@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { tryOnBeforeMount } from '@vueuse/core';
+  import { NConfigProvider, ruRU, dateRuRU } from 'naive-ui';
   import { ModalsContainer } from 'vue-final-modal';
 
   import { useUserStore } from '@/shared/stores/UserStore';
@@ -7,6 +8,9 @@
   import { DiceHistory } from '@/features/dice-history/ui';
   import { useDiceNotification } from '@/features/dice-notification';
   import NavBar from '@/features/menu/NavBar.vue';
+
+  import './config/dayjs';
+  import { themeOverrides } from './config';
 
   const userStore = useUserStore();
 
@@ -28,16 +32,24 @@
 </script>
 
 <template>
-  <nav-bar />
-
-  <div
-    id="container"
-    class="container"
+  <n-config-provider
+    :theme-overrides="themeOverrides"
+    :locale="ruRU"
+    :date-locale="dateRuRU"
+    abstract
+    inline-theme-disabled
   >
-    <router-view />
-  </div>
+    <nav-bar />
 
-  <dice-history />
+    <div
+      id="container"
+      class="container"
+    >
+      <router-view />
+    </div>
 
-  <modals-container />
+    <dice-history />
+
+    <modals-container />
+  </n-config-provider>
 </template>

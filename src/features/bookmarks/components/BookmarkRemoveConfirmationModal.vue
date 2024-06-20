@@ -3,7 +3,7 @@
   import { ref } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
 
-  import { DB_NAME } from '@/shared/constants/UI';
+  import { DB_NAME } from '@/shared/const/UI';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-  import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
-  import { useClassName } from '@/shared/composables/useClassName';
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
+  import { useClassName } from '@/shared/composable/useClassName';
 
   import type { ISharedButtonProps } from './UiButton';
 

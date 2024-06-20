@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue';
 
-import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
+import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
 import type { TBreakpoint } from '@/shared/types/Breakpoints';
 
 export type TResponsiveValues<T> = Partial<Record<TBreakpoint, T>> & {

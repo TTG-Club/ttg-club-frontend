@@ -4,9 +4,8 @@
   import { computed, defineComponent, onActivated, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
+  import { useDiceRoller } from '@/shared/composable/useDiceRoller';
+  import { ToastEventBus } from '@/shared/config';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';

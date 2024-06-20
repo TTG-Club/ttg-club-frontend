@@ -3,8 +3,7 @@
   import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+  import { ToastEventBus } from '@/shared/config';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';

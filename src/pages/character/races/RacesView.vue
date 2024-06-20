@@ -5,9 +5,9 @@
   import { computed, nextTick, onBeforeMount, ref, watch, provide } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink, TRaceList } from '@/shared/types/character/Races.d';
   import { RacesFilterDefaults } from '@/shared/types/character/Races.d';

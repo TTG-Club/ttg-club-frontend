@@ -6,8 +6,7 @@
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+  import { ToastEventBus } from '@/shared/config';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 

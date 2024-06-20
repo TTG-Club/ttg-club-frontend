@@ -3,12 +3,12 @@
   import { storeToRefs } from 'pinia';
   import { ref } from 'vue';
 
-  import { getFormattedDate } from '@/shared/composables/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { getDateString } from '@/shared/utils/getDateString';
 
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
   import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
@@ -135,8 +135,8 @@
                 {{ video.name }}
               </div>
 
-              <div v-if="getFormattedDate(video.created)">
-                Дата добавления: {{ getFormattedDate(video.created) }}
+              <div v-if="getDateString(video.created)">
+                Дата добавления: {{ getDateString(video.created) }}
               </div>
 
               <ui-checkbox

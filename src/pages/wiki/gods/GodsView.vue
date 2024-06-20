@@ -4,10 +4,10 @@
   import { computed, onBeforeMount } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
-  import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/constants';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
+  import { useScrollToPathInList } from '@/shared/composable/useScrollToPathInList';
+  import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { AnyObject } from '@/shared/types/Utility';
   import { GodsFilterDefaults } from '@/shared/types/wiki/Gods.d';

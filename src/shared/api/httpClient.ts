@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { USER_TOKEN_COOKIE } from '@/shared/constants/UI';
+import { USER_TOKEN_COOKIE } from '@/shared/const/UI';
 import {
   getBaseUrl,
   getProxyUrl,

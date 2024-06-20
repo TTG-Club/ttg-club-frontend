@@ -5,8 +5,7 @@
   import { ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+  import { ToastEventBus } from '@/shared/config';
   import { useUIStore } from '@/shared/stores/UIStore';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';

@@ -9,7 +9,7 @@
   import { storeToRefs } from 'pinia';
   import { computed, onMounted, ref } from 'vue';
 
-  import type { FilterComposable } from '@/shared/composables/useFilter';
+  import type { FilterComposable } from '@/shared/composable/useFilter';
   import { useUIStore } from '@/shared/stores/UIStore';
 
   import ListFilter from '@/features/filter/ListFilter.vue';

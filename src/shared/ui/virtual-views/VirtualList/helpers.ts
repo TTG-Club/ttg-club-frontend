@@ -1,4 +1,4 @@
-import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/constants';
+import { DEFAULT_ENTITY_KEY_FIELD } from '@/shared/const';
 import type { TVirtualListProps } from '@/shared/ui/virtual-views/VirtualList/types';
 
 const itemSizes = {

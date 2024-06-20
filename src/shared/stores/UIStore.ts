@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
 
-import { FULLSCREEN_DB_KEY, THEME_DB_KEY } from '@/shared/constants/UI';
+import { FULLSCREEN_DB_KEY, THEME_DB_KEY } from '@/shared/const/UI';
 
 export const useUIStore = defineStore('UIStore', () => {
   const updateThemeMeta = () => {

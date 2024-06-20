@@ -1,4 +1,4 @@
-import type { DefaultKeyField } from '@/shared/constants';
+import type { DefaultKeyField } from '@/shared/const';
 import type {
   AnyObject,
   RecordKey,

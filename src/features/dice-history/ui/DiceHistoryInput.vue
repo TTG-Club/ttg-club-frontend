@@ -2,10 +2,9 @@
   import { ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useClassName } from '@/shared/composables/useClassName';
-  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
+  import { useClassName } from '@/shared/composable/useClassName';
+  import { useDiceRoller } from '@/shared/composable/useDiceRoller';
+  import { ToastEventBus } from '@/shared/config';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const cn = useClassName();

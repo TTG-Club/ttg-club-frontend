@@ -2,7 +2,7 @@
   import { useVModel } from '@vueuse/core';
   import { computed, watch } from 'vue';
 
-  import { useNavPopover } from '@/shared/composables/useNavPopover';
+  import { useNavPopover } from '@/shared/composable/useNavPopover';
 
   const props = withDefaults(
     defineProps<{

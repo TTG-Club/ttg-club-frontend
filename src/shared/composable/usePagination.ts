@@ -3,9 +3,9 @@ import { computed, type Ref, ref, unref } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { httpClient, type RequestConfig } from '@/shared/api';
-import type { FilterQueryParams } from '@/shared/composables/useFilter';
-import { useMetrics } from '@/shared/composables/useMetrics';
-import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
+import type { FilterQueryParams } from '@/shared/composable/useFilter';
+import { useMetrics } from '@/shared/composable/useMetrics';
+import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/const';
 import { errorHandler } from '@/shared/utils/errorHandler';
 import { useIsDev } from '@/shared/utils/isDev';
 

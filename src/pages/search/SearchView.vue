@@ -6,7 +6,7 @@
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
-  import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useMetrics } from '@/shared/composable/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';

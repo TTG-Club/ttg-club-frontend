@@ -3,10 +3,10 @@
   import localforage from 'localforage';
   import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue';
 
-  import { useAppBreakpoints } from '@/shared/composables/useAppBreakpoints';
-  import { useClassName } from '@/shared/composables/useClassName';
-  import { useLocalforageItem } from '@/shared/composables/useLocalforageItem';
-  import { DB_NAME } from '@/shared/constants/UI';
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
+  import { useClassName } from '@/shared/composable/useClassName';
+  import { useLocalforageItem } from '@/shared/composable/useLocalforageItem';
+  import { DB_NAME } from '@/shared/const/UI';
 
   const emit = defineEmits<{
     (event: 'resize:start', height: number): void;

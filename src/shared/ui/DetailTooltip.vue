@@ -3,9 +3,8 @@
   import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
-  import { DefaultTippyProps } from '@/core/configs/TippyConfig';
-
   import { httpClient } from '@/shared/api';
+  import { DefaultTippyProps } from '@/shared/config';
   import type { DetailType } from '@/shared/types/BaseApiFields';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';

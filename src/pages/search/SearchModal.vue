@@ -12,7 +12,7 @@
   import { useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
-  import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useMetrics } from '@/shared/composable/useMetrics';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';

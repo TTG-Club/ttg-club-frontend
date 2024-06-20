@@ -4,7 +4,7 @@ import {
   useBreakpoints as vueUseBreakpoints,
 } from '@vueuse/core';
 
-import { BREAKPOINTS } from '@/shared/constants/breakpoints';
+import { BREAKPOINTS } from '@/shared/const/breakpoints';
 import type { TBreakpoint } from '@/shared/types/Breakpoints';
 
 export const useAppBreakpoints = <T extends TBreakpoint>(
