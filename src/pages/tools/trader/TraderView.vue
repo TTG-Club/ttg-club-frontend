@@ -69,7 +69,7 @@
   }>({
     magicLevel: 1,
     persuasion: 1,
-    unique: true,
+    unique: false,
   });
 
   const settings = ref<{
