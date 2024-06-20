@@ -2,9 +2,13 @@ import type { GlobalThemeOverrides } from 'naive-ui';
 
 export const themeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: '#FF0000',
+    borderRadius: '8px',
   },
-  Button: {
-    textColor: '#FF0000',
+  Checkbox: {
+    borderRadius: '4px',
+  },
+  Skeleton: {
+    color: 'var(--hover)',
+    colorEnd: 'var(--bg-main)',
   },
 };

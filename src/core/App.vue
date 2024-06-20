@@ -1,6 +1,15 @@
 <script setup lang="ts">
   import { tryOnBeforeMount } from '@vueuse/core';
-  import { NConfigProvider, ruRU, dateRuRU } from 'naive-ui';
+  import {
+    NConfigProvider,
+    NLoadingBarProvider,
+    NMessageProvider,
+    NNotificationProvider,
+    NModalProvider,
+    NDialogProvider,
+    ruRU,
+    dateRuRU,
+  } from 'naive-ui';
   import { ModalsContainer } from 'vue-final-modal';
 
   import { useUserStore } from '@/shared/stores/UserStore';
@@ -39,17 +48,27 @@
     abstract
     inline-theme-disabled
   >
-    <nav-bar />
+    <n-loading-bar-provider>
+      <n-message-provider>
+        <n-notification-provider>
+          <n-modal-provider>
+            <n-dialog-provider>
+              <nav-bar />
 
-    <div
-      id="container"
-      class="container"
-    >
-      <router-view />
-    </div>
+              <div
+                id="container"
+                class="container"
+              >
+                <router-view />
+              </div>
 
-    <dice-history />
+              <dice-history />
 
-    <modals-container />
+              <modals-container />
+            </n-dialog-provider>
+          </n-modal-provider>
+        </n-notification-provider>
+      </n-message-provider>
+    </n-loading-bar-provider>
   </n-config-provider>
 </template>

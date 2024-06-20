@@ -13,7 +13,7 @@
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
   type Props = {
-    title: string;
+    title?: string;
     subtitle?: string;
     url?: string;
     copy?: boolean;
@@ -29,6 +29,7 @@
   };
 
   const props = withDefaults(defineProps<Props>(), {
+    title: '',
     subtitle: '',
     url: '',
     copy: false,
@@ -180,15 +181,25 @@
         class="section-header__title"
         @click.left.exact.prevent.stop="copyText(title)"
       >
-        {{ title }}
+        <slot
+          v-if="$slots.title"
+          name="title"
+        />
+
+        <template v-else>{{ title }}</template>
       </div>
 
       <div
-        v-if="subtitle"
+        v-if="$slots.subtitle || subtitle"
         class="section-header__subtitle"
         @click.left.exact.prevent.stop="copyText(subtitle)"
       >
-        {{ subtitle }}
+        <slot
+          v-if="$slots.subtitle"
+          name="subtitle"
+        />
+
+        <template v-else>{{ subtitle }}</template>
       </div>
     </div>
 
