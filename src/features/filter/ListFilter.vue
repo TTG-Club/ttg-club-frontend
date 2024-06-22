@@ -154,6 +154,7 @@
       <n-tooltip v-if="filter">
         <template #trigger>
           <n-button
+            size="large"
             :type="isFilterCustomized ? 'warning' : 'primary'"
             @click.left.exact.prevent="showed = !showed"
           >
