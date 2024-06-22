@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { useDebounceFn } from '@vueuse/core';
   import { cloneDeep } from 'lodash-es';
+  import { NInput, NButton, NTooltip, NFlex } from 'naive-ui';
   import { computed, ref } from 'vue';
 
   import type {
@@ -10,8 +11,6 @@
     FilterItem,
   } from '@/shared/composable/useFilter';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -135,46 +134,56 @@
     :class="{ 'in-tab': inTab }"
     class="filter"
   >
-    <div class="filter__body">
-      <div class="filter__search">
-        <div
-          class="filter__search_field"
-          :class="{ 'has-filter': !!filter }"
-        >
-          <div class="filter__search_field_icon">
-            <svg-icon icon="search" />
-          </div>
+    <n-flex
+      :wrap="false"
+      size="small"
+    >
+      <n-input
+        v-model:value.trim="search"
+        :autocomplete="false"
+        :spellcheck="false"
+        placeholder="Поиск..."
+        clearable
+      >
+        <template #prefix>
+          <svg-icon icon="search" />
+        </template>
+      </n-input>
 
-          <ui-input
-            v-model.trim="search"
-            :autocomplete="false"
-            :spellcheck="false"
-            placeholder="Поиск..."
-            is-clearable
-          />
-        </div>
-      </div>
+      <n-tooltip v-if="filter">
+        <template #trigger>
+          <n-button
+            :type="isFilterCustomized ? 'warning' : 'primary'"
+            @click.left.exact.prevent="showed = !showed"
+          >
+            <template #icon>
+              <svg-icon
+                :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`"
+              />
+            </template>
 
-      <div class="filter__controls">
-        <ui-button
-          v-if="filter"
-          :tooltip="{ content: showed ? 'Скрыть фильтры' : 'Показать фильтры' }"
-          :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`"
-          :color="isFilterCustomized ? 'warning' : 'primary'"
-          @click.left.exact.prevent="showed = !showed"
-        >
-          Фильтр
-        </ui-button>
+            Фильтр
+          </n-button>
+        </template>
 
-        <ui-button
-          v-if="!!filter && isFilterCustomized"
-          :tooltip="{ content: 'Сбросить все фильтры' }"
-          icon="clear"
-          color="warning"
-          @click.left.exact.prevent="resetFilter"
-        />
-      </div>
-    </div>
+        <template #default>
+          {{ showed ? 'Скрыть фильтры' : 'Показать фильтры' }}
+        </template>
+      </n-tooltip>
+
+      <n-tooltip v-if="!!filter && isFilterCustomized">
+        <template #trigger>
+          <n-button
+            type="warning"
+            @click.left.exact.prevent="resetFilter"
+          >
+            <svg-icon icon="clear" />
+          </n-button>
+        </template>
+
+        <template #default> Сбросить все фильтры </template>
+      </n-tooltip>
+    </n-flex>
 
     <base-modal
       v-if="!!filter"
@@ -217,57 +226,6 @@
 
   .filter {
     position: relative;
-
-    &__body {
-      width: 100%;
-      display: flex;
-      position: relative;
-      overflow: hidden;
-      gap: 8px;
-    }
-
-    &__search {
-      flex: 1;
-      display: flex;
-      background-color: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-
-      &_field {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        cursor: text;
-
-        &_icon {
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          color: var(--text-color);
-
-          svg {
-            width: 24px;
-            height: 24px;
-          }
-        }
-
-        &.has-filter {
-          :deep(.ui-input__control) {
-            border: {
-              top-right-radius: 0;
-              bottom-right-radius: 0;
-            }
-          }
-        }
-      }
-    }
-
-    &__controls {
-      display: flex;
-    }
 
     &__dropdown {
       width: 100%;
