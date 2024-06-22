@@ -45,6 +45,15 @@ export const themeOverrides: GlobalThemeOverrides = {
     borderDisabledChecked: 'var(--border)',
     // boxShadowFocus: 'var(--checkbox-shadow)', Оставим если вдруг вернем фокус.
   },
+  Radio: {
+    // Не нашел цвет бордера при наведение
+    buttonColor: 'var(--hover)',
+    buttonColorActive: 'var(--primary-active)',
+    buttonBorderColorActive: 'var(--primary-active)',
+    buttonTextColorHover: 'var(--text-b-color)',
+    buttonTextColorActive: 'var(--text-b-color)',
+    buttonBorderColo: 'var(--border)',
+  },
   Button: {
     color: 'var(--primary)',
     colorHover: 'var(--primary-hover)',
@@ -73,10 +82,10 @@ export const themeOverrides: GlobalThemeOverrides = {
     colorSecondaryHover: 'var(--secondary-hover)',
     colorSecondaryPressed: 'var(--secondary)',
 
-    textColor: 'var(--text-btn-color)',
-    textColorHover: 'var(--text-btn-color)',
-    textColorTertiary: 'var(--text-btn-color)',
-    textColorPressed: 'var(--text-btn-color)',
-    textColorDisabled: 'var(--text-btn-color)',
+    textColor: 'var(--text-b-color)',
+    textColorHover: 'var(--text-b-color)',
+    textColorTertiary: 'var(--text-b-color)',
+    textColorPressed: 'var(--text-b-color)',
+    textColorDisabled: 'var(--text-b-color)',
   },
 };
