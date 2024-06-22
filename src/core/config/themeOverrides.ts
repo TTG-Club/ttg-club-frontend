@@ -2,6 +2,7 @@ import type { GlobalThemeOverrides } from 'naive-ui';
 
 export const themeOverrides: GlobalThemeOverrides = {
   common: {
+    borderColor: 'var(--border)',
     borderRadius: '8px',
     textColorBase: 'var(--text-color)',
     textColor1: 'var(--text-color)',
@@ -10,13 +11,19 @@ export const themeOverrides: GlobalThemeOverrides = {
     iconColor: 'var(--text-g-color)',
     iconColorDisabled: 'var(--text-g-color)',
     iconColorHover: 'var(--text-g-color)',
+    placeholderColor: 'var(--text-g-color)',
+    placeholderColorDisabled: 'var(--text-g-color)',
+    inputColor: 'var(--hover)',
+    hoverColor: 'var(--hover)',
+    // primaryColor: 'var(--primary)', нужно включить для состояния когда выбран селект. Но если включить, падает в ошибку.
+    primaryColorHover: 'var(--hover)',
+    popoverColor: 'var(--bg-sub-menu)',
   },
   Skeleton: {
     color: 'var(--hover)',
     colorEnd: 'var(--bg-main)',
   },
   Input: {
-    color: 'var(--hover)',
     groupLabelColor: 'var(--text-color)',
     colorFocus: 'var(--hover)',
     border: '1px solid var(--border)',
@@ -24,11 +31,6 @@ export const themeOverrides: GlobalThemeOverrides = {
     borderDisabled: '1px solid var(--border)',
     borderFocus: '1px solid var(--primary-active)',
     placeholderColor: 'var(--text-g-color)',
-  },
-  Select: {
-    color: 'var(--hover)',
-    colorFocus: 'var(--hover)',
-    suffixTextColor: 'var(--text-color)',
   },
   Checkbox: {
     borderRadius: '4px',
