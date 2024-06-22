@@ -359,12 +359,16 @@
         <n-space vertical>
           <n-collapse-transition :show="settings.opened">
             <n-space vertical>
-              <n-checkbox v-model:checked="form.unique">
+              <n-checkbox
+                v-model:checked="form.unique"
+                :focusable="false"
+              >
                 Только уникальные
               </n-checkbox>
 
               <n-checkbox
                 v-model:checked="settings.grouping"
+                :focusable="false"
                 :disabled="form.unique"
               >
                 Группировать одинаковые
@@ -372,6 +376,7 @@
 
               <n-checkbox
                 v-model:checked="settings.max"
+                :focusable="false"
                 :disabled="form.unique || !settings.grouping"
               >
                 Отображать максимальную цену
@@ -383,12 +388,14 @@
             <n-button
               type="primary"
               attr-type="submit"
+              :focusable="false"
             >
               Найти торговца
             </n-button>
 
             <n-button
               secondary
+              :focusable="false"
               @click.left.exact.prevent="settings.opened = !settings.opened"
             >
               Настройки
