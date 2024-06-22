@@ -381,7 +381,6 @@
 
           <n-space>
             <n-button
-              :loading
               type="primary"
               attr-type="submit"
             >
