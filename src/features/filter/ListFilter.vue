@@ -142,6 +142,7 @@
         v-model:value.trim="search"
         :autocomplete="false"
         :spellcheck="false"
+        size="large"
         placeholder="Поиск..."
         clearable
       >
