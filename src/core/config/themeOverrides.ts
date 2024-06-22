@@ -4,6 +4,31 @@ export const themeOverrides: GlobalThemeOverrides = {
   common: {
     borderRadius: '8px',
     textColorBase: 'var(--text-color)',
+    textColor1: 'var(--text-color)',
+    textColor2: 'var(--text-color)',
+    textColor3: 'var(--text-g-color)',
+    iconColor: 'var(--text-g-color)',
+    iconColorDisabled: 'var(--text-g-color)',
+    iconColorHover: 'var(--text-g-color)',
+  },
+  Skeleton: {
+    color: 'var(--hover)',
+    colorEnd: 'var(--bg-main)',
+  },
+  Input: {
+    color: 'var(--hover)',
+    groupLabelColor: 'var(--text-color)',
+    colorFocus: 'var(--hover)',
+    border: '1px solid var(--border)',
+    borderHover: '1px solid var(--border)',
+    borderDisabled: '1px solid var(--border)',
+    borderFocus: '1px solid var(--primary-active)',
+    placeholderColor: 'var(--text-g-color)',
+  },
+  Select: {
+    color: 'var(--hover)',
+    colorFocus: 'var(--hover)',
+    suffixTextColor: 'var(--text-color)',
   },
   Checkbox: {
     borderRadius: '4px',
@@ -11,17 +36,12 @@ export const themeOverrides: GlobalThemeOverrides = {
     colorDisabled: 'var(--border)',
     colorChecked: 'var(--primary)',
     colorDisabledChecked: 'var(--primary-disabled)',
-    textColor: 'var(--text-color)',
     textColorDisabled: 'var(--text-color-disabled)',
     border: 'var(--border)',
     borderChecked: 'var(--border)',
     borderDisabled: 'var(--border)',
     borderDisabledChecked: 'var(--border)',
     // boxShadowFocus: 'var(--checkbox-shadow)', Оставим если вдруг вернем фокус.
-  },
-  Skeleton: {
-    color: 'var(--hover)',
-    colorEnd: 'var(--bg-main)',
   },
   Button: {
     color: 'var(--primary)',
