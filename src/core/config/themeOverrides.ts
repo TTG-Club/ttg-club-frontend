@@ -24,7 +24,7 @@ export const themeOverrides: GlobalThemeOverrides = {
     color: 'var(--hover)',
     colorEnd: 'var(--bg-main)',
   },
-  Button: {    
+  Button: {
     color: 'var(--primary)',
     colorHover: 'var(--primary-hover)',
     colorPressed: 'var(--primary-active)',
@@ -58,7 +58,7 @@ export const themeOverrides: GlobalThemeOverrides = {
     colorPressedSecondary: 'var(--primary-active)',
     colorFocusSecondary: 'var(--primary)',
     colorDisabledSecondary: 'var(--primary-disabled)',
-    
+
     textColor: 'var(--text-btn-color)',
     textColorHover: 'var(--text-btn-color)',
     textColorTertiary: 'var(--text-btn-color)',
