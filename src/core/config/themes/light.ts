@@ -89,5 +89,10 @@ export const light: GlobalThemeOverrides = {
     textColorTertiary: 'var(--text-b-color)',
     textColorPressed: 'var(--text-b-color)',
     textColorDisabled: 'var(--text-b-color)',
+
+    paddingTiny: '0 4px',
+    paddingSmall: '0 5px',
+    paddingMedium: '0 8px',
+    paddingLarge: '0 10px',
   },
 };
