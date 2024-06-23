@@ -51,8 +51,8 @@ export const themeOverrides: GlobalThemeOverrides = {
     buttonColorActive: 'var(--primary-active)',
     buttonBorderColorActive: 'var(--primary-active)',
     buttonTextColorHover: 'var(--text-b-color)',
-    buttonTextColorActive: 'var(--text-b-color)',
-    buttonBorderColo: 'var(--border)',
+    buttonTextColorActive: 'var(--text-btn-color)',
+    buttonBorderColor: 'var(--border)',
   },
   Button: {
     color: 'var(--primary)',
