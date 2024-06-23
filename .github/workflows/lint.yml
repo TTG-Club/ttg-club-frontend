@@ -19,6 +19,12 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
       - uses: actions/download-artifact@v3
         with:
           name: front-build-${{ github.run_id }}

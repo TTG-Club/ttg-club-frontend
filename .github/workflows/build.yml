@@ -15,13 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint Workflow
-    uses: ./.github/workflows/lint.yml
-
   build:
     name: Build Job
-    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -54,3 +49,8 @@ jobs:
           path: ./dist
           retention-days: 1
           if-no-files-found: error
+
+  lint:
+    name: Lint Workflow
+    needs: build
+    uses: ./.github/workflows/lint.yml
