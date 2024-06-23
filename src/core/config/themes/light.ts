@@ -17,7 +17,7 @@ export const light: GlobalThemeOverrides = {
     hoverColor: 'var(--hover)',
     primaryColor: '#5e5446',
     primaryColorHover: 'var(--hover)',
-    popoverColor: 'var(--bg-sub-menu)',
+    popoverColor: '#ebe5d0',
   },
   Skeleton: {
     color: 'var(--hover)',
