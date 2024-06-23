@@ -18,6 +18,7 @@ permissions:
   pages: write
   actions: write
   id-token: write
+  security-events: write
 
 concurrency:
   group: lint-pr-${{ github.ref_name }}
