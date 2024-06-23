@@ -174,7 +174,9 @@
             type="warning"
             @click.left.exact.prevent="resetFilter"
           >
-            <svg-icon icon="clear" />
+            <template #icon>
+              <svg-icon icon="clear" />
+            </template>
           </n-button>
         </template>
 
