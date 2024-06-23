@@ -19,15 +19,15 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: front-build-${{ github.run_id }}
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: front-build-${{ github.run_id }}
 
       - name: ESLint
         run: npm run lint:workflow
