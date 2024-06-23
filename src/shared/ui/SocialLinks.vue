@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   type SocialLinkItem = {
     name: string;

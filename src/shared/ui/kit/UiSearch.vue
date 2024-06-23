@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { debounce } from 'lodash-es';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   const props = withDefaults(
     defineProps<{

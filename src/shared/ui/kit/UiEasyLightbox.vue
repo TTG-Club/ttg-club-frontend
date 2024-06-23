@@ -1,7 +1,7 @@
 <script lang="ts">
   import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import type { PropType } from 'vue';
 

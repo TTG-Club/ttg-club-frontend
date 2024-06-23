@@ -2,10 +2,13 @@
   import { useToast } from 'vue-toastification';
 
   import { ToastEventBus } from '@/shared/config';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
+  import { renderIcon } from '@/shared/utils/renderIcon';
 
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import type { IBookmarkGroup } from '@/features/bookmarks/types/Bookmark.d';
+
+  import type { MenuOption } from 'naive-ui';
 
   const props = withDefaults(
     defineProps<{
@@ -26,18 +29,14 @@
     props.url !== '' ? props.url : route.path,
   );
 
-  const groups = computed(() =>
-    bookmarksStore.getGroups.filter((group) => group.order > -1),
-  );
-
   const isSaved = (uuid?: IBookmarkGroup['uuid']) =>
     uuid
       ? bookmarksStore.isBookmarkSavedInGroup(bookmarkUrl.value, uuid)
       : !!bookmarksStore.isBookmarkSavedInDefault(bookmarkUrl.value);
 
-  const onOpenDropdown = () => bookmarksStore.queryGetBookmarks();
-
   const inProgress = ref(false);
+  const isUpdating = ref(false);
+  const isShowed = ref(false);
 
   const updateBookmark = async (groupUUID?: IBookmarkGroup['uuid']) => {
     if (inProgress.value) {
@@ -75,37 +74,87 @@
       inProgress.value = false;
     }
   };
+
+  const groups = computed<Array<MenuOption>>(() =>
+    bookmarksStore.getGroups
+      .filter((group) => group.order > -1)
+      .map((group) => ({
+        label: group.name,
+        icon: () =>
+          renderIcon({
+            icon: `bookmark/${isSaved(group.uuid) ? 'filled' : 'outline'}`,
+          }),
+        props: {
+          onClick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            updateBookmark(group.uuid);
+          },
+        },
+      })),
+  );
+
+  const onUpdateShowed = async (value: boolean) => {
+    if (value === isShowed.value) {
+      return;
+    }
+
+    if (value) {
+      isUpdating.value = true;
+
+      try {
+        await bookmarksStore.queryGetBookmarks();
+      } catch (err) {
+        isShowed.value = false;
+      } finally {
+        isUpdating.value = false;
+        isShowed.value = true;
+      }
+
+      return;
+    }
+
+    isShowed.value = false;
+  };
 </script>
 
 <template>
-  <ui-button
-    :tooltip="{
-      content: isSaved() ? 'Удалить из закладок' : 'Добавить в закладки',
-      hideOnClick: true,
-    }"
-    :icon="`bookmark/${isSaved() ? 'filled' : 'outline'}`"
-    :before-dropdown-show="onOpenDropdown"
-    :loading="inProgress"
-    type="text"
-    split
-    @click.left.exact.prevent="updateBookmark()"
-  >
-    <template
-      v-if="groups?.length"
-      #dropdown
+  <n-button-group>
+    <n-tooltip trigger="click">
+      <template #trigger>
+        <n-button
+          :loading="inProgress"
+          quaternary
+          @click.left.exact.prevent="updateBookmark()"
+        >
+          <template #icon>
+            <svg-icon :icon="`bookmark/${isSaved() ? 'filled' : 'outline'}`" />
+          </template>
+        </n-button>
+      </template>
+
+      <template #default>
+        {{ isSaved() ? 'Удалить из закладок' : 'Добавить в закладки' }}
+      </template>
+    </n-tooltip>
+
+    <n-dropdown
+      trigger="click"
+      :options="groups"
+      :show="isShowed"
+      @update:show="onUpdateShowed"
     >
-      <div
-        v-for="(group, key) in groups"
-        :key="key"
-        :class="{ 'is-saved': isSaved(group.uuid) }"
-        class="custom-bookmark-button__group"
-        @click.left.exact.prevent="updateBookmark(group.uuid)"
-        @dblclick.prevent.stop
+      <n-button
+        quaternary
+        :loading="isUpdating"
       >
-        {{ group.name }}
-      </div>
-    </template>
-  </ui-button>
+        <template #icon>
+          <svg-icon icon="arrow/down" />
+        </template>
+      </n-button>
+    </n-dropdown>
+  </n-button-group>
 </template>
 
 <style lang="scss" scoped>

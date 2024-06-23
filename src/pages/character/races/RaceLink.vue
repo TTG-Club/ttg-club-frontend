@@ -4,7 +4,7 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink } from '@/shared/types/character/Races.d';
   import { AbilityType } from '@/shared/types/tools/AbilityCalc.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import type { PropType } from 'vue';
   import type { RouteLocationPathRaw } from 'vue-router';

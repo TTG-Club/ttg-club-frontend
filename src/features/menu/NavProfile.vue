@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import AuthModal from '@/shared/ui/modals/AuthModal.vue';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';

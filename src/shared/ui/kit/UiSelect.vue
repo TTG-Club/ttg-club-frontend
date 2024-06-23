@@ -1,7 +1,7 @@
 <script>
   import Multiselect, { multiselectMixin } from 'vue-multiselect';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   // TODO: Создать свой селект компонент
   export default defineComponent({

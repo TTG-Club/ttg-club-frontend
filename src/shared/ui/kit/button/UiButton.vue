@@ -2,7 +2,7 @@
   import { useTippy } from 'vue-tippy';
 
   import IconLoader from '@/shared/ui/icons/IconLoader.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import type {
     TButtonType,
     TButtonOption,

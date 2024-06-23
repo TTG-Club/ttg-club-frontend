@@ -57,17 +57,12 @@ export const dark: GlobalThemeOverrides = {
     buttonBoxShadowFocus: 'inset 0 0 0 0px #ffffff00',
   },
   Button: {
-    color: 'var(--primary)',
-    colorHover: 'var(--primary-hover)',
-    colorPressed: 'var(--primary-active)',
-    colorDisabled: 'var(--primary-disabled)',
-
     border: '1px solid var(--border)',
     borderHover: 'var(--primary-hover)',
     borderPressed: 'var(--primary-active)',
     borderDisabled: 'var(--primary-disabled)',
 
-    colorPrimary: 'var(--primary)',
+    colorPrimary: '#3567c9',
     colorHoverPrimary: 'var(--primary-hover)',
     colorPressedPrimary: 'var(--primary-active)',
     colorDisabledPrimary: 'var(--primary-disabled)',

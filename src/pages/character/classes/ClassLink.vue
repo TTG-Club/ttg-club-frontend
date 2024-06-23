@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TClassItem } from '@/shared/types/character/Classes.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import { isIconExist } from '@/shared/utils/icons';
 
   import type { PropType } from 'vue';

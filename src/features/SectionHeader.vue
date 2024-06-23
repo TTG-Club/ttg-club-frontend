@@ -4,7 +4,7 @@
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import BookmarkSaveButton from '@/features/bookmarks/components/buttons/BookmarkSaveButton.vue';
 
@@ -57,7 +57,9 @@
   const urlForCopy = computed(() => window.location.origin + route.path);
 
   const withExportDropdown = computed(
-    () => props.foundryVersions.length > 1 || props.onExportLss,
+    () =>
+      props.foundryVersions.length > 1 ||
+      (props.foundryVersions.length && props.onExportLss),
   );
 
   const hasControls = computed(
@@ -145,7 +147,7 @@
     emit('exportLss');
   };
 
-  const exportButtonTooltip = computed(() => {
+  const ExportButtonTooltip = computed(() => {
     let str = 'Экспорт';
 
     if (props.onExportFoundry) {
@@ -154,9 +156,39 @@
       str += ' для LSS';
     }
 
-    return {
-      content: `<span>${str}&nbsp;(<a href="/info/exporting" target="_blank" rel="noopener noreferrer">Инструкция</a>)</span>`,
-    };
+    return h('span', null, [
+      `${str}\xa0(`,
+      h(
+        'a',
+        {
+          href: '/info/exporting',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+        'Инструкция',
+      ),
+      `)`,
+    ]);
+  });
+
+  const exportOptions = computed(() => {
+    const options = props.foundryVersions.map((version) => ({
+      label: `FVTT ${version}`,
+      props: {
+        onClick: () => exportToFoundry(version),
+      },
+    }));
+
+    if (props.onExportLss) {
+      options.push({
+        label: 'LSS',
+        props: {
+          onClick: () => exportToLss(),
+        },
+      });
+    }
+
+    return options;
   });
 
   const onExport = () => {
@@ -203,94 +235,114 @@
       v-if="hasControls"
       class="section-header__controls"
     >
-      <ui-button
-        v-if="copy"
-        :tooltip="{ content: 'Скопировать ссылку' }"
-        class="section-header__control"
-        icon="copy"
-        type="text"
-        color="text"
-        size="sm"
-        @click.left.exact.prevent.stop="copyURL"
-      />
+      <n-tooltip v-if="copy">
+        <template #trigger>
+          <n-button
+            quaternary
+            @click.left.exact.prevent.stop="copyURL"
+          >
+            <template #icon>
+              <svg-icon icon="copy" />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default> Скопировать ссылку </template>
+      </n-tooltip>
 
       <bookmark-save-button
         v-if="bookmark"
         :name="title"
         :url="url || ''"
-        color="text"
-        size="sm"
       />
 
-      <ui-button
-        v-if="print"
-        :tooltip="{ content: 'Открыть окно печати' }"
-        class="section-header__control is-only-desktop"
-        icon="print"
-        type="text"
-        color="text"
-        size="sm"
-        @click.left.exact.prevent.stop="openPrintWindow"
-      />
-
-      <ui-button
-        v-if="onExportFoundry || onExportLss"
-        :tooltip="exportButtonTooltip"
-        class="section-header__control is-only-desktop"
-        icon="export-foundry"
-        type="text"
-        color="text"
-        size="sm"
-        split
-        @click.left.exact.prevent="onExport"
-      >
-        <template
-          v-if="withExportDropdown"
-          #dropdown
-        >
-          <div
-            v-for="(version, key) in foundryVersions"
-            :key="key"
-            class="section-header__dropdown"
-            @click.left.exact.prevent="exportToFoundry(version)"
-            @dblclick.prevent.stop
+      <n-tooltip v-if="print">
+        <template #trigger>
+          <n-button
+            quaternary
+            class="is-only-desktop"
+            @click.left.exact.prevent.stop="openPrintWindow"
           >
-            FVTT {{ version }}
-          </div>
-
-          <div
-            v-if="onExportLss"
-            class="section-header__dropdown"
-            @click.left.exact.prevent="exportToLss"
-            @dblclick.prevent.stop
-          >
-            LSS
-          </div>
+            <template #icon>
+              <svg-icon icon="print" />
+            </template>
+          </n-button>
         </template>
-      </ui-button>
 
-      <ui-button
-        v-if="fullscreen"
-        :tooltip="{
-          content: fullscreenState ? 'Свернуть окно' : 'Развернуть окно',
-        }"
-        class="section-header__control is-only-desktop"
-        :icon="`expand/${fullscreenState ? 'exit' : 'enter'}`"
-        type="text"
-        color="text"
-        size="sm"
-        @click.left.exact.prevent.stop="fullscreenState = !fullscreenState"
-      />
+        <template #default> Открыть окно печати </template>
+      </n-tooltip>
 
-      <ui-button
-        v-if="closeAvailable"
-        :tooltip="{ content: 'Закрыть' }"
-        class="section-header__control"
-        icon="close"
-        type="secondary"
-        size="sm"
-        @click.left.exact.prevent.stop="$emit('close')"
-      />
+      <n-button-group
+        v-if="onExportFoundry || onExportLss"
+        class="is-only-desktop"
+      >
+        <n-tooltip>
+          <template #trigger>
+            <n-button
+              quaternary
+              @click.left.exact.prevent.stop="onExport"
+            >
+              <template #icon>
+                <svg-icon icon="export-foundry" />
+              </template>
+            </n-button>
+          </template>
+
+          <template #default>
+            <export-button-tooltip />
+          </template>
+        </n-tooltip>
+
+        <n-dropdown
+          v-if="withExportDropdown"
+          trigger="click"
+          :options="exportOptions"
+        >
+          <n-button
+            quaternary
+            class="is-only-desktop"
+          >
+            <template #icon>
+              <svg-icon icon="arrow/down" />
+            </template>
+          </n-button>
+        </n-dropdown>
+      </n-button-group>
+
+      <n-tooltip v-if="fullscreen">
+        <template #trigger>
+          <n-button
+            quaternary
+            class="is-only-desktop"
+            @click.left.exact.prevent.stop="fullscreenState = !fullscreenState"
+          >
+            <template #icon>
+              <svg-icon
+                :icon="`expand/${fullscreenState ? 'exit' : 'enter'}`"
+              />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default>
+          {{ fullscreenState ? 'Свернуть окно' : 'Развернуть окно' }}
+        </template>
+      </n-tooltip>
+
+      <n-tooltip v-if="closeAvailable">
+        <template #trigger>
+          <n-button
+            secondary
+            @click.left.exact.prevent.stop="$emit('close')"
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default> Закрыть </template>
+      </n-tooltip>
     </div>
   </div>
 </template>
@@ -372,10 +424,8 @@
       > .ui-button {
         margin-left: 0;
       }
-    }
 
-    &__control {
-      &.is-only-desktop {
+      .is-only-desktop {
         display: none;
 
         @include media-min($xl) {
