@@ -64,6 +64,7 @@
     &__icon {
       width: 24px;
       height: 24px;
+      font-size: 24px;
     }
 
     &__label {

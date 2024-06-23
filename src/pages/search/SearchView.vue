@@ -383,6 +383,7 @@
       &_icon {
         padding: 8px;
         flex-shrink: 0;
+        font-size: 24px;
 
         svg {
           width: 26px;

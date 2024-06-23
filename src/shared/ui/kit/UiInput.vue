@@ -218,6 +218,7 @@
         cursor: pointer;
         padding: 10px;
         color: var(--text-color-title);
+        font-size: 16px;
       }
     }
 

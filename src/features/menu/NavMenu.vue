@@ -344,6 +344,7 @@
         height: 32px;
         padding: 4px;
         flex-shrink: 0;
+        font-size: 24px;
       }
     }
 

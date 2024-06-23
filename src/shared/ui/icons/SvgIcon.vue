@@ -8,7 +8,7 @@
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    size: 24,
+    size: '1em',
     raw: false,
   });
 

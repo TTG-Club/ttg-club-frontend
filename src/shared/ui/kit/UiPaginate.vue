@@ -97,6 +97,7 @@
     &__next {
       color: var(--primary);
       border-color: var(--primary);
+      font-size: 21px;
 
       svg {
         width: 21px;

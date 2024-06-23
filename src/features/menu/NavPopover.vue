@@ -101,6 +101,7 @@
       position: relative;
       width: 100%;
       height: 100%;
+      font-size: 24px;
 
       &.is-active {
         z-index: 120;

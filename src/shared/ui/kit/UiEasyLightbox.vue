@@ -143,6 +143,7 @@
           <svg-icon
             :icon="`theme/${bgHide ? 'light' : 'dark'}`"
             class="vel-icon icon"
+            size="24"
           />
         </button>
       </div>
@@ -218,14 +219,6 @@
       .vel-img {
         background-color: transparent;
         box-shadow: none;
-      }
-    }
-
-    .vel-toolbar {
-      .vel-icon {
-        width: 1.5em;
-        height: 1.5em;
-        vertical-align: -0.15em;
       }
     }
   }

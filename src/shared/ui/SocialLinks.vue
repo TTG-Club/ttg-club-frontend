@@ -44,10 +44,7 @@
         rel="noopener noreferrer"
         target="_blank"
       >
-        <svg-icon
-          :icon="link.icon"
-          size="1em"
-        />
+        <svg-icon :icon="link.icon" />
       </a>
     </div>
   </div>
