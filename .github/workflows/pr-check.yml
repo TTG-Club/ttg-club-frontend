@@ -24,8 +24,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  analyze:
+    name: Lint PR
+    if: ${{ !github.event.pull_request.draft }}
+    uses: ./.github/workflows/codeql.yml
+
   build:
     name: Build PR
+    needs: analyze
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/build.yml
 
