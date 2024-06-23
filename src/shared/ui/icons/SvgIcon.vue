@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { v7 as uuid } from 'uuid';
+
   import { getIconName } from '@/shared/utils/icons';
 
   interface Props {
@@ -39,21 +41,31 @@
 
     return '';
   });
+
+  const iconUuidName = computed(() => uuid());
+
+  const SvgIconComponent = computed(() =>
+    props.raw
+      ? defineComponent({
+          template: `<symbol :id="iconUuidName" viewBox="0 0 24 24">${props.icon}</symbol>`,
+        })
+      : undefined,
+  );
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-v-html -->
-  <i
+  <n-icon
     v-if="icon && raw"
-    :class="$style['svg-icon']"
-    v-html="icon"
-  />
-  <!-- eslint-enable vue/no-v-html -->
+    :class="$style.svgIcon"
+  >
+    <svg-icon-component />
 
-  <i
+    <use :href="iconUuidName" />
+  </n-icon>
+
+  <n-icon
     v-else-if="!error"
-    :class="$style['svg-icon']"
-    role="img"
+    :class="$style.svgIcon"
   >
     <svg
       aria-hidden="true"
@@ -62,7 +74,7 @@
     >
       <use :href="iconName" />
     </svg>
-  </i>
+  </n-icon>
 
   <span
     v-else
@@ -73,7 +85,7 @@
 </template>
 
 <style lang="scss" module>
-  .svg-icon {
+  .svgIcon {
     font-size: v-bind(sizeCalculated);
     overflow: hidden;
     flex-shrink: 0;
@@ -86,7 +98,7 @@
     text-align: center;
     transform: translateZ(0);
 
-    > svg {
+    svg {
       width: 1em;
       height: 1em;
     }
