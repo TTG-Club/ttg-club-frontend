@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { v7 as uuid } from 'uuid';
-
   import { getIconName } from '@/shared/utils/icons';
 
   interface Props {
@@ -42,29 +40,21 @@
     return '';
   });
 
-  const iconUuidName = computed(() => uuid());
-
-  const SvgIconComponent = computed(() =>
-    props.raw
-      ? defineComponent({
-          template: `<symbol :id="iconUuidName" viewBox="0 0 24 24">${props.icon}</symbol>`,
-        })
-      : undefined,
+  const RawSvgIcon = computed(() =>
+    props.raw ? defineComponent({ template: props.icon }) : undefined,
   );
 </script>
 
 <template>
   <n-icon
-    v-if="icon && raw"
+    v-if="icon && raw && RawSvgIcon"
     :class="$style.svgIcon"
   >
-    <svg-icon-component />
-
-    <use :href="iconUuidName" />
+    <raw-svg-icon />
   </n-icon>
 
   <n-icon
-    v-else-if="!error"
+    v-else-if="!error && !raw"
     :class="$style.svgIcon"
   >
     <svg
