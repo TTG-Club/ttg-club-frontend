@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-  import { storeToRefs } from 'pinia';
-
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import CustomBookmarkButton from '@/features/bookmarks/components/buttons/CustomBookmarkButton.vue';

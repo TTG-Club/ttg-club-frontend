@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-  import { ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
   import { useClassName } from '@/shared/composable/useClassName';

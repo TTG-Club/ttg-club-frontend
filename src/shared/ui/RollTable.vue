@@ -1,8 +1,5 @@
 <script setup lang="ts">
-  import { refAutoReset } from '@vueuse/core';
   import { toNumber } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
   import { ToastEventBus } from '@/shared/config';

@@ -1,15 +1,6 @@
 <script lang="ts" setup>
-  import {
-    onKeyStroke,
-    onStartTyping,
-    useActiveElement,
-    useFocus,
-    useVModel,
-  } from '@vueuse/core';
   import { debounce } from 'lodash-es';
-  import { computed, onMounted, ref, watch } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
-  import { useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composable/useMetrics';

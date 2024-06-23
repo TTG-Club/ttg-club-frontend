@@ -17,6 +17,7 @@ module.exports = {
     '@vue/airbnb',
     '@vue/eslint-config-typescript',
     '@vue/eslint-config-prettier',
+    './src/shared/types/generated/.eslintrc-auto-import.json',
   ],
   plugins: ['@typescript-eslint', 'boundaries'],
   parser: 'vue-eslint-parser',

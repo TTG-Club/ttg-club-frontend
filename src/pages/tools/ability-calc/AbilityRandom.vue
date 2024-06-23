@@ -1,7 +1,5 @@
 <script lang="ts">
   import { orderBy, reverse } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, onActivated, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
   import { useDiceRoller } from '@/shared/composable/useDiceRoller';

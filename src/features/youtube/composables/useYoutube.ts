@@ -1,7 +1,3 @@
-import { useScroll } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { computed, readonly, ref, unref, watch } from 'vue';
-
 import { useUIStore } from '@/shared/stores/UIStore';
 
 import { YoutubeApi } from '@/features/youtube/api';

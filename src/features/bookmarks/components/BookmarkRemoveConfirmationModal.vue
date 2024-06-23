@@ -1,6 +1,5 @@
 <script lang="ts" setup>
   import localforage from 'localforage';
-  import { ref } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
 
   import { DB_NAME } from '@/shared/const/UI';

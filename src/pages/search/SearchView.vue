@@ -1,9 +1,5 @@
 <script setup lang="ts">
-  import { onStartTyping, tryOnBeforeMount, useFocus } from '@vueuse/core';
   import { debounce } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, ref } from 'vue';
-  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composable/useMetrics';

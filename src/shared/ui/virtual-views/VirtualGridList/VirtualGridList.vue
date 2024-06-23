@@ -1,7 +1,6 @@
 <script lang="ts" setup>
   import clsx from 'clsx';
   import { omit } from 'lodash-es';
-  import { computed } from 'vue';
 
   import { useResponsiveValues } from '@/shared/composable/useResponsiveValues';
   import { DEFAULT_KEY_FIELD } from '@/shared/const';

@@ -1,5 +1,3 @@
-import { getCurrentInstance, useCssModule } from 'vue';
-
 import { className, type ModifiersRecord } from '@/shared/utils/className';
 
 /**

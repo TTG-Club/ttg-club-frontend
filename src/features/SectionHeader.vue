@@ -1,8 +1,4 @@
 <script setup lang="ts">
-  import { useClipboard } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
-  import { computed, h } from 'vue';
-  import { useRoute } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
   import { useMetrics } from '@/shared/composable/useMetrics';

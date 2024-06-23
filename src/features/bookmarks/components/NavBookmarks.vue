@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, ref, watch } from 'vue';
-
   import { useUserStore } from '@/shared/stores/UserStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 

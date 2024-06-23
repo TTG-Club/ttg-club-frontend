@@ -1,7 +1,5 @@
 <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
 <script lang="ts" setup>
-  import { ref, watchEffect } from 'vue';
-
   import type { Events } from 'vue';
 
   const { min, max, step, minValue, maxValue } = defineProps({

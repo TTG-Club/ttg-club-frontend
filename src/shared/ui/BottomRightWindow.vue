@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-  import { useEventListener, useResizeObserver } from '@vueuse/core';
   import localforage from 'localforage';
-  import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue';
 
   import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useClassName } from '@/shared/composable/useClassName';

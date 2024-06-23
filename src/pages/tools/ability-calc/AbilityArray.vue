@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { computed, defineComponent, onActivated, ref } from 'vue';
-
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';

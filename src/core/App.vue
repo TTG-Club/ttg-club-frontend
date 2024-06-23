@@ -1,15 +1,4 @@
 <script setup lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
-  import {
-    NConfigProvider,
-    NLoadingBarProvider,
-    NMessageProvider,
-    NNotificationProvider,
-    NModalProvider,
-    NDialogProvider,
-    ruRU,
-    dateRuRU,
-  } from 'naive-ui';
   import { ModalsContainer } from 'vue-final-modal';
 
   import { useUserStore } from '@/shared/stores/UserStore';

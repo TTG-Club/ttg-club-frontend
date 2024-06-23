@@ -1,5 +1,4 @@
 <script>
-  import { defineComponent } from 'vue';
   import Multiselect, { multiselectMixin } from 'vue-multiselect';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';

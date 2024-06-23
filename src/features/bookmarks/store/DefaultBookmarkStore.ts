@@ -1,8 +1,6 @@
 import localforage from 'localforage';
 import { cloneDeep, isArray } from 'lodash-es';
-import { defineStore } from 'pinia';
 import { v4 as uuidV4 } from 'uuid';
-import { computed, ref } from 'vue';
 
 import { DB_NAME } from '@/shared/const/UI';
 import { errorHandler } from '@/shared/utils/errorHandler';

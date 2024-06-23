@@ -1,8 +1,5 @@
 <script lang="ts" setup>
   import { capitalize } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
 
   import { useFilter } from '@/shared/composable/useFilter';
   import { usePagination } from '@/shared/composable/usePagination';

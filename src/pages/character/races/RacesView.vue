@@ -1,9 +1,6 @@
 <script setup lang="ts">
   import { toValue } from '@vueuse/shared';
   import { cloneDeep, groupBy, sortBy } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, nextTick, onBeforeMount, ref, watch, provide } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
 
   import { useFilter } from '@/shared/composable/useFilter';
   import { usePagination } from '@/shared/composable/usePagination';

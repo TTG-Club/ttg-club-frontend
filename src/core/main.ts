@@ -1,6 +1,5 @@
 import 'virtual:svg-icons-register';
 import 'vite/modulepreload-polyfill';
-import { createApp } from 'vue';
 import { createVfm } from 'vue-final-modal';
 import VueGtag from 'vue-gtag';
 import VueLazyLoad from 'vue-lazyload';

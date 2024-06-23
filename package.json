@@ -2,6 +2,15 @@
   "name": "ttg-club",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TTG-Club/ttg-club-frontend.git"
+  },
+  "engines": {
+    "node": ">=20.15.x",
+    "npm": ">=10.5.x"
+  },
+  "engineStrict": true,
   "scripts": {
     "serve": "vite --host",
     "build:dev": "vite build --emptyOutDir --mode development",
@@ -14,7 +23,7 @@
     "prettier:write": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --write",
     "prettier:workflow": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --log-level error --check",
     "pre-commit": "lint-staged",
-    "prepare": "is-ci || husky install"
+    "prepare": "is-ci || husky"
   },
   "dependencies": {
     "@svifty7/vue-paginate": "^0.0.10",
@@ -23,7 +32,6 @@
     "@vueuse/core": "^10.11.0",
     "@vueuse/gesture": "^2.0.0",
     "@vueuse/math": "^10.11.0",
-    "ant-design-vue": "^4.2.3",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.11",
@@ -39,13 +47,13 @@
     "tippy.js": "^6.3.7",
     "ua-parser-js": "^1.0.38",
     "uuid": "^10.0.0",
-    "vue": "^3.4.29",
+    "vue": "^3.4.30",
     "vue-easy-lightbox": "^1.16.0",
     "vue-final-modal": "^4.4.5",
     "vue-gtag": "^2.0.1",
     "vue-lazyload": "^3.0.0",
     "vue-multiselect": "^3.0.0",
-    "vue-router": "^4.3.3",
+    "vue-router": "^4.4.0",
     "vue-tippy": "^6.3.1",
     "vue-toastification": "^2.0.0-rc.5",
     "vue-virtual-scroller": "^2.0.0-beta.8",
@@ -56,7 +64,7 @@
     "@types/js-cookie": "^3.0.6",
     "@types/lodash-es": "^4.17.12",
     "@types/ua-parser-js": "^0.7.39",
-    "@types/uuid": "^9.0.8",
+    "@types/uuid": "^10.0.0",
     "@types/vuelidate": "^0.7.18",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
@@ -77,12 +85,14 @@
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.2",
     "sass": "^1.77.6",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.2",
     "typescript-plugin-css-modules": "^5.1.0",
+    "unplugin-auto-import": "^0.17.6",
+    "unplugin-vue-components": "^0.27.0",
     "vite": "^5.3.1",
     "vite-plugin-ejs": "^1.7.0",
     "vite-plugin-svg-icons": "^2.0.1",
     "vue-eslint-parser": "^9.4.3",
-    "vue-tsc": "^2.0.21"
+    "vue-tsc": "^2.0.22"
   }
 }

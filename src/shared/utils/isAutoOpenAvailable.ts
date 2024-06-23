@@ -1,6 +1,3 @@
-import { storeToRefs } from 'pinia';
-import { unref } from 'vue';
-
 import { useUIStore } from '@/shared/stores/UIStore';
 
 import type { MaybeRef } from '@vueuse/core';

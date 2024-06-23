@@ -1,13 +1,4 @@
-import {
-  useColorMode,
-  useCssVar,
-  useScroll,
-  useStorage,
-  useWindowSize,
-} from '@vueuse/core';
 import Cookies from 'js-cookie';
-import { defineStore } from 'pinia';
-import { computed, ref, watch } from 'vue';
 
 import { FULLSCREEN_DB_KEY, THEME_DB_KEY } from '@/shared/const/UI';
 

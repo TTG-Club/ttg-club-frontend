@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { onClickOutside } from '@vueuse/core';
-  import { computed, inject, ref, useSlots, watch } from 'vue';
   import { useTippy } from 'vue-tippy';
 
   import IconLoader from '@/shared/ui/icons/IconLoader.vue';

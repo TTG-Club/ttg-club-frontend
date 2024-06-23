@@ -1,20 +1,6 @@
 <script setup lang="ts">
-  import {
-    computedInject,
-    resolveUnref,
-    useElementBounding,
-    useScroll,
-  } from '@vueuse/core';
   import { cloneDeep, groupBy, isArray, sortBy } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
   import VueEasyLightbox from 'vue-easy-lightbox';
-  import {
-    onBeforeRouteLeave,
-    onBeforeRouteUpdate,
-    useRoute,
-    useRouter,
-  } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';

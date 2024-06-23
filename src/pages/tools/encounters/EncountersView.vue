@@ -1,6 +1,5 @@
 <script>
   import { throttle } from 'lodash-es';
-  import { reactive } from 'vue';
 
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiSelect from '@/shared/ui/kit/UiSelect.vue';

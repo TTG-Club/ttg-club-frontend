@@ -1,5 +1,3 @@
-import { h, type VNode } from 'vue';
-
 import type {
   DiceExpressionRoll,
   DiceRollResult,
@@ -10,6 +8,7 @@ import type {
   MathFunctionRoll,
   RollBase,
 } from 'dice-roller-parser';
+import type { VNode } from 'vue';
 
 export type RollType = 'advantage' | 'disadvantage';
 

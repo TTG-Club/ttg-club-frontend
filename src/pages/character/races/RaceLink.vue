@@ -1,7 +1,5 @@
 <script lang="ts">
   import { groupBy, isArray, sortBy } from 'lodash-es';
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink, useRoute } from 'vue-router';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink } from '@/shared/types/character/Races.d';

@@ -1,13 +1,4 @@
 <script lang="ts" setup>
-  import {
-    computed,
-    defineComponent,
-    h,
-    onBeforeUnmount,
-    ref,
-    watch,
-  } from 'vue';
-
   import { httpClient } from '@/shared/api';
 
   const props = withDefaults(
