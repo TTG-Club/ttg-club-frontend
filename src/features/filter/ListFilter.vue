@@ -168,7 +168,7 @@
         </template>
       </n-tooltip>
 
-      <n-tooltip v-if="!!filter && !isFilterCustomized">
+      <n-tooltip v-if="!!filter && isFilterCustomized">
         <template #trigger>
           <n-button
             type="warning"
