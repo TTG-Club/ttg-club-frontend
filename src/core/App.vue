@@ -42,6 +42,7 @@
     :locale="ruRU"
     :date-locale="dateRuRU"
     abstract
+    inline-theme-disabled
   >
     <n-loading-bar-provider>
       <n-message-provider>
