@@ -29,5 +29,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Type-check application
         run: npm run type-check
