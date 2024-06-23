@@ -169,10 +169,12 @@
     svg {
       width: 20px;
       height: 20px;
+      font-size: 20px;
 
       @include media-min($md) {
         width: 24px;
         height: 24px;
+        font-size: 24px;
       }
     }
   }

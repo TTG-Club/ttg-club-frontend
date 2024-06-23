@@ -1,6 +1,6 @@
 import type { GlobalThemeOverrides } from 'naive-ui';
 
-export const themeOverrides: GlobalThemeOverrides = {
+export const dark: GlobalThemeOverrides = {
   common: {
     borderColor: 'var(--border)',
     borderRadius: '8px',
@@ -15,7 +15,7 @@ export const themeOverrides: GlobalThemeOverrides = {
     placeholderColorDisabled: 'var(--text-g-color)',
     inputColor: 'var(--hover)',
     hoverColor: 'var(--hover)',
-    // primaryColor: 'var(--primary)', нужно включить для состояния когда выбран селект. Но если включить, падает в ошибку.
+    primaryColor: '#3567c9',
     primaryColorHover: 'var(--hover)',
     popoverColor: 'var(--bg-sub-menu)',
   },

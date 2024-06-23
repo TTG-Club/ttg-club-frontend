@@ -246,6 +246,7 @@
         width: 40px;
         height: 40px;
         padding: 8px;
+        font-size: 24px;
       }
 
       &:hover {

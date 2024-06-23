@@ -139,7 +139,6 @@
         v-model:value.trim="search"
         :autocomplete="false"
         :spellcheck="false"
-        size="large"
         placeholder="Поиск..."
         clearable
       >
@@ -151,7 +150,6 @@
       <n-tooltip v-if="filter">
         <template #trigger>
           <n-button
-            size="large"
             :type="isFilterCustomized ? 'warning' : 'primary'"
             @click.left.exact.prevent="showed = !showed"
           >

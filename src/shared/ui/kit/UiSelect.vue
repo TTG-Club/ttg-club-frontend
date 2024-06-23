@@ -325,6 +325,7 @@
         top: initial;
         right: initial;
         border-radius: 0 8px 8px 0;
+        font-size: 22px;
 
         &:hover {
           background-color: var(--hover);

@@ -495,6 +495,7 @@
         padding: 6px;
         flex-shrink: 0;
         margin: 4px 0;
+        font-size: 24px;
       }
     }
 
@@ -531,6 +532,7 @@
         width: 28px;
         height: 28px;
         padding: 2px;
+        font-size: 24px;
       }
     }
   }
