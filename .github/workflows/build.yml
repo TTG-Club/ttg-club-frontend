@@ -49,8 +49,3 @@ jobs:
           path: ./dist
           retention-days: 1
           if-no-files-found: error
-
-  lint:
-    name: Lint Workflow
-    needs: build
-    uses: ./.github/workflows/lint.yml
