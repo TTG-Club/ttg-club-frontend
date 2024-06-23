@@ -46,13 +46,15 @@ export const dark: GlobalThemeOverrides = {
     // boxShadowFocus: 'var(--checkbox-shadow)', Оставим если вдруг вернем фокус.
   },
   Radio: {
-    // Не нашел цвет бордера при наведение
     buttonColor: 'var(--hover)',
     buttonColorActive: 'var(--primary-active)',
-    buttonBorderColorActive: 'var(--primary-active)',
     buttonTextColorHover: 'var(--text-b-color)',
     buttonTextColorActive: 'var(--text-btn-color)',
     buttonBorderColor: 'var(--border)',
+    buttonBorderColorHover: 'var(--primary)',
+    buttonBorderColorActive: 'var(--primary-active)',
+    buttonBoxShadowHover: 'inset 0 0 0 1px var(--primary)',
+    buttonBoxShadowFocus: 'inset 0 0 0 0px #ffffff00',
   },
   Button: {
     color: 'var(--primary)',
