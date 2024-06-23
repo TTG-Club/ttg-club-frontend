@@ -1,7 +1,5 @@
 <script setup lang="ts">
   import dayjs from 'dayjs';
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import SocialLinks from '@/shared/ui/SocialLinks.vue';

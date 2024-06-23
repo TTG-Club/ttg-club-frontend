@@ -1,7 +1,3 @@
-import { storeToRefs } from 'pinia';
-import { computed, ref, unref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-
 import { useReference } from '@/shared/composable/useReference';
 import { CONTENT_LAYOUT_FIXED_HEADER_SELECTOR } from '@/shared/const/UI';
 import { useUIStore } from '@/shared/stores/UIStore';

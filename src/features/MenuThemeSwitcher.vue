@@ -1,7 +1,4 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-
   import { useUIStore } from '@/shared/stores/UIStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import type { TButtonType } from '@/shared/ui/kit/button/UiButton';

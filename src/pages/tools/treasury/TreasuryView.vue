@@ -1,7 +1,5 @@
 <script lang="ts" setup>
   import { groupBy, max, mean, sortedUniq, throttle } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, ref } from 'vue';
 
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';

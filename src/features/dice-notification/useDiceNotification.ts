@@ -1,5 +1,4 @@
 import { type RollBase } from 'dice-roller-parser';
-import { h, ref } from 'vue';
 import { POSITION, useToast } from 'vue-toastification';
 
 import { ToastEventBus } from '@/shared/config';

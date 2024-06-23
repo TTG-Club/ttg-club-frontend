@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, onBeforeMount, ref } from 'vue';
   import draggableComponent from 'vuedraggable';
 
   import { useUIStore } from '@/shared/stores/UIStore';

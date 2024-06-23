@@ -1,13 +1,5 @@
 <script lang="ts" setup>
-  import {
-    useElementBounding,
-    useInfiniteScroll,
-    useResizeObserver,
-    useScroll,
-  } from '@vueuse/core';
   import { throttle } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, onMounted, ref } from 'vue';
 
   import type { FilterComposable } from '@/shared/composable/useFilter';
   import { useUIStore } from '@/shared/stores/UIStore';

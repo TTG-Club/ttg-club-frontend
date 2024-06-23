@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { computed, defineComponent, ref, shallowRef } from 'vue';
-
   import { useRollStore } from '@/shared/stores/RollStore';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';

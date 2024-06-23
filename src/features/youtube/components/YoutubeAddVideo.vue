@@ -1,8 +1,6 @@
 <script setup lang="ts">
   import useVuelidate from '@vuelidate/core';
   import { helpers, required } from '@vuelidate/validators';
-  import { useVModel } from '@vueuse/core';
-  import { reactive, ref, watch } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 

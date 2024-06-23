@@ -1,6 +1,4 @@
 <script>
-  import { mapState } from 'pinia';
-
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';

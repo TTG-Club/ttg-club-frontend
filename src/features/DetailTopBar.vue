@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-
   import type { TSource } from '@/shared/types/BaseApiFields';
 
   const props = withDefaults(

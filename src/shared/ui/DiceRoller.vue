@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { type RollBase } from 'dice-roller-parser';
-  import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
   import { useDiceRoller } from '@/shared/composable/useDiceRoller';

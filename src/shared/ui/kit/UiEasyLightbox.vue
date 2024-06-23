@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { watchArray } from '@vueuse/core';
-  import { computed, defineComponent, ref } from 'vue';
   import VueEasyLightbox, { useEasyLightbox } from 'vue-easy-lightbox';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';

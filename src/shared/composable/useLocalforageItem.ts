@@ -1,5 +1,6 @@
 import { debounce } from 'lodash-es';
-import { type Ref, ref, toRaw, watch } from 'vue';
+
+import type { Ref } from 'vue';
 
 export function useLocalforageItem<T>(
   store: LocalForage,

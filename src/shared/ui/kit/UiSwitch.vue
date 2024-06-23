@@ -3,9 +3,7 @@
   lang="ts"
   generic="OptionType extends Record<string | 'id' | 'name', any>"
 >
-  import { useVModel } from '@vueuse/core';
   import { cloneDeep } from 'lodash-es';
-  import { onBeforeMount } from 'vue';
 
   const props = withDefaults(
     defineProps<{

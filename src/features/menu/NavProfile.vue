@@ -1,7 +1,4 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, ref } from 'vue';
-
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import AuthModal from '@/shared/ui/modals/AuthModal.vue';

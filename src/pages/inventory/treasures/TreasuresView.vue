@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-  import { computed, onBeforeMount } from 'vue';
-
   import { useFilter } from '@/shared/composable/useFilter';
   import { usePagination } from '@/shared/composable/usePagination';
   import { TreasuresFilterDefaults } from '@/shared/types/inventory/Treasures.d';

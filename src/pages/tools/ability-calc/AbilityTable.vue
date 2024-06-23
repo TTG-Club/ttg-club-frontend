@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { computed, defineComponent } from 'vue';
-
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
   import {
     AbilityKey,

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';

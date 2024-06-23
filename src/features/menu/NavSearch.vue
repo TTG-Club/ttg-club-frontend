@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { onKeyStroke, useActiveElement } from '@vueuse/core';
-
   import { useNavPopover } from '@/shared/composable/useNavPopover';
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 

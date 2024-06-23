@@ -15,33 +15,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint Workflow
-    uses: ./.github/workflows/lint.yml
-
   build:
     name: Build Job
-    needs: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: TTG-Club/ttg-club-frontend
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: 'package.json'
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --cache .npm
 
       - name: Build
         run: npm run build:${{ github.ref_name == 'dev' && 'dev' || 'prod' }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: front-build-${{ github.run_id }}
+          path: ./
+          retention-days: 1
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
         with:
           name: front-app-${{ github.run_id }}
           path: ./dist

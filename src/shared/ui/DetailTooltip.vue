@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { cloneDeep } from 'lodash-es';
-  import { computed, h, ref, useSlots } from 'vue';
   import { Tippy } from 'vue-tippy';
 
   import { httpClient } from '@/shared/api';

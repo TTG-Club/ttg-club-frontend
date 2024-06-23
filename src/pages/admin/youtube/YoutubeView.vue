@@ -1,8 +1,4 @@
 <script setup lang="ts">
-  import { type MaybeRef, tryOnBeforeMount } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-
   import { useUIStore } from '@/shared/stores/UIStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
@@ -18,6 +14,8 @@
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
   import PageLayout from '@/layouts/PageLayout.vue';
+
+  import type { MaybeRef } from '@vueuse/core';
 
   const { isMobile } = storeToRefs(useUIStore());
 

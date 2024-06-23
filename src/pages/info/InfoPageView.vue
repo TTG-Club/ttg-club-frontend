@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
   import { AxiosError } from 'axios';
-  import { defineComponent, ref } from 'vue';
-  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
   import RawContent from '@/shared/ui/RawContent.vue';

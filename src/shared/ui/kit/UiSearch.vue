@@ -1,7 +1,5 @@
 <script setup lang="ts">
-  import { useFocus } from '@vueuse/core';
   import { debounce } from 'lodash-es';
-  import { ref, toRefs, watch } from 'vue';
 
   import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
 

@@ -1,9 +1,6 @@
-import { useBroadcastChannel } from '@vueuse/core';
 import { type RollBase } from 'dice-roller-parser';
 import localforage from 'localforage';
 import { sortBy } from 'lodash-es';
-import { defineStore } from 'pinia';
-import { computed, toRaw } from 'vue';
 
 import { useLocalforageItem } from '@/shared/composable/useLocalforageItem';
 import { DB_NAME } from '@/shared/const/UI';

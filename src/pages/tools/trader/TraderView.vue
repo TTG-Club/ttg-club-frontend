@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
   import {
     groupBy,
     max,
@@ -8,22 +7,6 @@
     throttle,
     toNumber,
   } from 'lodash-es';
-  import {
-    NForm,
-    NGrid,
-    NCollapseTransition,
-    NFormItemGi,
-    NInputNumber,
-    NSelect,
-    NRadioGroup,
-    NRadioButton,
-    NCheckbox,
-    NSpace,
-    NButton,
-    NSkeleton,
-  } from 'naive-ui';
-  import { storeToRefs } from 'pinia';
-  import { computed, ref, toRaw } from 'vue';
 
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';

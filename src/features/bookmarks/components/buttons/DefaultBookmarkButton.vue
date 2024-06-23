@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useRoute } from 'vue-router';
-
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import { toast } from '@/shared/utils/toast';
 
