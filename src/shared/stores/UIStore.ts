@@ -2,6 +2,8 @@ import Cookies from 'js-cookie';
 
 import { FULLSCREEN_DB_KEY, THEME_DB_KEY } from '@/shared/const/UI';
 
+import type { BasicColorMode, BasicColorSchema } from '@vueuse/core';
+
 export const useUIStore = defineStore('UIStore', () => {
   const updateThemeMeta = () => {
     let el: HTMLMetaElement | null = document.querySelector(
@@ -21,23 +23,24 @@ export const useUIStore = defineStore('UIStore', () => {
     document.getElementsByTagName('head')[0].appendChild(el);
   };
 
-  const { store: storedTheme, system: systemTheme } = useColorMode({
-    storageKey: null,
-    initialValue: Cookies.get(THEME_DB_KEY) || 'auto',
-    onChanged(mode, defaultHandler) {
-      defaultHandler(mode);
-      updateThemeMeta();
+  const { store: storedTheme, system: systemTheme } =
+    useColorMode<BasicColorSchema>({
+      storageKey: null,
+      initialValue: (Cookies.get(THEME_DB_KEY) as BasicColorSchema) || 'auto',
+      onChanged(mode, defaultHandler) {
+        defaultHandler(mode);
+        updateThemeMeta();
 
-      Cookies.set(THEME_DB_KEY, mode, {
-        expires: 365,
-      });
-    },
-  });
+        Cookies.set(THEME_DB_KEY, mode, {
+          expires: 365,
+        });
+      },
+    });
 
   const theme = computed({
-    get: () =>
+    get: (): BasicColorMode =>
       storedTheme.value === 'auto' ? systemTheme.value : storedTheme.value,
-    set: (value) => {
+    set: (value: BasicColorSchema) => {
       storedTheme.value = value;
     },
   });

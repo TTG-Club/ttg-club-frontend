@@ -1,6 +1,8 @@
 <script setup lang="ts">
+  import { dateRuRU, ruRU } from 'naive-ui';
   import { ModalsContainer } from 'vue-final-modal';
 
+  import { useUIStore } from '@/shared/stores/UIStore';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import { DiceHistory } from '@/features/dice-history/ui';
@@ -8,7 +10,7 @@
   import NavBar from '@/features/menu/NavBar.vue';
 
   import './config/dayjs';
-  import { themeOverrides } from './config';
+  import { themes } from './config';
 
   const userStore = useUserStore();
 
@@ -27,6 +29,11 @@
   });
 
   useDiceNotification().enable();
+
+  const uiStore = useUIStore();
+  const { theme } = storeToRefs(uiStore);
+
+  const themeOverrides = computed(() => themes[theme.value]);
 </script>
 
 <template>
@@ -35,7 +42,6 @@
     :locale="ruRU"
     :date-locale="dateRuRU"
     abstract
-    inline-theme-disabled
   >
     <n-loading-bar-provider>
       <n-message-provider>
