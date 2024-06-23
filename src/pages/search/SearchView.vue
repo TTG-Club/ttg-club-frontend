@@ -7,9 +7,6 @@
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
@@ -256,41 +253,47 @@
           ref="controls"
           class="search-view__controls"
         >
-          <form
-            class="search-view__control"
+          <n-form
             novalidate="true"
             autocomplete="off"
             autofocus="autofocus"
             autocapitalize="off"
-            @keyup.enter.exact.prevent.stop="onSearch"
             @submit.prevent.stop="onSearch"
           >
-            <div class="search-view__control_body">
-              <div
-                class="search-view__control_icon"
-                :class="{ 'in-progress': inProgress }"
-              >
-                <svg-icon :icon="inProgress ? 'dice/d20' : 'search'" />
-              </div>
-
-              <ui-input
-                ref="input"
-                v-model="search"
+            <n-input-group>
+              <n-input
+                v-model:value="search"
+                size="large"
                 placeholder="Поиск..."
-                is-clearable
-                @update:model-value="onChangeSearch"
-                @keyup.enter.exact.prevent.stop
-              />
-            </div>
+                :loading="inProgress"
+                :autofocus="true"
+                :input-props="{
+                  autocapitalize: 'off',
+                  autocomplete: 'off',
+                  formnovalidate: true,
+                }"
+                clearable
+                @clear="onChangeSearch('')"
+                @update:value="onChangeSearch"
+              >
+                <template #prefix>
+                  <svg-icon icon="search" />
+                </template>
 
-            <ui-button
-              class="search-view__control_btn"
-              native-type="button"
-              @click.left.exact.prevent.stop="onSearch"
-            >
-              Поиск
-            </ui-button>
-          </form>
+                <template #clear-icon>
+                  <svg-icon icon="close" />
+                </template>
+              </n-input>
+
+              <n-button
+                type="primary"
+                size="large"
+                attr-type="submit"
+              >
+                Поиск
+              </n-button>
+            </n-input-group>
+          </n-form>
         </div>
 
         <div
@@ -333,12 +336,12 @@
           </div>
         </div>
 
-        <ui-paginate
+        <n-pagination
           v-if="pages > 1"
-          v-model="page"
-          class="search-view__paginate"
+          v-model:page="page"
           :page-count="pages"
-          @update:model-value="onChangedPage"
+          class="search-view__paginate"
+          @update:page="onChangedPage"
         />
       </div>
     </template>
