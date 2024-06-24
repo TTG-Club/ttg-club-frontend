@@ -1,4 +1,3 @@
-import { unref } from 'vue';
 import { event, pageview } from 'vue-gtag';
 
 import { routes } from '@/pages';

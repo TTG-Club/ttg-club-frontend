@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useRoute } from 'vue-router';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import { toast } from '@/shared/utils/toast';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
@@ -53,16 +50,23 @@
 </script>
 
 <template>
-  <ui-button
-    :icon="`bookmark/${isSaved ? 'filled' : 'outline'}`"
-    :tooltip="{
-      content: isSaved ? 'Удалить из закладок' : 'Добавить в закладки',
-    }"
-    :loading="inProgress"
-    type="text"
-    @click.left.exact.prevent.stop="updateBookmark"
-    @dblclick.prevent.stop
-  />
+  <n-tooltip>
+    <template #trigger>
+      <n-button
+        :loading="inProgress"
+        quaternary
+        @click.left.exact.prevent.stop="updateBookmark"
+      >
+        <template #icon>
+          <svg-icon :icon="`bookmark/${isSaved ? 'filled' : 'outline'}`" />
+        </template>
+      </n-button>
+    </template>
+
+    <template #default>
+      {{ isSaved ? 'Удалить из закладок' : 'Добавить в закладки' }}
+    </template>
+  </n-tooltip>
 </template>
 
 <style lang="scss" scoped>

@@ -1,9 +1,8 @@
 <script lang="ts" setup>
   import dayjs from 'dayjs';
   import { type GroupedRollBase, type RollBase } from 'dice-roller-parser';
-  import { computed } from 'vue';
 
-  import { useClassName } from '@/shared/composables/useClassName';
+  import { useClassName } from '@/shared/composable/useClassName';
   import { isCritical, RollRenderer, type RollType } from '@/shared/utils/roll';
 
   const cn = useClassName();

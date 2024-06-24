@@ -1,5 +1,5 @@
 <script>
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   export default {
     name: 'ClassSquare',

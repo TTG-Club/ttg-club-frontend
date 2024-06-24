@@ -1,11 +1,7 @@
 <script lang="ts" setup>
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
+  import { useScrollToPathInList } from '@/shared/composable/useScrollToPathInList';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { AnyObject } from '@/shared/types/Utility';
   import { BestiaryFilterDefaults } from '@/shared/types/workshop/Bestiary.d';

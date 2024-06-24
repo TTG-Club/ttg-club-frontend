@@ -18,6 +18,7 @@
     "strict": true,
     "sourceMap": true,
     "typeRoots": [
+      "./src/shared/types/generated",
       "./node_modules/@types",
       "./node_modules"
     ],

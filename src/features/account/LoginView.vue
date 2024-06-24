@@ -1,12 +1,10 @@
 <script lang="ts">
   import useVuelidate from '@vuelidate/core';
   import { helpers, or } from '@vuelidate/validators';
-  import { defineComponent, reactive, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useMetrics } from '@/shared/composable/useMetrics';
+  import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';

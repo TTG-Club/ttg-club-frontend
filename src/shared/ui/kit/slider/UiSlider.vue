@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-  import { computed, toRefs, unref } from 'vue';
-
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   const modelValue = defineModel<number>({ required: true });

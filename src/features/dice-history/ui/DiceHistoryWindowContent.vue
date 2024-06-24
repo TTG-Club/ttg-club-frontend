@@ -1,8 +1,7 @@
 <script lang="ts" setup>
   // TODO: Consider renaming the component
-  import { ref, watch, onMounted, nextTick } from 'vue';
 
-  import { useClassName } from '@/shared/composables/useClassName';
+  import { useClassName } from '@/shared/composable/useClassName';
   import { useRollStore } from '@/shared/stores/RollStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 

@@ -18,18 +18,32 @@ permissions:
   pages: write
   actions: write
   id-token: write
+  security-events: write
 
 concurrency:
   group: lint-pr-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
+  analyze:
+    name: Lint PR
+    if: ${{ !github.event.pull_request.draft }}
+    uses: ./.github/workflows/codeql.yml
+
+  build:
+    name: Build PR
+    needs: analyze
+    if: ${{ !github.event.pull_request.draft }}
+    uses: ./.github/workflows/build.yml
+
   lint-pr:
     name: Lint PR
+    needs: build
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/lint.yml
 
   type-check-pr:
     name: Type check PR
+    needs: build
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/type-check.yml

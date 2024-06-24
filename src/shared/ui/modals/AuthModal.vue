@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-  import { useVModel } from '@vueuse/core';
   import { VueFinalModal } from 'vue-final-modal';
 
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';

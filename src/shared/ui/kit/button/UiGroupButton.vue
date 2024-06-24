@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { provide, reactive, toRef } from 'vue';
-
   import type {
     ISharedButtonProps,
     TButtonType,

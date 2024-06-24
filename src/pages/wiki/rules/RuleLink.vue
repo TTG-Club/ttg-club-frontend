@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { computed, defineComponent } from 'vue';
-  import { useLink } from 'vue-router';
-
   import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
 
   import type { PropType } from 'vue';

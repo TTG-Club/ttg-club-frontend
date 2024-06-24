@@ -1,13 +1,12 @@
 import localforage from 'localforage';
 import { cloneDeep } from 'lodash-es';
-import { computed, ref, unref } from 'vue';
 
 import { httpClient } from '@/shared/api';
 import type {
   SearchComposable,
   SearchConfig,
-} from '@/shared/composables/useSearch';
-import { useSearch } from '@/shared/composables/useSearch';
+} from '@/shared/composable/useSearch';
+import { useSearch } from '@/shared/composable/useSearch';
 
 import type { MaybeRef } from '@vueuse/core';
 import type { ComputedRef, Ref } from 'vue';

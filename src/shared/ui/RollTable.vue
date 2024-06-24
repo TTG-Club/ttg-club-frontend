@@ -1,15 +1,11 @@
 <script setup lang="ts">
-  import { refAutoReset } from '@vueuse/core';
   import { toNumber } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+  import { ToastEventBus } from '@/shared/config';
   import { useUIStore } from '@/shared/stores/UIStore';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { RollBase } from 'dice-roller-parser';

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-  import { onClickOutside } from '@vueuse/core';
-  import { computed, inject, ref, useSlots, watch } from 'vue';
   import { useTippy } from 'vue-tippy';
 
   import IconLoader from '@/shared/ui/icons/IconLoader.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import type {
     TButtonType,
     TButtonOption,
@@ -212,7 +210,6 @@
         <svg-icon
           v-if="icon"
           :icon="icon"
-          size="1em"
         />
 
         <slot
@@ -232,10 +229,7 @@
         v-if="!split && $slots.dropdown"
         :class="$style.icon"
       >
-        <svg-icon
-          icon="arrow/filled/down-mini"
-          size="1em"
-        />
+        <svg-icon icon="arrow/filled/down-mini" />
       </span>
 
       <span

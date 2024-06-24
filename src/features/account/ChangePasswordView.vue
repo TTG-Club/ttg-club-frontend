@@ -1,13 +1,9 @@
 <script lang="ts">
   import useVuelidate from '@vuelidate/core';
   import { helpers, or, sameAs } from '@vuelidate/validators';
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, reactive, ref } from 'vue';
-  import { useRouter } from 'vue-router';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+  import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';

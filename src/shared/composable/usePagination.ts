@@ -1,15 +1,12 @@
-import { toValue } from '@vueuse/core';
-import { computed, type Ref, ref, unref } from 'vue';
-import { useRoute } from 'vue-router';
-
 import { httpClient, type RequestConfig } from '@/shared/api';
-import type { FilterQueryParams } from '@/shared/composables/useFilter';
-import { useMetrics } from '@/shared/composables/useMetrics';
-import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/constants';
+import type { FilterQueryParams } from '@/shared/composable/useFilter';
+import { useMetrics } from '@/shared/composable/useMetrics';
+import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/const';
 import { errorHandler } from '@/shared/utils/errorHandler';
 import { useIsDev } from '@/shared/utils/isDev';
 
 import type { MaybeRefOrGetter, MaybeRef } from '@vueuse/core';
+import type { Ref } from 'vue';
 
 export type PaginationSearch = {
   value: MaybeRef<string>;

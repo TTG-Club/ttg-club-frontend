@@ -1,17 +1,7 @@
 <script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    nextTick,
-    onMounted,
-    ref,
-    watch,
-  } from 'vue';
-  import { useLink, useRoute, useRouter } from 'vue-router';
-
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TClassItem } from '@/shared/types/character/Classes.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import { isIconExist } from '@/shared/utils/icons';
 
   import type { PropType } from 'vue';

@@ -1,8 +1,7 @@
 <script>
-  import { defineComponent } from 'vue';
   import Multiselect, { multiselectMixin } from 'vue-multiselect';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   // TODO: Создать свой селект компонент
   export default defineComponent({
@@ -326,6 +325,7 @@
         top: initial;
         right: initial;
         border-radius: 0 8px 8px 0;
+        font-size: 22px;
 
         &:hover {
           background-color: var(--hover);

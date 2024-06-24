@@ -1,12 +1,9 @@
 <script lang="ts" setup>
   import { toValue } from '@vueuse/shared';
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, watch } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
 
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { useScrollToPathInList } from '@/shared/composables/useScrollToPathInList';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
+  import { useScrollToPathInList } from '@/shared/composable/useScrollToPathInList';
   import { useUIStore } from '@/shared/stores/UIStore';
   import { OptionsFilterDefaults } from '@/shared/types/character/Options.d';
   import { getListGridInTabProps } from '@/shared/ui/virtual-views/VirtualGridList/helpers';

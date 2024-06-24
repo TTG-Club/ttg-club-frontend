@@ -1,5 +1,3 @@
-import { getCurrentInstance, inject, provide } from 'vue';
-
 import type { InjectionKey } from 'vue';
 
 const isDev: boolean = import.meta.env.VITE_APP_DEV === 'true';

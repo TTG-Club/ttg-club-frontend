@@ -1,7 +1,4 @@
 <script setup lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
-  import { computed, ref } from 'vue';
-
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
 
   import { YoutubeApi } from '@/features/youtube/api';
