@@ -77,6 +77,8 @@ export const light: GlobalThemeOverrides = {
     textColorPressedPrimary: 'var(--text-btn-color)',
     textColorDisabledPrimary: 'var(--text-btn-color)',
 
+    colorQuaternaryHover: 'var(--hover)',
+
     colorSecondary: 'var(--secondary)',
     colorSecondaryHover: 'var(--secondary-hover)',
     colorSecondaryPressed: 'var(--secondary)',
