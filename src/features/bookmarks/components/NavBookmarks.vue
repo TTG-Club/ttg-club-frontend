@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import { useUserStore } from '@/shared/stores/UserStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import CustomBookmarks from '@/features/bookmarks/components/CustomBookmarks.vue';
   import DefaultBookmarks from '@/features/bookmarks/components/DefaultBookmarks.vue';

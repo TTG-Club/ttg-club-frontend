@@ -1,1 +1,1 @@
-export * from './themeOverrides';
+export * from './themes';

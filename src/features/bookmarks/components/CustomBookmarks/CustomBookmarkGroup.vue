@@ -3,7 +3,7 @@
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { WithChildren } from '@/shared/types/Utility';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 

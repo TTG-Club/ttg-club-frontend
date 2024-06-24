@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useNavPopover } from '@/shared/composable/useNavPopover';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 

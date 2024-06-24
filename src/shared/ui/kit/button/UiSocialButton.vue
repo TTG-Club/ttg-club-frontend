@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   withDefaults(
     defineProps<{
@@ -64,6 +64,7 @@
     &__icon {
       width: 24px;
       height: 24px;
+      font-size: 24px;
     }
 
     &__label {

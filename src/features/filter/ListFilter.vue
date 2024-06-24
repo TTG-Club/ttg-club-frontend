@@ -7,7 +7,7 @@
     FilterGroup,
     FilterItem,
   } from '@/shared/composable/useFilter';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -159,7 +159,7 @@
               />
             </template>
 
-            Фильтр
+            <template #default> Фильтр </template>
           </n-button>
         </template>
 
@@ -174,7 +174,9 @@
             type="warning"
             @click.left.exact.prevent="resetFilter"
           >
-            <svg-icon icon="clear" />
+            <template #icon>
+              <svg-icon icon="clear" />
+            </template>
           </n-button>
         </template>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useUIStore } from '@/shared/stores/UIStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import type { TButtonType } from '@/shared/ui/kit/button/UiButton';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 

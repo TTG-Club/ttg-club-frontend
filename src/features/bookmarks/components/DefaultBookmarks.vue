@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { useDefaultBookmarkStore } from '@/features/bookmarks/store/DefaultBookmarkStore';
 
@@ -120,6 +120,7 @@
         width: 24px;
         height: 24px;
         display: block;
+        font-size: 24px;
       }
     }
   }

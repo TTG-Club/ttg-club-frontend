@@ -1,7 +1,7 @@
 <script>
   import { cloneDeep } from 'lodash-es';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
 
   export default {

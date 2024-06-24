@@ -1,68 +1,63 @@
-<script lang="ts">
+<script lang="ts" setup>
   import { useRollStore } from '@/shared/stores/RollStore';
   import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
-  import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import AbilityRaces from '@/pages/tools/ability-calc/ability-races/AbilityRaces.vue';
-  import AbilityArray from '@/pages/tools/ability-calc/AbilityArray.vue';
-  import AbilityPointBuy from '@/pages/tools/ability-calc/AbilityPointBuy.vue';
-  import AbilityRandom from '@/pages/tools/ability-calc/AbilityRandom.vue';
-  import AbilityTable from '@/pages/tools/ability-calc/AbilityTable.vue';
+  import AbilityRaces from './ability-races/AbilityRaces.vue';
+  import AbilityArray from './AbilityArray.vue';
+  import AbilityPointBuy from './AbilityPointBuy.vue';
+  import AbilityRandom from './AbilityRandom.vue';
+  import AbilityTable from './AbilityTable.vue';
 
-  import type { Component } from 'vue';
+  enum Tabs {
+    RANDOM,
+    POINT_BY,
+    STANDARD,
+  }
 
   type TCalcTab = {
-    id: string;
-    name: string;
-    component: Component;
+    label: string;
+    value: Tabs;
   };
 
-  export default defineComponent({
-    components: {
-      AbilityRaces,
-      AbilityTable,
-      PageLayout,
-      UiSwitch,
+  const tabs: TCalcTab[] = [
+    {
+      label: 'Случайный набор',
+      value: Tabs.RANDOM,
     },
-    setup() {
-      const tabs: TCalcTab[] = [
-        {
-          id: 'random',
-          name: 'Случайный набор',
-          component: shallowRef(AbilityRandom),
-        },
-        {
-          id: 'point-buy',
-          name: '«Покупка» значений',
-          component: shallowRef(AbilityPointBuy),
-        },
-        {
-          id: 'standard',
-          name: 'Стандартный набор',
-          component: shallowRef(AbilityArray),
-        },
-      ];
-
-      const raceBonuses = ref<Array<AbilityRoll>>([]);
-      const currentTab = ref(tabs[0]);
-      const rolls = ref<Array<AbilityRoll>>([]);
-
-      const component = computed(() => currentTab.value?.component || null);
-
-      const rollStore = useRollStore();
-
-      rollStore.setFallbackSource('Калькулятор характеристик');
-
-      return {
-        tabs,
-        currentTab,
-        component,
-        rolls,
-        raceBonuses,
-      };
+    {
+      label: '«Покупка» значений',
+      value: Tabs.POINT_BY,
     },
+    {
+      label: 'Стандартный набор',
+      value: Tabs.STANDARD,
+    },
+  ];
+
+  const rolls = ref<Array<AbilityRoll>>([]);
+  const raceBonuses = ref<Array<AbilityRoll>>([]);
+  const currentTab = ref<TCalcTab['value']>(tabs[0].value);
+
+  const rollStore = useRollStore();
+
+  rollStore.setFallbackSource('Калькулятор характеристик');
+
+  const TabComponent = computed(() => {
+    switch (currentTab.value) {
+      case Tabs.RANDOM:
+        return h(AbilityRandom);
+
+      case Tabs.POINT_BY:
+        return h(AbilityPointBuy);
+
+      case Tabs.STANDARD:
+        return h(AbilityArray);
+
+      default:
+        return null;
+    }
   });
 </script>
 
@@ -74,47 +69,41 @@
     <template #title> Калькулятор характеристик </template>
 
     <template #default>
-      <ability-races
-        v-model="raceBonuses"
-        class="ability-calc__row"
-      />
-
-      <ui-switch
-        v-model="currentTab"
-        :options="tabs"
-        class="ability-calc__row"
-        pre-select-first
-        full-width
-      />
-
-      <transition
-        mode="out-in"
-        name="fade"
+      <n-space
+        vertical
+        :size="40"
       >
-        <keep-alive v-if="!!component">
-          <component
-            :is="component"
-            v-model="rolls"
-            class="ability-calc__row"
-          />
-        </keep-alive>
-      </transition>
+        <ability-races v-model="raceBonuses" />
 
-      <ability-table
-        :race-bonuses="raceBonuses"
-        :rolls="rolls"
-        class="ability-calc__row"
-      />
+        <n-flex justify="center">
+          <n-radio-group
+            v-model:value="currentTab"
+            size="large"
+          >
+            <n-radio-button
+              v-for="tab in tabs"
+              :key="tab.value"
+              :value="tab.value"
+            >
+              {{ tab.label }}
+            </n-radio-button>
+          </n-radio-group>
+        </n-flex>
+
+        <transition
+          mode="out-in"
+          name="fade"
+        >
+          <keep-alive>
+            <tab-component v-model="rolls" />
+          </keep-alive>
+        </transition>
+
+        <ability-table
+          :race-bonuses="raceBonuses"
+          :rolls="rolls"
+        />
+      </n-space>
     </template>
   </page-layout>
 </template>
-
-<style lang="scss" scoped>
-  .ability-calc {
-    &__row {
-      & + & {
-        margin-top: 40px;
-      }
-    }
-  }
-</style>

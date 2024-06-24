@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useClassName } from '@/shared/composable/useClassName';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import type { ISharedButtonProps } from './UiButton';
 

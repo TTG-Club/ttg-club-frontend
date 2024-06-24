@@ -1,5 +1,6 @@
 <script lang="ts" setup>
   import { useClassName } from '@/shared/composable/useClassName';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { useDiceHistory } from '@/features/dice-history/composables';
 
