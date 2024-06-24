@@ -416,7 +416,9 @@
               />
 
               <template v-else-if="selected.item?.name.rus">
-                {{ selected.item.name.rus }}
+                <n-performant-ellipsis>
+                  {{ selected.item.name.rus }}
+                </n-performant-ellipsis>
               </template>
 
               <template v-else> В продаже </template>
@@ -431,7 +433,9 @@
               />
 
               <template v-else-if="selected.item?.name.eng">
-                {{ selected.item.name.eng }}
+                <n-performant-ellipsis>
+                  {{ selected.item.name.eng }}
+                </n-performant-ellipsis>
               </template>
 
               <template v-else> On sale </template>
