@@ -214,7 +214,7 @@
           name="title"
         />
 
-        <template v-else>{{ title }}</template>
+        <n-performant-ellipsis v-else>{{ title }}</n-performant-ellipsis>
       </div>
 
       <div
@@ -227,7 +227,7 @@
           name="subtitle"
         />
 
-        <template v-else>{{ subtitle }}</template>
+        <n-performant-ellipsis v-else>{{ subtitle }}</n-performant-ellipsis>
       </div>
     </div>
 

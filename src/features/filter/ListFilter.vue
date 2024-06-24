@@ -158,7 +158,8 @@
                 :icon="`filter/${isFilterCustomized ? 'filled' : 'outline'}`"
               />
             </template>
-            Фильтр
+
+            <template #default> Фильтр </template>
           </n-button>
         </template>
 
