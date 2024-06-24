@@ -264,8 +264,7 @@
               <n-input
                 v-model:value="search"
                 size="large"
-                placeholder="Поиск..."
-                :loading="inProgress"
+                placeholder="Поиск по сайту..."
                 :autofocus="true"
                 :input-props="{
                   autocapitalize: 'off',
@@ -278,10 +277,6 @@
               >
                 <template #prefix>
                   <svg-icon icon="search" />
-                </template>
-
-                <template #clear-icon>
-                  <svg-icon icon="close" />
                 </template>
               </n-input>
 
