@@ -62,6 +62,8 @@ export const light: GlobalThemeOverrides = {
     borderPressed: 'var(--primary-active)',
     borderDisabled: 'var(--primary-disabled)',
 
+    iconSizeLarge: '22px',
+
     colorPrimary: '#5e5446',
     colorHoverPrimary: 'var(--primary-hover)',
     colorPressedPrimary: 'var(--primary-active)',

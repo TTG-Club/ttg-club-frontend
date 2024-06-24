@@ -62,6 +62,8 @@ export const dark: GlobalThemeOverrides = {
     borderPressed: 'var(--primary-active)',
     borderDisabled: 'var(--primary-disabled)',
 
+    iconSizeLarge: '22px',
+
     colorPrimary: '#3567c9',
     colorHoverPrimary: 'var(--primary-hover)',
     colorPressedPrimary: 'var(--primary-active)',
@@ -78,6 +80,8 @@ export const dark: GlobalThemeOverrides = {
     colorSecondary: 'var(--secondary)',
     colorSecondaryHover: 'var(--secondary-hover)',
     colorSecondaryPressed: 'var(--secondary)',
+
+    colorQuaternaryHover: 'var(--hover)',
 
     textColor: 'var(--text-b-color)',
     textColorHover: 'var(--text-b-color)',

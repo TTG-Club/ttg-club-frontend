@@ -297,6 +297,7 @@
             :value="search"
             :loading="inProgress"
             :autofocus="true"
+            size="large"
             :input-props="{
               autocapitalize: 'off',
               autocomplete: 'off',
@@ -315,7 +316,9 @@
           </n-input>
 
           <n-button
-            quaternary
+            secondary
+            size="large"
+            :loading="inProgress"
             @click.left.exact.prevent="onSearchRandom"
           >
             <template #icon>

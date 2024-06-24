@@ -159,6 +159,10 @@
               />
             </template>
 
+            <template #clear-icon>
+              <svg-icon icon="close" />
+            </template>
+
             Фильтр
           </n-button>
         </template>
