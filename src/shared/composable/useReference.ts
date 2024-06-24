@@ -1,5 +1,3 @@
-import { ref } from 'vue';
-
 import type { Maybe } from '@/shared/types/Utility';
 
 export type RefFunction<R> = (element: R) => void;

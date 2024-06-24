@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-  import { storeToRefs } from 'pinia';
-
   import { useUserStore } from '@/shared/stores/UserStore';
 
-  import CustomBookmarkButton from '@/features/bookmarks/components/buttons/CustomBookmarkButton.vue';
-  import DefaultBookmarkButton from '@/features/bookmarks/components/buttons/DefaultBookmarkButton.vue';
+  import CustomBookmarkButton from './CustomBookmarkButton.vue';
+  import DefaultBookmarkButton from './DefaultBookmarkButton.vue';
 
   withDefaults(
     defineProps<{

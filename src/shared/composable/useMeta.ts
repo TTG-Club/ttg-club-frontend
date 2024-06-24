@@ -1,5 +1,3 @@
-import { ref } from 'vue';
-
 import { httpClient } from '@/shared/api';
 import type { TMetaInfo } from '@/shared/stores/NavStore';
 import type { Maybe } from '@/shared/types/Utility';

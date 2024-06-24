@@ -1,11 +1,9 @@
 <script setup lang="ts">
   import { type RollBase } from 'dice-roller-parser';
-  import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
+  import { useDiceRoller } from '@/shared/composable/useDiceRoller';
+  import { ToastEventBus } from '@/shared/config';
   import { useIsDev } from '@/shared/utils/isDev';
 
   import { type RollType } from '../utils/roll';

@@ -1,9 +1,7 @@
 <script setup lang="ts">
   import { orderBy } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
 
-  import { useNavPopover } from '@/shared/composables/useNavPopover';
+  import { useNavPopover } from '@/shared/composable/useNavPopover';
   import type { TNavItem } from '@/shared/stores/NavStore';
   import { useNavStore } from '@/shared/stores/NavStore';
   import OurPartners from '@/shared/ui/OurPartners.vue';

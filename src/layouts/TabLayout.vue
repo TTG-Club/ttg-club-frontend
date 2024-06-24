@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-  import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
-  import { onMounted, ref } from 'vue';
-
-  import type { FilterComposable } from '@/shared/composables/useFilter';
+  import type { FilterComposable } from '@/shared/composable/useFilter';
 
   import ListFilter from '@/features/filter/ListFilter.vue';
 

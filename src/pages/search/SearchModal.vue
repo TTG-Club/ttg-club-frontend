@@ -1,23 +1,12 @@
 <script lang="ts" setup>
-  import {
-    onKeyStroke,
-    onStartTyping,
-    useActiveElement,
-    useFocus,
-    useVModel,
-  } from '@vueuse/core';
   import { debounce } from 'lodash-es';
-  import { computed, onMounted, ref, watch } from 'vue';
   import { VueFinalModal } from 'vue-final-modal';
-  import { useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
-  import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useMetrics } from '@/shared/composable/useMetrics';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import SearchLink from '@/pages/search/SearchLink.vue';
 
@@ -298,49 +287,45 @@
   >
     <div class="search-modal__container">
       <div class="search-modal__wrapper">
-        <div class="search-modal__control">
-          <div
-            :class="{ 'in-progress': inProgress }"
-            class="search-modal__control_icon"
+        <n-flex
+          class="search-modal__control"
+          :wrap="false"
+          size="small"
+        >
+          <n-input
+            ref="input"
+            :value="search"
+            :loading="inProgress"
+            :autofocus="true"
+            size="large"
+            :input-props="{
+              autocapitalize: 'off',
+              autocomplete: 'off',
+              formnovalidate: true,
+            }"
+            placeholder="Поиск..."
+            :show-count="results?.total"
+            @update:value="onSearchUpdate"
+            @keyup.enter.exact.prevent.stop="onSubmit"
           >
-            <svg-icon :icon="inProgress ? 'dice/d20' : 'search'" />
-          </div>
+            <template #prefix>
+              <svg-icon icon="search" />
+            </template>
 
-          <form
-            autocapitalize="off"
-            autocomplete="off"
-            class="search-modal__control_field"
-            novalidate="novalidate"
-            @submit.prevent.stop="onSubmit"
-          >
-            <ui-input
-              ref="input"
-              :model-value="search"
-              autocapitalize="off"
-              autocomplete="off"
-              autofocus="autofocus"
-              formnovalidate="formnovalidate"
-              placeholder="Поиск..."
-              @update:model-value="onSearchUpdate"
-              @keyup.enter.exact.prevent.stop="onSubmit"
-            />
-          </form>
+            <template #count> Найдено: {{ results?.total }} </template>
+          </n-input>
 
-          <div
-            v-if="!inProgress && results?.total"
-            class="search-modal__control__count"
-          >
-            Найдено: {{ results?.total }}
-          </div>
-
-          <ui-button
-            class="search-modal__control_dice"
-            icon="dice/d6"
-            type="text"
-            color="text"
+          <n-button
+            secondary
+            size="large"
+            :loading="inProgress"
             @click.left.exact.prevent="onSearchRandom"
-          />
-        </div>
+          >
+            <template #icon>
+              <svg-icon icon="dice/d6" />
+            </template>
+          </n-button>
+        </n-flex>
 
         <div class="search-modal__results">
           <div
@@ -431,80 +416,8 @@
     }
 
     &__control {
-      display: flex;
-      padding: 0 4px;
+      padding: 8px;
       position: relative;
-
-      &_field {
-        flex: 1 1 100%;
-        height: 44px;
-        overflow: hidden;
-        appearance: none;
-        border: 0;
-      }
-
-      &__count {
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-color);
-        padding: 0 16px;
-      }
-
-      &_icon {
-        svg {
-          color: var(--text-color);
-        }
-
-        &.in-progress {
-          svg {
-            @keyframes loader {
-              from {
-                transform: rotate(0deg);
-              }
-
-              to {
-                transform: rotate(360deg);
-              }
-            }
-
-            animation: {
-              name: loader;
-              duration: 1.5s;
-              iteration-count: infinite;
-            }
-          }
-        }
-      }
-
-      &_dice {
-        width: 36px;
-        height: 36px;
-        flex-shrink: 0;
-        margin: 4px 0;
-
-        svg {
-          @include css_anim($item: transform);
-
-          color: var(--text-color-title);
-        }
-
-        &:hover,
-        &:focus-within {
-          svg {
-            transform: rotate(45deg);
-          }
-        }
-      }
-
-      &_icon {
-        width: 36px;
-        height: 36px;
-        padding: 6px;
-        flex-shrink: 0;
-        margin: 4px 0;
-      }
     }
 
     &__results {
@@ -540,6 +453,7 @@
         width: 28px;
         height: 28px;
         padding: 2px;
+        font-size: 24px;
       }
     }
   }

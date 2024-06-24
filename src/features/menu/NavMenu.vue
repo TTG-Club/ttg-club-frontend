@@ -1,12 +1,8 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { ref, watch } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-
   import type { TNavItem } from '@/shared/stores/NavStore';
   import { useNavStore } from '@/shared/stores/NavStore';
   import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
@@ -348,6 +344,7 @@
         height: 32px;
         padding: 4px;
         flex-shrink: 0;
+        font-size: 24px;
       }
     }
 

@@ -1,10 +1,9 @@
 <script lang="ts" setup>
   import clsx from 'clsx';
   import { omit } from 'lodash-es';
-  import { computed, ref } from 'vue';
   import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 
-  import { DEFAULT_KEY_FIELD } from '@/shared/constants';
+  import { DEFAULT_KEY_FIELD } from '@/shared/const';
   import type {
     TVirtualListProps,
     TVirtualListRef,

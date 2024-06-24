@@ -1,8 +1,7 @@
 <script setup lang="ts">
-  import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
   import { icons } from '@/shared/utils/icons';
 

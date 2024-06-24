@@ -1,10 +1,9 @@
 <script lang="ts" setup>
   import clsx from 'clsx';
   import { omit } from 'lodash-es';
-  import { computed } from 'vue';
 
-  import { useResponsiveValues } from '@/shared/composables/useResponsiveValues';
-  import { DEFAULT_KEY_FIELD } from '@/shared/constants';
+  import { useResponsiveValues } from '@/shared/composable/useResponsiveValues';
+  import { DEFAULT_KEY_FIELD } from '@/shared/const';
   import type { AnyObject } from '@/shared/types/Utility';
   import ListRow from '@/shared/ui/virtual-views/ListRow.vue';
   import type { TVirtualGridListProps } from '@/shared/ui/virtual-views/VirtualGridList/types';

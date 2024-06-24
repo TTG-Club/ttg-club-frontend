@@ -1,6 +1,4 @@
 import { sortBy } from 'lodash-es';
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
 
 import BookmarksApi from '@/features/bookmarks/api';
 import type {

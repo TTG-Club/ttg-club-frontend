@@ -1,14 +1,11 @@
 <script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink } from 'vue-router';
-
   import { httpClient } from '@/shared/api';
   import type { Maybe } from '@/shared/types/Utility';
   import type {
     IScreenItem,
     IScreenLink,
   } from '@/shared/types/workshop/Screens.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 

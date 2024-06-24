@@ -1,8 +1,4 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, ref } from 'vue';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
 
@@ -101,15 +97,6 @@
         size="sm"
         @click.left.exact.prevent="isEdit = !isEdit"
       />
-
-      <label
-        v-if="false"
-        class="bookmarks__search"
-      >
-        <span class="bookmarks__search--icon">
-          <svg-icon icon="search" />
-        </span>
-      </label>
     </div>
 
     <div

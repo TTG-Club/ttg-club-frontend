@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { groupBy, sortBy } from 'lodash-es';
-  import { computed } from 'vue';
 
   import RawContent from '@/shared/ui/RawContent.vue';
 

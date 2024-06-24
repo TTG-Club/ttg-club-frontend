@@ -1,16 +1,10 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-
   import { getIconName } from '@/shared/utils/icons';
 
-  interface Props {
-    icon: string;
-    size?: string | number;
-    raw?: boolean;
-  }
+  import type { SvgIconProps } from './types';
 
-  const props = withDefaults(defineProps<Props>(), {
-    size: 24,
+  const props = withDefaults(defineProps<SvgIconProps>(), {
+    size: '1em',
     raw: false,
   });
 
@@ -41,21 +35,25 @@
 
     return '';
   });
+
+  const RawSvgIcon = computed(() =>
+    props.raw && props.icon
+      ? defineComponent({ template: props.icon })
+      : undefined,
+  );
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-v-html -->
-  <i
-    v-if="icon && raw"
-    :class="$style['svg-icon']"
-    v-html="icon"
-  />
-  <!-- eslint-enable vue/no-v-html -->
+  <n-icon
+    v-if="icon && raw && RawSvgIcon"
+    :class="$style.svgIcon"
+  >
+    <raw-svg-icon />
+  </n-icon>
 
-  <i
-    v-else-if="!error"
-    :class="$style['svg-icon']"
-    role="img"
+  <n-icon
+    v-else-if="!error && !raw"
+    :class="$style.svgIcon"
   >
     <svg
       aria-hidden="true"
@@ -64,7 +62,7 @@
     >
       <use :href="iconName" />
     </svg>
-  </i>
+  </n-icon>
 
   <span
     v-else
@@ -75,7 +73,7 @@
 </template>
 
 <style lang="scss" module>
-  .svg-icon {
+  .svgIcon {
     font-size: v-bind(sizeCalculated);
     overflow: hidden;
     flex-shrink: 0;
@@ -88,7 +86,7 @@
     text-align: center;
     transform: translateZ(0);
 
-    > svg {
+    svg {
       width: 1em;
       height: 1em;
     }

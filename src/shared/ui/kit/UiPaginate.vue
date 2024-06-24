@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { VuePaginate } from '@svifty7/vue-paginate';
 
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import type { TVuePaginateProps } from '@svifty7/vue-paginate/types/VuePaginate';
 
@@ -97,6 +97,7 @@
     &__next {
       color: var(--primary);
       border-color: var(--primary);
+      font-size: 21px;
 
       svg {
         width: 21px;

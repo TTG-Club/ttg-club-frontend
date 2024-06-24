@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
-  import localforage from 'localforage';
   import {
     groupBy,
     max,
@@ -9,25 +7,21 @@
     throttle,
     toNumber,
   } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, ref, toRaw } from 'vue';
 
   import { httpClient } from '@/shared/api';
-  import { DB_NAME } from '@/shared/constants/UI';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
-  import type { TSpellItem } from '@/shared/types/character/Spells';
-  import type { TArtifactItem } from '@/shared/types/inventory/MagicItems';
+  import type { TSpellItem, TSpellLink } from '@/shared/types/character/Spells';
+  import type {
+    TArtifactItem,
+    TArtifactLink,
+  } from '@/shared/types/inventory/MagicItems';
   import type {
     TGroupedTraderLink,
+    TTraderItem,
     TTraderLink,
   } from '@/shared/types/tools/Trader';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import UiSwitch from '@/shared/ui/kit/UiSwitch.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
@@ -46,11 +40,6 @@
   const uiStore = useUIStore();
   const { isMobile } = storeToRefs(uiStore);
 
-  const store = localforage.createInstance({
-    name: DB_NAME,
-    storeName: 'trader',
-  });
-
   const config = ref<TConfig>({
     magicLevels: [],
     sources: [],
@@ -63,14 +52,14 @@
   }>({
     magicLevel: 1,
     persuasion: 1,
-    unique: true,
+    unique: false,
   });
 
   const settings = ref<{
     opened: boolean;
     grouping: boolean;
     max: boolean;
-    priceSource?: TSource;
+    priceSource?: TSource['shortName'];
   }>({
     opened: !isMobile.value,
     grouping: true,
@@ -86,31 +75,24 @@
 
   const selected = ref<{
     index?: number;
-    item?: TArtifactItem;
+    item?: TGroupedTraderLink;
   }>({});
 
   const loading = ref(false);
+  const loadingDetail = ref(false);
   const error = ref(false);
 
   const controllers = ref(new AbortController());
 
   const showRightSide = ref(false);
 
-  const magicLevel = computed<TNameValue<number>>({
-    get: () =>
-      config.value.magicLevels.find((el) => el.value === form.value.magicLevel),
-    set: (v) => {
-      form.value.magicLevel = v.value;
-    },
-  });
-
-  const groupedResults = computed(() => {
+  const groupedResults = computed<Array<TGroupedTraderLink>>(() => {
     const getCurrentPrice = (price: Record<string, number | null>) => {
       if (!price) {
         return null;
       }
 
-      const priceKey = settings.value.priceSource?.shortName;
+      const priceKey = settings.value.priceSource;
 
       if (!priceKey) {
         return null;
@@ -150,7 +132,9 @@
           .filter((price) => typeof price === 'number'),
       );
 
-      return settings.value.max ? max(prices) : Math.round(mean(prices));
+      const res = settings.value.max ? max(prices) : Math.round(mean(prices));
+
+      return typeof res !== 'number' ? null : res;
     };
 
     const groups = Object.values<Array<TTraderLink>>(
@@ -181,137 +165,6 @@
     detailCard.value.spell = undefined;
   };
 
-  const updateUnique = async (value: boolean) => {
-    try {
-      await store.ready();
-
-      form.value.unique = value;
-
-      return store.setItem<boolean>('unique', value);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const restoreUnique = async () => {
-    try {
-      await store.ready();
-
-      const restored = await store.getItem<boolean>('unique');
-      const value = restored !== null ? restored : true;
-
-      await updateUnique(value);
-
-      return restored;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const updateGrouping = async (value: boolean) => {
-    try {
-      await store.ready();
-
-      settings.value.grouping = value;
-
-      return store.setItem<boolean>('grouping', value);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const restoreGrouping = async () => {
-    try {
-      await store.ready();
-
-      const restored = await store.getItem<boolean>('grouping');
-      const value = restored !== null ? restored : true;
-
-      await updateGrouping(value);
-
-      return restored;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const updateUsingMaxPrice = async (value: boolean) => {
-    try {
-      await store.ready();
-
-      settings.value.max = value;
-
-      return store.setItem<boolean>('maxPrice', value);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const restoreUsingMaxPrice = async () => {
-    try {
-      await store.ready();
-
-      const restored = await store.getItem<boolean>('maxPrice');
-      const value = restored !== null ? restored : false;
-
-      await updateUsingMaxPrice(value);
-
-      return restored;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const restorePriceSource = async (sources: Array<TSource>) => {
-    try {
-      if (!sources.length) {
-        return undefined;
-      }
-
-      if (sources.length < 2) {
-        return sources[0];
-      }
-
-      await store.ready();
-
-      const sourceKey =
-        await store.getItem<TSource['shortName']>('priceSource');
-
-      if (!sourceKey) {
-        return sources[0];
-      }
-
-      const oldSource = sources.find(
-        (source) => source.shortName === sourceKey,
-      );
-
-      if (!oldSource) {
-        return sources[0];
-      }
-
-      settings.value.priceSource = oldSource;
-
-      return oldSource;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const updatePriceSource = async (source: TSource) => {
-    try {
-      await store.ready();
-
-      settings.value.priceSource = source;
-
-      return store.setItem<TSource['shortName']>(
-        'priceSource',
-        source.shortName,
-      );
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
   const getConfig = async () => {
     try {
       const resp = await httpClient.get<TConfig>({
@@ -324,8 +177,8 @@
         return;
       }
 
-      config.value = resp.data as TConfig;
-      settings.value.priceSource = await restorePriceSource(resp.data.sources);
+      config.value = resp.data;
+      settings.value.priceSource = resp.data.sources[0].shortName;
     } catch (err) {
       errorHandler(err);
     }
@@ -362,7 +215,7 @@
 
       clearSelected();
 
-      results.value = data as Array<TTraderLink>;
+      results.value = data;
     } catch (err) {
       errorHandler(err);
     } finally {
@@ -370,9 +223,11 @@
     }
   }, 300);
 
-  const getItemDetail = async <T, L>(url: L['url']): Promise<T> => {
+  const getItemDetail = async <T extends { url: string }, R>(
+    url: T['url'],
+  ): Promise<R> => {
     try {
-      const { status, statusText, data } = await httpClient.post<T>({ url });
+      const { status, statusText, data } = await httpClient.post<R>({ url });
 
       if (status !== 200) {
         error.value = true;
@@ -386,7 +241,9 @@
     }
   };
 
-  const selectItem = async (index) => {
+  const selectItem = async (index: number) => {
+    loadingDetail.value = true;
+
     try {
       error.value = false;
 
@@ -394,15 +251,14 @@
 
       const item = groupedResults.value[index];
 
-      detailCard.value.item = await getItemDetail<TArtifactItem, TTraderLink>(
+      detailCard.value.item = await getItemDetail<TArtifactLink, TTraderItem>(
         item.url,
       );
 
       if (item.spell?.url) {
-        detailCard.value.spell = await getItemDetail<
-          TSpellItem,
-          TTraderLink['spell']
-        >(item.spell.url);
+        detailCard.value.spell = await getItemDetail<TSpellLink, TSpellItem>(
+          item.spell.url,
+        );
       }
 
       selected.value = {
@@ -416,6 +272,8 @@
 
       clearSelected();
       errorHandler(err);
+    } finally {
+      loadingDetail.value = false;
     }
   };
 
@@ -426,9 +284,6 @@
   tryOnBeforeMount(async () => {
     showRightSide.value = !isMobile.value;
 
-    await restoreUnique();
-    await restoreGrouping();
-    await restoreUsingMaxPrice();
     await getConfig();
   });
 </script>
@@ -439,116 +294,111 @@
     :force-fullscreen-state="false"
   >
     <template #fixed>
-      <form
+      <n-form
         class="tools_settings"
-        @submit.prevent="sendForm"
+        @submit.stop.prevent="sendForm"
       >
-        <div class="tools_settings__row">
-          <div class="tools_settings__column">
-            <div class="row">
-              <span class="label">Количество магии в мире:</span>
-
-              <ui-select
-                v-model="magicLevel"
-                :options="config.magicLevels"
-                label="name"
-                track-by="value"
-              >
-                <template #placeholder> Количество </template>
-              </ui-select>
-            </div>
-
-            <div class="row">
-              <span class="label">Результат проверки Харизмы (Убеждение):</span>
-
-              <ui-input
-                v-model="form.persuasion"
-                class="form-control select"
-                type="number"
-                :min="1"
-                :max="50"
-                placeholder="Харизма (Убеждение)"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          v-if="settings.opened"
-          class="tools_settings__row"
+        <n-grid
+          cols="1 350:3"
+          :x-gap="12"
         >
-          <div class="tools_settings__column">
-            <div class="row">
-              <div class="tools_settings__row">
-                <ui-checkbox
-                  :model-value="form.unique"
-                  type="toggle"
-                  @update:model-value="updateUnique"
-                >
-                  Только уникальные
-                </ui-checkbox>
-              </div>
-
-              <div
-                v-if="!form.unique"
-                class="tools_settings__row"
-              >
-                <ui-checkbox
-                  :model-value="settings.grouping"
-                  type="toggle"
-                  @update:model-value="updateGrouping"
-                >
-                  Группировать одинаковые
-                </ui-checkbox>
-              </div>
-
-              <div
-                v-if="!form.unique && settings.grouping"
-                class="tools_settings__row"
-              >
-                <ui-checkbox
-                  :model-value="settings.max"
-                  type="toggle"
-                  @update:model-value="updateUsingMaxPrice"
-                >
-                  Отображать максимальную цену
-                </ui-checkbox>
-              </div>
-            </div>
-
-            <div
-              v-if="config.sources.length"
-              class="row align-right"
-            >
-              <div class="tools_settings__row">
-                <span class="label">Источник цены:</span>
-
-                <div class="checkbox-group">
-                  <ui-switch
-                    track-by="shortName"
-                    label="shortName"
-                    :model-value="settings.priceSource"
-                    :options="config.sources"
-                    @update:model-value="updatePriceSource"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm()">
-            Найти торговца
-          </ui-button>
-
-          <ui-button
-            @click.left.exact.prevent="settings.opened = !settings.opened"
+          <n-form-item-gi
+            span="3"
+            label="Проверка харизмы (Убеждение)"
           >
-            Настройки
-          </ui-button>
-        </div>
-      </form>
+            <n-input-number
+              v-model:value="form.persuasion"
+              :min="1"
+            />
+          </n-form-item-gi>
+
+          <n-form-item-gi
+            span="2"
+            label="Количество магии"
+          >
+            <n-select
+              v-model:value="form.magicLevel"
+              value-field="value"
+              label-field="name"
+              :options="config.magicLevels"
+            />
+          </n-form-item-gi>
+
+          <n-form-item-gi
+            span="1"
+            label="Источник цены"
+          >
+            <n-radio-group v-model:value="settings.priceSource">
+              <n-radio-button
+                v-for="source in config.sources"
+                :key="source.shortName"
+                :value="source.shortName"
+                :label="source.shortName"
+              />
+            </n-radio-group>
+          </n-form-item-gi>
+        </n-grid>
+
+        <n-space vertical>
+          <n-collapse-transition :show="settings.opened">
+            <n-space vertical>
+              <n-checkbox
+                v-model:checked="form.unique"
+                :focusable="false"
+              >
+                Только уникальные
+              </n-checkbox>
+
+              <n-checkbox
+                v-model:checked="settings.grouping"
+                :focusable="false"
+                :disabled="form.unique"
+              >
+                Группировать одинаковые
+              </n-checkbox>
+
+              <n-checkbox
+                v-model:checked="settings.max"
+                :focusable="false"
+                :disabled="form.unique || !settings.grouping"
+              >
+                Отображать максимальную цену
+              </n-checkbox>
+            </n-space>
+          </n-collapse-transition>
+
+          <n-space>
+            <n-button
+              type="primary"
+              attr-type="submit"
+              :focusable="false"
+            >
+              Найти торговца
+            </n-button>
+
+            <n-button
+              secondary
+              :focusable="false"
+              @click.left.exact.prevent="settings.opened = !settings.opened"
+            >
+              Настройки
+            </n-button>
+          </n-space>
+        </n-space>
+      </n-form>
+    </template>
+
+    <template #default>
+      <magic-item-link
+        v-for="(item, key) in groupedResults"
+        :key="item.url + key"
+        :is-active="selected.index === key"
+        :magic-item="item"
+        :to="{ path: item.url }"
+        in-tools
+        in-trader
+        @select-item="selectItem(key)"
+      />
     </template>
 
     <template #right-side>
@@ -556,14 +406,70 @@
         <template #fixed>
           <section-header
             :subtitle="selected.item?.name.eng || 'On sale'"
-            :title="selected.item?.name.rus || 'В продаже'"
             @close="close"
-          />
+          >
+            <template #title>
+              <n-skeleton
+                v-if="loadingDetail"
+                round
+                :width="250"
+              />
+
+              <template v-else-if="selected.item?.name.rus">
+                <n-performant-ellipsis>
+                  {{ selected.item.name.rus }}
+                </n-performant-ellipsis>
+              </template>
+
+              <template v-else> В продаже </template>
+            </template>
+
+            <template #subtitle>
+              <n-skeleton
+                v-if="loadingDetail"
+                round
+                text
+                :width="150"
+              />
+
+              <template v-else-if="selected.item?.name.eng">
+                <n-performant-ellipsis>
+                  {{ selected.item.name.eng }}
+                </n-performant-ellipsis>
+              </template>
+
+              <template v-else> On sale </template>
+            </template>
+          </section-header>
         </template>
 
         <template #default>
           <div
-            v-if="!selected.item"
+            v-if="loadingDetail"
+            class="content-padding"
+          >
+            <n-skeleton
+              text
+              round
+              :repeat="2"
+            />
+
+            <n-skeleton
+              text
+              round
+              :repeat="2"
+              width="70%"
+            />
+
+            <n-skeleton
+              text
+              round
+              width="30%"
+            />
+          </div>
+
+          <div
+            v-else-if="!selected.item"
             class="content-padding trader__empty"
           >
             <p>Список товаров пуст.</p>
@@ -582,19 +488,6 @@
           </div>
         </template>
       </content-detail>
-    </template>
-
-    <template #default>
-      <magic-item-link
-        v-for="(item, key) in groupedResults"
-        :key="item.url + key"
-        :is-active="selected.index === key"
-        :magic-item="item"
-        :to="{ path: item.url }"
-        in-tools
-        in-trader
-        @select-item="selectItem(key)"
-      />
     </template>
   </content-layout>
 </template>

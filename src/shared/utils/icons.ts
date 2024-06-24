@@ -2,7 +2,7 @@ const iconAvailList = Object.fromEntries(
   Object.entries(
     import.meta.glob('@/assets/icons/svg/**/*.svg', {
       import: 'default',
-      as: 'raw',
+      query: '?raw',
       eager: true,
     }),
   )

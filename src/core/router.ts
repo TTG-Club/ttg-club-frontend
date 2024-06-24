@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import pinia from '@/core/store';
 import { routes } from '@/pages';
 
-import { useMeta } from '@/shared/composables/useMeta';
-import { useMetrics } from '@/shared/composables/useMetrics';
-import { useNavPopover } from '@/shared/composables/useNavPopover';
-import { useRouterHelpers } from '@/shared/composables/useRouterHelpers';
+import { useMeta } from '@/shared/composable/useMeta';
+import { useMetrics } from '@/shared/composable/useMetrics';
+import { useNavPopover } from '@/shared/composable/useNavPopover';
+import { useRouterHelpers } from '@/shared/composable/useRouterHelpers';
 import { useNavStore } from '@/shared/stores/NavStore';
 import { useRollStore } from '@/shared/stores/RollStore';
+
+import pinia from './store';
 
 const router = createRouter({
   history: createWebHistory(),

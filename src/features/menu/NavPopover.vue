@@ -1,8 +1,5 @@
 <script setup lang="ts">
-  import { useVModel } from '@vueuse/core';
-  import { computed, watch } from 'vue';
-
-  import { useNavPopover } from '@/shared/composables/useNavPopover';
+  import { useNavPopover } from '@/shared/composable/useNavPopover';
 
   const props = withDefaults(
     defineProps<{
@@ -104,6 +101,7 @@
       position: relative;
       width: 100%;
       height: 100%;
+      font-size: 24px;
 
       &.is-active {
         z-index: 120;

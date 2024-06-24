@@ -1,5 +1,3 @@
-import { computed } from 'vue';
-
 import { RollNotificationMode, useRollStore } from '@/shared/stores/RollStore';
 
 export function useDiceHistory() {

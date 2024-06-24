@@ -1,9 +1,7 @@
 import { type RollBase } from 'dice-roller-parser';
-import { h, ref } from 'vue';
 import { POSITION, useToast } from 'vue-toastification';
 
-import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+import { ToastEventBus } from '@/shared/config';
 import { RollNotificationMode, useRollStore } from '@/shared/stores/RollStore';
 import { Event, eventBus, type Events } from '@/shared/utils/eventBus';
 import { RollRenderer, isCritical, type RollType } from '@/shared/utils/roll';

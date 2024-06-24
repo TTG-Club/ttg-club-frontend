@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   type SocialLinkItem = {
     name: string;
@@ -44,10 +44,7 @@
         rel="noopener noreferrer"
         target="_blank"
       >
-        <svg-icon
-          :icon="link.icon"
-          size="1em"
-        />
+        <svg-icon :icon="link.icon" />
       </a>
     </div>
   </div>
