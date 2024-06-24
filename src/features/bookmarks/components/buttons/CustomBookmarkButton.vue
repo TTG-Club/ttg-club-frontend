@@ -121,7 +121,7 @@
 
 <template>
   <n-button-group>
-    <n-tooltip trigger="click">
+    <n-tooltip>
       <template #trigger>
         <n-button
           :loading="inProgress"
