@@ -37,7 +37,9 @@
   });
 
   const RawSvgIcon = computed(() =>
-    props.raw ? defineComponent({ template: props.icon }) : undefined,
+    props.raw && props.icon
+      ? defineComponent({ template: props.icon })
+      : undefined,
   );
 </script>
 
