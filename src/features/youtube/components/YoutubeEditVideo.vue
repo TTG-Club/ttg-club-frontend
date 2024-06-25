@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-  import useVuelidate from '@vuelidate/core';
-  import { helpers, required } from '@vuelidate/validators';
   import { cloneDeep } from 'lodash-es';
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
   import { ToastEventBus } from '@/shared/config';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
+  import { ruleYoutubeName } from '@/shared/utils/validation-rules';
 
   import { YoutubeApi } from '@/features/youtube/api';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import type { FormInst } from 'naive-ui';
 
   type TProp = {
     modelValue: boolean;
@@ -31,23 +31,17 @@
 
   const isShow = useVModel(props, 'modelValue', emit);
   const toast = useToast(ToastEventBus);
+  const formRef = ref<FormInst>();
 
   const isLoading = ref(false);
-  const state = reactive(cloneDeep(props.video));
+  const model = reactive(cloneDeep(props.video));
 
-  const rules = {
-    name: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required,
-      ),
-    },
-  };
-
-  const v$ = useVuelidate(rules, state);
+  const rules = reactive({
+    name: ruleYoutubeName(),
+  });
 
   const reset = () => {
-    Object.assign(state, cloneDeep(props.video));
+    Object.assign(model, cloneDeep(props.video));
   };
 
   const close = () => {
@@ -57,6 +51,8 @@
     isShow.value = false;
   };
 
+  const validate = () => formRef.value!.validate();
+
   const save = async () => {
     if (isLoading.value) {
       return Promise.resolve();
@@ -65,17 +61,17 @@
     isLoading.value = true;
 
     try {
-      await v$.value.$reset();
+      await validate();
+    } catch (err) {
+      toast.error('Проверьте правильность заполнения полей');
 
-      const result = await v$.value.$validate();
+      isLoading.value = false;
 
-      if (!result) {
-        toast.error('Проверьте правильность заполнения полей');
+      return Promise.reject(err);
+    }
 
-        return Promise.resolve();
-      }
-
-      const data = await YoutubeApi.edit(state);
+    try {
+      const data = await YoutubeApi.edit(model);
 
       emit('saved', data);
       close();
@@ -99,10 +95,8 @@
 <template>
   <vue-final-modal
     v-model="isShow"
-    :class="$style.modal"
     content-transition="vfm-fade"
     esc-to-close
-    focus-trap
     overlay-transition="vfm-fade"
     v-bind="$attrs"
   >
@@ -111,48 +105,54 @@
         <div :class="$style.header">
           <h2 :class="$style.title">Изменение видео</h2>
 
-          <ui-button
-            icon="close"
-            type="secondary"
+          <n-button
+            secondary
             @click.left.exact.prevent="close"
-          />
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
         </div>
 
-        <form
+        <n-form
+          ref="formRef"
+          :rules
+          :model
           :class="$style.form"
           @keyup.enter.exact.prevent="save"
           @submit.prevent.stop="save"
         >
-          <div :class="$style.row">
-            <ui-input
-              v-model="v$.name.$model"
-              :error-text="v$.name.$dirty ? v$.name.$errors?.[0]?.$message : ''"
+          <n-form-item
+            path="name"
+            label="Название видео"
+          >
+            <n-input
+              v-model:value.trim="model.name"
               :autocomplete="false"
               autocapitalize="off"
               autocorrect="off"
               placeholder="Название"
-              required
-              @blur="v$.name.$touch()"
-              @input="v$.name.$reset()"
             />
-          </div>
-        </form>
+          </n-form-item>
 
-        <div :class="$style.controls">
-          <ui-button
-            :loading="isLoading"
-            @click.left.exact.prevent="save"
-          >
-            Сохранить
-          </ui-button>
+          <n-flex :wrap="false">
+            <n-button
+              :loading="isLoading"
+              type="primary"
+              @click.left.exact.prevent="save"
+            >
+              Сохранить
+            </n-button>
 
-          <ui-button
-            type="secondary"
-            @click.left.exact.prevent="close"
-          >
-            Отменить
-          </ui-button>
-        </div>
+            <n-button
+              secondary
+              @click.left.exact.prevent="close"
+            >
+              Отменить
+            </n-button>
+          </n-flex>
+        </n-form>
       </div>
     </div>
   </vue-final-modal>
@@ -160,9 +160,6 @@
 
 <style lang="scss" module>
   @use '@/assets/styles/variables/breakpoints' as *;
-
-  .modal {
-  }
 
   .container {
     background-color: var(--bg-secondary);
@@ -199,17 +196,6 @@
   }
 
   .form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px 0;
-  }
-
-  .row {
-  }
-
-  .controls {
-    display: flex;
-    align-items: flex-start;
+    padding: 24px 0 0;
   }
 </style>

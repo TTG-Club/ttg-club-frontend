@@ -1,196 +1,156 @@
-<script lang="ts">
-  import useVuelidate from '@vuelidate/core';
-  import { helpers, or } from '@vuelidate/validators';
+<script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import {
-    validateEmailFormat,
-    validatePwdSpecial,
-    validateRequired,
-    validateUsernameSpecialChars,
-  } from '@/shared/utils/authChecks';
+    rulePassword,
+    ruleUsernameOrEmail,
+  } from '@/shared/utils/validation-rules/authChecks';
 
-  export default defineComponent({
-    components: {
-      UiButton,
-      UiCheckbox,
-      UiInput,
-    },
-    setup(props, { emit }) {
-      const userStore = useUserStore();
-      const { sendLoginMetrics } = useMetrics();
-      const toast = useToast(ToastEventBus);
-      const usernameOrEmail = ref('');
-      const password = ref('');
-      const remember = ref(true);
-      const success = ref(false);
-      const inProgress = ref(false);
+  import type { FormInst, FormRules } from 'naive-ui';
 
-      const rules = reactive({
-        usernameOrEmail: {
-          required: validateRequired(),
-          format: helpers.withMessage(
-            'Поле заполнено неверно',
-            or(validateUsernameSpecialChars(), validateEmailFormat()),
-          ),
-        },
-        password: {
-          required: validateRequired(),
-          format: validatePwdSpecial(),
-        },
-      });
+  const emit = defineEmits<{
+    (e: 'close'): void;
+    (e: 'switch:reg'): void;
+    (e: 'switch:change-password'): void;
+  }>();
 
-      const v$ = useVuelidate(rules, {
-        usernameOrEmail,
-        password,
-        remember,
-      });
+  const userStore = useUserStore();
+  const { sendLoginMetrics } = useMetrics();
+  const toast = useToast(ToastEventBus);
+  const success = ref(false);
+  const inProgress = ref(false);
+  const formRef = ref<FormInst>();
 
-      const successHandler = () => {
-        success.value = true;
-
-        toast.success('Вы успешно авторизовались!');
-        emit('close');
-      };
-
-      const onSubmit = async () => {
-        inProgress.value = true;
-
-        await v$.value.$reset();
-
-        const result = await v$.value.$validate();
-
-        if (success.value || !result) {
-          toast.error('Проверьте правильность заполнения полей');
-
-          inProgress.value = false;
-
-          return;
-        }
-
-        try {
-          await userStore.authorization({
-            usernameOrEmail: usernameOrEmail.value.trim(),
-            password: password.value.trim(),
-            remember: remember.value,
-          });
-
-          sendLoginMetrics();
-          successHandler();
-        } catch (err: any) {
-          if (!err?.response?.status) {
-            toast.error('Неизвестная ошибка');
-
-            return;
-          }
-
-          switch (err.response.status) {
-            case 401:
-              toast.error('Неверный логин или пароль');
-
-              break;
-            default:
-              toast.error('Неизвестная ошибка');
-
-              break;
-          }
-        } finally {
-          inProgress.value = false;
-        }
-      };
-
-      return {
-        v$,
-        usernameOrEmail,
-        password,
-        remember,
-        success,
-        inProgress,
-        onSubmit,
-      };
-    },
+  const model = reactive({
+    usernameOrEmail: '',
+    password: '',
+    remember: true,
   });
+
+  const rules: FormRules = reactive({
+    usernameOrEmail: ruleUsernameOrEmail(),
+    password: rulePassword(),
+  });
+
+  const successHandler = () => {
+    success.value = true;
+
+    toast.success('Вы успешно авторизовались!');
+    emit('close');
+  };
+
+  const validate = () => formRef.value!.validate();
+
+  const onSubmit = async () => {
+    if (success.value) {
+      emit('close');
+
+      return;
+    }
+
+    inProgress.value = true;
+
+    try {
+      await validate();
+    } catch (err) {
+      toast.error('Проверьте правильность заполнения полей');
+
+      inProgress.value = false;
+
+      return;
+    }
+
+    try {
+      await userStore.authorization(model);
+
+      sendLoginMetrics();
+      successHandler();
+    } catch (err: any) {
+      if (!err?.response?.status) {
+        toast.error('Неизвестная ошибка');
+
+        return;
+      }
+
+      switch (err.response.status) {
+        case 401:
+          toast.error('Неверный логин или пароль');
+
+          break;
+        default:
+          toast.error('Неизвестная ошибка');
+
+          break;
+      }
+    } finally {
+      inProgress.value = false;
+    }
+  };
 </script>
 
 <template>
-  <form
-    class="login form"
+  <n-form
+    ref="formRef"
+    :rules
+    :model
+    label-placement="left"
     @submit.prevent="onSubmit"
     @keyup.enter.prevent.stop
   >
-    <div class="form__row">
-      <ui-input
-        v-model.trim="v$.usernameOrEmail.$model"
-        :error-text="
-          v$.usernameOrEmail.$dirty
-            ? v$.usernameOrEmail.$errors?.[0]?.$message
-            : ''
-        "
+    <n-form-item path="usernameOrEmail">
+      <n-input
+        v-model:value.trim="model.usernameOrEmail"
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
         placeholder="Логин или электронная почта"
-        required
-        @blur="v$.usernameOrEmail.$touch()"
-        @input="v$.usernameOrEmail.$reset()"
+        autofocus
       />
-    </div>
+    </n-form-item>
 
-    <div class="form__row">
-      <ui-input
-        v-model.trim="v$.password.$model"
-        :error-text="
-          v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''
-        "
+    <n-form-item path="password">
+      <n-input
+        v-model:value.trim="model.password"
         autocapitalize="off"
         autocomplete="current-password"
         autocorrect="off"
         type="password"
         placeholder="Пароль"
-        required
-        @blur="v$.password.$touch()"
-        @input="v$.password.$reset()"
+        show-password-on="click"
       />
-    </div>
+    </n-form-item>
 
-    <div class="form__row">
-      <ui-checkbox
-        v-model="remember"
-        type="toggle"
-      >
-        Запомнить меня
-      </ui-checkbox>
-    </div>
+    <n-form-item>
+      <n-checkbox v-model:checked="model.remember"> Запомнить меня </n-checkbox>
+    </n-form-item>
 
-    <div class="form__row">
-      <ui-button
+    <n-flex :wrap="false">
+      <n-button
         :disabled="success"
         :loading="inProgress"
+        type="primary"
         native-type="submit"
         @click.left.exact.prevent="onSubmit"
       >
         Вход
-      </ui-button>
+      </n-button>
 
-      <ui-button
-        type="secondary"
+      <n-button
+        secondary
         @click.left.exact.prevent="$emit('switch:reg')"
       >
         Регистрация
-      </ui-button>
+      </n-button>
 
-      <ui-button
-        type="secondary"
+      <n-button
+        secondary
         @click.left.exact.prevent="$emit('switch:change-password')"
       >
         Забыли пароль?
-      </ui-button>
-    </div>
-  </form>
+      </n-button>
+    </n-flex>
+  </n-form>
 </template>

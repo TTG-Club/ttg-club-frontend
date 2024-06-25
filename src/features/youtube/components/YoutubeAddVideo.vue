@@ -1,15 +1,18 @@
 <script setup lang="ts">
-  import useVuelidate from '@vuelidate/core';
-  import { helpers, required } from '@vuelidate/validators';
   import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
   import { ToastEventBus } from '@/shared/config';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
+  import {
+    ruleYoutubeId,
+    ruleYoutubeName,
+  } from '@/shared/utils/validation-rules';
 
   import { YoutubeApi } from '@/features/youtube/api';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+  import type { FormInst } from 'naive-ui';
 
   export type TYoutubeVideoCreate = Pick<TYoutubeVideo, 'id' | 'name'>;
 
@@ -31,37 +34,23 @@
 
   const isShow = useVModel(props, 'modelValue', emit);
   const toast = useToast(ToastEventBus);
+  const formRef = ref<FormInst>();
 
   const isLoading = ref(false);
 
-  const video = reactive<TYoutubeVideoCreate>({
+  const model = reactive<TYoutubeVideoCreate>({
     id: '',
     name: '',
   });
 
-  const rules = {
-    id: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required,
-      ),
-      format: helpers.withMessage('Поле заполнено неверно', (value) =>
-        /([^"&?/\s]{11})/gi.test(value as string),
-      ),
-    },
-    name: {
-      required: helpers.withMessage(
-        'Поле обязательно для заполнения',
-        required,
-      ),
-    },
-  };
-
-  const v$ = useVuelidate(rules, video);
+  const rules = reactive({
+    id: ruleYoutubeId(),
+    name: ruleYoutubeName(),
+  });
 
   const clear = () => {
-    video.id = '';
-    video.name = '';
+    model.id = '';
+    model.name = '';
   };
 
   const close = () => {
@@ -71,6 +60,8 @@
     isShow.value = false;
   };
 
+  const validate = () => formRef.value!.validate();
+
   const add = async () => {
     if (isLoading.value) {
       return Promise.resolve();
@@ -79,17 +70,17 @@
     isLoading.value = true;
 
     try {
-      await v$.value.$reset();
+      await validate();
+    } catch (err) {
+      toast.error('Проверьте правильность заполнения полей');
 
-      const result = await v$.value.$validate();
+      isLoading.value = false;
 
-      if (!result) {
-        toast.error('Проверьте правильность заполнения полей');
+      return Promise.reject(err);
+    }
 
-        return Promise.resolve();
-      }
-
-      const data = await YoutubeApi.add(video);
+    try {
+      const data = await YoutubeApi.add(model);
 
       emit('added', data);
       close();
@@ -113,10 +104,8 @@
 <template>
   <vue-final-modal
     v-model="isShow"
-    :class="$style.modal"
     content-transition="vfm-fade"
     esc-to-close
-    focus-trap
     overlay-transition="vfm-fade"
     v-bind="$attrs"
   >
@@ -125,63 +114,70 @@
         <div :class="$style.header">
           <h2 :class="$style.title">Новое видео</h2>
 
-          <ui-button
-            icon="close"
-            type="secondary"
+          <n-button
+            secondary
             @click.left.exact.prevent="close"
-          />
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
         </div>
 
-        <form
+        <n-form
+          ref="formRef"
+          :rules
+          :model
           :class="$style.form"
           @keyup.enter.exact.prevent="add"
           @submit.prevent.stop="add"
         >
-          <div :class="$style.row">
-            <ui-input
-              v-model="v$.id.$model"
-              :max-length="11"
-              :error-text="v$.id.$dirty ? v$.id.$errors?.[0]?.$message : ''"
+          <n-form-item
+            path="id"
+            label="ID видео"
+          >
+            <n-input
+              v-model:value.trim="model.id"
+              :maxlength="11"
+              :minlength="11"
               :autocomplete="false"
               autocapitalize="off"
               autocorrect="off"
               placeholder="ID"
-              required
-              @blur="v$.id.$touch()"
-              @input="v$.id.$reset()"
+              autofocus
             />
-          </div>
+          </n-form-item>
 
-          <div :class="$style.row">
-            <ui-input
-              v-model="v$.name.$model"
-              :error-text="v$.name.$dirty ? v$.name.$errors?.[0]?.$message : ''"
+          <n-form-item
+            path="name"
+            label="Название видео"
+          >
+            <n-input
+              v-model:value.trim="model.name"
               :autocomplete="false"
               autocapitalize="off"
               autocorrect="off"
               placeholder="Название"
-              required
-              @blur="v$.name.$touch()"
-              @input="v$.name.$reset()"
             />
-          </div>
-        </form>
+          </n-form-item>
 
-        <div :class="$style.controls">
-          <ui-button
-            :loading="isLoading"
-            @click.left.exact.prevent="add"
-          >
-            Сохранить
-          </ui-button>
+          <n-flex :wrap="false">
+            <n-button
+              :loading="isLoading"
+              type="primary"
+              @click.left.exact.prevent="add"
+            >
+              Сохранить
+            </n-button>
 
-          <ui-button
-            type="secondary"
-            @click.left.exact.prevent="close"
-          >
-            Отменить
-          </ui-button>
-        </div>
+            <n-button
+              secondary
+              @click.left.exact.prevent="close"
+            >
+              Отменить
+            </n-button>
+          </n-flex>
+        </n-form>
       </div>
     </div>
   </vue-final-modal>
@@ -189,9 +185,6 @@
 
 <style module lang="scss">
   @use '@/assets/styles/variables/breakpoints' as *;
-
-  .modal {
-  }
 
   .container {
     background-color: var(--bg-secondary);
@@ -228,17 +221,6 @@
   }
 
   .form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px 0;
-  }
-
-  .row {
-  }
-
-  .controls {
-    display: flex;
-    align-items: flex-start;
+    padding: 24px 0 0;
   }
 </style>

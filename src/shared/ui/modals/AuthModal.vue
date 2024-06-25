@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   import { VueFinalModal } from 'vue-final-modal';
 
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   interface IEmit {
     (e: 'close'): void;
@@ -46,12 +46,15 @@
       />
 
       <div class="auth-reg-modal__content">
-        <ui-button
+        <n-button
           class="auth-reg-modal__close"
-          icon="close"
-          type="secondary"
+          secondary
           @click.left.exact.prevent="onClose"
-        />
+        >
+          <template #icon>
+            <svg-icon icon="close" />
+          </template>
+        </n-button>
 
         <div class="auth-reg-modal__body">
           <h4>{{ title }}</h4>
@@ -117,8 +120,6 @@
     }
 
     &__close {
-      @include css_anim();
-
       position: absolute;
       top: 12px;
       right: 12px;

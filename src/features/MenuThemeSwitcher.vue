@@ -1,8 +1,6 @@
 <script setup lang="ts">
   import { useUIStore } from '@/shared/stores/UIStore';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import type { TButtonType } from '@/shared/ui/kit/button/UiButton';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
 
   import NavPopover from '@/features/menu/NavPopover.vue';
 
@@ -12,8 +10,8 @@
   const { theme, storedTheme } = storeToRefs(uiStore);
   const popover = ref<boolean>(false);
 
-  const getButtonType = (name: BasicColorSchema): TButtonType =>
-    storedTheme.value === name ? 'default' : 'secondary';
+  const getButtonType = (name: BasicColorSchema) =>
+    storedTheme.value === name ? 'primary' : 'default';
 </script>
 
 <template>
@@ -30,80 +28,51 @@
     </template>
 
     <template #default>
-      <div :class="$style.container">
-        <div :class="$style.title">
-          <span :class="$style.text"> Переключение темы </span>
-        </div>
+      <n-flex
+        vertical
+        size="large"
+        :class="$style.container"
+      >
+        <span :class="$style.text"> Переключение темы </span>
 
-        <div :class="$style.wrapper">
-          <ui-button
+        <n-flex :wrap="false">
+          <n-button
             :type="getButtonType('auto')"
             @click.left.exact.prevent="storedTheme = 'auto'"
-            >Авто</ui-button
           >
+            Авто
+          </n-button>
 
-          <ui-button
+          <n-button
             :type="getButtonType('light')"
             @click.left.exact.prevent="storedTheme = 'light'"
-            >Светлая</ui-button
           >
+            Светлая
+          </n-button>
 
-          <ui-button
+          <n-button
             :type="getButtonType('dark')"
             @click.left.exact.prevent="storedTheme = 'dark'"
-            >Тёмная</ui-button
           >
-        </div>
-      </div>
+            Тёмная
+          </n-button>
+        </n-flex>
+      </n-flex>
     </template>
   </nav-popover>
 </template>
 
 <style lang="scss" module>
-  .title {
-    @include css_anim();
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    color: var(--text-color-title);
-    cursor: default;
+  .container {
+    padding: 12px;
   }
 
   .text {
-    padding: 12px;
-    color: inherit;
-  }
-
-  .wrapper {
-    display: flex;
-    justify-content: flex-start;
-    padding: 10px;
-  }
-
-  .button {
-    @include css_anim();
-    width: 85px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--border);
-    border-radius: 8px;
+    font-weight: 600;
     color: var(--text-color-title);
-    background-color: var(--bg-transparent);
-
-    &:hover {
-      border-color: var(--primary-hover);
-    }
   }
 
   .is-active {
     background-color: var(--hover);
-  }
-
-  .selected {
-    background-color: var(--bg-theme-selected);
-    color: var(--bg-main);
-    border: none;
   }
 </style>
