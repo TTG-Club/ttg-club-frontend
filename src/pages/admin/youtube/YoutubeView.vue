@@ -121,9 +121,7 @@
             :class="$style.video"
           >
             <div :class="$style.player">
-              <div>
-                <youtube-player :video="video" />
-              </div>
+              <youtube-player :video="video" />
             </div>
 
             <div :class="$style.info">
@@ -305,6 +303,11 @@
         opacity: 1;
       }
     }
+  }
+
+  .player {
+    border-radius: 8px;
+    overflow: hidden;
   }
 
   .info {
