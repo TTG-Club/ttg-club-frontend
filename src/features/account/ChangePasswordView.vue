@@ -159,6 +159,7 @@
         autocorrect="off"
         placeholder="Электронный адрес"
         autofocus
+        size="large"
       />
     </n-form-item>
 
@@ -175,6 +176,7 @@
         placeholder="Новый пароль"
         show-password-on="click"
         autofocus
+        size="large"
       />
     </n-form-item>
 
@@ -190,6 +192,7 @@
         type="password"
         placeholder="Повторите пароль"
         show-password-on="click"
+        size="large"
       />
     </n-form-item>
 
@@ -199,6 +202,7 @@
         :loading="inProgress"
         native-type="submit"
         type="primary"
+        size="large"
         @click.left.exact.prevent="onSubmit"
       >
         {{ isOnlyPassword ? 'Изменить пароль' : 'Восстановить пароль' }}
@@ -207,6 +211,7 @@
       <n-button
         v-if="!isAuthenticated"
         secondary
+        size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
         Авторизация
