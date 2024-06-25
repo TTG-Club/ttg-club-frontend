@@ -92,7 +92,10 @@
     @submit.prevent="onSubmit"
     @keyup.enter.prevent.stop
   >
-    <n-form-item path="username">
+    <n-form-item
+      size="large"
+      path="username"
+    >
       <n-input
         v-model:value.trim="model.username"
         autocapitalize="off"
@@ -102,7 +105,10 @@
       />
     </n-form-item>
 
-    <n-form-item path="email">
+    <n-form-item
+      size="large"
+      path="email"
+    >
       <n-input
         v-model:value.trim="model.email"
         autocapitalize="off"
@@ -112,7 +118,10 @@
       />
     </n-form-item>
 
-    <n-form-item path="password">
+    <n-form-item
+      size="large"
+      path="password"
+    >
       <n-input
         v-model:value.trim="model.password"
         autocapitalize="off"
@@ -123,7 +132,10 @@
       />
     </n-form-item>
 
-    <n-form-item path="repeat">
+    <n-form-item
+      size="large"
+      path="repeat"
+    >
       <n-input
         v-model:value.trim="model.repeat"
         autocapitalize="off"
@@ -140,6 +152,7 @@
         :loading="inProgress"
         native-type="submit"
         type="primary"
+        size="large"
         @click.left.exact.prevent="onSubmit"
       >
         Регистрация
@@ -147,6 +160,7 @@
 
       <n-button
         secondary
+        size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
         Авторизация

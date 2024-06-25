@@ -85,9 +85,14 @@
       display: flex;
       width: 100%;
       max-width: 700px;
+      min-height: auto;
 
       @include media-min($sm) {
         border-radius: 8px;
+      }
+
+      @include media-min($md) {
+        min-height: 454px;
       }
     }
 
