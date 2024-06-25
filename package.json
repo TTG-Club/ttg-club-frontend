@@ -26,7 +26,6 @@
     "prepare": "is-ci || husky"
   },
   "dependencies": {
-    "@svifty7/vue-paginate": "^0.0.10",
     "@vueuse/core": "^10.11.0",
     "@vueuse/gesture": "^2.0.0",
     "@vueuse/math": "^10.11.0",
@@ -47,7 +46,6 @@
     "uuid": "^10.0.0",
     "vue": "^3.4.30",
     "vue-easy-lightbox": "^1.16.0",
-    "vue-final-modal": "^4.4.5",
     "vue-gtag": "^2.0.1",
     "vue-lazyload": "^3.0.0",
     "vue-multiselect": "^3.0.0",

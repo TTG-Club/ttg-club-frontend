@@ -1,6 +1,5 @@
 import 'virtual:svg-icons-register';
 import 'vite/modulepreload-polyfill';
-import { createVfm } from 'vue-final-modal';
 import VueGtag from 'vue-gtag';
 import VueLazyLoad from 'vue-lazyload';
 import VueTippy from 'vue-tippy';
@@ -16,11 +15,9 @@ import router from './router';
 import pinia from './store';
 import registerComponents from './utils/RegisterComponents';
 
-import 'vue-final-modal/style.css';
 import '@/assets/styles/index.scss';
 
 const app = createApp(App);
-const vfm = createVfm();
 
 app.config.globalProperties.$http = httpClient;
 
@@ -33,7 +30,6 @@ app
     ...ToastOptions,
     eventBus: ToastEventBus,
   })
-  .use(vfm)
   .directive('tippy-lazy', TippyLazy);
 
 if (!isDev) {

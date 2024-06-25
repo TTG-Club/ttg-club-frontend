@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { dateRuRU, ruRU } from 'naive-ui';
-  import { ModalsContainer } from 'vue-final-modal';
 
   import { configurateDayjs, themeOverrides } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
@@ -53,8 +52,6 @@
               </div>
 
               <dice-history />
-
-              <modals-container />
             </n-dialog-provider>
           </n-modal-provider>
         </n-notification-provider>
