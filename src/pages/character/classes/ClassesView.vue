@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { resolveUnref } from '@vueuse/shared';
+  import { toValue } from '@vueuse/shared';
   import { cloneDeep, groupBy, sortBy } from 'lodash-es';
 
   import { useFilter } from '@/shared/composable/useFilter';
@@ -99,7 +99,7 @@
   });
 
   const books = computed(() => {
-    const params = resolveUnref(filter.queryParams);
+    const params = toValue(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return params.book;
