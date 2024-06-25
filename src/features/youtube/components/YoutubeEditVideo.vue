@@ -1,6 +1,5 @@
 <script lang="ts" setup>
   import { cloneDeep } from 'lodash-es';
-  import { VueFinalModal } from 'vue-final-modal';
   import { useToast } from 'vue-toastification';
 
   import { ToastEventBus } from '@/shared/config';
@@ -93,13 +92,7 @@
 </script>
 
 <template>
-  <vue-final-modal
-    v-model="isShow"
-    content-transition="vfm-fade"
-    esc-to-close
-    overlay-transition="vfm-fade"
-    v-bind="$attrs"
-  >
+  <n-modal v-model:show="isShow">
     <div :class="$style.container">
       <div :class="$style.wrapper">
         <div :class="$style.header">
@@ -120,7 +113,7 @@
           :rules
           :model
           :class="$style.form"
-          @keyup.enter.exact.prevent="save"
+          @keyup.enter.exact.prevent.stop="save"
           @submit.prevent.stop="save"
         >
           <n-form-item
@@ -140,7 +133,7 @@
             <n-button
               :loading="isLoading"
               type="primary"
-              @click.left.exact.prevent="save"
+              attr-type="submit"
             >
               Сохранить
             </n-button>
@@ -155,7 +148,7 @@
         </n-form>
       </div>
     </div>
-  </vue-final-modal>
+  </n-modal>
 </template>
 
 <style lang="scss" module>

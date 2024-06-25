@@ -141,6 +141,10 @@
       border-radius: 4px;
       background: var(--bg-sub-menu);
       color: var(--text-color-title);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
 
       &.only-hover {
         &:not(.is-active) {
@@ -227,7 +231,10 @@
         border-radius: 4px;
         background: var(--bg-sub-menu);
         color: var(--text-color-title);
-        font-size: 20px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &.is-left {
           margin-right: 4px;
@@ -386,6 +393,10 @@
       cursor: pointer;
       position: absolute;
       right: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
 
       &.only-hover {
         &:not(.is-active) {
@@ -431,16 +442,7 @@
     display: flex;
     width: 100%;
     padding: 8px 0;
-
-    .ui-input {
-      width: initial;
-      flex: 1 1 auto;
-      margin-right: 8px;
-    }
-
-    .ui-button {
-      margin-left: 0 !important;
-    }
+    gap: 8px;
   }
 
   &.is-default {

@@ -1,11 +1,11 @@
 import localforage from 'localforage';
 import { cloneDeep, sortBy } from 'lodash-es';
-import { useModal } from 'vue-final-modal';
+import { NCheckbox, NFlex } from 'naive-ui';
 
+import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
 import { DB_NAME } from '@/shared/const/UI';
 import type { WithChildren } from '@/shared/types/Utility';
 
-import BookmarkRemoveConfirmationModal from '@/features/bookmarks/components/BookmarkRemoveConfirmationModal.vue';
 import type {
   IBookmarkCategory,
   IBookmarkGroup,
@@ -31,8 +31,9 @@ const storage = localforage.createInstance({
 });
 
 /**
- * Метод обходит все группы, добавляет в них поле children и кладет туда категории (заклинания, классы, черты и т.д.).
- * С каждой категорией происходит то же самое - в нее кладутся все дочерние закладки.
+ * Метод обходит все группы, добавляет в них поле children и кладет туда
+ * категории (заклинания, классы, черты и т.д.). С каждой категорией происходит
+ * то же самое - в нее кладутся все дочерние закладки.
  *
  * @param {Ref<Array<IBookmarkGroup>>} groups
  * @param {Ref<Array<IBookmarkCategory>>} categories
@@ -126,24 +127,60 @@ export const isBookmarkRemoveAvailable = async (bookmark: TBookmark) => {
     }
 
     return new Promise<boolean>((resolve) => {
-      const { open, close } = useModal({
-        component: BookmarkRemoveConfirmationModal,
-        attrs: {
-          bookmark,
-          onConfirm: async () => {
-            await close();
+      const { dialog } = useDiscreteApi();
+      const dontAsk = ref(false);
 
-            resolve(true);
-          },
-          onClose: async () => {
-            await close();
-
-            resolve(false);
-          },
+      const { destroy } = dialog.error({
+        title: 'Подтверждение удаления',
+        showIcon: false,
+        closable: false,
+        positiveText: 'Удалить',
+        positiveButtonProps: {
+          size: 'medium',
         },
-      });
+        onPositiveClick: async () => {
+          destroy();
+          resolve(true);
 
-      open();
+          await storage.setItem('dont_ask_again', true);
+        },
+        negativeText: 'Отменить',
+        negativeButtonProps: {
+          size: 'medium',
+        },
+        onNegativeClick: () => {
+          destroy();
+          resolve(false);
+        },
+        onClose: () => {
+          destroy();
+          resolve(false);
+        },
+        content: () =>
+          h(
+            NFlex,
+            {
+              vertical: true,
+            },
+            [
+              h(
+                'span',
+                null,
+                `Вы действительно хотите удалить «${bookmark.name}»?`,
+              ),
+              h(
+                NCheckbox,
+                {
+                  'checked': dontAsk.value,
+                  'onUpdate:checked': (value: boolean) => {
+                    dontAsk.value = value;
+                  },
+                },
+                'Больше не спрашивать',
+              ),
+            ],
+          ),
+      });
     });
   } catch (err) {
     return Promise.reject(err);

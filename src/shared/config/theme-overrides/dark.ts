@@ -1,6 +1,6 @@
 import type { GlobalThemeOverrides } from 'naive-ui';
 
-export const light: GlobalThemeOverrides = {
+export const dark: GlobalThemeOverrides = {
   common: {
     borderColor: 'var(--border)',
     borderRadius: '8px',
@@ -15,10 +15,10 @@ export const light: GlobalThemeOverrides = {
     placeholderColorDisabled: 'var(--text-g-color)',
     inputColor: 'var(--hover)',
     hoverColor: 'var(--hover)',
-    primaryColor: '#5e5446',
+    primaryColor: '#3567c9',
     primaryColorHover: 'var(--primary-hover)',
     primaryColorPressed: 'var(--primary-hover)',
-    popoverColor: '#ebe5d0',
+    popoverColor: '#1d282f',
   },
   Skeleton: {
     color: 'var(--hover)',
@@ -59,14 +59,14 @@ export const light: GlobalThemeOverrides = {
   },
   Button: {
     border: '1px solid var(--border)',
-    borderHover: 'var(--primary-hover)',
+    // borderHover: 'var(--primary-hover)',
     borderPressed: 'var(--primary-active)',
     borderDisabled: 'var(--primary-disabled)',
 
     iconSizeLarge: '22px',
 
-    colorPrimary: '#5e5446',
-    colorHoverPrimary: 'var(--primary-hover)',
+    colorPrimary: '#3567c9',
+    // colorHoverPrimary: 'var(--primary-hover)',
     colorPressedPrimary: 'var(--primary-active)',
     colorDisabledPrimary: 'var(--primary-disabled)',
     borderPrimary: 'var(--primary)',
@@ -78,11 +78,11 @@ export const light: GlobalThemeOverrides = {
     textColorPressedPrimary: 'var(--text-btn-color)',
     textColorDisabledPrimary: 'var(--text-btn-color)',
 
-    colorQuaternaryHover: 'var(--hover)',
-
     colorSecondary: 'var(--secondary)',
     colorSecondaryHover: 'var(--secondary-hover)',
     colorSecondaryPressed: 'var(--secondary)',
+
+    colorQuaternaryHover: 'var(--hover)',
 
     textColor: 'var(--text-b-color)',
     textColorHover: 'var(--text-b-color)',
@@ -94,5 +94,10 @@ export const light: GlobalThemeOverrides = {
     paddingSmall: '0 5px',
     paddingMedium: '0 8px',
     paddingLarge: '0 10px',
+  },
+  Dialog: {
+    titleFontSize: 'var(--h4-font-size)',
+    fontSize: 'var(--main-font-size)',
+    color: 'var(--bg-main)',
   },
 };

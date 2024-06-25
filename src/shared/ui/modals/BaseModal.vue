@@ -1,34 +1,22 @@
 <script lang="ts" setup>
-  import { VueFinalModal } from 'vue-final-modal';
-
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiGroupButton from '@/shared/ui/kit/button/UiGroupButton.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   interface IEmits {
     (e: 'close'): void;
-    (e: 'confirm'): void;
   }
 
   const props = withDefaults(
     defineProps<{
       modelValue?: boolean;
-      type?: 'default' | 'confirm' | 'remove' | 'notify' | 'error';
     }>(),
     {
       modelValue: true,
-      type: 'default',
     },
   );
 
   const emit = defineEmits<IEmits>();
 
   const isShowModal = useVModel(props, 'modelValue');
-
-  const onConfirm = () => {
-    isShowModal.value = false;
-
-    emit('confirm');
-  };
 
   const onClose = () => {
     isShowModal.value = false;
@@ -38,114 +26,57 @@
 </script>
 
 <template>
-  <vue-final-modal
-    v-model="isShowModal"
-    class="base-modal"
-    content-transition="vfm-fade"
-    esc-to-close
-    focus-trap
-    overlay-transition="vfm-fade"
-    v-bind="$attrs"
+  <n-modal
+    v-model:show="isShowModal"
+    @mask-click="onClose"
+    @esc="onClose"
   >
-    <div class="base-modal__container">
-      <div class="base-modal__header">
-        <div class="base-modal__title">
-          <slot name="title" />
+    <div class="base-modal">
+      <div class="base-modal__container">
+        <div class="base-modal__header">
+          <div class="base-modal__title">
+            <slot name="title" />
+          </div>
+
+          <n-flex
+            v-if="$slots.topButtons"
+            size="small"
+            class="base-modal__buttons_top"
+          >
+            <slot name="topButtons" />
+          </n-flex>
+
+          <n-button
+            class="base-modal__close"
+            secondary
+            @click.left.exact.prevent="onClose"
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
         </div>
 
-        <ui-group-button
-          v-if="$slots.topButtons"
-          size="md"
-          color="text"
-          class="base-modal__buttons_top"
-        >
-          <slot name="topButtons" />
-        </ui-group-button>
-
-        <ui-button
-          class="base-modal__close"
-          icon="close"
-          type="secondary"
-          @click.left.exact.prevent="onClose"
-        />
-      </div>
-
-      <div class="base-modal__content">
-        <div class="base-modal__safe">
-          <div class="base-modal__body">
-            <slot @close="onClose" />
+        <div class="base-modal__content">
+          <div class="base-modal__safe">
+            <div class="base-modal__body">
+              <slot @close="onClose" />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div
-        v-if="$slots.footer"
-        class="base-modal__footer"
-      >
-        <slot
-          name="footer"
-          @close="onClose"
-        />
-      </div>
-
-      <div
-        v-if="type === 'default' && $slots.controls"
-        class="base-modal__controls"
-      >
-        <slot
-          name="controls"
-          @close="onClose"
-        />
-      </div>
-
-      <div
-        v-else-if="type === 'confirm'"
-        class="base-modal__controls"
-      >
-        <ui-button @click.left.exact.prevent="onConfirm"> Применить </ui-button>
-
-        <ui-button
-          type="secondary"
-          @click.left.exact.prevent="onClose"
+        <div
+          v-if="$slots.footer"
+          class="base-modal__footer"
         >
-          Отменить
-        </ui-button>
-      </div>
-
-      <div
-        v-else-if="type === 'remove'"
-        class="base-modal__controls"
-      >
-        <ui-button
-          type="secondary"
-          @click.left.exact.prevent="onClose"
-        >
-          Отменить
-        </ui-button>
-
-        <ui-button @click.left.exact.prevent="onConfirm"> Удалить </ui-button>
-      </div>
-
-      <div
-        v-else-if="type === 'notify'"
-        class="base-modal__controls"
-      >
-        <ui-button @click.left.exact.prevent="onClose"> Закрыть </ui-button>
-      </div>
-
-      <div
-        v-else-if="type === 'error'"
-        class="base-modal__controls"
-      >
-        <ui-button
-          type="secondary"
-          @click.left.exact.prevent="onClose"
-        >
-          Закрыть
-        </ui-button>
+          <slot
+            name="footer"
+            @close="onClose"
+          />
+        </div>
       </div>
     </div>
-  </vue-final-modal>
+  </n-modal>
 </template>
 
 <style lang="scss" scoped>
@@ -203,6 +134,7 @@
       overflow: auto;
       width: 100%;
       flex: 1;
+      padding-top: 16px;
     }
 
     &__footer {

@@ -97,8 +97,8 @@
     :rules
     :model
     label-placement="left"
-    @submit.prevent="onSubmit"
-    @keyup.enter.prevent.stop
+    @submit.prevent.stop="onSubmit"
+    @keyup.enter.exact.prevent.stop="onSubmit"
   >
     <n-form-item
       size="large"
@@ -140,7 +140,6 @@
         type="primary"
         native-type="submit"
         size="large"
-        @click.left.exact.prevent="onSubmit"
       >
         Вход
       </n-button>

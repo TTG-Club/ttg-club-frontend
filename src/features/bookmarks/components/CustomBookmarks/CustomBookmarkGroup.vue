@@ -4,8 +4,6 @@
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { WithChildren } from '@/shared/types/Utility';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
 
   import CustomBookmarkCategory from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkCategory.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
@@ -19,8 +17,6 @@
   export default defineComponent({
     components: {
       CustomBookmarkCategory,
-      UiInput,
-      UiButton,
       // eslint-disable-next-line vue/match-component-import-name
       Draggable: draggableComponent,
       SvgIcon,
@@ -142,10 +138,7 @@
       @click.left.exact.prevent="customBookmarkStore.toggleGroup(group.uuid)"
     >
       <div class="bookmarks__group_icon">
-        <svg-icon
-          :icon="`arrow/${isOpened ? 'down' : 'right'}`"
-          size="20"
-        />
+        <svg-icon :icon="`arrow/${isOpened ? 'down' : 'right'}`" />
       </div>
 
       <div class="bookmarks__group_label">
@@ -159,10 +152,7 @@
         class="bookmarks__group_icon is-right"
         @click.left.exact.prevent.stop="enableCategoryCreating"
       >
-        <svg-icon
-          icon="plus"
-          size="20"
-        />
+        <svg-icon icon="plus" />
       </div>
 
       <div
@@ -173,10 +163,7 @@
           customBookmarkStore.queryDeleteBookmark(group)
         "
       >
-        <svg-icon
-          icon="close"
-          size="20"
-        />
+        <svg-icon icon="close" />
       </div>
     </div>
 
@@ -209,26 +196,32 @@
         v-if="isCategoryCreating"
         class="bookmarks__input"
       >
-        <ui-input
-          v-model="newCategoryName"
+        <n-input
+          v-model:value="newCategoryName"
           autofocus
           placeholder="Название категории"
-          @keyup.enter.exact.prevent="createCategory"
+          @keyup.enter.exact.prevent.stop="createCategory"
         />
 
-        <ui-button
-          icon="check"
-          size="sm"
-          type="text"
+        <n-button
+          type="primary"
+          quaternary
           @click.left.exact.prevent="createCategory"
-        />
+        >
+          <template #icon>
+            <svg-icon icon="check" />
+          </template>
+        </n-button>
 
-        <ui-button
-          icon="close"
-          size="sm"
-          type="text"
+        <n-button
+          type="primary"
+          quaternary
           @click.left.exact.prevent="disableCategoryCreating"
-        />
+        >
+          <template #icon>
+            <svg-icon icon="close" />
+          </template>
+        </n-button>
       </div>
     </div>
   </div>

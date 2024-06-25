@@ -1,6 +1,5 @@
 <script lang="ts" setup>
   import { debounce } from 'lodash-es';
-  import { VueFinalModal } from 'vue-final-modal';
 
   import { httpClient } from '@/shared/api';
   import { useMetrics } from '@/shared/composable/useMetrics';
@@ -275,112 +274,105 @@
 </script>
 
 <template>
-  <vue-final-modal
-    v-model="isShowModal"
-    class="search-modal"
-    content-transition="vfm-fade"
-    esc-to-close
-    focus-trap
-    overlay-transition="vfm-fade"
-    v-bind="$attrs"
-    @opened="focused = true"
-  >
-    <div class="search-modal__container">
-      <div class="search-modal__wrapper">
-        <n-flex
-          class="search-modal__control"
-          :wrap="false"
-          size="small"
-        >
-          <n-input
-            ref="input"
-            :value="search"
-            :loading="inProgress"
-            :autofocus="true"
-            size="large"
-            :input-props="{
-              autocapitalize: 'off',
-              autocomplete: 'off',
-              formnovalidate: true,
-            }"
-            placeholder="Поиск..."
-            :show-count="results?.total"
-            @update:value="onSearchUpdate"
-            @keyup.enter.exact.prevent.stop="onSubmit"
+  <n-modal v-model:show="isShowModal">
+    <div class="search-modal">
+      <div class="search-modal__container">
+        <div class="search-modal__wrapper">
+          <n-flex
+            class="search-modal__control"
+            :wrap="false"
+            size="small"
           >
-            <template #prefix>
-              <svg-icon icon="search" />
-            </template>
+            <n-input
+              ref="input"
+              :value="search"
+              :loading="inProgress"
+              :autofocus="true"
+              size="large"
+              :input-props="{
+                autocapitalize: 'off',
+                autocomplete: 'off',
+                formnovalidate: true,
+              }"
+              placeholder="Поиск..."
+              :show-count="!!results?.total"
+              @update:value="onSearchUpdate"
+              @keyup.enter.exact.prevent.stop="onSubmit"
+            >
+              <template #prefix>
+                <svg-icon icon="search" />
+              </template>
 
-            <template #count> Найдено: {{ results?.total }} </template>
-          </n-input>
+              <template #count> Найдено: {{ results?.total }} </template>
+            </n-input>
 
-          <n-button
-            secondary
-            size="large"
-            :loading="inProgress"
-            @click.left.exact.prevent="onSearchRandom"
-          >
-            <template #icon>
-              <svg-icon icon="dice/d6" />
-            </template>
-          </n-button>
-        </n-flex>
+            <n-button
+              secondary
+              size="large"
+              :loading="inProgress"
+              @click.left.exact.prevent="onSearchRandom"
+            >
+              <template #icon>
+                <svg-icon icon="dice/d6" />
+              </template>
+            </n-button>
+          </n-flex>
 
-        <div class="search-modal__results">
-          <div
-            v-if="!search.length && !results?.items.length"
-            class="search-modal__text"
-            @mouseenter.self="selectedIndex = null"
-            @focusin.self="selectedIndex = null"
-          >
-            Введите текст, чтобы начать
-          </div>
-
-          <div
-            v-else-if="search.length && !results?.items.length && inProgress"
-            class="search-modal__text"
-            @mouseenter.self="selectedIndex = null"
-            @focusin.self="selectedIndex = null"
-          >
-            Боги ищут ответ на твой запрос
-          </div>
-
-          <div
-            v-else-if="!results?.items.length && !inProgress"
-            class="search-modal__text"
-            @mouseenter.self="selectedIndex = null"
-            @focusin.self="selectedIndex = null"
-          >
-            Боги не нашли ответа на твой запрос
-          </div>
-
-          <search-link
-            v-for="(res, key) in results?.items || []"
-            :key="key"
-            :search-link="res"
-            :selected="selectedIndex === key"
-            disable-hover
-            @focusin="selectedIndex = key"
-            @mouseenter.self="selectedIndex = key"
-          />
-
-          <router-link
-            :to="searchUrl"
-            class="search-modal__all"
-            @mouseenter.self="selectedIndex = null"
-            @focusin.self="selectedIndex = null"
-          >
-            <div class="search-modal__all_icon">
-              <svg-icon icon="search-page" />
+          <div class="search-modal__results">
+            <div
+              v-if="!search.length && !results?.items.length"
+              class="search-modal__text"
+              @mouseenter.self="selectedIndex = null"
+              @focusin.self="selectedIndex = null"
+            >
+              Введите текст, чтобы начать
             </div>
 
-            <div class="search-modal__all_body">Открыть страницу поиска</div>
-          </router-link>
+            <div
+              v-else-if="search.length && !results?.items.length && inProgress"
+              class="search-modal__text"
+              @mouseenter.self="selectedIndex = null"
+              @focusin.self="selectedIndex = null"
+            >
+              Боги ищут ответ на твой запрос
+            </div>
+
+            <div
+              v-else-if="!results?.items.length && !inProgress"
+              class="search-modal__text"
+              @mouseenter.self="selectedIndex = null"
+              @focusin.self="selectedIndex = null"
+            >
+              Боги не нашли ответа на твой запрос
+            </div>
+
+            <search-link
+              v-for="(res, key) in results?.items || []"
+              :key="key"
+              :search-link="res"
+              :selected="selectedIndex === key"
+              disable-hover
+              @focusin="selectedIndex = key"
+              @mouseenter.self="selectedIndex = key"
+            />
+
+            <router-link
+              :to="searchUrl"
+              class="search-modal__all"
+              @mouseenter.self="selectedIndex = null"
+              @focusin.self="selectedIndex = null"
+            >
+              <div class="search-modal__all_icon">
+                <svg-icon icon="search-page" />
+              </div>
+
+              <div class="search-modal__all_body">Открыть страницу поиска</div>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
-  </vue-final-modal>
+  </n-modal>
 </template>
 
 <style lang="scss" scoped>
@@ -392,14 +384,16 @@
   }
 
   .search-modal {
+    max-width: 560px;
+    width: 100vw;
+
     &__container {
       height: var(--max-vh);
       padding: 24px 24px 0;
       display: flex;
       flex-direction: column;
-      max-width: 560px;
-      width: 100vw;
       pointer-events: none;
+      width: 100%;
 
       @include media-min($md) {
         padding: 56px 24px 0;

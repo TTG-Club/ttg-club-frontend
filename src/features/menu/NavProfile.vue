@@ -37,8 +37,6 @@
     modals.value.find((item) => item.eng === modal.value),
   );
 
-  const modalComponent = computed(() => modalInfo.value?.component());
-
   const isModalOpened = computed({
     get: () => !!modal.value,
     set: (e) => {
@@ -191,25 +189,17 @@
   </nav-popover>
 
   <auth-modal
-    v-if="modalComponent"
     v-model="isModalOpened"
     :title="modalInfo?.rus"
     @close="closeModal"
   >
-    <template #default>
-      <transition
-        mode="out-in"
-        name="fade"
-      >
-        <component
-          :is="modalComponent"
-          @close="closeModal"
-          @switch:auth="modal = 'login'"
-          @switch:reg="modal = 'reg'"
-          @switch:change-password="modal = 'change-password'"
-        />
-      </transition>
-    </template>
+    <component
+      :is="modalInfo?.component()"
+      @close="closeModal"
+      @switch:auth="modal = 'login'"
+      @switch:reg="modal = 'reg'"
+      @switch:change-password="modal = 'change-password'"
+    />
   </auth-modal>
 </template>
 
