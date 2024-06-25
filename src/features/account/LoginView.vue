@@ -100,7 +100,10 @@
     @submit.prevent="onSubmit"
     @keyup.enter.prevent.stop
   >
-    <n-form-item path="usernameOrEmail">
+    <n-form-item
+      size="large"
+      path="usernameOrEmail"
+    >
       <n-input
         v-model:value.trim="model.usernameOrEmail"
         autocapitalize="off"
@@ -111,7 +114,10 @@
       />
     </n-form-item>
 
-    <n-form-item path="password">
+    <n-form-item
+      size="large"
+      path="password"
+    >
       <n-input
         v-model:value.trim="model.password"
         autocapitalize="off"
@@ -133,6 +139,7 @@
         :loading="inProgress"
         type="primary"
         native-type="submit"
+        size="large"
         @click.left.exact.prevent="onSubmit"
       >
         Вход
@@ -140,13 +147,15 @@
 
       <n-button
         secondary
+        size="large"
         @click.left.exact.prevent="$emit('switch:reg')"
       >
         Регистрация
       </n-button>
 
       <n-button
-        secondary
+        quaternary
+        size="large"
         @click.left.exact.prevent="$emit('switch:change-password')"
       >
         Забыли пароль?
