@@ -1,7 +1,5 @@
 <script setup lang="ts">
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
 
   import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
@@ -129,38 +127,45 @@
           v-if="isGroupCreating"
           class="bookmarks__input"
         >
-          <ui-input
-            v-model="newGroupName"
+          <n-input
+            v-model:value="newGroupName"
             autofocus
             placeholder="Название группы"
             @keyup.enter.exact.prevent="createGroup"
           />
 
-          <ui-button
-            icon="check"
-            size="sm"
-            type="text"
+          <n-button
+            quaternary
             @click.left.exact.prevent="createGroup"
-          />
+          >
+            <template #icon>
+              <svg-icon icon="check" />
+            </template>
+          </n-button>
 
-          <ui-button
-            icon="close"
-            size="sm"
-            type="text"
+          <n-button
+            quaternary
             @click.left.exact.prevent="disableGroupCreating"
-          />
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
         </div>
 
-        <ui-button
+        <n-button
           v-else
           class="bookmarks__new"
-          size="sm"
-          icon="plus"
-          type="text"
+          quaternary
+          block
           @click.left.exact.prevent="enableGroupCreating"
         >
-          Добавить группу
-        </ui-button>
+          <template #icon>
+            <svg-icon icon="plus" />
+          </template>
+
+          <template #default> Добавить группу </template>
+        </n-button>
       </div>
     </div>
   </div>

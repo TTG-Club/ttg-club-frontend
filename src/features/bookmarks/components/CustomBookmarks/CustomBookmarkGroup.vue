@@ -204,7 +204,6 @@
         />
 
         <n-button
-          type="primary"
           quaternary
           @click.left.exact.prevent="createCategory"
         >
@@ -214,7 +213,6 @@
         </n-button>
 
         <n-button
-          type="primary"
           quaternary
           @click.left.exact.prevent="disableCategoryCreating"
         >
