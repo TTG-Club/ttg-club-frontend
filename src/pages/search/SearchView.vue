@@ -283,7 +283,7 @@
               <n-button
                 type="primary"
                 size="large"
-                attr-type="submit"
+                @click.left.exact.prevent="onSearch"
               >
                 Поиск
               </n-button>

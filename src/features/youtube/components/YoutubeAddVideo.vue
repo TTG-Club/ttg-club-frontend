@@ -158,7 +158,7 @@
             <n-button
               :loading="isLoading"
               type="primary"
-              attr-type="submit"
+              @click.left.exact.prevent="add"
             >
               Сохранить
             </n-button>

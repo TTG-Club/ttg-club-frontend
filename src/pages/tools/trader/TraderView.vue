@@ -370,8 +370,8 @@
           <n-space>
             <n-button
               type="primary"
-              attr-type="submit"
               :focusable="false"
+              @click.left.exact.prevent="sendForm"
             >
               Найти торговца
             </n-button>

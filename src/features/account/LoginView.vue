@@ -138,8 +138,8 @@
         :disabled="success"
         :loading="inProgress"
         type="primary"
-        native-type="submit"
         size="large"
+        @click.left.exact.prevent="onSubmit"
       >
         Вход
       </n-button>

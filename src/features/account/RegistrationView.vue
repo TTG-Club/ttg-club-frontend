@@ -150,9 +150,9 @@
       <n-button
         :disabled="success"
         :loading="inProgress"
-        native-type="submit"
         type="primary"
         size="large"
+        @click.left.exact.prevent="onSubmit"
       >
         Регистрация
       </n-button>

@@ -200,9 +200,9 @@
       <n-button
         :disabled="success"
         :loading="inProgress"
-        native-type="submit"
         type="primary"
         size="large"
+        @click.left.exact.prevent="onSubmit"
       >
         {{ isOnlyPassword ? 'Изменить пароль' : 'Восстановить пароль' }}
       </n-button>
