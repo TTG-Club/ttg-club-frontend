@@ -116,11 +116,6 @@
           flex: 1 1 960px;
           max-width: 960px;
         }
-
-        @include media-min($xxl) {
-          flex: 1 1 1320px;
-          max-width: 1320px;
-        }
       }
 
       &--right {
