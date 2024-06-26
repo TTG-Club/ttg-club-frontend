@@ -438,8 +438,10 @@
       position: sticky;
       bottom: 0;
       background-color: var(--bg-main);
-      padding: 8px 0 24px 0;
+      padding: 8px 0 16px 0;
       margin: -8px 0 -24px 0;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
     }
   }
 

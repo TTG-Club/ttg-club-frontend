@@ -100,4 +100,7 @@ export const light: GlobalThemeOverrides = {
     fontSize: 'var(--main-font-size)',
     color: 'var(--bg-main)',
   },
+  Pagination: {
+    itemColorDisabled: 'var(--hover)',
+  },
 };
