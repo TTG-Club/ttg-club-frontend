@@ -2,6 +2,8 @@
   import { useClassName } from '@/shared/composable/useClassName';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
+  import NavPopover from '@/features/menu/NavPopover.vue';
+
   import { useDiceHistory } from '@/features/dice-history/composables';
 
   const cn = useClassName();
