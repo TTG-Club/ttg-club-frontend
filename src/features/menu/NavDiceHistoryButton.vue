@@ -9,13 +9,17 @@
 </script>
 
 <template>
-  <div
-    class="navbar__btn"
-    :class="[cn(), isOpen && 'is-active']"
-    @click="toggle"
-  >
-    <svg-icon :icon="isOpen ? 'close' : 'dice/d20'" />
-  </div>
+  <nav-popover>
+    <template #trigger>
+      <div
+        class="navbar__btn"
+        :class="[cn(), isOpen && 'is-active']"
+        @click="toggle"
+      >
+        <svg-icon :icon="isOpen ? 'close' : 'dice/d20'" />
+      </div>
+    </template>
+  </nav-popover>
 </template>
 
 <style lang="scss" module>
