@@ -379,13 +379,10 @@
   @use '@/assets/styles/variables/breakpoints' as *;
   @use '@/assets/styles/variables/mixins' as *;
 
-  :deep(.search-modal) {
-    pointer-events: none;
-  }
-
   .search-modal {
     max-width: 560px;
     width: 100vw;
+    pointer-events: none;
 
     &__container {
       height: var(--max-vh);
