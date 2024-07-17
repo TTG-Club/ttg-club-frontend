@@ -103,4 +103,12 @@ export const light: GlobalThemeOverrides = {
   Pagination: {
     itemColorDisabled: 'var(--hover)',
   },
+  Tag: {
+    textColorCheckable: 'var(--text-color)',
+    colorCheckable: 'var(--hover)',
+    textColorChecked: 'var(--text-btn-color)',
+    colorChecked: 'var(--primary-active)',
+    textColorHoverCheckable: 'var(--text-btn-color)',
+    colorCheckedHover: 'var(--primary-hover)',
+  },
 };

@@ -1,88 +1,65 @@
-<script>
+<script setup lang="ts">
   import { cloneDeep } from 'lodash-es';
 
+  import type { FilterItem } from '@/shared/composable/useFilter';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
 
-  export default {
-    components: {
-      UiCheckbox,
-      SvgIcon,
+  const props = withDefaults(
+    defineProps<{
+      name: string;
+      type: 'crumb' | 'toggle';
+      expand?: boolean;
+    }>(),
+    {
+      expand: false,
     },
-    props: {
-      name: {
-        type: String,
-        default: '',
-        required: true,
-      },
-      expand: {
-        type: Boolean,
-        default: false,
-      },
-      type: {
-        type: String,
-        default: 'crumb',
-        validator: (value) => ['crumb', 'toggle'].includes(value),
-      },
-      modelValue: {
-        type: Array,
-        default: undefined,
-      },
-    },
-    emits: ['update:model-value'],
-    data: () => ({
-      opened: false,
-    }),
-    computed: {
-      isFilterCustomized() {
-        if (!this.modelValue) {
-          return false;
-        }
+  );
 
-        for (const value of this.modelValue) {
-          if (value.value !== value.default) {
-            return true;
-          }
-        }
+  const filterItem = ref<HTMLDivElement>();
 
-        return false;
-      },
-    },
-    beforeMount() {
-      this.opened = this.isFilterCustomized || this.expand;
-    },
-    methods: {
-      resetValues() {
-        const values = cloneDeep(this.modelValue).map((value) => ({
-          ...value,
-          value: value.default,
-        }));
+  const model = defineModel<Array<FilterItem>>({ default: () => [] });
 
-        this.emitValues(values);
-      },
+  const isFilterCustomized = computed(() => {
+    if (!model.value) {
+      return false;
+    }
 
-      setValue(newValue, index) {
-        const values = cloneDeep(this.modelValue);
+    for (const value of model.value) {
+      if (value.value !== value.default) {
+        return true;
+      }
+    }
 
-        values[index].value = newValue;
+    return false;
+  });
 
-        this.emitValues(values);
-      },
+  const opened = ref<boolean>(
+    isFilterCustomized.value || props.expand || false,
+  );
 
-      emitValues(values) {
-        this.$emit('update:model-value', values);
-      },
+  function resetValues() {
+    model.value = cloneDeep(model.value).map((value) => ({
+      ...value,
+      value: value.default,
+    }));
+  }
 
-      toggleBlock() {
-        this.opened = !this.opened;
+  function setValue(newValue: boolean, index: number) {
+    const values = cloneDeep(model.value);
 
-        this.$refs.filterItem.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-        });
-      },
-    },
-  };
+    values[index].value = newValue;
+
+    model.value = values;
+  }
+
+  function toggleBlock() {
+    opened.value = !opened.value;
+
+    filterItem.value?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }
 </script>
 
 <template>
@@ -113,18 +90,24 @@
         </button>
       </div>
 
-      <button
-        v-if="isFilterCustomized"
-        v-tippy="{ content: `Сбросить блок «${name}»` }"
-        class="filter-item__button filter-item__button--reset"
-        type="button"
-        @click.left.exact.prevent="resetValues"
-      >
-        <svg-icon
-          icon="close"
-          size="24"
-        />
-      </button>
+      <n-tooltip v-if="isFilterCustomized">
+        <template #trigger>
+          <button
+            class="filter-item__button filter-item__button--reset"
+            type="button"
+            @click.left.exact.prevent="resetValues"
+          >
+            <svg-icon
+              icon="close"
+              size="24"
+            />
+          </button>
+        </template>
+
+        <template #default>
+          {{ `Сбросить блок «${name}»` }}
+        </template>
+      </n-tooltip>
     </div>
 
     <div
@@ -132,16 +115,35 @@
       :class="{ 'is-toggle': type === 'toggle' }"
       class="filter-item__body"
     >
-      <ui-checkbox
-        v-for="(checkbox, checkboxKey) in modelValue"
+      <n-tooltip
+        v-for="(checkbox, checkboxKey) in model"
         :key="checkboxKey"
-        :model-value="checkbox.value"
-        :tooltip="checkbox.tooltip"
-        :type="type"
-        @update:model-value="setValue($event, checkboxKey)"
+        :disabled="!checkbox.tooltip"
       >
-        {{ checkbox.label }}
-      </ui-checkbox>
+        <template #trigger>
+          <n-checkbox
+            v-if="type === 'toggle'"
+            :checked="checkbox.value"
+            @update:checked="setValue($event, checkboxKey)"
+          >
+            {{ checkbox.label }}
+          </n-checkbox>
+
+          <n-tag
+            v-if="type === 'crumb'"
+            :checked="checkbox.value"
+            checkable
+            round
+            @update:checked="setValue($event, checkboxKey)"
+          >
+            {{ checkbox.label }}
+          </n-tag>
+        </template>
+
+        <template #default>
+          {{ checkbox.tooltip }}
+        </template>
+      </n-tooltip>
     </div>
   </div>
 </template>

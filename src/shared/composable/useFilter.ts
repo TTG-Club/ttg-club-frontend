@@ -24,7 +24,7 @@ export type FilterGroup = {
   key: string;
   expand?: boolean;
   hidden?: boolean;
-  type?: string;
+  type?: 'toggle' | 'crumb';
   values: Array<FilterItem>;
 };
 

@@ -1,100 +1,83 @@
-<script>
+<script setup lang="ts">
   import { cloneDeep } from 'lodash-es';
 
+  import type { FilterGroup } from '@/shared/composable/useFilter';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
 
-  export default {
-    components: {
-      UiCheckbox,
-      SvgIcon,
-    },
-    props: {
-      modelValue: {
-        type: Array,
-        default: undefined,
-      },
-    },
-    emits: ['update:model-value'],
-    data: () => ({
-      opened: true,
-    }),
-    computed: {
-      isFilterCustomized() {
-        if (!this.modelValue) {
-          return false;
+  const model = defineModel<Array<FilterGroup>>({ default: undefined });
+
+  const opened = ref(true);
+
+  const isFilterCustomized = computed(() => {
+    if (!model.value) {
+      return false;
+    }
+
+    for (const group of model.value) {
+      for (const value of group.values) {
+        if (value.value !== value.default) {
+          return true;
         }
+      }
+    }
 
-        for (const group of this.modelValue) {
-          for (const value of group.values) {
-            if (value.value !== value.default) {
-              return true;
-            }
-          }
-        }
+    return false;
+  });
 
-        return false;
-      },
-    },
-    methods: {
-      setGroupStatus(e, index) {
-        if (!this.modelValue[index]?.values?.length) {
-          return;
-        }
+  function setGroupStatus(e: boolean, index: number) {
+    if (!model.value[index]?.values?.length) {
+      return;
+    }
 
-        const sources = cloneDeep(this.modelValue);
+    const sources = cloneDeep(model.value);
 
-        for (let i = 0; i < sources[index].values.length; i++) {
-          sources[index].values[i].value = e;
-        }
+    for (let i = 0; i < sources[index].values.length; i++) {
+      sources[index].values[i].value = e;
+    }
 
-        this.emitSources(sources);
-      },
+    model.value = sources;
+  }
 
-      isGroupActive(index) {
-        if (!this.modelValue[index]?.values?.length) {
-          return false;
-        }
+  function isGroupActive(index: number) {
+    if (!model.value[index]?.values?.length) {
+      return false;
+    }
 
-        for (let i = 0; i < this.modelValue[index].values.length; i++) {
-          if (this.modelValue[index].values[i].value) {
-            return true;
-          }
-        }
+    for (let i = 0; i < model.value[index].values.length; i++) {
+      if (model.value[index].values[i].value) {
+        return true;
+      }
+    }
 
-        return false;
-      },
+    return false;
+  }
 
-      resetSources() {
-        const sources = cloneDeep(this.modelValue).map((group) => ({
-          ...group,
-          values: group.values.map((value) => ({
-            ...value,
-            value: value.default,
-          })),
-        }));
+  function resetSources() {
+    model.value = cloneDeep(model.value).map((group) => ({
+      ...group,
+      values: group.values.map((value) => ({
+        ...value,
+        value: value.default,
+      })),
+    }));
+  }
 
-        this.emitSources(sources);
-      },
+  function setSourceValue(
+    newValue: boolean,
+    groupKey: number,
+    checkboxKey: number,
+  ) {
+    const sources = cloneDeep(model.value);
 
-      setSourceValue(newValue, groupKey, checkboxKey) {
-        const sources = cloneDeep(this.modelValue);
+    sources[groupKey].values[checkboxKey].value = newValue;
 
-        sources[groupKey].values[checkboxKey].value = newValue;
-
-        this.emitSources(sources);
-      },
-
-      emitSources(sources) {
-        this.$emit('update:model-value', sources);
-      },
-    },
-  };
+    model.value = sources;
+  }
 </script>
 
 <template>
   <div
-    v-if="modelValue?.length"
+    v-if="model?.length"
     :class="{ 'is-active': opened }"
     class="filter-item"
   >
@@ -117,18 +100,22 @@
         </button>
       </div>
 
-      <button
-        v-if="isFilterCustomized"
-        v-tippy="{ content: 'Сбросить источники' }"
-        class="filter-item__button filter-item__button--reset"
-        type="button"
-        @click.left.exact.prevent="resetSources"
-      >
-        <svg-icon
-          icon="close"
-          size="24"
-        />
-      </button>
+      <n-tooltip v-if="isFilterCustomized">
+        <template #trigger>
+          <button
+            class="filter-item__button filter-item__button--reset"
+            type="button"
+            @click.left.exact.prevent="resetSources"
+          >
+            <svg-icon
+              icon="close"
+              size="24"
+            />
+          </button>
+        </template>
+
+        <template #default> Сбросить источники </template>
+      </n-tooltip>
     </div>
 
     <div
@@ -136,7 +123,7 @@
       class="filter-item__body"
     >
       <div
-        v-for="(group, groupKey) in modelValue"
+        v-for="(group, groupKey) in model"
         v-show="!!group.values?.length"
         :key="groupKey"
         class="filter-item__source-group"
@@ -149,28 +136,44 @@
             {{ group.name }}
           </div>
 
-          <ui-checkbox
-            v-tippy="{
-              content: `${
-                isGroupActive(groupKey) ? 'Выключить' : 'Включить'
-              } «${group.name}»`,
-            }"
-            :model-value="isGroupActive(groupKey)"
-            type="toggle"
-            @update:model-value="setGroupStatus($event, groupKey)"
-          />
+          <n-tooltip>
+            <template #trigger>
+              <n-switch
+                size="small"
+                :value="isGroupActive(groupKey)"
+                @update:value="setGroupStatus($event, groupKey)"
+              />
+            </template>
+
+            <template #default>
+              {{
+                `${isGroupActive(groupKey) ? 'Выключить' : 'Включить'} «${group.name}»`
+              }}
+            </template>
+          </n-tooltip>
         </div>
 
         <div class="filter-item__source-group_body">
-          <ui-checkbox
+          <n-tooltip
             v-for="(checkbox, checkboxKey) in group.values"
             :key="checkboxKey"
-            :model-value="checkbox.value"
-            :tooltip="checkbox.tooltip"
-            @update:model-value="setSourceValue($event, groupKey, checkboxKey)"
+            :disabled="!checkbox.tooltip"
           >
-            {{ checkbox.label }}
-          </ui-checkbox>
+            <template #trigger>
+              <n-tag
+                :checked="checkbox.value"
+                checkable
+                round
+                @update:checked="setSourceValue($event, groupKey, checkboxKey)"
+              >
+                {{ checkbox.label }}
+              </n-tag>
+            </template>
+
+            <template #default>
+              {{ checkbox.tooltip }}
+            </template>
+          </n-tooltip>
         </div>
       </div>
     </div>

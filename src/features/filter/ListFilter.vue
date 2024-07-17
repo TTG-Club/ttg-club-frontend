@@ -1,18 +1,18 @@
 <script setup lang="ts">
   import { cloneDeep } from 'lodash-es';
 
-  import type {
-    Filter,
-    FilterComposable,
-    FilterGroup,
-    FilterItem,
+  import {
+    type Filter,
+    type FilterComposable,
+    type FilterGroup,
+    type FilterItem,
   } from '@/shared/composable/useFilter';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
-  import FilterItemCheckboxes from '@/features/filter/FilterItem/FilterItemCheckboxes.vue';
-  import FilterItemSources from '@/features/filter/FilterItem/FilterItemSources.vue';
+  import FilterItemCheckboxes from './FilterItem/FilterItemCheckboxes.vue';
+  import FilterItemSources from './FilterItem/FilterItemSources.vue';
 
   const props = withDefaults(
     defineProps<{
@@ -124,6 +124,10 @@
     await props.filterInstance.resetFilter();
     await emitFilter();
   };
+
+  const isFilterContainSources = (
+    obj: Filter | Array<FilterGroup> | undefined,
+  ): obj is Filter => !!obj && 'sources' in obj;
 </script>
 
 <template>
@@ -194,7 +198,7 @@
         <div class="filter__dropdown">
           <div class="filter__dropdown_body">
             <filter-item-sources
-              v-if="filter?.sources"
+              v-if="isFilterContainSources(filter)"
               :model-value="filter.sources"
               @update:model-value="setSourcesValue($event)"
             />
