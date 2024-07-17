@@ -1,21 +1,19 @@
 <script lang="ts" setup>
-  import { useClassName } from '@/shared/composable/useClassName';
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
+  import { useDiceHistory } from '@/features/dice-history/composables';
   import NavPopover from '@/features/menu/NavPopover.vue';
 
-  import { useDiceHistory } from '@/features/dice-history/composables';
-
-  const cn = useClassName();
   const { toggle, isOpen } = useDiceHistory();
+  const isShow = useAppBreakpoints().smallerOrEqual('md');
 </script>
 
 <template>
-  <nav-popover>
+  <nav-popover v-if="isShow">
     <template #trigger>
       <div
         class="navbar__btn"
-        :class="[cn(), isOpen && 'is-active']"
         @click="toggle"
       >
         <svg-icon :icon="isOpen ? 'close' : 'dice/d20'" />
@@ -23,13 +21,3 @@
     </template>
   </nav-popover>
 </template>
-
-<style lang="scss" module>
-  @use '@/assets/styles/variables/breakpoints' as *;
-
-  .nav-dice-history-button {
-    @include media-min($md) {
-      display: none !important;
-    }
-  }
-</style>
