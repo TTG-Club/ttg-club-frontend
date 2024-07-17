@@ -6,7 +6,7 @@
   import NavPopover from '@/features/menu/NavPopover.vue';
 
   const { toggle, isOpen } = useDiceHistory();
-  const isShow = useAppBreakpoints().smallerOrEqual('md');
+  const isShow = useAppBreakpoints().smaller('md');
 </script>
 
 <template>
