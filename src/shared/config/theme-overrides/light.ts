@@ -108,7 +108,7 @@ export const light: GlobalThemeOverrides = {
     colorCheckable: 'var(--hover)',
     textColorChecked: 'var(--text-btn-color)',
     colorChecked: 'var(--primary-active)',
-    textColorHoverCheckable: 'var(--text-btn-color)',
+    textColorHoverCheckable: 'var(--text-color)',
     colorCheckedHover: 'var(--primary-hover)',
   },
 };
