@@ -1,6 +1,8 @@
-<script>
+<script setup lang="ts">
   import { throttle } from 'lodash-es';
 
+  import { httpClient } from '@/shared/api/index.js';
+  import type { TNameValue } from '@/shared/types/BaseApiFields';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
   import UiInput from '@/shared/ui/kit/UiInput.vue';
@@ -9,100 +11,109 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  export default {
-    name: 'MadnessView',
-    components: {
-      RawContent,
-      UiCheckbox,
-      ContentLayout,
-      UiButton,
-      UiInput,
-    },
-    data: () => ({
-      count: 1,
-      types: [],
-      results: [],
-      controller: undefined,
-    }),
-    async beforeMount() {
-      await this.getTables();
-    },
-    methods: {
-      async getTables() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/madness',
-          });
+  interface MadnessType extends TNameValue {
+    toggled: boolean;
+  }
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  interface MadnessItemType {
+    key: string;
+    name: string;
+    shortName: string;
+    value: number;
+    additional: string;
+  }
 
-            return;
-          }
+  interface MadnessItem {
+    description: string;
+    type: MadnessItemType;
+  }
 
-          this.types = resp.data.map((type) => ({
-            ...type,
-            toggled: false,
-          }));
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
+  const count = ref(1);
+  const types = ref<Array<MadnessType>>([]);
+  const results = ref<Array<MadnessItem>>([]);
+  const controller = ref<AbortController>();
 
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
+  interface MadnessRequestPayload {
+    count: number;
+    type?: string;
+    sources?: Array<string>;
+  }
 
-        this.controller = new AbortController();
+  const getTables = async () => {
+    try {
+      const resp = await httpClient.get<Array<TNameValue>>({
+        url: '/tools/madness',
+      });
 
-        try {
-          const options = {
-            count: this.count || 1,
-          };
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
 
-          const type = this.types.find((el) => el.toggled);
+        return;
+      }
 
-          if (type) {
-            options.type = type.value;
-          }
-
-          const resp = await this.$http.post({
-            url: '/tools/madness',
-            payload: options,
-            signal: this.controller.signal,
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          for (const el of resp.data) {
-            this.results.unshift(reactive(el));
-          }
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-
-      toggleType(e, type) {
-        for (let i = 0; i < this.types.length; i++) {
-          if (this.types[i].value !== type.value) {
-            this.types[i].toggled = false;
-
-            continue;
-          }
-
-          this.types[i].toggled = e;
-        }
-      },
-    },
+      types.value = resp.data.map((type) => ({
+        ...type,
+        toggled: false,
+      }));
+    } catch (err) {
+      errorHandler(err);
+    }
   };
+
+  // eslint-disable-next-line func-names
+  const sendForm = throttle(async function () {
+    if (controller.value) {
+      controller.value.abort();
+    }
+
+    controller.value = new AbortController();
+
+    try {
+      const options: MadnessRequestPayload = {
+        count: count.value || 1,
+      };
+
+      const type = types.value.find((el) => el.toggled);
+
+      if (type) {
+        options.type = type.value;
+      }
+
+      const resp = await httpClient.post<Array<MadnessItem>>({
+        url: '/tools/madness',
+        payload: options,
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      for (const el of resp.data) {
+        results.value.unshift(reactive(el));
+      }
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
+  }, 300);
+
+  const toggleType = (e: boolean, type: MadnessType) => {
+    for (let i = 0; i < types.value.length; i++) {
+      if (types.value[i].value !== type.value) {
+        types.value[i].toggled = false;
+
+        continue;
+      }
+
+      types.value[i].toggled = e;
+    }
+  };
+
+  getTables();
 </script>
 
 <template>
