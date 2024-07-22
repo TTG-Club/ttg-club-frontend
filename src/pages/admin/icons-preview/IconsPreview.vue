@@ -2,7 +2,6 @@
   import { useToast } from 'vue-toastification';
 
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import { icons } from '@/shared/utils/icons';
 
   import PageLayout from '@/layouts/PageLayout.vue';
@@ -35,29 +34,36 @@
     <template #title>Предпросмотр иконок</template>
 
     <template #default>
-      <ui-input
-        v-model="search"
-        :class="$style.search"
+      <n-input
+        v-model:value="search"
         placeholder="Поиск..."
       />
 
       <div :class="$style.icons">
-        <div
+        <n-tooltip
           v-for="icon in newIcons"
           :key="icon"
-          v-tippy="{ content: icon }"
-          :class="$style.item"
-          @click="copyName(icon)"
         >
-          <div :class="$style.icon">
-            <svg-icon
-              :icon="icon"
-              size="32"
-            />
-          </div>
+          <template #trigger>
+            <div
+              :class="$style.item"
+              @click="copyName(icon)"
+            >
+              <div :class="$style.icon">
+                <svg-icon
+                  :icon="icon"
+                  size="32"
+                />
+              </div>
 
-          <div :class="$style.name">{{ icon }}</div>
-        </div>
+              <div :class="$style.name">{{ icon }}</div>
+            </div>
+          </template>
+
+          <template #default>
+            {{ icon }}
+          </template>
+        </n-tooltip>
       </div>
     </template>
   </page-layout>
