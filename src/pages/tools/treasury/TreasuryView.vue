@@ -179,7 +179,7 @@
       });
   }, 300);
 
-  const selectItem = async (group: number, index: number) => {
+  const selectItem = async (group: string, index: number) => {
     try {
       if (controllers.value.detail) {
         controllers.value.detail.abort();
