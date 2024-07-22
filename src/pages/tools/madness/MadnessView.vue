@@ -3,16 +3,13 @@
 
   import { httpClient } from '@/shared/api/index.js';
   import type { TNameValue } from '@/shared/types/BaseApiFields';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
   interface MadnessType extends TNameValue {
-    toggled: boolean;
+    checked: boolean;
   }
 
   interface MadnessItemType {
@@ -28,16 +25,16 @@
     type: MadnessItemType;
   }
 
-  const count = ref(1);
-  const types = ref<Array<MadnessType>>([]);
-  const results = ref<Array<MadnessItem>>([]);
-  const controller = ref<AbortController>();
-
   interface MadnessRequestPayload {
     count: number;
     type?: string;
     sources?: Array<string>;
   }
+
+  const count = ref(1);
+  const types = ref<Array<MadnessType>>([]);
+  const results = ref<Array<MadnessItem>>([]);
+  const controller = ref<AbortController>();
 
   const getTables = async () => {
     try {
@@ -53,7 +50,7 @@
 
       types.value = resp.data.map((type) => ({
         ...type,
-        toggled: false,
+        checked: false,
       }));
     } catch (err) {
       errorHandler(err);
@@ -73,7 +70,7 @@
         count: count.value || 1,
       };
 
-      const type = types.value.find((el) => el.toggled);
+      const type = types.value.find((el) => el.checked);
 
       if (type) {
         options.type = type.value;
@@ -104,12 +101,12 @@
   const toggleType = (e: boolean, type: MadnessType) => {
     for (let i = 0; i < types.value.length; i++) {
       if (types.value[i].value !== type.value) {
-        types.value[i].toggled = false;
+        types.value[i].checked = false;
 
         continue;
       }
 
-      types.value[i].toggled = e;
+      types.value[i].checked = e;
     }
   };
 
@@ -119,52 +116,45 @@
 <template>
   <content-layout>
     <template #fixed>
-      <form
+      <n-form
         class="tools_settings"
-        @submit.prevent="sendForm"
+        @submit.prevent.stop="sendForm"
+        @keyup.enter.exact.prevent.stop="sendForm"
       >
-        <div class="tools_settings__row">
-          <div class="tools_settings__column">
-            <div class="row">
-              <span class="label">Количество:</span>
+        <n-flex>
+          <n-form-item label="Количество">
+            <n-input-number v-model:value="count" />
+          </n-form-item>
 
-              <ui-input
-                v-model="count"
-                class="form-control select"
-                type="number"
-                placeholder="Количество"
-                :min="1"
-              />
-            </div>
+          <n-form-item label="Вид безумия">
+            <n-flex>
+              <n-tag
+                v-for="(type, key) in types"
+                :key="key"
+                :checked="type.checked"
+                checkable
+                round
+                @click.left.exact.prevent="toggleType(!type.checked, type)"
+              >
+                {{ type.name }}
+              </n-tag>
+            </n-flex>
+          </n-form-item>
+        </n-flex>
 
-            <div class="row">
-              <span class="label">Виды безумия:</span>
-
-              <div class="checkbox-group">
-                <ui-checkbox
-                  v-for="(type, key) in types"
-                  :key="key"
-                  :model-value="type.toggled"
-                  type="crumb"
-                  @update:model-value="toggleType($event, type)"
-                >
-                  {{ type.name }}
-                </ui-checkbox>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+        <n-flex>
+          <n-button
+            type="primary"
+            attr-type="submit"
+          >
             Сгенерировать
-          </ui-button>
+          </n-button>
 
-          <ui-button @click.left.exact.prevent="results = []">
+          <n-button @click.left.exact.prevent="results = []">
             Очистить
-          </ui-button>
-        </div>
-      </form>
+          </n-button>
+        </n-flex>
+      </n-form>
     </template>
 
     <template #default>
