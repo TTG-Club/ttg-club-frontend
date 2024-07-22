@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-  import type { TButtonOption } from '@/shared/ui/kit/button/UiButton';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiSlider from '@/shared/ui/kit/slider/UiSlider.vue';
 
   import { useTokenator } from '@/pages/tools/tokenator/composable';
+
+  import type { MenuOption } from 'naive-ui';
 
   const {
     open,
@@ -17,16 +18,30 @@
     MAX_DIMENSION,
   } = useTokenator();
 
-  const variants: Array<TButtonOption> = [
+  const variants: Array<MenuOption> = [
     {
       key: 'webp',
       label: 'WEBP',
-      callback: () => load('webp'),
+      props: {
+        onClick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          load('webp');
+        },
+      },
     },
     {
       key: 'png',
       label: 'PNG',
-      callback: () => load('png'),
+      props: {
+        onClick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          load('png');
+        },
+      },
     },
   ];
 </script>
@@ -35,7 +50,7 @@
   <div :class="$style.wrapper">
     <div :class="$style.header">Описание</div>
 
-    <div :class="$style.text_container">
+    <div :class="$style.text">
       <p>Вес загружаемой картинки не более {{ MAX_SIZE }}&nbsp;MB</p>
 
       <p>
@@ -44,54 +59,83 @@
       </p>
     </div>
 
-    <div :class="$style.handlers">
-      <div :class="$style['configuration-container']">
-        <div :class="$style['resize-container']">
-          <ui-slider
-            v-model="scale"
-            v-bind="scaleConfig"
-          />
-        </div>
+    <n-flex
+      :style="{ marginTop: '42px' }"
+      align="flex-end"
+    >
+      <ui-slider
+        v-model="scale"
+        v-bind="scaleConfig"
+        :class="$style.slider"
+      />
 
-        <ui-button
-          v-tippy="{ content: 'Зеркальное отображение' }"
-          type="outline"
-          :body-class="$style.button"
+      <n-tooltip>
+        <template #trigger>
+          <n-button
+            :disabled="!file"
+            @click.left.exact.prevent="reflectImage = !reflectImage"
+          >
+            <template #icon>
+              <svg-icon icon="reflect" />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default> Зеркальное отображение </template>
+      </n-tooltip>
+
+      <n-tooltip>
+        <template #trigger>
+          <n-button
+            :disabled="!file"
+            @click.left.exact.prevent="centerImage = !centerImage"
+          >
+            <template #icon>
+              <svg-icon icon="centerAxis" />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default> Центрировать изображение </template>
+      </n-tooltip>
+    </n-flex>
+
+    <n-flex
+      :class="$style.buttons"
+      :style="{ marginTop: '24px' }"
+    >
+      <n-button
+        block
+        @click.left.exact.prevent="open"
+      >
+        Загрузить картинку
+      </n-button>
+
+      <n-button-group :style="{ width: '100%' }">
+        <n-button
+          type="primary"
           :disabled="!file"
-          icon="reflect"
-          @click.left.exact.prevent="reflectImage = !reflectImage"
-        />
-
-        <ui-button
-          v-tippy="{ content: 'Центрировать изображение' }"
-          type="outline"
-          :body-class="$style.button"
-          :disabled="!file"
-          icon="centerAxis"
-          @click.left.exact.prevent="centerImage = !centerImage"
-        />
-      </div>
-
-      <div :class="$style.buttons">
-        <ui-button
-          type="outline"
-          :body-class="$style.button"
-          @click.left.exact.prevent="open"
-        >
-          Загрузить картинку
-        </ui-button>
-
-        <ui-button
-          type="default"
-          split
-          :disabled="!file"
-          :options="variants"
+          :style="{ flex: '1 1 auto' }"
           @click.left.exact.prevent="load('png')"
         >
           Скачать
-        </ui-button>
-      </div>
-    </div>
+        </n-button>
+
+        <n-dropdown
+          :options="variants"
+          trigger="click"
+        >
+          <n-button
+            type="primary"
+            :disabled="!file"
+          >
+            <template #icon>
+              <svg-icon icon="arrow/down" />
+            </template>
+          </n-button>
+        </n-dropdown>
+      </n-button-group>
+    </n-flex>
   </div>
 </template>
 
@@ -116,32 +160,13 @@
     line-height: 30px;
   }
 
-  .text_container {
+  .text {
     margin-top: 8px;
     max-width: 290px;
   }
 
-  .handlers {
-    margin-top: 42px;
-  }
-
-  .resize-container {
+  .slider {
     flex: 1 1 auto;
-    margin: 0 8px 0 0;
-  }
-
-  .configuration-container {
-    display: flex;
-    align-items: center;
-  }
-
-  .buttons {
-    margin-top: 24px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .button {
-    color: var(--text-color-title);
+    margin-top: 8px;
   }
 </style>

@@ -5,6 +5,7 @@
     usePinch,
     useWheel,
   } from '@vueuse/gesture';
+  import { set } from '@vueuse/shared';
 
   import isAppleDevice from '@/shared/utils/isAppleDevice';
 
