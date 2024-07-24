@@ -108,18 +108,25 @@
 </script>
 
 <template>
-  <span
-    v-tippy="{ content: `Нажмите для броска: <b>${formula}</b>` }"
-    :class="classes"
-    class="dice-roller"
-    @dblclick.prevent.stop
-    @click.left.exact.prevent.stop="tryRoll()"
-    @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
-    @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
-    @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
-  >
-    <slot>{{ formula }}</slot>
-  </span>
+  <n-tooltip>
+    <template #trigger>
+      <span
+        :class="classes"
+        class="dice-roller"
+        @dblclick.prevent.stop
+        @click.left.exact.prevent.stop="tryRoll()"
+        @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
+        @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
+        @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
+      >
+        <slot>{{ formula }}</slot>
+      </span>
+    </template>
+
+    <template #default>
+      Нажмите для броска: <b>{{ formula }}</b>
+    </template>
+  </n-tooltip>
 </template>
 
 <style lang="scss" scoped>
