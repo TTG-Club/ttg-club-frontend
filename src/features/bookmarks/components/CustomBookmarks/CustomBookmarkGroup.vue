@@ -167,60 +167,59 @@
       </div>
     </div>
 
-    <div
-      v-if="isOpened"
-      class="bookmarks__group_body"
-    >
-      <draggable
-        :model-value="group.children"
-        chosen-class="bookmarks__cat_chosen"
-        drag-class="bookmarks__cat_drag"
-        ghost-class="bookmarks__cat_ghost"
-        group="category"
-        handle=".js-drag-category"
-        item-key="uuid"
-        tag="div"
-        @change="onChangeHandler"
-      >
-        <template #item="{ element: category }">
-          <custom-bookmark-category
-            :key="category.uuid + category.order"
-            :category="category"
-            :group="group"
-            :is-edit="isEdit || false"
+    <n-collapse-transition :show="isOpened">
+      <div class="bookmarks__group_body">
+        <draggable
+          :model-value="group.children"
+          chosen-class="bookmarks__cat_chosen"
+          drag-class="bookmarks__cat_drag"
+          ghost-class="bookmarks__cat_ghost"
+          group="category"
+          handle=".js-drag-category"
+          item-key="uuid"
+          tag="div"
+          @change="onChangeHandler"
+        >
+          <template #item="{ element: category }">
+            <custom-bookmark-category
+              :key="category.uuid + category.order"
+              :category="category"
+              :group="group"
+              :is-edit="isEdit || false"
+            />
+          </template>
+        </draggable>
+
+        <div
+          v-if="isCategoryCreating"
+          class="bookmarks__input"
+        >
+          <n-input
+            v-model:value="newCategoryName"
+            autofocus
+            placeholder="Название категории"
+            @keyup.enter.exact.prevent.stop="createCategory"
           />
-        </template>
-      </draggable>
 
-      <div
-        v-if="isCategoryCreating"
-        class="bookmarks__input"
-      >
-        <n-input
-          v-model:value="newCategoryName"
-          autofocus
-          placeholder="Название категории"
-          @keyup.enter.exact.prevent.stop="createCategory"
-        />
+          <n-button
+            quaternary
+            @click.left.exact.prevent="createCategory"
+          >
+            <template #icon>
+              <svg-icon icon="check" />
+            </template>
+          </n-button>
 
-        <n-button
-          quaternary
-          @click.left.exact.prevent="createCategory"
-        >
-          <template #icon>
-            <svg-icon icon="check" />
-          </template>
-        </n-button>
-
-        <n-button
-          quaternary
-          @click.left.exact.prevent="disableCategoryCreating"
-        >
-          <template #icon>
-            <svg-icon icon="close" />
-          </template>
-        </n-button>
+          <n-button
+            quaternary
+            @click.left.exact.prevent="disableCategoryCreating"
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
+        </div>
       </div>
-    </div>
+    </n-collapse-transition>
   </div>
 </template>

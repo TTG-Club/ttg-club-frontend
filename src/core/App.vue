@@ -2,6 +2,7 @@
   import { dateRuRU, ruRU } from 'naive-ui';
 
   import { configurateDayjs, themeOverrides } from '@/shared/config';
+  import { BREAKPOINTS } from '@/shared/const/breakpoints';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import { DiceHistory } from '@/features/dice-history/ui';
@@ -36,6 +37,7 @@
     :date-locale="dateRuRU"
     abstract
     inline-theme-disabled
+    :breakpoints="BREAKPOINTS"
   >
     <n-loading-bar-provider>
       <n-message-provider>

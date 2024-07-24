@@ -140,6 +140,7 @@
     </n-tooltip>
 
     <n-dropdown
+      v-if="groups.length"
       trigger="click"
       :options="groups"
       :show="isShowed"

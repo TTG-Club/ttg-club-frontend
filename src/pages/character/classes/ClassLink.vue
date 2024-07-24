@@ -169,13 +169,9 @@
           </n-tooltip>
         </div>
 
-        <transition
-          mode="out-in"
-          name="fade"
-        >
+        <n-collapse-transition :show="submenu">
           <div
             v-if="hasArchetypes"
-            v-show="submenu"
             class="link-item-expand__arch-list"
           >
             <div
@@ -222,7 +218,7 @@
               </div>
             </div>
           </div>
-        </transition>
+        </n-collapse-transition>
       </div>
     </div>
   </router-link>
