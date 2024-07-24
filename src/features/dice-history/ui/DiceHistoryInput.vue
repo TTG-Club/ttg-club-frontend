@@ -85,6 +85,7 @@
 
     <n-button
       secondary
+      type="tertiary"
       @click.left.exact.prevent="roll"
     >
       <template #icon>
