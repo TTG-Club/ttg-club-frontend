@@ -1,16 +1,14 @@
 <script lang="ts" setup>
-  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { useDiceHistory } from '@/features/dice-history/composables';
   import NavPopover from '@/features/menu/NavPopover.vue';
 
-  const { toggle, isOpen } = useDiceHistory();
-  const isShow = useAppBreakpoints().smaller('md');
+  const { toggle, isOpen, isNavButtonVisible } = useDiceHistory();
 </script>
 
 <template>
-  <nav-popover v-if="isShow">
+  <nav-popover v-if="isNavButtonVisible">
     <template #trigger>
       <div
         class="navbar__btn"

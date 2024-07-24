@@ -6,7 +6,7 @@
 
   import DiceHistoryWindowContent from './DiceHistoryWindowContent.vue';
 
-  const { isOpen, toggle } = useDiceHistory();
+  const { isOpen, toggle, isFloatButtonVisible } = useDiceHistory();
 </script>
 
 <template>
@@ -15,6 +15,7 @@
   </bottom-right-window>
 
   <n-float-button
+    v-if="isFloatButtonVisible"
     position="fixed"
     right="16"
     bottom="24"
