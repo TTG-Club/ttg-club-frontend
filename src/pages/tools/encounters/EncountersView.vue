@@ -1,224 +1,198 @@
-<script>
-  import { throttle } from 'lodash-es';
+<script setup lang="ts">
+  import { fromPairs, throttle, toPairs } from 'lodash-es';
 
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { httpClient } from '@/shared/api';
+  import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
-  import RollTable from '@/shared/ui/RollTable.vue';
+  import RollTable, { type IRollTable } from '@/shared/ui/RollTable.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  export default {
-    name: 'EncountersView',
-    components: {
-      RollTable,
-      BaseModal,
-      UiButton,
-      UiSelect,
-      RawContent,
-      ContentLayout,
-    },
-    data: () => ({
-      controller: undefined,
-      environments: [],
-      levels: [],
-      results: [],
-      table: {
-        show: false,
-        data: undefined,
-      },
-      form: {
-        level: '',
-        environment: '',
-      },
-    }),
-    computed: {
-      isTableDisabled() {
-        return this.form.level && this.form.environment;
-      },
+  import type { SelectOption } from 'naive-ui';
 
-      level: {
-        get() {
-          if (!this.form.level) {
-            return '';
-          }
+  interface EncounterItem {
+    tableName: string;
+    description: string;
+    source: TSource;
+  }
 
-          return this.levels.find((level) => level.value === this.form.level);
-        },
+  const controller = ref<AbortController>();
+  const environments = ref<Array<SelectOption>>([]);
+  const levels = ref<Array<SelectOption>>([]);
+  const results = ref<Array<EncounterItem>>([]);
 
-        set(e) {
-          this.form.level = e.value;
-        },
-      },
+  interface TableState {
+    show: boolean;
+    data?: IRollTable;
+  }
 
-      env: {
-        get() {
-          if (!this.form.environment) {
-            return '';
-          }
+  const table = reactive<TableState>({
+    show: false,
+    data: undefined,
+  });
 
-          return this.environments.find(
-            (env) => env.value === this.form.environment,
-          );
-        },
+  interface FormPayload {
+    level?: number;
+    environment?: string;
+  }
 
-        set(e) {
-          this.form.environment = e.value;
-        },
-      },
-    },
-    async beforeMount() {
-      await this.getOptions();
-    },
-    methods: {
-      async getOptions() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/encounters',
-          });
+  const form = reactive<FormPayload>({
+    level: undefined,
+    environment: undefined,
+  });
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  interface GetOptionsResponse {
+    environments: Array<TNameValue>;
+    levels: Array<TNameValue<number>>;
+  }
 
-            return;
-          }
+  const getOptions = async () => {
+    try {
+      const resp = await httpClient.get<GetOptionsResponse>({
+        url: '/tools/encounters',
+      });
 
-          this.environments = resp.data.environments;
-          this.levels = resp.data.levels;
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
 
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
+        return;
+      }
 
-        this.controller = new AbortController();
+      environments.value = resp.data.environments.map((env) => ({
+        label: env.name,
+        value: env.value,
+      }));
 
-        try {
-          const options = {};
-
-          for (const [key, value] of Object.entries(this.form)) {
-            if (!value) {
-              continue;
-            }
-
-            options[key] = value;
-          }
-
-          const resp = await this.$http.post({
-            url: '/tools/encounters',
-            payload: options,
-            signal: this.controller.signal,
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.results.unshift(reactive(resp.data));
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-
-      async getTable() {
-        if (this.controller) {
-          this.controller.abort();
-        }
-
-        this.controller = new AbortController();
-
-        try {
-          const resp = await this.$http.post({
-            url: '/tools/encounters/table',
-            payload: this.form,
-            signal: this.controller.signal,
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          this.table = {
-            show: true,
-            data: resp.data,
-          };
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      },
-    },
+      levels.value = resp.data.levels.map((level) => ({
+        label: level.name,
+        value: level.value,
+      }));
+    } catch (err) {
+      errorHandler(err);
+    }
   };
+
+  // eslint-disable-next-line func-names
+  const sendForm = throttle(async function () {
+    if (controller.value) {
+      controller.value.abort();
+    }
+
+    controller.value = new AbortController();
+
+    try {
+      const options: Partial<FormPayload> = fromPairs(
+        toPairs(form).filter(([key, value]) => key && !!value),
+      );
+
+      const resp = await httpClient.post<EncounterItem>({
+        url: '/tools/encounters',
+        payload: options,
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      results.value.unshift(reactive(resp.data));
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
+  }, 300);
+
+  const getTable = async () => {
+    if (controller.value) {
+      controller.value.abort();
+    }
+
+    controller.value = new AbortController();
+
+    try {
+      const resp = await httpClient.post<IRollTable>({
+        url: '/tools/encounters/table',
+        payload: form,
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      table.data = resp.data;
+      table.show = true;
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
+  };
+
+  getOptions();
+
+  const isTableDisabled = computed(() => {
+    return form.level && form.environment;
+  });
 </script>
 
 <template>
   <content-layout>
     <template #fixed>
-      <form
+      <n-form
         class="tools_settings"
-        @submit.prevent="sendForm"
+        @submit.prevent.stop="sendForm"
+        @keyup.enter.exact.prevent.stop="sendForm"
       >
-        <div class="tools_settings__row">
-          <div class="tools_settings__column">
-            <div class="row">
-              <span class="label">Средний уровень Группы</span>
+        <n-flex>
+          <n-form-item label="Средний уровень Группы">
+            <n-select
+              v-model:value="form.level"
+              :options="levels"
+              placeholder="Уровень"
+            />
+          </n-form-item>
 
-              <ui-select
-                v-model="level"
-                :options="levels"
-                label="name"
-                track-by="value"
-              >
-                <template #placeholder> Уровень </template>
-              </ui-select>
-            </div>
+          <n-form-item label="Окружение">
+            <n-select
+              v-model:value="form.environment"
+              :options="environments"
+              placeholder="Окружение"
+            />
+          </n-form-item>
+        </n-flex>
 
-            <div class="row">
-              <span class="label">Окружение</span>
-
-              <ui-select
-                v-model="env"
-                :options="environments"
-                label="name"
-                track-by="value"
-              >
-                <template #placeholder> Окружение </template>
-              </ui-select>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+        <n-flex>
+          <n-button
+            type="primary"
+            attr-type="submit"
+          >
             Сгенерировать
-          </ui-button>
+          </n-button>
 
-          <ui-button @click.left.exact.prevent="results = []">
+          <n-button
+            secondary
+            @click.left.exact.prevent="results = []"
+          >
             Очистить
-          </ui-button>
+          </n-button>
 
-          <ui-button
+          <n-button
             v-if="isTableDisabled"
+            secondary
             @click.left.exact.prevent="getTable"
           >
             Показать таблицу
-          </ui-button>
-        </div>
-      </form>
+          </n-button>
+        </n-flex>
+      </n-form>
     </template>
 
     <template #default>
