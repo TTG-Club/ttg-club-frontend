@@ -1,145 +1,184 @@
-<script>
+<script setup lang="ts">
   import { throttle } from 'lodash-es';
 
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import { httpClient } from '@/shared/api';
+  import type { TSource } from '@/shared/types/BaseApiFields';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  export default {
-    name: 'WildMagicView',
-    components: {
-      RawContent,
-      UiCheckbox,
-      ContentLayout,
-      UiInput,
-      UiButton,
-    },
-    data: () => ({
-      count: 1,
-      tables: [],
-      results: [],
-      controller: undefined,
-    }),
-    async beforeMount() {
-      await this.getTables();
-    },
-    methods: {
-      async getTables() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/wildmagic',
-          });
+  interface WildMagicSource extends TSource {
+    checked: boolean;
+  }
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  interface WildMagicItem {
+    description: string;
+    source: TSource;
+  }
 
-            return;
-          }
+  const count = ref(1);
+  const sources = ref<Array<WildMagicSource>>([]);
+  const results = ref<Array<WildMagicItem>>([]);
+  const controller = ref<AbortController>();
 
-          this.tables = resp.data.map((source) => ({
-            ...source,
-            value: source.shortName === 'PHB',
-          }));
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
+  const resetSourceValue = () => {
+    const phbSourceIndex = sources.value.findIndex(
+      (source) => source.shortName === 'PHB',
+    );
 
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
+    if (phbSourceIndex < 0) {
+      sources.value[0].checked = true;
+    }
 
-        this.controller = new AbortController();
-
-        try {
-          const options = {
-            count: this.count || 1,
-            sources: this.tables
-              .filter((source) => source.value)
-              .map((source) => source.shortName),
-          };
-
-          const resp = await this.$http.post({
-            url: '/tools/wildmagic',
-            payload: options,
-            signal: this.controller.signal,
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          for (const el of resp.data) {
-            this.results.unshift(reactive(el));
-          }
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-    },
+    sources.value[phbSourceIndex].checked = true;
   };
+
+  const onSourceCheckedUpdate = (
+    name: WildMagicSource['shortName'],
+    value: WildMagicSource['checked'],
+  ) => {
+    const index = sources.value.findIndex(
+      (source) => source.shortName === name,
+    );
+
+    if (index < 0) {
+      return;
+    }
+
+    const checkedCount = sources.value.filter(
+      (source) => source.shortName !== name && source.checked,
+    ).length;
+
+    if (checkedCount > 0 || value) {
+      sources.value[index].checked = value;
+    }
+  };
+
+  const getTables = async () => {
+    try {
+      const resp = await httpClient.get<Array<TSource>>({
+        url: '/tools/wildmagic',
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      sources.value = resp.data.reverse().map((source) => ({
+        ...source,
+        checked: false,
+      }));
+
+      resetSourceValue();
+    } catch (err) {
+      errorHandler(err);
+    }
+  };
+
+  // eslint-disable-next-line func-names
+  const sendForm = throttle(async function () {
+    if (controller.value) {
+      controller.value.abort();
+    }
+
+    controller.value = new AbortController();
+
+    try {
+      const options = {
+        count: count.value || 1,
+        sources: sources.value
+          .filter((source) => source.checked)
+          .map((source) => source.shortName),
+      };
+
+      const resp = await httpClient.post<Array<WildMagicItem>>({
+        url: '/tools/wildmagic',
+        payload: options,
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      for (const el of resp.data) {
+        results.value.unshift(reactive(el));
+      }
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
+  }, 300);
+
+  getTables();
 </script>
 
 <template>
   <content-layout>
     <template #fixed>
-      <form
+      <n-form
         class="tools_settings"
-        @submit.prevent="sendForm"
+        @submit.prevent.stop="sendForm"
+        @keyup.enter.exact.prevent="sendForm"
       >
-        <div class="tools_settings__row">
-          <div class="tools_settings__column">
-            <div class="row">
-              <span class="label">Количество:</span>
+        <n-flex>
+          <n-form-item label="Количество">
+            <n-input-number
+              v-model:value="count"
+              placeholder="Количество"
+              :min="1"
+            />
+          </n-form-item>
 
-              <ui-input
-                v-model="count"
-                class="form-control select"
-                type="number"
-                :min="1"
-                placeholder="Количество"
-              />
-            </div>
+          <n-form-item label="Источники">
+            <n-flex>
+              <n-tooltip
+                v-for="(source, key) in sources"
+                :key="key"
+              >
+                <template #trigger>
+                  <n-tag
+                    :checked="source.checked"
+                    checkable
+                    round
+                    @update:checked="
+                      onSourceCheckedUpdate(source.shortName, $event)
+                    "
+                  >
+                    {{ source.shortName }}
+                  </n-tag>
+                </template>
 
-            <div class="row">
-              <span class="label">Источники:</span>
+                <template #default>
+                  {{ source.name }}
+                </template>
+              </n-tooltip>
+            </n-flex>
+          </n-form-item>
+        </n-flex>
 
-              <div class="checkbox-group">
-                <ui-checkbox
-                  v-for="(source, key) in tables"
-                  :key="key"
-                  v-tippy="{ content: source.name }"
-                  :model-value="source.value"
-                  type="crumb"
-                  @update:model-value="source.value = $event"
-                >
-                  {{ source.shortName }}
-                </ui-checkbox>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+        <n-flex>
+          <n-button
+            type="primary"
+            attr-type="submit"
+          >
             Сгенерировать
-          </ui-button>
+          </n-button>
 
-          <ui-button @click.left.exact.prevent="results = []">
+          <n-button
+            secondary
+            @click.left.exact.prevent="results = []"
+          >
             Очистить
-          </ui-button>
-        </div>
-      </form>
+          </n-button>
+        </n-flex>
+      </n-form>
     </template>
 
     <template #default>
@@ -149,15 +188,23 @@
         class="wild-magic-item"
       >
         <div class="wild-magic-item__body">
-          <raw-content :template="item.description" />
+          <raw-content
+            tag="span"
+            :template="item.description"
+          />
         </div>
 
-        <div
-          v-tippy="{ content: item.source.name }"
-          class="wild-magic-item__src"
-        >
-          {{ item.source.shortName }}
-        </div>
+        <n-tooltip>
+          <template #trigger>
+            <div class="wild-magic-item__src">
+              {{ item.source.shortName }}
+            </div>
+          </template>
+
+          <template #default>
+            {{ item.source.name }}
+          </template>
+        </n-tooltip>
       </div>
     </template>
   </content-layout>
@@ -177,6 +224,12 @@
 
     &__body {
       flex: 1 1 100%;
+
+      :deep(p) {
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
     }
 
     &__src {
