@@ -162,8 +162,8 @@
 
     @include media-min($md) {
       top: unset;
-      right: var(--fab-y-offset);
-      bottom: calc(var(--fab-size) + var(--fab-y-offset) + 8px);
+      right: 16px;
+      bottom: calc(50px + 16px + 8px);
       left: unset;
       width: 300px;
     }

@@ -1,12 +1,9 @@
 <script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
-  import { useClassName } from '@/shared/composable/useClassName';
   import { useDiceRoller } from '@/shared/composable/useDiceRoller';
   import { ToastEventBus } from '@/shared/config';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-
-  const cn = useClassName();
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   const currentInput = ref('');
   const invalid = ref(false);
@@ -70,60 +67,29 @@
 </script>
 
 <template>
-  <div :class="cn()">
-    <input
-      v-model="currentInput"
-      :class="cn('input')"
-      type="text"
+  <n-input-group>
+    <n-input
+      v-model:value="currentInput"
       placeholder="Введите формулу"
-      aria-label="Формула для броска"
-      @keyup.enter="roll"
-      @keyup.up="traverseHistory('up')"
-      @keyup.down="traverseHistory('down')"
+      :input-props="{
+        'aria-label': 'Формула для броска',
+        'autocapitalize': 'off',
+        'autocomplete': 'off',
+        'formnovalidate': true,
+      }"
+      clearable
+      @keyup.enter.exact.prevent="roll"
+      @keyup.up.exact.prevent="traverseHistory('up')"
+      @keyup.down.exact.prevent="traverseHistory('down')"
     />
 
-    <ui-button
-      type="plain"
-      size="md"
-      icon="dice/d6"
-      color="text"
-      :class="cn('button', { invalid })"
-      @click="roll"
-    />
-  </div>
+    <n-button
+      secondary
+      @click.left.exact.prevent="roll"
+    >
+      <template #icon>
+        <svg-icon icon="dice/d6" />
+      </template>
+    </n-button>
+  </n-input-group>
 </template>
-
-<style lang="scss" module>
-  .dice-history-input {
-    $root: &;
-
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-
-    &__input {
-      all: unset;
-      display: block;
-      flex: auto;
-      padding: 8px 12px;
-      font-size: var(--main-font-size);
-      line-height: 22px;
-    }
-
-    &__button {
-      color: var(--text-b-color);
-
-      &:hover {
-        color: var(--text-color);
-      }
-
-      &--invalid {
-        color: var(--error);
-
-        &:hover {
-          color: var(--error-hover);
-        }
-      }
-    }
-  }
-</style>
