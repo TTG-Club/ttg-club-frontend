@@ -121,11 +121,17 @@
         @keyup.enter.exact.prevent.stop="sendForm"
       >
         <n-flex>
-          <n-form-item label="Количество">
+          <n-form-item
+            label="Количество"
+            :style="{ minWidth: '254px' }"
+          >
             <n-input-number v-model:value="count" />
           </n-form-item>
 
-          <n-form-item label="Вид безумия">
+          <n-form-item
+            label="Вид безумия"
+            :style="{ minWidth: '254px' }"
+          >
             <n-flex>
               <n-tag
                 v-for="(type, key) in types"
@@ -185,5 +191,11 @@
     display: block;
     margin-bottom: 12px;
     padding: 12px;
+
+    :deep(p) {
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
   }
 </style>

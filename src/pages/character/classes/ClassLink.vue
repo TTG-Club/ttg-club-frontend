@@ -86,7 +86,6 @@
     v-bind="omit($props, 'to')"
   >
     <div
-      ref="classItem"
       :class="getClassList"
       class="link-item-expand"
       v-bind="$attrs"
@@ -129,23 +128,42 @@
                 </span>
               </span>
 
-              <span class="link-item-expand__body_row">
-                <span class="link-item-expand__tag">
+              <n-flex
+                :style="{ marginTop: 'auto' }"
+                size="small"
+              >
+                <n-tag
+                  type="primary"
+                  round
+                  size="small"
+                  :color="{
+                    color: 'var(--primary-active)',
+                    textColor: 'var(--text-btn-color)',
+                  }"
+                >
                   {{ classItem.dice }}
-                </span>
+                </n-tag>
 
                 <n-tooltip>
                   <template #trigger>
-                    <span class="link-item-expand__tag">
+                    <n-tag
+                      type="primary"
+                      round
+                      size="small"
+                      :color="{
+                        color: 'var(--primary-active)',
+                        textColor: 'var(--text-btn-color)',
+                      }"
+                    >
                       {{ classItem.source.shortName }}
-                    </span>
+                    </n-tag>
                   </template>
 
                   <template #default>
                     {{ classItem.source.name }}
                   </template>
                 </n-tooltip>
-              </span>
+              </n-flex>
             </span>
           </a>
 

@@ -127,7 +127,10 @@
         @keyup.enter.exact.prevent="sendForm"
       >
         <n-flex>
-          <n-form-item label="Количество">
+          <n-form-item
+            label="Количество"
+            :style="{ minWidth: '254px' }"
+          >
             <n-input-number
               v-model:value="count"
               placeholder="Количество"
@@ -135,7 +138,10 @@
             />
           </n-form-item>
 
-          <n-form-item label="Источники">
+          <n-form-item
+            label="Источники"
+            :style="{ minWidth: '254px' }"
+          >
             <n-flex>
               <n-tooltip
                 v-for="(source, key) in sources"

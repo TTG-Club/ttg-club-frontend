@@ -151,7 +151,10 @@
         @keyup.enter.exact.prevent.stop="sendForm"
       >
         <n-flex>
-          <n-form-item label="Средний уровень Группы">
+          <n-form-item
+            label="Средний уровень Группы"
+            :style="{ minWidth: '254px' }"
+          >
             <n-select
               v-model:value="form.level"
               :options="levels"
@@ -159,7 +162,10 @@
             />
           </n-form-item>
 
-          <n-form-item label="Окружение">
+          <n-form-item
+            label="Окружение"
+            :style="{ minWidth: '254px' }"
+          >
             <n-select
               v-model:value="form.environment"
               :options="environments"
@@ -238,5 +244,11 @@
     display: block;
     margin-bottom: 12px;
     padding: 12px;
+
+    :deep(p) {
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
   }
 </style>

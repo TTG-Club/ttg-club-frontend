@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+  import { omit } from 'lodash-es';
+
   import { httpClient } from '@/shared/api';
   import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type {
@@ -72,10 +74,9 @@
   <router-link
     :to="{ path: spell.url }"
     custom
-    v-bind="$props"
+    v-bind="omit($props, 'to')"
   >
     <a
-      ref="spell"
       :class="classList"
       :href="href"
       class="link-item"
@@ -91,7 +92,7 @@
           }"
           class="link-item__lvl"
         >
-          <span>{{ spell.level || '◐' }}</span>
+          {{ spell.level || '◐' }}
         </div>
 
         <div class="link-item__body">
@@ -225,6 +226,7 @@
       border-right: 1px solid var(--border);
       margin-right: 12px;
       margin-left: -8px;
+      text-align: center;
     }
 
     &__modifications {

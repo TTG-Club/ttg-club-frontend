@@ -19,6 +19,8 @@ export const light: GlobalThemeOverrides = {
     primaryColorHover: 'var(--primary-hover)',
     primaryColorPressed: 'var(--primary-hover)',
     popoverColor: '#ebe5d0',
+    fontFamily: '"Open Sans", sans-serif',
+    fontFamilyMono: '"Monaco", monospace sans-serif',
   },
   Skeleton: {
     color: 'var(--hover)',

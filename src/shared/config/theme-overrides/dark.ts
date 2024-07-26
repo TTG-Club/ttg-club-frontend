@@ -19,13 +19,17 @@ export const dark: GlobalThemeOverrides = {
     primaryColorHover: 'var(--primary-hover)',
     primaryColorPressed: 'var(--primary-hover)',
     popoverColor: '#1d282f',
+    fontFamily: '"Open Sans", sans-serif',
+    fontFamilyMono: '"Monaco", monospace sans-serif',
   },
   Skeleton: {
     color: 'var(--hover)',
     colorEnd: 'var(--bg-main)',
   },
   Input: {
-    groupLabelColor: 'var(--text-color)',
+    groupLabelColor: 'var(--primary)',
+    groupLabelTextColor: 'var(--text-b-color)',
+    groupLabelBorder: 'var(--border)',
     colorFocus: 'var(--hover)',
     border: '1px solid var(--border)',
     borderHover: '1px solid var(--border)',

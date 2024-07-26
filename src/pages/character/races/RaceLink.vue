@@ -155,26 +155,41 @@
                 </span>
               </span>
 
-              <span class="link-item-expand__body_row">
-                <span
+              <n-flex
+                :style="{ marginTop: 'auto' }"
+                size="small"
+              >
+                <n-tag
                   v-if="abilities"
-                  class="link-item-expand__tag"
+                  round
+                  size="small"
+                  :color="{
+                    color: 'var(--primary-active)',
+                    textColor: 'var(--text-btn-color)',
+                  }"
                 >
                   {{ abilities }}
-                </span>
+                </n-tag>
 
                 <n-tooltip>
                   <template #trigger>
-                    <span class="link-item-expand__tag">
+                    <n-tag
+                      round
+                      size="small"
+                      :color="{
+                        color: 'var(--primary-active)',
+                        textColor: 'var(--text-btn-color)',
+                      }"
+                    >
                       {{ raceItem.source.shortName }}
-                    </span>
+                    </n-tag>
                   </template>
 
                   <template #default>
                     {{ raceItem.source.name }}
                   </template>
                 </n-tooltip>
-              </span>
+              </n-flex>
             </span>
           </a>
 

@@ -263,8 +263,12 @@
   }
 
   &-tooltip {
-    @include media-max($lg) {
+    &:not(.mobile-show) {
       display: none;
+
+      @include media-min($lg) {
+        display: block;
+      }
     }
   }
 }

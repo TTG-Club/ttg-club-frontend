@@ -267,7 +267,10 @@
         @submit.prevent.stop="sendForm"
         @keyup.enter.exact.prevent.stop="sendForm"
       >
-        <n-form-item label="Показатель опасности монстров">
+        <n-form-item
+          label="Показатель опасности монстров"
+          :style="{ minWidth: '254px' }"
+        >
           <n-select
             v-model:value="form.cr"
             :options="crList"
