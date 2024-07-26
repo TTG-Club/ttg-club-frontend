@@ -3,6 +3,7 @@
 @use 'tippy.js/dist/tippy.css';
 @use 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 @use 'vue-toastification/src/scss' as *;
+@use 'variables' as *;
 
 [data-tippy-root] {
   display: inline;
