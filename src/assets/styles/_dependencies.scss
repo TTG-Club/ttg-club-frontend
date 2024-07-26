@@ -260,4 +260,10 @@
       width: 100%;
     }
   }
+
+  &-tooltip {
+    @include media-max($lg) {
+      display: none;
+    }
+  }
 }
