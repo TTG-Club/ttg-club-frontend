@@ -6,6 +6,7 @@ import AutoImport from 'unplugin-auto-import/vite';
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig, loadEnv } from 'vite';
+import checker from 'vite-plugin-checker';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
@@ -54,6 +55,24 @@ export default ({ mode }: ConfigEnv) => {
       },
     },
     plugins: [
+      checker({
+        vueTsc: false, // TODO: enable after types fix
+        eslint: {
+          lintCommand:
+            'eslint "{**/*,*}.{cjs,js,ts,jsx,tsx,vue}" --cache --cache-strategy content --ignore-path .eslintignore --quiet',
+          dev: {
+            logLevel: ['error'],
+          },
+        },
+        stylelint: {
+          lintCommand:
+            'stylelint "{**/*,*}.{css,scss,vue}" --cache --cache-strategy content --ignore-path .eslintignore --quiet',
+          dev: {
+            logLevel: ['error'],
+          },
+        },
+        terminal: false,
+      }),
       ViteEjsPlugin(() => ({
         env,
         mode,

@@ -79,11 +79,13 @@
     max-width: 698px;
 
     &__container {
-      background-color: var(--bg-secondary);
-      max-height: calc(var(--max-vh) / 100 * 90);
       overflow: hidden;
-      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
       display: flex;
+
+      max-height: calc(var(--max-vh) / 100 * 90);
+
+      background-color: var(--bg-secondary);
+      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
 
       @include media-min($sm) {
         border-radius: 8px;
@@ -95,9 +97,9 @@
     }
 
     &__bg {
+      display: none;
       width: 240px;
       object-fit: cover;
-      display: none;
 
       @include media-min($md) {
         display: block;
@@ -105,11 +107,13 @@
     }
 
     &__content {
+      position: relative;
+
+      overflow: auto;
       flex: 1 1 100%;
+
       max-height: var(--max-vh);
       padding: 16px;
-      position: relative;
-      overflow: auto;
 
       @include media-min($md) {
         padding: 48px;
@@ -117,9 +121,9 @@
     }
 
     &__header {
-      width: 100%;
       display: flex;
       justify-content: flex-end;
+      width: 100%;
     }
 
     &__close {
@@ -129,14 +133,14 @@
     }
 
     &__body {
-      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      height: 100%;
 
       h4 {
-        margin: 0;
         pointer-events: none;
+        margin: 0;
       }
     }
 

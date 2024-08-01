@@ -14,13 +14,13 @@
 
   &-enter-active,
   &-leave-active {
-    @include css_anim;
+    @include css-anim;
   }
 }
 
 .vue-anim {
   &-fade-enter-active {
-    @include css_anim;
+    @include css-anim;
   }
 
   &-fade-leave-active {

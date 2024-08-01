@@ -174,10 +174,10 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .youtube-player {
-    width: 100%;
+    cursor: pointer;
     position: relative;
     display: block;
-    cursor: pointer;
+    width: 100%;
 
     .body {
       position: relative;
@@ -185,14 +185,17 @@
     }
 
     .video {
+      position: relative;
+
+      overflow: hidden;
+
       width: 100%;
       padding-bottom: calc(720 / 1280 * 100%);
+
       background-color: #000000;
-      position: relative;
-      overflow: hidden;
       background: {
-        size: cover;
         position: center;
+        size: cover;
       }
 
       &.radius {
@@ -202,50 +205,58 @@
     }
 
     .iframe {
-      width: 100%;
-      height: 100%;
       position: absolute;
       top: 0;
       left: 0;
+
+      width: 100%;
+      height: 100%;
     }
 
     .btn {
-      @include css_anim(
+      cursor: pointer;
+
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate3d(-50%, -50%, 0);
+
+      display: block;
+
+      width: 68px;
+      height: 48px;
+
+      color: var(--youtube-base);
+
+      border: none;
+
+      @include css-anim(
         $item: color,
         $time: 0.2s,
         $style: cubic-bezier(0, 0, 0.2, 1)
       );
-
-      display: block;
-      width: 68px;
-      height: 48px;
-      position: absolute;
-      cursor: pointer;
-      transform: translate3d(-50%, -50%, 0);
-      top: 50%;
-      left: 50%;
-      border: none;
-      color: var(--youtube-base);
     }
 
     .name {
       display: block;
+
       padding: 8px;
+
       background-color: var(--bg-main);
-      border-bottom-left-radius: 8px;
       border-bottom-right-radius: 8px;
+      border-bottom-left-radius: 8px;
     }
 
     &:hover,
     &:focus-within {
       .btn {
-        @include css_anim(
+        color: var(--youtube-hover);
+
+        @include css-anim(
           $item: color,
           $time: 0.2s,
           $style: cubic-bezier(0, 0, 0.2, 1)
         );
-
-        color: var(--youtube-hover);
       }
     }
 

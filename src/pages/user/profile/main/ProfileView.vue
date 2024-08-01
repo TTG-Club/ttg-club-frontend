@@ -234,14 +234,16 @@
       align-items: flex-end;
 
       &_avatar {
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
+
         width: 96px;
         height: 96px;
-        border-radius: 8px;
-        overflow: hidden;
+
         border: 1px solid var(--primary);
+        border-radius: 8px;
 
         img {
           width: 100%;
@@ -282,15 +284,17 @@
     }
 
     &__block {
-      background-color: var(--bg-secondary);
-      padding: 24px;
-      border-radius: 8px;
       display: flex;
       flex-direction: column;
 
+      padding: 24px;
+
+      background-color: var(--bg-secondary);
+      border-radius: 8px;
+
       &_name {
-        margin: 0;
         flex-shrink: 0;
+        margin: 0;
         font-size: var(--h4-font-size);
         line-height: var(--h4-line-height);
       }
@@ -309,12 +313,14 @@
       }
 
       &_footer {
-        flex-shrink: 0;
         display: flex;
+        flex-shrink: 0;
         gap: 12px;
+
         margin-top: 12px;
-        border-top: 1px solid var(--border);
         padding-top: 12px;
+
+        border-top: 1px solid var(--border);
       }
     }
   }

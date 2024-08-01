@@ -78,8 +78,8 @@
   @use '@/assets/styles/modules/bookmarks';
 
   .nav-bookmarks {
+    overflow: hidden;
     display: flex;
     height: 100%;
-    overflow: hidden;
   }
 </style>

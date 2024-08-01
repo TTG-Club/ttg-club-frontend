@@ -18,10 +18,10 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .icon-toast-close {
-    @include css_anim();
-
     opacity: 1;
     border-radius: 8px;
+
+    @include css-anim();
 
     &:hover {
       background-color: var(--hover);

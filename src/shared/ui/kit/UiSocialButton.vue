@@ -51,15 +51,19 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .ui-social-button {
-    @include css_anim($time: 0.2s);
+    user-select: none;
 
-    padding: 8px 16px;
-    border-radius: 30px;
     display: inline-flex;
     align-items: center;
-    text-decoration: none;
+
+    padding: 8px 16px;
+
     color: var(--text-btn-color);
-    user-select: none;
+    text-decoration: none;
+
+    border-radius: 30px;
+
+    @include css-anim($time: 0.2s);
 
     &__icon {
       width: 24px;
@@ -118,13 +122,13 @@
     }
 
     &.is-transparent {
-      background-color: transparent;
       color: var(--text-color);
+      background-color: transparent;
 
       @include media-min($md) {
         &:hover {
-          background-color: var(--hover);
           opacity: 100%;
+          background-color: var(--hover);
         }
       }
     }

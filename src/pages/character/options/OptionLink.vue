@@ -101,7 +101,6 @@
     v-bind="$props"
   >
     <a
-      ref="optionItem"
       :class="classList"
       :href="href"
       class="link-item"

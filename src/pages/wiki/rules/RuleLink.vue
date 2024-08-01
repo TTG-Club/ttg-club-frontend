@@ -40,7 +40,6 @@
     v-bind="$props"
   >
     <a
-      ref="ruleItem"
       :class="classList"
       :href="href"
       class="link-item"

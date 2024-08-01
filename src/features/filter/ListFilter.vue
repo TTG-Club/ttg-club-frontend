@@ -254,8 +254,8 @@
   }
 
   :deep(.ui-input__control) {
-    border: 0;
     background-color: transparent;
+    border: 0;
 
     .ui-input__input {
       padding: 0;

@@ -469,24 +469,28 @@
 
   .class-detail {
     overflow: hidden;
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
 
+    width: 100%;
+    height: 100%;
+
     &__loader {
-      width: 100%;
-      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
 
+      width: 100%;
+      height: 100%;
+
       &_img {
-        width: 70%;
         position: relative;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
+        width: 70%;
 
         &:before {
           content: '';
@@ -496,10 +500,12 @@
         }
 
         img {
+          position: absolute;
+
           width: 100%;
           height: 100%;
+
           object-fit: contain;
-          position: absolute;
           filter: drop-shadow(0 0 12px var(--bg-main));
         }
       }
@@ -514,37 +520,42 @@
     }
 
     &__tab {
-      @include css_anim();
+      cursor: pointer;
 
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 16px;
-      cursor: pointer;
-      height: 34px;
+
       min-width: fit-content;
+      height: 34px;
+      padding: 0 16px;
+
+      background: var(--bg-sub-menu);
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: var(--bg-sub-menu);
+
+      @include css-anim();
 
       &.is-only-icon {
         flex: 1 0 fit-content;
       }
 
       &_icon {
-        width: 24px;
-        height: 24px;
         display: flex;
+        flex-shrink: 0;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+
+        width: 24px;
+        height: 24px;
+
         color: var(--primary);
       }
 
       &_name {
+        font-size: var(--main-font-size);
         color: var(--text-color);
         white-space: nowrap;
-        font-size: var(--main-font-size);
       }
 
       @include media-min($md) {
@@ -574,18 +585,19 @@
     }
 
     &__content {
-      width: 100%;
-      flex: 1 1 100%;
-      max-height: 100%;
       overflow: hidden;
       display: flex;
+      flex: 1 1 100%;
       flex-direction: column;
+
+      width: 100%;
+      max-height: 100%;
     }
 
     &__body {
-      width: 100%;
-      flex: 1 1 100%;
       overflow: auto;
+      flex: 1 1 100%;
+      width: 100%;
 
       &--inner {
         padding: 0 16px;

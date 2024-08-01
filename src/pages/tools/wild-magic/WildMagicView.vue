@@ -217,15 +217,17 @@
 
 <style lang="scss" scoped>
   .wild-magic-item {
-    border-radius: 12px;
     overflow: hidden;
-    background-color: var(--bg-table-list);
-    width: 100%;
     display: flex;
+    gap: 16px;
     align-items: flex-start;
+
+    width: 100%;
     margin-bottom: 12px;
     padding: 12px;
-    gap: 16px;
+
+    background-color: var(--bg-table-list);
+    border-radius: 12px;
 
     &__body {
       flex: 1 1 100%;

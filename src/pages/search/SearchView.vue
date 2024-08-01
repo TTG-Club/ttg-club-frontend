@@ -353,34 +353,38 @@
 
     &__controls {
       position: sticky;
+      z-index: 10;
       top: 0;
-      padding: 16px 0;
+
       margin: -16px 0;
+      padding: 16px 0;
+
       opacity: 1;
       background-color: var(--bg-main);
-      z-index: 10;
     }
 
     &__control {
       display: flex;
 
       &_body {
-        display: flex;
-        background: var(--bg-sub-menu);
         overflow: hidden;
+        display: flex;
         flex: 1 1 auto;
+        background: var(--bg-sub-menu);
         border: {
           width: 1px;
-          style: solid;
+
           color: var(--border);
+
           radius: 8px 0 0 8px;
           right-width: 0;
+          style: solid;
         }
       }
 
       &_icon {
-        padding: 8px;
         flex-shrink: 0;
+        padding: 8px;
         font-size: 24px;
 
         svg {
@@ -391,6 +395,12 @@
 
         &.in-progress {
           svg {
+            animation: {
+              duration: 1.5s;
+              iteration-count: infinite;
+              name: loader;
+            }
+
             @keyframes loader {
               from {
                 transform: rotate(0deg);
@@ -400,20 +410,14 @@
                 transform: rotate(360deg);
               }
             }
-
-            animation: {
-              name: loader;
-              duration: 1.5s;
-              iteration-count: infinite;
-            }
           }
         }
       }
 
       &_btn {
         :deep(button) {
-          border-radius: 0 8px 8px 0;
           padding: 13px 16px;
+          border-radius: 0 8px 8px 0;
         }
       }
     }
@@ -429,7 +433,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+
         padding: 32px 12px;
+
         color: var(--text-color);
       }
     }
@@ -437,9 +443,11 @@
     &__paginate {
       position: sticky;
       bottom: 0;
-      background-color: var(--bg-main);
-      padding: 8px 0 16px 0;
+
       margin: -8px 0 -24px 0;
+      padding: 8px 0 16px 0;
+
+      background-color: var(--bg-main);
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
     }

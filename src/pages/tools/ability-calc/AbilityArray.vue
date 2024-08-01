@@ -128,12 +128,15 @@
 
     &:after {
       content: '';
+
       display: block;
+
       width: 10px;
       height: 10px;
-      border-radius: 50%;
-      background-color: var(--primary);
       margin-right: 8px;
+
+      background-color: var(--primary);
+      border-radius: 50%;
     }
   }
 </style>

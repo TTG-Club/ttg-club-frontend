@@ -74,7 +74,9 @@
   .dice-history-window-content {
     display: grid;
     grid-template-rows: auto 1fr;
+
     height: 100%;
+
     background-color: var(--bg-sub-menu);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -84,21 +86,21 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+
       padding: 4px 4px 4px 12px;
+
+      border-bottom: 1px solid var(--border);
     }
 
     &__content {
-      overflow-y: auto;
-      padding: 0 8px;
       scrollbar-color: var(--text-g-color) var(--bg-sub-menu);
-      display: flex;
-      flex-flow: column nowrap;
-      flex: 1;
 
-      > *:first-child {
-        margin-top: auto;
-      }
+      overflow-y: auto;
+      display: flex;
+      flex: 1;
+      flex-flow: column nowrap;
+
+      padding: 0 8px;
 
       &::-webkit-scrollbar {
         width: 6px;
@@ -106,6 +108,10 @@
         &-thumb {
           background: var(--text-g-color);
         }
+      }
+
+      > *:first-child {
+        margin-top: auto;
       }
     }
 

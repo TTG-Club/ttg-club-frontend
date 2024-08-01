@@ -7,7 +7,7 @@ export const BREAKPOINTS: Record<TBreakpoint, number> = {
   lg: 992,
   xl: 1200,
   xxl: 1400,
-  fullHD: 1920,
+  fullHd: 1920,
   retina: 2560,
-  ultraHD: 3840,
+  ultraHd: 3840,
 };

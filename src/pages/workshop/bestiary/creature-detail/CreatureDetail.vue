@@ -108,24 +108,28 @@
 <style lang="scss" scoped>
   .creature-detail {
     overflow: hidden;
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
 
+    width: 100%;
+    height: 100%;
+
     &__loader {
-      width: 100%;
-      flex: 1 1 100%;
       display: flex;
+      flex: 1 1 100%;
       align-items: center;
       justify-content: center;
 
+      width: 100%;
+
       &_img {
-        width: 70%;
         position: relative;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
+        width: 70%;
 
         &:before {
           content: '';
@@ -135,10 +139,12 @@
         }
 
         img {
+          position: absolute;
+
           width: 100%;
           height: 100%;
+
           object-fit: contain;
-          position: absolute;
           filter: drop-shadow(0 0 12px var(--bg-main));
         }
       }

@@ -10,10 +10,7 @@
 </script>
 
 <template>
-  <div
-    ref="treasure"
-    class="link-item"
-  >
+  <div class="link-item">
     <div class="link-item__content">
       <div class="link-item__body">
         <div class="link-item__row">

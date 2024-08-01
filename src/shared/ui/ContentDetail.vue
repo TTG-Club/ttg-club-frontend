@@ -36,8 +36,8 @@
 
     &__fixed,
     &__body {
-      width: 100%;
       display: block;
+      width: 100%;
     }
 
     &__fixed {

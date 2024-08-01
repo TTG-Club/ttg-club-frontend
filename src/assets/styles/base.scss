@@ -22,8 +22,8 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    border: 5px solid transparent;
     background-clip: content-box;
+    border: 5px solid transparent;
     border-radius: 10px;
     box-shadow: inset 0 0 0 10px var(--background-color-thumb);
 
@@ -47,13 +47,14 @@
 *:before,
 *:after {
   box-sizing: border-box;
-  outline: none;
   appearance: none;
+  outline: none;
+
   -webkit-overflow-scrolling: touch;
 
   &::selection {
-    background: var(--primary);
     color: var(--text-btn-color);
+    background: var(--primary);
   }
 }
 
@@ -70,27 +71,33 @@
 }
 
 .disable {
-  opacity: 0.6 !important;
   cursor: no-drop !important;
+  opacity: 0.6 !important;
 }
 
 hr {
-  height: 1px;
-  border: none;
-  background-color: var(--border);
   display: block;
+
+  height: 1px;
   margin: 14px 0;
+
+  background-color: var(--border);
+  border: none;
 }
 
 body {
+  z-index: 1;
+
   display: flex;
+
   font-family: 'Open Sans', sans-serif;
-  background: var(--bg-main);
   font-size: var(--main-font-size);
   line-height: var(--main-line-height);
-  outline: none;
   color: var(--text-color);
-  z-index: 1;
+
+  background: var(--bg-main);
+  outline: none;
+
   transition:
     background-color ease-in-out 0.2s,
     color ease-in-out 0.2s;
@@ -99,11 +106,12 @@ body {
 html,
 body,
 #dnd5club {
+  overflow: hidden;
+
   width: 100%;
+  height: var(--max-vh);
   min-height: var(--max-vh);
   max-height: var(--max-vh);
-  height: var(--max-vh);
-  overflow: hidden;
 }
 
 #dnd5club {
@@ -115,21 +123,26 @@ body,
   }
 
   &:after {
+    pointer-events: none;
     content: '';
+
     position: fixed;
+    z-index: -100;
     right: 0;
     bottom: 0;
-    opacity: 0.65;
-    z-index: -100;
+
+    display: none;
+
     width: 100%;
     height: var(--max-vh);
-    pointer-events: none;
-    display: none;
+
+    opacity: 0.65;
     background: {
-      image: var(--bg-img);
-      repeat: no-repeat;
       position: bottom right;
       size: contain;
+
+      image: var(--bg-img);
+      repeat: no-repeat;
     }
 
     @include media-min($xxl) {
@@ -139,20 +152,23 @@ body,
 }
 
 button {
+  cursor: pointer;
   background-color: transparent;
   border: 0;
-  cursor: pointer;
 }
 
 .become-button {
-  @include css_anim($time: 0.2s);
-
-  padding: 8px 16px;
-  border-radius: 30px;
   display: inline-flex;
   align-items: center;
-  text-decoration: none;
+
+  padding: 8px 16px;
+
   color: var(--text-btn-color);
+  text-decoration: none;
+
+  border-radius: 30px;
+
+  @include css-anim($time: 0.2s);
 
   svg {
     width: 20px;

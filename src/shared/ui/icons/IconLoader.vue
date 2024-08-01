@@ -16,16 +16,16 @@
 
 <style module lang="scss">
   .icon-loader {
-    transition: none;
     width: 100%;
     height: 100%;
+    transition: none;
     animation: {
       delay: 0s;
-      timing-function: linear;
-      name: loading-rotate;
       duration: 1s;
       iteration-count: infinite;
+      name: loading-rotate;
       play-state: running;
+      timing-function: linear;
     }
 
     path {

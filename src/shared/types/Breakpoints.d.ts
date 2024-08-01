@@ -5,6 +5,6 @@ export type TBreakpoint =
   | 'lg'
   | 'xl'
   | 'xxl'
-  | 'fullHD'
+  | 'fullHd'
   | 'retina'
-  | 'ultraHD';
+  | 'ultraHd';

@@ -71,8 +71,8 @@
 
 <style lang="scss" scoped>
   .default-bookmark-button {
-    width: 28px;
     z-index: 1;
+    width: 28px;
 
     &:hover {
       position: relative;

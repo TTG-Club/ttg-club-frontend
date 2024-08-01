@@ -2,12 +2,15 @@
 @use '@/assets/styles/variables/breakpoints' as *;
 
 .bookmarks {
-  width: 100%;
+  user-select: none;
+
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  width: 100%;
+
   background-color: var(--bg-secondary);
-  user-select: none;
 
   *,
   *:before,
@@ -18,31 +21,33 @@
   }
 
   @include media-min($md) {
-    max-width: 640px;
     width: 100vw;
+    max-width: 640px;
   }
 
   &__header {
-    padding: 0 16px;
-    height: 50px;
-    border-bottom: 1px solid var(--hover);
     display: flex;
-    align-items: center;
     flex-shrink: 0;
+    align-items: center;
+
+    height: 50px;
+    padding: 0 16px;
+
+    border-bottom: 1px solid var(--hover);
   }
 
   &__wrapper {
-    padding: 8px 8px;
-    display: block;
     overflow: auto;
+    display: block;
+    padding: 8px 8px;
   }
 
   &__body {
+    overflow: auto;
     display: flex;
+    flex: 1 1 auto;
     flex-wrap: wrap;
     gap: 8px;
-    overflow: auto;
-    flex: 1 1 auto;
   }
 
   &__info {
@@ -50,10 +55,10 @@
     margin-right: auto;
 
     &--desc {
-      font-size: var(--h5-font-size);
-      margin-bottom: 4px;
       width: 200px;
+      margin-bottom: 4px;
       padding: 0 8px;
+      font-size: var(--h5-font-size);
     }
 
     &--title {
@@ -71,8 +76,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 24px;
+
     width: 100%;
+    height: 24px;
+
     background-color: var(--primary);
   }
 
@@ -87,42 +94,50 @@
     }
 
     &_head {
-      padding: 6px;
-      display: flex;
       cursor: pointer;
+
+      display: flex;
       align-items: center;
+
+      padding: 6px;
+
       line-height: 16px;
     }
 
     &_label {
-      color: var(--text-color-title);
+      overflow: hidden;
+      display: inline-block;
+
+      width: 100%;
+      padding: 0 0 0 8px;
+
       font-size: inherit;
       font-weight: normal;
-      letter-spacing: 0.75px;
-      display: inline-block;
-      white-space: nowrap;
-      overflow: hidden;
-      width: 100%;
+      color: var(--text-color-title);
       text-overflow: ellipsis;
-      padding: 0 0 0 8px;
+      letter-spacing: 0.75px;
+      white-space: nowrap;
     }
 
     &_icon {
-      @include css_anim();
-
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
       cursor: pointer;
-      padding: 2px;
-      border-radius: 4px;
-      background: var(--bg-sub-menu);
-      color: var(--text-color-title);
+
       display: flex;
+      flex-shrink: 0;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
 
+      width: 24px;
+      height: 24px;
+      padding: 2px;
+
+      font-size: 16px;
+      color: var(--text-color-title);
+
+      background: var(--bg-sub-menu);
+      border-radius: 4px;
+
+      @include css-anim();
       &.only-hover {
         &:not(.is-active) {
           opacity: 0;
@@ -176,21 +191,24 @@
   &__cat {
     margin-bottom: 16px;
     padding: 12px 8px;
-    border-radius: 8px;
     background-color: var(--bg-secondary);
+    border-radius: 8px;
 
     &_label {
-      padding: 2px 8px 2px 8px;
-      text-transform: uppercase;
-      font-size: calc(var(--main-font-size) - 4px);
-      color: var(--text-g-color);
-      letter-spacing: 0.75px;
       position: relative;
-      font-weight: 600;
+
       display: flex;
       align-items: center;
-      height: 20px;
+
       width: 100%;
+      height: 20px;
+      padding: 2px 8px 2px 8px;
+
+      font-size: calc(var(--main-font-size) - 4px);
+      font-weight: 600;
+      color: var(--text-g-color);
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
 
       &_name {
         line-height: 18px;
@@ -198,21 +216,24 @@
       }
 
       &_icon {
-        @include css_anim();
-
-        flex-shrink: 0;
-        width: 24px;
-        height: 24px;
         cursor: pointer;
-        padding: 2px;
-        border-radius: 4px;
-        background: var(--bg-sub-menu);
-        color: var(--text-color-title);
-        font-size: 16px;
+
         display: flex;
+        flex-shrink: 0;
         align-items: center;
         justify-content: center;
 
+        width: 24px;
+        height: 24px;
+        padding: 2px;
+
+        font-size: 16px;
+        color: var(--text-color-title);
+
+        background: var(--bg-sub-menu);
+        border-radius: 4px;
+
+        @include css-anim();
         &.is-left {
           margin-right: 4px;
 
@@ -247,10 +268,10 @@
       }
 
       .is-left {
-        margin-left: -6px;
-        margin-right: 14px;
         width: 20px;
         height: 20px;
+        margin-right: 14px;
+        margin-left: -6px;
       }
 
       @include media-min($md) {
@@ -302,12 +323,12 @@
 
   &__item {
     &_body {
-      @include css_anim();
-
+      position: relative;
       display: flex;
       align-items: center;
       border-radius: 6px;
-      position: relative;
+
+      @include css-anim();
 
       &:hover {
         .bookmarks {
@@ -337,8 +358,8 @@
               }
 
               &_label {
-                background-color: var(--hover);
                 color: var(--text-color-title);
+                background-color: var(--hover);
               }
             }
           }
@@ -347,34 +368,41 @@
     }
 
     &_label {
-      @include css_anim();
-
-      color: var(--text-color);
-      font-weight: 400;
-      padding: 8px 8px;
-      line-height: 16px;
-      width: 100%;
       display: flex;
+
+      width: 100%;
+      padding: 8px 8px;
+
+      font-weight: 400;
+      line-height: 16px;
+      color: var(--text-color);
+
       border-radius: 6px;
+
+      @include css-anim();
     }
 
     &_icon {
-      @include css_anim();
+      cursor: pointer;
+
+      position: absolute;
+      right: 4px;
+
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
 
       width: 24px;
       height: 24px;
-      padding: 2px;
-      flex-shrink: 0;
       margin-left: 4px;
-      border-radius: 6px;
-      cursor: pointer;
-      position: absolute;
-      right: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 2px;
+
       font-size: 16px;
 
+      border-radius: 6px;
+
+      @include css-anim();
       &.only-hover {
         &:not(.is-active) {
           opacity: 0;
@@ -417,9 +445,9 @@
 
   &__input {
     display: flex;
+    gap: 8px;
     width: 100%;
     padding: 8px 0;
-    gap: 8px;
   }
 
   &.is-default {

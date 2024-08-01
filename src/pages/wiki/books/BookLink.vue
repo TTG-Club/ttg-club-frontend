@@ -40,7 +40,6 @@
     v-bind="$props"
   >
     <a
-      ref="bookItem"
       :class="classList"
       :href="href"
       class="link-item"

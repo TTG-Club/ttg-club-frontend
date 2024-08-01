@@ -71,25 +71,31 @@
 
 <style module lang="scss">
   .icons {
-    width: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+
+    width: 100%;
     margin-top: 12px;
   }
 
   .item {
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
     cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: calc((100% - 8px * 2) / 3);
+    padding: 8px;
+
+    color: var(--text-color);
+
+    background-color: var(--bg-main);
     border: 1px solid var(--border);
     border-radius: 8px;
+
     transition: color 0.15s ease-in-out;
-    background-color: var(--bg-main);
-    color: var(--text-color);
-    width: calc((100% - 8px * 2) / 3);
 
     @include media-min($sm) {
       width: calc((100% - 8px * 3) / 4);
@@ -117,17 +123,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 64px;
     height: 64px;
     padding: 8px;
   }
 
   .name {
-    width: 100%;
-    display: block;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: block;
+
+    width: 100%;
+
     text-align: center;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 </style>

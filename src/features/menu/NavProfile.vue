@@ -211,15 +211,17 @@
     max-width: 260px;
 
     &__line {
-      @include css_anim();
-
-      width: 100%;
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      text-align: left;
+
+      width: 100%;
       padding: 0;
+
       color: var(--text-b-color);
+      text-align: left;
+
+      @include css-anim();
 
       &.is-main {
         cursor: default;
@@ -233,9 +235,11 @@
 
       &_icon {
         flex-shrink: 0;
+
         width: 40px;
         height: 40px;
         padding: 8px;
+
         font-size: 24px;
       }
 

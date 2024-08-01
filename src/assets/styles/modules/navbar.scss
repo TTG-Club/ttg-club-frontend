@@ -7,31 +7,39 @@ html {
 }
 
 .navbar {
-  display: flex;
-  height: var(--navbar-height);
-  padding-bottom: var(--safe-area-inset-bottom);
-  min-height: 56px;
-  width: 100%;
+  pointer-events: none;
+
   position: relative;
   z-index: 100;
-  pointer-events: none;
-  border-top: 1px solid var(--border);
-  background-color: var(--bg-main);
-  border-right: 0;
+
+  display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
 
-  &__btn {
-    @include css_anim();
+  width: 100%;
+  height: var(--navbar-height);
+  min-height: 56px;
+  padding-bottom: var(--safe-area-inset-bottom);
 
+  background-color: var(--bg-main);
+  border-top: 1px solid var(--border);
+  border-right: 0;
+
+  &__btn {
     cursor: pointer;
-    height: 40px;
-    width: 40px;
-    border-radius: 8px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
     color: var(--text-color);
+
+    border-radius: 8px;
+
+    @include css-anim();
 
     svg {
       font-size: 24px;
@@ -48,16 +56,20 @@ html {
   }
 
   &__link {
-    @include css_anim();
-
     cursor: pointer;
-    height: 40px;
-    border-radius: 8px;
-    padding: 6px;
+
     display: flex;
     align-items: center;
-    color: var(--text-color);
+
+    height: 40px;
+    padding: 6px;
+
     font-weight: 600;
+    color: var(--text-color);
+
+    border-radius: 8px;
+
+    @include css-anim();
 
     &:hover {
       color: var(--text-b-color);
@@ -66,8 +78,8 @@ html {
   }
 
   &__text {
-    color: var(--text-color);
     font-weight: 600;
+    color: var(--text-color);
 
     span {
       padding: 6px;
@@ -78,17 +90,18 @@ html {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+
     width: 100%;
     height: auto;
     padding: 0 16px;
-    justify-content: space-between;
 
     &_left,
     &_right {
       display: flex;
+      flex-direction: row;
       align-items: center;
       height: 100%;
-      flex-direction: row;
 
       * {
         pointer-events: auto;
@@ -122,23 +135,23 @@ html {
       }
 
       @include media-min($md) {
-        margin-left: 0;
-        height: auto;
         gap: 8px;
+        height: auto;
+        margin-left: 0;
       }
     }
 
     &_logo {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
 
     @include media-min($md) {
       flex-direction: column;
-      padding: 24px 0;
       height: 100%;
+      padding: 24px 0;
     }
   }
 
@@ -156,36 +169,43 @@ html {
   }
 
   @include media-min($md) {
-    border-top: 0;
-    border-right: 1px solid var(--border);
-    height: 100%;
-    min-height: 100%;
-    width: calc(var(--navbar-width) + 8px);
-    min-width: calc(var(--navbar-width) + 8px);
     flex-direction: column;
     flex-wrap: nowrap;
+
+    width: calc(var(--navbar-width) + 8px);
+    min-width: calc(var(--navbar-width) + 8px);
+    height: 100%;
+    min-height: 100%;
+
+    border-top: 0;
+    border-right: 1px solid var(--border);
   }
 }
 
 .hamburger {
-  display: block;
-  margin-right: 8px;
-  height: auto;
-  padding: 9px 9px;
   position: relative;
 
+  display: block;
+
+  height: auto;
+  margin-right: 8px;
+  padding: 9px 9px;
+
   .line {
-    @include css_anim();
+    display: block;
 
     width: 20px;
     height: 2px;
-    background-color: var(--text-color);
-    display: block;
     margin: 4px auto;
+
+    background-color: var(--text-color);
+    border-radius: 2px;
+
     -webkit-transition: all 0.3s ease-in-out;
     -o-transition: all 0.3s ease-in-out;
     transition: all 0.3s ease-in-out;
-    border-radius: 2px;
+
+    @include css-anim();
   }
 
   &.is-active {
