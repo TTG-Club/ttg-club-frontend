@@ -80,7 +80,7 @@
     background-color: var(--bg-sub-menu);
     border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 25%);
+    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 0.25);
 
     &__heading {
       display: flex;

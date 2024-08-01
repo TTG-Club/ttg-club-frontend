@@ -60,7 +60,7 @@ export const dark: GlobalThemeOverrides = {
     buttonBorderColorHover: 'var(--primary)',
     buttonBorderColorActive: 'var(--primary-active)',
     buttonBoxShadowHover: 'inset 0 0 0 1px var(--primary)',
-    buttonBoxShadowFocus: 'inset 0 0 0 0px #ffffff00',
+    buttonBoxShadowFocus: 'inset 0 0 0 0px #fff0',
   },
   Button: {
     border: '1px solid var(--border)',

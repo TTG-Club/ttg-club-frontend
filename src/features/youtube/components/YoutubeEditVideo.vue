@@ -164,7 +164,7 @@
     margin: auto;
 
     background-color: var(--bg-secondary);
-    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+    box-shadow: 0 22px 122px rgb(0 0 0 / 0.78);
 
     @include media-min($sm) {
       border-radius: 8px;
@@ -181,7 +181,7 @@
 
     background: var(--bg-secondary);
     border-radius: 12px;
-    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+    box-shadow: 0 22px 122px rgb(0 0 0 / 0.78);
   }
 
   .header {

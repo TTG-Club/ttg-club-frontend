@@ -1,9 +1,6 @@
 <script>
   import { throttle } from 'lodash-es';
 
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -11,9 +8,6 @@
 
   export default defineComponent({
     components: {
-      UiButton,
-      UiInput,
-      UiCheckbox,
       RawContent,
       ContentLayout,
     },
@@ -98,38 +92,40 @@
         <div class="tools_settings__row">
           <span class="label">Расы:</span>
 
-          <ui-checkbox
+          <n-checkbox
             v-for="(source, key) in tables"
             :key="key"
+            v-model:checked="source.value"
             v-tippy="{ content: source.name }"
-            :model-value="source.value"
-            type="crumb"
-            @update:model-value="source.value = $event"
           >
             {{ source.shortName }}
-          </ui-checkbox>
+          </n-checkbox>
         </div>
 
         <div class="tools_settings__row">
           <span class="label">Количество:</span>
 
-          <ui-input
-            v-model="count"
+          <n-input-number
+            v-model:value="count"
             :min="1"
-            class="form-control select"
-            is-number
-            placeholder="Количеств"
+            placeholder="Количество"
           />
         </div>
 
         <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+          <n-button
+            type="primary"
+            @click.left.exact.prevent="sendForm"
+          >
             Сгенерировать
-          </ui-button>
+          </n-button>
 
-          <ui-button @click.left.exact.prevent="results = []">
+          <n-button
+            secondary
+            @click.left.exact.prevent="results = []"
+          >
             Очистить
-          </ui-button>
+          </n-button>
         </div>
       </form>
     </template>

@@ -95,7 +95,7 @@
 
       background-color: var(--bg-secondary);
       border-radius: 8px;
-      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+      box-shadow: 0 22px 122px rgb(0 0 0 / 0.78);
 
       @include media-max($md) {
         max-height: 100%;

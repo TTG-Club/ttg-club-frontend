@@ -6,6 +6,7 @@ node_modules
 /public_html
 /_test
 .eslintcache
+.stylelintcache
 
 # Local env files
 .env.local

@@ -85,7 +85,7 @@
       max-height: calc(var(--max-vh) / 100 * 90);
 
       background-color: var(--bg-secondary);
-      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+      box-shadow: 0 22px 122px rgb(0 0 0 / 0.78);
 
       @include media-min($sm) {
         border-radius: 8px;
