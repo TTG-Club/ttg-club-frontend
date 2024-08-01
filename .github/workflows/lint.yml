@@ -19,7 +19,9 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: front-build-${{ github.run_id }}
 
       - uses: actions/setup-node@v4
         with:

@@ -30,14 +30,20 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/codeql.yml
 
+  build:
+    name: Build PR
+    needs: analyze
+    if: ${{ !github.event.pull_request.draft }}
+    uses: ./.github/workflows/build.yml
+
   lint-pr:
     name: Lint PR
-    needs: analyze
+    needs: build
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/lint.yml
 
   type-check-pr:
     name: Type check PR
-    needs: analyze
+    needs: build
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/type-check.yml
