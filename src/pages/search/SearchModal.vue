@@ -380,17 +380,19 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .search-modal {
-    max-width: 560px;
-    width: 100vw;
     pointer-events: none;
+    width: 100vw;
+    max-width: 560px;
 
     &__container {
-      height: var(--max-vh);
-      padding: 24px 24px 0;
+      pointer-events: none;
+
       display: flex;
       flex-direction: column;
-      pointer-events: none;
+
       width: 100%;
+      height: var(--max-vh);
+      padding: 24px 24px 0;
 
       @include media-min($md) {
         padding: 56px 24px 0;
@@ -398,17 +400,20 @@
     }
 
     &__wrapper {
-      background: var(--bg-secondary);
-      overflow: hidden;
-      border-radius: 12px;
-      width: 100%;
       pointer-events: auto;
+
+      overflow: hidden;
+
+      width: 100%;
+
+      background: var(--bg-secondary);
+      border-radius: 12px;
       box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
     }
 
     &__control {
-      padding: 8px;
       position: relative;
+      padding: 8px;
     }
 
     &__results {
@@ -420,24 +425,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       padding: 6px 12px;
+
       color: var(--text-color);
     }
 
     &__all {
-      @include css_anim();
+      cursor: pointer;
 
       display: flex;
       align-items: center;
+
       padding: 6px 12px;
+
       color: var(--text-color-title);
-      cursor: pointer;
+
+      @include css-anim;
 
       &:hover,
       &:focus-within {
-        @include css_anim();
-
         background: var(--hover);
+
+        @include css-anim;
       }
 
       &_icon {
@@ -450,12 +460,12 @@
   }
 
   :deep(.ui-input__control) {
-    border: 0;
     background: transparent;
+    border: 0;
 
     .ui-input__input {
-      color: var(--text-b-color);
       height: 44px;
+      color: var(--text-b-color);
     }
   }
 </style>

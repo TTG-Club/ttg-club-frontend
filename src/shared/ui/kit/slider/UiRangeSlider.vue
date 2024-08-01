@@ -38,8 +38,8 @@
   };
 
   const setCSSProps = (left: number, right: number) => {
-    slider.value?.style.setProperty('--progressLeft', `${left}%`);
-    slider.value?.style.setProperty('--progressRight', `${right}%`);
+    slider.value?.style.setProperty('--progress-left', `${left}%`);
+    slider.value?.style.setProperty('--progress-right', `${right}%`);
   };
 
   watchEffect(() => {
@@ -110,105 +110,137 @@
 
 <style lang="scss" module>
   .custom-slider {
-    --trackHeight: 0.25rem;
-    --thumbRadius: 1.25rem;
+    --track-height: 0.25rem;
+    --thumb-radius: 1.25rem;
+
     width: 100%;
+
     input[type='range'] {
+      pointer-events: none;
+
       position: relative;
+      z-index: 0;
+
+      height: 100%;
+
       appearance: none;
       background: none;
       border-radius: 999px;
-      z-index: 0;
-      height: 100%;
-      pointer-events: none;
+
       &::before {
         content: '';
-        display: block;
+
         position: absolute;
-        width: var(--ProgressPercent, 100%);
+
+        display: block;
+
+        width: var(--progress-percent, 100%);
         height: 100%;
+
         background: var(--primary);
         border-radius: 999px;
       }
+
       &::-webkit-slider-runnable-track {
+        height: var(--track-height);
         appearance: none;
         background: var(--primary);
-        height: var(--trackHeight);
         border-radius: 999px;
       }
+
       &::-webkit-slider-thumb {
+        pointer-events: all;
+
         position: relative;
-        width: var(--thumbRadius);
-        height: var(--thumbRadius);
-        margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+        z-index: 1;
+
+        width: var(--thumb-radius);
+        height: var(--thumb-radius);
+        margin-top: calc((var(--track-height) - var(--thumb-radius)) / 2);
+
+        appearance: none;
         background: var(--primary);
         border: 1px solid var(--bg-sub-menu);
         border-radius: 999px;
-        pointer-events: all;
-        appearance: none;
-        z-index: 1;
       }
+
       &::-moz-range-thumb {
+        pointer-events: all;
+
         position: relative;
+        z-index: 1;
+
         box-sizing: border-box;
-        width: var(--thumbRadius);
-        height: var(--thumbRadius);
-        margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+        width: var(--thumb-radius);
+        height: var(--thumb-radius);
+        margin-top: calc((var(--track-height) - var(--thumb-radius)) / 2);
+
+        appearance: none;
         background: var(--primary);
         border: 1px solid var(--bg-sub-menu);
         border-radius: 999px;
-        pointer-events: all;
-        appearance: none;
-        z-index: 1;
       }
     }
   }
 
   .custom-slider.default {
     input[type='range']::-moz-range-track {
+      height: var(--track-height);
       appearance: none;
       background: var(--primary);
-      height: var(--trackHeight);
       border-radius: 999px;
     }
   }
 
   .custom-slider.minmax {
+    --progress-left: 0%;
+    --progress-right: 0%;
+
     position: relative;
-    height: var(--trackHeight);
+
+    height: var(--track-height);
+    margin: 0.5rem 0;
+
     background: var(--bg-sub-menu);
     border-radius: 999px;
-    margin: 0.5rem 0;
-    --progressLeft: 0%;
-    --progressRight: 0%;
+
     & input[type='range'] {
       position: absolute;
-      width: calc(100% - var(--thumbRadius));
+      width: calc(100% - var(--thumb-radius));
+
       &::before {
         display: none;
       }
+
       &::-webkit-slider-runnable-track {
         background: none;
       }
     }
+
     & [name='max'] {
-      left: var(--thumbRadius);
+      left: var(--thumb-radius);
     }
   }
 
   .custom-slider .minmax-indicator {
-    position: absolute;
-    height: 100%;
     pointer-events: none;
-    left: var(--thumbRadius);
-    right: var(--thumbRadius);
+
+    position: absolute;
+    right: var(--thumb-radius);
+    left: var(--thumb-radius);
+
+    height: 100%;
+
     &::before {
       content: '';
+
       position: absolute;
-      background: var(--primary);
+      right: var(--progress-right);
+      left: var(--progress-left);
+
       height: 100%;
-      left: var(--progressLeft);
-      right: var(--progressRight);
+
+      background: var(--primary);
     }
   }
 </style>

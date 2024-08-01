@@ -71,27 +71,31 @@
 
   .link-item {
     &__rating {
-      width: 42px;
       flex-shrink: 0;
-      font-size: 17px;
-      color: var(--text-color);
-      border-right: 1px solid var(--border);
+
+      width: 42px;
       margin-right: 12px;
       margin-left: -8px;
 
+      font-size: 17px;
+      color: var(--text-color);
+
+      border-right: 1px solid var(--border);
+
       span {
-        width: 42px;
-        height: 42px;
         display: flex;
         align-items: center;
         justify-content: center;
+
+        width: 42px;
+        height: 42px;
       }
     }
 
     &__type {
-      color: var(--text-g-color);
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
+      color: var(--text-g-color);
     }
 
     &.router-link-active {

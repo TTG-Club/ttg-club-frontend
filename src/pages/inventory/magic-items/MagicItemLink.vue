@@ -133,64 +133,69 @@
 
   .link-item {
     &__type {
-      padding-left: 14px;
       position: relative;
-      color: var(--text-g-color);
+
+      padding-left: 14px;
+
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
+      color: var(--text-g-color);
 
-      &:after {
+      &::after {
         content: '';
+
         position: absolute;
+        top: 4px;
+        left: 0;
+
+        display: block;
+
+        width: 10px;
+        height: 10px;
+
         background: var(--border);
         border: 1px solid var(--border);
         border-radius: 50%;
-        width: 10px;
-        height: 10px;
-        display: block;
-        left: 0;
-        top: 4px;
-        //z-index: 1;
       }
 
       &.is-common {
-        &:after {
+        &::after {
           background-color: var(--common);
         }
       }
 
       &.is-uncommon {
-        &:after {
+        &::after {
           background-color: var(--uncommon);
         }
       }
 
       &.is-rare {
-        &:after {
+        &::after {
           background-color: var(--rare);
         }
       }
 
       &.is-very-rare {
-        &:after {
+        &::after {
           background-color: var(--very-rare);
         }
       }
 
       &.is-legendary {
-        &:after {
+        &::after {
           background-color: var(--legendary);
         }
       }
 
       &.is-artifact {
-        &:after {
+        &::after {
           background-color: var(--artifact);
         }
       }
 
       &.is-varies {
-        &:after {
+        &::after {
           background: linear-gradient(
             90deg,
             var(--common) 10%,
@@ -205,11 +210,12 @@
     }
 
     &__customization {
-      border-radius: 6px;
-      background-color: var(--bg-sub-menu);
       flex: 0 0 20px;
       justify-content: center;
+
+      background-color: var(--bg-sub-menu);
       border: 1px solid var(--border);
+      border-radius: 6px;
     }
 
     &.router-link-active {

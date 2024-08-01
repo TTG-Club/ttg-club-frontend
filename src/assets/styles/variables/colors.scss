@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:color';
 
 $theme-dark: (
   'bg-transparent': #ffffff00,
@@ -53,7 +54,7 @@ $theme-dark: (
   'secondary-hover': rgba(255, 255, 255, 0.18 ),
   'box-shadow': 0 8px 22px rgba(26, 20, 37, 0.8),
   'common': #ffffff,
-  'uncommon': #8aff91, 
+  'uncommon': #8aff91,
   'rare': #a5f1ff,
   'very-rare': #e770ff,
   'legendary': #f6ff00,
@@ -81,7 +82,6 @@ $theme-dark: (
   'logo-section-7': #1c386b,
   'logo-section-8': #103579
 );
-
 $theme-light: (
   'bg-transparent': #ffffff00,
   'bg-light-main': rgba(249, 246, 235, 0.3),
@@ -163,28 +163,26 @@ $theme-light: (
   'logo-section-7': #813120,
   'logo-section-8': #6e2a1c
 );
-
 $base-colors: (
   'discord-base': #5865f2,
   'discord-hover': #3f4cd9,
   'patreon-base': #ff424d,
   'patreon-hover': #e62934,
-  'vk-base': #0077ff,
+  'vk-base': #07f,
   'vk-hover': #005ee6,
   'boosty-base': #f15f2c,
   'boosty-hover': #d84613,
-  'youtube-base': #ff0000,
+  'youtube-base': #f00,
   'youtube-hover': #a80000,
   'success': #67c23a,
-  'success-hover': darken(#67c23a, 7%),
+  'success-hover': color.scale(#67c23a, $lightness: -7%),
   'warning': #e6a23c,
-  'warning-hover': darken(#e6a23c, 7%),
+  'warning-hover': color.scale(#e6a23c, $lightness: -7%),
   'error': #f56c6c,
-  'error-hover': darken(#f56c6c, 7%),
+  'error-hover': color.scale(#f56c6c, $lightness: -7%),
   'info': #909399,
-  'info-hover': darken(#909399, 7%)
+  'info-hover': color.scale(#909399, $lightness: -7%)
 );
-
 $theme-colors: (
   '': map.merge($theme-dark, $base-colors),
   'dark': map.merge($theme-dark, $base-colors),

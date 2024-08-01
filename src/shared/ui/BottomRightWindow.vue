@@ -155,9 +155,8 @@
 
   .bottom-right-window {
     position: fixed;
-    inset: 8px;
-    bottom: calc(var(--navbar-height) + 8px);
     z-index: 13;
+    inset: 8px 8px calc(var(--navbar-height) + 8px);
     transform-origin: right bottom;
 
     @include media-min($md) {
@@ -165,6 +164,7 @@
       right: 16px;
       bottom: calc(50px + 16px + 8px);
       left: unset;
+
       width: 300px;
     }
 
@@ -175,13 +175,16 @@
     }
 
     &__resize-trigger {
+      cursor: n-resize;
+
       position: absolute;
       top: -3px;
       right: 0;
       left: 0;
+
       display: none;
+
       height: 7px;
-      cursor: n-resize;
 
       @include media-min($md) {
         display: block;
@@ -194,19 +197,19 @@
   .popover-animation {
     &-enter-from,
     &-leave-to {
-      opacity: 0;
       transform: scale(0);
+      opacity: 0;
     }
 
     &-enter-to,
     &-leave-from {
-      opacity: 1;
       transform: scale(1);
+      opacity: 1;
     }
 
     &-enter-active,
     &-leave-active {
-      @include css_anim;
+      @include css-anim;
     }
   }
 </style>

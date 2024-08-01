@@ -161,13 +161,13 @@
 <style lang="scss" scoped>
   .custom-bookmark-button {
     z-index: 1;
-    margin: 0 !important;
     width: 18px;
+    margin: 0 !important;
 
     &__wrapper {
+      position: relative;
       height: 100%;
       margin-left: -4px;
-      position: relative;
     }
 
     &:hover {
@@ -177,43 +177,54 @@
 
     &__submenu {
       position: absolute;
-      background-color: var(--bg-sub-menu);
+      z-index: 1;
+      right: 0;
+
+      overflow: auto;
+
+      max-height: calc(16px + 30px * 4); // padding + 4 elements
       padding: 8px;
+
+      background-color: var(--bg-sub-menu);
       border-radius: 6px;
       box-shadow: 0 5px 30px #00000038;
-      right: 0;
-      z-index: 1;
-      max-height: calc(16px + 30px * 4); // padding + 4 elements
-      overflow: auto;
     }
 
     &__group {
-      padding: 6px 6px;
-      border-radius: 6px;
       cursor: pointer;
+
+      overflow: hidden;
+
+      width: 100%;
       min-width: 100px;
       max-width: 260px;
-      white-space: nowrap;
-      overflow: hidden;
-      width: 100%;
-      text-overflow: ellipsis;
-      line-height: 18px;
+      padding: 6px;
+
       font-size: 14px;
+      line-height: 18px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      border-radius: 6px;
 
       &.is-saved {
-        background-color: var(--primary-select);
         position: relative;
         padding-left: 12px;
+        background-color: var(--primary-select);
 
         &::before {
           content: '';
-          width: 4px;
+
+          position: absolute;
           top: 0;
           bottom: 0;
           left: 0;
-          position: absolute;
-          background-color: var(--primary);
+
           display: block;
+
+          width: 4px;
+
+          background-color: var(--primary);
         }
       }
 

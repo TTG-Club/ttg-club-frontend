@@ -1,12 +1,13 @@
 @use '@/assets/styles/variables/breakpoints' as *;
 
 .error-view {
-  width: 100%;
-  height: 100%;
-  max-height: var(--max-vh);
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 100%;
+  height: 100%;
+  max-height: var(--max-vh);
   padding: 16px 0;
 
   @include media-min($md) {

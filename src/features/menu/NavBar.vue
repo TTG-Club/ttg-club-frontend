@@ -89,18 +89,20 @@
     .navbar__logo {
       width: 52px;
       height: 36px;
-      padding: 0 16px 0 0;
-      border-bottom: 0;
-      border-right: 1px solid var(--border);
       margin: 0 8px 0 0;
+      padding: 0 16px 0 0;
+
+      border-right: 1px solid var(--border);
+      border-bottom: 0;
 
       @include media-min($md) {
         width: 44px;
         height: 60px;
-        padding: 0 0 24px 0;
-        border-bottom: 1px solid var(--border);
+        margin: 0 0 8px;
+        padding: 0 0 24px;
+
         border-right: 0;
-        margin: 0 0 8px 0;
+        border-bottom: 1px solid var(--border);
       }
     }
   }
@@ -115,14 +117,16 @@
       }
 
       .ui-social-button {
-        padding: 0;
-        width: 40px;
-        height: 40px;
         display: flex;
         justify-content: center;
+
+        width: 40px;
+        height: 40px;
+        margin: 8px 0;
+        padding: 0;
+
+        opacity: 0.7;
         border-radius: 8px;
-        margin: 8px 0 8px 0;
-        opacity: 70%;
 
         &.is-discord {
           color: var(--text-btn-color);
@@ -149,7 +153,7 @@
         }
 
         &:hover {
-          opacity: 100%;
+          opacity: 1;
         }
       }
     }

@@ -156,8 +156,8 @@
 
 <style lang="scss" scoped>
   .site-name {
+    overflow: hidden;
     height: 0;
     opacity: 0;
-    overflow: hidden;
   }
 </style>

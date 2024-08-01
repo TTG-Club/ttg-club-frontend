@@ -160,26 +160,28 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .screen-link {
-    @include css_anim();
-
     display: flex;
     align-items: center;
     justify-content: flex-start;
+
     width: 100%;
     height: 100%;
-    background-color: var(--bg-secondary);
     padding: 16px;
+
+    background-color: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 8px;
+
+    @include css-anim;
 
     &:hover {
       background-color: var(--hover);
     }
 
     &__icon {
+      flex-shrink: 0;
       width: 40px;
       height: 40px;
-      flex-shrink: 0;
       color: var(--primary);
 
       :deep(svg) {
@@ -187,7 +189,7 @@
         height: 100% !important;
 
         path {
-          fill: currentColor;
+          fill: currentcolor;
         }
       }
     }
@@ -197,15 +199,15 @@
     }
 
     &__name {
-      font-weight: 600;
       font-size: var(--h5-font-size);
+      font-weight: 600;
       color: var(--text-color-title);
     }
 
     &__desc {
-      font-weight: 400;
       // margin-top: 12px;
       font-size: var(--main-font-size);
+      font-weight: 400;
       line-height: var(--main-line-height);
       color: var(--text-color);
     }

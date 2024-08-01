@@ -169,21 +169,24 @@
   .race-items {
     &__group {
       &_name {
+        position: relative;
+
+        margin: 24px 0 16px;
+
+        font-family: Lora, sans-serif;
         font-size: var(--h3-font-size);
         font-weight: 300;
-        margin: 24px 0 16px 0;
         color: var(--text-color-title);
-        position: relative;
-        font-family: 'Lora', sans-serif;
       }
 
       &_list {
-        width: 100%;
-        padding: 0;
         display: grid;
         grid-gap: 16px;
-        align-items: start;
         grid-template-columns: repeat(1, 1fr);
+        align-items: start;
+
+        width: 100%;
+        padding: 0;
 
         @include media-min($sm) {
           grid-template-columns: repeat(2, 1fr);

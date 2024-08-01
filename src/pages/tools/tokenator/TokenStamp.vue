@@ -230,10 +230,10 @@
 
 <style lang="scss" module>
   .container {
+    pointer-events: initial;
+    cursor: pointer;
     width: 280px;
     height: 280px;
-    cursor: pointer;
-    pointer-events: initial;
   }
 
   .draggable {
@@ -244,10 +244,6 @@
     cursor: grabbing;
   }
 
-  //.border {
-  //  pointer-events: none;
-  //}
-
   .dropText {
     display: none;
 
@@ -256,15 +252,17 @@
     }
 
     span {
-      font-size: calc(var(--main-font-size) * 2);
       display: flex;
       align-items: center;
       justify-content: center;
+
       width: 100%;
       height: 100%;
       padding: calc((100% - 256px) / 2);
-      text-align: center;
+
+      font-size: calc(var(--main-font-size) * 2);
       color: #6a6a6a;
+      text-align: center;
     }
   }
 </style>

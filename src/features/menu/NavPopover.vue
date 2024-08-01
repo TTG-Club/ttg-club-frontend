@@ -92,10 +92,11 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .nav-popover {
+    flex-shrink: 0;
+
     // position: relative; // Нужно будет включать, если нужно относительно кнопки позиционирование
     width: 40px;
     height: 40px;
-    flex-shrink: 0;
 
     &__trigger {
       position: relative;
@@ -109,44 +110,51 @@
     }
 
     &__bg {
+      cursor: pointer;
+
       position: fixed;
+      z-index: 110;
       top: 0;
       left: 0;
+      transform: translate3d(0, 0, 0);
+
       width: 100vw;
       height: var(--max-vh);
+
       background-color: var(--bg-light-main);
-      transform: translate3d(0, 0, 0);
-      z-index: 110;
-      cursor: pointer;
     }
 
     &__body {
       pointer-events: auto;
-      display: inline-block;
       cursor: auto;
-      background-image: var(--bg-gradient);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      overflow: auto;
-      border-radius: 12px;
-      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
-      transform-origin: bottom left;
-      z-index: 111;
+
       position: absolute;
+      z-index: 111;
       top: inherit;
+      right: 0;
       bottom: calc(64px + var(--safe-area-inset-bottom));
       left: 8px;
-      right: 0;
+      transform-origin: bottom left;
+
+      overflow: auto;
+      display: inline-block;
+
       max-width: calc(100vw - 16px);
       max-height: calc(var(--max-vh) - 72px - var(--safe-area-inset-bottom));
 
+      background-image: var(--bg-gradient);
+      backdrop-filter: blur(16px);
+      border-radius: 12px;
+      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+
       @include media-min($md) {
         top: 16px;
-        left: 64px;
         bottom: inherit;
-        max-width: 1170px;
-        width: fit-content;
+        left: 64px;
         transform-origin: top left;
+
+        width: fit-content;
+        max-width: 1170px;
       }
 
       &.is-menu {
@@ -168,21 +176,21 @@
   .nav-popover-animation {
     &-enter-from,
     &-leave-to {
-      opacity: 0;
-      transform: scale(0) translate3d(0, 0, 0);
       z-index: -1;
+      transform: scale(0) translate3d(0, 0, 0);
+      opacity: 0;
     }
 
     &-enter-to,
     &-leave-from {
-      opacity: 1;
-      transform: scale(1) translate3d(0, 0, 0);
       z-index: 111;
+      transform: scale(1) translate3d(0, 0, 0);
+      opacity: 1;
     }
 
     &-enter-active,
     &-leave-active {
-      @include css_anim(
+      @include css-anim(
         $time: 0.25s,
         $style: cubic-bezier(0.215, 0.61, 0.355, 1)
       );
@@ -193,17 +201,18 @@
     .nav-popover {
       &__body {
         top: auto;
-        left: initial;
         right: 8px;
         bottom: 64px;
-        width: auto;
+        left: initial;
         transform-origin: bottom right;
+
+        width: auto;
 
         @include media-min($md) {
           top: auto;
-          left: 64px;
           right: initial;
           bottom: 16px;
+          left: 64px;
           transform-origin: bottom left;
         }
       }

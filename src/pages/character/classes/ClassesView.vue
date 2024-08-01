@@ -160,21 +160,24 @@
   .class-items {
     &__group {
       &_name {
+        position: relative;
+
+        margin: 32px 0 24px;
+
+        font-family: Lora, sans-serif;
         font-size: var(--h2-font-size);
         font-weight: 300;
-        margin: 32px 0 24px 0;
         color: var(--text-color-title);
-        position: relative;
-        font-family: 'Lora', sans-serif;
       }
 
       &_list {
-        width: 100%;
-        padding: 0;
         display: grid;
         grid-gap: 16px;
-        align-items: start;
         grid-template-columns: repeat(1, 1fr);
+        align-items: start;
+
+        width: 100%;
+        padding: 0;
 
         @include media-min($md) {
           grid-template-columns: repeat(2, 1fr);

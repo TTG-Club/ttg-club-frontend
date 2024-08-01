@@ -38,8 +38,8 @@
 
     &__column {
       flex-basis: calc(100% / v-bind(columns));
-      padding: calc(var(--item-spacing, #{$item-spacing}) / 2);
       min-width: 0;
+      padding: calc(var(--item-spacing, #{$item-spacing}) / 2);
     }
   }
 </style>

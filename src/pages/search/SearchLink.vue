@@ -91,28 +91,31 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .search-link {
-    display: block;
-    color: var(--text-color-title);
     user-select: none;
     overflow: hidden;
+    display: block;
+    color: var(--text-color-title);
 
     &.is-homebrew {
       background: var(--bg-homebrew-gradient-left);
     }
 
     &__body {
-      @include css_anim();
-
       padding: 10px 12px;
+
+      @include css-anim;
     }
 
     &__section {
-      margin-top: 4px;
-      font-style: italic;
-      font-size: 13px;
-      opacity: 0.4;
-      color: var(--text-color);
       display: flex;
+
+      margin-top: 4px;
+
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-color);
+
+      opacity: 0.4;
     }
 
     &__source {
@@ -120,13 +123,15 @@
     }
 
     &__desc {
-      margin-top: 4px;
-      color: var(--text-color);
-      white-space: nowrap;
-      max-width: 100%;
-      display: inline-block;
       overflow: hidden;
+      display: inline-block;
+
+      max-width: 100%;
+      margin-top: 4px;
+
+      color: var(--text-color);
       text-overflow: ellipsis;
+      white-space: nowrap;
 
       @include media-min($xl) {
         white-space: initial;
@@ -139,22 +144,22 @@
       }
     }
 
-    &:hover {
-      &:not(.is-hover-disabled):not(.is-selected) {
-        .search-link {
-          &__body {
-            background: var(--hover);
-          }
+    &.is-selected {
+      .search-link {
+        &__body {
+          background: var(--hover);
+
+          @include css-anim;
         }
       }
     }
 
-    &.is-selected {
-      .search-link {
-        &__body {
-          @include css_anim();
-
-          background: var(--hover);
+    &:hover {
+      &:not(.is-hover-disabled, .is-selected) {
+        .search-link {
+          &__body {
+            background: var(--hover);
+          }
         }
       }
     }

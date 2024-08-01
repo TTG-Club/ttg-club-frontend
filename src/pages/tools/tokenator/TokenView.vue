@@ -40,16 +40,17 @@
 
   .wrapper {
     display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+
     width: fit-content;
     height: fit-content;
-    flex-direction: column-reverse;
-    justify-content: center;
-    align-items: center;
 
     @include media-min($md) {
       flex-direction: row;
-      justify-content: start;
       align-items: center;
+      justify-content: start;
     }
   }
 </style>

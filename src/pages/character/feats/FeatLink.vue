@@ -54,10 +54,11 @@
 
   .link-item {
     &__requirements {
-      color: var(--text-g-color);
+      overflow: hidden;
+
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
-      overflow: hidden;
+      color: var(--text-g-color);
       text-overflow: ellipsis;
       white-space: nowrap;
     }

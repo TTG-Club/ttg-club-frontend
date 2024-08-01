@@ -6,6 +6,7 @@ node_modules
 /public_html
 package-lock.json
 .eslintcache
+.stylelintcache
 
 # Local env files
 .env.local

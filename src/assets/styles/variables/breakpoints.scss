@@ -4,9 +4,9 @@ $md: 768px;
 $lg: 992px;
 $xl: 1200px;
 $xxl: 1400px;
-$full_hd: 1920px;
+$full-hd: 1920px;
 $retina: 2560px;
-$ultra_hd: 3840px;
+$ultra-hd: 3840px;
 
 @mixin media-min($breakpoint) {
   @if $breakpoint == all {

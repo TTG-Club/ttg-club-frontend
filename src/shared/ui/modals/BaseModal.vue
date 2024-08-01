@@ -84,83 +84,90 @@
 
   .base-modal {
     &__container {
-      background-color: var(--bg-secondary);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
       width: 100%;
       max-width: $lg - 1px;
       max-height: calc(var(--max-vh) - 56px * 2);
       margin: auto;
+
+      background-color: var(--bg-secondary);
       border-radius: 8px;
-      overflow: hidden;
       box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
-      display: flex;
-      flex-direction: column;
 
       @include media-max($md) {
-        border-radius: 0;
         max-height: 100%;
+        border-radius: 0;
       }
     }
 
     &__header {
       display: flex;
+      flex-shrink: 0;
       align-items: center;
       justify-content: flex-start;
+
       padding: 16px 16px 16px 24px;
-      flex-shrink: 0;
+
       background-color: var(--hover);
 
-      @media (max-width: 1200px) {
+      @media (width <= 1200px) {
         padding: 12px 16px;
       }
     }
 
     &__title {
-      color: var(--text-color-title);
+      margin-right: auto;
       font-size: 22px;
       line-height: 28px;
-      margin-right: auto;
+      color: var(--text-color-title);
     }
 
     &__close {
       margin: {
-        left: 16px;
-        top: -6px;
-        right: -6px;
-        bottom: -6px;
+        inset: -6px -6px -6px 16px;
       }
     }
 
     &__content {
       overflow: auto;
-      width: 100%;
       flex: 1;
+      width: 100%;
       padding-top: 16px;
     }
 
     &__footer {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
       flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+
+      padding: 16px;
+
       background-color: var(--bg-sub-menu);
 
       > * + * {
-        margin-left: 8px;
-        flex-shrink: 0;
-        white-space: nowrap;
         overflow: hidden;
+        flex-shrink: 0;
+
+        margin-left: 8px;
+
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
 
     &__controls {
       display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 8px;
-      padding: 16px;
       flex-shrink: 0;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+
+      padding: 16px;
+
       background-color: var(--bg-sub-menu);
     }
   }

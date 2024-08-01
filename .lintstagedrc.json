@@ -2,5 +2,8 @@
   "*.{cjs,js,ts,jsx,tsx,vue}": [
     "eslint --cache --cache-strategy content --ignore-path .eslintignore --quiet --fix",
     "prettier --cache --cache-strategy content --ignore-path .eslintignore --log-level error --write"
+  ],
+  "*.{css,scss,html,vue}": [
+    "stylelint --cache --cache-strategy content --ignore-path .eslintignore --quiet --fix"
   ]
 }

@@ -208,59 +208,58 @@
     padding: 4px 0;
 
     .ui-social-button {
-      opacity: 70%;
-      border-radius: 8px;
       padding: 4px 8px;
+      opacity: 0.7;
+      border-radius: 8px;
     }
 
     &__bottom {
+      padding: 16px;
       border-top: 1px solid var(--hover);
-      padding: 16px 16px;
 
       &--block {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-flow: row wrap;
         gap: 16px;
         align-items: center;
 
         &--contacts,
         &--support {
           display: flex;
-          align-items: center;
-          gap: 8px;
           flex-wrap: wrap;
+          gap: 8px;
+          align-items: center;
         }
 
         &--support {
-          border-left: none;
           padding-left: 0;
+          border-left: none;
 
           @include media-min($sm) {
-            border-left: 1px solid var(--border);
             padding-left: 16px;
+            border-left: 1px solid var(--border);
           }
         }
       }
     }
 
     &__header {
-      padding: 16px 16px 16px 16px;
       display: flex;
       align-items: center;
+      padding: 16px;
 
-      @media (max-width: 600px) {
-        padding: 16px 16px 16px 16px;
+      @media (width <= 600px) {
+        padding: 16px;
       }
     }
 
     &__logo {
-      margin-right: 12px;
+      flex-shrink: 0;
       width: 70px;
       height: 70px;
-      flex-shrink: 0;
+      margin-right: 12px;
 
-      @media (max-width: 600px) {
+      @media (width <= 600px) {
         width: 60px;
         height: 60px;
       }
@@ -272,8 +271,8 @@
       justify-content: center;
 
       &--desc {
-        font-size: var(--h5-font-size);
         margin-bottom: 4px;
+        font-size: var(--h5-font-size);
       }
 
       &--title {
@@ -288,13 +287,15 @@
     }
 
     &__body {
-      padding: 8px 8px 32px 8px;
       display: flex;
       flex-wrap: wrap;
       gap: 48px;
+
+      padding: 8px 8px 32px;
+
       border-top: 1px solid var(--hover);
 
-      @media (max-width: 600px) {
+      @media (width <= 600px) {
         gap: 0;
       }
     }
@@ -309,61 +310,73 @@
       width: 240px;
       margin: 8px 0;
 
-      @media (max-width: 600px) {
-        width: 100%;
-      }
-
       &_label {
-        padding: 8px 8px 4px 8px;
+        position: relative;
+
         display: flex;
-        opacity: 0.8;
-        color: var(--text-g-color);
+        align-items: center;
+
+        width: 100%;
+        padding: 8px 8px 4px;
+
         font-size: inherit;
         font-weight: normal;
-        width: 100%;
-        position: relative;
-        align-items: center;
+        color: var(--text-g-color);
+
+        opacity: 0.8;
 
         .nav-menu__group_label {
           align-items: center;
 
           &::after {
             content: '';
+
+            position: relative;
+            top: 0;
+            left: 8px;
+
             width: 100%;
             height: 1px;
+
             background-color: var(--text-g-color);
-            position: relative;
-            left: 8px;
-            top: 0;
           }
         }
       }
 
       &_icon {
+        flex-shrink: 0;
+
         width: 32px;
         height: 32px;
         padding: 4px;
-        flex-shrink: 0;
+
         font-size: 24px;
+      }
+
+      @media (width <= 600px) {
+        width: 100%;
       }
     }
 
     &__link {
-      @include css_anim();
-
       display: flex;
       border-radius: 6px;
 
-      &_label {
-        @include css_anim();
+      @include css-anim;
 
-        color: var(--text-color);
-        font-weight: 400;
-        padding: 8px;
-        width: 100%;
+      &_label {
         display: flex;
-        border-radius: 6px;
+
+        width: 100%;
+        padding: 8px;
+
         font-size: var(--main-font-size);
+        font-weight: 400;
+        color: var(--text-color);
+
+        border-radius: 6px;
+
+        @include css-anim;
 
         &.router-link-active {
           color: var(--text-btn-color);
@@ -372,12 +385,12 @@
       }
 
       &_icon {
-        @include css_anim();
-
+        flex-shrink: 0;
         width: 32px;
         height: 32px;
         padding: 8px;
-        flex-shrink: 0;
+
+        @include css-anim;
 
         &.only-hover {
           &:not(.is-active) {

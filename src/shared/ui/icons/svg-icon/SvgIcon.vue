@@ -74,17 +74,21 @@
 
 <style lang="scss" module>
   .svgIcon {
-    font-size: v-bind(sizeCalculated);
+    transform: translateZ(0);
+
     overflow: hidden;
-    flex-shrink: 0;
     display: inline-block;
+    flex-shrink: 0;
+
     width: 1em;
     height: 1em;
+
+    font-size: v-bind(sizeCalculated);
     line-height: 1em;
-    color: currentColor;
-    fill: currentColor;
+    color: currentcolor;
     text-align: center;
-    transform: translateZ(0);
+
+    fill: currentcolor;
 
     svg {
       width: 1em;
@@ -93,10 +97,12 @@
   }
 
   .error {
+    overflow: hidden;
     display: none !important;
+
     width: 0;
     height: 0;
+
     visibility: hidden;
-    overflow: hidden;
   }
 </style>

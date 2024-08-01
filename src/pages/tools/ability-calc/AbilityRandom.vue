@@ -198,31 +198,37 @@
 
 <style module lang="scss">
   .sum {
-    width: 100%;
-    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-table-list);
-    border-radius: 8px;
+
+    width: 100%;
+    height: 34px;
     padding: 0 8px;
-    color: var(--text-b-color);
+
     font-size: var(--main-font-size);
     line-height: calc(var(--main-line-height) - 1px);
+    color: var(--text-b-color);
+
+    background: var(--bg-table-list);
+    border-radius: 8px;
   }
 
   .dotted {
     flex-direction: row-reverse;
     justify-content: flex-end;
 
-    &:after {
+    &::after {
       content: '';
+
       display: block;
+
       width: 10px;
       height: 10px;
-      border-radius: 50%;
-      background-color: var(--primary);
       margin-right: 8px;
+
+      background-color: var(--primary);
+      border-radius: 50%;
     }
   }
 </style>

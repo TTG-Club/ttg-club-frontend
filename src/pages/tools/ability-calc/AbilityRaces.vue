@@ -451,28 +451,33 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .race {
-    @include css_anim();
+    display: flex;
+    flex-shrink: 0;
+    align-items: stretch;
+    justify-content: center;
 
     width: 100%;
     max-width: 270px;
     min-height: 111px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
+
+    @include css-anim;
 
     .empty {
-      color: var(--primary);
-      width: 100%;
+      cursor: not-allowed;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: not-allowed;
+
+      width: 100%;
+
+      color: var(--primary);
       border: {
         width: 1px;
+        color: var(--primary);
+
         radius: 8px;
         style: dashed;
-        color: var(--primary);
       }
     }
   }
@@ -481,14 +486,17 @@
     flex-direction: row-reverse;
     justify-content: flex-end;
 
-    &:after {
+    &::after {
       content: '';
+
       display: block;
+
       width: 10px;
       height: 10px;
-      border-radius: 50%;
-      background-color: var(--primary);
       margin-right: 8px;
+
+      background-color: var(--primary);
+      border-radius: 50%;
     }
   }
 </style>

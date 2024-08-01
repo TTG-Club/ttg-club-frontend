@@ -89,11 +89,12 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .screen-items {
-    width: 100%;
     display: grid;
     grid-gap: 16px;
-    align-items: start;
     grid-template-columns: repeat(1, 1fr);
+    align-items: start;
+
+    width: 100%;
 
     @include media-min($sm) {
       grid-template-columns: repeat(2, 1fr);
@@ -115,15 +116,18 @@
   }
 
   .screen-item {
-    @include css_anim();
-
     display: block;
+
     width: 100%;
-    background-color: var(--bg-table-list);
-    border-radius: 12px;
-    border: 1px solid transparent;
     padding: 12px;
+
     color: var(--text-color-title);
+
+    background-color: var(--bg-table-list);
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    @include css-anim;
 
     @include media-min($xl) {
       padding: 16px;
@@ -131,11 +135,13 @@
 
     &__name {
       &--rus {
-        font-size: calc(var(--h5-font-size) + 2px);
+        display: block;
+
         margin: 0;
+
+        font-size: calc(var(--h5-font-size) + 2px);
         font-weight: 500;
         line-height: normal;
-        display: block;
       }
 
       &--eng {

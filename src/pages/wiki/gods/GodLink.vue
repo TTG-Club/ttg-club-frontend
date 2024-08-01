@@ -76,20 +76,24 @@
 
   .link-item {
     &__alignment {
-      width: 42px;
       flex-shrink: 0;
-      font-size: 17px;
-      color: var(--text-color);
-      border-right: 1px solid var(--border);
+
+      width: 42px;
       margin-right: 12px;
       margin-left: -8px;
 
+      font-size: 17px;
+      color: var(--text-color);
+
+      border-right: 1px solid var(--border);
+
       span {
-        width: 42px;
-        height: 42px;
         display: flex;
         align-items: center;
         justify-content: center;
+
+        width: 42px;
+        height: 42px;
       }
     }
   }

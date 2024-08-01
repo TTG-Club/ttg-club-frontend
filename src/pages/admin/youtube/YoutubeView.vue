@@ -205,27 +205,27 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .container {
-    min-height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 100%;
   }
 
   .header {
     display: flex;
-    align-items: center;
     gap: 12px;
+    align-items: center;
   }
 
   .count {
-    flex-shrink: 0;
     display: flex;
-    align-items: center;
+    flex-shrink: 0;
     gap: 16px;
+    align-items: center;
   }
 
   .active {
-    flex: auto;
     display: flex;
+    flex: auto;
     justify-content: flex-end;
   }
 
@@ -234,12 +234,13 @@
   }
 
   .body {
-    padding: 16px 0;
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: 24px;
-    min-height: 0;
+
     min-width: 0;
+    min-height: 0;
+    padding: 16px 0;
 
     @include media-min($md) {
       grid-template-columns: repeat(3, 1fr);
@@ -247,18 +248,33 @@
   }
 
   .add {
+    cursor: pointer;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--bg-secondary);
-    cursor: pointer;
+
     margin-top: 16px;
     padding: 16px;
+
+    background-color: var(--bg-secondary);
     border: {
-      radius: 12px;
       width: 1px;
-      style: solid;
       color: var(--border);
+
+      radius: 12px;
+      style: solid;
+    }
+
+    > div {
+      width: 48px;
+      height: 48px;
+      padding: 4px;
+
+      background-color: var(--border);
+      border-radius: 12px;
+
+      @include css-anim;
     }
 
     &:hover {
@@ -266,34 +282,95 @@
         background-color: var(--primary);
       }
     }
+  }
 
-    > div {
-      @include css_anim();
+  .player {
+    overflow: hidden;
+    border-radius: 8px;
+  }
 
-      background-color: var(--border);
-      border-radius: 12px;
-      width: 48px;
-      height: 48px;
-      padding: 4px;
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .title {
+    overflow: hidden;
+    display: inline-block;
+
+    width: 100%;
+    padding-bottom: 8px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font: {
+      size: var(--h5-font-size);
+
+      weight: bold;
+    }
+
+    border-bottom: {
+      width: 1px;
+      color: var(--border);
+
+      style: solid;
     }
   }
 
+  .controls {
+    $compensate: 8px;
+
+    pointer-events: none;
+    user-select: none;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateX($compensate) translateY(-$compensate);
+
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px;
+
+    opacity: 0;
+    background-color: var(--bg-secondary);
+    border: {
+      width: 1px;
+      color: var(--border);
+
+      radius: 12px;
+      style: solid;
+    }
+
+    @include css-anim;
+  }
+
   .video {
-    width: 100%;
+    position: relative;
+
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     gap: 8px;
-    padding: 12px;
-    background-color: var(--bg-secondary);
-    position: relative;
-    min-height: 0;
+
+    width: 100%;
     min-width: 0;
+    min-height: 0;
+    padding: 12px;
+
+    background-color: var(--bg-secondary);
     border: {
-      radius: 12px;
       width: 1px;
-      style: solid;
       color: var(--border);
+
+      radius: 12px;
+      style: solid;
     }
 
     &:hover {
@@ -302,64 +379,6 @@
         user-select: initial;
         opacity: 1;
       }
-    }
-  }
-
-  .player {
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .info {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .title {
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
-    padding-bottom: 8px;
-
-    font: {
-      weight: bold;
-      size: var(--h5-font-size);
-    }
-
-    border-bottom: {
-      width: 1px;
-      style: solid;
-      color: var(--border);
-    }
-  }
-
-  .controls {
-    @include css_anim();
-
-    $compensate: 8px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: absolute;
-    top: 0;
-    right: 0;
-    transform: translateX($compensate) translateY(-$compensate);
-    opacity: 0;
-    pointer-events: none;
-    user-select: none;
-    padding: 4px;
-    background-color: var(--bg-secondary);
-    border: {
-      radius: 12px;
-      width: 1px;
-      style: solid;
-      color: var(--border);
     }
   }
 

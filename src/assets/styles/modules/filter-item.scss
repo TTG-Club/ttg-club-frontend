@@ -2,21 +2,21 @@
 @use '@/assets/styles/variables/mixins' as *;
 
 .filter-item {
-  width: 100%;
   overflow: hidden;
-  border-radius: 8px;
+  width: 100%;
   border: 1px solid var(--border);
+  border-radius: 8px;
 
   & + & {
     margin-top: 16px;
   }
 
   &__header {
-    @include css_anim();
-
+    cursor: pointer;
     display: flex;
     width: 100%;
-    cursor: pointer;
+
+    @include css-anim;
 
     @include media-min($md) {
       &:hover {
@@ -26,50 +26,53 @@
   }
 
   &__trigger {
-    width: 100%;
     display: flex;
     flex: 1;
+    width: 100%;
   }
 
   &__name {
-    color: var(--text-color-title);
-    font-weight: 500;
     flex: 1;
+
     padding: 10px 12px;
+
     font-size: var(--h5-font-size);
+    font-weight: 500;
     line-height: var(--h5-line-height);
+    color: var(--text-color-title);
   }
 
   &__button {
-    @include css_anim();
-
-    flex-shrink: 0;
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
+
     width: 42px;
     height: 42px;
+
     color: var(--text-color);
+
+    @include css-anim;
 
     @include media-min($md) {
       &:hover {
-        @include css_anim();
-
         color: var(--text-btn-color);
         background-color: var(--primary-hover);
+
+        @include css-anim;
       }
     }
   }
 
   &__body {
-    padding: 4px 12px 12px;
     display: flex;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 12px 12px;
 
     &.is-toggle {
-      flex-wrap: nowrap;
-      flex-direction: column;
+      flex-flow: column nowrap;
     }
   }
 }

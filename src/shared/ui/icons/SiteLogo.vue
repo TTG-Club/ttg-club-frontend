@@ -95,7 +95,7 @@
 <style lang="scss" scoped>
   .site-logo {
     overflow: hidden;
-    flex-shrink: 0;
     display: block;
+    flex-shrink: 0;
   }
 </style>

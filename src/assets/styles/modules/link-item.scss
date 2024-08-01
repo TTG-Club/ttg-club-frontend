@@ -1,10 +1,12 @@
 .link-item {
-  border-radius: 12px;
   overflow: hidden;
-  background: var(--bg-table-list);
+  display: block;
+
   width: 100%;
   margin-bottom: 12px;
-  display: block;
+
+  background: var(--bg-table-list);
+  border-radius: 12px;
 
   &.is-sub-item {
     background: var(--bg-sub-menu);
@@ -14,26 +16,57 @@
     display: flex;
     flex-direction: row;
     align-items: initial;
-    padding: 6px 12px;
+
     width: 100%;
     min-height: 38px;
+    padding: 6px 12px;
   }
 
   &__body {
-    flex: 1 1 100%;
+    overflow: hidden;
     display: flex;
+    flex: 1 1 100%;
     flex-direction: column;
     justify-content: center;
-    overflow: hidden;
   }
 
   &__row {
     display: flex;
-    align-items: center;
     flex-wrap: nowrap;
+    align-items: center;
 
     & + & {
       margin-top: 4px;
+    }
+  }
+
+  &__type {
+    display: inline-block;
+    justify-content: flex-start;
+    padding-right: 4px;
+
+    @media (width <= 1200px) {
+      flex: 1 0 100%;
+    }
+  }
+
+  &__damage {
+    justify-content: flex-start;
+
+    &_type {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__ac {
+    justify-content: flex-start;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
@@ -43,70 +76,40 @@
   &__count,
   &__customization,
   &__price {
+    overflow: hidden;
     display: flex;
     flex: 1 0 auto;
-    color: var(--text-color);
+    justify-content: flex-end;
+
+    height: 20px;
+
     font-size: calc(var(--main-font-size) - 1px);
-    overflow: hidden;
+    line-height: normal;
+    color: var(--text-color);
     text-overflow: ellipsis;
     white-space: nowrap;
-    justify-content: flex-end;
-    height: 20px;
-    line-height: normal;
 
     &:first-child {
       flex: 1 1 auto;
     }
   }
 
-  &__damage {
-    &_type {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
-
-  &__ac {
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
-
-  &__type {
-    justify-content: flex-start;
-    display: inline-block;
-    padding-right: 4px;
-
-    @media (max-width: 1200px) {
-      flex: 1 0 100%;
-    }
-  }
-
-  &__damage {
-    justify-content: flex-start;
-  }
-
-  &__ac {
-    justify-content: flex-start;
-  }
-
   &__name {
-    display: inline-block;
-    width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--text-color-title);
+    display: inline-block;
+
+    width: 100%;
+
     font-size: var(--main-font-size);
     line-height: var(--main-line-height);
+    color: var(--text-color-title);
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &--rus {
       display: inline;
-      color: var(--text-color-title);
       max-width: 100%;
+      color: var(--text-color-title);
     }
 
     &--eng {
@@ -116,13 +119,15 @@
   }
 
   &__source {
+    margin-left: 8px;
+    padding: 0 6px;
+
     font-size: calc(var(--main-font-size) - 4px);
+    color: var(--text-color);
+
+    background: var(--source-group-color);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 0px 6px;
-    color: var(--text-color);
-    background: var(--source-group-color);
-    margin-left: 8px;
   }
 
   &__count + &__price,
@@ -135,13 +140,13 @@
   }
 
   &:hover {
+    border-bottom: none;
+
     .link-item {
       &__content {
         background-color: var(--hover);
       }
     }
-
-    border-bottom: none;
   }
 
   &.router-link-active {

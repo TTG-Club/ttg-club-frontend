@@ -130,7 +130,7 @@
     width: 100%;
 
     tr {
-      @include css_anim();
+      @include css-anim;
     }
 
     th {

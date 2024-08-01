@@ -187,8 +187,7 @@
     border-color: var(--primary);
 
     &__body {
-      flex-direction: column;
-      flex-wrap: nowrap;
+      flex-flow: column nowrap;
       gap: initial;
     }
 
@@ -197,10 +196,16 @@
         margin-top: 16px;
       }
 
+      &_body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
       &_head {
+        cursor: default;
         display: flex;
         align-items: center;
-        cursor: default;
 
         & + .filter-item {
           &__source-group {
@@ -217,20 +222,17 @@
         align-items: center;
         padding-right: 8px;
 
-        &:after {
+        &::after {
           content: '';
+
           display: block;
           flex: 1;
-          height: 1px;
-          background-color: var(--border);
-          margin-left: 8px;
-        }
-      }
 
-      &_body {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+          height: 1px;
+          margin-left: 8px;
+
+          background-color: var(--border);
+        }
       }
     }
   }
