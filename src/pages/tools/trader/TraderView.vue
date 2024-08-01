@@ -291,7 +291,7 @@
 <template>
   <content-layout
     :show-right-side="showRightSide"
-    :force-fullscreen-state="false"
+    full-screen-disabled
   >
     <template #fixed>
       <n-form
@@ -342,16 +342,12 @@
         <n-space vertical>
           <n-collapse-transition :show="settings.opened">
             <n-space vertical>
-              <n-checkbox
-                v-model:checked="form.unique"
-                :focusable="false"
-              >
+              <n-checkbox v-model:checked="form.unique">
                 Только уникальные
               </n-checkbox>
 
               <n-checkbox
                 v-model:checked="settings.grouping"
-                :focusable="false"
                 :disabled="form.unique"
               >
                 Группировать одинаковые
@@ -359,7 +355,6 @@
 
               <n-checkbox
                 v-model:checked="settings.max"
-                :focusable="false"
                 :disabled="form.unique || !settings.grouping"
               >
                 Отображать максимальную цену
@@ -370,7 +365,6 @@
           <n-space>
             <n-button
               type="primary"
-              :focusable="false"
               @click.left.exact.prevent="sendForm"
             >
               Найти торговца
@@ -378,7 +372,6 @@
 
             <n-button
               secondary
-              :focusable="false"
               @click.left.exact.prevent="settings.opened = !settings.opened"
             >
               Настройки

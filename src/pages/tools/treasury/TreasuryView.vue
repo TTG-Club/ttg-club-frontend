@@ -259,7 +259,7 @@
 <template>
   <content-layout
     :show-right-side="showRightSide"
-    :force-fullscreen-state="false"
+    full-screen-disabled
   >
     <template #fixed>
       <n-form
@@ -365,6 +365,7 @@
           </n-button>
 
           <n-button
+            secondary
             @click.left.exact.prevent="settings.opened = !settings.opened"
           >
             Настройки
@@ -377,7 +378,6 @@
       <content-detail>
         <template #fixed>
           <section-header
-            :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'In treasury'"
             :title="selected.item?.name.rus || 'В сокровищнице'"
             @close="close"

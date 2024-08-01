@@ -17,7 +17,7 @@
     defineProps<{
       showRightSide?: boolean;
       title?: string | null;
-      forceFullscreenState?: boolean;
+      fullScreenDisabled?: boolean;
       filterInstance?: FilterComposable;
       onLoadMore?: () => Promise<void>;
       isEnd?: boolean;
@@ -25,7 +25,7 @@
     {
       showRightSide: false,
       title: null,
-      forceFullscreenState: undefined,
+      fullScreenDisabled: false,
       filterInstance: undefined,
       onLoadMore: undefined,
       isEnd: false,
@@ -43,13 +43,11 @@
   const fixedContainer = ref<HTMLDivElement | null>(null);
   const shadow = ref(false);
 
-  const fullscreenState = computed(() => {
-    if (typeof props.forceFullscreenState === 'boolean') {
-      return props.forceFullscreenState;
-    }
-
-    return fullscreen.value;
+  const isFullScreen = computed(() => {
+    return fullscreen.value && !props.fullScreenDisabled;
   });
+
+  provide('fullScreenDisabled', props.fullScreenDisabled);
 
   const toggleShadow = () => {
     if (!bodyElement.value || !container.value) {
@@ -161,12 +159,12 @@
     class="content-layout"
   >
     <div
-      :class="{ 'is-fullscreen': fullscreenState }"
+      :class="{ 'is-fullscreen': isFullScreen }"
       class="content-layout__body"
     >
       <div
         :class="{
-          'is-fullscreen': fullscreenState,
+          'is-fullscreen': isFullScreen,
           'is-showed-right-side': showRightSide,
         }"
         class="content-layout__side--left"
@@ -212,7 +210,7 @@
 
         <div
           ref="leftSide"
-          :class="{ 'is-shadow': shadow || (showRightSide && fullscreenState) }"
+          :class="{ 'is-shadow': shadow || (showRightSide && isFullScreen) }"
           class="content-layout__side--left_body"
         >
           <slot name="default" />
@@ -221,8 +219,7 @@
 
       <div
         v-if="showRightSide"
-        ref="detail"
-        :class="{ 'is-fullscreen': fullscreenState }"
+        :class="{ 'is-fullscreen': isFullScreen }"
         class="content-layout__side--right"
       >
         <router-view

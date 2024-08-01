@@ -106,6 +106,7 @@
     >
       <n-button
         block
+        secondary
         @click.left.exact.prevent="open"
       >
         Загрузить картинку

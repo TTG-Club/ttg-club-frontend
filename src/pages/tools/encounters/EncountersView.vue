@@ -34,13 +34,13 @@
   });
 
   interface FormPayload {
-    level?: number;
-    environment?: string;
+    level: number | null;
+    environment: string | null;
   }
 
   const form = reactive<FormPayload>({
-    level: undefined,
-    environment: undefined,
+    level: null,
+    environment: null,
   });
 
   interface GetOptionsResponse {
@@ -74,6 +74,9 @@
     }
   };
 
+  const getFormPayload = (): Partial<FormPayload> =>
+    fromPairs(toPairs(form).filter(([key, value]) => key && !!value));
+
   const sendForm = throttle(async () => {
     if (controller.value) {
       controller.value.abort();
@@ -82,13 +85,9 @@
     controller.value = new AbortController();
 
     try {
-      const options: Partial<FormPayload> = fromPairs(
-        toPairs(form).filter(([key, value]) => key && !!value),
-      );
-
       const resp = await httpClient.post<EncounterItem>({
         url: '/tools/encounters',
-        payload: options,
+        payload: getFormPayload(),
         signal: controller.value.signal,
       });
 
@@ -116,7 +115,7 @@
     try {
       const resp = await httpClient.post<IRollTable>({
         url: '/tools/encounters/table',
-        payload: form,
+        payload: getFormPayload(),
         signal: controller.value.signal,
       });
 
@@ -137,7 +136,7 @@
 
   getOptions();
 
-  const isTableDisabled = computed(() => {
+  const isTableEnabled = computed(() => {
     return form.level && form.environment;
   });
 </script>
@@ -158,6 +157,7 @@
             <n-select
               v-model:value="form.level"
               :options="levels"
+              clearable
               placeholder="Уровень"
             />
           </n-form-item>
@@ -169,6 +169,7 @@
             <n-select
               v-model:value="form.environment"
               :options="environments"
+              clearable
               placeholder="Окружение"
             />
           </n-form-item>
@@ -190,7 +191,7 @@
           </n-button>
 
           <n-button
-            v-if="isTableDisabled"
+            v-if="isTableEnabled"
             secondary
             @click.left.exact.prevent="getTable"
           >

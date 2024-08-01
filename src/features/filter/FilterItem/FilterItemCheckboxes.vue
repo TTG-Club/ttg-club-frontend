@@ -115,35 +115,33 @@
       :class="{ 'is-toggle': type === 'toggle' }"
       class="filter-item__body"
     >
-      <n-tooltip
+      <template
         v-for="(checkbox, checkboxKey) in model"
         :key="checkboxKey"
-        :disabled="!checkbox.tooltip"
       >
-        <template #trigger>
-          <n-checkbox
-            v-if="type === 'toggle'"
-            :checked="checkbox.value"
-            @update:checked="setValue($event, checkboxKey)"
+        <n-checkbox
+          v-if="type === 'toggle'"
+          :checked="checkbox.value"
+          @update:checked="setValue($event, checkboxKey)"
+        >
+          {{ checkbox.label }}
+        </n-checkbox>
+
+        <n-tag
+          v-if="type === 'crumb'"
+          :checked="checkbox.value"
+          checkable
+          round
+          @update:checked="setValue($event, checkboxKey)"
+        >
+          <n-performant-ellipsis
+            tooltip
+            :style="{ maxWidth: '243px' }"
           >
             {{ checkbox.label }}
-          </n-checkbox>
-
-          <n-tag
-            v-if="type === 'crumb'"
-            :checked="checkbox.value"
-            checkable
-            round
-            @update:checked="setValue($event, checkboxKey)"
-          >
-            {{ checkbox.label }}
-          </n-tag>
-        </template>
-
-        <template #default>
-          {{ checkbox.tooltip }}
-        </template>
-      </n-tooltip>
+          </n-performant-ellipsis>
+        </n-tag>
+      </template>
     </div>
   </div>
 </template>

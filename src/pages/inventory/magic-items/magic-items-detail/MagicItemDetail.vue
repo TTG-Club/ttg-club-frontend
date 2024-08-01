@@ -76,6 +76,7 @@
         :subtitle="magicItem?.name?.eng || ''"
         :title="magicItem?.name?.rus || ''"
         bookmark
+        print
         @close="close"
       />
     </template>

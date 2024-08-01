@@ -54,6 +54,8 @@
   const toast = useToast(ToastEventBus);
   const { fullscreen: fullscreenState } = storeToRefs(uiStore);
 
+  const fullScreenDisabled = inject<boolean>('fullScreenDisabled', false);
+
   const urlForCopy = computed(() => window.location.origin + route.path);
 
   const withExportDropdown = computed(
@@ -69,7 +71,7 @@
       !!props.onExportLss ||
       !!props.onExportFoundry ||
       !!props.onClose ||
-      props.fullscreen,
+      (props.fullscreen && !fullScreenDisabled),
   );
 
   const closeAvailable = computed(() => props.onClose);
@@ -309,7 +311,7 @@
         </n-dropdown>
       </n-button-group>
 
-      <n-tooltip v-if="fullscreen">
+      <n-tooltip v-if="fullscreen && !fullScreenDisabled">
         <template #trigger>
           <n-button
             quaternary

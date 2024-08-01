@@ -155,7 +155,10 @@
             Сгенерировать
           </n-button>
 
-          <n-button @click.left.exact.prevent="results = []">
+          <n-button
+            secondary
+            @click.left.exact.prevent="results = []"
+          >
             Очистить
           </n-button>
         </n-flex>
