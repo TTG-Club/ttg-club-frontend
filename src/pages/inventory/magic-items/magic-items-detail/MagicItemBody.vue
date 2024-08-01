@@ -1,6 +1,6 @@
 <script>
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
-  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import GalleryLightbox from '@/shared/ui/kit/GalleryLightbox.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import DetailTopBar from '@/features/DetailTopBar.vue';
@@ -8,7 +8,7 @@
   export default {
     name: 'MagicItemBody',
     components: {
-      UiEasyLightbox,
+      GalleryLightbox,
       DetailTopBar,
       RawContent,
       DiceRoller,
@@ -57,10 +57,7 @@
     </detail-top-bar>
 
     <div class="content-padding">
-      <ui-easy-lightbox
-        :images="magicItem.images"
-        :use-bg-hide="false"
-      />
+      <gallery-lightbox :images="magicItem.images" />
 
       <ul class="stat-list">
         <li>

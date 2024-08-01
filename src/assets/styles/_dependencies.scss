@@ -65,7 +65,7 @@
     }
   }
 
-  .ui-easy-lightbox {
+  .gallery-lightbox {
     width: 140px;
     height: 140px;
   }
@@ -264,6 +264,8 @@
 }
 
 .n {
+  $namespace: &;
+
   &-input {
     &-number {
       width: 100%;
@@ -276,6 +278,35 @@
 
       @include media-min($lg) {
         display: block;
+      }
+    }
+  }
+
+  &-image-preview {
+    &-overlay {
+      @include css-anim($item: background-color);
+
+      &.is-bg-hide {
+        background-color: var(--bg-main) !important;
+      }
+    }
+
+    &-toolbar {
+      gap: 8px;
+
+      #{$namespace}-icon {
+        font-size: 28px;
+      }
+
+      #{$namespace}-base-icon {
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      #{$namespace}-icon,
+      #{$namespace}-base-icon {
+        cursor: pointer;
       }
     }
   }

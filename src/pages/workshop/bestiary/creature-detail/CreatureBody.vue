@@ -1,7 +1,7 @@
 <script setup>
   import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
-  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
+  import GalleryLightbox from '@/shared/ui/kit/GalleryLightbox.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
   import {
     getFormattedModifier,
@@ -130,7 +130,10 @@
     </detail-top-bar>
 
     <div class="content-padding">
-      <ui-easy-lightbox :images="creature.images" />
+      <gallery-lightbox
+        :images="creature.images"
+        use-bg-hide
+      />
 
       <div class="beast_info">
         <p>
