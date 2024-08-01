@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { useFocus } from '@vueuse/core';
-  import { computed, defineComponent, ref, watch } from 'vue';
-
   import type { TSearchResult } from '@/shared/types/search/Search.d';
 
   import type { PropType } from 'vue';

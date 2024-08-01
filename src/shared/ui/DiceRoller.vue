@@ -1,11 +1,9 @@
 <script setup lang="ts">
   import { type RollBase } from 'dice-roller-parser';
-  import { computed, ref } from 'vue';
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
-  import { useDiceRoller } from '@/shared/composables/useDiceRoller';
+  import { useDiceRoller } from '@/shared/composable/useDiceRoller';
+  import { ToastEventBus } from '@/shared/config';
   import { useIsDev } from '@/shared/utils/isDev';
 
   import { type RollType } from '../utils/roll';
@@ -110,18 +108,28 @@
 </script>
 
 <template>
-  <span
-    v-tippy="{ content: `Нажмите для броска: <b>${formula}</b>` }"
-    :class="classes"
-    class="dice-roller"
-    @dblclick.prevent.stop
-    @click.left.exact.prevent.stop="tryRoll()"
-    @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
-    @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
-    @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
-  >
-    <slot>{{ formula }}</slot>
-  </span>
+  <n-tooltip>
+    <template #trigger>
+      <span
+        :class="classes"
+        class="dice-roller"
+      >
+        <span
+          @dblclick.prevent.stop
+          @click.left.exact.prevent.stop="tryRoll()"
+          @click.left.shift.exact.prevent.stop="tryRoll('advantage')"
+          @click.left.ctrl.exact.prevent.stop="tryRoll('disadvantage')"
+          @click.left.meta.exact.prevent.stop="tryRoll('disadvantage')"
+        >
+          <slot>{{ formula }}</slot>
+        </span>
+      </span>
+    </template>
+
+    <template #default>
+      Нажмите для броска: <b>{{ formula }}</b>
+    </template>
+  </n-tooltip>
 </template>
 
 <style lang="scss" scoped>

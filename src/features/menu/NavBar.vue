@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { computed, defineComponent } from 'vue';
-  import { useRoute } from 'vue-router';
-
   import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
   import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import clsx from 'clsx';
-  import { useCssModule } from 'vue';
 
   import type { ClassName } from '@/shared/types/Vue';
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';

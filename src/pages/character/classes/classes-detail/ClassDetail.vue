@@ -1,27 +1,13 @@
 <script setup lang="ts">
-  import {
-    computedInject,
-    resolveUnref,
-    useElementBounding,
-    useScroll,
-  } from '@vueuse/core';
   import { cloneDeep, groupBy, isArray, sortBy } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
   import VueEasyLightbox from 'vue-easy-lightbox';
-  import {
-    onBeforeRouteLeave,
-    onBeforeRouteUpdate,
-    useRoute,
-    useRouter,
-  } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import type { TName, TSource } from '@/shared/types/BaseApiFields';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -30,7 +16,11 @@
   import OptionsView from '@/pages/character/options/OptionsView.vue';
   import SpellsView from '@/pages/character/spells/SpellsView.vue';
 
-  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+  import type { SelectGroupOption } from 'naive-ui';
+  import type {
+    RouteLocationNormalizedLoaded,
+    RouteLocationPathRaw,
+  } from 'vue-router';
 
   interface IEmit {
     (e: 'scroll-to-active'): void;
@@ -55,7 +45,13 @@
 
   const loading = ref(true);
   const error = ref(false);
-  const currentClass = ref(undefined);
+
+  const currentClass = ref<
+    unknown & {
+      archetypes?: Array<ClassItemArchetype>;
+    }
+  >();
+
   const currentTab = ref(undefined);
   const tabs = ref([]);
   const abortController = ref();
@@ -85,41 +81,58 @@
     }`.replace(/\s/g, ''),
   );
 
-  const currentArchetypes = computed(() => {
-    const getArchetypes = (list) =>
+  interface ClassItemArchetypeType {
+    name: string;
+    order: number;
+  }
+
+  interface ClassItemArchetype {
+    name: TName;
+    type: ClassItemArchetypeType;
+    source: TSource;
+    url: string;
+  }
+
+  const currentArchetypes = computed<Array<SelectGroupOption>>(() => {
+    const getArchetypes = (
+      list: Array<ClassItemArchetype>,
+    ): Array<SelectGroupOption> =>
       sortBy(
         Object.values(groupBy(list, (o) => o.type.name)).map((value) => ({
-          group: value[0].type,
-          list: value.map((el) => ({
-            name: `${el.name.rus} [${el.source.shortName}]`,
-            url: el.url,
+          type: 'group',
+          key: value[0].type.order,
+          label: value[0].type.name,
+          children: value.map((el) => ({
+            label: `${el.name.rus} [${el.source.shortName}]`,
+            value: el.url,
           })),
         })),
-        [(o) => o.group.order],
+        [(o) => o.key],
       );
 
-    return isArray(currentClass.value?.archetypes) &&
-      currentClass.value.archetypes.length
-      ? getArchetypes(currentClass.value.archetypes)
-      : [];
-  });
-
-  const currentSelectArchetype = computed(() => {
-    let selected;
-
-    for (let i = 0; i < currentArchetypes.value.length && !selected; i++) {
-      for (
-        let index = 0;
-        index < currentArchetypes.value[i].list.length && !selected;
-        index++
-      ) {
-        if (currentArchetypes.value[i].list[index].url === route.path) {
-          selected = currentArchetypes.value[i].list[index];
-        }
-      }
+    if (
+      !isArray(currentClass.value?.archetypes) ||
+      !currentClass.value.archetypes.length
+    ) {
+      return [];
     }
 
-    return selected;
+    return getArchetypes(currentClass.value.archetypes);
+  });
+
+  const currentSelectArchetype = computed<
+    ClassItemArchetype['url'] | undefined
+  >(() => {
+    if (
+      !isArray(currentClass.value?.archetypes) ||
+      !currentClass.value.archetypes.length
+    ) {
+      return undefined;
+    }
+
+    return currentClass.value.archetypes.find(
+      (archetype) => archetype.url === route.path,
+    )?.url;
   });
 
   const getUpdatedClass = (classInfo) => {
@@ -223,9 +236,8 @@
     await setTab(index);
   };
 
-  const goToArchetype = (path) => {
+  const goToArchetype = (path: RouteLocationPathRaw['path']) =>
     router.push({ path });
-  };
 
   const scrollToSection = (hash: string) => {
     if (!hash || !(classBody.value instanceof HTMLDivElement)) {
@@ -356,62 +368,42 @@
           v-if="isMobile && currentArchetypes.length"
           class="class-detail__select"
         >
-          <ui-select
-            :group-select="false"
-            :model-value="currentSelectArchetype"
+          <n-select
             :options="currentArchetypes"
-            group-label="group"
-            group-values="list"
-            label="name"
-            track-by="url"
-          >
-            <template #placeholder>
-              --- {{ currentClass?.archetypeName }} ---
-            </template>
-
-            <template #option="{ option }">
-              <span v-if="option.$isLabel">{{ option.$groupLabel.name }}</span>
-
-              <span
-                v-else
-                @click.left.exact.prevent="goToArchetype(option.url)"
-                >{{ option.name }}</span
-              >
-            </template>
-          </ui-select>
+            :value="currentSelectArchetype"
+            :placeholder="`--- ${currentClass?.archetypeName} ---`"
+            :show-checkmark="false"
+            @update:value="goToArchetype"
+          />
         </div>
 
-        <div
+        <n-flex
           v-if="tabs.length"
           class="class-detail__tabs"
         >
-          <div
+          <n-button
             v-for="(tab, tabKey) in tabs"
             :key="tabKey"
-            :class="{
-              'is-active': currentTab?.name === tab.name,
-              'is-only-icon': !tab.name,
-            }"
-            class="class-detail__tab"
+            :type="currentTab?.name === tab.name ? 'primary' : 'default'"
             @click.left.exact.prevent="
               clickTabHandler({ index: tabKey, callback: tab.callback })
             "
           >
-            <div
+            <template
               v-if="!tab.name"
-              class="class-detail__tab_icon"
+              #icon
             >
               <svg-icon :icon="`tab-${tab.type}`" />
-            </div>
+            </template>
 
-            <div
+            <template
               v-else
-              class="class-detail__tab_name"
+              #default
             >
               {{ tab.name }}
-            </div>
-          </div>
-        </div>
+            </template>
+          </n-button>
+        </n-flex>
       </div>
     </template>
 
@@ -514,11 +506,6 @@
     }
 
     &__tabs {
-      display: flex;
-      width: 100%;
-      flex-shrink: 0;
-      flex-wrap: wrap;
-      gap: 8px;
       padding: 16px 16px 8px 16px;
 
       @include media-min($xl) {
@@ -583,40 +570,7 @@
     }
 
     &__select {
-      :deep(.ui-select) {
-        .multiselect {
-          margin: 0 16px;
-          width: auto;
-
-          &__content {
-            &-wrapper {
-              width: 100%;
-              left: 0;
-              background-color: var(--bg-sub-menu);
-            }
-          }
-
-          &__tags,
-          &__select {
-            border-radius: 0;
-          }
-
-          &:hover,
-          &:focus-within {
-            @include css_anim();
-
-            border-color: var(--border);
-
-            .multiselect {
-              &__content {
-                &-wrapper {
-                  border-color: var(--border);
-                }
-              }
-            }
-          }
-        }
-      }
+      padding: 0 16px;
     }
 
     &__content {

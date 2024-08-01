@@ -1,9 +1,6 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, ref } from 'vue';
-
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import AuthModal from '@/shared/ui/modals/AuthModal.vue';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
@@ -39,8 +36,6 @@
   const modalInfo = computed(() =>
     modals.value.find((item) => item.eng === modal.value),
   );
-
-  const modalComponent = computed(() => modalInfo.value?.component());
 
   const isModalOpened = computed({
     get: () => !!modal.value,
@@ -194,25 +189,17 @@
   </nav-popover>
 
   <auth-modal
-    v-if="modalComponent"
     v-model="isModalOpened"
     :title="modalInfo?.rus"
     @close="closeModal"
   >
-    <template #default>
-      <transition
-        mode="out-in"
-        name="fade"
-      >
-        <component
-          :is="modalComponent"
-          @close="closeModal"
-          @switch:auth="modal = 'login'"
-          @switch:reg="modal = 'reg'"
-          @switch:change-password="modal = 'change-password'"
-        />
-      </transition>
-    </template>
+    <component
+      :is="modalInfo?.component()"
+      @close="closeModal"
+      @switch:auth="modal = 'login'"
+      @switch:reg="modal = 'reg'"
+      @switch:change-password="modal = 'change-password'"
+    />
   </auth-modal>
 </template>
 
@@ -249,6 +236,7 @@
         width: 40px;
         height: 40px;
         padding: 8px;
+        font-size: 24px;
       }
 
       &:hover {

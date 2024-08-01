@@ -1,116 +1,91 @@
-<script lang="ts">
-  import {
-    computed,
-    defineComponent,
-    nextTick,
-    onMounted,
-    ref,
-    watch,
-  } from 'vue';
-  import { useLink, useRoute, useRouter } from 'vue-router';
+<script setup lang="ts">
+  import { omit } from 'lodash-es';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TClassItem } from '@/shared/types/character/Classes.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import { isIconExist } from '@/shared/utils/icons';
 
-  import type { PropType } from 'vue';
   import type { RouteLocationPathRaw } from 'vue-router';
 
-  export default defineComponent({
-    components: { SvgIcon },
+  defineOptions({
     inheritAttrs: false,
-    props: {
-      to: {
-        type: Object as PropType<RouteLocationPathRaw>,
-        required: true,
-      },
-      classItem: {
-        type: Object as PropType<TClassItem>,
-        default: () => null,
-        required: true,
-      },
-      afterSearch: {
-        type: Boolean,
-        default: false,
-      },
-    },
-    setup(props) {
-      const route = useRoute();
-      const router = useRouter();
-      const uiStore = useUIStore();
-
-      const { isActive, navigate } = useLink(props);
-
-      const submenu = ref(false);
-
-      const getClassList = computed(() => ({
-        'router-link-active':
-          isActive.value ||
-          route.params.className ===
-            router.resolve(props.classItem.url)?.params?.className,
-        'is-selected': route.name === 'classDetail',
-        'is-green': props.classItem?.source?.homebrew,
-      }));
-
-      const hasArchetypes = computed(
-        () => !!props.classItem?.archetypes?.length,
-      );
-
-      const toggleArch = () => {
-        submenu.value = !submenu.value;
-      };
-
-      const selectClass = () => {
-        if (!uiStore.isMobile) {
-          submenu.value = true;
-        }
-
-        navigate();
-      };
-
-      onMounted(() => {
-        nextTick(() => {
-          submenu.value =
-            route.params.className ===
-            router.resolve(props.classItem.url)?.params?.className;
-        });
-      });
-
-      watch(
-        () => props.afterSearch,
-        (value) => {
-          if (value) {
-            submenu.value = value;
-
-            return;
-          }
-
-          submenu.value = false;
-        },
-      );
-
-      return {
-        submenu,
-        getClassList,
-        hasArchetypes,
-        toggleArch,
-        selectClass,
-      };
-    },
-    methods: { isIconExist },
   });
+
+  const props = withDefaults(
+    defineProps<{
+      to: RouteLocationPathRaw;
+      classItem: TClassItem | null;
+      afterSearch?: boolean;
+    }>(),
+    {
+      classItem: null,
+      afterSearch: false,
+    },
+  );
+
+  const route = useRoute();
+  const router = useRouter();
+  const uiStore = useUIStore();
+
+  const { isActive, navigate } = useLink(props);
+
+  const submenu = ref(false);
+
+  const getClassList = computed(() => ({
+    'router-link-active':
+      isActive.value ||
+      route.params.className ===
+        router.resolve(props.classItem?.url || '')?.params?.className,
+    'is-selected': route.name === 'classDetail',
+    'is-green': props.classItem?.source?.homebrew,
+  }));
+
+  const hasArchetypes = computed(() => !!props.classItem?.archetypes?.length);
+
+  const toggleArch = () => {
+    submenu.value = !submenu.value;
+  };
+
+  const selectClass = () => {
+    if (!uiStore.isMobile) {
+      submenu.value = true;
+    }
+
+    navigate();
+  };
+
+  onMounted(() => {
+    nextTick(() => {
+      submenu.value =
+        route.params.className ===
+        router.resolve(props.classItem?.url || '')?.params?.className;
+    });
+  });
+
+  watch(
+    () => props.afterSearch,
+    (value) => {
+      if (value) {
+        submenu.value = value;
+
+        return;
+      }
+
+      submenu.value = false;
+    },
+  );
 </script>
 
 <template>
   <router-link
+    v-if="classItem"
     v-slot="{ href }"
     :to="{ path: classItem.url }"
     custom
-    v-bind="$props"
+    v-bind="omit($props, 'to')"
   >
     <div
-      ref="classItem"
       :class="getClassList"
       class="link-item-expand"
       v-bind="$attrs"
@@ -153,42 +128,68 @@
                 </span>
               </span>
 
-              <span class="link-item-expand__body_row">
-                <span class="link-item-expand__tag">
-                  {{ classItem.dice }}
-                </span>
-
-                <span
-                  v-tippy-lazy="{ content: classItem.source.name }"
-                  class="link-item-expand__tag"
+              <n-flex
+                :style="{ marginTop: 'auto' }"
+                size="small"
+              >
+                <n-tag
+                  type="primary"
+                  round
+                  size="small"
+                  :color="{
+                    color: 'var(--primary-active)',
+                    textColor: 'var(--text-btn-color)',
+                  }"
                 >
-                  {{ classItem.source.shortName }}
-                </span>
-              </span>
+                  {{ classItem.dice }}
+                </n-tag>
+
+                <n-tooltip>
+                  <template #trigger>
+                    <n-tag
+                      type="primary"
+                      round
+                      size="small"
+                      :color="{
+                        color: 'var(--primary-active)',
+                        textColor: 'var(--text-btn-color)',
+                      }"
+                    >
+                      {{ classItem.source.shortName }}
+                    </n-tag>
+                  </template>
+
+                  <template #default>
+                    {{ classItem.source.name }}
+                  </template>
+                </n-tooltip>
+              </n-flex>
             </span>
           </a>
 
-          <button
+          <n-tooltip
             v-if="hasArchetypes"
-            v-tippy-lazy="{
-              content: classItem.archetypeName,
-              placement: 'left',
-            }"
-            class="link-item-expand__toggle"
-            type="button"
-            @click.left.exact.prevent="toggleArch"
+            placement="left"
           >
-            <svg-icon :icon="submenu ? 'minus' : 'plus'" />
-          </button>
+            <template #trigger>
+              <button
+                class="link-item-expand__toggle"
+                type="button"
+                @click.left.exact.prevent="toggleArch"
+              >
+                <svg-icon :icon="submenu ? 'minus' : 'plus'" />
+              </button>
+            </template>
+
+            <template #default>
+              {{ classItem.archetypeName }}
+            </template>
+          </n-tooltip>
         </div>
 
-        <transition
-          mode="out-in"
-          name="fade"
-        >
+        <n-collapse-transition :show="submenu">
           <div
             v-if="hasArchetypes"
-            v-show="submenu"
             class="link-item-expand__arch-list"
           >
             <div
@@ -196,7 +197,10 @@
               :key="groupKey"
               class="link-item-expand__arch-type"
             >
-              <div class="link-item-expand__arch-type_name">
+              <div
+                v-if="group.group"
+                class="link-item-expand__arch-type_name"
+              >
                 {{ group.group.name }}
               </div>
 
@@ -207,14 +211,22 @@
                   :to="{ path: arch.url }"
                   class="link-item-expand__arch-item"
                 >
-                  <span class="link-item-expand__arch-item_name">{{
-                    arch.name.rus
-                  }}</span>
+                  <span class="link-item-expand__arch-item_name">
+                    {{ arch.name.rus }}
+                  </span>
 
                   <span class="link-item-expand__arch-item_book">
-                    <span v-tippy-lazy="{ content: arch.source.name }">
-                      {{ arch.source.shortName }}
-                    </span>
+                    <n-tooltip>
+                      <template #trigger>
+                        <span>
+                          {{ arch.source.shortName }}
+                        </span>
+                      </template>
+
+                      <template #default>
+                        {{ arch.source.name }}
+                      </template>
+                    </n-tooltip>
 
                     /
 
@@ -224,7 +236,7 @@
               </div>
             </div>
           </div>
-        </transition>
+        </n-collapse-transition>
       </div>
     </div>
   </router-link>

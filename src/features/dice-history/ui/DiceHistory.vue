@@ -1,12 +1,12 @@
 <script lang="ts" setup>
   import BottomRightWindow from '@/shared/ui/BottomRightWindow.vue';
-  import UiFab from '@/shared/ui/kit/button/UiFab.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { useDiceHistory } from '../composables';
 
   import DiceHistoryWindowContent from './DiceHistoryWindowContent.vue';
 
-  const { isOpen, toggle } = useDiceHistory();
+  const { isOpen, toggle, isFloatButtonVisible } = useDiceHistory();
 </script>
 
 <template>
@@ -14,8 +14,16 @@
     <dice-history-window-content />
   </bottom-right-window>
 
-  <ui-fab
-    :icon="isOpen ? 'close' : 'dice/d20'"
-    @click="toggle"
-  />
+  <n-float-button
+    v-if="isFloatButtonVisible"
+    position="fixed"
+    right="16"
+    bottom="24"
+    @click.left.exact.prevent="toggle"
+  >
+    <svg-icon
+      :icon="isOpen ? 'close' : 'dice/d20'"
+      size="24"
+    />
+  </n-float-button>
 </template>

@@ -1,8 +1,4 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { onBeforeMount, ref } from 'vue';
-  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { FeatsItem } from '@/shared/types/character/Feats';

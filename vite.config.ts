@@ -2,6 +2,9 @@ import { fileURLToPath, URL } from 'node:url';
 
 import viteLegacyPlugin from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
+import AutoImport from 'unplugin-auto-import/vite';
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
+import Components from 'unplugin-vue-components/vite';
 import { defineConfig, loadEnv } from 'vite';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
@@ -65,6 +68,33 @@ export default ({ mode }: ConfigEnv) => {
         script: {
           propsDestructure: true,
         },
+      }),
+      AutoImport({
+        dts: './src/shared/types/generated/auto-imports.d.ts',
+        imports: [
+          'vue',
+          'vue-router',
+          'pinia',
+          '@vueuse/core',
+          '@vueuse/math',
+          {
+            'naive-ui': [
+              'useDialog',
+              'useMessage',
+              'useNotification',
+              'useLoadingBar',
+            ],
+          },
+        ],
+        eslintrc: {
+          enabled: true,
+          filepath: './src/shared/types/generated/.eslintrc-auto-import.json',
+        },
+      }),
+      Components({
+        dirs: [],
+        dts: './src/shared/types/generated/components.d.ts',
+        resolvers: [NaiveUiResolver()],
       }),
       createSvgIconsPlugin({
         iconDirs: [

@@ -18,13 +18,15 @@
     "strict": true,
     "sourceMap": true,
     "typeRoots": [
+      "./src/shared/types/generated",
       "./node_modules/@types",
       "./node_modules"
     ],
     "types": [
       "node",
       "vite/client",
-      "vite-plugin-svg-icons/client.d.ts"
+      "vite-plugin-svg-icons/client.d.ts",
+      "./global.d.ts"
     ],
   },
   "exclude": [
@@ -34,7 +36,7 @@
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [
     "vite.config.*",
-    "env.d.ts",
+    "global.d.ts",
     "src/**/*",
     "src/**/*.ts",
     "src/**/*.vue",

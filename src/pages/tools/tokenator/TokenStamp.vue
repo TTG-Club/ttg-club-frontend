@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-  import { set, useDropZone, useElementBounding } from '@vueuse/core';
   import {
     type EventTypes,
     useDrag,
     usePinch,
     useWheel,
   } from '@vueuse/gesture';
-  import { computed, ref, watch } from 'vue';
+  import { set } from '@vueuse/shared';
 
   import isAppleDevice from '@/shared/utils/isAppleDevice';
 

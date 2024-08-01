@@ -1,7 +1,5 @@
 <script setup lang="ts">
   import { orderBy, upperFirst } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
 
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import isDev from '@/shared/utils/isDev';

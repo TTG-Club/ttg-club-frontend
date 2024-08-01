@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-  import { computed, ref, useCssModule } from 'vue';
-
   import YoutubePlayIcon from '@/features/youtube/components/YoutubePlayIcon.vue';
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 

@@ -1,12 +1,15 @@
 <script setup lang="ts">
-  import { tryOnBeforeMount } from '@vueuse/core';
-  import { ModalsContainer } from 'vue-final-modal';
+  import { dateRuRU, ruRU } from 'naive-ui';
 
+  import { configurateDayjs, themeOverrides } from '@/shared/config';
+  import { BREAKPOINTS } from '@/shared/const/breakpoints';
   import { useUserStore } from '@/shared/stores/UserStore';
 
   import { DiceHistory } from '@/features/dice-history/ui';
   import { useDiceNotification } from '@/features/dice-notification';
   import NavBar from '@/features/menu/NavBar.vue';
+
+  configurateDayjs();
 
   const userStore = useUserStore();
 
@@ -28,16 +31,33 @@
 </script>
 
 <template>
-  <nav-bar />
-
-  <div
-    id="container"
-    class="container"
+  <n-config-provider
+    :theme-overrides="themeOverrides"
+    :locale="ruRU"
+    :date-locale="dateRuRU"
+    abstract
+    inline-theme-disabled
+    :breakpoints="BREAKPOINTS"
   >
-    <router-view />
-  </div>
+    <n-loading-bar-provider>
+      <n-message-provider>
+        <n-notification-provider>
+          <n-modal-provider>
+            <n-dialog-provider>
+              <nav-bar />
 
-  <dice-history />
+              <div
+                id="container"
+                class="container"
+              >
+                <router-view />
+              </div>
 
-  <modals-container />
+              <dice-history />
+            </n-dialog-provider>
+          </n-modal-provider>
+        </n-notification-provider>
+      </n-message-provider>
+    </n-loading-bar-provider>
+  </n-config-provider>
 </template>

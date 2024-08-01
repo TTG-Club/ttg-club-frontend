@@ -4,7 +4,7 @@ import type {
   AbilityShortName,
   AbilityType,
   AbilityTypeKey,
-} from '@/shared/types/tools/AbilityCalc';
+} from '../tools/AbilityCalc';
 
 export type TRaceAbility = {
   key: AbilityKey | AbilityTypeKey;

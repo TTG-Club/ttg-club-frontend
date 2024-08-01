@@ -1,6 +1,5 @@
 <script>
   import { throttle } from 'lodash-es';
-  import { defineComponent, reactive } from 'vue';
 
   import UiButton from '@/shared/ui/kit/button/UiButton.vue';
   import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
@@ -49,8 +48,7 @@
         }
       },
 
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
+      sendForm: throttle(async () => {
         if (this.controller) {
           this.controller.abort();
         }

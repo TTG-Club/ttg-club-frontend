@@ -1,14 +1,7 @@
 <script setup lang="ts">
-  import { type MaybeRef, tryOnBeforeMount } from '@vueuse/core';
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-
-  import { getFormattedDate } from '@/shared/composables/useDayjs';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
+  import { getDateString } from '@/shared/utils/getDateString';
 
   import YoutubeAddVideo from '@/features/youtube/components/YoutubeAddVideo.vue';
   import YoutubeEditVideo from '@/features/youtube/components/YoutubeEditVideo.vue';
@@ -18,6 +11,8 @@
   import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
 
   import PageLayout from '@/layouts/PageLayout.vue';
+
+  import type { MaybeRef } from '@vueuse/core';
 
   const { isMobile } = storeToRefs(useUIStore());
 
@@ -82,14 +77,11 @@
       <div :class="$style.container">
         <div :class="$style.header">
           <div :class="$style.count">
-            <span>Количество видео на странице</span>
+            <span>Количество на странице</span>
 
-            <ui-select
-              :model-value="itemsPerPage.find((item) => item.value === size)"
+            <n-select
+              v-model:value="size"
               :options="itemsPerPage"
-              label="name"
-              track-by="value"
-              @update:model-value="size = $event.value"
             />
           </div>
 
@@ -103,19 +95,23 @@
             На главной {{ activeCount }} из {{ activeLimit }}
           </div>
 
-          <ui-button
+          <n-button
             v-if="isLoaded"
-            icon="plus"
             icon-position="right"
+            type="primary"
             @click.left.exact.prevent="isAdding = true"
           >
+            <template #icon>
+              <svg-icon icon="plus" />
+            </template>
+
             <template
               v-if="!isMobile"
               #default
             >
               Новое видео
             </template>
-          </ui-button>
+          </n-button>
         </div>
 
         <div :class="$style.body">
@@ -125,9 +121,7 @@
             :class="$style.video"
           >
             <div :class="$style.player">
-              <div>
-                <youtube-player :video="video" />
-              </div>
+              <youtube-player :video="video" />
             </div>
 
             <div :class="$style.info">
@@ -135,18 +129,17 @@
                 {{ video.name }}
               </div>
 
-              <div v-if="getFormattedDate(video.created)">
-                Дата добавления: {{ getFormattedDate(video.created) }}
+              <div v-if="getDateString(video.created)">
+                Дата добавления: {{ getDateString(video.created) }}
               </div>
 
-              <ui-checkbox
-                :model-value="video.active"
+              <n-checkbox
+                :checked="video.active"
                 :disabled="isActivationDisabled(video.active)"
-                type="toggle"
-                @update:model-value="updateVideoStatus(video.id, $event)"
+                @update:checked="updateVideoStatus(video.id, $event)"
               >
                 Отображать на главной
-              </ui-checkbox>
+              </n-checkbox>
 
               <youtube-edit-video
                 :video="video"
@@ -156,29 +149,35 @@
               />
             </div>
 
-            <div
+            <n-flex
+              size="small"
               :class="{
                 [$style.controls]: true,
                 [$style.editing]: editID === video.id,
               }"
             >
-              <ui-button
-                icon="edit"
-                :class="$style.control"
-                :body-class="$style['control-body']"
+              <n-button
+                size="small"
+                type="primary"
                 :loading="editID === video.id"
                 @click.left.exact.prevent="editID = video.id"
-              />
+              >
+                <template #icon>
+                  <svg-icon icon="edit" />
+                </template>
+              </n-button>
 
-              <ui-button
-                icon="remove"
-                color="error"
+              <n-button
+                size="small"
+                type="error"
                 :loading="isRemoving(video.id)"
-                :class="$style.control"
-                :body-class="$style['control-body']"
                 @click.left.exact.prevent="remove(video.id)"
-              />
-            </div>
+              >
+                <template #icon>
+                  <svg-icon icon="remove" />
+                </template>
+              </n-button>
+            </n-flex>
           </div>
         </div>
 
@@ -186,8 +185,8 @@
           v-if="pages > 1"
           :class="$style.paginate"
         >
-          <ui-paginate
-            v-model="page"
+          <n-pagination
+            v-model:page="page"
             :page-count="pages"
           />
         </div>
@@ -225,7 +224,9 @@
   }
 
   .active {
-    margin-left: auto;
+    flex: auto;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .error {
@@ -302,6 +303,11 @@
         opacity: 1;
       }
     }
+  }
+
+  .player {
+    border-radius: 8px;
+    overflow: hidden;
   }
 
   .info {

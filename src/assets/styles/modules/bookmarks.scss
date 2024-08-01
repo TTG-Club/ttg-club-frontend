@@ -43,25 +43,6 @@
     gap: 8px;
     overflow: auto;
     flex: 1 1 auto;
-
-    .bookmarks__new {
-      color: var(--text-color-title);
-      cursor: pointer;
-      padding: 6px !important;
-      justify-content: flex-start !important;
-
-      .ui-button__icon {
-        background: var(--bg-sub-menu);
-        color: var(--text-color-title);
-        border-radius: 4px;
-      }
-
-      @include media-min($md) {
-        &:hover {
-          color: var(--text-color-title);
-        }
-      }
-    }
   }
 
   &__info {
@@ -85,10 +66,6 @@
     }
   }
 
-  &__new {
-    justify-content: left;
-    width: 100%;
-  }
 
   &__drop {
     display: flex;
@@ -141,6 +118,10 @@
       border-radius: 4px;
       background: var(--bg-sub-menu);
       color: var(--text-color-title);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
 
       &.only-hover {
         &:not(.is-active) {
@@ -227,6 +208,10 @@
         border-radius: 4px;
         background: var(--bg-sub-menu);
         color: var(--text-color-title);
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &.is-left {
           margin-right: 4px;
@@ -385,6 +370,10 @@
       cursor: pointer;
       position: absolute;
       right: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
 
       &.only-hover {
         &:not(.is-active) {
@@ -430,16 +419,7 @@
     display: flex;
     width: 100%;
     padding: 8px 0;
-
-    .ui-input {
-      width: initial;
-      flex: 1 1 auto;
-      margin-right: 8px;
-    }
-
-    .ui-button {
-      margin-left: 0 !important;
-    }
+    gap: 8px;
   }
 
   &.is-default {

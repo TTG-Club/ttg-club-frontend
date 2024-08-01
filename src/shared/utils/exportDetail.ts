@@ -1,10 +1,10 @@
-import { type MaybeRef, unref } from 'vue';
 import { useToast } from 'vue-toastification';
 
-import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+import { ToastEventBus } from '@/shared/config';
 import { downloadByUrl } from '@/shared/utils/download';
 import { getBaseUrl } from '@/shared/utils/getApiUrl';
+
+import type { MaybeRef } from 'vue';
 
 interface UseDetailExport {
   platform: 'fvtt' | 'lss';

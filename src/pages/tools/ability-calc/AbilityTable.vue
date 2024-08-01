@@ -1,90 +1,68 @@
-<script lang="ts">
-  import { computed, defineComponent } from 'vue';
-
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
+<script setup lang="ts">
   import {
+    type AbilityRoll,
     AbilityKey,
     AbilityName,
     AbilityShortName,
-  } from '@/shared/types/tools/AbilityCalc.d';
+  } from '@/shared/types/tools/AbilityCalc';
   import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
 
-  import type { PropType } from 'vue';
+  const props = defineProps<{
+    rolls: Array<AbilityRoll>;
+    raceBonuses: Array<AbilityRoll>;
+  }>();
 
-  export default defineComponent({
-    props: {
-      rolls: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
-      },
-      raceBonuses: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
-      },
-    },
-    setup(props) {
-      const abilities = computed(() =>
-        Object.values(AbilityKey).map((key: AbilityKey) => {
-          const roll = props.rolls.find((item) => item.key === key);
+  const abilities = computed(() =>
+    Object.values(AbilityKey).map((key: AbilityKey) => {
+      const roll = props.rolls.find((item) => item.key === key);
 
-          const getValue = () => {
-            if (typeof roll?.value !== 'number') {
-              return '−';
-            }
+      const getValue = () => {
+        if (typeof roll?.value !== 'number') {
+          return '−';
+        }
 
-            return roll.value;
-          };
+        return roll.value;
+      };
 
-          const getRaceBonus = () => {
-            const bonus = props.raceBonuses.find(
-              (item) => item.key === key,
-            )?.value;
+      const getRaceBonus = () => {
+        const bonus = props.raceBonuses.find((item) => item.key === key)?.value;
 
-            if (!bonus && bonus !== 0) {
-              return '−';
-            }
+        if (!bonus && bonus !== 0) {
+          return '−';
+        }
 
-            return bonus;
-          };
+        return bonus;
+      };
 
-          const getResult = () => {
-            let result = 0;
+      const getResult = () => {
+        let result = 0;
 
-            if (typeof roll?.value === 'number') {
-              result += roll.value;
-            }
+        if (typeof roll?.value === 'number') {
+          result += roll.value;
+        }
 
-            const raceBonus = getRaceBonus();
+        const raceBonus = getRaceBonus();
 
-            if (typeof raceBonus === 'number') {
-              result += raceBonus;
-            }
+        if (typeof raceBonus === 'number') {
+          result += raceBonus;
+        }
 
-            return result;
-          };
+        return result;
+      };
 
-          const getModifier = () => getFormattedModifier(getResult());
-
-          return {
-            key,
-            name: AbilityName[key],
-            shortName: AbilityShortName[key],
-            value: getValue(),
-            raceBonus: getRaceBonus(),
-            result: getResult(),
-            modifier: getModifier(),
-          };
-        }),
-      );
+      const getModifier = () => getFormattedModifier(getResult());
 
       return {
-        AbilityKey,
-        AbilityShortName,
-
-        abilities,
+        key,
+        name: AbilityName[key],
+        shortName: AbilityShortName[key],
+        value: getValue(),
+        raceBonus: getRaceBonus(),
+        result: getResult(),
+        modifier: getModifier(),
       };
-    },
-  });
+    }),
+  );
 </script>
 
 <template>

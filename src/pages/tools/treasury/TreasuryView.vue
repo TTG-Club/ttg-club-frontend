@@ -1,14 +1,9 @@
 <script lang="ts" setup>
   import { groupBy, max, mean, sortedUniq, throttle } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, ref } from 'vue';
 
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import SectionHeader from '@/features/SectionHeader.vue';
@@ -21,27 +16,23 @@
   import TreasureItem from '@/pages/inventory/treasures/TreasureItem.vue';
 
   import type { AxiosError, AxiosResponse } from 'axios';
+  import type { SelectOption } from 'naive-ui';
 
-  interface CrListItem {
-    name: string;
-    value: number;
-  }
-
-  const crList: CrListItem[] = [
+  const crList: Array<SelectOption> = [
     {
-      name: '0-4',
+      label: '0-4',
       value: 1,
     },
     {
-      name: '5-10',
+      label: '5-10',
       value: 2,
     },
     {
-      name: '11-16',
+      label: '11-16',
       value: 3,
     },
     {
-      name: '17+',
+      label: '17+',
       value: 4,
     },
   ];
@@ -96,16 +87,6 @@
   const uiStore = useUIStore();
 
   const { isMobile } = storeToRefs(uiStore);
-
-  const crValue = computed<CrListItem>({
-    get() {
-      return crList.find((el) => el.value === form.value.cr) || crList[0];
-    },
-
-    set(e: CrListItem) {
-      form.value.cr = e.value;
-    },
-  });
 
   const groupedResult = computed(() => {
     if (!settings.value.grouping) {
@@ -198,7 +179,7 @@
       });
   }, 300);
 
-  const selectItem = async (group: number, index: number) => {
+  const selectItem = async (group: string, index: number) => {
     try {
       if (controllers.value.detail) {
         controllers.value.detail.abort();
@@ -278,163 +259,125 @@
 <template>
   <content-layout
     :show-right-side="showRightSide"
-    :force-fullscreen-state="false"
+    full-screen-disabled
   >
     <template #fixed>
-      <form
+      <n-form
         class="tools_settings"
-        @submit.prevent="sendForm"
+        @submit.prevent.stop="sendForm"
+        @keyup.enter.exact.prevent.stop="sendForm"
       >
-        <div class="tools_settings__row">
-          <span class="label">Показатель опасности монстров:</span>
-
-          <ui-select
-            v-model="crValue"
+        <n-form-item
+          label="Показатель опасности монстров"
+          :style="{ minWidth: '254px' }"
+        >
+          <n-select
+            v-model:value="form.cr"
             :options="crList"
-            label="name"
-            track-by="value"
+            :show-checkmark="false"
+            placeholder="Показатель опасности"
+          />
+        </n-form-item>
+
+        <n-collapse-transition :show="settings.opened">
+          <n-flex vertical>
+            <n-text tag="h5">Настройки предметов</n-text>
+
+            <n-grid
+              cols="1 460:2"
+              x-gap="8"
+              y-gap="8"
+            >
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.coins">Монеты</n-checkbox>
+              </n-grid-item>
+
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.magicItem">
+                  Магические предметы
+                </n-checkbox>
+              </n-grid-item>
+
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.scroll">Свитки</n-checkbox>
+              </n-grid-item>
+
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.trinket">
+                  Безделушки
+                </n-checkbox>
+              </n-grid-item>
+            </n-grid>
+          </n-flex>
+
+          <n-divider />
+
+          <n-flex
+            vertical
+            :style="{ marginBottom: '24px' }"
           >
-            <template #placeholder> Показатель опасности </template>
-          </ui-select>
-        </div>
+            <n-text tag="h5">Настройки вида</n-text>
 
-        <transition-group name="fade">
-          <template v-if="settings.opened">
-            <div class="tools_settings__row">
-              <h5 class="label">Настройки предметов:</h5>
+            <n-grid
+              cols="1 460:2"
+              x-gap="8"
+              y-gap="8"
+            >
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.art">
+                  Предметы искусства
+                </n-checkbox>
+              </n-grid-item>
 
-              <div class="tools_settings__column">
-                <div class="row">
-                  <div>
-                    <ui-checkbox
-                      :model-value="form.coins"
-                      type="toggle"
-                      @update:model-value="form.coins = $event"
-                    >
-                      Монеты
-                    </ui-checkbox>
-                  </div>
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.gem">
+                  Драгоценные камни
+                </n-checkbox>
+              </n-grid-item>
 
-                  <div class="tools_settings__row">
-                    <ui-checkbox
-                      :model-value="form.magicItem"
-                      type="toggle"
-                      @update:model-value="form.magicItem = $event"
-                    >
-                      Магические предметы
-                    </ui-checkbox>
-                  </div>
-                </div>
+              <n-grid-item>
+                <n-checkbox v-model:checked="form.unique">
+                  Только уникальные
+                </n-checkbox>
+              </n-grid-item>
 
-                <div class="row">
-                  <div>
-                    <ui-checkbox
-                      :model-value="form.scroll"
-                      type="toggle"
-                      @update:model-value="form.scroll = $event"
-                    >
-                      Свитки
-                    </ui-checkbox>
-                  </div>
+              <n-grid-item>
+                <n-checkbox v-model:checked="settings.grouping">
+                  Группировать одинаковые
+                </n-checkbox>
+              </n-grid-item>
 
-                  <div class="tools_settings__row">
-                    <ui-checkbox
-                      :model-value="form.trinket"
-                      type="toggle"
-                      @update:model-value="form.trinket = $event"
-                    >
-                      Безделушки
-                    </ui-checkbox>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <n-grid-item>
+                <n-checkbox v-model:checked="settings.max">
+                  Отображать максимальную цену
+                </n-checkbox>
+              </n-grid-item>
+            </n-grid>
+          </n-flex>
+        </n-collapse-transition>
 
-            <hr class="hr_main" />
+        <n-flex>
+          <n-button
+            type="primary"
+            attr-type="submit"
+          >
+            Создать
+          </n-button>
 
-            <div class="tools_settings__row">
-              <h5 class="label">Настройки вида:</h5>
-
-              <div class="tools_settings__column">
-                <div class="row">
-                  <div>
-                    <ui-checkbox
-                      :model-value="form.art"
-                      type="toggle"
-                      @update:model-value="form.art = $event"
-                    >
-                      Предметы искусства
-                    </ui-checkbox>
-                  </div>
-
-                  <div class="tools_settings__row">
-                    <ui-checkbox
-                      :model-value="form.gem"
-                      type="toggle"
-                      @update:model-value="form.gem = $event"
-                    >
-                      Драгоценные камни
-                    </ui-checkbox>
-                  </div>
-
-                  <div class="tools_settings__row">
-                    <ui-checkbox
-                      :model-value="form.unique"
-                      type="toggle"
-                      @update:model-value="form.unique = $event"
-                    >
-                      Только уникальные
-                    </ui-checkbox>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div>
-                    <ui-checkbox
-                      :model-value="settings.grouping"
-                      type="toggle"
-                      @update:model-value="settings.grouping = $event"
-                    >
-                      Группировать одинаковые
-                    </ui-checkbox>
-                  </div>
-
-                  <div class="tools_settings__row">
-                    <ui-checkbox
-                      :model-value="settings.max"
-                      type="toggle"
-                      @update:model-value="settings.max = $event"
-                    >
-                      {{
-                        `Отображать ${
-                          settings.max ? 'максимальную' : 'среднюю'
-                        } цену`
-                      }}
-                    </ui-checkbox>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </transition-group>
-
-        <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm"> Создать </ui-button>
-
-          <ui-button
+          <n-button
+            secondary
             @click.left.exact.prevent="settings.opened = !settings.opened"
           >
             Настройки
-          </ui-button>
-        </div>
-      </form>
+          </n-button>
+        </n-flex>
+      </n-form>
     </template>
 
     <template #right-side>
       <content-detail>
         <template #fixed>
           <section-header
-            :fullscreen="!isMobile"
             :subtitle="selected.item?.name.eng || 'In treasury'"
             :title="selected.item?.name.rus || 'В сокровищнице'"
             @close="close"

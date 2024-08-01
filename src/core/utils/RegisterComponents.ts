@@ -1,7 +1,7 @@
 import DetailTooltip from '@/shared/ui/DetailTooltip.vue';
 import DiceRoller from '@/shared/ui/DiceRoller.vue';
 import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
-import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 import RawContent from '@/shared/ui/RawContent.vue';
 import RollTable from '@/shared/ui/RollTable.vue';
 import SocialLinks from '@/shared/ui/SocialLinks.vue';

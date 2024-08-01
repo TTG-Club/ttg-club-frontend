@@ -1,19 +1,12 @@
 <script setup lang="ts">
-  import { onStartTyping, tryOnBeforeMount, useFocus } from '@vueuse/core';
   import { debounce } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, ref } from 'vue';
-  import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
   import { httpClient } from '@/shared/api';
-  import { useMetrics } from '@/shared/composables/useMetrics';
+  import { useMetrics } from '@/shared/composable/useMetrics';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { IPaginatedResponse } from '@/shared/types/BaseApiFields';
   import type { TSearchResult } from '@/shared/types/search/Search';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
-  import UiPaginate from '@/shared/ui/kit/UiPaginate.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
@@ -260,41 +253,42 @@
           ref="controls"
           class="search-view__controls"
         >
-          <form
-            class="search-view__control"
+          <n-form
             novalidate="true"
             autocomplete="off"
             autofocus="autofocus"
             autocapitalize="off"
-            @keyup.enter.exact.prevent.stop="onSearch"
             @submit.prevent.stop="onSearch"
           >
-            <div class="search-view__control_body">
-              <div
-                class="search-view__control_icon"
-                :class="{ 'in-progress': inProgress }"
+            <n-input-group>
+              <n-input
+                v-model:value="search"
+                size="large"
+                placeholder="Поиск по сайту..."
+                :autofocus="true"
+                :input-props="{
+                  autocapitalize: 'off',
+                  autocomplete: 'off',
+                  formnovalidate: true,
+                }"
+                clearable
+                @clear="onChangeSearch('')"
+                @update:value="onChangeSearch"
               >
-                <svg-icon :icon="inProgress ? 'dice/d20' : 'search'" />
-              </div>
+                <template #prefix>
+                  <svg-icon icon="search" />
+                </template>
+              </n-input>
 
-              <ui-input
-                ref="input"
-                v-model="search"
-                placeholder="Поиск..."
-                is-clearable
-                @update:model-value="onChangeSearch"
-                @keyup.enter.exact.prevent.stop
-              />
-            </div>
-
-            <ui-button
-              class="search-view__control_btn"
-              native-type="button"
-              @click.left.exact.prevent.stop="onSearch"
-            >
-              Поиск
-            </ui-button>
-          </form>
+              <n-button
+                type="primary"
+                size="large"
+                @click.left.exact.prevent="onSearch"
+              >
+                Поиск
+              </n-button>
+            </n-input-group>
+          </n-form>
         </div>
 
         <div
@@ -337,12 +331,12 @@
           </div>
         </div>
 
-        <ui-paginate
+        <n-pagination
           v-if="pages > 1"
-          v-model="page"
-          class="search-view__paginate"
+          v-model:page="page"
           :page-count="pages"
-          @update:model-value="onChangedPage"
+          class="search-view__paginate"
+          @update:page="onChangedPage"
         />
       </div>
     </template>
@@ -387,6 +381,7 @@
       &_icon {
         padding: 8px;
         flex-shrink: 0;
+        font-size: 24px;
 
         svg {
           width: 26px;
@@ -443,8 +438,10 @@
       position: sticky;
       bottom: 0;
       background-color: var(--bg-main);
-      padding: 8px 0 24px 0;
+      padding: 8px 0 16px 0;
       margin: -8px 0 -24px 0;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
     }
   }
 

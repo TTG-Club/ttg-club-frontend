@@ -1,12 +1,9 @@
-import { useBroadcastChannel } from '@vueuse/core';
 import { type RollBase } from 'dice-roller-parser';
 import localforage from 'localforage';
 import { sortBy } from 'lodash-es';
-import { defineStore } from 'pinia';
-import { computed, toRaw } from 'vue';
 
-import { useLocalforageItem } from '@/shared/composables/useLocalforageItem';
-import { DB_NAME } from '@/shared/constants/UI';
+import { useLocalforageItem } from '@/shared/composable/useLocalforageItem';
+import { DB_NAME } from '@/shared/const/UI';
 
 import { Event, eventBus } from '../utils/eventBus';
 import { type RollType } from '../utils/roll';
@@ -65,10 +62,11 @@ export const useRollStore = defineStore('RollStore', () => {
   function registerRoll(
     item: PartialBy<RollEntry, 'source'>,
     toastOptions?: ToastOptions,
+    silent = false,
   ) {
     const roll = addRoll(item);
 
-    if (roll) {
+    if (roll && !silent) {
       eventBus.emit(Event.NewRoll, { entry: roll, toastOptions });
       broadcast(roll);
     }

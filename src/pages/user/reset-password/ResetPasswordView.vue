@@ -1,8 +1,4 @@
 <script lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-  import { useRoute } from 'vue-router';
-
   import { httpClient } from '@/shared/api';
   import { useUserStore } from '@/shared/stores/UserStore';
 

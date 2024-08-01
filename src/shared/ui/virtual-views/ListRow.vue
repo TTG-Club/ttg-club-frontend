@@ -1,6 +1,5 @@
 <script lang="ts" setup>
   import { isArray } from 'lodash-es';
-  import { computed } from 'vue';
 
   import type { AnyArray } from '@/shared/types/Utility';
 

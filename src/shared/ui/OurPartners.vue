@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { orderBy } from 'lodash-es';
-  import { computed, onBeforeMount, ref } from 'vue';
 
   import { httpClient } from '@/shared/api';
   import type { TPartner } from '@/shared/stores/NavStore';

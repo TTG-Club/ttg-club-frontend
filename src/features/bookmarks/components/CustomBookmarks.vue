@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { computed, onBeforeMount, ref } from 'vue';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import CustomBookmarkGroup from '@/features/bookmarks/components/CustomBookmarks/CustomBookmarkGroup.vue';
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
@@ -69,47 +64,50 @@
         </span>
       </div>
 
-      <transition
-        name="fade"
-        mode="out-in"
-      >
-        <ui-button
-          v-if="isShowScrollBtn"
-          icon="arrow/up"
-          size="sm"
-          type="text"
-          color="text"
-          class="bookmarks__to-top"
-          @click.left.prevent="scrollToTop"
-        />
-      </transition>
+      <n-flex size="small">
+        <transition
+          name="fade"
+          mode="out-in"
+        >
+          <n-button
+            v-if="isShowScrollBtn"
+            quaternary
+            @click.left.prevent="scrollToTop"
+          >
+            <template #icon>
+              <svg-icon icon="arrow/up" />
+            </template>
+          </n-button>
+        </transition>
 
-      <ui-button
-        :icon="`expand/${isAllGroupsOpened ? 'exit' : 'enter'}`"
-        size="sm"
-        type="text"
-        color="text"
-        class="bookmarks__toggle-all"
-        @click.left.prevent="toggleAll"
-      />
+        <n-button
+          quaternary
+          @click.left.prevent="toggleAll"
+        >
+          <template #icon>
+            <svg-icon
+              :icon="`expand/${isAllGroupsOpened ? 'exit' : 'enter'}`"
+            />
+          </template>
+        </n-button>
 
-      <ui-button
-        v-tippy="{ content: 'Перейти в режим редактирования' }"
-        :type="!isEdit ? 'text' : 'default'"
-        :color="!isEdit ? 'text' : 'primary'"
-        icon="edit"
-        size="sm"
-        @click.left.exact.prevent="isEdit = !isEdit"
-      />
+        <n-tooltip>
+          <template #trigger>
+            <n-button
+              :quaternary="!isEdit"
+              :default="isEdit"
+              :type="isEdit ? 'primary' : 'default'"
+              @click.left.prevent="isEdit = !isEdit"
+            >
+              <template #icon>
+                <svg-icon icon="edit" />
+              </template>
+            </n-button>
+          </template>
 
-      <label
-        v-if="false"
-        class="bookmarks__search"
-      >
-        <span class="bookmarks__search--icon">
-          <svg-icon icon="search" />
-        </span>
-      </label>
+          <template #default> Перейти в режим редактирования </template>
+        </n-tooltip>
+      </n-flex>
     </div>
 
     <div
@@ -129,38 +127,45 @@
           v-if="isGroupCreating"
           class="bookmarks__input"
         >
-          <ui-input
-            v-model="newGroupName"
+          <n-input
+            v-model:value="newGroupName"
             autofocus
             placeholder="Название группы"
             @keyup.enter.exact.prevent="createGroup"
           />
 
-          <ui-button
-            icon="check"
-            size="sm"
-            type="text"
+          <n-button
+            quaternary
             @click.left.exact.prevent="createGroup"
-          />
+          >
+            <template #icon>
+              <svg-icon icon="check" />
+            </template>
+          </n-button>
 
-          <ui-button
-            icon="close"
-            size="sm"
-            type="text"
+          <n-button
+            quaternary
             @click.left.exact.prevent="disableGroupCreating"
-          />
+          >
+            <template #icon>
+              <svg-icon icon="close" />
+            </template>
+          </n-button>
         </div>
 
-        <ui-button
+        <n-button
           v-else
           class="bookmarks__new"
-          size="sm"
-          icon="plus"
-          type="text"
+          quaternary
+          block
           @click.left.exact.prevent="enableGroupCreating"
         >
-          Добавить группу
-        </ui-button>
+          <template #icon>
+            <svg-icon icon="plus" />
+          </template>
+
+          <template #default> Добавить группу </template>
+        </n-button>
       </div>
     </div>
   </div>

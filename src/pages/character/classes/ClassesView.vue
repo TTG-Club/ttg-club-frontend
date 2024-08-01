@@ -1,13 +1,10 @@
 <script lang="ts" setup>
-  import { resolveUnref } from '@vueuse/shared';
+  import { toValue } from '@vueuse/shared';
   import { cloneDeep, groupBy, sortBy } from 'lodash-es';
-  import { storeToRefs } from 'pinia';
-  import { computed, nextTick, onBeforeMount, provide, ref, watch } from 'vue';
-  import { useRoute } from 'vue-router';
 
-  import { useFilter } from '@/shared/composables/useFilter';
-  import { usePagination } from '@/shared/composables/usePagination';
-  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/constants';
+  import { useFilter } from '@/shared/composable/useFilter';
+  import { usePagination } from '@/shared/composable/usePagination';
+  import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
   import type {
     TClassArchetype,
@@ -102,7 +99,7 @@
   });
 
   const books = computed(() => {
-    const params = resolveUnref(filter.queryParams);
+    const params = toValue(filter.queryParams);
 
     if (params?.book instanceof Array) {
       return params.book;

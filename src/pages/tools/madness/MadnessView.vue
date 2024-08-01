@@ -1,160 +1,168 @@
-<script>
+<script setup lang="ts">
   import { throttle } from 'lodash-es';
-  import { reactive } from 'vue';
 
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiCheckbox from '@/shared/ui/kit/UiCheckbox.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
+  import { httpClient } from '@/shared/api/index.js';
+  import type { TNameValue } from '@/shared/types/BaseApiFields';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  export default {
-    name: 'MadnessView',
-    components: {
-      RawContent,
-      UiCheckbox,
-      ContentLayout,
-      UiButton,
-      UiInput,
-    },
-    data: () => ({
-      count: 1,
-      types: [],
-      results: [],
-      controller: undefined,
-    }),
-    async beforeMount() {
-      await this.getTables();
-    },
-    methods: {
-      async getTables() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/madness',
-          });
+  interface MadnessType extends TNameValue {
+    checked: boolean;
+  }
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  interface MadnessItemType {
+    key: string;
+    name: string;
+    shortName: string;
+    value: number;
+    additional: string;
+  }
 
-            return;
-          }
+  interface MadnessItem {
+    description: string;
+    type: MadnessItemType;
+  }
 
-          this.types = resp.data.map((type) => ({
-            ...type,
-            toggled: false,
-          }));
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
+  interface MadnessRequestPayload {
+    count: number;
+    type?: string;
+    sources?: Array<string>;
+  }
 
-      // eslint-disable-next-line func-names
-      sendForm: throttle(async function () {
-        if (this.controller) {
-          this.controller.abort();
-        }
+  const count = ref(1);
+  const types = ref<Array<MadnessType>>([]);
+  const results = ref<Array<MadnessItem>>([]);
+  const controller = ref<AbortController>();
 
-        this.controller = new AbortController();
+  const getTables = async () => {
+    try {
+      const resp = await httpClient.get<Array<TNameValue>>({
+        url: '/tools/madness',
+      });
 
-        try {
-          const options = {
-            count: this.count || 1,
-          };
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
 
-          const type = this.types.find((el) => el.toggled);
+        return;
+      }
 
-          if (type) {
-            options.type = type.value;
-          }
-
-          const resp = await this.$http.post({
-            url: '/tools/madness',
-            payload: options,
-            signal: this.controller.signal,
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          for (const el of resp.data) {
-            this.results.unshift(reactive(el));
-          }
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-
-      toggleType(e, type) {
-        for (let i = 0; i < this.types.length; i++) {
-          if (this.types[i].value !== type.value) {
-            this.types[i].toggled = false;
-
-            continue;
-          }
-
-          this.types[i].toggled = e;
-        }
-      },
-    },
+      types.value = resp.data.map((type) => ({
+        ...type,
+        checked: false,
+      }));
+    } catch (err) {
+      errorHandler(err);
+    }
   };
+
+  const sendForm = throttle(async () => {
+    if (controller.value) {
+      controller.value.abort();
+    }
+
+    controller.value = new AbortController();
+
+    try {
+      const options: MadnessRequestPayload = {
+        count: count.value || 1,
+      };
+
+      const type = types.value.find((el) => el.checked);
+
+      if (type) {
+        options.type = type.value;
+      }
+
+      const resp = await httpClient.post<Array<MadnessItem>>({
+        url: '/tools/madness',
+        payload: options,
+        signal: controller.value.signal,
+      });
+
+      if (resp.status !== 200) {
+        errorHandler(resp.statusText);
+
+        return;
+      }
+
+      for (const el of resp.data) {
+        results.value.unshift(reactive(el));
+      }
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      controller.value = undefined;
+    }
+  }, 300);
+
+  const toggleType = (e: boolean, type: MadnessType) => {
+    for (let i = 0; i < types.value.length; i++) {
+      if (types.value[i].value !== type.value) {
+        types.value[i].checked = false;
+
+        continue;
+      }
+
+      types.value[i].checked = e;
+    }
+  };
+
+  getTables();
 </script>
 
 <template>
   <content-layout>
     <template #fixed>
-      <form
+      <n-form
         class="tools_settings"
-        @submit.prevent="sendForm"
+        @submit.prevent.stop="sendForm"
+        @keyup.enter.exact.prevent.stop="sendForm"
       >
-        <div class="tools_settings__row">
-          <div class="tools_settings__column">
-            <div class="row">
-              <span class="label">Количество:</span>
+        <n-flex>
+          <n-form-item
+            label="Количество"
+            :style="{ minWidth: '254px' }"
+          >
+            <n-input-number v-model:value="count" />
+          </n-form-item>
 
-              <ui-input
-                v-model="count"
-                class="form-control select"
-                type="number"
-                placeholder="Количество"
-                :min="1"
-              />
-            </div>
+          <n-form-item
+            label="Вид безумия"
+            :style="{ minWidth: '254px' }"
+          >
+            <n-flex>
+              <n-tag
+                v-for="(type, key) in types"
+                :key="key"
+                :checked="type.checked"
+                checkable
+                round
+                @click.left.exact.prevent="toggleType(!type.checked, type)"
+              >
+                {{ type.name }}
+              </n-tag>
+            </n-flex>
+          </n-form-item>
+        </n-flex>
 
-            <div class="row">
-              <span class="label">Виды безумия:</span>
-
-              <div class="checkbox-group">
-                <ui-checkbox
-                  v-for="(type, key) in types"
-                  :key="key"
-                  :model-value="type.toggled"
-                  type="crumb"
-                  @update:model-value="toggleType($event, type)"
-                >
-                  {{ type.name }}
-                </ui-checkbox>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools_settings__row btn-wrapper">
-          <ui-button @click.left.exact.prevent="sendForm">
+        <n-flex>
+          <n-button
+            type="primary"
+            attr-type="submit"
+          >
             Сгенерировать
-          </ui-button>
+          </n-button>
 
-          <ui-button @click.left.exact.prevent="results = []">
+          <n-button
+            secondary
+            @click.left.exact.prevent="results = []"
+          >
             Очистить
-          </ui-button>
-        </div>
-      </form>
+          </n-button>
+        </n-flex>
+      </n-form>
     </template>
 
     <template #default>
@@ -186,5 +194,11 @@
     display: block;
     margin-bottom: 12px;
     padding: 12px;
+
+    :deep(p) {
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
   }
 </style>

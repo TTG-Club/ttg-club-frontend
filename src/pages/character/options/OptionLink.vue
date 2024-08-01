@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink } from 'vue-router';
-
   import { httpClient } from '@/shared/api';
   import { CapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type {

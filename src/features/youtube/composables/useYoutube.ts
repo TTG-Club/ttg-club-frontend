@@ -1,11 +1,9 @@
-import { useScroll } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { computed, readonly, ref, unref, watch } from 'vue';
-
 import { useUIStore } from '@/shared/stores/UIStore';
 
 import { YoutubeApi } from '@/features/youtube/api';
 import type { TYoutubeVideo } from '@/features/youtube/types/Youtube';
+
+import type { SelectOption } from 'naive-ui';
 
 export const useYoutube = () => {
   const { bodyElement } = storeToRefs(useUIStore());
@@ -14,22 +12,20 @@ export const useYoutube = () => {
     behavior: 'smooth',
   });
 
-  const itemsPerPage = readonly(
-    ref([
-      {
-        name: 9,
-        value: 9,
-      },
-      {
-        name: 27,
-        value: 27,
-      },
-      {
-        name: 54,
-        value: 54,
-      },
-    ]),
-  );
+  const itemsPerPage: Array<SelectOption> = [
+    {
+      label: '9',
+      value: 9,
+    },
+    {
+      label: '27',
+      value: 27,
+    },
+    {
+      label: '54',
+      value: 54,
+    },
+  ];
 
   const isLoaded = ref(false);
 

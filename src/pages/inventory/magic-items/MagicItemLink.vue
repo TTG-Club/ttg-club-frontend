@@ -1,7 +1,4 @@
 <script setup lang="ts" generic="T extends TGroupedTraderLink">
-  import { computed } from 'vue';
-  import { useLink } from 'vue-router';
-
   import { CapitalizeFirst as vCapitalizeFirst } from '@/shared/directives/CapitalizeFirst';
   import type { TGroupedTraderLink } from '@/shared/types/tools/Trader.d';
 

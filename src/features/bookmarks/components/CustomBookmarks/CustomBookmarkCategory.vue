@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { storeToRefs } from 'pinia';
-  import { defineComponent } from 'vue';
   import draggableComponent from 'vuedraggable';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { WithChildren } from '@/shared/types/Utility';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { useCustomBookmarkStore } from '@/features/bookmarks/store/CustomBookmarksStore';
   import type {
@@ -88,10 +86,7 @@
         v-if="isEdit"
         class="bookmarks__cat_label_icon is-left js-drag-category"
       >
-        <svg-icon
-          icon="sandwich"
-          size="16"
-        />
+        <svg-icon icon="sandwich" />
       </div>
 
       <div class="bookmarks__cat_label_name">
@@ -106,10 +101,7 @@
           customBookmarkStore.queryDeleteBookmark(category)
         "
       >
-        <svg-icon
-          icon="close"
-          size="20"
-        />
+        <svg-icon icon="close" />
       </div>
     </div>
 
@@ -135,10 +127,7 @@
               v-if="isEdit"
               class="bookmarks__cat_label_icon is-left js-drag-bookmark"
             >
-              <svg-icon
-                icon="sandwich"
-                size="20"
-              />
+              <svg-icon icon="sandwich" />
             </div>
 
             <component
@@ -161,10 +150,7 @@
                 customBookmarkStore.queryDeleteBookmark(bookmark)
               "
             >
-              <svg-icon
-                icon="close"
-                size="20"
-              />
+              <svg-icon icon="close" />
             </div>
           </div>
         </div>

@@ -17,8 +17,9 @@ module.exports = {
     '@vue/airbnb',
     '@vue/eslint-config-typescript',
     '@vue/eslint-config-prettier',
+    './src/shared/types/generated/.eslintrc-auto-import.json',
   ],
-  plugins: ['@typescript-eslint', 'boundaries'],
+  plugins: ['boundaries'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
@@ -279,9 +280,11 @@ module.exports = {
       'error',
       {
         functions: false,
-        enums: false,
-        typedefs: false,
+        enums: true,
+        typedefs: true,
         ignoreTypeReferences: true,
+        variables: true,
+        classes: true,
       },
     ],
     '@typescript-eslint/consistent-type-assertions': [

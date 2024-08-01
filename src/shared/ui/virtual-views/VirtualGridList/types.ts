@@ -1,5 +1,5 @@
-import type { RefFunction } from '@/shared/composables/useReference';
-import type { TResponsiveValues } from '@/shared/composables/useResponsiveValues';
+import type { RefFunction } from '@/shared/composable/useReference';
+import type { TResponsiveValues } from '@/shared/composable/useResponsiveValues';
 import type { TListRow } from '@/shared/types/List';
 import type { AnyObject, RecordKey } from '@/shared/types/Utility';
 import type { TVirtualListProps } from '@/shared/ui/virtual-views/VirtualList/types';

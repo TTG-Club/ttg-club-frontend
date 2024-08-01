@@ -1,28 +1,21 @@
 <script lang="ts" setup>
-  import { useClassName } from '@/shared/composables/useClassName';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { useDiceHistory } from '@/features/dice-history/composables';
+  import NavPopover from '@/features/menu/NavPopover.vue';
 
-  const cn = useClassName();
-  const { toggle, isOpen } = useDiceHistory();
+  const { toggle, isOpen, isNavButtonVisible } = useDiceHistory();
 </script>
 
 <template>
-  <div
-    class="navbar__btn"
-    :class="[cn(), isOpen && 'is-active']"
-    @click="toggle"
-  >
-    <svg-icon :icon="isOpen ? 'close' : 'dice/d20'" />
-  </div>
+  <nav-popover v-if="isNavButtonVisible">
+    <template #trigger>
+      <div
+        class="navbar__btn"
+        @click="toggle"
+      >
+        <svg-icon :icon="isOpen ? 'close' : 'dice/d20'" />
+      </div>
+    </template>
+  </nav-popover>
 </template>
-
-<style lang="scss" module>
-  @use '@/assets/styles/variables/breakpoints' as *;
-
-  .nav-dice-history-button {
-    @include media-min($md) {
-      display: none !important;
-    }
-  }
-</style>

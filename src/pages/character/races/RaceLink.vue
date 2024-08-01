@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { groupBy, isArray, sortBy } from 'lodash-es';
-  import { computed, defineComponent, ref } from 'vue';
-  import { useLink, useRoute } from 'vue-router';
+  import { groupBy, isArray, omit, sortBy } from 'lodash-es';
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink } from '@/shared/types/character/Races.d';
-  import { AbilityType } from '@/shared/types/tools/AbilityCalc.d';
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import type { PropType } from 'vue';
   import type { RouteLocationPathRaw } from 'vue-router';
@@ -42,7 +39,7 @@
         }
 
         if (props.raceItem.abilities.length === 6) {
-          return AbilityType.ALL;
+          return '+1 к каждой';
         }
 
         const abilitiesList = [];
@@ -113,6 +110,7 @@
         selectRace,
       };
     },
+    methods: { omit },
   });
 </script>
 
@@ -121,10 +119,9 @@
     v-slot="{ href }"
     :to="{ path: raceItem.url }"
     custom
-    v-bind="$props"
+    v-bind="omit($props, 'to')"
   >
     <div
-      ref="raceItem"
       :class="parentClassList"
       class="link-item-expand"
       v-bind="$attrs"
@@ -157,74 +154,108 @@
                 </span>
               </span>
 
-              <span class="link-item-expand__body_row">
-                <span
+              <n-flex
+                :style="{ marginTop: 'auto' }"
+                size="small"
+              >
+                <n-tag
                   v-if="abilities"
-                  class="link-item-expand__tag"
+                  round
+                  size="small"
+                  :color="{
+                    color: 'var(--primary-active)',
+                    textColor: 'var(--text-btn-color)',
+                  }"
                 >
                   {{ abilities }}
-                </span>
+                </n-tag>
 
-                <span
-                  v-tippy-lazy="{ content: raceItem.source.name }"
-                  class="link-item-expand__tag"
-                >
-                  {{ raceItem.source.shortName }}
-                </span>
-              </span>
+                <n-tooltip>
+                  <template #trigger>
+                    <n-tag
+                      round
+                      size="small"
+                      :color="{
+                        color: 'var(--primary-active)',
+                        textColor: 'var(--text-btn-color)',
+                      }"
+                    >
+                      {{ raceItem.source.shortName }}
+                    </n-tag>
+                  </template>
+
+                  <template #default>
+                    {{ raceItem.source.name }}
+                  </template>
+                </n-tooltip>
+              </n-flex>
             </span>
           </a>
 
-          <button
+          <n-tooltip
             v-if="!isAbilityCalc && hasSubRaces"
-            v-tippy-lazy="{ content: 'Разновидности', placement: 'left' }"
-            :class="{ 'is-active': submenu }"
-            class="link-item-expand__toggle"
-            type="button"
-            @click.left.exact.prevent="submenu = !submenu"
+            placement="left"
           >
-            <svg-icon :icon="submenu ? 'minus' : 'plus'" />
-          </button>
+            <template #trigger>
+              <button
+                :class="{ 'is-active': submenu }"
+                class="link-item-expand__toggle"
+                type="button"
+                @click.left.exact.prevent="submenu = !submenu"
+              >
+                <svg-icon :icon="submenu ? 'minus' : 'plus'" />
+              </button>
+            </template>
+
+            <template #default> Разновидности </template>
+          </n-tooltip>
         </div>
 
-        <div
-          v-if="!isAbilityCalc && hasSubRaces"
-          v-show="submenu"
-          class="link-item-expand__arch-list"
-        >
+        <n-collapse-transition :show="submenu">
           <div
-            v-for="(group, groupKey) in subRaces"
-            :key="groupKey"
-            class="link-item-expand__arch-type"
+            v-if="!isAbilityCalc && hasSubRaces"
+            class="link-item-expand__arch-list"
           >
-            <div class="link-item-expand__arch-type_name">
-              {{ group.name.name }}
-            </div>
+            <div
+              v-for="(group, groupKey) in subRaces"
+              :key="groupKey"
+              class="link-item-expand__arch-type"
+            >
+              <div class="link-item-expand__arch-type_name">
+                {{ group.name.name }}
+              </div>
 
-            <div class="link-item-expand__arch-type_items">
-              <router-link
-                v-for="(subRace, subRaceKey) in group.list"
-                :key="subRaceKey"
-                :to="{ path: subRace.url }"
-                class="link-item-expand__arch-item"
-              >
-                <span class="link-item-expand__arch-item_name">{{
-                  subRace.name.rus
-                }}</span>
+              <div class="link-item-expand__arch-type_items">
+                <router-link
+                  v-for="(subRace, subRaceKey) in group.list"
+                  :key="subRaceKey"
+                  :to="{ path: subRace.url }"
+                  class="link-item-expand__arch-item"
+                >
+                  <span class="link-item-expand__arch-item_name">{{
+                    subRace.name.rus
+                  }}</span>
 
-                <span class="link-item-expand__arch-item_book">
-                  <span v-tippy-lazy="{ content: subRace.source.name }">
-                    {{ subRace.source.shortName }}
+                  <span class="link-item-expand__arch-item_book">
+                    <n-tooltip>
+                      <template #trigger>
+                        <span>
+                          {{ subRace.source.shortName }}
+                        </span>
+                      </template>
+
+                      <template #default> {{ subRace.source.name }} </template>
+                    </n-tooltip>
+
+                    /
+
+                    <span>{{ subRace.name.eng }}</span>
                   </span>
-
-                  /
-
-                  <span>{{ subRace.name.eng }}</span>
-                </span>
-              </router-link>
+                </router-link>
+              </div>
             </div>
           </div>
-        </div>
+        </n-collapse-transition>
       </div>
     </div>
   </router-link>

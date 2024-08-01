@@ -1,271 +1,220 @@
-<script lang="ts">
-  import useVuelidate from '@vuelidate/core';
-  import { helpers, or, sameAs } from '@vuelidate/validators';
-  import { storeToRefs } from 'pinia';
-  import { computed, defineComponent, reactive, ref } from 'vue';
-  import { useRouter } from 'vue-router';
+<script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
-  import { ToastEventBus } from '@/core/configs/ToastConfig';
-
+  import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiInput from '@/shared/ui/kit/UiInput.vue';
   import {
-    validateEmailFormat,
-    validateMinLength,
-    validatePwdLowerCase,
-    validatePwdNumber,
-    validatePwdSpecial,
-    validatePwdUpperCase,
-    validateRequired,
-    validateUsernameSpecialChars,
-  } from '@/shared/utils/authChecks';
+    ruleEmail,
+    rulePassword,
+    rulePasswordRepeat,
+  } from '@/shared/utils/validation-rules/authChecks';
 
-  import type { PropType } from 'vue';
+  import type { FormInst, FormRules } from 'naive-ui';
 
-  export default defineComponent({
-    components: {
-      UiButton,
-      UiInput,
+  const emit = defineEmits<{
+    (e: 'close'): void;
+    (e: 'switch:auth'): void;
+  }>();
+
+  const props = withDefaults(
+    defineProps<{
+      token?: string;
+      tokenValidate?: {
+        correct: boolean;
+        message: string;
+      };
+    }>(),
+    {
+      token: '',
+      tokenValidate: () => ({
+        correct: true,
+        message: '',
+      }),
     },
-    props: {
-      token: {
-        type: String,
-        default: '',
-      },
-      tokenValidate: {
-        type: Object as PropType<{
-          correct: boolean;
-          message: string;
-        }>,
-        default: () => ({
-          correct: true,
-          message: '',
-        }),
-      },
-    },
-    emits: ['close', 'switch:auth'],
-    setup(props, { emit }) {
-      const router = useRouter();
-      const toast = useToast(ToastEventBus);
-      const userStore = useUserStore();
-      const { isAuthenticated } = storeToRefs(userStore);
-      const success = ref(false);
-      const inProgress = ref(false);
-      const error = ref({});
+  );
 
-      const state = reactive({
-        email: '',
-        password: '',
-        repeat: '',
+  const router = useRouter();
+  const toast = useToast(ToastEventBus);
+  const userStore = useUserStore();
+  const { isAuthenticated } = storeToRefs(userStore);
+  const success = ref(false);
+  const inProgress = ref(false);
+  const formRef = ref<FormInst>();
+
+  const model = reactive({
+    email: '',
+    password: '',
+    repeat: '',
+  });
+
+  const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
+
+  const rules = computed<FormRules>(() => {
+    if (isOnlyPassword.value) {
+      return reactive({
+        password: rulePassword({ minLength: 8 }),
+        repeat: rulePasswordRepeat(model.password),
       });
+    }
 
-      const isOnlyPassword = computed(
-        () => props.token || isAuthenticated.value,
+    return reactive({
+      email: ruleEmail(),
+    });
+  });
+
+  const validate = () => formRef.value!.validate();
+
+  async function sendQuery() {
+    if (isOnlyPassword.value) {
+      try {
+        const payload = {
+          password: model.password,
+          [isAuthenticated.value ? 'userToken' : 'resetToken']:
+            isAuthenticated.value ? userStore.getUserToken() : props.token,
+        };
+
+        await userStore.changePassword(payload);
+
+        toast.success('Пароль успешно изменен!', {
+          onClose: () => {
+            if (!props.token) {
+              return;
+            }
+
+            router.replace({ name: 'index' });
+          },
+        });
+
+        emit('close');
+
+        return Promise.resolve();
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+
+    try {
+      await userStore.resetPassword(model.email);
+
+      toast.success(
+        'Ссылка для изменения пароля отправлена на указанный e-mail',
       );
 
-      const validations = computed(() => {
-        if (isOnlyPassword.value) {
-          return {
-            email: {
-              format: or(validateUsernameSpecialChars(), validateEmailFormat()),
-            },
-            password: {
-              required: validateRequired(),
-              minLength: validateMinLength(8),
-              lowerCase: validatePwdLowerCase(),
-              upperCase: validatePwdUpperCase(),
-              numbers: validatePwdNumber(),
-              specialChars: validatePwdSpecial(),
-            },
-            repeat: {
-              required: validateRequired(),
-              sameAs: helpers.withMessage(
-                'Пароли не совпадают',
-                sameAs(computed(() => state.password)),
-              ),
-            },
-          };
-        }
+      emit('close');
 
-        return {
-          email: {
-            required: validateRequired(),
-            format: validateEmailFormat(),
-          },
-        };
-      });
+      return Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
 
-      const v$ = useVuelidate(validations.value, state, { $lazy: true });
+  async function onSubmit() {
+    if (!props.tokenValidate?.correct) {
+      toast.error(props.tokenValidate.message);
 
-      async function sendQuery() {
-        if (isOnlyPassword.value) {
-          try {
-            const payload = {
-              password: state.password,
-              [isAuthenticated.value ? 'userToken' : 'resetToken']:
-                isAuthenticated.value ? userStore.getUserToken() : props.token,
-            };
+      return;
+    }
 
-            await userStore.changePassword(payload);
+    inProgress.value = true;
 
-            toast.success('Пароль успешно изменен!', {
-              onClose: () => {
-                if (!props.token) {
-                  return;
-                }
+    try {
+      await validate();
+    } catch (err) {
+      toast.error('Проверьте правильность заполнения полей');
 
-                router.replace({ name: 'index' });
-              },
-            });
+      inProgress.value = false;
 
-            emit('close');
+      return;
+    }
 
-            return Promise.resolve();
-          } catch (err) {
-            return Promise.reject(err);
-          }
-        }
+    try {
+      await sendQuery();
 
-        try {
-          await userStore.resetPassword(state.email);
-
-          toast.success(
-            'Ссылка для изменения пароля отправлена на указанный e-mail',
-          );
-
-          emit('close');
-
-          return Promise.resolve();
-        } catch (err) {
-          return Promise.reject(err);
-        }
-      }
-
-      async function onSubmit() {
-        if (!props.tokenValidate?.correct) {
-          toast.error(props.tokenValidate.message);
-
-          return;
-        }
-
-        inProgress.value = true;
-
-        await v$.value.$reset();
-
-        const result = await v$.value.$validate();
-
-        if (!result) {
-          toast.error('Проверьте правильность заполнения полей');
-
-          inProgress.value = false;
-
-          return;
-        }
-
-        try {
-          await sendQuery();
-
-          success.value = true;
-        } catch (err) {
-          toast.error('Неизвестная ошибка');
-        } finally {
-          inProgress.value = false;
-        }
-      }
-
-      return {
-        isAuthenticated,
-        inProgress,
-        isOnlyPassword,
-        v$,
-        error,
-        success,
-        onSubmit,
-      };
-    },
-  });
+      success.value = true;
+    } catch (err) {
+      toast.error('Неизвестная ошибка');
+    } finally {
+      inProgress.value = false;
+    }
+  }
 </script>
 
 <template>
-  <form
-    class="change-password form"
-    @submit.prevent="onSubmit"
-    @keyup.enter.prevent.stop
+  <n-form
+    ref="formRef"
+    :rules
+    :model
+    label-placement="left"
+    @submit.prevent.stop="onSubmit"
+    @keyup.enter.exact.prevent.stop="onSubmit"
   >
-    <div
-      :class="{ 'is-hidden': isOnlyPassword }"
-      class="form__row"
+    <n-form-item
+      v-if="!isOnlyPassword"
+      path="email"
     >
-      <ui-input
-        v-model.trim="v$.email.$model"
-        :autocomplete="isOnlyPassword ? 'username' : 'email'"
-        :error-text="v$.email.$dirty ? v$.email.$errors?.[0]?.$message : ''"
+      <n-input
+        v-model:value.trim="model.email"
+        autocomplete="off"
         autocapitalize="off"
         autocorrect="off"
         placeholder="Электронный адрес"
-        required
-        @blur="v$.email.$touch()"
-        @input="v$.email.$reset()"
+        autofocus
+        size="large"
       />
-    </div>
+    </n-form-item>
 
-    <div
+    <n-form-item
       v-if="isOnlyPassword"
-      class="form__row"
+      path="password"
     >
-      <ui-input
-        v-model.trim="v$.password.$model"
-        :error-text="
-          v$.password.$dirty ? v$.password.$errors?.[0]?.$message : ''
-        "
+      <n-input
+        v-model:value.trim="model.password"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
         type="password"
         placeholder="Новый пароль"
-        required
-        @blur="v$.password.$touch()"
-        @input="v$.password.$reset()"
+        show-password-on="click"
+        autofocus
+        size="large"
       />
-    </div>
+    </n-form-item>
 
-    <div
+    <n-form-item
       v-if="isOnlyPassword"
-      class="form__row"
+      path="repeat"
     >
-      <ui-input
-        v-model.trim="v$.repeat.$model"
-        :error-text="v$.repeat.$dirty ? v$.repeat.$errors?.[0]?.$message : ''"
+      <n-input
+        v-model:value.trim="model.repeat"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
         type="password"
         placeholder="Повторите пароль"
-        required
-        @blur="v$.repeat.$touch()"
-        @input="v$.repeat.$reset()"
+        show-password-on="click"
+        size="large"
       />
-    </div>
+    </n-form-item>
 
-    <div class="form__row">
-      <ui-button
+    <n-flex :wrap="false">
+      <n-button
         :disabled="success"
         :loading="inProgress"
-        native-type="submit"
+        type="primary"
+        size="large"
         @click.left.exact.prevent="onSubmit"
       >
         {{ isOnlyPassword ? 'Изменить пароль' : 'Восстановить пароль' }}
-      </ui-button>
+      </n-button>
 
-      <ui-button
+      <n-button
         v-if="!isAuthenticated"
-        type="secondary"
+        secondary
+        size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
         Авторизация
-      </ui-button>
-    </div>
-  </form>
+      </n-button>
+    </n-flex>
+  </n-form>
 </template>

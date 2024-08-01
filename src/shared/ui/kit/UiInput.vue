@@ -1,8 +1,5 @@
 <script setup lang="ts">
-  import { useVModel } from '@vueuse/core';
-  import { computed, onMounted, ref, useAttrs } from 'vue';
-
-  import SvgIcon from '@/shared/ui/icons/SvgIcon.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiEraseButton from '@/shared/ui/kit/button/UiEraseButton.vue';
 
   const props = withDefaults(
@@ -221,6 +218,7 @@
         cursor: pointer;
         padding: 10px;
         color: var(--text-color-title);
+        font-size: 16px;
       }
     }
 
