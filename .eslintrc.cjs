@@ -19,7 +19,7 @@ module.exports = {
     '@vue/eslint-config-prettier',
     './src/shared/types/generated/.eslintrc-auto-import.json',
   ],
-  plugins: ['@typescript-eslint', 'boundaries'],
+  plugins: ['boundaries'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
