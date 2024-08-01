@@ -13,7 +13,8 @@ export const dark: GlobalThemeOverrides = {
     iconColorHover: 'var(--text-g-color)',
     placeholderColor: 'var(--text-g-color)',
     placeholderColorDisabled: 'var(--text-g-color)',
-    inputColor: 'var(--hover)',
+    inputColor: 'var(--bg-secondary)',
+    inputColorDisabled: 'var(--hover)',
     hoverColor: 'var(--hover)',
     primaryColor: '#3567c9',
     primaryColorHover: 'var(--primary-hover)',
@@ -114,5 +115,12 @@ export const dark: GlobalThemeOverrides = {
     colorChecked: 'var(--primary-active)',
     textColorHoverCheckable: 'var(--text-color)',
     colorCheckedHover: 'var(--primary-hover)',
+  },
+  Select: {
+    peers: {
+      InternalSelectMenu: {
+        optionTextColorActive: 'var(--text-b-color)',
+      },
+    },
   },
 };

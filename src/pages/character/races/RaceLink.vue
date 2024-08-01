@@ -3,7 +3,6 @@
 
   import { useUIStore } from '@/shared/stores/UIStore';
   import type { TRaceLink } from '@/shared/types/character/Races.d';
-  import { AbilityType } from '@/shared/types/tools/AbilityCalc.d';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import type { PropType } from 'vue';
@@ -40,7 +39,7 @@
         }
 
         if (props.raceItem.abilities.length === 6) {
-          return AbilityType.ALL;
+          return '+1 к каждой';
         }
 
         const abilitiesList = [];

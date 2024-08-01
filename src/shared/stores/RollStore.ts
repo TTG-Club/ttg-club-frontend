@@ -62,10 +62,11 @@ export const useRollStore = defineStore('RollStore', () => {
   function registerRoll(
     item: PartialBy<RollEntry, 'source'>,
     toastOptions?: ToastOptions,
+    silent = false,
   ) {
     const roll = addRoll(item);
 
-    if (roll) {
+    if (roll && !silent) {
       eventBus.emit(Event.NewRoll, { entry: roll, toastOptions });
       broadcast(roll);
     }

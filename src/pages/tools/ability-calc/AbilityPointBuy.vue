@@ -1,291 +1,190 @@
-<script lang="ts">
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
+<script setup lang="ts">
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import {
     AbilityKey,
     AbilityName,
+    type AbilityRoll,
     AbilityShortName,
-  } from '@/shared/types/tools/AbilityCalc.d';
-  import UiButton from '@/shared/ui/kit/button/UiButton.vue';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
+    POINT_BUY_COST,
+  } from '@/shared/types/tools/AbilityCalc';
   import { getPlural } from '@/shared/utils/string';
 
-  import type { PropType } from 'vue';
+  import type { SelectOption } from 'naive-ui';
 
-  export default defineComponent({
-    components: {
-      UiSelect,
-      UiButton,
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
-      },
-    },
-    setup(props, { emit }) {
-      const cost = [
-        {
-          key: 8,
-          value: 0,
-        },
-        {
-          key: 9,
-          value: 1,
-        },
-        {
-          key: 10,
-          value: 2,
-        },
-        {
-          key: 11,
-          value: 3,
-        },
-        {
-          key: 12,
-          value: 4,
-        },
-        {
-          key: 13,
-          value: 5,
-        },
-        {
-          key: 14,
-          value: 7,
-        },
-        {
-          key: 15,
-          value: 9,
-        },
-      ];
+  const MAX_POINT_SUM = 27;
 
-      const rolls = ref<Array<AbilityRoll>>([
-        {
-          shortName: AbilityShortName.STRENGTH,
-          name: AbilityName.STRENGTH,
-          key: AbilityKey.STRENGTH,
-          value: 8,
-        },
-        {
-          shortName: AbilityShortName.DEXTERITY,
-          name: AbilityName.DEXTERITY,
-          key: AbilityKey.DEXTERITY,
-          value: 8,
-        },
-        {
-          shortName: AbilityShortName.CONSTITUTION,
-          name: AbilityName.CONSTITUTION,
-          key: AbilityKey.CONSTITUTION,
-          value: 8,
-        },
-        {
-          shortName: AbilityShortName.INTELLIGENCE,
-          name: AbilityName.INTELLIGENCE,
-          key: AbilityKey.INTELLIGENCE,
-          value: 8,
-        },
-        {
-          shortName: AbilityShortName.WISDOM,
-          name: AbilityName.WISDOM,
-          key: AbilityKey.WISDOM,
-          value: 8,
-        },
-        {
-          shortName: AbilityShortName.CHARISMA,
-          name: AbilityName.CHARISMA,
-          key: AbilityKey.CHARISMA,
-          value: 8,
-        },
-      ]);
+  const { smallerOrEqual } = useAppBreakpoints();
 
-      emit('update:model-value', rolls.value);
+  const isLg = smallerOrEqual('lg');
 
-      onActivated(() => {
-        emit('update:model-value', rolls.value);
-      });
+  const model = defineModel<Array<AbilityRoll>>({ default: () => [] });
 
-      const sum = computed(() =>
-        rolls.value.reduce((partialSum, roll) => {
-          const costItem = cost.find((item) => item.key === roll.value);
+  const rolls = ref<Array<AbilityRoll>>(
+    Object.values(AbilityKey).map((key) => ({
+      key,
+      value: 8,
+      name: AbilityName[key],
+      shortName: AbilityShortName[key],
+    })),
+  );
 
-          if (!costItem) {
-            return partialSum;
-          }
+  model.value = rolls.value;
 
-          return partialSum + costItem.value;
-        }, 0),
+  onActivated(() => {
+    model.value = rolls.value;
+  });
+
+  const sum = computed(() =>
+    rolls.value.reduce((partialSum, roll) => {
+      const index = POINT_BUY_COST.findIndex(
+        (cost) => cost.value === roll.value,
       );
 
-      const getOptions = (roll: AbilityRoll) => {
-        const rollValue = cost.find((costItem) => costItem.key === roll.value);
+      const value = POINT_BUY_COST[index];
 
-        if (!rollValue) {
-          return 'wtf?!';
-        }
+      return partialSum + value.cost;
+    }, 0),
+  );
 
-        return cost.filter(
-          (item) => sum.value + item.value - rollValue.value <= 27,
-        );
-      };
+  const getLabel = (
+    roll: (typeof rolls.value)[number],
+    option: (typeof POINT_BUY_COST)[number],
+  ) => {
+    let result = `${option.value}`;
 
-      const getLabel = (
-        roll: (typeof rolls.value)[number],
-        option: (typeof cost)[number],
-      ) => {
-        let result = `${option.key}`;
+    const index = POINT_BUY_COST.findIndex((cost) => cost.value === roll.value);
+    const value = POINT_BUY_COST[index];
 
-        const costItem = cost.find((item) => item.key === roll.value);
+    const difference = value.cost - option.cost;
+    const sign = Math.sign(difference) > -1 ? '+' : '-';
 
-        if (!costItem) {
-          return 'wtf?!';
-        }
+    const plural = getPlural(Math.abs(difference), ['очко', 'очка', 'очков']);
 
-        const difference = costItem.value - option.value;
-        const sign = Math.sign(difference) > -1 ? '+' : '-';
+    if (Math.abs(difference) > 0) {
+      result += ` (${sign}${Math.abs(difference)} ${plural})`;
+    }
 
-        const plural = getPlural(Math.abs(difference), [
-          'очко',
-          'очка',
-          'очков',
-        ]);
+    return result;
+  };
 
-        if (Math.abs(difference) > 0) {
-          result += ` (${sign}${Math.abs(difference)} ${plural})`;
-        }
+  const options = computed(() => (roll: AbilityRoll): Array<SelectOption> => {
+    const index = POINT_BUY_COST.findIndex((cost) => cost.value === roll.value);
+    const value = POINT_BUY_COST[index];
 
-        return result;
-      };
-
-      const onReset = () => {
-        for (let i = 0; i < rolls.value.length; i++) {
-          rolls.value[i].value = 8;
-        }
-
-        emit('update:model-value', rolls.value);
-      };
-
-      return {
-        abilities: computed(() =>
-          Object.keys(AbilityKey).map((key) => ({
-            key,
-            name: AbilityName[key as AbilityKey],
-          })),
-        ),
-        sum,
-        getOptions,
-        getLabel,
-        onReset,
-      };
-    },
+    return POINT_BUY_COST.map((item) => ({
+      key: item.value,
+      value: item.value,
+      disabled: !(sum.value + item.cost - value.cost <= MAX_POINT_SUM),
+      label: getLabel(roll, item),
+    }));
   });
+
+  const onSelect = (value: number | null, key: AbilityKey) => {
+    if (!value) {
+      return;
+    }
+
+    const index = rolls.value.findIndex((roll) => roll.key === key);
+
+    rolls.value[index].value = value;
+  };
+
+  const onReset = () => {
+    for (let i = 0; i < rolls.value.length; i++) {
+      rolls.value[i].value = 8;
+    }
+
+    model.value = rolls.value;
+  };
 </script>
 
 <template>
-  <div class="ability-point-buy">
-    <div class="ability-point-buy__blocks">
-      <div class="ability-point-buy__block">Очков: {{ 27 - sum }} / 27</div>
+  <n-flex
+    :wrap="false"
+    :vertical="isLg"
+    :size="16"
+  >
+    <n-flex
+      justify="space-between"
+      vertical
+      :size="16"
+    >
+      <div :class="$style.sum">
+        Очков: {{ MAX_POINT_SUM - sum }} / {{ MAX_POINT_SUM }}
+      </div>
 
-      <ui-button
-        class="ability-point-buy__block is-btn"
-        size="sm"
-        full-width
+      <n-button
+        block
+        type="primary"
         @click.left.exact.prevent="onReset"
       >
         Сбросить
-      </ui-button>
-    </div>
+      </n-button>
+    </n-flex>
 
-    <div
-      v-if="modelValue.length"
-      class="ability-point-buy__controls"
+    <n-grid
+      cols="1 672:3"
+      x-gap="16"
+      y-gap="16"
     >
-      <ui-select
-        v-for="(roll, index) in modelValue"
-        :key="index"
-        :model-value="roll"
-        :options="getOptions(roll)"
-        class="ability-point-buy__select"
-        label="value"
-        track-by="key"
-        @select="roll.value = $event.key"
+      <n-grid-item
+        v-for="roll in rolls"
+        :key="roll.key"
       >
-        <template #left-slot>
-          {{ String(roll.shortName).toUpperCase() }}
-        </template>
+        <n-input-group>
+          <transition
+            name="fade"
+            mode="out-in"
+            appear
+          >
+            <n-input-group-label
+              :style="{ width: '56px', textAlign: 'center' }"
+            >
+              {{ roll.shortName.toUpperCase() }}
+            </n-input-group-label>
+          </transition>
 
-        <template #singleLabel>
-          {{ roll.value || 'Выбрать значение' }}
-        </template>
-
-        <template #placeholder> Выбрать значение </template>
-
-        <template #option="{ option }">
-          {{ getLabel(roll, option) }}
-        </template>
-      </ui-select>
-    </div>
-  </div>
+          <n-select
+            :value="roll.value"
+            :options="options(roll)"
+            :show-checkmark="false"
+            placeholder="Выбрать значение"
+            @update:value="onSelect($event, roll.key)"
+          />
+        </n-input-group>
+      </n-grid-item>
+    </n-grid>
+  </n-flex>
 </template>
 
-<style lang="scss" scoped>
-  .ability-point-buy {
+<style module lang="scss">
+  .sum {
+    width: 100%;
+    height: 34px;
     display: flex;
-    gap: 32px;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    background: var(--bg-table-list);
+    border-radius: 8px;
+    padding: 0 8px;
+    color: var(--text-b-color);
+    font-size: var(--main-font-size);
+    line-height: calc(var(--main-line-height) - 1px);
+  }
 
-    &__blocks {
-      min-width: 124px;
-      gap: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
+  .dotted {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
 
-    &__block {
-      flex: 1 1 auto;
-
-      &:not(.is-btn) {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--bg-table-list);
-        border-radius: 6px;
-        padding: 8px;
-        color: var(--text-b-color);
-        font-size: var(--main-font-size);
-        line-height: calc(var(--main-line-height) - 1px);
-      }
-    }
-
-    &__controls {
-      flex: 1 1 auto;
-      display: grid;
-      gap: 16px;
-      grid-template-columns: 1fr 1fr 1fr;
-
-      @media (max-width: 576px) {
-        display: flex;
-        flex-direction: column;
-      }
-    }
-
-    &__select {
-      &_placeholder {
-        display: flex;
-      }
-
-      &_roll {
-      }
-    }
-
-    .ability-table {
-      margin-top: 24px;
-    }
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      gap: 16px;
+    &:after {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      margin-right: 8px;
     }
   }
 </style>

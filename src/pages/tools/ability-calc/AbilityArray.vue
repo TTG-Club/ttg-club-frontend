@@ -1,197 +1,139 @@
-<script lang="ts">
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
-  import { AbilityKey, AbilityName } from '@/shared/types/tools/AbilityCalc.d';
-  import UiSelect from '@/shared/ui/kit/UiSelect.vue';
-  import { getFormattedModifier } from '@/shared/utils/abilityTransforms';
+<script setup lang="ts">
+  import {
+    type AbilityRoll,
+    AbilityKey,
+    AbilityName,
+    AbilityShortName,
+  } from '@/shared/types/tools/AbilityCalc';
 
-  import type { PropType } from 'vue';
+  import type { SelectOption } from 'naive-ui';
 
-  export default defineComponent({
-    components: {
-      UiSelect,
-    },
-    props: {
-      modelValue: {
-        type: Array as PropType<Array<AbilityRoll>>,
-        required: true,
-      },
-    },
-    setup(props, { emit }) {
-      const rolls = ref<Array<AbilityRoll>>([
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 15,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 14,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 13,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 12,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 10,
-        },
-        {
-          name: null,
-          key: null,
-          shortName: null,
-          value: 8,
-        },
-      ]);
+  const style = useCssModule();
 
-      emit('update:model-value', rolls.value);
+  const model = defineModel<Array<AbilityRoll>>({ default: () => [] });
 
-      onActivated(() => {
-        emit('update:model-value', rolls.value);
+  interface AbilityArrayRoll {
+    key: AbilityKey | null;
+    value: number;
+  }
+
+  const rolls = ref<Array<AbilityArrayRoll>>(
+    [15, 14, 13, 12, 10, 8].map((value) => ({
+      key: null,
+      value,
+    })),
+  );
+
+  const isSelected = (key: AbilityKey) =>
+    rolls.value.find((roll) => roll.key === key);
+
+  const abilities = computed<Array<SelectOption>>(() => {
+    const keys: Array<AbilityKey> = Object.values(AbilityKey);
+
+    return keys.map<SelectOption>((key) => ({
+      value: key,
+      label: AbilityName[key],
+      class: isSelected(key) ? style.dotted : undefined,
+    }));
+  });
+
+  const emit = () => {
+    const res: Array<AbilityRoll> = [];
+
+    for (const { key, value } of rolls.value) {
+      if (!key || !value) {
+        continue;
+      }
+
+      res.push({
+        key,
+        value,
+        name: AbilityName[key],
+        shortName: AbilityShortName[key],
       });
+    }
 
-      const isSelected = (key: AbilityKey) =>
-        rolls.value.find((roll) => roll.key === key);
+    model.value = res;
+  };
 
-      const onSelect = (key: AbilityKey | null, index: number) => {
-        const setValue = (value: typeof key, i: number) => {
-          rolls.value[i].key = value;
+  const onSelect = (key: AbilityKey | null, index: number) => {
+    rolls.value[index].key = key;
 
-          rolls.value[i].name = value ? AbilityName[value] : null;
-        };
+    for (let i = 0; i < rolls.value.length; i++) {
+      if (i === index || rolls.value[i].key !== key) {
+        continue;
+      }
 
-        for (let i = 0; i < rolls.value.length; i++) {
-          if (i === index) {
-            setValue(key, i);
+      rolls.value[i].key = null;
+    }
 
-            continue;
-          }
+    emit();
+  };
 
-          if (rolls.value[i].key === key) {
-            setValue(null, i);
-          }
-        }
+  const onClear = (index: number) => {
+    rolls.value[index].key = null;
 
-        emit('update:model-value', rolls.value);
-      };
+    emit();
+  };
 
-      const onRemove = (index: number) => {
-        rolls.value[index].key = null;
-        rolls.value[index].name = null;
+  emit();
 
-        emit('update:model-value', rolls.value);
-      };
-
-      return {
-        abilities: computed(() =>
-          Object.keys(AbilityKey).map((key) => ({
-            key,
-            name: AbilityName[key as AbilityKey],
-          })),
-        ),
-        getFormattedModifier,
-        isSelected,
-        onSelect,
-        onRemove,
-      };
-    },
+  onActivated(() => {
+    emit();
   });
 </script>
 
 <template>
-  <div
-    v-if="modelValue.length"
-    class="ability-array"
+  <n-grid
+    cols="1 672:3"
+    x-gap="16"
+    y-gap="16"
   >
-    <ui-select
-      v-for="(roll, index) in modelValue"
+    <n-grid-item
+      v-for="(roll, index) in rolls"
       :key="index"
-      :model-value="roll"
-      :options="abilities"
-      allow-empty
-      class="ability-array__select"
-      label="name"
-      track-by="key"
-      @remove="onRemove(index)"
-      @select="onSelect($event.key, index)"
     >
-      <template #left-slot>
-        {{ roll.value }}
-      </template>
-
-      <template #singleLabel>
-        {{ roll.name || 'Выбрать хар-ку' }}
-      </template>
-
-      <template #placeholder> Выбрать хар-ку </template>
-
-      <template #option="{ option }">
-        <span
-          :class="{ 'is-selected': isSelected(option.key) }"
-          class="ability-array__select_option"
-          >{{ option.name }}</span
+      <n-input-group>
+        <transition
+          name="fade"
+          mode="out-in"
+          appear
         >
-      </template>
-    </ui-select>
-  </div>
+          <n-input-group-label
+            v-if="roll.value"
+            :style="{ width: '40px', textAlign: 'center' }"
+          >
+            {{ roll.value }}
+          </n-input-group-label>
+        </transition>
+
+        <n-select
+          :value="roll.key"
+          :options="abilities"
+          :show-checkmark="false"
+          clearable
+          placeholder="Выбери хар-ку"
+          @update:value="onSelect($event, index)"
+          @clear="onClear(index)"
+        />
+      </n-input-group>
+    </n-grid-item>
+  </n-grid>
 </template>
 
-<style lang="scss" scoped>
-  .ability-array {
-    flex: 1 1 auto;
-    display: grid;
-    gap: 16px;
-    grid-template-columns: 1fr 1fr 1fr;
+<style module lang="scss">
+  .dotted {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
 
-    &__select {
-      :deep(.multiselect__option) {
-        padding: 0;
-      }
-
-      &_placeholder {
-        display: flex;
-      }
-
-      &_option {
-        padding: 12px 12px 12px 28px;
-
-        &.is-selected {
-          &::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            position: absolute;
-            top: calc(50% - 5px);
-            left: 10px;
-          }
-        }
-      }
-
-      &_roll {
-      }
-    }
-
-    .ability-table {
-      margin-top: 24px;
-    }
-
-    @media (max-width: 768px) {
-      display: flex;
-      flex-direction: column;
+    &:after {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      margin-right: 8px;
     }
   }
 </style>

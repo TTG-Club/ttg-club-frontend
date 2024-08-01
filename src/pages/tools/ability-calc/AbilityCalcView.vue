@@ -1,12 +1,12 @@
 <script lang="ts" setup>
   import { useRollStore } from '@/shared/stores/RollStore';
-  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc.d';
+  import type { AbilityRoll } from '@/shared/types/tools/AbilityCalc';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
-  import AbilityRaces from './ability-races/AbilityRaces.vue';
   import AbilityArray from './AbilityArray.vue';
   import AbilityPointBuy from './AbilityPointBuy.vue';
+  import AbilityRaces from './AbilityRaces.vue';
   import AbilityRandom from './AbilityRandom.vue';
   import AbilityTable from './AbilityTable.vue';
 
@@ -75,29 +75,29 @@
       >
         <ability-races v-model="raceBonuses" />
 
-        <n-flex justify="center">
-          <n-radio-group
-            v-model:value="currentTab"
-            size="large"
+        <n-grid
+          cols="1 672:3"
+          x-gap="16"
+          y-gap="16"
+        >
+          <n-grid-item
+            v-for="tab in tabs"
+            :key="tab.value"
           >
-            <n-radio-button
-              v-for="tab in tabs"
-              :key="tab.value"
-              :value="tab.value"
+            <n-button
+              block
+              :type="currentTab !== tab.value ? 'default' : 'primary'"
+              :secondary="currentTab !== tab.value"
+              @click.left.exact.prevent="currentTab = tab.value"
             >
               {{ tab.label }}
-            </n-radio-button>
-          </n-radio-group>
-        </n-flex>
+            </n-button>
+          </n-grid-item>
+        </n-grid>
 
-        <transition
-          mode="out-in"
-          name="fade"
-        >
-          <keep-alive>
-            <tab-component v-model="rolls" />
-          </keep-alive>
-        </transition>
+        <keep-alive>
+          <tab-component v-model="rolls" />
+        </keep-alive>
 
         <ability-table
           :race-bonuses="raceBonuses"

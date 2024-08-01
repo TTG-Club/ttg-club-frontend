@@ -33,12 +33,14 @@ export function useDiceRoller() {
     label,
     type,
     toastOptions,
+    silent = false,
   }: {
     roll: RollBase;
     source?: string;
     label?: string;
     type?: RollType;
     toastOptions?: ToastOptions;
+    silent?: boolean;
   }) {
     rollStore.registerRoll(
       {
@@ -50,6 +52,7 @@ export function useDiceRoller() {
         type,
       },
       toastOptions,
+      silent,
     );
   }
 
