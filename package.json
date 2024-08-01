@@ -23,9 +23,9 @@
     "prettier:check": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --check",
     "prettier:write": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --write",
     "prettier:workflow": "prettier \"{**/*,*}.{cjs,js,ts,jsx,tsx,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --log-level error --check",
-    "styilelint:check": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore",
-    "styilelint:write": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --fix",
-    "styilelint:workflow": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --quiet",
+    "stylelint:check": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore",
+    "stylelint:write": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --fix",
+    "stylelint:workflow": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --quiet",
     "pre-commit": "lint-staged",
     "prepare": "is-ci || husky"
   },

@@ -37,3 +37,6 @@ jobs:
 
       - name: Prettier
         run: npm run prettier:workflow
+
+      - name: Stylelint
+        run: npm run stylelint:workflow
