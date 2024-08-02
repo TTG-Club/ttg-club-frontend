@@ -1,7 +1,7 @@
 <script>
   import { sortBy } from 'lodash-es';
 
-  import GalleryLightbox from '@/shared/ui/kit/GalleryLightbox.vue';
+  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import DetailTopBar from '@/features/DetailTopBar.vue';
@@ -9,7 +9,7 @@
   export default {
     name: 'RaceBody',
     components: {
-      GalleryLightbox,
+      UiEasyLightbox,
       DetailTopBar,
       RawContent,
     },
@@ -69,7 +69,10 @@
     <detail-top-bar :source="race.source" />
 
     <div class="content-padding">
-      <gallery-lightbox :images="race.images" />
+      <ui-easy-lightbox
+        :images="race.images"
+        :use-bg-hide="false"
+      />
 
       <div class="scores">
         <div class="scores__stats">

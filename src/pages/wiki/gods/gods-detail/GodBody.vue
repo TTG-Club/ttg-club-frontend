@@ -1,5 +1,5 @@
 <script>
-  import GalleryLightbox from '@/shared/ui/kit/GalleryLightbox.vue';
+  import UiEasyLightbox from '@/shared/ui/kit/UiEasyLightbox.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import DetailTopBar from '@/features/DetailTopBar.vue';
@@ -7,7 +7,7 @@
   export default {
     name: 'GodBody',
     components: {
-      GalleryLightbox,
+      UiEasyLightbox,
       DetailTopBar,
       RawContent,
     },
@@ -37,7 +37,10 @@
     />
 
     <div class="content-padding">
-      <gallery-lightbox :images="god.images" />
+      <ui-easy-lightbox
+        :images="god.images"
+        :use-bg-hide="false"
+      />
 
       <ul class="stat-list">
         <li>
