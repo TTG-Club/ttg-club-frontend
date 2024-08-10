@@ -24,12 +24,12 @@
   }
 
   body {
-    background: white !important;
     color: black !important;
+    background: white !important;
 
     * {
-      background: transparent !important;
       color: black !important;
+      background: transparent !important;
     }
   }
 
@@ -57,16 +57,20 @@
   .content-detail,
   .content-detail__body,
   .content-layout__side--right {
-    max-width: none !important;
-    width: 100% !important;
-    margin: 0 !important;
-    float: none !important;
-    display: block !important;
     position: relative !important;
-    visibility: visible !important;
+
+    float: none !important;
     overflow: visible !important;
-    color: black !important;
+    display: block !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
     padding: 0 !important;
+
+    color: black !important;
+
+    visibility: visible !important;
   }
 
   .content-layout__selected {
@@ -84,10 +88,10 @@
   }
 
   .scores__stats {
-    min-width: 20px !important;
     flex: none !important;
-    border: 1px solid rgb(119, 119, 119) !important;
+    min-width: 20px !important;
     padding: 8px !important;
+    border: 1px solid rgb(119, 119, 119) !important;
 
     h4 {
       height: 16px !important;
@@ -95,8 +99,8 @@
     }
 
     p {
-      padding: 0 !important;
       margin: 0 !important;
+      padding: 0 !important;
     }
   }
 
@@ -126,8 +130,8 @@
 
   .header_separator {
     margin: 8px 0 0 0 !important;
-    border-bottom: none !important;
     font-size: 16px;
+    border-bottom: none !important;
   }
 
   .section-header__title--text {
@@ -136,9 +140,9 @@
 
   .row_info,
   .section-header__body {
-    padding: 4px 0 4px 0 !important;
-    margin: 0 !important;
     gap: 0 !important;
+    margin: 0 !important;
+    padding: 4px 0 4px 0 !important;
   }
 
   .grid_stat_block {
@@ -157,8 +161,8 @@
 
   details[open] {
     display: block !important;
-    break-before: avoid;
     break-inside: avoid;
+    break-before: avoid;
     break-after: avoid;
   }
 

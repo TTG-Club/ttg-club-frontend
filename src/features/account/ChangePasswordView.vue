@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
   import {
@@ -40,6 +41,7 @@
   const success = ref(false);
   const inProgress = ref(false);
   const formRef = ref<FormInst>();
+  const vertical = useAppBreakpoints().smaller('sm');
 
   const model = reactive({
     email: '',
@@ -48,6 +50,8 @@
   });
 
   const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
+
+  const noSideSpace = (value: string) => !/ /g.test(value);
 
   const rules = computed<FormRules>(() => {
     if (isOnlyPassword.value) {
@@ -153,13 +157,14 @@
       path="email"
     >
       <n-input
-        v-model:value.trim="model.email"
+        v-model:value="model.email"
         autocomplete="off"
         autocapitalize="off"
         autocorrect="off"
         placeholder="Электронный адрес"
         autofocus
         size="large"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -168,7 +173,7 @@
       path="password"
     >
       <n-input
-        v-model:value.trim="model.password"
+        v-model:value="model.password"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
@@ -177,6 +182,7 @@
         show-password-on="click"
         autofocus
         size="large"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -185,7 +191,7 @@
       path="repeat"
     >
       <n-input
-        v-model:value.trim="model.repeat"
+        v-model:value="model.repeat"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
@@ -193,10 +199,14 @@
         placeholder="Повторите пароль"
         show-password-on="click"
         size="large"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
-    <n-flex :wrap="false">
+    <n-flex
+      :wrap="false"
+      :vertical
+    >
       <n-button
         :disabled="success"
         :loading="inProgress"
@@ -209,7 +219,7 @@
 
       <n-button
         v-if="!isAuthenticated"
-        secondary
+        quaternary
         size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >

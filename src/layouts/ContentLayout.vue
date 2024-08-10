@@ -244,11 +244,13 @@
     margin: 0 auto;
 
     &__body {
-      width: 100%;
-      min-height: calc(var(--max-vh) - 56px);
+      position: relative;
+
       display: flex;
       justify-content: flex-start;
-      position: relative;
+
+      width: 100%;
+      min-height: calc(var(--max-vh) - 56px);
 
       &.is-fullscreen {
         border-radius: 12px;
@@ -261,8 +263,8 @@
 
     &__title {
       font-size: var(--h2-font-size);
-      line-height: var(--h2-line-height);
       font-weight: 400;
+      line-height: var(--h2-line-height);
 
       @include media-min($lg) {
         font-size: var(--h1-font-size);
@@ -271,19 +273,25 @@
     }
 
     &__fixed {
-      position: sticky;
-      top: 0;
-      z-index: 3;
       pointer-events: none;
+
+      position: sticky;
+      z-index: 3;
+      top: 0;
+
       padding-bottom: 16px;
 
       &:after {
         content: '';
-        display: block;
+
         position: absolute;
         bottom: 0;
-        height: 16px;
+
+        display: block;
+
         width: 100%;
+        height: 16px;
+
         background: linear-gradient(
           180deg,
           var(--bg-main) 0,
@@ -296,10 +304,13 @@
 
       &_body {
         pointer-events: auto;
+
         display: flex;
         flex-direction: column;
         gap: 12px;
+
         padding-top: 16px;
+
         background-color: var(--bg-main);
 
         @include media-min($md) {
@@ -314,11 +325,13 @@
 
     &__side {
       &--left {
+        position: relative;
+
         display: flex;
         flex-direction: column;
-        position: relative;
-        width: 100%;
         flex-shrink: 0;
+
+        width: 100%;
 
         ::-webkit-scrollbar-track {
           background-color: transparent;
@@ -342,18 +355,22 @@
 
         &_body {
           &:after {
-            content: '';
-            display: block;
             pointer-events: none;
-            width: calc(100% + 16px);
-            height: 24px;
-            box-shadow: 0 0 32px 32px var(--bg-main);
+            content: '';
+
             position: sticky;
             bottom: 0;
+
+            display: block;
+
+            width: calc(100% + 16px);
+            height: 24px;
             margin: 0 -16px;
             //z-index: 16;
             opacity: 0;
             background-color: var(--bg-main);
+            box-shadow: 0 0 32px 32px var(--bg-main);
+
             transition: opacity 0.2s;
             border: {
               top-left-radius: 20%;
@@ -370,17 +387,20 @@
       }
 
       &--right {
-        display: block;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: calc(var(--max-vh) - 56px);
-        overflow: hidden;
-        border-radius: 0;
-        background: var(--bg-secondary-gradient);
         position: fixed;
-        margin-left: auto;
         z-index: 12;
+        top: 0;
+        right: 0;
+        left: 0;
+
+        overflow: hidden;
+        display: block;
+
+        height: calc(var(--max-vh) - 56px);
+        margin-left: auto;
+
+        background: var(--bg-secondary-gradient);
+        border-radius: 0;
 
         @include media-min($md) {
           left: 64px;
@@ -388,30 +408,33 @@
         }
 
         @include media-min($xl) {
-          left: 0;
-          top: 24px;
           position: sticky;
+          top: 24px;
+          left: 0;
+
           width: calc(64% - 24px);
           height: calc(var(--max-vh) - 24px - 24px);
+
           border-radius: 12px;
         }
 
         &.is-fullscreen {
           width: auto;
           max-width: 100%;
-          margin-left: initial;
           height: calc(var(--max-vh) - 56px);
+          margin-left: initial;
 
           @include media-min($md) {
             height: var(--max-vh);
           }
 
           @include media-min($xl) {
+            z-index: 16;
+
             width: var(--max-content);
             max-width: var(--max-content);
-            margin-left: -100%;
-            z-index: 16;
             height: calc(var(--max-vh) - 48px);
+            margin-left: -100%;
           }
         }
       }

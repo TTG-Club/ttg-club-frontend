@@ -113,11 +113,13 @@
   @use '@/assets/styles/variables/breakpoints' as *;
 
   .ability-table {
-    width: 100%;
+    cursor: default;
+
     display: grid;
     grid-template-columns: 1fr 4fr;
     gap: 12px;
-    cursor: default;
+
+    width: 100%;
 
     @include media-max($xl) {
       display: flex;
@@ -125,35 +127,28 @@
 
     &__body {
       display: grid;
-      gap: 12px;
       grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
       padding-bottom: 16px;
 
       @include media-max($xl) {
-        grid-template-columns: initial;
-        display: flex;
-        flex: 1 1 auto;
         overflow: auto;
+        display: flex;
+        grid-template-columns: initial;
+        flex: 1 1 auto;
         justify-content: space-between;
       }
     }
 
     &__col {
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       gap: 18px;
-      overflow: hidden;
-      border-radius: 16px;
+
       padding: 12px 0;
 
-      @include media-max($xl) {
-        width: 112px;
-      }
-
-      @media (max-width: 768px) {
-        width: 100%;
-        padding: 12px 0;
-      }
+      border-radius: 16px;
 
       &.is-aside {
         flex-shrink: 0;
@@ -167,15 +162,26 @@
         align-items: center;
         background-color: var(--bg-secondary);
       }
+
+      @media (max-width: 768px) {
+        width: 100%;
+        padding: 12px 0;
+      }
+
+      @include media-max($xl) {
+        width: 112px;
+      }
     }
 
     &__row {
+      display: flex;
+      align-items: center;
+
+      width: 100%;
+
       font-size: var(--h5-font-size);
       line-height: 27px;
       color: var(--text-b-color);
-      width: 100%;
-      display: flex;
-      align-items: center;
 
       &:not(.is-aside) {
         justify-content: center;
@@ -186,17 +192,19 @@
       }
 
       &:not(.is-aside):nth-child(4) {
-        background-color: var(--bg-table-row);
-        margin: 0 auto;
         max-width: 40px;
+        margin: 0 auto;
+        background-color: var(--bg-table-row);
         border-radius: 8px;
       }
 
       &:not(.is-aside):last-child {
-        background-color: var(--primary);
-        color: var(--text-btn-color);
-        margin: 0 auto;
         max-width: 40px;
+        margin: 0 auto;
+
+        color: var(--text-btn-color);
+
+        background-color: var(--primary);
         border-radius: 8px;
       }
     }

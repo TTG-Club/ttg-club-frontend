@@ -180,14 +180,16 @@
   @use '@/assets/styles/variables/breakpoints' as *;
 
   .container {
-    background-color: var(--bg-secondary);
-    max-height: calc(var(--max-vh) / 100 * 90);
-    margin: auto;
     overflow: hidden;
-    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
     display: flex;
+
     width: 100%;
     max-width: 500px;
+    max-height: calc(var(--max-vh) / 100 * 90);
+    margin: auto;
+
+    background-color: var(--bg-secondary);
+    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
 
     @include media-min($sm) {
       border-radius: 8px;
@@ -195,13 +197,16 @@
   }
 
   .wrapper {
-    background: var(--bg-secondary);
-    overflow: hidden;
-    border-radius: 12px;
-    width: 100%;
     pointer-events: auto;
-    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+
+    overflow: hidden;
+
+    width: 100%;
     padding: 24px;
+
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
   }
 
   .header {

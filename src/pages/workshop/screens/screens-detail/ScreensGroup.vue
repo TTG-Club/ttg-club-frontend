@@ -87,15 +87,17 @@
     width: 100%;
 
     &__name {
-      background: var(--hover);
-      // text-align: center;
-      line-height: 50px;
+      margin: 16px 16px 0 16px;
+      padding: 0 16px;
+
       font-size: var(--h4-font-size);
       font-weight: 300;
+      // text-align: center;
+      line-height: 50px;
       color: var(--text-color-title);
-      margin: 16px 16px 0 16px;
+
+      background: var(--hover);
       border-radius: 8px;
-      padding: 0 16px;
 
       @include media-min($xl) {
         margin: 16px 24px 0 24px;
@@ -103,12 +105,13 @@
     }
 
     &__list {
-      width: 100%;
       display: grid;
+      grid-template-columns: repeat(1, 1fr);
       row-gap: 8px;
       column-gap: 8px;
+
+      width: 100%;
       padding: 8px 16px;
-      grid-template-columns: repeat(1, 1fr);
 
       @include media-min($sm) {
         grid-template-columns: repeat(2, 1fr);

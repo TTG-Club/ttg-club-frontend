@@ -105,12 +105,14 @@
       }
 
       &--center {
+        display: flex;
         flex: 1 1 620px;
+        flex-direction: column;
+
         max-width: 100%;
         margin: 0 auto;
+
         border-radius: 12px;
-        display: flex;
-        flex-direction: column;
 
         @include media-min($xl) {
           flex: 1 1 960px;
@@ -124,8 +126,8 @@
     }
 
     &__header {
-      padding: 32px 0 16px 0;
       margin-bottom: 16px;
+      padding: 32px 0 16px 0;
 
       &.show-separator {
         border-bottom: 1px solid var(--border);
@@ -137,14 +139,14 @@
     }
 
     &__title {
-      font-weight: 500;
-      font-family: 'Lora', serif;
       margin: 0;
+      font-family: 'Lora', serif;
+      font-weight: 500;
     }
 
     &__subtitle {
-      line-height: normal;
       margin: 16px 0 0;
+      line-height: normal;
 
       @media (max-width: 600px) {
         font-size: calc(var(--h4-font-size) - 2px);
@@ -155,8 +157,8 @@
     }
 
     &__content {
-      padding-bottom: 24px;
       flex: 1 1 auto;
+      padding-bottom: 24px;
     }
 
     &__socials {

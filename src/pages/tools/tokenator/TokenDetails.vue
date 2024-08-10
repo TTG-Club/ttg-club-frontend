@@ -142,28 +142,29 @@
 
 <style lang="scss" module>
   .wrapper {
-    border-radius: 16px;
-    padding: 24px;
     margin-top: 24px;
+    padding: 24px;
+
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
+    border-radius: 16px;
 
     @include media-min($md) {
-      margin: 0 24px 0 0;
       transform: none;
+      margin: 0 24px 0 0;
     }
   }
 
   .header {
-    font-weight: 600;
     font-size: var(--h4-font-size);
-    color: var(--text-color-title);
+    font-weight: 600;
     line-height: 30px;
+    color: var(--text-color-title);
   }
 
   .text {
-    margin-top: 8px;
     max-width: 290px;
+    margin-top: 8px;
   }
 
   .slider {

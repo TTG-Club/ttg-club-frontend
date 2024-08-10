@@ -136,11 +136,11 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .dice-roller {
-    @include css_anim();
-
-    font-weight: 500;
     cursor: pointer;
+    font-weight: 500;
     white-space: nowrap;
+
+    @include css-anim();
 
     &:not(.is-error) {
       &.is-dice {
@@ -172,22 +172,23 @@
 
     &__result {
       font-size: var(--h1-font-size);
-      line-height: var(--h1-font-size);
       font-weight: 600;
+      line-height: var(--h1-font-size);
     }
 
     &__body {
-      margin-left: 8px;
       display: flex;
       flex-direction: column;
+      margin-left: 8px;
     }
 
     &__label {
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: calc(var(--main-font-size) - 2px);
-      line-height: calc(var(--main-font-size) + 2px);
       padding-top: 4px;
+
+      font-size: calc(var(--main-font-size) - 2px);
+      font-weight: 600;
+      line-height: calc(var(--main-font-size) + 2px);
+      text-transform: uppercase;
     }
 
     del {

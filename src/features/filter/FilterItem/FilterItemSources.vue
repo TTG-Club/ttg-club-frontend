@@ -198,9 +198,9 @@
       }
 
       &_head {
+        cursor: default;
         display: flex;
         align-items: center;
-        cursor: default;
 
         & + .filter-item {
           &__source-group {
@@ -219,18 +219,21 @@
 
         &:after {
           content: '';
+
           display: block;
           flex: 1;
+
           height: 1px;
-          background-color: var(--border);
           margin-left: 8px;
+
+          background-color: var(--border);
         }
       }
 
       &_body {
         display: flex;
-        gap: 8px;
         flex-wrap: wrap;
+        gap: 8px;
       }
     }
   }

@@ -215,18 +215,21 @@
 
   .link-item {
     &__lvl {
-      width: 42px;
-      height: 42px;
       display: flex;
+      flex-shrink: 0;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      font-size: 17px;
-      color: var(--text-color);
-      border-right: 1px solid var(--border);
+
+      width: 42px;
+      height: 42px;
       margin-right: 12px;
       margin-left: -8px;
+
+      font-size: 17px;
+      color: var(--text-color);
       text-align: center;
+
+      border-right: 1px solid var(--border);
     }
 
     &__modifications {
@@ -236,12 +239,14 @@
 
     &__modification {
       padding: 0 6px;
-      border-radius: 6px;
-      background-color: var(--bg-sub-menu);
-      border: 1px solid var(--border);
-      color: var(--text-color);
+
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
+      color: var(--text-color);
+
+      background-color: var(--bg-sub-menu);
+      border: 1px solid var(--border);
+      border-radius: 6px;
 
       & + & {
         margin-left: 4px;
@@ -249,10 +254,11 @@
     }
 
     &__school {
-      color: var(--text-g-color);
+      overflow: hidden;
+
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
-      overflow: hidden;
+      color: var(--text-g-color);
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -263,10 +269,11 @@
     }
 
     &__component {
+      width: 12px;
+
       font-size: calc(var(--main-font-size) - 1px);
       line-height: normal;
       color: var(--text-color);
-      width: 12px;
       text-align: center;
 
       & + & {

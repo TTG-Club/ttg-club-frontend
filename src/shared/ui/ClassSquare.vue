@@ -33,25 +33,3 @@
     <svg-icon :icon="icon" />
   </router-link>
 </template>
-
-<style lang="scss" scoped>
-  // .class-square {
-  //     @include css_anim();
-
-  //     display: block;
-  //     width: 48px;
-  //     height: 48px;
-  //     padding: 8px;
-  //     background-repeat: no-repeat;
-  //     background-position: center;
-  //     background-color: var(--hover);
-  //     border-radius: 8px;
-  //     margin-right: 8px;
-  //     cursor: pointer;
-  //     color: var(--primary);
-
-  //     &:hover {
-  //         color: var(--link-color-hover);
-  //     }
-  // }
-</style>

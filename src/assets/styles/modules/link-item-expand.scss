@@ -2,10 +2,10 @@
 @use '@/assets/styles/variables/mixins' as *;
 
 .link-item-expand {
-  width: 100%;
-  display: block;
   will-change: left, top;
   overflow: hidden;
+  display: block;
+  width: 100%;
 
   &.is-green {
     .link-item-expand {
@@ -13,32 +13,38 @@
         background: var(--bg-homebrew-gradient-left);
 
         &__gradient {
-          background: var(--bg-homebrew-gradient-left);
           opacity: 0.2;
+          background: var(--bg-homebrew-gradient-left);
         }
       }
     }
   }
 
   &__content {
+    isolation: isolate;
+    position: relative;
+
+    overflow: hidden;
+
+    width: 100%;
+
     background-color: var(--bg-table-list);
     border: 1px solid var(--bg-secondary);
     border-radius: 16px;
-    overflow: hidden;
-    width: 100%;
-    position: relative;
-    isolation: isolate;
 
     &__img-bg {
-      @include css_anim($item: transform, $time: 0.6s);
+      pointer-events: none;
 
       position: absolute;
       top: 0;
       right: 0;
-      pointer-events: none;
-      opacity: 1;
-      width: 50%;
       transform-origin: top right 1px;
+
+      width: 50%;
+
+      opacity: 1;
+
+      @include css-anim($item: transform, $time: 0.6s);
 
       @include media-min($lg) {
         width: 70%;
@@ -50,46 +56,56 @@
     }
 
     &__gradient {
-      position: absolute;
       pointer-events: none;
+
+      position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       left: 0;
-      display: block;
-      background: var(--bg-liner-list);
-      opacity: 1;
-      height: 100%;
-      width: 100%;
       transform-origin: 0 0 2px;
+
+      display: block;
+
+      width: 100%;
+      height: 100%;
+
+      opacity: 1;
+      background: var(--bg-liner-list);
     }
   }
 
   &__link {
+    z-index: 3;
+
     display: flex;
     flex-direction: row;
-    z-index: 3;
-    padding: 16px 16px !important;
-    height: 100%;
+
     width: 100%;
+    height: 100%;
+    padding: 16px 16px !important;
   }
 
   &__main {
-    width: 100%;
     display: flex;
+    width: 100%;
   }
 
   &__icon {
+    z-index: 3;
+
+    display: block;
+
     width: 44px;
     min-width: 44px;
     height: 44px;
-    display: block;
-    z-index: 3;
+    margin: -2px 8px 0 0;
+    padding: 6px;
+
+    color: var(--primary);
+
     background: var(--hover);
     border-radius: 8px;
-    padding: 6px;
-    margin: -2px 8px 0 0;
-    color: var(--primary);
 
     & + .link-item-expand {
       &__body {
@@ -99,71 +115,80 @@
   }
 
   &__body {
-    width: 100%;
+    z-index: 3;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
-    z-index: 3;
+
+    width: 100%;
 
     &_row {
+      display: flex;
       &:first-child {
         margin-bottom: 18px;
       }
-
-      display: flex;
     }
   }
 
   &__name {
-    padding-right: 8px;
     display: flex;
     flex-direction: column;
+    padding-right: 8px;
 
     &--rus,
     &--eng {
       display: inline;
+
       font-size: calc(var(--h5-font-size) + 2px);
       font-weight: 500;
-      color: var(--text-color-title);
       line-height: normal;
+      color: var(--text-color-title);
     }
 
     &--eng {
-      color: var(--text-g-color);
       font-size: calc(var(--h5-font-size) - 1px);
+      color: var(--text-g-color);
     }
   }
 
   &__tag {
-    margin: 8px 4px 0 0;
-    font-size: calc(var(--h5-font-size) - 2px);
-    width: fit-content;
-    background-color: var(--primary-active);
-    color: var(--text-btn-color);
-    border-radius: 20px;
-    padding: 4px 8px;
     display: inline-block;
+
+    width: fit-content;
+    margin: 8px 4px 0 0;
+    padding: 4px 8px;
+
+    font-size: calc(var(--h5-font-size) - 2px);
+    color: var(--text-btn-color);
+
+    background-color: var(--primary-active);
+    border-radius: 20px;
   }
 
   &__toggle {
-    margin: 0;
-    width: 24px;
-    height: 32px;
-    min-width: 32px;
+    position: absolute;
+    z-index: 6;
+    right: 0;
+    bottom: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    right: 0;
-    bottom: 0;
+
+    width: 24px;
+    min-width: 32px;
+    height: 32px;
+    margin: 0;
     padding: 8px 4px;
-    background-color: var(--primary);
+
+    font-size: 18px;
+    font-weight: 600;
     color: var(--text-btn-color);
     text-transform: uppercase;
-    font-weight: 600;
-    font-size: 18px;
+
+    background-color: var(--primary);
     border-top-left-radius: 12px;
-    z-index: 6;
 
     @include media-min($md) {
       &:hover {
@@ -172,17 +197,17 @@
     }
 
     svg {
-      @include css_anim();
-
       width: 24px;
       height: 24px;
+
+      @include css-anim();
     }
   }
 
   &__arch {
     &-list {
-      z-index: 5;
       position: relative;
+      z-index: 5;
       padding: 0 16px 16px 8px;
     }
 
@@ -192,12 +217,14 @@
       }
 
       &_items {
+        position: relative;
+
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+
         padding-top: 8px;
         padding-bottom: 6px;
-        position: relative;
 
         @include media-min($sm) {
           min-width: 216px;
@@ -206,38 +233,46 @@
 
         &::after {
           content: '';
-          display: block;
-          width: 1px;
+
           position: absolute;
-          left: 8px;
           top: 4px;
           bottom: 0;
+          left: 8px;
+
+          display: block;
+
+          width: 1px;
+
           background-color: var(--border);
         }
       }
 
       &_name {
+        padding: 0 8px;
+        color: var(--text-color-title);
         font: {
           size: calc(var(--h5-font-size) + 2px);
+
           weight: 400;
         }
-        color: var(--text-color-title);
-        padding: 0 8px;
       }
     }
 
     &-item {
-      display: inline-block;
-      padding: 6px 8px;
-      color: var(--text-color);
-      font-size: var(--main-font-size);
-      margin-left: 8px;
       position: relative;
+
+      display: inline-block;
+
+      margin-left: 8px;
+      padding: 6px 8px;
+
+      font-size: var(--main-font-size);
+      color: var(--text-color);
 
       &_book {
         margin-left: 4px;
-        color: var(--text-g-color);
         font-size: calc(var(--main-font-size) - 2px);
+        color: var(--text-g-color);
       }
 
       &:hover {
@@ -247,12 +282,16 @@
       &.router-link-active {
         &::after {
           content: '';
-          display: block;
-          width: 3px;
+
           position: absolute;
-          left: -1px;
           top: 0;
           bottom: 0;
+          left: -1px;
+
+          display: block;
+
+          width: 3px;
+
           background-color: var(--link-color);
           border-radius: 4px;
         }

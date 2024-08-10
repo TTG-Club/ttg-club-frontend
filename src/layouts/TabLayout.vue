@@ -48,13 +48,9 @@
 </script>
 
 <template>
-  <div
-    ref="layout"
-    class="tab-layout"
-  >
+  <div class="tab-layout">
     <div
       v-if="filterInstance"
-      ref="filter"
       class="tab-layout__filter"
     >
       <div class="tab-layout__filter_body">
@@ -88,25 +84,28 @@
   @use '@/assets/styles/variables/breakpoints' as *;
 
   .tab-layout {
-    width: 100%;
-    height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+
+    width: 100%;
+    height: 100%;
 
     &__filter {
-      flex-shrink: 0;
       position: relative;
+      flex-shrink: 0;
       padding-bottom: 8px;
 
       &_dropdown {
+        pointer-events: none;
+
         position: absolute;
+        z-index: 10;
         top: 100%;
         left: 0;
+
         width: 100%;
         height: 100%;
-        pointer-events: none;
-        z-index: 10;
 
         :deep(*) {
           pointer-events: auto;
@@ -115,8 +114,8 @@
     }
 
     &__items {
-      flex: 1 1 100%;
       overflow: auto;
+      flex: 1 1 100%;
 
       &--inner {
         padding: 8px 16px 16px;

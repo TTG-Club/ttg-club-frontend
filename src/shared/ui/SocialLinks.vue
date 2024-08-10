@@ -54,20 +54,16 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .social-links {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 32px;
+
     background-color: var(--hover);
     border-radius: 12px;
-    padding: 32px;
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 32px;
-
-    @media (max-width: 600px) {
-      flex-direction: column;
-      padding: 16px;
-      gap: 16px;
-    }
 
     &__text {
       flex: 1 1 auto;
@@ -85,19 +81,27 @@
     }
 
     &__link {
-      @include css_anim();
-
       display: flex;
       align-items: center;
       justify-content: center;
+
       width: 48px;
       height: 48px;
-      color: var(--text-color);
+
       font-size: 36px;
+      color: var(--text-color);
+
+      @include css-anim();
 
       &:hover {
         color: var(--primary-hover);
       }
+    }
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
     }
   }
 </style>

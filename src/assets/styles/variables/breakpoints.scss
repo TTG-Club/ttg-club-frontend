@@ -13,7 +13,9 @@ $ultra_hd: 3840px;
     @media screen {
       @content;
     }
-  } @else if $breakpoint != all {
+  }
+
+ @else if $breakpoint != all {
     @media screen and (min-width: $breakpoint) {
       @content;
     }
@@ -25,7 +27,9 @@ $ultra_hd: 3840px;
     @media screen {
       @content;
     }
-  } @else if $breakpoint != all {
+  }
+
+ @else if $breakpoint != all {
     @media screen and (max-width: $breakpoint - 1px) {
       @content;
     }

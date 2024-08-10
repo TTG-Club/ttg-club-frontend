@@ -103,13 +103,15 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .youtube-block {
+    overflow: hidden;
+    display: flex;
     flex: 1 1 calc(33% - 10px);
+    flex-direction: column;
+
+    padding: 16px;
+
     background-color: var(--bg-table-list);
     border-radius: 12px;
-    overflow: hidden;
-    padding: 16px;
-    flex-direction: column;
-    display: flex;
   }
 
   .list {
@@ -120,19 +122,22 @@
   }
 
   .link {
-    @include css_anim($time: 0.5s);
-
     display: flex;
-    padding: 8px 8px;
-    background-color: var(--bg-sub-menu);
-    color: var(--text-color);
-    border-radius: 8px;
     align-items: center;
+
+    padding: 8px 8px;
+
+    color: var(--text-color);
+
+    background-color: var(--bg-sub-menu);
     border: 1px solid var(--border);
+    border-radius: 8px;
+
+    @include css-anim($time: 0.5s);
 
     &:hover {
-      background-color: var(--bg-main);
       color: var(--text-color-title);
+      background-color: var(--bg-main);
     }
   }
 

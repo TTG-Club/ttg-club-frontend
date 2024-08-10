@@ -1,6 +1,6 @@
 <script lang="ts">
   import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
-  import UiSocialButton from '@/shared/ui/kit/button/UiSocialButton.vue';
+  import UiSocialButton from '@/shared/ui/kit/UiSocialButton.vue';
 
   import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
   import NavDiceHistoryButton from '@/features/menu/NavDiceHistoryButton.vue';
@@ -89,18 +89,20 @@
     .navbar__logo {
       width: 52px;
       height: 36px;
-      padding: 0 16px 0 0;
-      border-bottom: 0;
-      border-right: 1px solid var(--border);
       margin: 0 8px 0 0;
+      padding: 0 16px 0 0;
+
+      border-right: 1px solid var(--border);
+      border-bottom: 0;
 
       @include media-min($md) {
         width: 44px;
         height: 60px;
-        padding: 0 0 24px 0;
-        border-bottom: 1px solid var(--border);
-        border-right: 0;
         margin: 0 0 8px 0;
+        padding: 0 0 24px 0;
+
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
       }
     }
   }
@@ -115,14 +117,16 @@
       }
 
       .ui-social-button {
-        padding: 0;
-        width: 40px;
-        height: 40px;
         display: flex;
         justify-content: center;
-        border-radius: 8px;
+
+        width: 40px;
+        height: 40px;
         margin: 8px 0 8px 0;
+        padding: 0;
+
         opacity: 70%;
+        border-radius: 8px;
 
         &.is-discord {
           color: var(--text-btn-color);

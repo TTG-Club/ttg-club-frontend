@@ -12,3 +12,37 @@ export const DEFAULT_QUERY_BOOKS_INJECT_KEY: InjectionKey<
 > = Symbol('queryBooks');
 
 export type DefaultKeyField = typeof DEFAULT_KEY_FIELD;
+
+export const ALLOWED_SPECIAL_CHARACTERS = [
+  "'",
+  '-',
+  '!',
+  '"',
+  '#',
+  '$',
+  '%',
+  '&',
+  '(',
+  ')',
+  '*',
+  ',',
+  '.',
+  '/',
+  ':',
+  ';',
+  '?',
+  '@',
+  '[',
+  ']',
+  '^',
+  '_',
+  '`',
+  '{',
+  '|',
+  '}',
+  '~',
+  '+',
+  '<',
+  '=',
+  '>',
+];

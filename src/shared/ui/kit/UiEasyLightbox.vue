@@ -153,15 +153,49 @@
 
 <style lang="scss" scoped>
   .ui-easy-lightbox {
+    cursor: pointer;
+
     position: relative;
+
+    float: right;
+
     width: 200px;
     height: 200px;
-    float: right;
     margin: 0 0 32px 32px;
-    cursor: pointer;
 
     &.is-disabled {
       cursor: default;
+    }
+
+    &__container {
+      position: relative;
+
+      overflow: hidden;
+
+      width: 100%;
+      height: auto;
+      height: 100%;
+
+      border-radius: 50%;
+    }
+
+    &__img {
+      position: relative;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, 0%);
+
+      display: grid;
+
+      width: 100%;
+      height: 100%;
+
+      -o-object-fit: cover;
+      object-fit: cover;
+
+      @media (max-width: 500px) {
+        align-content: center;
+      }
     }
 
     @media (max-width: 1400px) {
@@ -170,36 +204,13 @@
     }
 
     @media (max-width: 500px) {
+      overflow: hidden;
+
       width: 120px;
       height: 120px;
-      overflow: hidden;
-      border-radius: 50%;
       margin: 0 0 16px 16px;
-    }
 
-    &__container {
-      overflow: hidden;
       border-radius: 50%;
-      height: auto;
-      position: relative;
-      height: 100%;
-      width: 100%;
-    }
-
-    &__img {
-      position: relative;
-      left: 50%;
-      top: 0;
-      height: 100%;
-      width: 100%;
-      transform: translate(-50%, 0%);
-      -o-object-fit: cover;
-      object-fit: cover;
-      display: grid;
-
-      @media (max-width: 500px) {
-        align-content: center;
-      }
     }
   }
 </style>
@@ -208,8 +219,9 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .vel-modal {
-    @include css_anim($item: background-color);
     z-index: 10000;
+
+    @include css-anim($item: background-color);
 
     &.is-bg-hide {
       background-color: var(--bg-main) !important;

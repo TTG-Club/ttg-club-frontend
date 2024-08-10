@@ -112,75 +112,92 @@
   .custom-slider {
     --trackHeight: 0.25rem;
     --thumbRadius: 1.25rem;
+
     width: 100%;
     input[type='range'] {
+      pointer-events: none;
+
       position: relative;
+      z-index: 0;
+
+      height: 100%;
+
       appearance: none;
       background: none;
       border-radius: 999px;
-      z-index: 0;
-      height: 100%;
-      pointer-events: none;
       &::before {
         content: '';
-        display: block;
+
         position: absolute;
+
+        display: block;
+
         width: var(--ProgressPercent, 100%);
         height: 100%;
+
         background: var(--primary);
         border-radius: 999px;
       }
       &::-webkit-slider-runnable-track {
+        height: var(--trackHeight);
         appearance: none;
         background: var(--primary);
-        height: var(--trackHeight);
         border-radius: 999px;
       }
       &::-webkit-slider-thumb {
+        pointer-events: all;
+
         position: relative;
+        z-index: 1;
+
         width: var(--thumbRadius);
         height: var(--thumbRadius);
         margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+
+        appearance: none;
         background: var(--primary);
         border: 1px solid var(--bg-sub-menu);
         border-radius: 999px;
-        pointer-events: all;
-        appearance: none;
-        z-index: 1;
       }
       &::-moz-range-thumb {
+        pointer-events: all;
+
         position: relative;
+        z-index: 1;
+
         box-sizing: border-box;
         width: var(--thumbRadius);
         height: var(--thumbRadius);
         margin-top: calc((var(--trackHeight) - var(--thumbRadius)) / 2);
+
+        appearance: none;
         background: var(--primary);
         border: 1px solid var(--bg-sub-menu);
         border-radius: 999px;
-        pointer-events: all;
-        appearance: none;
-        z-index: 1;
       }
     }
   }
 
   .custom-slider.default {
     input[type='range']::-moz-range-track {
+      height: var(--trackHeight);
       appearance: none;
       background: var(--primary);
-      height: var(--trackHeight);
       border-radius: 999px;
     }
   }
 
   .custom-slider.minmax {
-    position: relative;
-    height: var(--trackHeight);
-    background: var(--bg-sub-menu);
-    border-radius: 999px;
-    margin: 0.5rem 0;
     --progressLeft: 0%;
     --progressRight: 0%;
+
+    position: relative;
+
+    height: var(--trackHeight);
+    margin: 0.5rem 0;
+
+    background: var(--bg-sub-menu);
+    border-radius: 999px;
     & input[type='range'] {
       position: absolute;
       width: calc(100% - var(--thumbRadius));
@@ -197,18 +214,23 @@
   }
 
   .custom-slider .minmax-indicator {
-    position: absolute;
-    height: 100%;
     pointer-events: none;
-    left: var(--thumbRadius);
+
+    position: absolute;
     right: var(--thumbRadius);
+    left: var(--thumbRadius);
+
+    height: 100%;
     &::before {
       content: '';
+
       position: absolute;
-      background: var(--primary);
-      height: 100%;
-      left: var(--progressLeft);
       right: var(--progressRight);
+      left: var(--progressLeft);
+
+      height: 100%;
+
+      background: var(--primary);
     }
   }
 </style>

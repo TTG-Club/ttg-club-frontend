@@ -117,9 +117,9 @@
       }
 
       &--info {
+        display: block;
         width: 24px;
         height: 24px;
-        display: block;
         font-size: 24px;
       }
     }

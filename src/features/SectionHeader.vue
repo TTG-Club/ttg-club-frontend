@@ -354,28 +354,33 @@
   @use '@/assets/styles/variables/mixins' as *;
 
   .section-header {
-    width: 100%;
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    flex-wrap: nowrap;
     flex-shrink: 0;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    width: 100%;
     padding: 12px 16px 12px 16px;
 
     &__dropdown {
-      @include css_anim();
-
-      padding: 6px 6px;
-      border-radius: 6px;
       cursor: pointer;
+
+      overflow: hidden;
+
+      width: 100%;
       min-width: 100px;
       max-width: 260px;
-      white-space: nowrap;
-      overflow: hidden;
-      width: 100%;
-      text-overflow: ellipsis;
-      line-height: 18px;
+      padding: 6px 6px;
+
       font-size: var(--main-font-size);
+      line-height: 18px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      border-radius: 6px;
+
+      @include css-anim();
 
       &:hover {
         background-color: var(--hover);
@@ -393,35 +398,41 @@
     }
 
     &__title {
+      cursor: pointer;
+
+      position: relative;
+
+      overflow: hidden;
       display: flex;
       align-items: center;
+
+      min-height: var(--h3-line-height);
+
       font-size: var(--h3-font-size);
+      font-weight: 400;
       line-height: var(--h3-line-height);
-      overflow: hidden;
+      color: var(--text-color-title);
       text-overflow: ellipsis;
       white-space: nowrap;
-      position: relative;
-      color: var(--text-color-title);
-      font-weight: 400;
-      cursor: pointer;
-      min-height: var(--h3-line-height);
     }
 
     &__subtitle {
-      font-size: var(--h5-font-size);
-      color: var(--text-g-color);
+      cursor: pointer;
+
       overflow: hidden;
+
+      font-size: var(--h5-font-size);
+      line-height: normal;
+      color: var(--text-g-color);
       text-overflow: ellipsis;
       white-space: nowrap;
-      line-height: normal;
-      cursor: pointer;
     }
 
     &__controls {
       display: flex;
-      align-items: flex-start;
       flex-shrink: 0;
       gap: 4px;
+      align-items: flex-start;
 
       > .ui-button {
         margin-left: 0;

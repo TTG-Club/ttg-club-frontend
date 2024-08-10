@@ -76,13 +76,15 @@
 
   .row_info {
     display: flex;
-    padding: 12px;
     flex-direction: column;
-    justify-content: space-between;
-    border-radius: 8px;
-    margin: 0 16px;
     gap: 12px;
+    justify-content: space-between;
+
+    margin: 0 16px;
+    padding: 12px;
+
     background: var(--hover);
+    border-radius: 8px;
 
     @include media-min($xl) {
       flex-direction: row;
@@ -90,9 +92,9 @@
     }
 
     .left_info {
-      font-style: italic;
-      margin-right: 8px;
       flex: 1 1 100%;
+      margin-right: 8px;
+      font-style: italic;
 
       @include media-min($xl) {
         margin-right: 0;

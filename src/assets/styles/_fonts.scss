@@ -1,5 +1,8 @@
 @font-face {
   font-family: 'Lora';
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/Lora-BoldItalic.eot');
   src:
     local('Lora Bold Italic'),
@@ -8,13 +11,13 @@
     url('/fonts/Lora-BoldItalic.woff2') format('woff2'),
     url('/fonts/Lora-BoldItalic.woff') format('woff'),
     url('/fonts/Lora-BoldItalic.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/Lora-Regular.eot');
   src:
     local('Lora Regular'),
@@ -23,13 +26,13 @@
     url('/fonts/Lora-Regular.woff2') format('woff2'),
     url('/fonts/Lora-Regular.woff') format('woff'),
     url('/fonts/Lora-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/Lora-MediumItalic.eot');
   src:
     local('Lora Medium Italic'),
@@ -38,13 +41,13 @@
     url('/fonts/Lora-MediumItalic.woff2') format('woff2'),
     url('/fonts/Lora-MediumItalic.woff') format('woff'),
     url('/fonts/Lora-MediumItalic.ttf') format('truetype');
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/Lora-Bold.eot');
   src:
     local('Lora Bold'),
@@ -53,13 +56,13 @@
     url('/fonts/Lora-Bold.woff2') format('woff2'),
     url('/fonts/Lora-Bold.woff') format('woff'),
     url('/fonts/Lora-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/Lora-Medium.eot');
   src:
     local('Lora Medium'),
@@ -68,13 +71,13 @@
     url('/fonts/Lora-Medium.woff2') format('woff2'),
     url('/fonts/Lora-Medium.woff') format('woff'),
     url('/fonts/Lora-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/Lora-SemiBold.eot');
   src:
     local('Lora SemiBold'),
@@ -83,13 +86,13 @@
     url('/fonts/Lora-SemiBold.woff2') format('woff2'),
     url('/fonts/Lora-SemiBold.woff') format('woff'),
     url('/fonts/Lora-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/Lora-Italic.eot');
   src:
     local('Lora Italic'),
@@ -98,13 +101,13 @@
     url('/fonts/Lora-Italic.woff2') format('woff2'),
     url('/fonts/Lora-Italic.woff') format('woff'),
     url('/fonts/Lora-Italic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/OpenSans-Light.eot');
   src:
     local('Open Sans Light'),
@@ -113,13 +116,13 @@
     url('/fonts/OpenSans-Light.woff2') format('woff2'),
     url('/fonts/OpenSans-Light.woff') format('woff'),
     url('/fonts/OpenSans-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/OpenSans-Bold.eot');
   src:
     local('Open Sans Bold'),
@@ -128,13 +131,13 @@
     url('/fonts/OpenSans-Bold.woff2') format('woff2'),
     url('/fonts/OpenSans-Bold.woff') format('woff'),
     url('/fonts/OpenSans-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lora';
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/Lora-SemiBoldItalic.eot');
   src:
     local('Lora SemiBold Italic'),
@@ -143,13 +146,13 @@
     url('/fonts/Lora-SemiBoldItalic.woff2') format('woff2'),
     url('/fonts/Lora-SemiBoldItalic.woff') format('woff'),
     url('/fonts/Lora-SemiBoldItalic.ttf') format('truetype');
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/OpenSans-SemiBoldItalic.eot');
   src:
     local('Open Sans SemiBold Italic'),
@@ -158,13 +161,13 @@
     url('/fonts/OpenSans-SemiBoldItalic.woff2') format('woff2'),
     url('/fonts/OpenSans-SemiBoldItalic.woff') format('woff'),
     url('/fonts/OpenSans-SemiBoldItalic.ttf') format('truetype');
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/OpenSans-SemiBold.eot');
   src:
     local('Open Sans SemiBold'),
@@ -173,13 +176,13 @@
     url('/fonts/OpenSans-SemiBold.woff2') format('woff2'),
     url('/fonts/OpenSans-SemiBold.woff') format('woff'),
     url('/fonts/OpenSans-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/OpenSans-Medium.eot');
   src:
     local('Open Sans Medium'),
@@ -188,13 +191,13 @@
     url('/fonts/OpenSans-Medium.woff2') format('woff2'),
     url('/fonts/OpenSans-Medium.woff') format('woff'),
     url('/fonts/OpenSans-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/OpenSans-ExtraBold.eot');
   src:
     local('Open Sans ExtraBold'),
@@ -203,13 +206,13 @@
     url('/fonts/OpenSans-ExtraBold.woff2') format('woff2'),
     url('/fonts/OpenSans-ExtraBold.woff') format('woff'),
     url('/fonts/OpenSans-ExtraBold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/OpenSans-MediumItalic.eot');
   src:
     local('Open Sans Medium Italic'),
@@ -218,13 +221,13 @@
     url('/fonts/OpenSans-MediumItalic.woff2') format('woff2'),
     url('/fonts/OpenSans-MediumItalic.woff') format('woff'),
     url('/fonts/OpenSans-MediumItalic.ttf') format('truetype');
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/OpenSans-ExtraBoldItalic.eot');
   src:
     local('Open Sans ExtraBold Italic'),
@@ -234,13 +237,13 @@
     url('/fonts/OpenSans-ExtraBoldItalic.woff2') format('woff2'),
     url('/fonts/OpenSans-ExtraBoldItalic.woff') format('woff'),
     url('/fonts/OpenSans-ExtraBoldItalic.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/OpenSans-Regular.eot');
   src:
     local('Open Sans Regular'),
@@ -249,13 +252,13 @@
     url('/fonts/OpenSans-Regular.woff2') format('woff2'),
     url('/fonts/OpenSans-Regular.woff') format('woff'),
     url('/fonts/OpenSans-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/OpenSans-LightItalic.eot');
   src:
     local('Open Sans Light Italic'),
@@ -264,13 +267,13 @@
     url('/fonts/OpenSans-LightItalic.woff2') format('woff2'),
     url('/fonts/OpenSans-LightItalic.woff') format('woff'),
     url('/fonts/OpenSans-LightItalic.ttf') format('truetype');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/OpenSans-BoldItalic.eot');
   src:
     local('Open Sans Bold Italic'),
@@ -279,13 +282,13 @@
     url('/fonts/OpenSans-BoldItalic.woff2') format('woff2'),
     url('/fonts/OpenSans-BoldItalic.woff') format('woff'),
     url('/fonts/OpenSans-BoldItalic.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Neucha';
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
   src: url('/fonts/Neucha.eot');
   src:
     local('Neucha'),
@@ -293,13 +296,13 @@
     url('/fonts/Neucha.woff2') format('woff2'),
     url('/fonts/Neucha.woff') format('woff'),
     url('/fonts/Neucha.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
   src: url('/fonts/OpenSans-Italic.eot');
   src:
     local('Open Sans Italic'),
@@ -308,7 +311,4 @@
     url('/fonts/OpenSans-Italic.woff2') format('woff2'),
     url('/fonts/OpenSans-Italic.woff') format('woff'),
     url('/fonts/OpenSans-Italic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
-  font-display: swap;
 }

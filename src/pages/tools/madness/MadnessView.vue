@@ -125,7 +125,10 @@
             label="Количество"
             :style="{ minWidth: '254px' }"
           >
-            <n-input-number v-model:value="count" />
+            <n-input-number
+              v-model:value="count"
+              :min="1"
+            />
           </n-form-item>
 
           <n-form-item
@@ -187,13 +190,15 @@
 
 <style lang="scss" scoped>
   .madness-item {
-    border-radius: 12px;
     overflow: hidden;
-    background-color: var(--bg-table-list);
-    width: 100%;
     display: block;
+
+    width: 100%;
     margin-bottom: 12px;
     padding: 12px;
+
+    background-color: var(--bg-table-list);
+    border-radius: 12px;
 
     :deep(p) {
       &:last-of-type {

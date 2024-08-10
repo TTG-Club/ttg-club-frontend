@@ -94,8 +94,8 @@
     }
 
     .vue-recycle-scroller__item-wrapper {
-      padding: 0;
       margin: 0;
+      padding: 0;
     }
 
     .vue-recycle-scroller__item-view {

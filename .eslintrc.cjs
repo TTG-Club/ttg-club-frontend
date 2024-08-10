@@ -4,10 +4,11 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const boundaries = ['shared', 'features', 'layouts', 'pages', 'app'];
 
+/** @type {import('eslint').Linter.LegacyConfig} */
 module.exports = {
   root: true,
   env: { browser: true, es2021: true, node: true },
-  ignorePatterns: ['!(src|.storybook|public)/**'],
+  ignorePatterns: ['!(src|public)/**'],
   extends: [
     'plugin:vue/vue3-recommended',
     'plugin:import/errors',

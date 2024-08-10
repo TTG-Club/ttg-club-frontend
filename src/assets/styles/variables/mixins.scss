@@ -13,13 +13,13 @@
   $posY: center,
   $repeat: no-repeat
 ) {
-  background-size: $size;
+  background-repeat: $repeat;
   background-position-x: $posX;
   background-position-y: $posY;
-  background-repeat: $repeat;
+  background-size: $size;
 }
 
-@mixin css_anim($time: 0.15s, $item: all, $style: ease-in-out) {
+@mixin css-anim($time: 0.15s, $item: all, $style: ease-in-out) {
   $transition: ();
 
   @each $property in $item {
