@@ -43,6 +43,8 @@
     repeat: rulePasswordRepeat(model.password),
   }));
 
+  const noSideSpace = (value: string) => !/ /g.test(value);
+
   const successHandler = () => {
     success.value = true;
 
@@ -100,11 +102,12 @@
       path="username"
     >
       <n-input
-        v-model:value.trim="model.username"
+        v-model:value="model.username"
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
         placeholder="Имя пользователя"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -113,11 +116,12 @@
       path="email"
     >
       <n-input
-        v-model:value.trim="model.email"
+        v-model:value="model.email"
         autocapitalize="off"
         autocomplete="email"
         autocorrect="off"
         placeholder="Электронный адрес"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -131,13 +135,14 @@
       >
         <template #trigger>
           <n-input
-            v-model:value.trim="model.password"
+            v-model:value="model.password"
             autocapitalize="off"
             autocomplete="new-password"
             autocorrect="off"
             type="password"
             placeholder="Пароль"
             show-password-on="click"
+            :allow-input="noSideSpace"
           />
         </template>
 
@@ -152,13 +157,14 @@
       path="repeat"
     >
       <n-input
-        v-model:value.trim="model.repeat"
+        v-model:value="model.repeat"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
         type="password"
         placeholder="Повторите пароль"
         show-password-on="click"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 

@@ -51,6 +51,8 @@
 
   const isOnlyPassword = computed(() => props.token || isAuthenticated.value);
 
+  const noSideSpace = (value: string) => !/ /g.test(value);
+
   const rules = computed<FormRules>(() => {
     if (isOnlyPassword.value) {
       return reactive({
@@ -155,13 +157,14 @@
       path="email"
     >
       <n-input
-        v-model:value.trim="model.email"
+        v-model:value="model.email"
         autocomplete="off"
         autocapitalize="off"
         autocorrect="off"
         placeholder="Электронный адрес"
         autofocus
         size="large"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -170,7 +173,7 @@
       path="password"
     >
       <n-input
-        v-model:value.trim="model.password"
+        v-model:value="model.password"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
@@ -179,6 +182,7 @@
         show-password-on="click"
         autofocus
         size="large"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -187,7 +191,7 @@
       path="repeat"
     >
       <n-input
-        v-model:value.trim="model.repeat"
+        v-model:value="model.repeat"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
@@ -195,6 +199,7 @@
         placeholder="Повторите пароль"
         show-password-on="click"
         size="large"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 

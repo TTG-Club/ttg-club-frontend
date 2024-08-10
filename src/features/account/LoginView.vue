@@ -37,6 +37,8 @@
     password: rulePassword(),
   });
 
+  const noSideSpace = (value: string) => !/ /g.test(value);
+
   const successHandler = () => {
     success.value = true;
 
@@ -107,12 +109,13 @@
       path="usernameOrEmail"
     >
       <n-input
-        v-model:value.trim="model.usernameOrEmail"
+        v-model:value="model.usernameOrEmail"
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
         placeholder="Логин или электронная почта"
         autofocus
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -121,13 +124,14 @@
       path="password"
     >
       <n-input
-        v-model:value.trim="model.password"
+        v-model:value="model.password"
         autocapitalize="off"
         autocomplete="current-password"
         autocorrect="off"
         type="password"
         placeholder="Пароль"
         show-password-on="click"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 

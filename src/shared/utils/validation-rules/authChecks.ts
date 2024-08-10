@@ -258,7 +258,7 @@ export const rulePassword = (
         const other = list.slice(3);
 
         return new Error(
-          `${baseMsg}: ${visible}${!other.length ? '' : ` +${other.length} др.`}`,
+          `${baseMsg}: ${visible}${!other.length ? '' : `, +${other.length} др.`}`,
         );
       }
 
