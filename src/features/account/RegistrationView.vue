@@ -5,6 +5,7 @@
   import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
+  import { ALLOWED_SPECIAL_CHARACTERS } from '@/shared/const';
   import { useUserStore } from '@/shared/stores/UserStore';
   import {
     rulePassword,
@@ -124,15 +125,26 @@
       size="large"
       path="password"
     >
-      <n-input
-        v-model:value.trim="model.password"
-        autocapitalize="off"
-        autocomplete="new-password"
-        autocorrect="off"
-        type="password"
-        placeholder="Пароль"
-        show-password-on="click"
-      />
+      <n-tooltip
+        trigger="focus"
+        class="mobile-show"
+      >
+        <template #trigger>
+          <n-input
+            v-model:value.trim="model.password"
+            autocapitalize="off"
+            autocomplete="new-password"
+            autocorrect="off"
+            type="password"
+            placeholder="Пароль"
+            show-password-on="click"
+          />
+        </template>
+
+        <template #default>
+          Допустимые спец. символы: {{ ALLOWED_SPECIAL_CHARACTERS.join(' ') }}
+        </template>
+      </n-tooltip>
     </n-form-item>
 
     <n-form-item
