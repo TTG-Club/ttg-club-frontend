@@ -3,6 +3,7 @@
 
   import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { ToastEventBus } from '@/shared/config';
+  import { ALLOWED_SPECIAL_CHARACTERS } from '@/shared/const';
   import { useUserStore } from '@/shared/stores/UserStore';
   import {
     ruleEmail,
@@ -172,18 +173,29 @@
       v-if="isOnlyPassword"
       path="password"
     >
-      <n-input
-        v-model:value="model.password"
-        autocapitalize="off"
-        autocomplete="new-password"
-        autocorrect="off"
-        type="password"
-        placeholder="Новый пароль"
-        show-password-on="click"
-        autofocus
-        size="large"
-        :allow-input="noSideSpace"
-      />
+      <n-tooltip
+        trigger="focus"
+        class="mobile-show"
+      >
+        <template #trigger>
+          <n-input
+            v-model:value="model.password"
+            autocapitalize="off"
+            autocomplete="new-password"
+            autocorrect="off"
+            type="password"
+            placeholder="Новый пароль"
+            show-password-on="click"
+            autofocus
+            size="large"
+            :allow-input="noSideSpace"
+          />
+        </template>
+
+        <template #default>
+          Допустимые спец. символы: {{ ALLOWED_SPECIAL_CHARACTERS.join(' ') }}
+        </template>
+      </n-tooltip>
     </n-form-item>
 
     <n-form-item
