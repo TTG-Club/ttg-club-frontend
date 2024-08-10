@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
@@ -23,6 +24,7 @@
   const success = ref(false);
   const inProgress = ref(false);
   const formRef = ref<FormInst>();
+  const vertical = useAppBreakpoints().smaller('sm');
 
   const model = reactive({
     usernameOrEmail: '',
@@ -133,7 +135,10 @@
       <n-checkbox v-model:checked="model.remember"> Запомнить меня </n-checkbox>
     </n-form-item>
 
-    <n-flex :wrap="false">
+    <n-flex
+      :wrap="false"
+      :vertical
+    >
       <n-button
         :disabled="success"
         :loading="inProgress"
@@ -145,7 +150,7 @@
       </n-button>
 
       <n-button
-        secondary
+        quaternary
         size="large"
         @click.left.exact.prevent="$emit('switch:reg')"
       >

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
   import {
@@ -40,6 +41,7 @@
   const success = ref(false);
   const inProgress = ref(false);
   const formRef = ref<FormInst>();
+  const vertical = useAppBreakpoints().smaller('sm');
 
   const model = reactive({
     email: '',
@@ -196,7 +198,10 @@
       />
     </n-form-item>
 
-    <n-flex :wrap="false">
+    <n-flex
+      :wrap="false"
+      :vertical
+    >
       <n-button
         :disabled="success"
         :loading="inProgress"
@@ -209,7 +214,7 @@
 
       <n-button
         v-if="!isAuthenticated"
-        secondary
+        quaternary
         size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >

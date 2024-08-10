@@ -1,5 +1,5 @@
 import { isAxiosError } from 'axios';
-import { omit } from 'lodash-es';
+import { omit, uniq } from 'lodash-es';
 
 import { httpClient } from '@/shared/api';
 import { errorHandler } from '@/shared/utils/errorHandler';
@@ -244,6 +244,24 @@ export const rulePassword = (
         return true;
       }
 
+      if (/[^\w'\-!"#$%&()*,./:;?@[\]^_`{|}~+<=>]+/g.test(value)) {
+        const match = value.match(/[^\w'\-!"#$%&()*,./:;?@[\]^_`{|}~+<=>]+/g);
+        const matched = match?.flatMap((str) => str.split(''));
+        const list = uniq(matched);
+        const baseMsg = 'Недопустимые символы';
+
+        if (!list?.length) {
+          return new Error(baseMsg);
+        }
+
+        const visible = list.slice(0, 3).join(', ');
+        const other = list.slice(3);
+
+        return new Error(
+          `${baseMsg}: ${visible}${!other.length ? '' : ` +${other.length} др.`}`,
+        );
+      }
+
       if (!/[a-z]+/g.test(value)) {
         return new Error('Хотя бы одна буква в нижнем регистре');
       }
@@ -256,12 +274,8 @@ export const rulePassword = (
         return new Error('Хотя бы одна цифра');
       }
 
-      if (!/[-!@#$%^&*]+/g.test(value)) {
+      if (!/['\-!"#$%&()*,./:;?@[\]^_`{|}~+<=>]+/g.test(value)) {
         return new Error('Хотя бы один спец. символ');
-      }
-
-      if (/[^\w\-!@#$%^&*]+/g.test(value)) {
-        return new Error('Допустимые спец. символы: ! @ # $ % ^ & * _ -');
       }
 
       return true;

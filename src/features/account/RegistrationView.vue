@@ -2,6 +2,7 @@
   import { omit } from 'lodash-es';
   import { useToast } from 'vue-toastification';
 
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
@@ -25,6 +26,7 @@
   const success = ref(false);
   const inProgress = ref(false);
   const formRef = ref<FormInst>();
+  const vertical = useAppBreakpoints().smaller('sm');
 
   const model = reactive({
     username: '',
@@ -129,6 +131,7 @@
         autocorrect="off"
         type="password"
         placeholder="Пароль"
+        show-password-on="click"
       />
     </n-form-item>
 
@@ -143,10 +146,14 @@
         autocorrect="off"
         type="password"
         placeholder="Повторите пароль"
+        show-password-on="click"
       />
     </n-form-item>
 
-    <n-flex :wrap="false">
+    <n-flex
+      :wrap="false"
+      :vertical
+    >
       <n-button
         :disabled="success"
         :loading="inProgress"
@@ -158,11 +165,11 @@
       </n-button>
 
       <n-button
-        secondary
+        quaternary
         size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
-        Авторизация
+        Уже есть аккаунт
       </n-button>
     </n-flex>
   </n-form>
