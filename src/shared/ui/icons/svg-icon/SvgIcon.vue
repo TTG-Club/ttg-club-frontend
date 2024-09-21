@@ -1,11 +1,7 @@
 <script setup lang="ts">
   import { getIconName } from '@/shared/utils/icons';
 
-  export interface SvgIconProps {
-    icon: string;
-    size?: string | number;
-    raw?: boolean;
-  }
+  import type { SvgIconProps } from './types';
 
   const props = withDefaults(defineProps<SvgIconProps>(), {
     size: '1em',
