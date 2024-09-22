@@ -4,10 +4,6 @@ on:
   workflow_call:
 
 permissions:
-  deployments: write
-  contents: read
-  pages: write
-  actions: write
   id-token: write
 
 concurrency:
@@ -35,13 +31,6 @@ jobs:
 
       - name: Build
         run: npm run build:${{ github.ref_name == 'dev' && 'dev' || 'prod' }}
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: front-build-${{ github.run_id }}
-          path: ./
-          retention-days: 1
-          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
