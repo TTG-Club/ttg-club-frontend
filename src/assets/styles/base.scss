@@ -87,20 +87,8 @@ hr {
 
 body {
   z-index: 1;
-
   display: flex;
-
-  font-family: 'Open Sans', sans-serif;
-  font-size: var(--main-font-size);
-  line-height: var(--main-line-height);
-  color: var(--text-color);
-
-  background: var(--bg-main);
   outline: none;
-
-  transition:
-    background-color ease-in-out 0.2s,
-    color ease-in-out 0.2s;
 }
 
 html,

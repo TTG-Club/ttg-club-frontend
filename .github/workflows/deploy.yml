@@ -7,15 +7,11 @@ on:
       - dev
 
 permissions:
-  deployments: write
-  contents: read
-  pages: write
   actions: write
-  id-token: write
 
 concurrency:
-  group: deploy-${{ github.ref_name }}
-  cancel-in-progress: true
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
   dispatch-deploy:

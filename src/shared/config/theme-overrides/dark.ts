@@ -22,6 +22,7 @@ export const dark: GlobalThemeOverrides = {
     popoverColor: '#1d282f',
     fontFamily: '"Open Sans", sans-serif',
     fontFamilyMono: '"Monaco", monospace sans-serif',
+    bodyColor: 'var(--bg-main)',
   },
   Skeleton: {
     color: 'var(--hover)',
@@ -83,11 +84,11 @@ export const dark: GlobalThemeOverrides = {
     textColorPressedPrimary: 'var(--text-btn-color)',
     textColorDisabledPrimary: 'var(--text-btn-color)',
 
+    colorQuaternaryHover: 'var(--hover)',
+
     colorSecondary: 'var(--secondary)',
     colorSecondaryHover: 'var(--secondary-hover)',
     colorSecondaryPressed: 'var(--secondary)',
-
-    colorQuaternaryHover: 'var(--hover)',
 
     textColor: 'var(--text-b-color)',
     textColorHover: 'var(--text-b-color)',
