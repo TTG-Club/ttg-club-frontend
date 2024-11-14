@@ -1,22 +1,11 @@
 <script lang="ts" setup>
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
-  interface IEmits {
+  const emit = defineEmits<{
     (e: 'close'): void;
-  }
+  }>();
 
-  const props = withDefaults(
-    defineProps<{
-      modelValue?: boolean;
-    }>(),
-    {
-      modelValue: true,
-    },
-  );
-
-  const emit = defineEmits<IEmits>();
-
-  const isShowModal = useVModel(props, 'modelValue');
+  const isShowModal = defineModel<boolean>();
 
   const onClose = () => {
     isShowModal.value = false;
@@ -95,7 +84,7 @@
 
       background-color: var(--bg-secondary);
       border-radius: 8px;
-      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+      box-shadow: var(--n-box-shadow);
 
       @include media-max($md) {
         max-height: 100%;

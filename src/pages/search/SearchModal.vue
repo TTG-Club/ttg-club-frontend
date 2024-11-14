@@ -408,7 +408,7 @@
 
       background: var(--bg-secondary);
       border-radius: 12px;
-      box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+      box-shadow: var(--n-box-shadow);
     }
 
     &__control {
