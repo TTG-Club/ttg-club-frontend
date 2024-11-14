@@ -26,9 +26,10 @@
     rel="noopener noreferrer"
     target="_blank"
   >
-    <span class="ui-social-button__icon">
-      <svg-icon :icon="socialName" />
-    </span>
+    <svg-icon
+      :icon="socialName"
+      :size="24"
+    />
 
     <span
       v-if="!$slots.default && !hideLabel"
@@ -64,12 +65,6 @@
     border-radius: 30px;
 
     @include css-anim($time: 0.2s);
-
-    &__icon {
-      width: 24px;
-      height: 24px;
-      font-size: 24px;
-    }
 
     &__label {
       margin-left: 8px;
