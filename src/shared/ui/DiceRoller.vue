@@ -127,7 +127,8 @@
     </template>
 
     <template #default>
-      Нажмите для броска: <b>{{ formula }}</b>
+      Нажмите для броска:
+      <b :style="{ color: 'currentColor' }">{{ formula }}</b>
     </template>
   </n-tooltip>
 </template>

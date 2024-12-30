@@ -57,7 +57,7 @@
     }
 
     return props.creature.skills.map((skill) => ({
-      formula: `к20+${skill.value}`,
+      formula: skill.value ? `к20+${skill.value}` : 'к20',
       label: skill.name,
       value: `+${skill.value}${skill.additional ? skill.additional : ''}`,
     }));
