@@ -64,6 +64,21 @@
         </p>
       </div>
 
+      <a
+        href="http://new.ttg.club"
+        class="banner"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="title">Редакция D&D 2024</span>
+
+        <img
+          class="bg"
+          alt="Баннер 2024 DnD"
+          src="/img/banner-2024.webp"
+        />
+      </a>
+
       <div class="card_row">
         <router-link
           v-for="(section, key) in mainNavItems"
@@ -159,5 +174,74 @@
     overflow: hidden;
     height: 0;
     opacity: 0;
+  }
+
+  .banner {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    height: 100px;
+
+    background:
+      radial-gradient(
+          circle at 100% 100%,
+          var(--bg-secondary) 0,
+          var(--bg-secondary) 11px,
+          transparent 11px
+        )
+        0% 0% / 12px 12px no-repeat,
+      radial-gradient(
+          circle at 0 100%,
+          var(--bg-secondary) 0,
+          var(--bg-secondary) 11px,
+          transparent 11px
+        )
+        100% 0% / 12px 12px no-repeat,
+      radial-gradient(
+          circle at 100% 0,
+          var(--bg-secondary) 0,
+          var(--bg-secondary) 11px,
+          transparent 11px
+        )
+        0% 100% / 12px 12px no-repeat,
+      radial-gradient(
+          circle at 0 0,
+          var(--bg-secondary) 0,
+          var(--bg-secondary) 11px,
+          transparent 11px
+        )
+        100% 100% / 12px 12px no-repeat,
+      linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
+        calc(100% - 2px) calc(100% - 24px) no-repeat,
+      linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
+        calc(100% - 24px) calc(100% - 2px) no-repeat,
+      linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
+    border-radius: 12px;
+
+    &:hover {
+      .bg {
+        transform: scale(1.15);
+        transition: transform 0.6s;
+      }
+    }
+
+    .title {
+      position: absolute;
+
+      width: 110px;
+      margin-left: 36px;
+
+      font-size: var(--h4-font-size);
+      font-weight: 600;
+      line-height: 28px;
+      color: var(--text-color-title);
+    }
+
+    .bg {
+      transform: scale(1);
+      transition: transform 0.6s;
+    }
   }
 </style>
