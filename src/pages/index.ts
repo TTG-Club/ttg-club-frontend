@@ -28,7 +28,7 @@ import {
   TreasuryPage,
   WildMagicPage,
 } from './tools';
-import { ProfilePage, ResetPasswordPage } from './user';
+import { ProfilePage, ResetPasswordPage, WorkshopPage } from './user';
 import { BooksPage, GodsPage, RulesPage } from './wiki';
 import { BestiaryPage, ScreensPage } from './workshop';
 
@@ -63,6 +63,7 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   SearchPage,
   ProfilePage,
   ResetPasswordPage,
+  WorkshopPage,
   AdminPage,
   InfoPage,
   ErrorPage,
