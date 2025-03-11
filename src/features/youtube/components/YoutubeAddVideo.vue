@@ -189,7 +189,7 @@
     margin: auto;
 
     background-color: var(--bg-secondary);
-    box-shadow: 0 22px 122px rgb(0 0 0 / 78%);
+    box-shadow: var(--n-box-shadow);
 
     @include media-min($sm) {
       border-radius: 8px;

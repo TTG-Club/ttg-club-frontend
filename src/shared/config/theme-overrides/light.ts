@@ -22,13 +22,16 @@ export const light: GlobalThemeOverrides = {
     popoverColor: '#ebe5d0',
     fontFamily: '"Open Sans", sans-serif',
     fontFamilyMono: '"Monaco", monospace sans-serif',
+    bodyColor: 'var(--bg-main)',
   },
   Skeleton: {
     color: 'var(--hover)',
     colorEnd: 'var(--bg-main)',
   },
   Input: {
-    groupLabelColor: 'var(--text-color)',
+    groupLabelColor: 'var(--primary)',
+    groupLabelTextColor: 'var(--text-btn-color)',
+    groupLabelBorder: 'var(--border)',
     colorFocus: 'var(--hover)',
     border: '1px solid var(--border)',
     borderHover: '1px solid var(--border)',
@@ -113,5 +116,12 @@ export const light: GlobalThemeOverrides = {
     colorChecked: 'var(--primary-active)',
     textColorHoverCheckable: 'var(--text-color)',
     colorCheckedHover: 'var(--primary-hover)',
+  },
+  Select: {
+    peers: {
+      InternalSelectMenu: {
+        optionTextColorActive: 'var(--text-b-color)',
+      },
+    },
   },
 };

@@ -2,8 +2,10 @@
   import { omit } from 'lodash-es';
   import { useToast } from 'vue-toastification';
 
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
+  import { ALLOWED_SPECIAL_CHARACTERS } from '@/shared/const';
   import { useUserStore } from '@/shared/stores/UserStore';
   import {
     rulePassword,
@@ -25,6 +27,7 @@
   const success = ref(false);
   const inProgress = ref(false);
   const formRef = ref<FormInst>();
+  const vertical = useAppBreakpoints().smaller('sm');
 
   const model = reactive({
     username: '',
@@ -39,6 +42,8 @@
     password: rulePassword({ minLength: 8 }),
     repeat: rulePasswordRepeat(model.password),
   }));
+
+  const noSideSpace = (value: string) => !/ /g.test(value);
 
   const successHandler = () => {
     success.value = true;
@@ -97,11 +102,12 @@
       path="username"
     >
       <n-input
-        v-model:value.trim="model.username"
+        v-model:value="model.username"
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
         placeholder="Имя пользователя"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -110,11 +116,12 @@
       path="email"
     >
       <n-input
-        v-model:value.trim="model.email"
+        v-model:value="model.email"
         autocapitalize="off"
         autocomplete="email"
         autocorrect="off"
         placeholder="Электронный адрес"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -122,14 +129,27 @@
       size="large"
       path="password"
     >
-      <n-input
-        v-model:value.trim="model.password"
-        autocapitalize="off"
-        autocomplete="new-password"
-        autocorrect="off"
-        type="password"
-        placeholder="Пароль"
-      />
+      <n-tooltip
+        trigger="focus"
+        class="mobile-show"
+      >
+        <template #trigger>
+          <n-input
+            v-model:value="model.password"
+            autocapitalize="off"
+            autocomplete="new-password"
+            autocorrect="off"
+            type="password"
+            placeholder="Пароль"
+            show-password-on="click"
+            :allow-input="noSideSpace"
+          />
+        </template>
+
+        <template #default>
+          Допустимые спец. символы: {{ ALLOWED_SPECIAL_CHARACTERS.join(' ') }}
+        </template>
+      </n-tooltip>
     </n-form-item>
 
     <n-form-item
@@ -137,16 +157,21 @@
       path="repeat"
     >
       <n-input
-        v-model:value.trim="model.repeat"
+        v-model:value="model.repeat"
         autocapitalize="off"
         autocomplete="new-password"
         autocorrect="off"
         type="password"
         placeholder="Повторите пароль"
+        show-password-on="click"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
-    <n-flex :wrap="false">
+    <n-flex
+      :wrap="false"
+      :vertical
+    >
       <n-button
         :disabled="success"
         :loading="inProgress"
@@ -158,11 +183,11 @@
       </n-button>
 
       <n-button
-        secondary
+        quaternary
         size="large"
         @click.left.exact.prevent="$emit('switch:auth')"
       >
-        Авторизация
+        Уже есть аккаунт
       </n-button>
     </n-flex>
   </n-form>

@@ -1,27 +1,24 @@
-name: Lint
+name: Code Check
 
 on:
   workflow_call:
 
 permissions:
-  deployments: write
-  contents: read
-  pages: write
-  actions: write
-  id-token: write
+  security-events: write
 
 concurrency:
-  group: lint-${{ github.ref_name }}
+  group: code-check-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint
+  check:
+    name: Build and Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          name: front-build-${{ github.run_id }}
+          repository: TTG-Club/ttg-club-frontend
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/setup-node@v4
         with:
@@ -32,8 +29,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --cache .npm
 
+      - name: Build
+        run: npm run build:prod
+
       - name: ESLint
         run: npm run lint:workflow
 
-      - name: Prettier
-        run: npm run prettier:workflow
+      - name: Stylelint
+        run: npm run stylelint:workflow

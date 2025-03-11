@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { useToast } from 'vue-toastification';
 
+  import { useAppBreakpoints } from '@/shared/composable/useAppBreakpoints';
   import { useMetrics } from '@/shared/composable/useMetrics';
   import { ToastEventBus } from '@/shared/config';
   import { useUserStore } from '@/shared/stores/UserStore';
@@ -23,6 +24,7 @@
   const success = ref(false);
   const inProgress = ref(false);
   const formRef = ref<FormInst>();
+  const vertical = useAppBreakpoints().smaller('sm');
 
   const model = reactive({
     usernameOrEmail: '',
@@ -34,6 +36,8 @@
     usernameOrEmail: ruleUsernameOrEmail(),
     password: rulePassword(),
   });
+
+  const noSideSpace = (value: string) => !/ /g.test(value);
 
   const successHandler = () => {
     success.value = true;
@@ -105,12 +109,13 @@
       path="usernameOrEmail"
     >
       <n-input
-        v-model:value.trim="model.usernameOrEmail"
+        v-model:value="model.usernameOrEmail"
         autocapitalize="off"
         autocomplete="username"
         autocorrect="off"
         placeholder="Логин или электронная почта"
         autofocus
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -119,13 +124,14 @@
       path="password"
     >
       <n-input
-        v-model:value.trim="model.password"
+        v-model:value="model.password"
         autocapitalize="off"
         autocomplete="current-password"
         autocorrect="off"
         type="password"
         placeholder="Пароль"
         show-password-on="click"
+        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -133,7 +139,10 @@
       <n-checkbox v-model:checked="model.remember"> Запомнить меня </n-checkbox>
     </n-form-item>
 
-    <n-flex :wrap="false">
+    <n-flex
+      :wrap="false"
+      :vertical
+    >
       <n-button
         :disabled="success"
         :loading="inProgress"
@@ -145,7 +154,7 @@
       </n-button>
 
       <n-button
-        secondary
+        quaternary
         size="large"
         @click.left.exact.prevent="$emit('switch:reg')"
       >

@@ -39,6 +39,8 @@
     inline-theme-disabled
     :breakpoints="BREAKPOINTS"
   >
+    <n-global-style />
+
     <n-loading-bar-provider>
       <n-message-provider>
         <n-notification-provider>
