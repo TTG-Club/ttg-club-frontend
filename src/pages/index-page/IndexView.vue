@@ -65,7 +65,7 @@
       </div>
 
       <a
-        href="http://new.ttg.club"
+        href="//new.ttg.club"
         class="banner"
         target="_blank"
         rel="noopener noreferrer"
