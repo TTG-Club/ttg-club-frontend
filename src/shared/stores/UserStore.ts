@@ -44,6 +44,7 @@ export type TAuthBody = {
 export type TChangePassBody = {
   userToken?: string;
   resetToken?: string;
+  currentPassword?: string;
   password: string;
 };
 
@@ -123,7 +124,8 @@ export const useUserStore = defineStore('UserStore', () => {
     return resp;
   });
 
-  const getUserToken = () => Cookies.get(USER_TOKEN_COOKIE);
+  const getUserToken = () =>
+    isDev ? Cookies.get(USER_TOKEN_COOKIE) : undefined;
 
   const getUserInfo = async (): Promise<TUser> => {
     try {
