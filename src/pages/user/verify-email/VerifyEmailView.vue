@@ -16,7 +16,7 @@
       const message = ref('Подтверждаем почту...');
 
       const verifyEmail = async () => {
-        const token = route.query.token;
+        const { token } = route.query;
 
         if (!token || Array.isArray(token)) {
           status.value = 'error';
