@@ -223,13 +223,14 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const resetPassword = async (email: string) => {
     try {
-      const resp = await httpClient.get({
-        url: '/auth/change/password',
+      const resp = await httpClient.post({
+        url: '/account/password/reset-request',
         payload: { email },
+        version: 'auth',
       });
 
       switch (resp.status) {
-        case 200:
+        case 204:
           return Promise.resolve();
         default:
           return Promise.reject(resp.statusText);
@@ -247,14 +248,27 @@ export const useUserStore = defineStore('UserStore', () => {
     try {
       controllers.changePassword = new AbortController();
 
+      const isResetConfirm = !!payload.resetToken;
+
       const resp = await httpClient.post({
-        url: '/auth/change/password',
-        payload,
+        url: isResetConfirm
+          ? '/account/password/reset-confirm'
+          : '/account/change-password',
+        payload: isResetConfirm
+          ? {
+              newPassword: payload.password,
+              token: payload.resetToken,
+            }
+          : {
+              currentPassword: payload.currentPassword,
+              newPassword: payload.password,
+            },
         signal: controllers.changePassword.signal,
+        version: 'auth',
       });
 
       switch (resp.status) {
-        case 200:
+        case 204:
           return Promise.resolve();
         default:
           return Promise.reject(resp.statusText);
