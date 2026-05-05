@@ -60,24 +60,63 @@
     </template>
 
     <template #default>
-      <n-result
-        :status="
-          status === 'error' ? 'error' : status === 'success' ? 'success' : 'info'
-        "
-        :title="message"
+      <div
+        class="verify-email-view"
+        :class="`verify-email-view--${status}`"
       >
-        <template
+        <div class="verify-email-view__status">
+          {{ message }}
+        </div>
+
+        <router-link
           v-if="status !== 'pending'"
-          #footer
+          class="verify-email-view__link"
+          :to="{ name: 'index' }"
         >
-          <n-button
-            type="primary"
-            @click="$router.replace({ name: 'index' })"
-          >
-            На главную
-          </n-button>
-        </template>
-      </n-result>
+          На главную
+        </router-link>
+      </div>
     </template>
   </page-layout>
 </template>
+
+<style lang="scss" scoped>
+  .verify-email-view {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    &__status {
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    &__link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 18px;
+      border-radius: 4px;
+      color: var(--primary);
+      border: 1px solid currentColor;
+      text-decoration: none;
+      transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    &--success &__status {
+      color: var(--success);
+    }
+
+    &--error &__status {
+      color: var(--error);
+    }
+  }
+</style>
