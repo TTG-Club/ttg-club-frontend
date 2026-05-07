@@ -34,7 +34,10 @@
 
         try {
           const resp = await httpClient.get<ITokenValidation>({
-            url: `/auth/token/validate?token=${route.query.token}`,
+            url: '/auth/password/reset-token/validate',
+            payload: {
+              token: route.query.token,
+            },
           });
 
           if (resp.status !== 200) {

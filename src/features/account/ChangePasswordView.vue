@@ -46,6 +46,7 @@
 
   const model = reactive({
     email: '',
+    currentPassword: '',
     password: '',
     repeat: '',
   });
@@ -56,10 +57,16 @@
 
   const rules = computed<FormRules>(() => {
     if (isOnlyPassword.value) {
-      return reactive({
+      const passwordRules: FormRules = {
         password: rulePassword({ minLength: 8 }),
         repeat: rulePasswordRepeat(model.password),
-      });
+      };
+
+      if (isAuthenticated.value) {
+        passwordRules.currentPassword = rulePassword({ minLength: 8 });
+      }
+
+      return reactive(passwordRules);
     }
 
     return reactive({
@@ -74,8 +81,12 @@
       try {
         const payload = {
           password: model.password,
-          [isAuthenticated.value ? 'userToken' : 'resetToken']:
-            isAuthenticated.value ? userStore.getUserToken() : props.token,
+          ...(isAuthenticated.value
+            ? {
+                currentPassword: model.currentPassword,
+                userToken: userStore.getUserToken(),
+              }
+            : { resetToken: props.token }),
         };
 
         await userStore.changePassword(payload);
@@ -170,6 +181,23 @@
     </n-form-item>
 
     <n-form-item
+      v-if="isAuthenticated"
+      path="currentPassword"
+    >
+      <n-input
+        v-model:value.trim="model.currentPassword"
+        autocapitalize="off"
+        autocomplete="current-password"
+        autocorrect="off"
+        type="password"
+        placeholder="Текущий пароль"
+        show-password-on="click"
+        autofocus
+        size="large"
+      />
+    </n-form-item>
+
+    <n-form-item
       v-if="isOnlyPassword"
       path="password"
     >
@@ -186,7 +214,7 @@
             type="password"
             placeholder="Новый пароль"
             show-password-on="click"
-            autofocus
+            :autofocus="!isAuthenticated"
             size="large"
             :allow-input="noSideSpace"
           />

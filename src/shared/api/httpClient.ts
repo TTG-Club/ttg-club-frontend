@@ -7,6 +7,7 @@ import {
   getProxyUrl,
   type ApiVersion,
 } from '@/shared/utils/getApiUrl';
+import { useIsDev } from '@/shared/utils/isDev';
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
@@ -21,6 +22,8 @@ class HttpClient {
   readonly instance: AxiosInstance;
 
   constructor() {
+    const isDev = useIsDev();
+
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
@@ -35,7 +38,7 @@ class HttpClient {
         indexes: null,
       };
 
-      if (Cookies.get(USER_TOKEN_COOKIE)) {
+      if (isDev && Cookies.get(USER_TOKEN_COOKIE)) {
         // eslint-disable-next-line no-param-reassign
         req.headers.Authorization = `Bearer ${Cookies.get(USER_TOKEN_COOKIE)}`;
       }

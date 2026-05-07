@@ -67,6 +67,7 @@ export const useMetrics = () => {
 
     exclude.push('profile');
     exclude.push('reset-password');
+    exclude.push('verify-email');
 
     if (to.name && exclude.includes(to.name)) {
       return;

@@ -4,7 +4,7 @@ import type { RouteRecordRaw } from 'vue-router';
 
 export const ResetPasswordPage: RouteRecordRaw = {
   name: 'reset-password',
-  path: '/reset/password',
+  path: '/reset-password',
   component: () => import('./ResetPasswordView.vue'),
   beforeEnter: async (to, from, next) => {
     const userStore = useUserStore();
