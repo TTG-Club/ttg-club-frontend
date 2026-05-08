@@ -15,8 +15,11 @@
 
   const { isShowSearch } = useNavPopover();
 
-  const { adventurersCount, isAdventurersCounterLoading } =
-    useOnlineAdventurersCounter();
+  const {
+    adventurersCount,
+    isAdventurersCounterLoading,
+    refreshAdventurersCounter,
+  } = useOnlineAdventurersCounter();
 
   const mainNavItems = computed(() => {
     const items: TNavItem[] = [];
@@ -53,6 +56,10 @@
   const adventurersCountLabel = computed(() =>
     new Intl.NumberFormat('ru-RU').format(adventurersCount.value),
   );
+
+  onMounted(() => {
+    refreshAdventurersCounter().then(undefined);
+  });
 </script>
 
 <template>
@@ -314,8 +321,8 @@
 
     &__header {
       display: flex;
-      align-items: center;
       gap: 8px;
+      align-items: center;
 
       h3 {
         margin: 0;
@@ -347,8 +354,8 @@
     &__stats {
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 4px;
+      align-items: center;
 
       padding-top: 4px;
 
@@ -363,7 +370,6 @@
         font-size: 32px;
         line-height: 36px;
         color: var(--primary);
-
         transition: opacity 0.2s;
 
         &.is-loading {
