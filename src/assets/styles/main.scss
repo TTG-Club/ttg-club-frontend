@@ -151,7 +151,7 @@
       //   white,
       //   black
       // ); // Не удалять, это фикс для Safari, чтобы не вылазили углы картинки
-            // Вопрос решен кардинально! (оставим для истории)
+      // Вопрос решен кардинально! (оставим для истории)
 
       &::before {
         content: '';
@@ -244,13 +244,50 @@
       flex-direction: column;
       gap: 16px;
 
-      &.youtube-block {
+      .youtube-block {
         flex: 0 0 calc(33% - 4px);
 
         height: fit-content;
         padding: 1px;
 
-        background: radial-gradient(circle at 100% 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 0% / 12px 12px no-repeat, radial-gradient(circle at 0 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 0% / 12px 12px no-repeat, radial-gradient(circle at 100% 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 100% / 12px 12px no-repeat, radial-gradient(circle at 0 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 100% / 12px 12px no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 2px) calc(100% - 24px) no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 24px) calc(100% - 2px) no-repeat, linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
+        background:
+          radial-gradient(
+              circle at 100% 100%,
+              var(--bg-secondary) 0,
+              var(--bg-secondary) 11px,
+              transparent 11px
+            )
+            0 0% / 12px 12px no-repeat,
+          radial-gradient(
+              circle at 0 100%,
+              var(--bg-secondary) 0,
+              var(--bg-secondary) 11px,
+              transparent 11px
+            )
+            100% 0% / 12px 12px no-repeat,
+          radial-gradient(
+              circle at 100% 0,
+              var(--bg-secondary) 0,
+              var(--bg-secondary) 11px,
+              transparent 11px
+            )
+            0% 100% / 12px 12px no-repeat,
+          radial-gradient(
+              circle at 0 0,
+              var(--bg-secondary) 0,
+              var(--bg-secondary) 11px,
+              transparent 11px
+            )
+            100% 100% / 12px 12px no-repeat,
+          linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
+            calc(100% - 2px) calc(100% - 24px) no-repeat,
+          linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
+            calc(100% - 24px) calc(100% - 2px) no-repeat,
+          linear-gradient(
+            135deg,
+            var(--border-gradient) 0%,
+            var(--border) 100%
+          );
         border-radius: 12px;
         box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
       }
@@ -271,7 +308,6 @@
       background-color: var(--bg-sub-menu);
       border-radius: 12px;
       box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
-
 
       .info {
         z-index: 1;
@@ -346,7 +382,40 @@
 
 .links_block {
   padding: 16px;
-  background: radial-gradient(circle at 100% 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 0% / 12px 12px no-repeat, radial-gradient(circle at 0 100%, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 0% / 12px 12px no-repeat, radial-gradient(circle at 100% 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 0% 100% / 12px 12px no-repeat, radial-gradient(circle at 0 0, var(--bg-secondary) 0, var(--bg-secondary) 11px, transparent 11px) 100% 100% / 12px 12px no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 2px) calc(100% - 24px) no-repeat, linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% / calc(100% - 24px) calc(100% - 2px) no-repeat, linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
+  background:
+    radial-gradient(
+        circle at 100% 100%,
+        var(--bg-secondary) 0,
+        var(--bg-secondary) 11px,
+        transparent 11px
+      )
+      0 0% / 12px 12px no-repeat,
+    radial-gradient(
+        circle at 0 100%,
+        var(--bg-secondary) 0,
+        var(--bg-secondary) 11px,
+        transparent 11px
+      )
+      100% 0% / 12px 12px no-repeat,
+    radial-gradient(
+        circle at 100% 0,
+        var(--bg-secondary) 0,
+        var(--bg-secondary) 11px,
+        transparent 11px
+      )
+      0% 100% / 12px 12px no-repeat,
+    radial-gradient(
+        circle at 0 0,
+        var(--bg-secondary) 0,
+        var(--bg-secondary) 11px,
+        transparent 11px
+      )
+      100% 100% / 12px 12px no-repeat,
+    linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
+      calc(100% - 2px) calc(100% - 24px) no-repeat,
+    linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
+      calc(100% - 24px) calc(100% - 2px) no-repeat,
+    linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
   border-radius: 12px;
   box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
 

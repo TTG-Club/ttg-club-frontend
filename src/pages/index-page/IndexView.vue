@@ -43,8 +43,8 @@
 
   const tools = computed<TNavItem[]>(() => {
     const navTools = navItems.value
-      .flatMap((group) => group.children)
-      .filter((item) => item.url?.startsWith('/tools'));
+      .flatMap((group) => group.children || [])
+      .filter((item): item is TNavItem => !!item?.url?.startsWith('/tools'));
 
     return orderBy(navTools, ['order'], ['asc']);
   });
@@ -140,31 +140,6 @@
               </div>
 
               <div class="column">
-                <div class="online-counter-card">
-                  <div class="online-counter-card__header">
-                    <span class="online-counter-card__indicator" />
-
-                    <h3>Статистика онлайн</h3>
-                  </div>
-
-                  <p>
-                    TTG - твой проводник в мир Dungeons & Dragons, созданный
-                    сообществом для сообщества!
-                  </p>
-
-                  <div class="online-counter-card__stats">
-                    <span>Авантюристов</span>
-
-                    <strong
-                      :class="{
-                        'is-loading': isAdventurersCounterLoading,
-                      }"
-                    >
-                      {{ adventurersCountLabel }}
-                    </strong>
-                  </div>
-                </div>
-
                 <div class="links_block">
                   <h3>Инструменты:</h3>
 
@@ -187,8 +162,35 @@
             </div>
           </div>
 
-          <div class="column youtube-block">
-            <youtube-block />
+          <div class="column">
+            <div class="youtube-block">
+              <youtube-block />
+            </div>
+
+            <div class="online-counter-card">
+              <div class="online-counter-card__header">
+                <span class="online-counter-card__indicator" />
+
+                <h3>Статистика онлайн</h3>
+              </div>
+
+              <p>
+                TTG - твой проводник в мир Dungeons & Dragons, созданный
+                сообществом для сообщества!
+              </p>
+
+              <div class="online-counter-card__stats">
+                <span>Авантюристов</span>
+
+                <strong
+                  :class="{
+                    'is-loading': isAdventurersCounterLoading,
+                  }"
+                >
+                  {{ adventurersCountLabel }}
+                </strong>
+              </div>
+            </div>
           </div>
         </div>
       </div>
