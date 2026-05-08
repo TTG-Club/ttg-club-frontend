@@ -15,8 +15,11 @@
 
   const { isShowSearch } = useNavPopover();
 
-  const { adventurersCount, isAdventurersCounterLoading } =
-    useOnlineAdventurersCounter();
+  const {
+    adventurersCount,
+    isAdventurersCounterLoading,
+    refreshAdventurersCounter,
+  } = useOnlineAdventurersCounter();
 
   const mainNavItems = computed(() => {
     const items: TNavItem[] = [];
@@ -40,8 +43,8 @@
 
   const tools = computed<TNavItem[]>(() => {
     const navTools = navItems.value
-      .flatMap((group) => group.children)
-      .filter((item) => item.url?.startsWith('/tools'));
+      .flatMap((group) => group.children || [])
+      .filter((item): item is TNavItem => !!item?.url?.startsWith('/tools'));
 
     return orderBy(navTools, ['order'], ['asc']);
   });
@@ -53,6 +56,10 @@
   const adventurersCountLabel = computed(() =>
     new Intl.NumberFormat('ru-RU').format(adventurersCount.value),
   );
+
+  onMounted(() => {
+    refreshAdventurersCounter().then(undefined);
+  });
 </script>
 
 <template>
@@ -133,31 +140,6 @@
               </div>
 
               <div class="column">
-                <div class="online-counter-card">
-                  <div class="online-counter-card__header">
-                    <span class="online-counter-card__indicator" />
-
-                    <h3>Статистика онлайн</h3>
-                  </div>
-
-                  <p>
-                    TTG - твой проводник в мир Dungeons & Dragons, созданный
-                    сообществом для сообщества!
-                  </p>
-
-                  <div class="online-counter-card__stats">
-                    <span>Авантюристов</span>
-
-                    <strong
-                      :class="{
-                        'is-loading': isAdventurersCounterLoading,
-                      }"
-                    >
-                      {{ adventurersCountLabel }}
-                    </strong>
-                  </div>
-                </div>
-
                 <div class="links_block">
                   <h3>Инструменты:</h3>
 
@@ -180,8 +162,35 @@
             </div>
           </div>
 
-          <div class="column youtube-block">
-            <youtube-block />
+          <div class="column">
+            <div class="youtube-block">
+              <youtube-block />
+            </div>
+
+            <div class="online-counter-card">
+              <div class="online-counter-card__header">
+                <span class="online-counter-card__indicator" />
+
+                <h3>Статистика онлайн</h3>
+              </div>
+
+              <p>
+                TTG - твой проводник в мир Dungeons & Dragons, созданный
+                сообществом для сообщества!
+              </p>
+
+              <div class="online-counter-card__stats">
+                <span>Авантюристов</span>
+
+                <strong
+                  :class="{
+                    'is-loading': isAdventurersCounterLoading,
+                  }"
+                >
+                  {{ adventurersCountLabel }}
+                </strong>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -314,8 +323,8 @@
 
     &__header {
       display: flex;
-      align-items: center;
       gap: 8px;
+      align-items: center;
 
       h3 {
         margin: 0;
@@ -347,8 +356,8 @@
     &__stats {
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 4px;
+      align-items: center;
 
       padding-top: 4px;
 
@@ -363,7 +372,6 @@
         font-size: 32px;
         line-height: 36px;
         color: var(--primary);
-
         transition: opacity 0.2s;
 
         &.is-loading {
