@@ -8,6 +8,7 @@
   import { DiceHistory } from '@/features/dice-history/ui';
   import { useDiceNotification } from '@/features/dice-notification';
   import NavBar from '@/features/menu/NavBar.vue';
+  import { useOnlineAdventurersHeartbeat } from '@/features/online-counter/useOnlineAdventurersCounter';
 
   configurateDayjs();
 
@@ -28,6 +29,7 @@
   });
 
   useDiceNotification().enable();
+  useOnlineAdventurersHeartbeat();
 </script>
 
 <template>
