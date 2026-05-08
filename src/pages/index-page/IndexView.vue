@@ -73,7 +73,7 @@
       </div>
 
       <a
-        href="http://new.ttg.club"
+        href="//new.ttg.club"
         class="banner"
         target="_blank"
         rel="noopener noreferrer"
@@ -126,19 +126,6 @@
                     <p>Весь сайт у вас на сервере!</p>
 
                     <h4>Discord Bot</h4>
-                  </div>
-
-                  <div class="bg_img" />
-                </router-link>
-
-                <router-link
-                  to="/info/telegram_spells_bot"
-                  class="block dnd5club_tel_bot"
-                >
-                  <div class="info">
-                    <p>Книга заклинаний у вас в руках!</p>
-
-                    <h4>Telegram Spells Bot</h4>
                   </div>
 
                   <div class="bg_img" />
