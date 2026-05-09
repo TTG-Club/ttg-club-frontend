@@ -4,6 +4,7 @@
   import { useNavPopover } from '@/shared/composable/useNavPopover';
   import type { TNavItem } from '@/shared/stores/NavStore';
   import { useNavStore } from '@/shared/stores/NavStore';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import OurPartners from '@/shared/ui/OurPartners.vue';
 
   import { useOnlineAdventurersCounter } from '@/features/online-counter/useOnlineAdventurersCounter';
@@ -107,91 +108,143 @@
         </router-link>
       </div>
 
-      <div class="main-page-blocks">
-        <div class="row">
-          <div class="column">
-            <div class="row">
-              <div class="column">
-                <router-link
-                  to="/tools/tokenator"
-                  class="block token_library"
-                >
-                  <div class="info">
-                    <p>Всегда под рукой!</p>
+      <div class="main-page-grid">
+        <div class="main-page-grid__col left-col">
+          <router-link
+            to="/tools/tokenator"
+            class="block token_library"
+          >
+            <div class="info">
+              <p>Всегда под рукой!</p>
 
-                    <h4>Токенатор</h4>
-                  </div>
-
-                  <div class="bg_img" />
-                </router-link>
-
-                <router-link
-                  to="/info/discord_bot"
-                  class="block discord_bot"
-                >
-                  <div class="info">
-                    <p>Весь сайт у вас на сервере!</p>
-
-                    <h4>Discord Bot</h4>
-                  </div>
-
-                  <div class="bg_img" />
-                </router-link>
-              </div>
-
-              <div class="column">
-                <div class="links_block">
-                  <h3>Инструменты:</h3>
-
-                  <div class="list">
-                    <router-link
-                      v-for="(tool, key) in tools"
-                      :key="key"
-                      :to="{ path: tool.url }"
-                      class="chips tip w-100"
-                    >
-                      {{ tool.name }}
-                    </router-link>
-                  </div>
-                </div>
-              </div>
+              <h4>Токенатор</h4>
             </div>
 
-            <div class="row">
-              <our-partners />
+            <div class="bg_img" />
+          </router-link>
+
+          <router-link
+            to="/info/discord_bot"
+            class="block discord_bot"
+          >
+            <div class="info">
+              <p>Весь сайт у вас на сервере!</p>
+
+              <h4>Discord Bot</h4>
+            </div>
+
+            <div class="bg_img" />
+          </router-link>
+
+          <div class="links_block">
+            <h3>Инструменты:</h3>
+
+            <div class="list">
+              <router-link
+                v-for="(tool, key) in tools"
+                :key="key"
+                :to="{ path: tool.url }"
+                class="chips tip w-100"
+              >
+                {{ tool.name }}
+              </router-link>
+            </div>
+          </div>
+        </div>
+
+        <div class="main-page-grid__col center-col">
+          <div class="youtube-block">
+            <youtube-block />
+          </div>
+        </div>
+
+        <div class="main-page-grid__col right-col">
+          <div class="online-counter-card">
+            <div class="online-counter-card__header">
+              <span class="online-counter-card__indicator" />
+
+              <h3>Статистика онлайн</h3>
+            </div>
+
+            <p>
+              TTG - твой проводник в мир Dungeons & Dragons, созданный
+              сообществом для сообщества!
+            </p>
+
+            <div class="online-counter-card__stats">
+              <span>Авантюристов</span>
+
+              <strong
+                :class="{
+                  'is-loading': isAdventurersCounterLoading,
+                }"
+              >
+                {{ adventurersCountLabel }}
+              </strong>
             </div>
           </div>
 
-          <div class="column">
-            <div class="youtube-block">
-              <youtube-block />
-            </div>
+          <div class="index-social-links">
+            <a
+              href="https://t.me/ttgclubnews"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="index-social-btn is-telegram"
+            >
+              <svg-icon
+                icon="telegram"
+                :size="24"
+              />
 
-            <div class="online-counter-card">
-              <div class="online-counter-card__header">
-                <span class="online-counter-card__indicator" />
+              <span>Telegram</span>
+            </a>
 
-                <h3>Статистика онлайн</h3>
-              </div>
+            <a
+              href="https://discord.gg/JqFKMKRtxv"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="index-social-btn is-discord"
+            >
+              <svg-icon
+                icon="discord"
+                :size="24"
+              />
 
-              <p>
-                TTG - твой проводник в мир Dungeons & Dragons, созданный
-                сообществом для сообщества!
-              </p>
+              <span>Discord</span>
+            </a>
 
-              <div class="online-counter-card__stats">
-                <span>Авантюристов</span>
+            <a
+              href="https://vk.com/ttg.club"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="index-social-btn is-vk"
+            >
+              <svg-icon
+                icon="vk"
+                :size="24"
+              />
 
-                <strong
-                  :class="{
-                    'is-loading': isAdventurersCounterLoading,
-                  }"
-                >
-                  {{ adventurersCountLabel }}
-                </strong>
-              </div>
-            </div>
+              <span>ВКонтакте</span>
+            </a>
+
+            <a
+              href="https://boosty.to/dnd5club"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="index-social-btn is-boosty"
+            >
+              <svg-icon
+                icon="boosty"
+                :size="24"
+              />
+
+              <span>Boosty</span>
+            </a>
           </div>
+        </div>
+
+        <div class="main-page-grid__partners">
+          <our-partners />
         </div>
       </div>
     </div>
@@ -389,6 +442,72 @@
 
     50% {
       box-shadow: 0 0 16px var(--success-hover);
+    }
+  }
+
+  .index-social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .index-social-btn {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+
+      width: 100%;
+      height: 48px;
+
+      font-size: var(--main-font-size);
+      font-weight: 500;
+      color: var(--text-color-title);
+      text-decoration: none;
+
+      opacity: 0.7;
+      background-color: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+
+      @include css-anim();
+
+      &:deep(svg) {
+        color: var(--text-btn-color);
+        fill: var(--text-btn-color);
+        transition: all 0.2s ease;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &.is-telegram {
+        border-color: var(--telegram-base);
+        &:hover {
+          background-color: rgba(36, 161, 222, 0.1);
+        }
+      }
+
+      &.is-discord {
+        border-color: var(--discord-base);
+        &:hover {
+          background-color: rgba(88, 101, 242, 0.1);
+        }
+      }
+
+      &.is-vk {
+        border-color: var(--vk-base);
+        &:hover {
+          background-color: rgba(0, 119, 255, 0.1);
+        }
+      }
+
+      &.is-boosty {
+        border-color: var(--boosty-base);
+        &:hover {
+          background-color: rgba(241, 95, 44, 0.1);
+        }
+      }
     }
   }
 </style>
