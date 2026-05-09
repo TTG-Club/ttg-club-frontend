@@ -116,6 +116,16 @@
       }
     }
 
+    &.is-telegram {
+      background-color: var(--telegram-base);
+
+      @include media-min($md) {
+        &:hover {
+          background-color: var(--telegram-hover);
+        }
+      }
+    }
+
     &.is-transparent {
       color: var(--text-color);
       background-color: transparent;

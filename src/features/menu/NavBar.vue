@@ -55,6 +55,12 @@
         <div class="navbar__social-buttons">
           <ui-social-button
             hide-label
+            social-name="telegram"
+            url="https://t.me/ttgclubnews"
+          />
+
+          <ui-social-button
+            hide-label
             social-name="boosty"
             url="https://boosty.to/dnd5club"
           />
@@ -141,6 +147,14 @@
 
           &:hover {
             background-color: var(--boosty-hover);
+          }
+        }
+
+        &.is-telegram {
+          color: var(--text-btn-color);
+
+          &:hover {
+            background-color: var(--telegram-hover);
           }
         }
 

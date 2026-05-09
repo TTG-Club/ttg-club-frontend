@@ -216,6 +216,16 @@ button {
       }
     }
   }
+
+  &.is-telegram {
+    background-color: var(--telegram-base);
+
+    @include media-min($md) {
+      &:hover {
+        background-color: var(--telegram-hover);
+      }
+    }
+  }
 }
 
 input {

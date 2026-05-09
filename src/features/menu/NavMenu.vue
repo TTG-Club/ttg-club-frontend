@@ -155,6 +155,13 @@
               <ui-social-button
                 hide-label
                 transparent
+                social-name="telegram"
+                url="https://t.me/ttgclubnews"
+              />
+
+              <ui-social-button
+                hide-label
+                transparent
                 social-name="vk"
                 url="https://vk.com/ttg.club"
               />
