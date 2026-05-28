@@ -91,8 +91,8 @@
     fill: currentColor;
 
     svg {
-      width: 1em;
-      height: 1em;
+      width: 100% !important;
+      height: 100% !important;
     }
   }
 
