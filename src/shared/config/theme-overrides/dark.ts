@@ -65,14 +65,14 @@ export const dark: GlobalThemeOverrides = {
   },
   Button: {
     border: '1px solid var(--border)',
-    // borderHover: 'var(--primary-hover)',
+    borderHover: 'var(--primary-hover)',
     borderPressed: 'var(--primary-active)',
     borderDisabled: 'var(--primary-disabled)',
 
     iconSizeLarge: '22px',
 
     colorPrimary: '#3567c9',
-    // colorHoverPrimary: 'var(--primary-hover)',
+    colorHoverPrimary: 'var(--primary-hover)',
     colorPressedPrimary: 'var(--primary-active)',
     colorDisabledPrimary: 'var(--primary-disabled)',
     borderPrimary: 'var(--primary)',

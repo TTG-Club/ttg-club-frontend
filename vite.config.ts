@@ -13,7 +13,7 @@ import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import type { ConfigEnv } from 'vite';
 
 // https://vitejs.dev/config/
-export default ({ mode }: ConfigEnv) => {
+export default ({ mode, command }: ConfigEnv) => {
   const env = loadEnv(mode, process.cwd());
   const API_HOST = env.VITE_APP_API_URL || 'http://localhost:8080';
 
@@ -55,24 +55,26 @@ export default ({ mode }: ConfigEnv) => {
       },
     },
     plugins: [
-      checker({
-        vueTsc: false, // TODO: enable after types fix
-        eslint: {
-          lintCommand:
-            'eslint "{**/*,*}.{cjs,js,ts,jsx,tsx,vue}" --cache --cache-strategy content --ignore-path .eslintignore --quiet',
-          dev: {
-            logLevel: ['error'],
-          },
-        },
-        stylelint: {
-          lintCommand:
-            'stylelint "{**/*,*}.{css,scss,vue}" --cache --cache-strategy content --ignore-path .eslintignore --quiet',
-          dev: {
-            logLevel: ['error'],
-          },
-        },
-        terminal: false,
-      }),
+      command === 'serve'
+        ? checker({
+            vueTsc: false, // TODO: enable after types fix
+            eslint: {
+              lintCommand:
+                'eslint "{**/*,*}.{cjs,js,ts,jsx,tsx,vue}" --cache --cache-strategy content --ignore-path .eslintignore --quiet',
+              dev: {
+                logLevel: ['error'],
+              },
+            },
+            stylelint: {
+              lintCommand:
+                'stylelint "{**/*,*}.{css,scss,vue}" --cache --cache-strategy content --ignore-path .eslintignore --quiet',
+              dev: {
+                logLevel: ['error'],
+              },
+            },
+            terminal: false,
+          })
+        : null,
       ViteEjsPlugin(() => ({
         env,
         mode,
@@ -137,7 +139,7 @@ export default ({ mode }: ConfigEnv) => {
           ],
         },
       }),
-    ],
+    ].filter(Boolean),
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

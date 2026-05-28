@@ -1,8 +1,10 @@
 <script lang="ts">
   import SiteLogo from '@/shared/ui/icons/SiteLogo.vue';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import UiSocialButton from '@/shared/ui/kit/UiSocialButton.vue';
 
   import NavBookmarks from '@/features/bookmarks/components/NavBookmarks.vue';
+  import { useBugReport } from '@/features/bug-report';
   import NavDiceHistoryButton from '@/features/menu/NavDiceHistoryButton.vue';
   import NavMenu from '@/features/menu/NavMenu.vue';
   import NavProfile from '@/features/menu/NavProfile.vue';
@@ -20,14 +22,17 @@
       MenuThemeSwitcher,
       UiSocialButton,
       NavDiceHistoryButton,
+      SvgIcon,
     },
     setup() {
       const route = useRoute();
+      const { openReport } = useBugReport();
 
       const isShowSearch = computed(() => route.name !== 'search-page');
 
       return {
         isShowSearch,
+        openReport,
       };
     },
   });
@@ -79,6 +84,17 @@
         </div>
 
         <nav-dice-history-button />
+
+        <div
+          class="navbar__btn"
+          title="Сообщить о баге"
+          @click.left.exact.prevent="openReport"
+        >
+          <svg-icon
+            icon="bug"
+            size="20"
+          />
+        </div>
 
         <nav-profile />
 
