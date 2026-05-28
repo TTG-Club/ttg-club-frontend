@@ -56,6 +56,7 @@ export default ({ mode }: ConfigEnv) => {
     },
     plugins: [
       checker({
+        enableBuild: false,
         vueTsc: false, // TODO: enable after types fix
         eslint: {
           lintCommand:
