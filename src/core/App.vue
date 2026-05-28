@@ -5,6 +5,7 @@
   import { BREAKPOINTS } from '@/shared/const/breakpoints';
   import { useUserStore } from '@/shared/stores/UserStore';
 
+  import { BugReportModal, SelectionReportButton } from '@/features/bug-report';
   import { DiceHistory } from '@/features/dice-history/ui';
   import { useDiceNotification } from '@/features/dice-notification';
   import NavBar from '@/features/menu/NavBar.vue';
@@ -58,6 +59,10 @@
               </div>
 
               <dice-history />
+
+              <selection-report-button />
+
+              <bug-report-modal />
             </n-dialog-provider>
           </n-modal-provider>
         </n-notification-provider>
