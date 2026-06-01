@@ -10,6 +10,8 @@
   import { useOnlineAdventurersCounter } from '@/features/online-counter/useOnlineAdventurersCounter';
   import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
 
+  import VttgCampaignBanner from './VttgCampaignBanner.vue';
+
   const navStore = useNavStore();
 
   const { navItems, showedNavItems } = storeToRefs(navStore);
@@ -80,20 +82,24 @@
         </p>
       </div>
 
-      <a
-        href="//new.ttg.club"
-        class="banner"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="title">Редакция D&D 2024</span>
+      <div class="banners-container">
+        <vttg-campaign-banner />
 
-        <img
-          class="bg"
-          alt="Баннер 2024 DnD"
-          src="/img/banner-2024.webp"
-        />
-      </a>
+        <a
+          href="//new.ttg.club"
+          class="banner"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="title">Редакция D&D 2024</span>
+
+          <img
+            class="bg"
+            alt="Баннер 2024 DnD"
+            src="/img/banner-2024.webp"
+          />
+        </a>
+      </div>
 
       <div class="card_row">
         <router-link
@@ -258,7 +264,21 @@
     opacity: 0;
   }
 
+  .banners-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+
+    @include media-min($md) {
+      grid-template-columns: 5fr 1fr;
+      align-items: stretch;
+    }
+  }
+
   .banner {
+    position: relative;
+
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -302,7 +322,35 @@
       linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
     border-radius: 12px;
 
+    @include media-min($md) {
+      height: 100%;
+    }
+
+    &::after {
+      content: '';
+
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+      );
+
+      transition: background 0.3s ease;
+    }
+
     &:hover {
+      &::after {
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.3) 0%,
+          rgba(0, 0, 0, 0.35) 100%
+        );
+      }
+
       .bg {
         transform: scale(1.15);
         transition: transform 0.6s;
@@ -311,18 +359,45 @@
 
     .title {
       position: absolute;
+      z-index: 1;
+      inset: 0;
 
-      width: 110px;
-      margin-left: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      box-sizing: border-box;
+      padding: 12px;
 
       font-size: var(--h4-font-size);
-      font-weight: 600;
-      line-height: 28px;
+      font-weight: 700;
+      line-height: 1.3;
       color: var(--text-color-title);
+      text-align: center;
+      text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(0, 0, 0, 0.5);
+
+      @include media-min($md) {
+        font-size: calc(var(--h4-font-size) - 2px);
+        line-height: 1.2;
+      }
+
+      @include media-min($xl) {
+        font-size: var(--h4-font-size);
+        line-height: 1.3;
+      }
     }
 
     .bg {
       transform: scale(1);
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+      object-position: center;
+
       transition: transform 0.6s;
     }
   }
