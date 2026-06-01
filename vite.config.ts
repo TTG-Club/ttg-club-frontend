@@ -33,6 +33,11 @@ export default ({ mode, command }: ConfigEnv) => {
             });
           },
         },
+        '^/s3': {
+          target: 'https://ttg.club',
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
     build: {
