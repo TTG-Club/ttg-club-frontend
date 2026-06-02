@@ -61,12 +61,6 @@ export function useBugReport() {
     const userToken =
       Cookies.get('ttg-user-token') || Cookies.get(USER_TOKEN_COOKIE);
 
-    console.log('[bug-report debug] Cookies check:', {
-      'ttg-user-token': Cookies.get('ttg-user-token'),
-      [USER_TOKEN_COOKIE]: Cookies.get(USER_TOKEN_COOKIE),
-      'resolvedToken': userToken ? `${userToken.substring(0, 15)}...` : null,
-    });
-
     const guestId = useLocalStorage('bug-report:guest-id', createUuid());
 
     const formattedSelectedText = textSelection.value
