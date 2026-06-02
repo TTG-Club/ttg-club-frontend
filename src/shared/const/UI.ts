@@ -4,7 +4,7 @@ export const THEME_DB_KEY = 'ttg_theme_name';
 
 export const FULLSCREEN_DB_KEY = 'ttg_detail_fullscreen';
 
-export const USER_TOKEN_COOKIE = 'dnd5_user_token';
+export const USER_TOKEN_COOKIE = 'ttg-user-token';
 
 export const CONTENT_LAYOUT_FIXED_HEADER_SELECTOR = '.content-layout__fixed';
 
