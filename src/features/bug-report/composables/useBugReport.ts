@@ -58,7 +58,9 @@ export function useBugReport() {
     description: string,
     screenshotBlob: Blob | null,
   ): Promise<boolean> {
-    const userToken = Cookies.get(USER_TOKEN_COOKIE);
+    const userToken =
+      Cookies.get('ttg-user-token') || Cookies.get(USER_TOKEN_COOKIE);
+
     const guestId = useLocalStorage('bug-report:guest-id', createUuid());
 
     const formattedSelectedText = textSelection.value
