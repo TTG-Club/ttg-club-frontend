@@ -108,6 +108,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
   const clearUser = async () => {
     Cookies.remove(USER_TOKEN_COOKIE);
+    Cookies.remove('ttg-user-token');
 
     user.value = null;
 
@@ -205,6 +206,10 @@ export const useUserStore = defineStore('UserStore', () => {
             });
           }
 
+          Cookies.set('ttg-user-token', resp.data.accessToken, {
+            expires: 365,
+          });
+
           await getUserInfo();
 
           return Promise.resolve();
@@ -289,6 +294,8 @@ export const useUserStore = defineStore('UserStore', () => {
           if (isDev) {
             Cookies.remove(USER_TOKEN_COOKIE, { path: '' });
           }
+
+          Cookies.remove('ttg-user-token', { path: '' });
 
           return Promise.resolve();
         default:
