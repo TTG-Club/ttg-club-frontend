@@ -9,7 +9,7 @@ type ApiErrorPayload = {
   errors?: unknown;
 };
 
-const getMessageFromValue = (value: unknown): string | null => {
+function getMessageFromValue(value: unknown): string | null {
   if (typeof value === 'string' && value.trim()) {
     return value;
   }
@@ -31,7 +31,7 @@ const getMessageFromValue = (value: unknown): string | null => {
   }
 
   return null;
-};
+}
 
 export const getApiErrorMessage = (
   error: unknown,
