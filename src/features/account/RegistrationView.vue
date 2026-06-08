@@ -7,6 +7,7 @@
   import { ToastEventBus } from '@/shared/config';
   import { ALLOWED_SPECIAL_CHARACTERS } from '@/shared/const';
   import { useUserStore } from '@/shared/stores/UserStore';
+  import { getApiErrorMessage } from '@/shared/utils/apiError';
   import {
     rulePassword,
     rulePasswordRepeat,
@@ -81,7 +82,7 @@
       sendLoginMetrics();
       successHandler();
     } catch (err) {
-      toast.error('Неизвестная ошибка');
+      toast.error(getApiErrorMessage(err));
     } finally {
       inProgress.value = false;
     }
