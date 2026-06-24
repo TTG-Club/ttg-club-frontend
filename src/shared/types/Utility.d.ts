@@ -1,6 +1,6 @@
 export type Maybe<T> = T | undefined;
 
-export type AnyObject = Record<string, unknown>;
+export type AnyObject = Record<string, any>;
 
 export type AnyArray = any[];
 

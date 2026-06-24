@@ -2,11 +2,8 @@
 
 <html
   lang="ru"
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{layouts/layout}"
 >
-  <head th:fragment="head">
+  <head>
     <meta
       name="robots"
       content="<%= mode === 'production' ? 'all' : 'noindex' %>"
@@ -121,7 +118,6 @@
   </head>
   <body
     id="body"
-    th:fragment="body"
   >
     <% if (mode === 'production') { %>
     <script type="text/javascript">

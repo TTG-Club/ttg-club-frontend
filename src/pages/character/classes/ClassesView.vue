@@ -10,6 +10,7 @@
     TClassArchetype,
     TClassArchetypeList,
     TClassItem,
+    TClassLink,
     TClassList,
   } from '@/shared/types/character/Classes.d';
   import { ClassesFilterDefaults } from '@/shared/types/character/Classes.d';
@@ -29,7 +30,7 @@
 
   const { fullscreen } = storeToRefs(uiStore);
 
-  const { initPages, items: classes } = usePagination({
+  const { initPages, items: classes } = usePagination<TClassLink>({
     url: '/classes',
     size: -1,
     filter: {

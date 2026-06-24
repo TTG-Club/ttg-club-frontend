@@ -2,7 +2,7 @@ import mitt from 'mitt';
 
 import type { RollEntry } from '@/shared/stores/RollStore';
 
-import type { ToastOptions } from 'vue-toastification/src/types';
+import type { ToastOptions } from 'vue-toastification/dist/types/types';
 
 export enum Event {
   NewRoll,

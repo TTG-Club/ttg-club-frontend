@@ -2,6 +2,7 @@ import { httpClient, type RequestConfig } from '@/shared/api';
 import type { FilterQueryParams } from '@/shared/composable/useFilter';
 import { useMetrics } from '@/shared/composable/useMetrics';
 import { DEFAULT_PAGINATION_ITEMS_SIZE } from '@/shared/const';
+import type { AnyObject } from '@/shared/types/Utility';
 import { errorHandler } from '@/shared/utils/errorHandler';
 import { useIsDev } from '@/shared/utils/isDev';
 
@@ -44,7 +45,7 @@ export type PaginationConfig = {
   filter?: MaybeRef<PaginationFilter>;
 };
 
-export function usePagination<T>(config: PaginationConfig) {
+export function usePagination<T = AnyObject>(config: PaginationConfig) {
   let abortController: AbortController | null;
 
   const route = useRoute();

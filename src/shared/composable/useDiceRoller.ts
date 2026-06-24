@@ -1,7 +1,7 @@
 import { DiceRoller } from 'dice-roller-parser';
 import { type RollBase } from 'dice-roller-parser';
 import { v4 } from 'uuid';
-import { type ToastOptions } from 'vue-toastification/src/types';
+import type { ToastOptions } from 'vue-toastification/dist/types/types';
 
 import { useRollStore } from '@/shared/stores/RollStore';
 import { getFormattedFormula, type RollType } from '@/shared/utils/roll';

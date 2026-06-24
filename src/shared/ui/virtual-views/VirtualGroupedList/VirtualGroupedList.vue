@@ -28,7 +28,7 @@
 
   const props = withDefaults(defineProps<TProps>(), {
     groupLabelKey: 'name',
-    sortBy: 'order',
+    sortBy: () => 'order',
     grid: () => ({}),
   });
 

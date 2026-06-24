@@ -12,7 +12,7 @@ export type TListRow<
   columns: Item[];
 };
 
-export type TGetListRowsOptions<Item, KeyField extends keyof Item> = {
+export type TGetListRowsOptions<Item, KeyField extends RecordKey> = {
   chunks: number;
   keyField: KeyField;
 };

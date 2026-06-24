@@ -72,7 +72,7 @@
     resetPages,
     isEnd,
     items: spells,
-  } = usePagination<TSpellLink[]>({
+  } = usePagination<TSpellLink>({
     url: '/spells',
     filter: {
       isCustomized,

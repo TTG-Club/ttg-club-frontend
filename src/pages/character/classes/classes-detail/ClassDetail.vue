@@ -46,11 +46,7 @@
   const loading = ref(true);
   const error = ref(false);
 
-  const currentClass = ref<
-    unknown & {
-      archetypes?: Array<ClassItemArchetype>;
-    }
-  >();
+  const currentClass = ref<any>();
 
   const currentTab = ref(undefined);
   const tabs = ref([]);

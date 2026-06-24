@@ -31,7 +31,7 @@
         name: list[0].group,
         list: sortBy(list, [(o) => o.order, (o) => o.name.rus]),
       })),
-      [(o) => o.group],
+        [(o) => o.name],
     );
 
     const noGroup = props.childList.filter((item) => !item.group);

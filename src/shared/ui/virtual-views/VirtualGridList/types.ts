@@ -1,6 +1,5 @@
 import type { RefFunction } from '@/shared/composable/useReference';
 import type { TResponsiveValues } from '@/shared/composable/useResponsiveValues';
-import type { TListRow } from '@/shared/types/List';
 import type { AnyObject, RecordKey } from '@/shared/types/Utility';
 import type { TVirtualListProps } from '@/shared/ui/virtual-views/VirtualList/types';
 
@@ -34,7 +33,7 @@ export type TVirtualGridListProps = {
   getRows?: (
     items: TItem[],
     context: TVirtualGridListContext,
-  ) => TListRow<TItem, RecordKey>[];
+  ) => AnyObject[];
 
   /**
    * Ref-функция для доступа к внутреннему API компонента списка

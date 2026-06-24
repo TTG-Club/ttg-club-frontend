@@ -15,7 +15,7 @@ export type TVirtualListProps = {
   /**
    * Функция для получения индекса элемента списка по ключу
    */
-  getItemIndexByKey?: (items: AnyObject[], key: string) => Maybe<AnyObject>;
+  getItemIndexByKey?: (items: AnyObject[], key: string) => Maybe<number>;
 };
 
 export type TVirtualListRef = {
