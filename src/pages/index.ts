@@ -32,7 +32,14 @@ import {
 } from './tools';
 import { ProfilePage, ResetPasswordPage, VerifyEmailPage } from './user';
 import { BooksPage, GodsPage, RulesPage } from './wiki';
-import { BestiaryPage, ScreensPage } from './workshop';
+import {
+  BestiaryPage,
+  ScreensPage,
+  WorkshopPage,
+  WorkshopSpellCreatePage,
+  WorkshopSpellEditPage,
+  WorkshopSpellsPage,
+} from './workshop';
 
 import type { RouteRecordRaw } from 'vue-router';
 
@@ -52,6 +59,10 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   TreasuresPage,
   BestiaryPage,
   ScreensPage,
+  WorkshopPage,
+  WorkshopSpellsPage,
+  WorkshopSpellCreatePage,
+  WorkshopSpellEditPage,
   GodsPage,
   RulesPage,
   BooksPage,

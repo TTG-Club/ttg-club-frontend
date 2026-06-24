@@ -55,3 +55,24 @@ export type TSpellItem = {
   races?: TRaceBadge[];
   upper?: string;
 };
+
+export type TSpellSave = {
+  name: string;
+  englishName: string;
+  level: number;
+  school: string;
+  additionalType?: string;
+  ritual: boolean;
+  concentration: boolean;
+  verbalComponent: boolean;
+  somaticComponent: boolean;
+  consumable: boolean;
+  materialComponent?: string;
+  timeNumber: number;
+  timeUnit: string;
+  timeCondition?: string;
+  range: string;
+  duration: string;
+  description: string;
+  upper?: string;
+};

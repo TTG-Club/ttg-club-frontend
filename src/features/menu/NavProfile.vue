@@ -165,6 +165,14 @@
           <span class="nav-profile__line_body"> Личный кабинет </span>
         </router-link>
 
+        <router-link
+          v-if="hasAccessToProfile"
+          :to="{ path: `/workshop` }"
+          class="nav-profile__line"
+        >
+          <span class="nav-profile__line_body">Мастерская</span>
+        </router-link>
+
         <a
           class="nav-profile__line"
           href="#"

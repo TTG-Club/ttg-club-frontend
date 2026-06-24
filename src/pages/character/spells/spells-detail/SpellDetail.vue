@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import type { TSpellItem } from '@/shared/types/character/Spells';
   import type { Maybe } from '@/shared/types/Utility';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -14,8 +15,10 @@
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
+  const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(uiStore);
+  const { user } = storeToRefs(userStore);
 
   const spell = ref<Maybe<TSpellItem>>(undefined);
   const loading = ref(true);
@@ -79,6 +82,12 @@
     router.push({ name: 'spells' });
   };
 
+  const canEdit = computed(
+    () =>
+      user.value?.roles.includes(EUserRoles.MODERATOR) ||
+      user.value?.roles.includes(EUserRoles.ADMIN),
+  );
+
   onBeforeMount(async () => {
     await spellInfoQuery(route.path);
   });
@@ -108,6 +117,14 @@
         @export-lss="exportLss"
         @export-foundry="exportFoundry"
       />
+
+      <router-link
+        v-if="canEdit && spell"
+        class="spell-detail__edit"
+        :to="`/workshop/spells/${route.params.spellName}/edit`"
+      >
+        Редактировать
+      </router-link>
     </template>
 
     <template #default>
@@ -162,6 +179,17 @@
           filter: drop-shadow(0 0 12px var(--bg-main));
         }
       }
+    }
+
+    &__edit {
+      display: inline-flex;
+
+      margin: 0 16px 12px;
+      padding: 6px 10px;
+
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
   }
 </style>
