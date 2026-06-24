@@ -82,10 +82,12 @@
     router.push({ name: 'spells' });
   };
 
-  const canEdit = computed(
-    () =>
-      user.value?.roles.includes(EUserRoles.MODERATOR) ||
-      user.value?.roles.includes(EUserRoles.ADMIN),
+  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
+
+  const editUrl = computed(() =>
+    canEdit.value && spell.value
+      ? `/workshop/spells/${route.params.spellName}/edit`
+      : '',
   );
 
   onBeforeMount(async () => {
@@ -110,6 +112,7 @@
         :fullscreen="!isMobile"
         :subtitle="spell?.name?.eng || ''"
         :title="spell?.name?.rus || ''"
+        :edit-url="editUrl"
         :foundry-versions="[11]"
         bookmark
         print
@@ -117,14 +120,6 @@
         @export-lss="exportLss"
         @export-foundry="exportFoundry"
       />
-
-      <router-link
-        v-if="canEdit && spell"
-        class="spell-detail__edit"
-        :to="`/workshop/spells/${route.params.spellName}/edit`"
-      >
-        Редактировать
-      </router-link>
     </template>
 
     <template #default>
@@ -179,17 +174,6 @@
           filter: drop-shadow(0 0 12px var(--bg-main));
         }
       }
-    }
-
-    &__edit {
-      display: inline-flex;
-
-      margin: 0 16px 12px;
-      padding: 6px 10px;
-
-      background-color: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
     }
   }
 </style>
