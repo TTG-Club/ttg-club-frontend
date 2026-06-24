@@ -171,45 +171,23 @@
     </label>
 
     <div class="spell-editor__checks">
-      <label>
-        <input
-          v-model="form.ritual"
-          type="checkbox"
-        />
-        Ритуал
-      </label>
+      <n-checkbox v-model:checked="form.ritual"> Ритуал </n-checkbox>
 
-      <label>
-        <input
-          v-model="form.concentration"
-          type="checkbox"
-        />
+      <n-checkbox v-model:checked="form.concentration">
         Концентрация
-      </label>
+      </n-checkbox>
 
-      <label>
-        <input
-          v-model="form.verbalComponent"
-          type="checkbox"
-        />
+      <n-checkbox v-model:checked="form.verbalComponent">
         Вербальный
-      </label>
+      </n-checkbox>
 
-      <label>
-        <input
-          v-model="form.somaticComponent"
-          type="checkbox"
-        />
+      <n-checkbox v-model:checked="form.somaticComponent">
         Соматический
-      </label>
+      </n-checkbox>
 
-      <label>
-        <input
-          v-model="form.consumable"
-          type="checkbox"
-        />
+      <n-checkbox v-model:checked="form.consumable">
         Расходуемый компонент
-      </label>
+      </n-checkbox>
     </div>
 
     <label class="spell-editor__field spell-editor__field--wide">
