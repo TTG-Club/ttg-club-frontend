@@ -8,6 +8,12 @@
       url: '/workshop/spells',
       createUrl: '/workshop/spells/create',
     },
+    {
+      title: 'Существа',
+      description: 'Создание и редактирование существ бестиария.',
+      url: '/workshop/bestiary',
+      createUrl: '/workshop/bestiary/create',
+    },
   ];
 </script>
 

@@ -24,6 +24,24 @@ export const WorkshopSpellEditPage: RouteRecordRaw = {
   component: () => import('./spells/SpellEditView.vue'),
 };
 
+export const WorkshopBestiaryPage: RouteRecordRaw = {
+  name: 'workshop-bestiary',
+  path: '/workshop/bestiary',
+  component: () => import('./bestiary/WorkshopBestiaryView.vue'),
+};
+
+export const WorkshopCreatureCreatePage: RouteRecordRaw = {
+  name: 'workshop-creature-create',
+  path: '/workshop/bestiary/create',
+  component: () => import('./bestiary/CreatureCreateView.vue'),
+};
+
+export const WorkshopCreatureEditPage: RouteRecordRaw = {
+  name: 'workshop-creature-edit',
+  path: '/workshop/bestiary/:creatureName/edit',
+  component: () => import('./bestiary/CreatureEditView.vue'),
+};
+
 export * from './bestiary';
 
 export * from './screens';
