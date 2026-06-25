@@ -91,6 +91,8 @@
     child: '',
   });
 
+  const levelOptions = Array.from({ length: 20 }, (_, index) => index + 1);
+
   const form = reactive<ClassSave>({
     name: props.classItem?.name.rus || '',
     englishName: props.classItem?.name.eng || '',
@@ -429,7 +431,7 @@
 
     <section class="class-editor__traits">
       <div class="class-editor__traits-header">
-        <h3>Умения по уровням</h3>
+        <h3>Умения</h3>
 
         <button
           type="button"
@@ -444,26 +446,29 @@
         :key="trait.id || index"
         class="class-editor__trait"
       >
-        <div class="class-editor__trait-header">
-          <strong>{{ trait.name || `Умение #${index + 1}` }}</strong>
+        <button
+          class="class-editor__trait-delete"
+          type="button"
+          @click="removeClassTrait(index)"
+        >
+          Удалить
+        </button>
 
-          <button
-            type="button"
-            @click="removeClassTrait(index)"
-          >
-            Удалить
-          </button>
-        </div>
-
-        <label class="class-editor__field">
+        <label class="class-editor__field class-editor__field--level">
           <span>Уровень</span>
 
-          <input
+          <select
             v-model.number="trait.level"
-            max="20"
-            min="1"
-            type="number"
-          />
+            required
+          >
+            <option
+              v-for="level in levelOptions"
+              :key="level"
+              :value="level"
+            >
+              {{ level }}
+            </option>
+          </select>
         </label>
 
         <label class="class-editor__field">
@@ -553,6 +558,10 @@
         align-items: center;
       }
 
+      &--level {
+        max-width: 120px;
+      }
+
       span {
         color: var(--text-color);
       }
@@ -620,8 +629,7 @@
       border-radius: 8px;
     }
 
-    &__traits-header,
-    &__trait-header {
+    &__traits-header {
       display: flex;
       gap: 12px;
       align-items: center;
@@ -646,24 +654,34 @@
     }
 
     &__trait {
+      position: relative;
+
       display: grid;
       grid-template-columns: repeat(1, minmax(0, 1fr));
       gap: 12px;
 
-      padding: 12px;
+      padding: 12px 92px 12px 12px;
 
       background-color: var(--bg-main);
       border: 1px solid var(--border);
       border-radius: 8px;
     }
 
-    &__trait-header {
-      grid-column: 1 / -1;
+    &__trait-delete {
+      cursor: pointer;
 
-      button {
-        background-color: var(--bg-secondary);
-        border: 1px solid var(--border);
-      }
+      position: absolute;
+      top: 12px;
+      right: 12px;
+
+      min-height: 36px;
+      padding: 6px 12px;
+
+      color: var(--text-b-color);
+
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
 
     &__empty {
