@@ -21,6 +21,16 @@
   const router = useRouter();
   const { message } = useDiscreteApi();
 
+  type TextBlockField = 'feats' | 'actions' | 'bonusActions';
+
+  type EditableTextBlock = {
+    name: string;
+    englishName: string;
+    description: string;
+    markdown: boolean;
+    sharedUsageCount?: number;
+  };
+
   const option = (label: string, value: string) => ({ label, value });
 
   const sizeOptions = [
@@ -189,6 +199,29 @@
       ?.map((item) => `${item.name}\n${item.value || ''}`.trim())
       .join('\n\n') || '';
 
+  const toTextBlocks = (
+    items?: Array<{
+      name: string;
+      value?: string;
+      markdown?: boolean;
+      sharedUsageCount?: number;
+    }>,
+  ): EditableTextBlock[] =>
+    items?.map((item) => ({
+      name: item.name,
+      englishName: '',
+      description: item.value || '',
+      markdown: item.markdown ?? true,
+      sharedUsageCount: item.sharedUsageCount,
+    })) || [];
+
+  const createTextBlock = (): EditableTextBlock => ({
+    name: '',
+    englishName: '',
+    description: '',
+    markdown: true,
+  });
+
   const parseBlocks = (value: string): ICreatureSaveDescription[] =>
     value
       .split(/\n{2,}/)
@@ -211,6 +244,25 @@
       name: block.name.rus,
       value: block.description || '',
     }));
+
+  const toDescriptionBlocks = (
+    blocks: EditableTextBlock[],
+  ): ICreatureSaveDescription[] =>
+    blocks
+      .filter(
+        (block) =>
+          block.name.trim() ||
+          block.englishName.trim() ||
+          block.description.trim(),
+      )
+      .map((block) => ({
+        name: {
+          rus: block.name.trim(),
+          eng: block.englishName.trim(),
+        },
+        description: block.description.trim() || undefined,
+        markdown: block.markdown,
+      }));
 
   const findSpeed = (name?: string) =>
     props.creature?.speed.find((speed) => speed.name === name);
@@ -294,9 +346,9 @@
       environmentOptions,
     ),
     description: props.creature?.description || '',
-    feats: blockToText(props.creature?.feats),
-    actions: blockToText(props.creature?.actions),
-    bonusActions: blockToText(props.creature?.bonusActions),
+    feats: toTextBlocks(props.creature?.feats),
+    actions: toTextBlocks(props.creature?.actions),
+    bonusActions: toTextBlocks(props.creature?.bonusActions),
     reactions: blockToText(props.creature?.reactions),
     reaction: props.creature?.reaction || '',
     legendaryDescription: props.creature?.legendary?.description || '',
@@ -306,6 +358,20 @@
 
   const pending = ref(false);
   const isEdit = computed(() => !!props.creature?.id);
+
+  const textBlockSections: Array<{ key: TextBlockField; title: string }> = [
+    { key: 'feats', title: 'Особенности' },
+    { key: 'actions', title: 'Действия' },
+    { key: 'bonusActions', title: 'Бонусные действия' },
+  ];
+
+  const addTextBlock = (key: TextBlockField) => {
+    form[key].push(createTextBlock());
+  };
+
+  const removeTextBlock = (key: TextBlockField, index: number) => {
+    form[key].splice(index, 1);
+  };
 
   const csv = (value: string) =>
     value
@@ -428,11 +494,11 @@
       },
       languages: csv(form.languages),
       challengeRating: form.challengeRating,
-      feats: parseBlocks(form.feats),
-      actions: parseBlocks(form.actions),
+      feats: toDescriptionBlocks(form.feats),
+      actions: toDescriptionBlocks(form.actions),
       reactions: parseBlocks(form.reactions),
       reaction: form.reaction || undefined,
-      bonusActions: parseBlocks(form.bonusActions),
+      bonusActions: toDescriptionBlocks(form.bonusActions),
       legendary: {
         list: parseLegendaryBlocks(form.legendaryActions),
         count: 3,
@@ -890,32 +956,85 @@
       />
     </label>
 
-    <label class="creature-editor__field creature-editor__field--wide">
-      <span>Особенности</span>
+    <section
+      v-for="section in textBlockSections"
+      :key="section.key"
+      class="creature-editor__text-section"
+    >
+      <div class="creature-editor__text-section_header">
+        <h3>{{ section.title }}</h3>
 
-      <textarea
-        v-model="form.feats"
-        rows="8"
-      />
-    </label>
+        <button
+          type="button"
+          @click="addTextBlock(section.key)"
+        >
+          Добавить
+        </button>
+      </div>
 
-    <label class="creature-editor__field creature-editor__field--wide">
-      <span>Действия</span>
+      <div
+        v-for="(block, blockIndex) in form[section.key]"
+        :key="blockIndex"
+        class="creature-editor__text-block"
+      >
+        <div class="creature-editor__text-block_header">
+          <strong>{{ section.title }} #{{ blockIndex + 1 }}</strong>
 
-      <textarea
-        v-model="form.actions"
-        rows="8"
-      />
-    </label>
+          <button
+            type="button"
+            @click="removeTextBlock(section.key, blockIndex)"
+          >
+            Удалить
+          </button>
+        </div>
 
-    <label class="creature-editor__field creature-editor__field--wide">
-      <span>Бонусные действия</span>
+        <p
+          v-if="block.sharedUsageCount && block.sharedUsageCount > 1"
+          class="creature-editor__text-block_warning"
+        >
+          Это действие используется несколькими существами:
+          {{ block.sharedUsageCount }}.
+        </p>
 
-      <textarea
-        v-model="form.bonusActions"
-        rows="5"
-      />
-    </label>
+        <label class="creature-editor__field">
+          <span>Название</span>
+
+          <input
+            v-model="block.name"
+            type="text"
+          />
+        </label>
+
+        <label class="creature-editor__field">
+          <span>Английское название</span>
+
+          <input
+            v-model="block.englishName"
+            type="text"
+          />
+        </label>
+
+        <label class="creature-editor__field creature-editor__field--wide">
+          <span>Описание</span>
+
+          <textarea
+            v-model="block.description"
+            rows="6"
+          />
+        </label>
+
+        <n-checkbox v-model:checked="block.markdown">
+          Используется markdown
+        </n-checkbox>
+      </div>
+
+      <p
+        v-if="!form[section.key].length"
+        class="creature-editor__empty"
+      >
+        Нет блоков.
+      </p>
+    </section>
 
     <label class="creature-editor__field creature-editor__field--wide">
       <span>Реакции</span>
@@ -1040,6 +1159,63 @@
       gap: 12px;
     }
 
+    &__text-section {
+      display: flex;
+      grid-column: 1 / -1;
+      flex-direction: column;
+      gap: 12px;
+
+      padding: 16px;
+
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+
+      &_header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+
+        h3 {
+          margin: 0;
+          font-size: var(--h4-font-size);
+          line-height: var(--h4-line-height);
+        }
+      }
+    }
+
+    &__text-block {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 12px;
+
+      padding: 12px;
+
+      background-color: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+
+      &_header {
+        display: flex;
+        grid-column: 1 / -1;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      &_warning {
+        grid-column: 1 / -1;
+        margin: 0;
+        color: var(--primary);
+      }
+    }
+
+    &__empty {
+      margin: 0;
+      color: var(--text-color);
+    }
+
     &__actions {
       align-items: center;
       padding-top: 8px;
@@ -1063,11 +1239,29 @@
       }
     }
 
+    &__text-section button,
+    &__text-block button {
+      cursor: pointer;
+
+      min-height: 36px;
+      padding: 6px 12px;
+
+      color: var(--text-b-color);
+
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
 
       &__group {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      &__text-block {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   }
