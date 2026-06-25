@@ -168,6 +168,7 @@ export interface ICreatureSave {
   type: string;
   alignment: string;
   armorClass: number;
+  armorText?: string;
   armors?: string[];
   hits: {
     average: number;

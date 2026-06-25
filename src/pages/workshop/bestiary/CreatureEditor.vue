@@ -310,6 +310,7 @@
     ),
     armorClass: props.creature?.armorClass || 10,
     armorText: props.creature?.armorText || '',
+    hitText: props.creature?.hits.text || '',
     armors: selectedValues(
       props.creature?.armors?.map((armor) => armor.name),
       armorOptions,
@@ -504,11 +505,12 @@
       type: form.type,
       alignment: form.alignment,
       armorClass: Number(form.armorClass),
+      armorText: form.armorText || undefined,
       armors: form.armors,
       hits: {
         average: averageHp.value,
         diceCount: numberOrUndefined(form.diceCount),
-        text: form.armorText || undefined,
+        text: form.hitText || undefined,
       },
       speed,
       ability: {
@@ -738,6 +740,15 @@
           />
         </label>
       </div>
+
+      <label class="creature-editor__field">
+        <span>Текст хитов</span>
+
+        <input
+          v-model="form.hitText"
+          type="text"
+        />
+      </label>
     </div>
 
     <div class="creature-editor__group">
