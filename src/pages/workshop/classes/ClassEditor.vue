@@ -7,6 +7,7 @@
     ClassSave,
     ClassSkill,
     ClassSpellcasterType,
+    ClassTrait,
     TClassItem,
   } from '@/shared/types/character/Classes';
   import { errorHandler } from '@/shared/utils/errorHandler';
@@ -81,6 +82,15 @@
     { label: 'Инфузии: Изобретатель', value: 'ARTIFICER_INFUSION' },
   ];
 
+  const createClassTrait = (): ClassTrait => ({
+    name: '',
+    suffix: '',
+    level: 1,
+    description: '',
+    optional: false,
+    child: '',
+  });
+
   const form = reactive<ClassSave>({
     name: props.classItem?.name.rus || '',
     englishName: props.classItem?.name.eng || '',
@@ -104,10 +114,24 @@
     sidekick: !!props.classItem?.sidekick,
     icon: props.classItem?.icon || '',
     page: props.classItem?.page,
+    classTraits:
+      props.classItem?.classTraits?.map((trait) => ({
+        ...trait,
+        suffix: trait.suffix || '',
+        child: trait.child || '',
+      })) || [],
   });
 
   const pending = ref(false);
   const isEdit = computed(() => !!props.classItem?.id);
+
+  const addClassTrait = () => {
+    form.classTraits.push(createClassTrait());
+  };
+
+  const removeClassTrait = (index: number) => {
+    form.classTraits.splice(index, 1);
+  };
 
   const optionalNumber = (value?: number) =>
     value === undefined || value === null ? undefined : value;
@@ -130,6 +154,15 @@
         slotsReset: form.slotsReset || undefined,
         icon: form.icon || undefined,
         page: optionalNumber(form.page),
+        classTraits: form.classTraits
+          .filter((trait) => trait.name.trim() && trait.description.trim())
+          .map((trait) => ({
+            ...trait,
+            name: trait.name.trim(),
+            suffix: trait.suffix?.trim() || undefined,
+            description: trait.description.trim(),
+            child: trait.child?.trim() || undefined,
+          })),
       };
 
       const resp = isEdit.value
@@ -394,6 +427,99 @@
       />
     </label>
 
+    <section class="class-editor__traits">
+      <div class="class-editor__traits-header">
+        <h3>Умения по уровням</h3>
+
+        <button
+          type="button"
+          @click="addClassTrait"
+        >
+          Добавить
+        </button>
+      </div>
+
+      <article
+        v-for="(trait, index) in form.classTraits"
+        :key="trait.id || index"
+        class="class-editor__trait"
+      >
+        <div class="class-editor__trait-header">
+          <strong>{{ trait.name || `Умение #${index + 1}` }}</strong>
+
+          <button
+            type="button"
+            @click="removeClassTrait(index)"
+          >
+            Удалить
+          </button>
+        </div>
+
+        <label class="class-editor__field">
+          <span>Уровень</span>
+
+          <input
+            v-model.number="trait.level"
+            max="20"
+            min="1"
+            type="number"
+          />
+        </label>
+
+        <label class="class-editor__field">
+          <span>Название</span>
+
+          <input
+            v-model="trait.name"
+            type="text"
+          />
+        </label>
+
+        <label class="class-editor__field">
+          <span>Суффикс</span>
+
+          <input
+            v-model="trait.suffix"
+            type="text"
+          />
+        </label>
+
+        <label class="class-editor__field">
+          <span>Дочерний якорь</span>
+
+          <input
+            v-model="trait.child"
+            type="text"
+          />
+        </label>
+
+        <label class="class-editor__field class-editor__field--wide">
+          <span>Описание</span>
+
+          <textarea
+            v-model="trait.description"
+            rows="8"
+          />
+        </label>
+
+        <label class="class-editor__field class-editor__field--checkbox">
+          <input
+            v-model="trait.optional"
+            type="checkbox"
+          />
+
+          <span>Опциональное умение</span>
+        </label>
+      </article>
+
+      <p
+        v-if="!form.classTraits.length"
+        class="class-editor__empty"
+      >
+        Умения не добавлены.
+      </p>
+    </section>
+
     <div class="class-editor__actions">
       <button
         :disabled="pending"
@@ -481,8 +607,76 @@
       }
     }
 
+    &__traits {
+      display: flex;
+      grid-column: 1 / -1;
+      flex-direction: column;
+      gap: 12px;
+
+      padding: 16px;
+
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    &__traits-header,
+    &__trait-header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+
+      h3 {
+        margin: 0;
+      }
+
+      button {
+        cursor: pointer;
+
+        min-height: 36px;
+        padding: 6px 12px;
+
+        color: var(--text-b-color);
+
+        background-color: var(--primary);
+        border: 0;
+        border-radius: 8px;
+      }
+    }
+
+    &__trait {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 12px;
+
+      padding: 12px;
+
+      background-color: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    &__trait-header {
+      grid-column: 1 / -1;
+
+      button {
+        background-color: var(--bg-secondary);
+        border: 1px solid var(--border);
+      }
+    }
+
+    &__empty {
+      margin: 0;
+      color: var(--text-color);
+    }
+
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      &__trait {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
   }
 </style>

@@ -52,6 +52,7 @@ export type TClassItem = Omit<TClassLink, 'archetypes'> & {
   slotsReset?: ClassRest;
   enabledArhitypeLevel?: number;
   page?: number;
+  classTraits?: ClassTrait[];
   traits?: {
     diceHp: number;
     armor?: string;
@@ -62,6 +63,16 @@ export type TClassItem = Omit<TClassLink, 'archetypes'> & {
     availableSkills?: string[];
     equipment?: string;
   };
+};
+
+export type ClassTrait = {
+  id?: number;
+  name: string;
+  suffix?: string;
+  level: number;
+  description: string;
+  optional: boolean;
+  child?: string;
 };
 
 export type ClassAbility =
@@ -119,6 +130,7 @@ export type ClassSave = {
   sidekick: boolean;
   icon?: string;
   page?: number;
+  classTraits: ClassTrait[];
 };
 
 export type TClassList = {
