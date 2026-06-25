@@ -9,7 +9,7 @@
     name: string;
     anchor: string;
     tooltipUrl: string;
-    archetype: boolean;
+    archetypeFeature: boolean;
   };
 
   type LevelRow = {
@@ -27,6 +27,7 @@
     type: string;
     description?: string;
     optional?: boolean;
+    archetypeFeature: boolean;
     source?: {
       name?: string;
       shortName?: string;
@@ -205,7 +206,7 @@
                   <a
                     :class="{
                       tip_scroll: true,
-                      archetype_feet: trait.archetype,
+                      archetype_feet: trait.archetypeFeature,
                     }"
                     :href="trait.anchor"
                     @click.left.exact.prevent="anchorClickHandler(trait.anchor)"
@@ -321,7 +322,10 @@
     >
       <summary
         :id="feature.id"
-        class="h4"
+        :class="{
+          h4: true,
+          archetype_feet: feature.archetypeFeature,
+        }"
       >
         <span>{{ feature.name }}</span>
 
