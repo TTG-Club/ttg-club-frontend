@@ -96,6 +96,24 @@ export const WorkshopClassEditPage: RouteRecordRaw = {
   component: () => import('./classes/ClassEditView.vue'),
 };
 
+export const WorkshopRacesPage: RouteRecordRaw = {
+  name: 'workshop-races',
+  path: '/workshop/races',
+  component: () => import('./races/WorkshopRacesView.vue'),
+};
+
+export const WorkshopRaceCreatePage: RouteRecordRaw = {
+  name: 'workshop-race-create',
+  path: '/workshop/races/create',
+  component: () => import('./races/RaceCreateView.vue'),
+};
+
+export const WorkshopRaceEditPage: RouteRecordRaw = {
+  name: 'workshop-race-edit',
+  path: '/workshop/races/:raceName/edit',
+  component: () => import('./races/RaceEditView.vue'),
+};
+
 export const WorkshopWeaponsPage: RouteRecordRaw = {
   name: 'workshop-weapons',
   path: '/workshop/weapons',

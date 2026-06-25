@@ -33,6 +33,12 @@
       createUrl: '/workshop/classes/create',
     },
     {
+      title: 'Расы',
+      description: 'Создание и редактирование рас справочника.',
+      url: '/workshop/races',
+      createUrl: '/workshop/races/create',
+    },
+    {
       title: 'Оружие',
       description: 'Создание и редактирование оружия справочника.',
       url: '/workshop/weapons',
