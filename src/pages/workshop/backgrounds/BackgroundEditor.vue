@@ -141,18 +141,13 @@
     <label class="background-editor__field">
       <span>Навыки</span>
 
-      <select
-        v-model="form.skills"
+      <n-select
+        v-model:value="form.skills"
+        :options="skillOptions"
+        clearable
+        filterable
         multiple
-      >
-        <option
-          v-for="item in skillOptions"
-          :key="item.value"
-          :value="item.value"
-        >
-          {{ item.label }}
-        </option>
-      </select>
+      />
     </label>
 
     <label class="background-editor__field">
@@ -263,10 +258,6 @@
         background-color: var(--bg-secondary);
         border: 1px solid var(--border);
         border-radius: 8px;
-      }
-
-      select[multiple] {
-        min-height: 128px;
       }
 
       textarea {

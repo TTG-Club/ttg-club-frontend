@@ -285,18 +285,13 @@
     <label class="weapon-editor__field">
       <span>Свойства</span>
 
-      <select
-        v-model="form.properties"
+      <n-select
+        v-model:value="form.properties"
+        :options="propertyOptions"
+        clearable
+        filterable
         multiple
-      >
-        <option
-          v-for="item in propertyOptions"
-          :key="item.value"
-          :value="item.value"
-        >
-          {{ item.label }}
-        </option>
-      </select>
+      />
     </label>
 
     <label class="weapon-editor__field weapon-editor__field--wide">
@@ -360,10 +355,6 @@
         background-color: var(--bg-secondary);
         border: 1px solid var(--border);
         border-radius: 8px;
-      }
-
-      select[multiple] {
-        min-height: 128px;
       }
 
       textarea {

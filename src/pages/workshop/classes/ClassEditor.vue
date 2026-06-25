@@ -210,18 +210,13 @@
     <label class="class-editor__field">
       <span>Основные характеристики</span>
 
-      <select
-        v-model="form.primaryAbilities"
+      <n-select
+        v-model:value="form.primaryAbilities"
+        :options="abilityOptions"
+        clearable
+        filterable
         multiple
-      >
-        <option
-          v-for="item in abilityOptions"
-          :key="item.value"
-          :value="item.value"
-        >
-          {{ item.label }}
-        </option>
-      </select>
+      />
     </label>
 
     <label class="class-editor__field">
@@ -246,18 +241,13 @@
     <label class="class-editor__field">
       <span>Навыки на выбор</span>
 
-      <select
-        v-model="form.availableSkills"
+      <n-select
+        v-model:value="form.availableSkills"
+        :options="skillOptions"
+        clearable
+        filterable
         multiple
-      >
-        <option
-          v-for="item in skillOptions"
-          :key="item.value"
-          :value="item.value"
-        >
-          {{ item.label }}
-        </option>
-      </select>
+      />
     </label>
 
     <label class="class-editor__field">
@@ -456,10 +446,6 @@
 
       input[type='checkbox'] {
         width: auto;
-      }
-
-      select[multiple] {
-        min-height: 128px;
       }
 
       textarea {

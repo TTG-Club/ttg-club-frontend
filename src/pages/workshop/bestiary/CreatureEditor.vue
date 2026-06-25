@@ -693,18 +693,13 @@
     <label class="creature-editor__field">
       <span>Доспехи</span>
 
-      <select
-        v-model="form.armors"
+      <n-select
+        v-model:value="form.armors"
+        :options="armorOptions"
+        clearable
+        filterable
         multiple
-      >
-        <option
-          v-for="item in armorOptions"
-          :key="item.value"
-          :value="item.value"
-        >
-          {{ item.label }}
-        </option>
-      </select>
+      />
     </label>
 
     <div class="creature-editor__group">
@@ -901,86 +896,61 @@
       <label class="creature-editor__field">
         <span>Сопротивления</span>
 
-        <select
-          v-model="form.damageResistances"
+        <n-select
+          v-model:value="form.damageResistances"
+          :options="damageOptions"
+          clearable
+          filterable
           multiple
-        >
-          <option
-            v-for="item in damageOptions"
-            :key="item.value"
-            :value="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+        />
       </label>
 
       <label class="creature-editor__field">
         <span>Иммунитеты к урону</span>
 
-        <select
-          v-model="form.damageImmunities"
+        <n-select
+          v-model:value="form.damageImmunities"
+          :options="damageOptions"
+          clearable
+          filterable
           multiple
-        >
-          <option
-            v-for="item in damageOptions"
-            :key="item.value"
-            :value="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+        />
       </label>
 
       <label class="creature-editor__field">
         <span>Уязвимости</span>
 
-        <select
-          v-model="form.damageVulnerabilities"
+        <n-select
+          v-model:value="form.damageVulnerabilities"
+          :options="damageOptions"
+          clearable
+          filterable
           multiple
-        >
-          <option
-            v-for="item in damageOptions"
-            :key="item.value"
-            :value="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+        />
       </label>
 
       <label class="creature-editor__field">
         <span>Иммунитеты к состояниям</span>
 
-        <select
-          v-model="form.conditionImmunities"
+        <n-select
+          v-model:value="form.conditionImmunities"
+          :options="conditionOptions"
+          clearable
+          filterable
           multiple
-        >
-          <option
-            v-for="item in conditionOptions"
-            :key="item.value"
-            :value="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+        />
       </label>
 
       <label class="creature-editor__field">
         <span>Среда обитания</span>
 
-        <select
-          v-model="form.environment"
+        <n-select
+          v-model:value="form.environment"
+          :options="environmentOptions"
+          clearable
+          filterable
           multiple
-        >
-          <option
-            v-for="item in environmentOptions"
-            :key="item.value"
-            :value="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+        />
       </label>
     </div>
 
@@ -1165,10 +1135,6 @@
         background-color: var(--bg-secondary);
         border: 1px solid var(--border);
         border-radius: 8px;
-      }
-
-      select[multiple] {
-        min-height: 126px;
       }
 
       textarea {
