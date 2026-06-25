@@ -9,6 +9,7 @@
     name: string;
     anchor: string;
     tooltipUrl: string;
+    archetype: boolean;
   };
 
   type LevelRow = {
@@ -54,6 +55,7 @@
   const emit = defineEmits<{
     (e: 'loaded'): void;
     (e: 'before-unmount'): void;
+    (e: 'anchor-click', hash: string): void;
   }>();
 
   const spellSlotHeaders = computed(() => {
@@ -74,6 +76,10 @@
   onBeforeUnmount(() => {
     emit('before-unmount');
   });
+
+  const anchorClickHandler = (hash: string) => {
+    emit('anchor-click', hash);
+  };
 </script>
 
 <template>
@@ -197,8 +203,12 @@
               >
                 <detail-tooltip :url="trait.tooltipUrl">
                   <a
-                    class="tip_scroll"
+                    :class="{
+                      tip_scroll: true,
+                      archetype_feet: trait.archetype,
+                    }"
                     :href="trait.anchor"
+                    @click.left.exact.prevent="anchorClickHandler(trait.anchor)"
                   >
                     {{ trait.name }}
                   </a>
@@ -348,7 +358,15 @@
 </template>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
   .class-traits {
+    padding: 0 16px;
+
+    @include media-min($xl) {
+      padding: 0 24px;
+    }
+
     &__level-column {
       width: 24px;
     }

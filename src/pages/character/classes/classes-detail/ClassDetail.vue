@@ -243,7 +243,8 @@
 
     const formattedHash = hash.startsWith('#') ? hash : `#${hash}`;
 
-    const section = classBody.value.querySelector(formattedHash).parentElement;
+    const target = classBody.value.querySelector(formattedHash);
+    const section = target?.parentElement;
 
     if (!section) {
       return;
@@ -264,12 +265,16 @@
       return;
     }
 
+    const link = e.target?.closest?.('a[href^="#"]');
+
+    if (!link) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
 
-    const { target } = e;
-
-    const hash = target.getAttribute('href').replace('#', '').trim();
+    const hash = link.getAttribute('href').replace('#', '').trim();
 
     if (hash) {
       scrollToSection(hash);
@@ -417,6 +422,7 @@
           <class-traits
             v-if="currentTab?.type === 'traits'"
             :traits="currentClass.traits"
+            @anchor-click="scrollToSection"
             @loaded="initScrollListeners"
             @before-unmount="removeScrollListeners"
           />
