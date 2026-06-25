@@ -77,8 +77,6 @@
     option('Любое не доброе мировоззрение', 'NO_GOOD'),
   ];
 
-  const diceOptions = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
-
   const armorOptions = [
     option('природный доспех', 'NATURAL'),
     option('кожаный доспех', 'LEATHER'),
@@ -130,6 +128,16 @@
     option('ошеломление', 'STUNNED'),
     option('бессознательность', 'UNCONSCIOUS'),
   ];
+
+  const sizeHitDiceMap: Record<string, { dice: string; average: number }> = {
+    TINY: { dice: 'd4', average: 2.5 },
+    SMALL: { dice: 'd6', average: 3.5 },
+    MEDIUM: { dice: 'd8', average: 4.5 },
+    LARGE: { dice: 'd10', average: 5.5 },
+    HUGE: { dice: 'd12', average: 6.5 },
+    GARGANTUAN: { dice: 'd20', average: 10.5 },
+    SMALL_MEDIUM: { dice: 'd8', average: 4.5 },
+  };
 
   const environmentOptions = [
     option('полярная тундра', 'ARCTIC'),
@@ -280,15 +288,14 @@
       ?.value || fallback;
 
   const parseHitFormula = () => {
-    const match = props.creature?.hits.formula?.match(/^(\d+)d(\d+)/);
+    const match = props.creature?.hits.formula?.match(/^(\d+)(?:d|к)(\d+)/);
 
     return {
       diceCount: match ? Number(match[1]) : undefined,
-      hitDice: match ? `d${match[2]}` : 'd8',
     };
   };
 
-  const hitFormula = parseHitFormula();
+  const parsedHitFormula = parseHitFormula();
 
   const form = reactive({
     name: props.creature?.name.rus || '',
@@ -307,10 +314,7 @@
       props.creature?.armors?.map((armor) => armor.name),
       armorOptions,
     ),
-    averageHp: props.creature?.hits.average || 1,
-    diceCount: hitFormula.diceCount,
-    hitDice: hitFormula.hitDice,
-    hpBonus: props.creature?.hits.bonus,
+    diceCount: parsedHitFormula.diceCount,
     challengeRating: props.creature?.challengeRating || '0',
     npc: false,
     speed: Number(findSpeed()?.value || 30),
@@ -373,6 +377,40 @@
   const removeTextBlock = (key: TextBlockField, index: number) => {
     form[key].splice(index, 1);
   };
+
+  const hitDice = computed(
+    () => sizeHitDiceMap[form.size] || sizeHitDiceMap.MEDIUM,
+  );
+
+  const constitutionModifier = computed(() =>
+    Math.floor((Number(form.con) - 10) / 2),
+  );
+
+  const hitDiceBonus = computed(
+    () => constitutionModifier.value * Number(form.diceCount || 0),
+  );
+
+  const averageHp = computed(() =>
+    Math.floor(
+      Number(form.diceCount || 0) * hitDice.value.average + hitDiceBonus.value,
+    ),
+  );
+
+  const hitFormula = computed(() => {
+    const diceCount = Number(form.diceCount || 0);
+
+    if (!diceCount) {
+      return '';
+    }
+
+    const bonus = hitDiceBonus.value;
+
+    if (!bonus) {
+      return `${diceCount}${hitDice.value.dice}`;
+    }
+
+    return `${diceCount}${hitDice.value.dice}${bonus > 0 ? '+' : '-'}${Math.abs(bonus)}`;
+  });
 
   const csv = (value: string) =>
     value
@@ -468,10 +506,8 @@
       armorClass: Number(form.armorClass),
       armors: form.armors,
       hits: {
-        average: Number(form.averageHp),
+        average: averageHp.value,
         diceCount: numberOrUndefined(form.diceCount),
-        hitDice: form.hitDice || undefined,
-        bonus: numberOrUndefined(form.hpBonus),
         text: form.armorText || undefined,
       },
       speed,
@@ -671,48 +707,25 @@
 
     <div class="creature-editor__group">
       <label class="creature-editor__field">
-        <span>Хиты: среднее</span>
+        <span>Хиты: количество костей</span>
 
         <input
-          v-model.number="form.averageHp"
+          v-model.number="form.diceCount"
           min="1"
           required
           type="number"
         />
       </label>
 
-      <label class="creature-editor__field">
-        <span>Хиты: кол-во костей</span>
+      <div class="creature-editor__readonly">
+        <span>Кость хитов: {{ hitDice.dice }}</span>
 
-        <input
-          v-model.number="form.diceCount"
-          min="1"
-          type="number"
-        />
-      </label>
+        <span>Бонус от Тел: {{ hitDiceBonus }}</span>
 
-      <label class="creature-editor__field">
-        <span>Хиты: кость</span>
+        <span>Формула: {{ hitFormula || '—' }}</span>
 
-        <select v-model="form.hitDice">
-          <option
-            v-for="dice in diceOptions"
-            :key="dice"
-            :value="dice"
-          >
-            {{ dice }}
-          </option>
-        </select>
-      </label>
-
-      <label class="creature-editor__field">
-        <span>Хиты: бонус</span>
-
-        <input
-          v-model.number="form.hpBonus"
-          type="number"
-        />
-      </label>
+        <span>Среднее: {{ averageHp || '—' }}</span>
+      </div>
     </div>
 
     <div class="creature-editor__group">
@@ -1215,6 +1228,20 @@
     &__empty {
       margin: 0;
       color: var(--text-color);
+    }
+
+    &__readonly {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      padding: 10px 12px;
+
+      color: var(--text-color);
+
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
 
     &__actions {

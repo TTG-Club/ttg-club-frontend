@@ -172,8 +172,6 @@ export interface ICreatureSave {
   hits: {
     average: number;
     diceCount?: number;
-    hitDice?: string;
-    bonus?: number;
     text?: string;
   };
   speed: ICreatureSaveNameValue[];
