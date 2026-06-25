@@ -16,6 +16,7 @@
     try {
       const resp = await httpClient.post<TClassItem>({
         url: `/classes/${route.params.className}`,
+        payload: {},
       });
 
       classItem.value = resp.data;
