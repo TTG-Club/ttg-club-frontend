@@ -11,6 +11,7 @@ export enum BestiaryFilterDefaults {
 
 export interface ICreatureAction {
   name: string;
+  englishName?: string;
   value: string;
   markdown?: boolean;
   sharedUsageCount?: number;
@@ -18,6 +19,7 @@ export interface ICreatureAction {
 
 export interface ICreatureFeat {
   name: string;
+  englishName?: string;
   value?: string;
   markdown?: boolean;
 }

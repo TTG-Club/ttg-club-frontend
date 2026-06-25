@@ -202,6 +202,7 @@
   const toTextBlocks = (
     items?: Array<{
       name: string;
+      englishName?: string;
       value?: string;
       markdown?: boolean;
       sharedUsageCount?: number;
@@ -209,7 +210,7 @@
   ): EditableTextBlock[] =>
     items?.map((item) => ({
       name: item.name,
-      englishName: '',
+      englishName: item.englishName || '',
       description: item.value || '',
       markdown: item.markdown ?? true,
       sharedUsageCount: item.sharedUsageCount,
