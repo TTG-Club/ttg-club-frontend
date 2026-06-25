@@ -78,6 +78,42 @@ export const WorkshopBackgroundEditPage: RouteRecordRaw = {
   component: () => import('./backgrounds/BackgroundEditView.vue'),
 };
 
+export const WorkshopWeaponsPage: RouteRecordRaw = {
+  name: 'workshop-weapons',
+  path: '/workshop/weapons',
+  component: () => import('./weapons/WorkshopWeaponsView.vue'),
+};
+
+export const WorkshopWeaponCreatePage: RouteRecordRaw = {
+  name: 'workshop-weapon-create',
+  path: '/workshop/weapons/create',
+  component: () => import('./weapons/WeaponCreateView.vue'),
+};
+
+export const WorkshopWeaponEditPage: RouteRecordRaw = {
+  name: 'workshop-weapon-edit',
+  path: '/workshop/weapons/:weaponName/edit',
+  component: () => import('./weapons/WeaponEditView.vue'),
+};
+
+export const WorkshopArmorsPage: RouteRecordRaw = {
+  name: 'workshop-armors',
+  path: '/workshop/armors',
+  component: () => import('./armors/WorkshopArmorsView.vue'),
+};
+
+export const WorkshopArmorCreatePage: RouteRecordRaw = {
+  name: 'workshop-armor-create',
+  path: '/workshop/armors/create',
+  component: () => import('./armors/ArmorCreateView.vue'),
+};
+
+export const WorkshopArmorEditPage: RouteRecordRaw = {
+  name: 'workshop-armor-edit',
+  path: '/workshop/armors/:armorName/edit',
+  component: () => import('./armors/ArmorEditView.vue'),
+};
+
 export * from './bestiary';
 
 export * from './screens';

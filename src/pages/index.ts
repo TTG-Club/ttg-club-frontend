@@ -36,6 +36,9 @@ import {
   BestiaryPage,
   ScreensPage,
   WorkshopPage,
+  WorkshopArmorCreatePage,
+  WorkshopArmorEditPage,
+  WorkshopArmorsPage,
   WorkshopBackgroundCreatePage,
   WorkshopBackgroundEditPage,
   WorkshopBackgroundsPage,
@@ -48,6 +51,9 @@ import {
   WorkshopSpellCreatePage,
   WorkshopSpellEditPage,
   WorkshopSpellsPage,
+  WorkshopWeaponCreatePage,
+  WorkshopWeaponEditPage,
+  WorkshopWeaponsPage,
 } from './workshop';
 
 import type { RouteRecordRaw } from 'vue-router';
@@ -81,6 +87,12 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   WorkshopBackgroundsPage,
   WorkshopBackgroundCreatePage,
   WorkshopBackgroundEditPage,
+  WorkshopWeaponsPage,
+  WorkshopWeaponCreatePage,
+  WorkshopWeaponEditPage,
+  WorkshopArmorsPage,
+  WorkshopArmorCreatePage,
+  WorkshopArmorEditPage,
   GodsPage,
   RulesPage,
   BooksPage,

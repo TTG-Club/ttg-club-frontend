@@ -1,5 +1,6 @@
 <script>
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -26,6 +27,12 @@
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+      ...mapState(useUserStore, ['user']),
+      editUrl() {
+        return this.user?.roles.includes(EUserRoles.ADMIN) && this.weapon
+          ? `/workshop/weapons/${this.$route.params.weaponName}/edit`
+          : '';
+      },
     },
     async mounted() {
       await this.weaponInfoQuery(this.$route.path);
@@ -71,6 +78,7 @@
         :fullscreen="!isMobile"
         :subtitle="weapon?.name?.eng"
         :title="weapon?.name?.rus"
+        :edit-url="editUrl"
         bookmark
         copy
         print

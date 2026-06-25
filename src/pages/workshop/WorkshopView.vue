@@ -26,6 +26,18 @@
       url: '/workshop/backgrounds',
       createUrl: '/workshop/backgrounds/create',
     },
+    {
+      title: 'Оружие',
+      description: 'Создание и редактирование оружия справочника.',
+      url: '/workshop/weapons',
+      createUrl: '/workshop/weapons/create',
+    },
+    {
+      title: 'Доспехи',
+      description: 'Создание и редактирование доспехов справочника.',
+      url: '/workshop/armors',
+      createUrl: '/workshop/armors/create',
+    },
   ];
 </script>
 
