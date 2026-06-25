@@ -27,6 +27,12 @@
       createUrl: '/workshop/backgrounds/create',
     },
     {
+      title: 'Классы',
+      description: 'Создание и редактирование классов справочника.',
+      url: '/workshop/classes',
+      createUrl: '/workshop/classes/create',
+    },
+    {
       title: 'Оружие',
       description: 'Создание и редактирование оружия справочника.',
       url: '/workshop/weapons',

@@ -78,6 +78,24 @@ export const WorkshopBackgroundEditPage: RouteRecordRaw = {
   component: () => import('./backgrounds/BackgroundEditView.vue'),
 };
 
+export const WorkshopClassesPage: RouteRecordRaw = {
+  name: 'workshop-classes',
+  path: '/workshop/classes',
+  component: () => import('./classes/WorkshopClassesView.vue'),
+};
+
+export const WorkshopClassCreatePage: RouteRecordRaw = {
+  name: 'workshop-class-create',
+  path: '/workshop/classes/create',
+  component: () => import('./classes/ClassCreateView.vue'),
+};
+
+export const WorkshopClassEditPage: RouteRecordRaw = {
+  name: 'workshop-class-edit',
+  path: '/workshop/classes/:className/edit',
+  component: () => import('./classes/ClassEditView.vue'),
+};
+
 export const WorkshopWeaponsPage: RouteRecordRaw = {
   name: 'workshop-weapons',
   path: '/workshop/weapons',

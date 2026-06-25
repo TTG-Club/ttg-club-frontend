@@ -5,6 +5,7 @@
   import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import type { TName, TSource } from '@/shared/types/BaseApiFields';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
@@ -35,8 +36,10 @@
 
   const route = useRoute();
   const router = useRouter();
+  const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(useUIStore());
+  const { user } = storeToRefs(userStore);
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
@@ -317,6 +320,14 @@
     router.push({ name: 'classes' });
   };
 
+  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
+
+  const editUrl = computed(() =>
+    canEdit.value && currentClass.value
+      ? `/workshop/classes/${currentClass.value.name.eng.replace(/\s+/g, '_')}/edit`
+      : '',
+  );
+
   onMounted(async () => {
     await classInfoQuery(route.path);
 
@@ -358,6 +369,7 @@
       >
         <section-header
           :copy="!error && !loading"
+          :edit-url="editUrl"
           :subtitle="currentClass?.name?.eng || ''"
           :title="currentClass?.name?.rus || ''"
           bookmark
