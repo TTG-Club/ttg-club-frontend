@@ -42,6 +42,42 @@ export const WorkshopCreatureEditPage: RouteRecordRaw = {
   component: () => import('./bestiary/CreatureEditView.vue'),
 };
 
+export const WorkshopFeatsPage: RouteRecordRaw = {
+  name: 'workshop-feats',
+  path: '/workshop/feats',
+  component: () => import('./feats/WorkshopFeatsView.vue'),
+};
+
+export const WorkshopFeatCreatePage: RouteRecordRaw = {
+  name: 'workshop-feat-create',
+  path: '/workshop/feats/create',
+  component: () => import('./feats/FeatCreateView.vue'),
+};
+
+export const WorkshopFeatEditPage: RouteRecordRaw = {
+  name: 'workshop-feat-edit',
+  path: '/workshop/feats/:featName/edit',
+  component: () => import('./feats/FeatEditView.vue'),
+};
+
+export const WorkshopBackgroundsPage: RouteRecordRaw = {
+  name: 'workshop-backgrounds',
+  path: '/workshop/backgrounds',
+  component: () => import('./backgrounds/WorkshopBackgroundsView.vue'),
+};
+
+export const WorkshopBackgroundCreatePage: RouteRecordRaw = {
+  name: 'workshop-background-create',
+  path: '/workshop/backgrounds/create',
+  component: () => import('./backgrounds/BackgroundCreateView.vue'),
+};
+
+export const WorkshopBackgroundEditPage: RouteRecordRaw = {
+  name: 'workshop-background-edit',
+  path: '/workshop/backgrounds/:backgroundName/edit',
+  component: () => import('./backgrounds/BackgroundEditView.vue'),
+};
+
 export * from './bestiary';
 
 export * from './screens';

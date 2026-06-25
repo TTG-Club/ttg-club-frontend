@@ -13,9 +13,23 @@ export interface FeatsLinkItem {
 }
 
 export interface FeatsItem {
+  id: number;
   name: TName;
   requirements: string;
   description: string;
   source: TSource;
+  abilities?: string[];
+  skills?: string[];
   homebrew?: boolean;
+}
+
+export interface FeatSave {
+  name: string;
+  englishName: string;
+  altName?: string;
+  level?: number;
+  requirement?: string;
+  description: string;
+  abilities: string[];
+  skills: string[];
 }

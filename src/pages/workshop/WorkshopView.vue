@@ -14,6 +14,18 @@
       url: '/workshop/bestiary',
       createUrl: '/workshop/bestiary/create',
     },
+    {
+      title: 'Черты',
+      description: 'Создание и редактирование черт справочника.',
+      url: '/workshop/feats',
+      createUrl: '/workshop/feats/create',
+    },
+    {
+      title: 'Предыстории',
+      description: 'Создание и редактирование предысторий справочника.',
+      url: '/workshop/backgrounds',
+      createUrl: '/workshop/backgrounds/create',
+    },
   ];
 </script>
 
