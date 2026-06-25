@@ -13,6 +13,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import ClassTraits from '@/pages/character/classes/classes-detail/ClassTraits.vue';
   import OptionsView from '@/pages/character/options/OptionsView.vue';
   import SpellsView from '@/pages/character/spells/SpellsView.vue';
 
@@ -413,8 +414,15 @@
           ref="classBody"
           class="class-detail__body"
         >
+          <class-traits
+            v-if="currentTab?.type === 'traits'"
+            :traits="currentClass.traits"
+            @loaded="initScrollListeners"
+            @before-unmount="removeScrollListeners"
+          />
+
           <div
-            v-if="currentTab?.url"
+            v-else-if="currentTab?.url"
             class="class-detail__body--inner"
           >
             <raw-content
