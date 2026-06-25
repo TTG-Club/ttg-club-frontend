@@ -718,13 +718,25 @@
       </label>
 
       <div class="creature-editor__readonly">
-        <span>Кость хитов: {{ hitDice.dice }}</span>
+        <label class="creature-editor__field">
+          <span>Среднее</span>
 
-        <span>Бонус от Тел: {{ hitDiceBonus }}</span>
+          <input
+            :value="averageHp || '—'"
+            readonly
+            type="text"
+          />
+        </label>
 
-        <span>Формула: {{ hitFormula || '—' }}</span>
+        <label class="creature-editor__field">
+          <span>Формула</span>
 
-        <span>Среднее: {{ averageHp || '—' }}</span>
+          <input
+            :value="hitFormula || '—'"
+            readonly
+            type="text"
+          />
+        </label>
       </div>
     </div>
 
@@ -1231,17 +1243,9 @@
     }
 
     &__readonly {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      padding: 10px 12px;
-
-      color: var(--text-color);
-
-      background-color: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 12px;
     }
 
     &__actions {
@@ -1289,6 +1293,10 @@
       }
 
       &__text-block {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      &__readonly {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
