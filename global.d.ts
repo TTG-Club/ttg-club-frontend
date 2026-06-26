@@ -17,6 +17,12 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+interface Window {
+  // Глобальная функция Яндекс.Метрики, инициализируется сниппетом в index.html
+  // (только в production-сборке).
+  ym?: (counterId: number, method: string, ...args: unknown[]) => void;
+}
+
 declare module 'vue-virtual-scroller' {
   import type { DefineComponent } from 'vue';
 

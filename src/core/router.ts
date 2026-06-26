@@ -17,7 +17,7 @@ const router = createRouter({
 });
 
 const { nextAvailable } = useRouterHelpers();
-const { sendPageViewMetrics } = useMetrics();
+const { sendPageViewMetrics, sendYandexPageView } = useMetrics();
 const { closeSearch, closePopover } = useNavPopover();
 const { updateMetaByURL } = useMeta();
 const navStore = useNavStore(pinia);
@@ -38,6 +38,7 @@ router.beforeResolve(async () => {
 
 router.afterEach((to, from) => {
   sendPageViewMetrics(to);
+  sendYandexPageView(to, from);
 
   updateMetaByURL(to, from).finally();
 });
