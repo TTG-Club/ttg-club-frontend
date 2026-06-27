@@ -60,13 +60,7 @@
   );
 
   useWheel(
-    ({
-      direction: [, dir],
-      metaKey,
-      ctrlKey,
-      wheeling,
-      velocity,
-    }: any) => {
+    ({ direction: [, dir], metaKey, ctrlKey, wheeling, velocity }: any) => {
       if (!wheeling || !file.value) {
         return;
       }
