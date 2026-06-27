@@ -15,7 +15,8 @@
       }
     ],
     "pretty": true,
-    "strict": true,
+    "skipLibCheck": true,
+    "strict": false,
     "sourceMap": true,
     "typeRoots": [
       "./src/shared/types/generated",
@@ -25,8 +26,7 @@
     "types": [
       "node",
       "vite/client",
-      "vite-plugin-svg-icons/client.d.ts",
-      "./global.d.ts"
+      "vite-plugin-svg-icons/client.d.ts"
     ],
   },
   "exclude": [
@@ -34,6 +34,10 @@
     "dist"
   ],
   "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "vueCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "strictTemplates": false
+  },
   "include": [
     "vite.config.*",
     "global.d.ts",

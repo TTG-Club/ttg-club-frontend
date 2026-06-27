@@ -6,7 +6,7 @@ import type { TGetListRowsOptions, TListRow } from '@/shared/types/List';
 
 export const getListRows = <Item, KeyField extends keyof Item>(
   items: Item[],
-  { chunks, keyField }: TGetListRowsOptions<Item, KeyField>,
+  { chunks, keyField }: TGetListRowsOptions<KeyField>,
 ): TListRow<Item, KeyField>[] =>
   chunk(items, chunks).map(
     (columns) =>

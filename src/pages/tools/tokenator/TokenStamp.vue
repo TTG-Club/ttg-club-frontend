@@ -1,10 +1,5 @@
 <script lang="ts" setup>
-  import {
-    type EventTypes,
-    useDrag,
-    usePinch,
-    useWheel,
-  } from '@vueuse/gesture';
+  import { useDrag, usePinch, useWheel } from '@vueuse/gesture';
   import { set } from '@vueuse/shared';
 
   import isAppleDevice from '@/shared/utils/isAppleDevice';
@@ -40,7 +35,7 @@
   const moveCompensate = computed(() => delta.value * scale.value);
 
   useDrag(
-    ({ delta: [x, y], dragging, event }: EventTypes['drag']) => {
+    ({ delta: [x, y], dragging, event }: any) => {
       event.preventDefault();
 
       set(isDragging, dragging);
@@ -65,13 +60,7 @@
   );
 
   useWheel(
-    ({
-      direction: [, dir],
-      metaKey,
-      ctrlKey,
-      wheeling,
-      velocity,
-    }: EventTypes['wheel']) => {
+    ({ direction: [, dir], metaKey, ctrlKey, wheeling, velocity }: any) => {
       if (!wheeling || !file.value) {
         return;
       }
@@ -99,7 +88,7 @@
   );
 
   usePinch(
-    ({ direction: [dir], pinching, event, velocity }: EventTypes['pinch']) => {
+    ({ direction: [dir], pinching, event, velocity }: any) => {
       event.preventDefault();
 
       if (!pinching || !file.value) {

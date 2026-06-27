@@ -5,6 +5,7 @@ import type { RouteRecordRaw } from 'vue-router';
 export const MagicItemsPage: RouteRecordRaw = {
   name: 'magicItems',
   path: '/items/magic',
+  alias: ['/tools/items/magic'],
   component: () => import('./MagicItemsView.vue'),
   children: [MagicItemsDetailPage],
 };

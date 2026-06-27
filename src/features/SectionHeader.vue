@@ -16,6 +16,7 @@
     bookmark?: boolean;
     print?: boolean;
     fullscreen?: boolean;
+    editUrl?: string;
     foundryVersions?: Array<10 | 11 | 12>;
     defaultFoundry?: 10 | 11 | 12;
     exportLss?: boolean;
@@ -32,6 +33,7 @@
     bookmark: false,
     print: false,
     fullscreen: false,
+    editUrl: '',
     foundryVersions: () => [11],
     defaultFoundry: 11,
     onExportLss: undefined,
@@ -68,6 +70,7 @@
     () =>
       props.bookmark ||
       props.print ||
+      !!props.editUrl ||
       !!props.onExportLss ||
       !!props.onExportFoundry ||
       !!props.onClose ||
@@ -250,6 +253,23 @@
         </template>
 
         <template #default> Скопировать ссылку </template>
+      </n-tooltip>
+
+      <n-tooltip v-if="editUrl">
+        <template #trigger>
+          <n-button
+            quaternary
+            tag="a"
+            :href="editUrl"
+            @click.left.exact.prevent.stop="$router.push(editUrl)"
+          >
+            <template #icon>
+              <svg-icon icon="edit" />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default>Редактировать</template>
       </n-tooltip>
 
       <bookmark-save-button

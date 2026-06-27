@@ -11,12 +11,17 @@ export enum BestiaryFilterDefaults {
 
 export interface ICreatureAction {
   name: string;
+  englishName?: string;
   value: string;
+  markdown?: boolean;
+  sharedUsageCount?: number;
 }
 
 export interface ICreatureFeat {
   name: string;
+  englishName?: string;
   value?: string;
+  markdown?: boolean;
 }
 
 export interface ICreatureHits {
@@ -120,6 +125,7 @@ export interface ICreature {
   feats?: ICreatureFeat[];
   actions?: ICreatureAction[];
   reactions?: ICreatureAction[];
+  reaction?: string;
   images?: string[];
   damageImmunities?: string[];
   description?: string;
@@ -134,4 +140,69 @@ export interface ICreature {
   lair?: ICreatureLair;
   legendary?: ICreatureLegendary;
   mysticalActions?: ICreatureAction[];
+}
+
+export interface ICreatureSaveName {
+  rus: string;
+  eng: string;
+  alt?: string;
+}
+
+export interface ICreatureSaveNameValue {
+  key?: string;
+  name?: string;
+  value: number | string;
+  additional?: string;
+}
+
+export interface ICreatureSaveDescription {
+  name: ICreatureSaveName;
+  description?: string;
+  markdown?: boolean;
+}
+
+export interface ICreatureSave {
+  id?: number;
+  name: ICreatureSaveName;
+  size: string;
+  type: string;
+  alignment: string;
+  armorClass: number;
+  armorText?: string;
+  armors?: string[];
+  hits: {
+    average: number;
+    diceCount?: number;
+    text?: string;
+  };
+  speed: ICreatureSaveNameValue[];
+  ability: IAbilitiesValue;
+  savingThrows?: ICreatureSaveNameValue[];
+  skills?: ICreatureSaveNameValue[];
+  damageResistances?: string[];
+  damageImmunities?: string[];
+  damageVulnerabilities?: string[];
+  conditionImmunities?: string[];
+  senses: {
+    passivePerception: string;
+    senses?: ICreatureSaveNameValue[];
+  };
+  languages?: string[];
+  challengeRating: string;
+  feats?: ICreatureSaveDescription[];
+  actions?: ICreatureSaveDescription[];
+  reactions?: ICreatureSaveDescription[];
+  reaction?: string;
+  bonusActions?: ICreatureSaveDescription[];
+  legendary?: {
+    list: ICreatureSaveNameValue[];
+    count: number;
+    description?: string;
+  };
+  mysticalActions?: ICreatureSaveDescription[];
+  description?: string;
+  tags?: string[];
+  environment?: string[];
+  npc: boolean;
+  source?: string;
 }

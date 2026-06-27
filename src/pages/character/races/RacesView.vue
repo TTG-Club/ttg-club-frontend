@@ -27,7 +27,7 @@
     url: RacesFilterDefaults.url,
   });
 
-  const { initPages, items: races } = usePagination({
+  const { initPages, items: races } = usePagination<TRaceLink>({
     url: '/races',
     size: -1,
     filter: {
@@ -67,20 +67,8 @@
       return [];
     }
 
-    const getGroupArchetypes = (list: Array<TRaceLink>): Array<TRaceList> =>
-      sortBy(
-        Object.values(groupBy(list, (o) => o.type.name)).map((value) => ({
-          group: value[0].type,
-          list: value,
-        })),
-        [(o) => o.group.order],
-      );
-
     const getGroupClasses = (): Array<TRaceList> => {
-      const newClasses: Array<TRaceLink> = races.value.map((race) => ({
-        ...race,
-        archetypes: getGroupArchetypes(race.archetypes),
-      }));
+      const newClasses: Array<TRaceLink> = races.value;
 
       const defaultGroup: TRaceList = {
         list: sortBy(

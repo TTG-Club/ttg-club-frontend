@@ -6,6 +6,8 @@ export * from './madness';
 
 export * from './name-generator';
 
+export * from './tavern';
+
 export * from './tokenator';
 
 export * from './trader';

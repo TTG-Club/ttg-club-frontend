@@ -1,5 +1,6 @@
 <script>
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -26,6 +27,12 @@
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+      ...mapState(useUserStore, ['user']),
+      editUrl() {
+        return this.user?.roles.includes(EUserRoles.ADMIN) && this.background
+          ? `/workshop/backgrounds/${this.$route.params.backgroundName}/edit`
+          : '';
+      },
     },
     async mounted() {
       await this.backgroundInfoQuery(this.$route.path);
@@ -77,6 +84,7 @@
         :fullscreen="!isMobile"
         :subtitle="background?.name?.eng || ''"
         :title="background?.name?.rus || ''"
+        :edit-url="editUrl"
         bookmark
         print
         @close="close"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -22,6 +23,8 @@
 
   const route = useRoute();
   const router = useRouter();
+  const userStore = useUserStore();
+  const { user } = storeToRefs(userStore);
 
   const race = ref();
   const loading = ref(false);
@@ -68,6 +71,14 @@
     router.push({ name: 'races' });
   };
 
+  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
+
+  const editUrl = computed(() =>
+    canEdit.value && race.value
+      ? `/workshop/races/${race.value.name.eng.replace(/\s+/g, '_')}/edit`
+      : '',
+  );
+
   tryOnMounted(async () => {
     await raceInfoQuery(route.path);
 
@@ -101,6 +112,7 @@
     <template #fixed>
       <section-header
         :copy="!error && !loading"
+        :edit-url="editUrl"
         :subtitle="race?.name?.eng || ''"
         :title="race?.name?.rus || ''"
         bookmark

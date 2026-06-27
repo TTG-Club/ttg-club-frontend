@@ -5,6 +5,7 @@
   import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import type { TName, TSource } from '@/shared/types/BaseApiFields';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
@@ -13,6 +14,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import ClassTraits from '@/pages/character/classes/classes-detail/ClassTraits.vue';
   import OptionsView from '@/pages/character/options/OptionsView.vue';
   import SpellsView from '@/pages/character/spells/SpellsView.vue';
 
@@ -34,8 +36,10 @@
 
   const route = useRoute();
   const router = useRouter();
+  const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(useUIStore());
+  const { user } = storeToRefs(userStore);
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
@@ -46,11 +50,7 @@
   const loading = ref(true);
   const error = ref(false);
 
-  const currentClass = ref<
-    unknown & {
-      archetypes?: Array<ClassItemArchetype>;
-    }
-  >();
+  const currentClass = ref<any>();
 
   const currentTab = ref(undefined);
   const tabs = ref([]);
@@ -246,7 +246,8 @@
 
     const formattedHash = hash.startsWith('#') ? hash : `#${hash}`;
 
-    const section = classBody.value.querySelector(formattedHash).parentElement;
+    const target = classBody.value.querySelector(formattedHash);
+    const section = target?.parentElement;
 
     if (!section) {
       return;
@@ -267,12 +268,16 @@
       return;
     }
 
+    const link = e.target?.closest?.('a[href^="#"]');
+
+    if (!link) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
 
-    const { target } = e;
-
-    const hash = target.getAttribute('href').replace('#', '').trim();
+    const hash = link.getAttribute('href').replace('#', '').trim();
 
     if (hash) {
       scrollToSection(hash);
@@ -315,6 +320,14 @@
     router.push({ name: 'classes' });
   };
 
+  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
+
+  const editUrl = computed(() =>
+    canEdit.value && currentClass.value
+      ? `/workshop/classes/${currentClass.value.name.eng.replace(/\s+/g, '_')}/edit`
+      : '',
+  );
+
   onMounted(async () => {
     await classInfoQuery(route.path);
 
@@ -356,6 +369,7 @@
       >
         <section-header
           :copy="!error && !loading"
+          :edit-url="editUrl"
           :subtitle="currentClass?.name?.eng || ''"
           :title="currentClass?.name?.rus || ''"
           bookmark
@@ -417,8 +431,16 @@
           ref="classBody"
           class="class-detail__body"
         >
+          <class-traits
+            v-if="currentTab?.type === 'traits'"
+            :traits="currentClass.traits"
+            @anchor-click="scrollToSection"
+            @loaded="initScrollListeners"
+            @before-unmount="removeScrollListeners"
+          />
+
           <div
-            v-if="currentTab?.url"
+            v-else-if="currentTab?.url"
             class="class-detail__body--inner"
           >
             <raw-content

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import type { FeatsItem } from '@/shared/types/character/Feats';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
@@ -12,6 +13,7 @@
   const route = useRoute();
   const router = useRouter();
   const { isMobile } = storeToRefs(useUIStore());
+  const { user } = storeToRefs(useUserStore());
 
   const feat = ref<FeatsItem>();
   const loading = ref(false);
@@ -48,6 +50,13 @@
   };
 
   const close = () => router.push({ name: 'feats' });
+  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
+
+  const editUrl = computed(() =>
+    canEdit.value && feat.value
+      ? `/workshop/feats/${route.params.featName}/edit`
+      : '',
+  );
 
   onBeforeMount(async () => {
     try {
@@ -81,6 +90,7 @@
         :fullscreen="!isMobile"
         :subtitle="feat?.name?.eng || ''"
         :title="feat?.name?.rus || ''"
+        :edit-url="editUrl"
         bookmark
         print
         @close="close"

@@ -1,10 +1,10 @@
-import { DiceRoller } from 'dice-roller-parser';
-import { type RollBase } from 'dice-roller-parser';
+import { DiceRoller, type RollBase } from 'dice-roller-parser';
 import { v4 } from 'uuid';
-import { type ToastOptions } from 'vue-toastification/src/types';
 
 import { useRollStore } from '@/shared/stores/RollStore';
 import { getFormattedFormula, type RollType } from '@/shared/utils/roll';
+
+import type { ToastOptions } from 'vue-toastification/dist/types/types';
 
 export function useDiceRoller() {
   const roller = new DiceRoller();

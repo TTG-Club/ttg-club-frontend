@@ -9,7 +9,7 @@ import { Event, eventBus } from '../utils/eventBus';
 import { type RollType } from '../utils/roll';
 import { type PartialBy } from '../utils/types';
 
-import type { ToastOptions } from 'vue-toastification/src/types';
+import type { ToastOptions } from 'vue-toastification/dist/types/types';
 
 const ROLL_ITEMS_LIMIT = 100;
 const DEFAULT_FALLBACK_SOURCE = 'Бросок';

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -14,8 +15,10 @@
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
+  const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(uiStore);
+  const { user } = storeToRefs(userStore);
 
   const creature = ref<Maybe<ICreature>>(undefined);
   const loading = ref(true);
@@ -66,6 +69,14 @@
     router.push({ name: 'bestiary' });
   };
 
+  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
+
+  const editUrl = computed(() =>
+    canEdit.value && creature.value
+      ? `/workshop/bestiary/${route.params.creatureName}/edit`
+      : '',
+  );
+
   onBeforeMount(async () => {
     await creatureInfoQuery(route.path);
   });
@@ -88,6 +99,7 @@
         :fullscreen="!isMobile"
         :subtitle="creature?.name?.eng || ''"
         :title="creature?.name?.rus || ''"
+        :edit-url="editUrl"
         bookmark
         print
         :foundry-versions="[10, 11]"

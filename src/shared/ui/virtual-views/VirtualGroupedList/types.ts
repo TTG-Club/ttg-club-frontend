@@ -22,6 +22,6 @@ export type TFilterItemsByGroupIdOptions<Item, Group, KeyField> = {
 export type TGetGroupedListItemsOptions<
   Item,
   Group,
-  KeyField extends keyof Item,
+  KeyField extends RecordKey,
 > = TFilterItemsByGroupIdOptions<Item, Group, KeyField> &
-  TGetListRowsOptions<Item, KeyField>;
+  TGetListRowsOptions<KeyField>;
