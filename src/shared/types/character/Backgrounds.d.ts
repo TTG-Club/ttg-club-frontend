@@ -1,4 +1,5 @@
 import type { TName, TSource } from '@/shared/types/BaseApiFields';
+import type { IRollTable } from '@/shared/types/RollTable';
 
 export enum BackgroundsFilterDefaults {
   dbName = 'backgrounds',
@@ -18,6 +19,7 @@ export interface BackgroundItem {
   startGold?: number;
   description?: string;
   personalization?: string;
+  personalizationTables?: IRollTable[];
 }
 
 export interface BackgroundSave {
