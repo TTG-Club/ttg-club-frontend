@@ -6,10 +6,10 @@
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  type GenerationType = 'SINGLE' | 'GROUP' | 'FAMILY' | 'CLAN';
+  type GenerationType = 'SINGLE' | 'GROUP' | 'FAMILY' | 'CLAN' | 'HOUSE';
   type NameFormat =
+    | 'ANY'
     | 'NAME_SURNAME'
-    | 'NAME_SURNAME_HOUSE'
     | 'NAME_CLAN'
     | 'NAME_HOUSE'
     | 'NAME_NICKNAME'
@@ -34,15 +34,13 @@
     { label: 'Один персонаж', value: 'SINGLE' },
     { label: 'Группа', value: 'GROUP' },
     { label: 'Семья', value: 'FAMILY' },
-    { label: 'Один клан', value: 'CLAN' },
+    { label: 'Клан', value: 'CLAN' },
+    { label: 'Дом', value: 'HOUSE' },
   ];
 
   const nameFormats = [
+    { label: 'Любой', value: 'ANY' },
     { label: 'Имя и фамилия', value: 'NAME_SURNAME' },
-    {
-      label: 'Имя, фамилия и дом',
-      value: 'NAME_SURNAME_HOUSE',
-    },
     { label: 'Имя и клан', value: 'NAME_CLAN' },
     { label: 'Имя и дом', value: 'NAME_HOUSE' },
     { label: 'Имя и прозвище', value: 'NAME_NICKNAME' },
@@ -64,7 +62,7 @@
   };
 
   const type = ref<GenerationType>('SINGLE');
-  const format = ref<NameFormat>('NAME_SURNAME');
+  const format = ref<NameFormat>('ANY');
   const count = ref(5);
   const raceId = ref<number | typeof ALL_RACES>(ALL_RACES);
   const sexes = ref<Array<Sex>>(['MALE', 'FEMALE']);
@@ -86,7 +84,10 @@
   ]);
 
   const isSharedGroup = computed(
-    () => type.value === 'FAMILY' || type.value === 'CLAN',
+    () =>
+      type.value === 'FAMILY' ||
+      type.value === 'CLAN' ||
+      type.value === 'HOUSE',
   );
 
   const effectiveFormatHint = computed(() => {
@@ -96,6 +97,10 @@
 
     if (type.value === 'CLAN') {
       return 'Для всех участников будет использован один клан.';
+    }
+
+    if (type.value === 'HOUSE') {
+      return 'Для всех участников будет использован один дом.';
     }
 
     return null;
