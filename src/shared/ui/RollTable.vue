@@ -4,18 +4,12 @@
 
   import { ToastEventBus } from '@/shared/config';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import type { IRollTable } from '@/shared/types/RollTable';
   import DiceRoller from '@/shared/ui/DiceRoller.vue';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import type { RollBase } from 'dice-roller-parser';
-
-  export interface IRollTable {
-    name: string;
-    formula: string;
-    thead: Array<string>;
-    tbody: Array<Array<string>>;
-  }
 
   const props = defineProps<{
     table: IRollTable;

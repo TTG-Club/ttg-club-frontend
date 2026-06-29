@@ -3,9 +3,10 @@
 
   import { httpClient } from '@/shared/api';
   import type { TNameValue, TSource } from '@/shared/types/BaseApiFields';
+  import type { IRollTable } from '@/shared/types/RollTable';
   import BaseModal from '@/shared/ui/modals/BaseModal.vue';
   import RawContent from '@/shared/ui/RawContent.vue';
-  import RollTable, { type IRollTable } from '@/shared/ui/RollTable.vue';
+  import RollTable from '@/shared/ui/RollTable.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
