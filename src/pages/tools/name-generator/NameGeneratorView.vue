@@ -17,6 +17,8 @@
     | 'NAME_CLAN_AFFILIATION';
   type Sex = 'MALE' | 'FEMALE';
 
+  const ALL_RACES = 'ALL_RACES' as const;
+
   type RaceOption = {
     id: number;
     name: string;
@@ -56,10 +58,15 @@
     FEMALE: 'Женское',
   };
 
+  const metaTagColor = {
+    color: 'var(--hover)',
+    textColor: 'var(--text-g-color)',
+  };
+
   const type = ref<GenerationType>('SINGLE');
   const format = ref<NameFormat>('NAME_SURNAME');
   const count = ref(5);
-  const raceId = ref<number | null>(null);
+  const raceId = ref<number | typeof ALL_RACES>(ALL_RACES);
   const sexes = ref<Array<Sex>>(['MALE', 'FEMALE']);
   const races = ref<Array<RaceOption>>([]);
   const results = ref<Array<GeneratedName>>([]);
@@ -67,12 +74,16 @@
   const loadingRaces = ref(false);
   const controller = ref<AbortController>();
 
-  const raceOptions = computed(() =>
-    races.value.map((race) => ({
+  const raceOptions = computed(() => [
+    {
+      label: 'Любая раса',
+      value: ALL_RACES,
+    },
+    ...races.value.map((race) => ({
       label: race.name,
       value: race.id,
     })),
-  );
+  ]);
 
   const isSharedGroup = computed(
     () => type.value === 'FAMILY' || type.value === 'CLAN',
@@ -123,7 +134,7 @@
           type: type.value,
           format: format.value,
           count: type.value === 'SINGLE' ? 1 : count.value,
-          raceId: raceId.value,
+          raceId: raceId.value === ALL_RACES ? null : raceId.value,
           sexes: sexes.value,
         },
         signal: controller.value.signal,
@@ -175,9 +186,7 @@
               v-model:value="raceId"
               :options="raceOptions"
               :loading="loadingRaces"
-              clearable
               filterable
-              placeholder="Любая раса"
             />
           </n-form-item>
 
@@ -261,6 +270,7 @@
             <n-tag
               size="small"
               :bordered="false"
+              :color="metaTagColor"
             >
               {{ item.race }}
             </n-tag>
@@ -269,6 +279,7 @@
               v-if="item.sex"
               size="small"
               :bordered="false"
+              :color="metaTagColor"
             >
               {{ sexLabels[item.sex] }}
             </n-tag>
