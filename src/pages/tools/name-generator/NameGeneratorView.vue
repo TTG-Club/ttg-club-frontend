@@ -219,6 +219,7 @@
           >
             <n-select
               v-model:value="components"
+              class="name-generator-form__components"
               :options="nameComponentOptions"
               :disabled="isSharedGroup"
               clearable
@@ -366,6 +367,16 @@
 
     &__sexes {
       max-width: 100%;
+    }
+
+    &__components {
+      :deep(.n-tag) {
+        --n-color: var(--hover) !important;
+        --n-text-color: var(--text-color) !important;
+        --n-border: 1px solid var(--border) !important;
+        --n-close-icon-color: var(--text-g-color) !important;
+        --n-close-icon-color-hover: var(--text-color) !important;
+      }
     }
   }
 
