@@ -7,14 +7,13 @@
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
   type GenerationType = 'SINGLE' | 'GROUP' | 'FAMILY' | 'CLAN' | 'HOUSE';
-  type NameFormat =
-    | 'ANY'
-    | 'NAME_SURNAME'
-    | 'NAME_CLAN'
-    | 'NAME_HOUSE'
-    | 'NAME_NICKNAME'
+  type NameComponent =
+    | 'NAME'
+    | 'SURNAME'
     | 'NICKNAME'
-    | 'NAME_CLAN_AFFILIATION';
+    | 'CLAN'
+    | 'HOUSE'
+    | 'FROM';
   type Sex = 'MALE' | 'FEMALE' | 'UNISEX';
 
   const ALL_RACES = 'ALL_RACES' as const;
@@ -38,17 +37,13 @@
     { label: 'Дом', value: 'HOUSE' },
   ];
 
-  const nameFormats = [
-    { label: 'Любой', value: 'ANY' },
-    { label: 'Имя и фамилия', value: 'NAME_SURNAME' },
-    { label: 'Имя и клан', value: 'NAME_CLAN' },
-    { label: 'Имя и дом', value: 'NAME_HOUSE' },
-    { label: 'Имя и прозвище', value: 'NAME_NICKNAME' },
-    { label: 'Только прозвище', value: 'NICKNAME' },
-    {
-      label: 'Имя и принадлежность к клану',
-      value: 'NAME_CLAN_AFFILIATION',
-    },
+  const nameComponentOptions = [
+    { label: 'Имя', value: 'NAME' },
+    { label: 'Фамилия', value: 'SURNAME' },
+    { label: 'Прозвище', value: 'NICKNAME' },
+    { label: 'Клан', value: 'CLAN' },
+    { label: 'Дом', value: 'HOUSE' },
+    { label: 'Место', value: 'FROM' },
   ];
 
   const sexLabels: Record<Sex, string> = {
@@ -63,7 +58,16 @@
   };
 
   const type = ref<GenerationType>('SINGLE');
-  const format = ref<NameFormat>('ANY');
+
+  const components = ref<Array<NameComponent>>([
+    'NAME',
+    'SURNAME',
+    'NICKNAME',
+    'CLAN',
+    'HOUSE',
+    'FROM',
+  ]);
+
   const count = ref(5);
   const raceId = ref<number | typeof ALL_RACES>(ALL_RACES);
   const sexes = ref<Array<Sex>>(['MALE', 'FEMALE']);
@@ -125,7 +129,10 @@
   };
 
   const generate = async () => {
-    if (!sexes.value.length) {
+    if (
+      !sexes.value.length ||
+      (!isSharedGroup.value && !components.value.length)
+    ) {
       return;
     }
 
@@ -138,7 +145,7 @@
         url: '/tools/names',
         payload: {
           type: type.value,
-          format: format.value,
+          components: components.value,
           count: type.value === 'SINGLE' ? 1 : count.value,
           raceId: raceId.value === ALL_RACES ? null : raceId.value,
           sexes: sexes.value,
@@ -160,7 +167,10 @@
 </script>
 
 <template>
-  <content-layout title="Генератор имён">
+  <content-layout
+    title="Генератор имён"
+    class="name-generator-layout"
+  >
     <template #fixed>
       <n-form
         class="name-generator-form"
@@ -196,11 +206,25 @@
             />
           </n-form-item>
 
-          <n-form-item label="Формат имени">
+          <n-form-item
+            label="Состав имени"
+            :validation-status="
+              components.length || isSharedGroup ? undefined : 'error'
+            "
+            :feedback="
+              components.length || isSharedGroup
+                ? undefined
+                : 'Выберите хотя бы один вариант'
+            "
+          >
             <n-select
-              v-model:value="format"
-              :options="nameFormats"
+              v-model:value="components"
+              :options="nameComponentOptions"
               :disabled="isSharedGroup"
+              clearable
+              multiple
+              max-tag-count="responsive"
+              placeholder="Выберите состав имени"
             />
           </n-form-item>
         </div>
@@ -211,7 +235,7 @@
           :feedback="sexes.length ? undefined : 'Выберите хотя бы один вариант'"
         >
           <n-checkbox-group v-model:value="sexes">
-            <n-space>
+            <n-space class="name-generator-form__sexes">
               <n-checkbox value="MALE">Мужчина</n-checkbox>
 
               <n-checkbox value="FEMALE">Женщина</n-checkbox>
@@ -229,12 +253,12 @@
           {{ effectiveFormatHint }}
         </n-text>
 
-        <n-flex>
+        <div class="name-generator-form__actions">
           <n-button
             type="primary"
             attr-type="submit"
             :loading="loading"
-            :disabled="!sexes.length"
+            :disabled="!sexes.length || (!isSharedGroup && !components.length)"
           >
             Сгенерировать
           </n-button>
@@ -246,7 +270,7 @@
           >
             Очистить
           </n-button>
-        </n-flex>
+        </div>
       </n-form>
     </template>
 
@@ -302,6 +326,14 @@
   @use '@/assets/styles/variables/breakpoints' as *;
 
   .name-generator-form {
+    :deep(.n-form-item) {
+      min-width: 0;
+    }
+
+    :deep(.n-input-number) {
+      width: 100%;
+    }
+
     &__grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -316,6 +348,33 @@
       display: block;
       margin: -4px 0 16px;
     }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      @include media-max($sm) {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        :deep(.n-button) {
+          width: 100%;
+        }
+      }
+    }
+
+    &__sexes {
+      max-width: 100%;
+    }
+  }
+
+  .name-generator-layout {
+    @include media-max($md) {
+      :deep(.content-layout__fixed) {
+        position: static;
+      }
+    }
   }
 
   .name-generator-empty,
@@ -324,6 +383,10 @@
     padding: 16px;
     background-color: var(--bg-table-list);
     border-radius: 12px;
+
+    @include media-max($sm) {
+      padding: 12px;
+    }
   }
 
   .name-generator-empty {
