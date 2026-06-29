@@ -15,7 +15,7 @@
     | 'NAME_NICKNAME'
     | 'NICKNAME'
     | 'NAME_CLAN_AFFILIATION';
-  type Sex = 'MALE' | 'FEMALE';
+  type Sex = 'MALE' | 'FEMALE' | 'UNISEX';
 
   const ALL_RACES = 'ALL_RACES' as const;
 
@@ -54,6 +54,7 @@
   const sexLabels: Record<Sex, string> = {
     MALE: 'Мужское',
     FEMALE: 'Женское',
+    UNISEX: 'Универсальное',
   };
 
   const metaTagColor = {
@@ -211,9 +212,11 @@
         >
           <n-checkbox-group v-model:value="sexes">
             <n-space>
-              <n-checkbox value="MALE">Мужские имена</n-checkbox>
+              <n-checkbox value="MALE">Мужчина</n-checkbox>
 
-              <n-checkbox value="FEMALE">Женские имена</n-checkbox>
+              <n-checkbox value="FEMALE">Женщина</n-checkbox>
+
+              <n-checkbox value="UNISEX">Универсальные</n-checkbox>
             </n-space>
           </n-checkbox-group>
         </n-form-item>
