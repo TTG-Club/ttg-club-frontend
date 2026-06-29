@@ -1,176 +1,420 @@
-<script>
-  import { throttle } from 'lodash-es';
-
-  import RawContent from '@/shared/ui/RawContent.vue';
+<script setup lang="ts">
+  import { httpClient } from '@/shared/api';
+  import { getApiErrorMessage } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
+  import { toast } from '@/shared/utils/toast';
 
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
-  export default defineComponent({
-    components: {
-      RawContent,
-      ContentLayout,
+  type GenerationType = 'SINGLE' | 'GROUP' | 'FAMILY' | 'CLAN' | 'HOUSE';
+  type NameComponent =
+    | 'NAME'
+    | 'SURNAME'
+    | 'NICKNAME'
+    | 'CLAN'
+    | 'HOUSE'
+    | 'FROM';
+  type Sex = 'MALE' | 'FEMALE' | 'UNISEX';
+
+  const ALL_RACES = 'ALL_RACES' as const;
+
+  type RaceOption = {
+    id: number;
+    name: string;
+  };
+
+  type GeneratedName = {
+    value: string;
+    race: string;
+    sex: Sex | null;
+  };
+
+  const generationTypes = [
+    { label: 'Один персонаж', value: 'SINGLE' },
+    { label: 'Группа', value: 'GROUP' },
+    { label: 'Семья', value: 'FAMILY' },
+    { label: 'Клан', value: 'CLAN' },
+    { label: 'Дом', value: 'HOUSE' },
+  ];
+
+  const nameComponentOptions = [
+    { label: 'Имя', value: 'NAME' },
+    { label: 'Фамилия', value: 'SURNAME' },
+    { label: 'Прозвище', value: 'NICKNAME' },
+    { label: 'Клан', value: 'CLAN' },
+    { label: 'Дом', value: 'HOUSE' },
+    { label: 'Место', value: 'FROM' },
+  ];
+
+  const sexLabels: Record<Sex, string> = {
+    MALE: 'Мужское',
+    FEMALE: 'Женское',
+    UNISEX: 'Универсальное',
+  };
+
+  const metaTagColor = {
+    color: 'var(--hover)',
+    textColor: 'var(--text-g-color)',
+  };
+
+  const type = ref<GenerationType>('SINGLE');
+
+  const components = ref<Array<NameComponent>>([
+    'NAME',
+    'SURNAME',
+    'NICKNAME',
+    'CLAN',
+    'HOUSE',
+    'FROM',
+  ]);
+
+  const count = ref(5);
+  const raceId = ref<number | typeof ALL_RACES>(ALL_RACES);
+  const sexes = ref<Array<Sex>>(['MALE', 'FEMALE']);
+  const races = ref<Array<RaceOption>>([]);
+  const results = ref<Array<GeneratedName>>([]);
+  const loading = ref(false);
+  const loadingRaces = ref(false);
+  const controller = ref<AbortController>();
+
+  const raceOptions = computed(() => [
+    {
+      label: 'Любая раса',
+      value: ALL_RACES,
     },
-    data: () => ({
-      count: 1,
-      tables: [],
-      results: [],
-      controller: undefined,
-    }),
-    async beforeMount() {
-      await this.getTables();
-    },
-    methods: {
-      async getTables() {
-        try {
-          const resp = await this.$http.get({
-            url: '/tools/wildmagic',
-          });
+    ...races.value.map((race) => ({
+      label: race.name,
+      value: race.id,
+    })),
+  ]);
 
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
+  const isSharedGroup = computed(
+    () =>
+      type.value === 'FAMILY' ||
+      type.value === 'CLAN' ||
+      type.value === 'HOUSE',
+  );
 
-            return;
-          }
+  const effectiveFormatHint = computed(() => {
+    if (type.value === 'FAMILY') {
+      return 'Для всех членов семьи будет использована одна фамилия.';
+    }
 
-          this.tables = resp.data.map((source) => ({
-            ...source,
-            value: source.shortName === 'PHB',
-          }));
-        } catch (err) {
-          errorHandler(err);
-        }
-      },
+    if (type.value === 'CLAN') {
+      return 'Для всех участников будет использован один клан.';
+    }
 
-      sendForm: throttle(async () => {
-        if (this.controller) {
-          this.controller.abort();
-        }
+    if (type.value === 'HOUSE') {
+      return 'Для всех участников будет использован один дом.';
+    }
 
-        this.controller = new AbortController();
-
-        try {
-          const options = {
-            count: this.count || 1,
-            sources: this.tables
-              .filter((source) => source.value)
-              .map((source) => source.shortName),
-          };
-
-          const resp = await this.$http.post({
-            url: '/tools/wildmagic',
-            payload: options,
-            signal: this.controller.signal,
-          });
-
-          if (resp.status !== 200) {
-            errorHandler(resp.statusText);
-
-            return;
-          }
-
-          for (const el of resp.data) {
-            this.results.unshift(reactive(el));
-          }
-        } catch (err) {
-          errorHandler(err);
-        } finally {
-          this.controller = undefined;
-        }
-      }, 300),
-    },
+    return null;
   });
+
+  const loadRaces = async () => {
+    loadingRaces.value = true;
+
+    try {
+      const response = await httpClient.get<Array<RaceOption>>({
+        url: '/tools/names',
+      });
+
+      races.value = response.data;
+    } catch (error) {
+      errorHandler(error);
+      toast.error(getApiErrorMessage(error, 'Не удалось загрузить список рас'));
+    } finally {
+      loadingRaces.value = false;
+    }
+  };
+
+  const generate = async () => {
+    if (
+      !sexes.value.length ||
+      (!isSharedGroup.value && !components.value.length)
+    ) {
+      return;
+    }
+
+    controller.value?.abort();
+    controller.value = new AbortController();
+    loading.value = true;
+
+    try {
+      const response = await httpClient.post<Array<GeneratedName>>({
+        url: '/tools/names',
+        payload: {
+          type: type.value,
+          components: components.value,
+          count: type.value === 'SINGLE' ? 1 : count.value,
+          raceId: raceId.value === ALL_RACES ? null : raceId.value,
+          sexes: sexes.value,
+        },
+        signal: controller.value.signal,
+      });
+
+      results.value = response.data;
+    } catch (error) {
+      errorHandler(error);
+      toast.error(getApiErrorMessage(error, 'Не удалось сгенерировать имена'));
+    } finally {
+      controller.value = undefined;
+      loading.value = false;
+    }
+  };
+
+  onBeforeMount(loadRaces);
 </script>
 
 <template>
-  <content-layout>
+  <content-layout
+    title="Генератор имён"
+    class="name-generator-layout"
+  >
     <template #fixed>
-      <form
-        class="tools_settings"
-        @submit.prevent="sendForm"
+      <n-form
+        class="name-generator-form"
+        label-placement="top"
+        @submit.prevent.stop="generate"
+        @keyup.enter.exact.prevent.stop="generate"
       >
-        <div class="tools_settings__row">
-          <span class="label">Расы:</span>
+        <div class="name-generator-form__grid">
+          <n-form-item label="Генерация">
+            <n-select
+              v-model:value="type"
+              :options="generationTypes"
+            />
+          </n-form-item>
 
-          <n-checkbox
-            v-for="(source, key) in tables"
-            :key="key"
-            v-model:checked="source.value"
-            v-tippy="{ content: source.name }"
+          <n-form-item
+            v-if="type !== 'SINGLE'"
+            label="Количество"
           >
-            {{ source.shortName }}
-          </n-checkbox>
+            <n-input-number
+              v-model:value="count"
+              :min="1"
+              :max="100"
+            />
+          </n-form-item>
+
+          <n-form-item label="Раса">
+            <n-select
+              v-model:value="raceId"
+              :options="raceOptions"
+              :loading="loadingRaces"
+              filterable
+            />
+          </n-form-item>
+
+          <n-form-item
+            label="Состав имени"
+            :validation-status="
+              components.length || isSharedGroup ? undefined : 'error'
+            "
+            :feedback="
+              components.length || isSharedGroup
+                ? undefined
+                : 'Выберите хотя бы один вариант'
+            "
+          >
+            <n-select
+              v-model:value="components"
+              :options="nameComponentOptions"
+              :disabled="isSharedGroup"
+              clearable
+              multiple
+              max-tag-count="responsive"
+              placeholder="Выберите состав имени"
+            />
+          </n-form-item>
         </div>
 
-        <div class="tools_settings__row">
-          <span class="label">Количество:</span>
+        <n-form-item
+          label="Пол"
+          :validation-status="sexes.length ? undefined : 'error'"
+          :feedback="sexes.length ? undefined : 'Выберите хотя бы один вариант'"
+        >
+          <n-checkbox-group v-model:value="sexes">
+            <n-space class="name-generator-form__sexes">
+              <n-checkbox value="MALE">Мужчина</n-checkbox>
 
-          <n-input-number
-            v-model:value="count"
-            :min="1"
-            class="form-control select"
-            placeholder="Количеств"
-          />
-        </div>
+              <n-checkbox value="FEMALE">Женщина</n-checkbox>
 
-        <div class="tools_settings__row btn-wrapper">
+              <n-checkbox value="UNISEX">Универсальные</n-checkbox>
+            </n-space>
+          </n-checkbox-group>
+        </n-form-item>
+
+        <n-text
+          v-if="effectiveFormatHint"
+          depth="3"
+          class="name-generator-form__hint"
+        >
+          {{ effectiveFormatHint }}
+        </n-text>
+
+        <div class="name-generator-form__actions">
           <n-button
             type="primary"
-            @click.left.exact.prevent="sendForm"
+            attr-type="submit"
+            :loading="loading"
+            :disabled="!sexes.length || (!isSharedGroup && !components.length)"
           >
             Сгенерировать
           </n-button>
 
           <n-button
             secondary
+            :disabled="!results.length"
             @click.left.exact.prevent="results = []"
           >
             Очистить
           </n-button>
         </div>
-      </form>
+      </n-form>
     </template>
 
     <template #default>
       <div
-        v-for="(item, key) in results"
-        :key="key"
-        class="wild-magic-item"
+        v-if="!results.length"
+        class="name-generator-empty"
       >
-        <div class="wild-magic-item__body">
-          <raw-content :template="item.description" />
-        </div>
+        Настройте параметры и сгенерируйте имена персонажей или существ.
+      </div>
 
-        <div
-          v-tippy="{ content: item.source.name }"
-          class="wild-magic-item__src"
+      <div
+        v-else
+        class="name-generator-results"
+      >
+        <article
+          v-for="item in results"
+          :key="item.value"
+          class="name-generator-item"
         >
-          {{ item.source.shortName }}
-        </div>
+          <div class="name-generator-item__value">
+            {{ item.value }}
+          </div>
+
+          <n-flex
+            size="small"
+            class="name-generator-item__meta"
+          >
+            <n-tag
+              size="small"
+              :bordered="false"
+              :color="metaTagColor"
+            >
+              {{ item.race }}
+            </n-tag>
+
+            <n-tag
+              v-if="item.sex"
+              size="small"
+              :bordered="false"
+              :color="metaTagColor"
+            >
+              {{ sexLabels[item.sex] }}
+            </n-tag>
+          </n-flex>
+        </article>
       </div>
     </template>
   </content-layout>
 </template>
 
 <style lang="scss" scoped>
-  .wild-magic-item {
-    overflow: hidden;
-    display: flex;
-    align-items: flex-start;
+  @use '@/assets/styles/variables/breakpoints' as *;
 
+  .name-generator-form {
+    :deep(.n-form-item) {
+      min-width: 0;
+    }
+
+    :deep(.n-input-number) {
+      width: 100%;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0 16px;
+
+      @include media-min($md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    &__hint {
+      display: block;
+      margin: -4px 0 16px;
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      @include media-max($sm) {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        :deep(.n-button) {
+          width: 100%;
+        }
+      }
+    }
+
+    &__sexes {
+      max-width: 100%;
+    }
+  }
+
+  .name-generator-layout {
+    @include media-max($md) {
+      :deep(.content-layout__fixed) {
+        position: static;
+      }
+    }
+  }
+
+  .name-generator-empty,
+  .name-generator-item {
     width: 100%;
-    margin-bottom: 12px;
-    padding: 12px;
-
+    padding: 16px;
     background-color: var(--bg-table-list);
     border-radius: 12px;
 
-    &__body {
-      flex: 1 1 100%;
+    @include media-max($sm) {
+      padding: 12px;
+    }
+  }
+
+  .name-generator-empty {
+    color: var(--text-g-color);
+  }
+
+  .name-generator-results {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+
+    @include media-min($md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .name-generator-item {
+    min-width: 0;
+
+    &__value {
+      font-size: var(--h4-font-size);
+      font-weight: 600;
+      line-height: var(--h4-line-height);
+      overflow-wrap: anywhere;
     }
 
-    &__src {
-      flex-shrink: 0;
+    &__meta {
+      margin-top: 12px;
     }
   }
 </style>
