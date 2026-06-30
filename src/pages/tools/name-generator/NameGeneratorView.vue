@@ -21,6 +21,14 @@
   type RaceOption = {
     id: number;
     name: string;
+    parentId: number | null;
+    available: boolean;
+  };
+
+  type RaceTreeOption = {
+    key: number | typeof ALL_RACES;
+    label: string;
+    children?: Array<RaceTreeOption>;
   };
 
   type GeneratedName = {
@@ -69,7 +77,7 @@
   ]);
 
   const count = ref(5);
-  const raceId = ref<number | typeof ALL_RACES>(ALL_RACES);
+  const raceIds = ref<Array<number | typeof ALL_RACES>>([ALL_RACES]);
   const sexes = ref<Array<Sex>>(['MALE', 'FEMALE']);
   const races = ref<Array<RaceOption>>([]);
   const results = ref<Array<GeneratedName>>([]);
@@ -77,16 +85,49 @@
   const loadingRaces = ref(false);
   const controller = ref<AbortController>();
 
-  const raceOptions = computed(() => [
-    {
-      label: 'Любая раса',
-      value: ALL_RACES,
-    },
-    ...races.value.map((race) => ({
-      label: race.name,
-      value: race.id,
-    })),
-  ]);
+  const raceOptions = computed<Array<RaceTreeOption>>(() => {
+    const nodes = new Map<number, RaceTreeOption>();
+    const roots: Array<RaceTreeOption> = [];
+
+    for (const race of races.value) {
+      nodes.set(race.id, {
+        key: race.id,
+        label: race.name,
+        children: [],
+      });
+    }
+
+    for (const race of [...races.value].sort((a, b) =>
+      a.name.localeCompare(b.name, 'ru'),
+    )) {
+      const node = nodes.get(race.id)!;
+      const parent = race.parentId ? nodes.get(race.parentId) : undefined;
+
+      if (parent) {
+        parent.children!.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    return [
+      {
+        key: ALL_RACES,
+        label: 'Любая раса',
+      },
+      ...roots,
+    ];
+  });
+
+  const selectedRaceIds = computed(() => {
+    const available = new Set(
+      races.value.filter((race) => race.available).map((race) => race.id),
+    );
+
+    return raceIds.value.filter(
+      (id): id is number => typeof id === 'number' && available.has(id),
+    );
+  });
 
   const isSharedGroup = computed(
     () =>
@@ -110,6 +151,31 @@
 
     return null;
   });
+
+  const onRaceIdsUpdate = (
+    value: string | number | Array<string | number> | null,
+  ) => {
+    const values: Array<string | number> = Array.isArray(value) ? value : [];
+
+    if (!Array.isArray(value) && value != null) {
+      values.push(value);
+    }
+
+    const hadAllRaces = raceIds.value.includes(ALL_RACES);
+    const hasAllRaces = values.includes(ALL_RACES);
+
+    if (hasAllRaces && !hadAllRaces) {
+      raceIds.value = [ALL_RACES];
+
+      return;
+    }
+
+    const selected = values.filter(
+      (id): id is number => typeof id === 'number',
+    );
+
+    raceIds.value = selected.length ? selected : [ALL_RACES];
+  };
 
   const loadRaces = async () => {
     loadingRaces.value = true;
@@ -147,7 +213,7 @@
           type: type.value,
           components: components.value,
           count: type.value === 'SINGLE' ? 1 : count.value,
-          raceId: raceId.value === ALL_RACES ? null : raceId.value,
+          raceIds: selectedRaceIds.value.length ? selectedRaceIds.value : null,
           sexes: sexes.value,
         },
         signal: controller.value.signal,
@@ -198,11 +264,21 @@
           </n-form-item>
 
           <n-form-item label="Раса">
-            <n-select
-              v-model:value="raceId"
+            <n-tree-select
+              :value="raceIds"
+              class="name-generator-form__races"
               :options="raceOptions"
               :loading="loadingRaces"
+              cascade
+              checkable
+              check-strategy="all"
+              clearable
+              default-expand-all
               filterable
+              multiple
+              max-tag-count="responsive"
+              placeholder="Любая раса"
+              @update:value="onRaceIdsUpdate"
             />
           </n-form-item>
 
@@ -369,7 +445,8 @@
       max-width: 100%;
     }
 
-    &__components {
+    &__components,
+    &__races {
       :deep(.n-tag) {
         --n-color: var(--hover) !important;
         --n-text-color: var(--text-color) !important;
