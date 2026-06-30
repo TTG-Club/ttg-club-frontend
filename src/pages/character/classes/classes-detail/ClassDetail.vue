@@ -431,13 +431,19 @@
           ref="classBody"
           class="class-detail__body"
         >
-          <class-traits
-            v-if="currentTab?.type === 'traits'"
-            :traits="currentClass.traits"
-            @anchor-click="scrollToSection"
-            @loaded="initScrollListeners"
-            @before-unmount="removeScrollListeners"
-          />
+          <template v-if="currentTab?.type === 'traits'">
+            <class-traits
+              :traits="currentClass.traits"
+              :archetypes="
+                currentClass.url === route.path ? currentClass.archetypes : []
+              "
+              :archetype-spells="currentClass.archetypeSpells"
+              :query-books="queryBooks"
+              @anchor-click="scrollToSection"
+              @loaded="initScrollListeners"
+              @before-unmount="removeScrollListeners"
+            />
+          </template>
 
           <div
             v-else-if="currentTab?.url"

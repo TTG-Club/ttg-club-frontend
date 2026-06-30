@@ -173,8 +173,10 @@
             />
 
             <div
-              v-for="(skill, skillKey) in subrace.skills"
-              :key="skillKey"
+              v-for="(skill, skillKey) in subrace.features?.length
+                ? subrace.features
+                : subrace.skills"
+              :key="skill.id || skillKey"
             >
               <h4 class="header_separator">
                 <span>{{ skill.name }}</span>
