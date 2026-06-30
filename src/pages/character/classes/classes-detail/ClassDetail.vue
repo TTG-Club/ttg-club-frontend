@@ -448,6 +448,60 @@
               @loaded="initScrollListeners"
               @before-unmount="removeScrollListeners"
             />
+
+            <div
+              v-if="
+                currentTab.type === 'description' &&
+                currentClass.archetypeSpells?.length
+              "
+              class="table-responsive"
+            >
+              <table class="dnd5_table">
+                <thead>
+                  <tr>
+                    <th class="text-center">Уровень персонажа</th>
+
+                    <th>Заклинания</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr
+                    v-for="level in currentClass.archetypeSpells"
+                    :key="level.level"
+                  >
+                    <td class="text-center">{{ level.level }}</td>
+
+                    <td>
+                      <template
+                        v-for="(spell, index) in level.spells"
+                        :key="spell.url"
+                      >
+                        <detail-tooltip
+                          :url="spell.url"
+                          type="spell"
+                        >
+                          <router-link
+                            class="tip_spell"
+                            :to="spell.url"
+                          >
+                            {{ spell.name.toLowerCase() }} [{{
+                              spell.englishName.toLowerCase()
+                            }}]
+                          </router-link>
+                        </detail-tooltip>
+
+                        <span v-if="spell.advanced">
+                          ({{ spell.advanced }})</span
+                        >
+
+                        <span v-if="index < level.spells.length - 1">, </span>
+                      </template>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
