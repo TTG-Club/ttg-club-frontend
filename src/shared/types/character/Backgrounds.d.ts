@@ -18,6 +18,8 @@ export interface BackgroundItem {
   equipments?: string[];
   startGold?: number;
   description?: string;
+  skillName?: string;
+  skillDescription?: string;
   personalization?: string;
   personalizationTables?: IRollTable[];
 }
@@ -32,6 +34,8 @@ export interface BackgroundSave {
   equipments?: string;
   startGold?: number;
   description: string;
+  skillName?: string;
+  skillDescription?: string;
   personalization?: string;
   language?: string;
   languages: string[];

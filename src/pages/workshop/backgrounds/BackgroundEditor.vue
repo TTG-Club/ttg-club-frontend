@@ -58,6 +58,8 @@
     equipments: props.background?.equipments?.join(', ') || '',
     startGold: props.background?.startGold || 0,
     description: props.background?.description || '',
+    skillName: props.background?.skillName || '',
+    skillDescription: props.background?.skillDescription || '',
     personalization: props.background?.personalization || '',
     languages: props.background?.languages || [],
   });
@@ -82,6 +84,8 @@
         otherSkills: form.otherSkills || undefined,
         toolOwnership: form.toolOwnership || undefined,
         equipments: form.equipments || undefined,
+        skillName: form.skillName || undefined,
+        skillDescription: form.skillDescription || undefined,
         personalization: form.personalization || undefined,
         language: form.language || undefined,
         languages: csv(languageText.value),
@@ -203,6 +207,24 @@
         v-model="form.description"
         required
         rows="12"
+      />
+    </label>
+
+    <label class="background-editor__field background-editor__field--wide">
+      <span>Название умения предыстории</span>
+
+      <input
+        v-model="form.skillName"
+        type="text"
+      />
+    </label>
+
+    <label class="background-editor__field background-editor__field--wide">
+      <span>Описание умения предыстории</span>
+
+      <textarea
+        v-model="form.skillDescription"
+        rows="8"
       />
     </label>
 
