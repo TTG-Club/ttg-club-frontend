@@ -52,6 +52,7 @@
     archetypeFeatureLevels: FeatureLevel[];
     levels: LevelRow[];
     features: TraitFeature[];
+    archetype?: TraitFeature;
   };
 
   const props = defineProps<{
@@ -94,6 +95,12 @@
   });
 
   const hasEquipment = computed(() => !!props.traits?.equipment?.trim());
+
+  const orderedFeatures = computed(() =>
+    [...(props.traits?.features || []), props.traits?.archetype]
+      .filter((feature): feature is TraitFeature => !!feature)
+      .sort((left, right) => left.level - right.level),
+  );
 
   onMounted(() => {
     emit('loaded');
@@ -341,7 +348,7 @@
     </details>
 
     <template
-      v-for="feature in traits.features"
+      v-for="feature in orderedFeatures"
       :key="feature.id"
     >
       <details open>
@@ -385,7 +392,7 @@
       </details>
 
       <archetype-spells
-        v-if="feature.archetypeRoot && archetypeSpells?.length"
+        v-if="feature.id === traits.archetype?.id && archetypeSpells?.length"
         :levels="archetypeSpells"
       />
     </template>
