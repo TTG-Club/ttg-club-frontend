@@ -17,6 +17,7 @@
     name: string;
     description?: string;
     type?: string;
+    archetypeFeature: boolean;
   };
 
   type ArchetypeDetail = ArchetypeLink & {
@@ -32,6 +33,11 @@
 
   const details = reactive<Record<string, ArchetypeDetail | null>>({});
   const loading = reactive<Record<string, boolean>>({});
+
+  const getArchetypeFeatures = (url: string) =>
+    details[url]?.traits?.features?.filter(
+      (feature) => feature.archetypeFeature,
+    ) || [];
 
   const loadArchetype = async (archetype: ArchetypeLink) => {
     if (details[archetype.url] || loading[archetype.url]) {
@@ -97,7 +103,7 @@
 
         <template v-else>
           <div
-            v-for="feature in details[archetype.url]?.traits?.features || []"
+            v-for="feature in getArchetypeFeatures(archetype.url)"
             :key="feature.id"
           >
             <h4 class="header_separator">
