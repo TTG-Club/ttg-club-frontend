@@ -56,6 +56,17 @@
         <raw-content :template="background.description" />
       </template>
 
+      <template v-if="background.skillName || background.skillDescription">
+        <h4 class="header_separator">
+          <span>{{ background.skillName || 'Умение предыстории' }}</span>
+        </h4>
+
+        <raw-content
+          v-if="background.skillDescription"
+          :template="background.skillDescription"
+        />
+      </template>
+
       <template
         v-if="
           background.personalization || background.personalizationTables?.length
