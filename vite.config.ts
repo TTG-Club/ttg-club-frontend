@@ -10,35 +10,60 @@ import checker from 'vite-plugin-checker';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
-import type { ConfigEnv } from 'vite';
+import type { ConfigEnv, ProxyOptions } from 'vite';
 
 // https://vitejs.dev/config/
 export default ({ mode, command }: ConfigEnv) => {
   const env = loadEnv(mode, process.cwd());
   const API_HOST = env.VITE_APP_API_URL || 'http://localhost:8080';
 
+  // URL subscriber-service (подписки/коды) для dev-прокси берём только из окружения,
+  // чтобы не хранить его в репозитории. Локально задаётся в .env.local
+  // (VITE_SUBSCRIBER_SERVICE_URL); в проде запросы идут на относительный /api и
+  // маршрутизируются шлюзом. Прокси подключается, только если переменная задана.
+  const SUBSCRIBER_HOST = env.VITE_SUBSCRIBER_SERVICE_URL;
+
+  const proxyConfig: Record<string, ProxyOptions> = {
+    '^/proxy': {
+      target: API_HOST,
+      changeOrigin: true,
+      ws: false,
+      secure: false,
+      rewrite: (path) => path.replace(/^\/proxy/, ''),
+      configure: (proxy) => {
+        proxy.on('proxyReq', (req) => {
+          req.setHeader('origin', API_HOST);
+        });
+      },
+    },
+    '^/s3': {
+      target: 'https://ttg.club',
+      changeOrigin: true,
+      secure: false,
+    },
+  };
+
+  // Dev-прокси к subscriber-service подключаем, только если задан его URL,
+  // чтобы не держать адрес сервиса в репозитории.
+  if (SUBSCRIBER_HOST) {
+    proxyConfig['^/subscriber'] = {
+      target: SUBSCRIBER_HOST,
+      changeOrigin: true,
+      ws: false,
+      secure: false,
+      rewrite: (path) => path.replace(/^\/subscriber/, ''),
+      configure: (proxy) => {
+        proxy.on('proxyReq', (req) => {
+          req.setHeader('origin', SUBSCRIBER_HOST);
+        });
+      },
+    };
+  }
+
   return defineConfig({
     base: '/',
     server: {
-      proxy: {
-        '^/proxy': {
-          target: API_HOST,
-          changeOrigin: true,
-          ws: false,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/proxy/, ''),
-          configure: (proxy) => {
-            proxy.on('proxyReq', (req) => {
-              req.setHeader('origin', API_HOST);
-            });
-          },
-        },
-        '^/s3': {
-          target: 'https://ttg.club',
-          changeOrigin: true,
-          secure: false,
-        },
-      },
+      proxy: proxyConfig,
     },
     build: {
       outDir: env.VITE_APP_BUILD_PATH || 'dist',

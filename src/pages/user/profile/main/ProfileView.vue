@@ -4,6 +4,8 @@
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import isDev from '@/shared/utils/isDev';
 
+  import { SubscriptionStatusCard } from '@/features/subscription';
+
   import PageLayout from '@/layouts/PageLayout.vue';
 
   const userStore = useUserStore();
@@ -54,6 +56,10 @@
               </p>
             </div>
           </div>
+        </div>
+
+        <div class="profile__row">
+          <subscription-status-card />
         </div>
 
         <div
