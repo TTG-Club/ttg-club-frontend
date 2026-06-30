@@ -24,6 +24,7 @@
   type TraitFeature = {
     id: string;
     name: string;
+    level: number;
     type: string;
     description?: string;
     optional?: boolean;
