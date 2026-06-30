@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import RawContent from '@/shared/ui/RawContent.vue';
 
+  import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
+
   type FeatureLevel = {
     name: string;
   };
@@ -29,6 +31,7 @@
     description?: string;
     optional?: boolean;
     archetypeFeature: boolean;
+    archetypeRoot: boolean;
     source?: {
       name?: string;
       shortName?: string;
@@ -52,6 +55,15 @@
 
   const props = defineProps<{
     traits?: ClassTraits;
+    archetypeSpells?: Array<{
+      level: number;
+      spells: Array<{
+        name: string;
+        englishName: string;
+        url: string;
+        advanced?: string;
+      }>;
+    }>;
   }>();
 
   const emit = defineEmits<{
@@ -316,49 +328,55 @@
       </div>
     </details>
 
-    <details
+    <template
       v-for="feature in traits.features"
       :key="feature.id"
-      open
     >
-      <summary
-        :id="feature.id"
-        :class="{
-          h4: true,
-          archetype_feet: feature.archetypeFeature,
-        }"
-      >
-        <span>{{ feature.name }}</span>
-
-        <span
-          v-if="feature.source?.shortName"
-          class="source-data tip"
-          :title="feature.source.name"
+      <details open>
+        <summary
+          :id="feature.id"
+          :class="{
+            h4: true,
+            archetype_feet: feature.archetypeFeature,
+          }"
         >
-          {{ feature.source.shortName }}
-        </span>
-      </summary>
+          <span>{{ feature.name }}</span>
 
-      <div class="content">
-        <div class="caption_text">
-          <span>{{ feature.type }}</span>
-
-          <a
-            v-if="feature.optional"
-            href="/rules/optional_class_features"
-            class="tip optional-rules"
-            title="Эта опция представлена в книге «Котёл Таши со всякой всячиной». Всё в этой книге опционально."
+          <span
+            v-if="feature.source?.shortName"
+            class="source-data tip"
+            :title="feature.source.name"
           >
-            (опционально)
-          </a>
-        </div>
+            {{ feature.source.shortName }}
+          </span>
+        </summary>
 
-        <raw-content
-          v-if="feature.description"
-          :template="feature.description"
-        />
-      </div>
-    </details>
+        <div class="content">
+          <div class="caption_text">
+            <span>{{ feature.type }}</span>
+
+            <a
+              v-if="feature.optional"
+              href="/rules/optional_class_features"
+              class="tip optional-rules"
+              title="Эта опция представлена в книге «Котёл Таши со всякой всячиной». Всё в этой книге опционально."
+            >
+              (опционально)
+            </a>
+          </div>
+
+          <raw-content
+            v-if="feature.description"
+            :template="feature.description"
+          />
+        </div>
+      </details>
+
+      <archetype-spells
+        v-if="feature.archetypeRoot && archetypeSpells?.length"
+        :levels="archetypeSpells"
+      />
+    </template>
   </div>
 </template>
 

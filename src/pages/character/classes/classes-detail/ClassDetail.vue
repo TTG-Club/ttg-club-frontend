@@ -14,7 +14,6 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
-  import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
   import ClassTraits from '@/pages/character/classes/classes-detail/ClassTraits.vue';
   import OptionsView from '@/pages/character/options/OptionsView.vue';
   import SpellsView from '@/pages/character/spells/SpellsView.vue';
@@ -435,15 +434,10 @@
           <template v-if="currentTab?.type === 'traits'">
             <class-traits
               :traits="currentClass.traits"
+              :archetype-spells="currentClass.archetypeSpells"
               @anchor-click="scrollToSection"
               @loaded="initScrollListeners"
               @before-unmount="removeScrollListeners"
-            />
-
-            <archetype-spells
-              v-if="currentClass.archetypeSpells?.length"
-              :levels="currentClass.archetypeSpells"
-              class="class-detail__archetype-spells"
             />
           </template>
 
@@ -455,14 +449,6 @@
               :url="currentTab.url"
               @loaded="initScrollListeners"
               @before-unmount="removeScrollListeners"
-            />
-
-            <archetype-spells
-              v-if="
-                currentTab.type === 'description' &&
-                currentClass.archetypeSpells?.length
-              "
-              :levels="currentClass.archetypeSpells"
             />
           </div>
         </div>
@@ -620,14 +606,6 @@
 
     &__select {
       padding: 0 16px;
-    }
-
-    &__archetype-spells {
-      margin: 0 16px;
-
-      @include media-min($xl) {
-        margin: 0 24px;
-      }
     }
 
     &__content {
