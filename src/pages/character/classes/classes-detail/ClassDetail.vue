@@ -14,6 +14,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
   import ClassTraits from '@/pages/character/classes/classes-detail/ClassTraits.vue';
   import OptionsView from '@/pages/character/options/OptionsView.vue';
   import SpellsView from '@/pages/character/spells/SpellsView.vue';
@@ -431,13 +432,20 @@
           ref="classBody"
           class="class-detail__body"
         >
-          <class-traits
-            v-if="currentTab?.type === 'traits'"
-            :traits="currentClass.traits"
-            @anchor-click="scrollToSection"
-            @loaded="initScrollListeners"
-            @before-unmount="removeScrollListeners"
-          />
+          <template v-if="currentTab?.type === 'traits'">
+            <class-traits
+              :traits="currentClass.traits"
+              @anchor-click="scrollToSection"
+              @loaded="initScrollListeners"
+              @before-unmount="removeScrollListeners"
+            />
+
+            <archetype-spells
+              v-if="currentClass.archetypeSpells?.length"
+              :levels="currentClass.archetypeSpells"
+              class="class-detail__archetype-spells"
+            />
+          </template>
 
           <div
             v-else-if="currentTab?.url"
@@ -449,59 +457,13 @@
               @before-unmount="removeScrollListeners"
             />
 
-            <div
+            <archetype-spells
               v-if="
                 currentTab.type === 'description' &&
                 currentClass.archetypeSpells?.length
               "
-              class="table-responsive"
-            >
-              <table class="dnd5_table">
-                <thead>
-                  <tr>
-                    <th class="text-center">Уровень персонажа</th>
-
-                    <th>Заклинания</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr
-                    v-for="level in currentClass.archetypeSpells"
-                    :key="level.level"
-                  >
-                    <td class="text-center">{{ level.level }}</td>
-
-                    <td>
-                      <template
-                        v-for="(spell, index) in level.spells"
-                        :key="spell.url"
-                      >
-                        <detail-tooltip
-                          :url="spell.url"
-                          type="spell"
-                        >
-                          <router-link
-                            class="tip_spell"
-                            :to="spell.url"
-                          >
-                            {{ spell.name.toLowerCase() }} [{{
-                              spell.englishName.toLowerCase()
-                            }}]
-                          </router-link>
-                        </detail-tooltip>
-
-                        <span v-if="spell.advanced">
-                          ({{ spell.advanced }})</span
-                        >
-
-                        <span v-if="index < level.spells.length - 1">, </span>
-                      </template>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+              :levels="currentClass.archetypeSpells"
+            />
           </div>
         </div>
 
@@ -658,6 +620,14 @@
 
     &__select {
       padding: 0 16px;
+    }
+
+    &__archetype-spells {
+      margin: 0 16px;
+
+      @include media-min($xl) {
+        margin: 0 24px;
+      }
     }
 
     &__content {
