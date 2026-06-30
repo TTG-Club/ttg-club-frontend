@@ -2,6 +2,7 @@
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
+  import ClassArchetypes from '@/pages/character/classes/classes-detail/ClassArchetypes.vue';
 
   type FeatureLevel = {
     name: string;
@@ -55,6 +56,17 @@
 
   const props = defineProps<{
     traits?: ClassTraits;
+    archetypes?: Array<{
+      name: {
+        rus: string;
+      };
+      source: {
+        name: string;
+        shortName: string;
+      };
+      url: string;
+    }>;
+    queryBooks?: string[];
     archetypeSpells?: Array<{
       level: number;
       spells: Array<{
@@ -377,6 +389,12 @@
         :levels="archetypeSpells"
       />
     </template>
+
+    <class-archetypes
+      v-if="archetypes?.length"
+      :archetypes="archetypes"
+      :query-books="queryBooks || []"
+    />
   </div>
 </template>
 
