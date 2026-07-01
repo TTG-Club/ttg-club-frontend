@@ -99,7 +99,11 @@
   const orderedFeatures = computed(() =>
     [...(props.traits?.features || []), props.traits?.archetype]
       .filter((feature): feature is TraitFeature => !!feature)
-      .sort((left, right) => left.level - right.level),
+      .sort(
+        (left, right) =>
+          left.level - right.level ||
+          Number(right.archetypeRoot) - Number(left.archetypeRoot),
+      ),
   );
 
   onMounted(() => {

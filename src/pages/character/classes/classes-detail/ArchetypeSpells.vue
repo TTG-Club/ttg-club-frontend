@@ -23,7 +23,7 @@
         <tr>
           <th>Уровень персонажа</th>
 
-          <th>Заклинания</th>
+          <th class="align_left">Заклинания</th>
         </tr>
       </thead>
 
