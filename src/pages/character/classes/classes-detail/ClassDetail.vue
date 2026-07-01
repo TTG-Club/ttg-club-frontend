@@ -14,6 +14,7 @@
 
   import SectionHeader from '@/features/SectionHeader.vue';
 
+  import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
   import ClassTraits from '@/pages/character/classes/classes-detail/ClassTraits.vue';
   import OptionsView from '@/pages/character/options/OptionsView.vue';
   import SpellsView from '@/pages/character/spells/SpellsView.vue';
@@ -453,6 +454,14 @@
               :url="currentTab.url"
               @loaded="initScrollListeners"
               @before-unmount="removeScrollListeners"
+            />
+
+            <archetype-spells
+              v-if="
+                currentTab.type === 'description' &&
+                currentClass.archetypeSpells?.length
+              "
+              :levels="currentClass.archetypeSpells"
             />
           </div>
         </div>
