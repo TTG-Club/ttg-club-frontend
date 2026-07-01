@@ -4,57 +4,69 @@
 
 <template>
   <div class="vttg-banner">
-    <!-- Background image and overlay -->
-    <div class="vttg-banner__bg-wrapper">
-      <img
-        :src="'/img/vttg-banner.webp'"
-        alt=""
-        class="vttg-banner__bg"
-        aria-hidden="true"
+    <!-- Top ribbon -->
+    <div class="vttg-banner__ribbon">
+      <svg-icon
+        icon="heart"
+        class="vttg-icon"
       />
 
-      <div class="vttg-banner__overlay" />
+      <span>Идёт сбор средств на CrowdRepublic</span>
     </div>
 
-    <!-- Content -->
-    <div class="vttg-banner__content">
-      <h2 class="vttg-banner__title">Virtual TTG Club!</h2>
-
-      <p class="vttg-banner__desc">
-        Полноценный виртуальный стол для D&D 5e с интерактивными картами,
-        3D-кубиками и интеграцией с ttg.club.
-      </p>
-    </div>
-
-    <!-- Actions -->
-    <div class="vttg-banner__actions">
-      <a
-        href="https://new.ttg.club/vttg"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="vttg-btn vttg-btn-secondary"
-      >
-        <span>Подробнее</span>
-
-        <svg-icon
-          icon="arrow/right"
-          class="vttg-icon"
-        />
-      </a>
-
-      <a
-        href="https://crowdrepublic.ru/projects/1073013"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="vttg-btn vttg-btn-primary"
-      >
-        <svg-icon
-          icon="heart"
-          class="vttg-icon"
+    <div class="vttg-banner__body">
+      <!-- Background image and overlay -->
+      <div class="vttg-banner__bg-wrapper">
+        <img
+          :src="'/img/vttg-banner.webp'"
+          alt=""
+          class="vttg-banner__bg"
+          aria-hidden="true"
         />
 
-        <span>Поддержать проект</span>
-      </a>
+        <div class="vttg-banner__overlay" />
+      </div>
+
+      <!-- Content -->
+      <div class="vttg-banner__content">
+        <h2 class="vttg-banner__title">Virtual TTG Club!</h2>
+
+        <p class="vttg-banner__desc">
+          Полноценный виртуальный стол для D&D 5e с интерактивными картами,
+          3D-кубиками и интеграцией с ttg.club.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="vttg-banner__actions">
+        <a
+          href="https://new.ttg.club/vttg"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="vttg-btn vttg-btn-secondary"
+        >
+          <span>Подробнее</span>
+
+          <svg-icon
+            icon="arrow/right"
+            class="vttg-icon"
+          />
+        </a>
+
+        <a
+          href="https://crowdrepublic.ru/projects/1073013"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="vttg-btn vttg-btn-primary"
+        >
+          <svg-icon
+            icon="heart"
+            class="vttg-icon"
+          />
+
+          <span>Поддержать проект</span>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -68,10 +80,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 24px;
 
     width: 100%;
-    padding: 24px;
 
     background-color: var(--bg-sub-menu);
     border: 1px solid var(--border);
@@ -79,15 +89,6 @@
     box-shadow: 0 10px 12px 0 var(--card-shadow);
 
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    @include media-min($md) {
-      flex-direction: row;
-      gap: 32px;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 32px;
-    }
 
     &:hover {
       border-color: color-mix(in oklch, var(--vttg-gold) 45%, transparent);
@@ -97,6 +98,52 @@
 
       .vttg-banner__bg {
         transform: scale(1.03);
+      }
+    }
+
+    &__ribbon {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+
+      padding: 7px 16px;
+
+      font-family: 'Open Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--bg-main);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+
+      background-color: var(--vttg-gold);
+
+      .vttg-icon {
+        flex-shrink: 0;
+        font-size: 14px;
+      }
+    }
+
+    &__body {
+      position: relative;
+
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      padding: 24px;
+
+      @include media-min($md) {
+        flex-direction: row;
+        gap: 32px;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 32px;
       }
     }
 
