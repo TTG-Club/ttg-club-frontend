@@ -10,22 +10,15 @@
   import { useDiceNotification } from '@/features/dice-notification';
   import NavBar from '@/features/menu/NavBar.vue';
   import { useOnlineAdventurersHeartbeat } from '@/features/online-counter/useOnlineAdventurersCounter';
-  import { useSubscriptionStore } from '@/features/subscription';
 
   configurateDayjs();
 
   const userStore = useUserStore();
-  const subscriptionStore = useSubscriptionStore();
 
   const initUser = async () => {
     try {
       if (await userStore.getUserStatus()) {
         await userStore.getUserInfo();
-
-        // Статус подписки берём реал-тайм из subscriber-service,
-        // не полагаясь на роль из JWT (она устаревает до перелогина).
-        await subscriptionStore.refreshStatus().catch(() => undefined);
-        subscriptionStore.startPolling();
       }
     } catch (err) {
       await userStore.clearUser();
@@ -35,31 +28,6 @@
   tryOnBeforeMount(async () => {
     await initUser();
   });
-
-  // Реал-тайм: обновляем статус при возвращении на вкладку.
-  const visibility = useDocumentVisibility();
-
-  watch(visibility, (state) => {
-    if (state === 'visible' && userStore.isAuthenticated) {
-      subscriptionStore.refreshStatus().catch(() => undefined);
-    }
-  });
-
-  // Сбрасываем подписку и опрос при выходе / авторизации.
-  watch(
-    () => userStore.isAuthenticated,
-    (authenticated) => {
-      if (authenticated) {
-        subscriptionStore.refreshStatus().catch(() => undefined);
-        subscriptionStore.startPolling();
-
-        return;
-      }
-
-      subscriptionStore.stopPolling();
-      subscriptionStore.resetSubscription();
-    },
-  );
 
   useDiceNotification().enable();
   useOnlineAdventurersHeartbeat();

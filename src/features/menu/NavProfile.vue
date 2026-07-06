@@ -2,48 +2,18 @@
   import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import AuthModal from '@/shared/ui/modals/AuthModal.vue';
-  import { getDateString } from '@/shared/utils/getDateString';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
   import LoginView from '@/features/account/LoginView.vue';
   import RegistrationView from '@/features/account/RegistrationView.vue';
   import NavPopover from '@/features/menu/NavPopover.vue';
-  import {
-    SUBSCRIPTION_DATE_FORMAT,
-    SUBSCRIPTION_STATUS_ACTIVE_PREFIX,
-    SUBSCRIPTION_STATUS_INACTIVE,
-    useSubscriptionStore,
-  } from '@/features/subscription';
 
   const userStore = useUserStore();
-  const subscriptionStore = useSubscriptionStore();
 
   const { isAuthenticated, user } = storeToRefs(userStore);
 
-  const { isActive: isSubscriptionActive, expiresAt: subscriptionExpiresAt } =
-    storeToRefs(subscriptionStore);
-
   const popover = ref(false);
   const modal = ref('');
-
-  const subscriptionLabel = computed(() => {
-    if (!isSubscriptionActive.value) {
-      return SUBSCRIPTION_STATUS_INACTIVE;
-    }
-
-    if (!subscriptionExpiresAt.value) {
-      return 'Подписка активна';
-    }
-
-    const formatted = getDateString(
-      subscriptionExpiresAt.value,
-      SUBSCRIPTION_DATE_FORMAT,
-    );
-
-    return formatted
-      ? `${SUBSCRIPTION_STATUS_ACTIVE_PREFIX} ${formatted}`
-      : 'Подписка активна';
-  });
 
   const modals = computed(() => [
     {
@@ -153,7 +123,10 @@
 </script>
 
 <template>
-  <nav-popover v-model="popover">
+  <nav-popover
+    v-model="popover"
+    :body-style="{ overflow: 'hidden' }"
+  >
     <template #trigger="{ isActive }">
       <div
         :class="{ 'is-active': isActive }"
@@ -184,19 +157,6 @@
             class="nav-profile__line_body"
           >
             {{ greeting }}
-          </span>
-        </div>
-
-        <div
-          class="nav-profile__line is-subscription"
-          :class="{ 'is-active': isSubscriptionActive }"
-        >
-          <span class="nav-profile__line_body">
-            <span class="nav-profile__line_icon-inline">
-              <svg-icon icon="star" />
-            </span>
-
-            {{ subscriptionLabel }}
           </span>
         </div>
 
@@ -279,27 +239,9 @@
         background-color: var(--hover);
       }
 
-      &.is-subscription {
-        cursor: default;
-
-        &:hover {
-          background-color: transparent;
-        }
-
-        &.is-active {
-          color: var(--primary);
-        }
-      }
-
       &_body {
         flex: 1 1 auto;
         padding: 12px 16px;
-      }
-
-      &_icon-inline {
-        margin-right: 6px;
-        font-size: 16px;
-        vertical-align: -2px;
       }
 
       &_icon {

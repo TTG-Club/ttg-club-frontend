@@ -84,21 +84,6 @@
 
       <div class="banners-container">
         <vttg-campaign-banner />
-
-        <a
-          href="//new.ttg.club"
-          class="banner"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="title">Редакция D&D 2024</span>
-
-          <img
-            class="bg"
-            alt="Баннер 2024 DnD"
-            src="/img/banner-2024.webp"
-          />
-        </a>
       </div>
 
       <div class="card_row">
@@ -165,29 +150,55 @@
         </div>
 
         <div class="main-page-grid__col right-col">
-          <div class="online-counter-card">
-            <div class="online-counter-card__header">
-              <span class="online-counter-card__indicator" />
+          <div class="stats-banner-row">
+            <div class="online-counter-card">
+              <div class="online-counter-card__header">
+                <span class="online-counter-card__indicator" />
 
-              <h3>Статистика онлайн</h3>
+                <h3>Статистика онлайн</h3>
+              </div>
+
+              <p>
+                TTG - твой проводник в мир Dungeons & Dragons, созданный
+                сообществом для сообщества!
+              </p>
+
+              <div class="online-counter-card__stats">
+                <span>Авантюристов</span>
+
+                <strong
+                  :class="{
+                    'is-loading': isAdventurersCounterLoading,
+                  }"
+                >
+                  {{ adventurersCountLabel }}
+                </strong>
+              </div>
             </div>
 
-            <p>
-              TTG - твой проводник в мир Dungeons & Dragons, созданный
-              сообществом для сообщества!
-            </p>
+            <a
+              href="//new.ttg.club"
+              class="banner"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                class="banner__bg"
+                alt="Баннер 2024 DnD"
+                src="/img/banner-2024.webp"
+              />
 
-            <div class="online-counter-card__stats">
-              <span>Авантюристов</span>
+              <span class="banner__badge">Новинка</span>
 
-              <strong
-                :class="{
-                  'is-loading': isAdventurersCounterLoading,
-                }"
-              >
-                {{ adventurersCountLabel }}
-              </strong>
-            </div>
+              <div class="banner__content">
+                <span class="banner__title">Редакция D&D 2024</span>
+
+                <span class="banner__link">
+                  Перейти
+                  <span class="banner__arrow">→</span>
+                </span>
+              </div>
+            </a>
           </div>
 
           <div class="index-social-links">
@@ -268,11 +279,32 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
-    width: 100%;
 
-    @include media-min($md) {
-      grid-template-columns: 5fr 1fr;
-      align-items: stretch;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .stats-banner-row {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .banner {
+      height: auto;
+      min-height: 100px;
+    }
+
+    @include media-max($sm) {
+      flex-direction: column;
+
+      .banner {
+        height: 140px;
+      }
     }
   }
 
@@ -281,7 +313,7 @@
 
     overflow: hidden;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
 
     width: 100%;
     height: 100px;
@@ -321,6 +353,7 @@
         calc(100% - 24px) calc(100% - 2px) no-repeat,
       linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
     border-radius: 12px;
+    box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
 
     @include media-min($md) {
       height: 100%;
@@ -330,13 +363,14 @@
       content: '';
 
       position: absolute;
-      z-index: 0;
+      z-index: 1;
       inset: 0;
 
       background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.45) 0%,
-        rgba(0, 0, 0, 0.5) 100%
+        to top,
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(0, 0, 0, 0.78) 45%,
+        rgba(0, 0, 0, 0.68) 100%
       );
 
       transition: background 0.3s ease;
@@ -345,51 +379,26 @@
     &:hover {
       &::after {
         background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.3) 0%,
-          rgba(0, 0, 0, 0.35) 100%
+          to top,
+          rgba(0, 0, 0, 0.84) 0%,
+          rgba(0, 0, 0, 0.68) 45%,
+          rgba(0, 0, 0, 0.55) 100%
         );
       }
 
-      .bg {
-        transform: scale(1.15);
-        transition: transform 0.6s;
+      .banner__bg {
+        transform: scale(1.08);
+      }
+
+      .banner__arrow {
+        transform: translateX(4px);
       }
     }
 
-    .title {
+    &__bg {
       position: absolute;
-      z-index: 1;
+      z-index: 0;
       inset: 0;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      box-sizing: border-box;
-      padding: 12px;
-
-      font-size: var(--h4-font-size);
-      font-weight: 700;
-      line-height: 1.3;
-      color: var(--text-color-title);
-      text-align: center;
-      text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.8),
-        0 0 10px rgba(0, 0, 0, 0.5);
-
-      @include media-min($md) {
-        font-size: calc(var(--h4-font-size) - 2px);
-        line-height: 1.2;
-      }
-
-      @include media-min($xl) {
-        font-size: var(--h4-font-size);
-        line-height: 1.3;
-      }
-    }
-
-    .bg {
       transform: scale(1);
 
       width: 100%;
@@ -398,7 +407,80 @@
       object-fit: cover;
       object-position: center;
 
-      transition: transform 0.6s;
+      transition: transform 0.6s ease;
+    }
+
+    &__badge {
+      position: absolute;
+      z-index: 2;
+      top: 12px;
+      left: 12px;
+
+      display: inline-flex;
+      align-items: center;
+
+      padding: 3px 10px;
+
+      font-family: 'Open Sans', sans-serif;
+      font-size: calc(var(--main-font-size) - 4px);
+      font-weight: 600;
+      color: var(--text-btn-color);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(53, 103, 201, 0.5);
+    }
+
+    &__content {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      box-sizing: border-box;
+      width: 100%;
+      padding: 14px 16px;
+    }
+
+    &__title {
+      font-size: var(--h4-font-size);
+      font-weight: 700;
+      line-height: 1.2;
+
+      // Баннер всегда на тёмной картинке, поэтому цвет фиксированный,
+      // а не тема-зависимый (иначе в светлой теме текст становится тёмным).
+      color: #fff;
+      text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(0, 0, 0, 0.5);
+
+      @include media-min($md) {
+        font-size: calc(var(--h4-font-size) - 2px);
+      }
+
+      @include media-min($xl) {
+        font-size: var(--h4-font-size);
+      }
+    }
+
+    &__link {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+
+      font-size: calc(var(--main-font-size) - 1px);
+      font-weight: 600;
+      color: #9db8ff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+
+    &__arrow {
+      display: inline-block;
+      transition: transform 0.3s ease;
     }
   }
 
