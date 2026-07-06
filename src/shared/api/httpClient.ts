@@ -9,7 +9,23 @@ import {
 } from '@/shared/utils/getApiUrl';
 import { useIsDev } from '@/shared/utils/isDev';
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
+
+declare module 'axios' {
+  // Internal marker used to prevent an infinite refresh/retry cycle.
+  interface InternalAxiosRequestConfig {
+    _retryAfterRefresh?: boolean;
+  }
+}
+
+type AuthResponse = {
+  accessToken: string;
+};
 
 export type RequestConfig = {
   url: AxiosRequestConfig['url'];
@@ -22,9 +38,13 @@ export type RequestConfig = {
 class HttpClient {
   readonly instance: AxiosInstance;
 
-  constructor() {
-    const isDev = useIsDev();
+  private refreshRequest: Promise<string> | null = null;
 
+  private authFailureHandler?: () => Promise<void> | void;
+
+  private readonly isDev = useIsDev();
+
+  constructor() {
     axios.defaults.withCredentials = true;
 
     this.instance = axios.create({
@@ -39,13 +59,78 @@ class HttpClient {
         indexes: null,
       };
 
-      if (isDev && Cookies.get(USER_TOKEN_COOKIE)) {
+      if (this.isDev && Cookies.get(USER_TOKEN_COOKIE)) {
         // eslint-disable-next-line no-param-reassign
         req.headers.Authorization = `Bearer ${Cookies.get(USER_TOKEN_COOKIE)}`;
       }
 
       return req;
     });
+
+    this.instance.interceptors.response.use(
+      (response) => response,
+      async (error: AxiosError) => {
+        const request = error.config;
+        const isUnauthorized = error.response?.status === 401;
+        const isRefreshRequest = request?.url?.endsWith('/auth/refresh');
+        const isSignInRequest = request?.url?.endsWith('/auth/signin');
+
+        if (
+          !isUnauthorized ||
+          !request ||
+          request._retryAfterRefresh ||
+          isRefreshRequest ||
+          isSignInRequest
+        ) {
+          if (isUnauthorized && !isSignInRequest) {
+            await this.authFailureHandler?.();
+          }
+
+          return Promise.reject(error);
+        }
+
+        request._retryAfterRefresh = true;
+
+        try {
+          if (!this.refreshRequest) {
+            this.refreshRequest = this.instance
+              .post<AuthResponse>('/auth/refresh')
+              .then(({ data }) => {
+                this.saveAccessToken(data.accessToken);
+
+                return data.accessToken;
+              })
+              .finally(() => {
+                this.refreshRequest = null;
+              });
+          }
+
+          const accessToken = await this.refreshRequest;
+
+          if (this.isDev) {
+            request.headers.Authorization = `Bearer ${accessToken}`;
+          }
+
+          return this.instance(request);
+        } catch (refreshError) {
+          await this.authFailureHandler?.();
+
+          return Promise.reject(refreshError);
+        }
+      },
+    );
+  }
+
+  setAuthFailureHandler(handler: () => Promise<void> | void) {
+    this.authFailureHandler = handler;
+  }
+
+  saveAccessToken(accessToken: string) {
+    if (this.isDev) {
+      Cookies.set(USER_TOKEN_COOKIE, accessToken, { expires: 365 });
+    }
+
+    Cookies.set('ttg-user-token', accessToken, { expires: 365 });
   }
 
   get<T>(config: RequestConfig) {
