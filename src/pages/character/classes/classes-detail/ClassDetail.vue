@@ -324,9 +324,7 @@
   const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
 
   const editUrl = computed(() =>
-    canEdit.value && currentClass.value
-      ? `/workshop/classes/${currentClass.value.name.eng.replace(/\s+/g, '_')}/edit`
-      : '',
+    canEdit.value && currentClass.value ? `/workshop${route.path}/edit` : '',
   );
 
   onMounted(async () => {

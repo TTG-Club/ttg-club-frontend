@@ -96,6 +96,12 @@ export const WorkshopClassEditPage: RouteRecordRaw = {
   component: () => import('./classes/ClassEditView.vue'),
 };
 
+export const WorkshopArchetypeEditPage: RouteRecordRaw = {
+  name: 'workshop-archetype-edit',
+  path: '/workshop/classes/:className/:archetypeName/edit',
+  component: () => import('./classes/ArchetypeEditView.vue'),
+};
+
 export const WorkshopRacesPage: RouteRecordRaw = {
   name: 'workshop-races',
   path: '/workshop/races',
