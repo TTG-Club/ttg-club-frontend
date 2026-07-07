@@ -8,8 +8,15 @@
   import ContentLayout from '@/layouts/ContentLayout.vue';
 
   type TavernResult = {
+    typeLabel: string;
+    territoryLabel: string;
     name: string;
+    menu: string;
     atmosphere: string;
+    rumors: string;
+    event: string;
+    tables: string;
+    bartender: string;
   };
 
   const tavernTypes = [
@@ -31,9 +38,53 @@
     },
   ];
 
+  // Значения совпадают с enum HabitatType на бэкенде.
+  const territories = [
+    { label: 'Случайная территория', value: null },
+    { label: 'Лес', value: 'FOREST' },
+    { label: 'Болото', value: 'SWAMP' },
+    { label: 'Горы', value: 'MOUNTAIN' },
+    { label: 'Холмы', value: 'HILL' },
+    { label: 'Равнина / луг', value: 'GRASSLAND' },
+    { label: 'Побережье', value: 'COAST' },
+    { label: 'Полярная тундра', value: 'ARCTIC' },
+    { label: 'Пустыня', value: 'DESERT' },
+    { label: 'Тропики', value: 'TROPICS' },
+    { label: 'Город', value: 'CITY' },
+    { label: 'Деревня', value: 'VILLAGE' },
+    { label: 'Руины', value: 'RUINS' },
+    { label: 'Подземелья', value: 'DUNGEON' },
+    { label: 'Подземье', value: 'UNDERGROUND' },
+    { label: 'Под водой', value: 'WATERS' },
+  ];
+
+  const typeLabels: Record<string, string> = {
+    BEER: 'Пивная / бар',
+    INN: 'Постоялый двор / таверна',
+    HOTEL: 'Гостиница',
+  };
+
   const tavernaType = ref<string | null>(null);
+  const territory = ref<string | null>(null);
   const results = ref<Array<TavernResult>>([]);
   const controller = ref<AbortController>();
+
+  const pickRandom = <T,>(items: Array<T>): T =>
+    items[Math.floor(Math.random() * items.length)];
+
+  const resolveType = (): string =>
+    tavernaType.value ?? pickRandom(['BEER', 'INN', 'HOTEL']);
+
+  const resolveHabitat = (): string =>
+    territory.value ??
+    pickRandom(
+      territories
+        .map((item) => item.value)
+        .filter((value): value is string => value !== null),
+    );
+
+  const territoryLabel = (value: string): string =>
+    territories.find((item) => item.value === value)?.label ?? value;
 
   const generateTavern = throttle(async () => {
     if (controller.value) {
@@ -42,38 +93,81 @@
 
     controller.value = new AbortController();
 
+    const { signal } = controller.value;
+    const resolvedType = resolveType();
+    const resolvedHabitat = resolveHabitat();
+
     try {
-      const [nameResp, atmosphereResp] = await Promise.all([
+      const [
+        nameResp,
+        menuResp,
+        atmosphereResp,
+        rumorsResp,
+        eventResp,
+        tablesResp,
+        bartenderResp,
+      ] = await Promise.all([
         httpClient.rawGet({
           url: '/tools/tavern/name',
-          payload: tavernaType.value
-            ? {
-                tavernaType: tavernaType.value,
-              }
-            : undefined,
-          signal: controller.value.signal,
+          payload: { tavernaType: resolvedType },
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/menu',
+          payload: { tavernaType: resolvedType, habitat: resolvedHabitat },
+          signal,
         }),
         httpClient.rawGet({
           url: '/tools/tavern/atmosphere/',
-          signal: controller.value.signal,
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/rumors',
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/event',
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/tables',
+          payload: { tavernaType: resolvedType },
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/bartender',
+          signal,
         }),
       ]);
 
-      if (nameResp.status !== 200) {
-        errorHandler(nameResp.statusText);
+      const responses = [
+        nameResp,
+        menuResp,
+        atmosphereResp,
+        rumorsResp,
+        eventResp,
+        tablesResp,
+        bartenderResp,
+      ];
 
-        return;
-      }
+      const failed = responses.find((resp) => resp.status !== 200);
 
-      if (atmosphereResp.status !== 200) {
-        errorHandler(atmosphereResp.statusText);
+      if (failed) {
+        errorHandler(failed.statusText);
 
         return;
       }
 
       results.value.unshift({
+        typeLabel: typeLabels[resolvedType] ?? resolvedType,
+        territoryLabel: territoryLabel(resolvedHabitat),
         name: nameResp.data,
+        menu: menuResp.data,
         atmosphere: atmosphereResp.data,
+        rumors: rumorsResp.data,
+        event: eventResp.data,
+        tables: tablesResp.data,
+        bartender: bartenderResp.data,
       });
     } catch (err) {
       errorHandler(err);
@@ -101,6 +195,16 @@
               :options="tavernTypes"
             />
           </n-form-item>
+
+          <n-form-item
+            label="Территория"
+            :style="{ minWidth: '254px' }"
+          >
+            <n-select
+              v-model:value="territory"
+              :options="territories"
+            />
+          </n-form-item>
         </n-flex>
 
         <n-flex>
@@ -126,7 +230,7 @@
         v-if="!results.length"
         class="tavern-empty"
       >
-        Выберите тип заведения и сгенерируйте таверну.
+        Выберите тип заведения и территорию, затем сгенерируйте таверну.
       </div>
 
       <div
@@ -138,7 +242,33 @@
           {{ item.name }}
         </div>
 
-        <raw-content :template="item.atmosphere" />
+        <div class="tavern-item__meta">
+          {{ item.typeLabel }} · {{ item.territoryLabel }}
+        </div>
+
+        <div class="tavern-item__section">
+          <raw-content :template="item.menu" />
+        </div>
+
+        <div class="tavern-item__section">
+          <raw-content :template="item.atmosphere" />
+        </div>
+
+        <div class="tavern-item__section">
+          <raw-content :template="item.rumors" />
+        </div>
+
+        <div class="tavern-item__section">
+          <raw-content :template="item.event" />
+        </div>
+
+        <div class="tavern-item__section">
+          <raw-content :template="item.tables" />
+        </div>
+
+        <div class="tavern-item__section">
+          <raw-content :template="item.bartender" />
+        </div>
       </div>
     </template>
   </content-layout>
@@ -163,10 +293,23 @@
     overflow: hidden;
 
     &__name {
-      margin-bottom: 12px;
       font-size: var(--h4-font-size);
       font-weight: 600;
       line-height: var(--h4-line-height);
+    }
+
+    &__meta {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: var(--text-g-color);
+    }
+
+    &__section {
+      &:not(:last-child) {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
     }
 
     :deep(p) {
