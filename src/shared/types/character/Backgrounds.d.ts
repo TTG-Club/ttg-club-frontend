@@ -14,6 +14,7 @@ export interface BackgroundItem {
   homebrew?: boolean;
   skills?: string[];
   toolOwnership?: string;
+  language?: string;
   languages?: string[];
   equipments?: string[];
   startGold?: number;

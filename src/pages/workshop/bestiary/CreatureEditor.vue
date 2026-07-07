@@ -23,6 +23,12 @@
 
   type TextBlockField = 'feats' | 'actions' | 'bonusActions';
 
+  type SkillEntry = {
+    key: string;
+    value: number | string;
+    additional: string;
+  };
+
   type EditableTextBlock = {
     name: string;
     englishName: string;
@@ -193,6 +199,10 @@
     'Убеждение': 'PERSUASION',
   };
 
+  const skillOptions = Object.entries(skillMap).map(([label, value]) =>
+    option(label, value),
+  );
+
   const selectedValues = (values?: string[], options = damageOptions) =>
     values
       ?.map(
@@ -297,6 +307,15 @@
 
   const parsedHitFormula = parseHitFormula();
 
+  const initialSkills = (): SkillEntry[] =>
+    props.creature?.skills
+      ?.map((skill) => ({
+        key: skillMap[skill.name] || '',
+        value: skill.value,
+        additional: skill.additional || '',
+      }))
+      .filter((skill) => !!skill.key) || [];
+
   const form = reactive({
     name: props.creature?.name.rus || '',
     englishName: props.creature?.name.eng || '',
@@ -330,6 +349,7 @@
     int: props.creature?.ability.int || 10,
     wiz: props.creature?.ability.wiz || 10,
     cha: props.creature?.ability.cha || 10,
+    skills: initialSkills(),
     passivePerception: props.creature?.senses.passivePerception || '10',
     darkvision: findSense('тёмное зрение')?.value || '',
     trysight: findSense('истинное зрение')?.value || '',
@@ -377,6 +397,14 @@
 
   const removeTextBlock = (key: TextBlockField, index: number) => {
     form[key].splice(index, 1);
+  };
+
+  const addSkill = () => {
+    form.skills.push({ key: '', value: 0, additional: '' });
+  };
+
+  const removeSkill = (index: number) => {
+    form.skills.splice(index, 1);
   };
 
   const hitDice = computed(
@@ -432,16 +460,6 @@
         additional: save.additional,
       }))
       .filter((save) => !!save.key) || [];
-
-  const existingSkills = (): ICreatureSaveNameValue[] =>
-    props.creature?.skills
-      ?.map((skill) => ({
-        key: skillMap[skill.name],
-        name: skill.name,
-        value: skill.value,
-        additional: skill.additional,
-      }))
-      .filter((skill) => !!skill.key) || [];
 
   const createPayload = (): ICreatureSave => {
     const speed: ICreatureSaveNameValue[] = [
@@ -522,7 +540,13 @@
         cha: Number(form.cha),
       },
       savingThrows: existingSavingThrows(),
-      skills: existingSkills(),
+      skills: form.skills
+        .filter((skill) => skill.key)
+        .map((skill) => ({
+          key: skill.key,
+          value: Number(skill.value) || 0,
+          additional: skill.additional || undefined,
+        })),
       damageResistances: form.damageResistances,
       damageImmunities: form.damageImmunities,
       damageVulnerabilities: form.damageVulnerabilities,
@@ -818,6 +842,82 @@
         />
       </label>
     </div>
+
+    <section class="creature-editor__text-section">
+      <div class="creature-editor__text-section_header">
+        <h3>Навыки</h3>
+
+        <button
+          type="button"
+          @click="addSkill"
+        >
+          Добавить
+        </button>
+      </div>
+
+      <div
+        v-for="(skill, skillIndex) in form.skills"
+        :key="skillIndex"
+        class="creature-editor__skill-row"
+      >
+        <label class="creature-editor__field">
+          <span>Навык</span>
+
+          <select
+            v-model="skill.key"
+            required
+          >
+            <option
+              disabled
+              value=""
+            >
+              Выберите навык
+            </option>
+
+            <option
+              v-for="item in skillOptions"
+              :key="item.value"
+              :value="item.value"
+            >
+              {{ item.label }}
+            </option>
+          </select>
+        </label>
+
+        <label class="creature-editor__field">
+          <span>Бонус</span>
+
+          <input
+            v-model.number="skill.value"
+            required
+            type="number"
+          />
+        </label>
+
+        <label class="creature-editor__field">
+          <span>Доп. текст</span>
+
+          <input
+            v-model="skill.additional"
+            type="text"
+          />
+        </label>
+
+        <button
+          type="button"
+          @click="removeSkill(skillIndex)"
+        >
+          Удалить
+        </button>
+      </div>
+
+      <p
+        v-if="!form.skills.length"
+        class="creature-editor__empty"
+      >
+        Нет навыков.
+      </p>
+    </section>
 
     <div class="creature-editor__group">
       <label class="creature-editor__field">
@@ -1219,6 +1319,19 @@
       color: var(--text-color);
     }
 
+    &__skill-row {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+
+      padding: 12px;
+
+      background-color: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
     &__readonly {
       display: grid;
       grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -1249,7 +1362,8 @@
     }
 
     &__text-section button,
-    &__text-block button {
+    &__text-block button,
+    &__skill-row button {
       cursor: pointer;
 
       min-height: 36px;
@@ -1271,6 +1385,10 @@
 
       &__text-block {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      &__skill-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
       }
 
       &__readonly {

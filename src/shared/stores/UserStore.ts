@@ -117,13 +117,7 @@ export const useUserStore = defineStore('UserStore', () => {
     }
   };
 
-  httpClient.instance.interceptors.response.use(async (resp) => {
-    if (resp.status === 401) {
-      await clearUser();
-    }
-
-    return resp;
-  });
+  httpClient.setAuthFailureHandler(clearUser);
 
   const getUserToken = () =>
     isDev ? Cookies.get(USER_TOKEN_COOKIE) : undefined;
@@ -200,15 +194,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
       switch (resp.status) {
         case 200:
-          if (isDev) {
-            Cookies.set(USER_TOKEN_COOKIE, resp.data.accessToken, {
-              expires: 365,
-            });
-          }
-
-          Cookies.set('ttg-user-token', resp.data.accessToken, {
-            expires: 365,
-          });
+          httpClient.saveAccessToken(resp.data.accessToken);
 
           await getUserInfo();
 
