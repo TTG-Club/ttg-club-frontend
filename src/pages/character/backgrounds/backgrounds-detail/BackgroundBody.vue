@@ -32,8 +32,13 @@
           />
         </li>
 
-        <li v-if="background.languages?.length">
-          <b>Языки:</b> {{ background.languages.join(', ') }}
+        <li v-if="background.languages?.length || background.language">
+          <b>Языки:</b>
+          {{
+            background.languages?.length
+              ? background.languages.join(', ')
+              : background.language
+          }}
         </li>
 
         <li v-if="background.equipments?.length">
