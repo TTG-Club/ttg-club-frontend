@@ -49,6 +49,18 @@
       label: 'Гостиница, отель',
       value: 'HOTEL',
     },
+    {
+      label: 'Кафе, кофейня, чайная',
+      value: 'CAFE',
+    },
+    {
+      label: 'Ресторан, трапезная, харчевня',
+      value: 'RESTAURANT',
+    },
+    {
+      label: 'Игорный дом, казино, притон',
+      value: 'GAMBLING_DEN',
+    },
   ];
 
   // Значения совпадают с enum HabitatType на бэкенде.
@@ -75,6 +87,9 @@
     BEER: 'Пивная / бар',
     INN: 'Постоялый двор / таверна',
     HOTEL: 'Гостиница',
+    CAFE: 'Кафе',
+    RESTAURANT: 'Ресторан',
+    GAMBLING_DEN: 'Игорный дом',
   };
 
   // Блоки результата с кнопкой перегенерации (кроме названия — оно в шапке).
@@ -99,7 +114,8 @@
     items[Math.floor(Math.random() * items.length)];
 
   const resolveType = (): string =>
-    tavernaType.value ?? pickRandom(['BEER', 'INN', 'HOTEL']);
+    tavernaType.value ??
+    pickRandom(['BEER', 'INN', 'HOTEL', 'CAFE', 'RESTAURANT', 'GAMBLING_DEN']);
 
   const resolveHabitat = (): string =>
     territory.value ??
