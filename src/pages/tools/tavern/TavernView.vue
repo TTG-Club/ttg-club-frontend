@@ -2,6 +2,7 @@
   import { throttle } from 'lodash-es';
 
   import { httpClient } from '@/shared/api';
+  import { useUIStore } from '@/shared/stores/UIStore';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -102,6 +103,9 @@
     { field: 'bartender', title: 'Хозяин заведения' },
   ];
 
+  const uiStore = useUIStore();
+  const { isMobile } = storeToRefs(uiStore);
+
   const tavernaType = ref<string | null>(null);
   const territory = ref<string | null>(null);
   const results = ref<Array<TavernResult>>([]);
@@ -167,9 +171,15 @@
       case 'atmosphere':
         return { url: '/tools/tavern/atmosphere/' };
       case 'rumors':
-        return { url: '/tools/tavern/rumors' };
+        return {
+          url: '/tools/tavern/rumors',
+          payload: { atmosphereVisitors: item.atmosphereVisitors },
+        };
       case 'event':
-        return { url: '/tools/tavern/event' };
+        return {
+          url: '/tools/tavern/event',
+          payload: { atmosphereVisitors: item.atmosphereVisitors },
+        };
       case 'tables':
         return {
           url: '/tools/tavern/tables',
@@ -233,52 +243,30 @@
     const resolvedHabitat = resolveHabitat();
 
     try {
-      // Фаза 1: всё, кроме столиков (столикам нужна заполненность из атмосферы).
-      const [
-        nameResp,
-        menuResp,
-        atmosphereResp,
-        rumorsResp,
-        eventResp,
-        bartenderResp,
-      ] = await Promise.all([
-        httpClient.rawGet({
-          url: '/tools/tavern/name',
-          payload: { tavernaType: resolvedType },
-          signal,
-        }),
-        httpClient.rawGet({
-          url: '/tools/tavern/menu',
-          payload: { tavernaType: resolvedType, habitat: resolvedHabitat },
-          signal,
-        }),
-        httpClient.rawGet({
-          url: '/tools/tavern/atmosphere/',
-          signal,
-        }),
-        httpClient.rawGet({
-          url: '/tools/tavern/rumors',
-          signal,
-        }),
-        httpClient.rawGet({
-          url: '/tools/tavern/event',
-          signal,
-        }),
-        httpClient.rawGet({
-          url: '/tools/tavern/bartender',
-          signal,
-        }),
-      ]);
+      // Фаза 1: не зависит от заполненности зала.
+      const [nameResp, menuResp, atmosphereResp, bartenderResp] =
+        await Promise.all([
+          httpClient.rawGet({
+            url: '/tools/tavern/name',
+            payload: { tavernaType: resolvedType },
+            signal,
+          }),
+          httpClient.rawGet({
+            url: '/tools/tavern/menu',
+            payload: { tavernaType: resolvedType, habitat: resolvedHabitat },
+            signal,
+          }),
+          httpClient.rawGet({
+            url: '/tools/tavern/atmosphere/',
+            signal,
+          }),
+          httpClient.rawGet({
+            url: '/tools/tavern/bartender',
+            signal,
+          }),
+        ]);
 
-      const phaseOne = [
-        nameResp,
-        menuResp,
-        atmosphereResp,
-        rumorsResp,
-        eventResp,
-        bartenderResp,
-      ];
-
+      const phaseOne = [nameResp, menuResp, atmosphereResp, bartenderResp];
       const failedOne = phaseOne.find((resp) => resp.status !== 200);
 
       if (failedOne) {
@@ -287,17 +275,33 @@
         return;
       }
 
-      // Фаза 2: столики зависят от заполненности зала (visitors из атмосферы).
+      // Заполненность зала из атмосферы — от неё зависят слухи, событие и столики.
       const atmosphereVisitors = parseVisitors(atmosphereResp.data);
 
-      const tablesResp = await httpClient.rawGet({
-        url: '/tools/tavern/tables',
-        payload: { tavernaType: resolvedType, atmosphereVisitors },
-        signal,
-      });
+      // Фаза 2.
+      const [rumorsResp, eventResp, tablesResp] = await Promise.all([
+        httpClient.rawGet({
+          url: '/tools/tavern/rumors',
+          payload: { atmosphereVisitors },
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/event',
+          payload: { atmosphereVisitors },
+          signal,
+        }),
+        httpClient.rawGet({
+          url: '/tools/tavern/tables',
+          payload: { tavernaType: resolvedType, atmosphereVisitors },
+          signal,
+        }),
+      ]);
 
-      if (tablesResp.status !== 200) {
-        errorHandler(tablesResp.statusText);
+      const phaseTwo = [rumorsResp, eventResp, tablesResp];
+      const failedTwo = phaseTwo.find((resp) => resp.status !== 200);
+
+      if (failedTwo) {
+        errorHandler(failedTwo.statusText);
 
         return;
       }
@@ -333,29 +337,35 @@
         @submit.prevent.stop="generateTavern"
         @keyup.enter.exact.prevent.stop="generateTavern"
       >
-        <n-flex>
-          <n-form-item
+        <n-grid
+          cols="2"
+          :x-gap="12"
+          :y-gap="4"
+        >
+          <n-form-item-gi
             label="Тип заведения"
-            :style="{ minWidth: '254px' }"
+            :show-label="!isMobile"
           >
             <n-select
               v-model:value="tavernaType"
               :options="tavernTypes"
+              placeholder="Тип заведения"
             />
-          </n-form-item>
+          </n-form-item-gi>
 
-          <n-form-item
+          <n-form-item-gi
             label="Территория"
-            :style="{ minWidth: '254px' }"
+            :show-label="!isMobile"
           >
             <n-select
               v-model:value="territory"
               :options="territories"
+              placeholder="Территория"
             />
-          </n-form-item>
-        </n-flex>
+          </n-form-item-gi>
+        </n-grid>
 
-        <n-flex>
+        <n-flex :size="8">
           <n-button
             type="primary"
             attr-type="submit"
