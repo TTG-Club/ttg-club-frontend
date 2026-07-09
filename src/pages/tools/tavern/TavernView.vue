@@ -2,7 +2,7 @@
   import { throttle } from 'lodash-es';
 
   import { httpClient } from '@/shared/api';
-  import { useUIStore } from '@/shared/stores/UIStore';
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -121,15 +121,13 @@
     { field: 'bartender', title: 'Хозяин заведения' },
   ];
 
-  const uiStore = useUIStore();
-  const { isMobile } = storeToRefs(uiStore);
-
   const tavernaType = ref<string | null>(null);
   const territory = ref<string | null>(null);
   const serviceLevel = ref<string | null>(null);
   const results = ref<Array<TavernResult>>([]);
   const controller = ref<AbortController>();
   const loadingKeys = ref<Set<string>>(new Set());
+  const isGenerating = ref(false);
 
   let nextId = 0;
 
@@ -260,13 +258,14 @@
   };
 
   const generateTavern = throttle(async () => {
-    if (controller.value) {
-      controller.value.abort();
-    }
+    controller.value?.abort();
 
-    controller.value = new AbortController();
+    const currentController = new AbortController();
 
-    const { signal } = controller.value;
+    controller.value = currentController;
+    isGenerating.value = true;
+
+    const { signal } = currentController;
     const resolvedType = resolveType();
     const resolvedHabitat = resolveHabitat();
     const resolvedServiceLevel = resolveServiceLevel();
@@ -364,74 +363,79 @@
     } catch (err) {
       errorHandler(err);
     } finally {
-      controller.value = undefined;
+      if (controller.value === currentController) {
+        controller.value = undefined;
+        isGenerating.value = false;
+      }
     }
   }, 300);
 </script>
 
 <template>
-  <content-layout title="Таверна">
+  <content-layout
+    title="Таверна"
+    class="tavern-layout"
+  >
     <template #fixed>
       <n-form
-        class="tools_settings"
+        class="tools_settings tavern-settings"
         @submit.prevent.stop="generateTavern"
         @keyup.enter.exact.prevent.stop="generateTavern"
       >
-        <n-grid
-          cols="2"
-          :x-gap="12"
-          :y-gap="4"
-        >
-          <n-form-item-gi
-            label="Тип заведения"
-            :show-label="!isMobile"
-          >
+        <p class="tavern-settings__hint">
+          Задайте детали или оставьте их случайными — генератор соберёт готовое
+          место для приключения.
+        </p>
+
+        <div class="tavern-settings__grid">
+          <n-form-item label="Тип заведения">
             <n-select
               v-model:value="tavernaType"
               :options="tavernTypes"
               placeholder="Тип заведения"
             />
-          </n-form-item-gi>
+          </n-form-item>
 
-          <n-form-item-gi
-            label="Территория"
-            :show-label="!isMobile"
-          >
+          <n-form-item label="Территория">
             <n-select
               v-model:value="territory"
               :options="territories"
               placeholder="Территория"
             />
-          </n-form-item-gi>
+          </n-form-item>
 
-          <n-form-item-gi
-            :span="2"
+          <n-form-item
+            class="tavern-settings__service-level"
             label="Уровень обслуживания"
-            :show-label="!isMobile"
           >
             <n-select
               v-model:value="serviceLevel"
               :options="serviceLevels"
               placeholder="Уровень обслуживания"
             />
-          </n-form-item-gi>
-        </n-grid>
+          </n-form-item>
+        </div>
 
-        <n-flex :size="8">
+        <div class="tavern-settings__actions">
           <n-button
             type="primary"
             attr-type="submit"
+            :loading="isGenerating"
           >
+            <template #icon>
+              <svg-icon icon="dice/d20" />
+            </template>
             Сгенерировать
           </n-button>
 
           <n-button
             secondary
+            :disabled="!results.length"
             @click.left.exact.prevent="results = []"
           >
             Очистить
           </n-button>
-        </n-flex>
+        </div>
       </n-form>
     </template>
 
@@ -440,7 +444,17 @@
         v-if="!results.length"
         class="tavern-empty"
       >
-        Выберите тип заведения и территорию, затем сгенерируйте таверну.
+        <svg-icon
+          class="tavern-empty__icon"
+          icon="dice/d20"
+          size="32"
+        />
+
+        <p class="tavern-empty__title">Здесь появится ваша таверна</p>
+
+        <p class="tavern-empty__text">
+          Выберите параметры или доверьтесь случаю, затем запустите генерацию.
+        </p>
       </div>
 
       <div
@@ -453,10 +467,28 @@
             {{ item.name }}
           </div>
 
-          <div class="tavern-item__meta">
-            {{ item.typeLabel }} · {{ item.territoryLabel }} ·
-            {{ item.serviceLevelLabel }}
-          </div>
+          <n-space
+            class="tavern-item__meta"
+            size="small"
+          >
+            <n-tag
+              :bordered="false"
+              size="small"
+              >{{ item.typeLabel }}</n-tag
+            >
+
+            <n-tag
+              :bordered="false"
+              size="small"
+              >{{ item.territoryLabel }}</n-tag
+            >
+
+            <n-tag
+              :bordered="false"
+              size="small"
+              >{{ item.serviceLevelLabel }}</n-tag
+            >
+          </n-space>
 
           <n-button
             class="tavern-item__reroll"
@@ -476,7 +508,12 @@
           :key="section.field"
           class="tavern-item__section"
         >
-          <raw-content :template="item[section.field]" />
+          <div class="tavern-item__section-title">{{ section.title }}</div>
+
+          <raw-content
+            class="tavern-item__section-content"
+            :template="item[section.field]"
+          />
 
           <n-button
             class="tavern-item__reroll"
@@ -496,49 +533,159 @@
 </template>
 
 <style lang="scss" scoped>
+  @use '@/assets/styles/variables/breakpoints' as *;
+
+  .tavern-layout {
+    @include media-max($md) {
+      :deep(.content-layout__fixed) {
+        position: static;
+      }
+    }
+  }
+
+  .tavern-settings {
+    &__hint {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-g-color);
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0 16px;
+
+      @include media-min($md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    &__service-level {
+      @include media-min($md) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      @include media-max($sm) {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        :deep(.n-button) {
+          width: 100%;
+        }
+      }
+    }
+  }
+
   .tavern-empty,
   .tavern-item {
     width: 100%;
-    margin-bottom: 12px;
-    padding: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
 
     background-color: var(--bg-table-list);
     border-radius: 12px;
+
+    @include media-max($sm) {
+      padding: 12px;
+    }
   }
 
   .tavern-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    min-height: 180px;
+
     color: var(--text-g-color);
+
+    &__icon {
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+
+    &__title {
+      margin: 0 0 4px;
+
+      font-size: var(--h4-font-size);
+      font-weight: 600;
+      line-height: var(--h4-line-height);
+      color: var(--text-color-title);
+    }
+
+    &__text {
+      max-width: 520px;
+      margin: 0;
+      line-height: 1.5;
+    }
   }
 
   .tavern-item {
     overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
 
     &__name {
+      padding-right: 36px;
+
       font-size: var(--h4-font-size);
       font-weight: 600;
       line-height: var(--h4-line-height);
+      color: var(--text-color-title);
+      overflow-wrap: anywhere;
     }
 
     &__meta {
-      font-size: 14px;
-      color: var(--text-g-color);
+      margin-top: 12px;
+
+      :deep(.n-tag) {
+        --n-color: var(--hover) !important;
+        --n-text-color: var(--text-g-color) !important;
+        --n-border: 1px solid var(--border) !important;
+      }
     }
 
     &__section {
       position: relative;
-      padding-right: 44px;
+      padding: 16px 44px 0 0;
 
       &:not(:last-child) {
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--border);
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--hover);
       }
+    }
+
+    &__section-title {
+      margin-bottom: 8px;
+
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.33;
+      color: var(--text-g-color);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    &__section-content {
+      color: var(--text-color);
     }
 
     &__reroll {
       position: absolute;
-      top: 0;
+      top: 16px;
       right: 0;
+    }
+
+    &__header {
+      padding-top: 0;
     }
 
     :deep(p) {
