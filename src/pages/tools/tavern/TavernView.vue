@@ -21,8 +21,10 @@
     id: number;
     type: string;
     habitat: string;
+    serviceLevel: string;
     typeLabel: string;
     territoryLabel: string;
+    serviceLevelLabel: string;
     atmosphereVisitors: number;
     name: string;
     menu: string;
@@ -84,6 +86,22 @@
     { label: 'Под водой', value: 'WATERS' },
   ];
 
+  // Значения совпадают с enum TavernaCategory на бэкенде (уровень цен меню).
+  const serviceLevels = [
+    { label: 'Случайный уровень', value: null },
+    { label: 'Дешёвое', value: 'CHEAP' },
+    { label: 'Обычное', value: 'ORDINARY' },
+    { label: 'Дорогое', value: 'EXPENSIVE' },
+    { label: 'Элитное', value: 'ELITE' },
+  ];
+
+  const serviceLevelLabels: Record<string, string> = {
+    CHEAP: 'Дешёвое',
+    ORDINARY: 'Обычное',
+    EXPENSIVE: 'Дорогое',
+    ELITE: 'Элитное',
+  };
+
   const typeLabels: Record<string, string> = {
     BEER: 'Пивная / бар',
     INN: 'Постоялый двор / таверна',
@@ -108,6 +126,7 @@
 
   const tavernaType = ref<string | null>(null);
   const territory = ref<string | null>(null);
+  const serviceLevel = ref<string | null>(null);
   const results = ref<Array<TavernResult>>([]);
   const controller = ref<AbortController>();
   const loadingKeys = ref<Set<string>>(new Set());
@@ -128,6 +147,10 @@
         .map((item) => item.value)
         .filter((value): value is string => value !== null),
     );
+
+  const resolveServiceLevel = (): string =>
+    serviceLevel.value ??
+    pickRandom(['CHEAP', 'ORDINARY', 'EXPENSIVE', 'ELITE']);
 
   const territoryLabel = (value: string): string =>
     territories.find((item) => item.value === value)?.label ?? value;
@@ -166,7 +189,11 @@
       case 'menu':
         return {
           url: '/tools/tavern/menu',
-          payload: { tavernaType: item.type, habitat: item.habitat },
+          payload: {
+            tavernaType: item.type,
+            habitat: item.habitat,
+            serviceLevel: item.serviceLevel,
+          },
         };
       case 'atmosphere':
         return { url: '/tools/tavern/atmosphere/' };
@@ -186,6 +213,7 @@
           payload: {
             tavernaType: item.type,
             atmosphereVisitors: item.atmosphereVisitors,
+            serviceLevel: item.serviceLevel,
           },
         };
       case 'bartender':
@@ -241,6 +269,7 @@
     const { signal } = controller.value;
     const resolvedType = resolveType();
     const resolvedHabitat = resolveHabitat();
+    const resolvedServiceLevel = resolveServiceLevel();
 
     try {
       // Фаза 1: не зависит от заполненности зала.
@@ -253,7 +282,11 @@
           }),
           httpClient.rawGet({
             url: '/tools/tavern/menu',
-            payload: { tavernaType: resolvedType, habitat: resolvedHabitat },
+            payload: {
+              tavernaType: resolvedType,
+              habitat: resolvedHabitat,
+              serviceLevel: resolvedServiceLevel,
+            },
             signal,
           }),
           httpClient.rawGet({
@@ -292,7 +325,11 @@
         }),
         httpClient.rawGet({
           url: '/tools/tavern/tables',
-          payload: { tavernaType: resolvedType, atmosphereVisitors },
+          payload: {
+            tavernaType: resolvedType,
+            atmosphereVisitors,
+            serviceLevel: resolvedServiceLevel,
+          },
           signal,
         }),
       ]);
@@ -310,8 +347,11 @@
         id: (nextId += 1),
         type: resolvedType,
         habitat: resolvedHabitat,
+        serviceLevel: resolvedServiceLevel,
         typeLabel: typeLabels[resolvedType] ?? resolvedType,
         territoryLabel: territoryLabel(resolvedHabitat),
+        serviceLevelLabel:
+          serviceLevelLabels[resolvedServiceLevel] ?? resolvedServiceLevel,
         atmosphereVisitors,
         name: nameResp.data,
         menu: menuResp.data,
@@ -363,6 +403,18 @@
               placeholder="Территория"
             />
           </n-form-item-gi>
+
+          <n-form-item-gi
+            :span="2"
+            label="Уровень обслуживания"
+            :show-label="!isMobile"
+          >
+            <n-select
+              v-model:value="serviceLevel"
+              :options="serviceLevels"
+              placeholder="Уровень обслуживания"
+            />
+          </n-form-item-gi>
         </n-grid>
 
         <n-flex :size="8">
@@ -402,7 +454,8 @@
           </div>
 
           <div class="tavern-item__meta">
-            {{ item.typeLabel }} · {{ item.territoryLabel }}
+            {{ item.typeLabel }} · {{ item.territoryLabel }} ·
+            {{ item.serviceLevelLabel }}
           </div>
 
           <n-button
