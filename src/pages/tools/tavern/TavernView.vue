@@ -125,6 +125,7 @@
   const territory = ref<string | null>(null);
   const serviceLevel = ref<string | null>(null);
   const results = ref<Array<TavernResult>>([]);
+  const resultsContainer = ref<HTMLElement | null>(null);
   const controller = ref<AbortController>();
   const loadingKeys = ref<Set<string>>(new Set());
   const isGenerating = ref(false);
@@ -175,6 +176,20 @@
     }
 
     loadingKeys.value = next;
+  };
+
+  const focusNewestResult = async (): Promise<void> => {
+    await nextTick();
+
+    const newestResult =
+      resultsContainer.value?.querySelector<HTMLElement>('.tavern-item');
+
+    if (!newestResult) {
+      return;
+    }
+
+    newestResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    newestResult.focus({ preventScroll: true });
   };
 
   const requestForField = (item: TavernResult, field: RerollField) => {
@@ -360,6 +375,8 @@
         tables: tablesResp.data,
         bartender: bartenderResp.data,
       });
+
+      await focusNewestResult();
     } catch (err) {
       errorHandler(err);
     } finally {
@@ -454,73 +471,79 @@
         </p>
       </div>
 
-      <div
-        v-for="item in results"
-        :key="item.id"
-        class="tavern-item"
-      >
-        <div class="tavern-item__section tavern-item__header">
-          <div class="tavern-item__name">
-            {{ item.name }}
+      <div ref="resultsContainer">
+        <div
+          v-for="item in results"
+          :key="item.id"
+          class="tavern-item"
+          tabindex="-1"
+        >
+          <div class="tavern-item__section tavern-item__header">
+            <div class="tavern-item__name">
+              {{ item.name }}
+            </div>
+
+            <n-space
+              class="tavern-item__meta"
+              size="small"
+            >
+              <n-tag
+                :bordered="false"
+                size="small"
+                >{{ item.typeLabel }}</n-tag
+              >
+
+              <n-tag
+                :bordered="false"
+                size="small"
+                >{{ item.territoryLabel }}</n-tag
+              >
+
+              <n-tag
+                :bordered="false"
+                size="small"
+                >{{ item.serviceLevelLabel }}</n-tag
+              >
+            </n-space>
+
+            <n-button
+              class="tavern-item__reroll"
+              circle
+              tertiary
+              size="small"
+              title="Обновить название"
+              :loading="isLoading(item, 'name')"
+              @click.left.exact.prevent="rerollField(item, 'name')"
+            >
+              ↻
+            </n-button>
           </div>
 
-          <n-space
-            class="tavern-item__meta"
-            size="small"
+          <div
+            v-for="section in sections"
+            :key="section.field"
+            :class="[
+              'tavern-item__section',
+              `tavern-item__section--${section.field}`,
+            ]"
           >
-            <n-tag
-              :bordered="false"
+            <raw-content
+              class="tavern-item__section-content"
+              :template="item[section.field]"
+            />
+
+            <n-button
+              class="tavern-item__reroll"
+              circle
+              tertiary
               size="small"
-              >{{ item.typeLabel }}</n-tag
+              :title="`Обновить: ${section.title}`"
+              :loading="isLoading(item, section.field)"
+              @click.left.exact.prevent="rerollField(item, section.field)"
             >
-
-            <n-tag
-              :bordered="false"
-              size="small"
-              >{{ item.territoryLabel }}</n-tag
-            >
-
-            <n-tag
-              :bordered="false"
-              size="small"
-              >{{ item.serviceLevelLabel }}</n-tag
-            >
-          </n-space>
-
-          <n-button
-            class="tavern-item__reroll"
-            circle
-            tertiary
-            size="small"
-            title="Обновить название"
-            :loading="isLoading(item, 'name')"
-            @click.left.exact.prevent="rerollField(item, 'name')"
-          >
-            ↻
-          </n-button>
-        </div>
-
-        <div
-          v-for="section in sections"
-          :key="section.field"
-          class="tavern-item__section"
-        >
-          <raw-content
-            class="tavern-item__section-content"
-            :template="item[section.field]"
-          />
-
-          <n-button
-            class="tavern-item__reroll"
-            circle
-            tertiary
-            size="small"
-            :title="`Обновить: ${section.title}`"
-            :loading="isLoading(item, section.field)"
-            @click.left.exact.prevent="rerollField(item, section.field)"
-          >
-            ↻
-          </n-button>
+              ↻
+            </n-button>
+          </div>
         </div>
       </div>
     </template>
@@ -658,6 +681,64 @@
 
     &__section-content {
       color: var(--text-color);
+    }
+
+    &__section--menu {
+      padding: 20px 44px 4px 0;
+
+      :deep(.tavern-item__section-content > div > strong:first-child) {
+        display: block;
+
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+
+        font-size: var(--h4-font-size);
+        font-weight: 600;
+        line-height: var(--h4-line-height);
+        color: var(--text-color-title);
+        text-align: center;
+
+        border-bottom: 1px solid var(--border);
+      }
+
+      :deep(p) {
+        margin: 20px 0 8px;
+      }
+
+      :deep(p strong) {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-color-title);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      :deep(ul) {
+        display: grid;
+        gap: 4px;
+
+        margin: 0;
+        padding: 0;
+
+        list-style: none;
+      }
+
+      :deep(li) {
+        position: relative;
+        padding: 8px 0 8px 16px;
+        line-height: 1.5;
+        border-bottom: 1px dashed var(--border);
+
+        &::before {
+          content: '•';
+
+          position: absolute;
+          top: 8px;
+          left: 0;
+
+          color: var(--primary);
+        }
+      }
     }
 
     &__reroll {
