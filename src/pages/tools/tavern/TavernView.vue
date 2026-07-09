@@ -508,14 +508,12 @@
 
             <n-button
               class="tavern-item__reroll"
-              circle
               tertiary
               size="small"
-              title="Обновить название"
               :loading="isLoading(item, 'name')"
               @click.left.exact.prevent="rerollField(item, 'name')"
             >
-              ↻
+              Обновить
             </n-button>
           </div>
 
@@ -534,14 +532,12 @@
 
             <n-button
               class="tavern-item__reroll"
-              circle
               tertiary
               size="small"
-              :title="`Обновить: ${section.title}`"
               :loading="isLoading(item, section.field)"
               @click.left.exact.prevent="rerollField(item, section.field)"
             >
-              ↻
+              Обновить
             </n-button>
           </div>
         </div>
@@ -649,8 +645,6 @@
     box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
 
     &__name {
-      padding-right: 36px;
-
       font-size: var(--h4-font-size);
       font-weight: 600;
       line-height: var(--h4-line-height);
@@ -659,7 +653,7 @@
     }
 
     &__meta {
-      margin-top: 12px;
+      margin-top: 16px;
 
       :deep(.n-tag) {
         --n-color: var(--hover) !important;
@@ -669,8 +663,12 @@
     }
 
     &__section {
-      position: relative;
-      padding: 16px 44px 0 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+
+      padding: 16px 0 0;
 
       &:not(:last-child) {
         margin-bottom: 16px;
@@ -680,11 +678,12 @@
     }
 
     &__section-content {
+      min-width: 0;
       color: var(--text-color);
     }
 
     &__section--menu {
-      padding: 20px 44px 4px 0;
+      padding: 20px 0 4px;
 
       :deep(.tavern-item__section-content > div > strong:first-child) {
         display: block;
@@ -741,14 +740,34 @@
       }
     }
 
+    &__section--bartender {
+      :deep(p) {
+        display: inline;
+        margin: 0;
+      }
+
+      :deep(p + p)::before,
+      :deep(.tavern-item__section-content > div > strong:first-child)::after {
+        content: ': ';
+      }
+    }
+
     &__reroll {
-      position: absolute;
-      top: 16px;
-      right: 0;
+      white-space: nowrap;
     }
 
     &__header {
       padding-top: 0;
+
+      .tavern-item__name,
+      .tavern-item__meta {
+        grid-column: 1;
+      }
+
+      .tavern-item__reroll {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+      }
     }
 
     :deep(p) {
