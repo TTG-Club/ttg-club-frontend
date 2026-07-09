@@ -404,10 +404,7 @@
             />
           </n-form-item>
 
-          <n-form-item
-            class="tavern-settings__service-level"
-            label="Уровень обслуживания"
-          >
+          <n-form-item label="Уровень обслуживания">
             <n-select
               v-model:value="serviceLevel"
               :options="serviceLevels"
@@ -508,8 +505,6 @@
           :key="section.field"
           class="tavern-item__section"
         >
-          <div class="tavern-item__section-title">{{ section.title }}</div>
-
           <raw-content
             class="tavern-item__section-content"
             :template="item[section.field]"
@@ -557,20 +552,18 @@
       gap: 0 16px;
 
       @include media-min($md) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    &__service-level {
-      @include media-min($md) {
-        grid-column: 1 / -1;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
     &__actions {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 180px));
       gap: 8px;
+
+      :deep(.n-button) {
+        width: 100%;
+      }
 
       @include media-max($sm) {
         display: grid;
@@ -661,17 +654,6 @@
         padding-bottom: 16px;
         border-bottom: 1px solid var(--hover);
       }
-    }
-
-    &__section-title {
-      margin-bottom: 8px;
-
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.33;
-      color: var(--text-g-color);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
     }
 
     &__section-content {
