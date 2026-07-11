@@ -61,6 +61,7 @@
     skillName: props.background?.skillName || '',
     skillDescription: props.background?.skillDescription || '',
     personalization: props.background?.personalization || '',
+    language: props.background?.language || '',
     languages: props.background?.languages || [],
   });
 
@@ -196,6 +197,15 @@
 
       <input
         v-model="languageText"
+        type="text"
+      />
+    </label>
+
+    <label class="background-editor__field background-editor__field--wide">
+      <span>Языки текстом (например, «Два на ваш выбор»)</span>
+
+      <input
+        v-model="form.language"
         type="text"
       />
     </label>
