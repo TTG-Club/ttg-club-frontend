@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type { ICreature } from '@/shared/types/workshop/Bestiary';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -18,7 +18,7 @@
   const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(uiStore);
-  const { user } = storeToRefs(userStore);
+  const { isEditor } = storeToRefs(userStore);
 
   const creature = ref<Maybe<ICreature>>(undefined);
   const loading = ref(true);
@@ -69,10 +69,8 @@
     router.push({ name: 'bestiary' });
   };
 
-  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
-
   const editUrl = computed(() =>
-    canEdit.value && creature.value
+    isEditor.value && creature.value
       ? `/workshop/bestiary/${route.params.creatureName}/edit`
       : '',
   );

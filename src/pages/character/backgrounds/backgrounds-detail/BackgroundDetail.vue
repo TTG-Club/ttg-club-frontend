@@ -1,6 +1,6 @@
 <script>
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -27,9 +27,9 @@
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile']),
-      ...mapState(useUserStore, ['user']),
+      ...mapState(useUserStore, ['isEditor']),
       editUrl() {
-        return this.user?.roles.includes(EUserRoles.ADMIN) && this.background
+        return this.isEditor && this.background
           ? `/workshop/backgrounds/${this.$route.params.backgroundName}/edit`
           : '';
       },

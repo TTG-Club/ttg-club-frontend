@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import type { TSpellItem } from '@/shared/types/character/Spells';
   import type { Maybe } from '@/shared/types/Utility';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
@@ -18,7 +18,7 @@
   const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(uiStore);
-  const { user } = storeToRefs(userStore);
+  const { isEditor } = storeToRefs(userStore);
 
   const spell = ref<Maybe<TSpellItem>>(undefined);
   const loading = ref(true);
@@ -82,10 +82,8 @@
     router.push({ name: 'spells' });
   };
 
-  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
-
   const editUrl = computed(() =>
-    canEdit.value && spell.value
+    isEditor.value && spell.value
       ? `/workshop/spells/${route.params.spellName}/edit`
       : '',
   );
