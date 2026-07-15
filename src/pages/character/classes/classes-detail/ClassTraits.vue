@@ -106,11 +106,6 @@
       ),
   );
 
-  // Исправляем опечатку в данных: родительный суффикс «N-го уровень»
-  // при именительном «уровень» → «N-й уровень».
-  const formatFeatureType = (type: string) =>
-    type.replace(/(\d+)-го уровень/, '$1-й уровень');
-
   onMounted(() => {
     emit('loaded');
   });
@@ -381,7 +376,7 @@
 
         <div class="content">
           <div class="caption_text">
-            <span>{{ formatFeatureType(feature.type) }}</span>
+            <span>{{ feature.type }}</span>
 
             <a
               v-if="feature.optional"
