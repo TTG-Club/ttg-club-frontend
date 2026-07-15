@@ -5,7 +5,7 @@
   import { httpClient } from '@/shared/api';
   import { DEFAULT_QUERY_BOOKS_INJECT_KEY } from '@/shared/const';
   import { useUIStore } from '@/shared/stores/UIStore';
-  import { EUserRoles, useUserStore } from '@/shared/stores/UserStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import type { TName, TSource } from '@/shared/types/BaseApiFields';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
@@ -40,7 +40,7 @@
   const userStore = useUserStore();
 
   const { isMobile } = storeToRefs(useUIStore());
-  const { user } = storeToRefs(userStore);
+  const { isEditor } = storeToRefs(userStore);
 
   const queryBooks = computedInject(
     DEFAULT_QUERY_BOOKS_INJECT_KEY,
@@ -321,10 +321,8 @@
     router.push({ name: 'classes' });
   };
 
-  const canEdit = computed(() => user.value?.roles.includes(EUserRoles.ADMIN));
-
   const editUrl = computed(() =>
-    canEdit.value && currentClass.value ? `/workshop${route.path}/edit` : '',
+    isEditor.value && currentClass.value ? `/workshop${route.path}/edit` : '',
   );
 
   onMounted(async () => {

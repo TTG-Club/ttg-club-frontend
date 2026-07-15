@@ -100,6 +100,16 @@ export const useUserStore = defineStore('UserStore', () => {
     roles.value.map((role) => role.role).includes(EUserRoles.ADMIN),
   );
 
+  // Может редактировать контент: администратор или модератор.
+  const isEditor = computed(() => {
+    const currentRoles = roles.value.map((role) => role.role);
+
+    return (
+      currentRoles.includes(EUserRoles.ADMIN) ||
+      currentRoles.includes(EUserRoles.MODERATOR)
+    );
+  });
+
   const avatar = computed(() => ({
     src: user.value?.avatar || null,
     error: '/icon/avatar.png',
@@ -321,6 +331,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
     isAuthenticated,
     isAdmin,
+    isEditor,
 
     clearUser,
     getUserToken,
