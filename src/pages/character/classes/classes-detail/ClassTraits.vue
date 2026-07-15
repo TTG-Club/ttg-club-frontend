@@ -134,7 +134,7 @@
 
       <div class="content">
         <p class="class_stats">
-          <b>Кость Хитов:</b>
+          <b>Кость Хитов:&nbsp;</b>
 
           <dice-roller :formula="`1к${traits.diceHp}`" />
           за каждый уровень
@@ -147,10 +147,10 @@
         </p>
 
         <p class="class_stats">
-          <b>Хиты на следующих уровнях:</b>
+          <b>Хиты на следующих уровнях:&nbsp;</b>
 
-          <dice-roller :formula="`1к${traits.diceHp}`" />
-          (или {{ Math.floor(traits.diceHp / 2) + 1 }}) + модификатор
+          <dice-roller :formula="`1к${traits.diceHp}`" /> (или
+          {{ Math.floor(traits.diceHp / 2) + 1 }}) + модификатор
           <strong>Телосложения</strong> за каждый уровень этого класса, после
           первого (минимум 1)
         </p>
@@ -287,7 +287,7 @@
 
       <div class="content">
         <p class="class_stats">
-          <b>Доспехи:</b>
+          <b>Доспехи:&nbsp;</b>
 
           <raw-content
             v-if="traits.armor"
@@ -297,7 +297,7 @@
         </p>
 
         <p class="class_stats">
-          <b>Оружие:</b>
+          <b>Оружие:&nbsp;</b>
 
           <raw-content
             v-if="traits.weapon"
@@ -307,7 +307,7 @@
         </p>
 
         <p class="class_stats">
-          <b>Инструменты:</b>
+          <b>Инструменты:&nbsp;</b>
 
           <raw-content
             v-if="traits.tools"
