@@ -6,13 +6,16 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
+  import WorkshopRevisions from '../WorkshopRevisions.vue';
+
   import RaceEditor from './RaceEditor.vue';
 
   const route = useRoute();
   const race = ref<Maybe<TRaceDetail>>(undefined);
   const loading = ref(true);
+  const editorKey = ref(0);
 
-  onBeforeMount(async () => {
+  const loadRace = async () => {
     try {
       const resp = await httpClient.post<TRaceDetail>({
         url: `/races/${route.params.raceName}`,
@@ -25,7 +28,14 @@
     } finally {
       loading.value = false;
     }
-  });
+  };
+
+  const onRestored = async () => {
+    await loadRace();
+    editorKey.value += 1;
+  };
+
+  onBeforeMount(loadRace);
 </script>
 
 <template>
@@ -34,10 +44,19 @@
 
     <div v-if="loading">Загрузка...</div>
 
-    <race-editor
-      v-else-if="race"
-      :race="race"
-    />
+    <template v-else-if="race">
+      <race-editor
+        :key="editorKey"
+        :race="race"
+      />
+
+      <workshop-revisions
+        v-if="race.id"
+        base-path="/workshop/races"
+        :item-id="race.id"
+        @restored="onRestored"
+      />
+    </template>
 
     <div v-else>Раса не найдена.</div>
   </page-layout>
