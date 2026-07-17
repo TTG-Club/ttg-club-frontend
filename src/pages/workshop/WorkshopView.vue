@@ -50,6 +50,13 @@
       url: '/workshop/armors',
       createUrl: '/workshop/armors/create',
     },
+    {
+      title: 'Магические предметы',
+      description:
+        'Создание и редактирование магических предметов справочника.',
+      url: '/workshop/magic-items',
+      createUrl: '/workshop/magic-items/create',
+    },
   ];
 </script>
 

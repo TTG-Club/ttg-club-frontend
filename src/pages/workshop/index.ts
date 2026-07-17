@@ -138,6 +138,24 @@ export const WorkshopWeaponEditPage: RouteRecordRaw = {
   component: () => import('./weapons/WeaponEditView.vue'),
 };
 
+export const WorkshopMagicItemsPage: RouteRecordRaw = {
+  name: 'workshop-magic-items',
+  path: '/workshop/magic-items',
+  component: () => import('./magic-items/WorkshopMagicItemsView.vue'),
+};
+
+export const WorkshopMagicItemCreatePage: RouteRecordRaw = {
+  name: 'workshop-magic-item-create',
+  path: '/workshop/magic-items/create',
+  component: () => import('./magic-items/MagicItemCreateView.vue'),
+};
+
+export const WorkshopMagicItemEditPage: RouteRecordRaw = {
+  name: 'workshop-magic-item-edit',
+  path: '/workshop/magic-items/:magicItemName/edit',
+  component: () => import('./magic-items/MagicItemEditView.vue'),
+};
+
 export const WorkshopArmorsPage: RouteRecordRaw = {
   name: 'workshop-armors',
   path: '/workshop/armors',
