@@ -39,6 +39,7 @@ export type TArtifactRarity = {
 };
 
 export type TArtifactItem = {
+  id?: number;
   name: TName;
   type: TType;
   source: TSource;
@@ -50,4 +51,31 @@ export type TArtifactItem = {
   images?: string[];
   detailType?: string[];
   homebrew?: boolean;
+  rarityRaw?: string;
+  typeRaw?: string;
+  altName?: string;
+  custSpecial?: string;
+  specialRaw?: string;
+  consumed?: boolean;
+  charge?: number;
+  curse?: boolean;
+  costRaw?: number;
+  bonus?: number;
 };
+
+export interface MagicItemSave {
+  name: string;
+  englishName: string;
+  altName?: string;
+  rarity: string;
+  type: string;
+  customization: boolean;
+  custSpecial?: string;
+  special?: string;
+  description: string;
+  consumed: boolean;
+  charge?: number;
+  curse: boolean;
+  cost?: number;
+  bonus?: number;
+}

@@ -1,5 +1,6 @@
 <script>
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -26,6 +27,12 @@
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+      ...mapState(useUserStore, ['isEditor']),
+      editUrl() {
+        return this.isEditor && this.magicItem
+          ? `/workshop/magic-items/${this.$route.params.magicItemName}/edit`
+          : '';
+      },
     },
     async mounted() {
       await this.magicItemInfoQuery(this.$route.path);
@@ -75,6 +82,7 @@
         :fullscreen="!isMobile"
         :subtitle="magicItem?.name?.eng || ''"
         :title="magicItem?.name?.rus || ''"
+        :edit-url="editUrl"
         bookmark
         print
         @close="close"
