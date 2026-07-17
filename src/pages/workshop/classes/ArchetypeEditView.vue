@@ -225,6 +225,9 @@
   input,
   textarea {
     padding: 8px;
+
+    color: var(--text-b-color);
+
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 6px;
