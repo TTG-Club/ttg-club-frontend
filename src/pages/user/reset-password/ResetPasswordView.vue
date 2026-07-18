@@ -1,6 +1,7 @@
 <script lang="ts">
   import { httpClient } from '@/shared/api';
   import { useUserStore } from '@/shared/stores/UserStore';
+  import { getApiErrorMessage } from '@/shared/utils/apiError';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
 
@@ -33,29 +34,29 @@
         }
 
         try {
-          const resp = await httpClient.get<ITokenValidation>({
-            url: '/auth/password/reset-token/validate',
+          // auth-service отвечает 204 без тела, если токен валиден,
+          // и 400 с полем message — если нет.
+          await httpClient.get({
+            url: '/account/password/reset-token/validate',
             payload: {
               token: route.query.token,
             },
+            version: 'auth',
           });
 
-          if (resp.status !== 200) {
-            tokenValidation.value = {
-              correct: false,
-              message: 'Неизвестная ошибка',
-            };
-
-            return Promise.resolve();
-          }
-
-          tokenValidation.value = resp.data;
+          tokenValidation.value = {
+            correct: true,
+            message: '',
+          };
 
           return Promise.resolve();
         } catch (err) {
           tokenValidation.value = {
             correct: false,
-            message: 'Неизвестная ошибка',
+            message: getApiErrorMessage(
+              err,
+              'Не удалось проверить ссылку для сброса пароля',
+            ),
           };
 
           return Promise.resolve();
