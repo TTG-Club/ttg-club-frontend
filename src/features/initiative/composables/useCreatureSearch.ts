@@ -12,7 +12,7 @@ import {
  * Автокомплит существ из бестиария для сборки энкаунтера.
  *
  * Использует тот же эндпоинт, что и страница бестиария
- * (`/api/v2/bestiary/search`), с дебаунсом ввода.
+ * (`POST /api/v1/bestiary`), с дебаунсом ввода.
  */
 export function useCreatureSearch() {
   const searchTerm = ref('');
@@ -32,10 +32,12 @@ export function useCreatureSearch() {
     isLoading.value = true;
 
     try {
-      const { data } = await httpClient.get<unknown>({
+      const { data } = await httpClient.post<unknown>({
         url: BESTIARY_SEARCH_PATH,
-        version: 'v2',
-        payload: { search: query, size: CREATURE_SEARCH_SIZE },
+        payload: {
+          search: { value: query, exact: false },
+          size: CREATURE_SEARCH_SIZE,
+        },
       });
 
       // Защита от гонки: применяем ответ, только если терм всё ещё актуален

@@ -6,8 +6,8 @@ import type { ParticipantType, TrackerStatus } from './types';
  */
 export const INITIATIVE_API_PATH = '/tools/initiative';
 
-/** Путь поиска существ в бестиарии для автокомплита (относительно `/api/v2`). */
-export const BESTIARY_SEARCH_PATH = '/bestiary/search';
+/** Путь поиска существ в бестиарии для автокомплита (относительно `/api/v1`). */
+export const BESTIARY_SEARCH_PATH = '/bestiary';
 
 /** Публичный путь страницы инструмента. */
 export const INITIATIVE_TOOL_ROUTE = '/tools/initiative';

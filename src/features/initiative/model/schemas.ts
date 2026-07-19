@@ -100,7 +100,7 @@ export function parseAnonTrackerSlot(input: unknown): AnonTrackerSlot | null {
 const creatureLinkSchema = z.object({
   url: z.string(),
   name: z.object({ rus: z.string().catch('') }),
-  challengeRailing: z.string().catch(''),
+  challengeRating: z.string().catch(''),
 });
 
 /** Ответ поиска бестиария: плоский массив или страница `{ value, Count }`. */
@@ -112,7 +112,7 @@ const creatureSearchResponseSchema = z
   .catch([]);
 
 /**
- * Валидирует ответ `/api/v2/bestiary/search` и приводит его к плоскому списку
+ * Валидирует ответ `POST /api/v1/bestiary` и приводит его к плоскому списку
  * опций автокомплита. Битый или неожиданный ответ даёт пустой список, а не
  * бросок исключения.
  * @param input Сырой ответ бестиария.
@@ -124,7 +124,7 @@ export function parseCreatureOptions(input: unknown): Array<CreatureOption> {
   return list.map((creature) => ({
     url: creature.url,
     label: creature.name.rus,
-    challengeRating: creature.challengeRailing,
+    challengeRating: creature.challengeRating,
   }));
 }
 
