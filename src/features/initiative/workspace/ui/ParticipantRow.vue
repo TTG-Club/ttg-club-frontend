@@ -3,10 +3,7 @@
   import { clamp } from 'lodash-es';
   import { h } from 'vue';
 
-  import {
-    useCreatureDrawer,
-    useCreatureSummaries,
-  } from '@/features/initiative/composables';
+  import { useCreatureSummaries } from '@/features/initiative/composables';
   import type {
     TrackerParticipant,
     UpdateParticipantRequest,
@@ -62,8 +59,6 @@
     'set-max-hit-points': [id: string, value: number];
     'set-armor-class': [id: string, value: number];
   }>();
-
-  const { openCreature } = useCreatureDrawer();
 
   const { imageFor, summaryFor, dropImage } = useCreatureSummaries(() => [
     participant,
@@ -136,8 +131,7 @@
 
     const { creatureUrl } = participant;
 
-    // Дровер открывается кликом по самой строке, поэтому в меню — только
-    // альтернатива для новой вкладки.
+    // Явный пункт остаётся в меню как подсказка о поведении клика по строке.
     if (creatureUrl) {
       options.push({
         label: 'Статблок в новой вкладке',
@@ -236,7 +230,7 @@
   );
 
   /**
-   * Клик по «пустому» месту строки существа открывает его статблок в дровере.
+   * Клик по «пустому» месту строки существа открывает его статблок в новой вкладке.
    * Клики, дошедшие от интерактивных элементов (кнопки, поля, ссылки), — не
    * навигация: у них своя логика, поэтому пропускаем их.
    * @param event Событие клика по строке.
@@ -255,7 +249,7 @@
       return;
     }
 
-    openCreature(creatureUrl);
+    window.open(getCreatureRoute(creatureUrl), '_blank', 'noopener');
   }
 
   /**

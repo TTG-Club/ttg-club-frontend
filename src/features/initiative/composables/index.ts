@@ -1,7 +1,5 @@
 export * from './useArmorClass';
 
-export * from './useCreatureDrawer';
-
 export * from './useCreatureSearch';
 
 export * from './useCreatureSummaries';
