@@ -6,14 +6,17 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
+  import WorkshopRevisions from '../WorkshopRevisions.vue';
+
   import SpellEditor from './SpellEditor.vue';
 
   const route = useRoute();
 
   const spell = ref<Maybe<TSpellItem>>(undefined);
   const loading = ref(true);
+  const editorKey = ref(0);
 
-  onBeforeMount(async () => {
+  const loadSpell = async () => {
     try {
       const resp = await httpClient.post<TSpellItem>({
         url: `/spells/${route.params.spellName}`,
@@ -25,7 +28,14 @@
     } finally {
       loading.value = false;
     }
-  });
+  };
+
+  const onRestored = async () => {
+    await loadSpell();
+    editorKey.value += 1;
+  };
+
+  onBeforeMount(loadSpell);
 </script>
 
 <template>
@@ -34,10 +44,19 @@
 
     <div v-if="loading">Загрузка...</div>
 
-    <spell-editor
-      v-else-if="spell"
-      :spell="spell"
-    />
+    <template v-else-if="spell">
+      <spell-editor
+        :key="editorKey"
+        :spell="spell"
+      />
+
+      <workshop-revisions
+        v-if="spell.id"
+        base-path="/workshop/spells"
+        :item-id="spell.id"
+        @restored="onRestored"
+      />
+    </template>
 
     <div v-else>Заклинание не найдено.</div>
   </page-layout>

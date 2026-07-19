@@ -6,13 +6,16 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
+  import WorkshopRevisions from '../WorkshopRevisions.vue';
+
   import BackgroundEditor from './BackgroundEditor.vue';
 
   const route = useRoute();
   const background = ref<Maybe<BackgroundItem>>(undefined);
   const loading = ref(true);
+  const editorKey = ref(0);
 
-  onBeforeMount(async () => {
+  const loadBackground = async () => {
     try {
       const resp = await httpClient.post<BackgroundItem>({
         url: `/backgrounds/${route.params.backgroundName}`,
@@ -24,7 +27,14 @@
     } finally {
       loading.value = false;
     }
-  });
+  };
+
+  const onRestored = async () => {
+    await loadBackground();
+    editorKey.value += 1;
+  };
+
+  onBeforeMount(loadBackground);
 </script>
 
 <template>
@@ -33,10 +43,19 @@
 
     <div v-if="loading">Загрузка...</div>
 
-    <background-editor
-      v-else-if="background"
-      :background="background"
-    />
+    <template v-else-if="background">
+      <background-editor
+        :key="editorKey"
+        :background="background"
+      />
+
+      <workshop-revisions
+        v-if="background.id"
+        base-path="/workshop/backgrounds"
+        :item-id="background.id"
+        @restored="onRestored"
+      />
+    </template>
 
     <div v-else>Предыстория не найдена.</div>
   </page-layout>

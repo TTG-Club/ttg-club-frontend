@@ -9,6 +9,8 @@
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
+  import WorkshopRevisions from '../WorkshopRevisions.vue';
+
   type ArchetypeEdit = {
     id: number;
     name: string;
@@ -36,7 +38,7 @@
       optional: false,
     });
 
-  onBeforeMount(async () => {
+  const loadArchetype = async () => {
     try {
       const response = await httpClient.post<ArchetypeEdit>({
         url: `/workshop/classes/${route.params.className}/${route.params.archetypeName}`,
@@ -49,7 +51,9 @@
     } finally {
       loading.value = false;
     }
-  });
+  };
+
+  onBeforeMount(loadArchetype);
 
   const submit = async () => {
     if (!item.value) {
@@ -197,6 +201,13 @@
     </form>
 
     <div v-else>Архетип не найден.</div>
+
+    <workshop-revisions
+      v-if="item"
+      base-path="/workshop/classes/archetypes"
+      :item-id="item.id"
+      @restored="loadArchetype"
+    />
   </page-layout>
 </template>
 
@@ -214,6 +225,9 @@
   input,
   textarea {
     padding: 8px;
+
+    color: var(--text-b-color);
+
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 6px;

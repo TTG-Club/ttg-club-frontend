@@ -109,7 +109,22 @@ export const dark: GlobalThemeOverrides = {
   Pagination: {
     itemColorDisabled: 'var(--hover)',
   },
+  Card: {
+    colorModal: 'var(--bg-secondary)',
+    textColor: 'var(--text-color)',
+    titleTextColor: 'var(--text-color-title)',
+    borderColor: 'var(--border)',
+    closeIconColor: 'var(--text-g-color)',
+    closeIconColorHover: 'var(--text-color)',
+    closeIconColorPressed: 'var(--text-color-title)',
+    closeColorHover: 'var(--hover)',
+    closeColorPressed: 'var(--secondary)',
+  },
   Tag: {
+    textColor: 'var(--text-color)',
+    color: 'var(--secondary)',
+    colorBordered: 'var(--secondary)',
+    border: '1px solid var(--border)',
     textColorCheckable: 'var(--text-color)',
     colorCheckable: 'var(--hover)',
     textColorChecked: 'var(--text-btn-color)',

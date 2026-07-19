@@ -22,6 +22,8 @@ import { SearchPage } from './search';
 import {
   AbilityCalcPage,
   EncountersPage,
+  InitiativeToolPage,
+  InitiativeTrackerPage,
   MadnessPage,
   NameGeneratorPage,
   TavernPage,
@@ -124,6 +126,8 @@ const customRoutes: Readonly<RouteRecordRaw[]> = [
   TavernPage,
   TokenatorPage,
   EncountersPage,
+  InitiativeToolPage,
+  InitiativeTrackerPage,
   AbilityCalcPage,
   SearchPage,
   ProfilePage,

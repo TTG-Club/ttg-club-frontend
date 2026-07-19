@@ -33,6 +33,7 @@ export type RequestConfig = {
   signal?: AbortSignal;
   version?: ApiVersion;
   baseUrl?: string;
+  headers?: AxiosRequestConfig['headers'];
 };
 
 class HttpClient {
@@ -139,6 +140,7 @@ class HttpClient {
       url: config.url,
       params: config.payload,
       signal: config.signal,
+      headers: config.headers,
       baseURL: config.baseUrl ?? getBaseUrl(config.version),
     });
   }
@@ -149,6 +151,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
+      headers: config.headers,
       baseURL: config.baseUrl ?? getBaseUrl(config.version),
     });
   }
@@ -159,6 +162,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
+      headers: config.headers,
       baseURL: config.baseUrl ?? getBaseUrl(config.version),
     });
   }
@@ -169,6 +173,7 @@ class HttpClient {
       url: config.url,
       data: config.payload,
       signal: config.signal,
+      headers: config.headers,
       baseURL: config.baseUrl ?? getBaseUrl(config.version),
     });
   }
@@ -179,6 +184,7 @@ class HttpClient {
       url: config.url,
       params: config.payload,
       signal: config.signal,
+      headers: config.headers,
       baseURL: config.baseUrl ?? getBaseUrl(config.version),
     });
   }
