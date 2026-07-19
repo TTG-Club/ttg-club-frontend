@@ -128,24 +128,40 @@ export function parseCreatureOptions(input: unknown): Array<CreatureOption> {
   }));
 }
 
+/** Формирует полную формулу хитов из костей и числового модификатора. */
+function formatHitFormula(formula: string, bonus: number): string {
+  if (!formula || bonus === 0) {
+    return formula;
+  }
+
+  const operator = bonus > 0 ? '+' : '-';
+
+  return `${formula} ${operator} ${Math.abs(bonus)}`;
+}
+
 /**
- * Схема детального ответа существа — строке трекера нужны лишь картинка
- * аватара (`image`), строка КД статблока (`ac`), показатель опасности (`cr`),
- * средний максимум хитов (`hit.hit`) и формула броска хитов (`hit.formula`).
+ * Схема детального ответа существа `ttg-club-backend`: строке трекера нужны
+ * первая картинка, КД, показатель опасности, средние хиты и формула броска.
  */
 const creatureSummarySchema = z
   .object({
-    image: z.string().catch(''),
-    ac: z.string().catch(''),
-    cr: z.string().catch(''),
-    hit: z
+    images: z.array(z.string()).catch([]),
+    armorClass: z.coerce.string().catch(''),
+    challengeRating: z.string().catch(''),
+    hits: z
       .object({
-        hit: z.coerce.number().catch(0),
+        average: z.coerce.number().catch(0),
         formula: z.string().catch(''),
+        bonus: z.coerce.number().catch(0),
       })
-      .catch({ hit: 0, formula: '' }),
+      .catch({ average: 0, formula: '', bonus: 0 }),
   })
-  .catch({ image: '', ac: '', cr: '', hit: { hit: 0, formula: '' } });
+  .catch({
+    images: [],
+    armorClass: '',
+    challengeRating: '',
+    hits: { average: 0, formula: '', bonus: 0 },
+  });
 
 /**
  * Валидирует детальный ответ `GET /api/v2/bestiary/{url}` и возвращает сводку
@@ -157,10 +173,10 @@ export function parseCreatureSummary(input: unknown): CreatureSummary {
   const parsed = creatureSummarySchema.parse(input);
 
   return {
-    image: parsed.image,
-    armorClass: parsed.ac,
-    challengeRating: parsed.cr,
-    maxHitPoints: parsed.hit.hit,
-    hitFormula: parsed.hit.formula,
+    image: parsed.images[0] ?? '',
+    armorClass: parsed.armorClass,
+    challengeRating: parsed.challengeRating,
+    maxHitPoints: parsed.hits.average,
+    hitFormula: formatHitFormula(parsed.hits.formula, parsed.hits.bonus),
   };
 }
