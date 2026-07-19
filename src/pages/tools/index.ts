@@ -2,6 +2,8 @@ export * from './ability-calc';
 
 export * from './encounters';
 
+export * from './initiative';
+
 export * from './madness';
 
 export * from './name-generator';
