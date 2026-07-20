@@ -14,6 +14,10 @@ import pinia from './store';
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  // Прокрутка полностью на стороне компонентов: страница скроллит #container,
+  // а не window, поэтому нативный переход к якорю только мешает — он двигает
+  // сразу все прокручиваемые контейнеры-предки.
+  scrollBehavior: () => false,
 });
 
 const { nextAvailable } = useRouterHelpers();

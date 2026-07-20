@@ -96,8 +96,11 @@
 
     fixedContainerRect.update();
 
+    // scrollTop берём с элемента, а не из useScroll.y: тот обновляется
+    // троттлингом с leading: false и после smooth-скролла хранит позицию ДО
+    // анимации, из-за чего сумма со свежим rect.top уезжает мимо.
     bodyScroll.y.value =
-      rect.top + bodyScroll.y.value - fixedContainerRect.height.value;
+      rect.top + bodyElement.value.scrollTop - fixedContainerRect.height.value;
   };
 
   const scrollToLastActive = (url: string) => {
