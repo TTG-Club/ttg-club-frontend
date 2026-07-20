@@ -423,6 +423,14 @@ details[open].spoiler h4 > span {
   font-size: calc(var(--h4-font-size) - 2px);
 }
 
+/* Первый заголовок в спойлере не отбивается сверху — иначе под summary пустота */
+details.spoiler > .content > :first-child > h3:first-child,
+details.spoiler > .content > :first-child > h4:first-child,
+details.spoiler > .content > h3:first-child,
+details.spoiler > .content > h4:first-child {
+  margin-top: 0;
+}
+
 details[open].spoiler table {
   background-color: var(--bg-sub-menu);
   border-radius: 8px;
