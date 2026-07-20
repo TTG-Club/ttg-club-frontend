@@ -49,6 +49,8 @@
   const form = reactive<FeatSave>({
     name: props.feat?.name.rus || '',
     englishName: props.feat?.name.eng || '',
+    altName: props.feat?.altName || '',
+    level: props.feat?.level,
     requirement:
       props.feat?.requirements === 'Нет' ? '' : props.feat?.requirements || '',
     description: props.feat?.description || '',
@@ -115,6 +117,15 @@
       <input
         v-model="form.englishName"
         required
+        type="text"
+      />
+    </label>
+
+    <label class="feat-editor__field">
+      <span>Альтернативное название</span>
+
+      <input
+        v-model="form.altName"
         type="text"
       />
     </label>

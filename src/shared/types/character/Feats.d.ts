@@ -21,6 +21,8 @@ export interface FeatsItem {
   abilities?: string[];
   skills?: string[];
   homebrew?: boolean;
+  altName?: string;
+  level?: number;
 }
 
 export interface FeatSave {
