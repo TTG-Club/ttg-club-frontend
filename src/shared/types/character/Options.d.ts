@@ -24,6 +24,7 @@ interface OptionClass {
 }
 
 export interface OptionDetail {
+  id: number;
   name: OptionName;
   url: string;
   homebrew: true;
@@ -31,6 +32,20 @@ export interface OptionDetail {
   description: string;
   source: OptionSource;
   classes: Array<OptionClass>;
+  altName?: string;
+  level?: number;
+  prerequisite?: string;
+  optionTypes?: Array<string>;
+}
+
+export interface OptionSave {
+  name: string;
+  englishName: string;
+  altName?: string;
+  optionTypes: Array<string>;
+  prerequisite?: string;
+  level?: number;
+  description: string;
 }
 
 export interface OptionLink {

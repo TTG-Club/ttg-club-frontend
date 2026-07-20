@@ -21,6 +21,13 @@
       createUrl: '/workshop/feats/create',
     },
     {
+      title: 'Особенности классов',
+      description:
+        'Создание и редактирование особенностей классов справочника.',
+      url: '/workshop/options',
+      createUrl: '/workshop/options/create',
+    },
+    {
       title: 'Предыстории',
       description: 'Создание и редактирование предысторий справочника.',
       url: '/workshop/backgrounds',

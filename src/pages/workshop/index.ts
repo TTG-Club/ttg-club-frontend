@@ -60,6 +60,24 @@ export const WorkshopFeatEditPage: RouteRecordRaw = {
   component: () => import('./feats/FeatEditView.vue'),
 };
 
+export const WorkshopOptionsPage: RouteRecordRaw = {
+  name: 'workshop-options',
+  path: '/workshop/options',
+  component: () => import('./options/WorkshopOptionsView.vue'),
+};
+
+export const WorkshopOptionCreatePage: RouteRecordRaw = {
+  name: 'workshop-option-create',
+  path: '/workshop/options/create',
+  component: () => import('./options/OptionCreateView.vue'),
+};
+
+export const WorkshopOptionEditPage: RouteRecordRaw = {
+  name: 'workshop-option-edit',
+  path: '/workshop/options/:optionName/edit',
+  component: () => import('./options/OptionEditView.vue'),
+};
+
 export const WorkshopBackgroundsPage: RouteRecordRaw = {
   name: 'workshop-backgrounds',
   path: '/workshop/backgrounds',
