@@ -131,6 +131,8 @@ export type ClassSave = {
   icon?: string;
   page?: number;
   classTraits: ClassTrait[];
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 };
 
 export type TClassList = {

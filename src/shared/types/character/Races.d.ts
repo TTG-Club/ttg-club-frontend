@@ -101,6 +101,8 @@ export type RaceSave = {
   page?: number;
   abilities: RaceAbilitySave[];
   features: TRaceFeature[];
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 };
 
 export type RaceAbilityKey =

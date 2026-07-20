@@ -78,4 +78,6 @@ export interface MagicItemSave {
   curse: boolean;
   cost?: number;
   bonus?: number;
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 }

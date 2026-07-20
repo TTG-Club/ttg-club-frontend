@@ -58,4 +58,6 @@ export interface WeaponSave {
   ammo?: number;
   description?: string;
   special?: string;
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 }

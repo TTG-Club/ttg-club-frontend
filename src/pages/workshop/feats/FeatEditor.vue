@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { FeatSave, FeatsItem } from '@/shared/types/character/Feats';
   import { errorHandler } from '@/shared/utils/errorHandler';
@@ -46,6 +47,10 @@
     { label: 'Убеждение', value: 'PERSUASION' },
   ];
 
+  const { source, sourceOptions } = useBookSources(
+    props.feat?.source?.shortName,
+  );
+
   const form = reactive<FeatSave>({
     name: props.feat?.name.rus || '',
     englishName: props.feat?.name.eng || '',
@@ -67,6 +72,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         altName: form.altName || undefined,
         level: form.level || undefined,
         requirement: form.requirement || undefined,
@@ -180,6 +186,18 @@
         v-model="form.description"
         required
         rows="12"
+      />
+    </label>
+
+    <label class="feat-editor__field feat-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 

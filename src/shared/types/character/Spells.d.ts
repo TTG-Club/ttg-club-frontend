@@ -75,4 +75,6 @@ export type TSpellSave = {
   duration: string;
   description: string;
   upper?: string;
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 };

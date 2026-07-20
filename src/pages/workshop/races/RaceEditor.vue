@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     RaceAbilitySave,
@@ -85,6 +86,10 @@
   const optionalNumber = (value?: number) =>
     value === undefined || value === null ? undefined : value;
 
+  const { source, sourceOptions } = useBookSources(
+    props.race?.source?.shortName,
+  );
+
   const form = reactive<RaceSave>({
     name: props.race?.name.rus || '',
     altName: props.race?.altName || '',
@@ -162,6 +167,7 @@
 
       const payload: RaceSave = {
         ...form,
+        source: source.value || undefined,
         altName: form.altName || undefined,
         minAge: optionalNumber(form.minAge),
         maxAge: optionalNumber(form.maxAge),
@@ -529,6 +535,18 @@
         v-model="form.description"
         required
         rows="12"
+      />
+    </label>
+
+    <label class="race-editor__field race-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 

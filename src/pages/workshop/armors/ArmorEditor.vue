@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { ArmorItem, ArmorSave } from '@/shared/types/inventory/Armors';
   import { errorHandler } from '@/shared/utils/errorHandler';
@@ -22,6 +23,10 @@
     { label: 'Тяжёлый доспех', value: 'HEAVY' },
     { label: 'Щит', value: 'SHIELD' },
   ];
+
+  const { source, sourceOptions } = useBookSources(
+    props.armor?.source?.shortName,
+  );
 
   const form = reactive<ArmorSave>({
     name: props.armor?.name.rus || '',
@@ -47,6 +52,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         altName: form.altName || undefined,
         armorClass: optionalNumber(form.armorClass),
         cost: optionalNumber(form.cost),
@@ -175,6 +181,18 @@
       <textarea
         v-model="form.description"
         rows="10"
+      />
+    </label>
+
+    <label class="armor-editor__field armor-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 
