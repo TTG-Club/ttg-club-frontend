@@ -40,4 +40,6 @@ export interface BackgroundSave {
   personalization?: string;
   language?: string;
   languages: string[];
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 }

@@ -46,6 +46,8 @@ export interface OptionSave {
   prerequisite?: string;
   level?: number;
   description: string;
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 }
 
 export interface OptionLink {

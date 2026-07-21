@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     BackgroundItem,
@@ -50,6 +51,10 @@
       )
       .filter((value): value is string => !!value) || [];
 
+  const { source, sourceOptions } = useBookSources(
+    props.background?.source?.shortName,
+  );
+
   const form = reactive<BackgroundSave>({
     name: props.background?.name.rus || '',
     englishName: props.background?.name.eng || '',
@@ -81,6 +86,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         altName: form.altName || undefined,
         otherSkills: form.otherSkills || undefined,
         toolOwnership: form.toolOwnership || undefined,
@@ -244,6 +250,18 @@
       <textarea
         v-model="form.personalization"
         rows="8"
+      />
+    </label>
+
+    <label class="background-editor__field background-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 

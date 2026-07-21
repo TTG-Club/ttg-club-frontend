@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { TSpellItem, TSpellSave } from '@/shared/types/character/Spells';
   import { errorHandler } from '@/shared/utils/errorHandler';
@@ -64,6 +65,10 @@
     upper: props.spell?.upper || '',
   });
 
+  const { source, sourceOptions } = useBookSources(
+    props.spell?.source?.shortName,
+  );
+
   const form = reactive<TSpellSave>(initialForm());
   const pending = ref(false);
 
@@ -75,6 +80,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         additionalType: form.additionalType || undefined,
         materialComponent: form.materialComponent || undefined,
         timeCondition: form.timeCondition || undefined,
@@ -272,6 +278,18 @@
       <textarea
         v-model="form.upper"
         rows="5"
+      />
+    </label>
+
+    <label class="spell-editor__field spell-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 

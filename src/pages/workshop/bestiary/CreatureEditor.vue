@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     ICreature,
@@ -382,6 +383,10 @@
     mysticalActions: blockToText(props.creature?.mysticalActions),
   });
 
+  const { source, sourceOptions } = useBookSources(
+    props.creature?.source?.shortName,
+  );
+
   const pending = ref(false);
   const isEdit = computed(() => !!props.creature?.id);
 
@@ -572,7 +577,7 @@
       tags: csv(form.tags),
       environment: form.environment,
       npc: form.npc,
-      source: props.creature?.source?.shortName,
+      source: source.value || undefined,
     };
   };
 
@@ -682,6 +687,18 @@
           {{ item.label }}
         </option>
       </select>
+    </label>
+
+    <label class="creature-editor__field">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
+      />
     </label>
 
     <label class="creature-editor__field">

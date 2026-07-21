@@ -68,8 +68,6 @@
   const classBody = ref<HTMLDivElement>();
   const fixed = ref<HTMLDivElement>();
 
-  const { height: fixedHeight } = useElementBounding(fixed);
-
   const { y: bodyScroll } = useScroll(classBody, {
     behavior: 'smooth',
   });
@@ -240,7 +238,7 @@
   const goToArchetype = (path: RouteLocationPathRaw['path']) =>
     router.push({ path });
 
-  const scrollToSection = (hash: string) => {
+  const scrollToSection = async (hash: string) => {
     if (!hash || !(classBody.value instanceof HTMLDivElement)) {
       return;
     }
@@ -261,7 +259,26 @@
       });
     }
 
-    bodyScroll.value = section.offsetTop - fixedHeight.value;
+    // Хэш обрабатывается из onMounted дочернего ClassTraits, то есть внутри
+    // патча — до того, как шапка (заголовок + табы) получит высоту. Ждём
+    // отрисовку, иначе измерения промахиваются на её высоту.
+    await nextTick();
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+    if (!(classBody.value instanceof HTMLDivElement)) {
+      return;
+    }
+
+    // Считаем смещение от самого скроллера: offsetTop здесь бесполезен, потому
+    // что ближайший позиционированный предок — .content-layout__side--right,
+    // а не classBody.
+    bodyScroll.value =
+      section.getBoundingClientRect().top -
+      classBody.value.getBoundingClientRect().top +
+      classBody.value.scrollTop;
   };
 
   const anchorClickHandler = (e) => {

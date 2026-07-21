@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     WeaponItem,
@@ -51,6 +52,10 @@
     { label: 'Универсальное', value: 10 },
   ];
 
+  const { source, sourceOptions } = useBookSources(
+    props.weapon?.source?.shortName,
+  );
+
   const form = reactive<WeaponSave>({
     name: props.weapon?.name.rus || '',
     englishName: props.weapon?.name.eng || '',
@@ -82,6 +87,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         altName: form.altName || undefined,
         cost: optionalNumber(form.cost),
         weight: optionalNumber(form.weight),
@@ -309,6 +315,18 @@
       <textarea
         v-model="form.special"
         rows="5"
+      />
+    </label>
+
+    <label class="weapon-editor__field weapon-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 

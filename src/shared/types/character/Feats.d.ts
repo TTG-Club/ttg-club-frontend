@@ -34,4 +34,6 @@ export interface FeatSave {
   description: string;
   abilities: string[];
   skills: string[];
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 }

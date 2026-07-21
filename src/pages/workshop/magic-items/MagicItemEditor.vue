@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     MagicItemSave,
@@ -46,6 +47,10 @@
     { label: 'Оружие', value: 'WEAPON' },
   ];
 
+  const { source, sourceOptions } = useBookSources(
+    props.magicItem?.source?.shortName,
+  );
+
   const form = reactive<MagicItemSave>({
     name: props.magicItem?.name.rus || '',
     englishName: props.magicItem?.name.eng || '',
@@ -75,6 +80,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         altName: form.altName || undefined,
         custSpecial: form.custSpecial || undefined,
         special: form.special || undefined,
@@ -246,6 +252,18 @@
         v-model="form.description"
         required
         rows="8"
+      />
+    </label>
+
+    <label class="magic-item-editor__field magic-item-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
       />
     </label>
 

@@ -33,4 +33,6 @@ export interface ArmorSave {
   stealthHindrance?: boolean;
   type: string;
   description?: string;
+  /** Аббревиатура книги-источника, например MM */
+  source?: string;
 }

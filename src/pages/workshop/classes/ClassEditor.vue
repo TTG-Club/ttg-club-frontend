@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     ClassAbility,
@@ -93,6 +94,10 @@
 
   const levelOptions = Array.from({ length: 20 }, (_, index) => index + 1);
 
+  const { source, sourceOptions } = useBookSources(
+    props.classItem?.source?.shortName,
+  );
+
   const form = reactive<ClassSave>({
     name: props.classItem?.name.rus || '',
     englishName: props.classItem?.name.eng || '',
@@ -144,6 +149,7 @@
 
       const payload = {
         ...form,
+        source: source.value || undefined,
         accusativeName: form.accusativeName || undefined,
         armor: form.armor || undefined,
         weapon: form.weapon || undefined,
@@ -524,6 +530,18 @@
         Умения не добавлены.
       </p>
     </section>
+
+    <label class="class-editor__field class-editor__field--wide">
+      <span>Источник</span>
+
+      <n-select
+        v-model:value="source"
+        :options="sourceOptions"
+        clearable
+        filterable
+        placeholder="Homebrew (по умолчанию)"
+      />
+    </label>
 
     <div class="class-editor__actions">
       <button
