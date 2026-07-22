@@ -3,6 +3,7 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
@@ -10,6 +11,7 @@
 
   export default {
     components: {
+      CommentsBlock,
       ScreensGroup,
       ScreenBody,
       ContentDetail,
@@ -93,6 +95,8 @@
         v-else-if="screen"
         :screen="screen"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

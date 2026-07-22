@@ -5,6 +5,7 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import RaceBody from '@/pages/character/races/races-detail/RaceBody.vue';
@@ -125,6 +126,8 @@
         v-if="race"
         :race="race"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

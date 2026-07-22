@@ -8,6 +8,7 @@
   import { errorHandler } from '@/shared/utils/errorHandler';
   import { detailExport } from '@/shared/utils/exportDetail';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import CreatureBody from '@/pages/workshop/bestiary/creature-detail/CreatureBody.vue';
@@ -111,6 +112,8 @@
         v-if="creature"
         :creature="creature"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

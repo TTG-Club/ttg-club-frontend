@@ -3,12 +3,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import GodBody from '@/pages/wiki/gods/gods-detail/GodBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       GodBody,
       SectionHeader,
@@ -82,6 +84,8 @@
         v-if="god"
         :god="god"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

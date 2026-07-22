@@ -1,3 +1,5 @@
+import type { SourcePlatform } from '@/shared/const/platform';
+
 /** Контекст выделенного текста для баг-репорта */
 export interface TextSelection {
   /** Текст до выделения (~50 символов контекста) */
@@ -9,9 +11,6 @@ export interface TextSelection {
   /** Текст после выделения (~50 символов контекста) */
   after: string;
 }
-
-/** Допустимые платформы-источники баг-репорта */
-export type SourcePlatform = 'SITE_5E24' | 'SITE_5E14' | 'VTTG';
 
 /** Запрос на создание баг-репорта для API */
 export interface BugReportCreateRequest {

@@ -4,12 +4,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import ArmorBody from '@/pages/inventory/armors/armors-detail/ArmorBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       ArmorBody,
       SectionHeader,
@@ -91,6 +93,8 @@
         v-if="armor"
         :armor="armor"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

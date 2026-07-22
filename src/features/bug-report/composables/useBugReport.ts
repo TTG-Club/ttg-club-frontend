@@ -7,6 +7,7 @@ import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 
 import { ToastEventBus } from '@/shared/config';
+import { SOURCE_PLATFORM } from '@/shared/const/platform';
 import { USER_TOKEN_COOKIE } from '@/shared/const/UI';
 
 import type {
@@ -18,7 +19,6 @@ import {
   BUG_REPORT_SUBMIT_ERROR_DESC,
   BUG_REPORT_SUBMIT_LIMIT_DESC,
   BUG_REPORT_SUBMIT_SUCCESS_DESC,
-  SOURCE_PLATFORM,
 } from '@/features/bug-report/model';
 
 function formatSelectionText(selection: TextSelection): string {

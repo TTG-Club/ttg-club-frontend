@@ -4,12 +4,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import WeaponBody from '@/pages/inventory/weapons/weapons-detail/WeaponBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       WeaponBody,
       SectionHeader,
@@ -91,6 +93,8 @@
         v-if="weapon"
         :weapon="weapon"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

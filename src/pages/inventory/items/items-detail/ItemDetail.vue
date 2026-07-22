@@ -4,12 +4,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import ItemBody from '@/pages/inventory/items/items-detail/ItemBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       ItemBody,
       SectionHeader,
@@ -94,6 +96,8 @@
         v-if="item"
         :item="item"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

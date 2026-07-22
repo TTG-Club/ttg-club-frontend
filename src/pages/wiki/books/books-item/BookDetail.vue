@@ -3,12 +3,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import BookBody from '@/pages/wiki/books/books-item/BookBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       BookBody,
       SectionHeader,
@@ -82,6 +84,8 @@
         v-if="book"
         :book="book"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>
