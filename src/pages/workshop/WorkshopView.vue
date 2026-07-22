@@ -58,6 +58,12 @@
       createUrl: '/workshop/armors/create',
     },
     {
+      title: 'Снаряжение',
+      description: 'Создание и редактирование снаряжения справочника.',
+      url: '/workshop/items',
+      createUrl: '/workshop/items/create',
+    },
+    {
       title: 'Магические предметы',
       description:
         'Создание и редактирование магических предметов справочника.',

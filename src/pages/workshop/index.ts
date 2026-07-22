@@ -192,6 +192,24 @@ export const WorkshopArmorEditPage: RouteRecordRaw = {
   component: () => import('./armors/ArmorEditView.vue'),
 };
 
+export const WorkshopItemsPage: RouteRecordRaw = {
+  name: 'workshop-items',
+  path: '/workshop/items',
+  component: () => import('./items/WorkshopItemsView.vue'),
+};
+
+export const WorkshopItemCreatePage: RouteRecordRaw = {
+  name: 'workshop-item-create',
+  path: '/workshop/items/create',
+  component: () => import('./items/ItemCreateView.vue'),
+};
+
+export const WorkshopItemEditPage: RouteRecordRaw = {
+  name: 'workshop-item-edit',
+  path: '/workshop/items/:itemName/edit',
+  component: () => import('./items/ItemEditView.vue'),
+};
+
 export * from './bestiary';
 
 export * from './screens';
