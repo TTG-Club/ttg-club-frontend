@@ -5,6 +5,8 @@ import { SSO_TOKEN_COOKIE, USER_TOKEN_COOKIE } from '@/shared/const/UI';
 import { useUserStore } from '@/shared/stores/UserStore';
 import { ToastEventBus } from '@/shared/utils/toast';
 
+import { useCommentSubmitCooldown } from '@/features/comments';
+
 import {
   COMMENT_ALREADY_DELETED_TOAST,
   COMMENT_DELETE_ERROR_TOAST,
@@ -47,8 +49,6 @@ import {
   restoreComment,
   updateComment,
 } from '../model';
-
-import { useCommentSubmitCooldown } from './useCommentSubmitCooldown';
 
 import type { CommentEntry, CommentNode, PublicComment } from '../model';
 import type { Ref } from 'vue';
@@ -236,6 +236,28 @@ export function useCommentsSection(
   const userStore = useUserStore();
 
   const { user } = storeToRefs(userStore);
+
+  /**
+   * Отображаемое имя текущего пользователя (или логин, если имя не задано).
+   * Нужно, чтобы свежесозданный комментарий сразу показывал имя, а не логин:
+   * сервис стамперит логин из токена, а синк на бэкенде переставит имя уже
+   * в фоне.
+   */
+  const selfDisplayName = computed(
+    () => user.value?.displayName || user.value?.username || '',
+  );
+
+  /**
+   * Подменяет имя автора у только что созданного комментария на отображаемое —
+   * до того, как фоновый синк перепишет снимок имени на стороне сервиса.
+   *
+   * @param created Комментарий из ответа сервиса.
+   */
+  function withSelfDisplayName(created: CommentEntry): CommentEntry {
+    return selfDisplayName.value
+      ? { ...created, authorName: selfDisplayName.value }
+      : created;
+  }
 
   const rootNodes = ref<CommentNode[]>([]);
 
@@ -577,10 +599,16 @@ export function useCommentsSection(
         content,
       });
 
-      rootNodes.value = [createCommentNode(created), ...rootNodes.value];
+      rootNodes.value = [
+        createCommentNode(withSelfDisplayName(created)),
+        ...rootNodes.value,
+      ];
 
       totalCount.value += 1;
       startCooldown(COMMENT_SUBMIT_COOLDOWN_SECONDS);
+
+      // Заменяем логин на отображаемое имя во всех комментариях автора (best-effort).
+      userStore.syncCommentsName();
 
       return true;
     } catch (error) {
@@ -623,7 +651,10 @@ export function useCommentsSection(
       totalCount.value += 1;
 
       if (node.repliesLoaded) {
-        node.replies = [...node.replies, createCommentNode(created)];
+        node.replies = [
+          ...node.replies,
+          createCommentNode(withSelfDisplayName(created)),
+        ];
 
         node.repliesExpanded = true;
       } else {
@@ -631,6 +662,9 @@ export function useCommentsSection(
       }
 
       startCooldown(COMMENT_SUBMIT_COOLDOWN_SECONDS);
+
+      // Заменяем логин на отображаемое имя во всех комментариях автора (best-effort).
+      userStore.syncCommentsName();
 
       return true;
     } catch (error) {
