@@ -4,6 +4,7 @@
   import AuthModal from '@/shared/ui/modals/AuthModal.vue';
 
   import ChangePasswordView from '@/features/account/ChangePasswordView.vue';
+  import DisplayNameView from '@/features/account/DisplayNameView.vue';
   import LoginView from '@/features/account/LoginView.vue';
   import RegistrationView from '@/features/account/RegistrationView.vue';
   import NavPopover from '@/features/menu/NavPopover.vue';
@@ -30,6 +31,11 @@
       rus: `${isAuthenticated.value ? 'Изменение' : 'Восстановление'} пароля`,
       eng: 'change-password',
       component: () => ChangePasswordView,
+    },
+    {
+      rus: 'Отображаемое имя',
+      eng: 'display-name',
+      component: () => DisplayNameView,
     },
   ]);
 
@@ -175,6 +181,14 @@
         >
           <span class="nav-profile__line_body">Мастерская</span>
         </router-link>
+
+        <a
+          class="nav-profile__line"
+          href="#"
+          @click.left.exact.prevent="modal = 'display-name'"
+        >
+          <span class="nav-profile__line_body"> Изменить имя </span>
+        </a>
 
         <a
           class="nav-profile__line"

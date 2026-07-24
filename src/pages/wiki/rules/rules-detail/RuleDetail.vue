@@ -3,12 +3,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import RuleBody from '@/pages/wiki/rules/rules-detail/RuleBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       RuleBody,
       SectionHeader,
@@ -82,6 +84,8 @@
         v-if="rule"
         :rule="rule"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

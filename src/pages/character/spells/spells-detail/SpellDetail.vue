@@ -8,6 +8,7 @@
   import { errorHandler } from '@/shared/utils/errorHandler';
   import { detailExport } from '@/shared/utils/exportDetail';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import SpellBody from '@/pages/character/spells/spells-detail/SpellBody.vue';
@@ -125,6 +126,8 @@
         v-if="spell"
         :spell="spell"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

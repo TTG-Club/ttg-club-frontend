@@ -4,12 +4,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import OptionBody from '@/pages/character/options/options-detail/OptionBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       OptionBody,
       SectionHeader,
@@ -96,6 +98,8 @@
         v-if="option"
         :option="option"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

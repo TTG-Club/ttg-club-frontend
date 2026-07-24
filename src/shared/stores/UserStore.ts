@@ -25,6 +25,8 @@ export type TUser = {
   username: string;
   name: string;
   email: string;
+  /** Отображаемое имя для комментариев; null — показывается логин. */
+  displayName: string | null;
   roles: EUserRoles[];
   avatar: string;
 };
@@ -281,6 +283,44 @@ export const useUserStore = defineStore('UserStore', () => {
     }
   };
 
+  /**
+   * Сообщает сервису комментариев привести имя автора в его комментариях этого
+   * сайта к текущему отображаемому имени. Fire-and-forget и best-effort: сервис
+   * стамперит логин на новом комментарии, этот вызов заменяет его на имя. Ошибки
+   * проглатываются — на пользовательский поток не влияет.
+   */
+  const syncCommentsName = () => {
+    httpClient.post({ url: '/user/comments/sync-name' }).catch(() => undefined);
+  };
+
+  /**
+   * Сохраняет новое отображаемое имя. После успеха обновляет профиль (чтобы имя
+   * сразу подхватилось везде) и синхронизирует имя в уже оставленных комментариях.
+   */
+  const changeDisplayName = async (displayName: string) => {
+    try {
+      const resp = await httpClient.patch<{ displayName: string | null }>({
+        url: '/user/display-name',
+        payload: { displayName },
+      });
+
+      if (resp.status !== 200) {
+        return Promise.reject(resp.statusText);
+      }
+
+      if (user.value) {
+        user.value = { ...user.value, displayName: resp.data.displayName };
+      }
+
+      // Прокидываем новое имя в старые комментарии пользователя (best-effort).
+      syncCommentsName();
+
+      return Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   const logout = async () => {
     try {
       const resp = await httpClient.post({ url: '/auth/signout' });
@@ -341,6 +381,8 @@ export const useUserStore = defineStore('UserStore', () => {
     authorization,
     resetPassword,
     changePassword,
+    changeDisplayName,
+    syncCommentsName,
     logout,
   };
 });

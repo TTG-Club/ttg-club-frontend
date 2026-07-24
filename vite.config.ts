@@ -23,6 +23,11 @@ export default ({ mode, command }: ConfigEnv) => {
   // маршрутизируются шлюзом. Прокси подключается, только если переменная задана.
   const SUBSCRIBER_HOST = env.VITE_SUBSCRIBER_SERVICE_URL;
 
+  // URL сервиса комментариев — по той же схеме, что и subscriber-service:
+  // локально задаётся в .env.local (VITE_COMMENTS_SERVICE_URL), в проде
+  // запросы идут на относительный /api/v1 и маршрутизируются шлюзом.
+  const COMMENTS_HOST = env.VITE_COMMENTS_SERVICE_URL;
+
   const proxyConfig: Record<string, ProxyOptions> = {
     '^/proxy': {
       target: API_HOST,
@@ -55,6 +60,23 @@ export default ({ mode, command }: ConfigEnv) => {
       configure: (proxy) => {
         proxy.on('proxyReq', (req) => {
           req.setHeader('origin', SUBSCRIBER_HOST);
+        });
+      },
+    };
+  }
+
+  // Dev-прокси к сервису комментариев подключаем, только если задан его URL,
+  // чтобы не держать адрес сервиса в репозитории.
+  if (COMMENTS_HOST) {
+    proxyConfig['^/comments'] = {
+      target: COMMENTS_HOST,
+      changeOrigin: true,
+      ws: false,
+      secure: false,
+      rewrite: (path) => path.replace(/^\/comments/, ''),
+      configure: (proxy) => {
+        proxy.on('proxyReq', (req) => {
+          req.setHeader('origin', COMMENTS_HOST);
         });
       },
     };

@@ -6,6 +6,7 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import FeatBody from './FeatBody.vue';
@@ -101,6 +102,8 @@
         v-if="feat"
         :feat="feat"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

@@ -1,4 +1,4 @@
-import type { BrushColor, SourcePlatform } from './types';
+import type { BrushColor } from './types';
 
 /** Предустановленные цвета кисти для рисования на скриншоте */
 export const BRUSH_COLORS: ReadonlyArray<BrushColor> = [
@@ -30,9 +30,6 @@ export const MODAL_CHROME_WIDTH = 560;
 
 /** URL API микросервиса баг-репортов напрямую */
 export const BUG_REPORT_API_URL = 'https://bug-report.api.ttg.club/api/v1/bugs';
-
-/** Платформа-источник бага для сайта TTG (Сайт 2014) */
-export const SOURCE_PLATFORM: SourcePlatform = 'SITE_5E14';
 
 /** Имя анонимного пользователя по умолчанию */
 export const BUG_REPORT_ANONYMOUS_USER = 'Аноним';

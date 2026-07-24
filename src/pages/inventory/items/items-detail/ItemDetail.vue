@@ -1,14 +1,17 @@
 <script>
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import ItemBody from '@/pages/inventory/items/items-detail/ItemBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       ItemBody,
       SectionHeader,
@@ -26,6 +29,12 @@
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+      ...mapState(useUserStore, ['isEditor']),
+      editUrl() {
+        return this.isEditor && this.item
+          ? `/workshop/items/${this.$route.params.itemName}/edit`
+          : '';
+      },
     },
     async mounted() {
       await this.itemInfoQuery(this.$route.path);
@@ -75,6 +84,7 @@
         :fullscreen="!isMobile"
         :subtitle="item?.name?.eng || ''"
         :title="item?.name?.rus || ''"
+        :edit-url="editUrl"
         bookmark
         print
         @close="close"
@@ -86,6 +96,8 @@
         v-if="item"
         :item="item"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

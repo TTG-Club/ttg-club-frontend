@@ -4,12 +4,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import MagicItemBody from '@/pages/inventory/magic-items/magic-items-detail/MagicItemBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       MagicItemBody,
       SectionHeader,
@@ -94,6 +96,8 @@
         v-if="magicItem"
         :magic-item="magicItem"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

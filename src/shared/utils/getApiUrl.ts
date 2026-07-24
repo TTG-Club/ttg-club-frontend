@@ -20,3 +20,14 @@ export const getBaseUrl = (version: ApiVersion = 'v1') => {
  */
 export const getSubscriberBaseUrl = () =>
   import.meta.env.DEV ? '/subscriber/api' : '/api';
+
+/**
+ * Базовый URL сервиса комментариев (источник истины по обсуждениям деталок).
+ *
+ * Схема та же, что у subscriber-service: в dev обращения идут через отдельный
+ * proxy `/comments` (см. vite.config.ts), который проксирует на
+ * VITE_COMMENTS_SERVICE_URL и сохраняет SSO-JWT. В prod всё ходит через единый
+ * api-gateway/nginx, поэтому достаточно относительного пути.
+ */
+export const getCommentsBaseUrl = () =>
+  import.meta.env.DEV ? '/comments/api/v1' : '/api/v1';

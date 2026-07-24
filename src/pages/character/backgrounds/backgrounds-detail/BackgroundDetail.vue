@@ -4,12 +4,14 @@
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import BackgroundBody from '@/pages/character/backgrounds/backgrounds-detail/BackgroundBody.vue';
 
   export default {
     components: {
+      CommentsBlock,
       ContentDetail,
       BackgroundBody,
       SectionHeader,
@@ -96,6 +98,8 @@
         v-if="background"
         :background="background"
       />
+
+      <comments-block />
     </template>
   </content-detail>
 </template>

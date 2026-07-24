@@ -12,6 +12,7 @@
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import { CommentsBlock } from '@/features/comments';
   import SectionHeader from '@/features/SectionHeader.vue';
 
   import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
@@ -147,6 +148,15 @@
 
     return updatedClass;
   };
+
+  // Вкладки «Заклинания» и «Особенности» показывают вложенные списки на всю
+  // высоту — обсуждение класса под ними не к месту, оно живёт на текстовых
+  // вкладках.
+  const isTextTab = computed(
+    () =>
+      currentTab.value?.type !== 'spells' &&
+      currentTab.value?.type !== 'options',
+  );
 
   const setTab = (index) => {
     try {
@@ -509,6 +519,8 @@
       >
         <template #toolbar />
       </vue-easy-lightbox>
+
+      <comments-block v-if="isTextTab" />
     </template>
   </content-detail>
 </template>
