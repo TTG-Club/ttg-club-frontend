@@ -358,9 +358,31 @@ export const useUserStore = defineStore('UserStore', () => {
 
       return Promise.resolve(resp.data as boolean);
     } catch (err) {
-      clearUser();
-
+      // Разлогин при неуспешном refresh уже выполнил interceptor (authFailureHandler).
+      // Здесь НЕ чистим пользователя: транзиентная ошибка (сеть/5xx) не должна
+      // сбрасывать валидную сессию — иначе авторизация «отваливается» на ровном месте.
       return Promise.resolve(false);
+    }
+  };
+
+  /**
+   * Восстанавливает сессию при старте приложения. Гейтится клиентским маркером
+   * `ttg-user-token` (живёт 365 дней, независимо от короткого access-токена): нет
+   * маркера — аноним, refresh не дёргаем. Есть маркер — access-токен мог протухнуть,
+   * поэтому грузим профиль через getUserInfo: `/user/info` отдаёт 401, на который
+   * срабатывает refresh-interceptor и прозрачно продлевает сессию. Раньше старт шёл
+   * через getUserStatus, который на протухшем токене возвращал 200 false (без refresh)
+   * и молча разлогинивал пользователя с ещё живым refresh-токеном.
+   */
+  const restoreSession = async () => {
+    if (!Cookies.get('ttg-user-token')) {
+      return;
+    }
+
+    try {
+      await getUserInfo();
+    } catch (err) {
+      await clearUser();
     }
   };
 
@@ -376,6 +398,7 @@ export const useUserStore = defineStore('UserStore', () => {
     clearUser,
     getUserToken,
     getUserStatus,
+    restoreSession,
     getUserInfo,
     registration,
     authorization,

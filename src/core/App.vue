@@ -15,18 +15,8 @@
 
   const userStore = useUserStore();
 
-  const initUser = async () => {
-    try {
-      if (await userStore.getUserStatus()) {
-        await userStore.getUserInfo();
-      }
-    } catch (err) {
-      await userStore.clearUser();
-    }
-  };
-
   tryOnBeforeMount(async () => {
-    await initUser();
+    await userStore.restoreSession();
   });
 
   useDiceNotification().enable();
