@@ -138,6 +138,12 @@ export const WorkshopRaceEditPage: RouteRecordRaw = {
   component: () => import('./races/RaceEditView.vue'),
 };
 
+export const WorkshopRuleEditPage: RouteRecordRaw = {
+  name: 'workshop-rule-edit',
+  path: '/workshop/rules/:ruleName/edit',
+  component: () => import('./rules/RuleEditView.vue'),
+};
+
 export const WorkshopWeaponsPage: RouteRecordRaw = {
   name: 'workshop-weapons',
   path: '/workshop/weapons',
