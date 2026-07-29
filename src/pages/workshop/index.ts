@@ -144,6 +144,12 @@ export const WorkshopRuleEditPage: RouteRecordRaw = {
   component: () => import('./rules/RuleEditView.vue'),
 };
 
+export const WorkshopScreenEditPage: RouteRecordRaw = {
+  name: 'workshop-screen-edit',
+  path: '/workshop/screens/:screenName/edit',
+  component: () => import('./screens/ScreenEditView.vue'),
+};
+
 export const WorkshopWeaponsPage: RouteRecordRaw = {
   name: 'workshop-weapons',
   path: '/workshop/weapons',
