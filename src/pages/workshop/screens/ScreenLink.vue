@@ -1,5 +1,6 @@
 <script lang="ts">
   import { httpClient } from '@/shared/api';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import type { Maybe } from '@/shared/types/Utility';
   import type {
     IScreenItem,
@@ -37,6 +38,8 @@
     },
     setup(props) {
       const { href } = useLink(props);
+      const router = useRouter();
+      const { isEditor } = storeToRefs(useUserStore());
 
       const modal = ref<{
         show: boolean;
@@ -90,14 +93,22 @@
         }
       };
 
+      const editUrl = computed(() =>
+        isEditor.value && modal.value.data
+          ? `/workshop${props.screen.url}/edit`
+          : '',
+      );
+
       return {
         href,
         modal,
+        editUrl,
         bookmarkObj: computed(() => ({
           url: props.screen.url,
           name: props.screen.name.rus,
         })),
         clickHandler,
+        openEditor: () => router.push(editUrl.value),
       };
     },
   });
@@ -147,6 +158,23 @@
     </template>
 
     <template #topButtons>
+      <n-tooltip v-if="editUrl">
+        <template #trigger>
+          <n-button
+            quaternary
+            tag="a"
+            :href="editUrl"
+            @click.left.exact.prevent.stop="openEditor"
+          >
+            <template #icon>
+              <svg-icon icon="edit" />
+            </template>
+          </n-button>
+        </template>
+
+        <template #default>Редактировать</template>
+      </n-tooltip>
+
       <bookmark-save-button v-bind="bookmarkObj" />
     </template>
 
