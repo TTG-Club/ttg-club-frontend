@@ -1,5 +1,9 @@
-<script>
+<script setup lang="ts">
+  import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
+  import type { Maybe } from '@/shared/types/Utility';
+  import type { RuleDetail as RuleDetailData } from '@/shared/types/wiki/Rules';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -8,62 +12,56 @@
 
   import RuleBody from '@/pages/wiki/rules/rules-detail/RuleBody.vue';
 
-  export default {
-    components: {
-      CommentsBlock,
-      ContentDetail,
-      RuleBody,
-      SectionHeader,
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.ruleInfoQuery(to.path);
+  const route = useRoute();
+  const router = useRouter();
+  const { isMobile } = storeToRefs(useUIStore());
+  const { isEditor } = storeToRefs(useUserStore());
 
-      next();
-    },
-    data: () => ({
-      rule: undefined,
-      loading: false,
-      error: false,
-      abortController: null,
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile']),
-    },
-    async mounted() {
-      await this.ruleInfoQuery(this.$route.path);
-    },
-    methods: {
-      async ruleInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
+  const rule = ref<Maybe<RuleDetailData>>(undefined);
+  const loading = ref(false);
+  const error = ref(false);
+  const abortController = ref<AbortController | null>(null);
 
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
+  const editUrl = computed(() =>
+    isEditor.value && rule.value
+      ? `/workshop/rules/${route.params.ruleName}/edit`
+      : '',
+  );
 
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal,
-          });
+  const ruleInfoQuery = async (url: string) => {
+    abortController.value?.abort();
 
-          this.rule = resp.data;
-        } catch (err) {
-          errorHandler(err);
+    try {
+      error.value = false;
+      loading.value = true;
+      abortController.value = new AbortController();
 
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
+      const response = await httpClient.post<RuleDetailData>({
+        url,
+        signal: abortController.value.signal,
+      });
 
-      close() {
-        this.$router.push({ name: 'rules' });
-      },
-    },
+      rule.value = response.data;
+    } catch (err) {
+      errorHandler(err);
+      error.value = true;
+    } finally {
+      loading.value = false;
+      abortController.value = null;
+    }
   };
+
+  const close = () => {
+    router.push({ name: 'rules' });
+  };
+
+  onBeforeRouteUpdate(async (to) => {
+    await ruleInfoQuery(to.path);
+  });
+
+  onMounted(async () => {
+    await ruleInfoQuery(route.path);
+  });
 </script>
 
 <template>
@@ -71,6 +69,7 @@
     <template #fixed>
       <section-header
         :copy="!error && !loading"
+        :edit-url="editUrl"
         :fullscreen="!isMobile"
         :subtitle="rule?.name?.eng || ''"
         :title="rule?.name?.rus || ''"

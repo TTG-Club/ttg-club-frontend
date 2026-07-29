@@ -1,5 +1,9 @@
-<script>
+<script setup lang="ts">
+  import { httpClient } from '@/shared/api';
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
+  import type { Maybe } from '@/shared/types/Utility';
+  import type { IScreenDetail } from '@/shared/types/workshop/Screens';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -9,63 +13,56 @@
   import ScreenBody from '@/pages/workshop/screens/screens-detail/ScreenBody.vue';
   import ScreensGroup from '@/pages/workshop/screens/screens-detail/ScreensGroup.vue';
 
-  export default {
-    components: {
-      CommentsBlock,
-      ScreensGroup,
-      ScreenBody,
-      ContentDetail,
-      SectionHeader,
-    },
-    async beforeRouteUpdate(to, from, next) {
-      await this.screenInfoQuery(to.path);
+  const route = useRoute();
+  const router = useRouter();
+  const { isMobile } = storeToRefs(useUIStore());
+  const { isEditor } = storeToRefs(useUserStore());
 
-      next();
-    },
-    data: () => ({
-      screen: undefined,
-      loading: false,
-      error: false,
-      abortController: null,
-    }),
-    computed: {
-      ...mapState(useUIStore, ['fullscreen', 'isMobile']),
-    },
-    async mounted() {
-      await this.screenInfoQuery(this.$route.path);
-    },
-    methods: {
-      async screenInfoQuery(url) {
-        if (this.abortController) {
-          this.abortController.abort();
-        }
+  const screen = ref<Maybe<IScreenDetail>>(undefined);
+  const loading = ref(false);
+  const error = ref(false);
+  const abortController = ref<AbortController | null>(null);
 
-        try {
-          this.error = false;
-          this.loading = true;
-          this.abortController = new AbortController();
+  const editUrl = computed(() =>
+    isEditor.value && screen.value
+      ? `/workshop/screens/${route.params.screenName}/edit`
+      : '',
+  );
 
-          const resp = await this.$http.post({
-            url,
-            signal: this.abortController.signal,
-          });
+  const screenInfoQuery = async (url: string) => {
+    abortController.value?.abort();
 
-          this.screen = resp.data;
-        } catch (err) {
-          errorHandler(err);
+    try {
+      error.value = false;
+      loading.value = true;
+      abortController.value = new AbortController();
 
-          this.error = true;
-        } finally {
-          this.loading = false;
-          this.abortController = null;
-        }
-      },
+      const response = await httpClient.post<IScreenDetail>({
+        url,
+        signal: abortController.value.signal,
+      });
 
-      close() {
-        this.$router.push({ name: 'screens' });
-      },
-    },
+      screen.value = response.data;
+    } catch (err) {
+      errorHandler(err);
+      error.value = true;
+    } finally {
+      loading.value = false;
+      abortController.value = null;
+    }
   };
+
+  const close = () => {
+    router.push({ name: 'screens' });
+  };
+
+  onBeforeRouteUpdate(async (to) => {
+    await screenInfoQuery(to.path);
+  });
+
+  onMounted(async () => {
+    await screenInfoQuery(route.path);
+  });
 </script>
 
 <template>
@@ -76,6 +73,7 @@
     <template #fixed>
       <section-header
         :copy="!error && !loading"
+        :edit-url="editUrl"
         :fullscreen="!isMobile"
         :subtitle="screen?.name?.eng || ''"
         :title="screen?.name?.rus || ''"

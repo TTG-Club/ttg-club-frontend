@@ -30,6 +30,7 @@ export interface IScreenGroup {
 }
 
 export interface IScreenLinkParent {
+  id: number;
   name: TName;
   url: string;
   order: number;
@@ -41,5 +42,30 @@ export interface IScreenItem {
   order: number;
   source: TSource;
   description: string;
-  parent: IScreenLinkParent;
+  parent?: IScreenLinkParent;
+}
+
+export interface IScreenDetail {
+  id: number;
+  name: TName;
+  altName?: string;
+  category?: string;
+  description?: string;
+  icon?: string;
+  order: number;
+  source?: TSource;
+  parent?: IScreenLinkParent;
+  chields?: IScreenLink[];
+}
+
+export interface IScreenSave {
+  name: string;
+  englishName: string;
+  altName?: string;
+  category?: string;
+  description?: string;
+  icon?: string;
+  order?: number;
+  source?: string;
+  parentId?: number;
 }
