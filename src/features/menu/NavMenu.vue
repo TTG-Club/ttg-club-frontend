@@ -335,6 +335,7 @@
 
         .nav-menu__group_label {
           align-items: center;
+          white-space: nowrap;
 
           &::after {
             content: '';

@@ -29,6 +29,20 @@ export type TMetaInfo = {
   menu: string;
 };
 
+const VTTG_NAV_SECTION: TNavItem = {
+  name: 'Virtual TTG',
+  icon: 'menu/filled/information',
+  order: 7,
+  children: [
+    {
+      name: 'Информация',
+      url: 'https://new.ttg.club/vttg',
+      external: true,
+      order: 1,
+    },
+  ],
+};
+
 export const useNavStore = defineStore('NavStore', () => {
   /* Menu */
   const navItems = ref<Array<TNavItem>>([]);
@@ -73,7 +87,7 @@ export const useNavStore = defineStore('NavStore', () => {
       });
 
       if (resp.status === 200) {
-        navItems.value = resp.data;
+        navItems.value = [...resp.data, VTTG_NAV_SECTION];
 
         return Promise.resolve();
       }
