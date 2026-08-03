@@ -10,7 +10,7 @@
   import { useOnlineAdventurersCounter } from '@/features/online-counter/useOnlineAdventurersCounter';
   import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
 
-  import VttgCampaignBanner from './VttgCampaignBanner.vue';
+  import VttgPromoCard from './VttgPromoCard.vue';
 
   const navStore = useNavStore();
 
@@ -82,10 +82,6 @@
         </p>
       </div>
 
-      <div class="banners-container">
-        <vttg-campaign-banner />
-      </div>
-
       <div class="card_row">
         <router-link
           v-for="(section, key) in mainNavItems"
@@ -101,6 +97,8 @@
 
       <div class="main-page-grid">
         <div class="main-page-grid__col left-col">
+          <vttg-promo-card />
+
           <router-link
             to="/tools/tokenator"
             class="block token_library"
@@ -273,15 +271,6 @@
     overflow: hidden;
     height: 0;
     opacity: 0;
-  }
-
-  .banners-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-
-    width: 100%;
-    margin-bottom: 24px;
   }
 
   .stats-banner-row {
