@@ -32,6 +32,50 @@ const INLINE_REPLACEMENTS = [
 /** Атрибуты, с которыми `<div>` всё ещё считается обычным абзацем. */
 const BLOCK_KEEP_ATTRS = ['style', 'align'];
 
+/**
+ * Блочные теги: пробелы и переносы рядом с ними на отображение не влияют,
+ * поэтому при сжатии их можно убирать полностью. Между инлайновыми тегами
+ * пробел значим (`<strong>а</strong> <em>б</em>`) — там оставляем один.
+ */
+const BLOCK_TAGS = [
+  'ARTICLE',
+  'BLOCKQUOTE',
+  'BR',
+  'CAPTION',
+  'COL',
+  'COLGROUP',
+  'DIV',
+  'FIGURE',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'HR',
+  'LI',
+  'OL',
+  'P',
+  'SECTION',
+  'TABLE',
+  'TBODY',
+  'TD',
+  'TFOOT',
+  'TH',
+  'THEAD',
+  'TR',
+  'UL',
+];
+
+/** Теги, внутри которых пробелы значимы и сжимать их нельзя. */
+const PRESERVE_WHITESPACE = 'pre, code, textarea';
+
+/**
+ * Пробельные символы, кроме неразрывного: `&nbsp;` в описаниях ставят
+ * намеренно (`СЛ&nbsp;15`, `10&nbsp;футов`), схлопывать его нельзя.
+ */
+const COLLAPSIBLE_SPACE = /[^\S\u00A0]+/g;
+
 const expandSelfClosingTags = (html: string) =>
   html.replace(
     SELF_CLOSING_TAG,
@@ -124,6 +168,68 @@ const removeEmptyParagraphs = (root: HTMLElement) => {
       element.remove();
     }
   }
+};
+
+const isBlockNode = (node: Node | null) =>
+  !!node &&
+  node.nodeType === Node.ELEMENT_NODE &&
+  BLOCK_TAGS.includes(node.nodeName);
+
+/**
+ * Схлопывает отступы и переносы строк: браузер их всё равно не отображает,
+ * а в базе они раздувают описание. Пробел между инлайновыми тегами значим,
+ * поэтому он сохраняется — убираются только «оформительские» пробелы
+ * на границах блоков.
+ */
+const collapseWhitespace = (root: HTMLElement, doc: Document) => {
+  const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes: Array<Text> = [];
+
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+
+    if (node instanceof Text) {
+      nodes.push(node);
+    }
+  }
+
+  for (const node of nodes) {
+    if (node.parentElement?.closest(PRESERVE_WHITESPACE)) {
+      continue;
+    }
+
+    let text = node.data.replace(COLLAPSIBLE_SPACE, ' ');
+
+    if (isBlockNode(node.previousSibling) || !node.previousSibling) {
+      text = text.replace(/^ /, '');
+    }
+
+    if (isBlockNode(node.nextSibling) || !node.nextSibling) {
+      text = text.replace(/ $/, '');
+    }
+
+    if (text) {
+      node.data = text;
+    } else {
+      node.remove();
+    }
+  }
+};
+
+/**
+ * Приводит разметку к компактному виду. Идемпотентна: сжатый HTML
+ * проходит через неё без изменений.
+ */
+export const compressHtml = (html: string): string => {
+  if (!html.trim()) {
+    return '';
+  }
+
+  const doc = parseHtml(html);
+
+  collapseWhitespace(doc.body, doc);
+
+  return doc.body.innerHTML.trim();
 };
 
 const cleanupAttributes = (root: HTMLElement) => {
@@ -248,6 +354,7 @@ export const editableToHtml = (html: string): string => {
   normalizeBlocks(doc.body, doc);
   removeEmptyParagraphs(doc.body);
   cleanupAttributes(doc.body);
+  collapseWhitespace(doc.body, doc);
 
   return doc.body.innerHTML.trim();
 };

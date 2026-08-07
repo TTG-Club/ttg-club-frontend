@@ -3,6 +3,7 @@
 
   import {
     TOKEN_CLASS,
+    compressHtml,
     createDiceToken,
     createTokenElement,
     editableToHtml,
@@ -148,6 +149,16 @@
   const onSourceInput = (event: Event) => {
     if (event.target instanceof HTMLTextAreaElement) {
       emitValue(event.target.value);
+    }
+  };
+
+  /**
+   * Сжимаем не на каждый символ, а когда правка исходника закончена, —
+   * иначе разметку невозможно было бы форматировать при наборе.
+   */
+  const onSourceChange = (event: Event) => {
+    if (event.target instanceof HTMLTextAreaElement) {
+      emitValue(compressHtml(event.target.value));
     }
   };
 
@@ -535,6 +546,7 @@
       :value="modelValue"
       class="html-editor__source"
       spellcheck="false"
+      @change="onSourceChange"
       @input="onSourceInput"
     />
 
