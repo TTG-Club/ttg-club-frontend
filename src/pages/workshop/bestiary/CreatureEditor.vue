@@ -8,6 +8,7 @@
     ICreatureSaveDescription,
     ICreatureSaveNameValue,
   } from '@/shared/types/workshop/Bestiary';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -1071,14 +1072,14 @@
       </label>
     </div>
 
-    <label class="creature-editor__field creature-editor__field--wide">
+    <div class="creature-editor__field creature-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
-        rows="8"
+        :rows="8"
       />
-    </label>
+    </div>
 
     <section
       v-for="section in textBlockSections"
@@ -1102,8 +1103,6 @@
         class="creature-editor__text-block"
       >
         <div class="creature-editor__text-block_header">
-          <strong>{{ section.title }} #{{ blockIndex + 1 }}</strong>
-
           <button
             type="button"
             @click="removeTextBlock(section.key, blockIndex)"
@@ -1138,14 +1137,14 @@
           />
         </label>
 
-        <label class="creature-editor__field creature-editor__field--wide">
+        <div class="creature-editor__field creature-editor__field--wide">
           <span>Описание</span>
 
-          <textarea
+          <ui-html-editor
             v-model="block.description"
-            rows="6"
+            :rows="6"
           />
-        </label>
+        </div>
 
         <n-checkbox v-model:checked="block.markdown">
           Используется markdown
@@ -1169,23 +1168,23 @@
       />
     </label>
 
-    <label class="creature-editor__field creature-editor__field--wide">
+    <div class="creature-editor__field creature-editor__field--wide">
       <span>Свободный текст реакций</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.reaction"
-        rows="4"
+        :rows="4"
       />
-    </label>
+    </div>
 
-    <label class="creature-editor__field creature-editor__field--wide">
+    <div class="creature-editor__field creature-editor__field--wide">
       <span>Описание легендарных действий</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.legendaryDescription"
-        rows="4"
+        :rows="4"
       />
-    </label>
+    </div>
 
     <label class="creature-editor__field creature-editor__field--wide">
       <span>Легендарные действия</span>
@@ -1321,7 +1320,7 @@
         grid-column: 1 / -1;
         gap: 12px;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
       }
 
       &_warning {

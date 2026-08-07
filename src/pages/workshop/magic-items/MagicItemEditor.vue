@@ -6,6 +6,7 @@
     MagicItemSave,
     TArtifactItem,
   } from '@/shared/types/inventory/MagicItems';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -245,15 +246,15 @@
       />
     </label>
 
-    <label class="magic-item-editor__field magic-item-editor__field--wide">
+    <div class="magic-item-editor__field magic-item-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
+        :rows="8"
         required
-        rows="8"
       />
-    </label>
+    </div>
 
     <label class="magic-item-editor__field magic-item-editor__field--wide">
       <span>Источник</span>

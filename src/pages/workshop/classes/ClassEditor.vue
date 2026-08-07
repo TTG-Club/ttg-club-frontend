@@ -11,6 +11,7 @@
     ClassTrait,
     TClassItem,
   } from '@/shared/types/character/Classes';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -389,51 +390,51 @@
       <span>Напарник</span>
     </label>
 
-    <label class="class-editor__field class-editor__field--wide">
+    <div class="class-editor__field class-editor__field--wide">
       <span>Доспехи</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.armor"
-        rows="3"
+        :rows="3"
       />
-    </label>
+    </div>
 
-    <label class="class-editor__field class-editor__field--wide">
+    <div class="class-editor__field class-editor__field--wide">
       <span>Оружие</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.weapon"
-        rows="3"
+        :rows="3"
       />
-    </label>
+    </div>
 
-    <label class="class-editor__field class-editor__field--wide">
+    <div class="class-editor__field class-editor__field--wide">
       <span>Инструменты</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.tools"
-        rows="3"
+        :rows="3"
       />
-    </label>
+    </div>
 
-    <label class="class-editor__field class-editor__field--wide">
+    <div class="class-editor__field class-editor__field--wide">
       <span>Снаряжение</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.equipment"
-        rows="6"
+        :rows="6"
       />
-    </label>
+    </div>
 
-    <label class="class-editor__field class-editor__field--wide">
+    <div class="class-editor__field class-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
+        :rows="12"
         required
-        rows="12"
       />
-    </label>
+    </div>
 
     <section class="class-editor__traits">
       <div class="class-editor__traits-header">
@@ -504,14 +505,14 @@
           />
         </label>
 
-        <label class="class-editor__field class-editor__field--wide">
+        <div class="class-editor__field class-editor__field--wide">
           <span>Описание</span>
 
-          <textarea
+          <ui-html-editor
             v-model="trait.description"
-            rows="8"
+            :rows="8"
           />
-        </label>
+        </div>
 
         <label class="class-editor__field class-editor__field--checkbox">
           <input
