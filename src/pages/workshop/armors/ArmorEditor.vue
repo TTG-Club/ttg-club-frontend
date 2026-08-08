@@ -3,6 +3,7 @@
   import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { ArmorItem, ArmorSave } from '@/shared/types/inventory/Armors';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -175,14 +176,14 @@
       </n-checkbox>
     </div>
 
-    <label class="armor-editor__field armor-editor__field--wide">
+    <div class="armor-editor__field armor-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
-        rows="10"
+        :rows="10"
       />
-    </label>
+    </div>
 
     <label class="armor-editor__field armor-editor__field--wide">
       <span>Источник</span>

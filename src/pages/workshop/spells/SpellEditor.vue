@@ -3,6 +3,7 @@
   import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { TSpellItem, TSpellSave } from '@/shared/types/character/Spells';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -262,24 +263,24 @@
       />
     </label>
 
-    <label class="spell-editor__field spell-editor__field--wide">
+    <div class="spell-editor__field spell-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
+        :rows="10"
         required
-        rows="10"
       />
-    </label>
+    </div>
 
-    <label class="spell-editor__field spell-editor__field--wide">
+    <div class="spell-editor__field spell-editor__field--wide">
       <span>На больших уровнях</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.upper"
-        rows="5"
+        :rows="5"
       />
-    </label>
+    </div>
 
     <label class="spell-editor__field spell-editor__field--wide">
       <span>Источник</span>

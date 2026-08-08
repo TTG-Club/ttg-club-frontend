@@ -6,6 +6,7 @@
     IScreenDetail,
     IScreenSave,
   } from '@/shared/types/workshop/Screens';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = defineProps<{
@@ -149,14 +150,14 @@
       </router-link>
     </div>
 
-    <label class="screen-editor__field screen-editor__field--wide">
+    <div class="screen-editor__field screen-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
-        rows="18"
+        :rows="18"
       />
-    </label>
+    </div>
 
     <div class="screen-editor__actions">
       <button

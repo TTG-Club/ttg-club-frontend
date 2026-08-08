@@ -6,6 +6,7 @@
     WeaponItem,
     WeaponSave,
   } from '@/shared/types/inventory/Weapons';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -300,23 +301,23 @@
       />
     </label>
 
-    <label class="weapon-editor__field weapon-editor__field--wide">
+    <div class="weapon-editor__field weapon-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
-        rows="8"
+        :rows="8"
       />
-    </label>
+    </div>
 
-    <label class="weapon-editor__field weapon-editor__field--wide">
+    <div class="weapon-editor__field weapon-editor__field--wide">
       <span>Особое</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.special"
-        rows="5"
+        :rows="5"
       />
-    </label>
+    </div>
 
     <label class="weapon-editor__field weapon-editor__field--wide">
       <span>Источник</span>

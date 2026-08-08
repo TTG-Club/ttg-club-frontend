@@ -6,6 +6,7 @@
     EquipmentItem,
     EquipmentSave,
   } from '@/shared/types/inventory/Items';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -201,14 +202,14 @@
       />
     </label>
 
-    <label class="item-editor__field item-editor__field--wide">
+    <div class="item-editor__field item-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
-        rows="10"
+        :rows="10"
       />
-    </label>
+    </div>
 
     <label class="item-editor__field item-editor__field--wide">
       <span>Источник</span>

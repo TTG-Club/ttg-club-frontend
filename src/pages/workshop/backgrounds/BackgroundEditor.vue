@@ -6,6 +6,7 @@
     BackgroundItem,
     BackgroundSave,
   } from '@/shared/types/character/Backgrounds';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -216,15 +217,15 @@
       />
     </label>
 
-    <label class="background-editor__field background-editor__field--wide">
+    <div class="background-editor__field background-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
+        :rows="12"
         required
-        rows="12"
       />
-    </label>
+    </div>
 
     <label class="background-editor__field background-editor__field--wide">
       <span>Название умения предыстории</span>
@@ -235,23 +236,23 @@
       />
     </label>
 
-    <label class="background-editor__field background-editor__field--wide">
+    <div class="background-editor__field background-editor__field--wide">
       <span>Описание умения предыстории</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.skillDescription"
-        rows="8"
+        :rows="8"
       />
-    </label>
+    </div>
 
-    <label class="background-editor__field background-editor__field--wide">
+    <div class="background-editor__field background-editor__field--wide">
       <span>Персонализация</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.personalization"
-        rows="8"
+        :rows="8"
       />
-    </label>
+    </div>
 
     <label class="background-editor__field background-editor__field--wide">
       <span>Источник</span>

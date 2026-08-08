@@ -3,6 +3,7 @@
   import { useBookSources } from '@/shared/composable/useBookSources';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { RuleDetail, RuleSave } from '@/shared/types/wiki/Rules';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = defineProps<{
@@ -123,15 +124,15 @@
       />
     </label>
 
-    <label class="rule-editor__field rule-editor__field--wide">
+    <div class="rule-editor__field rule-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
+        :rows="18"
         required
-        rows="18"
       />
-    </label>
+    </div>
 
     <div class="rule-editor__actions">
       <button

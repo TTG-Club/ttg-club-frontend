@@ -5,6 +5,7 @@
     ClassSpellcasterType,
     ClassTrait,
   } from '@/shared/types/character/Classes';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import PageLayout from '@/layouts/PageLayout.vue';
@@ -123,15 +124,15 @@
           required
       /></label>
 
-      <label class="wide"
-        ><span>Описание</span>
+      <div class="field wide">
+        <span>Описание</span>
 
-        <textarea
+        <ui-html-editor
           v-model="item.description"
-          rows="8"
+          :rows="8"
           required
         />
-      </label>
+      </div>
 
       <section class="wide">
         <div class="heading">
@@ -179,14 +180,14 @@
             Удалить
           </button>
 
-          <label class="wide"
-            ><span>Описание</span>
+          <div class="field wide">
+            <span>Описание</span>
 
-            <textarea
+            <ui-html-editor
               v-model="trait.description"
-              rows="5"
+              :rows="5"
             />
-          </label>
+          </div>
         </div>
       </section>
 
@@ -217,7 +218,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
-  label {
+  label,
+  .field {
     display: flex;
     flex-direction: column;
     gap: 6px;

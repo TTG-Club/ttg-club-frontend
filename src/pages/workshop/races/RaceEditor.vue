@@ -11,6 +11,7 @@
     TRaceFeature,
     TRaceLink,
   } from '@/shared/types/character/Races';
+  import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -518,26 +519,26 @@
           <span>Открывать по умолчанию</span>
         </label>
 
-        <label class="race-editor__field race-editor__field--wide">
+        <div class="race-editor__field race-editor__field--wide">
           <span>Описание</span>
 
-          <textarea
+          <ui-html-editor
             v-model="feature.description"
-            rows="8"
+            :rows="8"
           />
-        </label>
+        </div>
       </article>
     </section>
 
-    <label class="race-editor__field race-editor__field--wide">
+    <div class="race-editor__field race-editor__field--wide">
       <span>Описание</span>
 
-      <textarea
+      <ui-html-editor
         v-model="form.description"
+        :rows="12"
         required
-        rows="12"
       />
-    </label>
+    </div>
 
     <label class="race-editor__field race-editor__field--wide">
       <span>Источник</span>
