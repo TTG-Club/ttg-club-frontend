@@ -25,6 +25,8 @@
 
   type TextBlockField = 'feats' | 'actions' | 'bonusActions';
 
+  type HtmlActionField = 'legendaryActions' | 'mysticalActions';
+
   type SkillEntry = {
     key: string;
     value: number | string;
@@ -37,6 +39,11 @@
     description: string;
     markdown: boolean;
     sharedUsageCount?: number;
+  };
+
+  type EditableHtmlAction = {
+    name: string;
+    description: string;
   };
 
   const option = (label: string, value: string) => ({ label, value });
@@ -219,6 +226,14 @@
       ?.map((item) => `${item.name}\n${item.value || ''}`.trim())
       .join('\n\n') || '';
 
+  const toHtmlActions = (
+    items?: Array<{ name: string; value?: string }>,
+  ): EditableHtmlAction[] =>
+    items?.map((item) => ({
+      name: item.name,
+      description: item.value || '',
+    })) || [];
+
   const toTextBlocks = (
     items?: Array<{
       name: string;
@@ -243,6 +258,11 @@
     markdown: true,
   });
 
+  const createHtmlAction = (): EditableHtmlAction => ({
+    name: '',
+    description: '',
+  });
+
   const parseBlocks = (value: string): ICreatureSaveDescription[] =>
     value
       .split(/\n{2,}/)
@@ -260,11 +280,28 @@
         };
       });
 
-  const parseLegendaryBlocks = (value: string): ICreatureSaveNameValue[] =>
-    parseBlocks(value).map((block) => ({
-      name: block.name.rus,
-      value: block.description || '',
-    }));
+  const toLegendaryActions = (
+    actions: EditableHtmlAction[],
+  ): ICreatureSaveNameValue[] =>
+    actions
+      .filter((action) => action.name.trim() || action.description.trim())
+      .map((action) => ({
+        name: action.name.trim(),
+        value: action.description.trim(),
+      }));
+
+  const toMysticalActions = (
+    actions: EditableHtmlAction[],
+  ): ICreatureSaveDescription[] =>
+    actions
+      .filter((action) => action.name.trim() || action.description.trim())
+      .map((action) => ({
+        name: {
+          rus: action.name.trim(),
+          eng: '',
+        },
+        description: action.description.trim() || undefined,
+      }));
 
   const toDescriptionBlocks = (
     blocks: EditableTextBlock[],
@@ -380,8 +417,8 @@
     reactions: blockToText(props.creature?.reactions),
     reaction: props.creature?.reaction || '',
     legendaryDescription: props.creature?.legendary?.description || '',
-    legendaryActions: blockToText(props.creature?.legendary?.list),
-    mysticalActions: blockToText(props.creature?.mysticalActions),
+    legendaryActions: toHtmlActions(props.creature?.legendary?.list),
+    mysticalActions: toHtmlActions(props.creature?.mysticalActions),
   });
 
   const { source, sourceOptions } = useBookSources(
@@ -397,11 +434,24 @@
     { key: 'bonusActions', title: 'Бонусные действия' },
   ];
 
+  const htmlActionSections: Array<{ key: HtmlActionField; title: string }> = [
+    { key: 'legendaryActions', title: 'Легендарные действия' },
+    { key: 'mysticalActions', title: 'Мистические действия' },
+  ];
+
   const addTextBlock = (key: TextBlockField) => {
     form[key].push(createTextBlock());
   };
 
   const removeTextBlock = (key: TextBlockField, index: number) => {
+    form[key].splice(index, 1);
+  };
+
+  const addHtmlAction = (key: HtmlActionField) => {
+    form[key].push(createHtmlAction());
+  };
+
+  const removeHtmlAction = (key: HtmlActionField, index: number) => {
     form[key].splice(index, 1);
   };
 
@@ -569,11 +619,11 @@
       reaction: form.reaction || undefined,
       bonusActions: toDescriptionBlocks(form.bonusActions),
       legendary: {
-        list: parseLegendaryBlocks(form.legendaryActions),
+        list: toLegendaryActions(form.legendaryActions),
         count: 3,
         description: form.legendaryDescription || undefined,
       },
-      mysticalActions: parseBlocks(form.mysticalActions),
+      mysticalActions: toMysticalActions(form.mysticalActions),
       description: form.description || undefined,
       tags: csv(form.tags),
       environment: form.environment,
@@ -1186,23 +1236,62 @@
       />
     </div>
 
-    <label class="creature-editor__field creature-editor__field--wide">
-      <span>Легендарные действия</span>
+    <section
+      v-for="section in htmlActionSections"
+      :key="section.key"
+      class="creature-editor__text-section"
+    >
+      <div class="creature-editor__text-section_header">
+        <h3>{{ section.title }}</h3>
 
-      <textarea
-        v-model="form.legendaryActions"
-        rows="6"
-      />
-    </label>
+        <button
+          type="button"
+          @click="addHtmlAction(section.key)"
+        >
+          Добавить
+        </button>
+      </div>
 
-    <label class="creature-editor__field creature-editor__field--wide">
-      <span>Мистические действия</span>
+      <div
+        v-for="(action, actionIndex) in form[section.key]"
+        :key="actionIndex"
+        class="creature-editor__text-block"
+      >
+        <div class="creature-editor__text-block_header">
+          <button
+            type="button"
+            @click="removeHtmlAction(section.key, actionIndex)"
+          >
+            Удалить
+          </button>
+        </div>
 
-      <textarea
-        v-model="form.mysticalActions"
-        rows="5"
-      />
-    </label>
+        <label class="creature-editor__field">
+          <span>Название</span>
+
+          <input
+            v-model="action.name"
+            type="text"
+          />
+        </label>
+
+        <div class="creature-editor__field creature-editor__field--wide">
+          <span>Описание</span>
+
+          <ui-html-editor
+            v-model="action.description"
+            :rows="6"
+          />
+        </div>
+      </div>
+
+      <p
+        v-if="!form[section.key].length"
+        class="creature-editor__empty"
+      >
+        Нет действий.
+      </p>
+    </section>
 
     <div class="creature-editor__checks">
       <n-checkbox v-model:checked="form.npc">Именованный НИП</n-checkbox>
