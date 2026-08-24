@@ -396,6 +396,7 @@
     blindsightRadius: !!findSense('слепое зрение')?.additional,
     vibration: findSense('чувство вибрации')?.value || '',
     languages: props.creature?.languages?.join(', ') || '',
+    language: props.creature?.language || '',
     tags: props.creature?.tags?.map((tag) => tag.name).join(', ') || '',
     damageResistances: selectedValues(props.creature?.damageResistances),
     damageImmunities: selectedValues(props.creature?.damageImmunities),
@@ -612,6 +613,7 @@
         senses,
       },
       languages: csv(form.languages),
+      language: form.language || undefined,
       challengeRating: form.challengeRating,
       feats: toDescriptionBlocks(form.feats),
       actions: toDescriptionBlocks(form.actions),
@@ -1047,6 +1049,16 @@
 
       <input
         v-model="form.languages"
+        type="text"
+      />
+    </label>
+
+    <label class="creature-editor__field creature-editor__field--wide">
+      <span>Языки свободным текстом</span>
+
+      <input
+        v-model="form.language"
+        placeholder="Например: понимает Общий, но не говорит"
         type="text"
       />
     </label>

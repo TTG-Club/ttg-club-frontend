@@ -373,7 +373,9 @@
 
           <span>
             {{
-              creature.languages?.length ? creature.languages.join(', ') : '—'
+              [creature.languages?.join(', '), creature.language]
+                .filter(Boolean)
+                .join(', ') || '—'
             }}</span
           >
         </p>
