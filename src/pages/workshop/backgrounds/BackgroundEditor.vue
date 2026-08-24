@@ -9,6 +9,8 @@
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
+  import BackgroundPersonalizationTableEditor from './BackgroundPersonalizationTableEditor.vue';
+
   const props = withDefaults(
     defineProps<{
       background?: BackgroundItem | null;
@@ -67,6 +69,11 @@
     skillName: props.background?.skillName || '',
     skillDescription: props.background?.skillDescription || '',
     personalization: props.background?.personalization || '',
+    personalizationTables:
+      props.background?.personalizationTables?.map((table) => ({
+        type: table.type,
+        values: table.tbody.map((row) => row[1]).filter(Boolean),
+      })) || [],
     language: props.background?.language || '',
     languages: props.background?.languages || [],
   });
@@ -253,6 +260,11 @@
         :rows="8"
       />
     </div>
+
+    <background-personalization-table-editor
+      v-model="form.personalizationTables"
+      class="background-editor__field--wide"
+    />
 
     <label class="background-editor__field background-editor__field--wide">
       <span>Источник</span>
