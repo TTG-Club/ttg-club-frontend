@@ -3,6 +3,7 @@
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
     ClassSpellcasterType,
+    ClassTableColumn,
     ClassTrait,
   } from '@/shared/types/character/Classes';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
@@ -11,6 +12,8 @@
   import PageLayout from '@/layouts/PageLayout.vue';
 
   import WorkshopRevisions from '../WorkshopRevisions.vue';
+
+  import ClassTableEditor from './ClassTableEditor.vue';
 
   type ArchetypeEdit = {
     id: number;
@@ -23,6 +26,7 @@
     optionType?: string;
     page?: number;
     traits: ClassTrait[];
+    tableColumns: ClassTableColumn[];
   };
 
   const route = useRoute();
@@ -46,7 +50,10 @@
         payload: {},
       });
 
-      item.value = response.data;
+      item.value = {
+        ...response.data,
+        tableColumns: response.data.tableColumns || [],
+      };
     } catch (error) {
       errorHandler(error);
     } finally {
@@ -66,10 +73,24 @@
 
       const response = await httpClient.patch<ArchetypeEdit>({
         url: `/workshop/classes/archetypes/${item.value.id}`,
-        payload: item.value,
+        payload: {
+          ...item.value,
+          tableColumns: item.value.tableColumns
+            .filter((column) => column.name.trim())
+            .map((column) => ({
+              ...column,
+              name: column.name.trim(),
+              prefix: column.prefix?.trim() || undefined,
+              suffix: column.suffix?.trim() || undefined,
+              levels: column.levels.map((value) => value ?? 0),
+            })),
+        },
       });
 
-      item.value = response.data;
+      item.value = {
+        ...response.data,
+        tableColumns: response.data.tableColumns || [],
+      };
       message.success('Архетип обновлён');
     } catch (error) {
       errorHandler(error);
@@ -191,6 +212,11 @@
         </div>
       </section>
 
+      <class-table-editor
+        v-model="item.tableColumns"
+        class="wide"
+      />
+
       <div class="actions wide">
         <button
           type="submit"
@@ -258,6 +284,7 @@
   button {
     padding: 8px 14px;
   }
+
   @media (max-width: 700px) {
     .editor,
     .trait {
