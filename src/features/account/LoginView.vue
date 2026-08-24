@@ -37,7 +37,7 @@
     password: rulePassword(),
   });
 
-  const noSideSpace = (value: string) => !/ /g.test(value);
+  const noSpacesInPassword = (value: string) => !/ /g.test(value);
 
   const successHandler = () => {
     success.value = true;
@@ -115,7 +115,6 @@
         autocorrect="off"
         placeholder="Логин или электронная почта"
         autofocus
-        :allow-input="noSideSpace"
       />
     </n-form-item>
 
@@ -131,7 +130,7 @@
         type="password"
         placeholder="Пароль"
         show-password-on="click"
-        :allow-input="noSideSpace"
+        :allow-input="noSpacesInPassword"
       />
     </n-form-item>
 
