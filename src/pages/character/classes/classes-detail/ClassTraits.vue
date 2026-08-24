@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import type { ArchetypeSpellTable } from '@/shared/types/character/Classes';
   import RawContent from '@/shared/ui/RawContent.vue';
 
   import ArchetypeSpells from '@/pages/character/classes/classes-detail/ArchetypeSpells.vue';
@@ -68,15 +69,7 @@
       url: string;
     }>;
     queryBooks?: string[];
-    archetypeSpells?: Array<{
-      level: number;
-      spells: Array<{
-        name: string;
-        englishName: string;
-        url: string;
-        advanced?: string;
-      }>;
-    }>;
+    archetypeSpellTable?: ArchetypeSpellTable;
   }>();
 
   const emit = defineEmits<{
@@ -396,8 +389,11 @@
       </details>
 
       <archetype-spells
-        v-if="feature.id === traits.archetype?.id && archetypeSpells?.length"
-        :levels="archetypeSpells"
+        v-if="
+          feature.id === traits.archetype?.id &&
+          archetypeSpellTable?.levels.length
+        "
+        :table="archetypeSpellTable"
       />
     </template>
 

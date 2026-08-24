@@ -54,6 +54,7 @@ export type TClassItem = Omit<TClassLink, 'archetypes'> & {
   page?: number;
   classTraits?: ClassTrait[];
   tableColumns?: ClassTableColumn[];
+  archetypeSpellTable?: ArchetypeSpellTable;
   traits?: {
     diceHp: number;
     armor?: string;
@@ -113,6 +114,24 @@ export type ClassSkill =
   | 'PERSUASION';
 
 export type ClassSpellcasterType = 'FULL' | 'HALF' | 'PARTLY' | 'NONE';
+
+export type ArchetypeSpellLevelType = 'CLASS_LEVEL' | 'SPELL_LEVEL';
+
+export type ArchetypeSpell = {
+  name: string;
+  englishName: string;
+  url: string;
+  advanced?: string;
+};
+
+export type ArchetypeSpellTable = {
+  levelType: ArchetypeSpellLevelType;
+  classNameGenitive: string;
+  levels: Array<{
+    level: number;
+    spells: ArchetypeSpell[];
+  }>;
+};
 
 export type ClassRest = 'SHORT' | 'LONG' | 'FULL';
 

@@ -2,12 +2,15 @@
   import { httpClient } from '@/shared/api';
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type {
+    ArchetypeSpellLevelType,
     ClassSpellcasterType,
     ClassTableColumn,
     ClassTrait,
   } from '@/shared/types/character/Classes';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
+
+  import { ARCHETYPE_SPELL_LEVEL_TYPE_OPTIONS } from '@/features/classes/model';
 
   import PageLayout from '@/layouts/PageLayout.vue';
 
@@ -24,6 +27,7 @@
     level: number;
     spellcasterType?: ClassSpellcasterType;
     optionType?: string;
+    spellLevelType: ArchetypeSpellLevelType;
     page?: number;
     traits: ClassTrait[];
     tableColumns: ClassTableColumn[];
@@ -52,6 +56,7 @@
 
       item.value = {
         ...response.data,
+        spellLevelType: response.data.spellLevelType || 'CLASS_LEVEL',
         tableColumns: response.data.tableColumns || [],
       };
     } catch (error) {
@@ -89,6 +94,7 @@
 
       item.value = {
         ...response.data,
+        spellLevelType: response.data.spellLevelType || 'CLASS_LEVEL',
         tableColumns: response.data.tableColumns || [],
       };
       message.success('Архетип обновлён');
@@ -144,6 +150,20 @@
           type="number"
           required
       /></label>
+
+      <label
+        ><span>Тип уровня в таблице заклинаний</span>
+
+        <select v-model="item.spellLevelType">
+          <option
+            v-for="option in ARCHETYPE_SPELL_LEVEL_TYPE_OPTIONS"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
 
       <div class="field wide">
         <span>Описание</span>
@@ -251,6 +271,7 @@
     gap: 6px;
   }
   input,
+  select,
   textarea {
     padding: 8px;
 
