@@ -53,6 +53,7 @@ export type TClassItem = Omit<TClassLink, 'archetypes'> & {
   enabledArhitypeLevel?: number;
   page?: number;
   classTraits?: ClassTrait[];
+  tableColumns?: ClassTableColumn[];
   traits?: {
     diceHp: number;
     armor?: string;
@@ -73,6 +74,14 @@ export type ClassTrait = {
   description: string;
   optional: boolean;
   child?: string;
+};
+
+export type ClassTableColumn = {
+  id?: number;
+  name: string;
+  prefix?: string;
+  suffix?: string;
+  levels: Array<number | null>;
 };
 
 export type ClassAbility =
@@ -131,6 +140,7 @@ export type ClassSave = {
   icon?: string;
   page?: number;
   classTraits: ClassTrait[];
+  tableColumns: ClassTableColumn[];
   /** Аббревиатура книги-источника, например MM */
   source?: string;
 };

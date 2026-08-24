@@ -8,11 +8,14 @@
     ClassSave,
     ClassSkill,
     ClassSpellcasterType,
+    ClassTableColumn,
     ClassTrait,
     TClassItem,
   } from '@/shared/types/character/Classes';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
   import { errorHandler } from '@/shared/utils/errorHandler';
+
+  import ClassTableEditor from './ClassTableEditor.vue';
 
   const props = withDefaults(
     defineProps<{
@@ -128,6 +131,11 @@
         suffix: trait.suffix || '',
         child: trait.child || '',
       })) || [],
+    tableColumns:
+      props.classItem?.tableColumns?.map((column: ClassTableColumn) => ({
+        ...column,
+        levels: [...column.levels],
+      })) || [],
   });
 
   const pending = ref(false);
@@ -171,6 +179,15 @@
             suffix: trait.suffix?.trim() || undefined,
             description: trait.description.trim(),
             child: trait.child?.trim() || undefined,
+          })),
+        tableColumns: form.tableColumns
+          .filter((column) => column.name.trim())
+          .map((column) => ({
+            ...column,
+            name: column.name.trim(),
+            prefix: column.prefix?.trim() || undefined,
+            suffix: column.suffix?.trim() || undefined,
+            levels: column.levels.map((value) => value ?? 0),
           })),
       };
 
@@ -532,6 +549,11 @@
       </p>
     </section>
 
+    <class-table-editor
+      v-model="form.tableColumns"
+      class="class-editor__table"
+    />
+
     <label class="class-editor__field class-editor__field--wide">
       <span>Источник</span>
 
@@ -646,6 +668,10 @@
       background-color: var(--bg-secondary);
       border: 1px solid var(--border);
       border-radius: 8px;
+    }
+
+    &__table {
+      grid-column: 1 / -1;
     }
 
     &__traits-header {
