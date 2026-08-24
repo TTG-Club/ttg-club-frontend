@@ -122,6 +122,7 @@ export interface ICreature {
   savingThrows?: ICreatureSavingThrow[];
   senses: ICreatureSenses;
   languages?: string[];
+  language?: string;
   feats?: ICreatureFeat[];
   actions?: ICreatureAction[];
   reactions?: ICreatureAction[];
@@ -188,6 +189,7 @@ export interface ICreatureSave {
     senses?: ICreatureSaveNameValue[];
   };
   languages?: string[];
+  language?: string;
   challengeRating: string;
   feats?: ICreatureSaveDescription[];
   actions?: ICreatureSaveDescription[];

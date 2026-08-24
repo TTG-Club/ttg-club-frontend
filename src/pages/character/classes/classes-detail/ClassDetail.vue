@@ -461,7 +461,7 @@
               :archetypes="
                 currentClass.url === route.path ? currentClass.archetypes : []
               "
-              :archetype-spells="currentClass.archetypeSpells"
+              :archetype-spell-table="currentClass.archetypeSpellTable"
               :query-books="queryBooks"
               @anchor-click="scrollToSection"
               @loaded="initScrollListeners"
@@ -482,9 +482,9 @@
             <archetype-spells
               v-if="
                 currentTab.type === 'description' &&
-                currentClass.archetypeSpells?.length
+                currentClass.archetypeSpellTable?.levels.length
               "
-              :levels="currentClass.archetypeSpells"
+              :table="currentClass.archetypeSpellTable"
             />
           </div>
         </div>

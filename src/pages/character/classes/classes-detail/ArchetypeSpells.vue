@@ -1,19 +1,18 @@
 <script setup lang="ts">
-  type ArchetypeSpell = {
-    name: string;
-    englishName: string;
-    url: string;
-    advanced?: string;
-  };
+  import type { ArchetypeSpellTable } from '@/shared/types/character/Classes';
 
-  type ArchetypeSpellLevel = {
-    level: number;
-    spells: ArchetypeSpell[];
-  };
+  import { getArchetypeSpellLevelHeader } from '@/features/classes/model';
 
-  defineProps<{
-    levels: ArchetypeSpellLevel[];
+  const props = defineProps<{
+    table: ArchetypeSpellTable;
   }>();
+
+  const levelHeader = computed(() =>
+    getArchetypeSpellLevelHeader(
+      props.table.levelType,
+      props.table.classNameGenitive,
+    ),
+  );
 </script>
 
 <template>
@@ -21,7 +20,7 @@
     <table class="dnd5_table">
       <thead>
         <tr>
-          <th>Уровень персонажа</th>
+          <th>{{ levelHeader }}</th>
 
           <th class="align_left">Заклинания</th>
         </tr>
@@ -29,7 +28,7 @@
 
       <tbody>
         <tr
-          v-for="level in levels"
+          v-for="level in table.levels"
           :key="level.level"
         >
           <td class="archetype-spells__level">{{ level.level }}</td>
