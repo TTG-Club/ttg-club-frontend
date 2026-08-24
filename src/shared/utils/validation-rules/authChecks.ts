@@ -71,6 +71,7 @@ const checkUsernameOrEmailExist = async (
 const validatorUsername = async (
   value: string,
   config?: Omit<UsernameOrEmailRuleConfig, 'trigger'>,
+  allowSpaces = false,
 ): Promise<void> => {
   const { required, minLength, maxLength, checkExist } = {
     required: true,
@@ -94,8 +95,12 @@ const validatorUsername = async (
     return;
   }
 
-  if (/[^\w\-.]/g.test(value)) {
-    throw new Error('Допустимы латинские буквы, 0-9 - _ .');
+  const invalidCharacterPattern = allowSpaces ? /[^\w\-. ]/g : /[^\w\-.]/g;
+
+  if (invalidCharacterPattern.test(value)) {
+    throw new Error(
+      `Допустимы латинские буквы, 0-9 - _ .${allowSpaces ? ' и пробел' : ''}`,
+    );
   }
 
   if (checkExist) {
@@ -199,7 +204,7 @@ export const ruleUsernameOrEmail = (
     transform: (value: string) => value.trim(),
     validator: (rule: FormItemRule, value: string) =>
       new Promise((resolve, reject) => {
-        validatorUsername(value, omit(options, 'trigger'))
+        validatorUsername(value, omit(options, 'trigger'), true)
           .then(() => resolve())
           .catch((userNameError) =>
             validatorEmail(value, omit(options, 'trigger'))
