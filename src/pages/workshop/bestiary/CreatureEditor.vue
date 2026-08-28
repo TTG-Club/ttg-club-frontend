@@ -187,6 +187,15 @@
     Хар: 'CHARISMA',
   };
 
+  const savingThrowOptions = [
+    option('Сила', 'STRENGTH'),
+    option('Ловкость', 'DEXTERITY'),
+    option('Телосложение', 'CONSTITUTION'),
+    option('Интеллект', 'INTELLIGENCE'),
+    option('Мудрость', 'WISDOM'),
+    option('Харизма', 'CHARISMA'),
+  ];
+
   const skillMap: Record<string, string> = {
     'Атлетика': 'ATHLETICS',
     'Акробатика': 'ACROBATICS',
@@ -355,6 +364,18 @@
       }))
       .filter((skill) => !!skill.key) || [];
 
+  const initialSavingThrows = (): SkillEntry[] =>
+    props.creature?.savingThrows
+      ?.map((savingThrow) => ({
+        key:
+          abilityMap[savingThrow.name] ||
+          abilityMap[savingThrow.shortName] ||
+          '',
+        value: savingThrow.value,
+        additional: savingThrow.additional || '',
+      }))
+      .filter((savingThrow) => !!savingThrow.key) || [];
+
   const form = reactive({
     name: props.creature?.name.rus || '',
     englishName: props.creature?.name.eng || '',
@@ -388,6 +409,7 @@
     int: props.creature?.ability.int || 10,
     wiz: props.creature?.ability.wiz || 10,
     cha: props.creature?.ability.cha || 10,
+    savingThrows: initialSavingThrows(),
     skills: initialSkills(),
     passivePerception: props.creature?.senses.passivePerception || '10',
     darkvision: findSense('тёмное зрение')?.value || '',
@@ -464,6 +486,20 @@
     form.skills.splice(index, 1);
   };
 
+  const addSavingThrow = () => {
+    form.savingThrows.push({ key: '', value: 0, additional: '' });
+  };
+
+  const removeSavingThrow = (index: number) => {
+    form.savingThrows.splice(index, 1);
+  };
+
+  const isSavingThrowOptionDisabled = (value: string, index: number) =>
+    form.savingThrows.some(
+      (savingThrow, savingThrowIndex) =>
+        savingThrowIndex !== index && savingThrow.key === value,
+    );
+
   const hitDice = computed(
     () => sizeHitDiceMap[form.size] || sizeHitDiceMap.MEDIUM,
   );
@@ -506,17 +542,6 @@
 
   const numberOrUndefined = (value: number | string | undefined) =>
     value === '' || value === undefined ? undefined : Number(value);
-
-  const existingSavingThrows = (): ICreatureSaveNameValue[] =>
-    props.creature?.savingThrows
-      ?.map((save) => ({
-        key: abilityMap[save.name] || abilityMap[save.shortName],
-        name: save.name,
-        shortName: save.shortName,
-        value: save.value,
-        additional: save.additional,
-      }))
-      .filter((save) => !!save.key) || [];
 
   const createPayload = (): ICreatureSave => {
     const speed: ICreatureSaveNameValue[] = [
@@ -596,7 +621,13 @@
         wiz: Number(form.wiz),
         cha: Number(form.cha),
       },
-      savingThrows: existingSavingThrows(),
+      savingThrows: form.savingThrows
+        .filter((savingThrow) => savingThrow.key)
+        .map((savingThrow) => ({
+          key: savingThrow.key,
+          value: Number(savingThrow.value) || 0,
+          additional: savingThrow.additional || undefined,
+        })),
       skills: form.skills
         .filter((skill) => skill.key)
         .map((skill) => ({
@@ -912,6 +943,85 @@
         />
       </label>
     </div>
+
+    <section class="creature-editor__text-section">
+      <div class="creature-editor__text-section_header">
+        <h3>Спасброски</h3>
+
+        <button
+          type="button"
+          @click="addSavingThrow"
+        >
+          Добавить
+        </button>
+      </div>
+
+      <div
+        v-for="(savingThrow, savingThrowIndex) in form.savingThrows"
+        :key="savingThrowIndex"
+        class="creature-editor__skill-row"
+      >
+        <label class="creature-editor__field">
+          <span>Характеристика</span>
+
+          <select
+            v-model="savingThrow.key"
+            required
+          >
+            <option
+              disabled
+              value=""
+            >
+              Выберите характеристику
+            </option>
+
+            <option
+              v-for="item in savingThrowOptions"
+              :key="item.value"
+              :disabled="
+                isSavingThrowOptionDisabled(item.value, savingThrowIndex)
+              "
+              :value="item.value"
+            >
+              {{ item.label }}
+            </option>
+          </select>
+        </label>
+
+        <label class="creature-editor__field">
+          <span>Бонус</span>
+
+          <input
+            v-model.number="savingThrow.value"
+            required
+            type="number"
+          />
+        </label>
+
+        <label class="creature-editor__field">
+          <span>Доп. текст</span>
+
+          <input
+            v-model="savingThrow.additional"
+            type="text"
+          />
+        </label>
+
+        <button
+          type="button"
+          @click="removeSavingThrow(savingThrowIndex)"
+        >
+          Удалить
+        </button>
+      </div>
+
+      <p
+        v-if="!form.savingThrows.length"
+        class="creature-editor__empty"
+      >
+        Нет спасбросков.
+      </p>
+    </section>
 
     <section class="creature-editor__text-section">
       <div class="creature-editor__text-section_header">
