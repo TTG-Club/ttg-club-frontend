@@ -141,125 +141,129 @@
           </div>
         </div>
 
-        <div class="main-page-grid__col center-col">
-          <div class="youtube-block">
-            <youtube-block />
-          </div>
-        </div>
-
-        <div class="main-page-grid__col right-col">
-          <div class="stats-banner-row">
-            <div class="online-counter-card">
-              <div class="online-counter-card__header">
-                <span class="online-counter-card__indicator" />
-
-                <h3>Статистика онлайн</h3>
-              </div>
-
-              <p>
-                TTG - твой проводник в мир Dungeons & Dragons, созданный
-                сообществом для сообщества!
-              </p>
-
-              <div class="online-counter-card__stats">
-                <span>Авантюристов</span>
-
-                <strong
-                  :class="{
-                    'is-loading': isAdventurersCounterLoading,
-                  }"
-                >
-                  {{ adventurersCountLabel }}
-                </strong>
+        <div class="main-page-grid__aside">
+          <div class="main-page-grid__row">
+            <div class="main-page-grid__col center-col">
+              <div class="youtube-block">
+                <youtube-block />
               </div>
             </div>
 
-            <a
-              href="//new.ttg.club"
-              class="banner"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                class="banner__bg"
-                alt="Баннер 2024 DnD"
-                src="/img/banner-2024.webp"
-              />
+            <div class="main-page-grid__col right-col">
+              <div class="stats-banner-row">
+                <div class="online-counter-card">
+                  <div class="online-counter-card__header">
+                    <span class="online-counter-card__indicator" />
 
-              <span class="banner__badge">Новинка</span>
+                    <h3>Статистика онлайн</h3>
+                  </div>
 
-              <div class="banner__content">
-                <span class="banner__title">Редакция D&D 2024</span>
+                  <p>
+                    TTG - твой проводник в мир Dungeons & Dragons, созданный
+                    сообществом для сообщества!
+                  </p>
 
-                <span class="banner__link">
-                  Перейти
-                  <span class="banner__arrow">→</span>
-                </span>
+                  <div class="online-counter-card__stats">
+                    <span>Авантюристов</span>
+
+                    <strong
+                      :class="{
+                        'is-loading': isAdventurersCounterLoading,
+                      }"
+                    >
+                      {{ adventurersCountLabel }}
+                    </strong>
+                  </div>
+                </div>
+
+                <a
+                  href="//new.ttg.club"
+                  class="banner"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    class="banner__bg"
+                    alt="Баннер 2024 DnD"
+                    src="/img/banner-2024.webp"
+                  />
+
+                  <span class="banner__badge">Новинка</span>
+
+                  <div class="banner__content">
+                    <span class="banner__title">Редакция D&D 2024</span>
+
+                    <span class="banner__link">
+                      Перейти
+                      <span class="banner__arrow">→</span>
+                    </span>
+                  </div>
+                </a>
               </div>
-            </a>
+
+              <div class="index-social-links">
+                <a
+                  href="https://t.me/ttgclubnews"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="index-social-btn is-telegram"
+                >
+                  <svg-icon
+                    icon="telegram"
+                    :size="24"
+                  />
+
+                  <span>Telegram</span>
+                </a>
+
+                <a
+                  href="https://discord.gg/JqFKMKRtxv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="index-social-btn is-discord"
+                >
+                  <svg-icon
+                    icon="discord"
+                    :size="24"
+                  />
+
+                  <span>Discord</span>
+                </a>
+
+                <a
+                  href="https://vk.com/ttg.club"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="index-social-btn is-vk"
+                >
+                  <svg-icon
+                    icon="vk"
+                    :size="24"
+                  />
+
+                  <span>ВКонтакте</span>
+                </a>
+
+                <a
+                  href="https://boosty.to/dnd5club"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="index-social-btn is-boosty"
+                >
+                  <svg-icon
+                    icon="boosty"
+                    :size="24"
+                  />
+
+                  <span>Boosty</span>
+                </a>
+              </div>
+            </div>
           </div>
 
-          <div class="index-social-links">
-            <a
-              href="https://t.me/ttgclubnews"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="index-social-btn is-telegram"
-            >
-              <svg-icon
-                icon="telegram"
-                :size="24"
-              />
-
-              <span>Telegram</span>
-            </a>
-
-            <a
-              href="https://discord.gg/JqFKMKRtxv"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="index-social-btn is-discord"
-            >
-              <svg-icon
-                icon="discord"
-                :size="24"
-              />
-
-              <span>Discord</span>
-            </a>
-
-            <a
-              href="https://vk.com/ttg.club"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="index-social-btn is-vk"
-            >
-              <svg-icon
-                icon="vk"
-                :size="24"
-              />
-
-              <span>ВКонтакте</span>
-            </a>
-
-            <a
-              href="https://boosty.to/dnd5club"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="index-social-btn is-boosty"
-            >
-              <svg-icon
-                icon="boosty"
-                :size="24"
-              />
-
-              <span>Boosty</span>
-            </a>
+          <div class="main-page-grid__partners">
+            <our-partners />
           </div>
-        </div>
-
-        <div class="main-page-grid__partners">
-          <our-partners />
         </div>
       </div>
     </div>
@@ -593,17 +597,19 @@
 
   .index-social-links {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     gap: 8px;
 
     .index-social-btn {
       display: flex;
+      flex: 1 1 auto;
       gap: 12px;
       align-items: center;
       justify-content: center;
 
       width: 100%;
-      height: 48px;
+      min-height: 48px;
 
       font-size: var(--main-font-size);
       font-weight: 500;
