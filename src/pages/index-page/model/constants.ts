@@ -142,7 +142,7 @@ export const HOME_EDITION_CARD: HomePromoCardContent = {
   eyebrow: 'Новинка',
   title: 'Редакция D&D 2024',
   linkLabel: 'Перейти',
-  image: '/img/banner-2024.webp',
+  image: '/img/banner_2024.webp',
   to: '//new.ttg.club',
   external: true,
 };
