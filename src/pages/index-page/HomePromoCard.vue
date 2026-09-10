@@ -14,11 +14,6 @@
       /** Низкая карточка — для тех, где под заголовком нет описания */
       compact?: boolean;
       /**
-       * Картинка растянута на всю карточку без обрезки: у вытянутого баннера
-       * при обрезке по высоте карточки видна лишь середина
-       */
-      stretchImage?: boolean;
-      /**
        * Картинка обесцвечена, как фактуры плиты разделов, и набирает цвет
        * только под курсором
        */
@@ -26,7 +21,6 @@
     }>(),
     {
       compact: false,
-      stretchImage: false,
       muted: false,
     },
   );
@@ -49,7 +43,6 @@
     'home-promo',
     {
       'home-promo_compact': props.compact,
-      'home-promo_stretch': props.stretchImage,
       'home-promo_muted': props.muted,
     },
   ]);
@@ -134,12 +127,6 @@
       min-height: 112px;
     }
 
-    // Край баннера растворяется в прозрачность, а подпись светлая во всех
-    // темах — под картинкой нужен тёмный фон
-    &_stretch {
-      background-color: var(--bg-image-backdrop);
-    }
-
     &:hover {
       border-color: color-mix(in srgb, var(--primary) 45%, transparent);
       box-shadow:
@@ -176,12 +163,6 @@
       transition:
         transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
         filter 0.25s ease;
-    }
-
-    /* Баннер виден целиком и закрывает карточку: пропорции он теряет, но
-       обесцвеченным работает фактурой, а не иллюстрацией */
-    &_stretch &__image {
-      object-fit: fill;
     }
 
     /* Те же фильтры, что у фактур плиты разделов: brightness сбивает
