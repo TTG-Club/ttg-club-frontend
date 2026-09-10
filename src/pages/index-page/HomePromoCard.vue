@@ -13,9 +13,21 @@
       card: HomePromoCardContent;
       /** Низкая карточка — для тех, где под заголовком нет описания */
       compact?: boolean;
+      /**
+       * Картинка-баннер вписана по ширине целиком, а не обрезана по высоте
+       * карточки: у вытянутого баннера иначе видна лишь середина
+       */
+      fitImageWidth?: boolean;
+      /**
+       * Картинка обесцвечена, как фактуры плиты разделов, и набирает цвет
+       * только под курсором
+       */
+      muted?: boolean;
     }>(),
     {
       compact: false,
+      fitImageWidth: false,
+      muted: false,
     },
   );
 
@@ -35,7 +47,11 @@
 
   const rootClasses = computed(() => [
     'home-promo',
-    { 'home-promo_compact': props.compact },
+    {
+      'home-promo_compact': props.compact,
+      'home-promo_fit-width': props.fitImageWidth,
+      'home-promo_muted': props.muted,
+    },
   ]);
 </script>
 
@@ -118,6 +134,11 @@
       min-height: 112px;
     }
 
+    // Баннер закрывает только верх карточки, а подпись светлая во всех темах
+    &_fit-width {
+      background-color: var(--bg-image-backdrop);
+    }
+
     &:hover {
       border-color: color-mix(in srgb, var(--primary) 45%, transparent);
       box-shadow:
@@ -151,7 +172,27 @@
       object-fit: cover;
       object-position: center;
 
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition:
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.25s ease;
+    }
+
+    /* Баннер прижат к верху, чтобы не ложиться под подпись; растёт при
+       наведении тоже от верха, иначе край уезжает под скругление */
+    &_fit-width &__image {
+      transform-origin: top;
+      object-fit: contain;
+      object-position: top;
+    }
+
+    /* Те же фильтры, что у фактур плиты разделов: brightness сбивает
+       пересветы обесцвеченной картинки */
+    &_muted &__image {
+      filter: grayscale(1) brightness(0.85);
+    }
+
+    &_muted:hover &__image {
+      filter: grayscale(0) brightness(1);
     }
 
     &__overlay {
