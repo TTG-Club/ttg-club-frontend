@@ -24,6 +24,10 @@ html {
   --max-vh: 100vh;
   --max-content: 1320px;
 
+  // Расширенная колонка главной для широких мониторов: на 1320px она терялась
+  // посреди пустого экрана. Остальные страницы остаются на `--max-content`.
+  --max-content-wide: 1600px;
+
   // Backgrounds
   --bg-img-bestiary-forest: url('/img/bg-forest.webp');
   --bg-img-bard: url('/img/bg-bard.webp');
@@ -33,4 +37,9 @@ html {
   --safe-area-inset-left: env(safe-area-inset-left);
   --safe-area-inset-right: env(safe-area-inset-right);
   --safe-area-inset-bottom: env(safe-area-inset-bottom);
+
+  // 2K и шире: ширину отдаём контенту, а не пустым полям
+  @media (min-width: 2100px) {
+    --max-content-wide: 1880px;
+  }
 }

@@ -10,6 +10,13 @@ html {
 }
 
 html {
+  // Моноширинный шрифт микро-подписей; системные — запас на время загрузки
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono',
+    'Consolas', 'Liberation Mono', monospace;
+}
+
+html {
   --main-line-height: 19px;
   --h1-line-height: 52px;
   --h2-line-height: 38px;

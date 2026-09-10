@@ -1,269 +1,69 @@
 <script setup lang="ts">
-  import { orderBy } from 'lodash-es';
-
-  import { useNavPopover } from '@/shared/composable/useNavPopover';
-  import type { TNavItem } from '@/shared/stores/NavStore';
-  import { useNavStore } from '@/shared/stores/NavStore';
-  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
-  import OurPartners from '@/shared/ui/OurPartners.vue';
-
-  import { useOnlineAdventurersCounter } from '@/features/online-counter/useOnlineAdventurersCounter';
-  import YoutubeBlock from '@/features/youtube/components/YoutubeBlock.vue';
-
-  import VttgPromoCard from './VttgPromoCard.vue';
-
-  const navStore = useNavStore();
-
-  const { navItems, showedNavItems } = storeToRefs(navStore);
-
-  const { isShowSearch } = useNavPopover();
-
-  const {
-    adventurersCount,
-    isAdventurersCounterLoading,
-    refreshAdventurersCounter,
-  } = useOnlineAdventurersCounter();
-
-  const mainNavItems = computed(() => {
-    const items: TNavItem[] = [];
-
-    const iterate = (childList: TNavItem[]) => {
-      for (const child of childList) {
-        if (child.children instanceof Array && child.children.length) {
-          iterate(child.children);
-        }
-
-        if (child.onIndex) {
-          items.push(child);
-        }
-      }
-    };
-
-    iterate(showedNavItems.value);
-
-    return orderBy(items, ['indexOrder'], ['asc']);
-  });
-
-  const tools = computed<TNavItem[]>(() => {
-    const navTools = navItems.value
-      .flatMap((group) => group.children || [])
-      .filter((item): item is TNavItem => !!item?.url?.startsWith('/tools'));
-
-    return orderBy(navTools, ['order'], ['asc']);
-  });
-
-  const openSearchModal = () => {
-    isShowSearch.value = true;
-  };
-
-  const adventurersCountLabel = computed(() =>
-    new Intl.NumberFormat('ru-RU').format(adventurersCount.value),
-  );
-
-  onMounted(() => {
-    refreshAdventurersCounter().then(undefined);
-  });
+  import HomeHero from './HomeHero.vue';
+  import HomePartners from './HomePartners.vue';
+  import HomePromoCard from './HomePromoCard.vue';
+  import HomeSections from './HomeSections.vue';
+  import HomeSocialLinks from './HomeSocialLinks.vue';
+  import HomeVideos from './HomeVideos.vue';
+  import {
+    HOME_DISCORD_BOT_CARD,
+    HOME_TOKENATOR_CARD,
+    HOME_VTTG_CARD,
+  } from './model';
 </script>
 
 <template>
-  <div class="main_page_wrapper">
-    <h1 class="site-name">TTG.Club Oнлайн-справочник</h1>
+  <div class="home">
+    <home-hero />
 
-    <div class="main_block">
-      <div class="header">
-        <p
-          class="search_row_g"
-          @click.left.exact.prevent="openSearchModal"
-        >
-          Нажмите
-          <span class="computer_version"
-            >&nbsp;тут или <span class="key">\</span>&nbsp;</span
-          >для начала поиска
-        </p>
-      </div>
+    <!-- Плита разделов и лента — разные по смыслу полосы, им нужен воздух
+      шире, чем зазор между соседними панелями внутри ленты -->
+    <div class="home__content">
+      <home-sections />
 
-      <div class="card_row">
-        <router-link
-          v-for="(section, key) in mainNavItems"
-          :key="key"
-          :to="{ path: section.url }"
-          class="card"
-        >
-          <div class="title">
-            <h4>{{ section.name }}</h4>
-          </div>
-        </router-link>
-      </div>
+      <!--
+        Ниже xl все обёртки схлопываются в display: contents: блоки становятся
+        прямыми флекс-элементами ленты и выстраиваются одним потоком в порядке
+        order: VTTG → Соцсети → Видео → Токенатор → Discord Bot → Друзья.
 
-      <div class="main-page-grid">
-        <div class="main-page-grid__col left-col">
-          <vttg-promo-card />
-
-          <router-link
-            to="/tools/tokenator"
-            class="block token_library"
-          >
-            <div class="info">
-              <p>Всегда под рукой!</p>
-
-              <h4>Токенатор</h4>
-            </div>
-
-            <div class="bg_img" />
-          </router-link>
-
-          <router-link
-            to="/info/discord_bot"
-            class="block discord_bot"
-          >
-            <div class="info">
-              <p>Весь сайт у вас на сервере!</p>
-
-              <h4>Discord Bot</h4>
-            </div>
-
-            <div class="bg_img" />
-          </router-link>
-
-          <div class="links_block">
-            <h3>Инструменты:</h3>
-
-            <div class="list">
-              <router-link
-                v-for="(tool, key) in tools"
-                :key="key"
-                :to="{ path: tool.url }"
-                class="chips tip w-100"
-              >
-                {{ tool.name }}
-              </router-link>
-            </div>
-          </div>
+        С xl лента делится на две половины, растянутые друг под друга. Слева
+        видео. Справа ряд из двух узких столбцов — Токенатор с Discord Bot и
+        VTTG с соцсетями, ряд `stretch`, поэтому их низы совпадают, — а под ним
+        друзья. Последний блок каждой половины добирает высоту до соседней,
+        чтобы низ ленты шёл одной линией.
+      -->
+      <div class="home__feed">
+        <div class="home__half">
+          <home-videos class="home__videos" />
         </div>
 
-        <div class="main-page-grid__aside">
-          <div class="main-page-grid__row">
-            <div class="main-page-grid__col center-col">
-              <div class="youtube-block">
-                <youtube-block />
-              </div>
+        <div class="home__half">
+          <div class="home__row">
+            <div class="home__stack">
+              <home-promo-card
+                :card="HOME_TOKENATOR_CARD"
+                compact
+                class="home__tokenator"
+              />
+
+              <home-promo-card
+                :card="HOME_DISCORD_BOT_CARD"
+                compact
+                class="home__discord-bot"
+              />
             </div>
 
-            <div class="main-page-grid__col right-col">
-              <div class="stats-banner-row">
-                <div class="online-counter-card">
-                  <div class="online-counter-card__header">
-                    <span class="online-counter-card__indicator" />
+            <div class="home__stack">
+              <home-promo-card
+                :card="HOME_VTTG_CARD"
+                class="home__vttg"
+              />
 
-                    <h3>Статистика онлайн</h3>
-                  </div>
-
-                  <p>
-                    TTG - твой проводник в мир Dungeons & Dragons, созданный
-                    сообществом для сообщества!
-                  </p>
-
-                  <div class="online-counter-card__stats">
-                    <span>Авантюристов</span>
-
-                    <strong
-                      :class="{
-                        'is-loading': isAdventurersCounterLoading,
-                      }"
-                    >
-                      {{ adventurersCountLabel }}
-                    </strong>
-                  </div>
-                </div>
-
-                <a
-                  href="//new.ttg.club"
-                  class="banner"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    class="banner__bg"
-                    alt="Баннер 2024 DnD"
-                    src="/img/banner-2024.webp"
-                  />
-
-                  <span class="banner__badge">Новинка</span>
-
-                  <div class="banner__content">
-                    <span class="banner__title">Редакция D&D 2024</span>
-
-                    <span class="banner__link">
-                      Перейти
-                      <span class="banner__arrow">→</span>
-                    </span>
-                  </div>
-                </a>
-              </div>
-
-              <div class="index-social-links">
-                <a
-                  href="https://t.me/ttgclubnews"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="index-social-btn is-telegram"
-                >
-                  <svg-icon
-                    icon="telegram"
-                    :size="24"
-                  />
-
-                  <span>Telegram</span>
-                </a>
-
-                <a
-                  href="https://discord.gg/JqFKMKRtxv"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="index-social-btn is-discord"
-                >
-                  <svg-icon
-                    icon="discord"
-                    :size="24"
-                  />
-
-                  <span>Discord</span>
-                </a>
-
-                <a
-                  href="https://vk.com/ttg.club"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="index-social-btn is-vk"
-                >
-                  <svg-icon
-                    icon="vk"
-                    :size="24"
-                  />
-
-                  <span>ВКонтакте</span>
-                </a>
-
-                <a
-                  href="https://boosty.to/dnd5club"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="index-social-btn is-boosty"
-                >
-                  <svg-icon
-                    icon="boosty"
-                    :size="24"
-                  />
-
-                  <span>Boosty</span>
-                </a>
-              </div>
+              <home-social-links class="home__social" />
             </div>
           </div>
 
-          <div class="main-page-grid__partners">
-            <our-partners />
-          </div>
+          <home-partners class="home__partners" />
         </div>
       </div>
     </div>
@@ -271,394 +71,112 @@
 </template>
 
 <style lang="scss" scoped>
-  .site-name {
-    overflow: hidden;
-    height: 0;
-    opacity: 0;
-  }
-
-  .stats-banner-row {
-    display: flex;
-    gap: 16px;
-    align-items: stretch;
-
-    > * {
-      flex: 1 1 0;
-      min-width: 0;
-    }
-
-    .banner {
-      height: auto;
-      min-height: 100px;
-    }
-
-    @include media-max($sm) {
-      flex-direction: column;
-
-      .banner {
-        height: 140px;
-      }
-    }
-  }
-
-  .banner {
-    position: relative;
-
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-
-    width: 100%;
-    height: 100px;
-
-    background:
-      radial-gradient(
-          circle at 100% 100%,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        0 0 / 12px 12px no-repeat,
-      radial-gradient(
-          circle at 0 100%,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        100% 0 / 12px 12px no-repeat,
-      radial-gradient(
-          circle at 100% 0,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        0% 100% / 12px 12px no-repeat,
-      radial-gradient(
-          circle at 0 0,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        100% 100% / 12px 12px no-repeat,
-      linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
-        calc(100% - 2px) calc(100% - 24px) no-repeat,
-      linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
-        calc(100% - 24px) calc(100% - 2px) no-repeat,
-      linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
-    border-radius: 12px;
-    box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
-
-    @include media-min($md) {
-      height: 100%;
-    }
-
-    &::after {
-      content: '';
-
-      position: absolute;
-      z-index: 1;
-      inset: 0;
-
-      background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.9) 0%,
-        rgba(0, 0, 0, 0.78) 45%,
-        rgba(0, 0, 0, 0.68) 100%
-      );
-
-      transition: background 0.3s ease;
-    }
-
-    &:hover {
-      &::after {
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.84) 0%,
-          rgba(0, 0, 0, 0.68) 45%,
-          rgba(0, 0, 0, 0.55) 100%
-        );
-      }
-
-      .banner__bg {
-        transform: scale(1.08);
-      }
-
-      .banner__arrow {
-        transform: translateX(4px);
-      }
-    }
-
-    &__bg {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      transform: scale(1);
-
-      width: 100%;
-      height: 100%;
-
-      object-fit: cover;
-      object-position: center;
-
-      transition: transform 0.6s ease;
-    }
-
-    &__badge {
-      position: absolute;
-      z-index: 2;
-      top: 12px;
-      left: 12px;
-
-      display: inline-flex;
-      align-items: center;
-
-      padding: 3px 10px;
-
-      font-family: 'Open Sans', sans-serif;
-      font-size: calc(var(--main-font-size) - 4px);
-      font-weight: 600;
-      color: var(--text-btn-color);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-
-      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-      border-radius: 6px;
-      box-shadow: 0 0 12px rgba(53, 103, 201, 0.5);
-    }
-
+  .home {
     &__content {
-      position: relative;
-      z-index: 2;
-
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 24px;
 
-      box-sizing: border-box;
       width: 100%;
-      padding: 14px 16px;
+      max-width: var(--max-content);
+      margin: 0 auto;
+      padding-block: 24px 32px;
+
+      @include media-min($lg) {
+        gap: 32px;
+        padding-top: 32px;
+      }
+
+      // На широких мониторах колонка растёт, и ширина уходит в контент, а не
+      // в пустые поля
+      @include media-min($xxl) {
+        max-width: var(--max-content-wide);
+      }
     }
 
-    &__title {
-      font-size: var(--h4-font-size);
-      font-weight: 700;
-      line-height: 1.2;
-
-      // Баннер всегда на тёмной картинке, поэтому цвет фиксированный,
-      // а не тема-зависимый (иначе в светлой теме текст становится тёмным).
-      color: #fff;
-      text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.8),
-        0 0 10px rgba(0, 0, 0, 0.5);
-
-      @include media-min($md) {
-        font-size: calc(var(--h4-font-size) - 2px);
-      }
+    &__feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
 
       @include media-min($xl) {
-        font-size: var(--h4-font-size);
+        flex-direction: row;
+        align-items: stretch;
       }
     }
 
-    &__link {
-      display: inline-flex;
-      gap: 6px;
-      align-items: center;
-
-      font-size: calc(var(--main-font-size) - 1px);
-      font-weight: 600;
-      color: #9db8ff;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    &__half,
+    &__row,
+    &__stack {
+      display: contents;
     }
 
-    &__arrow {
-      display: inline-block;
-      transition: transform 0.3s ease;
-    }
-  }
-
-  .online-counter-card {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    padding: 16px;
-
-    color: var(--text-color);
-
-    background:
-      radial-gradient(
-          circle at 100% 100%,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        0 0 / 12px 12px no-repeat,
-      radial-gradient(
-          circle at 0 100%,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        100% 0 / 12px 12px no-repeat,
-      radial-gradient(
-          circle at 100% 0,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        0% 100% / 12px 12px no-repeat,
-      radial-gradient(
-          circle at 0 0,
-          var(--bg-secondary) 0,
-          var(--bg-secondary) 11px,
-          transparent 11px
-        )
-        100% 100% / 12px 12px no-repeat,
-      linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
-        calc(100% - 2px) calc(100% - 24px) no-repeat,
-      linear-gradient(var(--bg-secondary), var(--bg-secondary)) 50% 50% /
-        calc(100% - 24px) calc(100% - 2px) no-repeat,
-      linear-gradient(135deg, var(--border-gradient) 0%, var(--border) 100%);
-    border-radius: 12px;
-    box-shadow: 0 0.625rem 0.75rem 0 var(--card-shadow);
-
-    &__header {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-
-      h3 {
-        margin: 0;
-
-        font-family: 'Open Sans', sans-serif;
-        font-size: var(--main-font-size);
-        font-weight: 600;
-        color: var(--success);
-      }
+    &__vttg {
+      order: 0;
     }
 
-    &__indicator {
-      width: 18px;
-      height: 18px;
-
-      background: linear-gradient(135deg, var(--success), var(--success-hover));
-      border-radius: 5px;
-      box-shadow: 0 0 10px var(--success);
-
-      animation: online-counter-glow 2s ease-in-out infinite;
+    &__social {
+      order: 1;
     }
 
-    p {
-      margin: 0;
-      font-size: calc(var(--main-font-size) - 2px);
-      line-height: calc(var(--main-line-height) - 2px);
+    &__videos {
+      order: 2;
     }
 
-    &__stats {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: center;
-
-      padding-top: 4px;
-
-      span {
-        font-size: calc(var(--main-font-size) - 2px);
-        font-weight: 600;
-        color: var(--text-g-color);
-        text-transform: uppercase;
-      }
-
-      strong {
-        font-size: 32px;
-        line-height: 36px;
-        color: var(--primary);
-        transition: opacity 0.2s;
-
-        &.is-loading {
-          opacity: 0.55;
-        }
-      }
-    }
-  }
-
-  @keyframes online-counter-glow {
-    0%,
-    100% {
-      box-shadow: 0 0 8px var(--success);
+    &__tokenator {
+      order: 3;
     }
 
-    50% {
-      box-shadow: 0 0 16px var(--success-hover);
+    &__discord-bot {
+      order: 4;
     }
-  }
 
-  .index-social-links {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    gap: 8px;
+    &__partners {
+      order: 5;
+    }
 
-    .index-social-btn {
-      display: flex;
-      flex: 1 1 auto;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
+    @include media-min($xl) {
+      &__half {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: 12px;
 
-      width: 100%;
-      min-height: 48px;
-
-      font-size: var(--main-font-size);
-      font-weight: 500;
-      color: var(--text-color-title);
-      text-decoration: none;
-
-      opacity: 0.7;
-      background-color: transparent;
-      border: 1px solid transparent;
-      border-radius: 8px;
-
-      @include css-anim();
-
-      &:deep(svg) {
-        color: var(--text-btn-color);
-        fill: var(--text-btn-color);
-        transition: all 0.2s ease;
+        min-width: 0;
       }
 
-      &:hover {
-        opacity: 1;
+      &__row {
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
       }
 
-      &.is-telegram {
-        border-color: var(--telegram-base);
-        &:hover {
-          background-color: rgba(36, 161, 222, 0.1);
-        }
+      &__stack {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: 12px;
+
+        min-width: 0;
       }
 
-      &.is-discord {
-        border-color: var(--discord-base);
-        &:hover {
-          background-color: rgba(88, 101, 242, 0.1);
-        }
+      &__vttg,
+      &__social,
+      &__videos,
+      &__tokenator,
+      &__discord-bot,
+      &__partners {
+        order: 0;
       }
 
-      &.is-vk {
-        border-color: var(--vk-base);
-        &:hover {
-          background-color: rgba(0, 119, 255, 0.1);
-        }
-      }
-
-      &.is-boosty {
-        border-color: var(--boosty-base);
-        &:hover {
-          background-color: rgba(241, 95, 44, 0.1);
-        }
+      // Карточки столбцов делят высоту ряда поровну, а последние блоки половин
+      // добирают высоту до соседней половины
+      &__tokenator,
+      &__discord-bot,
+      &__vttg,
+      &__videos,
+      &__partners {
+        flex: 1 1 auto;
       }
     }
   }
