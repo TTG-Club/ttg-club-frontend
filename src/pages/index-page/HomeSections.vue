@@ -63,7 +63,7 @@
     <home-promo-card
       :card="HOME_EDITION_CARD"
       compact
-      fit-image-width
+      stretch-image
       muted
       class="home-sections__edition"
     />
