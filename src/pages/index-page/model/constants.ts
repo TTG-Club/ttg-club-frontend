@@ -1,3 +1,4 @@
+import { TOKENATOR_URL } from '@/shared/stores/NavStore';
 import type { IOrderItem } from '@/shared/types/BaseApiFields';
 
 import type { HomePromoCardContent, HomeSocialLink } from './types';
@@ -83,18 +84,22 @@ export const HOME_SEARCH_SHORTCUT = '\\';
 /** Подпись ленты инструментов (используется как aria-label навигации) */
 export const HOME_TOOLS_LABEL = 'Инструменты';
 
-/** Инструментами считаются пункты меню с адресом внутри этого раздела */
+/**
+ * Группа инструментов в меню — та, где есть пункты с адресом внутри этого
+ * раздела. Переехавшие на новый сайт инструменты лежат в той же группе, но
+ * адрес у них внешний.
+ */
 export const HOME_TOOLS_PATH_PREFIX = '/tools';
 
 /** Иконки инструментов по адресу; неизвестный инструмент получит общую */
 export const HOME_TOOL_ICONS: Partial<Record<string, string>> = {
+  [TOKENATOR_URL]: 'home/photo-circle',
   '/tools/ability-calc': 'home/calculator',
   '/tools/trader': 'home/coins',
   '/tools/encounters': 'home/dice-5',
   '/tools/treasury': 'home/diamond',
   '/tools/wildmagic': 'home/bolt',
   '/tools/madness': 'home/brain',
-  '/tools/tokenator': 'home/photo-circle',
   '/tools/names': 'home/signature',
   '/tools/tavern': 'home/beer',
   '/tools/initiative': 'home/swords',
@@ -161,7 +166,8 @@ export const HOME_TOKENATOR_CARD: HomePromoCardContent = {
   eyebrow: 'Всегда под рукой!',
   title: 'Токенатор',
   image: '/img/bg_token_library.webp?v=1',
-  to: '/tools/tokenator',
+  to: TOKENATOR_URL,
+  external: true,
 };
 
 export const HOME_DISCORD_BOT_CARD: HomePromoCardContent = {

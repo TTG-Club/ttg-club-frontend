@@ -1,12 +1,27 @@
 <script setup lang="ts">
+  import { RouterLink } from 'vue-router';
+
   import { useNavStore } from '@/shared/stores/NavStore';
   import { SvgIcon } from '@/shared/ui/icons/svg-icon';
 
   import { getHomeTools, HOME_TOOLS_LABEL } from './model';
 
+  import type { HomeNavLink } from './model';
+
   const { navItems } = storeToRefs(useNavStore());
 
   const tools = computed(() => getHomeTools(navItems.value));
+
+  /**
+   * Атрибуты ссылки чипа: переехавший на новый сайт инструмент открывается в
+   * новой вкладке, здешний — роутером.
+   * @param tool - инструмент ленты
+   */
+  function getLinkAttributes(tool: HomeNavLink) {
+    return tool.external
+      ? { href: tool.url, target: '_blank', rel: 'noopener noreferrer' }
+      : { to: { path: tool.url } };
+  }
 </script>
 
 <template>
@@ -19,10 +34,11 @@
     :aria-label="HOME_TOOLS_LABEL"
     class="home-tools"
   >
-    <router-link
+    <component
+      :is="tool.external ? 'a' : RouterLink"
       v-for="tool in tools"
       :key="tool.url"
-      :to="{ path: tool.url }"
+      v-bind="getLinkAttributes(tool)"
       class="home-tools__chip"
     >
       <svg-icon
@@ -32,7 +48,7 @@
       />
 
       {{ tool.name }}
-    </router-link>
+    </component>
   </nav>
 </template>
 

@@ -30,6 +30,8 @@ export type HomeNavLink = {
   name: string;
   url: string;
   icon: string;
+  /** Внешняя ссылка открывается в новой вкладке */
+  external?: boolean;
 };
 
 /** Плитка раздела: к ссылке добавлен кадр фактуры из спрайта */

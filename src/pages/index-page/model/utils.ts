@@ -79,22 +79,32 @@ export function getHomeSections(
 }
 
 /**
- * Инструменты для ленты под поиском: пункты групп меню с адресом внутри
- * раздела инструментов, в порядке меню.
+ * Проверяет, что пункт меню ведёт внутрь раздела инструментов.
+ * @param navItem - пункт меню
+ */
+function isToolPath(navItem: TNavItem): boolean {
+  return hasUrl(navItem) && navItem.url.startsWith(HOME_TOOLS_PATH_PREFIX);
+}
+
+/**
+ * Инструменты для ленты под поиском: пункты группы инструментов в порядке
+ * меню — и здешние, и переехавшие на новый сайт. Старые версии переехавших
+ * инструментов остаются только в меню.
  * @param navItems - группы меню сайта
  */
 export function getHomeTools(navItems: Array<TNavItem>): Array<HomeNavLink> {
   const tools = navItems
+    .filter((group) => group.children?.some(isToolPath))
     .flatMap((group) => group.children ?? [])
     .filter(
-      (navItem): navItem is LinkedNavItem =>
-        hasUrl(navItem) && navItem.url.startsWith(HOME_TOOLS_PATH_PREFIX),
+      (navItem): navItem is LinkedNavItem => hasUrl(navItem) && !navItem.legacy,
     );
 
   return orderBy(tools, ['order'], ['asc']).map((tool) => ({
     name: tool.name,
     url: tool.url,
     icon: HOME_TOOL_ICONS[tool.url] ?? HOME_TOOL_DEFAULT_ICON,
+    external: tool.external,
   }));
 }
 
