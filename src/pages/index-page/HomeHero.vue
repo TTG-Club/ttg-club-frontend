@@ -64,6 +64,10 @@
     margin-inline: -16px;
     padding-inline: 16px;
 
+    /* Фон страницы с картинкой в правом нижнем углу (`#dnd5club::after`)
+       закреплён на экране. Шапка его закрывает: картинка обрезается по её
+       нижней границе, а не просвечивает под картой */
+    background-color: var(--bg-main);
     border-bottom: 1px solid var(--border);
 
     @include media-min($xl) {
