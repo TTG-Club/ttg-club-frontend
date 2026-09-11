@@ -8,18 +8,20 @@
   <!--
     Шапка главной идёт во всю ширину контейнера страницы: колонка контента
     начинается только ниже, в сетке блоков. `isolate` держит декоративные слои
-    внутри шапки.
+    — карту и свечение — внутри шапки, под её содержимым.
   -->
   <section class="home-hero">
     <div
       aria-hidden="true"
       class="home-hero__decor"
     >
+      <!-- Карта деревни с высоты птичьего полёта: рисунок под каждую тему
+        лежит в `public/img/<тема>/hero-map.svg`, выбирает его переменная
+        `--hero-map-image` -->
+      <div class="home-hero__map" />
+
       <!-- Свечение по центру — «очаг», к которому стягивается взгляд -->
       <div class="home-hero__glow" />
-
-      <!-- Волосяная клетка: даёт фактуру пустому месту по краям -->
-      <div class="home-hero__grid" />
     </div>
 
     <div class="home-hero__inner">
@@ -47,13 +49,17 @@
 </template>
 
 <style lang="scss" scoped>
+  /* Уже этой ширины карта не сжимается: края уходят за экран, а дома
+     остаются различимыми */
+  $map-min-width: 1600px;
+
   .home-hero {
     isolation: isolate;
     position: relative;
 
     overflow: hidden;
 
-    /* Шапка выходит на поля контейнера (#container), чтобы свечение и клетка
+    /* Шапка выходит на поля контейнера (#container), чтобы свечение и карта
        тянулись от края до края, а содержимое осталось в колонке */
     margin-inline: -16px;
     padding-inline: 16px;
@@ -70,6 +76,51 @@
       position: absolute;
       z-index: -1;
       inset: 0;
+    }
+
+    /* Масштаб карты задаёт только ширина шапки, не высота: холст с запасом
+       по высоте, поэтому шапку он закрывает и так */
+    &__map {
+      position: absolute;
+      inset: 0;
+
+      opacity: var(--hero-map-opacity);
+      background: var(--hero-map-image) center / max(100%, $map-min-width) auto
+        no-repeat;
+
+      -webkit-mask-composite: source-in;
+      mask-composite: intersect;
+
+      /* Под заголовком и поиском карта почти растворяется, по бокам видна
+         целиком; сверху и снизу тает, чтобы не упираться в края шапки */
+      -webkit-mask-image: linear-gradient(
+          to right,
+          #000 12%,
+          rgb(0 0 0 / 22%) 32%,
+          rgb(0 0 0 / 22%) 68%,
+          #000 88%
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          #000 15%,
+          #000 85%,
+          transparent 100%
+        );
+      mask-image: linear-gradient(
+          to right,
+          #000 12%,
+          rgb(0 0 0 / 22%) 32%,
+          rgb(0 0 0 / 22%) 68%,
+          #000 88%
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          #000 15%,
+          #000 85%,
+          transparent 100%
+        );
     }
 
     /* Слои свечения прозрачны целиком, а не цветом: так оттенок берётся прямо
@@ -102,41 +153,6 @@
           transparent 75%
         );
       }
-    }
-
-    &__grid {
-      position: absolute;
-      inset: 0;
-
-      /* Клетка видна только по краям — под текстом она мешала бы читать */
-      opacity: 0.75;
-
-      /* Два повтора с одним шагом дают квадратную клетку, а не полоски */
-      background-image: repeating-linear-gradient(
-          to right,
-          var(--border) 0 1px,
-          transparent 1px 96px
-        ),
-        repeating-linear-gradient(
-          to bottom,
-          var(--border) 0 1px,
-          transparent 1px 96px
-        );
-
-      -webkit-mask-image: linear-gradient(
-        to right,
-        #000 0%,
-        transparent 24%,
-        transparent 76%,
-        #000 100%
-      );
-      mask-image: linear-gradient(
-        to right,
-        #000 0%,
-        transparent 24%,
-        transparent 76%,
-        #000 100%
-      );
     }
 
     &__inner {

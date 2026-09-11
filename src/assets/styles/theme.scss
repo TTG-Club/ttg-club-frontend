@@ -17,6 +17,9 @@
     // Background image
     --bg-img: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-main.webp');
     --bg-token: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-token.webp');
+
+    // Карта деревни в шапке главной: рисунок в палитре темы
+    --hero-map-image: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/hero-map.svg');
   }
 }
 

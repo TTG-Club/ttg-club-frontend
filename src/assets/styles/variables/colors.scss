@@ -79,7 +79,9 @@ $theme-dark: (
   'logo-section-5': #25498c,
   'logo-section-6': #173f88,
   'logo-section-7': #1c386b,
-  'logo-section-8': #103579
+  'logo-section-8': #103579,
+  // Бледность карты деревни в шапке главной (--hero-map-image)
+  'hero-map-opacity': 0.6
 );
 
 $theme-light: (
@@ -161,7 +163,9 @@ $theme-light: (
   'logo-section-5': #b34536,
   'logo-section-6': #8e3b2b,
   'logo-section-7': #813120,
-  'logo-section-8': #6e2a1c
+  'logo-section-8': #6e2a1c,
+  // Бледность карты деревни в шапке главной (--hero-map-image)
+  'hero-map-opacity': 0.55
 );
 
 $base-colors: (
