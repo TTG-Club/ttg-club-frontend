@@ -172,8 +172,10 @@
       max-width: 896px;
       margin: 0;
 
+      /* Кегль на всех ширинах примерно на четверть мельче, чем на
+         new.ttg.club, — при переносе раскладки его не возвращать */
       font-family: 'Open Sans', sans-serif;
-      font-size: 30px;
+      font-size: 24px;
       font-weight: 600;
       line-height: 1.25;
       text-align: center;
@@ -181,24 +183,21 @@
       letter-spacing: -0.025em;
 
       @include media-min($sm) {
-        font-size: 36px;
+        font-size: 28px;
       }
 
       @include media-min($xl) {
-        font-size: 40px;
+        font-size: 32px;
       }
 
-      // Колонка заголовка растёт вместе с кеглем, иначе подзаголовок
-      // переносится на вторую строку
       @media (min-width: 1700px) {
-        max-width: 1024px;
-        font-size: 48px;
+        font-size: 36px;
       }
 
       /* На 360px и уже заголовок ужат: в полный размер он занимал пять строк
          и выталкивал поиск за первый экран */
       @media (max-width: 360px) {
-        font-size: 24px;
+        font-size: 20px;
       }
     }
 
@@ -212,7 +211,7 @@
       color: var(--text-g-color);
 
       @media (max-width: 360px) {
-        font-size: 18px;
+        font-size: 16px;
       }
     }
   }
