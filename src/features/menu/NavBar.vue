@@ -109,21 +109,16 @@
 
   .navbar__header_left {
     .navbar__logo {
-      width: 52px;
-      height: 36px;
-      margin: 0 8px 0 0;
-      padding: 0 16px 0 0;
-
-      border-right: 1px solid var(--border);
-      border-bottom: 0;
+      display: none;
 
       @include media-min($md) {
+        display: block;
+
         width: 44px;
         height: 60px;
         margin: 0 0 8px 0;
         padding: 0 0 24px 0;
 
-        border-right: 0;
         border-bottom: 1px solid var(--border);
       }
     }
