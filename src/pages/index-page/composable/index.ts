@@ -1,0 +1,1 @@
+export { useSearchHintTypewriter } from './useSearchHintTypewriter';

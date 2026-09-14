@@ -79,7 +79,9 @@ $theme-dark: (
   'logo-section-5': #25498c,
   'logo-section-6': #173f88,
   'logo-section-7': #1c386b,
-  'logo-section-8': #103579
+  'logo-section-8': #103579,
+  // Бледность карты деревни в шапке главной (--hero-map-image)
+  'hero-map-opacity': 0.6
 );
 
 $theme-light: (
@@ -161,7 +163,9 @@ $theme-light: (
   'logo-section-5': #b34536,
   'logo-section-6': #8e3b2b,
   'logo-section-7': #813120,
-  'logo-section-8': #6e2a1c
+  'logo-section-8': #6e2a1c,
+  // Бледность карты деревни в шапке главной (--hero-map-image)
+  'hero-map-opacity': 0.55
 );
 
 $base-colors: (
@@ -184,7 +188,19 @@ $base-colors: (
   'error': #f56c6c,
   'error-hover': darken(#f56c6c, 7%),
   'info': #909399,
-  'info-hover': darken(#909399, 7%)
+  'info-hover': darken(#909399, 7%),
+  // Затемнение картинки под светлым текстом (промо-карточки главной): текст на
+  // картинке светлый во всех темах, поэтому и затемнение одно на все темы.
+  // Горизонтальный слой держит контраст под текстом, вертикальный затемняет низ.
+  'bg-image-overlay': (
+    linear-gradient(
+      to right,
+      rgb(0 0 0 / 44%) 0%,
+      rgb(0 0 0 / 31%) 65%,
+      rgb(0 0 0 / 15%) 100%
+    ),
+    linear-gradient(to top, rgb(0 0 0 / 41%) 0%, rgb(0 0 0 / 7.5%) 100%)
+  )
 );
 
 $theme-colors: (

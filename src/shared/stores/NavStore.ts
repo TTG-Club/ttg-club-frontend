@@ -13,6 +13,8 @@ export type TNavItem = {
   order: number;
   onIndex?: boolean;
   indexOrder?: number;
+  /** Старая версия переехавшего раздела: есть в меню, но не на главной */
+  legacy?: boolean;
 };
 
 export type TPartner = {
@@ -42,6 +44,32 @@ const VTTG_NAV_SECTION: TNavItem = {
     },
   ],
 };
+
+/** Токенатор переехал на новый сайт */
+export const TOKENATOR_URL = 'https://new.ttg.club/tokenator';
+
+/** Здешний токенатор — теперь его старая версия */
+const TOKENATOR_LEGACY_URL = '/tools/tokenator';
+
+/**
+ * Пункт токенатора из меню бэкенда ведёт на новый сайт, а сразу за ним встаёт
+ * ссылка на здешнюю старую версию. Порядок у обоих тот же, что у исходного
+ * пункта: сортировка меню устойчивая, и они остаются рядом.
+ * @param navItems - группы меню с бэкенда
+ */
+function withNewTokenator(navItems: Array<TNavItem>): Array<TNavItem> {
+  return navItems.map((group) => ({
+    ...group,
+    children: group.children?.flatMap((link) =>
+      link.url === TOKENATOR_LEGACY_URL
+        ? [
+            { ...link, url: TOKENATOR_URL, external: true },
+            { ...link, name: `${link.name} (старая версия)`, legacy: true },
+          ]
+        : [link],
+    ),
+  }));
+}
 
 export const useNavStore = defineStore('NavStore', () => {
   /* Menu */
@@ -87,7 +115,7 @@ export const useNavStore = defineStore('NavStore', () => {
       });
 
       if (resp.status === 200) {
-        navItems.value = [...resp.data, VTTG_NAV_SECTION];
+        navItems.value = [...withNewTokenator(resp.data), VTTG_NAV_SECTION];
 
         return Promise.resolve();
       }
