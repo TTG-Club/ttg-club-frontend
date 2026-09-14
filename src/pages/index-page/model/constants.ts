@@ -36,6 +36,20 @@ export const HOME_HERO_SUBTITLE = 'Создан сообществом\u00A0— 
 export const HOME_HERO_MOTION_QUERY =
   '(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)';
 
+/**
+ * Ключ localStorage: посетитель выключил повозку и дым кнопкой в углу шапки.
+ * По умолчанию живой фон включён.
+ */
+export const HOME_HERO_MOTION_STORAGE_KEY = 'home:hero-motion';
+
+export const HOME_HERO_MOTION_PLAY_ICON = 'media/play';
+
+export const HOME_HERO_MOTION_PAUSE_ICON = 'media/pause';
+
+export const HOME_HERO_MOTION_PLAY_LABEL = 'Запустить анимацию фона';
+
+export const HOME_HERO_MOTION_PAUSE_LABEL = 'Остановить анимацию фона';
+
 /** Холст карты — `viewBox` рисунка `public/img/<тема>/hero-map.svg` */
 export const HOME_HERO_MAP_VIEWBOX: HomeMapPoint & HomeMapSize = {
   x: 0,

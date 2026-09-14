@@ -15,6 +15,15 @@ export type HomePromoCardContent = {
   external?: boolean;
 };
 
+/**
+ * Повозка и дым на карте шапки:
+ * - `static` — анимации нет вовсе (телефон, «меньше движения» или посетитель
+ *   выключил её ещё до захода на страницу): повозка стоит, дыма нет;
+ * - `running` — едет и дымит;
+ * - `paused` — замерла на месте: выключена кнопкой или шапка за экраном.
+ */
+export type HomeHeroMotionState = 'static' | 'running' | 'paused';
+
 /** Точка на карте деревни в шапке, в единицах карты */
 export type HomeMapPoint = {
   x: number;

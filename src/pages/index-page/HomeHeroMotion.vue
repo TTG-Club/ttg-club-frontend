@@ -8,7 +8,6 @@
     HOME_HERO_HORSE_PARKING,
     HOME_HERO_HORSE_SIZE,
     HOME_HERO_MAP_VIEWBOX,
-    HOME_HERO_MOTION_QUERY,
     HOME_HERO_SMOKE_PUFF_SIZE,
     HOME_HERO_WAGON_LAP,
     HOME_HERO_WAGON_PARKING,
@@ -16,12 +15,17 @@
     HOME_HERO_WAGON_SIZE,
   } from './model';
 
-  import type { HomeMapPlacement, HomeMapPoint, HomeMapSize } from './model';
+  import type {
+    HomeHeroMotionState,
+    HomeMapPlacement,
+    HomeMapPoint,
+    HomeMapSize,
+  } from './model';
   import type { CSSProperties } from 'vue';
 
   const props = defineProps<{
-    /** Шапка за экраном — повозка замирает */
-    paused: boolean;
+    /** Едет, замерла или анимации нет вовсе (см. `useHomeHeroMotion`) */
+    state: HomeHeroMotionState;
   }>();
 
   /** Клубов на трубу: они идут друг за другом со сдвигом в треть цикла */
@@ -39,21 +43,23 @@
     () => canvasWidth.value / HOME_HERO_MAP_VIEWBOX.width,
   );
 
-  const isMotionAllowed = useMediaQuery(HOME_HERO_MOTION_QUERY);
+  const isAnimated = computed(() => props.state !== 'static');
+
+  const isPaused = computed(() => props.state === 'paused');
 
   useHomeMapTravel(wagon, route, {
     size: HOME_HERO_WAGON_SIZE,
     duration: HOME_HERO_WAGON_LAP,
-    enabled: isMotionAllowed,
-    paused: () => props.paused,
+    enabled: isAnimated,
+    paused: isPaused,
   });
 
   useHomeMapTravel(horse, route, {
     size: HOME_HERO_HORSE_SIZE,
     lead: HOME_HERO_HORSE_LEAD,
     duration: HOME_HERO_WAGON_LAP,
-    enabled: isMotionAllowed,
-    paused: () => props.paused,
+    enabled: isAnimated,
+    paused: isPaused,
   });
 
   const canvasViewBox = Object.values(HOME_HERO_MAP_VIEWBOX).join(' ');
@@ -110,8 +116,8 @@
   -->
   <div
     ref="canvas"
+    :class="['home-hero-motion', { 'home-hero-motion_paused': isPaused }]"
     aria-hidden="true"
-    class="home-hero-motion"
   >
     <!-- Дорога только для расчёта ключевых кадров, на экране её нет -->
     <svg
@@ -230,26 +236,30 @@
         </svg>
       </div>
 
-      <div
-        v-for="chimney in HOME_HERO_CHIMNEYS"
-        :key="`${chimney.x}:${chimney.y}`"
-        :style="getChimneyStyle(chimney)"
-        class="home-hero-motion__chimney"
-      >
-        <!-- Анимируется обёртка, а не сам <svg>: сдвиг и масштаб
-          SVG-элемента браузер композитору не отдаёт -->
-        <span
-          v-for="puff in PUFFS_PER_CHIMNEY"
-          :key="puff"
-          class="home-hero-motion__puff"
+      <!-- Без анимации дыма нет вовсе: застывший клуб над трубой смотрится
+        пятном -->
+      <template v-if="isAnimated">
+        <div
+          v-for="chimney in HOME_HERO_CHIMNEYS"
+          :key="`${chimney.x}:${chimney.y}`"
+          :style="getChimneyStyle(chimney)"
+          class="home-hero-motion__chimney"
         >
-          <svg :viewBox="getFigureViewBox(HOME_HERO_SMOKE_PUFF_SIZE)">
-            <path
-              d="M-8 3C-15 1-13-7-7-8C-9-15 3-18 7-11C15-13 20-3 13 2C9 8-2 8-8 3Z"
-            />
-          </svg>
-        </span>
-      </div>
+          <!-- Анимируется обёртка, а не сам <svg>: сдвиг и масштаб
+            SVG-элемента браузер композитору не отдаёт -->
+          <span
+            v-for="puff in PUFFS_PER_CHIMNEY"
+            :key="puff"
+            class="home-hero-motion__puff"
+          >
+            <svg :viewBox="getFigureViewBox(HOME_HERO_SMOKE_PUFF_SIZE)">
+              <path
+                d="M-8 3C-15 1-13-7-7-8C-9-15 3-18 7-11C15-13 20-3 13 2C9 8-2 8-8 3Z"
+              />
+            </svg>
+          </span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -347,6 +357,7 @@
 
     /* Без анимации дыма нет вовсе: застывший клуб над трубой смотрится
        пятном */
+    /* Клубы есть в разметке только при анимации (`isAnimated`) */
     &__puff {
       position: absolute;
       inset: 0;
@@ -357,21 +368,19 @@
       stroke: color-mix(in oklab, $paper, $ink 25%);
       stroke-width: 0.8;
 
-      /* Дымят только на устройствах с мышью (см. `decor-motion`), а когда
-         шапка уходит с экрана, замирают: `--home-hero-play-state` ставит
-         HomeHero */
-      @include decor-motion {
-        animation: home-hero-smoke-drift 8s linear infinite
-          var(--home-hero-play-state, running);
+      animation: home-hero-smoke-drift 8s linear infinite;
 
-        &:nth-child(2) {
-          animation-delay: -2.67s;
-        }
-
-        &:nth-child(3) {
-          animation-delay: -5.33s;
-        }
+      &:nth-child(2) {
+        animation-delay: -2.67s;
       }
+
+      &:nth-child(3) {
+        animation-delay: -5.33s;
+      }
+    }
+
+    &_paused &__puff {
+      animation-play-state: paused;
     }
   }
 

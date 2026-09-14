@@ -1,14 +1,36 @@
 <script setup lang="ts">
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
+
+  import { useHomeHeroMotion } from './composable';
   import HomeHeroMotion from './HomeHeroMotion.vue';
   import HomeSearch from './HomeSearch.vue';
   import HomeTools from './HomeTools.vue';
-  import { HOME_HERO_SUBTITLE, HOME_HERO_TITLE } from './model';
+  import {
+    HOME_HERO_MOTION_PAUSE_ICON,
+    HOME_HERO_MOTION_PAUSE_LABEL,
+    HOME_HERO_MOTION_PLAY_ICON,
+    HOME_HERO_MOTION_PLAY_LABEL,
+    HOME_HERO_SUBTITLE,
+    HOME_HERO_TITLE,
+  } from './model';
 
   const hero = ref<HTMLElement>();
 
   // Пока шапки не видно, её бесконечные анимации (повозка, дым, свет по
   // рамке поиска) стоят: браузер не считает кадры ради того, что за экраном
-  const isHeroVisible = useElementVisibility(hero);
+  const {
+    state: motionState,
+    isSupported: isMotionSupported,
+    isEnabled: isMotionEnabled,
+    isVisible: isHeroVisible,
+    toggle: toggleMotion,
+  } = useHomeHeroMotion(hero);
+
+  const motionToggleLabel = computed(() =>
+    isMotionEnabled.value
+      ? HOME_HERO_MOTION_PAUSE_LABEL
+      : HOME_HERO_MOTION_PLAY_LABEL,
+  );
 </script>
 
 <template>
@@ -33,7 +55,7 @@
         <div class="home-hero__map-image" />
 
         <home-hero-motion
-          :paused="!isHeroVisible"
+          :state="motionState"
           class="home-hero__map-motion"
         />
       </div>
@@ -63,6 +85,26 @@
 
       <home-tools />
     </div>
+
+    <!-- Пауза и запуск повозки с дымом. На телефонах анимации нет, и кнопки
+      тоже -->
+    <button
+      v-if="isMotionSupported"
+      :aria-label="motionToggleLabel"
+      :title="motionToggleLabel"
+      class="home-hero__motion-toggle"
+      type="button"
+      @click.left.exact.prevent="toggleMotion"
+    >
+      <svg-icon
+        :icon="
+          isMotionEnabled
+            ? HOME_HERO_MOTION_PAUSE_ICON
+            : HOME_HERO_MOTION_PLAY_ICON
+        "
+        :size="14"
+      />
+    </button>
   </section>
 </template>
 
@@ -93,6 +135,8 @@
       padding-inline: 24px;
     }
 
+    /* Свет по рамке поиска за экраном стоит; повозкой и дымом управляет
+       `useHomeHeroMotion` */
     &_offscreen {
       --home-hero-play-state: paused;
     }
@@ -171,6 +215,53 @@
       aspect-ratio: 3200 / 1100;
       width: max(100%, $map-min-width);
       height: auto;
+    }
+
+    /* Кнопка в левом нижнем углу, на полях шапки: не спорит с поиском и
+       лентой инструментов, но под рукой */
+    &__motion-toggle {
+      cursor: pointer;
+
+      position: absolute;
+      bottom: 10px;
+      left: 16px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 28px;
+      height: 28px;
+      padding: 0;
+
+      color: var(--text-g-color);
+
+      background-color: color-mix(
+        in srgb,
+        var(--bg-secondary) 85%,
+        transparent
+      );
+      border: 1px solid var(--border);
+      border-radius: 50%;
+
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--primary);
+        border-color: color-mix(in srgb, var(--primary) 60%, transparent);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      @include media-min($xl) {
+        left: 24px;
+      }
     }
 
     /* Слои свечения прозрачны целиком, а не цветом: так оттенок берётся прямо
