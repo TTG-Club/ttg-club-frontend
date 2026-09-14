@@ -146,8 +146,9 @@
       max-width: 896px;
     }
 
-    /* Без анимации (телефоны, планшеты, «меньше движения») дуги стоят на
-       месте и светят ровно, вполсилы */
+    /* При системной настройке «меньше движения» дуги стоят на месте и светят
+       ровно, вполсилы. На телефонах свет бежит, как и на компьютере: поворот и
+       мерцание идут в композиторе и почти ничего не стоят */
     &__glow {
       pointer-events: none;
 
@@ -174,7 +175,7 @@
       -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
       mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
 
-      @include decor-motion {
+      @media (prefers-reduced-motion: no-preference) {
         /* Шапка ушла с экрана — свет замирает (`--home-hero-play-state`
            ставит HomeHero) */
         animation: home-search-arc-flicker 7.3s ease-in-out infinite
@@ -202,7 +203,7 @@
 
       background: $arc-track;
 
-      @include decor-motion {
+      @media (prefers-reduced-motion: no-preference) {
         animation: home-search-arc-travel 9s linear infinite
           var(--home-hero-play-state, running);
       }
@@ -216,11 +217,17 @@
 
     /* --- Строка-машинка ---------------------------------------------------- */
 
+    /* Строка изолирована (`contain: strict`) и её высота задана явно: машинка
+       меняет текст по букве, и без изоляции браузер на каждой букве заново
+       раскладывал всю страницу — на телефонах набор подлагивал. Ширину строке
+       даёт флекс, высоту — line-height ниже */
     &__hint {
+      contain: strict;
       overflow: hidden;
       flex: 1 1 auto;
 
       min-width: 0;
+      height: 20px;
 
       font-size: 14px;
       line-height: 20px;
@@ -243,6 +250,7 @@
       );
 
       @include media-min($sm) {
+        height: 24px;
         font-size: 16px;
         line-height: 24px;
       }
