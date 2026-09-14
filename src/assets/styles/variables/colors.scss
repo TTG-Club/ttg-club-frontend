@@ -81,7 +81,11 @@ $theme-dark: (
   'logo-section-7': #1c386b,
   'logo-section-8': #103579,
   // Бледность карты деревни в шапке главной (--hero-map-image)
-  'hero-map-opacity': 0.6
+  'hero-map-opacity': 0.6,
+  // Бумага и тушь карты деревни — ими нарисованы повозка и дым поверх неё
+  // (HomeHeroMotion). Совпадают с --paper и --ink в public/img/dark/hero-map.svg
+  'hero-map-paper': oklch(0.42 0.03 230),
+  'hero-map-ink': oklch(0.1 0.02 235)
 );
 
 $theme-light: (
@@ -165,7 +169,11 @@ $theme-light: (
   'logo-section-7': #813120,
   'logo-section-8': #6e2a1c,
   // Бледность карты деревни в шапке главной (--hero-map-image)
-  'hero-map-opacity': 0.55
+  'hero-map-opacity': 0.55,
+  // Бумага и тушь карты деревни — ими нарисованы повозка и дым поверх неё
+  // (HomeHeroMotion). Совпадают с --paper и --ink в public/img/light/hero-map.svg
+  'hero-map-paper': oklch(0.985 0.008 75),
+  'hero-map-ink': oklch(0.26 0.02 60)
 );
 
 $base-colors: (

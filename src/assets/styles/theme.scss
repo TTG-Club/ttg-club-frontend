@@ -18,8 +18,11 @@
     --bg-img: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-main.webp');
     --bg-token: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/bg-token.webp');
 
-    // Карта деревни в шапке главной: рисунок в палитре темы
-    --hero-map-image: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/hero-map.svg');
+    // Карта деревни в шапке главной: растровые копии hero-map.svg в палитре
+    // темы, уже наложенные на её цвет страницы (scripts/render-hero-map.mjs).
+    // Весь холст и середина для экранов уже 768px
+    --hero-map-image: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/hero-map.webp');
+    --hero-map-image-sm: url('/img/#{if($is-name-success, "#{$theme-name}", "dark")}/hero-map-sm.webp');
   }
 }
 

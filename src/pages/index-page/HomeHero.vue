@@ -1,7 +1,36 @@
 <script setup lang="ts">
+  import { SvgIcon } from '@/shared/ui/icons/svg-icon';
+
+  import { useHomeHeroMotion } from './composable';
+  import HomeHeroMotion from './HomeHeroMotion.vue';
   import HomeSearch from './HomeSearch.vue';
   import HomeTools from './HomeTools.vue';
-  import { HOME_HERO_SUBTITLE, HOME_HERO_TITLE } from './model';
+  import {
+    HOME_HERO_MOTION_PAUSE_ICON,
+    HOME_HERO_MOTION_PAUSE_LABEL,
+    HOME_HERO_MOTION_PLAY_ICON,
+    HOME_HERO_MOTION_PLAY_LABEL,
+    HOME_HERO_SUBTITLE,
+    HOME_HERO_TITLE,
+  } from './model';
+
+  const hero = ref<HTMLElement>();
+
+  // Пока шапки не видно, её бесконечные анимации (повозка, дым, свет по
+  // рамке поиска) стоят: браузер не считает кадры ради того, что за экраном
+  const {
+    state: motionState,
+    isSupported: isMotionSupported,
+    isEnabled: isMotionEnabled,
+    isVisible: isHeroVisible,
+    toggle: toggleMotion,
+  } = useHomeHeroMotion(hero);
+
+  const motionToggleLabel = computed(() =>
+    isMotionEnabled.value
+      ? HOME_HERO_MOTION_PAUSE_LABEL
+      : HOME_HERO_MOTION_PLAY_LABEL,
+  );
 </script>
 
 <template>
@@ -10,15 +39,26 @@
     начинается только ниже, в сетке блоков. `isolate` держит декоративные слои
     — карту и свечение — внутри шапки, под её содержимым.
   -->
-  <section class="home-hero">
+  <section
+    ref="hero"
+    :class="['home-hero', { 'home-hero_offscreen': !isHeroVisible }]"
+  >
     <div
       aria-hidden="true"
       class="home-hero__decor"
     >
       <!-- Карта деревни с высоты птичьего полёта: рисунок под каждую тему
         лежит в `public/img/<тема>/hero-map.svg`, выбирает его переменная
-        `--hero-map-image` -->
-      <div class="home-hero__map" />
+        `--hero-map-image`. Сверху — повозка и дым, они анимированы отдельно
+        от рисунка -->
+      <div class="home-hero__map">
+        <div class="home-hero__map-image" />
+
+        <home-hero-motion
+          :state="motionState"
+          class="home-hero__map-motion"
+        />
+      </div>
 
       <!-- Свечение по центру — «очаг», к которому стягивается взгляд -->
       <div class="home-hero__glow" />
@@ -45,6 +85,26 @@
 
       <home-tools />
     </div>
+
+    <!-- Пауза и запуск повозки с дымом. На телефонах анимации нет, и кнопки
+      тоже -->
+    <button
+      v-if="isMotionSupported"
+      :aria-label="motionToggleLabel"
+      :title="motionToggleLabel"
+      class="home-hero__motion-toggle"
+      type="button"
+      @click.left.exact.prevent="toggleMotion"
+    >
+      <svg-icon
+        :icon="
+          isMotionEnabled
+            ? HOME_HERO_MOTION_PAUSE_ICON
+            : HOME_HERO_MOTION_PLAY_ICON
+        "
+        :size="14"
+      />
+    </button>
   </section>
 </template>
 
@@ -52,6 +112,10 @@
   /* Уже этой ширины карта не сжимается: края уходят за экран, а дома
      остаются различимыми */
   $map-min-width: 1600px;
+
+  /* Середина карты, видная на экране уже 768px (`hero-map-sm.webp`, её
+     ширину задаёт scripts/render-hero-map.mjs) */
+  $map-sm-width: 768px;
 
   .home-hero {
     isolation: isolate;
@@ -66,13 +130,20 @@
 
     /* Фон страницы с картинкой в правом нижнем углу (`#dnd5club::after`)
        закреплён на экране. Шапка его закрывает: картинка обрезается по её
-       нижней границе, а не просвечивает под картой */
+       нижней границе, а не просвечивает под картой. Картинка карты уже
+       наложена на этот цвет — менять его вместе с ней */
     background-color: var(--bg-main);
     border-bottom: 1px solid var(--border);
 
     @include media-min($xl) {
       margin-inline: -24px;
       padding-inline: 24px;
+    }
+
+    /* Свет по рамке поиска за экраном стоит; повозкой и дымом управляет
+       `useHomeHeroMotion` */
+    &_offscreen {
+      --home-hero-play-state: paused;
     }
 
     &__decor {
@@ -82,15 +153,11 @@
       inset: 0;
     }
 
-    /* Масштаб карты задаёт только ширина шапки, не высота: холст с запасом
-       по высоте, поэтому шапку он закрывает и так */
     &__map {
       position: absolute;
       inset: 0;
 
       opacity: var(--hero-map-opacity);
-      background: var(--hero-map-image) center / max(100%, $map-min-width) auto
-        no-repeat;
 
       -webkit-mask-composite: source-in;
       mask-composite: intersect;
@@ -125,6 +192,89 @@
           #000 85%,
           transparent 100%
         );
+    }
+
+    /* Масштаб карты задаёт только ширина шапки, не высота: холст с запасом
+       по высоте, поэтому шапку он закрывает и так.
+
+       Карта — готовая растровая копия SVG: сам рисунок с сотнями фигур и
+       шумовыми фильтрами видеокарта растрировала при первом показе секундами,
+       и всё это время страница на телефоне не прокручивалась. Своим слоем
+       (`will-change`) карта не перерисовывается, когда меняется что-то над
+       ней: повозка, машинка в поиске, наведение на кнопки */
+    &__map-image {
+      will-change: transform;
+      position: absolute;
+      inset: 0;
+      background: var(--hero-map-image) center / max(100%, $map-min-width) auto
+        no-repeat;
+
+      /* На узком экране видна только середина карты — её и грузим: та же
+         карта шириной $map-min-width, но без краёв за экраном */
+      @include media-max($md) {
+        background-image: var(--hero-map-image-sm);
+        background-size: $map-sm-width auto;
+      }
+    }
+
+    /* Холст повозки и дыма — ровно там, где фоновая картинка карты:
+       та же ширина, по центру шапки */
+    &__map-motion {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+
+      aspect-ratio: 3200 / 1100;
+      width: max(100%, $map-min-width);
+      height: auto;
+    }
+
+    /* Кнопка в левом нижнем углу, на полях шапки: не спорит с поиском и
+       лентой инструментов, но под рукой */
+    &__motion-toggle {
+      cursor: pointer;
+
+      position: absolute;
+      bottom: 10px;
+      left: 16px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 28px;
+      height: 28px;
+      padding: 0;
+
+      color: var(--text-g-color);
+
+      background-color: color-mix(
+        in srgb,
+        var(--bg-secondary) 85%,
+        transparent
+      );
+      border: 1px solid var(--border);
+      border-radius: 50%;
+
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--primary);
+        border-color: color-mix(in srgb, var(--primary) 60%, transparent);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      @include media-min($xl) {
+        left: 24px;
+      }
     }
 
     /* Слои свечения прозрачны целиком, а не цветом: так оттенок берётся прямо

@@ -43,6 +43,18 @@
     :aria-label="HOME_SEARCH_PLACEHOLDER"
     @click.left.exact.prevent="openSearch"
   >
+    <!--
+      Свет по контуру: кольцо-маска в толщину рамки, а под ним вращается
+      квадрат с дугами. Поворот и мерцание браузер ведёт одной композицией, не
+      перерисовывая градиент на каждом кадре.
+    -->
+    <span
+      aria-hidden="true"
+      class="home-search__glow"
+    >
+      <span class="home-search__arcs" />
+    </span>
+
     <svg-icon
       :icon="HOME_SEARCH_ICON"
       :size="20"
@@ -80,7 +92,6 @@
   $arc-light: color-mix(in srgb, var(--primary) 55%, var(--text-btn-color));
 
   $arc-track: conic-gradient(
-    from var(--home-search-arc-angle),
     transparent 0deg,
     $arc-base 14deg,
     $arc-light 34deg,
@@ -122,9 +133,24 @@
       background-color 0.2s ease,
       border-color 0.2s ease;
 
-    &::before {
+    &:hover {
+      background-color: var(--bg-sub-menu);
+      border-color: color-mix(in srgb, var(--primary) 60%, transparent);
+
+      .home-search__icon {
+        color: var(--primary);
+      }
+    }
+
+    @include media-min($xxl) {
+      max-width: 896px;
+    }
+
+    /* При системной настройке «меньше движения» дуги стоят на месте и светят
+       ровно, вполсилы. На телефонах свет бежит, как и на компьютере: поворот и
+       мерцание идут в композиторе и почти ничего не стоят */
+    &__glow {
       pointer-events: none;
-      content: '';
 
       position: absolute;
       /* Ровно по рамке: абсолютный слой считает края от внутренней (padding)
@@ -134,13 +160,10 @@
 
       padding: 1px;
 
-      background: $arc-track;
+      opacity: 0.6;
       border-radius: inherit;
 
       transition: filter 0.25s ease;
-      animation:
-        home-search-arc-travel 9s linear infinite,
-        home-search-arc-flicker 7.3s ease-in-out infinite;
 
       /* Маска оставляет от дорожки только кольцо в эту толщину — без неё
          градиент залил бы всё поле. Префиксы вручную: автопрефиксера в сборке
@@ -151,24 +174,39 @@
       mask-composite: exclude;
       -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
       mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-    }
 
-    &:hover {
-      background-color: var(--bg-sub-menu);
-      border-color: color-mix(in srgb, var(--primary) 60%, transparent);
-
-      .home-search__icon {
-        color: var(--primary);
+      @media (prefers-reduced-motion: no-preference) {
+        /* Шапка ушла с экрана — свет замирает (`--home-hero-play-state`
+           ставит HomeHero) */
+        animation: home-search-arc-flicker 7.3s ease-in-out infinite
+          var(--home-hero-play-state, running);
       }
     }
 
-    &:hover::before,
-    &:focus-visible::before {
+    &:hover &__glow,
+    &:focus-visible &__glow {
       filter: brightness(1.35) saturate(1.1);
     }
 
-    @include media-min($xxl) {
-      max-width: 896px;
+    /* Поворот дорожки вокруг центра поля — то же, что сдвиг начального угла
+       конического градиента. Квадрат шире поля на 64px, поэтому его сторона
+       всегда не меньше диагонали поля и при любом повороте он закрывает рамку
+       целиком. */
+    &__arcs {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+
+      aspect-ratio: 1;
+      width: calc(100% + 64px);
+
+      background: $arc-track;
+
+      @media (prefers-reduced-motion: no-preference) {
+        animation: home-search-arc-travel 9s linear infinite
+          var(--home-hero-play-state, running);
+      }
     }
 
     &__icon {
@@ -179,11 +217,17 @@
 
     /* --- Строка-машинка ---------------------------------------------------- */
 
+    /* Строка изолирована (`contain: strict`) и её высота задана явно: машинка
+       меняет текст по букве, и без изоляции браузер на каждой букве заново
+       раскладывал всю страницу — на телефонах набор подлагивал. Ширину строке
+       даёт флекс, высоту — line-height ниже */
     &__hint {
+      contain: strict;
       overflow: hidden;
       flex: 1 1 auto;
 
       min-width: 0;
+      height: 20px;
 
       font-size: 14px;
       line-height: 20px;
@@ -206,6 +250,7 @@
       );
 
       @include media-min($sm) {
+        height: 24px;
         font-size: 16px;
         line-height: 24px;
       }
@@ -270,19 +315,9 @@
     }
   }
 
-  @property --home-search-arc-angle {
-    inherits: false;
-    initial-value: 0deg;
-    syntax: '<angle>';
-  }
-
   @keyframes home-search-arc-travel {
-    0% {
-      --home-search-arc-angle: 0deg;
-    }
-
-    100% {
-      --home-search-arc-angle: 360deg;
+    to {
+      rotate: 360deg;
     }
   }
 
@@ -347,11 +382,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .home-search::before {
-      opacity: 0.6;
-      animation: none;
-    }
-
     .home-search__word_idle::after {
       animation: none;
     }

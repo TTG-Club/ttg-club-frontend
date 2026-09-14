@@ -3,6 +3,7 @@ import { orderBy } from 'lodash-es';
 import type { TNavItem } from '@/shared/stores/NavStore';
 
 import {
+  HOME_HERO_MAP_VIEWBOX,
   HOME_SECTION_DEFAULT_ICON,
   HOME_SECTION_ICONS,
   HOME_SECTION_TEXTURE,
@@ -12,8 +13,14 @@ import {
   HOME_VIDEO_SHORT_URL,
 } from './constants';
 
-import type { HomeNavLink, HomeSectionLink } from './types';
-import type { StyleValue } from 'vue';
+import type {
+  HomeMapPlacement,
+  HomeMapPoint,
+  HomeMapSize,
+  HomeNavLink,
+  HomeSectionLink,
+} from './types';
+import type { CSSProperties, StyleValue } from 'vue';
 
 /** Пункт меню, у которого точно есть адрес */
 type LinkedNavItem = TNavItem & { url: string };
@@ -106,6 +113,53 @@ export function getHomeTools(navItems: Array<TNavItem>): Array<HomeNavLink> {
     icon: HOME_TOOL_ICONS[tool.url] ?? HOME_TOOL_DEFAULT_ICON,
     external: tool.external,
   }));
+}
+
+/**
+ * Длина в единицах карты. Фигуры карты шапки стоят на сцене, где единица карты
+ * — ровно пиксель, а под ширину холста масштабируется сцена целиком.
+ * @param units - единицы карты
+ */
+function toMapPixels(units: number): string {
+  return `${Number(units.toFixed(3))}px`;
+}
+
+/**
+ * Прямоугольник на сцене карты шапки.
+ * @param point - левый верхний угол, единицы карты
+ * @param size - размер, единицы карты
+ */
+export function getHomeMapBoxStyle(
+  point: HomeMapPoint,
+  size: HomeMapSize,
+): CSSProperties {
+  return {
+    left: toMapPixels(point.x - HOME_HERO_MAP_VIEWBOX.x),
+    top: toMapPixels(point.y - HOME_HERO_MAP_VIEWBOX.y),
+    width: toMapPixels(size.width),
+    height: toMapPixels(size.height),
+  };
+}
+
+/**
+ * Сдвиг и поворот фигуры, которая стоит на карте в точке `placement`, — для
+ * слоя фигуры в левом верхнем углу сцены. Сдвиг в пикселях, а не в процентах
+ * от фигуры: анимацию `transform`, зависящую от размера элемента, браузер не
+ * отдаёт композитору и ведёт в основном потоке.
+ * @param placement - точка привязки (центр фигуры) и поворот
+ * @param size - размер слоя фигуры, единицы карты
+ */
+export function getHomeMapFigureTransform(
+  placement: HomeMapPlacement,
+  size: HomeMapSize,
+): { translate: string; rotate: string } {
+  const left = placement.x - HOME_HERO_MAP_VIEWBOX.x - size.width / 2;
+  const top = placement.y - HOME_HERO_MAP_VIEWBOX.y - size.height / 2;
+
+  return {
+    translate: `${toMapPixels(left)} ${toMapPixels(top)}`,
+    rotate: `${Number(placement.angle.toFixed(3))}deg`,
+  };
 }
 
 /**
