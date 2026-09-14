@@ -15,6 +15,24 @@ export type HomePromoCardContent = {
   external?: boolean;
 };
 
+/** Точка на карте деревни в шапке, в единицах карты */
+export type HomeMapPoint = {
+  x: number;
+  y: number;
+};
+
+/** Размер фигуры на карте, в единицах карты */
+export type HomeMapSize = {
+  width: number;
+  height: number;
+};
+
+/** Где стоит фигура на карте: точка привязки (центр фигуры) и поворот */
+export type HomeMapPlacement = HomeMapPoint & {
+  /** Поворот по часовой стрелке, градусы */
+  angle: number;
+};
+
 /** Бренд соцсети — задаёт цвет рамки и иконки кнопки */
 export type HomeSocialBrand = 'telegram' | 'discord' | 'vk' | 'boosty';
 

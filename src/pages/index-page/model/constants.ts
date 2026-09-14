@@ -1,7 +1,13 @@
 import { TOKENATOR_URL } from '@/shared/stores/NavStore';
 import type { IOrderItem } from '@/shared/types/BaseApiFields';
 
-import type { HomePromoCardContent, HomeSocialLink } from './types';
+import type {
+  HomeMapPlacement,
+  HomeMapPoint,
+  HomeMapSize,
+  HomePromoCardContent,
+  HomeSocialLink,
+} from './types';
 
 /* --- Общее ------------------------------------------------------------- */
 
@@ -19,6 +25,62 @@ export const HOME_HERO_TITLE = 'Справочник и инструменты D
  * строка не начнётся с тире.
  */
 export const HOME_HERO_SUBTITLE = 'Создан сообществом\u00A0— для сообщества';
+
+/* --- Карта в шапке ----------------------------------------------------- */
+
+/**
+ * Когда на карте шапки едет повозка и дымят трубы, а по рамке поиска бежит
+ * свет: устройство с мышью и без системной просьбы «меньше движения». То же
+ * условие в стилях — миксин `decor-motion`.
+ */
+export const HOME_HERO_MOTION_QUERY =
+  '(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)';
+
+/** Холст карты — `viewBox` рисунка `public/img/<тема>/hero-map.svg` */
+export const HOME_HERO_MAP_VIEWBOX: HomeMapPoint & HomeMapSize = {
+  x: 0,
+  y: -100,
+  width: 3200,
+  height: 1100,
+};
+
+/** Дорога повозки: идёт между колеями, начало и конец скрыты за холстом */
+export const HOME_HERO_WAGON_ROUTE =
+  'M-130 504C120 495 350 470 550 475S800 494 930 487S1160 466 1300 471S1510 487 1630 484S1900 459 2010 462S2200 473 2330 470S2530 467 2660 469S2920 499 3080 494S3260 490 3330 486';
+
+/** Один проезд повозки по дороге, мс */
+export const HOME_HERO_WAGON_LAP = 65_000;
+
+/** Лошадь опережает телегу на длину упряжи, единицы карты */
+export const HOME_HERO_HORSE_LEAD = 74;
+
+/** Телега: слой с запасом под оглобли и обводку */
+export const HOME_HERO_WAGON_SIZE: HomeMapSize = { width: 132, height: 52 };
+
+export const HOME_HERO_HORSE_SIZE: HomeMapSize = { width: 72, height: 24 };
+
+/** Где телега стоит, пока анимация выключена, — там же, где на исходной карте */
+export const HOME_HERO_WAGON_PARKING: HomeMapPlacement = {
+  x: 1150,
+  y: 486,
+  angle: -4,
+};
+
+export const HOME_HERO_HORSE_PARKING: HomeMapPlacement = {
+  x: 1223.82,
+  y: 480.84,
+  angle: -4,
+};
+
+/** Устья труб в координатах карты: ветер не зависит от поворота крыши */
+export const HOME_HERO_CHIMNEYS: Array<HomeMapPoint> = [
+  { x: 349.36, y: 249.57 },
+  { x: 2781.95, y: 329.98 },
+  { x: 2688, y: 732 },
+];
+
+/** Клуб дыма: слой с запасом под сдвиг формы от устья трубы */
+export const HOME_HERO_SMOKE_PUFF_SIZE: HomeMapSize = { width: 40, height: 40 };
 
 /* --- Строка поиска ----------------------------------------------------- */
 

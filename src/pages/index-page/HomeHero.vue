@@ -1,7 +1,14 @@
 <script setup lang="ts">
+  import HomeHeroMotion from './HomeHeroMotion.vue';
   import HomeSearch from './HomeSearch.vue';
   import HomeTools from './HomeTools.vue';
   import { HOME_HERO_SUBTITLE, HOME_HERO_TITLE } from './model';
+
+  const hero = ref<HTMLElement>();
+
+  // Пока шапки не видно, её бесконечные анимации (повозка, дым, свет по
+  // рамке поиска) стоят: браузер не считает кадры ради того, что за экраном
+  const isHeroVisible = useElementVisibility(hero);
 </script>
 
 <template>
@@ -10,15 +17,26 @@
     начинается только ниже, в сетке блоков. `isolate` держит декоративные слои
     — карту и свечение — внутри шапки, под её содержимым.
   -->
-  <section class="home-hero">
+  <section
+    ref="hero"
+    :class="['home-hero', { 'home-hero_offscreen': !isHeroVisible }]"
+  >
     <div
       aria-hidden="true"
       class="home-hero__decor"
     >
       <!-- Карта деревни с высоты птичьего полёта: рисунок под каждую тему
         лежит в `public/img/<тема>/hero-map.svg`, выбирает его переменная
-        `--hero-map-image` -->
-      <div class="home-hero__map" />
+        `--hero-map-image`. Сверху — повозка и дым, они анимированы отдельно
+        от рисунка -->
+      <div class="home-hero__map">
+        <div class="home-hero__map-image" />
+
+        <home-hero-motion
+          :paused="!isHeroVisible"
+          class="home-hero__map-motion"
+        />
+      </div>
 
       <!-- Свечение по центру — «очаг», к которому стягивается взгляд -->
       <div class="home-hero__glow" />
@@ -75,6 +93,10 @@
       padding-inline: 24px;
     }
 
+    &_offscreen {
+      --home-hero-play-state: paused;
+    }
+
     &__decor {
       pointer-events: none;
       position: absolute;
@@ -82,15 +104,11 @@
       inset: 0;
     }
 
-    /* Масштаб карты задаёт только ширина шапки, не высота: холст с запасом
-       по высоте, поэтому шапку он закрывает и так */
     &__map {
       position: absolute;
       inset: 0;
 
       opacity: var(--hero-map-opacity);
-      background: var(--hero-map-image) center / max(100%, $map-min-width) auto
-        no-repeat;
 
       -webkit-mask-composite: source-in;
       mask-composite: intersect;
@@ -125,6 +143,34 @@
           #000 85%,
           transparent 100%
         );
+    }
+
+    /* Масштаб карты задаёт только ширина шапки, не высота: холст с запасом
+       по высоте, поэтому шапку он закрывает и так.
+
+       Рисунок тяжёлый — сотни фигур и шумовые фильтры, растрировать его
+       дорого. Поэтому карта лежит в своём слое композиции (`will-change`):
+       браузер растрирует её один раз, а повозка, машинка в поиске и наведение
+       на кнопки над ней перерисовываются, не трогая карту */
+    &__map-image {
+      will-change: transform;
+      position: absolute;
+      inset: 0;
+      background: var(--hero-map-image) center / max(100%, $map-min-width) auto
+        no-repeat;
+    }
+
+    /* Холст повозки и дыма — ровно там, где фоновая картинка карты:
+       та же ширина, по центру шапки */
+    &__map-motion {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+
+      aspect-ratio: 3200 / 1100;
+      width: max(100%, $map-min-width);
+      height: auto;
     }
 
     /* Слои свечения прозрачны целиком, а не цветом: так оттенок берётся прямо
