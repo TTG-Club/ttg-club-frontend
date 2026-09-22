@@ -27,6 +27,30 @@ const videoSchema = z.object({
   order: z.number().nullish(),
 });
 
+const homeGameSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1),
+  imageUrl: z.string().nullish(),
+  type: z.enum(['ONLINE', 'TEXT', 'OFFLINE']),
+  city: z.string().nullish(),
+  maxPlayers: z.number().int().nonnegative(),
+  takenSeats: z.number().int().nonnegative(),
+  createdAt: z.string().datetime({ offset: true }),
+});
+
+export type HomeGame = z.infer<typeof homeGameSchema>;
+
+/**
+ * Проверяет ответ публичного каталога и оставляет игры с нужными полями.
+ * Битая отдельная игра не скрывает остальные объявления.
+ * @param input Ответ `GET /api/v1/games`.
+ */
+export function parseHomeGames(input: unknown): Array<HomeGame> {
+  const page = z.object({ content: z.array(z.unknown()) }).parse(input);
+
+  return parseList(page.content, homeGameSchema, 'Игра');
+}
+
 /**
  * Разбирает массив из ответа API, отсеивая битые записи поштучно и сообщая о
  * каждой в консоль. Поэлементно — чтобы одна кривая запись не прятала весь

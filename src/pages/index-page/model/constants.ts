@@ -259,6 +259,34 @@ export const HOME_VIDEOS_LABEL = 'Видео';
 
 export const HOME_VIDEOS_ICON = 'home/brand-youtube';
 
+/* --- Последняя игра ---------------------------------------------------- */
+
+export const HOME_LATEST_GAME_LABEL = 'Новая игра';
+
+export const HOME_LATEST_GAME_ICON = 'home/users';
+
+export const HOME_LATEST_GAME_SITE_URL = 'https://new.ttg.club';
+
+export const HOME_LATEST_GAME_CATALOG_URL = `${HOME_LATEST_GAME_SITE_URL}/games`;
+
+export const HOME_LATEST_GAME_API_URL = import.meta.env.DEV
+  ? '/find-game/api/v1/games'
+  : 'https://nexus.api.ttg.club/api/v1/games';
+
+export const HOME_LATEST_GAME_LOOKUP_SIZE = 20;
+
+export const HOME_LATEST_GAME_EMPTY_TEXT = 'Игр в каталоге пока нет';
+
+export const HOME_LATEST_GAME_ERROR_TEXT = 'Не удалось загрузить игры';
+
+export const HOME_LATEST_GAME_ALL_LABEL = 'Все игры';
+
+export const HOME_LATEST_GAME_TYPE_LABELS = {
+  ONLINE: 'Онлайн',
+  TEXT: 'Текстовая',
+  OFFLINE: 'Вживую',
+};
+
 /** Свежие ролики сверху; при одной дате — по названию */
 const HOME_VIDEOS_ORDER: Array<IOrderItem> = [
   {
