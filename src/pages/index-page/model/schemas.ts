@@ -54,6 +54,18 @@ const homeGameSchema = z.object({
 
 export type HomeGame = z.infer<typeof homeGameSchema>;
 
+const gameSystemSchema = z.object({
+  code: z.string().min(1),
+  name: z.string().min(1),
+});
+
+export type HomeGameSystem = z.infer<typeof gameSystemSchema>;
+
+/** Проверяет публичный справочник систем `find-game-api`. */
+export function parseHomeGameSystems(input: unknown): Array<HomeGameSystem> {
+  return parseList(input, gameSystemSchema, 'Игровая система');
+}
+
 /** Имя пользователя из `POST /api/user/display-names/by-ids` core-api */
 const displayNameSchema = z.object({
   userId: z.string().min(1),

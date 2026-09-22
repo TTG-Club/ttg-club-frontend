@@ -16,7 +16,6 @@ import {
   HOME_TOOLS_PATH_PREFIX,
   HOME_VIDEO_SHORT_URL,
 } from './constants';
-import { HOME_GAME_SYSTEM_NAMES } from './gameSystems';
 
 import type { HomeGame } from './schemas';
 import type {
@@ -194,19 +193,6 @@ export function getHomeSiteImageUrl(
   }
 
   return /^https?:\/\//.test(imageUrl) ? imageUrl : null;
-}
-
-/**
- * Подпись системы игры: у своей системы — название, которое вписал мастер,
- * у системы из списка — её название, а незнакомая показывается кодом.
- * @param game - игра
- */
-export function getHomeGameSystemLabel(
-  game: Pick<HomeGame, 'system' | 'customSystem'>,
-): string {
-  return (
-    game.customSystem || HOME_GAME_SYSTEM_NAMES[game.system] || game.system
-  );
 }
 
 /**

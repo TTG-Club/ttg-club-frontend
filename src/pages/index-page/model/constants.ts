@@ -273,6 +273,10 @@ export const HOME_LATEST_GAME_API_URL = import.meta.env.DEV
   ? '/find-game/api/v1/games'
   : 'https://nexus.api.ttg.club/api/v1/games';
 
+export const HOME_LATEST_GAME_SYSTEMS_API_URL = import.meta.env.DEV
+  ? '/find-game/api/v1/game-systems'
+  : 'https://nexus.api.ttg.club/api/v1/game-systems';
+
 export const HOME_LATEST_GAME_LOOKUP_SIZE = 20;
 
 export const HOME_LATEST_GAME_EMPTY_TEXT = 'Игр в каталоге пока нет';

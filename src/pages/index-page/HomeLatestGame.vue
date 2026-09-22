@@ -6,7 +6,6 @@
   import {
     getHomeGameFormatSummary,
     getHomeGameGenresLabel,
-    getHomeGameSystemLabel,
     getHomeSiteImageUrl,
     HOME_LATEST_GAME_ALL_LABEL,
     HOME_LATEST_GAME_API_URL,
@@ -23,17 +22,20 @@
     HOME_LATEST_GAME_NEXT_SESSION_FORMAT,
     HOME_LATEST_GAME_NEXT_SESSION_LABEL,
     HOME_LATEST_GAME_SEATS_LABEL,
+    HOME_LATEST_GAME_SYSTEMS_API_URL,
     HOME_LATEST_GAME_TYPE_ICONS,
     HOME_LATEST_GAME_UNKNOWN_MASTER,
     parseHomeDisplayNames,
+    parseHomeGameSystems,
     parseHomeGames,
   } from './model';
 
-  import type { HomeDisplayName, HomeGame } from './model';
+  import type { HomeDisplayName, HomeGame, HomeGameSystem } from './model';
 
   const latestGame = ref<HomeGame | null>(null);
   const isLoading = ref(true);
   const hasError = ref(false);
+  const gameSystems = ref<Array<HomeGameSystem>>([]);
 
   const master = ref<HomeDisplayName | null>(null);
   const isMasterLoading = ref(true);
@@ -60,9 +62,19 @@
     latestGame.value ? getHomeGameGenresLabel(latestGame.value) : '',
   );
 
-  const systemLabel = computed(() =>
-    latestGame.value ? getHomeGameSystemLabel(latestGame.value) : '',
-  );
+  const systemLabel = computed(() => {
+    const game = latestGame.value;
+
+    if (!game) {
+      return '';
+    }
+
+    return (
+      game.customSystem ||
+      gameSystems.value.find((system) => system.code === game.system)?.name ||
+      game.system
+    );
+  });
 
   const costLabel = computed(() =>
     latestGame.value
@@ -150,6 +162,22 @@
     }
   };
 
+  /** Названия систем берём из справочника сервиса игр, чтобы новые системы
+   * отображались на главной сразу после их добавления. */
+  const loadGameSystems = async (): Promise<void> => {
+    try {
+      const response = await fetch(HOME_LATEST_GAME_SYSTEMS_API_URL);
+
+      if (!response.ok) {
+        throw new Error(`Game systems: ${response.status}`);
+      }
+
+      gameSystems.value = parseHomeGameSystems(await response.json());
+    } catch (error) {
+      console.warn('[home] Справочник систем не загрузился:', error);
+    }
+  };
+
   /** Загружает первую страницу и выбирает игру по дате создания: поднятые
    * объявления стоят выше новых в каталоге. */
   const loadLatestGame = async (): Promise<void> => {
@@ -181,7 +209,10 @@
     }
 
     if (latestGame.value) {
-      await loadMaster(latestGame.value.masterId);
+      await Promise.all([
+        loadMaster(latestGame.value.masterId),
+        loadGameSystems(),
+      ]);
     }
   };
 
