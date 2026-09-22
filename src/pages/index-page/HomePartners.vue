@@ -42,6 +42,7 @@
     v-if="showedPartners.length"
     :label="HOME_PARTNERS_LABEL"
     :icon="HOME_PARTNERS_ICON"
+    fill
   >
     <div class="home-partners">
       <a
@@ -73,6 +74,15 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    align-content: flex-start;
+
+    // С xl высоту панели задаёт колонка (см. IndexView): друзей много, и
+    // список прокручивается внутри, а не вытягивает всю ленту
+    @include media-min($xl) {
+      overflow-y: auto;
+      flex: 1 1 0;
+      min-height: 0;
+    }
 
     &__chip {
       display: inline-flex;

@@ -9,17 +9,23 @@
       icon?: string;
       /** Содержимое без внутренних отступов — для картинки во всю ширину */
       flush?: boolean;
+      /** Тело тянется на высоту панели и раскладывает содержимое столбцом */
+      fill?: boolean;
     }>(),
     {
       label: undefined,
       icon: undefined,
       flush: false,
+      fill: false,
     },
   );
 
   const bodyClasses = computed(() => [
     'home-panel__body',
-    { 'home-panel__body_flush': props.flush },
+    {
+      'home-panel__body_flush': props.flush,
+      'home-panel__body_fill': props.fill,
+    },
   ]);
 </script>
 
@@ -78,6 +84,15 @@
 
       &_flush {
         padding: 0;
+      }
+
+      // min-height: 0 — чтобы содержимое могло прокручиваться внутри, когда
+      // высоту панели задаёт раскладка, а не содержимое
+      &_fill {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        min-height: 0;
       }
     }
   }

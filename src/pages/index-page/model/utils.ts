@@ -4,6 +4,10 @@ import type { TNavItem } from '@/shared/stores/NavStore';
 
 import {
   HOME_HERO_MAP_VIEWBOX,
+  HOME_LATEST_GAME_DURATION_LABELS,
+  HOME_LATEST_GAME_GENRES_SEPARATOR,
+  HOME_LATEST_GAME_SITE_URL,
+  HOME_LATEST_GAME_TYPE_LABELS,
   HOME_SECTION_DEFAULT_ICON,
   HOME_SECTION_ICONS,
   HOME_SECTION_TEXTURE,
@@ -12,7 +16,9 @@ import {
   HOME_TOOLS_PATH_PREFIX,
   HOME_VIDEO_SHORT_URL,
 } from './constants';
+import { HOME_GAME_SYSTEM_NAMES } from './gameSystems';
 
+import type { HomeGame } from './schemas';
 import type {
   HomeMapPlacement,
   HomeMapPoint,
@@ -168,4 +174,67 @@ export function getHomeMapFigureTransform(
  */
 export function getHomeVideoUrl(videoId: string): string {
   return `${HOME_VIDEO_SHORT_URL}${encodeURIComponent(videoId)}`;
+}
+
+/**
+ * Адрес картинки с new.ttg.club: сервисы отдают путь от корня того сайта,
+ * а главная живёт на другом домене.
+ * @param imageUrl - путь от корня new.ttg.club или полный адрес
+ * @returns полный адрес; `null` — картинки нет или адрес не похож на ссылку
+ */
+export function getHomeSiteImageUrl(
+  imageUrl: string | null | undefined,
+): string | null {
+  if (!imageUrl) {
+    return null;
+  }
+
+  if (imageUrl.startsWith('/')) {
+    return `${HOME_LATEST_GAME_SITE_URL}${imageUrl}`;
+  }
+
+  return /^https?:\/\//.test(imageUrl) ? imageUrl : null;
+}
+
+/**
+ * Подпись системы игры: у своей системы — название, которое вписал мастер,
+ * у системы из списка — её название, а незнакомая показывается кодом.
+ * @param game - игра
+ */
+export function getHomeGameSystemLabel(
+  game: Pick<HomeGame, 'system' | 'customSystem'>,
+): string {
+  return (
+    game.customSystem || HOME_GAME_SYSTEM_NAMES[game.system] || game.system
+  );
+}
+
+/**
+ * Условия игры одной строкой: формат (с городом у офлайна) и длительность.
+ * @param game - игра
+ */
+export function getHomeGameFormatSummary(
+  game: Pick<HomeGame, 'type' | 'city' | 'durationType'>,
+): string {
+  const format = HOME_LATEST_GAME_TYPE_LABELS[game.type];
+
+  const place =
+    game.type === 'OFFLINE' && game.city ? `${format}, ${game.city}` : format;
+
+  return `${place} · ${HOME_LATEST_GAME_DURATION_LABELS[game.durationType]}`;
+}
+
+/**
+ * Жанры игры через запятую, вместе с жанром, который мастер вписал сам.
+ * @param game - игра
+ * @returns строка жанров; пустая — жанров нет
+ */
+export function getHomeGameGenresLabel(
+  game: Pick<HomeGame, 'genres' | 'customGenre'>,
+): string {
+  const genres = game.genres ?? [];
+
+  return (game.customGenre ? [...genres, game.customGenre] : genres).join(
+    HOME_LATEST_GAME_GENRES_SEPARATOR,
+  );
 }
