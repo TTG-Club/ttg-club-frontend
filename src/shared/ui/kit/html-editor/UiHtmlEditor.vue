@@ -6,10 +6,12 @@
     compressHtml,
     createDiceToken,
     createTokenElement,
+    describeHtmlProblem,
     editableToHtml,
     extractFormula,
     findHtmlProblems,
     fixHtmlProblems,
+    getHtmlValidityMessage,
     htmlToEditable,
     tokenFromElement,
   } from './helpers';
@@ -378,14 +380,12 @@
    * бывают сломаны (ссылка внутри ссылки), и без подсказки непонятно,
    * почему форма не сохраняется и где искать причину.
    */
-  const problems = computed(() => findHtmlProblems(props.modelValue || ''));
+  const problems = computed(() => findHtmlProblems(props.modelValue));
 
   const visibleProblems = computed(() =>
     problems.value.slice(0, MAX_VISIBLE_PROBLEMS).map((problem) => ({
       ...problem,
-      text: problem.context
-        ? `${problem.message} — рядом с «${problem.context}»`
-        : problem.message,
+      text: describeHtmlProblem(problem),
     })),
   );
 
@@ -427,7 +427,7 @@
    * по своим правилам, и результат стоит проверить глазами.
    */
   const fixProblems = () => {
-    const fixed = fixHtmlProblems(props.modelValue || '');
+    const fixed = fixHtmlProblems(props.modelValue);
 
     emitValue(fixed);
 
@@ -439,9 +439,7 @@
   };
 
   const validityMessage = computed(() =>
-    problems.value.length
-      ? `Ошибка в разметке описания: ${problems.value[0].message.toLowerCase()}. Исправьте её, иначе сервер не примет текст.`
-      : '',
+    getHtmlValidityMessage(problems.value),
   );
 
   // Нативная валидация формы не даст отправить её, пока в поле есть ошибки,

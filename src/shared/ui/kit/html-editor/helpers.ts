@@ -325,7 +325,14 @@ const PARAGRAPH_CLOSERS = new Set([
   'ul',
 ]);
 
+/** Сколько символов видимого текста показывать рядом с ошибкой. */
 const PROBLEM_CONTEXT_LENGTH = 60;
+
+/**
+ * Сколько символов разметки брать для цитаты: в ней есть теги, поэтому
+ * видимого текста там заметно меньше, чем символов.
+ */
+const PROBLEM_CONTEXT_SOURCE_LENGTH = PROBLEM_CONTEXT_LENGTH * 4;
 
 export type HtmlProblem = {
   /** Что не так — простыми словами. */
@@ -368,7 +375,7 @@ const truncateWords = (text: string, fromEnd: boolean) => {
 /** Видимый текст рядом с тегом: сначала после него, иначе — перед ним. */
 const getProblemContext = (html: string, start: number, end: number) => {
   const after = fragmentToText(
-    html.slice(end, end + PROBLEM_CONTEXT_LENGTH * 4),
+    html.slice(end, end + PROBLEM_CONTEXT_SOURCE_LENGTH),
   );
 
   if (after) {
@@ -377,7 +384,7 @@ const getProblemContext = (html: string, start: number, end: number) => {
 
   return truncateWords(
     fragmentToText(
-      html.slice(Math.max(0, start - PROBLEM_CONTEXT_LENGTH * 4), start),
+      html.slice(Math.max(0, start - PROBLEM_CONTEXT_SOURCE_LENGTH), start),
     ),
     true,
   );
@@ -491,6 +498,21 @@ export const findHtmlProblems = (html: string): Array<HtmlProblem> => {
   return problems.sort((first, second) => first.start - second.start);
 };
 
+/** Ошибка разметки одной строкой: что не так и рядом с каким текстом. */
+export const describeHtmlProblem = (problem: HtmlProblem): string =>
+  problem.context
+    ? `${problem.message} — рядом с «${problem.context}»`
+    : problem.message;
+
+/**
+ * Подсказка браузера при попытке отправить форму с ошибкой разметки.
+ * Пустая строка — ошибок нет, отправку не блокируем.
+ */
+export const getHtmlValidityMessage = (problems: Array<HtmlProblem>): string =>
+  problems.length
+    ? `Ошибка в разметке описания: ${problems[0].message.toLowerCase()}. Исправьте её, иначе сервер не примет текст.`
+    : '';
+
 /** Ссылка без вложенных ссылок, с подсказкой-обёрткой или без неё. */
 const PLAIN_LINK =
   '(?:<detail-tooltip\\b[^>]*>\\s*)?<a\\b[^>]*>(?:(?!<\\/?a\\b)[\\s\\S])*<\\/a>(?:\\s*<\\/detail-tooltip>)?';
@@ -516,7 +538,7 @@ const MAX_LINK_NESTING = 5;
 const unwrapNestedLinks = (html: string): string => {
   let result = html;
 
-  for (let i = 0; i < MAX_LINK_NESTING; i++) {
+  for (let depth = 0; depth < MAX_LINK_NESTING; depth++) {
     const next = WRAPPED_LINKS.reduce(
       (current, pattern) => current.replace(pattern, '$1'),
       result,
