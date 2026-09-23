@@ -372,6 +372,15 @@ const truncateWords = (text: string, fromEnd: boolean) => {
   return `${lastSpace > 0 ? head.slice(0, lastSpace) : head}…`;
 };
 
+/**
+ * Стандартный HTML-тег (`p`, `div`), а не кастомный (`dice-roller`)
+ * и не элемент SVG (`path`): неизвестные теги браузер создаёт как
+ * `HTMLUnknownElement`.
+ */
+const isKnownHtmlTag = (name: string) =>
+  !name.includes('-') &&
+  !(document.createElement(name) instanceof HTMLUnknownElement);
+
 /** Видимый текст рядом с тегом: сначала после него, иначе — перед ним. */
 const getProblemContext = (html: string, start: number, end: number) => {
   const after = fragmentToText(
@@ -484,7 +493,15 @@ export const findHtmlProblems = (html: string): Array<HtmlProblem> => {
       }
     }
 
-    if (!VOID_TAGS.has(name) && !attributes.trim().endsWith('/')) {
+    const selfClosing = attributes.trim().endsWith('/');
+
+    // `<dice-roller/>` и `<path/>` в SVG допустимы, а `<p/>` — нет:
+    // для известных HTML-тегов бэкенд считает это ошибкой.
+    if (selfClosing && !VOID_TAGS.has(name) && isKnownHtmlTag(name)) {
+      addProblem(`Тег <${name}/> не может быть самозакрывающимся`, tag);
+    }
+
+    if (!VOID_TAGS.has(name) && !selfClosing) {
       stack.push(tag);
     }
   }
@@ -570,15 +587,36 @@ export const compressHtml = (html: string): string => {
   return doc.body.innerHTML.trim();
 };
 
+/** Самозакрывающийся обычный тег без дефиса в имени: `<p/>`, `<div class="x" />`. */
+const STANDARD_SELF_CLOSING_TAG =
+  /<([a-z][a-z\d]*)((?:"[^"]*"|'[^']*'|[^"'>])*?)\s*\/>/gi;
+
+/**
+ * `<p/>` браузер читает как открывающий тег и складывает в него следующий
+ * текст, поэтому до разбора приводим такие теги к пустой паре `<p></p>`.
+ * Пустые теги вроде `<br/>` и элементы SVG вроде `<path/>` не трогаем.
+ */
+const expandStandardSelfClosingTags = (html: string) =>
+  html.replace(
+    STANDARD_SELF_CLOSING_TAG,
+    (match, tag: string, attrs: string) => {
+      const name = tag.toLowerCase();
+
+      return VOID_TAGS.has(name) || !isKnownHtmlTag(name)
+        ? match
+        : `<${tag}${attrs}></${tag}>`;
+    },
+  );
+
 /**
  * Исправляет ошибки разметки, которые находит `findHtmlProblems`.
  *
- * Частый случай — ссылку с подсказкой обернули в такую же ссылку — чиним
- * точечно, снимая внешнюю обёртку. Остальное перестраивает браузер
- * по правилам HTML; результат стоит проверить глазами.
+ * Частые случаи чиним точечно: снимаем лишнюю обёртку со ссылки внутри
+ * такой же ссылки и превращаем `<p/>` в пустую пару. Остальное перестраивает
+ * браузер по правилам HTML; результат стоит проверить глазами.
  */
 export const fixHtmlProblems = (html: string): string =>
-  compressHtml(unwrapNestedLinks(html));
+  compressHtml(expandStandardSelfClosingTags(unwrapNestedLinks(html)));
 
 const cleanupAttributes = (root: HTMLElement) => {
   for (const element of Array.from(
