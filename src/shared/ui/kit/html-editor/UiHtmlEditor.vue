@@ -6,12 +6,17 @@
     compressHtml,
     createDiceToken,
     createTokenElement,
+    describeHtmlProblem,
     editableToHtml,
     extractFormula,
+    findHtmlProblems,
+    fixHtmlProblems,
+    getHtmlValidityMessage,
     htmlToEditable,
     tokenFromElement,
   } from './helpers';
 
+  import type { HtmlProblem } from './helpers';
   import type { DiceToken, DiceVariant, HtmlEditorMode } from './types';
 
   const props = withDefaults(
@@ -95,8 +100,13 @@
     },
   ];
 
+  /** Сколько ошибок разметки перечислять над текстом, остальные — числом. */
+  const MAX_VISIBLE_PROBLEMS = 5;
+
   const mode = ref<HtmlEditorMode>('html');
   const editor = ref<HTMLElement | null>(null);
+  const source = ref<HTMLTextAreaElement | null>(null);
+  const problemInput = ref<HTMLInputElement | null>(null);
 
   /**
    * Последняя отданная наружу разметка. Нужна, чтобы не переписывать
@@ -365,6 +375,83 @@
     }
   };
 
+  /**
+   * Ошибки разметки, из-за которых бэкенд отклонит описание. Старые тексты
+   * бывают сломаны (ссылка внутри ссылки), и без подсказки непонятно,
+   * почему форма не сохраняется и где искать причину.
+   */
+  const problems = computed(() => findHtmlProblems(props.modelValue));
+
+  const visibleProblems = computed(() =>
+    problems.value.slice(0, MAX_VISIBLE_PROBLEMS).map((problem) => ({
+      ...problem,
+      text: describeHtmlProblem(problem),
+    })),
+  );
+
+  const hiddenProblemsCount = computed(() =>
+    Math.max(0, problems.value.length - MAX_VISIBLE_PROBLEMS),
+  );
+
+  /**
+   * Показывает ошибку в исходном коде: переключает режим, выделяет тег
+   * и прокручивает к нему. Сам браузер к выделению не прокручивает, поэтому
+   * высоту текста до ошибки меряем, временно оставив в поле только его.
+   */
+  const showProblem = async (problem: HtmlProblem) => {
+    mode.value = 'source';
+
+    await nextTick();
+
+    const textarea = source.value;
+
+    if (!textarea) {
+      return;
+    }
+
+    const { value } = textarea;
+
+    textarea.value = value.slice(0, problem.start);
+
+    const offset = textarea.scrollHeight;
+
+    textarea.value = value;
+    // Без preventScroll браузер после фокуса уводит прокрутку к старой каретке.
+    textarea.focus({ preventScroll: true });
+    textarea.setSelectionRange(problem.start, problem.end);
+    textarea.scrollTop = Math.max(0, offset - textarea.clientHeight / 2);
+  };
+
+  /**
+   * Автоисправление только по кнопке: браузер перестраивает разметку
+   * по своим правилам, и результат стоит проверить глазами.
+   */
+  const fixProblems = () => {
+    const fixed = fixHtmlProblems(props.modelValue);
+
+    emitValue(fixed);
+
+    // Проп обновится только после рендера родителя, поэтому визуальный
+    // режим заполняем исправленным значением напрямую.
+    if (editor.value) {
+      editor.value.innerHTML = htmlToEditable(fixed);
+    }
+  };
+
+  const validityMessage = computed(() =>
+    getHtmlValidityMessage(problems.value),
+  );
+
+  // Нативная валидация формы не даст отправить её, пока в поле есть ошибки,
+  // и сама прокрутит страницу к подсказке у этого редактора. Поле появляется
+  // вместе с блоком ошибок, поэтому ждём отрисовки (`flush: 'post'`).
+  watchEffect(
+    () => {
+      problemInput.value?.setCustomValidity(validityMessage.value);
+    },
+    { flush: 'post' },
+  );
+
   watch(
     () => props.modelValue,
     (value) => {
@@ -391,7 +478,10 @@
 </script>
 
 <template>
-  <div class="html-editor">
+  <div
+    :class="{ 'is-invalid': problems.length }"
+    class="html-editor"
+  >
     <div class="html-editor__toolbar">
       <div class="html-editor__group">
         <button
@@ -523,6 +613,59 @@
     </div>
 
     <div
+      v-if="problems.length"
+      class="html-editor__problems"
+      role="alert"
+    >
+      <p class="html-editor__problems-title">
+        Ошибка в разметке — сервер не примет этот текст
+      </p>
+
+      <ul class="html-editor__problems-list">
+        <li
+          v-for="problem in visibleProblems"
+          :key="problem.start"
+          class="html-editor__problem"
+        >
+          <span>{{ problem.text }}</span>
+
+          <button
+            class="html-editor__problem-link"
+            type="button"
+            @click="showProblem(problem)"
+          >
+            Показать в коде
+          </button>
+        </li>
+      </ul>
+
+      <p
+        v-if="hiddenProblemsCount"
+        class="html-editor__problems-more"
+      >
+        И ещё {{ hiddenProblemsCount }}
+      </p>
+
+      <button
+        :disabled="disabled"
+        class="html-editor__button html-editor__problems-fix"
+        title="Браузер перестроит разметку по правилам HTML — проверьте результат"
+        type="button"
+        @click="fixProblems"
+      >
+        Исправить автоматически
+      </button>
+
+      <!-- Не даёт отправить форму, пока в разметке есть ошибки. -->
+      <input
+        ref="problemInput"
+        aria-hidden="true"
+        class="html-editor__validation"
+        tabindex="-1"
+      />
+    </div>
+
+    <div
       v-show="mode === 'html'"
       ref="editor"
       :contenteditable="!disabled"
@@ -540,6 +683,7 @@
 
     <textarea
       v-show="mode === 'source'"
+      ref="source"
       :disabled="disabled"
       :placeholder="placeholder"
       :rows="rows"
@@ -836,6 +980,69 @@
 
       opacity: 0%;
       border: 0;
+    }
+
+    &.is-invalid {
+      border-color: var(--error);
+    }
+
+    &__problems {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start;
+
+      padding: 10px 12px;
+
+      font-size: calc(var(--main-font-size) - 1px);
+      color: var(--text-color);
+
+      border-bottom: 1px solid var(--error);
+    }
+
+    &__problems-title {
+      margin: 0;
+      font-weight: 600;
+      color: var(--error);
+    }
+
+    &__problems-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      margin: 0;
+      padding: 0;
+
+      list-style: none;
+    }
+
+    &__problem {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: baseline;
+    }
+
+    &__problem-link {
+      cursor: pointer;
+
+      padding: 0;
+
+      color: var(--primary);
+      text-decoration: underline;
+
+      background: none;
+      border: 0;
+    }
+
+    &__problems-more {
+      margin: 0;
+      color: var(--text-g-color);
+    }
+
+    &__problems-fix {
+      border-color: var(--border);
     }
 
     &__modal-actions {
