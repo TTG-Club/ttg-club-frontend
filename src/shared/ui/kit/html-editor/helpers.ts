@@ -236,31 +236,300 @@ const collapseWhitespace = (root: HTMLElement, doc: Document) => {
   }
 };
 
-/** Открывающие и закрывающие теги: `<p`, `</a`, `<dice-roller`. */
-const TAG_START = /<\/?[a-z][a-z\d-]*/gi;
+/** Комментарий или тег: `<!-- … -->`, `<a href="…">`, `</p>`, `<br/>`. */
+const MARKUP_TOKEN =
+  /<!--[\s\S]*?-->|<(\/?)([a-z][a-z\d-]*)((?:"[^"]*"|'[^']*'|[^"'>])*)>/gi;
 
-/** Последовательность тегов без атрибутов и текста — «скелет» разметки. */
-const getTagSkeleton = (html: string) =>
-  Array.from(html.matchAll(TAG_START), (match) => match[0].toLowerCase()).join(
-    '',
-  );
+/** Теги без закрывающей пары. */
+const VOID_TAGS = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
 
-/**
- * Исправляет разметку, которую браузер при разборе вынужден перестроить:
- * ссылку внутри ссылки, незакрытые теги и т. п. Бэкенд такой HTML
- * отклоняет, поэтому старые описания нельзя было сохранить даже без правок.
- *
- * Если скелет тегов после разбора не изменился, возвращает исходную строку,
- * чтобы не переписывать сущности (`&mdash;`) и форматирование без нужды.
- */
-export const repairHtml = (html: string): string => {
-  if (!html.trim()) {
-    return html;
+/** Теги, закрывающий тег которых по стандарту можно опустить. */
+const OPTIONAL_END_TAGS = new Set([
+  'li',
+  'dt',
+  'dd',
+  'p',
+  'rt',
+  'rp',
+  'optgroup',
+  'option',
+  'colgroup',
+  'thead',
+  'tbody',
+  'tfoot',
+  'tr',
+  'td',
+  'th',
+]);
+
+const TABLE_SECTION_SIBLINGS = ['thead', 'tbody', 'tfoot', 'tr', 'td', 'th'];
+
+/** Какие открытые теги неявно закрывает новый тег того же уровня. */
+const IMPLICITLY_CLOSED_BY: Record<string, Array<string>> = {
+  li: ['li'],
+  dt: ['dt', 'dd'],
+  dd: ['dt', 'dd'],
+  option: ['option'],
+  td: ['td', 'th'],
+  th: ['td', 'th'],
+  tr: ['tr', 'td', 'th'],
+  thead: TABLE_SECTION_SIBLINGS,
+  tbody: TABLE_SECTION_SIBLINGS,
+  tfoot: TABLE_SECTION_SIBLINGS,
+};
+
+/** Блоки, перед которыми браузер закрывает открытый абзац `<p>`. */
+const PARAGRAPH_CLOSERS = new Set([
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'details',
+  'div',
+  'dl',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'header',
+  'hr',
+  'main',
+  'nav',
+  'ol',
+  'p',
+  'pre',
+  'section',
+  'table',
+  'ul',
+]);
+
+const PROBLEM_CONTEXT_LENGTH = 60;
+
+export type HtmlProblem = {
+  /** Что не так — простыми словами. */
+  message: string;
+  /** Начало проблемного тега в исходной разметке. */
+  start: number;
+  /** Конец проблемного тега в исходной разметке. */
+  end: number;
+  /** Текст рядом с ошибкой, чтобы её было легко найти глазами. */
+  context: string;
+};
+
+type OpenTag = {
+  name: string;
+  start: number;
+  end: number;
+};
+
+const fragmentToText = (fragment: string) =>
+  (parseHtml(fragment).body.textContent || '').replace(/\s+/g, ' ').trim();
+
+/** Обрезает текст по границе слова и отмечает обрезку многоточием. */
+const truncateWords = (text: string, fromEnd: boolean) => {
+  if (text.length <= PROBLEM_CONTEXT_LENGTH) {
+    return text;
   }
 
-  const repaired = parseHtml(html).body.innerHTML;
+  if (fromEnd) {
+    const tail = text.slice(-PROBLEM_CONTEXT_LENGTH);
 
-  return getTagSkeleton(repaired) === getTagSkeleton(html) ? html : repaired;
+    return `…${tail.slice(tail.indexOf(' ') + 1)}`;
+  }
+
+  const head = text.slice(0, PROBLEM_CONTEXT_LENGTH);
+  const lastSpace = head.lastIndexOf(' ');
+
+  return `${lastSpace > 0 ? head.slice(0, lastSpace) : head}…`;
+};
+
+/** Видимый текст рядом с тегом: сначала после него, иначе — перед ним. */
+const getProblemContext = (html: string, start: number, end: number) => {
+  const after = fragmentToText(
+    html.slice(end, end + PROBLEM_CONTEXT_LENGTH * 4),
+  );
+
+  if (after) {
+    return truncateWords(after, false);
+  }
+
+  return truncateWords(
+    fragmentToText(
+      html.slice(Math.max(0, start - PROBLEM_CONTEXT_LENGTH * 4), start),
+    ),
+    true,
+  );
+};
+
+/**
+ * Ищет в разметке ошибки, из-за которых бэкенд отклоняет описание
+ * («Некорректный HTML»): ссылку внутри ссылки, блок внутри абзаца,
+ * незакрытые и лишние закрывающие теги.
+ *
+ * Разбор упрощённый и повторяет правила HTML только в той мере, в какой
+ * они встречаются в описаниях. Место ошибки — позиции тега в исходной
+ * строке, по ним редактор выделяет его в режиме исходного кода.
+ */
+export const findHtmlProblems = (html: string): Array<HtmlProblem> => {
+  const problems: Array<HtmlProblem> = [];
+  const stack: Array<OpenTag> = [];
+
+  // Блок, перед которым браузер неявно закрыл абзац. Если потом встретится
+  // `</p>`, ошибка именно в нём: абзац не может содержать блоки.
+  let paragraphCloser: OpenTag | null = null;
+
+  const addProblem = (message: string, tag: OpenTag) => {
+    problems.push({
+      message,
+      start: tag.start,
+      end: tag.end,
+      context: getProblemContext(html, tag.start, tag.end),
+    });
+  };
+
+  const hasOpen = (name: string) => stack.some((tag) => tag.name === name);
+
+  /** Закрывает теги до `name` включительно; незакрытые по пути — ошибки. */
+  const closeUntil = (name: string) => {
+    while (stack.length) {
+      const tag = stack.pop();
+
+      if (!tag || tag.name === name) {
+        return;
+      }
+
+      if (!OPTIONAL_END_TAGS.has(tag.name)) {
+        addProblem(`Тег <${tag.name}> не закрыт`, tag);
+      }
+    }
+  };
+
+  for (const match of html.matchAll(MARKUP_TOKEN)) {
+    const [token, slash, rawName, attributes] = match;
+
+    if (!rawName) {
+      continue;
+    }
+
+    const name = rawName.toLowerCase();
+    const start = match.index || 0;
+    const tag: OpenTag = { name, start, end: start + token.length };
+
+    if (slash) {
+      if (VOID_TAGS.has(name)) {
+        continue;
+      }
+
+      if (hasOpen(name)) {
+        closeUntil(name);
+      } else if (name === 'p' && paragraphCloser) {
+        addProblem(
+          `Блок <${paragraphCloser.name}> внутри абзаца <p>`,
+          paragraphCloser,
+        );
+
+        paragraphCloser = null;
+      } else {
+        addProblem(`Лишний закрывающий тег </${name}>`, tag);
+      }
+
+      continue;
+    }
+
+    if (name === 'a' && hasOpen('a')) {
+      addProblem('Ссылка внутри ссылки', tag);
+    }
+
+    const siblings = IMPLICITLY_CLOSED_BY[name] || [];
+
+    while (stack.length && siblings.includes(stack[stack.length - 1].name)) {
+      stack.pop();
+    }
+
+    if (PARAGRAPH_CLOSERS.has(name)) {
+      if (hasOpen('p')) {
+        closeUntil('p');
+        paragraphCloser = tag;
+      } else if (name === 'p') {
+        paragraphCloser = null;
+      }
+    }
+
+    if (!VOID_TAGS.has(name) && !attributes.trim().endsWith('/')) {
+      stack.push(tag);
+    }
+  }
+
+  for (const tag of stack) {
+    if (!OPTIONAL_END_TAGS.has(tag.name)) {
+      addProblem(`Тег <${tag.name}> не закрыт`, tag);
+    }
+  }
+
+  return problems.sort((first, second) => first.start - second.start);
+};
+
+/** Ссылка без вложенных ссылок, с подсказкой-обёрткой или без неё. */
+const PLAIN_LINK =
+  '(?:<detail-tooltip\\b[^>]*>\\s*)?<a\\b[^>]*>(?:(?!<\\/?a\\b)[\\s\\S])*<\\/a>(?:\\s*<\\/detail-tooltip>)?';
+
+/**
+ * Ссылка, по ошибке обёрнутая в ещё одну ссылку — с подсказкой
+ * (`<detail-tooltip><a> <detail-tooltip><a>текст</a></detail-tooltip></a></detail-tooltip>`)
+ * или без неё (`<a> <detail-tooltip><a>текст</a></detail-tooltip></a>`).
+ * Внешнюю обёртку снимаем, внутреннюю ссылку оставляем.
+ */
+const WRAPPED_LINKS = [
+  new RegExp(
+    `<detail-tooltip\\b[^>]*>\\s*<a\\b[^>]*>\\s*(${PLAIN_LINK})\\s*<\\/a>\\s*<\\/detail-tooltip>`,
+    'gi',
+  ),
+  new RegExp(`<a\\b[^>]*>\\s*(${PLAIN_LINK})\\s*<\\/a>`, 'gi'),
+];
+
+/** Глубина вложенности ссылок, которую разворачиваем (встречалась тройная). */
+const MAX_LINK_NESTING = 5;
+
+/** Снимает лишние обёртки со ссылок — от внутренних к внешним. */
+const unwrapNestedLinks = (html: string): string => {
+  let result = html;
+
+  for (let i = 0; i < MAX_LINK_NESTING; i++) {
+    const next = WRAPPED_LINKS.reduce(
+      (current, pattern) => current.replace(pattern, '$1'),
+      result,
+    );
+
+    if (next === result) {
+      break;
+    }
+
+    result = next;
+  }
+
+  return result;
 };
 
 /**
@@ -278,6 +547,16 @@ export const compressHtml = (html: string): string => {
 
   return doc.body.innerHTML.trim();
 };
+
+/**
+ * Исправляет ошибки разметки, которые находит `findHtmlProblems`.
+ *
+ * Частый случай — ссылку с подсказкой обернули в такую же ссылку — чиним
+ * точечно, снимая внешнюю обёртку. Остальное перестраивает браузер
+ * по правилам HTML; результат стоит проверить глазами.
+ */
+export const fixHtmlProblems = (html: string): string =>
+  compressHtml(unwrapNestedLinks(html));
 
 const cleanupAttributes = (root: HTMLElement) => {
   for (const element of Array.from(
