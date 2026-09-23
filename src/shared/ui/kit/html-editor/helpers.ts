@@ -236,6 +236,33 @@ const collapseWhitespace = (root: HTMLElement, doc: Document) => {
   }
 };
 
+/** Открывающие и закрывающие теги: `<p`, `</a`, `<dice-roller`. */
+const TAG_START = /<\/?[a-z][a-z\d-]*/gi;
+
+/** Последовательность тегов без атрибутов и текста — «скелет» разметки. */
+const getTagSkeleton = (html: string) =>
+  Array.from(html.matchAll(TAG_START), (match) => match[0].toLowerCase()).join(
+    '',
+  );
+
+/**
+ * Исправляет разметку, которую браузер при разборе вынужден перестроить:
+ * ссылку внутри ссылки, незакрытые теги и т. п. Бэкенд такой HTML
+ * отклоняет, поэтому старые описания нельзя было сохранить даже без правок.
+ *
+ * Если скелет тегов после разбора не изменился, возвращает исходную строку,
+ * чтобы не переписывать сущности (`&mdash;`) и форматирование без нужды.
+ */
+export const repairHtml = (html: string): string => {
+  if (!html.trim()) {
+    return html;
+  }
+
+  const repaired = parseHtml(html).body.innerHTML;
+
+  return getTagSkeleton(repaired) === getTagSkeleton(html) ? html : repaired;
+};
+
 /**
  * Приводит разметку к компактному виду. Идемпотентна: сжатый HTML
  * проходит через неё без изменений.

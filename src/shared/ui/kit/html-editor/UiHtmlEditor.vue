@@ -9,6 +9,7 @@
     editableToHtml,
     extractFormula,
     htmlToEditable,
+    repairHtml,
     tokenFromElement,
   } from './helpers';
 
@@ -365,11 +366,28 @@
     }
   };
 
+  /**
+   * Старые описания бывают с разметкой, которую бэкенд не принимает
+   * (ссылка внутри ссылки). Чиним её сразу при загрузке, иначе такое поле
+   * не даёт сохранить форму даже без правок.
+   */
+  const repairModel = () => {
+    const value = props.modelValue || '';
+    const repaired = repairHtml(value);
+
+    if (repaired !== value) {
+      emitValue(repaired);
+    }
+  };
+
   watch(
     () => props.modelValue,
     (value) => {
+      // Своё же исправленное значение возвращается сюда с `emitted` —
+      // повторно не чиним, поэтому цикла watch → emit → watch нет.
       if (value !== emitted.value) {
         syncFromModel();
+        repairModel();
       }
     },
   );
@@ -387,6 +405,7 @@
     document.execCommand('styleWithCSS', false, 'false');
 
     syncFromModel();
+    repairModel();
   });
 </script>
 
