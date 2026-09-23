@@ -7,6 +7,7 @@
     OptionSave,
   } from '@/shared/types/character/Options';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -109,7 +110,10 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить особенность');
+
+      message.error(
+        withApiErrorReason('Не удалось сохранить особенность', err),
+      );
     } finally {
       pending.value = false;
     }

@@ -7,6 +7,7 @@
     WeaponSave,
   } from '@/shared/types/inventory/Weapons';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -118,7 +119,7 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить оружие');
+      message.error(withApiErrorReason('Не удалось сохранить оружие', err));
     } finally {
       pending.value = false;
     }

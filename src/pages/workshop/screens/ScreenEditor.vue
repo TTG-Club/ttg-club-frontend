@@ -7,6 +7,7 @@
     IScreenSave,
   } from '@/shared/types/workshop/Screens';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = defineProps<{
@@ -59,7 +60,10 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить раздел ширмы');
+
+      message.error(
+        withApiErrorReason('Не удалось сохранить раздел ширмы', err),
+      );
     } finally {
       pending.value = false;
     }

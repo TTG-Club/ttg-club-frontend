@@ -67,6 +67,18 @@ const BLOCK_TAGS = [
   'UL',
 ];
 
+/**
+ * Блоки, которые не могут лежать внутри `<p>`. `BR` из `BLOCK_TAGS` сюда
+ * не входит: для абзаца это обычный перенос строки.
+ */
+const NESTED_BLOCK_SELECTOR = [
+  ...BLOCK_TAGS.filter((tag) => tag !== 'BR'),
+  'DL',
+  'PRE',
+]
+  .map((tag) => tag.toLowerCase())
+  .join(', ');
+
 /** Теги, внутри которых пробелы значимы и сжимать их нельзя. */
 const PRESERVE_WHITESPACE = 'pre, code, textarea';
 
@@ -144,6 +156,10 @@ const normalizeInlineTags = (root: HTMLElement, doc: Document) => {
  * Переименовываем только «служебные» блоки: свои `<div>` с классами
  * (`table-responsive` и подобные) трогать нельзя, а `style` от выравнивания
  * нужно сохранить.
+ *
+ * `<div>` с блоками внутри (`<div><table>`, выравнивание по центру вокруг
+ * заголовка) тоже оставляем: `<p>` не может содержать блоки, и бэкенд
+ * отклоняет такую разметку как некорректный HTML.
  */
 const normalizeBlocks = (root: HTMLElement, doc: Document) => {
   for (const child of Array.from(root.children)) {
@@ -151,7 +167,11 @@ const normalizeBlocks = (root: HTMLElement, doc: Document) => {
       BLOCK_KEEP_ATTRS.includes(attr.name),
     );
 
-    if (child.tagName === 'DIV' && onlyLayoutAttrs) {
+    if (
+      child.tagName === 'DIV' &&
+      onlyLayoutAttrs &&
+      !child.querySelector(NESTED_BLOCK_SELECTOR)
+    ) {
       renameElement(child, 'p', doc);
     }
   }

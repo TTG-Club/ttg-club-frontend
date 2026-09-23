@@ -4,6 +4,7 @@
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { FeatSave, FeatsItem } from '@/shared/types/character/Feats';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -96,7 +97,7 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить черту');
+      message.error(withApiErrorReason('Не удалось сохранить черту', err));
     } finally {
       pending.value = false;
     }

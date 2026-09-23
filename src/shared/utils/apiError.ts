@@ -55,3 +55,19 @@ export const getApiErrorMessage = (
 
   return fallback;
 };
+
+/**
+ * Дополняет текст ошибки причиной от сервера, например
+ * «Не удалось сохранить предысторию: skillDescription: Некорректный HTML».
+ *
+ * HTML-страницу ошибки (ответ прокси) в причину не выводим.
+ */
+export const withApiErrorReason = (text: string, error: unknown): string => {
+  const reason = getApiErrorMessage(error, '').trim();
+
+  if (!reason || reason.startsWith('<')) {
+    return text;
+  }
+
+  return `${text}: ${reason}`;
+};

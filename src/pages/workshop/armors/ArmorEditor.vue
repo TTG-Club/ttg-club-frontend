@@ -4,6 +4,7 @@
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { ArmorItem, ArmorSave } from '@/shared/types/inventory/Armors';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -79,7 +80,7 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить доспех');
+      message.error(withApiErrorReason('Не удалось сохранить доспех', err));
     } finally {
       pending.value = false;
     }

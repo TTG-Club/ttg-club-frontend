@@ -8,6 +8,7 @@
     ClassTrait,
   } from '@/shared/types/character/Classes';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import { ARCHETYPE_SPELL_LEVEL_TYPE_OPTIONS } from '@/features/classes/model';
@@ -100,7 +101,7 @@
       message.success('Архетип обновлён');
     } catch (error) {
       errorHandler(error);
-      message.error('Не удалось сохранить архетип');
+      message.error(withApiErrorReason('Не удалось сохранить архетип', error));
     } finally {
       pending.value = false;
     }
