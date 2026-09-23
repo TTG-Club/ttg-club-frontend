@@ -4,6 +4,7 @@
   import { useDiscreteApi } from '@/shared/composable/useDiscreteApi';
   import type { RuleDetail, RuleSave } from '@/shared/types/wiki/Rules';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = defineProps<{
@@ -52,7 +53,10 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить правило или термин');
+
+      message.error(
+        withApiErrorReason('Не удалось сохранить правило или термин', err),
+      );
     } finally {
       pending.value = false;
     }

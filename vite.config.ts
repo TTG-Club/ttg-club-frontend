@@ -46,6 +46,11 @@ export default ({ mode, command }: ConfigEnv) => {
       changeOrigin: true,
       secure: false,
     },
+    '^/find-game': {
+      target: 'https://nexus.api.ttg.club',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/find-game/, ''),
+    },
   };
 
   // Dev-прокси к subscriber-service подключаем, только если задан его URL,

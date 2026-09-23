@@ -259,6 +259,80 @@ export const HOME_VIDEOS_LABEL = 'Видео';
 
 export const HOME_VIDEOS_ICON = 'home/brand-youtube';
 
+/* --- Последняя игра ---------------------------------------------------- */
+
+export const HOME_LATEST_GAME_LABEL = 'Новая игра';
+
+export const HOME_LATEST_GAME_ICON = 'home/users';
+
+export const HOME_LATEST_GAME_SITE_URL = 'https://new.ttg.club';
+
+export const HOME_LATEST_GAME_CATALOG_URL = `${HOME_LATEST_GAME_SITE_URL}/games`;
+
+export const HOME_LATEST_GAME_API_URL = import.meta.env.DEV
+  ? '/find-game/api/v1/games'
+  : 'https://nexus.api.ttg.club/api/v1/games';
+
+export const HOME_LATEST_GAME_SYSTEMS_API_URL = import.meta.env.DEV
+  ? '/find-game/api/v1/game-systems'
+  : 'https://nexus.api.ttg.club/api/v1/game-systems';
+
+export const HOME_LATEST_GAME_LOOKUP_SIZE = 20;
+
+export const HOME_LATEST_GAME_EMPTY_TEXT = 'Игр в каталоге пока нет';
+
+export const HOME_LATEST_GAME_ERROR_TEXT = 'Не удалось загрузить игры';
+
+export const HOME_LATEST_GAME_ALL_LABEL = 'Все игры';
+
+export const HOME_LATEST_GAME_TYPE_LABELS = {
+  ONLINE: 'Онлайн',
+  TEXT: 'Текстовая',
+  OFFLINE: 'Вживую',
+};
+
+/** Значок формата игры в строке поверх обложки */
+export const HOME_LATEST_GAME_TYPE_ICONS = {
+  ONLINE: 'home/device-desktop',
+  TEXT: 'home/message-2',
+  OFFLINE: 'home/users',
+};
+
+export const HOME_LATEST_GAME_DURATION_LABELS = {
+  ONE_SHOT: 'Ваншот',
+  CAMPAIGN: 'Кампания',
+};
+
+export const HOME_LATEST_GAME_COST_LABELS = {
+  FREE: 'Бесплатно',
+  PAID: 'Платно',
+};
+
+/**
+ * Имена мастеров отдаёт core-api: сервис игр знает только идентификатор.
+ * Ходим к нему напрямую — прокси new.ttg.club не пускает запросы с чужих
+ * сайтов, а core-api разрешает любой источник.
+ */
+export const HOME_LATEST_GAME_NAMES_API_URL =
+  'https://api.ttg.club/api/user/display-names/by-ids';
+
+export const HOME_LATEST_GAME_MASTER_LABEL = 'Мастер';
+
+/** Имя мастера не пришло — сырой идентификатор посетителю ничего не скажет */
+export const HOME_LATEST_GAME_UNKNOWN_MASTER = 'Без имени';
+
+export const HOME_LATEST_GAME_NEXT_SESSION_LABEL = 'Ближайшая встреча';
+
+/** Своей даты у игры нет — время назначается встречам */
+export const HOME_LATEST_GAME_NEXT_SESSION_EMPTY = 'Дата не назначена';
+
+/** Без года: он почти всегда текущий, а строка в карточке тесная */
+export const HOME_LATEST_GAME_NEXT_SESSION_FORMAT = 'D MMM, HH:mm';
+
+export const HOME_LATEST_GAME_SEATS_LABEL = 'Места';
+
+export const HOME_LATEST_GAME_GENRES_SEPARATOR = ', ';
+
 /** Свежие ролики сверху; при одной дате — по названию */
 const HOME_VIDEOS_ORDER: Array<IOrderItem> = [
   {

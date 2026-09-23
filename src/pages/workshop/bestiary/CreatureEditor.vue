@@ -9,6 +9,7 @@
     ICreatureSaveNameValue,
   } from '@/shared/types/workshop/Bestiary';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -690,7 +691,7 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить существо');
+      message.error(withApiErrorReason('Не удалось сохранить существо', err));
     } finally {
       pending.value = false;
     }

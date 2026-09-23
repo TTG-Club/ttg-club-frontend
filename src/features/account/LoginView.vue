@@ -55,6 +55,7 @@
       return;
     }
 
+    model.usernameOrEmail = model.usernameOrEmail.trim();
     inProgress.value = true;
 
     try {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import HomeHero from './HomeHero.vue';
+  import HomeLatestGame from './HomeLatestGame.vue';
   import HomePartners from './HomePartners.vue';
   import HomePromoCard from './HomePromoCard.vue';
   import HomeSections from './HomeSections.vue';
@@ -24,13 +25,16 @@
       <!--
         Ниже xl все обёртки схлопываются в display: contents: блоки становятся
         прямыми флекс-элементами ленты и выстраиваются одним потоком в порядке
-        order: VTTG → Соцсети → Видео → Токенатор → Discord Bot → Друзья.
+        order: VTTG → Соцсети → Видео → Новая игра → Токенатор →
+        Discord Bot → Друзья.
 
         С xl лента делится на две половины, растянутые друг под друга. Слева
-        видео. Справа ряд из двух узких столбцов — Токенатор с Discord Bot и
-        VTTG с соцсетями, ряд `stretch`, поэтому их низы совпадают, — а под ним
-        друзья. Последний блок каждой половины добирает высоту до соседней,
-        чтобы низ ленты шёл одной линией.
+        видео. Справа два узких столбца: игра с Токенатором и Discord Bot, и
+        VTTG с соцсетями и друзьями. Столбцы стоят в одном ряду `stretch`,
+        поэтому их низы совпадают: высоту задаёт столбец с игрой, обложка игры
+        забирает разницу, а друзья занимают остаток под соцсетями и
+        прокручиваются. VTTG и промо-карточки остаются своей высоты. Видео добирает высоту до
+        правой половины, чтобы низ ленты шёл одной линией.
       -->
       <div class="home__feed">
         <div class="home__half">
@@ -40,6 +44,8 @@
         <div class="home__half">
           <div class="home__row">
             <div class="home__stack">
+              <home-latest-game class="home__latest-game" />
+
               <home-promo-card
                 :card="HOME_TOKENATOR_CARD"
                 compact
@@ -60,10 +66,10 @@
               />
 
               <home-social-links class="home__social" />
+
+              <home-partners class="home__partners" />
             </div>
           </div>
-
-          <home-partners class="home__partners" />
         </div>
       </div>
     </div>
@@ -123,16 +129,20 @@
       order: 2;
     }
 
-    &__tokenator {
+    &__latest-game {
       order: 3;
     }
 
-    &__discord-bot {
+    &__tokenator {
       order: 4;
     }
 
-    &__partners {
+    &__discord-bot {
       order: 5;
+    }
+
+    &__partners {
+      order: 6;
     }
 
     @include media-min($xl) {
@@ -147,6 +157,7 @@
 
       &__row {
         display: flex;
+        flex: 1 1 auto;
         gap: 12px;
         align-items: stretch;
       }
@@ -163,20 +174,26 @@
       &__vttg,
       &__social,
       &__videos,
+      &__latest-game,
       &__tokenator,
       &__discord-bot,
       &__partners {
         order: 0;
       }
 
-      // Карточки столбцов делят высоту ряда поровну, а последние блоки половин
-      // добирают высоту до соседней половины
-      &__tokenator,
-      &__discord-bot,
-      &__vttg,
-      &__videos,
-      &__partners {
+      // Высоту до соседей добирают игра (за счёт обложки) и видео; VTTG и
+      // промо-карточки не растягиваются
+      &__latest-game,
+      &__videos {
         flex: 1 1 auto;
+      }
+
+      // Друзей много, и в узкой колонке список вытянул бы всю ленту. Поэтому
+      // он не участвует в высоте ряда (flex-basis 0): берёт то, что осталось
+      // в колонке под соцсетями, и прокручивается внутри
+      &__partners {
+        flex: 1 1 0;
+        min-height: 240px;
       }
     }
   }

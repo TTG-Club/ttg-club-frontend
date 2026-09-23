@@ -7,6 +7,7 @@
     BackgroundSave,
   } from '@/shared/types/character/Backgrounds';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import BackgroundPersonalizationTableEditor from './BackgroundPersonalizationTableEditor.vue';
@@ -125,7 +126,10 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить предысторию');
+
+      message.error(
+        withApiErrorReason('Не удалось сохранить предысторию', err),
+      );
     } finally {
       pending.value = false;
     }

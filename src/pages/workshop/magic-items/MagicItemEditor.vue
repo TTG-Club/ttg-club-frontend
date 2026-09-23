@@ -7,6 +7,7 @@
     TArtifactItem,
   } from '@/shared/types/inventory/MagicItems';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   const props = withDefaults(
@@ -111,7 +112,10 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить магический предмет');
+
+      message.error(
+        withApiErrorReason('Не удалось сохранить магический предмет', err),
+      );
     } finally {
       pending.value = false;
     }

@@ -132,6 +132,10 @@
       return;
     }
 
+    if (!isOnlyPassword.value) {
+      model.email = model.email.trim();
+    }
+
     inProgress.value = true;
 
     try {
@@ -177,7 +181,6 @@
         placeholder="Электронный адрес"
         autofocus
         size="large"
-        :allow-input="noSideSpace"
       />
     </n-form-item>
 

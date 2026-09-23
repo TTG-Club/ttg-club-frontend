@@ -13,6 +13,7 @@
     TClassItem,
   } from '@/shared/types/character/Classes';
   import { UiHtmlEditor } from '@/shared/ui/kit/html-editor';
+  import { withApiErrorReason } from '@/shared/utils/apiError';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
   import ClassTableEditor from './ClassTableEditor.vue';
@@ -208,7 +209,7 @@
       );
     } catch (err) {
       errorHandler(err);
-      message.error('Не удалось сохранить класс');
+      message.error(withApiErrorReason('Не удалось сохранить класс', err));
     } finally {
       pending.value = false;
     }
