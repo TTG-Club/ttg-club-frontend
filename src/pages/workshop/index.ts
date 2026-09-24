@@ -150,6 +150,12 @@ export const WorkshopScreenEditPage: RouteRecordRaw = {
   component: () => import('./screens/ScreenEditView.vue'),
 };
 
+export const WorkshopGodEditPage: RouteRecordRaw = {
+  name: 'workshop-god-edit',
+  path: '/workshop/gods/:godName/edit',
+  component: () => import('./gods/GodEditView.vue'),
+};
+
 export const WorkshopWeaponsPage: RouteRecordRaw = {
   name: 'workshop-weapons',
   path: '/workshop/weapons',

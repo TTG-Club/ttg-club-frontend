@@ -1,5 +1,6 @@
 <script>
   import { useUIStore } from '@/shared/stores/UIStore';
+  import { useUserStore } from '@/shared/stores/UserStore';
   import ContentDetail from '@/shared/ui/ContentDetail.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
 
@@ -28,6 +29,12 @@
     }),
     computed: {
       ...mapState(useUIStore, ['fullscreen', 'isMobile']),
+      ...mapState(useUserStore, ['isEditor']),
+      editUrl() {
+        return this.isEditor && this.god
+          ? `/workshop/gods/${this.$route.params.godName}/edit`
+          : '';
+      },
     },
     async mounted() {
       await this.godInfoQuery(this.$route.path);
@@ -71,6 +78,7 @@
     <template #fixed>
       <section-header
         :copy="!error && !loading"
+        :edit-url="editUrl"
         :fullscreen="!isMobile"
         :subtitle="god?.name?.eng || ''"
         :title="god?.name?.rus || ''"
