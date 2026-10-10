@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import { httpClient } from '@/shared/api';
   import type { TSource } from '@/shared/types/BaseApiFields';
+  import type { ArchetypeSpellTable } from '@/shared/types/character/Classes';
   import RawContent from '@/shared/ui/RawContent.vue';
   import { errorHandler } from '@/shared/utils/errorHandler';
+
+  import ArchetypeSpells from './ArchetypeSpells.vue';
 
   type ArchetypeLink = {
     name: {
@@ -21,7 +24,9 @@
   };
 
   type ArchetypeDetail = ArchetypeLink & {
+    archetypeSpellTable?: ArchetypeSpellTable;
     traits?: {
+      archetype?: ArchetypeFeature;
       features?: ArchetypeFeature[];
     };
   };
@@ -102,6 +107,16 @@
         <n-spin v-if="loading[archetype.url]" />
 
         <template v-else>
+          <raw-content
+            v-if="details[archetype.url]?.traits?.archetype?.description"
+            :template="details[archetype.url].traits.archetype.description"
+          />
+
+          <archetype-spells
+            v-if="details[archetype.url]?.archetypeSpellTable?.levels?.length"
+            :table="details[archetype.url].archetypeSpellTable"
+          />
+
           <div
             v-for="feature in getArchetypeFeatures(archetype.url)"
             :key="feature.id"
