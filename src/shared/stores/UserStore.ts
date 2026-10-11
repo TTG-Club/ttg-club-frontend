@@ -35,6 +35,10 @@ export type TRegBody = {
   username: string;
   password: string;
   email: string;
+  offerAccepted: boolean;
+  offerVersion: string;
+  personalDataConsent: boolean;
+  privacyPolicyVersion: string;
 };
 
 export type TAuthBody = {
