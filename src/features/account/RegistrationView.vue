@@ -15,6 +15,13 @@
     ruleEmail,
   } from '@/shared/utils/validation-rules/authChecks';
 
+  import {
+    PRIVACY_POLICY_URL,
+    PRIVACY_POLICY_VERSION,
+    PUBLIC_OFFER_URL,
+    PUBLIC_OFFER_VERSION,
+  } from './model';
+
   import type { FormInst, FormRules } from 'naive-ui';
 
   const emit = defineEmits<{
@@ -35,7 +42,16 @@
     email: '',
     password: '',
     repeat: '',
+    // Согласия не отмечены заранее: человек ставит каждую галочку сам.
+    offerAccepted: false,
+    personalDataConsent: false,
   });
+
+  const consentsGiven = computed(
+    () => model.offerAccepted && model.personalDataConsent,
+  );
+
+  const submitDisabled = computed(() => success.value || !consentsGiven.value);
 
   const rules = computed<FormRules>(() => ({
     username: ruleUsername({ minLength: 5, checkExist: true }),
@@ -56,6 +72,11 @@
   const validate = () => formRef.value!.validate();
 
   const onSubmit = async () => {
+    // Enter в поле формы обходит выключенную кнопку.
+    if (!consentsGiven.value) {
+      return;
+    }
+
     inProgress.value = true;
 
     try {
@@ -69,7 +90,13 @@
     }
 
     try {
-      await userStore.registration(omit(model, 'repeat'));
+      // Вместе с согласиями уходят редакции документов, которые видел
+      // пользователь: в базе остаётся, с чем именно он согласился.
+      await userStore.registration({
+        ...omit(model, 'repeat'),
+        offerVersion: PUBLIC_OFFER_VERSION,
+        privacyPolicyVersion: PRIVACY_POLICY_VERSION,
+      });
 
       sendSignUpMetrics();
 
@@ -169,12 +196,46 @@
       />
     </n-form-item>
 
+    <n-form-item
+      path="offerAccepted"
+      :show-feedback="false"
+    >
+      <n-checkbox v-model:checked="model.offerAccepted">
+        Принимаю условия
+        <a
+          :href="PUBLIC_OFFER_URL"
+          target="_blank"
+          rel="noopener"
+          @click.stop
+        >
+          публичной оферты
+        </a>
+      </n-checkbox>
+    </n-form-item>
+
+    <n-form-item
+      path="personalDataConsent"
+      :show-feedback="false"
+    >
+      <n-checkbox v-model:checked="model.personalDataConsent">
+        Даю согласие на обработку персональных данных в соответствии с
+        <a
+          :href="PRIVACY_POLICY_URL"
+          target="_blank"
+          rel="noopener"
+          @click.stop
+        >
+          политикой конфиденциальности
+        </a>
+      </n-checkbox>
+    </n-form-item>
+
     <n-flex
       :wrap="false"
       :vertical
     >
       <n-button
-        :disabled="success"
+        :disabled="submitDisabled"
         :loading="inProgress"
         type="primary"
         size="large"
