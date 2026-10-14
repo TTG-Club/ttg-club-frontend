@@ -152,7 +152,7 @@
               props: { style: { color: 'var(--success)' } },
             }
           : {
-              label: 'Пометить повержённым',
+              label: 'Пометить поверженным',
               key: 'kill',
               icon: renderMenuIcon('tabler:skull'),
               props: { style: { color: 'var(--error)' } },
