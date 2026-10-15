@@ -383,6 +383,7 @@
     altName: '',
     size: getEnumByLabel(props.creature?.size.rus, sizeOptions, 'MEDIUM'),
     type: getEnumByLabel(props.creature?.type.name, typeOptions, 'HUMANOID'),
+    typeClarification: props.creature?.type.tags?.join(', ') || '',
     alignment: getEnumByLabel(
       props.creature?.alignment?.split('/')[0]?.trim(),
       alignmentOptions,
@@ -604,6 +605,7 @@
       },
       size: form.size,
       type: form.type,
+      typeClarification: form.typeClarification.trim(),
       alignment: form.alignment,
       armorClass: Number(form.armorClass),
       armorText: form.armorText || undefined,
@@ -755,6 +757,16 @@
           {{ item.label }}
         </option>
       </select>
+    </label>
+
+    <label class="creature-editor__field">
+      <span>Уточнение типа</span>
+
+      <input
+        v-model="form.typeClarification"
+        placeholder="Например: человек"
+        type="text"
+      />
     </label>
 
     <label class="creature-editor__field">
