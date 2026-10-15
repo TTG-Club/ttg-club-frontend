@@ -167,6 +167,7 @@ export interface ICreatureSave {
   name: ICreatureSaveName;
   size: string;
   type: string;
+  typeClarification: string;
   alignment: string;
   armorClass: number;
   armorText?: string;
