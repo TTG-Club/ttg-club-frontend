@@ -381,7 +381,12 @@
     name: props.creature?.name.rus || '',
     englishName: props.creature?.name.eng || '',
     altName: '',
-    size: getEnumByLabel(props.creature?.size.rus, sizeOptions, 'MEDIUM'),
+    size:
+      sizeOptions.find(
+        (size) =>
+          size.value ===
+          props.creature?.size.eng.toUpperCase().replace(' OR ', '_'),
+      )?.value || 'MEDIUM',
     type: getEnumByLabel(props.creature?.type.name, typeOptions, 'HUMANOID'),
     typeClarification: props.creature?.type.tags?.join(', ') || '',
     alignment: getEnumByLabel(
@@ -399,7 +404,7 @@
     diceCount: parsedHitFormula.diceCount,
     challengeRating: props.creature?.challengeRating || '0',
     npc: false,
-    speed: Number(findSpeed()?.value || 30),
+    speed: Number(findSpeed()?.value ?? 30),
     flySpeed: findSpeed('летая')?.value || '',
     hover: findSpeed('летая')?.additional === 'парит',
     swimSpeed: findSpeed('плавая')?.value || '',
