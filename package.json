@@ -1,0 +1,62 @@
+{
+  "name": "ttg-club-5e14",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev": "nuxt dev --host --no-qr",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "server": "node .output/server/index.mjs",
+    "postinstall": "nuxt cleanup && nuxt prepare",
+    "type-check": "vue-tsc -p tsconfig.json",
+    "test": "vitest run",
+    "lint:check": "eslint .",
+    "lint:write": "eslint . --fix",
+    "lint:workflow": "eslint . --quiet",
+    "stylelint:check": "stylelint \"{**/*,*}.{css,scss,vue}\" \"!legacy/**\" --ignore-path .gitignore",
+    "stylelint:write": "stylelint \"{**/*,*}.{css,scss,vue}\" \"!legacy/**\" --ignore-path .gitignore --fix",
+    "stylelint:workflow": "stylelint \"{**/*,*}.{css,scss,vue}\" \"!legacy/**\" --ignore-path .gitignore --quiet"
+  },
+  "dependencies": {
+    "@iconify-json/tabler": "^1.2.35",
+    "@nuxt/fonts": "^0.14.0",
+    "@nuxt/icon": "^2.5.1",
+    "@nuxt/ui": "^4.11.0",
+    "@nuxtjs/seo": "^5.3.14",
+    "@pinia/nuxt": "^0.11.3",
+    "@vueuse/core": "^14.4.0",
+    "@vueuse/nuxt": "^14.4.0",
+    "consola": "^3.4.2",
+    "es-toolkit": "^1.48.1",
+    "ms": "^2.1.3",
+    "nuxt": "^4.5.2",
+    "nuxt-gtag": "^4.1.0",
+    "nuxt-security": "^2.6.0",
+    "pinia": "^3.0.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.16.0",
+    "@prettier/plugin-xml": "^3.4.2",
+    "@svifty7/eslint-config": "^0.2.1",
+    "@types/ms": "^2.1.0",
+    "eslint": "^10.5.0",
+    "eslint-plugin-format": "^2.0.1",
+    "eslint-plugin-vuejs-accessibility": "^2.5.0",
+    "jiti": "^2.7.0",
+    "postcss-html": "^1.8.1",
+    "postcss-scss": "^4.0.9",
+    "prettier": "^3.8.4",
+    "prettier-plugin-tailwindcss": "^0.7.4",
+    "sass": "^1.101.0",
+    "stylelint-config-clean-order": "^8.0.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.5"
+  },
+  "volta": {
+    "node": "24.13.0",
+    "pnpm": "10.32.1"
+  }
+}

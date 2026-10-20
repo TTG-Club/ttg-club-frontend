@@ -1,0 +1,57 @@
+name: Deploy
+run-name: Deploy ${{ github.ref_name }} by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths-ignore:
+      - 'legacy/**'
+      - .github/workflows/build.yml
+      - '.github/workflows/legacy-*.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      APPLICATION_ID: ${{ github.ref_name == 'main' && secrets.DOKPLOY_APP_ID_PROD || secrets.DOKPLOY_APP_ID_DEV }}
+    steps:
+      # Nuxt-приложение деплоится отдельным приложением Dokploy. Пока его id не
+      # заведён в секретах, сборка пропускается, а не падает.
+      - name: Check Dokploy application
+        id: target
+        run: |
+          if [ -z "$APPLICATION_ID" ]; then
+            echo "::notice::DOKPLOY_APP_ID_${{ github.ref_name == 'main' && 'PROD' || 'DEV' }} не задан, деплой пропущен"
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        if: steps.target.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+
+      - name: Build, Push and Deploy
+        if: steps.target.outputs.enabled == 'true'
+        uses: TTG-Club/shared-workflows/standard@v1
+        with:
+          image_name: ttg-club-frontend
+          application_id: ${{ env.APPLICATION_ID }}
+          registry_url: ${{ secrets.REGISTRY_URL }}
+          registry_username: ${{ secrets.REGISTRY_USERNAME }}
+          registry_password: ${{ secrets.REGISTRY_PASSWORD }}
+          dokploy_url: ${{ secrets.DOKPLOY_URL }}
+          dokploy_api_key: ${{ secrets.DOKPLOY_API_KEY }}
+          cosign_private_key: ${{ secrets.COSIGN_PRIVATE_KEY }}

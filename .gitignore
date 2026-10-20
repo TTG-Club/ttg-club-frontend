@@ -1,0 +1,44 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Generated files and dirs
+dist
+.eslintcache
+.stylelintcache
+shared/types/generated
+
+# Custom
+.test
+.antigravityignore
+/tmp
+
+# AI Agents
+/.agent/rules/project-style-guide.md
+.claude

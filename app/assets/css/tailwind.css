@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+@import './theme.css';
+
+@theme {
+  --font-sans:
+    'Open Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --font-serif: 'Lora', ui-serif, Georgia, serif;
+}
+
+/*
+ * Семантические цвета Tailwind поверх палитры старого сайта: в шаблонах
+ * пишем `bg-main`, `text-link`, `border-default` и т.п., без `dark:`.
+ */
+@theme inline {
+  --color-main: var(--bg-main);
+  --color-secondary-surface: var(--bg-secondary);
+  --color-sub-menu: var(--bg-sub-menu);
+  --color-table-list: var(--bg-table-list);
+  --color-body: var(--text-color);
+  --color-title: var(--text-color-title);
+  --color-link: var(--link-color);
+  --color-link-hover: var(--link-color-hover);
+  --color-hover: var(--hover);
+}
+
+/* Nuxt UI берёт цвета из той же палитры. */
+:root {
+  --max-content: 1320px;
+
+  --ui-primary: var(--primary);
+  --ui-bg: var(--bg-main);
+  --ui-bg-muted: var(--bg-secondary);
+  --ui-bg-elevated: var(--bg-sub-menu);
+  --ui-bg-accented: var(--bg-table-list);
+  --ui-text: var(--text-color);
+  --ui-text-highlighted: var(--text-color-title);
+  --ui-text-muted: var(--text-g-color);
+  --ui-text-dimmed: var(--text-color-disabled);
+  --ui-border: var(--border);
+  --ui-border-accented: var(--border-hover);
+}
+
+body {
+  @apply bg-main font-sans text-body;
+}
