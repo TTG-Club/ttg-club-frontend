@@ -1,4 +1,4 @@
-name: Code Check
+name: Legacy Code Check
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ permissions:
   security-events: write
 
 concurrency:
-  group: code-check-${{ github.ref_name }}
+  group: legacy-code-check-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -22,18 +22,22 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: 'package.json'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          node-version-file: legacy/package.json
+          cache: npm
+          cache-dependency-path: legacy/package-lock.json
 
       - name: Install dependencies
+        working-directory: legacy
         run: npm ci --cache .npm
 
       - name: Build
+        working-directory: legacy
         run: npm run build:prod
 
       - name: ESLint
+        working-directory: legacy
         run: npm run lint:workflow
 
       - name: Stylelint
+        working-directory: legacy
         run: npm run stylelint:workflow

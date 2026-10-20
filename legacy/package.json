@@ -24,7 +24,7 @@
     "stylelint:write": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --fix",
     "stylelint:workflow": "stylelint \"{**/*,*}.{css,scss,vue}\" --cache --cache-strategy content --ignore-path .eslintignore --quiet",
     "pre-commit": "lint-staged",
-    "prepare": "is-ci || husky"
+    "prepare": "is-ci || (cd .. && husky)"
   },
   "dependencies": {
     "@iconify/vue": "^5.0.1",

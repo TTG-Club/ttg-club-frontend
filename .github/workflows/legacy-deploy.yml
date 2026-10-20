@@ -1,16 +1,20 @@
-name: Deploy
+name: Legacy Deploy
 
 on:
   push:
     branches:
       - main
       - dev
+    # Старое SPA собирается в образ бэкенда: передеплой нужен только при его изменениях.
+    paths:
+      - 'legacy/**'
+      - .github/workflows/build.yml
 
 permissions:
   actions: write
 
 concurrency:
-  group: deploy
+  group: legacy-deploy
   cancel-in-progress: false
 
 jobs:
