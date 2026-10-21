@@ -1,4 +1,9 @@
-export type { FilterGroupResponse, FilterResponse } from './schema';
+export type {
+  EntryName,
+  EntrySource,
+  FilterGroupResponse,
+  FilterResponse,
+} from './schema';
 export type {
   FilterDefinition,
   FilterGroup,
@@ -11,13 +16,22 @@ export type {
 } from './types';
 
 export {
+  entryNameSchema,
+  entrySourceSchema,
+  filterResponseSchema,
+} from './schema';
+
+export {
   buildFilterPayload,
   buildListRequest,
   getDefaultSelection,
+  getEntryApiPath,
   getFilterGroups,
   getGroupSelection,
   getQueryString,
+  getWorkshopEditPath,
   groupItems,
+  hasSourceGroupLabel,
   isSelectionCustomized,
   normalizeFilter,
   selectionFromQuery,
@@ -26,4 +40,3 @@ export {
 } from './utils';
 
 export * from './constants';
-export { filterResponseSchema } from './schema';

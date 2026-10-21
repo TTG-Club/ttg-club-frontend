@@ -19,7 +19,8 @@
 │   ├── features/               # DDD domains
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
-│   │   ├── section/            # layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane
+│   │   ├── section/            # page (whole section), layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane, source-bar, image-preview
+│   │   ├── wiki/               # gods, rules, books: list rows and entry cards
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
@@ -52,20 +53,21 @@
 
 ## 🚚 Migration status
 
-| Section                                                            | Status |
-| ------------------------------------------------------------------ | ------ |
-| Skeleton: config, proxy, theme, page meta, deploy                  | ✅     |
-| Home page                                                          | ✅     |
-| Sidebar menu, sign in and session on SSR, analytics                | ✅     |
-| Sign up, password reset, profile actions (stage 5)                 | ⏳     |
-| Content renderer (`RawContent` replacement), dice, tooltips        | ✅     |
-| Dice history                                                       | ✅     |
-| List + detail, URL filters, search                                 | ✅     |
-| Bookmarks                                                          | ✅     |
-| Reference sections (character, inventory, wiki, bestiary, screens) | ⏳     |
-| Tools, initiative tracker                                          | ⏳     |
-| Account, comments, subscription, bug report                        | ⏳     |
-| Workshop, admin                                                    | ⏳     |
+| Section                                                      | Status |
+| ------------------------------------------------------------ | ------ |
+| Skeleton: config, proxy, theme, page meta, deploy            | ✅     |
+| Home page                                                    | ✅     |
+| Sidebar menu, sign in and session on SSR, analytics          | ✅     |
+| Sign up, password reset, profile actions (stage 5)           | ⏳     |
+| Content renderer (`RawContent` replacement), dice, tooltips  | ✅     |
+| Dice history                                                 | ✅     |
+| List + detail, URL filters, search                           | ✅     |
+| Bookmarks                                                    | ✅     |
+| Wiki: gods, rules, books                                     | ✅     |
+| Reference sections (character, inventory, bestiary, screens) | ⏳     |
+| Tools, initiative tracker                                    | ⏳     |
+| Account, comments, subscription, bug report                  | ⏳     |
+| Workshop, admin                                              | ⏳     |
 
 ## 🔐 Session
 
@@ -100,6 +102,13 @@ the first page on SSR and the next ones on scroll (`POST` with `page`, `size`,
 section's filter endpoint and keeps only the groups changed from their
 defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
 `book` parameter, as in the legacy SPA. Search lives in `?search=`.
+
+`SectionPage` puts these together, so a section only gives its endpoints, the
+entry schema and the list row. The entry page reads `POST /api/v1<path>` with
+`useSectionEntry`; a missing entry renders a real 404. `SectionDetailPane`
+copies the canonical link of the entry and, for moderators and admins, links
+to its editor in the legacy workshop (`/workshop/<path>/edit`).
+`SectionSourceBar` replaces `DetailTopBar`.
 
 ## 🔖 Bookmarks
 

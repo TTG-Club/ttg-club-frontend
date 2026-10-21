@@ -69,6 +69,11 @@ export function useUser() {
 
   const isAdmin = computed(() => roles.value.includes(Role.ADMIN));
 
+  /** Может править контент в мастерской: администратор или модератор. */
+  const isEditor = computed(
+    () => isAdmin.value || roles.value.includes(Role.MODERATOR),
+  );
+
   /**
    * Перечитывает профиль. При ошибке пользователь считается вышедшим.
    * @param fetcher - клиент запросов
@@ -160,6 +165,7 @@ export function useUser() {
     roles,
     isLoggedIn,
     isAdmin,
+    isEditor,
     pending: readonly(pending),
 
     fetchProfile,
