@@ -7,8 +7,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
+      '~bookmarks': fileURLToPath(
+        new URL('./app/features/bookmarks', import.meta.url),
+      ),
       '~content': fileURLToPath(
         new URL('./app/features/content', import.meta.url),
+      ),
+      '~section': fileURLToPath(
+        new URL('./app/features/section', import.meta.url),
       ),
       '~dice-roller': fileURLToPath(
         new URL('./app/features/dice-roller', import.meta.url),

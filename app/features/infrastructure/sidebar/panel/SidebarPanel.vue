@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { SiteLogo } from '~/shared/ui/site-logo';
+  import { BookmarksPanel } from '~bookmarks/panel';
   import { DiceHistoryToggle } from '~dice-roller/history';
   import { ThemeSwitcher } from '~infrastructure/theme-switcher';
   import { UserHelmet } from '~user/helmet';
@@ -26,6 +27,14 @@
 
         <ClientOnly>
           <AppMenu />
+
+          <template #fallback>
+            <div class="size-10" />
+          </template>
+        </ClientOnly>
+
+        <ClientOnly>
+          <BookmarksPanel />
 
           <template #fallback>
             <div class="size-10" />
