@@ -53,6 +53,7 @@
         >
           <ContentLink
             v-if="part.url"
+            class="text-link hover:text-link-hover"
             :href="part.url"
             :attributes="{}"
             >{{ part.text }}</ContentLink

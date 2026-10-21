@@ -26,6 +26,7 @@
       >
         <ContentLink
           v-if="property.url"
+          class="text-link hover:text-link-hover"
           :href="property.url"
           :attributes="{}"
         >
