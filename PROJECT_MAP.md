@@ -13,10 +13,12 @@
 │   ├── app.vue                 # Root: Nuxt UI, theme class, page meta from /api/v1/meta
 │   ├── error.vue               # Error page (404 / 5xx)
 │   ├── app.config.ts           # Nuxt UI icons
-│   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css)
+│   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css), content typography (content.scss)
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
 │   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
+│   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
+│   │   ├── dice-roller/        # roller (clickable formula), useDiceRoll (roll + toast)
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
 │   │   └── user/               # helmet (user menu), auth-modal (sign in)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile)
@@ -52,7 +54,8 @@
 | Skeleton: config, proxy, theme, page meta, deploy                  | ✅     |
 | Sidebar menu, sign in and session on SSR, analytics                | ✅     |
 | Sign up, password reset, profile actions (stage 5)                 | ⏳     |
-| Content renderer (`RawContent` replacement), dice, tooltips        | ⏳     |
+| Content renderer (`RawContent` replacement), dice, tooltips        | ✅     |
+| Dice history, list + detail, URL filters, search, bookmarks        | ⏳     |
 | Reference sections (character, inventory, wiki, bestiary, screens) | ⏳     |
 | Tools, initiative tracker                                          | ⏳     |
 | Account, comments, subscription, bug report                        | ⏳     |
@@ -65,3 +68,13 @@ and `dnd5_refresh_token` (path `/api/v1/auth`). SSR sees only the access cookie
 and loads the profile with it; an expired session is refreshed in the browser
 after hydration, and only when the visible marker `ttg-user-token` (shared with
 the legacy SPA) says the visitor has signed in before.
+
+## 📄 Content
+
+HTML from the database used to be compiled as a Vue template in the browser.
+`ContentRender` parses it with `htmlparser2` instead (works on SSR too), keeps
+only allowed tags and attributes, and renders `dice-roller` and
+`detail-tooltip` as components. From Vue bindings like `:formula="'2к6'"` only
+the string literal survives. Internal links to pages not yet ported to Nuxt use
+a full page load, so the legacy SPA still serves them. Typed tooltips show only
+the link until entity cards arrive with their sections.
