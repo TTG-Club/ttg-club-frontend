@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { SiteLogo } from '~/shared/ui/site-logo';
+  import { DiceHistoryToggle } from '~dice-roller/history';
   import { ThemeSwitcher } from '~infrastructure/theme-switcher';
   import { UserHelmet } from '~user/helmet';
 
@@ -34,6 +35,11 @@
 
       <div class="flex items-center gap-2 md:flex-col">
         <SidebarSocials />
+
+        <!-- На десктопе история открывается плавающей кнопкой -->
+        <ClientOnly>
+          <DiceHistoryToggle class="md:hidden" />
+        </ClientOnly>
 
         <UserHelmet />
 
