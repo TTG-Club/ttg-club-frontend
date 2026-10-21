@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "ripgrep": {
+      "source": "ratacat/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ripgrep/SKILL.md",
+      "computedHash": "bc5ed0a5b897b7e06db597c00d0e1554dc1db3671009cdeab7945addf0708808"
+    },
+    "search-first": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "skillPath": "skills/search-first/SKILL.md",
+      "computedHash": "c82ffe228acdc70bb4d641d391f811d3d3ea5ba467b9ffe88e6dc4cd71c7b416"
+    }
+  }
+}

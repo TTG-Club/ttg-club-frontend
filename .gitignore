@@ -1,25 +1,19 @@
-.DS_Store
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
 
-# Generated files and dirs
+# Node dependencies
 node_modules
-/dist
-/public_html
-/_test
-.eslintcache
-.stylelintcache
 
-# Local env files
-.env.local
-.env.*.local
+# Logs
+logs
+*.log
 
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Editor directories and files
-.claude
+# Misc
+.DS_Store
 .fleet
 .idea
 .vscode
@@ -29,6 +23,22 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-# Generated files
-/src/shared/types/generated/*
-!/src/shared/types/generated/readme.md
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Generated files and dirs
+dist
+.eslintcache
+.stylelintcache
+shared/types/generated
+
+# Custom
+.test
+.antigravityignore
+/tmp
+
+# AI Agents
+/.agent/rules/project-style-guide.md
+.claude

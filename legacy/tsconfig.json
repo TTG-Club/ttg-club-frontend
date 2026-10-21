@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "outDir": "./dist/",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
+    "pretty": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "sourceMap": true,
+    "typeRoots": [
+      "./src/shared/types/generated",
+      "./node_modules/@types",
+      "./node_modules"
+    ],
+    "types": [
+      "node",
+      "vite/client",
+      "vite-plugin-svg-icons/client.d.ts"
+    ],
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "vueCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "strictTemplates": false
+  },
+  "include": [
+    "vite.config.*",
+    "global.d.ts",
+    "src/**/*",
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/**/*.d.ts"
+  ]
+}

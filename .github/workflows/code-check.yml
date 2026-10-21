@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 permissions:
-  security-events: write
+  contents: read
 
 concurrency:
   group: code-check-${{ github.ref_name }}
@@ -16,24 +16,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: TTG-Club/ttg-club-frontend
-          ref: ${{ github.head_ref || github.ref_name }}
 
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          node-version-file: 'package.json'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci --cache .npm
-
-      - name: Build
-        run: npm run build:prod
-
-      - name: ESLint
-        run: npm run lint:workflow
+        run: pnpm install --frozen-lockfile
 
       - name: Stylelint
-        run: npm run stylelint:workflow
+        run: pnpm run stylelint:workflow
+
+      - name: ESLint
+        run: pnpm run lint:workflow
+
+      - name: Type Check
+        run: pnpm run type-check
+
+      - name: Unit Tests
+        run: pnpm run test
+
+      - name: Build
+        run: pnpm run build
