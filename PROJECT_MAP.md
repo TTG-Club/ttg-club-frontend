@@ -19,8 +19,8 @@
 │   ├── features/               # DDD domains
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
-│   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane, source-bar, source-badge, stat-grid, image-preview
-│   │   ├── character/          # feats, backgrounds, class options, spells, races; references (links to classes, races…)
+│   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
+│   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── wiki/               # gods, rules, books: list rows and entry cards
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
@@ -68,7 +68,7 @@
 | Wiki: gods, rules, books                                    | ✅     |
 | Inventory: weapons, armors, items, magic items, treasures   | ✅     |
 | Character: feats, backgrounds, class options, spells, races | ✅     |
-| Character: classes                                          | ⏳     |
+| Character: classes                                          | ✅     |
 | Bestiary, screens                                           | ⏳     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
@@ -118,6 +118,18 @@ section's own body. The entry page reads `POST /api/v1<path>` with
 copies the canonical link of the entry and, for moderators and admins, links
 to its editor in the legacy workshop (`/workshop/<path>/edit`).
 `SectionSourceBar` replaces `DetailTopBar`.
+
+Search and filter live in a `SectionQueryStore`: the page address by default,
+or memory for `SectionTabList`, the list inside a tab (spells and options of a
+class). A tab list always sends its filter, because a hidden group of the
+filter picks the class. `SectionEntryModal` opens an entry from such a list in
+a modal instead of leaving the page.
+
+A class page (`/classes/<class>` and `/classes/<class>/<archetype>`) has
+tabs from the API: traits (level table, proficiencies, features, archetypes
+loaded on first open), description, and the spells and options lists.
+Gallery images open in `SectionImageViewer`. Feature tooltips in the level
+table use the features already loaded with the class.
 
 ## 🔖 Bookmarks
 

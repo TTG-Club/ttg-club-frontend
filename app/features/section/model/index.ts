@@ -14,6 +14,7 @@ export type {
   SectionConfig,
   SectionListRequest,
   SectionOrder,
+  SectionQueryStore,
 } from './types';
 
 export {
@@ -36,6 +37,7 @@ export {
   groupItems,
   hasSourceGroupLabel,
   isSelectionCustomized,
+  mergeQuery,
   normalizeFilter,
   selectionFromQuery,
   selectionToQuery,

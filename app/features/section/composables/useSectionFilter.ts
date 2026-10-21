@@ -1,4 +1,4 @@
-import type { FilterSelection } from '../model';
+import type { FilterSelection, SectionQueryStore } from '../model';
 
 import {
   buildFilterPayload,
@@ -9,16 +9,31 @@ import {
   selectionFromQuery,
   selectionToQuery,
 } from '../model';
+import { useRouteQueryStore } from './useSectionQuery';
+
+interface SectionFilterOptions {
+  /** Где живёт выбор; по умолчанию в адресе страницы. */
+  store?: SectionQueryStore;
+  /**
+   * Отправлять фильтр всегда, а не только изменённый: у списков во
+   * вкладках класса скрытая группа выбирает класс.
+   */
+  isAlwaysSent?: boolean;
+}
 
 /**
  * Фильтр раздела: группы приходят из API, выбор живёт в адресе страницы,
  * поэтому ссылкой на отфильтрованный список можно поделиться.
  * @param key - ключ раздела
  * @param url - ручка фильтра, например `/api/v1/filters/spells`
+ * @param options - где живёт выбор и всегда ли отправлять фильтр
  */
-export async function useSectionFilter(key: string, url: string) {
-  const route = useRoute();
-  const router = useRouter();
+export async function useSectionFilter(
+  key: string,
+  url: string,
+  options: SectionFilterOptions = {},
+) {
+  const { store = useRouteQueryStore(), isAlwaysSent = false } = options;
 
   const { data: definition, status } = await useAsyncData(
     `section-filter-${key}`,
@@ -30,7 +45,9 @@ export async function useSectionFilter(key: string, url: string) {
   );
 
   const selection = computed<FilterSelection>(() =>
-    definition.value ? selectionFromQuery(definition.value, route.query) : {},
+    definition.value
+      ? selectionFromQuery(definition.value, store.query.value)
+      : {},
   );
 
   const isCustomized = computed(
@@ -39,9 +56,9 @@ export async function useSectionFilter(key: string, url: string) {
       && isSelectionCustomized(definition.value, selection.value),
   );
 
-  // Фильтр уходит в запрос списка, только если его меняли.
+  // Фильтр уходит в запрос списка, только если его меняли или он нужен всегда.
   const payload = computed(() =>
-    definition.value && isCustomized.value
+    definition.value && (isAlwaysSent || isCustomized.value)
       ? buildFilterPayload(definition.value, selection.value)
       : undefined,
   );
@@ -49,7 +66,7 @@ export async function useSectionFilter(key: string, url: string) {
   const isPending = computed(() => status.value === 'pending');
 
   /**
-   * Применяет выбор: он записывается в адрес, а список перезагружается.
+   * Применяет выбор: он записывается в параметры, а список перезагружается.
    * @param next - новый выбор
    */
   function setSelection(next: FilterSelection) {
@@ -57,10 +74,7 @@ export async function useSectionFilter(key: string, url: string) {
       return;
     }
 
-    router.replace({
-      query: { ...route.query, ...selectionToQuery(definition.value, next) },
-      hash: route.hash,
-    });
+    store.update(selectionToQuery(definition.value, next));
   }
 
   function reset() {

@@ -1,27 +1,48 @@
+import type { SectionConfig } from '~section/model';
+
 import type {
+  ArchetypeSpell,
+  ArchetypeSpellTable,
   BackgroundDetail,
+  ClassDetail,
+  ClassFeature,
+  ClassTraits,
   RaceAbility,
   RaceDetail,
-  RaceLink,
   RaceSpeed,
   SpellComponents,
   SpellDetail,
-  SubraceLink,
+  TypedLink,
 } from './schema';
-import type { RaceStat, SpellComponentLabel, SubraceGroup } from './types';
+import type {
+  ClassTab,
+  GroupedLink,
+  RaceStat,
+  SpellComponentLabel,
+  TypedLinkGroup,
+} from './types';
 
 import { sortBy } from 'es-toolkit';
 
-import { WORKSHOP_EDIT_SUFFIX } from '~section/model';
+import { getEntryApiPath, WORKSHOP_EDIT_SUFFIX } from '~section/model';
 
 import {
   ABILITIES_COUNT,
+  ARCHETYPE_SPELL_LEVEL_TYPE,
   CHARACTER_LIST_SEPARATOR,
   CHARACTER_NO_REQUIREMENTS,
+  CLASS_HIT_DICE_PREFIX,
+  CLASS_ICON_COLLECTION_PREFIX,
+  CLASS_ICON_PREFIX,
+  CLASS_ICONS,
+  CLASS_TAB_SECTIONS,
+  CLASS_TEXT,
   FEAT_TEXT,
   RACE_STATS,
   RACE_TEXT,
   RACES_WORKSHOP_PATH,
+  REFERENCE_SEPARATOR,
+  SKILLS_COUNT,
   SPELL_COMPONENTS,
   SPELL_TEXT,
 } from './constants';
@@ -177,43 +198,46 @@ export function getRaceStats(race: RaceDetail): Array<RaceStat> {
 }
 
 /**
- * Порядок рас как в старом SPA: сначала основные по алфавиту, затем
- * группы (происхождения, UA, хомбрю…) по их порядку.
- * @param races - расы из списка
+ * Порядок рас и классов как в старом SPA: сначала основные по алфавиту,
+ * затем группы (происхождения, UA, хомбрю…) по их порядку.
+ * @param entries - расы или классы из списка
  */
-export function sortRaces(races: Array<RaceLink>): Array<RaceLink> {
-  return sortBy(races, [
-    (race) => (race.group ? race.group.order + 1 : 0),
-    (race) => race.name.rus,
+export function sortByGroup<T extends GroupedLink>(
+  entries: Array<T>,
+): Array<T> {
+  return sortBy(entries, [
+    (entry) => (entry.group ? entry.group.order + 1 : 0),
+    (entry) => entry.name.rus,
   ]);
 }
 
 /**
- * Группа расы в списке; у основных рас подписи нет.
- * @param race - раса
+ * Группа расы или класса в списке; у основных подписи нет.
+ * @param entry - раса или класс
  */
-export function getRaceGroup(race: RaceLink): string {
-  return race.group?.name ?? '';
+export function getGroupName(entry: GroupedLink): string {
+  return entry.group?.name ?? '';
 }
 
 /**
- * Разновидности расы, разбитые по типу книги в его порядке.
- * @param subraces - разновидности из списка
+ * Разновидности расы или архетипы класса, разбитые по типу книги в его
+ * порядке.
+ * @param links - ссылки из списка
  */
-export function groupSubraces(
-  subraces?: Array<SubraceLink> | null,
-): Array<SubraceGroup> {
-  const groups = new Map<string, SubraceGroup & { order: number }>();
+export function groupByBookType(
+  links?: Array<TypedLink> | null,
+): Array<TypedLinkGroup> {
+  const groups = new Map<string, TypedLinkGroup & { order: number }>();
 
-  for (const subrace of subraces ?? []) {
-    const group = groups.get(subrace.type.name) ?? {
-      name: subrace.type.name,
-      order: subrace.type.order,
+  for (const link of links ?? []) {
+    const group = groups.get(link.type.name) ?? {
+      name: link.type.name,
+      order: link.type.order,
       items: [],
     };
 
-    group.items.push(subrace);
-    groups.set(subrace.type.name, group);
+    group.items.push(link);
+    groups.set(link.type.name, group);
   }
 
   return sortBy([...groups.values()], [(group) => group.order]).map(
@@ -242,4 +266,153 @@ export function getRaceEditPath(path: string): string {
   const slug = path.split('/').at(-1) ?? '';
 
   return `${RACES_WORKSHOP_PATH}/${slug}${WORKSHOP_EDIT_SUFFIX}`;
+}
+
+/**
+ * Значок класса из коллекции `ttg`; у классов без своего значка его нет.
+ * @param icon - значок из API, например `class/wizard`
+ */
+export function getClassIcon(icon?: string | null): string | undefined {
+  if (!icon?.startsWith(CLASS_ICON_PREFIX)) {
+    return undefined;
+  }
+
+  const name = icon.slice(CLASS_ICON_PREFIX.length);
+
+  return CLASS_ICONS.has(name)
+    ? `${CLASS_ICON_COLLECTION_PREFIX}${name}`
+    : undefined;
+}
+
+/**
+ * Вкладки страницы класса по порядку. Ключ собирается из типа и порядка:
+ * у класса и его архетипа могут быть две вкладки особенностей.
+ * @param entry - класс или архетип
+ */
+export function getClassTabs(entry: ClassDetail): Array<ClassTab> {
+  return sortBy(entry.tabs ?? [], [(tab) => tab.order]).map((tab) => ({
+    key: `${tab.type}-${tab.order}`,
+    name: tab.name,
+    type: tab.type,
+    url: tab.url,
+  }));
+}
+
+/**
+ * Список во вкладке класса: заклинания или особенности с фильтром класса.
+ * Ключ свой у каждой вкладки, иначе данные соседних классов смешаются.
+ * @param tab - вкладка класса
+ */
+export function getClassTabSection(tab: ClassTab): SectionConfig | undefined {
+  const section = CLASS_TAB_SECTIONS[tab.type];
+
+  return section
+    ? {
+        ...section,
+        key: `${section.key}:${tab.url}`,
+        title: tab.name,
+        filterUrl: getEntryApiPath(tab.url),
+      }
+    : undefined;
+}
+
+/**
+ * Кость хитов и среднее значение для хитов на следующих уровнях.
+ * @param diceHp - грани кости хитов
+ */
+export function getClassHitPoints(diceHp: number): {
+  formula: string;
+  average: number;
+} {
+  return {
+    formula: `${CLASS_HIT_DICE_PREFIX}${diceHp}`,
+    average: Math.floor(diceHp / 2) + 1,
+  };
+}
+
+/**
+ * Подпись выбора навыков: из всех — одной фразой, иначе число и список.
+ * @param traits - умения класса
+ */
+export function getClassSkillsLabel(traits: ClassTraits): string {
+  if (traits.skillAvailableCount === SKILLS_COUNT) {
+    return CLASS_TEXT.anySkills;
+  }
+
+  const skills = (traits.availableSkills ?? []).join(CHARACTER_LIST_SEPARATOR);
+
+  return `${CLASS_TEXT.chooseSkills} ${traits.skillAvailableCount} ${CLASS_TEXT.chooseSkillsFrom} ${skills}`;
+}
+
+/**
+ * Умения класса и архетипа по уровням; сам архетип идёт первым на своём
+ * уровне, как в старом SPA.
+ * @param traits - умения класса
+ */
+export function sortClassFeatures(traits: ClassTraits): Array<ClassFeature> {
+  const features = traits.archetype
+    ? [...(traits.features ?? []), traits.archetype]
+    : (traits.features ?? []);
+
+  return sortBy(features, [
+    (feature) => feature.level,
+    (feature) => (feature.archetypeRoot ? 0 : 1),
+  ]);
+}
+
+/**
+ * Умение по якорю из таблицы уровней, например `#c12`.
+ * @param traits - умения класса
+ * @param anchor - якорь ссылки
+ */
+export function findClassFeature(
+  traits: ClassTraits,
+  anchor: string,
+): ClassFeature | undefined {
+  const id = anchor.replace(/^#/, '');
+
+  return sortClassFeatures(traits).find((feature) => feature.id === id);
+}
+
+/**
+ * Умения самого архетипа, без умений класса.
+ * @param traits - умения архетипа
+ */
+export function getArchetypeFeatures(traits: ClassTraits): Array<ClassFeature> {
+  return (traits.features ?? []).filter((feature) => feature.archetypeFeature);
+}
+
+/**
+ * Текст вкладки «Описание»: у архетипа описание лежит в его умении.
+ * @param entry - класс или архетип
+ */
+export function getClassDescription(entry: ClassDetail): string | undefined {
+  return entry.description ?? entry.traits?.archetype?.description ?? undefined;
+}
+
+/**
+ * Заголовок колонки уровня в таблице заклинаний архетипа.
+ * @param table - таблица заклинаний
+ */
+export function getArchetypeSpellLevelHeader(
+  table: ArchetypeSpellTable,
+): string {
+  return table.levelType === ARCHETYPE_SPELL_LEVEL_TYPE
+    ? CLASS_TEXT.spellLevel
+    : `${CLASS_TEXT.classLevel} ${table.classNameGenitive ?? ''}`.trim();
+}
+
+/**
+ * Хвост заклинания в таблице архетипа: условие в скобках и запятая перед
+ * следующим заклинанием.
+ * @param spell - заклинание архетипа
+ * @param isLast - последнее ли оно в строке
+ */
+export function getArchetypeSpellSuffix(
+  spell: ArchetypeSpell,
+  isLast: boolean,
+): string {
+  const advanced = spell.advanced ? ` (${spell.advanced})` : '';
+
+  return isLast ? advanced : `${advanced}${REFERENCE_SEPARATOR}`;
 }

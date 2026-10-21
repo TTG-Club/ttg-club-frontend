@@ -1,14 +1,19 @@
 <script setup lang="ts">
+  import type { RaceLink } from '../model';
+
   import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
 
   import {
-    getRaceGroup,
+    getGroupName,
     raceLinkSchema,
     RACES_SECTION,
-    sortRaces,
+    sortByGroup,
   } from '../model';
   import RaceCard from './RaceCard.vue';
+
+  // Тип задан явно: иначе список выводит тип записи из общей сортировки
+  const sortItems: (items: Array<RaceLink>) => Array<RaceLink> = sortByGroup;
 </script>
 
 <template>
@@ -17,9 +22,9 @@
     :section="RACES_SECTION"
     :schema="raceLinkSchema"
     :get-key="getEntryUrl"
-    :get-group="getRaceGroup"
+    :get-group="getGroupName"
     :get-path="getEntryUrl"
-    :sort-items="sortRaces"
+    :sort-items="sortItems"
     is-grid
   >
     <template #item="{ item, to }">

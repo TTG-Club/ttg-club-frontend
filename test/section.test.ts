@@ -7,6 +7,7 @@ import {
   getDefaultSelection,
   groupItems,
   isSelectionCustomized,
+  mergeQuery,
   normalizeFilter,
   selectionFromQuery,
   selectionToQuery,
@@ -134,5 +135,23 @@ describe('groupItems', () => {
       { name: '1', items: [1, 1] },
       { name: '2', items: [2] },
     ]);
+  });
+});
+
+describe('mergeQuery', () => {
+  it('накладывает изменения и убирает пустые параметры', () => {
+    expect(
+      mergeQuery(
+        { search: 'огонь', level: '1' },
+        { level: undefined, book: 'PHB' },
+      ),
+    ).toEqual({ search: 'огонь', book: 'PHB' });
+  });
+
+  it('приводит числа к строкам, как в адресе', () => {
+    expect(mergeQuery({}, { page: 2, tags: [1, 'a'] })).toEqual({
+      page: '2',
+      tags: ['1', 'a'],
+    });
   });
 });

@@ -1,8 +1,20 @@
+import type { ClassTraits } from '~character/model';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   backgroundDetailSchema,
+  classDetailSchema,
+  findClassFeature,
+  getArchetypeSpellLevelHeader,
+  getArchetypeSpellSuffix,
   getBackgroundLanguages,
+  getClassDescription,
+  getClassHitPoints,
+  getClassIcon,
+  getClassSkillsLabel,
+  getClassTabs,
+  getClassTabSection,
   getRaceAbilitiesLabel,
   getRaceEditPath,
   getRaceSpeedLabel,
@@ -10,10 +22,11 @@ import {
   getSpellComponentLabels,
   getSpellGroup,
   getSpellTypeLabel,
-  groupSubraces,
+  groupByBookType,
   hasPersonalization,
   raceLinkSchema,
-  sortRaces,
+  sortByGroup,
+  sortClassFeatures,
   spellDetailSchema,
 } from '~character/model';
 
@@ -153,7 +166,7 @@ describe('расы', () => {
   });
 
   it('ставит основные расы первыми, группы — по порядку', () => {
-    const sorted = sortRaces([
+    const sorted = sortByGroup([
       race('Аасимар', { name: 'Монстры', order: 1 }),
       race('Эльф'),
       race('Кастом', { name: 'Происхождения', order: 0 }),
@@ -169,7 +182,7 @@ describe('расы', () => {
   });
 
   it('делит разновидности по типу книги в его порядке', () => {
-    const groups = groupSubraces([
+    const groups = groupByBookType([
       { ...race('Морской'), type: { name: 'UA', order: 2 } },
       race('Высший'),
       race('Лесной'),
@@ -185,5 +198,143 @@ describe('расы', () => {
     expect(getRaceEditPath('/races/elf/high')).toBe(
       '/workshop/races/high/edit',
     );
+  });
+});
+
+describe('классы', () => {
+  const feature = (id: string, level: number, isRoot = false) => ({
+    id,
+    name: id,
+    level,
+    archetypeFeature: isRoot,
+    archetypeRoot: isRoot,
+  });
+
+  const traits: ClassTraits = {
+    diceHp: 6,
+    skillAvailableCount: 2,
+    availableSkills: ['Анализ', 'История'],
+    features: [feature('c3', 4), feature('a1', 2), feature('c1', 1)],
+    archetype: feature('ad1', 2, true),
+  };
+
+  const wizard = classDetailSchema.parse({
+    name: { rus: 'Волшебник', eng: 'Wizard' },
+    url: '/classes/wizard',
+    source: { shortName: 'PHB', name: 'Книга игрока' },
+    tabs: [
+      {
+        name: 'Заклинания',
+        url: '/filters/spells/wizard',
+        type: 'spells',
+        order: 2,
+      },
+      {
+        name: 'Навыки',
+        url: '/classes/fragment/wizard',
+        type: 'traits',
+        order: 0,
+      },
+    ],
+    traits,
+  });
+
+  it('берёт значок только у классов, для которых он есть', () => {
+    expect(getClassIcon('class/wizard')).toBe('ttg:class-wizard');
+    expect(getClassIcon('class/unknown')).toBeUndefined();
+    expect(getClassIcon(null)).toBeUndefined();
+  });
+
+  it('сортирует вкладки и даёт им уникальные ключи', () => {
+    expect(getClassTabs(wizard).map((tab) => tab.key)).toEqual([
+      'traits-0',
+      'spells-2',
+    ]);
+  });
+
+  it('вкладка заклинаний читает фильтр класса и свой ключ', () => {
+    const [, spells] = getClassTabs(wizard);
+    const section = spells ? getClassTabSection(spells) : undefined;
+
+    expect(section?.listUrl).toBe('/api/v1/spells');
+    expect(section?.filterUrl).toBe('/api/v1/filters/spells/wizard');
+    expect(section?.key).toBe('spells:/filters/spells/wizard');
+  });
+
+  it('у вкладки умений списка нет', () => {
+    const [traitsTab] = getClassTabs(wizard);
+
+    expect(traitsTab && getClassTabSection(traitsTab)).toBeUndefined();
+  });
+
+  it('считает хиты как в старом SPA', () => {
+    expect(getClassHitPoints(10)).toEqual({ formula: '1к10', average: 6 });
+  });
+
+  it('подписывает выбор навыков', () => {
+    expect(getClassSkillsLabel(traits)).toBe(
+      'Выберите 2 навыка из следующих: Анализ, История',
+    );
+
+    expect(getClassSkillsLabel({ ...traits, skillAvailableCount: 18 })).toBe(
+      'Выберите любые навыки.',
+    );
+  });
+
+  it('ставит архетип первым на его уровне', () => {
+    expect(sortClassFeatures(traits).map((item) => item.id)).toEqual([
+      'c1',
+      'ad1',
+      'a1',
+      'c3',
+    ]);
+  });
+
+  it('находит умение по якорю из таблицы', () => {
+    expect(findClassFeature(traits, '#a1')?.id).toBe('a1');
+    expect(findClassFeature(traits, '#c9')).toBeUndefined();
+  });
+
+  it('у архетипа описание берётся из его умения', () => {
+    expect(
+      getClassDescription({
+        ...wizard,
+        traits: {
+          ...traits,
+          archetype: {
+            ...feature('ad1', 2, true),
+            description: '<p>Школа</p>',
+          },
+        },
+      }),
+    ).toBe('<p>Школа</p>');
+  });
+
+  it('подписывает колонку уровня в таблице заклинаний архетипа', () => {
+    expect(
+      getArchetypeSpellLevelHeader({
+        levelType: 'CLASS_LEVEL',
+        classNameGenitive: 'волшебника',
+        levels: [],
+      }),
+    ).toBe('Уровень волшебника');
+
+    expect(
+      getArchetypeSpellLevelHeader({ levelType: 'SPELL_LEVEL', levels: [] }),
+    ).toBe('Уровень заклинания');
+  });
+
+  it('добавляет условие и запятую к заклинанию архетипа', () => {
+    const spell = {
+      name: 'Молния',
+      englishName: 'Lightning bolt',
+      url: '/spells/x',
+    };
+
+    expect(
+      getArchetypeSpellSuffix({ ...spell, advanced: 'в бою' }, false),
+    ).toBe(' (в бою),');
+
+    expect(getArchetypeSpellSuffix(spell, true)).toBe('');
   });
 });
