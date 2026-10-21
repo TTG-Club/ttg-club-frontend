@@ -1,6 +1,7 @@
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 
 import type {
+  EntryName,
   EntrySource,
   FilterGroupResponse,
   FilterResponse,
@@ -345,4 +346,23 @@ export function hasSourceGroupLabel(source: EntrySource): boolean {
  */
 export function getWorkshopEditPath(path: string): string {
   return `${WORKSHOP_PREFIX}${path}${WORKSHOP_EDIT_SUFFIX}`;
+}
+
+/**
+ * Группа записи по первой букве русского названия, как у снаряжения в
+ * старом SPA.
+ * @param entry - запись списка
+ * @param entry.name - название записи
+ */
+export function getFirstLetterGroup(entry: { name: EntryName }): string {
+  return entry.name.rus.charAt(0);
+}
+
+/**
+ * Адрес записи из списка; он же её ключ — у каждой записи он свой.
+ * @param entry - запись списка
+ * @param entry.url - адрес записи
+ */
+export function getEntryUrl(entry: { url: string }): string {
+  return entry.url;
 }

@@ -1,55 +1,19 @@
 <script setup lang="ts">
-  import { BookmarkButton } from '~bookmarks/button';
-  import { useSectionEntry } from '~section/composables';
-  import { SectionDetailPane } from '~section/detail-pane';
+  import { SectionEntry } from '~section/entry';
   import { getWorkshopEditPath } from '~section/model';
 
   import { godDetailSchema, GODS_SECTION } from '../model';
   import GodBody from './GodBody.vue';
-
-  /** Открытый бог рядом со списком. */
-  const route = useRoute();
-
-  const {
-    entry: god,
-    isLoading,
-    isError,
-  } = await useSectionEntry({
-    key: GODS_SECTION.key,
-    path: () => route.path,
-    schema: godDetailSchema,
-  });
-
-  const closeTo = computed(() => ({
-    path: GODS_SECTION.path,
-    query: route.query,
-  }));
-
-  const editUrl = computed(() => getWorkshopEditPath(route.path));
 </script>
 
 <template>
-  <SectionDetailPane
-    :title="god?.name.rus ?? ''"
-    :subtitle="god?.name.eng"
-    :close-to="closeTo"
-    :edit-url="editUrl"
-    :is-loading="isLoading"
-    :is-error="isError"
+  <SectionEntry
+    :section="GODS_SECTION"
+    :schema="godDetailSchema"
+    :get-edit-path="getWorkshopEditPath"
   >
-    <template #actions>
-      <ClientOnly>
-        <BookmarkButton
-          v-if="god"
-          :url="route.path"
-          :name="god.name.rus"
-        />
-      </ClientOnly>
+    <template #default="{ entry }">
+      <GodBody :god="entry" />
     </template>
-
-    <GodBody
-      v-if="god"
-      :god="god"
-    />
-  </SectionDetailPane>
+  </SectionEntry>
 </template>

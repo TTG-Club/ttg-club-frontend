@@ -6,7 +6,6 @@ export type {
   RuleDetail,
   RuleLink,
 } from './schema';
-export type { WikiSection } from './types';
 
 export {
   bookDetailSchema,
@@ -18,4 +17,4 @@ export {
 } from './schema';
 
 export * from './constants';
-export { getBookGroup, getEntryUrl, getGodGroup, joinWikiList } from './utils';
+export { getBookGroup, getGodGroup, joinWikiList } from './utils';

@@ -1,8 +1,8 @@
-import type { WikiSection } from './types';
+import type { SectionConfig } from '~section/model';
 
 /* --- Боги --------------------------------------------------------------- */
 
-export const GODS_SECTION: WikiSection = {
+export const GODS_SECTION: SectionConfig = {
   key: 'gods',
   title: 'Боги',
   path: '/gods',
@@ -28,7 +28,7 @@ export const GOD_TEXT = {
 
 /* --- Правила ------------------------------------------------------------ */
 
-export const RULES_SECTION: WikiSection = {
+export const RULES_SECTION: SectionConfig = {
   key: 'rules',
   title: 'Правила и термины',
   path: '/rules',
@@ -41,7 +41,7 @@ export const RULE_CATEGORY_LABEL = 'Категория:';
 
 /* --- Источники ---------------------------------------------------------- */
 
-export const BOOKS_SECTION: WikiSection = {
+export const BOOKS_SECTION: SectionConfig = {
   key: 'books',
   title: 'Источники',
   path: '/books',
