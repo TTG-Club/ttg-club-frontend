@@ -25,6 +25,8 @@
     getKey,
     getGroup = undefined,
     getPath = undefined,
+    sortItems = undefined,
+    isGrid = false,
   } = defineProps<{
     /** Заголовок, ручки, сортировка и размер страницы раздела. */
     section: SectionConfig;
@@ -33,6 +35,10 @@
     getGroup?: (item: T) => string;
     /** Адрес записи на сайте; без него строки списка никуда не ведут. */
     getPath?: (item: T) => string;
+    /** Порядок записей на странице, если ручка отдаёт их не так. */
+    sortItems?: (items: Array<T>) => Array<T>;
+    /** Записи карточками в сетку, как расы и классы. */
+    isGrid?: boolean;
   }>();
 
   defineSlots<{
@@ -60,6 +66,10 @@
       search: term,
       filter: filterPayload,
     });
+
+  const sortedItems = computed(() =>
+    sortItems ? sortItems(items.value) : items.value,
+  );
 
   // Запись открыта, когда сработал дочерний маршрут раздела
   const isDetailOpen = computed(() => route.matched.length > 1);
@@ -94,12 +104,14 @@
     </template>
 
     <SectionList
-      :items="items"
+      :items="sortedItems"
       :get-key="getKey"
       :get-group="getGroup"
       :status="status"
       :is-end="isEnd"
       :is-loading-more="isLoadingMore"
+      :is-grid="isGrid"
+      :is-detail-open="isDetailOpen"
       @load-more="loadMore"
       @retry="retry"
     >

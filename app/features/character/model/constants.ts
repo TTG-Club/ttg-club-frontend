@@ -145,3 +145,45 @@ export const SPELL_COMPONENTS = [
 
 /** Точка вместо буквы компонента, которого у заклинания нет. */
 export const SPELL_COMPONENT_EMPTY = '·';
+
+/* --- Расы --------------------------------------------------------------- */
+
+/** Рас немного, поэтому список грузится целиком, как в старом SPA */
+export const RACES_SECTION: SectionConfig = {
+  key: 'races',
+  title: 'Расы и происхождения',
+  path: '/races',
+  listUrl: '/api/v1/races',
+  filterUrl: '/api/v1/filters/races',
+  order: [{ field: 'name', direction: 'asc' }],
+  pageSize: SECTION_PAGE_SIZE_ALL,
+};
+
+/** Сколько всего характеристик: бонус ко всем пишется одной фразой. */
+export const ABILITIES_COUNT = 6;
+
+export const RACE_TEXT = {
+  everyAbility: '+1 к каждой',
+  feet: 'фт.',
+  subraces: 'Разновидности',
+  description: 'Описание',
+  showSubraces: 'Показать разновидности',
+  hideSubraces: 'Скрыть разновидности',
+} as const;
+
+export const RACE_ICON = {
+  expand: 'tabler:plus',
+  collapse: 'tabler:minus',
+} as const;
+
+/** Короткие характеристики расы в карточке: подпись и подсказка. */
+export const RACE_STATS = {
+  type: { label: 'ТИП', hint: 'Тип существа' },
+  abilities: { label: 'ХАР', hint: 'Увеличение характеристик' },
+  size: { label: 'РАЗ', hint: 'Размер' },
+  speed: { label: 'СКР', hint: 'Скорость' },
+  darkvision: { label: 'ТЗ', hint: 'Тёмное зрение' },
+} as const;
+
+/** Раздел мастерской, где правятся расы. */
+export const RACES_WORKSHOP_PATH = '/workshop/races';

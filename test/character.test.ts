@@ -3,11 +3,17 @@ import { describe, expect, it } from 'vitest';
 import {
   backgroundDetailSchema,
   getBackgroundLanguages,
+  getRaceAbilitiesLabel,
+  getRaceEditPath,
+  getRaceSpeedLabel,
   getRequirementsLabel,
   getSpellComponentLabels,
   getSpellGroup,
   getSpellTypeLabel,
+  groupSubraces,
   hasPersonalization,
+  raceLinkSchema,
+  sortRaces,
   spellDetailSchema,
 } from '~character/model';
 
@@ -108,5 +114,76 @@ describe('заклинания', () => {
     expect(
       getSpellComponentLabels({ v: true, m: true }).map(({ label }) => label),
     ).toEqual(['Вербальный', 'Материальный']);
+  });
+});
+
+describe('расы', () => {
+  const source = { shortName: 'PHB', name: 'Книга игрока' };
+  const type = { name: 'Официальные источники', order: 0 };
+
+  const race = (rus: string, group?: { name: string; order: number }) =>
+    raceLinkSchema.parse({
+      name: { rus, eng: rus },
+      url: `/races/${rus}`,
+      type,
+      source,
+      group,
+    });
+
+  it('пишет бонусы характеристик, а бонус ко всем — одной фразой', () => {
+    const abilities = ['СИЛ', 'ЛОВ', 'ТЕЛ', 'ИНТ', 'МДР', 'ХАР'].map(
+      (shortName) => ({ name: shortName, shortName, value: 1 }),
+    );
+
+    expect(
+      getRaceAbilitiesLabel([
+        { name: 'Ловкость', shortName: 'ЛОВ', value: 2 },
+        { name: 'Две на выбор', value: null },
+      ]),
+    ).toBe('ЛОВ +2, Две на выбор');
+
+    expect(getRaceAbilitiesLabel(abilities, true)).toBe('+1 к каждой');
+    expect(getRaceAbilitiesLabel(abilities)).toContain('ХАР +1');
+  });
+
+  it('пишет скорости с видом передвижения', () => {
+    expect(
+      getRaceSpeedLabel([{ value: 30 }, { name: 'летая', value: 50 }]),
+    ).toBe('30 фт., летая 50 фт.');
+  });
+
+  it('ставит основные расы первыми, группы — по порядку', () => {
+    const sorted = sortRaces([
+      race('Аасимар', { name: 'Монстры', order: 1 }),
+      race('Эльф'),
+      race('Кастом', { name: 'Происхождения', order: 0 }),
+      race('Дварф'),
+    ]);
+
+    expect(sorted.map((item) => item.name.rus)).toEqual([
+      'Дварф',
+      'Эльф',
+      'Кастом',
+      'Аасимар',
+    ]);
+  });
+
+  it('делит разновидности по типу книги в его порядке', () => {
+    const groups = groupSubraces([
+      { ...race('Морской'), type: { name: 'UA', order: 2 } },
+      race('Высший'),
+      race('Лесной'),
+    ]);
+
+    expect(groups.map((group) => [group.name, group.items.length])).toEqual([
+      ['Официальные источники', 2],
+      ['UA', 1],
+    ]);
+  });
+
+  it('правка разновидности ведёт в мастерскую рас', () => {
+    expect(getRaceEditPath('/races/elf/high')).toBe(
+      '/workshop/races/high/edit',
+    );
   });
 });

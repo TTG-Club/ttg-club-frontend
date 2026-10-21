@@ -117,3 +117,84 @@ export const spellDetailSchema = spellLinkSchema.omit({ url: true }).extend({
 });
 
 export type SpellDetail = z.infer<typeof spellDetailSchema>;
+
+/* --- Расы --------------------------------------------------------------- */
+
+/** Бонус к характеристике: значение или выбор («Две на выбор»). */
+const raceAbilitySchema = z.object({
+  name: z.string(),
+  shortName: z.string().nullish(),
+  value: z.number().nullish(),
+});
+
+export type RaceAbility = z.infer<typeof raceAbilitySchema>;
+
+/** Тип книги расы в списке: по нему разновидности делятся на группы. */
+const raceSourceTypeSchema = z.object({
+  name: z.string(),
+  order: z.number(),
+});
+
+export const subraceLinkSchema = z.object({
+  name: entryNameSchema,
+  url: z.string().min(1),
+  type: raceSourceTypeSchema,
+  source: entrySourceSchema.nullish(),
+});
+
+export type SubraceLink = z.infer<typeof subraceLinkSchema>;
+
+export const raceLinkSchema = subraceLinkSchema.extend({
+  image: z.string().nullish(),
+  abilities: z.array(raceAbilitySchema).nullish(),
+  group: z.object({ name: z.string(), order: z.number() }).nullish(),
+  subraces: z.array(subraceLinkSchema).nullish(),
+});
+
+export type RaceLink = z.infer<typeof raceLinkSchema>;
+
+const raceFeatureSchema = z.object({
+  name: z.string(),
+  description: z.string().nullish(),
+});
+
+/** Особенность расы; `opened` раскрыта сразу, `subrace` — от разновидности. */
+const raceSkillSchema = raceFeatureSchema.extend({
+  subrace: z.boolean().nullish(),
+  opened: z.boolean().nullish(),
+});
+
+export type RaceSkill = z.infer<typeof raceSkillSchema>;
+
+const raceSpeedSchema = z.object({
+  name: z.string().nullish(),
+  value: z.number(),
+});
+
+export type RaceSpeed = z.infer<typeof raceSpeedSchema>;
+
+const subraceDetailSchema = z.object({
+  name: entryNameSchema,
+  source: entrySourceSchema.nullish(),
+  description: z.string().nullish(),
+  features: z.array(raceFeatureSchema).nullish(),
+  skills: z.array(raceFeatureSchema).nullish(),
+});
+
+export type SubraceDetail = z.infer<typeof subraceDetailSchema>;
+
+export const raceDetailSchema = z.object({
+  name: entryNameSchema,
+  source: entrySourceSchema.nullish(),
+  abilities: z.array(raceAbilitySchema).nullish(),
+  type: z.string().nullish(),
+  size: z.string().nullish(),
+  speed: z.array(raceSpeedSchema).nullish(),
+  darkvision: z.number().nullish(),
+  images: z.array(z.string()).nullish(),
+  description: z.string().nullish(),
+  skills: z.array(raceSkillSchema).nullish(),
+  subraces: z.array(subraceDetailSchema).nullish(),
+});
+
+export type RaceDetail = z.infer<typeof raceDetailSchema>;
