@@ -19,7 +19,7 @@
       <div class="flex items-center gap-2 md:flex-col">
         <NuxtLink
           to="/"
-          class="hidden size-11 border-default md:mb-2 md:block md:h-15 md:border-b md:pb-4"
+          class="hidden size-11 border-default md:mb-2 md:block md:h-15 md:border-b md:pb-6"
         >
           <SiteLogo />
         </NuxtLink>
