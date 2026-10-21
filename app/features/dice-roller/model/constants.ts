@@ -24,3 +24,34 @@ export const OTHER_MODE_SUFFIX = {
   advantage: ' (удвоенный бросок)',
   disadvantage: ' (1/2)',
 } as const;
+
+/** Сколько бросков хранится в истории, как в старом SPA. */
+export const ROLL_HISTORY_LIMIT = 100;
+
+/** Ключ истории бросков в localStorage. */
+export const ROLL_HISTORY_STORAGE_KEY = 'ttg-dice-history';
+
+/** Ключ признака открытой истории в localStorage. */
+export const ROLL_HISTORY_OPEN_STORAGE_KEY = 'ttg-dice-history-open';
+
+/** Тексты истории бросков. */
+export const ROLL_HISTORY_TEXT = {
+  title: 'История бросков',
+  clear: 'Очистить историю',
+  empty: 'Здесь появятся ваши броски',
+  placeholder: 'Введите формулу',
+  inputLabel: 'Формула для броска',
+  invalidFormula: 'Неверная формула для броска',
+  formulaSource: 'Бросок по формуле',
+} as const;
+
+/** Иконки истории бросков. */
+export const ROLL_HISTORY_ICON = {
+  open: 'tabler:dice-5',
+  close: 'tabler:x',
+  clear: 'tabler:trash',
+  roll: 'tabler:dice-5',
+} as const;
+
+/** Формат времени броска в истории. */
+export const ROLL_HISTORY_TIME_FORMAT = 'HH:mm';

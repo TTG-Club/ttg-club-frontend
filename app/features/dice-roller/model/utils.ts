@@ -1,6 +1,6 @@
 import type { RollBase } from '@ttg-club/dice-roller-parser';
 
-import type { RollMode } from './types';
+import type { RollCritical, RollEntry, RollMode } from './types';
 
 import { z } from 'zod';
 
@@ -109,4 +109,73 @@ function isRollNode(value: unknown): value is RollBase {
     && 'type' in value
     && 'value' in value
   );
+}
+
+const criticalDieSchema = z.object({
+  die: z.object({ value: z.number() }),
+  rolls: z.array(
+    z.object({ valid: z.boolean(), critical: z.string().nullish() }),
+  ),
+});
+
+/**
+ * Определяет критический результат, как старое SPA: первый бросок
+ * формулы — к20 (не больше трёх кубиков, чтобы учесть преимущество),
+ * и среди засчитанных кубиков есть натуральные 20 или 1.
+ * @param node - корневой узел результата парсера
+ */
+export function getRollCritical(node: RollBase): RollCritical | undefined {
+  // Формула из одного кубика (`к20`) приходит узлом кубика без обёртки.
+  const first: unknown =
+    'dice' in node && Array.isArray(node.dice) ? node.dice[0] : node;
+
+  const parsed = criticalDieSchema.safeParse(first);
+
+  if (
+    !parsed.success
+    || parsed.data.die.value !== 20
+    || parsed.data.rolls.length > 3
+  ) {
+    return undefined;
+  }
+
+  const valid = parsed.data.rolls.filter((item) => item.valid);
+
+  if (valid.some((item) => item.critical === 'success')) {
+    return 'success';
+  }
+
+  if (valid.some((item) => item.critical === 'failure')) {
+    return 'failure';
+  }
+
+  return undefined;
+}
+
+/** Проверка сохранённой истории: localStorage мог изменить кто угодно. */
+export const rollHistorySchema = z.array(
+  z.object({
+    id: z.string(),
+    date: z.string(),
+    formula: z.string(),
+    value: z.number(),
+    dice: z.array(z.number()),
+    label: z.string(),
+    source: z.string().optional(),
+    critical: z.enum(['success', 'failure']).optional(),
+  }),
+);
+
+/**
+ * Добавляет бросок в конец истории и обрезает её до лимита.
+ * @param entries - текущая история
+ * @param entry - новый бросок
+ * @param limit - сколько бросков хранить
+ */
+export function appendRollEntry(
+  entries: Array<RollEntry>,
+  entry: RollEntry,
+  limit: number,
+): Array<RollEntry> {
+  return [...entries, entry].slice(-limit);
 }

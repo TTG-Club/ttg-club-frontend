@@ -1,6 +1,12 @@
+import { DiceRoller } from '@ttg-club/dice-roller-parser';
 import { describe, expect, it } from 'vitest';
 
-import { formatFormula, getModeSuffix } from '~dice-roller/model';
+import {
+  appendRollEntry,
+  formatFormula,
+  getModeSuffix,
+  getRollCritical,
+} from '~dice-roller/model';
 
 describe('formatFormula', () => {
   it('переводит русскую нотацию и минус', () => {
@@ -23,5 +29,39 @@ describe('getModeSuffix', () => {
     expect(getModeSuffix('к20', 'advantage')).toBe(' (преимущество)');
     expect(getModeSuffix('2к6', 'disadvantage')).toBe(' (1/2)');
     expect(getModeSuffix('2к6')).toBe('');
+  });
+});
+
+describe('getRollCritical', () => {
+  it('узнаёт натуральные 20 и 1 на первом к20', () => {
+    const max = new DiceRoller(() => 0.9999);
+    const min = new DiceRoller(() => 0);
+
+    expect(getRollCritical(max.roll('1d20+5'))).toBe('success');
+    expect(getRollCritical(max.roll('d20'))).toBe('success');
+    expect(getRollCritical(min.roll('2d20kh1'))).toBe('failure');
+  });
+
+  it('не считает критом другие кубики', () => {
+    expect(
+      getRollCritical(new DiceRoller(() => 0.9999).roll('2d6')),
+    ).toBeUndefined();
+  });
+});
+
+describe('appendRollEntry', () => {
+  it('держит историю в пределах лимита', () => {
+    const entry = (id: string) => ({
+      id,
+      date: '',
+      formula: 'к6',
+      value: 1,
+      dice: [1],
+      label: 'Бросок',
+    });
+
+    const result = appendRollEntry([entry('1'), entry('2')], entry('3'), 2);
+
+    expect(result.map(({ id }) => id)).toEqual(['2', '3']);
   });
 });

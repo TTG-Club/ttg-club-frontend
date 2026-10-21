@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { DiceHistory } from '~dice-roller/history';
   import { SidebarPanel } from '~infrastructure/sidebar/panel';
 </script>
 
@@ -9,5 +10,9 @@
     <main class="mx-auto w-full max-w-(--max-content) px-4 py-6">
       <slot />
     </main>
+
+    <ClientOnly>
+      <DiceHistory />
+    </ClientOnly>
   </div>
 </template>

@@ -18,7 +18,7 @@
 │   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
-│   │   ├── dice-roller/        # roller (clickable formula), useDiceRoll (roll + toast)
+│   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
 │   │   └── user/               # helmet (user menu), auth-modal (sign in)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile)
@@ -55,7 +55,8 @@
 | Sidebar menu, sign in and session on SSR, analytics                | ✅     |
 | Sign up, password reset, profile actions (stage 5)                 | ⏳     |
 | Content renderer (`RawContent` replacement), dice, tooltips        | ✅     |
-| Dice history, list + detail, URL filters, search, bookmarks        | ⏳     |
+| Dice history                                                       | ✅     |
+| List + detail, URL filters, search, bookmarks                      | ⏳     |
 | Reference sections (character, inventory, wiki, bestiary, screens) | ⏳     |
 | Tools, initiative tracker                                          | ⏳     |
 | Account, comments, subscription, bug report                        | ⏳     |
@@ -78,3 +79,8 @@ only allowed tags and attributes, and renders `dice-roller` and
 the string literal survives. Internal links to pages not yet ported to Nuxt use
 a full page load, so the legacy SPA still serves them. Typed tooltips show only
 the link until entity cards arrive with their sections.
+
+Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
+between tabs by the `storage` event). While the history window is open, rolls
+skip the toast. The legacy SPA kept its history in IndexedDB, so it is not
+carried over.
