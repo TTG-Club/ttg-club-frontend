@@ -196,7 +196,11 @@ export default defineNuxtConfig({
       fontshare: false,
     },
     priority: ['google', 'fontsource'],
-    families: [{ name: 'Open Sans' }, { name: 'Lora' }],
+    families: [
+      { name: 'Open Sans' },
+      { name: 'Lora' },
+      { name: 'JetBrains Mono' },
+    ],
   },
 
   // TypeScript и линтеры

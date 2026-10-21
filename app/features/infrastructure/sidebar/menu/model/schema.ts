@@ -11,6 +11,8 @@ export const siteMenuItemSchema: z.ZodType<SiteMenuItem> = z.lazy(() =>
     onlyDev: z.boolean().optional(),
     external: z.boolean().optional(),
     order: z.number(),
+    onIndex: z.boolean().optional(),
+    indexOrder: z.number().optional(),
     children: z.array(siteMenuItemSchema).optional(),
   }),
 );

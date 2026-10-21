@@ -8,6 +8,14 @@
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   --font-serif: 'Lora', ui-serif, Georgia, serif;
+
+  /* Самые узкие телефоны (360px и уже) и мониторы шире Full HD-ноутбука */
+  --breakpoint-2xs: 361px;
+  --breakpoint-3xl: 1700px;
+
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono',
+    'Consolas', 'Liberation Mono', monospace;
 }
 
 /*
@@ -30,11 +38,23 @@
   --color-disadvantage: var(--bg-disadvantage);
   --color-saving-throw: var(--bg-saving-throw);
   --color-row-highlighted: var(--bg-table-row-highlighted);
+  --color-primary-select: var(--primary-select);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-on-image: var(--text-btn-color);
+  --color-legacy-success: var(--success);
+  --color-legacy-warning: var(--warning);
+  --shadow-legacy: var(--box-shadow);
+  --color-youtube: var(--youtube-base);
+  --color-youtube-hover: var(--youtube-hover);
 }
 
 /* Nuxt UI берёт цвета из той же палитры. */
 :root {
   --max-content: 1320px;
+
+  /* Расширенная колонка главной: на широких мониторах ширина уходит в
+     контент, а не в пустые поля. */
+  --max-content-wide: 1600px;
   --navbar-height: calc(56px + env(safe-area-inset-bottom));
   --navbar-width: calc(64px + env(safe-area-inset-left));
 
@@ -49,6 +69,12 @@
   --ui-text-dimmed: var(--text-color-disabled);
   --ui-border: var(--border);
   --ui-border-accented: var(--border-hover);
+}
+
+@media (width >= 2100px) {
+  :root {
+    --max-content-wide: 1880px;
+  }
 }
 
 body {

@@ -20,11 +20,12 @@
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
 │   │   ├── section/            # layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane
+│   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
 │   │   └── user/               # helmet (user menu), auth-modal (sign in)
-│   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile)
-│   ├── pages/                  # File-based routes (index is a placeholder until the home page is ported)
+│   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home: same, full width
+│   ├── pages/                  # File-based routes
 │   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA)
 │   └── shared/                 # consts (API paths, UI texts), types (user), ui (logo, hamburger)
 ├── server/
@@ -54,6 +55,7 @@
 | Section                                                            | Status |
 | ------------------------------------------------------------------ | ------ |
 | Skeleton: config, proxy, theme, page meta, deploy                  | ✅     |
+| Home page                                                          | ✅     |
 | Sidebar menu, sign in and session on SSR, analytics                | ✅     |
 | Sign up, password reset, profile actions (stage 5)                 | ⏳     |
 | Content renderer (`RawContent` replacement), dice, tooltips        | ✅     |
@@ -108,3 +110,12 @@ group plus their own groups, which can be created, renamed and deleted from the
 panel. The category of a page (spells, races…) comes from
 `/api/v1/bookmarks/category`. `BookmarkButton` toggles the bookmark in the
 default group and adds it to any custom group from its menu.
+
+## 🏠 Home
+
+The home page repeats the legacy one block for block. Section tiles and the
+tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
+render on SSR; videos (`/api/v1/youtube`) and friends (`/api/v1/partners`) too.
+The latest game comes from the new.ttg.club game service and core-api, so it
+loads only in the browser. Search still lives in the legacy SPA: the search
+field and its hotkeys (`/`, `\`) open `/search` with a full page load.
