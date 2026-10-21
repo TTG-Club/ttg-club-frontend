@@ -77,19 +77,3 @@ export const MENU_SUPPORT_LINKS: Array<SupportLink> = [
     icon: 'ttg:boosty',
   },
 ];
-
-/** Соцсети на боковой панели, как в старом SPA. */
-export const SIDEBAR_SOCIAL_LINKS: Array<SocialLink> = [
-  { label: 'Telegram', url: 'https://t.me/ttgclubnews', icon: 'ttg:telegram' },
-  {
-    label: 'Boosty',
-    url: 'https://boosty.to/dnd5club',
-    icon: 'ttg:boosty',
-  },
-  { label: 'VK', url: 'https://vk.com/ttg.club', icon: 'ttg:vk' },
-  {
-    label: 'Discord',
-    url: 'https://discord.gg/JqFKMKRtxv',
-    icon: 'ttg:discord',
-  },
-];
