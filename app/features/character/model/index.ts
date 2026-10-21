@@ -6,7 +6,11 @@ export type {
   OptionDetail,
   OptionLink,
   ReferenceClass,
+  SpellComponents,
+  SpellDetail,
+  SpellLink,
 } from './schema';
+export type { SpellComponentLabel } from './types';
 
 export {
   backgroundDetailSchema,
@@ -15,11 +19,16 @@ export {
   featLinkSchema,
   optionDetailSchema,
   optionLinkSchema,
+  spellDetailSchema,
+  spellLinkSchema,
 } from './schema';
 
 export {
   getBackgroundLanguages,
   getRequirementsLabel,
+  getSpellComponentLabels,
+  getSpellGroup,
+  getSpellTypeLabel,
   hasPersonalization,
 } from './utils';
 

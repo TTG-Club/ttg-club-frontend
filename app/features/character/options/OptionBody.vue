@@ -1,10 +1,11 @@
 <script setup lang="ts">
   import type { OptionDetail } from '../model';
 
-  import { ContentLink, ContentRender } from '~content/render';
+  import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
 
   import { getRequirementsLabel, OPTION_TEXT } from '../model';
+  import { ReferenceList } from '../references';
 
   /**
    * Карточка особенности класса: требования в плашке источника, описание
@@ -31,29 +32,10 @@
       :html="option.description"
     />
 
-    <p
+    <ReferenceList
       v-if="option.classes?.length"
-      class="flex flex-wrap gap-x-1"
-    >
-      <b>{{ OPTION_TEXT.classes }}</b>
-
-      <span
-        v-for="(item, index) in option.classes"
-        :key="item.name"
-      >
-        <ContentLink
-          v-if="item.url"
-          :href="item.url"
-          :attributes="{}"
-          >{{ item.name }}</ContentLink
-        >
-
-        <template v-else>{{ item.name }}</template>
-
-        <template v-if="index < option.classes.length - 1">{{
-          OPTION_TEXT.classSeparator
-        }}</template>
-      </span>
-    </p>
+      :label="OPTION_TEXT.classes"
+      :items="option.classes"
+    />
   </div>
 </template>
