@@ -19,6 +19,7 @@
 │   ├── features/               # DDD domains
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
+│   │   ├── section/            # layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
 │   │   └── user/               # helmet (user menu), auth-modal (sign in)
@@ -57,8 +58,8 @@
 | Sign up, password reset, profile actions (stage 5)                 | ⏳     |
 | Content renderer (`RawContent` replacement), dice, tooltips        | ✅     |
 | Dice history                                                       | ✅     |
+| List + detail, URL filters, search                                 | ✅     |
 | Bookmarks                                                          | ✅     |
-| List + detail, URL filters, search                                 | ⏳     |
 | Reference sections (character, inventory, wiki, bestiary, screens) | ⏳     |
 | Tools, initiative tracker                                          | ⏳     |
 | Account, comments, subscription, bug report                        | ⏳     |
@@ -86,6 +87,17 @@ Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
 between tabs by the `storage` event). While the history window is open, rolls
 skip the toast. The legacy SPA kept its history in IndexedDB, so it is not
 carried over.
+
+## 📚 Sections
+
+A reference section is a parent page with `SectionLayout` and a child route
+for the entry (`pages/spells.vue` + `pages/spells/[slug].vue`): on desktop the
+entry opens next to the list, on a phone instead of it. `useSectionList` loads
+the first page on SSR and the next ones on scroll (`POST` with `page`, `size`,
+`search`, `order`, `filter`). `useSectionFilter` takes the groups from the
+section's filter endpoint and keeps only the groups changed from their
+defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
+`book` parameter, as in the legacy SPA. Search lives in `?search=`.
 
 ## 🔖 Bookmarks
 
