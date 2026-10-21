@@ -123,6 +123,25 @@
     color: var(--text-color);
   }
 
+  /* Маркеры, которые сбрасывает preflight Tailwind: в старом SPA они были */
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  /* Список характеристик в тексте записи — без маркеров, как в старом SPA */
+  .stat-list {
+    padding: 0;
+
+    li {
+      margin-bottom: 6px;
+      list-style: none;
+    }
+  }
+
   ol li,
   ul li {
     margin-bottom: 8px;
