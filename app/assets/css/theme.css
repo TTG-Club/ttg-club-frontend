@@ -97,6 +97,8 @@ html.dark {
   --logo-section-7: #1c386b;
   --logo-section-8: #103579;
   --hero-map-opacity: 0.6;
+  --hero-map-image: url('/img/dark/hero-map.webp');
+  --hero-map-image-sm: url('/img/dark/hero-map-sm.webp');
   --hero-map-paper: oklch(42% 0.03 230deg);
   --hero-map-ink: oklch(10% 0.02 235deg);
   --discord-base: #5865f2;
@@ -217,6 +219,8 @@ html.light {
   --logo-section-7: #813120;
   --logo-section-8: #6e2a1c;
   --hero-map-opacity: 0.55;
+  --hero-map-image: url('/img/light/hero-map.webp');
+  --hero-map-image-sm: url('/img/light/hero-map-sm.webp');
   --hero-map-paper: oklch(98.5% 0.008 75deg);
   --hero-map-ink: oklch(26% 0.02 60deg);
   --discord-base: #5865f2;
@@ -342,6 +346,8 @@ html.light {
     --logo-section-7: #813120;
     --logo-section-8: #6e2a1c;
     --hero-map-opacity: 0.55;
+    --hero-map-image: url('/img/light/hero-map.webp');
+    --hero-map-image-sm: url('/img/light/hero-map-sm.webp');
     --hero-map-paper: oklch(98.5% 0.008 75deg);
     --hero-map-ink: oklch(26% 0.02 60deg);
     --discord-base: #5865f2;

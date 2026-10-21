@@ -6,6 +6,10 @@ export interface SiteMenuItem {
   onlyDev?: boolean;
   external?: boolean;
   order: number;
+  /** Пункт стоит плиткой на главной. */
+  onIndex?: boolean;
+  /** Порядок плитки на главной. */
+  indexOrder?: number;
   children?: Array<SiteMenuItem>;
 }
 
