@@ -6,7 +6,6 @@
   import { UserHelmet } from '~user/helmet';
 
   import { AppMenu } from '../menu';
-  import { SidebarSocials } from '../socials';
 </script>
 
 <template>
@@ -43,8 +42,6 @@
       </div>
 
       <div class="flex items-center gap-2 md:flex-col">
-        <SidebarSocials />
-
         <!-- На десктопе история открывается плавающей кнопкой -->
         <ClientOnly>
           <DiceHistoryToggle class="md:hidden" />
