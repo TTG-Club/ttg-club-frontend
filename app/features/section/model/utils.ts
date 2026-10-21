@@ -1,6 +1,10 @@
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 
-import type { FilterGroupResponse, FilterResponse } from './schema';
+import type {
+  EntrySource,
+  FilterGroupResponse,
+  FilterResponse,
+} from './schema';
 import type {
   FilterDefinition,
   FilterGroup,
@@ -11,7 +15,14 @@ import type {
   SectionOrder,
 } from './types';
 
-import { QUERY_VALUES_SEPARATOR, SOURCES_PARAM } from './constants';
+import {
+  QUERY_VALUES_SEPARATOR,
+  SECTION_API_PREFIX,
+  SOURCE_GROUPS_WITH_LABEL,
+  SOURCES_PARAM,
+  WORKSHOP_EDIT_SUFFIX,
+  WORKSHOP_PREFIX,
+} from './constants';
 
 /**
  * Приводит группу из API к единому виду.
@@ -307,4 +318,31 @@ export function setGroupSelection(
   );
 
   return { ...selection, [group.param]: [...others, ...keys] };
+}
+
+/**
+ * Возвращает ручку записи по её адресу на сайте: `/gods/Bane` читается
+ * из `POST /api/v1/gods/Bane`, как в старом SPA.
+ * @param path - адрес страницы записи
+ */
+export function getEntryApiPath(path: string): string {
+  return `${SECTION_API_PREFIX}${path}`;
+}
+
+/**
+ * Проверяет, нужна ли рядом с книгой подпись её группы: сторонний
+ * материал и хомбрю помечаются, официальные книги — нет.
+ * @param source - источник записи
+ */
+export function hasSourceGroupLabel(source: EntrySource): boolean {
+  return !!source.group && SOURCE_GROUPS_WITH_LABEL.has(source.group.shortName);
+}
+
+/**
+ * Возвращает страницу правки записи в мастерской: `/gods/Bane` правится
+ * на `/workshop/gods/Bane/edit`, как в старом SPA.
+ * @param path - адрес страницы записи
+ */
+export function getWorkshopEditPath(path: string): string {
+  return `${WORKSHOP_PREFIX}${path}${WORKSHOP_EDIT_SUFFIX}`;
 }

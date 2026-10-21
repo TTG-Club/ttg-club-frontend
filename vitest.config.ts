@@ -20,6 +20,7 @@ export default defineConfig({
       '~dice-roller': fileURLToPath(
         new URL('./app/features/dice-roller', import.meta.url),
       ),
+      '~wiki': fileURLToPath(new URL('./app/features/wiki', import.meta.url)),
       '~infrastructure': fileURLToPath(
         new URL('./app/features/infrastructure', import.meta.url),
       ),

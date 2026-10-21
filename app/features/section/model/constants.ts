@@ -29,6 +29,14 @@ export const SECTION_TEXT = {
   error: 'Не удалось загрузить список',
   detailError: 'Не удалось загрузить запись',
   retry: 'Повторить',
+  copyLink: 'Скопировать ссылку',
+  linkCopied: 'Ссылка скопирована',
+  copyError: 'Не удалось скопировать ссылку',
+  edit: 'Редактировать',
+  source: 'Источник:',
+  openImage: 'Открыть изображение',
+  previousImage: 'Предыдущее изображение',
+  nextImage: 'Следующее изображение',
 } as const;
 
 /** Иконки раздела. */
@@ -38,4 +46,25 @@ export const SECTION_ICON = {
   reset: 'tabler:filter-off',
   close: 'tabler:x',
   empty: 'tabler:mood-empty',
+  copy: 'tabler:link',
+  edit: 'tabler:pencil',
+  previous: 'tabler:chevron-left',
+  next: 'tabler:chevron-right',
 } as const;
+
+/** Мастерская: правка записей, пока живёт в старом SPA. */
+export const WORKSHOP_PREFIX = '/workshop';
+
+export const WORKSHOP_EDIT_SUFFIX = '/edit';
+
+/** Префикс API записей: адрес записи на сайте совпадает с её ручкой. */
+export const SECTION_API_PREFIX = '/api/v1';
+
+/**
+ * Группы источников, которые подписываются рядом с книгой, как в старом
+ * SPA: у официальных и тестовых книг подпись группы ничего не добавляет.
+ */
+export const SOURCE_GROUPS_WITH_LABEL: ReadonlySet<string> = new Set([
+  '3rd',
+  'HB',
+]);

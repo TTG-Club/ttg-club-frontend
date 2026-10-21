@@ -25,3 +25,31 @@ export const filterResponseSchema = z.union([
 
 export type FilterResponse = z.infer<typeof filterResponseSchema>;
 export type FilterGroupResponse = z.infer<typeof filterGroupSchema>;
+
+/** Название записи: по-русски, по-английски и необязательное другое. */
+export const entryNameSchema = z.object({
+  rus: z.string(),
+  eng: z.string(),
+  alt: z.string().nullish(),
+});
+
+export type EntryName = z.infer<typeof entryNameSchema>;
+
+/**
+ * Источник записи. Группа есть у источников, привязанных к книге:
+ * официальные, тестовые, сторонние и хомбрю.
+ */
+export const entrySourceSchema = z.object({
+  shortName: z.string(),
+  name: z.string(),
+  group: z
+    .object({
+      shortName: z.string(),
+      name: z.string(),
+    })
+    .nullish(),
+  homebrew: z.boolean().nullish(),
+  page: z.number().nullish(),
+});
+
+export type EntrySource = z.infer<typeof entrySourceSchema>;

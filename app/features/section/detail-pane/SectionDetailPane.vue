@@ -3,20 +3,55 @@
 
   import { SECTION_ICON, SECTION_TEXT } from '../model';
 
-  /** Панель открытой записи раздела: заголовок, закрытие и содержимое. */
+  /**
+   * Панель открытой записи раздела: заголовок, ссылка на запись, правка
+   * для редакторов, закрытие и содержимое.
+   */
   const {
     title,
     subtitle = undefined,
     closeTo,
+    editUrl = undefined,
     isLoading = false,
     isError = false,
   } = defineProps<{
     title: string;
     subtitle?: string;
     closeTo: RouteLocationRaw;
+    /** Страница записи в мастерской; мастерская пока живёт в старом SPA. */
+    editUrl?: string;
     isLoading?: boolean;
     isError?: boolean;
   }>();
+
+  const route = useRoute();
+  const siteConfig = useSiteConfig();
+  const toast = useToast();
+  const { copy, isSupported } = useClipboard({ legacy: true });
+  const { isEditor } = useUser();
+
+  const isReady = computed(() => !isLoading && !isError);
+
+  const isEditAvailable = computed(
+    () => !!editUrl && isEditor.value && isReady.value,
+  );
+
+  /** Копирует каноничную ссылку на запись, без параметров списка. */
+  async function copyLink() {
+    if (!isSupported.value) {
+      toast.add({ title: SECTION_TEXT.copyError, color: 'error' });
+
+      return;
+    }
+
+    try {
+      await copy(`${siteConfig.url}${route.path}`);
+
+      toast.add({ title: SECTION_TEXT.linkCopied, icon: SECTION_ICON.copy });
+    } catch {
+      toast.add({ title: SECTION_TEXT.copyError, color: 'error' });
+    }
+  }
 </script>
 
 <template>
@@ -43,7 +78,33 @@
         </div>
       </div>
 
-      <slot name="actions" />
+      <template v-if="isReady">
+        <UTooltip :text="SECTION_TEXT.copyLink">
+          <UButton
+            :icon="SECTION_ICON.copy"
+            :aria-label="SECTION_TEXT.copyLink"
+            color="neutral"
+            variant="ghost"
+            @click.left.exact.prevent="copyLink"
+          />
+        </UTooltip>
+
+        <slot name="actions" />
+
+        <UTooltip
+          v-if="isEditAvailable"
+          :text="SECTION_TEXT.edit"
+        >
+          <UButton
+            :to="editUrl"
+            :icon="SECTION_ICON.edit"
+            :aria-label="SECTION_TEXT.edit"
+            color="neutral"
+            variant="ghost"
+            external
+          />
+        </UTooltip>
+      </template>
 
       <UButton
         :to="closeTo"
