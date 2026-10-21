@@ -5,12 +5,19 @@ export type {
   FeatLink,
   OptionDetail,
   OptionLink,
+  RaceAbility,
+  RaceDetail,
+  RaceLink,
+  RaceSkill,
+  RaceSpeed,
   ReferenceClass,
   SpellComponents,
   SpellDetail,
   SpellLink,
+  SubraceDetail,
+  SubraceLink,
 } from './schema';
-export type { SpellComponentLabel } from './types';
+export type { RaceStat, SpellComponentLabel, SubraceGroup } from './types';
 
 export {
   backgroundDetailSchema,
@@ -19,17 +26,27 @@ export {
   featLinkSchema,
   optionDetailSchema,
   optionLinkSchema,
+  raceDetailSchema,
+  raceLinkSchema,
   spellDetailSchema,
   spellLinkSchema,
 } from './schema';
 
 export {
   getBackgroundLanguages,
+  getRaceAbilitiesLabel,
+  getRaceEditPath,
+  getRaceGroup,
+  getRaceSpeedLabel,
+  getRaceStats,
   getRequirementsLabel,
   getSpellComponentLabels,
   getSpellGroup,
   getSpellTypeLabel,
+  groupSubraces,
   hasPersonalization,
+  sortRaces,
+  sortRaceSkills,
 } from './utils';
 
 export * from './constants';

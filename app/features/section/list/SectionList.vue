@@ -19,6 +19,8 @@
     status,
     isEnd = true,
     isLoadingMore = false,
+    isGrid = false,
+    isDetailOpen = false,
   } = defineProps<{
     items: Array<T>;
     getKey: (item: T) => string;
@@ -26,6 +28,10 @@
     status: AsyncDataRequestStatus;
     isEnd?: boolean;
     isLoadingMore?: boolean;
+    /** Карточки в сетку вместо строк. */
+    isGrid?: boolean;
+    /** Рядом открыта запись: сетке остаётся меньше места. */
+    isDetailOpen?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -40,6 +46,16 @@
   const groups = computed(() =>
     getGroup ? groupItems(items, getGroup) : [{ name: '', items }],
   );
+
+  const groupClass = computed(() => {
+    if (!isGrid) {
+      return 'flex flex-col gap-1';
+    }
+
+    return isDetailOpen
+      ? 'grid grid-cols-1 items-start gap-4 sm:grid-cols-2'
+      : 'grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5';
+  });
 
   const isFirstLoading = computed(() => status === 'pending' && !items.length);
 
@@ -109,12 +125,14 @@
         {{ group.name }}
       </h2>
 
-      <template
-        v-for="item in group.items"
-        :key="getKey(item)"
-      >
-        <slot :item="item" />
-      </template>
+      <div :class="groupClass">
+        <template
+          v-for="item in group.items"
+          :key="getKey(item)"
+        >
+          <slot :item="item" />
+        </template>
+      </div>
     </section>
 
     <div

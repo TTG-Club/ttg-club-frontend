@@ -1,0 +1,7 @@
+<script setup lang="ts">
+  import { RacesSection } from '~character/races';
+</script>
+
+<template>
+  <RacesSection />
+</template>

@@ -20,7 +20,7 @@
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
 │   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane, source-bar, source-badge, stat-grid, image-preview
-│   │   ├── character/          # feats, backgrounds, class options, spells; references (links to classes, races…)
+│   │   ├── character/          # feats, backgrounds, class options, spells, races; references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── wiki/               # gods, rules, books: list rows and entry cards
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
@@ -67,8 +67,8 @@
 | Bookmarks                                                   | ✅     |
 | Wiki: gods, rules, books                                    | ✅     |
 | Inventory: weapons, armors, items, magic items, treasures   | ✅     |
-| Character: feats, backgrounds, class options, spells        | ✅     |
-| Character: classes, races                                   | ⏳     |
+| Character: feats, backgrounds, class options, spells, races | ✅     |
+| Character: classes                                          | ⏳     |
 | Bestiary, screens                                           | ⏳     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
@@ -110,7 +110,8 @@ defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
 
 `SectionPage` puts these together, so a section only gives its config
 (`SectionConfig`: endpoints, order, page size), the entry schema and the list
-row; `pageSize: SECTION_PAGE_SIZE_ALL` loads a short section in one request.
+row; `pageSize: SECTION_PAGE_SIZE_ALL` loads a short section in one request,
+`sortItems` reorders it on the page and `isGrid` shows cards in a grid (races).
 `SectionEntry` is the entry card shell (header, bookmark, close link) around the
 section's own body. The entry page reads `POST /api/v1<path>` with
 `useSectionEntry`; a missing entry renders a real 404. `SectionDetailPane`
