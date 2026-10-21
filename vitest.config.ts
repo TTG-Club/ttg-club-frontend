@@ -7,6 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
+      '~bookmarks': fileURLToPath(
+        new URL('./app/features/bookmarks', import.meta.url),
+      ),
       '~content': fileURLToPath(
         new URL('./app/features/content', import.meta.url),
       ),
