@@ -17,6 +17,7 @@
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
 │   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
+│   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
@@ -56,7 +57,8 @@
 | Sign up, password reset, profile actions (stage 5)                 | ⏳     |
 | Content renderer (`RawContent` replacement), dice, tooltips        | ✅     |
 | Dice history                                                       | ✅     |
-| List + detail, URL filters, search, bookmarks                      | ⏳     |
+| Bookmarks                                                          | ✅     |
+| List + detail, URL filters, search                                 | ⏳     |
 | Reference sections (character, inventory, wiki, bestiary, screens) | ⏳     |
 | Tools, initiative tracker                                          | ⏳     |
 | Account, comments, subscription, bug report                        | ⏳     |
@@ -84,3 +86,13 @@ Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
 between tabs by the `storage` event). While the history window is open, rolls
 skip the toast. The legacy SPA kept its history in IndexedDB, so it is not
 carried over.
+
+## 🔖 Bookmarks
+
+Guests keep bookmarks in `localStorage` (`ttg-bookmarks`); on the first visit
+the bookmarks of the legacy SPA are read once from its IndexedDB (`dnd5club`,
+store `bookmarks`). Signed-in users work with `/api/v1/bookmarks`: the default
+group plus their own groups, which can be created, renamed and deleted from the
+panel. The category of a page (spells, races…) comes from
+`/api/v1/bookmarks/category`. `BookmarkButton` toggles the bookmark in the
+default group and adds it to any custom group from its menu.
