@@ -12,7 +12,7 @@
     MENU_TOGGLE_LABEL,
     siteMenuSchema,
   } from './model';
-  import { MenuFooter, MenuSection } from './ui';
+  import { MenuFooter, MenuSection, MenuSkeleton } from './ui';
 
   /** Ключ данных меню: одно на всё приложение. */
   const MENU_DATA_KEY = 'site-menu';
@@ -37,7 +37,9 @@
     { server: false, immediate: false, default: () => [] },
   );
 
-  const isLoading = computed(() => status.value === 'pending');
+  // До первого открытия статус `idle`: скелетон и для него, иначе на миг
+  // мелькает пустое меню.
+  const isLoaded = computed(() => status.value === 'success');
   const isFailed = computed(() => status.value === 'error');
 
   watch(isOpened, (value) => {
@@ -88,18 +90,8 @@
       <USeparator />
 
       <nav class="@container px-2 pt-4">
-        <div
-          v-if="isLoading"
-          class="flex justify-center py-8"
-        >
-          <UIcon
-            name="tabler:loader-2"
-            class="size-6 animate-spin text-dimmed"
-          />
-        </div>
-
         <p
-          v-else-if="isFailed"
+          v-if="isFailed"
           class="px-2.5 pb-6 text-muted"
         >
           {{ MENU_ERROR_TEXT }}
@@ -109,11 +101,15 @@
           v-else
           class="columns-1 gap-3 @sm:columns-2 @2xl:columns-3 @4xl:columns-4"
         >
-          <MenuSection
-            v-for="group in groups"
-            :key="group.label"
-            :group
-          />
+          <MenuSkeleton v-if="!isLoaded" />
+
+          <template v-else>
+            <MenuSection
+              v-for="group in groups"
+              :key="group.label"
+              :group
+            />
+          </template>
         </div>
       </nav>
 
