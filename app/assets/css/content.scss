@@ -1,0 +1,557 @@
+/*
+ * Типографика HTML-контента из базы: перенесена из старого SPA
+ * (`legacy/src/assets/styles/_typography.scss`), чтобы классы в описаниях
+ * (`spoiler`, `header_separator`, `dice_text` и т.п.) выглядели как раньше.
+ * Правила ограничены рендером контента и не трогают остальную вёрстку.
+ */
+
+:root {
+  --main-font-size: 14px;
+  --h1-font-size: 38px;
+  --h2-font-size: 30px;
+  --h3-font-size: 26px;
+  --h4-font-size: 22px;
+  --h5-font-size: 14px;
+}
+:root {
+  --main-line-height: 19px;
+  --h1-line-height: 52px;
+  --h2-line-height: 38px;
+  --h3-line-height: 34px;
+  --h4-line-height: 28px;
+  --h5-line-height: 19px;
+}
+
+@media (max-width: 800px) {
+  :root {
+    --main-font-size: 14px;
+    --h1-font-size: 32px;
+    --h2-font-size: 28px;
+    --h3-font-size: 24px;
+    --h4-font-size: 20px;
+    --h5-font-size: 14px;
+  }
+}
+
+.content-render {
+  h1 {
+    margin: 0;
+
+    font-size: var(--h1-font-size);
+    font-weight: 300;
+    line-height: var(--h1-line-height);
+    color: var(--text-color-title);
+  }
+
+  h2 {
+    margin: 0;
+
+    font-size: var(--h2-font-size);
+    font-weight: 400;
+    line-height: var(--h2-line-height);
+    color: var(--text-color-title);
+  }
+
+  h3 {
+    margin: 28px 0 8px 0;
+
+    font-size: var(--h3-font-size);
+    font-weight: 300;
+    line-height: var(--h3-line-height);
+    color: var(--text-color-title);
+  }
+
+  h4 {
+    position: relative;
+
+    margin: 36px 0 8px 0;
+
+    font-size: var(--h4-font-size);
+    font-weight: 400;
+    line-height: var(--h4-line-height);
+    color: var(--text-color-title);
+  }
+
+  h5 {
+    position: relative;
+
+    margin: 0;
+
+    font-size: var(--h5-font-size);
+    font-weight: 600;
+    line-height: var(--h5-line-height);
+    color: var(--text-color-title);
+  }
+
+  p {
+    margin: 0 0 16px 0;
+
+    font-size: var(--main-font-size);
+    font-weight: 400;
+    line-height: var(--main-line-height);
+    color: var(--text-color);
+  }
+
+  a {
+    font-weight: 400;
+    color: var(--link-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--link-color-hover);
+      transition: all 0.5s;
+    }
+  }
+
+  p {
+    a {
+      &:hover {
+        border-bottom: 1px solid var(--link-color);
+      }
+    }
+
+    & + ul {
+      margin-top: 8px;
+    }
+  }
+
+  ol,
+  ul {
+    margin: 0 0 12px 0;
+    padding-left: 24px;
+    line-height: var(--main-line-height);
+    color: var(--text-color);
+  }
+
+  ol li,
+  ul li {
+    margin-bottom: 8px;
+  }
+
+  strong,
+  b {
+    font-weight: 600;
+    color: var(--text-color-title);
+  }
+
+  .btn_text {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+
+  .small_btn {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-color);
+  }
+
+  .caption_text {
+    margin: -4px 0 12px 0;
+
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 12px;
+    color: var(--text-g-color);
+  }
+
+  h4 + .caption_text {
+    margin-top: -6px;
+  }
+
+  summary.header_separator + .caption_text {
+    margin-top: -10px;
+  }
+
+  .uppercase_text {
+    text-transform: uppercase;
+  }
+
+  .capitalize_text {
+    text-transform: capitalize;
+  }
+
+  blockquote {
+    margin-top: 32px;
+    margin-bottom: 32px;
+    margin-block-start: 16px;
+    margin-block-end: 16px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding: 16px 16px 4px 16px;
+    border-left: 2px solid var(--primary);
+
+    background-color: var(--hover);
+
+    h4:first-child {
+      margin: 0 0 8px;
+    }
+
+    .source-quote {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+
+  .spell-list {
+    margin-bottom: 16px;
+    margin-left: 16px;
+    text-indent: -16px;
+
+    p {
+      margin: 0 0 4px;
+    }
+  }
+
+  .header_separator {
+    display: flex;
+    align-items: center;
+
+    margin-top: 32px;
+    padding: 6px 0;
+    border-color: var(--border);
+    border-bottom: 1px solid;
+  }
+
+  h5.header_separator {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+
+  .filter_crumbs_box .header_separator {
+    margin: 16px 4px 4px;
+    font-weight: 400;
+  }
+
+  .header_separator:not(:empty)::after {
+    margin-left: 8px;
+  }
+
+  .header_separator > span {
+    margin-right: 8px;
+  }
+
+  /********* Сворачивание текста / details  *********/
+  details {
+    margin-top: 28px;
+    margin-right: -8px;
+    margin-left: -8px;
+
+    summary {
+      cursor: pointer;
+
+      position: relative;
+
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+
+      width: auto;
+      margin: 0;
+      padding: 8px 8px;
+      border-radius: 8px;
+
+      color: var(--text-color-title);
+
+      background: var(--bg-details-title);
+
+      &.h4 {
+        font-size: var(--h4-font-size);
+        font-weight: 400;
+        line-height: var(--h4-line-height);
+      }
+    }
+
+    .content {
+      padding: 0 8px;
+    }
+  }
+
+  details[open] {
+    summary {
+      margin: 0 0 8px 8px;
+      padding: 8px 0;
+      border-color: var(--border);
+      border-bottom: 1px solid;
+      border-radius: 0;
+
+      background: none;
+
+      .source-data {
+        margin-right: 48px;
+      }
+    }
+  }
+
+  details {
+    &.inside {
+      margin-right: 8px;
+      margin-left: 8px;
+      border-radius: 8px;
+      background-color: var(--bg-details-title);
+
+      summary {
+        margin-bottom: 0;
+        border-bottom: 0;
+      }
+    }
+  }
+
+  details[open] {
+    &.inside {
+      padding-bottom: 4px;
+      summary {
+        margin-bottom: 8px;
+        border-color: var(--border);
+        border-bottom: 1px solid;
+      }
+    }
+  }
+
+  details[open] {
+    &.lvl {
+      background-color: var(--bg-details-title);
+
+      .content {
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  summary::marker {
+    content: '';
+  }
+
+  summary:before {
+    content: '➕';
+
+    position: absolute;
+    right: 32px;
+
+    display: flex;
+    align-items: center;
+
+    width: 0;
+    height: 0;
+
+    font-size: 14px;
+
+    opacity: 0.7;
+  }
+
+  details[open] > summary::before {
+    content: '➖';
+  }
+
+  summary.h5 {
+    cursor: pointer;
+
+    margin: 0 0 8px 0;
+
+    font-size: var(--h5-font-size);
+    font-weight: 400;
+    line-height: 18px;
+    color: var(--text-color);
+  }
+
+  summary.h4:hover,
+  summary.h5:hover {
+    color: var(--text-color);
+  }
+
+  .optional-rules {
+    margin-right: 8px;
+  }
+
+  .source-data {
+    margin-right: 40px;
+    margin-left: auto;
+
+    font-size: var(--main-font-size);
+    color: var(--text-g-color);
+    text-align: right;
+    text-transform: uppercase;
+  }
+
+  h4.separator_card {
+    width: 100%;
+    margin-left: 8px;
+  }
+
+  .archetype_feet {
+    color: var(--text-a-color) !important;
+  }
+
+  .align_left {
+    text-align: left !important;
+  }
+
+  details.spoiler {
+    margin: 24px -8px 16px -8px;
+    padding: 0 0 4px 0;
+    border-radius: 8px;
+
+    .content {
+      padding: 8px 16px;
+    }
+  }
+
+  details[open].spoiler {
+    background-color: var(--bg-details-title);
+
+    summary {
+      .source-data {
+        margin-right: 40px;
+      }
+    }
+  }
+
+  details[open].spoiler > summary.h4 {
+    margin: 0 0 4px 0;
+    padding: 8px 8px;
+    border-radius: 8px 8px 0 0;
+    background: var(--hover);
+  }
+
+  details[open].spoiler > summary::after {
+    right: 8px !important;
+  }
+
+  details[open].spoiler h4 > span {
+    font-size: calc(var(--h4-font-size) - 2px);
+  }
+
+  /* Первый заголовок в спойлере не отбивается сверху — иначе под summary пустота */
+  details.spoiler > .content > :first-child > h3:first-child,
+  details.spoiler > .content > :first-child > h4:first-child,
+  details.spoiler > .content > h3:first-child,
+  details.spoiler > .content > h4:first-child {
+    margin-top: 0;
+  }
+
+  details[open].spoiler table {
+    border-radius: 8px;
+    background-color: var(--bg-sub-menu);
+  }
+
+  details[open].spoiler div > details {
+    margin-bottom: 0;
+  }
+
+  /********* Выделение в тексте *********/
+  dnd5club-dice-text,
+  dnd5club-saving-throw,
+  dnd5club-advantage,
+  dnd5club-disadvantage,
+  span.dice_text,
+  span.homebrew_text,
+  span.advantage,
+  span.disadvantage,
+  span.saving_throw {
+    font-weight: 500;
+    color: var(--text-btn-color);
+  }
+
+  dnd5club-dice-text,
+  span.dice_text {
+    color: var(--bg-dice) !important;
+  }
+
+  span.homebrew_text {
+    color: var(--bg-homebrew);
+    text-transform: none;
+  }
+
+  dnd5club-advantage,
+  span.advantage {
+    color: var(--bg-advantage);
+  }
+
+  dnd5club-disadvantage,
+  span.disadvantage {
+    color: var(--bg-disadvantage);
+  }
+
+  dnd5club-saving-throw,
+  span.saving_throw {
+    color: var(--bg-saving-throw);
+  }
+
+  /********* Таблицы *********/
+  .table-responsive {
+    overflow-x: auto;
+    margin-bottom: 12px;
+    border-radius: 8px;
+
+    table {
+      margin-bottom: 0;
+    }
+  }
+
+  table {
+    overflow: scroll;
+    border-spacing: inherit;
+
+    width: 100% !important;
+    height: 100%;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    color: var(--text-color);
+  }
+
+  table thead {
+    font-size: calc(var(--main-font-size) - 2px);
+    color: var(--text-btn-color);
+    background-color: var(--primary);
+
+    .dice-roller {
+      border-bottom: 1px solid var(--text-btn-color);
+      color: var(--text-btn-color) !important;
+    }
+  }
+
+  table th,
+  table thead th {
+    padding: 4px 4px;
+    font-weight: 500;
+  }
+
+  table th b,
+  table th strong,
+  table thead th b,
+  table thead th strong {
+    font-weight: 500;
+  }
+
+  table td {
+    height: auto;
+    padding: 4px 4px;
+    border-right: 1px solid var(--border);
+    line-height: var(--main-line-height);
+  }
+
+  table tr:nth-child(2n) {
+    background: var(--bg-table-row);
+  }
+
+  table td:last-child {
+    border-right: 0 solid var(--border);
+  }
+
+  .table-responsive.class {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  table tbody tr:hover {
+    background-color: var(--hover);
+  }
+
+  @media (max-width: 800px) {
+    summary::before {
+      right: 28px;
+    }
+  }
+}

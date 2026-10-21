@@ -25,6 +25,11 @@
   --color-link-hover: var(--link-color-hover);
   --color-hover: var(--hover);
   --color-overlay: var(--bg-light-main);
+  --color-dice: var(--bg-dice);
+  --color-advantage: var(--bg-advantage);
+  --color-disadvantage: var(--bg-disadvantage);
+  --color-saving-throw: var(--bg-saving-throw);
+  --color-row-highlighted: var(--bg-table-row-highlighted);
 }
 
 /* Nuxt UI берёт цвета из той же палитры. */

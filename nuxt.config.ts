@@ -162,7 +162,7 @@ export default defineNuxtConfig({
   },
 
   // Стили и UI
-  css: ['~/assets/css/tailwind.css'],
+  css: ['~/assets/css/tailwind.css', '~/assets/css/content.scss'],
 
   ui: {
     colorMode: false,
