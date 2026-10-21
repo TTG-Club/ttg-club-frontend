@@ -72,9 +72,10 @@
     </div>
   </section>
 
-  <div
-    class="fixed right-4 bottom-6 z-90 hidden rounded-full border border-default bg-default shadow-lg md:block"
-  >
-    <DiceHistoryToggle />
+  <!-- Как плавающая кнопка старого SPA: круг 40px цвета всплывающих окон -->
+  <div class="fixed right-4 bottom-6 z-90 hidden md:block">
+    <DiceHistoryToggle
+      class="size-10 justify-center rounded-full bg-elevated p-2 text-default shadow-lg"
+    />
   </div>
 </template>

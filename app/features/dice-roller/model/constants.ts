@@ -47,7 +47,7 @@ export const ROLL_HISTORY_TEXT = {
 
 /** Иконки истории бросков. */
 export const ROLL_HISTORY_ICON = {
-  open: 'tabler:dice-5',
+  open: 'ttg:dice-d20',
   close: 'tabler:x',
   clear: 'tabler:trash',
   roll: 'tabler:dice-5',
