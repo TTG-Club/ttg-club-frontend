@@ -1,22 +1,15 @@
 <script setup lang="ts">
   import { SectionLink } from '~section/list';
+  import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
 
-  import {
-    bookLinkSchema,
-    BOOKS_SECTION,
-    getBookGroup,
-    getEntryUrl,
-  } from '../model';
+  import { bookLinkSchema, BOOKS_SECTION, getBookGroup } from '../model';
 </script>
 
 <template>
   <!-- У источников нет фильтра, как и в старом SPA: только поиск. -->
   <SectionPage
-    :section-key="BOOKS_SECTION.key"
-    :title="BOOKS_SECTION.title"
-    :list-url="BOOKS_SECTION.listUrl"
-    :order="BOOKS_SECTION.order"
+    :section="BOOKS_SECTION"
     :schema="bookLinkSchema"
     :get-key="getEntryUrl"
     :get-group="getBookGroup"

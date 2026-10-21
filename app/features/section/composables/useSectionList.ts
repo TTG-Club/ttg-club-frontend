@@ -4,7 +4,11 @@ import type { FilterPayload, SectionOrder } from '../model';
 
 import { z } from 'zod';
 
-import { buildListRequest, SECTION_PAGE_SIZE } from '../model';
+import {
+  buildListRequest,
+  SECTION_PAGE_SIZE,
+  SECTION_PAGE_SIZE_ALL,
+} from '../model';
 
 interface SectionListOptions<T> {
   /** Ключ раздела для данных SSR. */
@@ -14,6 +18,11 @@ interface SectionListOptions<T> {
   /** Проверка записи списка. */
   schema: z.ZodType<T>;
   order?: Array<SectionOrder>;
+  /**
+   * Размер страницы; `SECTION_PAGE_SIZE_ALL` грузит весь раздел одним
+   * запросом, как у коротких списков оружия и доспехов в старом SPA.
+   */
+  size?: number;
   search: Ref<string>;
   filter: Ref<FilterPayload | undefined>;
 }
@@ -25,6 +34,15 @@ interface SectionListOptions<T> {
  */
 export async function useSectionList<T>(options: SectionListOptions<T>) {
   const listSchema = z.array(options.schema);
+  const size = options.size ?? SECTION_PAGE_SIZE;
+
+  /**
+   * Проверяет, последняя ли это страница.
+   * @param loaded - сколько записей пришло
+   */
+  function isLastPage(loaded: number): boolean {
+    return size === SECTION_PAGE_SIZE_ALL || loaded < size;
+  }
 
   /**
    * Загружает одну страницу списка.
@@ -35,7 +53,7 @@ export async function useSectionList<T>(options: SectionListOptions<T>) {
       method: 'POST',
       body: buildListRequest({
         page,
-        size: SECTION_PAGE_SIZE,
+        size,
         search: options.search.value,
         order: options.order,
         filter: options.filter.value,
@@ -75,7 +93,7 @@ export async function useSectionList<T>(options: SectionListOptions<T>) {
       generation++;
       nextPages.value = [];
       page.value = 0;
-      isEnd.value = (value?.length ?? 0) < SECTION_PAGE_SIZE;
+      isEnd.value = isLastPage(value?.length ?? 0);
       isLoadingMore.value = false;
     },
     { immediate: true },
@@ -105,7 +123,7 @@ export async function useSectionList<T>(options: SectionListOptions<T>) {
 
       page.value = nextPage;
       nextPages.value = [...nextPages.value, ...loaded];
-      isEnd.value = loaded.length < SECTION_PAGE_SIZE;
+      isEnd.value = isLastPage(loaded.length);
     } catch {
       if (current === generation) {
         isEnd.value = true;

@@ -1,13 +1,9 @@
 <script setup lang="ts">
   import { SectionLink } from '~section/list';
+  import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
 
-  import {
-    getEntryUrl,
-    getGodGroup,
-    godLinkSchema,
-    GODS_SECTION,
-  } from '../model';
+  import { getGodGroup, godLinkSchema, GODS_SECTION } from '../model';
 </script>
 
 <template>
@@ -16,11 +12,7 @@
     мировоззрения, полное название в подсказке.
   -->
   <SectionPage
-    :section-key="GODS_SECTION.key"
-    :title="GODS_SECTION.title"
-    :list-url="GODS_SECTION.listUrl"
-    :filter-url="GODS_SECTION.filterUrl"
-    :order="GODS_SECTION.order"
+    :section="GODS_SECTION"
     :schema="godLinkSchema"
     :get-key="getEntryUrl"
     :get-group="getGodGroup"

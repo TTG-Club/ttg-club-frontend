@@ -1,17 +1,14 @@
 <script setup lang="ts">
   import { SectionLink } from '~section/list';
+  import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
 
-  import { getEntryUrl, ruleLinkSchema, RULES_SECTION } from '../model';
+  import { ruleLinkSchema, RULES_SECTION } from '../model';
 </script>
 
 <template>
   <SectionPage
-    :section-key="RULES_SECTION.key"
-    :title="RULES_SECTION.title"
-    :list-url="RULES_SECTION.listUrl"
-    :filter-url="RULES_SECTION.filterUrl"
-    :order="RULES_SECTION.order"
+    :section="RULES_SECTION"
     :schema="ruleLinkSchema"
     :get-key="getEntryUrl"
     :get-path="getEntryUrl"

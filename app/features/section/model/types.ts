@@ -48,3 +48,18 @@ export interface SectionListRequest {
   order?: Array<SectionOrder>;
   filter?: FilterPayload;
 }
+
+/** Раздел справочника: заголовок, адрес, ручки списка и фильтра и сортировка. */
+export interface SectionConfig {
+  /** Ключ раздела для данных SSR. */
+  key: string;
+  title: string;
+  /** Адрес раздела на сайте. */
+  path: string;
+  listUrl: string;
+  /** Ручка фильтра; без неё у раздела только поиск. */
+  filterUrl?: string;
+  order: Array<SectionOrder>;
+  /** Размер страницы; по умолчанию `SECTION_PAGE_SIZE`. */
+  pageSize?: number;
+}

@@ -10,6 +10,9 @@ export const QUERY_VALUES_SEPARATOR = ',';
 /** Размер страницы списка, как в старом SPA. */
 export const SECTION_PAGE_SIZE = 60;
 
+/** Размер страницы «весь раздел сразу»: так его понимает бэкенд. */
+export const SECTION_PAGE_SIZE_ALL = -1;
+
 /** Задержка перед записью поиска в адрес. */
 export const SEARCH_DEBOUNCE_MS = 400;
 
@@ -68,3 +71,12 @@ export const SOURCE_GROUPS_WITH_LABEL: ReadonlySet<string> = new Set([
   '3rd',
   'HB',
 ]);
+
+/**
+ * Оттенок метки группы источника по её короткому названию. У официальных
+ * и тестовых книг метка нейтральная.
+ */
+export const SOURCE_BADGE_CLASSES: Partial<Record<string, string>> = {
+  'hb': 'homebrew',
+  '3rd': 'thirdParty',
+};

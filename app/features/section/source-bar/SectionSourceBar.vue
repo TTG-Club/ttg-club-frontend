@@ -14,6 +14,8 @@
   }>();
 
   defineSlots<{
+    /** Левая часть с разметкой, например со ссылками. */
+    left?: () => unknown;
     /** Правая часть, когда у записи нет источника. */
     default?: () => unknown;
   }>();
@@ -28,10 +30,10 @@
     class="flex flex-col justify-between gap-3 rounded-lg bg-elevated px-3 py-3 xl:flex-row"
   >
     <span
-      v-if="left"
+      v-if="left || $slots.left"
       class="flex-auto italic"
     >
-      {{ left }}
+      <slot name="left">{{ left }}</slot>
     </span>
 
     <span

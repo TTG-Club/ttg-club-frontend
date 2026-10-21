@@ -5,15 +5,6 @@ import { capitalize } from 'es-toolkit';
 import { WIKI_LIST_SEPARATOR } from './constants';
 
 /**
- * Адрес записи из списка; он же её ключ — у каждой записи он свой.
- * @param entry - запись списка
- * @param entry.url - адрес записи
- */
-export function getEntryUrl(entry: { url: string }): string {
-  return entry.url;
-}
-
-/**
  * Группа бога в списке — его мировоззрение, как в старом SPA.
  * @param god - бог из списка
  */

@@ -11,6 +11,7 @@ export type {
   FilterPayload,
   FilterSelection,
   FilterValue,
+  SectionConfig,
   SectionListRequest,
   SectionOrder,
 } from './types';
@@ -26,7 +27,9 @@ export {
   buildListRequest,
   getDefaultSelection,
   getEntryApiPath,
+  getEntryUrl,
   getFilterGroups,
+  getFirstLetterGroup,
   getGroupSelection,
   getQueryString,
   getWorkshopEditPath,

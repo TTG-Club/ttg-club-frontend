@@ -3,7 +3,7 @@
 
   import type { RouteLocationRaw } from 'vue-router';
 
-  import type { SectionOrder } from '../model';
+  import type { SectionConfig } from '../model';
 
   import {
     useSectionFilter,
@@ -20,51 +20,43 @@
    * проверку записей и вид строки списка.
    */
   const {
-    sectionKey,
-    title,
-    listUrl,
-    filterUrl = undefined,
-    order = undefined,
+    section,
     schema,
     getKey,
     getGroup = undefined,
-    getPath,
+    getPath = undefined,
   } = defineProps<{
-    /** Ключ раздела для данных SSR. */
-    sectionKey: string;
-    title: string;
-    listUrl: string;
-    /** Ручка фильтра; без неё у раздела только поиск. */
-    filterUrl?: string;
-    order?: Array<SectionOrder>;
+    /** Заголовок, ручки, сортировка и размер страницы раздела. */
+    section: SectionConfig;
     schema: z.ZodType<T>;
     getKey: (item: T) => string;
     getGroup?: (item: T) => string;
-    /** Адрес записи на сайте. */
-    getPath: (item: T) => string;
+    /** Адрес записи на сайте; без него строки списка никуда не ведут. */
+    getPath?: (item: T) => string;
   }>();
 
   defineSlots<{
     /** Строка списка; `to` ведёт к записи с текущими поиском и фильтром. */
-    item: (props: { item: T; to: RouteLocationRaw }) => unknown;
+    item: (props: { item: T; to?: RouteLocationRaw }) => unknown;
   }>();
 
   const route = useRoute();
   const { input, term } = useSectionSearch();
 
   // Ручка фильтра у раздела не меняется, поэтому условный вызов безопасен
-  const filter = filterUrl
-    ? await useSectionFilter(sectionKey, filterUrl)
+  const filter = section.filterUrl
+    ? await useSectionFilter(section.key, section.filterUrl)
     : undefined;
 
   const filterPayload = computed(() => filter?.payload.value);
 
   const { items, status, isEnd, isLoadingMore, refresh, loadMore } =
     await useSectionList({
-      key: sectionKey,
-      url: listUrl,
+      key: section.key,
+      url: section.listUrl,
       schema,
-      order,
+      order: section.order,
+      size: section.pageSize,
       search: term,
       filter: filterPayload,
     });
@@ -76,8 +68,8 @@
    * Ссылка на запись: поиск и фильтр списка переходят вместе с ней.
    * @param item - запись списка
    */
-  function getLink(item: T): RouteLocationRaw {
-    return { path: getPath(item), query: route.query };
+  function getLink(item: T): RouteLocationRaw | undefined {
+    return getPath ? { path: getPath(item), query: route.query } : undefined;
   }
 
   function retry() {
@@ -87,7 +79,7 @@
 
 <template>
   <SectionLayout
-    :title="title"
+    :title="section.title"
     :is-detail-open="isDetailOpen"
   >
     <template #controls>
