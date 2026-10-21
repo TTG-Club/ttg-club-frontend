@@ -7,6 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
+      '~infrastructure': fileURLToPath(
+        new URL('./app/features/infrastructure', import.meta.url),
+      ),
     },
   },
   test: {

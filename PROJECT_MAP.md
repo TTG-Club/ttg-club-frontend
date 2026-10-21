@@ -15,12 +15,14 @@
 │   ├── app.config.ts           # Nuxt UI icons
 │   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css)
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
-│   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta
+│   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
-│   │   └── infrastructure/     # site-header, theme-switcher
-│   ├── layouts/                # default
+│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
+│   │   └── user/               # helmet (user menu), auth-modal (sign in)
+│   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile)
 │   ├── pages/                  # File-based routes (index is a placeholder until the home page is ported)
-│   └── shared/consts/          # UI constants
+│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA)
+│   └── shared/                 # consts (API paths, UI texts), types (user), ui (logo, hamburger)
 ├── server/
 │   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
 │   ├── routes/sitemap.xml.ts   # Sitemap from the backend
@@ -33,23 +35,33 @@
 
 ## 🌍 Environment
 
-| Variable                   | Purpose                                               |
-| -------------------------- | ----------------------------------------------------- |
-| `NITRO_API_URL`            | Backend (or gateway) base URL, required               |
-| `NITRO_SUBSCRIBER_API_URL` | subscriber-service; empty → `NITRO_API_URL`           |
-| `NITRO_COMMENTS_API_URL`   | comments-service; empty → `NITRO_API_URL`             |
-| `NUXT_SITE_URL`            | Canonical origin, defaults to `https://5e14.ttg.club` |
-| `NUXT_SITE_ENV`            | `preview` on the dev stand to disable indexing        |
-| `NUXT_PUBLIC_GTAG_ID`      | Google Analytics id, empty disables it                |
+| Variable                        | Purpose                                               |
+| ------------------------------- | ----------------------------------------------------- |
+| `NITRO_API_URL`                 | Backend (or gateway) base URL, required               |
+| `NITRO_SUBSCRIBER_API_URL`      | subscriber-service; empty → `NITRO_API_URL`           |
+| `NITRO_COMMENTS_API_URL`        | comments-service; empty → `NITRO_API_URL`             |
+| `NUXT_SITE_URL`                 | Canonical origin, defaults to `https://5e14.ttg.club` |
+| `NUXT_SITE_ENV`                 | `preview` on the dev stand to disable indexing        |
+| `NUXT_PUBLIC_GTAG_ID`           | Google Analytics id, empty disables it                |
+| `NUXT_PUBLIC_YANDEX_METRIKA_ID` | Yandex.Metrika id, empty disables it                  |
 
 ## 🚚 Migration status
 
 | Section                                                            | Status |
 | ------------------------------------------------------------------ | ------ |
 | Skeleton: config, proxy, theme, page meta, deploy                  | ✅     |
-| Header menu, auth on SSR, analytics (Yandex)                       | ⏳     |
+| Sidebar menu, sign in and session on SSR, analytics                | ✅     |
+| Sign up, password reset, profile actions (stage 5)                 | ⏳     |
 | Content renderer (`RawContent` replacement), dice, tooltips        | ⏳     |
 | Reference sections (character, inventory, wiki, bestiary, screens) | ⏳     |
 | Tools, initiative tracker                                          | ⏳     |
 | Account, comments, subscription, bug report                        | ⏳     |
 | Workshop, admin                                                    | ⏳     |
+
+## 🔐 Session
+
+The backend keeps the session in httpOnly cookies: `dnd5_user_token` (path `/`)
+and `dnd5_refresh_token` (path `/api/v1/auth`). SSR sees only the access cookie
+and loads the profile with it; an expired session is refreshed in the browser
+after hydration, and only when the visible marker `ttg-user-token` (shared with
+the legacy SPA) says the visitor has signed in before.

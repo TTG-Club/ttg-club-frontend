@@ -24,11 +24,14 @@
   --color-link: var(--link-color);
   --color-link-hover: var(--link-color-hover);
   --color-hover: var(--hover);
+  --color-overlay: var(--bg-light-main);
 }
 
 /* Nuxt UI берёт цвета из той же палитры. */
 :root {
   --max-content: 1320px;
+  --navbar-height: calc(56px + env(safe-area-inset-bottom));
+  --navbar-width: calc(64px + env(safe-area-inset-left));
 
   --ui-primary: var(--primary);
   --ui-bg: var(--bg-main);

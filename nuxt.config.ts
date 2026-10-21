@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/fonts',
     '@nuxtjs/seo',
+    '@nuxt/scripts',
     '@nuxt/eslint',
     '@vueuse/nuxt',
     '@pinia/nuxt',
@@ -62,10 +63,23 @@ export default defineNuxtConfig({
   },
 
   // Google Analytics (nuxt-gtag). Идентификатор задаётся в рантайме через
-  // NUXT_PUBLIC_GTAG_ID; при пустом id скрипт не подключается.
+  // NUXT_PUBLIC_GTAG_ID; при пустом id скрипт не подключается. initMode
+  // 'manual': скрипт с defer подключает плагин analytics.client.ts.
   gtag: {
     enabled: true,
     id: '',
+    initMode: 'manual',
+  },
+
+  runtimeConfig: {
+    public: {
+      // Яндекс.Метрика подключается плагином analytics.client.ts. Id задаётся
+      // в рантайме через NUXT_PUBLIC_YANDEX_METRIKA_ID; пустой id отключает
+      // счётчик (на сборке и на dev).
+      yandexMetrika: {
+        id: '',
+      },
+    },
   },
 
   // Каноничный адрес — домен старого справочника. На dev-стенде его
