@@ -20,6 +20,7 @@
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
 │   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), list (infinite scroll), detail-pane, source-bar, source-badge, stat-grid, image-preview
+│   │   ├── character/          # feats, backgrounds, class options
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── wiki/               # gods, rules, books: list rows and entry cards
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
@@ -66,7 +67,9 @@
 | Bookmarks                                                   | ✅     |
 | Wiki: gods, rules, books                                    | ✅     |
 | Inventory: weapons, armors, items, magic items, treasures   | ✅     |
-| Reference sections (character, bestiary, screens)           | ⏳     |
+| Character: feats, backgrounds, class options                | ✅     |
+| Character: classes, races, spells                           | ⏳     |
+| Bestiary, screens                                           | ⏳     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |
