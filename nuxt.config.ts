@@ -133,6 +133,11 @@ export default defineNuxtConfig({
 
   // Безопасность
   security: {
+    // Валидатор nuxt-security 2.6 передаёт в xss `escapeHtml: undefined`,
+    // и любой GET с параметрами (`/?utm_source=...`) падает с 500. От XSS
+    // защищает экранирование на выводе, а не отказ на входе.
+    xssValidator: false,
+
     headers: {
       contentSecurityPolicy: {
         'script-src': [
@@ -223,10 +228,6 @@ export default defineNuxtConfig({
       '/api/**': {
         security: {
           enabled: process.env.NODE_ENV !== 'development',
-          // Валидатор nuxt-security целиком отклоняет JSON с `<` или `>`,
-          // а описания в мастерской — HTML. От XSS защищает экранирование
-          // на выводе, а не отказ на входе.
-          xssValidator: false,
           requestSizeLimiter: false,
         },
       },

@@ -12,6 +12,9 @@ export const MENU_TOGGLE_LABEL = 'Меню';
 /** Текст, пока меню загружается или не загрузилось. */
 export const MENU_ERROR_TEXT = 'Не удалось загрузить меню';
 
+/** Число ссылок в группах скелетона меню, пока меню грузится. */
+export const MENU_SKELETON_LINKS = [6, 4, 7, 5, 3, 6];
+
 /** Подпись блока соцсетей в подвале меню. */
 export const MENU_CONTACTS_LABEL = 'Контакты:';
 
