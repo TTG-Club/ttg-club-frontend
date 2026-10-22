@@ -7,6 +7,7 @@ import {
   getDefaultSelection,
   getDetailPath,
   getDetailSlug,
+  getSelectAllState,
   groupItems,
   isFilterSearchable,
   isPartCustomized,
@@ -272,5 +273,13 @@ describe('isFilterSearchable', () => {
     expect(isFilterSearchable(Array.from({ length: 6 }, () => first))).toBe(
       true,
     );
+  });
+});
+
+describe('getSelectAllState', () => {
+  it('отмечает «Выбрать все» целиком, чёрточкой или пустым', () => {
+    expect(getSelectAllState(['PHB', 'XGE'], [])).toBe(false);
+    expect(getSelectAllState(['PHB', 'XGE'], ['PHB'])).toBe('indeterminate');
+    expect(getSelectAllState(['PHB', 'XGE'], ['XGE', 'PHB'])).toBe(true);
   });
 });

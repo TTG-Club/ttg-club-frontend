@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import type { FilterGroup, FilterValue } from '../model';
 
-  import { SECTION_ICON, SECTION_TEXT } from '../model';
+  import { getSelectAllState, SECTION_ICON, SECTION_TEXT } from '../model';
+  import SectionFilterValues from './SectionFilterValues.vue';
 
   /**
    * Группа фильтра в левой колонке, как на new.ttg.club: строка-заголовок с
@@ -36,16 +37,7 @@
     group.values.map((value) => String(value.key)),
   );
 
-  // Частичный выбор показывается чёрточкой в «Выбрать все»
-  const allState = computed<boolean | 'indeterminate'>(() => {
-    if (!hasSelection.value) {
-      return false;
-    }
-
-    return (
-      allKeys.value.every((key) => selected.includes(key)) || 'indeterminate'
-    );
-  });
+  const allState = computed(() => getSelectAllState(allKeys.value, selected));
 
   // Снимок на момент появления группы: дальше её открывает сам пользователь
   const isOpenedByUser = ref(selected.length > 0);
@@ -61,22 +53,6 @@
   }
 
   /**
-   * Вид метки: выбранная залита.
-   * @param value - значение фильтра
-   */
-  function getVariant(value: FilterValue) {
-    return selected.includes(String(value.key)) ? 'solid' : 'subtle';
-  }
-
-  /**
-   * Цвет метки: выбранная — акцентная.
-   * @param value - значение фильтра
-   */
-  function getColor(value: FilterValue) {
-    return selected.includes(String(value.key)) ? 'primary' : 'neutral';
-  }
-
-  /**
    * Отмечает все значения группы или снимает все отметки.
    * @param value - новое состояние «Выбрать все»
    */
@@ -86,10 +62,10 @@
 
   /**
    * Отмечает значение или снимает отметку.
-   * @param value - значение фильтра
+   * @param key - ключ значения
    */
-  function toggle(value: FilterValue): void {
-    emit('toggle', String(value.key));
+  function toggle(key: string): void {
+    emit('toggle', key);
   }
 </script>
 
@@ -132,28 +108,11 @@
           @update:model-value="setAll"
         />
 
-        <div class="flex flex-wrap gap-1.5">
-          <UTooltip
-            v-for="value in values"
-            :key="value.key"
-            :text="value.tooltip"
-            :disabled="!value.tooltip"
-          >
-            <UBadge
-              :label="value.label"
-              :variant="getVariant(value)"
-              :color="getColor(value)"
-              :aria-pressed="selected.includes(String(value.key))"
-              role="button"
-              tabindex="0"
-              size="lg"
-              class="max-w-full min-w-8 cursor-pointer justify-center rounded-md px-2 font-normal select-none hover:brightness-95"
-              @click.left.exact.prevent="toggle(value)"
-              @keydown.enter.prevent="toggle(value)"
-              @keydown.space.prevent="toggle(value)"
-            />
-          </UTooltip>
-        </div>
+        <SectionFilterValues
+          :values="values"
+          :selected="selected"
+          @toggle="toggle"
+        />
       </div>
     </template>
   </UCollapsible>

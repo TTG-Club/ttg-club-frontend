@@ -38,6 +38,7 @@ export {
   getFirstLetterGroup,
   getGroupSelection,
   getQueryString,
+  getSelectAllState,
   getWorkshopEditPath,
   groupItems,
   hasSourceGroupLabel,

@@ -68,7 +68,7 @@
   --ui-text-muted: var(--text-g-color);
   --ui-text-dimmed: var(--text-color-disabled);
   --ui-border: var(--border);
-  --ui-border-accented: var(--border-hover);
+  --ui-border-accented: var(--secondary-hover);
 }
 
 @media (width >= 2100px) {
