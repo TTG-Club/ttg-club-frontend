@@ -22,6 +22,7 @@
 │   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
+│   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books: list rows and entry cards
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
@@ -69,7 +70,8 @@
 | Inventory: weapons, armors, items, magic items, treasures   | ✅     |
 | Character: feats, backgrounds, class options, spells, races | ✅     |
 | Character: classes                                          | ✅     |
-| Bestiary, screens                                           | ⏳     |
+| Bestiary                                                    | ✅     |
+| Screens                                                     | ⏳     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |
@@ -130,6 +132,11 @@ tabs from the API: traits (level table, proficiencies, features, archetypes
 loaded on first open), description, and the spells and options lists.
 Gallery images open in `SectionImageViewer`. Feature tooltips in the level
 table use the features already loaded with the class.
+
+The bestiary groups creatures by challenge rating. A creature card is the
+legacy stat block: ability checks, saving throws, skills and hit dice roll
+through `DiceRoller` with the creature name as the roll source. Foundry export
+is not ported yet.
 
 ## 🔖 Bookmarks
 
