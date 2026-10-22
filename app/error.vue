@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import type { NuxtError } from '#app';
 
-  import { ERROR_PAGE, NOT_FOUND_STATUS } from '~/shared/consts';
+  import {
+    ERROR_MESSAGE_UNKNOWN,
+    ERROR_MESSAGES,
+    ERROR_PAGE,
+    NOT_FOUND_STATUS,
+  } from '~/shared/consts';
 
   const { error } = defineProps<{
     error: NuxtError;
@@ -11,6 +16,11 @@
     error.statusCode === NOT_FOUND_STATUS
       ? ERROR_PAGE.notFoundTitle
       : ERROR_PAGE.defaultTitle,
+  );
+
+  // Фразы и ссылка на главную — как на страницах ошибок старого SPA
+  const message = computed(
+    () => ERROR_MESSAGES[error.statusCode ?? 0] ?? ERROR_MESSAGE_UNKNOWN,
   );
 
   useSeoMeta({
@@ -26,19 +36,25 @@
 <template>
   <UApp>
     <NuxtLayout>
-      <section class="flex flex-col items-start gap-4">
-        <p class="text-5xl font-semibold text-title">
-          {{ error.statusCode }}
-        </p>
-
-        <h1 class="font-serif text-2xl text-title">
-          {{ title }}
+      <section
+        class="flex min-h-[60dvh] flex-col items-center justify-center gap-4 text-center"
+      >
+        <h1 class="font-serif text-6xl text-title">
+          {{ message.heading }}
         </h1>
 
-        <UButton
-          :label="ERROR_PAGE.homeLabel"
-          @click.left.exact.prevent="goHome"
-        />
+        <p class="max-w-xl text-xl text-title">
+          {{ message.before }}
+
+          <a
+            href="/"
+            class="text-link hover:text-link-hover"
+            @click.left.exact.prevent="goHome"
+            >{{ message.link }}</a
+          >
+
+          {{ message.after }}
+        </p>
       </section>
     </NuxtLayout>
   </UApp>

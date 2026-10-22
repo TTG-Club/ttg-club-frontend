@@ -11,7 +11,7 @@
 ./
 ├── app/
 │   ├── app.vue                 # Root: Nuxt UI, theme class, page meta from /api/v1/meta
-│   ├── error.vue               # Error page (404 / 5xx)
+│   ├── error.vue               # Error page: legacy phrases by status (401, 403, 404, 500, other)
 │   ├── app.config.ts           # Nuxt UI icons
 │   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css), content typography (content.scss)
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
@@ -24,6 +24,7 @@
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
+│   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
@@ -72,6 +73,7 @@
 | Character: classes                                          | ✅     |
 | Bestiary                                                    | ✅     |
 | Screens                                                     | ✅     |
+| Info pages, error pages                                     | ✅     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |

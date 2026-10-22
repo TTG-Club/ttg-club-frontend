@@ -1,0 +1,1 @@
+export { useInfoPage } from './useInfoPage';
