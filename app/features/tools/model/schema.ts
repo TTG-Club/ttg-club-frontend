@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import { entrySourceSchema } from '~section/model';
+import { magicItemLinkSchema, treasureSchema } from '~inventory/model';
+import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /** Вариант выбора из ручки инструмента: подпись и значение. */
 const nameValueSchema = z.object({
@@ -71,6 +72,53 @@ export const nameResultSchema = z.object({
   sex: z.enum(['MALE', 'FEMALE', 'UNISEX']).nullish(),
 });
 
+/** Варианты формы торговца: количество магии и книги с ценами. */
+export const traderOptionsSchema = z.object({
+  magicLevels: z.array(
+    z.object({
+      name: z.string(),
+      value: z.number(),
+    }),
+  ),
+  sources: z.array(entrySourceSchema),
+});
+
+/**
+ * Магический предмет из инструмента: цена по каждой книге строкой с
+ * числом, у свитка — его заклинание.
+ */
+export const lootMagicItemSchema = magicItemLinkSchema.extend({
+  price: z.record(z.string(), z.string().nullish()).nullish(),
+  spell: z
+    .object({
+      name: entryNameSchema,
+      url: z.string().min(1),
+    })
+    .nullish(),
+});
+
+/** Товары торговца, по редкости. */
+export const traderResultSchema = z.array(lootMagicItemSchema);
+
+const coinSchema = z.number().nullish();
+
+/** Сокровищница: без запрошенного вида добычи поля нет. */
+export const treasuryResultSchema = z.object({
+  coins: z
+    .object({
+      copper: coinSchema,
+      silver: coinSchema,
+      electrum: coinSchema,
+      gold: coinSchema,
+      platinum: coinSchema,
+    })
+    .nullish(),
+  magicItems: z.array(lootMagicItemSchema).nullish(),
+  gems: z.array(treasureSchema).nullish(),
+  arts: z.array(treasureSchema).nullish(),
+  trinkets: z.array(treasureSchema).nullish(),
+});
+
 export type ToolOption = z.infer<typeof nameValueSchema>;
 export type MadnessResult = z.infer<typeof madnessResultSchema>;
 export type WildMagicResult = z.infer<typeof wildMagicResultSchema>;
@@ -78,3 +126,7 @@ export type EncounterOptions = z.infer<typeof encounterOptionsSchema>;
 export type EncounterResult = z.infer<typeof encounterResultSchema>;
 export type NameRace = z.infer<typeof nameRacesSchema>[number];
 export type NameResult = z.infer<typeof nameResultSchema>;
+export type TraderOptions = z.infer<typeof traderOptionsSchema>;
+export type LootMagicItem = z.infer<typeof lootMagicItemSchema>;
+export type TreasuryResult = z.infer<typeof treasuryResultSchema>;
+export type TreasuryCoins = NonNullable<TreasuryResult['coins']>;
