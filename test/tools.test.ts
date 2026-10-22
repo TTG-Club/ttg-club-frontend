@@ -8,14 +8,20 @@ import {
   buildNameRaceGroups,
   buildNamesRequest,
   buildRaceBonuses,
+  formatLootPrice,
   getDefaultSources,
+  getLootCountLabel,
   getNameSharedHint,
   getPointBuyItems,
   getPointBuySpent,
   getPointsWord,
   getRaceBonusSlots,
+  getTraderPrice,
+  getTreasuryCoins,
+  groupLoot,
   isSplitBonus,
   normalizeToolCount,
+  parseLootPrice,
   toggleRequired,
 } from '~tools/model';
 
@@ -115,6 +121,97 @@ describe('getNameSharedHint', () => {
   it('подсказывает только для семьи, клана и дома', () => {
     expect(getNameSharedHint('GROUP')).toBeUndefined();
     expect(getNameSharedHint('CLAN')).toContain('клан');
+  });
+});
+
+function lootItem(rus: string, price?: number) {
+  return {
+    name: { rus, eng: rus },
+    price,
+  };
+}
+
+describe('groupLoot', () => {
+  const items = [
+    lootItem('Зелье', 50),
+    lootItem('Свиток', 100),
+    lootItem('Зелье', 75),
+    lootItem('Зелье', 50),
+  ];
+
+  const getPrice = (item: { price?: number }) => item.price;
+
+  it('без группировки оставляет каждый предмет отдельно', () => {
+    expect(
+      groupLoot(items, getPrice, { isGrouped: false, isMaxPrice: false }),
+    ).toHaveLength(4);
+  });
+
+  it('сливает одинаковые и берёт среднюю из разных цен', () => {
+    const [potion, scroll] = groupLoot(items, getPrice, {
+      isGrouped: true,
+      isMaxPrice: false,
+    });
+
+    expect(potion).toMatchObject({ count: 3, price: 63 });
+    expect(scroll).toMatchObject({ count: 1, price: 100 });
+  });
+
+  it('с максимальной ценой берёт наибольшую', () => {
+    const [potion] = groupLoot(items, getPrice, {
+      isGrouped: true,
+      isMaxPrice: true,
+    });
+
+    expect(potion?.price).toBe(75);
+  });
+
+  it('без цен оставляет группу без цены', () => {
+    const [potion] = groupLoot([lootItem('Зелье')], getPrice, {
+      isGrouped: true,
+      isMaxPrice: false,
+    });
+
+    expect(potion?.price).toBeUndefined();
+  });
+});
+
+describe('parseLootPrice', () => {
+  it('читает цену строкой и пропускает пустую', () => {
+    expect(parseLootPrice('1500')).toBe(1500);
+    expect(parseLootPrice(null)).toBeUndefined();
+    expect(parseLootPrice('')).toBeUndefined();
+    expect(parseLootPrice('(100) / 2')).toBeUndefined();
+  });
+});
+
+describe('getTraderPrice', () => {
+  it('берёт цену выбранной книги', () => {
+    const item = {
+      name: { rus: 'Зелье', eng: 'Potion' },
+      url: '/items/magic/potion',
+      rarity: { type: 'common', name: 'обычный' },
+      price: { dmg: '40', xge: '60' },
+    };
+
+    expect(getTraderPrice(item, 'XGE')).toBe(60);
+    expect(getTraderPrice(item, undefined)).toBeUndefined();
+  });
+});
+
+describe('formatLootPrice и getLootCountLabel', () => {
+  it('пишут цену с разрядами и количество только для группы', () => {
+    expect(formatLootPrice(12500)).toBe('12\u00A0500 зм');
+    expect(getLootCountLabel(1)).toBeUndefined();
+    expect(getLootCountLabel(3)).toBe('×3');
+  });
+});
+
+describe('getTreasuryCoins', () => {
+  it('ставит ноль на месте отсутствующих монет', () => {
+    expect(
+      getTreasuryCoins({ gold: 12, copper: null }).map((coin) => coin.value),
+    ).toEqual([0, 0, 0, 12, 0]);
   });
 });
 

@@ -5,6 +5,8 @@ export const TOOLS_API_URL = {
   encounters: '/api/v1/tools/encounters',
   encountersTable: '/api/v1/tools/encounters/table',
   names: '/api/v1/tools/names',
+  trader: '/api/v1/tools/trader',
+  treasury: '/api/v1/tools/treasury',
 } as const;
 
 /** Сколько результатов можно получить за раз: больше бэкенд не отдаёт. */
@@ -191,6 +193,79 @@ export const RACE_BONUS_TYPE = {
 export const ABILITY_SPLITS = [
   { label: '+2 и +1', value: 'FOR_TWO' },
   { label: '+1 к трём', value: 'FOR_THREE' },
+] as const;
+
+/** Настройки вида добычи: общие у торговца и сокровищницы. */
+export const LOOT_TEXT = {
+  unique: 'Только уникальные',
+  grouping: 'Группировать одинаковые',
+  maxPrice: 'Отображать максимальную цену',
+  countPrefix: '×',
+  currency: 'зм',
+} as const;
+
+export const TRADER_TEXT = {
+  title: 'Торговец',
+  persuasion: 'Проверка харизмы (Убеждение)',
+  magicLevel: 'Количество магии',
+  priceSource: 'Источник цены',
+  items: 'Товары',
+  empty: 'Торговцу нечего предложить',
+} as const;
+
+/** Проверка Убеждения не ниже единицы, как в старом SPA. */
+export const TRADER_PERSUASION_MIN = 1;
+
+/** «Норма» магии у торговца по умолчанию. */
+export const TRADER_MAGIC_LEVEL_DEFAULT = 1;
+
+export const TREASURY_TEXT = {
+  title: 'Сокровищница',
+  cr: 'Показатель опасности монстров',
+  contents: 'Состав',
+  coins: 'Монеты',
+  magicItems: 'Магические предметы',
+  gems: 'Драгоценные камни',
+  arts: 'Предметы искусства',
+  trinkets: 'Безделушки',
+  empty: 'Сокровищница пуста',
+} as const;
+
+/** Показатель опасности группами, как в таблицах сокровищ DMG. */
+export const TREASURY_CR_ITEMS: ReadonlyArray<{
+  label: string;
+  value: number;
+}> = [
+  { label: '0–4', value: 1 },
+  { label: '5–10', value: 2 },
+  { label: '11–16', value: 3 },
+  { label: '17+', value: 4 },
+];
+
+/** Показатель опасности по умолчанию: 0–4. */
+export const TREASURY_CR_DEFAULT = 1;
+
+/** Что положить в сокровищницу: поле запроса и подпись. */
+export const TREASURY_KINDS = [
+  { key: 'coins', label: 'Монеты' },
+  { key: 'magicItem', label: 'Магические предметы' },
+  { key: 'scroll', label: 'Свитки' },
+  { key: 'trinket', label: 'Безделушки' },
+  { key: 'art', label: 'Предметы искусства' },
+  { key: 'gem', label: 'Драгоценные камни' },
+] as const;
+
+/** Сетка монет: все пять в ряд, когда хватает места. */
+export const TREASURY_COINS_GRID_CLASS =
+  'grid grid-cols-2 gap-3 @md:grid-cols-3 @2xl:grid-cols-5';
+
+/** Монеты по возрастанию ценности и их сокращения. */
+export const TREASURY_COINS = [
+  { key: 'copper', unit: 'мм' },
+  { key: 'silver', unit: 'см' },
+  { key: 'electrum', unit: 'эм' },
+  { key: 'gold', unit: 'зм' },
+  { key: 'platinum', unit: 'пм' },
 ] as const;
 
 export const TOOLS_ICON = {

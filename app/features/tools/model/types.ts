@@ -5,6 +5,8 @@ import type {
   NAME_COMPONENTS,
   NAME_GENERATION_TYPES,
   NAME_SEXES,
+  TREASURY_COINS,
+  TREASURY_KINDS,
 } from './constants';
 
 /** Запрос безумия: без вида бэкенд выбирает его сам. */
@@ -53,6 +55,43 @@ export interface NameRaceItem {
   value?: number;
   type?: 'label';
   class?: string;
+}
+
+/** Запрос торговца. */
+export interface TraderRequest {
+  magicLevel: number;
+  persuasion: number;
+  unique: boolean;
+}
+
+export type TreasuryKind = (typeof TREASURY_KINDS)[number]['key'];
+
+/** Запрос сокровищницы: показатель опасности и виды добычи. */
+export type TreasuryRequest = Record<TreasuryKind, boolean> & {
+  cr: number;
+  unique: boolean;
+};
+
+/** Одинаковые предметы одной строкой: сколько их и общая цена. */
+export interface LootGroup<T> {
+  item: T;
+  count: number;
+  price?: number;
+}
+
+/** Как показывать добычу. */
+export interface LootView {
+  isGrouped: boolean;
+  /** Цена группы — максимальная, а не средняя. */
+  isMaxPrice: boolean;
+}
+
+/** Монета сокровищницы для вывода. */
+export interface TreasuryCoin {
+  key: (typeof TREASURY_COINS)[number]['key'];
+  value: number;
+  /** Количество с разрядами и сокращение, «1 200 мм». */
+  label: string;
 }
 
 export type AbilityKey = (typeof ABILITIES)[number]['key'];

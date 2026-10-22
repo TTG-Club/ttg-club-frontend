@@ -1,24 +1,35 @@
-import type { NameRace, RaceBonus } from './schema';
+import type { EntryName } from '~section/model';
+
+import type {
+  LootMagicItem,
+  NameRace,
+  RaceBonus,
+  TreasuryCoins,
+} from './schema';
 import type {
   AbilityKey,
   AbilityRow,
   AbilityScores,
   AbilitySplit,
   EncounterRequest,
+  LootGroup,
+  LootView,
   NameComponent,
   NameGenerationType,
   NameRaceItem,
   NameSex,
   NamesRequest,
   PointBuyItem,
+  TreasuryCoin,
 } from './types';
 
-import { clamp } from 'es-toolkit';
+import { clamp, mean, uniq } from 'es-toolkit';
 
 import { formatModifier, getAbilityModifier } from '~bestiary/model';
 
 import {
   ABILITIES,
+  LOOT_TEXT,
   NAME_RACE_CHILD_CLASS,
   NAME_SHARED_HINT,
   POINT_BUY_COST,
@@ -27,6 +38,7 @@ import {
   RACE_BONUS_TYPE,
   TOOL_COUNT_MAX,
   TOOL_COUNT_MIN,
+  TREASURY_COINS,
 } from './constants';
 
 /**
@@ -197,6 +209,134 @@ export function buildNamesRequest(options: {
     raceIds: options.raceIds.length ? [...options.raceIds] : null,
     sexes: [...options.sexes],
   };
+}
+
+/**
+ * Число из цены: бэкенд отдаёт цену строкой, у артефактов её нет.
+ * @param value - цена из ответа
+ */
+export function parseLootPrice(
+  value: string | number | null | undefined,
+): number | undefined {
+  if (value === null || value === undefined || value === '') {
+    return undefined;
+  }
+
+  const price = Number(value);
+
+  return Number.isFinite(price) ? price : undefined;
+}
+
+/**
+ * Цена товара по выбранной книге: DMG или XGE.
+ * @param item - магический предмет
+ * @param source - сокращение книги с ценами
+ */
+export function getTraderPrice(
+  item: LootMagicItem,
+  source: string | undefined,
+): number | undefined {
+  if (!source) {
+    return undefined;
+  }
+
+  return parseLootPrice(item.price?.[source.toLowerCase()]);
+}
+
+/**
+ * Добыча строками списка. С группировкой одинаковые по названию предметы
+ * сливаются в одну строку с количеством; цена строки — средняя или
+ * наибольшая из разных цен, как в старом SPA.
+ * @param items - добыча в порядке ответа
+ * @param getPrice - цена одного предмета
+ * @param view - группировать ли и какую цену брать
+ */
+export function groupLoot<T extends { name: EntryName }>(
+  items: ReadonlyArray<T>,
+  getPrice: (item: T) => number | undefined,
+  view: LootView,
+): Array<LootGroup<T>> {
+  if (!view.isGrouped) {
+    return items.map((item) => ({ item, count: 1, price: getPrice(item) }));
+  }
+
+  const groups = new Map<string, Array<T>>();
+
+  for (const item of items) {
+    const group = groups.get(item.name.rus);
+
+    if (group) {
+      group.push(item);
+    } else {
+      groups.set(item.name.rus, [item]);
+    }
+  }
+
+  return [...groups.values()].flatMap((group) => {
+    const [item] = group;
+
+    if (!item) {
+      return [];
+    }
+
+    const prices = uniq(
+      group
+        .map(getPrice)
+        .filter((price): price is number => price !== undefined),
+    );
+
+    return [
+      {
+        item,
+        count: group.length,
+        price: getGroupPrice(prices, view.isMaxPrice),
+      },
+    ];
+  });
+}
+
+/**
+ * Цена группы одинаковых предметов.
+ * @param prices - разные цены группы
+ * @param isMax - брать наибольшую, а не среднюю
+ */
+function getGroupPrice(
+  prices: ReadonlyArray<number>,
+  isMax: boolean,
+): number | undefined {
+  if (!prices.length) {
+    return undefined;
+  }
+
+  return isMax ? Math.max(...prices) : Math.round(mean([...prices]));
+}
+
+/**
+ * Цена в золотых с разрядами: «12 500 зм».
+ * @param price - цена
+ */
+export function formatLootPrice(price: number): string {
+  return `${price.toLocaleString('ru-RU')} ${LOOT_TEXT.currency}`;
+}
+
+/**
+ * Количество одинаковых предметов, «×3»; у одиночного — ничего.
+ * @param count - сколько предметов в строке
+ */
+export function getLootCountLabel(count: number): string | undefined {
+  return count > 1 ? `${LOOT_TEXT.countPrefix}${count}` : undefined;
+}
+
+/**
+ * Монеты сокровищницы по порядку; нет монеты — ноль, как в старом SPA.
+ * @param coins - монеты из ответа
+ */
+export function getTreasuryCoins(coins: TreasuryCoins): Array<TreasuryCoin> {
+  return TREASURY_COINS.map((coin) => ({
+    key: coin.key,
+    value: coins[coin.key] ?? 0,
+    label: `${(coins[coin.key] ?? 0).toLocaleString('ru-RU')} ${coin.unit}`,
+  }));
 }
 
 /**
