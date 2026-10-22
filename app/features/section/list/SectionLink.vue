@@ -7,9 +7,9 @@
   import { SectionSourceBadge } from '../source-badge';
 
   /**
-   * Запись в списке раздела, плиткой как на new.ttg.club: русское и
-   * английское название, метка группы источника и короткие сведения (урон,
-   * цена) справа от английского. Клик открывает запись так, как велит режим
+   * Запись в списке раздела, плиткой как на new.ttg.club: название с
+   * английским в скобках, книга цветом группы источника и короткие сведения
+   * (урон, цена) второй строкой. Клик открывает запись так, как велит режим
    * раздела; Ctrl-клик и средняя кнопка ведут на страницу записи. Без адреса
    * плитка просто показывает запись, как у драгоценностей.
    */
@@ -70,29 +70,36 @@
     :is="tag"
     v-bind="linkAttributes"
     :class="tileClass"
-    class="flex min-h-12.5 items-center gap-3 rounded-xl border px-3 py-2"
+    class="flex min-h-14 items-center gap-3 rounded-xl border px-3 py-2"
     @click.left.exact.capture="open"
   >
     <slot name="leading" />
 
-    <div class="min-w-0 flex-auto">
+    <div class="flex min-w-0 flex-auto flex-col gap-1">
       <div class="flex items-center gap-2">
         <span class="min-w-0 flex-auto truncate text-highlighted">
           {{ title }}
+
+          <span
+            v-if="subtitle"
+            class="text-muted"
+          >
+            [{{ subtitle }}]
+          </span>
         </span>
 
         <SectionSourceBadge
           v-if="source?.group"
           :group="source.group"
+          :label="source.shortName"
+          :tooltip="source.name"
         />
       </div>
 
       <div
-        v-if="subtitle || $slots.details"
-        class="flex items-center gap-3 text-sm text-muted"
+        v-if="$slots.details"
+        class="flex min-w-0 items-center gap-3 text-sm text-muted"
       >
-        <span class="min-w-0 flex-auto truncate">{{ subtitle }}</span>
-
         <slot name="details" />
       </div>
     </div>

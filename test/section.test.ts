@@ -8,11 +8,13 @@ import {
   getDetailPath,
   getDetailSlug,
   groupItems,
+  isFilterSearchable,
   isPartCustomized,
   isSelectionCustomized,
   mergeQuery,
   normalizeFilter,
   resetSelectionPart,
+  searchFilterGroups,
   selectionFromQuery,
   selectionToQuery,
   setGroupSelection,
@@ -223,5 +225,52 @@ describe('getDetailSlug и getDetailPath', () => {
     expect(getDetailPath('/spells', '')).toBeUndefined();
     expect(getDetailPath('/spells', '../admin')).toBeUndefined();
     expect(getDetailPath('/spells', 'a//b')).toBeUndefined();
+  });
+});
+
+describe('searchFilterGroups', () => {
+  const groups = definition.other;
+
+  it('без запроса оставляет все группы целиком', () => {
+    expect(searchFilterGroups(groups, '  ')).toHaveLength(groups.length);
+  });
+
+  it('оставляет группу целиком по названию, иначе подошедшие значения', () => {
+    const [first] = groups;
+
+    if (!first) {
+      throw new Error('в фильтре нет групп');
+    }
+
+    expect(searchFilterGroups(groups, first.name.toUpperCase())[0]).toEqual({
+      group: first,
+      values: first.values,
+    });
+
+    const [value] = first.values;
+
+    if (value) {
+      const matches = searchFilterGroups([first], value.label.slice(1));
+
+      expect(matches[0]?.values).toContainEqual(value);
+    }
+
+    expect(searchFilterGroups(groups, 'нет такого значения')).toEqual([]);
+  });
+});
+
+describe('isFilterSearchable', () => {
+  it('нужен при больше пяти группах', () => {
+    const [first] = definition.other;
+
+    if (!first) {
+      throw new Error('в фильтре нет групп');
+    }
+
+    expect(isFilterSearchable([first])).toBe(false);
+
+    expect(isFilterSearchable(Array.from({ length: 6 }, () => first))).toBe(
+      true,
+    );
   });
 });
