@@ -1,15 +1,25 @@
-import type { SignUpState } from './schema';
+import type { RedeemResult, SignUpState, Subscription } from './schema';
 
 import {
+  ACCOUNT_CHANGE_PASSWORD_PATH,
   AUTH_EXIST_PATH,
   AUTH_SIGN_UP_PATH,
   AUTH_VERIFY_EMAIL_PATH,
   PASSWORD_RESET_CONFIRM_PATH,
   PASSWORD_RESET_REQUEST_PATH,
   PASSWORD_RESET_VALIDATE_PATH,
+  SUBSCRIPTIONS_MY_PATH,
+  SUBSCRIPTIONS_PATH,
+  SUBSCRIPTIONS_REDEEM_PATH,
+  USER_DISPLAY_NAME_PATH,
 } from '~/shared/consts';
 
 import { LEGAL_DOCUMENTS } from './constants';
+import {
+  redeemResultSchema,
+  subscriptionListSchema,
+  subscriptionSchema,
+} from './schema';
 
 /**
  * Регистрирует пользователя. Вместе с согласиями уходят редакции документов,
@@ -86,4 +96,67 @@ export async function confirmPasswordReset(
  */
 export async function verifyEmail(token: string): Promise<void> {
   await $fetch(AUTH_VERIFY_EMAIL_PATH, { query: { token } });
+}
+
+/**
+ * Меняет отображаемое имя. Имя в старых комментариях бэкенд меняет сам.
+ * @param displayName - новое имя
+ */
+export async function changeDisplayName(displayName: string): Promise<void> {
+  await $fetch(USER_DISPLAY_NAME_PATH, {
+    method: 'PATCH',
+    body: { displayName: displayName.trim() },
+  });
+}
+
+/**
+ * Меняет пароль вошедшего пользователя.
+ * @param currentPassword - текущий пароль
+ * @param password - новый пароль
+ */
+export async function changePassword(
+  currentPassword: string,
+  password: string,
+): Promise<void> {
+  await $fetch(ACCOUNT_CHANGE_PASSWORD_PATH, {
+    method: 'POST',
+    body: {
+      currentPassword: currentPassword.trim(),
+      newPassword: password.trim(),
+    },
+  });
+}
+
+/** Загружает подписки текущего пользователя. */
+export async function getMySubscriptions(): Promise<Subscription[]> {
+  const response: unknown = await $fetch(SUBSCRIPTIONS_MY_PATH);
+
+  return subscriptionListSchema.parse(response);
+}
+
+/**
+ * Гасит промокод.
+ * @param code - промокод в любом регистре
+ * @returns что выдано впервые
+ */
+export async function redeemCode(code: string): Promise<RedeemResult> {
+  const response: unknown = await $fetch(SUBSCRIPTIONS_REDEEM_PATH, {
+    method: 'POST',
+    body: { code: code.trim() },
+  });
+
+  return redeemResultSchema.parse(response);
+}
+
+/**
+ * Запускает срок подписки, полученной по промокоду.
+ * @param id - подписка в статусе `REGISTERED`
+ */
+export async function activateSubscription(id: string): Promise<Subscription> {
+  const response: unknown = await $fetch(
+    `${SUBSCRIPTIONS_PATH}/${encodeURIComponent(id)}/activate`,
+    { method: 'POST' },
+  );
+
+  return subscriptionSchema.parse(response);
 }

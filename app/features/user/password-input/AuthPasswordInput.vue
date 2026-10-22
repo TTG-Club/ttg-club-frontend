@@ -6,10 +6,13 @@
     placeholder,
     icon = AUTH_ICON.password,
     autocomplete = 'current-password',
+    size = 'lg',
   } = defineProps<{
     placeholder: string;
     icon?: string;
     autocomplete?: 'current-password' | 'new-password';
+    /** Окна входа крупнее, поля в карточках — обычного размера. */
+    size?: 'md' | 'lg';
   }>();
 
   const password = defineModel<string>({ required: true });
@@ -41,8 +44,8 @@
     :icon="icon"
     :autocomplete="autocomplete"
     :ui="{ trailing: 'pe-1' }"
+    :size="size"
     class="w-full"
-    size="lg"
     autocapitalize="off"
     autocorrect="off"
   >

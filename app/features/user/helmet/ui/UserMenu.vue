@@ -5,10 +5,12 @@
 
   import {
     getGreeting,
+    PROFILE_ROUTE,
     SIGN_OUT_LABEL,
     USER_HELMET_ICON,
     USER_MENU_BUTTON_LABEL,
     USER_MENU_LEGACY_LINKS,
+    USER_MENU_PROFILE_LINK,
   } from '../../model';
 
   const { user, roles, signOut } = useUser();
@@ -20,7 +22,7 @@
     breakpoints.greaterOrEqual('md').value ? 'right' : 'top',
   );
 
-  // Личный кабинет и мастерская в старом SPA открыты только редакторам.
+  // Мастерская в старом SPA открыта только редакторам.
   const canEdit = computed(() =>
     [Role.ADMIN, Role.MODERATOR].some((role) => roles.value.includes(role)),
   );
@@ -30,6 +32,10 @@
   const greeting = computed(() =>
     isOpened.value ? getGreeting(new Date().getHours()) : '',
   );
+
+  function close(): void {
+    isOpened.value = false;
+  }
 
   async function handleSignOut() {
     isOpened.value = false;
@@ -59,6 +65,17 @@
 
       <USeparator class="my-1" />
 
+      <UButton
+        :to="PROFILE_ROUTE"
+        :icon="USER_MENU_PROFILE_LINK.icon"
+        :label="USER_MENU_PROFILE_LINK.label"
+        color="neutral"
+        variant="ghost"
+        block
+        :ui="{ base: 'justify-start' }"
+        @click.left.exact="close"
+      />
+
       <template v-if="canEdit">
         <UButton
           v-for="link in USER_MENU_LEGACY_LINKS"
@@ -72,9 +89,9 @@
           block
           :ui="{ base: 'justify-start' }"
         />
-
-        <USeparator class="my-1" />
       </template>
+
+      <USeparator class="my-1" />
 
       <UButton
         :label="SIGN_OUT_LABEL"
