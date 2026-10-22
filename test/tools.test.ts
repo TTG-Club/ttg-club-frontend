@@ -16,12 +16,17 @@ import {
   getPointBuySpent,
   getPointsWord,
   getRaceBonusSlots,
+  getTavernRequest,
+  getTavernTags,
   getTraderPrice,
   getTreasuryCoins,
   groupLoot,
   isSplitBonus,
   normalizeToolCount,
   parseLootPrice,
+  parseTavernVisitors,
+  patchTavern,
+  resolveTavernSettings,
   toggleRequired,
 } from '~tools/model';
 
@@ -310,5 +315,79 @@ describe('buildAbilityRows', () => {
     expect(rows[0]).toMatchObject({ total: 17, modifier: '+3' });
     expect(rows[1]?.bonus).toBe(1);
     expect(rows[1]?.total).toBeUndefined();
+  });
+});
+
+describe('tavern', () => {
+  const base = {
+    type: 'INN',
+    habitat: 'FOREST',
+    serviceLevel: 'CHEAP',
+    visitors: 3,
+  } as const;
+
+  const tavern = {
+    ...base,
+    name: 'Пьяный дракон',
+    menu: '',
+    atmosphere: '',
+    rumors: '',
+    event: '',
+    tables: '',
+    bartender: '',
+  };
+
+  it('оставляет выбранные настройки и дополняет пустые', () => {
+    const settings = resolveTavernSettings({ type: 'CAFE' });
+
+    expect(settings.type).toBe('CAFE');
+    expect(settings.habitat).toBeTypeOf('string');
+    expect(settings.serviceLevel).toBeTypeOf('string');
+  });
+
+  it('читает заполненность зала из атмосферы', () => {
+    expect(
+      parseTavernVisitors('<div data-visitors="4"><h5>Шумно</h5></div>'),
+    ).toBe(4);
+
+    expect(parseTavernVisitors('<div>Тихо</div>')).toBe(0);
+  });
+
+  it('собирает запрос части по настройкам', () => {
+    expect(getTavernRequest('atmosphere', base)).toEqual({
+      path: 'atmosphere/',
+      query: {},
+    });
+
+    expect(getTavernRequest('tables', base)).toEqual({
+      path: 'tables',
+      query: {
+        tavernaType: 'INN',
+        atmosphereVisitors: 3,
+        serviceLevel: 'CHEAP',
+        habitat: 'FOREST',
+      },
+    });
+  });
+
+  it('меняет часть, а с атмосферой и заполненность зала', () => {
+    expect(patchTavern(tavern, 'menu', '<p>Эль</p>').menu).toBe('<p>Эль</p>');
+
+    const patched = patchTavern(
+      tavern,
+      'atmosphere',
+      '<div data-visitors="5"></div>',
+    );
+
+    expect(patched.visitors).toBe(5);
+    expect(tavern.visitors).toBe(3);
+  });
+
+  it('подписывает тип, территорию и уровень', () => {
+    expect(getTavernTags(base)).toEqual([
+      'Постоялый двор / таверна',
+      'Лес',
+      'Дешёвое',
+    ]);
   });
 });
