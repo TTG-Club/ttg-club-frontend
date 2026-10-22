@@ -1,16 +1,17 @@
 <script setup lang="ts">
-  import type { RouteLocationRaw } from 'vue-router';
-
   import type { EntrySource } from '../model';
 
   import { NuxtLink } from '#components';
 
+  import { useSectionOpener } from '../composables';
   import { SectionSourceBadge } from '../source-badge';
 
   /**
-   * Запись в списке раздела: русское и английское название, метка группы
-   * источника и короткие сведения (урон, цена) справа от английского.
-   * Без адреса строка просто показывает запись, как у драгоценностей.
+   * Запись в списке раздела, плиткой как на new.ttg.club: русское и
+   * английское название, метка группы источника и короткие сведения (урон,
+   * цена) справа от английского. Клик открывает запись так, как велит режим
+   * раздела; Ctrl-клик и средняя кнопка ведут на страницу записи. Без адреса
+   * плитка просто показывает запись, как у драгоценностей.
    */
   const {
     to = undefined,
@@ -18,7 +19,8 @@
     subtitle = undefined,
     source = undefined,
   } = defineProps<{
-    to?: RouteLocationRaw;
+    /** Адрес записи, например `/spells/fireball`. */
+    to?: string;
     title: string;
     subtitle?: string;
     source?: EntrySource | null;
@@ -31,23 +33,45 @@
     details?: () => unknown;
   }>();
 
+  const opener = useSectionOpener();
+
   const tag = computed(() => (to ? NuxtLink : 'div'));
 
-  const linkAttributes = computed(() =>
-    to ? { 'to': to, 'active-class': 'bg-elevated border-accented' } : {},
-  );
+  const isActive = computed(() => !!to && opener?.activePath.value === to);
 
-  const rowClass = computed(() =>
-    to ? 'transition-colors hover:bg-elevated' : undefined,
-  );
+  const linkAttributes = computed(() => (to ? { to } : {}));
+
+  const tileClass = computed(() => {
+    if (isActive.value) {
+      return 'border-primary bg-primary/10 ring-1 ring-primary/50';
+    }
+
+    return to
+      ? 'border-default bg-elevated/50 transition-colors hover:border-accented hover:bg-elevated'
+      : 'border-default bg-elevated/50';
+  });
+
+  /**
+   * Открывает запись через страницу раздела, если она умеет.
+   * @param event - клик по плитке
+   */
+  function open(event: MouseEvent): void {
+    if (!to || !opener) {
+      return;
+    }
+
+    event.preventDefault();
+    opener.open(to);
+  }
 </script>
 
 <template>
   <component
     :is="tag"
     v-bind="linkAttributes"
-    :class="rowClass"
-    class="flex items-center gap-3 rounded-md border border-default px-3 py-2"
+    :class="tileClass"
+    class="flex min-h-12.5 items-center gap-3 rounded-xl border px-3 py-2"
+    @click.left.exact.capture="open"
   >
     <slot name="leading" />
 

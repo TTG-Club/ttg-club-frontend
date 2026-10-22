@@ -8,6 +8,7 @@
     creatureLinkSchema,
     getChallengeRatingGroup,
   } from '../model';
+  import CreatureEntry from './CreatureEntry.vue';
   import CreatureRating from './CreatureRating.vue';
 </script>
 
@@ -35,6 +36,10 @@
           <span class="shrink-0 first-letter:uppercase">{{ item.type }}</span>
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <CreatureEntry :path="path" />
     </template>
   </SectionPage>
 </template>

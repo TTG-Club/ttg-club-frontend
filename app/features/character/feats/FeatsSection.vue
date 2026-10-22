@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { featLinkSchema, FEATS_SECTION } from '../model';
+  import FeatEntry from './FeatEntry.vue';
 </script>
 
 <template>
@@ -29,6 +30,10 @@
           <span class="min-w-0 truncate">{{ item.requirements }}</span>
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <FeatEntry :path="path" />
     </template>
   </SectionPage>
 </template>

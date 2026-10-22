@@ -11,6 +11,7 @@
     sortByGroup,
   } from '../model';
   import RaceCard from './RaceCard.vue';
+  import RaceEntry from './RaceEntry.vue';
 
   // Тип задан явно: иначе список выводит тип записи из общей сортировки
   const sortItems: (items: Array<RaceLink>) => Array<RaceLink> = sortByGroup;
@@ -32,6 +33,10 @@
         :race="item"
         :to="to"
       />
+    </template>
+
+    <template #entry="{ path }">
+      <RaceEntry :path="path" />
     </template>
   </SectionPage>
 </template>

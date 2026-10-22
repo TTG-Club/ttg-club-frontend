@@ -2,8 +2,8 @@
   import { SiteLogo } from '~/shared/ui/site-logo';
   import { BookmarksPanel } from '~bookmarks/panel';
   import { DiceHistoryToggle } from '~dice-roller/history';
+  import { DisplaySettings } from '~infrastructure/display-settings';
   import { SearchButton } from '~infrastructure/search/button';
-  import { ThemeSwitcher } from '~infrastructure/theme-switcher';
   import { UserHelmet } from '~user/helmet';
 
   import { AppMenu } from '../menu';
@@ -52,7 +52,7 @@
 
         <UserHelmet />
 
-        <ThemeSwitcher />
+        <DisplaySettings />
       </div>
     </header>
   </div>

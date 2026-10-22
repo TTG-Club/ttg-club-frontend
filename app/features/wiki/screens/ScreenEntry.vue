@@ -5,10 +5,19 @@
   import { screenDetailSchema, SCREENS_SECTION } from '../model';
   import ScreenBody from './ScreenBody.vue';
   import ScreenGroups from './ScreenGroups.vue';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="SCREENS_SECTION"
     :schema="screenDetailSchema"
     :get-edit-path="getWorkshopEditPath"

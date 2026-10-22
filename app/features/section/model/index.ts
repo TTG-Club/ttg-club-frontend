@@ -14,6 +14,7 @@ export type {
   FilterValue,
   SectionConfig,
   SectionListRequest,
+  SectionOpener,
   SectionOrder,
   SectionQueryStore,
 } from './types';
@@ -28,6 +29,8 @@ export {
   buildFilterPayload,
   buildListRequest,
   getDefaultSelection,
+  getDetailPath,
+  getDetailSlug,
   getEntryApiPath,
   getEntryUrl,
   getFilterGroups,

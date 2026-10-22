@@ -13,6 +13,11 @@ interface SectionEntryOptions<T> {
   path: MaybeRefOrGetter<string>;
   /** Проверка ответа ручки записи. */
   schema: z.ZodType<T>;
+  /**
+   * Запись открыта поверх списка, а не своей страницей: страница не ждёт её
+   * загрузки, а отсутствующая запись показывает ошибку в панели, а не 404.
+   */
+  isEmbedded?: boolean;
 }
 
 /**
@@ -30,11 +35,11 @@ export async function useSectionEntry<T>(options: SectionEntryOptions<T>) {
           method: 'POST',
         }),
       ),
-    { deep: false },
+    { deep: false, lazy: options.isEmbedded },
   );
 
   const isNotFound = computed(
-    () => error.value?.statusCode === NOT_FOUND_STATUS,
+    () => !options.isEmbedded && error.value?.statusCode === NOT_FOUND_STATUS,
   );
 
   if (isNotFound.value) {

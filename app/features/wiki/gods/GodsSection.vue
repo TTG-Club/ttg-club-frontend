@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { getGodGroup, godLinkSchema, GODS_SECTION } from '../model';
+  import GodEntry from './GodEntry.vue';
 </script>
 
 <template>
@@ -34,6 +35,10 @@
           </UTooltip>
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <GodEntry :path="path" />
     </template>
   </SectionPage>
 </template>

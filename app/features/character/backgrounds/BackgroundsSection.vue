@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { backgroundLinkSchema, BACKGROUNDS_SECTION } from '../model';
+  import BackgroundEntry from './BackgroundEntry.vue';
 </script>
 
 <template>
@@ -22,6 +23,10 @@
         :subtitle="item.name.eng"
         :source="item.source"
       />
+    </template>
+
+    <template #entry="{ path }">
+      <BackgroundEntry :path="path" />
     </template>
   </SectionPage>
 </template>

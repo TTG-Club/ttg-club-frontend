@@ -27,6 +27,9 @@ importers:
       '@nuxt/ui':
         specifier: ^4.11.0
         version: 4.12.0(5c67aa7a2f30e0868caccdc14dad2e98)
+      '@nuxtjs/device':
+        specifier: ^4.0.0
+        version: 4.0.0
       '@nuxtjs/seo':
         specifier: ^5.3.14
         version: 5.3.16(87940a000ca903e219d48625b0b2346a)
@@ -1283,6 +1286,9 @@ packages:
 
   '@nuxtjs/color-mode@4.0.1':
     resolution: {integrity: sha512-eiA7hWXi5zNHaYKyJFCGF6i0wFZtuvR7KDXZ6jiSvwxjCpRFwphrw0MOSmNfArTSSsT1wpW+/2H92cejeVfUlg==}
+
+  '@nuxtjs/device@4.0.0':
+    resolution: {integrity: sha512-Tkbvde/GInmigbS/n3X3X+qXJWi6hsYrViKpZrakaBBYY3NbGYJb0c8aVxd3vI636HBbOhu0I39rv7MSjP7w8Q==}
 
   '@nuxtjs/robots@6.2.4':
     resolution: {integrity: sha512-+MyHUT6fAqJHnGPxzSrPgXCp+giH04A9aS4RwSvjgHDzYQ+xOqpaSy8jb7U7sPlXmPZE2Et3ened9ccfmwGPKA==}
@@ -8736,6 +8742,10 @@ snapshots:
       - oxc-parser
       - rolldown
       - unplugin
+
+  '@nuxtjs/device@4.0.0':
+    dependencies:
+      defu: 6.1.7
 
   '@nuxtjs/robots@6.2.4(1f3409949f7472d7aebbca2259a1099e)':
     dependencies:

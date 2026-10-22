@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { getSpellGroup, spellLinkSchema, SPELLS_SECTION } from '../model';
+  import SpellEntry from './SpellEntry.vue';
   import SpellLevel from './SpellLevel.vue';
   import SpellLinkDetails from './SpellLinkDetails.vue';
 </script>
@@ -32,6 +33,10 @@
           <SpellLinkDetails :spell="item" />
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <SpellEntry :path="path" />
     </template>
   </SectionPage>
 </template>

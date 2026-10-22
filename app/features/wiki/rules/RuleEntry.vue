@@ -19,10 +19,19 @@
   function getCategory(rule: RuleDetail): string | undefined {
     return rule.type ? `${RULE_CATEGORY_LABEL} ${rule.type}` : undefined;
   }
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="RULES_SECTION"
     :schema="ruleDetailSchema"
     :get-edit-path="getWorkshopEditPath"

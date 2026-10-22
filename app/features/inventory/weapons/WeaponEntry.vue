@@ -4,10 +4,19 @@
 
   import { weaponDetailSchema, WEAPONS_SECTION } from '../model';
   import WeaponBody from './WeaponBody.vue';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="WEAPONS_SECTION"
     :schema="weaponDetailSchema"
     :get-edit-path="getWorkshopEditPath"

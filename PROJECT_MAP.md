@@ -15,11 +15,11 @@
 │   ├── app.config.ts           # Nuxt UI icons
 │   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css), content typography (content.scss)
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
-│   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta, useUser (session)
+│   ├── composables/            # useTheme (shared cookie with the legacy SPA), useLayoutWidth (section width), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
-│   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
+│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer), layout (filter column + list + entry pane), controls (search, filter), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
@@ -27,9 +27,9 @@
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
-│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), theme-switcher, analytics
+│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics
 │   │   └── user/               # helmet (user menu), auth-modal (sign in)
-│   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home: same, full width
+│   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
 │   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA)
 │   └── shared/                 # consts (API paths, UI texts), types (user), ui (logo, hamburger)
@@ -75,6 +75,7 @@
 | Screens                                                     | ✅     |
 | Info pages, error pages                                     | ✅     |
 | Site search: palette and `/search` page                     | ✅     |
+| Section modes like new.ttg.club: drawer and wide            | ✅     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |
@@ -107,26 +108,40 @@ carried over.
 
 ## 📚 Sections
 
-A reference section is a parent page with `SectionLayout` and a child route
-for the entry (`pages/spells.vue` + `pages/spells/[slug].vue`): on desktop the
-entry opens next to the list, on a phone instead of it. `useSectionList` loads
-the first page on SSR and the next ones on scroll (`POST` with `page`, `size`,
-`search`, `order`, `filter`). `useSectionFilter` takes the groups from the
-section's filter endpoint and keeps only the groups changed from their
+A reference section looks like new.ttg.club: a column with the title, search
+and filter on the left, entry tiles in a grid on the right
+(`pages/spells/index.vue` with the `section` layout). It has two modes, picked
+in the sidebar settings menu next to the theme and kept in the
+`ttg_layout_width` cookie. In the wide mode (the default) the entry stands next
+to the list on a resizable split and lives in `?detail=` (the path after the
+section, `?detail=fireball`); the first entry is selected until the visitor
+closes the pane. In the normal mode a click opens the entry in a right drawer
+and the address does not change. On a phone the wide mode is off and a click
+opens the entry page; a link with `?detail=` opened outside the wide mode
+redirects there on SSR. The server guesses the screen from the User-Agent
+(`@nuxtjs/device`). The entry page (`pages/spells/[slug].vue`) is a standalone
+SSR page. `useSectionDetail` keeps the open entry, and list links get it
+through `useSectionOpener`; Ctrl-click still opens the entry page. Classes
+have no entry slot, so their cards always open the class page.
+
+`useSectionList` loads the first page on SSR and the next ones on scroll
+(`POST` with `page`, `size`, `search`, `order`, `filter`). `useSectionFilter` takes the groups from
+the section's filter endpoint and keeps only the groups changed from their
 defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
 `book` parameter, as in the legacy SPA. Sources and the other groups open from
 separate buttons, each with its own panel and reset. Search lives in `?search=`.
 
 `SectionPage` puts these together, so a section only gives its config
-(`SectionConfig`: endpoints, order, page size), the entry schema and the list
-row; `pageSize: SECTION_PAGE_SIZE_ALL` loads a short section in one request,
-`sortItems` reorders it on the page and `isGrid` shows cards in a grid (races).
-`SectionEntry` is the entry card shell (header, bookmark, close link) around the
-section's own body. The entry page reads `POST /api/v1<path>` with
-`useSectionEntry`; a missing entry renders a real 404. `SectionDetailPane`
-copies the canonical link of the entry and, for moderators and admins, links
-to its editor in the legacy workshop (`/workshop/<path>/edit`).
-`SectionSourceBar` replaces `DetailTopBar`.
+(`SectionConfig`: endpoints, order, page size), the list schema, the list
+tile and the entry (`#entry="{ path }"`); `pageSize: SECTION_PAGE_SIZE_ALL`
+loads a short section in one request, `sortItems` reorders it on the page and
+`isGrid` shows large cards (races). `SectionEntry` is the entry card shell
+(header, bookmark, close) around the section's own body: by the page address
+on the entry page, or by `path` in the pane and the drawer. It reads
+`POST /api/v1<path>`; a missing entry renders a real 404 on its page and an
+error in the pane. `SectionDetailPane` copies the canonical link of the entry
+and, for moderators and admins, links to its editor in the legacy workshop
+(`/workshop/<path>/edit`). `SectionSourceBar` replaces `DetailTopBar`.
 
 Search and filter live in a `SectionQueryStore`: the page address by default,
 or memory for `SectionTabList`, the list inside a tab (spells and options of a

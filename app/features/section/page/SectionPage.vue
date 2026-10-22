@@ -1,11 +1,13 @@
 <script setup lang="ts" generic="T">
   import type { z } from 'zod';
 
-  import type { RouteLocationRaw } from 'vue-router';
-
   import type { SectionConfig } from '../model';
 
+  import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
+
   import {
+    provideSectionOpener,
+    useSectionDetail,
     useSectionFilter,
     useSectionList,
     useSectionSearch,
@@ -13,11 +15,13 @@
   import { SectionControls } from '../controls';
   import { SectionLayout } from '../layout';
   import { SectionList } from '../list';
+  import { SECTION_ICON, SECTION_TEXT } from '../model';
 
   /**
-   * Страница раздела целиком: поиск, фильтр, список с подгрузкой и панель
-   * открытой записи из дочернего маршрута. Раздел задаёт только ручки,
-   * проверку записей и вид строки списка.
+   * Страница раздела целиком: поиск, фильтр, список с подгрузкой и открытая
+   * запись. В широком режиме запись стоит рядом со списком (`?detail=`), в
+   * обычном открывается дровером, на телефоне — своей страницей. Раздел
+   * задаёт только ручки, проверку записей, вид строки списка и запись.
    */
   const {
     section,
@@ -41,12 +45,16 @@
     isGrid?: boolean;
   }>();
 
-  defineSlots<{
-    /** Строка списка; `to` ведёт к записи с текущими поиском и фильтром. */
-    item: (props: { item: T; to?: RouteLocationRaw }) => unknown;
+  const slots = defineSlots<{
+    /** Строка списка; `to` — адрес записи. */
+    item: (props: { item: T; to?: string }) => unknown;
+    /**
+     * Запись поверх списка по адресу. Без слота записи открываются только
+     * своей страницей, как классы с вкладками.
+     */
+    entry?: (props: { path: string }) => unknown;
   }>();
 
-  const route = useRoute();
   const { input, term } = useSectionSearch();
 
   // Ручка фильтра у раздела не меняется, поэтому условный вызов безопасен
@@ -71,16 +79,58 @@
     sortItems ? sortItems(items.value) : items.value,
   );
 
-  // Запись открыта, когда сработал дочерний маршрут раздела
-  const isDetailOpen = computed(() => route.matched.length > 1);
+  // Слот записи у раздела не меняется, поэтому условный вызов безопасен
+  const detail = slots.entry ? await useSectionDetail(section.path) : undefined;
+
+  if (detail) {
+    provideSectionOpener({
+      activePath: detail.activePath,
+      open: detail.open,
+      close: detail.close,
+    });
+  }
+
+  const isSplit = computed(() => !!detail?.isSplitActive.value);
+
+  const detailPath = computed(() => detail?.detailPath.value);
+
+  const drawerPath = computed(() => detail?.drawerPath.value);
+
+  const isDrawerOpen = computed({
+    get: () => !!detail?.isDrawerOpen.value,
+    set: (value: boolean) => {
+      if (detail) {
+        detail.isDrawerOpen.value = value;
+      }
+    },
+  });
+
+  const firstPath = computed(() => {
+    const [first] = sortedItems.value;
+
+    return first && getPath ? getPath(first) : undefined;
+  });
+
+  // Пустую панель заполняет первая запись списка — уже в браузере, чтобы
+  // разметка сервера совпала с первой отрисовкой, и при включении широкого
+  // режима
+  const isMounted = useMounted();
+
+  watch([isMounted, firstPath, isSplit], ([mounted, path, split]) => {
+    if (mounted && split) {
+      detail?.selectFirst(path);
+    }
+  });
 
   /**
-   * Ссылка на запись: поиск и фильтр списка переходят вместе с ней.
+   * Адрес записи для строки списка.
    * @param item - запись списка
    */
-  function getLink(item: T): RouteLocationRaw | undefined {
-    return getPath ? { path: getPath(item), query: route.query } : undefined;
+  function getLink(item: T): string | undefined {
+    return getPath?.(item);
   }
+
+  const isDrawerInset = useMediaQuery(LAYOUT_DRAWER_QUERY);
 
   function retry() {
     return refresh();
@@ -90,7 +140,7 @@
 <template>
   <SectionLayout
     :title="section.title"
-    :is-detail-open="isDetailOpen"
+    :is-split="isSplit"
   >
     <template #controls>
       <SectionControls
@@ -111,7 +161,6 @@
       :is-end="isEnd"
       :is-loading-more="isLoadingMore"
       :is-grid="isGrid"
-      :is-detail-open="isDetailOpen"
       @load-more="loadMore"
       @retry="retry"
     >
@@ -124,8 +173,51 @@
       </template>
     </SectionList>
 
+    <UDrawer
+      v-if="detail && !isSplit"
+      v-model:open="isDrawerOpen"
+      :title="section.title"
+      :inset="isDrawerInset"
+      :handle="false"
+      direction="right"
+      :ui="{
+        content: 'w-full max-w-2xl',
+        header: 'sr-only',
+        body: 'p-4 sm:p-6',
+      }"
+    >
+      <template #body>
+        <div
+          v-if="drawerPath"
+          :key="drawerPath"
+        >
+          <slot
+            name="entry"
+            :path="drawerPath"
+          />
+        </div>
+      </template>
+    </UDrawer>
+
     <template #detail>
-      <NuxtPage />
+      <div
+        v-if="detailPath"
+        :key="detailPath"
+      >
+        <slot
+          name="entry"
+          :path="detailPath"
+        />
+      </div>
+
+      <UEmpty
+        v-else
+        :icon="SECTION_ICON.detailEmpty"
+        :title="SECTION_TEXT.detailEmpty"
+        :description="SECTION_TEXT.detailEmptyHint"
+        variant="naked"
+        class="h-full"
+      />
     </template>
   </SectionLayout>
 </template>

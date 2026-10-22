@@ -9,6 +9,7 @@
     MAGIC_ITEMS_SECTION,
     magicItemLinkSchema,
   } from '../model';
+  import MagicItemEntry from './MagicItemEntry.vue';
   import MagicItemRarity from './MagicItemRarity.vue';
 </script>
 
@@ -46,6 +47,10 @@
           </UTooltip>
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <MagicItemEntry :path="path" />
     </template>
   </SectionPage>
 </template>

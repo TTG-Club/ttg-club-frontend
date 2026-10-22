@@ -4,6 +4,7 @@
 
   import { screenLinkSchema, SCREENS_SECTION } from '../model';
   import ScreenCard from './ScreenCard.vue';
+  import ScreenEntry from './ScreenEntry.vue';
 </script>
 
 <template>
@@ -21,6 +22,10 @@
         :title="item.name.rus"
         :subtitle="item.name.eng"
       />
+    </template>
+
+    <template #entry="{ path }">
+      <ScreenEntry :path="path" />
     </template>
   </SectionPage>
 </template>

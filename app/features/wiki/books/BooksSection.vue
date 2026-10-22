@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { bookLinkSchema, BOOKS_SECTION, getBookGroup } from '../model';
+  import BookEntry from './BookEntry.vue';
 </script>
 
 <template>
@@ -21,6 +22,10 @@
         :title="item.name.rus"
         :subtitle="item.name.eng"
       />
+    </template>
+
+    <template #entry="{ path }">
+      <BookEntry :path="path" />
     </template>
   </SectionPage>
 </template>

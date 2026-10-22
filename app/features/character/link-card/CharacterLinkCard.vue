@@ -1,15 +1,17 @@
 <script setup lang="ts">
-  import type { RouteLocationRaw } from 'vue-router';
   import type { EntryName } from '~section/model';
 
   import type { TypedLink } from '../model';
+
+  import { useSectionOpener } from '~section/composables';
 
   import { groupByBookType, LINK_CARD_ICON } from '../model';
 
   /**
    * Карточка расы или класса в списке: картинка с градиентом, названия и
    * метки. Кнопка в углу раскрывает разновидности или архетипы,
-   * сгруппированные по типу книги.
+   * сгруппированные по типу книги. Клик открывает запись так, как велит
+   * режим раздела, а вне раздела ведёт на её страницу.
    */
   const {
     name,
@@ -25,7 +27,8 @@
     /** Адрес записи: по нему подсвечивается открытая карточка. */
     url: string;
     image?: string | null;
-    to?: RouteLocationRaw;
+    /** Адрес записи, например `/races/elf`. */
+    to?: string;
     links?: Array<TypedLink> | null;
     /** Подсказка кнопки: «Разновидности», «Архетипы»… */
     linksLabel: string;
@@ -43,6 +46,12 @@
   }>();
 
   const route = useRoute();
+  const opener = useSectionOpener();
+
+  /** Запись, открытая сейчас: поверх списка или своей страницей. */
+  const openPath = computed(() =>
+    opener ? opener.activePath.value : route.path,
+  );
 
   const linkGroups = computed(() => groupByBookType(links));
 
@@ -56,19 +65,25 @@
 
   // Открыта сама запись или её разновидность — подсвечиваем карточку
   const isActive = computed(
-    () => route.path === url || route.path.startsWith(`${url}/`),
+    () => openPath.value === url || !!openPath.value?.startsWith(`${url}/`),
   );
 
   const cardClass = computed(() =>
-    isActive.value ? 'border-accented' : 'border-default',
+    isActive.value ? 'border-primary ring-1 ring-primary/50' : 'border-default',
   );
 
   /**
-   * Ссылка на разновидность с текущими поиском и фильтром.
-   * @param linkUrl - адрес разновидности
+   * Открывает запись через страницу раздела, если она умеет.
+   * @param event - клик по ссылке
+   * @param path - адрес записи или разновидности
    */
-  function getLinkTarget(linkUrl: string): RouteLocationRaw {
-    return { path: linkUrl, query: route.query };
+  function open(event: MouseEvent, path: string | undefined): void {
+    if (!path || !opener) {
+      return;
+    }
+
+    event.preventDefault();
+    opener.open(path);
   }
 
   /**
@@ -76,7 +91,7 @@
    * @param linkUrl - адрес разновидности
    */
   function getLinkClass(linkUrl: string) {
-    return route.path === linkUrl
+    return openPath.value === linkUrl
       ? 'border-link text-highlighted'
       : 'border-transparent';
   }
@@ -104,6 +119,7 @@
     <NuxtLink
       :to="to"
       class="relative z-10 flex h-32 flex-col justify-between p-4 sm:h-40"
+      @click.left.exact.capture="open($event, to)"
     >
       <span class="flex items-start gap-2 pr-2">
         <slot name="icon" />
@@ -153,9 +169,10 @@
             :key="link.url"
           >
             <NuxtLink
-              :to="getLinkTarget(link.url)"
+              :to="link.url"
               :class="getLinkClass(link.url)"
               class="-ml-px block border-l-2 px-2 py-1.5 hover:bg-elevated"
+              @click.left.exact.capture="open($event, link.url)"
             >
               {{ link.name.rus }}
 

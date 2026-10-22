@@ -4,10 +4,19 @@
 
   import { featDetailSchema, FEATS_SECTION } from '../model';
   import FeatBody from './FeatBody.vue';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="FEATS_SECTION"
     :schema="featDetailSchema"
     :get-edit-path="getWorkshopEditPath"

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-  import {
-    SECTION_DRAWER_INSET_QUERY,
-    SECTION_ICON,
-    SECTION_TEXT,
-  } from '../model';
+  import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
+
+  import { SECTION_ICON, SECTION_TEXT } from '../model';
 
   /**
    * Дровер справа, как карточки на new.ttg.club: заголовок, кнопки
@@ -30,7 +28,7 @@
     default: () => unknown;
   }>();
 
-  const isWide = useMediaQuery(SECTION_DRAWER_INSET_QUERY);
+  const isWide = useMediaQuery(LAYOUT_DRAWER_QUERY);
 
   function close(): void {
     isOpen.value = false;
