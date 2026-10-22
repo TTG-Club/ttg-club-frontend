@@ -6,9 +6,13 @@ import { TOOL_GENERATE_THROTTLE_MS, TOOLS_TEXT } from '../model';
  * Результаты генератора: новые встают в начало списка, как в старом SPA.
  * Повторное нажатие отменяет незаконченный запрос.
  * @param request - запрос новых результатов; сигнал отменяет его
+ * @param options - настройки
+ * @param options.isReplacing - новый результат заменяет прежние, как у
+ *   торговца и сокровищницы
  */
 export function useToolGenerator<T>(
   request: (signal: AbortSignal) => Promise<Array<T>>,
+  options: { isReplacing?: boolean } = {},
 ) {
   const toast = useToast();
 
@@ -31,7 +35,9 @@ export function useToolGenerator<T>(
 
       const added = values.map((value) => ({ id: nextId++, value })).reverse();
 
-      results.value = [...added, ...results.value];
+      results.value = options.isReplacing
+        ? added
+        : [...added, ...results.value];
     } catch {
       if (!current.signal.aborted) {
         toast.add({ title: TOOLS_TEXT.error, color: 'error' });
