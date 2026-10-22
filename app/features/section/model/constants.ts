@@ -59,6 +59,9 @@ export const SECTION_ICON = {
   openPage: 'tabler:external-link',
 } as const;
 
+/** С этой ширины дровер записи отступает от краёв экрана. */
+export const SECTION_DRAWER_INSET_QUERY = '(min-width: 768px)';
+
 /** Мастерская: правка записей, пока живёт в старом SPA. */
 export const WORKSHOP_PREFIX = '/workshop';
 

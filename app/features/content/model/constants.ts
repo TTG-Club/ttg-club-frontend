@@ -166,14 +166,14 @@ export const DETAIL_TYPES: ReadonlySet<string> = new Set([
   'god',
 ]);
 
+/** Типы подсказок, которые открывают карточку черты. */
+export const FEAT_DETAIL_TYPES: ReadonlySet<string> = new Set([
+  'feat',
+  'trait',
+]);
+
 /** Подсказки без типа подгружают HTML только с этих адресов API. */
 export const RAW_TOOLTIP_PREFIX = '/api/';
-
-/** Тексты подсказки сущности. */
-export const DETAIL_TOOLTIP_TEXT = {
-  loading: 'Загрузка...',
-  error: 'Произошла непредвиденная ошибка',
-} as const;
 
 /** Сколько подсвечивается строка таблицы после броска. */
 export const ROLL_TABLE_HIGHLIGHT_MS = 5000;

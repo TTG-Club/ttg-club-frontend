@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   findRollTableRow,
+  isFeatDetailType,
   isKnownRoute,
   parseContent,
   toRenderItem,
@@ -114,8 +115,14 @@ describe('toRenderItem', () => {
 
     expect(node && toRenderItem(node)).toMatchObject({
       kind: 'tooltip',
-      props: { type: 'spell', url: '/spells/shield' },
+      props: { type: 'spell', url: '/spells/shield', title: 'щит' },
     });
+  });
+
+  it('открывает карточку черты и по старому типу trait', () => {
+    expect(isFeatDetailType('trait')).toBe(true);
+    expect(isFeatDetailType('feat')).toBe(true);
+    expect(isFeatDetailType('spell')).toBe(false);
   });
 
   it('не принимает незнакомый тип подсказки', () => {

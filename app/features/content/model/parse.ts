@@ -223,6 +223,19 @@ export function findFirstHref(nodes: Array<ContentNode>): string | undefined {
 }
 
 /**
+ * Собирает текст узлов: из него берётся заголовок дровера, пока запись
+ * грузится.
+ * @param nodes - узлы контента
+ */
+export function getNodesText(nodes: Array<ContentNode>): string {
+  return nodes
+    .map((node) =>
+      node.kind === 'text' ? node.text : getNodesText(node.children),
+    )
+    .join('');
+}
+
+/**
  * Проверяет наличие булева атрибута в любом из написаний.
  * @param attributes - атрибуты элемента
  * @param names - допустимые имена атрибута

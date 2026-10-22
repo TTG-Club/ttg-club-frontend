@@ -4,9 +4,10 @@ import {
   DETAIL_TOOLTIP_TAG,
   DETAIL_TYPES,
   DICE_ROLLER_TAG,
+  FEAT_DETAIL_TYPES,
   VOID_TAGS,
 } from './constants';
-import { findFirstHref, hasAnyAttribute } from './parse';
+import { findFirstHref, getNodesText, hasAnyAttribute } from './parse';
 
 /**
  * Проверяет, что строка — известный тип подсказки.
@@ -14,6 +15,15 @@ import { findFirstHref, hasAnyAttribute } from './parse';
  */
 export function isDetailType(value: string | undefined): value is DetailType {
   return value !== undefined && DETAIL_TYPES.has(value);
+}
+
+/**
+ * Проверяет, что подсказка ведёт на черту: старый тип `trait` открывает
+ * ту же карточку, что и `feat`.
+ * @param type - тип подсказки
+ */
+export function isFeatDetailType(type: DetailType): boolean {
+  return FEAT_DETAIL_TYPES.has(type);
 }
 
 /**
@@ -58,6 +68,7 @@ export function toRenderItem(node: ContentNode): ContentRenderItem {
       props: {
         type: isDetailType(attributes.type) ? attributes.type : undefined,
         url: attributes.url || findFirstHref(children),
+        title: getNodesText(children).trim(),
       },
       children,
     };
