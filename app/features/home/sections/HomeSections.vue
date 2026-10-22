@@ -24,7 +24,7 @@
         при любом числе колонок висящих линий не остаётся.
       -->
       <div
-        class="-mt-px -ml-px grid h-full grid-cols-2 max-2xs:grid-cols-1 min-[1920px]:grid-cols-6 md:grid-cols-3 lg:grid-cols-4 xl:auto-rows-fr"
+        class="-mt-px -ml-px grid h-full grid-cols-2 max-2xs:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:auto-rows-fr xl:grid-cols-6"
       >
         <NuxtLink
           v-for="section in sections"
