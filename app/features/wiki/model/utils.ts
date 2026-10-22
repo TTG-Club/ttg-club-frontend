@@ -31,6 +31,15 @@ export function getBookGroup(book: BookLink): string {
 }
 
 /**
+ * Порядок группы книги: ручка отдаёт книги по году, а группы идут по
+ * порядку типа, как в старом SPA.
+ * @param book - книга из списка
+ */
+export function getBookOrder(book: BookLink): number {
+  return book.type.order;
+}
+
+/**
  * Собирает значения свойства в строку; пустой список — пустая строка.
  * @param values - значения свойства
  */

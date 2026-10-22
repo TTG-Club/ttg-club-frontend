@@ -22,12 +22,15 @@
     schema,
     getKey,
     getGroup = undefined,
+    getGroupOrder = undefined,
   } = defineProps<{
     /** Ключ должен быть свой у каждой вкладки: по нему кэшируются данные. */
     section: SectionConfig;
     schema: z.ZodType<T>;
     getKey: (item: T) => string;
     getGroup?: (item: T) => string;
+    /** Порядок группы записи; без него группы идут по первой записи. */
+    getGroupOrder?: (item: T) => number;
   }>();
 
   defineSlots<{
@@ -78,6 +81,7 @@
       :items="items"
       :get-key="getKey"
       :get-group="getGroup"
+      :get-group-order="getGroupOrder"
       :status="status"
       :is-end="isEnd"
       :is-loading-more="isLoadingMore"

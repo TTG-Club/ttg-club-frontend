@@ -5,6 +5,7 @@
 
   import {
     getTypeGroup,
+    getTypeOrder,
     WEAPON_TEXT,
     weaponLinkSchema,
     WEAPONS_SECTION,
@@ -19,6 +20,7 @@
     :schema="weaponLinkSchema"
     :get-key="getEntryUrl"
     :get-group="getTypeGroup"
+    :get-group-order="getTypeOrder"
     :get-path="getEntryUrl"
   >
     <template #item="{ item, to }">

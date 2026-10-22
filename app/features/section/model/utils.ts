@@ -21,6 +21,8 @@ import type {
   SectionOrder,
 } from './types';
 
+import { sortBy } from 'es-toolkit';
+
 import {
   QUERY_VALUES_SEPARATOR,
   SECTION_API_PREFIX,
@@ -318,28 +320,42 @@ export function buildListRequest(options: {
 }
 
 /**
- * Делит список на группы по подписи, сохраняя порядок записей.
+ * Делит список на группы по подписи, как старый SPA: записи одной группы
+ * собираются вместе, даже если ручка отдала их вперемешку (оружие идёт по
+ * названию, а группируется по типу). Группы идут по `getOrder`, а без него —
+ * в порядке первой записи; записи внутри группы сохраняют свой порядок.
  * @param items - записи списка
  * @param getGroup - подпись группы записи
+ * @param getOrder - порядок группы записи
  */
 export function groupItems<T>(
   items: Array<T>,
   getGroup: (item: T) => string,
+  getOrder?: (item: T) => number,
 ): Array<{ name: string; items: Array<T> }> {
-  const groups: Array<{ name: string; items: Array<T> }> = [];
+  const groups = new Map<
+    string,
+    { name: string; order: number; items: Array<T> }
+  >();
 
   for (const item of items) {
     const name = getGroup(item);
-    const last = groups.at(-1);
+    const group = groups.get(name);
 
-    if (last && last.name === name) {
-      last.items.push(item);
+    if (group) {
+      group.items.push(item);
     } else {
-      groups.push({ name, items: [item] });
+      groups.set(name, {
+        name,
+        order: getOrder?.(item) ?? groups.size,
+        items: [item],
+      });
     }
   }
 
-  return groups;
+  return sortBy([...groups.values()], [(group) => group.order]).map(
+    ({ name, items: groupItemsList }) => ({ name, items: groupItemsList }),
+  );
 }
 
 /**

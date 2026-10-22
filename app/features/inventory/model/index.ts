@@ -33,6 +33,7 @@ export {
   getTreasureKey,
   getTreasurePrice,
   getTypeGroup,
+  getTypeOrder,
 } from './utils';
 
 export * from './constants';

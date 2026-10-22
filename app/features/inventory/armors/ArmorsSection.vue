@@ -8,6 +8,7 @@
     armorLinkSchema,
     ARMORS_SECTION,
     getTypeGroup,
+    getTypeOrder,
   } from '../model';
   import ArmorEntry from './ArmorEntry.vue';
 </script>
@@ -19,6 +20,7 @@
     :schema="armorLinkSchema"
     :get-key="getEntryUrl"
     :get-group="getTypeGroup"
+    :get-group-order="getTypeOrder"
     :get-path="getEntryUrl"
   >
     <template #item="{ item, to }">
