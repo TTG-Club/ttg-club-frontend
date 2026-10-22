@@ -1,15 +1,35 @@
-import type { CreatureLink } from '~bestiary/model';
+import type { CreatureDetail, CreatureLink } from '~bestiary/model';
 
-import type { TrackerParticipant, TrackerSlot } from './schema';
-import type { CreatureOption, ParticipantType } from './types';
+import type {
+  ParticipantValues,
+  TrackerParticipant,
+  TrackerSlot,
+} from './schema';
+import type {
+  CreatureOption,
+  CreatureSummary,
+  HitPointsTone,
+  ParticipantType,
+  TurnReelCell,
+} from './types';
+
+import { clamp } from 'es-toolkit';
+
+import { getHitsFormula } from '~bestiary/model';
 
 import {
+  HIT_POINT_INPUT_PATTERN,
   INITIATIVE_BESTIARY_ROUTE,
   INITIATIVE_ROUTE,
   PARTICIPANT_TYPE_META,
   TRACKER_KEY_HEADER,
+  TURN_REEL,
 } from './constants';
-import { trackerErrorSchema, trackerSlotSchema } from './schema';
+import {
+  participantValuesSchema,
+  trackerErrorSchema,
+  trackerSlotSchema,
+} from './schema';
 
 /**
  * Адрес страницы трекера.
@@ -45,6 +65,20 @@ export function getTrackerErrorMessage(title: string, error: unknown): string {
   const parsed = trackerErrorSchema.safeParse(error);
 
   return parsed.success ? `${title}. ${parsed.data.data.message}` : title;
+}
+
+/**
+ * Читает хиты или КД участников из localStorage; битое значение — пусто.
+ * @param raw - строка из хранилища
+ */
+export function parseParticipantValues(raw: string): ParticipantValues {
+  try {
+    const parsed = participantValuesSchema.safeParse(JSON.parse(raw));
+
+    return parsed.success ? parsed.data : {};
+  } catch {
+    return {};
+  }
 }
 
 /**
@@ -139,4 +173,143 @@ export function isParticipantCurrent(
   currentId: string | null | undefined,
 ): boolean {
   return !participant.dead && participant.id === currentId;
+}
+
+/**
+ * Сводка существа для трекера из его статблока.
+ * @param creature - статблок из бестиария
+ */
+export function toCreatureSummary(creature: CreatureDetail): CreatureSummary {
+  return {
+    image: creature.images?.[0] || undefined,
+    armorClass: creature.armorClass ?? undefined,
+    challengeRating: creature.challengeRating,
+    maxHitPoints: creature.hits.average ?? 0,
+    hitFormula: getHitsFormula(creature.hits),
+  };
+}
+
+/**
+ * Держит хиты в пределах: не ниже нуля и не выше максимума, если он известен.
+ * @param value - новые хиты
+ * @param max - максимум, `0` — неизвестен
+ */
+export function clampHitPoints(value: number, max: number): number {
+  return max > 0 ? clamp(value, 0, max) : Math.max(0, value);
+}
+
+/**
+ * Хиты после ввода: число ставит значение, со знаком — сдвигает текущее.
+ * @param input - введённое, например `58`, `+7` или `-6`
+ * @param current - текущие хиты
+ * @param max - максимум, `0` — неизвестен
+ * @returns новые хиты или `undefined`, если ввод не распознан
+ */
+export function applyHitPointsInput(
+  input: string,
+  current: number,
+  max: number,
+): number | undefined {
+  const match = HIT_POINT_INPUT_PATTERN.exec(input.trim());
+
+  if (!match) {
+    return undefined;
+  }
+
+  const [, sign, digits] = match;
+  const amount = Number(digits);
+
+  if (!sign) {
+    return clampHitPoints(amount, max);
+  }
+
+  return clampHitPoints(current + (sign === '-' ? -amount : amount), max);
+}
+
+/**
+ * Окраска остатка хитов: ноль — опасно, половина и меньше — тревожно.
+ * @param current - текущие хиты
+ * @param max - максимум, `0` — неизвестен
+ */
+export function getHitPointsTone(
+  current: number,
+  max: number,
+): HitPointsTone | undefined {
+  if (current <= 0) {
+    return 'error';
+  }
+
+  return max > 0 && current * 2 <= max ? 'warning' : undefined;
+}
+
+/**
+ * Подпись шага хитов со знаком: `−5`, `+1`.
+ * @param delta - сдвиг хитов
+ */
+export function formatHitPointStep(delta: number): string {
+  return delta > 0 ? `+${delta}` : String(delta);
+}
+
+/**
+ * Лента ходов: участники по кругу, раунды разделены границей. Координата
+ * растёт от раунда к раунду, поэтому лента всегда едет в одну сторону.
+ * @param participants - участники в порядке хода
+ * @param currentId - чей сейчас ход
+ * @param round - текущий раунд
+ * @returns ячейки вокруг текущего хода и колонка, на которой он стоит
+ */
+export function getTurnReel(
+  participants: ReadonlyArray<TrackerParticipant>,
+  currentId: string | null | undefined,
+  round: number,
+): { cells: Array<TurnReelCell>; column: number } {
+  const total = participants.length;
+  const span = total + 1;
+  const safeRound = Math.max(1, round);
+
+  const currentIndex = Math.max(
+    0,
+    participants.findIndex((participant) => participant.id === currentId),
+  );
+
+  const column = safeRound * span + currentIndex;
+
+  if (!total) {
+    return { cells: [], column };
+  }
+
+  const from = Math.max(1, Math.floor((column - TURN_REEL.window) / span) - 1);
+  const to = Math.ceil((column + TURN_REEL.window) / span) + 1;
+  const cells: Array<TurnReelCell> = [];
+
+  for (let cycle = from; cycle <= to; cycle += 1) {
+    const base = cycle * span;
+
+    // Перед первым раундом границы нет: до него не было перехода
+    if (cycle > 1) {
+      cells.push({
+        kind: 'divider',
+        key: `divider-${cycle}`,
+        column: base - 1,
+        round: cycle,
+      });
+    }
+
+    for (const [index, participant] of participants.entries()) {
+      cells.push({
+        kind: 'token',
+        key: `${participant.id}-${cycle}`,
+        column: base + index,
+        participant,
+        isCurrent: cycle === safeRound && index === currentIndex,
+      });
+    }
+  }
+
+  return {
+    cells: cells.filter(
+      (cell) => Math.abs(cell.column - column) <= TURN_REEL.window,
+    ),
+    column,
+  };
 }

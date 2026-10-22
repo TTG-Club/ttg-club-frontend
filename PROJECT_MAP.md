@@ -24,7 +24,7 @@
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
-│   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace, guest key slot)
+│   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace with turn reel, hit points and armor class on the device, guest key slot)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
@@ -79,7 +79,6 @@
 | Site search: palette and `/search` page                                                                                           | ✅     |
 | Section modes like new.ttg.club: drawer and wide                                                                                  | ✅     |
 | Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker | ✅     |
-| Initiative tracker: hit points, armor class, creature cards                                                                       | ⏳     |
 | Account, comments, subscription, bug report                                                                                       | ⏳     |
 | Workshop, admin                                                                                                                   | ⏳     |
 
