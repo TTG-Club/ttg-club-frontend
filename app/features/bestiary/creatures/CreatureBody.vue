@@ -159,12 +159,14 @@
           {{ speed }}
         </CreatureProperty>
       </div>
-    </div>
 
-    <CreatureAbilities
-      :scores="scores"
-      :source="creature.name.rus"
-    />
+      <!-- Характеристики обтекают картинку, как в старом SPA -->
+      <CreatureAbilities
+        :scores="scores"
+        :source="creature.name.rus"
+        class="mt-4"
+      />
+    </div>
 
     <div class="flex flex-col gap-1">
       <CreatureRolls

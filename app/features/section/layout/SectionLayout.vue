@@ -52,13 +52,13 @@
         :max-size="SECTION_SPLIT_MAX_SIZE"
         class="border-r border-default"
       >
-        <div class="scrollbar-none h-full overflow-y-auto px-4 pt-6 pb-8">
+        <div class="scrollbar-subtle h-full overflow-y-auto px-4 pt-6 pb-8">
           <slot />
         </div>
       </UDashboardPanel>
 
       <UDashboardPanel id="section-detail">
-        <div class="scrollbar-none h-full overflow-y-auto px-6 pt-4 pb-8">
+        <div class="scrollbar-subtle h-full overflow-y-auto px-6 pt-4 pb-8">
           <slot name="detail" />
         </div>
       </UDashboardPanel>

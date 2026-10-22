@@ -23,7 +23,7 @@
     <button
       :aria-label="SECTION_TEXT.openImage"
       type="button"
-      class="float-right mb-8 ml-8 size-50 cursor-pointer overflow-hidden rounded-full max-sm:float-none max-sm:mx-auto max-sm:mb-4 max-sm:block"
+      class="float-right mb-8 ml-8 size-50 cursor-pointer overflow-hidden rounded-full max-2xl:size-45 max-sm:mb-4 max-sm:ml-4 max-sm:size-30"
       @click.left.exact.prevent="open"
     >
       <img

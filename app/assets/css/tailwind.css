@@ -93,6 +93,38 @@ body {
   }
 }
 
+/*
+ * Тонкая полоса прокрутки, как у списка на new.ttg.club: скруглённый
+ * бегунок без дорожки. Chrome и Safari рисуют её через `::-webkit-scrollbar`
+ * (стандартные свойства их бы отключили), остальные — через стандартные.
+ */
+@utility scrollbar-subtle {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background-color: var(--ui-border-accented);
+    background-clip: content-box;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-color: var(--ui-border-accented) transparent;
+    scrollbar-width: thin;
+  }
+}
+
 html {
-  @apply scrollbar-none;
+  @apply scrollbar-subtle;
 }
