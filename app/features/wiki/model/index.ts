@@ -5,7 +5,10 @@ export type {
   GodLink,
   RuleDetail,
   RuleLink,
+  ScreenDetail,
+  ScreenLink,
 } from './schema';
+export type { ScreenGroup, SvgNode } from './types';
 
 export {
   bookDetailSchema,
@@ -14,7 +17,16 @@ export {
   godLinkSchema,
   ruleDetailSchema,
   ruleLinkSchema,
+  screenDetailSchema,
+  screenLinkSchema,
 } from './schema';
 
+export {
+  getBookGroup,
+  getGodGroup,
+  groupScreens,
+  joinWikiList,
+  parseSvgIcon,
+} from './utils';
+
 export * from './constants';
-export { getBookGroup, getGodGroup, joinWikiList } from './utils';
