@@ -28,8 +28,11 @@ export function findRollTableRow(
       .split(ROLL_RANGE_SEPARATOR)
       .map((part) => Number(part.trim()));
 
-    return (
-      min !== undefined && max !== undefined && min <= result && result <= max
-    );
+    if (min === undefined || max === undefined) {
+      return false;
+    }
+
+    // Таблицы столкновений приходят с диапазоном задом наперёд: `20-11`
+    return Math.min(min, max) <= result && result <= Math.max(min, max);
   });
 }

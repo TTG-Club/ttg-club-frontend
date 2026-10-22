@@ -31,6 +31,7 @@ export default defineConfig({
         new URL('./app/features/inventory', import.meta.url),
       ),
       '~wiki': fileURLToPath(new URL('./app/features/wiki', import.meta.url)),
+      '~tools': fileURLToPath(new URL('./app/features/tools', import.meta.url)),
       '~infrastructure': fileURLToPath(
         new URL('./app/features/infrastructure', import.meta.url),
       ),

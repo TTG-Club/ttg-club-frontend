@@ -150,6 +150,10 @@ describe('findRollTableRow', () => {
     expect(findRollTableRow(rows, 10)).toBe(2);
   });
 
+  it('понимает диапазон задом наперёд', () => {
+    expect(findRollTableRow([['20-11', 'a']], 15)).toBe(0);
+  });
+
   it('возвращает -1, если результат вне таблицы', () => {
     expect(findRollTableRow(rows, 11)).toBe(-1);
   });
