@@ -7,6 +7,12 @@ export const CHARACTER_NO_REQUIREMENTS = 'Нет';
 
 export const CHARACTER_LIST_SEPARATOR = ', ';
 
+/** Кнопка карточки расы или класса, раскрывающая её ссылки. */
+export const LINK_CARD_ICON = {
+  expand: 'tabler:plus',
+  collapse: 'tabler:minus',
+} as const;
+
 /* --- Черты -------------------------------------------------------------- */
 
 /** Черт немного, поэтому список грузится целиком, как в старом SPA */
@@ -171,11 +177,6 @@ export const RACE_TEXT = {
   hideSubraces: 'Скрыть разновидности',
 } as const;
 
-export const RACE_ICON = {
-  expand: 'tabler:plus',
-  collapse: 'tabler:minus',
-} as const;
-
 /** Короткие характеристики расы в карточке: подпись и подсказка. */
 export const RACE_STATS = {
   type: { label: 'ТИП', hint: 'Тип существа' },
@@ -187,3 +188,112 @@ export const RACE_STATS = {
 
 /** Раздел мастерской, где правятся расы. */
 export const RACES_WORKSHOP_PATH = '/workshop/races';
+
+/* --- Классы ------------------------------------------------------------- */
+
+/** Классов немного, поэтому список грузится целиком, как в старом SPA */
+export const CLASSES_SECTION: SectionConfig = {
+  key: 'classes',
+  title: 'Классы',
+  path: '/classes',
+  listUrl: '/api/v1/classes',
+  filterUrl: '/api/v1/filters/classes',
+  order: [{ field: 'name', direction: 'asc' }],
+  pageSize: SECTION_PAGE_SIZE_ALL,
+};
+
+/** Типы вкладок страницы класса из API. */
+export const CLASS_TAB_TYPE = {
+  traits: 'traits',
+  description: 'description',
+  spells: 'spells',
+  options: 'options',
+} as const;
+
+/** Разделы, списки которых показываются во вкладках класса. */
+export const CLASS_TAB_SECTIONS: Partial<Record<string, SectionConfig>> = {
+  [CLASS_TAB_TYPE.spells]: SPELLS_SECTION,
+  [CLASS_TAB_TYPE.options]: OPTIONS_SECTION,
+};
+
+/** Значки классов из коллекции `ttg`: `class/wizard` → `ttg:class-wizard`. */
+export const CLASS_ICON_PREFIX = 'class/';
+
+export const CLASS_ICON_COLLECTION_PREFIX = 'ttg:class-';
+
+/** Классы, у которых есть свой значок. */
+export const CLASS_ICONS: ReadonlySet<string> = new Set([
+  'artificer',
+  'barbarian',
+  'bard',
+  'blood-hunter',
+  'cleric',
+  'druid',
+  'fighter',
+  'monk',
+  'paladin',
+  'ranger',
+  'rogue',
+  'sorcerer',
+  'warlock',
+  'wizard',
+]);
+
+/** Префикс кости хитов в формуле броска. */
+export const CLASS_HIT_DICE_PREFIX = '1к';
+
+/** Столько навыков всего: выбор из всех пишется одной фразой. */
+export const SKILLS_COUNT = 18;
+
+/** Опциональные умения из «Котла Таши»: правило о них. */
+export const OPTIONAL_FEATURES_PATH = '/rules/optional_class_features';
+
+export const CLASS_TEXT = {
+  archetypes: 'Архетипы',
+  showArchetypes: 'Показать архетипы',
+  hideArchetypes: 'Скрыть архетипы',
+  gallery: 'Галерея',
+  hitPoints: 'Хиты',
+  hitDice: 'Кость Хитов:',
+  perLevel: 'за каждый уровень',
+  firstLevel: 'Хиты на 1 уровне:',
+  firstLevelModifier: '+ ваш модификатор',
+  nextLevels: 'Хиты на следующих уровнях:',
+  or: 'или',
+  nextLevelsModifier: '+ модификатор',
+  constitution: 'Телосложения',
+  nextLevelsSuffix: 'за каждый уровень этого класса, после первого (минимум 1)',
+  level: 'Ур.',
+  proficiencyBonus: 'БМ',
+  features: 'Умения',
+  spellSlots: 'Ячейки заклинаний на уровень заклинаний',
+  proficiencies: 'Владение',
+  armor: 'Доспехи:',
+  weapon: 'Оружие:',
+  tools: 'Инструменты:',
+  savingThrows: 'Спасброски:',
+  skills: 'Навыки:',
+  anySkills: 'Выберите любые навыки.',
+  chooseSkills: 'Выберите',
+  chooseSkillsFrom: 'навыка из следующих:',
+  equipment: 'Снаряжение',
+  equipmentIntro:
+    'Вы начинаете со следующим снаряжением в дополнение к снаряжению, '
+    + 'полученному за вашу предысторию:',
+  optional: '(опционально)',
+  optionalHint:
+    'Эта опция представлена в книге «Котёл Таши со всякой всячиной». '
+    + 'Всё в этой книге опционально.',
+  subclasses: 'Подклассы',
+  spellLevel: 'Уровень заклинания',
+  classLevel: 'Уровень',
+  spells: 'Заклинания',
+  archetypeLoadError: 'Не удалось загрузить архетип',
+} as const;
+
+export const CLASS_ICON = {
+  gallery: 'tabler:photo',
+} as const;
+
+/** Уровень в таблице заклинаний архетипа — уровень заклинания. */
+export const ARCHETYPE_SPELL_LEVEL_TYPE = 'SPELL_LEVEL';

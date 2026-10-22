@@ -40,6 +40,7 @@ export const SECTION_TEXT = {
   openImage: 'Открыть изображение',
   previousImage: 'Предыдущее изображение',
   nextImage: 'Следующее изображение',
+  openPage: 'Открыть страницу',
 } as const;
 
 /** Иконки раздела. */
@@ -53,6 +54,7 @@ export const SECTION_ICON = {
   edit: 'tabler:pencil',
   previous: 'tabler:chevron-left',
   next: 'tabler:chevron-right',
+  openPage: 'tabler:external-link',
 } as const;
 
 /** Мастерская: правка записей, пока живёт в старом SPA. */

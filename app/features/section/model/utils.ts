@@ -1,4 +1,8 @@
-import type { LocationQuery, LocationQueryRaw } from 'vue-router';
+import type {
+  LocationQuery,
+  LocationQueryRaw,
+  LocationQueryValueRaw,
+} from 'vue-router';
 
 import type {
   EntryName,
@@ -365,4 +369,37 @@ export function getFirstLetterGroup(entry: { name: EntryName }): string {
  */
 export function getEntryUrl(entry: { url: string }): string {
   return entry.url;
+}
+
+/**
+ * Приводит значение параметра к виду `route.query`: числа становятся
+ * строками, пустые значения — `null`.
+ * @param value - значение параметра
+ */
+function toQueryValue(value: LocationQueryValueRaw): string | null {
+  return value === null || value === undefined ? null : String(value);
+}
+
+/**
+ * Накладывает изменения на параметры, как `router.replace` с
+ * `{ ...route.query, ...patch }`: `undefined` и `null` убирают параметр.
+ * Нужен спискам во вкладках, которые держат поиск и фильтр не в адресе.
+ * @param query - текущие параметры
+ * @param patch - изменения
+ */
+export function mergeQuery(
+  query: LocationQuery,
+  patch: LocationQueryRaw,
+): LocationQuery {
+  const merged: LocationQuery = { ...query };
+
+  for (const [key, value] of Object.entries(patch)) {
+    merged[key] = Array.isArray(value)
+      ? value.map(toQueryValue)
+      : toQueryValue(value);
+  }
+
+  return Object.fromEntries(
+    Object.entries(merged).filter(([, value]) => value !== null),
+  );
 }

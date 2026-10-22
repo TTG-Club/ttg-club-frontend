@@ -1,15 +1,18 @@
+import type { SectionQueryStore } from '../model';
+
 import { getQueryString, SEARCH_DEBOUNCE_MS, SEARCH_QUERY_KEY } from '../model';
+import { useRouteQueryStore } from './useSectionQuery';
 
 /**
- * Поиск по разделу. Строка в поле меняется сразу, а в адрес и в запрос
+ * Поиск по разделу. Строка в поле меняется сразу, а в параметры и в запрос
  * списка попадает с задержкой, чтобы не грузить список на каждую букву.
+ * @param store - где живут параметры; по умолчанию в адресе страницы
  */
-export function useSectionSearch() {
-  const route = useRoute();
-  const router = useRouter();
-
+export function useSectionSearch(
+  store: SectionQueryStore = useRouteQueryStore(),
+) {
   const term = computed(
-    () => getQueryString(route.query[SEARCH_QUERY_KEY])?.trim() ?? '',
+    () => getQueryString(store.query.value[SEARCH_QUERY_KEY])?.trim() ?? '',
   );
 
   const input = ref(term.value);
@@ -23,10 +26,7 @@ export function useSectionSearch() {
         return;
       }
 
-      router.replace({
-        query: { ...route.query, [SEARCH_QUERY_KEY]: next || undefined },
-        hash: route.hash,
-      });
+      store.update({ [SEARCH_QUERY_KEY]: next || undefined });
     },
     { debounce: SEARCH_DEBOUNCE_MS },
   );

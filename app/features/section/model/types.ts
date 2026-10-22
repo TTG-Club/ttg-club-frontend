@@ -1,3 +1,6 @@
+import type { Ref } from 'vue';
+import type { LocationQuery, LocationQueryRaw } from 'vue-router';
+
 /** Ключ значения фильтра: строка или число, как его отдаёт API. */
 export type FilterKey = string | number;
 
@@ -62,4 +65,14 @@ export interface SectionConfig {
   order: Array<SectionOrder>;
   /** Размер страницы; по умолчанию `SECTION_PAGE_SIZE`. */
   pageSize?: number;
+}
+
+/**
+ * Где список держит поиск и фильтр: в адресе страницы раздела или в
+ * памяти, как списки во вкладках класса.
+ */
+export interface SectionQueryStore {
+  query: Readonly<Ref<LocationQuery>>;
+  /** Накладывает изменения: `undefined` убирает параметр. */
+  update: (patch: LocationQueryRaw) => void;
 }

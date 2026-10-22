@@ -1,4 +1,6 @@
-import type { SubraceLink } from './schema';
+import type { EntryName } from '~section/model';
+
+import type { TypedLink } from './schema';
 
 /** Компонент заклинания в карточке: подпись и подсказка с правилом. */
 export interface SpellComponentLabel {
@@ -7,10 +9,10 @@ export interface SpellComponentLabel {
   hint: string;
 }
 
-/** Разновидности расы одного типа книги: основные, UA, хомбрю. */
-export interface SubraceGroup {
+/** Ссылки одного типа книги: основные, UA, хомбрю. */
+export interface TypedLinkGroup {
   name: string;
-  items: Array<SubraceLink>;
+  items: Array<TypedLink>;
 }
 
 /** Короткая характеристика расы в карточке. */
@@ -19,4 +21,19 @@ export interface RaceStat {
   label: string;
   hint: string;
   value: string;
+}
+
+/** Раса или класс в списке: основные без группы, остальные в группах. */
+export interface GroupedLink {
+  name: EntryName;
+  group?: { name: string; order: number } | null;
+}
+
+/** Вкладка страницы класса после разбора ответа API. */
+export interface ClassTab {
+  /** Ключ вкладки: тип и порядок, у двух вкладок особенностей типы совпадают. */
+  key: string;
+  name: string;
+  type: string;
+  url: string;
 }

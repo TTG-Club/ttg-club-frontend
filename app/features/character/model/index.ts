@@ -1,6 +1,14 @@
 export type {
+  ArchetypeSpell,
+  ArchetypeSpellTable,
   BackgroundDetail,
   BackgroundLink,
+  ClassDetail,
+  ClassFeature,
+  ClassLevel,
+  ClassLink,
+  ClassTraitLink,
+  ClassTraits,
   FeatDetail,
   FeatLink,
   OptionDetail,
@@ -15,13 +23,21 @@ export type {
   SpellDetail,
   SpellLink,
   SubraceDetail,
-  SubraceLink,
+  TypedLink,
 } from './schema';
-export type { RaceStat, SpellComponentLabel, SubraceGroup } from './types';
+export type {
+  ClassTab,
+  GroupedLink,
+  RaceStat,
+  SpellComponentLabel,
+  TypedLinkGroup,
+} from './types';
 
 export {
   backgroundDetailSchema,
   backgroundLinkSchema,
+  classDetailSchema,
+  classLinkSchema,
   featDetailSchema,
   featLinkSchema,
   optionDetailSchema,
@@ -33,19 +49,30 @@ export {
 } from './schema';
 
 export {
+  findClassFeature,
+  getArchetypeFeatures,
+  getArchetypeSpellLevelHeader,
+  getArchetypeSpellSuffix,
   getBackgroundLanguages,
+  getClassDescription,
+  getClassHitPoints,
+  getClassIcon,
+  getClassSkillsLabel,
+  getClassTabs,
+  getClassTabSection,
+  getGroupName,
   getRaceAbilitiesLabel,
   getRaceEditPath,
-  getRaceGroup,
   getRaceSpeedLabel,
   getRaceStats,
   getRequirementsLabel,
   getSpellComponentLabels,
   getSpellGroup,
   getSpellTypeLabel,
-  groupSubraces,
+  groupByBookType,
   hasPersonalization,
-  sortRaces,
+  sortByGroup,
+  sortClassFeatures,
   sortRaceSkills,
 } from './utils';
 

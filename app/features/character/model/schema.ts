@@ -129,26 +129,30 @@ const raceAbilitySchema = z.object({
 
 export type RaceAbility = z.infer<typeof raceAbilitySchema>;
 
-/** Тип книги расы в списке: по нему разновидности делятся на группы. */
-const raceSourceTypeSchema = z.object({
+/**
+ * Тип книги в списке: по нему разновидности рас и архетипы классов
+ * делятся на группы.
+ */
+const bookTypeSchema = z.object({
   name: z.string(),
   order: z.number(),
 });
 
-export const subraceLinkSchema = z.object({
+/** Ссылка на разновидность расы или архетип класса с типом книги. */
+export const typedLinkSchema = z.object({
   name: entryNameSchema,
   url: z.string().min(1),
-  type: raceSourceTypeSchema,
+  type: bookTypeSchema,
   source: entrySourceSchema.nullish(),
 });
 
-export type SubraceLink = z.infer<typeof subraceLinkSchema>;
+export type TypedLink = z.infer<typeof typedLinkSchema>;
 
-export const raceLinkSchema = subraceLinkSchema.extend({
+export const raceLinkSchema = typedLinkSchema.extend({
   image: z.string().nullish(),
   abilities: z.array(raceAbilitySchema).nullish(),
   group: z.object({ name: z.string(), order: z.number() }).nullish(),
-  subraces: z.array(subraceLinkSchema).nullish(),
+  subraces: z.array(typedLinkSchema).nullish(),
 });
 
 export type RaceLink = z.infer<typeof raceLinkSchema>;
@@ -198,3 +202,128 @@ export const raceDetailSchema = z.object({
 });
 
 export type RaceDetail = z.infer<typeof raceDetailSchema>;
+
+/* --- Классы ------------------------------------------------------------- */
+
+const classGroupSchema = z.object({
+  name: z.string(),
+  order: z.number(),
+});
+
+export const classLinkSchema = z.object({
+  name: entryNameSchema,
+  url: z.string().min(1),
+  source: entrySourceSchema,
+  dice: z.string().nullish(),
+  image: z.string().nullish(),
+  icon: z.string().nullish(),
+  group: classGroupSchema.nullish(),
+  /** Как называются архетипы класса: «Подклассы», «Божественные домены»… */
+  archetypeName: z.string().nullish(),
+  archetypes: z.array(typedLinkSchema).nullish(),
+});
+
+export type ClassLink = z.infer<typeof classLinkSchema>;
+
+/** Вкладка страницы класса; `url` — ручка текста или фильтра списка. */
+const classTabSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+  type: z.string(),
+  order: z.number(),
+});
+
+/** Умение в таблице уровней: ссылка на якорь его описания ниже. */
+const classTraitLinkSchema = z.object({
+  name: z.string(),
+  anchor: z.string(),
+  archetypeFeature: z.boolean().nullish(),
+});
+
+export type ClassTraitLink = z.infer<typeof classTraitLinkSchema>;
+
+const classLevelSchema = z.object({
+  level: z.number(),
+  proficiencyBonus: z.number(),
+  traits: z.array(classTraitLinkSchema),
+  classFeatureValues: z.array(z.string()),
+  archetypeFeatureValues: z.array(z.string()),
+  spellSlots: z.array(z.string()),
+});
+
+export type ClassLevel = z.infer<typeof classLevelSchema>;
+
+/**
+ * Умение класса или архетипа. `archetypeRoot` — сам архетип: на своём
+ * уровне он идёт перед остальными умениями.
+ */
+const classFeatureSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  level: z.number(),
+  type: z.string().nullish(),
+  description: z.string().nullish(),
+  optional: z.boolean().nullish(),
+  archetypeFeature: z.boolean().nullish(),
+  archetypeRoot: z.boolean().nullish(),
+  source: z
+    .object({ name: z.string().nullish(), shortName: z.string().nullish() })
+    .nullish(),
+});
+
+export type ClassFeature = z.infer<typeof classFeatureSchema>;
+
+const classColumnSchema = z.object({
+  name: z.string(),
+});
+
+const classTraitsSchema = z.object({
+  diceHp: z.number(),
+  armor: z.string().nullish(),
+  weapon: z.string().nullish(),
+  tools: z.string().nullish(),
+  savingThrows: z.string().nullish(),
+  skillAvailableCount: z.number(),
+  availableSkills: z.array(z.string()).nullish(),
+  equipment: z.string().nullish(),
+  classFeatureLevels: z.array(classColumnSchema).nullish(),
+  archetypeFeatureLevels: z.array(classColumnSchema).nullish(),
+  levels: z.array(classLevelSchema).nullish(),
+  features: z.array(classFeatureSchema).nullish(),
+  archetype: classFeatureSchema.nullish(),
+});
+
+export type ClassTraits = z.infer<typeof classTraitsSchema>;
+
+const archetypeSpellSchema = z.object({
+  name: z.string(),
+  englishName: z.string(),
+  url: z.string(),
+  advanced: z.string().nullish(),
+});
+
+export type ArchetypeSpell = z.infer<typeof archetypeSpellSchema>;
+
+/** Заклинания архетипа по уровням класса или уровням заклинаний. */
+const archetypeSpellTableSchema = z.object({
+  levelType: z.string().nullish(),
+  classNameGenitive: z.string().nullish(),
+  levels: z.array(
+    z.object({
+      level: z.number(),
+      spells: z.array(archetypeSpellSchema),
+    }),
+  ),
+});
+
+export type ArchetypeSpellTable = z.infer<typeof archetypeSpellTableSchema>;
+
+export const classDetailSchema = classLinkSchema.extend({
+  tabs: z.array(classTabSchema).nullish(),
+  images: z.array(z.string()).nullish(),
+  description: z.string().nullish(),
+  traits: classTraitsSchema.nullish(),
+  archetypeSpellTable: archetypeSpellTableSchema.nullish(),
+});
+
+export type ClassDetail = z.infer<typeof classDetailSchema>;
