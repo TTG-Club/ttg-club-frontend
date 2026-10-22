@@ -6,9 +6,11 @@ import {
   filterResponseSchema,
   getDefaultSelection,
   groupItems,
+  isPartCustomized,
   isSelectionCustomized,
   mergeQuery,
   normalizeFilter,
+  resetSelectionPart,
   selectionFromQuery,
   selectionToQuery,
   setGroupSelection,
@@ -152,6 +154,38 @@ describe('mergeQuery', () => {
     expect(mergeQuery({}, { page: 2, tags: [1, 'a'] })).toEqual({
       page: '2',
       tags: ['1', 'a'],
+    });
+  });
+});
+
+describe('части фильтра', () => {
+  const selection = {
+    book: ['PHB'],
+    level: ['1'],
+  };
+
+  it('отличает изменённые источники от изменённого содержимого', () => {
+    expect(isPartCustomized(definition, selection, 'sources')).toBe(true);
+    expect(isPartCustomized(definition, selection, 'other')).toBe(true);
+
+    expect(
+      isPartCustomized(
+        definition,
+        { ...getDefaultSelection(definition), level: ['1'] },
+        'sources',
+      ),
+    ).toBe(false);
+  });
+
+  it('сбрасывает одну часть, не трогая другую', () => {
+    expect(resetSelectionPart(definition, selection, 'sources')).toEqual({
+      book: ['PHB', 'XGE'],
+      level: ['1'],
+    });
+
+    expect(resetSelectionPart(definition, selection, 'other')).toEqual({
+      book: ['PHB'],
+      level: [],
     });
   });
 });

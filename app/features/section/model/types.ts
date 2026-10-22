@@ -31,6 +31,9 @@ export interface FilterDefinition {
   other: Array<FilterGroup>;
 }
 
+/** Часть фильтра со своей кнопкой: источники или условия по содержимому. */
+export type FilterPart = keyof FilterDefinition;
+
 /** Выбранные значения по параметрам: ключи значений строками. */
 export type FilterSelection = Record<string, Array<string>>;
 
