@@ -30,7 +30,7 @@
     class="flex h-dvh w-full"
   >
     <aside
-      class="flex w-75 shrink-0 flex-col gap-4 overflow-y-auto border-r border-default p-4 pt-6"
+      class="scrollbar-none flex w-75 shrink-0 flex-col gap-4 overflow-y-auto border-r border-default p-4 pt-6"
     >
       <h1 class="text-2xl text-highlighted">
         {{ title }}
@@ -52,13 +52,13 @@
         :max-size="SECTION_SPLIT_MAX_SIZE"
         class="border-r border-default"
       >
-        <div class="h-full overflow-y-auto px-4 pt-6 pb-8">
+        <div class="scrollbar-none h-full overflow-y-auto px-4 pt-6 pb-8">
           <slot />
         </div>
       </UDashboardPanel>
 
       <UDashboardPanel id="section-detail">
-        <div class="h-full overflow-y-auto px-6 pt-4 pb-8">
+        <div class="scrollbar-none h-full overflow-y-auto px-6 pt-4 pb-8">
           <slot name="detail" />
         </div>
       </UDashboardPanel>
@@ -70,7 +70,7 @@
     class="mx-auto flex w-full flex-col lg:max-w-330 lg:flex-row"
   >
     <aside
-      class="sticky top-0 z-10 shrink-0 border-default bg-default/80 backdrop-blur-lg lg:h-dvh lg:overflow-y-auto lg:border-r"
+      class="sticky top-0 z-10 scrollbar-none shrink-0 border-default bg-default/80 backdrop-blur-lg lg:h-dvh lg:overflow-y-auto lg:border-r"
     >
       <div class="flex w-full flex-col gap-4 p-4 md:pt-6 lg:w-75">
         <h1 class="text-2xl text-highlighted">

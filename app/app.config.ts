@@ -18,6 +18,8 @@ export default defineAppConfig({
       light: 'tabler:sun',
       loading: 'tabler:loader-2',
       menu: 'tabler:menu-2',
+      minus: 'tabler:minus',
+      plus: 'tabler:plus',
       search: 'tabler:search',
     },
   },
