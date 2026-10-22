@@ -53,7 +53,7 @@ export function useDiceRoll() {
         critical,
       });
 
-      if (!history.isOpen.value) {
+      if (!history.isOpen.value && !request.isQuiet) {
         toast.add({
           title: `${label}: ${result.value}`,
           description: [

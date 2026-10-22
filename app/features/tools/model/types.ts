@@ -1,4 +1,7 @@
 import type {
+  ABILITIES,
+  ABILITY_METHODS,
+  ABILITY_SPLITS,
   NAME_COMPONENTS,
   NAME_GENERATION_TYPES,
   NAME_SEXES,
@@ -89,4 +92,31 @@ export interface TreasuryCoin {
   value: number;
   /** Количество с разрядами и сокращение, «1 200 мм». */
   label: string;
+}
+
+export type AbilityKey = (typeof ABILITIES)[number]['key'];
+
+export type AbilityMethod = (typeof ABILITY_METHODS)[number]['value'];
+
+export type AbilitySplit = (typeof ABILITY_SPLITS)[number]['value'];
+
+/** Значения характеристик; без значения — характеристика не назначена. */
+export type AbilityScores = Partial<Record<AbilityKey, number>>;
+
+/** Значение «покупки» в списке: подпись со стоимостью и доступность. */
+export interface PointBuyItem {
+  label: string;
+  value: number;
+  disabled: boolean;
+}
+
+/** Строка итоговой таблицы. */
+export interface AbilityRow {
+  key: AbilityKey;
+  name: string;
+  short: string;
+  base?: number;
+  bonus?: number;
+  total?: number;
+  modifier?: string;
 }

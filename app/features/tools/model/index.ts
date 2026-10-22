@@ -1,10 +1,12 @@
 export type {
+  AbilityRace,
   EncounterOptions,
   EncounterResult,
   LootMagicItem,
   MadnessResult,
   NameRace,
   NameResult,
+  RaceBonus,
   ToolOption,
   TraderOptions,
   TreasuryCoins,
@@ -12,6 +14,11 @@ export type {
   WildMagicResult,
 } from './schema';
 export type {
+  AbilityKey,
+  AbilityMethod,
+  AbilityRow,
+  AbilityScores,
+  AbilitySplit,
   EncounterRequest,
   LootGroup,
   LootView,
@@ -21,6 +28,7 @@ export type {
   NameRaceItem,
   NameSex,
   NamesRequest,
+  PointBuyItem,
   ToolResult,
   TraderRequest,
   TreasuryCoin,
@@ -30,6 +38,7 @@ export type {
 } from './types';
 
 export {
+  abilityRacesSchema,
   encounterOptionsSchema,
   encounterResultSchema,
   lootMagicItemSchema,
@@ -45,16 +54,25 @@ export {
 } from './schema';
 
 export {
+  assignUnique,
+  buildAbilityRows,
+  buildAssignedScores,
   buildEncounterRequest,
   buildNameRaceGroups,
   buildNamesRequest,
+  buildRaceBonuses,
   formatLootPrice,
   getDefaultSources,
   getLootCountLabel,
   getNameSharedHint,
+  getPointBuyItems,
+  getPointBuySpent,
+  getPointsWord,
+  getRaceBonusSlots,
   getTraderPrice,
   getTreasuryCoins,
   groupLoot,
+  isSplitBonus,
   normalizeToolCount,
   parseLootPrice,
   toggleRequired,
