@@ -104,9 +104,99 @@ export const NAME_SHARED_HINT = {
 /** Отступ подрасы под своей расой в списке. */
 export const NAME_RACE_CHILD_CLASS = 'ps-6';
 
+export const ABILITY_CALC_TEXT = {
+  title: 'Калькулятор характеристик',
+  source: 'Калькулятор характеристик',
+  race: 'Раса',
+  racePlaceholder: 'Выбрать расу',
+  subrace: 'Подраса',
+  subracePlaceholder: 'Выбрать подрасу',
+  split: 'Набор характеристик',
+  splitPlaceholder: 'Выбрать набор',
+  bonusPlaceholder: 'Выбери характеристику',
+  bonuses: 'Бонусы расы',
+  noRace: 'Раса не выбрана, бонусов нет',
+  methods: 'Способ',
+  sum: 'Сумма',
+  roll: 'Бросить кубики',
+  reroll: 'Перебросить',
+  rollLabel: 'Бросок №',
+  rolled: 'Выпало',
+  points: 'Очков',
+  reset: 'Сбросить',
+  valuePlaceholder: 'Значение',
+  ability: 'Характеристика',
+  base: 'Значение',
+  raceBonus: 'Бонус расы',
+  total: 'Итого',
+  modifier: 'Модификатор',
+  empty: '—',
+} as const;
+
+/** Характеристики в порядке листа персонажа. */
+export const ABILITIES = [
+  { key: 'STRENGTH', name: 'Сила', short: 'сил' },
+  { key: 'DEXTERITY', name: 'Ловкость', short: 'лов' },
+  { key: 'CONSTITUTION', name: 'Телосложение', short: 'тел' },
+  { key: 'INTELLIGENCE', name: 'Интеллект', short: 'инт' },
+  { key: 'WISDOM', name: 'Мудрость', short: 'мдр' },
+  { key: 'CHARISMA', name: 'Харизма', short: 'хар' },
+] as const;
+
+/** Способы получить значения характеристик. */
+export const ABILITY_METHODS = [
+  { label: 'Случайный набор', value: 'random' },
+  { label: '«Покупка» значений', value: 'pointBuy' },
+  { label: 'Стандартный набор', value: 'standard' },
+] as const;
+
+/** Бросок характеристики: 4к6, лучшие три. */
+export const ABILITY_ROLL_FORMULA = '4к6kh3';
+
+/** Стандартный набор из «Книги игрока». */
+export const ABILITY_STANDARD_ARRAY = [15, 14, 13, 12, 10, 8] as const;
+
+/** Сколько очков на «покупку» и что стоит каждое значение. */
+export const POINT_BUY_MAX = 27;
+
+export const POINT_BUY_MIN_SCORE = 8;
+
+export const POINT_BUY_COST = [
+  { value: 8, cost: 0 },
+  { value: 9, cost: 1 },
+  { value: 10, cost: 2 },
+  { value: 11, cost: 3 },
+  { value: 12, cost: 4 },
+  { value: 13, cost: 5 },
+  { value: 14, cost: 7 },
+  { value: 15, cost: 9 },
+] as const;
+
+/** Склонения «очка» для подписей «покупки». */
+export const POINTS_FORMS = {
+  one: 'очко',
+  few: 'очка',
+  many: 'очков',
+} as const;
+
+/** Бонусы расы на выбор: ключи из ответа бэкенда. */
+export const RACE_BONUS_TYPE = {
+  one: 'ONE',
+  choice: 'CHOICE',
+  choiceUnique: 'CHOICE_UNIQUE',
+  choiceDouble: 'CHOICE_DOUBLE',
+} as const;
+
+/** Как распределить бонус «+2 и +1 / +1 к трём». */
+export const ABILITY_SPLITS = [
+  { label: '+2 и +1', value: 'FOR_TWO' },
+  { label: '+1 к трём', value: 'FOR_THREE' },
+] as const;
+
 export const TOOLS_ICON = {
   generate: 'ttg:dice-d20',
   clear: 'tabler:trash',
   empty: 'tabler:sparkles',
   table: 'tabler:table',
+  reset: 'tabler:restore',
 } as const;

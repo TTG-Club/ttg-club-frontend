@@ -1,11 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  assignUnique,
+  buildAbilityRows,
+  buildAssignedScores,
   buildEncounterRequest,
   buildNameRaceGroups,
   buildNamesRequest,
+  buildRaceBonuses,
   getDefaultSources,
   getNameSharedHint,
+  getPointBuyItems,
+  getPointBuySpent,
+  getPointsWord,
+  getRaceBonusSlots,
+  isSplitBonus,
   normalizeToolCount,
   toggleRequired,
 } from '~tools/model';
@@ -106,5 +115,103 @@ describe('getNameSharedHint', () => {
   it('подсказывает только для семьи, клана и дома', () => {
     expect(getNameSharedHint('GROUP')).toBeUndefined();
     expect(getNameSharedHint('CLAN')).toContain('клан');
+  });
+});
+
+describe('assignUnique', () => {
+  it('ставит выбор в ячейку и снимает его с другой', () => {
+    expect(assignUnique(['A', undefined, 'B'], 1, 'A')).toEqual([
+      undefined,
+      'A',
+      'B',
+    ]);
+
+    expect(assignUnique(['A', 'B'], 0, undefined)).toEqual([undefined, 'B']);
+  });
+});
+
+describe('buildAssignedScores', () => {
+  it('берёт только назначенные значения', () => {
+    expect(
+      buildAssignedScores(
+        [15, 14, undefined],
+        ['WISDOM', undefined, 'CHARISMA'],
+      ),
+    ).toEqual({ WISDOM: 15 });
+  });
+});
+
+describe('«покупка» значений', () => {
+  const scores = {
+    STRENGTH: 15,
+    DEXTERITY: 15,
+    CONSTITUTION: 15,
+    INTELLIGENCE: 8,
+    WISDOM: 8,
+    CHARISMA: 8,
+  };
+
+  it('считает потраченные очки', () => {
+    expect(getPointBuySpent(scores)).toBe(27);
+  });
+
+  it('подписывает разницу и отключает недоступное', () => {
+    const items = getPointBuyItems(scores, 'WISDOM');
+
+    expect(items[0]).toEqual({ label: '8', value: 8, disabled: false });
+    expect(items[1]).toMatchObject({ label: '9 (+1 очко)', disabled: true });
+
+    expect(getPointBuyItems(scores, 'STRENGTH')[0]?.label).toBe('8 (−9 очков)');
+  });
+
+  it('склоняет «очко»', () => {
+    expect(getPointsWord(1)).toBe('очко');
+    expect(getPointsWord(3)).toBe('очка');
+    expect(getPointsWord(7)).toBe('очков');
+  });
+});
+
+describe('бонусы расы', () => {
+  const human = [
+    { key: 'CHARISMA', name: 'Харизма', value: 2 },
+    { key: 'ONE', name: 'к одной', value: 1 },
+    { key: 'CHOICE', name: 'к другой', value: 1 },
+  ];
+
+  const tasha = [{ key: 'CHOICE_DOUBLE', name: '+2 и +1', value: 0 }];
+
+  it('раскладывает бонусы на выбор по ячейкам', () => {
+    expect(getRaceBonusSlots(human, undefined)).toEqual([1, 1]);
+
+    expect(
+      getRaceBonusSlots(
+        [{ key: 'CHOICE_UNIQUE', name: 'к 2 другим', value: 1 }],
+        undefined,
+      ),
+    ).toEqual([1, 1]);
+
+    expect(isSplitBonus(tasha)).toBe(true);
+    expect(getRaceBonusSlots(tasha, 'FOR_TWO')).toEqual([2, 1]);
+    expect(getRaceBonusSlots(tasha, 'FOR_THREE')).toEqual([1, 1, 1]);
+  });
+
+  it('складывает заданные и выбранные бонусы', () => {
+    expect(buildRaceBonuses(human, [1, 1], ['CHARISMA', 'WISDOM'])).toEqual({
+      CHARISMA: 3,
+      WISDOM: 1,
+    });
+  });
+});
+
+describe('buildAbilityRows', () => {
+  it('считает итог и модификатор только при значении', () => {
+    const rows = buildAbilityRows(
+      { STRENGTH: 15 },
+      { STRENGTH: 2, DEXTERITY: 1 },
+    );
+
+    expect(rows[0]).toMatchObject({ total: 17, modifier: '+3' });
+    expect(rows[1]?.bonus).toBe(1);
+    expect(rows[1]?.total).toBeUndefined();
   });
 });

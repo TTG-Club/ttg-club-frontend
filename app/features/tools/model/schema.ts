@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { entrySourceSchema } from '~section/model';
+import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /** Вариант выбора из ручки инструмента: подпись и значение. */
 const nameValueSchema = z.object({
@@ -71,6 +71,27 @@ export const nameResultSchema = z.object({
   sex: z.enum(['MALE', 'FEMALE', 'UNISEX']).nullish(),
 });
 
+/** Бонус расы: характеристика или бонус на выбор (`ONE`, `CHOICE`...). */
+const raceBonusSchema = z.object({
+  key: z.string().nullish(),
+  name: z.string(),
+  value: z.number().nullish(),
+});
+
+const abilityRaceBaseSchema = z.object({
+  name: entryNameSchema,
+  url: z.string().min(1),
+  source: entrySourceSchema.nullish(),
+  abilities: z.array(raceBonusSchema).nullish(),
+});
+
+/** Расы с бонусами для калькулятора, подрасы со своими бонусами. */
+export const abilityRacesSchema = z.array(
+  abilityRaceBaseSchema.extend({
+    subraces: z.array(abilityRaceBaseSchema).nullish(),
+  }),
+);
+
 export type ToolOption = z.infer<typeof nameValueSchema>;
 export type MadnessResult = z.infer<typeof madnessResultSchema>;
 export type WildMagicResult = z.infer<typeof wildMagicResultSchema>;
@@ -78,3 +99,5 @@ export type EncounterOptions = z.infer<typeof encounterOptionsSchema>;
 export type EncounterResult = z.infer<typeof encounterResultSchema>;
 export type NameRace = z.infer<typeof nameRacesSchema>[number];
 export type NameResult = z.infer<typeof nameResultSchema>;
+export type RaceBonus = z.infer<typeof raceBonusSchema>;
+export type AbilityRace = z.infer<typeof abilityRacesSchema>[number];
