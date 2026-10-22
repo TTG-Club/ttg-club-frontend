@@ -24,6 +24,7 @@
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
+│   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
@@ -76,7 +77,8 @@
 | Info pages, error pages                                     | ✅     |
 | Site search: palette and `/search` page                     | ✅     |
 | Section modes like new.ttg.club: drawer and wide            | ✅     |
-| Tools, initiative tracker                                   | ⏳     |
+| Tools: madness, wild magic, random encounters               | ✅     |
+| Other tools, initiative tracker                             | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |
 
