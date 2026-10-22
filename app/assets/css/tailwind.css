@@ -68,7 +68,7 @@
   --ui-text-muted: var(--text-g-color);
   --ui-text-dimmed: var(--text-color-disabled);
   --ui-border: var(--border);
-  --ui-border-accented: var(--border-hover);
+  --ui-border-accented: var(--secondary-hover);
 }
 
 @media (width >= 2100px) {
@@ -127,4 +127,24 @@ body {
 
 html {
   @apply scrollbar-subtle;
+}
+
+/*
+ * Tailwind 4 убрал руку с кнопок; на сайте всё кликабельное с ней, как в
+ * старом SPA и на new.ttg.club.
+ */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='checkbox']:not([data-disabled]),
+  [role='radio']:not([data-disabled]),
+  [role='switch']:not([data-disabled]),
+  [role='tab']:not([data-disabled]),
+  [role='option']:not([data-disabled]),
+  [role='menuitem']:not([data-disabled]),
+  summary,
+  label[for],
+  select:not(:disabled) {
+    cursor: pointer;
+  }
 }

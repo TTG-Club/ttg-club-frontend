@@ -555,3 +555,19 @@ export function searchFilterGroups(
 
   return matches.filter((match) => match.values.length > 0);
 }
+
+/**
+ * Состояние «Выбрать все» у группы: частичный выбор показывается чёрточкой.
+ * @param keys - все ключи группы
+ * @param selected - выбранные ключи группы
+ */
+export function getSelectAllState(
+  keys: ReadonlyArray<string>,
+  selected: ReadonlyArray<string>,
+): boolean | 'indeterminate' {
+  if (!selected.length) {
+    return false;
+  }
+
+  return keys.every((key) => selected.includes(key)) || 'indeterminate';
+}

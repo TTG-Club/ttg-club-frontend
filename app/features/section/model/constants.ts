@@ -47,6 +47,8 @@ export const SECTION_TEXT = {
   filters: 'Фильтры',
   filterSearch: 'Поиск по фильтрам...',
   filterSearchLabel: 'Поиск по фильтрам',
+  sourceSearch: 'Поиск по источникам...',
+  sourceSearchLabel: 'Поиск по источникам',
   selectAll: 'Выбрать все',
   more: 'Ещё',
 } as const;

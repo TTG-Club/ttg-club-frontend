@@ -6,16 +6,21 @@
     FilterSelection,
   } from '../model';
 
+  import { xor } from 'es-toolkit';
+
   import {
+    FILTER_SEARCH_DEBOUNCE_MS,
     getGroupSelection,
+    searchFilterGroups,
     SECTION_ICON,
     SECTION_TEXT,
     setGroupSelection,
   } from '../model';
+  import SectionFilterCard from './SectionFilterCard.vue';
 
   /**
-   * Панель части фильтра: источники столбиком или условия по содержимому
-   * в строку, значения чекбоксами.
+   * Панель части фильтра, как источники на new.ttg.club: поиск сверху и
+   * группы карточками со «Выбрать все» и значениями метками.
    */
   const {
     part,
@@ -36,9 +41,24 @@
 
   const isOpen = defineModel<boolean>('open', { default: false });
 
+  const search = ref('');
+
+  const debouncedSearch = refDebounced(search, FILTER_SEARCH_DEBOUNCE_MS);
+
+  // Очистка поля возвращает группы сразу, без задержки
+  const appliedSearch = computed(() =>
+    search.value ? debouncedSearch.value : '',
+  );
+
   const groups = computed(() =>
     definition[part].filter((group) => !group.hidden),
   );
+
+  const matches = computed(() =>
+    searchFilterGroups(groups.value, appliedSearch.value),
+  );
+
+  const isEmpty = computed(() => !matches.value.length);
 
   const isSources = computed(() => part === 'sources');
 
@@ -46,29 +66,52 @@
     isSources.value ? SECTION_TEXT.sources : SECTION_TEXT.filterTitle,
   );
 
-  const orientation = computed(() =>
-    isSources.value ? 'vertical' : 'horizontal',
+  const searchPlaceholder = computed(() =>
+    isSources.value ? SECTION_TEXT.sourceSearch : SECTION_TEXT.filterSearch,
   );
 
-  const checkboxUi = computed(() =>
-    isSources.value ? undefined : { fieldset: 'flex-wrap gap-x-4 gap-y-2' },
+  const searchLabel = computed(() =>
+    isSources.value
+      ? SECTION_TEXT.sourceSearchLabel
+      : SECTION_TEXT.filterSearchLabel,
   );
 
-  function getItems(group: FilterGroup) {
-    return group.values.map((value) => ({
-      label: value.label,
-      value: String(value.key),
-      description: value.tooltip,
-    }));
-  }
-
-  function getValue(group: FilterGroup) {
+  /**
+   * Выбранные ключи группы.
+   * @param group - группа фильтра
+   */
+  function getSelected(group: FilterGroup): Array<string> {
     return getGroupSelection(selection, group);
   }
 
-  function update(group: FilterGroup, keys: Array<string>) {
+  /**
+   * Заменяет выбор группы целиком, например через «Выбрать все».
+   * @param group - группа фильтра
+   * @param keys - выбранные ключи
+   */
+  function setGroup(group: FilterGroup, keys: Array<string>): void {
     emit('update:selection', setGroupSelection(selection, group, keys));
   }
+
+  /**
+   * Отмечает значение группы или снимает отметку.
+   * @param group - группа фильтра
+   * @param key - ключ значения
+   */
+  function toggle(group: FilterGroup, key: string): void {
+    setGroup(group, xor(getSelected(group), [key]));
+  }
+
+  function reset(): void {
+    emit('reset');
+  }
+
+  // Новая панель открывается без старого поиска
+  watch(isOpen, (value) => {
+    if (!value) {
+      search.value = '';
+    }
+  });
 </script>
 
 <template>
@@ -77,16 +120,32 @@
     :title="title"
   >
     <template #body>
-      <div class="flex flex-col gap-6">
-        <UCheckboxGroup
-          v-for="group in groups"
-          :key="group.key"
-          :legend="group.name"
-          :items="getItems(group)"
-          :model-value="getValue(group)"
-          :orientation="orientation"
-          :ui="checkboxUi"
-          @update:model-value="update(group, $event)"
+      <div class="flex flex-col gap-4">
+        <UInput
+          v-model="search"
+          :icon="SECTION_ICON.search"
+          :placeholder="searchPlaceholder"
+          :aria-label="searchLabel"
+          type="search"
+          autocomplete="off"
+          class="w-full"
+        />
+
+        <p
+          v-if="isEmpty"
+          class="py-2 text-sm text-muted"
+        >
+          {{ SECTION_TEXT.empty }}
+        </p>
+
+        <SectionFilterCard
+          v-for="match in matches"
+          :key="match.group.key"
+          :group="match.group"
+          :values="match.values"
+          :selected="getSelected(match.group)"
+          @toggle="toggle(match.group, $event)"
+          @update:selected="setGroup(match.group, $event)"
         />
       </div>
     </template>
@@ -99,7 +158,7 @@
         color="neutral"
         variant="subtle"
         block
-        @click.left.exact.prevent="emit('reset')"
+        @click.left.exact.prevent="reset"
       />
     </template>
   </USlideover>
