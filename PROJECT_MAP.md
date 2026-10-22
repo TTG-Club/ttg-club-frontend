@@ -27,7 +27,7 @@
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
-│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), theme-switcher, analytics
+│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), theme-switcher, analytics
 │   │   └── user/               # helmet (user menu), auth-modal (sign in)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home: same, full width
 │   ├── pages/                  # File-based routes
@@ -74,6 +74,7 @@
 | Bestiary                                                    | ✅     |
 | Screens                                                     | ✅     |
 | Info pages, error pages                                     | ✅     |
+| Site search: palette and `/search` page                     | ✅     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |
@@ -162,5 +163,13 @@ The home page repeats the legacy one block for block. Section tiles and the
 tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
 render on SSR; videos (`/api/v1/youtube`) and friends (`/api/v1/partners`) too.
 The latest game comes from the new.ttg.club game service and core-api, so it
-loads only in the browser. Search still lives in the legacy SPA: the search
-field and its hotkeys (`/`, `\`) open `/search` with a full page load.
+loads only in the browser. The search field opens the search palette.
+
+## 🔍 Search
+
+Site search uses `POST /api/v1/search` (and `/search/random` for the dice
+button). The palette is mounted by the sidebar search button, which also owns
+the hotkeys (`/`, `\`, `⌘K`); the home search field opens it through
+`useSearchPalette`. It shows the first 5 results, random entries and a link to
+`/search`. The `/search` page renders on SSR, keeps the query in `?search=` and
+the page number in `?page=`, 20 results per page.
