@@ -27,6 +27,7 @@ export const SECTION_TEXT = {
   filterTitle: 'Фильтр',
   sources: 'Источники',
   reset: 'Сбросить',
+  resetAll: 'Сбросить фильтр и источники',
   close: 'Закрыть',
   empty: 'Ничего не найдено',
   error: 'Не удалось загрузить список',
@@ -47,6 +48,7 @@ export const SECTION_TEXT = {
 export const SECTION_ICON = {
   search: 'tabler:search',
   filter: 'tabler:filter',
+  sources: 'tabler:books',
   reset: 'tabler:filter-off',
   close: 'tabler:x',
   empty: 'tabler:mood-empty',

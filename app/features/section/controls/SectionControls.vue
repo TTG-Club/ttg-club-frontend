@@ -1,10 +1,13 @@
 <script setup lang="ts">
-  import type { FilterDefinition, FilterSelection } from '../model';
+  import type { FilterDefinition, FilterPart, FilterSelection } from '../model';
 
   import { SectionFilterDrawer } from '../filter-drawer';
-  import { SECTION_ICON, SECTION_TEXT } from '../model';
+  import { isPartCustomized, SECTION_ICON, SECTION_TEXT } from '../model';
 
-  /** Поиск, кнопка фильтра и сброс фильтра над списком раздела. */
+  /**
+   * Поиск и две кнопки над списком раздела, как на старом сайте:
+   * фильтр по содержимому и источники открывают каждая свою панель.
+   */
   const {
     definition = undefined,
     selection,
@@ -17,12 +20,59 @@
 
   const emit = defineEmits<{
     'update:selection': [selection: FilterSelection];
-    'reset': [];
+    /** Сброс одной части фильтра или, без неё, всего фильтра. */
+    'reset': [part?: FilterPart];
   }>();
 
   const search = defineModel<string>('search', { required: true });
 
-  const isFilterOpen = ref(false);
+  const isDrawerOpen = ref(false);
+
+  // Часть остаётся после закрытия, чтобы панель не менялась на анимации
+  const drawerPart = ref<FilterPart>('other');
+
+  const hasOther = computed(
+    () => !!definition?.other.some((group) => !group.hidden),
+  );
+
+  const hasSources = computed(
+    () => !!definition?.sources.some((group) => !group.hidden),
+  );
+
+  const isOtherCustomized = computed(
+    () => !!definition && isPartCustomized(definition, selection, 'other'),
+  );
+
+  const isSourcesCustomized = computed(
+    () => !!definition && isPartCustomized(definition, selection, 'sources'),
+  );
+
+  const isDrawerPartCustomized = computed(() =>
+    drawerPart.value === 'sources'
+      ? isSourcesCustomized.value
+      : isOtherCustomized.value,
+  );
+
+  /**
+   * Открывает панель части фильтра.
+   * @param part - источники или условия по содержимому
+   */
+  function openDrawer(part: FilterPart) {
+    drawerPart.value = part;
+    isDrawerOpen.value = true;
+  }
+
+  function openFilter() {
+    openDrawer('other');
+  }
+
+  function openSources() {
+    openDrawer('sources');
+  }
+
+  function resetAll() {
+    emit('reset');
+  }
 </script>
 
 <template>
@@ -38,35 +88,63 @@
     />
 
     <template v-if="definition">
-      <UChip
-        :show="isCustomized"
-        inset
+      <UTooltip
+        v-if="hasOther"
+        :text="SECTION_TEXT.filter"
+      >
+        <UChip
+          :show="isOtherCustomized"
+          inset
+        >
+          <UButton
+            :icon="SECTION_ICON.filter"
+            :aria-label="SECTION_TEXT.filter"
+            color="neutral"
+            variant="subtle"
+            @click.left.exact.prevent="openFilter"
+          />
+        </UChip>
+      </UTooltip>
+
+      <UTooltip
+        v-if="hasSources"
+        :text="SECTION_TEXT.sources"
+      >
+        <UChip
+          :show="isSourcesCustomized"
+          inset
+        >
+          <UButton
+            :icon="SECTION_ICON.sources"
+            :aria-label="SECTION_TEXT.sources"
+            color="neutral"
+            variant="subtle"
+            @click.left.exact.prevent="openSources"
+          />
+        </UChip>
+      </UTooltip>
+
+      <UTooltip
+        v-if="isCustomized"
+        :text="SECTION_TEXT.resetAll"
       >
         <UButton
-          :icon="SECTION_ICON.filter"
-          :aria-label="SECTION_TEXT.filter"
+          :icon="SECTION_ICON.reset"
+          :aria-label="SECTION_TEXT.resetAll"
           color="neutral"
-          variant="subtle"
-          @click.left.exact.prevent="isFilterOpen = true"
+          variant="ghost"
+          @click.left.exact.prevent="resetAll"
         />
-      </UChip>
-
-      <UButton
-        v-if="isCustomized"
-        :icon="SECTION_ICON.reset"
-        :aria-label="SECTION_TEXT.reset"
-        color="neutral"
-        variant="ghost"
-        @click.left.exact.prevent="emit('reset')"
-      />
+      </UTooltip>
 
       <SectionFilterDrawer
-        v-model:open="isFilterOpen"
+        v-model:open="isDrawerOpen"
+        :part="drawerPart"
         :definition="definition"
         :selection="selection"
-        :is-customized="isCustomized"
+        :is-customized="isDrawerPartCustomized"
         @update:selection="emit('update:selection', $event)"
-        @reset="emit('reset')"
+        @reset="emit('reset', drawerPart)"
       />
     </template>
   </div>

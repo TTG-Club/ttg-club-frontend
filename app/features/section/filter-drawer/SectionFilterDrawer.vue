@@ -2,6 +2,7 @@
   import type {
     FilterDefinition,
     FilterGroup,
+    FilterPart,
     FilterSelection,
   } from '../model';
 
@@ -12,12 +13,17 @@
     setGroupSelection,
   } from '../model';
 
-  /** Панель фильтра: группы значений чекбоксами, источники отдельно. */
+  /**
+   * Панель части фильтра: источники столбиком или условия по содержимому
+   * в строку, значения чекбоксами.
+   */
   const {
+    part,
     definition,
     selection,
     isCustomized = false,
   } = defineProps<{
+    part: FilterPart;
     definition: FilterDefinition;
     selection: FilterSelection;
     isCustomized?: boolean;
@@ -30,12 +36,22 @@
 
   const isOpen = defineModel<boolean>('open', { default: false });
 
-  const sources = computed(() =>
-    definition.sources.filter((group) => !group.hidden),
+  const groups = computed(() =>
+    definition[part].filter((group) => !group.hidden),
   );
 
-  const other = computed(() =>
-    definition.other.filter((group) => !group.hidden),
+  const isSources = computed(() => part === 'sources');
+
+  const title = computed(() =>
+    isSources.value ? SECTION_TEXT.sources : SECTION_TEXT.filterTitle,
+  );
+
+  const orientation = computed(() =>
+    isSources.value ? 'vertical' : 'horizontal',
+  );
+
+  const checkboxUi = computed(() =>
+    isSources.value ? undefined : { fieldset: 'flex-wrap gap-x-4 gap-y-2' },
   );
 
   function getItems(group: FilterGroup) {
@@ -58,36 +74,18 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    :title="SECTION_TEXT.filterTitle"
+    :title="title"
   >
     <template #body>
       <div class="flex flex-col gap-6">
-        <section
-          v-if="sources.length"
-          class="flex flex-col gap-4"
-        >
-          <h3 class="font-semibold text-highlighted">
-            {{ SECTION_TEXT.sources }}
-          </h3>
-
-          <UCheckboxGroup
-            v-for="group in sources"
-            :key="group.key"
-            :legend="group.name"
-            :items="getItems(group)"
-            :model-value="getValue(group)"
-            @update:model-value="update(group, $event)"
-          />
-        </section>
-
         <UCheckboxGroup
-          v-for="group in other"
+          v-for="group in groups"
           :key="group.key"
           :legend="group.name"
           :items="getItems(group)"
           :model-value="getValue(group)"
-          orientation="horizontal"
-          :ui="{ fieldset: 'flex-wrap gap-x-4 gap-y-2' }"
+          :orientation="orientation"
+          :ui="checkboxUi"
           @update:model-value="update(group, $event)"
         />
       </div>

@@ -14,6 +14,7 @@ import type {
   FilterDefinition,
   FilterGroup,
   FilterKey,
+  FilterPart,
   FilterPayload,
   FilterSelection,
   SectionListRequest,
@@ -200,6 +201,57 @@ export function isSelectionCustomized(
   return Object.values(selectionToQuery(definition, selection)).some(
     (value) => value !== undefined,
   );
+}
+
+/**
+ * Параметры адреса, которые занимают группы части фильтра.
+ * @param definition - фильтр раздела
+ * @param part - источники или условия по содержимому
+ */
+function getPartParams(
+  definition: FilterDefinition,
+  part: FilterPart,
+): Set<string> {
+  return new Set(definition[part].map((group) => group.param));
+}
+
+/**
+ * Проверяет, отличается ли выбор части фильтра от выбора по умолчанию.
+ * @param definition - фильтр раздела
+ * @param selection - текущий выбор
+ * @param part - источники или условия по содержимому
+ */
+export function isPartCustomized(
+  definition: FilterDefinition,
+  selection: FilterSelection,
+  part: FilterPart,
+): boolean {
+  const query = selectionToQuery(definition, selection);
+
+  return [...getPartParams(definition, part)].some(
+    (param) => query[param] !== undefined,
+  );
+}
+
+/**
+ * Возвращает часть фильтра к выбору по умолчанию, не трогая другую.
+ * @param definition - фильтр раздела
+ * @param selection - текущий выбор
+ * @param part - источники или условия по содержимому
+ */
+export function resetSelectionPart(
+  definition: FilterDefinition,
+  selection: FilterSelection,
+  part: FilterPart,
+): FilterSelection {
+  const defaults = getDefaultSelection(definition);
+  const reset: FilterSelection = {};
+
+  for (const param of getPartParams(definition, part)) {
+    reset[param] = defaults[param] ?? [];
+  }
+
+  return { ...selection, ...reset };
 }
 
 /**
