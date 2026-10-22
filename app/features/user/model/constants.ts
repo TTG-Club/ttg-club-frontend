@@ -10,12 +10,17 @@ export const GUEST_HELMET_ICON = 'ttg:profile-helmet-outline';
 /** Иконка шлема вошедшего пользователя. */
 export const USER_HELMET_ICON = 'ttg:profile-helmet-filled';
 
+/** Пункт меню пользователя «Личный кабинет». */
+export const USER_MENU_PROFILE_LINK = {
+  label: 'Личный кабинет',
+  icon: 'tabler:user-cog',
+} as const;
+
 /**
  * Пункты меню пользователя, которые ведут в ещё не перенесённые разделы
  * старого SPA и открываются с перезагрузкой страницы.
  */
 export const USER_MENU_LEGACY_LINKS = [
-  { label: 'Личный кабинет', url: '/profile', icon: 'tabler:user-cog' },
   { label: 'Мастерская', url: '/workshop', icon: 'tabler:tools' },
 ] as const;
 
@@ -194,3 +199,148 @@ export const SIGN_IN_TOASTS = {
 
 /** Статус ответа бэкенда на неверный логин или пароль. */
 export const WRONG_CREDENTIALS_STATUS = 401;
+
+/** Адрес личного кабинета, как в старом SPA. */
+export const PROFILE_ROUTE = '/profile';
+
+/** Тексты личного кабинета. */
+export const PROFILE_TEXT = {
+  title: 'Личный кабинет',
+  guestTitle: 'Личный кабинет доступен после входа',
+  guestDescription: 'Войдите, чтобы сменить имя, пароль или ввести промокод',
+  signIn: 'Войти',
+  signOut: 'Выйти',
+  personal: 'Личные данные',
+  displayName: 'Отображаемое имя',
+  displayNameHelp: 'Его видят другие в ваших комментариях вместо логина',
+  displayNamePlaceholder: 'Например, Отважный Странник',
+  save: 'Сохранить',
+  username: 'Логин',
+  email: 'Почта',
+  displayNameSaved: 'Имя обновлено',
+  displayNameFailed: 'Не удалось сменить имя',
+  password: 'Смена пароля',
+  currentPassword: 'Текущий пароль',
+  newPassword: 'Новый пароль',
+  repeatPassword: 'Повторите новый пароль',
+  changePassword: 'Сменить пароль',
+  passwordSaved: 'Пароль успешно изменён',
+  passwordFailed: 'Не удалось сменить пароль',
+} as const;
+
+/** Отображаемое имя, как в старом SPA и на new.ttg.club. */
+export const DISPLAY_NAME_LIMIT = {
+  min: 2,
+  max: 24,
+} as const;
+
+/** Отображаемое имя: буквы любого алфавита, цифры, пробел, `-` и `_`. */
+export const DISPLAY_NAME_PATTERN = /^[\w\p{L}\s-]+$/u;
+
+/** Подсказки проверки полей личного кабинета. */
+export const PROFILE_VALIDATION = {
+  displayNameMin: `Минимум ${DISPLAY_NAME_LIMIT.min} символа`,
+  displayNameMax: `Максимум ${DISPLAY_NAME_LIMIT.max} символа`,
+  displayNameChars: 'Только буквы, цифры, пробелы, дефисы и подчёркивания',
+  samePassword: 'Новый пароль должен отличаться от текущего',
+} as const;
+
+/** Подписи ролей; незнакомая роль показывается как есть. */
+export const ROLE_LABELS: Readonly<Record<string, string>> = {
+  USER: 'Пользователь',
+  WRITER: 'Автор',
+  SUBSCRIBER: 'Подписчик',
+  MODERATOR: 'Модератор',
+  ADMIN: 'Администратор',
+};
+
+/** Иконки личного кабинета. */
+export const PROFILE_ICON = {
+  guest: 'tabler:user-off',
+  personal: 'tabler:user-edit',
+  displayName: 'tabler:forms',
+  username: 'tabler:fingerprint',
+  email: 'tabler:mail',
+  password: 'tabler:key',
+  saved: 'tabler:circle-check',
+  failed: 'tabler:alert-circle',
+  signOut: 'tabler:logout',
+} as const;
+
+/** Статусы подписки из сервиса подписок. */
+export const SUBSCRIPTION_STATUS = {
+  registered: 'REGISTERED',
+  active: 'ACTIVE',
+  expired: 'EXPIRED',
+} as const;
+
+/** Подписи типов подписки; незнакомый тип не подписывается. */
+export const SUBSCRIPTION_TYPE_LABELS: Readonly<Record<string, string>> = {
+  GIFT: 'Подарочная',
+  BUY: 'Купленная',
+};
+
+/** Подписи наград за промокод; незнакомая показывается как есть. */
+export const REWARD_PERK_LABELS: Readonly<Record<string, string>> = {
+  EARLY_ACCESS_DOWNLOAD: 'Ранний доступ к скачиванию',
+  MAP_TOKENS_DOWNLOAD: 'Карты и токены',
+  ADVENTURE_DOWNLOAD: 'Приключение',
+  DEV_CHAT_ACCESS: 'Приватный чат разработки',
+  PROFILE_BADGE: 'Значок профиля',
+  AVATAR_FRAME: 'Рамка аватара',
+  NICKNAME_COLOR: 'Цвет никнейма',
+  PROFILE_ICON: 'Иконки профиля',
+  APP_CREDITS: 'Упоминание в титрах приложения',
+};
+
+/** Даты подписки: `ДД.ММ.ГГГГ`, как в старом SPA. */
+export const SUBSCRIPTION_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
+
+/** Локаль дат подписки. */
+export const SUBSCRIPTION_DATE_LOCALE = 'ru-RU';
+
+/** Тексты подписки и промокодов. */
+export const SUBSCRIPTION_TEXT = {
+  title: 'Подписка',
+  loadFailed: 'Не удалось загрузить подписку',
+  retry: 'Повторить',
+  active: 'Подписка активна',
+  activeUntil: 'Действует до',
+  expired: 'Подписка истекла',
+  expiredAt: 'Закончилась',
+  none: 'Активной подписки нет. Введите промокод, чтобы получить подписку и награды.',
+  registered: 'Есть неактивированная подписка',
+  months: 'мес.',
+  activate: 'Активировать',
+  activated: 'Подписка активирована',
+  activateFailed: 'Не удалось активировать подписку',
+  code: 'Промокод',
+  codePlaceholder: 'Введите промокод',
+  redeem: 'Применить',
+  redeemed: 'Промокод успешно активирован!',
+  redeemFailed: 'Промокод не найден или уже использован.',
+  granted: 'Вы получили',
+  subscription: 'Подписка',
+  achievements: 'Достижения',
+  nothingNew: 'Награды этого кода у вас уже были',
+} as const;
+
+/** Ключ данных подписок пользователя. */
+export const SUBSCRIPTIONS_DATA_KEY = 'profile-subscriptions';
+
+/** Иконки подписки. */
+export const SUBSCRIPTION_ICON = {
+  title: 'tabler:crown',
+  active: 'tabler:circle-check',
+  expired: 'tabler:circle-x',
+  none: 'tabler:gift-off',
+  registered: 'tabler:clock-pause',
+  activate: 'tabler:player-play',
+  code: 'tabler:ticket',
+  redeem: 'tabler:gift',
+  info: 'tabler:info-circle',
+} as const;

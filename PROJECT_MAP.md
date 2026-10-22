@@ -29,7 +29,7 @@
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics
-│   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email)
+│   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, password change), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
 │   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA)
@@ -65,7 +65,7 @@
 | Home page                                                                                                                         | ✅     |
 | Sidebar menu, sign in and session on SSR, analytics                                                                               | ✅     |
 | Sign up, password reset, email verification                                                                                       | ✅     |
-| Profile actions (stage 5)                                                                                                         | ⏳     |
+| Profile: display name, password change, subscription and promo codes                                                              | ✅     |
 | Content renderer (`RawContent` replacement), dice, tooltips                                                                       | ✅     |
 | Dice history                                                                                                                      | ✅     |
 | List + detail, URL filters, search                                                                                                | ✅     |

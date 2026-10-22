@@ -36,3 +36,21 @@ export const PASSWORD_RESET_VALIDATE_PATH =
 /** Новый пароль по ссылке сброса. */
 export const PASSWORD_RESET_CONFIRM_PATH =
   '/api/account/password/reset-confirm';
+
+/** Смена пароля вошедшего пользователя: сервис авторизации, без версии. */
+export const ACCOUNT_CHANGE_PASSWORD_PATH = '/api/account/change-password';
+
+/**
+ * Отображаемое имя. Бэкенд сам переименовывает автора в уже оставленных
+ * комментариях.
+ */
+export const USER_DISPLAY_NAME_PATH = '/api/v1/user/display-name';
+
+/** Сервис подписок; активация — `/{id}/activate`. */
+export const SUBSCRIPTIONS_PATH = '/api/subscriptions';
+
+/** Подписки текущего пользователя. */
+export const SUBSCRIPTIONS_MY_PATH = `${SUBSCRIPTIONS_PATH}/my`;
+
+/** Погашение промокода: выдаёт награды и регистрирует подписку. */
+export const SUBSCRIPTIONS_REDEEM_PATH = `${SUBSCRIPTIONS_PATH}/redeem`;
