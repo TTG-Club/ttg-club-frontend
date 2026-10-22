@@ -7,6 +7,8 @@ export const TOOLS_API_URL = {
   names: '/api/v1/tools/names',
   trader: '/api/v1/tools/trader',
   treasury: '/api/v1/tools/treasury',
+  // Таверна живёт на бэкенде вне `/api` и отдаёт HTML, см. `server/api/tools/tavern`
+  tavern: '/api/tools/tavern',
 } as const;
 
 /** Сколько результатов можно получить за раз: больше бэкенд не отдаёт. */
@@ -184,4 +186,90 @@ export const TOOLS_ICON = {
   clear: 'tabler:trash',
   empty: 'tabler:sparkles',
   table: 'tabler:table',
+  reroll: 'tabler:refresh',
 } as const;
+
+export const TAVERN_TEXT = {
+  title: 'Таверна',
+  type: 'Тип заведения',
+  typePlaceholder: 'Случайный тип',
+  habitat: 'Территория',
+  habitatPlaceholder: 'Случайная территория',
+  serviceLevel: 'Уровень обслуживания',
+  serviceLevelPlaceholder: 'Случайный уровень',
+  reroll: 'Обновить',
+  rerollName: 'Обновить название',
+} as const;
+
+/** Типы заведений: подпись в списке и короткая метка на карточке. */
+export const TAVERN_TYPES = [
+  { value: 'BEER', label: 'Пивная, кабак, бар', short: 'Пивная / бар' },
+  {
+    value: 'INN',
+    label: 'Постоялый двор, трактир, таверна',
+    short: 'Постоялый двор / таверна',
+  },
+  { value: 'HOTEL', label: 'Гостиница, отель', short: 'Гостиница' },
+  { value: 'CAFE', label: 'Кафе, кофейня, чайная', short: 'Кафе' },
+  {
+    value: 'RESTAURANT',
+    label: 'Ресторан, трапезная, харчевня',
+    short: 'Ресторан',
+  },
+  {
+    value: 'GAMBLING_DEN',
+    label: 'Игорный дом, казино, притон',
+    short: 'Игорный дом',
+  },
+] as const;
+
+/** Территории; значения совпадают с `HabitatType` бэкенда. */
+export const TAVERN_HABITATS = [
+  { value: 'FOREST', label: 'Лес' },
+  { value: 'SWAMP', label: 'Болото' },
+  { value: 'MOUNTAIN', label: 'Горы' },
+  { value: 'HILL', label: 'Холмы' },
+  { value: 'GRASSLAND', label: 'Равнина / луг' },
+  { value: 'COAST', label: 'Побережье' },
+  { value: 'ARCTIC', label: 'Полярная тундра' },
+  { value: 'DESERT', label: 'Пустыня' },
+  { value: 'TROPICS', label: 'Тропики' },
+  { value: 'CITY', label: 'Город' },
+  { value: 'VILLAGE', label: 'Деревня' },
+  { value: 'RUINS', label: 'Руины' },
+  { value: 'DUNGEON', label: 'Подземелья' },
+  { value: 'UNDERGROUND', label: 'Подземье' },
+  { value: 'WATERS', label: 'Под водой' },
+] as const;
+
+/** Уровни обслуживания; значения совпадают с `TavernaCategory` бэкенда. */
+export const TAVERN_SERVICE_LEVELS = [
+  { value: 'CHEAP', label: 'Дешёвое' },
+  { value: 'ORDINARY', label: 'Обычное' },
+  { value: 'EXPENSIVE', label: 'Дорогое' },
+  { value: 'ELITE', label: 'Элитное' },
+] as const;
+
+/** Части таверны и их ручки; у атмосферы бэкенд ждёт слэш на конце. */
+export const TAVERN_PATH = {
+  name: 'name',
+  menu: 'menu',
+  atmosphere: 'atmosphere/',
+  rumors: 'rumors',
+  event: 'event',
+  tables: 'tables',
+  bartender: 'bartender',
+} as const;
+
+/** Блоки карточки под названием, по порядку. */
+export const TAVERN_SECTIONS = [
+  'menu',
+  'atmosphere',
+  'rumors',
+  'event',
+  'tables',
+  'bartender',
+] as const;
+
+/** Заполненность зала в HTML атмосферы. */
+export const TAVERN_VISITORS_PATTERN = /data-visitors="(\d+)"/;

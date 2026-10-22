@@ -10,15 +10,25 @@ import type {
   NameRaceItem,
   NameSex,
   NamesRequest,
+  Tavern,
+  TavernBase,
+  TavernField,
+  TavernRequest,
+  TavernSettings,
   TreasuryCoin,
 } from './types';
 
-import { clamp, mean, uniq } from 'es-toolkit';
+import { clamp, mean, sample, uniq } from 'es-toolkit';
 
 import {
   LOOT_TEXT,
   NAME_RACE_CHILD_CLASS,
   NAME_SHARED_HINT,
+  TAVERN_HABITATS,
+  TAVERN_PATH,
+  TAVERN_SERVICE_LEVELS,
+  TAVERN_TYPES,
+  TAVERN_VISITORS_PATTERN,
   TOOL_COUNT_MAX,
   TOOL_COUNT_MIN,
   TREASURY_COINS,
@@ -320,4 +330,93 @@ export function getTreasuryCoins(coins: TreasuryCoins): Array<TreasuryCoin> {
     value: coins[coin.key] ?? 0,
     label: `${(coins[coin.key] ?? 0).toLocaleString('ru-RU')} ${coin.unit}`,
   }));
+}
+
+/**
+ * Дополняет настройки таверны случайными значениями там, где ничего не
+ * выбрано: так метки на карточке и запросы частей совпадают.
+ * @param selected - выбранные настройки
+ */
+export function resolveTavernSettings(
+  selected: Partial<TavernSettings>,
+): TavernSettings {
+  return {
+    type: selected.type ?? sample(TAVERN_TYPES).value,
+    habitat: selected.habitat ?? sample(TAVERN_HABITATS).value,
+    serviceLevel: selected.serviceLevel ?? sample(TAVERN_SERVICE_LEVELS).value,
+  };
+}
+
+/**
+ * Заполненность зала из HTML атмосферы; без метки зал пустой.
+ * @param html - HTML атмосферы
+ */
+export function parseTavernVisitors(html: string): number {
+  const [, visitors] = TAVERN_VISITORS_PATTERN.exec(html) ?? [];
+
+  return Number(visitors ?? 0);
+}
+
+/**
+ * Ручка и параметры одной части таверны.
+ * @param field - часть таверны
+ * @param tavern - настройки и заполненность зала
+ */
+export function getTavernRequest(
+  field: TavernField,
+  tavern: TavernBase,
+): TavernRequest {
+  const { type, habitat, serviceLevel, visitors } = tavern;
+
+  const queries: Record<TavernField, TavernRequest['query']> = {
+    name: { tavernaType: type },
+    menu: { tavernaType: type, habitat, serviceLevel },
+    atmosphere: {},
+    rumors: { atmosphereVisitors: visitors },
+    event: { atmosphereVisitors: visitors },
+    tables: {
+      tavernaType: type,
+      atmosphereVisitors: visitors,
+      serviceLevel,
+      habitat,
+    },
+    bartender: { habitat },
+  };
+
+  return { path: TAVERN_PATH[field], query: queries[field] };
+}
+
+/**
+ * Таверна с новой частью; новая атмосфера меняет и заполненность зала.
+ * @param tavern - таверна
+ * @param field - обновлённая часть
+ * @param html - её HTML
+ */
+export function patchTavern(
+  tavern: Tavern,
+  field: TavernField,
+  html: string,
+): Tavern {
+  const patched: Tavern = { ...tavern };
+
+  patched[field] = html;
+
+  if (field === 'atmosphere') {
+    patched.visitors = parseTavernVisitors(html);
+  }
+
+  return patched;
+}
+
+/**
+ * Метки карточки таверны: тип, территория и уровень обслуживания.
+ * @param settings - настройки таверны
+ */
+export function getTavernTags(settings: TavernSettings): Array<string> {
+  return [
+    TAVERN_TYPES.find((item) => item.value === settings.type)?.short,
+    TAVERN_HABITATS.find((item) => item.value === settings.habitat)?.label,
+    TAVERN_SERVICE_LEVELS.find((item) => item.value === settings.serviceLevel)
+      ?.label,
+  ].filter((label) => label !== undefined);
 }

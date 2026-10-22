@@ -119,6 +119,9 @@ export const treasuryResultSchema = z.object({
   trinkets: z.array(treasureSchema).nullish(),
 });
 
+/** Часть таверны: бэкенд отдаёт готовый HTML. */
+export const tavernHtmlSchema = z.string();
+
 export type ToolOption = z.infer<typeof nameValueSchema>;
 export type MadnessResult = z.infer<typeof madnessResultSchema>;
 export type WildMagicResult = z.infer<typeof wildMagicResultSchema>;

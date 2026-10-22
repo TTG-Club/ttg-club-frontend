@@ -24,7 +24,7 @@
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
-│   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury
+│   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, tavern
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
@@ -36,6 +36,7 @@
 │   └── shared/                 # consts (API paths, UI texts), types (user), ui (logo, hamburger)
 ├── server/
 │   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
+│   ├── api/tools/tavern/       # Proxy /api/tools/tavern/** → backend /tools/tavern/** (HTML outside /api)
 │   ├── routes/sitemap.xml.ts   # Sitemap from the backend
 │   └── utils/upstreams.ts      # Reads upstream URLs from the environment
 ├── shared/                     # Isomorphic consts and utils (cookie names, proxy routing)
@@ -58,29 +59,29 @@
 
 ## 🚚 Migration status
 
-| Section                                                                | Status |
-| ---------------------------------------------------------------------- | ------ |
-| Skeleton: config, proxy, theme, page meta, deploy                      | ✅     |
-| Home page                                                              | ✅     |
-| Sidebar menu, sign in and session on SSR, analytics                    | ✅     |
-| Sign up, password reset, profile actions (stage 5)                     | ⏳     |
-| Content renderer (`RawContent` replacement), dice, tooltips            | ✅     |
-| Dice history                                                           | ✅     |
-| List + detail, URL filters, search                                     | ✅     |
-| Bookmarks                                                              | ✅     |
-| Wiki: gods, rules, books                                               | ✅     |
-| Inventory: weapons, armors, items, magic items, treasures              | ✅     |
-| Character: feats, backgrounds, class options, spells, races            | ✅     |
-| Character: classes                                                     | ✅     |
-| Bestiary                                                               | ✅     |
-| Screens                                                                | ✅     |
-| Info pages, error pages                                                | ✅     |
-| Site search: palette and `/search` page                                | ✅     |
-| Section modes like new.ttg.club: drawer and wide                       | ✅     |
-| Tools: madness, wild magic, random encounters, names, trader, treasury | ✅     |
-| Other tools, initiative tracker                                        | ⏳     |
-| Account, comments, subscription, bug report                            | ⏳     |
-| Workshop, admin                                                        | ⏳     |
+| Section                                                                        | Status |
+| ------------------------------------------------------------------------------ | ------ |
+| Skeleton: config, proxy, theme, page meta, deploy                              | ✅     |
+| Home page                                                                      | ✅     |
+| Sidebar menu, sign in and session on SSR, analytics                            | ✅     |
+| Sign up, password reset, profile actions (stage 5)                             | ⏳     |
+| Content renderer (`RawContent` replacement), dice, tooltips                    | ✅     |
+| Dice history                                                                   | ✅     |
+| List + detail, URL filters, search                                             | ✅     |
+| Bookmarks                                                                      | ✅     |
+| Wiki: gods, rules, books                                                       | ✅     |
+| Inventory: weapons, armors, items, magic items, treasures                      | ✅     |
+| Character: feats, backgrounds, class options, spells, races                    | ✅     |
+| Character: classes                                                             | ✅     |
+| Bestiary                                                                       | ✅     |
+| Screens                                                                        | ✅     |
+| Info pages, error pages                                                        | ✅     |
+| Site search: palette and `/search` page                                        | ✅     |
+| Section modes like new.ttg.club: drawer and wide                               | ✅     |
+| Tools: madness, wild magic, random encounters, names, trader, treasury, tavern | ✅     |
+| Other tools, initiative tracker                                                | ⏳     |
+| Account, comments, subscription, bug report                                    | ⏳     |
+| Workshop, admin                                                                | ⏳     |
 
 ## 🔐 Session
 

@@ -2,6 +2,10 @@ import type {
   NAME_COMPONENTS,
   NAME_GENERATION_TYPES,
   NAME_SEXES,
+  TAVERN_HABITATS,
+  TAVERN_PATH,
+  TAVERN_SERVICE_LEVELS,
+  TAVERN_TYPES,
   TREASURY_COINS,
   TREASURY_KINDS,
 } from './constants';
@@ -89,4 +93,34 @@ export interface TreasuryCoin {
   value: number;
   /** Количество с разрядами и сокращение, «1 200 мм». */
   label: string;
+}
+
+export type TavernType = (typeof TAVERN_TYPES)[number]['value'];
+
+export type TavernHabitat = (typeof TAVERN_HABITATS)[number]['value'];
+
+export type TavernServiceLevel =
+  (typeof TAVERN_SERVICE_LEVELS)[number]['value'];
+
+export type TavernField = keyof typeof TAVERN_PATH;
+
+/** Настройки таверны; пустое поле выбирается случайно. */
+export interface TavernSettings {
+  type: TavernType;
+  habitat: TavernHabitat;
+  serviceLevel: TavernServiceLevel;
+}
+
+/** Настройки и заполненность зала: от неё зависят слухи, событие, столики. */
+export interface TavernBase extends TavernSettings {
+  visitors: number;
+}
+
+/** Сгенерированная таверна: HTML каждой части из бэкенда. */
+export type Tavern = TavernBase & Record<TavernField, string>;
+
+/** Запрос одной части таверны. */
+export interface TavernRequest {
+  path: string;
+  query: Record<string, string | number>;
 }
