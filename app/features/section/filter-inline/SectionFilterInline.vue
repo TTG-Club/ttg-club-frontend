@@ -75,6 +75,15 @@
     emit('update:selection', setGroupSelection(selection, group, next));
   }
 
+  /**
+   * Заменяет выбор группы целиком, например через «Выбрать все».
+   * @param group - группа фильтра
+   * @param keys - выбранные ключи
+   */
+  function setGroup(group: FilterGroup, keys: Array<string>): void {
+    emit('update:selection', setGroupSelection(selection, group, keys));
+  }
+
   function reset(): void {
     emit('reset');
   }
@@ -126,6 +135,7 @@
         :selected="getSelected(match.group)"
         :is-expanded="isSearching"
         @toggle="toggle(match.group, $event)"
+        @update:selected="setGroup(match.group, $event)"
       />
     </div>
   </div>

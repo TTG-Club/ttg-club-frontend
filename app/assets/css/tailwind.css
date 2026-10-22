@@ -80,3 +80,19 @@
 body {
   @apply bg-main font-sans text-body;
 }
+
+/*
+ * Прокрутка без видимой полосы, как на new.ttg.club: колесо, тачпад и
+ * свайп работают, а полоса не съедает место и не мигает.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+html {
+  @apply scrollbar-none;
+}
