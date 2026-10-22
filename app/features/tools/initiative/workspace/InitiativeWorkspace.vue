@@ -8,7 +8,12 @@
 
   import { SectionLayout } from '~section/layout';
 
-  import { useTrackerSlot, useTrackerWorkspace } from '../composables';
+  import {
+    useCreatureSummaries,
+    useParticipantStats,
+    useTrackerSlot,
+    useTrackerWorkspace,
+  } from '../composables';
   import { TrackerConfirmModal, TrackerNameModal } from '../dialogs';
   import {
     createTracker,
@@ -25,6 +30,7 @@
   import ParticipantRow from './ParticipantRow.vue';
   import PlayerAddForm from './PlayerAddForm.vue';
   import TrackerControls from './TrackerControls.vue';
+  import TurnReel from './TurnReel.vue';
 
   const NOT_FOUND_STATUS = 404;
   const FORBIDDEN_STATUS = 403;
@@ -66,6 +72,29 @@
     reset,
     destroy,
   } = useTrackerWorkspace(() => id);
+
+  const { getSummary } = useCreatureSummaries(() => participants.value);
+
+  const {
+    hitPoints,
+    maxHitPoints,
+    armorClass,
+    setHitPoints,
+    setMaxHitPoints,
+    setArmorClass,
+  } = useParticipantStats(
+    () => id,
+    () => participants.value,
+  );
+
+  const avatars = computed<Record<string, string | undefined>>(() =>
+    Object.fromEntries(
+      participants.value.map((participant) => [
+        participant.id,
+        getSummary(participant)?.image,
+      ]),
+    ),
+  );
 
   const isRenameOpen = ref(false);
   const isRemoveOpen = ref(false);
@@ -395,11 +424,24 @@
       v-else-if="participants.length"
       class="flex flex-col gap-2"
     >
+      <TurnReel
+        v-if="isActive && tracker"
+        :participants="participants"
+        :current-id="tracker.currentParticipantId"
+        :round="tracker.round"
+        :avatars="avatars"
+        class="mb-2"
+      />
+
       <ParticipantRow
         v-for="(participant, index) in participants"
         :key="participant.id"
         :participant="participant"
         :order="index + 1"
+        :summary="getSummary(participant)"
+        :hit-points="hitPoints[participant.id]"
+        :max-hit-points="maxHitPoints[participant.id]"
+        :armor-class="armorClass[participant.id]"
         :is-combat="isActive"
         :is-current="isCurrent(participant.id)"
         :is-disabled="isMutating"
@@ -407,6 +449,9 @@
         @remove="remove"
         @roll="roll"
         @toggle-dead="toggleDead"
+        @set-hit-points="setHitPoints"
+        @set-max-hit-points="setMaxHitPoints"
+        @set-armor-class="setArmorClass"
       />
     </div>
 

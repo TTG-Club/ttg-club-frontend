@@ -10,6 +10,16 @@ export const INITIATIVE_BESTIARY_ROUTE = '/bestiary';
 /** Слот единственного трекера гостя, общий со старым SPA. */
 export const INITIATIVE_SLOT_STORAGE_KEY = 'initiative:anon-slot';
 
+/**
+ * Хиты, их прокинутый максимум и КД игроков: на бэкенде этих полей нет, они
+ * живут на устройстве ведущего. Ключи общие со старым SPA.
+ */
+export const PARTICIPANT_STAT_STORAGE_KEY = {
+  hitPoints: 'initiative:hit-points',
+  maxHitPoints: 'initiative:max-hit-points',
+  armorClass: 'initiative:armor-class',
+} as const;
+
 /** Заголовок с ключом доступа к трекеру гостя. */
 export const TRACKER_KEY_HEADER = 'X-Tracker-Key';
 
@@ -31,6 +41,22 @@ export const INITIATIVE_LIMIT = {
   rollMin: 1,
   rollMax: 20,
   batchMin: 1,
+  armorClassMin: 1,
+  armorClassMax: 50,
+  /** КД игрока без брони, пока ведущий его не задал. */
+  armorClassDefault: 10,
+} as const;
+
+/** Быстрые шаги урона и лечения в окне хитов. */
+export const HIT_POINT_STEPS: ReadonlyArray<number> = [-5, -1, 1, 5];
+
+/** Ввод хитов: `58` ставит значение, `+7` лечит, `-6` ранит. */
+export const HIT_POINT_INPUT_PATTERN = /^([+-])?(\d+)$/;
+
+/** Лента ходов: шаг между токенами в пикселях и токенов по сторонам. */
+export const TURN_REEL = {
+  step: 96,
+  window: 8,
 } as const;
 
 /** Поиск существ для добавления: сколько и через сколько миллисекунд. */
@@ -119,6 +145,16 @@ export const INITIATIVE_TEXT = {
   errorTurn: 'Не удалось передать ход',
   errorReset: 'Не удалось завершить бой',
   errorNoKey: 'Сервер не вернул ключ доступа',
+  hitPoints: 'Хиты',
+  changeHitPoints: 'Изменить хиты',
+  fullHitPoints: 'Полные хиты',
+  rollHitPoints: 'Бросить хиты',
+  hitPointsInput: 'Точное значение, + или −',
+  hitPointsSource: 'Трекер инициативы',
+  ok: 'ОК',
+  armorClass: 'КД',
+  changeArmorClass: 'Изменить КД',
+  currentTurn: 'Сейчас ходит',
 } as const;
 
 export const INITIATIVE_ICON = {
@@ -148,6 +184,7 @@ export const INITIATIVE_ICON = {
   signIn: 'tabler:user',
   newGuest: 'tabler:plus',
   minus: 'tabler:minus',
+  heal: 'tabler:heart-plus',
 } as const;
 
 /** Подпись и иконка типа участника, если бэкенд не прислал `typeName`. */

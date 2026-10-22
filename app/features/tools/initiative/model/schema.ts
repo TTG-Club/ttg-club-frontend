@@ -54,6 +54,12 @@ export const trackerSlotSchema = z.object({
   accessKey: z.string().min(1),
 });
 
+/** Значения участников по трекерам: `{ [trackerId]: { [participantId]: N } }`. */
+export const participantValuesSchema = z.record(
+  z.string(),
+  z.record(z.string(), z.number()),
+);
+
 /** Существа из поиска бестиария. */
 export const creatureOptionsSchema = z.array(creatureLinkSchema);
 
@@ -66,3 +72,5 @@ export type TrackerParticipant = z.infer<typeof participantSchema>;
 export type Tracker = z.infer<typeof trackerSchema>;
 export type TrackerListItem = z.infer<typeof trackerListItemSchema>;
 export type TrackerSlot = z.infer<typeof trackerSlotSchema>;
+
+export type ParticipantValues = z.infer<typeof participantValuesSchema>;

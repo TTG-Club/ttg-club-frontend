@@ -1,7 +1,11 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { TrackerParticipant, UpdateParticipantRequest } from '../model';
+  import type {
+    CreatureSummary,
+    TrackerParticipant,
+    UpdateParticipantRequest,
+  } from '../model';
 
   import { formatModifier } from '~bestiary/model';
 
@@ -14,24 +18,39 @@
     INITIATIVE_TEXT,
     PARTICIPANT_TYPE_META,
   } from '../model';
+  import ParticipantArmorClass from './ParticipantArmorClass.vue';
+  import ParticipantHitPoints from './ParticipantHitPoints.vue';
   import ParticipantRollControl from './ParticipantRollControl.vue';
+  import ParticipantStat from './ParticipantStat.vue';
 
   /** Пауза перед сохранением бонуса, пока его щёлкают стрелками. */
   const BONUS_SAVE_DELAY_MS = 500;
 
   /**
-   * Участник боя: порядок, имя, бонус и инициатива. В подготовке бонус
-   * правится, в бою участника можно отметить поверженным.
+   * Участник боя: порядок, аватар, имя, КД, хиты, бонус и инициатива. В
+   * подготовке бонус правится, в бою участника можно отметить поверженным.
    */
   const {
     participant,
     order,
+    summary = undefined,
+    hitPoints = undefined,
+    maxHitPoints = undefined,
+    armorClass = undefined,
     isCombat = false,
     isCurrent = false,
     isDisabled = false,
   } = defineProps<{
     participant: TrackerParticipant;
     order: number;
+    /** Статблок существа; у игрока и пока грузится — нет. */
+    summary?: CreatureSummary;
+    /** Записанные хиты. */
+    hitPoints?: number;
+    /** Прокинутый максимум хитов. */
+    maxHitPoints?: number;
+    /** КД игрока, заданный ведущим. */
+    armorClass?: number;
     /** Идёт бой: бонус только для чтения. */
     isCombat?: boolean;
     isCurrent?: boolean;
@@ -43,6 +62,9 @@
     'remove': [id: string];
     'roll': [id: string];
     'toggle-dead': [id: string, isDead: boolean];
+    'set-hit-points': [id: string, value: number];
+    'set-max-hit-points': [id: string, value: number];
+    'set-armor-class': [id: string, value: number];
   }>();
 
   const isRenameOpen = ref(false);
@@ -51,7 +73,25 @@
 
   const typeMeta = computed(() => PARTICIPANT_TYPE_META[participant.type]);
 
-  const typeLabel = computed(() => getParticipantTypeLabel(participant));
+  const isPlayer = computed(() => participant.type === 'PLAYER');
+
+  const typeLabel = computed(() => {
+    const label = getParticipantTypeLabel(participant);
+
+    return summary?.challengeRating
+      ? `${label} · ${INITIATIVE_TEXT.challengeRating} ${summary.challengeRating}`
+      : label;
+  });
+
+  const hitPointsMax = computed(
+    () => maxHitPoints ?? summary?.maxHitPoints ?? 0,
+  );
+
+  const armorClassValue = computed(() =>
+    isPlayer.value
+      ? (armorClass ?? INITIATIVE_LIMIT.armorClassDefault)
+      : summary?.armorClass,
+  );
 
   const bonusLabel = computed(() =>
     formatModifier(participant.initiativeBonus),
@@ -165,6 +205,30 @@
   }
 
   /**
+   * Сохраняет хиты.
+   * @param value - новые хиты
+   */
+  function setHitPoints(value: number): void {
+    emit('set-hit-points', participant.id, value);
+  }
+
+  /**
+   * Сохраняет прокинутый максимум хитов.
+   * @param value - выпавший максимум
+   */
+  function setMaxHitPoints(value: number): void {
+    emit('set-max-hit-points', participant.id, value);
+  }
+
+  /**
+   * Сохраняет КД игрока.
+   * @param value - новый КД
+   */
+  function setArmorClass(value: number): void {
+    emit('set-armor-class', participant.id, value);
+  }
+
+  /**
    * Ставит своё значение к20.
    * @param value - выпавшее на кости
    */
@@ -175,81 +239,107 @@
 
 <template>
   <div
-    class="flex items-center gap-3 rounded-xl border border-default bg-elevated/50 p-3"
+    class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-default bg-elevated/50 p-3"
     :class="rowClass"
   >
-    <span class="w-6 shrink-0 text-center text-sm text-muted">
-      {{ order }}
-    </span>
-
-    <UIcon
-      :name="typeMeta.icon"
-      class="size-5 shrink-0 text-muted"
-    />
-
-    <div class="flex min-w-0 flex-auto flex-col">
-      <ULink
-        v-if="creatureRoute"
-        :to="creatureRoute"
-        target="_blank"
-        class="truncate text-highlighted"
-        :class="nameClass"
-      >
-        {{ participant.name }}
-      </ULink>
-
-      <span
-        v-else
-        class="truncate text-highlighted"
-        :class="nameClass"
-      >
-        {{ participant.name }}
+    <div class="flex min-w-48 flex-auto items-center gap-3">
+      <span class="w-6 shrink-0 text-center text-sm text-muted">
+        {{ order }}
       </span>
 
-      <span class="truncate text-xs text-muted">{{ typeLabel }}</span>
-    </div>
-
-    <div class="flex shrink-0 flex-col items-center gap-0.5">
-      <span class="text-xs text-muted">{{ INITIATIVE_TEXT.bonus }}</span>
-
-      <span
-        v-if="isCombat"
-        class="text-highlighted"
-      >
-        {{ bonusLabel }}
-      </span>
-
-      <UInputNumber
-        v-else
-        v-model="bonus"
-        :min="INITIATIVE_LIMIT.bonusMin"
-        :max="INITIATIVE_LIMIT.bonusMax"
-        :disabled="isDisabled"
-        size="xs"
-        class="w-24"
-      />
-    </div>
-
-    <div class="flex shrink-0 flex-col items-center gap-0.5">
-      <span class="text-xs text-muted">{{ INITIATIVE_TEXT.initiative }}</span>
-
-      <ParticipantRollControl
-        :participant="participant"
-        :is-disabled="isDisabled"
-        @roll="roll"
-        @set-roll="setRoll"
-      />
-    </div>
-
-    <UDropdownMenu :items="menuItems">
-      <UButton
-        :icon="INITIATIVE_ICON.menu"
-        :aria-label="INITIATIVE_TEXT.actions"
-        :disabled="isDisabled"
+      <UAvatar
+        :src="summary?.image"
+        :icon="typeMeta.icon"
+        :alt="participant.name"
         color="neutral"
-        variant="ghost"
+        size="lg"
+        class="bg-elevated ring-1 ring-default"
       />
-    </UDropdownMenu>
+
+      <div class="flex min-w-0 flex-auto flex-col">
+        <ULink
+          v-if="creatureRoute"
+          :to="creatureRoute"
+          target="_blank"
+          class="truncate text-highlighted"
+          :class="nameClass"
+        >
+          {{ participant.name }}
+        </ULink>
+
+        <span
+          v-else
+          class="truncate text-highlighted"
+          :class="nameClass"
+        >
+          {{ participant.name }}
+        </span>
+
+        <span class="truncate text-xs text-muted">{{ typeLabel }}</span>
+      </div>
+    </div>
+
+    <div class="ml-auto flex items-center gap-3">
+      <ParticipantStat :label="INITIATIVE_TEXT.armorClass">
+        <ParticipantArmorClass
+          :value="armorClassValue"
+          :is-editable="isPlayer"
+          :is-disabled="isDisabled"
+          @change="setArmorClass"
+        />
+      </ParticipantStat>
+
+      <ParticipantStat :label="INITIATIVE_TEXT.hitPoints">
+        <ParticipantHitPoints
+          :current="hitPoints"
+          :max="hitPointsMax"
+          :formula="summary?.hitFormula"
+          :name="participant.name"
+          :is-player="isPlayer"
+          :is-disabled="isDisabled"
+          @change="setHitPoints"
+          @set-max="setMaxHitPoints"
+        />
+      </ParticipantStat>
+
+      <ParticipantStat :label="INITIATIVE_TEXT.bonus">
+        <span
+          v-if="isCombat"
+          class="text-highlighted"
+        >
+          {{ bonusLabel }}
+        </span>
+
+        <UInputNumber
+          v-else
+          v-model="bonus"
+          :min="INITIATIVE_LIMIT.bonusMin"
+          :max="INITIATIVE_LIMIT.bonusMax"
+          :disabled="isDisabled"
+          size="xs"
+          class="w-24"
+        />
+      </ParticipantStat>
+
+      <ParticipantStat :label="INITIATIVE_TEXT.initiative">
+        <ParticipantRollControl
+          :participant="participant"
+          :is-disabled="isDisabled"
+          @roll="roll"
+          @set-roll="setRoll"
+        />
+      </ParticipantStat>
+
+      <UDropdownMenu :items="menuItems">
+        <UButton
+          :icon="INITIATIVE_ICON.menu"
+          :aria-label="INITIATIVE_TEXT.actions"
+          :disabled="isDisabled"
+          color="neutral"
+          variant="ghost"
+        />
+      </UDropdownMenu>
+    </div>
 
     <TrackerNameModal
       v-model:open="isRenameOpen"
