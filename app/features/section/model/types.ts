@@ -91,3 +91,9 @@ export interface SectionOpener {
   /** Закрывает открытую запись: панель рядом со списком или дровер. */
   close: () => void;
 }
+
+/** Группа фильтра со значениями, подошедшими под поиск по фильтрам. */
+export interface FilterGroupMatch {
+  group: FilterGroup;
+  values: Array<FilterValue>;
+}

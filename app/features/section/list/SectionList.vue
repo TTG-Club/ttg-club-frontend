@@ -119,7 +119,7 @@
     >
       <h2
         v-if="group.name"
-        class="flex items-center gap-3 pt-2 text-sm font-semibold text-muted after:h-px after:flex-auto after:bg-(--ui-border)"
+        class="flex items-center gap-3 pt-2 text-sm font-semibold text-muted before:h-px before:flex-auto before:bg-(--ui-border) after:h-px after:flex-auto after:bg-(--ui-border)"
       >
         {{ group.name }}
       </h2>

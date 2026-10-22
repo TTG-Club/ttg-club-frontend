@@ -19,7 +19,7 @@
 │   ├── features/               # DDD domains
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
-│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer), layout (filter column + list + entry pane), controls (search, filter), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
+│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
@@ -128,8 +128,11 @@ have no entry slot, so their cards always open the class page.
 (`POST` with `page`, `size`, `search`, `order`, `filter`). `useSectionFilter` takes the groups from
 the section's filter endpoint and keeps only the groups changed from their
 defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
-`book` parameter, as in the legacy SPA. Sources and the other groups open from
-separate buttons, each with its own panel and reset. Search lives in `?search=`.
+`book` parameter, as in the legacy SPA. On a wide screen the groups sit in the
+left column as collapsible rows with value tags, as on new.ttg.club, with a
+search over the filter when there are more than five groups or twenty values;
+a choice applies at once. Sources open from their own button, and on a phone
+the filter does too. Search lives in `?search=`.
 
 `SectionPage` puts these together, so a section only gives its config
 (`SectionConfig`: endpoints, order, page size), the list schema, the list

@@ -13,6 +13,7 @@ import type {
 import type {
   FilterDefinition,
   FilterGroup,
+  FilterGroupMatch,
   FilterKey,
   FilterPart,
   FilterPayload,
@@ -24,6 +25,8 @@ import type {
 import { sortBy } from 'es-toolkit';
 
 import {
+  FILTER_SEARCH_MIN_GROUPS,
+  FILTER_SEARCH_MIN_VALUES,
   QUERY_VALUES_SEPARATOR,
   SECTION_API_PREFIX,
   SECTION_DETAIL_FORBIDDEN_SEGMENTS,
@@ -504,4 +507,51 @@ export function getDetailPath(
     );
 
   return isValid ? `${sectionPath}/${slug}` : undefined;
+}
+
+/**
+ * Нужен ли поиск по фильтрам: групп больше пяти или значений больше двадцати.
+ * @param groups - видимые группы фильтра
+ */
+export function isFilterSearchable(
+  groups: ReadonlyArray<FilterGroup>,
+): boolean {
+  const valuesCount = groups.reduce(
+    (total, group) => total + group.values.length,
+    0,
+  );
+
+  return (
+    groups.length > FILTER_SEARCH_MIN_GROUPS
+    || valuesCount > FILTER_SEARCH_MIN_VALUES
+  );
+}
+
+/**
+ * Группы и значения под поиск по фильтрам. Совпало название группы — она
+ * остаётся целиком, иначе в ней остаются подошедшие значения; группы без
+ * значений пропадают.
+ * @param groups - видимые группы фильтра
+ * @param query - строка поиска
+ */
+export function searchFilterGroups(
+  groups: ReadonlyArray<FilterGroup>,
+  query: string,
+): Array<FilterGroupMatch> {
+  const needle = query.trim().toLocaleLowerCase();
+
+  const matches = groups.map((group) => {
+    if (!needle || group.name.toLocaleLowerCase().includes(needle)) {
+      return { group, values: group.values };
+    }
+
+    return {
+      group,
+      values: group.values.filter((value) =>
+        value.label.toLocaleLowerCase().includes(needle),
+      ),
+    };
+  });
+
+  return matches.filter((match) => match.values.length > 0);
 }

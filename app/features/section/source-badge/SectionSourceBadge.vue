@@ -4,12 +4,25 @@
   import { SOURCE_BADGE_CLASSES } from '../model';
 
   /**
-   * Метка группы источника в строке списка: официальный, тестовый,
-   * сторонний материал или хомбрю. Полное название группы — в подсказке.
+   * Метка источника в строке списка, цветом его группы: официальный,
+   * тестовый, сторонний материал или хомбрю. Без подписи показывает саму
+   * группу, с подписью — например, сокращение книги.
    */
-  const { group } = defineProps<{
+  const {
+    group,
+    label = undefined,
+    tooltip = undefined,
+  } = defineProps<{
     group: NonNullable<EntrySource['group']>;
+    /** Текст метки вместо сокращения группы. */
+    label?: string;
+    /** Подсказка вместо названия группы. */
+    tooltip?: string;
   }>();
+
+  const text = computed(() => label ?? group.shortName);
+
+  const hint = computed(() => tooltip ?? group.name);
 
   const styles = useCssModule();
 
@@ -21,8 +34,8 @@
 </script>
 
 <template>
-  <UTooltip :text="group.name">
-    <span :class="badgeClass">{{ group.shortName }}</span>
+  <UTooltip :text="hint">
+    <span :class="badgeClass">{{ text }}</span>
   </UTooltip>
 </template>
 

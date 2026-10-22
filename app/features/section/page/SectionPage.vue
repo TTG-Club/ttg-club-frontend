@@ -15,7 +15,7 @@
   import { SectionControls } from '../controls';
   import { SectionLayout } from '../layout';
   import { SectionList } from '../list';
-  import { SECTION_ICON, SECTION_TEXT } from '../model';
+  import { groupItems, SECTION_ICON, SECTION_TEXT } from '../model';
 
   /**
    * Страница раздела целиком: поиск, фильтр, список с подгрузкой и открытая
@@ -108,8 +108,14 @@
     },
   });
 
+  // Первая запись на экране: после группировки она может быть не первой в
+  // ответе ручки
   const firstPath = computed(() => {
-    const [first] = sortedItems.value;
+    const [firstGroup] = getGroup
+      ? groupItems(sortedItems.value, getGroup, getGroupOrder)
+      : [];
+
+    const [first] = firstGroup?.items ?? sortedItems.value;
 
     return first && getPath ? getPath(first) : undefined;
   });

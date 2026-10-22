@@ -44,6 +44,10 @@ export const SECTION_TEXT = {
   openPage: 'Открыть страницу',
   detailEmpty: 'Запись не выбрана',
   detailEmptyHint: 'Выберите запись в списке, чтобы открыть её здесь',
+  filters: 'Фильтры',
+  filterSearch: 'Поиск по фильтрам...',
+  filterSearchLabel: 'Поиск по фильтрам',
+  more: 'Ещё',
 } as const;
 
 /** Иконки раздела. */
@@ -60,7 +64,20 @@ export const SECTION_ICON = {
   next: 'tabler:chevron-right',
   openPage: 'tabler:external-link',
   detailEmpty: 'tabler:click',
+  more: 'tabler:dots',
+  expand: 'tabler:chevron-down',
 } as const;
+
+/**
+ * Поиск по фильтрам появляется, когда групп больше пяти или значений во всех
+ * группах больше двадцати, как на new.ttg.club: короткий фильтр и так виден
+ * целиком.
+ */
+export const FILTER_SEARCH_MIN_GROUPS = 5;
+export const FILTER_SEARCH_MIN_VALUES = 20;
+
+/** Задержка перед пересчётом групп под поиск по фильтрам. */
+export const FILTER_SEARCH_DEBOUNCE_MS = 200;
 
 /** Параметр адреса с открытой записью в широком режиме, как на new.ttg.club. */
 export const SECTION_DETAIL_QUERY_KEY = 'detail';
@@ -107,6 +124,8 @@ export const SECTION_SPLIT_MAX_SIZE = 70;
 
 /** Сетка списка: плитки-строки справочника и крупные карточки рас и классов. */
 export const SECTION_GRID_CLASS = {
-  tiles: 'grid grid-cols-1 gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3',
-  cards: 'grid grid-cols-1 items-start gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3',
+  tiles:
+    'grid grid-cols-1 gap-3 @lg:grid-cols-2 @3xl:grid-cols-3 @7xl:grid-cols-4',
+  cards:
+    'grid grid-cols-1 items-start gap-4 @lg:grid-cols-2 @3xl:grid-cols-3 @7xl:grid-cols-4',
 } as const;
