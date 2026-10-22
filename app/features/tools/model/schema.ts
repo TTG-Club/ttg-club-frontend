@@ -51,8 +51,30 @@ export const encounterResultSchema = z.object({
   source: entrySourceSchema.nullish(),
 });
 
+/**
+ * Расы для генератора имён. Раса без своих имён приходит, только если у неё
+ * есть подрасы с именами: она становится заголовком группы.
+ */
+export const nameRacesSchema = z.array(
+  z.object({
+    id: z.number(),
+    name: z.string(),
+    parentId: z.number().nullish(),
+    available: z.boolean(),
+  }),
+);
+
+/** Готовое имя с расой и полом. */
+export const nameResultSchema = z.object({
+  value: z.string(),
+  race: z.string(),
+  sex: z.enum(['MALE', 'FEMALE', 'UNISEX']).nullish(),
+});
+
 export type ToolOption = z.infer<typeof nameValueSchema>;
 export type MadnessResult = z.infer<typeof madnessResultSchema>;
 export type WildMagicResult = z.infer<typeof wildMagicResultSchema>;
 export type EncounterOptions = z.infer<typeof encounterOptionsSchema>;
 export type EncounterResult = z.infer<typeof encounterResultSchema>;
+export type NameRace = z.infer<typeof nameRacesSchema>[number];
+export type NameResult = z.infer<typeof nameResultSchema>;
