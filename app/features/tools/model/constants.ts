@@ -4,6 +4,7 @@ export const TOOLS_API_URL = {
   wildMagic: '/api/v1/tools/wildmagic',
   encounters: '/api/v1/tools/encounters',
   encountersTable: '/api/v1/tools/encounters/table',
+  names: '/api/v1/tools/names',
 } as const;
 
 /** Сколько результатов можно получить за раз: больше бэкенд не отдаёт. */
@@ -48,6 +49,60 @@ export const ENCOUNTERS_TEXT = {
   showTable: 'Показать таблицу',
   tableError: 'Таблица для этого уровня и окружения не найдена',
 } as const;
+
+export const NAMES_TEXT = {
+  title: 'Генератор имён',
+  type: 'Генерация',
+  races: 'Раса',
+  racesPlaceholder: 'Любая раса',
+  components: 'Состав имени',
+  sexes: 'Пол',
+} as const;
+
+/** Сколько имён генерировать для группы по умолчанию, как в старом SPA. */
+export const NAME_COUNT_DEFAULT = 5;
+
+/** Как генерировать: одно имя или группу с общей частью. */
+export const NAME_GENERATION_TYPES = [
+  { label: 'Один персонаж', value: 'SINGLE' },
+  { label: 'Группа', value: 'GROUP' },
+  { label: 'Семья', value: 'FAMILY' },
+  { label: 'Клан', value: 'CLAN' },
+  { label: 'Дом', value: 'HOUSE' },
+] as const;
+
+/** Части имени, из которых бэкенд собирает результат. */
+export const NAME_COMPONENTS = [
+  { label: 'Имя', value: 'NAME' },
+  { label: 'Фамилия', value: 'SURNAME' },
+  { label: 'Прозвище', value: 'NICKNAME' },
+  { label: 'Клан', value: 'CLAN' },
+  { label: 'Дом', value: 'HOUSE' },
+  { label: 'Место', value: 'FROM' },
+] as const;
+
+export const NAME_SEXES = [
+  { label: 'Мужчина', value: 'MALE' },
+  { label: 'Женщина', value: 'FEMALE' },
+  { label: 'Универсальные', value: 'UNISEX' },
+] as const;
+
+/** Подпись пола у готового имени. */
+export const NAME_SEX_LABEL = {
+  MALE: 'Мужское',
+  FEMALE: 'Женское',
+  UNISEX: 'Универсальное',
+} as const;
+
+/** Подсказка для генерации с общей частью имени: состав тогда задан. */
+export const NAME_SHARED_HINT = {
+  FAMILY: 'Для всех членов семьи будет использована одна фамилия.',
+  CLAN: 'Для всех участников будет использован один клан.',
+  HOUSE: 'Для всех участников будет использован один дом.',
+} as const;
+
+/** Отступ подрасы под своей расой в списке. */
+export const NAME_RACE_CHILD_CLASS = 'ps-6';
 
 export const TOOLS_ICON = {
   generate: 'ttg:dice-d20',

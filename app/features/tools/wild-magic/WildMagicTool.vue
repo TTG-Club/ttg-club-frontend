@@ -11,7 +11,7 @@
   import {
     getDefaultSources,
     normalizeToolCount,
-    toggleRequiredSource,
+    toggleRequired,
     TOOL_COUNT_MIN,
     TOOLS_API_URL,
     WILD_MAGIC_DEFAULT_SOURCE,
@@ -72,7 +72,7 @@
    * @param source - сокращение книги
    */
   function toggleSource(source: string): void {
-    selected.value = toggleRequiredSource(selected.value, source);
+    selected.value = toggleRequired(selected.value, source);
   }
 </script>
 
