@@ -23,7 +23,7 @@
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
-│   │   ├── wiki/               # gods, rules, books: list rows and entry cards
+│   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
@@ -72,8 +72,8 @@
 | Character: feats, backgrounds, class options, spells, races | ✅     |
 | Character: classes                                          | ✅     |
 | Bestiary                                                    | ✅     |
+| Screens                                                     | ✅     |
 | Info pages, error pages                                     | ✅     |
-| Screens                                                     | ⏳     |
 | Tools, initiative tracker                                   | ⏳     |
 | Account, comments, subscription, bug report                 | ⏳     |
 | Workshop, admin                                             | ⏳     |
@@ -140,6 +140,11 @@ The bestiary groups creatures by challenge rating. A creature card is the
 legacy stat block: ability checks, saving throws, skills and hit dice roll
 through `DiceRoller` with the creature name as the roll source. Foundry export
 is not ported yet.
+
+The DM screen lists only root sections (search finds nested ones too). A root
+section shows its nested sections grouped by category; a click opens one in
+`SectionEntryModal`. Section icons are SVG markup from the database: they are
+parsed with `parseSvgIcon` and keep only shape tags and attributes.
 
 ## 🔖 Bookmarks
 

@@ -66,3 +66,34 @@ export const bookDetailSchema = z.object({
 });
 
 export type BookDetail = z.infer<typeof bookDetailSchema>;
+
+/** Раздел ширмы в списке или в группе родительского раздела. */
+export const screenLinkSchema = z.object({
+  name: entryNameSchema,
+  url: z.string().min(1),
+  order: z.number().nullish(),
+  source: entrySourceSchema.nullish(),
+  /** SVG-разметка иконки из базы. */
+  icon: z.string().nullish(),
+  /** Группа внутри родительского раздела. */
+  group: z.string().nullish(),
+});
+
+export type ScreenLink = z.infer<typeof screenLinkSchema>;
+
+/**
+ * Раздел ширмы: у корневого раздела вложенные разделы, у вложенного —
+ * ссылка на родителя.
+ */
+export const screenDetailSchema = screenLinkSchema.extend({
+  description: z.string().nullish(),
+  parent: z
+    .object({
+      name: entryNameSchema,
+      url: z.string().min(1),
+    })
+    .nullish(),
+  chields: z.array(screenLinkSchema).nullish(),
+});
+
+export type ScreenDetail = z.infer<typeof screenDetailSchema>;
