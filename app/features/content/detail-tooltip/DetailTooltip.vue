@@ -1,83 +1,84 @@
 <script setup lang="ts">
   import type { DetailType } from '../model';
 
-  import { z } from 'zod';
-
-  import { DETAIL_TOOLTIP_TEXT, RAW_TOOLTIP_PREFIX } from '../model';
+  import { RAW_TOOLTIP_PREFIX } from '../model';
 
   /**
-   * Подсказка со ссылкой на сущность: замена `DetailTooltip` старого SPA.
-   * Подсказки с типом получат карточки сущностей вместе с их разделами,
-   * а пока выводят только ссылку. Подсказка без типа подгружает HTML
-   * с адреса API.
+   * Ссылка на сущность из текста: замена `DetailTooltip` старого SPA. Вместо
+   * всплывающей подсказки карточка открывается дровером, как на
+   * new.ttg.club. Клик с Ctrl или колесом по-прежнему ведёт на страницу.
    */
-  const { type = undefined, url = undefined } = defineProps<{
+  const {
+    type = undefined,
+    url = undefined,
+    title,
+  } = defineProps<{
     type?: DetailType;
     url?: string;
+    title: string;
   }>();
 
-  // Рендер контента ссылается на подсказку, поэтому подключается лениво.
-  const ContentRender = defineAsyncComponent(() =>
-    import('../render').then((module) => module.ContentRender),
+  // Дроверы тянут карточки всех разделов, а ссылка в них снова рисует
+  // этот компонент, поэтому они подключаются лениво — по первому клику.
+  const ContentEntityDrawer = defineAsyncComponent(() =>
+    import('../entity-drawer').then((module) => module.ContentEntityDrawer),
   );
 
-  const html = ref<string>();
-  const isLoading = ref(false);
-  const isError = ref(false);
+  const ContentRawDrawer = defineAsyncComponent(() =>
+    import('../entity-drawer').then((module) => module.ContentRawDrawer),
+  );
 
   const rawUrl = computed(() =>
     !type && url?.startsWith(RAW_TOOLTIP_PREFIX) ? url : undefined,
   );
 
-  async function load(isOpen: boolean) {
-    if (!isOpen || !rawUrl.value || html.value || isLoading.value) {
-      return;
-    }
+  const isClickable = computed(() => !!(type && url) || !!rawUrl.value);
 
-    isLoading.value = true;
-    isError.value = false;
+  // У подсказки без типа внутри нет ссылки, поэтому она подчёркивается сама
+  const triggerClass = computed(() =>
+    rawUrl.value
+      ? 'cursor-pointer underline decoration-dotted underline-offset-4'
+      : 'cursor-pointer',
+  );
 
-    try {
-      const response: unknown = await $fetch(rawUrl.value, {
-        responseType: 'text',
-      });
+  const isOpen = ref(false);
+  const isMounted = ref(false);
 
-      html.value = z.string().parse(response);
-    } catch {
-      isError.value = true;
-    } finally {
-      isLoading.value = false;
-    }
+  /**
+   * Открывает дровер вместо перехода по ссылке внутри подсказки.
+   * @param event - клик левой кнопкой без модификаторов
+   */
+  function open(event: MouseEvent): void {
+    event.preventDefault();
+
+    isMounted.value = true;
+    isOpen.value = true;
   }
 </script>
 
 <template>
-  <UPopover
-    v-if="rawUrl"
-    mode="hover"
-    @update:open="load"
+  <span
+    v-if="isClickable"
+    :class="triggerClass"
+    @click.left.exact.capture="open"
   >
-    <span>
-      <slot />
-    </span>
-
-    <template #content>
-      <div class="max-h-96 max-w-md overflow-auto p-3">
-        <p v-if="isLoading">
-          {{ DETAIL_TOOLTIP_TEXT.loading }}
-        </p>
-
-        <p v-else-if="isError">
-          {{ DETAIL_TOOLTIP_TEXT.error }}
-        </p>
-
-        <ContentRender
-          v-else-if="html"
-          :html="html"
-        />
-      </div>
-    </template>
-  </UPopover>
+    <slot />
+  </span>
 
   <slot v-else />
+
+  <ContentEntityDrawer
+    v-if="isMounted && type && url"
+    v-model:open="isOpen"
+    :type="type"
+    :path="url"
+    :title="title"
+  />
+
+  <ContentRawDrawer
+    v-else-if="isMounted && rawUrl"
+    v-model:open="isOpen"
+    :url="rawUrl"
+    :title="title"
+  />
 </template>

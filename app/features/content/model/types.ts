@@ -50,6 +50,8 @@ export interface DiceRollerProps {
 export interface DetailTooltipProps {
   type?: DetailType;
   url?: string;
+  /** Текст ссылки: заголовок дровера, пока запись грузится. */
+  title: string;
 }
 
 /** Узел контента, готовый к выводу. */

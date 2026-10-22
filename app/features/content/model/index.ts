@@ -9,8 +9,14 @@ export type {
   RollTableData,
 } from './types';
 
+export {
+  findFirstHref,
+  getNodesText,
+  hasAnyAttribute,
+  parseContent,
+} from './parse';
+
 export * from './constants';
-export { findFirstHref, hasAnyAttribute, parseContent } from './parse';
-export { isDetailType, toRenderItem } from './render';
+export { isDetailType, isFeatDetailType, toRenderItem } from './render';
 export { findRollTableRow, rollTableSchema } from './rollTable';
 export { isKnownRoute } from './routes';

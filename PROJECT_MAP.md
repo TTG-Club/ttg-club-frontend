@@ -18,8 +18,8 @@
 │   ├── composables/            # useTheme (shared cookie with the legacy SPA), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
-│   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, roll-table
-│   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
+│   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
+│   │   ├── section/            # page (whole section), entry (entry card shell), layout (list + entry pane), controls (search, filter), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
@@ -94,8 +94,11 @@ HTML from the database used to be compiled as a Vue template in the browser.
 only allowed tags and attributes, and renders `dice-roller` and
 `detail-tooltip` as components. From Vue bindings like `:formula="'2к6'"` only
 the string literal survives. Internal links to pages not yet ported to Nuxt use
-a full page load, so the legacy SPA still serves them. Typed tooltips show only
-the link until entity cards arrive with their sections.
+a full page load, so the legacy SPA still serves them. A `detail-tooltip` no
+longer pops up: a plain click opens the entity card in a right drawer
+(`ContentEntityDrawer` picks the section body by `type`, `SectionEntryDrawer`
+loads it), as on new.ttg.club; Ctrl-click still opens the page. Untyped
+tooltips show the HTML from their `/api/` address in the same drawer.
 
 Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
 between tabs by the `storage` event). While the history window is open, rolls
