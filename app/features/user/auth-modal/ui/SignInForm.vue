@@ -1,5 +1,8 @@
 <script setup lang="ts">
+  import { AuthPasswordInput } from '~user/password-input';
+
   import {
+    AUTH_ICON,
     getErrorStatus,
     SIGN_IN_FORM,
     SIGN_IN_TOASTS,
@@ -7,13 +10,14 @@
   } from '../../model';
 
   const emit = defineEmits<{
-    close: [];
+    'close': [];
+    'sign-up': [];
+    'password-reset': [];
   }>();
 
   const { signIn } = useUser();
   const toast = useToast();
 
-  const isPasswordVisible = ref(false);
   const isSubmitting = ref(false);
 
   const state = reactive({
@@ -22,29 +26,19 @@
     remember: true,
   });
 
-  const passwordType = computed(() =>
-    isPasswordVisible.value ? 'text' : 'password',
-  );
+  function openSignUp(): void {
+    emit('sign-up');
+  }
 
-  const passwordToggleIcon = computed(() =>
-    isPasswordVisible.value ? 'tabler:eye-off' : 'tabler:eye',
-  );
-
-  const passwordToggleLabel = computed(() =>
-    isPasswordVisible.value
-      ? SIGN_IN_FORM.hidePasswordLabel
-      : SIGN_IN_FORM.showPasswordLabel,
-  );
-
-  function togglePasswordVisibility() {
-    isPasswordVisible.value = !isPasswordVisible.value;
+  function openPasswordReset(): void {
+    emit('password-reset');
   }
 
   function showError(description: string) {
     toast.add({
       title: description,
       color: 'error',
-      icon: 'tabler:user-exclamation',
+      icon: AUTH_ICON.error,
     });
   }
 
@@ -67,7 +61,7 @@
       toast.add({
         title: SIGN_IN_TOASTS.success,
         color: 'success',
-        icon: 'tabler:user-check',
+        icon: AUTH_ICON.success,
       });
 
       emit('close');
@@ -104,7 +98,7 @@
           :placeholder="SIGN_IN_FORM.loginPlaceholder"
           class="w-full"
           size="lg"
-          icon="tabler:user"
+          :icon="AUTH_ICON.user"
           autocapitalize="off"
           autocomplete="username"
           autocorrect="off"
@@ -113,34 +107,25 @@
       </UFormField>
 
       <UFormField name="password">
-        <UInput
+        <AuthPasswordInput
           v-model="state.password"
-          :type="passwordType"
           :placeholder="SIGN_IN_FORM.passwordPlaceholder"
-          :ui="{ trailing: 'pe-1' }"
-          class="w-full"
-          size="lg"
-          icon="tabler:lock"
-          autocomplete="current-password"
-        >
-          <template #trailing>
-            <UButton
-              :icon="passwordToggleIcon"
-              :aria-label="passwordToggleLabel"
-              :aria-pressed="isPasswordVisible"
-              color="neutral"
-              variant="link"
-              size="sm"
-              @click.left.exact.prevent="togglePasswordVisibility"
-            />
-          </template>
-        </UInput>
+        />
       </UFormField>
 
-      <UCheckbox
-        v-model="state.remember"
-        :label="SIGN_IN_FORM.rememberLabel"
-      />
+      <div class="flex items-center justify-between gap-2">
+        <UCheckbox
+          v-model="state.remember"
+          :label="SIGN_IN_FORM.rememberLabel"
+        />
+
+        <UButton
+          :label="SIGN_IN_FORM.forgotPassword"
+          variant="link"
+          class="p-0"
+          @click.left.exact.prevent="openPasswordReset"
+        />
+      </div>
 
       <UButton
         :label="SIGN_IN_FORM.submitLabel"
@@ -150,5 +135,18 @@
         block
       />
     </UForm>
+
+    <div
+      class="flex flex-wrap items-center justify-center gap-x-2 border-t border-default pt-5 text-sm text-muted"
+    >
+      {{ SIGN_IN_FORM.noAccount }}
+
+      <UButton
+        :label="SIGN_IN_FORM.signUp"
+        variant="link"
+        class="p-0"
+        @click.left.exact.prevent="openSignUp"
+      />
+    </div>
   </div>
 </template>

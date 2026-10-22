@@ -35,6 +35,8 @@ export default defineConfig({
       '~infrastructure': fileURLToPath(
         new URL('./app/features/infrastructure', import.meta.url),
       ),
+      '~user': fileURLToPath(new URL('./app/features/user', import.meta.url)),
+      '~': fileURLToPath(new URL('./app', import.meta.url)),
     },
   },
   test: {
