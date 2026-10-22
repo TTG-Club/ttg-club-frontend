@@ -30,6 +30,15 @@ export function getTypeGroup(entry: WeaponLink | ArmorLink): string {
 }
 
 /**
+ * Порядок группы оружия или доспеха: ручка отдаёт записи по названию, а
+ * группы идут по порядку типа, как в старом SPA.
+ * @param entry - оружие или доспех из списка
+ */
+export function getTypeOrder(entry: WeaponLink | ArmorLink): number {
+  return entry.type.order;
+}
+
+/**
  * Группа магического предмета — редкость с заглавной буквы.
  * @param item - предмет из списка
  */

@@ -3,7 +3,12 @@
   import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
 
-  import { bookLinkSchema, BOOKS_SECTION, getBookGroup } from '../model';
+  import {
+    bookLinkSchema,
+    BOOKS_SECTION,
+    getBookGroup,
+    getBookOrder,
+  } from '../model';
   import BookEntry from './BookEntry.vue';
 </script>
 
@@ -14,6 +19,7 @@
     :schema="bookLinkSchema"
     :get-key="getEntryUrl"
     :get-group="getBookGroup"
+    :get-group-order="getBookOrder"
     :get-path="getEntryUrl"
   >
     <template #item="{ item, to }">

@@ -28,6 +28,7 @@
     schema,
     getKey,
     getGroup = undefined,
+    getGroupOrder = undefined,
     getPath = undefined,
     sortItems = undefined,
     isGrid = false,
@@ -37,6 +38,8 @@
     schema: z.ZodType<T>;
     getKey: (item: T) => string;
     getGroup?: (item: T) => string;
+    /** Порядок группы записи; без него группы идут по первой записи. */
+    getGroupOrder?: (item: T) => number;
     /** Адрес записи на сайте; без него строки списка никуда не ведут. */
     getPath?: (item: T) => string;
     /** Порядок записей на странице, если ручка отдаёт их не так. */
@@ -157,6 +160,7 @@
       :items="sortedItems"
       :get-key="getKey"
       :get-group="getGroup"
+      :get-group-order="getGroupOrder"
       :status="status"
       :is-end="isEnd"
       :is-loading-more="isLoadingMore"

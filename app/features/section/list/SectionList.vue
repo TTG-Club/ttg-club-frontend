@@ -17,6 +17,7 @@
     items,
     getKey,
     getGroup = undefined,
+    getGroupOrder = undefined,
     status,
     isEnd = true,
     isLoadingMore = false,
@@ -25,6 +26,8 @@
     items: Array<T>;
     getKey: (item: T) => string;
     getGroup?: (item: T) => string;
+    /** Порядок группы записи; без него группы идут по первой записи. */
+    getGroupOrder?: (item: T) => number;
     status: AsyncDataRequestStatus;
     isEnd?: boolean;
     isLoadingMore?: boolean;
@@ -42,7 +45,9 @@
   }>();
 
   const groups = computed(() =>
-    getGroup ? groupItems(items, getGroup) : [{ name: '', items }],
+    getGroup
+      ? groupItems(items, getGroup, getGroupOrder)
+      : [{ name: '', items }],
   );
 
   // Колонки считаются от ширины самого списка, а не экрана: в широком

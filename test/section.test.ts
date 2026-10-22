@@ -134,10 +134,29 @@ describe('buildListRequest', () => {
 });
 
 describe('groupItems', () => {
-  it('делит список на группы подряд идущих записей', () => {
-    expect(groupItems([1, 1, 2], (item) => String(item))).toEqual([
+  it('собирает записи одной группы вместе, даже вперемешку', () => {
+    expect(groupItems([1, 2, 1], (item) => String(item))).toEqual([
       { name: '1', items: [1, 1] },
       { name: '2', items: [2] },
+    ]);
+  });
+
+  it('ставит группы по порядку, а записи внутри группы не трогает', () => {
+    const items = [
+      { name: 'Алебарда', type: 'Воинское', order: 2 },
+      { name: 'Булава', type: 'Простое', order: 1 },
+      { name: 'Глефа', type: 'Воинское', order: 2 },
+    ];
+
+    expect(
+      groupItems(
+        items,
+        (item) => item.type,
+        (item) => item.order,
+      ).map((group) => [group.name, group.items.map((item) => item.name)]),
+    ).toEqual([
+      ['Простое', ['Булава']],
+      ['Воинское', ['Алебарда', 'Глефа']],
     ]);
   });
 });

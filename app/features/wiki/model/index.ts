@@ -23,6 +23,7 @@ export {
 
 export {
   getBookGroup,
+  getBookOrder,
   getGodGroup,
   groupScreens,
   joinWikiList,
