@@ -1,4 +1,4 @@
-import type { FilterSelection, SectionQueryStore } from '../model';
+import type { FilterPart, FilterSelection, SectionQueryStore } from '../model';
 
 import {
   buildFilterPayload,
@@ -6,6 +6,7 @@ import {
   getDefaultSelection,
   isSelectionCustomized,
   normalizeFilter,
+  resetSelectionPart,
   selectionFromQuery,
   selectionToQuery,
 } from '../model';
@@ -77,10 +78,20 @@ export async function useSectionFilter(
     store.update(selectionToQuery(definition.value, next));
   }
 
-  function reset() {
-    if (definition.value) {
-      setSelection(getDefaultSelection(definition.value));
+  /**
+   * Возвращает выбор к умолчанию: весь или только одну часть фильтра.
+   * @param part - источники или условия по содержимому
+   */
+  function reset(part?: FilterPart) {
+    if (!definition.value) {
+      return;
     }
+
+    setSelection(
+      part
+        ? resetSelectionPart(definition.value, selection.value, part)
+        : getDefaultSelection(definition.value),
+    );
   }
 
   return {

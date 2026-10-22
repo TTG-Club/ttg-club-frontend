@@ -108,7 +108,8 @@ the first page on SSR and the next ones on scroll (`POST` with `page`, `size`,
 `search`, `order`, `filter`). `useSectionFilter` takes the groups from the
 section's filter endpoint and keeps only the groups changed from their
 defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
-`book` parameter, as in the legacy SPA. Search lives in `?search=`.
+`book` parameter, as in the legacy SPA. Sources and the other groups open from
+separate buttons, each with its own panel and reset. Search lives in `?search=`.
 
 `SectionPage` puts these together, so a section only gives its config
 (`SectionConfig`: endpoints, order, page size), the entry schema and the list

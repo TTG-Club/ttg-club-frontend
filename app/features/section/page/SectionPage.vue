@@ -99,7 +99,7 @@
         :selection="filter?.selection.value ?? {}"
         :is-customized="filter?.isCustomized.value"
         @update:selection="filter?.setSelection($event)"
-        @reset="filter?.reset()"
+        @reset="filter?.reset($event)"
       />
     </template>
 
