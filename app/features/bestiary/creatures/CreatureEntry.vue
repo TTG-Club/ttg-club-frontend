@@ -4,10 +4,19 @@
 
   import { BESTIARY_SECTION, creatureDetailSchema } from '../model';
   import CreatureBody from './CreatureBody.vue';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="BESTIARY_SECTION"
     :schema="creatureDetailSchema"
     :get-edit-path="getWorkshopEditPath"

@@ -8,11 +8,20 @@
     bookDetailSchema,
     BOOKS_SECTION,
   } from '../model';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <!-- Правки в мастерской у книг нет -->
   <SectionEntry
+    :path="path"
     :section="BOOKS_SECTION"
     :schema="bookDetailSchema"
   >

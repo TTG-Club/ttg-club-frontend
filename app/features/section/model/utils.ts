@@ -24,6 +24,7 @@ import type {
 import {
   QUERY_VALUES_SEPARATOR,
   SECTION_API_PREFIX,
+  SECTION_DETAIL_FORBIDDEN_SEGMENTS,
   SOURCE_GROUPS_WITH_LABEL,
   SOURCES_PARAM,
   WORKSHOP_EDIT_SUFFIX,
@@ -454,4 +455,37 @@ export function mergeQuery(
   return Object.fromEntries(
     Object.entries(merged).filter(([, value]) => value !== null),
   );
+}
+
+/**
+ * Часть адреса записи после раздела: так запись хранится в `?detail=`.
+ * @param sectionPath - адрес раздела, например `/spells`
+ * @param path - адрес записи, например `/spells/fireball`
+ */
+export function getDetailSlug(sectionPath: string, path: string): string {
+  const prefix = `${sectionPath}/`;
+
+  return path.startsWith(prefix) ? path.slice(prefix.length) : path;
+}
+
+/**
+ * Адрес записи из `?detail=`; без значения или с подозрительными
+ * сегментами (`..`) — `undefined`.
+ * @param sectionPath - адрес раздела
+ * @param slug - значение параметра
+ */
+export function getDetailPath(
+  sectionPath: string,
+  slug: string | undefined,
+): string | undefined {
+  const segments = slug?.split('/') ?? [];
+
+  const isValid =
+    segments.length > 0
+    && segments.every(
+      (segment) =>
+        segment.length > 0 && !SECTION_DETAIL_FORBIDDEN_SEGMENTS.has(segment),
+    );
+
+  return isValid ? `${sectionPath}/${slug}` : undefined;
 }

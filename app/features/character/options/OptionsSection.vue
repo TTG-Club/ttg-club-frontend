@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { optionLinkSchema, OPTIONS_SECTION } from '../model';
+  import OptionEntry from './OptionEntry.vue';
 </script>
 
 <template>
@@ -22,6 +23,10 @@
         :subtitle="item.name.eng"
         :source="item.source"
       />
+    </template>
+
+    <template #entry="{ path }">
+      <OptionEntry :path="path" />
     </template>
   </SectionPage>
 </template>

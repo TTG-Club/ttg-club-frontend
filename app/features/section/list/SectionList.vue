@@ -4,6 +4,7 @@
   import {
     groupItems,
     INFINITE_SCROLL_DISTANCE,
+    SECTION_GRID_CLASS,
     SECTION_ICON,
     SECTION_TEXT,
   } from '../model';
@@ -20,7 +21,6 @@
     isEnd = true,
     isLoadingMore = false,
     isGrid = false,
-    isDetailOpen = false,
   } = defineProps<{
     items: Array<T>;
     getKey: (item: T) => string;
@@ -28,10 +28,8 @@
     status: AsyncDataRequestStatus;
     isEnd?: boolean;
     isLoadingMore?: boolean;
-    /** Карточки в сетку вместо строк. */
+    /** Крупные карточки, как у рас и классов, вместо плиток-строк. */
     isGrid?: boolean;
-    /** Рядом открыта запись: сетке остаётся меньше места. */
-    isDetailOpen?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -47,15 +45,11 @@
     getGroup ? groupItems(items, getGroup) : [{ name: '', items }],
   );
 
-  const groupClass = computed(() => {
-    if (!isGrid) {
-      return 'flex flex-col gap-1';
-    }
-
-    return isDetailOpen
-      ? 'grid grid-cols-1 items-start gap-4 sm:grid-cols-2'
-      : 'grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5';
-  });
+  // Колонки считаются от ширины самого списка, а не экрана: в широком
+  // режиме рядом стоит панель записи, и списку достаётся меньше места
+  const groupClass = computed(() =>
+    isGrid ? SECTION_GRID_CLASS.cards : SECTION_GRID_CLASS.tiles,
+  );
 
   const isFirstLoading = computed(() => status === 'pending' && !items.length);
 
@@ -85,7 +79,7 @@
     <USkeleton
       v-for="index in 8"
       :key="index"
-      class="h-12 w-full"
+      class="h-12.5 w-full rounded-xl"
     />
   </div>
 
@@ -111,16 +105,16 @@
 
   <div
     v-else
-    class="flex flex-col gap-4"
+    class="@container flex flex-col gap-4"
   >
     <section
       v-for="group in groups"
       :key="group.name"
-      class="flex flex-col gap-1"
+      class="flex flex-col gap-2"
     >
       <h2
         v-if="group.name"
-        class="pt-2 text-sm font-semibold text-muted"
+        class="flex items-center gap-3 pt-2 text-sm font-semibold text-muted after:h-px after:flex-auto after:bg-(--ui-border)"
       >
         {{ group.name }}
       </h2>

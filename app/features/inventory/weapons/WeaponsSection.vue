@@ -9,6 +9,7 @@
     weaponLinkSchema,
     WEAPONS_SECTION,
   } from '../model';
+  import WeaponEntry from './WeaponEntry.vue';
 </script>
 
 <template>
@@ -55,6 +56,10 @@
           </UTooltip>
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <WeaponEntry :path="path" />
     </template>
   </SectionPage>
 </template>

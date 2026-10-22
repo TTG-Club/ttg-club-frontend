@@ -10,18 +10,29 @@
   const {
     title,
     subtitle = undefined,
-    closeTo,
+    closeTo = undefined,
+    path = undefined,
     editUrl = undefined,
     isLoading = false,
     isError = false,
   } = defineProps<{
     title: string;
     subtitle?: string;
-    closeTo: RouteLocationRaw;
+    /** Куда ведёт закрытие; без адреса панель просит закрыть себя событием. */
+    closeTo?: RouteLocationRaw;
+    /**
+     * Адрес записи, когда панель стоит рядом со списком: адрес страницы
+     * тогда ведёт на раздел, а не на запись.
+     */
+    path?: string;
     /** Страница записи в мастерской; мастерская пока живёт в старом SPA. */
     editUrl?: string;
     isLoading?: boolean;
     isError?: boolean;
+  }>();
+
+  const emit = defineEmits<{
+    close: [];
   }>();
 
   const route = useRoute();
@@ -36,6 +47,10 @@
     () => !!editUrl && isEditor.value && isReady.value,
   );
 
+  function close(): void {
+    emit('close');
+  }
+
   /** Копирует каноничную ссылку на запись, без параметров списка. */
   async function copyLink() {
     if (!isSupported.value) {
@@ -45,7 +60,7 @@
     }
 
     try {
-      await copy(`${siteConfig.url}${route.path}`);
+      await copy(`${siteConfig.url}${path ?? route.path}`);
 
       toast.add({ title: SECTION_TEXT.linkCopied, icon: SECTION_ICON.copy });
     } catch {
@@ -92,6 +107,19 @@
         <slot name="actions" />
 
         <UTooltip
+          v-if="path"
+          :text="SECTION_TEXT.openPage"
+        >
+          <UButton
+            :to="path"
+            :icon="SECTION_ICON.openPage"
+            :aria-label="SECTION_TEXT.openPage"
+            color="neutral"
+            variant="ghost"
+          />
+        </UTooltip>
+
+        <UTooltip
           v-if="isEditAvailable"
           :text="SECTION_TEXT.edit"
         >
@@ -107,11 +135,21 @@
       </template>
 
       <UButton
+        v-if="closeTo"
         :to="closeTo"
         :icon="SECTION_ICON.close"
         :aria-label="SECTION_TEXT.close"
         color="neutral"
         variant="ghost"
+      />
+
+      <UButton
+        v-else
+        :icon="SECTION_ICON.close"
+        :aria-label="SECTION_TEXT.close"
+        color="neutral"
+        variant="ghost"
+        @click.left.exact.prevent="close"
       />
     </header>
 

@@ -3,10 +3,19 @@
 
   import { getRaceEditPath, raceDetailSchema, RACES_SECTION } from '../model';
   import RaceBody from './RaceBody.vue';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="RACES_SECTION"
     :schema="raceDetailSchema"
     :get-edit-path="getRaceEditPath"

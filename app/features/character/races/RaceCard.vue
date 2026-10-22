@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import type { RouteLocationRaw } from 'vue-router';
-
   import type { RaceLink } from '../model';
 
   import { CharacterLinkCard } from '../link-card';
@@ -11,7 +9,7 @@
    */
   const { race, to = undefined } = defineProps<{
     race: RaceLink;
-    to?: RouteLocationRaw;
+    to?: string;
   }>();
 
   const abilities = computed(() => getRaceAbilitiesLabel(race.abilities, true));

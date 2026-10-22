@@ -79,3 +79,15 @@ export interface SectionQueryStore {
   /** Накладывает изменения: `undefined` убирает параметр. */
   update: (patch: LocationQueryRaw) => void;
 }
+
+/**
+ * Как список открывает записи: дровером, панелью рядом или переходом на
+ * страницу. Ссылки списка получают его через `inject`.
+ */
+export interface SectionOpener {
+  /** Адрес записи, открытой сейчас: её строка в списке подсвечена. */
+  activePath: Readonly<Ref<string | undefined>>;
+  open: (path: string) => void;
+  /** Закрывает открытую запись: панель рядом со списком или дровер. */
+  close: () => void;
+}

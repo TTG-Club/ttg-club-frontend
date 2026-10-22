@@ -5,6 +5,8 @@ import {
   buildListRequest,
   filterResponseSchema,
   getDefaultSelection,
+  getDetailPath,
+  getDetailSlug,
   groupItems,
   isPartCustomized,
   isSelectionCustomized,
@@ -187,5 +189,20 @@ describe('части фильтра', () => {
       book: ['PHB'],
       level: [],
     });
+  });
+});
+
+describe('getDetailSlug и getDetailPath', () => {
+  it('хранит в ?detail= адрес записи без раздела и собирает его обратно', () => {
+    expect(getDetailSlug('/spells', '/spells/fireball')).toBe('fireball');
+    expect(getDetailSlug('/races', '/races/elf/high')).toBe('elf/high');
+    expect(getDetailPath('/races', 'elf/high')).toBe('/races/elf/high');
+  });
+
+  it('не собирает адрес из пустого значения и сегментов с точками', () => {
+    expect(getDetailPath('/spells', undefined)).toBeUndefined();
+    expect(getDetailPath('/spells', '')).toBeUndefined();
+    expect(getDetailPath('/spells', '../admin')).toBeUndefined();
+    expect(getDetailPath('/spells', 'a//b')).toBeUndefined();
   });
 });

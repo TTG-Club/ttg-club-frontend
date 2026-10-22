@@ -4,10 +4,19 @@
 
   import { armorDetailSchema, ARMORS_SECTION } from '../model';
   import ArmorBody from './ArmorBody.vue';
+
+  /**
+   * Запись поверх списка раздела; без адреса — страница записи по адресу
+   * страницы.
+   */
+  const { path = undefined } = defineProps<{
+    path?: string;
+  }>();
 </script>
 
 <template>
   <SectionEntry
+    :path="path"
     :section="ARMORS_SECTION"
     :schema="armorDetailSchema"
     :get-edit-path="getWorkshopEditPath"

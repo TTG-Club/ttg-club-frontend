@@ -31,6 +31,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     '@nuxt/fonts',
+    '@nuxtjs/device',
     '@nuxtjs/seo',
     '@nuxt/scripts',
     '@nuxt/eslint',

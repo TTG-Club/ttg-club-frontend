@@ -9,6 +9,7 @@
     ARMORS_SECTION,
     getTypeGroup,
   } from '../model';
+  import ArmorEntry from './ArmorEntry.vue';
 </script>
 
 <template>
@@ -43,6 +44,10 @@
           </UTooltip>
         </template>
       </SectionLink>
+    </template>
+
+    <template #entry="{ path }">
+      <ArmorEntry :path="path" />
     </template>
   </SectionPage>
 </template>

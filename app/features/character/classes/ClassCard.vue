@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import type { RouteLocationRaw } from 'vue-router';
-
   import type { ClassLink } from '../model';
 
   import { getQueryString, SEARCH_QUERY_KEY } from '~section/model';
@@ -15,7 +13,7 @@
    */
   const { classLink, to = undefined } = defineProps<{
     classLink: ClassLink;
-    to?: RouteLocationRaw;
+    to?: string;
   }>();
 
   const route = useRoute();

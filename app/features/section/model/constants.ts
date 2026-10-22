@@ -42,6 +42,8 @@ export const SECTION_TEXT = {
   previousImage: 'Предыдущее изображение',
   nextImage: 'Следующее изображение',
   openPage: 'Открыть страницу',
+  detailEmpty: 'Запись не выбрана',
+  detailEmptyHint: 'Выберите запись в списке, чтобы открыть её здесь',
 } as const;
 
 /** Иконки раздела. */
@@ -57,10 +59,17 @@ export const SECTION_ICON = {
   previous: 'tabler:chevron-left',
   next: 'tabler:chevron-right',
   openPage: 'tabler:external-link',
+  detailEmpty: 'tabler:click',
 } as const;
 
-/** С этой ширины дровер записи отступает от краёв экрана. */
-export const SECTION_DRAWER_INSET_QUERY = '(min-width: 768px)';
+/** Параметр адреса с открытой записью в широком режиме, как на new.ttg.club. */
+export const SECTION_DETAIL_QUERY_KEY = 'detail';
+
+/** Сегменты пути, которых не бывает в адресе записи. */
+export const SECTION_DETAIL_FORBIDDEN_SEGMENTS: ReadonlySet<string> = new Set([
+  '.',
+  '..',
+]);
 
 /** Мастерская: правка записей, пока живёт в старом SPA. */
 export const WORKSHOP_PREFIX = '/workshop';
@@ -87,3 +96,17 @@ export const SOURCE_BADGE_CLASSES: Partial<Record<string, string>> = {
   'hb': 'homebrew',
   '3rd': 'thirdParty',
 };
+
+/** Где хранится ширина списка в широком режиме. */
+export const SECTION_SPLIT_STORAGE_KEY = 'ttg-section-split';
+
+/** Ширина списка в широком режиме, проценты: по умолчанию, меньше и больше. */
+export const SECTION_SPLIT_DEFAULT_SIZE = 50;
+export const SECTION_SPLIT_MIN_SIZE = 30;
+export const SECTION_SPLIT_MAX_SIZE = 70;
+
+/** Сетка списка: плитки-строки справочника и крупные карточки рас и классов. */
+export const SECTION_GRID_CLASS = {
+  tiles: 'grid grid-cols-1 gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3',
+  cards: 'grid grid-cols-1 items-start gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3',
+} as const;

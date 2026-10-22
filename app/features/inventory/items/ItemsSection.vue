@@ -4,6 +4,7 @@
   import { SectionPage } from '~section/page';
 
   import { itemLinkSchema, ITEMS_SECTION } from '../model';
+  import ItemEntry from './ItemEntry.vue';
 </script>
 
 <template>
@@ -22,6 +23,10 @@
         :subtitle="item.name.eng"
         :source="item.source"
       />
+    </template>
+
+    <template #entry="{ path }">
+      <ItemEntry :path="path" />
     </template>
   </SectionPage>
 </template>

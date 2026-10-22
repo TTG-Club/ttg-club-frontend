@@ -1,41 +1,88 @@
 <script setup lang="ts">
+  import {
+    SECTION_SPLIT_DEFAULT_SIZE,
+    SECTION_SPLIT_MAX_SIZE,
+    SECTION_SPLIT_MIN_SIZE,
+    SECTION_SPLIT_STORAGE_KEY,
+  } from '../model';
+
   /**
-   * Раздел справочника: заголовок, поиск и фильтр, список и панель записи.
-   * На десктопе запись открывается справа от списка, на телефоне — вместо
-   * него, как в старом SPA.
+   * Раскладка раздела, как на new.ttg.club: слева колонка с заголовком,
+   * поиском и фильтром, справа список. В широком режиме рядом со списком
+   * стоит панель записи, а граница между ними перетаскивается.
    */
-  const { title, isDetailOpen = false } = defineProps<{
+  const { title, isSplit = false } = defineProps<{
     title: string;
-    isDetailOpen?: boolean;
+    /** Широкий режим: список и запись рядом на весь экран. */
+    isSplit?: boolean;
   }>();
 
-  const listClass = computed(() =>
-    isDetailOpen ? 'max-lg:hidden' : undefined,
-  );
+  defineSlots<{
+    controls?: () => unknown;
+    default: () => unknown;
+    detail?: () => unknown;
+  }>();
 </script>
 
 <template>
-  <div class="flex gap-6">
-    <div
-      :class="listClass"
-      class="min-w-0 flex-1"
+  <div
+    v-if="isSplit"
+    class="flex h-dvh w-full"
+  >
+    <aside
+      class="flex w-75 shrink-0 flex-col gap-4 overflow-y-auto border-r border-default p-4 pt-6"
     >
-      <div class="sticky top-0 z-10 flex flex-col gap-3 bg-default pt-2 pb-4">
-        <h1 class="text-2xl text-highlighted lg:text-3xl">
+      <h1 class="text-2xl text-highlighted">
+        {{ title }}
+      </h1>
+
+      <slot name="controls" />
+    </aside>
+
+    <UDashboardGroup
+      storage="cookie"
+      :storage-key="SECTION_SPLIT_STORAGE_KEY"
+      :ui="{ base: 'relative inset-auto flex h-dvh flex-1 overflow-hidden' }"
+    >
+      <UDashboardPanel
+        id="section-list"
+        resizable
+        :default-size="SECTION_SPLIT_DEFAULT_SIZE"
+        :min-size="SECTION_SPLIT_MIN_SIZE"
+        :max-size="SECTION_SPLIT_MAX_SIZE"
+        class="border-r border-default"
+      >
+        <div class="h-full overflow-y-auto px-4 pt-6 pb-8">
+          <slot />
+        </div>
+      </UDashboardPanel>
+
+      <UDashboardPanel id="section-detail">
+        <div class="h-full overflow-y-auto px-6 pt-4 pb-8">
+          <slot name="detail" />
+        </div>
+      </UDashboardPanel>
+    </UDashboardGroup>
+  </div>
+
+  <div
+    v-else
+    class="mx-auto flex w-full flex-col lg:max-w-330 lg:flex-row"
+  >
+    <aside
+      class="sticky top-0 z-10 shrink-0 border-default bg-default/80 backdrop-blur-lg lg:h-dvh lg:overflow-y-auto lg:border-r"
+    >
+      <div class="flex w-full flex-col gap-4 p-4 md:pt-6 lg:w-75">
+        <h1 class="text-2xl text-highlighted">
           {{ title }}
         </h1>
 
         <slot name="controls" />
       </div>
+    </aside>
 
+    <div class="flex min-w-0 flex-auto flex-col px-4 pb-8 lg:pt-6">
       <slot />
     </div>
-
-    <aside
-      v-if="isDetailOpen"
-      class="min-w-0 flex-1 lg:sticky lg:top-0 lg:max-h-dvh lg:w-[55%] lg:flex-none lg:overflow-y-auto lg:border-l lg:border-default lg:pl-6"
-    >
-      <slot name="detail" />
-    </aside>
   </div>
 </template>

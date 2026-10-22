@@ -5,6 +5,7 @@
   definePageMeta({
     path: '/items/magic',
     alias: ['/tools/items/magic'],
+    layout: 'section',
   });
 </script>
 
