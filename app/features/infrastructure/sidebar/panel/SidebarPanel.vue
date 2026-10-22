@@ -2,6 +2,7 @@
   import { SiteLogo } from '~/shared/ui/site-logo';
   import { BookmarksPanel } from '~bookmarks/panel';
   import { DiceHistoryToggle } from '~dice-roller/history';
+  import { SearchButton } from '~infrastructure/search/button';
   import { ThemeSwitcher } from '~infrastructure/theme-switcher';
   import { UserHelmet } from '~user/helmet';
 
@@ -39,6 +40,8 @@
             <div class="size-10" />
           </template>
         </ClientOnly>
+
+        <SearchButton />
       </div>
 
       <div class="flex items-center gap-2 md:flex-col">

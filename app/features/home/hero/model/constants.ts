@@ -95,13 +95,7 @@ export const HOME_HERO_SMOKE_PUFFS_PER_CHIMNEY = 3;
 export const HOME_SEARCH_ICON = 'tabler:search';
 
 /**
- * Страница поиска. Её ещё отдаёт старое SPA, поэтому переход на неё — полная
- * загрузка страницы.
- */
-export const HOME_SEARCH_PATH = '/search';
-
-/**
- * Подсказка в строке поиска целиком — уходит в `aria-label` ссылки. Видимая
+ * Подсказка в строке поиска целиком — уходит в `aria-label` кнопки. Видимая
  * строка собирается по частям и меняется, поэтому скринридерам нужна отдельная
  * неподвижная формулировка.
  */
@@ -157,12 +151,6 @@ export const HOME_SEARCH_HINT_TYPE_STEP = 72;
 
 /** Горячая клавиша открытия поиска на подсказке в строке */
 export const HOME_SEARCH_SHORTCUT = '\\';
-
-/** Все горячие клавиши поиска, как в старом SPA */
-export const HOME_SEARCH_SHORTCUT_KEYS = ['/', '\\', 'Find'];
-
-/** Поля ввода: в них горячие клавиши поиска печатаются как обычно */
-export const HOME_SEARCH_TYPING_TAGS = ['INPUT', 'TEXTAREA'];
 
 /* --- Инструменты -------------------------------------------------------- */
 

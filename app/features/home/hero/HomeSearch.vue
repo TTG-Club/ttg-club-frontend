@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { useSearchPalette } from '~infrastructure/search/composables';
+
   import { useSearchHintTypewriter } from './composables';
   import {
     HOME_SEARCH_HINT_PREFIX,
@@ -6,11 +8,8 @@
     HOME_SEARCH_HINT_WORDS,
     HOME_SEARCH_HINT_WORDS_COMPACT,
     HOME_SEARCH_ICON,
-    HOME_SEARCH_PATH,
     HOME_SEARCH_PLACEHOLDER,
     HOME_SEARCH_SHORTCUT,
-    HOME_SEARCH_SHORTCUT_KEYS,
-    HOME_SEARCH_TYPING_TAGS,
   } from './model';
 
   const styles = useCssModule();
@@ -34,38 +33,21 @@
     isIdle.value ? styles.wordIdle : undefined,
   ]);
 
-  const activeElement = useActiveElement();
-
-  /**
-   * Горячая клавиша поиска, как в старом SPA. В полях ввода клавиша печатается
-   * как обычно.
-   *
-   * @param event - нажатие клавиши
-   */
-  function handleShortcut(event: KeyboardEvent): void {
-    if (HOME_SEARCH_TYPING_TAGS.includes(activeElement.value?.tagName ?? '')) {
-      return;
-    }
-
-    event.preventDefault();
-
-    navigateTo(HOME_SEARCH_PATH, { external: true });
-  }
-
-  onKeyStroke(HOME_SEARCH_SHORTCUT_KEYS, handleShortcut);
+  // Горячие клавиши окна поиска держит кнопка в боковой панели
+  const { open } = useSearchPalette();
 </script>
 
 <template>
   <!--
-    Строка читается как поле поиска, а не кнопка: так понятно, что сюда можно
-    печатать. Поиск пока живёт в старом SPA, поэтому строка ведёт на его
-    страницу — набор идёт уже там.
+    Строка читается как поле поиска, хоть и кнопка: так понятно, что сюда
+    можно печатать. Клик открывает окно поиска — набор идёт уже в нём.
   -->
-  <a
-    :href="HOME_SEARCH_PATH"
+  <button
+    type="button"
     :aria-label="HOME_SEARCH_PLACEHOLDER"
     :class="$style.search"
-    class="group relative flex w-full max-w-3xl items-center gap-3 rounded-xl border border-default bg-muted px-4 py-3.5 text-left no-underline transition-colors duration-200 hover:border-primary/60 hover:bg-elevated 2xl:max-w-4xl"
+    class="group relative flex w-full max-w-3xl cursor-text items-center gap-3 rounded-xl border border-default bg-muted px-4 py-3.5 text-left transition-colors duration-200 hover:border-primary/60 hover:bg-elevated 2xl:max-w-4xl"
+    @click.left.exact.prevent="open"
   >
     <!--
       Свет по контуру: кольцо-маска в толщину рамки, а под ним вращается
@@ -87,7 +69,7 @@
     <!--
       Подсказка живая: «Поиск по» стоит на месте, а раздел за ним машинка
       стирает по букве и печатает следующий. Скринридерам эта чехарда
-      бесполезна — им ссылка представляется целой фразой через `aria-label`.
+      бесполезна — им кнопка представляется целой фразой через `aria-label`.
     -->
     <span
       aria-hidden="true"
@@ -104,7 +86,7 @@
     >
       {{ HOME_SEARCH_SHORTCUT }}
     </kbd>
-  </a>
+  </button>
 </template>
 
 <style lang="scss" module>
