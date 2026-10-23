@@ -1,11 +1,10 @@
 <script setup lang="ts">
-  import type { ScreenDetail, ScreenLink } from '../model';
+  import type { ScreenDetail } from '../model';
 
   import { ContentRender } from '~content/render';
-  import { SectionEntryDrawer } from '~section/entry-drawer';
 
-  import { groupScreens, screenDetailSchema } from '../model';
-  import ScreenBody from './ScreenBody.vue';
+  import { groupScreens } from '../model';
+  import ScreenChildDrawer from './ScreenChildDrawer.vue';
   import ScreenLinkCard from './ScreenLinkCard.vue';
 
   /**
@@ -18,16 +17,16 @@
 
   const groups = computed(() => groupScreens(screen.chields ?? []));
 
-  const selected = shallowRef<ScreenLink>();
+  const openPath = ref<string>();
 
   const isOpen = ref(false);
 
   /**
    * Открывает вложенный раздел в дровере.
-   * @param item - вложенный раздел
+   * @param path - адрес вложенного раздела
    */
-  function open(item: ScreenLink): void {
-    selected.value = item;
+  function open(path: string): void {
+    openPath.value = path;
     isOpen.value = true;
   }
 </script>
@@ -56,22 +55,15 @@
           v-for="item in group.items"
           :key="item.url"
           :screen="item"
-          @open="open(item)"
+          @open="open"
         />
       </div>
     </section>
 
-    <SectionEntryDrawer
-      v-if="selected"
-      :key="selected.url"
+    <ScreenChildDrawer
+      v-if="openPath"
+      v-model:path="openPath"
       v-model:open="isOpen"
-      :schema="screenDetailSchema"
-      :path="selected.url"
-      :title="selected.name.rus"
-    >
-      <template #default="{ entry }">
-        <ScreenBody :screen="entry" />
-      </template>
-    </SectionEntryDrawer>
+    />
   </div>
 </template>
