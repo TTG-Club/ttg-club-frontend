@@ -38,7 +38,5 @@ shared/types/generated
 .test
 
 # Repository parts the Nuxt image does not need
-legacy
 .github
 .agents
-.husky

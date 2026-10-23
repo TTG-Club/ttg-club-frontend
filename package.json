@@ -14,9 +14,9 @@
     "lint:check": "eslint .",
     "lint:write": "eslint . --fix",
     "lint:workflow": "eslint . --quiet",
-    "stylelint:check": "stylelint \"{**/*,*}.{css,scss,vue}\" \"!legacy/**\" --ignore-path .gitignore",
-    "stylelint:write": "stylelint \"{**/*,*}.{css,scss,vue}\" \"!legacy/**\" --ignore-path .gitignore --fix",
-    "stylelint:workflow": "stylelint \"{**/*,*}.{css,scss,vue}\" \"!legacy/**\" --ignore-path .gitignore --quiet"
+    "stylelint:check": "stylelint \"{**/*,*}.{css,scss,vue}\" --ignore-path .gitignore",
+    "stylelint:write": "stylelint \"{**/*,*}.{css,scss,vue}\" --ignore-path .gitignore --fix",
+    "stylelint:workflow": "stylelint \"{**/*,*}.{css,scss,vue}\" --ignore-path .gitignore --quiet"
   },
   "dependencies": {
     "@iconify-json/tabler": "^1.2.35",
