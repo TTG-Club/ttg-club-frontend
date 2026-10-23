@@ -17,6 +17,7 @@
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
 │   ├── composables/            # useTheme (shared cookie with the legacy SPA), useLayoutWidth (section width), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
+│   │   ├── bug-report/         # button (sidebar), modal (description, page, selected text, screenshot with marks), selection ("Ошибка в тексте" under a selection); posts to bug-report.api.ttg.club
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
 │   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
@@ -66,6 +67,7 @@
 | Sidebar menu, sign in and session on SSR, analytics, online heartbeat                                                             | ✅     |
 | Sign up, password reset, email verification                                                                                       | ✅     |
 | Profile: display name, password change, subscription and promo codes                                                              | ✅     |
+| Bug report: sidebar button, text selection, screenshot with marks                                                                 | ✅     |
 | Content renderer (`RawContent` replacement), dice, tooltips                                                                       | ✅     |
 | Dice history                                                                                                                      | ✅     |
 | List + detail, URL filters, search                                                                                                | ✅     |
