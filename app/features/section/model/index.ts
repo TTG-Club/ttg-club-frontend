@@ -15,6 +15,7 @@ export type {
   FilterValue,
   SectionConfig,
   SectionListRequest,
+  SectionListView,
   SectionOpener,
   SectionOrder,
   SectionQueryStore,

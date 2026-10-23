@@ -1,6 +1,8 @@
 <script setup lang="ts" generic="T">
   import type { AsyncDataRequestStatus } from '#app';
 
+  import type { SectionListView } from '../model';
+
   import {
     groupItems,
     INFINITE_SCROLL_DISTANCE,
@@ -21,7 +23,7 @@
     status,
     isEnd = true,
     isLoadingMore = false,
-    isGrid = false,
+    view = 'tiles',
   } = defineProps<{
     items: Array<T>;
     getKey: (item: T) => string;
@@ -31,8 +33,8 @@
     status: AsyncDataRequestStatus;
     isEnd?: boolean;
     isLoadingMore?: boolean;
-    /** Крупные карточки, как у рас и классов, вместо плиток-строк. */
-    isGrid?: boolean;
+    /** Плитки-строки, крупные карточки рас или обложки классов. */
+    view?: SectionListView;
   }>();
 
   const emit = defineEmits<{
@@ -52,9 +54,7 @@
 
   // Колонки считаются от ширины самого списка, а не экрана: в широком
   // режиме рядом стоит панель записи, и списку достаётся меньше места
-  const groupClass = computed(() =>
-    isGrid ? SECTION_GRID_CLASS.cards : SECTION_GRID_CLASS.tiles,
-  );
+  const groupClass = computed(() => SECTION_GRID_CLASS[view]);
 
   const isFirstLoading = computed(() => status === 'pending' && !items.length);
 

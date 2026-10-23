@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
   import type { z } from 'zod';
 
-  import type { SectionConfig } from '../model';
+  import type { SectionConfig, SectionListView } from '../model';
 
   import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 
@@ -31,7 +31,7 @@
     getGroupOrder = undefined,
     getPath = undefined,
     sortItems = undefined,
-    isGrid = false,
+    view = undefined,
   } = defineProps<{
     /** Заголовок, ручки, сортировка и размер страницы раздела. */
     section: SectionConfig;
@@ -44,8 +44,8 @@
     getPath?: (item: T) => string;
     /** Порядок записей на странице, если ручка отдаёт их не так. */
     sortItems?: (items: Array<T>) => Array<T>;
-    /** Записи карточками в сетку, как расы и классы. */
-    isGrid?: boolean;
+    /** Вид списка: плитки-строки, карточки рас или обложки классов. */
+    view?: SectionListView;
   }>();
 
   const slots = defineSlots<{
@@ -170,7 +170,7 @@
       :status="status"
       :is-end="isEnd"
       :is-loading-more="isLoadingMore"
-      :is-grid="isGrid"
+      :view="view"
       @load-more="loadMore"
       @retry="retry"
     >

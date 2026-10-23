@@ -250,8 +250,6 @@ export const OPTIONAL_FEATURES_PATH = '/rules/optional_class_features';
 
 export const CLASS_TEXT = {
   archetypes: 'Архетипы',
-  showArchetypes: 'Показать архетипы',
-  hideArchetypes: 'Скрыть архетипы',
   gallery: 'Галерея',
   hitPoints: 'Хиты',
   hitDice: 'Кость Хитов:',
@@ -293,6 +291,7 @@ export const CLASS_TEXT = {
 
 export const CLASS_ICON = {
   gallery: 'tabler:photo',
+  archetypes: 'tabler:subtask',
 } as const;
 
 /** Уровень в таблице заклинаний архетипа — уровень заклинания. */

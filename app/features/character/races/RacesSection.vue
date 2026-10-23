@@ -26,7 +26,7 @@
     :get-group="getGroupName"
     :get-path="getEntryUrl"
     :sort-items="sortItems"
-    is-grid
+    view="cards"
   >
     <template #item="{ item, to }">
       <RaceCard

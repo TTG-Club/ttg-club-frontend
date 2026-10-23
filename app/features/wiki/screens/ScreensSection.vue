@@ -14,7 +14,7 @@
     :schema="screenLinkSchema"
     :get-key="getEntryUrl"
     :get-path="getEntryUrl"
-    is-grid
+    view="cards"
   >
     <template #item="{ item, to }">
       <ScreenCard
