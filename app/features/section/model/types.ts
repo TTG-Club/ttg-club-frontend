@@ -1,6 +1,11 @@
 import type { Ref } from 'vue';
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 
+import type { SECTION_GRID_CLASS } from './constants';
+
+/** Вид списка раздела: плитки, карточки или обложки. */
+export type SectionListView = keyof typeof SECTION_GRID_CLASS;
+
 /** Ключ значения фильтра: строка или число, как его отдаёт API. */
 export type FilterKey = string | number;
 

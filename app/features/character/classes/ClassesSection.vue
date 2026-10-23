@@ -25,7 +25,7 @@
     :get-group="getGroupName"
     :get-path="getEntryUrl"
     :sort-items="sortItems"
-    is-grid
+    view="covers"
   >
     <template #item="{ item, to }">
       <ClassCard
