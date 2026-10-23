@@ -8,10 +8,9 @@
 >
 > **🚚 Migration context:** this is the Nuxt port of the legacy 5e14 site
 > (D&D 5e 2014). The rules are shared with `core-app` (the 2024 site) on
-> purpose. The legacy Vite SPA lives in `legacy/` and is the reference for
-> behaviour, URLs and markup while sections are being ported. Never import from
-> it; port the code into `app/`, `server/` and `shared/` following the rules
-> below. `legacy/AGENTS.md` applies only to `legacy/`.
+> purpose. Every section of the old Vite SPA is ported and its code is removed
+> from the repository; git history keeps it as the reference for old
+> behaviour and URLs.
 
 ---
 
@@ -261,7 +260,7 @@ Always import feature components using the domain alias (e.g.,
 - **Commit Format:**
   Use [Conventional Commits](https://www.conventionalcommits.org/):
   `<type>[scope]: <description>` (e.g., `feat`, `fix`, `refactor`).
-- **Pre-commit:** the git hook only runs the legacy lint-staged in `legacy/`; for the Nuxt app CI (`code-check.yml`) runs stylelint, eslint, type-check and tests.
+- **Pre-commit:** there is no git hook; CI (`code-check.yml`) runs stylelint, eslint, type-check and tests.
 
 **Final Verification (Must Follow):**
 At the end of any task, you **MUST**:

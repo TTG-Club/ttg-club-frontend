@@ -1,6 +1,0 @@
-export {
-  PRIVACY_POLICY_URL,
-  PRIVACY_POLICY_VERSION,
-  PUBLIC_OFFER_URL,
-  PUBLIC_OFFER_VERSION,
-} from './constants';

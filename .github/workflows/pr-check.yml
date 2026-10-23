@@ -32,9 +32,3 @@ jobs:
     needs: analyze
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/code-check.yml
-
-  legacy:
-    name: Legacy Code Check PR
-    needs: analyze
-    if: ${{ !github.event.pull_request.draft }}
-    uses: ./.github/workflows/legacy-code-check.yml

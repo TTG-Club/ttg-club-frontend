@@ -22,7 +22,7 @@ const config = configure({
   prettier: {
     tailwindStylesheet: './app/assets/css/tailwind.css',
   },
-  ignores: ['.agents', 'AGENTS.md', 'legacy'],
+  ignores: ['.agents', 'AGENTS.md'],
 });
 
 export default withNuxt(
