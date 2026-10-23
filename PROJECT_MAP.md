@@ -175,7 +175,7 @@ is not ported yet.
 
 The DM screen lists only root sections (search finds nested ones too). A root
 section shows its nested sections grouped by category; a click opens one in
-`SectionEntryModal`. Section icons are SVG markup from the database: they are
+`SectionEntryDrawer` on the right. Section icons are SVG markup from the database: they are
 parsed with `parseSvgIcon` and keep only shape tags and attributes.
 
 ## 🔖 Bookmarks

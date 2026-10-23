@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import type { ScreenDetail } from '../model';
+  import type { ScreenDetail, ScreenLink } from '../model';
 
   import { ContentRender } from '~content/render';
-  import { SectionEntryModal } from '~section/entry-modal';
+  import { SectionEntryDrawer } from '~section/entry-drawer';
 
   import { groupScreens, screenDetailSchema } from '../model';
   import ScreenBody from './ScreenBody.vue';
@@ -10,7 +10,7 @@
 
   /**
    * Корневой раздел ширмы: описание и вложенные разделы по группам.
-   * Вложенный раздел открывается в окне поверх страницы.
+   * Вложенный раздел открывается в дровере справа.
    */
   const { screen } = defineProps<{
     screen: ScreenDetail;
@@ -18,10 +18,17 @@
 
   const groups = computed(() => groupScreens(screen.chields ?? []));
 
-  const openPath = ref<string>();
+  const selected = shallowRef<ScreenLink>();
 
-  function open(path: string) {
-    openPath.value = path;
+  const isOpen = ref(false);
+
+  /**
+   * Открывает вложенный раздел в дровере.
+   * @param item - вложенный раздел
+   */
+  function open(item: ScreenLink): void {
+    selected.value = item;
+    isOpen.value = true;
   }
 </script>
 
@@ -49,18 +56,22 @@
           v-for="item in group.items"
           :key="item.url"
           :screen="item"
-          @open="open"
+          @open="open(item)"
         />
       </div>
     </section>
 
-    <SectionEntryModal
-      v-model:path="openPath"
+    <SectionEntryDrawer
+      v-if="selected"
+      :key="selected.url"
+      v-model:open="isOpen"
       :schema="screenDetailSchema"
+      :path="selected.url"
+      :title="selected.name.rus"
     >
       <template #default="{ entry }">
         <ScreenBody :screen="entry" />
       </template>
-    </SectionEntryModal>
+    </SectionEntryDrawer>
   </div>
 </template>
