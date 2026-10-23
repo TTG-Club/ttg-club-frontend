@@ -17,6 +17,10 @@ export interface WorkshopEditPageOptions<Entry> {
   parse: (input: unknown) => Entry;
   /** Адрес записи строчными буквами, как у особенностей и богов. */
   isLowercaseSlug?: boolean;
+  /** Параметр маршрута с сегментом записи: у архетипа это не `slug`. */
+  slugParam?: string;
+  /** Адрес правки по сегменту записи, если он не из раздела и сегмента. */
+  getEditRoute?: (slug: string) => string;
 }
 
 /** Возвращаемое значение useWorkshopEditPage. */
@@ -42,7 +46,15 @@ export interface UseWorkshopEditPageReturn<Entry> {
 export function useWorkshopEditPage<Entry>(
   options: WorkshopEditPageOptions<Entry>,
 ): UseWorkshopEditPageReturn<Entry> {
-  const { sectionKey, fetchEntry, parse, isLowercaseSlug = false } = options;
+  const {
+    sectionKey,
+    fetchEntry,
+    parse,
+    isLowercaseSlug = false,
+    slugParam = 'slug',
+    getEditRoute = (nextSlug: string) =>
+      getWorkshopEditRoute(sectionKey, nextSlug),
+  } = options;
 
   const route = useRoute();
 
@@ -52,7 +64,7 @@ export function useWorkshopEditPage<Entry>(
   const isError = ref(false);
   const version = ref(0);
 
-  const slug = computed(() => getRouteSlug(route.params.slug) ?? '');
+  const slug = computed(() => getRouteSlug(route.params[slugParam]) ?? '');
 
   async function load(): Promise<void> {
     isLoading.value = true;
@@ -88,7 +100,7 @@ export function useWorkshopEditPage<Entry>(
       return;
     }
 
-    await navigateTo(getWorkshopEditRoute(sectionKey, nextSlug), {
+    await navigateTo(getEditRoute(nextSlug), {
       replace: true,
     });
   }

@@ -1,27 +1,37 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  archetypeFormSchema,
+  classFormSchema,
+  createArchetypeForm,
   createArmorForm,
   createBackgroundForm,
+  createClassForm,
+  createClassTableColumn,
   createFeatForm,
   createGodForm,
   createItemForm,
   createMagicItemForm,
   createOptionForm,
+  createRaceForm,
   createSpellForm,
   createWeaponForm,
   describeHtmlProblem,
   extractFormula,
   findFreePersonalizationType,
+  getArchetypeEditRoute,
+  getArchetypePayload,
   getArmorPayload,
   getBackgroundPayload,
   getBackgroundSkills,
+  getClassPayload,
   getFeatPayload,
   getGodPayload,
   getHtmlValidityMessage,
   getItemPayload,
   getMagicItemPayload,
   getOptionPayload,
+  getRacePayload,
   getRequirementText,
   getSpellPayload,
   getSpellSchoolValue,
@@ -30,16 +40,20 @@ import {
   getWorkshopSlug,
   parseBookSources,
   parseFilterGroups,
+  parseRaceParentOptions,
   parseRevisions,
   parseSavedEntry,
   parseSpellTime,
+  parseWorkshopArchetype,
   parseWorkshopArmor,
   parseWorkshopBackground,
+  parseWorkshopClass,
   parseWorkshopFeat,
   parseWorkshopGod,
   parseWorkshopItem,
   parseWorkshopMagicItem,
   parseWorkshopOption,
+  parseWorkshopRace,
   parseWorkshopRule,
   parseWorkshopSpell,
   parseWorkshopWeapon,
@@ -510,5 +524,182 @@ describe('редактор магических предметов', () => {
       curse: false,
       special: undefined,
     });
+  });
+});
+
+describe('редактор рас', () => {
+  const race = parseWorkshopRace({
+    id: 4,
+    name: { rus: 'Высший эльф', eng: 'High' },
+    parentId: 3,
+    sizeRaw: 'MEDIUM',
+    typeRaw: 'HUMANOID',
+    speed: [{ value: 30 }, { name: 'летая', value: 0 }],
+    fly: 0,
+    darkvision: 60,
+    view: true,
+    abilities: [{ key: 'INTELLIGENCE', name: 'Интеллект', value: 1 }],
+    features: [
+      {
+        id: 12,
+        name: 'Заговор',
+        englishName: null,
+        description: '<p>Текст</p>',
+        feature: false,
+        replaceFeatureId: null,
+      },
+    ],
+    description: '<p>Описание</p>',
+    source: { shortName: 'PHB' },
+  });
+
+  it('заполняется записью справочника', () => {
+    expect(race).toMatchObject({
+      parentId: '3',
+      speed: 30,
+      abilities: [{ ability: 'INTELLIGENCE', bonus: 1 }],
+      source: 'PHB',
+    });
+  });
+
+  it('не отправляет нулевую скорость полёта и шлёт родителя числом', () => {
+    expect(getRacePayload(createRaceForm(race), 'PHB')).toMatchObject({
+      parentId: 3,
+      fly: undefined,
+      darkvision: 60,
+      origin: undefined,
+      features: [
+        { id: 12, englishName: undefined, replaceFeatureId: undefined },
+      ],
+    });
+  });
+
+  it('новая раса — средний гуманоид со скоростью 30', () => {
+    expect(createRaceForm()).toMatchObject({
+      size: 'MEDIUM',
+      type: 'HUMANOID',
+      speed: 30,
+      view: true,
+    });
+  });
+
+  it('не предлагает расу родительской для самой себя', () => {
+    const options = parseRaceParentOptions(
+      [
+        { id: 3, name: { rus: 'Эльф', eng: 'Elf' } },
+        { id: 4, name: { rus: 'Высший эльф', eng: 'High' } },
+      ],
+      4,
+    );
+
+    expect(options).toEqual([{ label: 'Эльф (Elf)', value: '3' }]);
+  });
+});
+
+describe('редактор классов', () => {
+  const heroClass = parseWorkshopClass({
+    id: 2,
+    name: { rus: 'Воин', eng: 'Fighter' },
+    primaryAbilities: ['STRENGTH'],
+    availableSkillsRaw: ['ATHLETICS'],
+    spellcasterType: 'NONE',
+    optionType: 'FIGHTING_STYLE',
+    enabledArhitypeLevel: 3,
+    sidekick: false,
+    classTraits: [
+      {
+        id: 7,
+        name: 'Второе дыхание',
+        level: 1,
+        description: '<p>Текст</p>',
+        optional: false,
+      },
+    ],
+    tableColumns: [{ id: 5, name: 'Атаки', levels: [1, 1, null] }],
+    traits: { diceHp: 10, skillAvailableCount: 2, armor: '<p>Все</p>' },
+    source: { shortName: 'PHB' },
+  });
+
+  it('берёт кость хитов и навыки из блока traits', () => {
+    expect(heroClass).toMatchObject({
+      diceHp: 10,
+      skillAvailableCount: 2,
+      armor: '<p>Все</p>',
+      optionType: 'FIGHTING_STYLE',
+    });
+  });
+
+  it('дополняет колонки таблицы до двадцати уровней', () => {
+    expect(heroClass.tableColumns[0]?.levels).toHaveLength(20);
+  });
+
+  it('отправляет пустые ячейки нулями', () => {
+    const payload = getClassPayload(createClassForm(heroClass), undefined);
+
+    expect(payload).toMatchObject({
+      spellAbility: undefined,
+      weapon: undefined,
+      classTraits: [{ id: 7, suffix: undefined, child: undefined }],
+    });
+
+    expect(payload.tableColumns).toEqual([
+      expect.objectContaining({
+        levels: [1, 1, ...Array.from({ length: 18 }, () => 0)],
+      }),
+    ]);
+  });
+
+  it('не принимает значение ячейки больше 127', () => {
+    const column = { ...createClassTableColumn(), name: 'Ки' };
+
+    column.levels[0] = 128;
+
+    const form = {
+      ...createClassForm(heroClass),
+      tableColumns: [column],
+    };
+
+    expect(classFormSchema.safeParse(form).success).toBe(false);
+  });
+});
+
+describe('редактор архетипов', () => {
+  const archetype = parseWorkshopArchetype({
+    id: 9,
+    name: 'Чемпион',
+    englishName: 'Champion',
+    description: '<p>Описание</p>',
+    level: 3,
+    spellcasterType: null,
+    optionType: 'MANEUVER',
+    spellLevelType: null,
+    traits: [
+      {
+        id: 1,
+        name: 'Крит',
+        level: 3,
+        description: '<p>Т</p>',
+        optional: false,
+      },
+    ],
+    tableColumns: [],
+  });
+
+  it('сохраняет особенности архетипа, которые форма не правит', () => {
+    const form = createArchetypeForm(archetype);
+
+    expect(archetypeFormSchema.safeParse(form).success).toBe(true);
+
+    expect(getArchetypePayload(form, archetype)).toMatchObject({
+      optionType: 'MANEUVER',
+      spellcasterType: undefined,
+      spellLevelType: 'CLASS_LEVEL',
+    });
+  });
+
+  it('строит адрес правки архетипа', () => {
+    expect(getArchetypeEditRoute('fighter', 'champion')).toBe(
+      '/workshop/classes/fighter/champion/edit',
+    );
   });
 });

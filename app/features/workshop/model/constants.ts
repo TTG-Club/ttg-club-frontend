@@ -74,6 +74,20 @@ export const WORKSHOP_SECTIONS: ReadonlyArray<WorkshopSection> = [
     icon: 'tabler:writing',
   },
   {
+    key: 'classes',
+    title: 'Классы',
+    description: 'Создание классов и правка классов и архетипов справочника.',
+    referencePath: '/classes',
+    icon: 'tabler:sword',
+  },
+  {
+    key: 'races',
+    title: 'Расы',
+    description: 'Создание и редактирование рас и их разновидностей.',
+    referencePath: '/races',
+    icon: 'tabler:users',
+  },
+  {
     key: 'weapons',
     title: 'Оружие',
     description: 'Создание и редактирование оружия справочника.',
@@ -198,6 +212,8 @@ export const WORKSHOP_VALIDATION = {
   notNegative: 'Не меньше 0',
   distance: 'Не меньше ближней дистанции',
   chooseOne: 'Выберите хотя бы одно значение',
+  classLevel: 'Не больше 20',
+  tableValue: 'Целое от -1 до 127',
 } as const;
 
 /** Так карточка показывает пустые требования черты или особенности. */
