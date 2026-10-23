@@ -179,8 +179,10 @@ is not ported yet.
 
 The DM screen lists only root sections (search finds nested ones too). A root
 section shows its nested sections grouped by category; a click opens one in
-`SectionEntryDrawer` on the right. Section icons are SVG markup from the database: they are
-parsed with `parseSvgIcon` and keep only shape tags and attributes.
+a drawer on the right with the same entry card as the root section (link,
+bookmark, page, edit, close); closing it leaves the root section open.
+Section icons are SVG markup from the database: they are parsed with
+`parseSvgIcon` and keep only shape tags and attributes.
 
 ## 🔖 Bookmarks
 
