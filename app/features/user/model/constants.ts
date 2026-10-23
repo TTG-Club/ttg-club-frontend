@@ -16,6 +16,13 @@ export const USER_MENU_PROFILE_LINK = {
   icon: 'tabler:user-cog',
 } as const;
 
+/** Пункт меню редактора: ролики на главной. */
+export const USER_MENU_ADMIN_LINK = {
+  label: 'Видео на главной',
+  to: '/admin/youtube',
+  icon: 'tabler:brand-youtube',
+} as const;
+
 /**
  * Пункты меню пользователя, которые ведут в ещё не перенесённые разделы
  * старого SPA и открываются с перезагрузкой страницы.

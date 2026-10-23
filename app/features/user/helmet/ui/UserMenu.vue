@@ -1,30 +1,24 @@
 <script setup lang="ts">
   import { breakpointsTailwind } from '@vueuse/core';
 
-  import { Role } from '~/shared/types';
-
   import {
     getGreeting,
     PROFILE_ROUTE,
     SIGN_OUT_LABEL,
     USER_HELMET_ICON,
+    USER_MENU_ADMIN_LINK,
     USER_MENU_BUTTON_LABEL,
     USER_MENU_LEGACY_LINKS,
     USER_MENU_PROFILE_LINK,
   } from '../../model';
 
-  const { user, roles, signOut } = useUser();
+  const { user, isEditor, signOut } = useUser();
   const breakpoints = useBreakpoints(breakpointsTailwind);
 
   const isOpened = ref(false);
 
   const side = computed(() =>
     breakpoints.greaterOrEqual('md').value ? 'right' : 'top',
-  );
-
-  // Мастерская в старом SPA открыта только редакторам.
-  const canEdit = computed(() =>
-    [Role.ADMIN, Role.MODERATOR].some((role) => roles.value.includes(role)),
   );
 
   // Час берётся только в браузере: меню рендерится по открытию, поэтому
@@ -76,7 +70,19 @@
         @click.left.exact="close"
       />
 
-      <template v-if="canEdit">
+      <!-- Админка и мастерская открыты только редакторам -->
+      <template v-if="isEditor">
+        <UButton
+          :to="USER_MENU_ADMIN_LINK.to"
+          :icon="USER_MENU_ADMIN_LINK.icon"
+          :label="USER_MENU_ADMIN_LINK.label"
+          color="neutral"
+          variant="ghost"
+          block
+          :ui="{ base: 'justify-start' }"
+          @click.left.exact="close"
+        />
+
         <UButton
           v-for="link in USER_MENU_LEGACY_LINKS"
           :key="link.url"
