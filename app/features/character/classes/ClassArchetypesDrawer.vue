@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { TypedLink } from '../model';
 
+  import { useSectionOpener } from '~section/composables';
   import { SectionDrawer } from '~section/entry-drawer';
   import { SectionSourceBadge } from '~section/source-badge';
 
@@ -8,7 +9,8 @@
 
   /**
    * Архетипы класса в дровере справа, как подклассы на new.ttg.club:
-   * сгруппированы по типу книги, клик ведёт на страницу архетипа.
+   * сгруппированы по типу книги. Клик открывает архетип так, как велит
+   * режим раздела, а вне раздела ведёт на его страницу.
    */
   const { title, className, classUrl, archetypes } = defineProps<{
     /** Как называются архетипы класса: «Подклассы», «Божественные домены»… */
@@ -21,6 +23,12 @@
   const isOpen = defineModel<boolean>('open', { default: false });
 
   const route = useRoute();
+  const opener = useSectionOpener();
+
+  /** Запись, открытая сейчас: поверх списка или своей страницей. */
+  const openPath = computed(() =>
+    opener ? opener.activePath.value : route.path,
+  );
 
   const groups = computed(() => groupByBookType(archetypes));
 
@@ -29,13 +37,30 @@
    * @param url - адрес архетипа
    */
   function getLinkClass(url: string) {
-    return route.path === url
+    return openPath.value === url
       ? 'border-primary bg-primary/10 ring-1 ring-primary/50'
       : 'border-default bg-muted hover:border-accented';
   }
 
   function close(): void {
     isOpen.value = false;
+  }
+
+  /**
+   * Закрывает дровер и открывает архетип через страницу раздела, если она
+   * умеет.
+   * @param event - клик по ссылке
+   * @param url - адрес архетипа
+   */
+  function openArchetype(event: MouseEvent, url: string): void {
+    close();
+
+    if (!opener) {
+      return;
+    }
+
+    event.preventDefault();
+    opener.open(url);
   }
 </script>
 
@@ -62,7 +87,7 @@
           :to="link.url"
           :class="getLinkClass(link.url)"
           class="flex items-center justify-between gap-2 rounded-xl border px-4 py-3 transition-colors"
-          @click.left.exact="close"
+          @click.left.exact.capture="openArchetype($event, link.url)"
         >
           <span class="flex min-w-0 flex-col gap-0.5">
             <span class="truncate font-semibold text-highlighted">

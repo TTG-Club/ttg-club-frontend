@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassLink } from '../model';
 
+  import { useSectionOpener } from '~section/composables';
   import { SectionSourceBadge } from '~section/source-badge';
 
   import { CLASS_ICON, CLASS_TEXT, getClassIcon } from '../model';
@@ -9,7 +10,8 @@
   /**
    * Карточка класса в списке, как на new.ttg.club: квадратная обложка с
    * книгой в углу, названия под ней, а на узком экране — строкой с
-   * миниатюрой. Кнопка открывает архетипы в дровере справа.
+   * миниатюрой. Кнопка открывает архетипы в дровере справа. Клик открывает
+   * класс так, как велит режим раздела: дровером или панелью рядом.
    */
   const { classLink, to = undefined } = defineProps<{
     classLink: ClassLink;
@@ -17,6 +19,12 @@
   }>();
 
   const route = useRoute();
+  const opener = useSectionOpener();
+
+  /** Запись, открытая сейчас: поверх списка или своей страницей. */
+  const openPath = computed(() =>
+    opener ? opener.activePath.value : route.path,
+  );
 
   const icon = computed(() => getClassIcon(classLink.icon));
 
@@ -31,8 +39,8 @@
   // Открыт сам класс или его архетип — подсвечиваем карточку
   const isActive = computed(
     () =>
-      route.path === classLink.url
-      || route.path.startsWith(`${classLink.url}/`),
+      openPath.value === classLink.url
+      || !!openPath.value?.startsWith(`${classLink.url}/`),
   );
 
   const cardClass = computed(() =>
@@ -40,6 +48,19 @@
       ? 'border-primary bg-primary/10 ring-1 ring-primary/50'
       : 'border-default bg-muted hover:border-accented',
   );
+
+  /**
+   * Открывает класс через страницу раздела, если она умеет.
+   * @param event - клик по ссылке
+   */
+  function openClass(event: MouseEvent): void {
+    if (!to || !opener) {
+      return;
+    }
+
+    event.preventDefault();
+    opener.open(to);
+  }
 
   function openArchetypes(): void {
     isArchetypesOpen.value = true;
@@ -91,6 +112,7 @@
       <NuxtLink
         :to="to"
         class="flex min-w-0 flex-auto flex-col justify-center gap-0.5 after:absolute after:inset-0"
+        @click.left.exact.capture="openClass"
       >
         <span
           :title="classLink.name.rus"
