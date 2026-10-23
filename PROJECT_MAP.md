@@ -160,9 +160,11 @@ class). A tab list always sends its filter, because a hidden group of the
 filter picks the class. `SectionEntryModal` opens an entry from such a list in
 a modal instead of leaving the page.
 
-A class page (`/classes/<class>` and `/classes/<class>/<archetype>`) has
-tabs from the API: traits (level table, proficiencies, features, archetypes
-loaded on first open), description, and the spells and options lists.
+A class or archetype opens like other section entries: in a drawer, in the
+side panel in the wide layout, or as its own page (`/classes/<class>` and
+`/classes/<class>/<archetype>`). It has tabs from the API: traits (level
+table, proficiencies, features, archetypes loaded on first open),
+description, and the spells and options lists.
 Gallery images open in `SectionImageViewer`. Feature tooltips in the level
 table use the features already loaded with the class.
 
