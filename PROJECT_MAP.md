@@ -152,7 +152,7 @@ loads a short section in one request, `sortItems` reorders it on the page and
 on the entry page, or by `path` in the pane and the drawer. It reads
 `POST /api/v1<path>`; a missing entry renders a real 404 on its page and an
 error in the pane. `SectionDetailPane` copies the canonical link of the entry
-and, for moderators and admins, links to its editor in the legacy workshop
+and, for moderators and admins, links to its editor in the workshop
 (`/workshop/<path>/edit`). `SectionSourceBar` replaces `DetailTopBar`.
 
 Search and filter live in a `SectionQueryStore`: the page address by default,
@@ -207,8 +207,9 @@ the edit page loads the entry from the reference API, saves through
 `/api/v1/workshop/<section>` and lists its revisions with restore. Descriptions
 use `WorkshopHtmlEditor`: a visual mode with `dice-roller` tokens and a source
 mode; markup the backend would reject is listed above the field and blocks the
-form. Every legacy editor is ported; the gateway still keeps `/workshop` on the
-legacy SPA until it is switched, so entry edit links stay external until then.
+form. Every legacy editor is ported, and the user menu and entry edit buttons
+open the workshop inside the app. Until the gateway routes `/workshop` to Nuxt,
+a full page load of a workshop address still opens the legacy SPA.
 
 Rules, gods and screens are edit-only (no section page or create). Options,
 classes, races, creatures, screens, rules and gods use lowercase slugs.

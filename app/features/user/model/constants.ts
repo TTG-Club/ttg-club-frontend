@@ -23,13 +23,12 @@ export const USER_MENU_ADMIN_LINK = {
   icon: 'tabler:brand-youtube',
 } as const;
 
-/**
- * Пункты меню пользователя, которые ведут в ещё не перенесённые разделы
- * старого SPA и открываются с перезагрузкой страницы.
- */
-export const USER_MENU_LEGACY_LINKS = [
-  { label: 'Мастерская', url: '/workshop', icon: 'tabler:tools' },
-] as const;
+/** Пункт меню редактора: мастерская. */
+export const USER_MENU_WORKSHOP_LINK = {
+  label: 'Мастерская',
+  to: '/workshop',
+  icon: 'tabler:tools',
+} as const;
 
 /** Подпись кнопки выхода. */
 export const SIGN_OUT_LABEL = 'Выйти';
