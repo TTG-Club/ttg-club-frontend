@@ -27,9 +27,10 @@
   } = defineProps<{
     items: Array<T>;
     getKey: (item: T) => string;
-    getGroup?: (item: T) => string;
+    /** Подпись группы записи; с несколькими запись есть в каждой группе. */
+    getGroup?: (item: T) => string | Array<string>;
     /** Порядок группы записи; без него группы идут по первой записи. */
-    getGroupOrder?: (item: T) => number;
+    getGroupOrder?: (item: T, group: string) => number;
     status: AsyncDataRequestStatus;
     isEnd?: boolean;
     isLoadingMore?: boolean;
