@@ -31,6 +31,7 @@
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
+│   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, password change), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
@@ -84,7 +85,8 @@
 | Section modes like new.ttg.club: drawer and wide                                                                                  | ✅     |
 | Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker | ✅     |
 | Account, comments, subscription, bug report                                                                                       | ⏳     |
-| Workshop, admin                                                                                                                   | ⏳     |
+| Admin: home page videos (`/admin/youtube`)                                                                                        | ✅     |
+| Workshop                                                                                                                          | ⏳     |
 
 ## 🔐 Session
 
@@ -191,6 +193,10 @@ tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
 render on SSR; videos (`/api/v1/youtube`) and friends (`/api/v1/partners`) too.
 The latest game comes from the new.ttg.club game service and core-api, so it
 loads only in the browser. The search field opens the search palette.
+
+Moderators and administrators manage the videos at `/admin/youtube` (also in
+the user menu): add by link or ID, rename, delete, and switch up to five on for
+the home page. The page is closed to search engines and to other users.
 
 ## 🔍 Search
 
