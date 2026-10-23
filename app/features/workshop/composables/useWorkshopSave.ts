@@ -39,12 +39,12 @@ function getErrorReason(error: unknown): string | undefined {
 
 /**
  * Сохранение записи мастерской: без идентификатора — создание.
- * @param sectionKey - раздел мастерской
+ * @param apiSection - раздел в ручках мастерской
  * @param entryId - идентификатор записи при правке
  * @param texts - подписи уведомлений
  */
 export function useWorkshopSave(
-  sectionKey: string,
+  apiSection: string,
   entryId: () => number | undefined,
   texts: WorkshopSaveTexts,
 ): UseWorkshopSaveReturn {
@@ -61,8 +61,8 @@ export function useWorkshopSave(
     try {
       const saved =
         id === undefined
-          ? await createWorkshopEntry(sectionKey, payload)
-          : await updateWorkshopEntry(sectionKey, id, payload);
+          ? await createWorkshopEntry(apiSection, payload)
+          : await updateWorkshopEntry(apiSection, id, payload);
 
       toast.add({
         title: id === undefined ? texts.created : texts.saved,

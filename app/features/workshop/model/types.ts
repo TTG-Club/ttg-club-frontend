@@ -20,3 +20,9 @@ export interface BookSourceOption {
 export interface SavedEntry {
   englishName: string;
 }
+
+/** Вариант выбора в форме: подпись и значение для бэкенда. */
+export interface SelectOption {
+  label: string;
+  value: string;
+}

@@ -3,6 +3,8 @@ import type { WorkshopSection } from './constants';
 import {
   WORKSHOP_CREATE_SUFFIX,
   WORKSHOP_EDIT_SUFFIX,
+  WORKSHOP_LIST_SEPARATOR,
+  WORKSHOP_NO_REQUIREMENT,
   WORKSHOP_ROUTE,
   WORKSHOP_SECTIONS,
   WORKSHOP_SLUG_SEPARATOR,
@@ -13,11 +15,17 @@ import {
  * Сегмент адреса записи из английского названия, как в старом SPA:
  * `Fire Bolt` → `Fire_Bolt`.
  * @param englishName - английское название
+ * @param isLowercase - привести к нижнему регистру (особенности, боги)
  */
-export function getWorkshopSlug(englishName: string): string {
-  return englishName
+export function getWorkshopSlug(
+  englishName: string,
+  isLowercase = false,
+): string {
+  const slug = englishName
     .trim()
     .replace(WORKSHOP_SLUG_SPACES, WORKSHOP_SLUG_SEPARATOR);
+
+  return isLowercase ? slug.toLowerCase() : slug;
 }
 
 /**
@@ -74,4 +82,36 @@ export function toOptionalText(
   const trimmed = value?.trim();
 
   return trimmed || undefined;
+}
+
+/**
+ * Необязательное число: пустое поле или ноль бэкенд должен получить как
+ * отсутствие значения.
+ * @param value - значение поля формы
+ */
+export function toOptionalNumber(
+  value: number | null | undefined,
+): number | undefined {
+  return value || undefined;
+}
+
+/**
+ * Требования из карточки: «Нет» в форме — пустое поле.
+ * @param value - требования из карточки
+ */
+export function getRequirementText(value: string | null | undefined): string {
+  const trimmed = value?.trim() ?? '';
+
+  return trimmed === WORKSHOP_NO_REQUIREMENT ? '' : trimmed;
+}
+
+/**
+ * Список из строки через запятую, без пустых элементов.
+ * @param text - «Общий, Эльфийский»
+ */
+export function splitList(text: string): Array<string> {
+  return text
+    .split(WORKSHOP_LIST_SEPARATOR)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }

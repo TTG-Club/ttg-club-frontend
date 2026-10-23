@@ -1,3 +1,4 @@
 export * from './useBookSources';
-export * from './useWorkshopEntry';
+export * from './useFilterGroups';
+export * from './useWorkshopEditPage';
 export * from './useWorkshopSave';

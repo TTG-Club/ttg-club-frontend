@@ -1,12 +1,8 @@
 <script setup lang="ts">
   import { SectionLayout } from '~section/layout';
+  import { useWorkshopCreatePage } from '~workshop/composables';
   import { WorkshopAccessGate } from '~workshop/gate';
-  import {
-    getWorkshopEditRoute,
-    getWorkshopSlug,
-    SPELL_EDITOR_TEXT,
-    SPELLS_WORKSHOP_KEY,
-  } from '~workshop/model';
+  import { SPELL_EDITOR_TEXT, SPELLS_WORKSHOP_KEY } from '~workshop/model';
   import { SpellEditor } from '~workshop/spells';
 
   definePageMeta({ layout: 'section' });
@@ -17,11 +13,7 @@
     robots: 'noindex, nofollow',
   });
 
-  async function handleSaved(englishName: string): Promise<void> {
-    await navigateTo(
-      getWorkshopEditRoute(SPELLS_WORKSHOP_KEY, getWorkshopSlug(englishName)),
-    );
-  }
+  const handleSaved = useWorkshopCreatePage(SPELLS_WORKSHOP_KEY);
 </script>
 
 <template>

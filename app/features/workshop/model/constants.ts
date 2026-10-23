@@ -1,3 +1,7 @@
+import type { SelectOption } from './types';
+
+import { ABILITIES } from '~tools/model';
+
 /** Адрес мастерской. */
 export const WORKSHOP_ROUTE = '/workshop';
 
@@ -47,6 +51,27 @@ export const WORKSHOP_SECTIONS: ReadonlyArray<WorkshopSection> = [
     description: 'Создание и редактирование заклинаний справочника.',
     referencePath: '/spells',
     icon: 'tabler:wand',
+  },
+  {
+    key: 'feats',
+    title: 'Черты',
+    description: 'Создание и редактирование черт справочника.',
+    referencePath: '/feats',
+    icon: 'tabler:star',
+  },
+  {
+    key: 'options',
+    title: 'Особенности классов',
+    description: 'Создание и редактирование особенностей классов справочника.',
+    referencePath: '/options',
+    icon: 'tabler:puzzle',
+  },
+  {
+    key: 'backgrounds',
+    title: 'Предыстории',
+    description: 'Создание и редактирование предысторий справочника.',
+    referencePath: '/backgrounds',
+    icon: 'tabler:writing',
   },
 ];
 
@@ -137,3 +162,62 @@ export const REVISION_ICON = {
   restore: 'tabler:restore',
   empty: 'tabler:history-off',
 } as const;
+
+/** Сообщения проверки форм мастерской. */
+export const WORKSHOP_VALIDATION = {
+  required: 'Заполните поле',
+  positive: 'Не меньше 1',
+  notNegative: 'Не меньше 0',
+  chooseOne: 'Выберите хотя бы одно значение',
+} as const;
+
+/** Так карточка показывает пустые требования черты или особенности. */
+export const WORKSHOP_NO_REQUIREMENT = 'Нет';
+
+/** Разделитель списков, которые форма принимает одной строкой. */
+export const WORKSHOP_LIST_SEPARATOR = ',';
+
+/** Склейка списков в одну строку для формы. */
+export const WORKSHOP_LIST_JOINER = ', ';
+
+/** Характеристики: код бэкенда и название. */
+export const WORKSHOP_ABILITY_OPTIONS: ReadonlyArray<SelectOption> =
+  ABILITIES.map(({ key, name }) => ({ label: name, value: key }));
+
+/** Навыки: код бэкенда и название, как его показывает карточка. */
+export const WORKSHOP_SKILL_OPTIONS: ReadonlyArray<SelectOption> = [
+  { label: 'Атлетика', value: 'ATHLETICS' },
+  { label: 'Акробатика', value: 'ACROBATICS' },
+  { label: 'Ловкость рук', value: 'SLEIGHT_OF_HAND' },
+  { label: 'Скрытность', value: 'STEALTH' },
+  { label: 'Магия', value: 'ARCANA' },
+  { label: 'История', value: 'HISTORY' },
+  { label: 'Анализ', value: 'INVESTIGATION' },
+  { label: 'Природа', value: 'NATURE' },
+  { label: 'Религия', value: 'RELIGION' },
+  { label: 'Уход за животными', value: 'ANIMAL_HANDLING' },
+  { label: 'Проницательность', value: 'INSIGHT' },
+  { label: 'Медицина', value: 'MEDICINE' },
+  { label: 'Внимательность', value: 'PERCEPTION' },
+  { label: 'Выживание', value: 'SURVIVAL' },
+  { label: 'Обман', value: 'DECEPTION' },
+  { label: 'Запугивание', value: 'INTIMIDATION' },
+  { label: 'Выступление', value: 'PERFORMANCE' },
+  { label: 'Убеждение', value: 'PERSUASION' },
+];
+
+/** Подписи общих полей редакторов. */
+export const WORKSHOP_FIELD_TEXT = {
+  name: 'Название',
+  englishName: 'Английское название',
+  altName: 'Альтернативное название',
+  level: 'Уровень',
+  page: 'Страница',
+  description: 'Описание',
+  abilities: 'Характеристики',
+  skills: 'Навыки',
+  selectPlaceholder: 'Не выбрано',
+} as const;
+
+/** Строки описания в редакторах. */
+export const WORKSHOP_DESCRIPTION_ROWS = 12;

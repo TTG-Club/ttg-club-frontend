@@ -13,8 +13,9 @@
   import WorkshopRevisionItem from './WorkshopRevisionItem.vue';
 
   /** История изменений записи с восстановлением из ревизии. */
-  const { sectionKey, entryId } = defineProps<{
-    sectionKey: string;
+  const { apiSection, entryId } = defineProps<{
+    /** Раздел в ручках мастерской: `spells`, `items/magic`. */
+    apiSection: string;
     entryId: number;
   }>();
 
@@ -50,7 +51,7 @@
     isError.value = false;
 
     try {
-      revisions.value = await fetchRevisions(sectionKey, entryId);
+      revisions.value = await fetchRevisions(apiSection, entryId);
     } catch {
       isError.value = true;
     } finally {
@@ -77,7 +78,7 @@
     restoringRevision.value = revision;
 
     try {
-      await restoreRevision(sectionKey, entryId, revision);
+      await restoreRevision(apiSection, entryId, revision);
 
       toast.add({
         title: REVISION_TEXT.restored,

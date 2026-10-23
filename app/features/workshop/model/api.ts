@@ -1,4 +1,9 @@
-import type { BookSourceOption, RevisionInfo, SavedEntry } from './types';
+import type {
+  BookSourceOption,
+  RevisionInfo,
+  SavedEntry,
+  SelectOption,
+} from './types';
 
 import {
   REFERENCE_API_PATH,
@@ -6,7 +11,12 @@ import {
   WORKSHOP_BOOKS_PATH,
   WORKSHOP_BOOKS_QUERY,
 } from './constants';
-import { parseBookSources, parseRevisions, parseSavedEntry } from './schemas';
+import {
+  parseBookSources,
+  parseFilterGroups,
+  parseRevisions,
+  parseSavedEntry,
+} from './schemas';
 
 /**
  * Запись справочника по адресу её страницы: `/spells/Fire_Bolt`.
@@ -19,16 +29,40 @@ export async function fetchReferenceEntry(path: string): Promise<unknown> {
 }
 
 /**
+ * Запись в виде формы мастерской: так её отдают только боги.
+ * @param apiSection - раздел в ручках мастерской
+ * @param slug - сегмент адреса записи
+ */
+export async function fetchWorkshopEntry(
+  apiSection: string,
+  slug: string,
+): Promise<unknown> {
+  return await $fetch<unknown>(`${WORKSHOP_API_PATH}/${apiSection}/${slug}`);
+}
+
+/**
+ * Группы фильтров раздела: значения по ключу группы.
+ * @param filterPath - ручка фильтров, например `/api/v1/filters/gods`
+ */
+export async function fetchFilterGroups(
+  filterPath: string,
+): Promise<Map<string, Array<SelectOption>>> {
+  return parseFilterGroups(
+    await $fetch<unknown>(filterPath, { method: 'POST', body: {} }),
+  );
+}
+
+/**
  * Создаёт запись.
- * @param sectionKey - раздел мастерской
+ * @param apiSection - раздел в ручках мастерской
  * @param payload - данные формы
  */
 export async function createWorkshopEntry(
-  sectionKey: string,
+  apiSection: string,
   payload: Record<string, unknown>,
 ): Promise<SavedEntry> {
   return parseSavedEntry(
-    await $fetch<unknown>(`${WORKSHOP_API_PATH}/${sectionKey}`, {
+    await $fetch<unknown>(`${WORKSHOP_API_PATH}/${apiSection}`, {
       method: 'POST',
       body: payload,
     }),
@@ -37,17 +71,17 @@ export async function createWorkshopEntry(
 
 /**
  * Сохраняет правку записи.
- * @param sectionKey - раздел мастерской
+ * @param apiSection - раздел в ручках мастерской
  * @param entryId - идентификатор записи
  * @param payload - данные формы
  */
 export async function updateWorkshopEntry(
-  sectionKey: string,
+  apiSection: string,
   entryId: number,
   payload: Record<string, unknown>,
 ): Promise<SavedEntry> {
   return parseSavedEntry(
-    await $fetch<unknown>(`${WORKSHOP_API_PATH}/${sectionKey}/${entryId}`, {
+    await $fetch<unknown>(`${WORKSHOP_API_PATH}/${apiSection}/${entryId}`, {
       method: 'PATCH',
       body: payload,
     }),
@@ -56,33 +90,33 @@ export async function updateWorkshopEntry(
 
 /**
  * Ревизии записи, свежие сверху — в порядке ответа бэкенда.
- * @param sectionKey - раздел мастерской
+ * @param apiSection - раздел в ручках мастерской
  * @param entryId - идентификатор записи
  */
 export async function fetchRevisions(
-  sectionKey: string,
+  apiSection: string,
   entryId: number,
 ): Promise<Array<RevisionInfo>> {
   return parseRevisions(
     await $fetch<unknown>(
-      `${WORKSHOP_API_PATH}/${sectionKey}/${entryId}/revisions`,
+      `${WORKSHOP_API_PATH}/${apiSection}/${entryId}/revisions`,
     ),
   );
 }
 
 /**
  * Возвращает запись к состоянию ревизии.
- * @param sectionKey - раздел мастерской
+ * @param apiSection - раздел в ручках мастерской
  * @param entryId - идентификатор записи
  * @param revision - номер ревизии
  */
 export async function restoreRevision(
-  sectionKey: string,
+  apiSection: string,
   entryId: number,
   revision: number,
 ): Promise<void> {
   await $fetch(
-    `${WORKSHOP_API_PATH}/${sectionKey}/${entryId}/revisions/${revision}/restore`,
+    `${WORKSHOP_API_PATH}/${apiSection}/${entryId}/revisions/${revision}/restore`,
     { method: 'POST' },
   );
 }

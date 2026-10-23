@@ -1,18 +1,15 @@
 <script setup lang="ts">
   import { SectionLayout } from '~section/layout';
-  import { useWorkshopEntry } from '~workshop/composables';
-  import { WorkshopEntryState } from '~workshop/entry-state';
+  import { useWorkshopEditPage } from '~workshop/composables';
+  import { WorkshopEditFrame } from '~workshop/entry-state';
   import { WorkshopAccessGate } from '~workshop/gate';
   import {
-    getRouteSlug,
-    getWorkshopEditRoute,
-    getWorkshopSlug,
+    fetchReferenceEntry,
     parseWorkshopSpell,
     SPELL_EDITOR_TEXT,
     SPELLS_REFERENCE_PATH,
     SPELLS_WORKSHOP_KEY,
   } from '~workshop/model';
-  import { WorkshopRevisions } from '~workshop/revisions';
   import { SpellEditor } from '~workshop/spells';
 
   definePageMeta({ layout: 'section' });
@@ -23,36 +20,20 @@
     robots: 'noindex, nofollow',
   });
 
-  const route = useRoute();
-
-  const slug = computed(() => getRouteSlug(route.params.slug) ?? '');
-
-  const { entry, isLoading, isNotFound, isError, load } = useWorkshopEntry(
-    () => `${SPELLS_REFERENCE_PATH}/${slug.value}`,
-    parseWorkshopSpell,
-  );
-
-  // Форма и история пересоздаются, когда запись перечитана с сервера
-  const version = ref(0);
-
-  async function reload(): Promise<void> {
-    await load();
-    version.value += 1;
-  }
-
-  async function handleSaved(englishName: string): Promise<void> {
-    const nextSlug = getWorkshopSlug(englishName);
-
-    if (nextSlug === slug.value) {
-      await reload();
-
-      return;
-    }
-
-    await navigateTo(getWorkshopEditRoute(SPELLS_WORKSHOP_KEY, nextSlug), {
-      replace: true,
-    });
-  }
+  const {
+    entry,
+    isLoading,
+    isNotFound,
+    isError,
+    version,
+    reload,
+    handleSaved,
+  } = useWorkshopEditPage({
+    sectionKey: SPELLS_WORKSHOP_KEY,
+    fetchEntry: (slug) =>
+      fetchReferenceEntry(`${SPELLS_REFERENCE_PATH}/${slug}`),
+    parse: parseWorkshopSpell,
+  });
 </script>
 
 <template>
@@ -60,30 +41,22 @@
     <WorkshopAccessGate>
       <!-- Редактор разбирает разметку средствами браузера -->
       <ClientOnly>
-        <WorkshopEntryState
+        <WorkshopEditFrame
+          :api-section="SPELLS_WORKSHOP_KEY"
+          :entry-id="entry?.id"
+          :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"
           :is-error="isError"
-          @retry="reload"
+          @reload="reload"
         >
-          <div
+          <SpellEditor
             v-if="entry"
-            class="flex max-w-5xl flex-col gap-8"
-          >
-            <SpellEditor
-              :key="version"
-              :spell="entry"
-              @saved="handleSaved"
-            />
-
-            <WorkshopRevisions
-              :key="version"
-              :section-key="SPELLS_WORKSHOP_KEY"
-              :entry-id="entry.id"
-              @restored="reload"
-            />
-          </div>
-        </WorkshopEntryState>
+            :key="version"
+            :spell="entry"
+            @saved="handleSaved"
+          />
+        </WorkshopEditFrame>
       </ClientOnly>
     </WorkshopAccessGate>
   </SectionLayout>
