@@ -10,6 +10,9 @@ export default defineConfig({
       '~bookmarks': fileURLToPath(
         new URL('./app/features/bookmarks', import.meta.url),
       ),
+      '~comments': fileURLToPath(
+        new URL('./app/features/comments', import.meta.url),
+      ),
       '~bug-report': fileURLToPath(
         new URL('./app/features/bug-report', import.meta.url),
       ),

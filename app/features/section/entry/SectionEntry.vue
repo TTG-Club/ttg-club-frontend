@@ -4,13 +4,14 @@
   import type { EntryName, SectionConfig } from '../model';
 
   import { BookmarkButton } from '~bookmarks/button';
+  import { CommentsBlock } from '~comments/section';
 
   import { useSectionEntry, useSectionOpener } from '../composables';
   import { SectionDetailPane } from '../detail-pane';
 
   /**
-   * Запись раздела: загрузка, заголовок, закладка, ссылка на правку и
-   * закрытие. Без `path` это страница записи по адресу, с `path` — запись
+   * Запись раздела: загрузка, заголовок, закладка, ссылка на правку,
+   * закрытие и комментарии. Без `path` это страница записи по адресу, с `path` — запись
    * поверх списка раздела (панель рядом или дровер), её закрывает страница
    * раздела. Раздел задаёт только схему и карточку записи.
    */
@@ -85,9 +86,11 @@
       </ClientOnly>
     </template>
 
-    <slot
-      v-if="entry"
-      :entry="entry"
-    />
+    <template v-if="entry">
+      <slot :entry="entry" />
+
+      <!-- Блок сам решает, есть ли у раздела обсуждение -->
+      <CommentsBlock :path="entryPath" />
+    </template>
   </SectionDetailPane>
 </template>
