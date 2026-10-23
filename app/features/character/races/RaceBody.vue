@@ -2,14 +2,16 @@
   import type { RaceDetail } from '../model';
 
   import { ContentRender } from '~content/render';
-  import { SectionImagePreview } from '~section/image-preview';
+  import { SectionCollapse } from '~section/collapse';
+  import { SectionDetailLayout } from '~section/detail-layout';
+  import { SectionImageCover } from '~section/image-preview';
   import { SectionSourceBar } from '~section/source-bar';
 
   import { getRaceStats, RACE_TEXT, sortRaceSkills } from '../model';
 
   /**
-   * Карточка расы: картинка, короткие характеристики, особенности
-   * (часть раскрыта сразу), описание и разновидности под спойлерами.
+   * Карточка расы, как вида на new.ttg.club: слева обложка и свойства,
+   * справа описание, особенности (раскрыты сразу) и разновидности.
    */
   const { race } = defineProps<{
     race: RaceDetail;
@@ -19,115 +21,119 @@
 
   const skills = computed(() => sortRaceSkills(race));
 
-  /**
-   * Класс особенности: особенности разновидности выделены, как раньше.
-   * @param isSubrace - особенность от разновидности
-   */
-  function getSkillClass(isSubrace?: boolean | null) {
-    return isSubrace ? 'archetype_feet' : undefined;
-  }
+  const hasAside = computed(
+    () => !!race.images?.length || stats.value.length > 0,
+  );
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <SectionSourceBar :source="race.source" />
 
-    <div class="flow-root">
-      <SectionImagePreview
-        v-if="race.images?.length"
-        :images="race.images"
-        :alt="race.name.rus"
-      />
-
-      <dl class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <div
-          v-for="stat in stats"
-          :key="stat.key"
-          class="rounded-lg border border-default px-3 py-2"
-        >
-          <dt class="text-sm font-semibold text-highlighted">
-            <UTooltip :text="stat.hint">
-              <span class="cursor-help">{{ stat.label }}</span>
-            </UTooltip>
-          </dt>
-
-          <dd>{{ stat.value }}</dd>
-        </div>
-      </dl>
-    </div>
-
-    <div class="content-render">
-      <details
-        v-for="skill in skills"
-        :key="skill.name"
-        :class="getSkillClass(skill.subrace)"
-        :open="Boolean(skill.opened)"
+    <SectionDetailLayout>
+      <template
+        v-if="hasAside"
+        #aside
       >
-        <summary class="h4">
-          <span>{{ skill.name }}</span>
-        </summary>
+        <div class="flex flex-col gap-4 @min-xl:@max-3xl:flex-row">
+          <SectionImageCover
+            v-if="race.images?.length"
+            :images="race.images"
+            :alt="race.name.rus"
+          />
 
-        <div class="content">
+          <dl
+            v-if="stats.length"
+            class="w-full self-start overflow-hidden rounded-lg border border-default bg-muted py-1.5"
+          >
+            <div
+              v-for="stat in stats"
+              :key="stat.key"
+              class="flex gap-2 px-4 py-1.5"
+            >
+              <dt
+                class="min-w-28 flex-none text-sm font-medium text-highlighted"
+              >
+                {{ stat.label }}
+              </dt>
+
+              <dd>{{ stat.value }}</dd>
+            </div>
+          </dl>
+        </div>
+      </template>
+
+      <div class="flex flex-col gap-6">
+        <ContentRender
+          v-if="race.description"
+          :html="race.description"
+        />
+
+        <SectionCollapse
+          v-for="skill in skills"
+          :key="skill.name"
+          :title="skill.name"
+          default-open
+        >
           <ContentRender
             v-if="skill.description"
             :html="skill.description"
           />
-        </div>
-      </details>
+        </SectionCollapse>
 
-      <details v-if="race.description">
-        <summary class="h4">
-          <span>{{ RACE_TEXT.description }}</span>
-        </summary>
-
-        <div class="content">
-          <ContentRender :html="race.description" />
-        </div>
-      </details>
-
-      <template v-if="race.subraces?.length">
-        <h4>{{ RACE_TEXT.subraces }}</h4>
-
-        <details
-          v-for="subrace in race.subraces"
-          :key="subrace.name.eng"
-          class="spoiler feet_show"
+        <section
+          v-if="race.subraces?.length"
+          class="flex flex-col gap-4"
         >
-          <summary class="h4">
-            <span>{{ subrace.name.rus }}</span>
+          <h3 class="text-xl font-semibold text-highlighted">
+            {{ RACE_TEXT.subraces }}
+          </h3>
 
-            <span
+          <SectionCollapse
+            v-for="subrace in race.subraces"
+            :key="subrace.name.eng"
+            :title="subrace.name.rus"
+          >
+            <template
               v-if="subrace.source"
-              class="source-data"
+              #badge
             >
-              {{ subrace.source.shortName }}
-            </span>
-          </summary>
+              <UTooltip :text="subrace.source.name">
+                <UBadge
+                  :label="subrace.source.shortName"
+                  color="neutral"
+                  variant="soft"
+                  size="sm"
+                />
+              </UTooltip>
+            </template>
 
-          <div class="content">
-            <ContentRender
-              v-if="subrace.description"
-              :html="subrace.description"
-            />
-
-            <div
-              v-for="feature in subrace.features?.length
-                ? subrace.features
-                : subrace.skills"
-              :key="feature.name"
-            >
-              <h4 class="header_separator">
-                <span>{{ feature.name }}</span>
-              </h4>
-
+            <div class="flex flex-col gap-4 pl-6">
               <ContentRender
-                v-if="feature.description"
-                :html="feature.description"
+                v-if="subrace.description"
+                :html="subrace.description"
               />
+
+              <div
+                v-for="feature in subrace.features?.length
+                  ? subrace.features
+                  : subrace.skills"
+                :key="feature.name"
+                class="flex flex-col gap-2"
+              >
+                <h4 class="text-lg font-semibold text-highlighted">
+                  {{ feature.name }}
+                </h4>
+
+                <ContentRender
+                  v-if="feature.description"
+                  :html="feature.description"
+                />
+              </div>
             </div>
-          </div>
-        </details>
-      </template>
-    </div>
+          </SectionCollapse>
+        </section>
+      </div>
+    </SectionDetailLayout>
   </div>
 </template>

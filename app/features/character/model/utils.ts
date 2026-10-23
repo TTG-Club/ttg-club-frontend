@@ -181,30 +181,34 @@ export function getRaceSpeedLabel(speed?: Array<RaceSpeed> | null): string {
 }
 
 /**
- * Короткие характеристики расы для карточки; тёмное зрение — если есть.
+ * Свойства расы для колонки слева; пустые не показываются.
  * @param race - раса
  */
 export function getRaceStats(race: RaceDetail): Array<RaceStat> {
   const stats: Array<RaceStat> = [
-    { key: 'type', ...RACE_STATS.type, value: race.type ?? '' },
+    { key: 'type', label: RACE_STATS.type, value: race.type ?? '' },
     {
       key: 'abilities',
-      ...RACE_STATS.abilities,
+      label: RACE_STATS.abilities,
       value: getRaceAbilitiesLabel(race.abilities),
     },
-    { key: 'size', ...RACE_STATS.size, value: race.size ?? '' },
-    { key: 'speed', ...RACE_STATS.speed, value: getRaceSpeedLabel(race.speed) },
+    { key: 'size', label: RACE_STATS.size, value: race.size ?? '' },
+    {
+      key: 'speed',
+      label: RACE_STATS.speed,
+      value: getRaceSpeedLabel(race.speed),
+    },
   ];
 
   if (race.darkvision) {
     stats.push({
       key: 'darkvision',
-      ...RACE_STATS.darkvision,
+      label: RACE_STATS.darkvision,
       value: `${race.darkvision} ${RACE_TEXT.feet}`,
     });
   }
 
-  return stats;
+  return stats.filter(({ value }) => Boolean(value));
 }
 
 /**

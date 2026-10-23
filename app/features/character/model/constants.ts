@@ -7,10 +7,9 @@ export const CHARACTER_NO_REQUIREMENTS = 'Нет';
 
 export const CHARACTER_LIST_SEPARATOR = ', ';
 
-/** Кнопка карточки расы или класса, раскрывающая её ссылки. */
+/** Кнопка карточки расы или класса: её разновидности или архетипы. */
 export const LINK_CARD_ICON = {
-  expand: 'tabler:plus',
-  collapse: 'tabler:minus',
+  links: 'tabler:subtask',
 } as const;
 
 /* --- Черты -------------------------------------------------------------- */
@@ -172,18 +171,15 @@ export const RACE_TEXT = {
   everyAbility: '+1 к каждой',
   feet: 'фт.',
   subraces: 'Разновидности',
-  description: 'Описание',
-  showSubraces: 'Показать разновидности',
-  hideSubraces: 'Скрыть разновидности',
 } as const;
 
-/** Короткие характеристики расы в карточке: подпись и подсказка. */
+/** Подписи свойств расы в колонке слева, как у видов на new.ttg.club. */
 export const RACE_STATS = {
-  type: { label: 'ТИП', hint: 'Тип существа' },
-  abilities: { label: 'ХАР', hint: 'Увеличение характеристик' },
-  size: { label: 'РАЗ', hint: 'Размер' },
-  speed: { label: 'СКР', hint: 'Скорость' },
-  darkvision: { label: 'ТЗ', hint: 'Тёмное зрение' },
+  type: 'Тип',
+  abilities: 'Характеристики',
+  size: 'Размер',
+  speed: 'Скорость',
+  darkvision: 'Тёмное зрение',
 } as const;
 
 /** Раздел мастерской, где правятся расы. */
@@ -307,7 +303,6 @@ export const CLASS_TEXT = {
 
 export const CLASS_ICON = {
   gallery: 'tabler:photo',
-  archetypes: 'tabler:subtask',
   spells: 'tabler:vocabulary',
 } as const;
 
