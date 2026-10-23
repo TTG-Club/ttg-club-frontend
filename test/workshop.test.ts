@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   archetypeFormSchema,
+  bookFormSchema,
   classFormSchema,
   createArchetypeForm,
   createArmorForm,
   createBackgroundForm,
+  createBookForm,
   createClassForm,
   createClassTableColumn,
   createCreatureForm,
@@ -26,6 +28,7 @@ import {
   getArmorPayload,
   getBackgroundPayload,
   getBackgroundSkills,
+  getBookPayload,
   getClassPayload,
   getCreatureHits,
   getCreatureHtmlFields,
@@ -54,6 +57,7 @@ import {
   parseWorkshopArchetype,
   parseWorkshopArmor,
   parseWorkshopBackground,
+  parseWorkshopBook,
   parseWorkshopClass,
   parseWorkshopCreature,
   parseWorkshopFeat,
@@ -899,5 +903,50 @@ describe('редактор существ', () => {
       'actions.0.description': 'Атака',
       'legendary.0.description': '<p>Бег</p>',
     });
+  });
+});
+
+describe('источники', () => {
+  const book = parseWorkshopBook({
+    source: 'PHB',
+    name: 'Книга игрока',
+    englishName: "Player's Handbook",
+    altName: null,
+    type: 'OFFICAL',
+    year: 2014,
+  });
+
+  it('разбирает источник для редактора', () => {
+    expect(book).toEqual({
+      source: 'PHB',
+      name: 'Книга игрока',
+      englishName: "Player's Handbook",
+      altName: '',
+      type: 'OFFICAL',
+      year: 2014,
+      description: '',
+    });
+  });
+
+  it('не отправляет пустые необязательные поля', () => {
+    const form = bookFormSchema.parse({
+      ...createBookForm(book),
+      year: null,
+    });
+
+    expect(getBookPayload(form)).toEqual({
+      name: 'Книга игрока',
+      englishName: "Player's Handbook",
+      altName: undefined,
+      type: 'OFFICAL',
+      year: undefined,
+      description: undefined,
+    });
+  });
+
+  it('требует тип источника', () => {
+    expect(
+      bookFormSchema.safeParse({ ...createBookForm(book), type: '' }).success,
+    ).toBe(false);
   });
 });

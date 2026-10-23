@@ -4,6 +4,7 @@ export * from './api';
 export * from './armors';
 export * from './backgrounds';
 export * from './bestiary';
+export * from './books';
 export * from './classes';
 export * from './constants';
 export * from './feats';
