@@ -16,6 +16,7 @@ export default defineConfig({
       '~bestiary': fileURLToPath(
         new URL('./app/features/bestiary', import.meta.url),
       ),
+      '~admin': fileURLToPath(new URL('./app/features/admin', import.meta.url)),
       '~info': fileURLToPath(new URL('./app/features/info', import.meta.url)),
       '~home': fileURLToPath(new URL('./app/features/home', import.meta.url)),
       '~content': fileURLToPath(
