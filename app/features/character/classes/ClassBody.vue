@@ -15,15 +15,18 @@
   } from '../model';
   import ArchetypeSpells from './ArchetypeSpells.vue';
   import ClassOptionsTab from './ClassOptionsTab.vue';
-  import ClassSpellsTab from './ClassSpellsTab.vue';
+  import ClassRoutingBar from './ClassRoutingBar.vue';
   import ClassTraitsTab from './ClassTraitsTab.vue';
 
   /**
-   * Страница класса или архетипа по вкладкам: умения, описание, списки
-   * заклинаний и особенностей. Галерея открывается во весь экран.
+   * Страница класса или архетипа по вкладкам: умения, описание и список
+   * особенностей. Над вкладками переходы к классу, подклассам и
+   * заклинаниям. Галерея открывается во весь экран.
    */
-  const { entry } = defineProps<{
+  const { entry, path } = defineProps<{
     entry: ClassDetail;
+    /** Адрес открытой записи: класса или архетипа. */
+    path: string;
   }>();
 
   const tabs = computed(() => getClassTabs(entry));
@@ -68,6 +71,11 @@
   <div class="flex flex-col gap-4">
     <SectionSourceBar :source="entry.source" />
 
+    <ClassRoutingBar
+      :entry="entry"
+      :path="path"
+    />
+
     <div class="flex flex-wrap items-center gap-2">
       <UTabs
         v-model="activeKey"
@@ -108,14 +116,7 @@
     </div>
 
     <Suspense v-else-if="listSection && activeTab">
-      <ClassSpellsTab
-        v-if="activeTab.type === CLASS_TAB_TYPE.spells"
-        :key="activeTab.key"
-        :section="listSection"
-      />
-
       <ClassOptionsTab
-        v-else
         :key="activeTab.key"
         :section="listSection"
       />

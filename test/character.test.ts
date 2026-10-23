@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   backgroundDetailSchema,
   classDetailSchema,
+  findClassArchetype,
   findClassFeature,
   getArchetypeSpellLevelHeader,
   getArchetypeSpellSuffix,
@@ -13,8 +14,11 @@ import {
   getClassHitPoints,
   getClassIcon,
   getClassSkillsLabel,
+  getClassSpellsFilterUrl,
+  getClassSpellsLink,
   getClassTabs,
   getClassTabSection,
+  getParentClassName,
   getRaceAbilitiesLabel,
   getRaceEditPath,
   getRaceSpeedLabel,
@@ -29,6 +33,7 @@ import {
   sortClassFeatures,
   spellDetailSchema,
 } from '~character/model';
+import { normalizeFilter } from '~section/model';
 
 const name = { rus: 'Артист', eng: 'Entertainer' };
 
@@ -235,6 +240,12 @@ describe('классы', () => {
         type: 'traits',
         order: 0,
       },
+      {
+        name: 'Особенности',
+        url: '/filters/options/wizard',
+        type: 'options',
+        order: 3,
+      },
     ],
     traits,
   });
@@ -245,20 +256,71 @@ describe('классы', () => {
     expect(getClassIcon(null)).toBeUndefined();
   });
 
-  it('сортирует вкладки и даёт им уникальные ключи', () => {
+  it('сортирует вкладки, прячет заклинания и даёт вкладкам ключи', () => {
     expect(getClassTabs(wizard).map((tab) => tab.key)).toEqual([
       'traits-0',
-      'spells-2',
+      'options-3',
     ]);
   });
 
-  it('вкладка заклинаний читает фильтр класса и свой ключ', () => {
-    const [, spells] = getClassTabs(wizard);
-    const section = spells ? getClassTabSection(spells) : undefined;
+  it('вкладка особенностей читает фильтр класса и свой ключ', () => {
+    const [, options] = getClassTabs(wizard);
+    const section = options ? getClassTabSection(options) : undefined;
 
-    expect(section?.listUrl).toBe('/api/v1/spells');
-    expect(section?.filterUrl).toBe('/api/v1/filters/spells/wizard');
-    expect(section?.key).toBe('spells:/filters/spells/wizard');
+    expect(section?.listUrl).toBe('/api/v1/options');
+    expect(section?.filterUrl).toBe('/api/v1/filters/options/wizard');
+    expect(section?.key).toBe('options:/filters/options/wizard');
+  });
+
+  it('заклинания класса открываются в разделе с фильтром класса', () => {
+    expect(getClassSpellsFilterUrl(wizard)).toBe(
+      '/api/v1/filters/spells/wizard',
+    );
+
+    const filter = normalizeFilter({
+      other: [
+        { name: 'Уровень', key: 'level', values: [{ label: '1', key: '1' }] },
+        {
+          name: 'Классы',
+          key: 'class',
+          hidden: true,
+          values: [{ label: 'Волшебник', key: '2', default: true }],
+        },
+      ],
+    });
+
+    expect(getClassSpellsLink(filter)).toEqual({
+      path: '/spells',
+      query: { class: '2' },
+    });
+
+    expect(getClassSpellsLink(normalizeFilter([]))).toBeUndefined();
+  });
+
+  it('узнаёт открытый архетип и название его класса', () => {
+    const archetype = {
+      name: { rus: 'Школа воплощения', eng: 'School of Evocation' },
+      url: '/classes/wizard/evocation',
+      type: { name: 'Официальные', order: 0 },
+    };
+
+    const evocation = classDetailSchema.parse({
+      ...wizard,
+      name: {
+        rus: 'Волшебник Школа воплощения',
+        eng: 'Wizard School of Evocation',
+      },
+      archetypes: [archetype],
+    });
+
+    expect(findClassArchetype(evocation, evocation.url)).toBeUndefined();
+
+    expect(findClassArchetype(evocation, archetype.url)?.url).toBe(
+      archetype.url,
+    );
+
+    expect(getParentClassName(evocation, archetype)).toBe('Волшебник');
+    expect(getParentClassName(wizard)).toBe('Волшебник');
   });
 
   it('у вкладки умений списка нет', () => {

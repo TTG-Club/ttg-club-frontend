@@ -30,6 +30,7 @@
       <ClassBody
         :key="entryPath"
         :entry="entry"
+        :path="entryPath"
       />
     </template>
   </SectionEntry>
