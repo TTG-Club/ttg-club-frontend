@@ -73,6 +73,34 @@ export const WORKSHOP_SECTIONS: ReadonlyArray<WorkshopSection> = [
     referencePath: '/backgrounds',
     icon: 'tabler:writing',
   },
+  {
+    key: 'weapons',
+    title: 'Оружие',
+    description: 'Создание и редактирование оружия справочника.',
+    referencePath: '/weapons',
+    icon: 'tabler:axe',
+  },
+  {
+    key: 'armors',
+    title: 'Доспехи',
+    description: 'Создание и редактирование доспехов справочника.',
+    referencePath: '/armors',
+    icon: 'tabler:shield',
+  },
+  {
+    key: 'items',
+    title: 'Снаряжение',
+    description: 'Создание и редактирование снаряжения справочника.',
+    referencePath: '/items',
+    icon: 'tabler:backpack',
+  },
+  {
+    key: 'magic-items',
+    title: 'Магические предметы',
+    description: 'Создание и редактирование магических предметов справочника.',
+    referencePath: '/items/magic',
+    icon: 'tabler:diamond',
+  },
 ];
 
 /** Подписи мастерской. */
@@ -168,6 +196,7 @@ export const WORKSHOP_VALIDATION = {
   required: 'Заполните поле',
   positive: 'Не меньше 1',
   notNegative: 'Не меньше 0',
+  distance: 'Не меньше ближней дистанции',
   chooseOne: 'Выберите хотя бы одно значение',
 } as const;
 
@@ -217,7 +246,27 @@ export const WORKSHOP_FIELD_TEXT = {
   abilities: 'Характеристики',
   skills: 'Навыки',
   selectPlaceholder: 'Не выбрано',
+  cost: 'Цена',
+  currency: 'Валюта',
+  weight: 'Вес',
+  weightHelp: 'В фунтах',
+  type: 'Тип',
 } as const;
+
+/** Монеты цены: код бэкенда и сокращение. */
+export const WORKSHOP_CURRENCY_OPTIONS: ReadonlyArray<SelectOption> = [
+  { label: 'мм', value: 'MM' },
+  { label: 'см', value: 'SM' },
+  { label: 'эм', value: 'EM' },
+  { label: 'зм', value: 'GM' },
+  { label: 'пм', value: 'PM' },
+];
+
+/** Монета цены новой записи. */
+export const WORKSHOP_DEFAULT_CURRENCY = 'GM';
+
+/** Шаг поля веса: вес бывает дробным. */
+export const WORKSHOP_WEIGHT_STEP = 0.1;
 
 /** Строки описания в редакторах. */
 export const WORKSHOP_DESCRIPTION_ROWS = 12;

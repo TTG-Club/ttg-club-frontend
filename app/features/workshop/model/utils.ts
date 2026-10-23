@@ -96,6 +96,17 @@ export function toOptionalNumber(
 }
 
 /**
+ * Необязательное количество: ноль — это значение (бесплатно, невесомо), а
+ * пустое поле бэкенд должен получить как отсутствие значения.
+ * @param value - значение поля формы
+ */
+export function toOptionalAmount(
+  value: number | null | undefined,
+): number | undefined {
+  return value ?? undefined;
+}
+
+/**
  * Требования из карточки: «Нет» в форме — пустое поле.
  * @param value - требования из карточки
  */

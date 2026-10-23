@@ -22,6 +22,19 @@ export const workshopOptionalPositive = z
   .min(1, WORKSHOP_VALIDATION.positive)
   .nullable();
 
+/** Необязательное неотрицательное целое: цена. */
+export const workshopOptionalNotNegative = z
+  .number(WORKSHOP_VALIDATION.notNegative)
+  .int(WORKSHOP_VALIDATION.notNegative)
+  .min(0, WORKSHOP_VALIDATION.notNegative)
+  .nullable();
+
+/** Необязательный вес: дробный, не меньше нуля. */
+export const workshopOptionalWeight = z
+  .number(WORKSHOP_VALIDATION.notNegative)
+  .min(0, WORKSHOP_VALIDATION.notNegative)
+  .nullable();
+
 /** Название из карточки справочника. */
 export const workshopNameSchema = z.object({
   rus: z.string(),
