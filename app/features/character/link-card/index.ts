@@ -1,1 +1,1 @@
-export { default as CharacterLinkCard } from './CharacterLinkCard.vue';
+export { default as CharacterCoverCard } from './CharacterCoverCard.vue';

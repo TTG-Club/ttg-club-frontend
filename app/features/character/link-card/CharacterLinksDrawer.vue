@@ -8,16 +8,17 @@
   import { groupByBookType } from '../model';
 
   /**
-   * Архетипы класса в дровере справа, как подклассы на new.ttg.club:
-   * сгруппированы по типу книги. Клик открывает архетип так, как велит
-   * режим раздела, а вне раздела ведёт на его страницу.
+   * Разновидности расы или архетипы класса в дровере справа, как на
+   * new.ttg.club: сгруппированы по типу книги. Клик открывает запись так,
+   * как велит режим раздела, а вне раздела ведёт на её страницу.
    */
-  const { title, className, classUrl, archetypes } = defineProps<{
-    /** Как называются архетипы класса: «Подклассы», «Божественные домены»… */
+  const { title, parentName, parentUrl, links } = defineProps<{
+    /** Как называются ссылки: «Разновидности», «Божественные домены»… */
     title: string;
-    className: string;
-    classUrl: string;
-    archetypes: Array<TypedLink>;
+    /** Раса или класс, чьи это ссылки. */
+    parentName: string;
+    parentUrl: string;
+    links: Array<TypedLink>;
   }>();
 
   const isOpen = defineModel<boolean>('open', { default: false });
@@ -30,11 +31,11 @@
     opener ? opener.activePath.value : route.path,
   );
 
-  const groups = computed(() => groupByBookType(archetypes));
+  const groups = computed(() => groupByBookType(links));
 
   /**
-   * Подсветка открытого сейчас архетипа.
-   * @param url - адрес архетипа
+   * Подсветка открытой сейчас записи.
+   * @param url - адрес записи
    */
   function getLinkClass(url: string) {
     return openPath.value === url
@@ -47,12 +48,12 @@
   }
 
   /**
-   * Закрывает дровер и открывает архетип через страницу раздела, если она
+   * Закрывает дровер и открывает запись через страницу раздела, если она
    * умеет.
    * @param event - клик по ссылке
-   * @param url - адрес архетипа
+   * @param url - адрес записи
    */
-  function openArchetype(event: MouseEvent, url: string): void {
+  function openLink(event: MouseEvent, url: string): void {
     close();
 
     if (!opener) {
@@ -68,8 +69,8 @@
   <SectionDrawer
     v-model:open="isOpen"
     :title="title"
-    :subtitle="className"
-    :path="classUrl"
+    :subtitle="parentName"
+    :path="parentUrl"
   >
     <div class="flex flex-col gap-4">
       <section
@@ -87,7 +88,7 @@
           :to="link.url"
           :class="getLinkClass(link.url)"
           class="flex items-center justify-between gap-2 rounded-xl border px-4 py-3 transition-colors"
-          @click.left.exact.capture="openArchetype($event, link.url)"
+          @click.left.exact.capture="openLink($event, link.url)"
         >
           <span class="flex min-w-0 flex-col gap-0.5">
             <span class="truncate font-semibold text-highlighted">

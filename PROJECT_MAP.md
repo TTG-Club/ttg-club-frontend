@@ -21,8 +21,8 @@
 │   │   ├── comments/           # section (discussion under an entry: collapsed preview, tree of replies, composer with cooldown, edit, delete, report, moderator restore, #comment-<id> links); talks to comments-service via /api/v1/comments
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
-│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
-│   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race card), references (links to classes, races…)
+│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview (round preview, square cover, viewer), collapse (titled block with an arrow), detail-layout (properties column + text)
+│   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (cover card of a race or class, drawer with subraces or archetypes), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
@@ -145,7 +145,7 @@ the filter does too. Search lives in `?search=`.
 (`SectionConfig`: endpoints, order, page size), the list schema, the list
 tile and the entry (`#entry="{ path }"`); `pageSize: SECTION_PAGE_SIZE_ALL`
 loads a short section in one request, `sortItems` reorders it on the page and
-`isGrid` shows large cards (races). `SectionEntry` is the entry card shell
+`view="covers"` shows cover tiles (classes, races). `SectionEntry` is the shell
 (header, bookmark, close) around the section's own body: by the page address
 on the entry page, or by `path` in the pane and the drawer. It reads
 `POST /api/v1<path>`; a missing entry renders a real 404 on its page and an

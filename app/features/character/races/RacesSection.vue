@@ -18,7 +18,7 @@
 </script>
 
 <template>
-  <!-- Расы карточками: сначала основные, затем группы по порядку -->
+  <!-- Расы обложками, как виды на new.ttg.club: сначала основные, затем группы по порядку -->
   <SectionPage
     :section="RACES_SECTION"
     :schema="raceLinkSchema"
@@ -26,7 +26,7 @@
     :get-group="getGroupName"
     :get-path="getEntryUrl"
     :sort-items="sortItems"
-    view="cards"
+    view="covers"
   >
     <template #item="{ item, to }">
       <RaceCard
