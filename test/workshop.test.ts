@@ -1,18 +1,37 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  createBackgroundForm,
+  createFeatForm,
+  createGodForm,
+  createOptionForm,
   createSpellForm,
   describeHtmlProblem,
   extractFormula,
+  findFreePersonalizationType,
+  getBackgroundPayload,
+  getBackgroundSkills,
+  getFeatPayload,
+  getGodPayload,
   getHtmlValidityMessage,
+  getOptionPayload,
+  getRequirementText,
   getSpellPayload,
   getSpellSchoolValue,
   getWorkshopEditRoute,
   getWorkshopSlug,
   parseBookSources,
+  parseFilterGroups,
   parseRevisions,
+  parseSavedEntry,
   parseSpellTime,
+  parseWorkshopBackground,
+  parseWorkshopFeat,
+  parseWorkshopGod,
+  parseWorkshopOption,
+  parseWorkshopRule,
   parseWorkshopSpell,
+  splitList,
 } from '~workshop/model';
 
 const SPELL = {
@@ -31,6 +50,7 @@ const SPELL = {
 describe('мастерская', () => {
   it('строит адрес правки из английского названия', () => {
     expect(getWorkshopSlug(' Fire  Bolt ')).toBe('Fire_Bolt');
+    expect(getWorkshopSlug('Eldritch Blast', true)).toBe('eldritch_blast');
 
     expect(getWorkshopEditRoute('spells', 'Fire_Bolt')).toBe(
       '/workshop/spells/Fire_Bolt/edit',
@@ -165,5 +185,196 @@ describe('hTML-редактор', () => {
     expect(getHtmlValidityMessage([problem])).toContain('ссылка внутри ссылки');
 
     expect(getHtmlValidityMessage([])).toBe('');
+  });
+});
+
+describe('общее мастерской', () => {
+  it('понимает ответ сохранения справочника и богов', () => {
+    expect(parseSavedEntry({ name: { rus: 'А', eng: 'Alert' } })).toEqual({
+      englishName: 'Alert',
+    });
+
+    expect(parseSavedEntry({ englishName: 'Tyr' })).toEqual({
+      englishName: 'Tyr',
+    });
+  });
+
+  it('берёт списки из групп фильтров', () => {
+    const groups = parseFilterGroups({
+      other: [
+        { key: 'pantheon', values: [{ key: 3, label: 'Фаэрун' }] },
+        { key: 'rank', values: [{ key: 'GREATER', label: 'Высший' }] },
+      ],
+    });
+
+    expect(groups.get('pantheon')).toEqual([{ label: 'Фаэрун', value: '3' }]);
+    expect(groups.get('rank')).toEqual([{ label: 'Высший', value: 'GREATER' }]);
+    expect(parseFilterGroups(null).size).toBe(0);
+  });
+
+  it('разбирает требования и списки', () => {
+    expect(getRequirementText('Нет')).toBe('');
+    expect(getRequirementText(' Сила 13 ')).toBe('Сила 13');
+    expect(splitList(' Общий, , Эльфийский ')).toEqual(['Общий', 'Эльфийский']);
+  });
+});
+
+describe('редактор черт', () => {
+  const FEAT = {
+    id: 3,
+    name: { rus: 'Бдительный', eng: 'Alert' },
+    requirements: 'Нет',
+    abilities: ['DEXTERITY'],
+    skills: [],
+    description: '<p>Текст</p>',
+    source: { shortName: 'PHB' },
+  };
+
+  it('заполняется записью справочника', () => {
+    const feat = parseWorkshopFeat(FEAT);
+
+    expect(createFeatForm(feat)).toMatchObject({
+      name: 'Бдительный',
+      englishName: 'Alert',
+      requirement: '',
+      level: null,
+      abilities: ['DEXTERITY'],
+    });
+
+    expect(feat.source).toBe('PHB');
+  });
+
+  it('не отправляет пустые необязательные поля', () => {
+    const payload = getFeatPayload(createFeatForm(), undefined);
+
+    expect(payload.altName).toBeUndefined();
+    expect(payload.level).toBeUndefined();
+    expect(payload.requirement).toBeUndefined();
+  });
+});
+
+describe('редактор особенностей', () => {
+  it('заполняется записью и отправляет типы', () => {
+    const option = parseWorkshopOption({
+      id: 5,
+      name: { rus: 'Мучительный взрыв', eng: 'Agonizing Blast' },
+      prerequisite: 'Заговор мистический заряд',
+      level: null,
+      optionTypes: ['ELDRITCH_INVOCATION'],
+      description: '<p>Текст</p>',
+    });
+
+    const form = createOptionForm(option);
+
+    expect(form.optionTypes).toEqual(['ELDRITCH_INVOCATION']);
+
+    expect(getOptionPayload(form, 'PHB')).toMatchObject({
+      prerequisite: 'Заговор мистический заряд',
+      level: undefined,
+      source: 'PHB',
+    });
+  });
+});
+
+describe('редактор правил', () => {
+  it('берёт страницу из источника', () => {
+    const rule = parseWorkshopRule({
+      id: 1,
+      name: { rus: 'Укрытие', eng: 'Cover' },
+      type: 'Бой',
+      description: '<p>Текст</p>',
+      source: { shortName: 'PHB', page: 196 },
+    });
+
+    expect(rule).toMatchObject({ page: 196, source: 'PHB', type: 'Бой' });
+  });
+});
+
+describe('редактор богов', () => {
+  it('отправляет пантеон числом', () => {
+    const god = parseWorkshopGod({
+      id: 9,
+      name: 'Тир',
+      englishName: 'Tyr',
+      sex: 'MALE',
+      rank: 'GREATER',
+      alignment: 'LAWFUL_GOOD',
+      domains: ['WAR'],
+      pantheonId: 3,
+      source: 'PHB',
+    });
+
+    const payload = getGodPayload(createGodForm(god), god.source);
+
+    expect(payload).toMatchObject({
+      pantheonId: 3,
+      domains: ['WAR'],
+      source: 'PHB',
+      description: undefined,
+    });
+  });
+});
+
+describe('редактор предысторий', () => {
+  const BACKGROUND = {
+    id: 2,
+    name: { rus: 'Отшельник', eng: 'Hermit' },
+    skills: ['Медицина', 'Религия', 'Один навык на выбор'],
+    equipments: ['Футляр для свитков', 'зимнее одеяло'],
+    startGold: 5,
+    languages: ['Общий'],
+    description: '<p>Текст</p>',
+    personalizationTables: [
+      {
+        type: 'TRAIT',
+        tbody: [
+          ['1', 'Спокойный'],
+          ['2', 'Говорливый'],
+        ],
+      },
+    ],
+  };
+
+  it('разбирает навыки из названий', () => {
+    expect(getBackgroundSkills(['Медицина', 'ловкость рук', 'Любой'])).toEqual({
+      values: ['MEDICINE', 'SLEIGHT_OF_HAND'],
+      other: 'Любой',
+    });
+  });
+
+  it('заполняется записью справочника', () => {
+    const form = createBackgroundForm(parseWorkshopBackground(BACKGROUND));
+
+    expect(form).toMatchObject({
+      skills: ['MEDICINE', 'RELIGION'],
+      otherSkills: 'Один навык на выбор',
+      equipments: 'Футляр для свитков, зимнее одеяло',
+      languages: 'Общий',
+      lifeStyle: undefined,
+      personalizationTables: [
+        { type: 'TRAIT', values: ['Спокойный', 'Говорливый'] },
+      ],
+    });
+  });
+
+  it('отправляет языки списком и обрезает строки таблиц', () => {
+    const form = createBackgroundForm(parseWorkshopBackground(BACKGROUND));
+
+    form.languages = 'Общий, Дварфийский';
+    form.personalizationTables = [{ type: 'IDEAL', values: [' Честь '] }];
+
+    expect(getBackgroundPayload(form, undefined)).toMatchObject({
+      languages: ['Общий', 'Дварфийский'],
+      lifeStyle: undefined,
+      personalizationTables: [{ type: 'IDEAL', values: ['Честь'] }],
+    });
+  });
+
+  it('предлагает первую свободную таблицу', () => {
+    expect(findFreePersonalizationType([])).toBe('LIFE_IN_SECLUSION');
+
+    expect(
+      findFreePersonalizationType([{ type: 'LIFE_IN_SECLUSION', values: [] }]),
+    ).toBe('EMPLOYMENT');
   });
 });
