@@ -1,23 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  createArmorForm,
   createBackgroundForm,
   createFeatForm,
   createGodForm,
+  createItemForm,
+  createMagicItemForm,
   createOptionForm,
   createSpellForm,
+  createWeaponForm,
   describeHtmlProblem,
   extractFormula,
   findFreePersonalizationType,
+  getArmorPayload,
   getBackgroundPayload,
   getBackgroundSkills,
   getFeatPayload,
   getGodPayload,
   getHtmlValidityMessage,
+  getItemPayload,
+  getMagicItemPayload,
   getOptionPayload,
   getRequirementText,
   getSpellPayload,
   getSpellSchoolValue,
+  getWeaponPayload,
   getWorkshopEditRoute,
   getWorkshopSlug,
   parseBookSources,
@@ -25,13 +33,18 @@ import {
   parseRevisions,
   parseSavedEntry,
   parseSpellTime,
+  parseWorkshopArmor,
   parseWorkshopBackground,
   parseWorkshopFeat,
   parseWorkshopGod,
+  parseWorkshopItem,
+  parseWorkshopMagicItem,
   parseWorkshopOption,
   parseWorkshopRule,
   parseWorkshopSpell,
+  parseWorkshopWeapon,
   splitList,
+  weaponFormSchema,
 } from '~workshop/model';
 
 const SPELL = {
@@ -376,5 +389,126 @@ describe('редактор предысторий', () => {
     expect(
       findFreePersonalizationType([{ type: 'LIFE_IN_SECLUSION', values: [] }]),
     ).toBe('EMPLOYMENT');
+  });
+});
+
+describe('редактор оружия', () => {
+  const WEAPON = {
+    id: 4,
+    name: { rus: 'Длинный лук', eng: 'Longbow' },
+    typeRaw: 'WAR_RANGED',
+    damageType: 'PIERCING',
+    numberDice: 1,
+    damageDice: 'd8',
+    cost: 50,
+    currency: 'GM',
+    weight: 2,
+    minDistance: 150,
+    maxDistance: 600,
+    propertyIds: [1, 3, 6],
+    source: { shortName: 'PHB' },
+  };
+
+  it('заполняется записью и отправляет свойства числами', () => {
+    const form = createWeaponForm(parseWorkshopWeapon(WEAPON));
+
+    expect(form).toMatchObject({
+      type: 'WAR_RANGED',
+      damageDice: 'd8',
+      twoHandDamageDice: undefined,
+      properties: ['1', '3', '6'],
+    });
+
+    expect(getWeaponPayload(form, 'PHB')).toMatchObject({
+      properties: [1, 3, 6],
+      cost: 50,
+      ammo: undefined,
+      special: undefined,
+    });
+  });
+
+  it('новое оружие — простое рукопашное, 1к6 дробящего', () => {
+    expect(createWeaponForm()).toMatchObject({
+      type: 'SIMPLE_MELE',
+      damageType: 'BLUDGEONING',
+      numberDice: 1,
+      damageDice: 'd6',
+      currency: 'GM',
+    });
+  });
+
+  it('не принимает дальнюю дистанцию меньше ближней', () => {
+    const form = createWeaponForm(parseWorkshopWeapon(WEAPON));
+
+    form.maxDistance = 100;
+
+    expect(weaponFormSchema.safeParse(form).success).toBe(false);
+  });
+});
+
+describe('редактор доспехов', () => {
+  it('сохраняет нулевую цену и помеху', () => {
+    const armor = parseWorkshopArmor({
+      id: 6,
+      name: { rus: 'Щит', eng: 'Shield' },
+      typeRaw: 'SHIELD',
+      armorClassRaw: 2,
+      cost: 0,
+      weight: 6,
+      disadvantage: true,
+    });
+
+    expect(getArmorPayload(createArmorForm(armor), undefined)).toMatchObject({
+      type: 'SHIELD',
+      armorClass: 2,
+      cost: 0,
+      stealthHindrance: true,
+      forceRequirements: undefined,
+    });
+
+    expect(createArmorForm()).toMatchObject({ type: 'LIGHT', armorClass: 10 });
+  });
+});
+
+describe('редактор снаряжения', () => {
+  it('берёт коды категорий', () => {
+    const item = parseWorkshopItem({
+      id: 8,
+      name: { rus: 'Верёвка', eng: 'Rope' },
+      categoriesRaw: ['ADVENTURING_GEAR'],
+      cost: 1,
+      currency: 'GM',
+      weight: 10,
+    });
+
+    expect(getItemPayload(createItemForm(item), undefined)).toMatchObject({
+      categories: ['ADVENTURING_GEAR'],
+      currency: 'GM',
+      altName: undefined,
+    });
+  });
+});
+
+describe('редактор магических предметов', () => {
+  it('заполняется записью справочника', () => {
+    const item = parseWorkshopMagicItem({
+      id: 10,
+      name: { rus: 'Плащ защиты', eng: 'Cloak of Protection' },
+      rarityRaw: 'UNCOMMON',
+      typeRaw: 'SUBJECT',
+      customization: true,
+      costRaw: 3500,
+      description: '<p>Текст</p>',
+    });
+
+    expect(
+      getMagicItemPayload(createMagicItemForm(item), undefined),
+    ).toMatchObject({
+      rarity: 'UNCOMMON',
+      customization: true,
+      cost: 3500,
+      curse: false,
+      special: undefined,
+    });
   });
 });
