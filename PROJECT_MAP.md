@@ -18,9 +18,10 @@
 │   ├── composables/            # useTheme (shared cookie with the legacy SPA), useLayoutWidth (section width), usePageMeta, useUser (session)
 │   ├── features/               # DDD domains
 │   │   ├── bug-report/         # button (sidebar), modal (description, page, selected text, screenshot with marks), selection ("Ошибка в тексте" under a selection); posts to bug-report.api.ttg.club
+│   │   ├── comments/           # section (discussion under an entry: collapsed preview, tree of replies, composer with cooldown, edit, delete, report, moderator restore, #comment-<id> links); talks to comments-service via /api/v1/comments
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
-│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
+│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (race/class card), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
