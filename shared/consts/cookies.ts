@@ -21,3 +21,12 @@ export const USER_SESSION_MARKER_COOKIE = 'ttg-user-token';
 
 /** Срок хранения отметки о входе, как в старом SPA. */
 export const USER_SESSION_MARKER_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+
+/**
+ * Идентификатор гостя для учёта посетителей онлайн. Общий со старым SPA,
+ * чтобы гость не считался дважды при переходах между сайтами.
+ */
+export const ONLINE_VISITOR_ID_COOKIE = 'ttg-online-visitor-id';
+
+/** Срок жизни идентификатора гостя: 400 дней, как в старом SPA. */
+export const ONLINE_VISITOR_ID_MAX_AGE_SECONDS = 60 * 60 * 24 * 400;

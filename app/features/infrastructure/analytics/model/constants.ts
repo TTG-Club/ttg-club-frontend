@@ -36,3 +36,27 @@ export const YANDEX_METRIKA_INIT_OPTIONS = {
   trackLinks: true,
   webvisor: true,
 };
+
+/** Как часто вкладка отмечает посетителя онлайн: раз в 30 секунд. */
+export const ONLINE_HEARTBEAT_INTERVAL_MS = 30_000;
+
+/**
+ * Пауза между отметками при частых возвратах на вкладку, чтобы серия
+ * переключений не дала пачку запросов.
+ */
+export const ONLINE_HEARTBEAT_COOLDOWN_MS = 10_000;
+
+/**
+ * Блокировка, по которой отмечает только одна вкладка сайта, остальные ждут.
+ * Имя общее со старым SPA.
+ */
+export const ONLINE_HEARTBEAT_LOCK_NAME = 'ttg-online-heartbeat-leader';
+
+/** Тип посетителя для сервиса онлайна. */
+export const ONLINE_VISITOR_TYPE = {
+  guest: 'GUEST',
+  registered: 'REGISTERED',
+} as const;
+
+/** Длина ключа посетителя, которую принимает сервис онлайна. */
+export const ONLINE_VISITOR_KEY_MAX_LENGTH = 128;

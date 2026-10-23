@@ -54,3 +54,6 @@ export const SUBSCRIPTIONS_MY_PATH = `${SUBSCRIPTIONS_PATH}/my`;
 
 /** Погашение промокода: выдаёт награды и регистрирует подписку. */
 export const SUBSCRIPTIONS_REDEEM_PATH = `${SUBSCRIPTIONS_PATH}/redeem`;
+
+/** Учёт посетителей онлайн: бэкенд пересылает отметку в сервис онлайна. */
+export const ONLINE_HEARTBEAT_PATH = '/api/online/heartbeat';
