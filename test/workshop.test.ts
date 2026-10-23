@@ -8,12 +8,14 @@ import {
   createBackgroundForm,
   createClassForm,
   createClassTableColumn,
+  createCreatureForm,
   createFeatForm,
   createGodForm,
   createItemForm,
   createMagicItemForm,
   createOptionForm,
   createRaceForm,
+  createScreenForm,
   createSpellForm,
   createWeaponForm,
   describeHtmlProblem,
@@ -25,6 +27,9 @@ import {
   getBackgroundPayload,
   getBackgroundSkills,
   getClassPayload,
+  getCreatureHits,
+  getCreatureHtmlFields,
+  getCreaturePayload,
   getFeatPayload,
   getGodPayload,
   getHtmlValidityMessage,
@@ -33,6 +38,8 @@ import {
   getOptionPayload,
   getRacePayload,
   getRequirementText,
+  getScreenPayload,
+  getScreenReferenceRoute,
   getSpellPayload,
   getSpellSchoolValue,
   getWeaponPayload,
@@ -48,6 +55,7 @@ import {
   parseWorkshopArmor,
   parseWorkshopBackground,
   parseWorkshopClass,
+  parseWorkshopCreature,
   parseWorkshopFeat,
   parseWorkshopGod,
   parseWorkshopItem,
@@ -55,6 +63,7 @@ import {
   parseWorkshopOption,
   parseWorkshopRace,
   parseWorkshopRule,
+  parseWorkshopScreen,
   parseWorkshopSpell,
   parseWorkshopWeapon,
   splitList,
@@ -701,5 +710,194 @@ describe('редактор архетипов', () => {
     expect(getArchetypeEditRoute('fighter', 'champion')).toBe(
       '/workshop/classes/fighter/champion/edit',
     );
+  });
+});
+
+describe('редактор ширмы', () => {
+  const screen = parseWorkshopScreen({
+    id: 9,
+    name: { rus: 'Укрытие', eng: 'Cover' },
+    category: 'Бой',
+    description: '<p>Текст</p>',
+    icon: 'shield',
+    order: 0,
+    url: '/screens/cover',
+    parent: {
+      id: 2,
+      name: { rus: 'Бой', eng: 'Combat' },
+      url: '/screens/combat',
+    },
+  });
+
+  it('сохраняет родителя и нулевой порядок', () => {
+    expect(
+      getScreenPayload(createScreenForm(screen), screen, ''),
+    ).toMatchObject({
+      name: 'Укрытие',
+      englishName: 'Cover',
+      altName: undefined,
+      order: 0,
+      source: undefined,
+      parentId: 2,
+    });
+  });
+
+  it('отменяет правку на страницу раздела', () => {
+    expect(getScreenReferenceRoute(screen)).toBe('/screens/cover');
+  });
+});
+
+describe('редактор существ', () => {
+  const creature = parseWorkshopCreature({
+    id: 5,
+    name: { rus: 'Гоблин', eng: 'Goblin' },
+    size: { rus: 'Маленький', eng: 'small or medium', cell: '1' },
+    type: { name: 'гуманоид', tags: ['гоблиноид'] },
+    alignment: 'нейтрально-злой',
+    armorClass: 15,
+    armors: [
+      { name: 'кожаный доспех', type: 'LEATHER', url: '/armors/leather' },
+    ],
+    hits: { average: 7, formula: '2к6', text: null },
+    speed: [
+      { value: 30 },
+      { name: 'летая', value: 40, additional: 'парит' },
+      { name: 'плавая', value: 20 },
+    ],
+    ability: { str: 8, dex: 14, con: 10, int: 10, wiz: 8, cha: 8 },
+    savingThrows: [{ name: 'Ловкость', shortName: 'Лов', value: 4 }],
+    skills: [
+      { name: 'Скрытность', value: 6 },
+      { name: 'Неведомое', value: 1 },
+    ],
+    damageImmunities: ['яд', 'неизвестный'],
+    conditionImmunities: ['отравление'],
+    senses: {
+      passivePerception: '9',
+      senses: [
+        { name: 'тёмное зрение', value: 60 },
+        {
+          name: 'слепое зрение',
+          value: 10,
+          additional: 'слеп за пределами этого радиуса',
+        },
+      ],
+    },
+    languages: ['Общий', 'Гоблинский'],
+    challengeRating: '1/4',
+    actions: [
+      {
+        name: 'Скимитар',
+        englishName: 'Scimitar',
+        value: 'Атака',
+        markdown: true,
+        sharedUsageCount: 3,
+      },
+    ],
+    legendary: { list: [{ name: 'Рывок', value: '<p>Бег</p>' }], count: 3 },
+    tags: [{ name: 'Гоблин', description: '' }],
+    environment: ['лес', 'холмы'],
+    source: { shortName: 'MM' },
+  });
+
+  it('переводит подписи карточки в коды бэкенда', () => {
+    expect(creature).toMatchObject({
+      size: 'SMALL_MEDIUM',
+      type: 'HUMANOID',
+      alignment: 'NEUTRAL_EVIL',
+      armors: ['LEATHER'],
+      diceCount: 2,
+      fly: 40,
+      hover: true,
+      swim: 20,
+      climb: null,
+      savingThrows: [{ key: 'DEXTERITY', value: 4, additional: '' }],
+      skills: [{ key: 'STEALTH', value: 6, additional: '' }],
+      damageImmunities: ['POISON'],
+      conditionImmunities: ['POISONED'],
+      darkvision: 60,
+      blindsight: 10,
+      blindBeyond: true,
+      languages: 'Общий, Гоблинский',
+      tags: 'Гоблин',
+      environment: ['FOREST', 'HILL'],
+      source: 'MM',
+    });
+  });
+
+  it('считает хиты по размеру и телосложению', () => {
+    expect(getCreatureHits('MEDIUM', 14, 4)).toEqual({
+      average: 26,
+      formula: '4d8+8',
+    });
+
+    expect(getCreatureHits('SMALL', 8, 2)).toEqual({
+      average: 5,
+      formula: '2d6-2',
+    });
+
+    expect(getCreatureHits('LARGE', 10, null)).toEqual({
+      average: 0,
+      formula: '',
+    });
+  });
+
+  it('собирает запрос в формате бестиария', () => {
+    const payload = getCreaturePayload(createCreatureForm(creature), 5, 'MM');
+
+    expect(payload).toMatchObject({
+      id: 5,
+      name: { rus: 'Гоблин', eng: 'Goblin', alt: undefined },
+      hits: { average: 9, diceCount: 2, text: undefined },
+      speed: [
+        { value: 30 },
+        { name: 'летая', value: 40, additional: 'парит' },
+        { name: 'плавая', value: 20 },
+      ],
+      senses: {
+        passivePerception: '9',
+        senses: [
+          { name: 'тёмное зрение', value: 60 },
+          {
+            name: 'слепое зрение',
+            value: 10,
+            additional: 'слеп за пределами этого радиуса',
+          },
+        ],
+      },
+      languages: ['Общий', 'Гоблинский'],
+      actions: [
+        {
+          name: { rus: 'Скимитар', eng: 'Scimitar' },
+          description: 'Атака',
+          markdown: true,
+        },
+      ],
+      legendary: {
+        list: [{ name: 'Рывок', value: '<p>Бег</p>' }],
+        count: 3,
+      },
+      tags: ['Гоблин'],
+      npc: false,
+      source: 'MM',
+    });
+  });
+
+  it('новое существо — средний гуманоид без мировоззрения', () => {
+    expect(createCreatureForm()).toMatchObject({
+      size: 'MEDIUM',
+      type: 'HUMANOID',
+      alignment: 'WITHOUT',
+      armorClass: 10,
+      speed: 30,
+      passivePerception: '10',
+    });
+  });
+
+  it('проверяет разметку описаний блоков', () => {
+    expect(getCreatureHtmlFields(createCreatureForm(creature))).toMatchObject({
+      'actions.0.description': 'Атака',
+      'legendary.0.description': '<p>Бег</p>',
+    });
   });
 });

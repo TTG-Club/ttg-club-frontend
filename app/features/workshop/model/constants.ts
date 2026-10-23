@@ -53,6 +53,13 @@ export const WORKSHOP_SECTIONS: ReadonlyArray<WorkshopSection> = [
     icon: 'tabler:wand',
   },
   {
+    key: 'bestiary',
+    title: 'Существа',
+    description: 'Создание и редактирование существ бестиария.',
+    referencePath: '/bestiary',
+    icon: 'tabler:paw',
+  },
+  {
     key: 'feats',
     title: 'Черты',
     description: 'Создание и редактирование черт справочника.',
@@ -214,6 +221,8 @@ export const WORKSHOP_VALIDATION = {
   chooseOne: 'Выберите хотя бы одно значение',
   classLevel: 'Не больше 20',
   tableValue: 'Целое от -1 до 127',
+  abilityValue: 'Целое от 1 до 30',
+  byteValue: 'Не больше 127',
 } as const;
 
 /** Так карточка показывает пустые требования черты или особенности. */

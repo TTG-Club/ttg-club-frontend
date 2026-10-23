@@ -13,6 +13,7 @@
     isLoading,
     isNotFound,
     isError,
+    hasRevisions = true,
   } = defineProps<{
     /** Раздел в ручках мастерской: `spells`, `items/magic`. */
     apiSection: string;
@@ -22,6 +23,8 @@
     isLoading: boolean;
     isNotFound: boolean;
     isError: boolean;
+    /** У существ истории изменений нет. */
+    hasRevisions?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -47,6 +50,7 @@
       <slot />
 
       <WorkshopRevisions
+        v-if="hasRevisions"
         :key="version"
         :api-section="apiSection"
         :entry-id="entryId"

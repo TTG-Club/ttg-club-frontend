@@ -32,7 +32,7 @@
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
-│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, actions), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), gods, rules, weapons, armors, items, magic-items
+│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, actions), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, password change), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
@@ -63,31 +63,31 @@
 
 ## 🚚 Migration status
 
-| Section                                                                                                                                                                                                      | Status |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| Skeleton: config, proxy, theme, page meta, deploy                                                                                                                                                            | ✅     |
-| Home page                                                                                                                                                                                                    | ✅     |
-| Sidebar menu, sign in and session on SSR, analytics, online heartbeat                                                                                                                                        | ✅     |
-| Sign up, password reset, email verification                                                                                                                                                                  | ✅     |
-| Profile: display name, password change, subscription and promo codes                                                                                                                                         | ✅     |
-| Bug report: sidebar button, text selection, screenshot with marks                                                                                                                                            | ✅     |
-| Content renderer (`RawContent` replacement), dice, tooltips                                                                                                                                                  | ✅     |
-| Dice history                                                                                                                                                                                                 | ✅     |
-| List + detail, URL filters, search                                                                                                                                                                           | ✅     |
-| Bookmarks                                                                                                                                                                                                    | ✅     |
-| Wiki: gods, rules, books                                                                                                                                                                                     | ✅     |
-| Inventory: weapons, armors, items, magic items, treasures                                                                                                                                                    | ✅     |
-| Character: feats, backgrounds, class options, spells, races                                                                                                                                                  | ✅     |
-| Character: classes                                                                                                                                                                                           | ✅     |
-| Bestiary                                                                                                                                                                                                     | ✅     |
-| Screens                                                                                                                                                                                                      | ✅     |
-| Info pages, error pages                                                                                                                                                                                      | ✅     |
-| Site search: palette and `/search` page                                                                                                                                                                      | ✅     |
-| Section modes like new.ttg.club: drawer and wide                                                                                                                                                             | ✅     |
-| Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker                                                                            | ✅     |
-| Account, comments, subscription, bug report                                                                                                                                                                  | ⏳     |
-| Admin: home page videos (`/admin/youtube`)                                                                                                                                                                   | ✅     |
-| Workshop: shell, revisions, HTML editor, spells, feats, options, backgrounds, classes, archetypes, races, gods, rules, weapons, armors, items, magic items (not routed to Nuxt until every editor is ported) | ⏳     |
+| Section                                                                                                                                                                                                                                                         | Status |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Skeleton: config, proxy, theme, page meta, deploy                                                                                                                                                                                                               | ✅     |
+| Home page                                                                                                                                                                                                                                                       | ✅     |
+| Sidebar menu, sign in and session on SSR, analytics, online heartbeat                                                                                                                                                                                           | ✅     |
+| Sign up, password reset, email verification                                                                                                                                                                                                                     | ✅     |
+| Profile: display name, password change, subscription and promo codes                                                                                                                                                                                            | ✅     |
+| Bug report: sidebar button, text selection, screenshot with marks                                                                                                                                                                                               | ✅     |
+| Content renderer (`RawContent` replacement), dice, tooltips                                                                                                                                                                                                     | ✅     |
+| Dice history                                                                                                                                                                                                                                                    | ✅     |
+| List + detail, URL filters, search                                                                                                                                                                                                                              | ✅     |
+| Bookmarks                                                                                                                                                                                                                                                       | ✅     |
+| Wiki: gods, rules, books                                                                                                                                                                                                                                        | ✅     |
+| Inventory: weapons, armors, items, magic items, treasures                                                                                                                                                                                                       | ✅     |
+| Character: feats, backgrounds, class options, spells, races                                                                                                                                                                                                     | ✅     |
+| Character: classes                                                                                                                                                                                                                                              | ✅     |
+| Bestiary                                                                                                                                                                                                                                                        | ✅     |
+| Screens                                                                                                                                                                                                                                                         | ✅     |
+| Info pages, error pages                                                                                                                                                                                                                                         | ✅     |
+| Site search: palette and `/search` page                                                                                                                                                                                                                         | ✅     |
+| Section modes like new.ttg.club: drawer and wide                                                                                                                                                                                                                | ✅     |
+| Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker                                                                                                                               | ✅     |
+| Account, comments, subscription, bug report                                                                                                                                                                                                                     | ⏳     |
+| Admin: home page videos (`/admin/youtube`)                                                                                                                                                                                                                      | ✅     |
+| Workshop: shell, revisions, HTML editor, spells, creatures, feats, options, backgrounds, classes, archetypes, races, screens, gods, rules, weapons, armors, items, magic items (every legacy editor ported; waits for the gateway to route `/workshop` to Nuxt) | ⏳     |
 
 ## 🔐 Session
 
@@ -207,11 +207,17 @@ the edit page loads the entry from the reference API, saves through
 `/api/v1/workshop/<section>` and lists its revisions with restore. Descriptions
 use `WorkshopHtmlEditor`: a visual mode with `dice-roller` tokens and a source
 mode; markup the backend would reject is listed above the field and blocks the
-form. The gateway keeps `/workshop` on the legacy SPA until every editor is
-ported, so entry edit links stay external until then.
+form. Every legacy editor is ported; the gateway still keeps `/workshop` on the
+legacy SPA until it is switched, so entry edit links stay external until then.
 
-Rules and gods are edit-only (no section page or create). Options, classes,
-races, rules and gods use lowercase slugs. Archetypes are edit-only at
+Rules, gods and screens are edit-only (no section page or create). Options,
+classes, races, creatures, screens, rules and gods use lowercase slugs.
+Screens send their parent back unchanged. Creatures load from
+`GET /api/v2/bestiary/<slug>` and save with `POST`/`PUT /api/v2/bestiary`
+(`WorkshopEditFrame` with `has-revisions="false"`: there is no history). The
+creature card returns labels, so `parseWorkshopCreature` maps them back to
+backend codes; hit average and formula are computed from size, Constitution and
+dice count. Archetypes are edit-only at
 `/workshop/classes/<class>/<archetype>/edit`: they load from
 `POST /api/v1/workshop/classes/<class>/<archetype>` and save through
 `/api/v1/workshop/classes/archetypes`. Classes and archetypes share the traits
