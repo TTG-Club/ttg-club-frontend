@@ -216,8 +216,11 @@ use `WorkshopHtmlEditor`: a visual mode with `dice-roller` tokens and a source
 mode; markup the backend would reject is listed above the field and blocks the
 form. Every legacy editor is ported.
 
-Rules, gods and screens are edit-only (no section page or create). Options,
-classes, races, creatures, screens, rules and gods use lowercase slugs.
+Rules, gods, screens and books (sources) are edit-only (no section page or
+create). Options, classes, races, creatures, screens, rules, gods and books use
+lowercase slugs. Books load from `GET /api/v1/workshop/books/<slug>` and save
+with `PATCH /api/v1/workshop/books/<source>`: the abbreviation is the book key,
+so it is shown but not editable, and books have no revisions.
 Screens send their parent back unchanged. Creatures load from
 `GET /api/v2/bestiary/<slug>` and save with `POST`/`PUT /api/v2/bestiary`
 (`WorkshopEditFrame` with `has-revisions="false"`: there is no history). The

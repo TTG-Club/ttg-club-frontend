@@ -17,13 +17,13 @@
   } = defineProps<{
     /** Раздел в ручках мастерской: `spells`, `items/magic`. */
     apiSection: string;
-    /** Идентификатор загруженной записи. */
-    entryId?: number;
+    /** Идентификатор загруженной записи; у источника это аббревиатура. */
+    entryId?: number | string;
     version: number;
     isLoading: boolean;
     isNotFound: boolean;
     isError: boolean;
-    /** У существ истории изменений нет. */
+    /** У существ и источников истории изменений нет. */
     hasRevisions?: boolean;
   }>();
 
@@ -50,7 +50,7 @@
       <slot />
 
       <WorkshopRevisions
-        v-if="hasRevisions"
+        v-if="hasRevisions && typeof entryId === 'number'"
         :key="version"
         :api-section="apiSection"
         :entry-id="entryId"
