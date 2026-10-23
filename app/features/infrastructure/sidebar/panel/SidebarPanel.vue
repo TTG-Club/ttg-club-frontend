@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { SiteLogo } from '~/shared/ui/site-logo';
   import { BookmarksPanel } from '~bookmarks/panel';
+  import { BugReportButton } from '~bug-report/button';
   import { DiceHistoryToggle } from '~dice-roller/history';
   import { DisplaySettings } from '~infrastructure/display-settings';
   import { SearchButton } from '~infrastructure/search/button';
@@ -49,6 +50,8 @@
         <ClientOnly>
           <DiceHistoryToggle class="md:hidden" />
         </ClientOnly>
+
+        <BugReportButton />
 
         <UserHelmet />
 
