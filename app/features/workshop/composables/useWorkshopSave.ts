@@ -17,6 +17,12 @@ export interface WorkshopSaveTexts {
   error: string;
 }
 
+/** Запрос сохранения: без идентификатора — создание. */
+export type WorkshopSaveRequest = (
+  payload: Record<string, unknown>,
+  entryId: number | undefined,
+) => Promise<SavedEntry>;
+
 /** Возвращаемое значение useWorkshopSave. */
 export interface UseWorkshopSaveReturn {
   isSaving: Ref<boolean>;
@@ -42,14 +48,30 @@ function getErrorReason(error: unknown): string | undefined {
  * @param apiSection - раздел в ручках мастерской
  * @param entryId - идентификатор записи при правке
  * @param texts - подписи уведомлений
+ * @param request - свой запрос, если раздел сохраняется не ручками мастерской
  */
 export function useWorkshopSave(
   apiSection: string,
   entryId: () => number | undefined,
   texts: WorkshopSaveTexts,
+  request?: WorkshopSaveRequest,
 ): UseWorkshopSaveReturn {
   const toast = useToast();
   const isSaving = ref(false);
+
+  /**
+   * Сохранение ручками мастерской.
+   * @param payload - данные формы
+   * @param id - идентификатор записи при правке
+   */
+  async function saveWorkshopEntry(
+    payload: Record<string, unknown>,
+    id: number | undefined,
+  ): Promise<SavedEntry> {
+    return id === undefined
+      ? await createWorkshopEntry(apiSection, payload)
+      : await updateWorkshopEntry(apiSection, id, payload);
+  }
 
   async function save(
     payload: Record<string, unknown>,
@@ -59,10 +81,7 @@ export function useWorkshopSave(
     isSaving.value = true;
 
     try {
-      const saved =
-        id === undefined
-          ? await createWorkshopEntry(apiSection, payload)
-          : await updateWorkshopEntry(apiSection, id, payload);
+      const saved = await (request ?? saveWorkshopEntry)(payload, id);
 
       toast.add({
         title: id === undefined ? texts.created : texts.saved,
