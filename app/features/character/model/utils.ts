@@ -1,4 +1,5 @@
-import type { SectionConfig } from '~section/model';
+import type { LocationQueryRaw } from 'vue-router';
+import type { FilterDefinition, SectionConfig } from '~section/model';
 
 import type {
   ArchetypeSpell,
@@ -24,18 +25,25 @@ import type {
 
 import { sortBy } from 'es-toolkit';
 
-import { getEntryApiPath, WORKSHOP_EDIT_SUFFIX } from '~section/model';
+import {
+  getEntryApiPath,
+  getFilterGroups,
+  QUERY_VALUES_SEPARATOR,
+  WORKSHOP_EDIT_SUFFIX,
+} from '~section/model';
 
 import {
   ABILITIES_COUNT,
   ARCHETYPE_SPELL_LEVEL_TYPE,
   CHARACTER_LIST_SEPARATOR,
   CHARACTER_NO_REQUIREMENTS,
+  CLASS_HIDDEN_TABS,
   CLASS_HIT_DICE_PREFIX,
   CLASS_ICON_COLLECTION_PREFIX,
   CLASS_ICON_PREFIX,
   CLASS_ICONS,
   CLASS_TAB_SECTIONS,
+  CLASS_TAB_TYPE,
   CLASS_TEXT,
   FEAT_TEXT,
   RACE_STATS,
@@ -43,8 +51,10 @@ import {
   RACES_WORKSHOP_PATH,
   REFERENCE_SEPARATOR,
   SKILLS_COUNT,
+  SPELL_CLASS_FILTER_KEY,
   SPELL_COMPONENTS,
   SPELL_TEXT,
+  SPELLS_SECTION,
 } from './constants';
 
 /**
@@ -286,16 +296,88 @@ export function getClassIcon(icon?: string | null): string | undefined {
 
 /**
  * Вкладки страницы класса по порядку. Ключ собирается из типа и порядка:
- * у класса и его архетипа могут быть две вкладки особенностей.
+ * у класса и его архетипа могут быть две вкладки особенностей. Заклинаний
+ * среди них нет: их открывает кнопка.
  * @param entry - класс или архетип
  */
 export function getClassTabs(entry: ClassDetail): Array<ClassTab> {
-  return sortBy(entry.tabs ?? [], [(tab) => tab.order]).map((tab) => ({
+  return sortBy(
+    (entry.tabs ?? []).filter((tab) => !CLASS_HIDDEN_TABS.has(tab.type)),
+    [(tab) => tab.order],
+  ).map((tab) => ({
     key: `${tab.type}-${tab.order}`,
     name: tab.name,
     type: tab.type,
     url: tab.url,
   }));
+}
+
+/**
+ * Ручка фильтра заклинаний класса: в нём скрыто выбран сам класс. У
+ * класса без заклинаний её нет.
+ * @param entry - класс или архетип
+ */
+export function getClassSpellsFilterUrl(
+  entry: ClassDetail,
+): string | undefined {
+  const tab = entry.tabs?.find((item) => item.type === CLASS_TAB_TYPE.spells);
+
+  return tab ? getEntryApiPath(tab.url) : undefined;
+}
+
+/**
+ * Ссылка на раздел заклинаний с фильтром класса. Класс берётся из фильтра
+ * класса: у Мистического рыцаря и Мистического ловкача это Волшебник.
+ * @param filter - фильтр заклинаний класса
+ */
+export function getClassSpellsLink(
+  filter: FilterDefinition,
+): { path: string; query: LocationQueryRaw } | undefined {
+  const group = getFilterGroups(filter).find(
+    (item) => item.key === SPELL_CLASS_FILTER_KEY && item.values.length,
+  );
+
+  return group
+    ? {
+        path: SPELLS_SECTION.path,
+        query: {
+          [group.key]: group.values
+            .map((value) => String(value.key))
+            .join(QUERY_VALUES_SEPARATOR),
+        },
+      }
+    : undefined;
+}
+
+/**
+ * Архетип, открытый сейчас. Архетип приходит с адресом и архетипами
+ * своего класса, поэтому узнаётся по адресу страницы.
+ * @param entry - класс или архетип
+ * @param path - адрес открытой записи
+ */
+export function findClassArchetype(
+  entry: ClassDetail,
+  path: string,
+): TypedLink | undefined {
+  return path === entry.url
+    ? undefined
+    : entry.archetypes?.find((archetype) => archetype.url === path);
+}
+
+/**
+ * Название класса у архетипа: API склеивает его с названием архетипа.
+ * @param entry - класс или архетип
+ * @param archetype - открытый архетип
+ */
+export function getParentClassName(
+  entry: ClassDetail,
+  archetype?: TypedLink,
+): string {
+  const suffix = archetype ? ` ${archetype.name.rus}` : '';
+
+  return suffix && entry.name.rus.endsWith(suffix)
+    ? entry.name.rus.slice(0, -suffix.length)
+    : entry.name.rus;
 }
 
 /**

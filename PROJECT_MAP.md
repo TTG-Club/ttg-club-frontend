@@ -129,8 +129,7 @@ opens the entry page; a link with `?detail=` opened outside the wide mode
 redirects there on SSR. The server guesses the screen from the User-Agent
 (`@nuxtjs/device`). The entry page (`pages/spells/[slug].vue`) is a standalone
 SSR page. `useSectionDetail` keeps the open entry, and list links get it
-through `useSectionOpener`; Ctrl-click still opens the entry page. Classes
-have no entry slot, so their cards always open the class page.
+through `useSectionOpener`; Ctrl-click still opens the entry page.
 
 `useSectionList` loads the first page on SSR and the next ones on scroll
 (`POST` with `page`, `size`, `search`, `order`, `filter`). `useSectionFilter` takes the groups from
@@ -155,8 +154,7 @@ and, for moderators and admins, links to its editor in the workshop
 (`/workshop/<path>/edit`). `SectionSourceBar` replaces `DetailTopBar`.
 
 Search and filter live in a `SectionQueryStore`: the page address by default,
-or memory for `SectionTabList`, the list inside a tab (spells and options of a
-class). A tab list always sends its filter, because a hidden group of the
+or memory for `SectionTabList`, the list inside a tab (options of a class). A tab list always sends its filter, because a hidden group of the
 filter picks the class. `SectionEntryModal` opens an entry from such a list in
 a modal instead of leaving the page.
 
@@ -164,7 +162,13 @@ A class or archetype opens like other section entries: in a drawer, in the
 side panel in the wide layout, or as its own page (`/classes/<class>` and
 `/classes/<class>/<archetype>`). It has tabs from the API: traits (level
 table, proficiencies, features, archetypes loaded on first open),
-description, and the spells and options lists.
+description and the options list. Above the tabs, as on new.ttg.club, a row
+of buttons returns from an archetype to its class, picks an archetype in a
+popover (grouped by book type, with search) and opens the spells section in a
+new tab with the class filter set (`/spells?class=<id>`). The class id comes
+from the hidden group of the class spell filter, so Eldritch Knight and
+Arcane Trickster get the wizard list. The class and archetype open the same
+way as from the list: in the drawer, the side panel or their own page.
 Gallery images open in `SectionImageViewer`. Feature tooltips in the level
 table use the features already loaded with the class.
 
