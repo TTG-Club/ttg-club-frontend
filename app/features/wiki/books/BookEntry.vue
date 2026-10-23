@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ContentRender } from '~content/render';
   import { SectionEntry } from '~section/entry';
+  import { getWorkshopEditPath } from '~section/model';
   import { SectionSourceBar } from '~section/source-bar';
 
   import {
@@ -19,11 +20,11 @@
 </script>
 
 <template>
-  <!-- Правки в мастерской у книг нет -->
   <SectionEntry
     :path="path"
     :section="BOOKS_SECTION"
     :schema="bookDetailSchema"
+    :get-edit-path="getWorkshopEditPath"
   >
     <template #default="{ entry }">
       <SectionSourceBar :left="entry.type.name">
