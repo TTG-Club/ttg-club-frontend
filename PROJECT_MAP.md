@@ -29,11 +29,11 @@
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
-│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics
+│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, password change), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
-│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA)
+│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks)
 │   └── shared/                 # consts (API paths, UI texts), types (user), ui (logo, hamburger)
 ├── server/
 │   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
@@ -64,7 +64,7 @@
 | --------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | Skeleton: config, proxy, theme, page meta, deploy                                                                                 | ✅     |
 | Home page                                                                                                                         | ✅     |
-| Sidebar menu, sign in and session on SSR, analytics                                                                               | ✅     |
+| Sidebar menu, sign in and session on SSR, analytics, online heartbeat                                                             | ✅     |
 | Sign up, password reset, email verification                                                                                       | ✅     |
 | Profile: display name, password change, subscription and promo codes                                                              | ✅     |
 | Bug report: sidebar button, text selection, screenshot with marks                                                                 | ✅     |

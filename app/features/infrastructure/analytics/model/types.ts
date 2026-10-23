@@ -1,3 +1,5 @@
+import type { ONLINE_VISITOR_TYPE } from './constants';
+
 /**
  * Функция `ym` Яндекс.Метрики. До загрузки скрипта это очередь из кода
  * подключения: вызовы копятся в ней, и загруженный скрипт выполняет их по
@@ -18,4 +20,13 @@ declare global {
     /** Функция Яндекс.Метрики; создаётся при подключении счётчика */
     ym?: YandexMetrikaQueue;
   }
+}
+
+/** Тело отметки посетителя онлайн. */
+export interface OnlineHeartbeatBody {
+  /** Логин вошедшего или идентификатор гостя. */
+  key: string;
+  /** Идентификатор гостя до входа: сервис не считает его отдельно. */
+  previousGuestKey?: string;
+  type: (typeof ONLINE_VISITOR_TYPE)[keyof typeof ONLINE_VISITOR_TYPE];
 }

@@ -1,8 +1,13 @@
-export type { YandexMetrikaQueue } from './types';
+export type { OnlineHeartbeatBody, YandexMetrikaQueue } from './types';
 
 export {
   GOOGLE_ANALYTICS_ID_QUERY_PARAMETER,
   GOOGLE_ANALYTICS_SCRIPT_MARKER,
+  ONLINE_HEARTBEAT_COOLDOWN_MS,
+  ONLINE_HEARTBEAT_INTERVAL_MS,
+  ONLINE_HEARTBEAT_LOCK_NAME,
+  ONLINE_VISITOR_KEY_MAX_LENGTH,
+  ONLINE_VISITOR_TYPE,
   YANDEX_METRIKA_DESTRUCT_METHOD,
   YANDEX_METRIKA_HIT_METHOD,
   YANDEX_METRIKA_INIT_METHOD,
@@ -10,3 +15,9 @@ export {
   YANDEX_METRIKA_SCRIPT_KEY,
   YANDEX_METRIKA_SCRIPT_URL,
 } from './constants';
+
+export {
+  getGuestHeartbeatBody,
+  getRegisteredHeartbeatBody,
+  parseOnlineVisitorId,
+} from './utils';
