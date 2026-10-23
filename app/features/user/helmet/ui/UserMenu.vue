@@ -8,8 +8,8 @@
     USER_HELMET_ICON,
     USER_MENU_ADMIN_LINK,
     USER_MENU_BUTTON_LABEL,
-    USER_MENU_LEGACY_LINKS,
     USER_MENU_PROFILE_LINK,
+    USER_MENU_WORKSHOP_LINK,
   } from '../../model';
 
   const { user, isEditor, signOut } = useUser();
@@ -84,16 +84,14 @@
         />
 
         <UButton
-          v-for="link in USER_MENU_LEGACY_LINKS"
-          :key="link.url"
-          :to="link.url"
-          :icon="link.icon"
-          :label="link.label"
-          external
+          :to="USER_MENU_WORKSHOP_LINK.to"
+          :icon="USER_MENU_WORKSHOP_LINK.icon"
+          :label="USER_MENU_WORKSHOP_LINK.label"
           color="neutral"
           variant="ghost"
           block
           :ui="{ base: 'justify-start' }"
+          @click.left.exact="close"
         />
       </template>
 

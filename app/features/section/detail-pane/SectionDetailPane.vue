@@ -129,7 +129,6 @@
             :aria-label="SECTION_TEXT.edit"
             color="neutral"
             variant="ghost"
-            external
           />
         </UTooltip>
       </template>
