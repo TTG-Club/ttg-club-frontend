@@ -31,6 +31,7 @@
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
+│   │   ├── workshop/           # model (sections, revisions, html-editor, spells), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (source select, actions), entry-state, spells (editor)
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, password change), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
@@ -85,7 +86,7 @@
 | Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker | ✅     |
 | Account, comments, subscription, bug report                                                                                       | ⏳     |
 | Admin: home page videos (`/admin/youtube`)                                                                                        | ✅     |
-| Workshop                                                                                                                          | ⏳     |
+| Workshop: shell, revisions, HTML editor, spells (not routed to Nuxt until every editor is ported)                                 | ⏳     |
 
 ## 🔐 Session
 
@@ -196,6 +197,17 @@ loads only in the browser. The search field opens the search palette.
 Moderators and administrators manage the videos at `/admin/youtube` (also in
 the user menu): add by link or ID, rename, delete, and switch up to five on for
 the home page. The page is closed to search engines and to other users.
+
+## 🛠️ Workshop
+
+Moderators and administrators edit reference entries at `/workshop`. Each
+section has `/workshop/<section>/create` and `/workshop/<section>/<slug>/edit`;
+the edit page loads the entry from the reference API, saves through
+`/api/v1/workshop/<section>` and lists its revisions with restore. Descriptions
+use `WorkshopHtmlEditor`: a visual mode with `dice-roller` tokens and a source
+mode; markup the backend would reject is listed above the field and blocks the
+form. The gateway keeps `/workshop` on the legacy SPA until every editor is
+ported, so entry edit links stay external until then.
 
 ## 🔍 Search
 
