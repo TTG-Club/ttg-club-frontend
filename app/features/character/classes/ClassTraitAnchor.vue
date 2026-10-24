@@ -13,6 +13,9 @@
     feature?: ClassFeature;
   }>();
 
+  // Подсказка ждёт, чтобы не всплывать, пока курсор идёт по таблице
+  const HINT_OPEN_DELAY_MS = 700;
+
   const emit = defineEmits<{
     select: [anchor: string];
   }>();
@@ -30,6 +33,7 @@
   <UPopover
     v-if="feature?.description"
     mode="hover"
+    :open-delay="HINT_OPEN_DELAY_MS"
   >
     <a
       :href="traitLink.anchor"
