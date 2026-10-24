@@ -18,6 +18,7 @@ import type {
   FilterPart,
   FilterPayload,
   FilterSelection,
+  FilterValue,
   SectionListRequest,
   SectionOrder,
 } from './types';
@@ -547,13 +548,29 @@ export function searchFilterGroups(
 
     return {
       group,
+      // У книг ищем и по сокращению, и по названию из подсказки
       values: group.values.filter((value) =>
-        value.label.toLocaleLowerCase().includes(needle),
+        [value.label, value.tooltip].some((text) =>
+          text?.toLocaleLowerCase().includes(needle),
+        ),
       ),
     };
   });
 
   return matches.filter((match) => match.values.length > 0);
+}
+
+/**
+ * Книга в фильтре источников подписана названием, а сокращение уходит в
+ * подсказку; без названия остаётся сокращение.
+ * @param value - книга из фильтра
+ */
+export function getSourceFilterValue(value: FilterValue): FilterValue {
+  if (!value.tooltip) {
+    return value;
+  }
+
+  return { ...value, label: value.tooltip, tooltip: value.label };
 }
 
 /**
