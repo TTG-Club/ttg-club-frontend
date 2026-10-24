@@ -41,26 +41,31 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <ClassRoutingBar
-      :entry="entry"
-      :path="path"
-    >
-      <UButton
-        v-if="description || spellTable"
-        :icon="CLASS_ICON.description"
-        variant="soft"
-        color="neutral"
-        @click.left.exact.prevent="openDescription"
-      >
-        <span class="flex flex-col items-start leading-tight">
-          <span class="text-xs text-muted">{{ CLASS_TEXT.aboutLabel }}</span>
-
-          <span>{{ CLASS_TEXT.description }}</span>
-        </span>
-      </UButton>
-    </ClassRoutingBar>
-
     <SectionDetailLayout>
+      <template #header>
+        <ClassRoutingBar
+          :entry="entry"
+          :path="path"
+        >
+          <UButton
+            v-if="description || spellTable"
+            :icon="CLASS_ICON.description"
+            class="ml-auto"
+            variant="soft"
+            color="neutral"
+            @click.left.exact.prevent="openDescription"
+          >
+            <span class="flex flex-col items-start leading-tight">
+              <span class="text-xs text-muted">{{
+                CLASS_TEXT.aboutLabel
+              }}</span>
+
+              <span>{{ CLASS_TEXT.description }}</span>
+            </span>
+          </UButton>
+        </ClassRoutingBar>
+      </template>
+
       <template
         v-if="images.length"
         #aside
