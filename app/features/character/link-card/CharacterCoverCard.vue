@@ -114,7 +114,7 @@
       <!-- Источник на обложке, как на new.ttg.club: строке остаётся место под название -->
       <span
         v-if="source?.group"
-        class="absolute top-2 right-2 z-10 flex"
+        class="absolute top-2 left-2 z-10 flex"
       >
         <SectionSourceBadge
           :group="source.group"
