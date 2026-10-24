@@ -2,16 +2,20 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getItemCategoriesLabel,
+  getItemCategoryGroups,
+  getItemCategoryOrder,
   getMagicItemEditPath,
   getMagicItemTypeParts,
   getRarityGroup,
   getTreasureKey,
   getTreasurePrice,
+  isItemsGrouping,
   itemDetailSchema,
+  itemLinkSchema,
   magicItemDetailSchema,
   treasureSchema,
 } from '~inventory/model';
-import { getFirstLetterGroup } from '~section/model';
+import { getFirstLetterGroup, groupItems } from '~section/model';
 
 const name = { rus: 'Сумка хранения', eng: 'Bag of Holding' };
 const rarity = { type: 'uncommon', name: 'необычный' };
@@ -89,6 +93,47 @@ describe('снаряжение', () => {
 
   it('группирует по первой букве русского названия', () => {
     expect(getFirstLetterGroup({ name })).toBe('С');
+  });
+
+  it('кладёт предмет в каждую его категорию в порядке справочника', () => {
+    const sack = itemLinkSchema.parse({
+      name: { rus: 'Мешок', eng: 'Sack' },
+      url: '/items/sack',
+      categoryGroups: [
+        { name: 'Снаряжение', order: 0 },
+        { name: 'Контейнеры', order: 4 },
+      ],
+    });
+
+    const flask = itemLinkSchema.parse({
+      name: { rus: 'Фляга', eng: 'Flask' },
+      url: '/items/flask',
+      categoryGroups: [{ name: 'Контейнеры', order: 4 }],
+    });
+
+    const stone = itemLinkSchema.parse({
+      name: { rus: 'Камень', eng: 'Stone' },
+      url: '/items/stone',
+    });
+
+    const groups = groupItems(
+      [flask, sack, stone],
+      getItemCategoryGroups,
+      getItemCategoryOrder,
+    );
+
+    expect(
+      groups.map((group) => [group.name, group.items.map((item) => item.url)]),
+    ).toEqual([
+      ['Снаряжение', ['/items/sack']],
+      ['Контейнеры', ['/items/flask', '/items/sack']],
+      ['Без категории', ['/items/stone']],
+    ]);
+  });
+
+  it('принимает из cookie только известную группировку', () => {
+    expect(isItemsGrouping('alphabet')).toBe(true);
+    expect(isItemsGrouping('size')).toBe(false);
   });
 });
 

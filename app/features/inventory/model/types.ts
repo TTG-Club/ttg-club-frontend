@@ -1,6 +1,11 @@
+import type { ITEMS_GROUPINGS } from './constants';
+
 /** Часть подписи типа магического предмета: текст или ссылка. */
 export interface MagicItemTypePart {
   key: string;
   text: string;
   url?: string;
 }
+
+/** Группировка списка снаряжения. */
+export type ItemsGrouping = (typeof ITEMS_GROUPINGS)[number];
