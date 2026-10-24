@@ -35,9 +35,8 @@ export const SEARCH_TEXT = {
   empty: 'Боги не нашли ответа на твой запрос',
   error: 'Произошла ошибка, попробуйте ещё раз',
   found: 'Найдено:',
-  random: 'Случайные',
-  randomLabel: 'Показать случайные записи',
-  allResults: 'Все результаты',
+  random: 'Показать случайные записи',
+  openPage: 'Открыть страницу поиска',
   range: 'Результат:',
   of: 'из',
 } as const;
@@ -45,5 +44,5 @@ export const SEARCH_TEXT = {
 export const SEARCH_ICON = {
   search: 'tabler:search',
   random: 'ttg:dice-d20',
-  page: 'tabler:list-search',
+  page: 'tabler:file-search',
 } as const;

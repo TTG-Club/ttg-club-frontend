@@ -31,6 +31,14 @@
     isError?: boolean;
   }>();
 
+  /** Кнопки записи: в шапке, а на телефоне плавают в правом нижнем углу. */
+  const ACTIONS_CLASS = [
+    'flex shrink-0 items-center gap-1',
+    'max-md:fixed max-md:right-2 max-md:bottom-(--navbar-height) max-md:z-10 max-md:mb-2',
+    'max-md:rounded-md max-md:border max-md:border-default max-md:p-1',
+    'max-md:bg-default/50 max-md:shadow-md max-md:backdrop-blur-lg',
+  ];
+
   const emit = defineEmits<{
     close: [];
   }>();
@@ -93,63 +101,66 @@
         </div>
       </div>
 
-      <template v-if="isReady">
-        <UTooltip :text="SECTION_TEXT.copyLink">
-          <UButton
-            :icon="SECTION_ICON.copy"
-            :aria-label="SECTION_TEXT.copyLink"
-            color="neutral"
-            variant="ghost"
-            @click.left.exact.prevent="copyLink"
-          />
-        </UTooltip>
+      <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
+      <div :class="ACTIONS_CLASS">
+        <template v-if="isReady">
+          <UTooltip :text="SECTION_TEXT.copyLink">
+            <UButton
+              :icon="SECTION_ICON.copy"
+              :aria-label="SECTION_TEXT.copyLink"
+              color="neutral"
+              variant="ghost"
+              @click.left.exact.prevent="copyLink"
+            />
+          </UTooltip>
 
-        <slot name="actions" />
+          <slot name="actions" />
 
-        <UTooltip
-          v-if="path"
-          :text="SECTION_TEXT.openPage"
-        >
-          <UButton
-            :to="path"
-            :icon="SECTION_ICON.openPage"
-            :aria-label="SECTION_TEXT.openPage"
-            color="neutral"
-            variant="ghost"
-          />
-        </UTooltip>
+          <UTooltip
+            v-if="path"
+            :text="SECTION_TEXT.openPage"
+          >
+            <UButton
+              :to="path"
+              :icon="SECTION_ICON.openPage"
+              :aria-label="SECTION_TEXT.openPage"
+              color="neutral"
+              variant="ghost"
+            />
+          </UTooltip>
 
-        <UTooltip
-          v-if="isEditAvailable"
-          :text="SECTION_TEXT.edit"
-        >
-          <UButton
-            :to="editUrl"
-            :icon="SECTION_ICON.edit"
-            :aria-label="SECTION_TEXT.edit"
-            color="neutral"
-            variant="ghost"
-          />
-        </UTooltip>
-      </template>
+          <UTooltip
+            v-if="isEditAvailable"
+            :text="SECTION_TEXT.edit"
+          >
+            <UButton
+              :to="editUrl"
+              :icon="SECTION_ICON.edit"
+              :aria-label="SECTION_TEXT.edit"
+              color="neutral"
+              variant="ghost"
+            />
+          </UTooltip>
+        </template>
 
-      <UButton
-        v-if="closeTo"
-        :to="closeTo"
-        :icon="SECTION_ICON.close"
-        :aria-label="SECTION_TEXT.close"
-        color="neutral"
-        variant="ghost"
-      />
+        <UButton
+          v-if="closeTo"
+          :to="closeTo"
+          :icon="SECTION_ICON.close"
+          :aria-label="SECTION_TEXT.close"
+          color="neutral"
+          variant="ghost"
+        />
 
-      <UButton
-        v-else
-        :icon="SECTION_ICON.close"
-        :aria-label="SECTION_TEXT.close"
-        color="neutral"
-        variant="ghost"
-        @click.left.exact.prevent="close"
-      />
+        <UButton
+          v-else
+          :icon="SECTION_ICON.close"
+          :aria-label="SECTION_TEXT.close"
+          color="neutral"
+          variant="ghost"
+          @click.left.exact.prevent="close"
+        />
+      </div>
     </header>
 
     <div
