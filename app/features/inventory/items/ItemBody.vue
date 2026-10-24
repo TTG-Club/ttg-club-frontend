@@ -16,10 +16,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="categories"
-      :source="item.source"
-    />
+    <SectionSourceBar :left="categories" />
 
     <ul
       v-if="item.price || item.weight"

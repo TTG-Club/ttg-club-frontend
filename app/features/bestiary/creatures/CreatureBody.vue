@@ -99,10 +99,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="typeLabel"
-      :source="creature.source"
-    />
+    <SectionSourceBar :left="typeLabel" />
 
     <div class="flow-root">
       <SectionImagePreview

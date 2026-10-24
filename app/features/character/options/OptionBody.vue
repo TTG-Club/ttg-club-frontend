@@ -22,10 +22,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="requirements"
-      :source="option.source"
-    />
+    <SectionSourceBar :left="requirements" />
 
     <ContentRender
       v-if="option.description"

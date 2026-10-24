@@ -1,7 +1,11 @@
-<script setup lang="ts" generic="T extends { name: EntryName }">
+<script
+  setup
+  lang="ts"
+  generic="T extends { name: EntryName; source?: EntrySource | null }"
+>
   import type { z } from 'zod';
 
-  import type { EntryName } from '../model';
+  import type { EntryName, EntrySource } from '../model';
 
   import { getEntryApiPath } from '../model';
   import SectionDrawer from './SectionDrawer.vue';
@@ -61,6 +65,7 @@
     v-model:open="isOpen"
     :title="entry?.name.rus ?? title"
     :subtitle="entry?.name.eng"
+    :source="entry?.source"
     :path="path"
     :is-loading="isLoading"
     :is-error="isError"

@@ -14,7 +14,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="screen.source">
+    <SectionSourceBar>
       <template
         v-if="screen.parent"
         #left

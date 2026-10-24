@@ -17,10 +17,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="weapon.type.name"
-      :source="weapon.source"
-    />
+    <SectionSourceBar :left="weapon.type.name" />
 
     <SectionStatGrid>
       <SectionStat :label="WEAPON_TEXT.price">

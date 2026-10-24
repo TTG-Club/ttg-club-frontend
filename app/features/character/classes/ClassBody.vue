@@ -3,7 +3,6 @@
 
   import { ContentRender } from '~content/render';
   import { SectionImageViewer } from '~section/image-preview';
-  import { SectionSourceBar } from '~section/source-bar';
 
   import {
     CLASS_ICON,
@@ -69,8 +68,6 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="entry.source" />
-
     <ClassRoutingBar
       :entry="entry"
       :path="path"
