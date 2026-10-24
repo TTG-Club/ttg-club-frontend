@@ -1,14 +1,10 @@
 <script setup lang="ts">
-  import type { CommandPaletteGroup, CommandPaletteItem } from '@nuxt/ui';
-
-  import type { EntrySource } from '~section/model';
-
   import type { ClassDetail } from '../model';
 
   import { useSectionOpener } from '~section/composables';
   import { filterResponseSchema, normalizeFilter } from '~section/model';
-  import { SectionSourceBadge } from '~section/source-badge';
 
+  import { CharacterLinkPicker } from '../link-card';
   import {
     CLASS_ICON,
     CLASS_TEXT,
@@ -16,12 +12,7 @@
     getClassSpellsFilterUrl,
     getClassSpellsLink,
     getParentClassName,
-    groupByBookType,
   } from '../model';
-
-  interface SubclassItem extends CommandPaletteItem {
-    source?: EntrySource | null;
-  }
 
   /**
    * Переходы со страницы класса, как на new.ttg.club: к самому классу,
@@ -43,22 +34,12 @@
 
   const archetypes = computed(() => entry.archetypes ?? []);
 
-  const subclassName = computed(
-    () => archetype.value?.name.rus ?? CLASS_TEXT.chooseSubclass,
-  );
-
-  const isPopoverOpen = ref(false);
-
-  const search = ref('');
-
   /**
    * Открывает класс или подкласс через страницу раздела, а вне раздела
    * переходит на его страницу.
    * @param url - адрес класса или подкласса
    */
   function openEntry(url: string): void {
-    isPopoverOpen.value = false;
-
     if (opener) {
       opener.open(url);
 
@@ -80,20 +61,6 @@
     event.preventDefault();
     opener.open(entry.url);
   }
-
-  const groups = computed<Array<CommandPaletteGroup<SubclassItem>>>(() =>
-    groupByBookType(archetypes.value).map((group) => ({
-      id: group.name,
-      label: group.name,
-      items: group.items.map((link) => ({
-        label: link.name.rus,
-        suffix: link.name.eng ? `[${link.name.eng}]` : undefined,
-        source: link.source,
-        active: link.url === path,
-        onSelect: () => openEntry(link.url),
-      })),
-    })),
-  );
 
   const spellsFilterUrl = computed(() => getClassSpellsFilterUrl(entry));
 
@@ -135,56 +102,15 @@
       </span>
     </UButton>
 
-    <UPopover
+    <CharacterLinkPicker
       v-if="archetypes.length"
-      v-model:open="isPopoverOpen"
-      :ui="{ content: 'p-0' }"
-      arrow
-    >
-      <UButton
-        :active="!!archetype || isPopoverOpen"
-        active-variant="subtle"
-        variant="soft"
-        color="primary"
-        class="gap-2"
-      >
-        <UBadge
-          :label="archetypes.length"
-          variant="subtle"
-          color="primary"
-          size="lg"
-        />
-
-        <span class="flex flex-col items-start leading-tight">
-          <span class="text-xs text-muted">{{ CLASS_TEXT.subclassLabel }}</span>
-
-          <span class="text-left">{{ subclassName }}</span>
-        </span>
-      </UButton>
-
-      <template #content>
-        <UCommandPalette
-          v-model:search-term="search"
-          :groups="groups"
-          :placeholder="CLASS_TEXT.searchSubclass"
-          :autofocus="false"
-          :ui="{
-            input: '[&>input]:h-8 [&>input]:text-sm',
-            content: 'max-h-80',
-          }"
-          class="w-80 max-w-[calc(100vw-2rem)]"
-        >
-          <template #item-trailing="{ item }">
-            <SectionSourceBadge
-              v-if="item.source?.group"
-              :group="item.source.group"
-              :label="item.source.shortName"
-              :tooltip="item.source.name"
-            />
-          </template>
-        </UCommandPalette>
-      </template>
-    </UPopover>
+      :label="CLASS_TEXT.subclassLabel"
+      :placeholder="CLASS_TEXT.searchSubclass"
+      :empty-text="CLASS_TEXT.chooseSubclass"
+      :links="archetypes"
+      :active-path="path"
+      @select="openEntry"
+    />
 
     <UButton
       v-if="spellsLink"
