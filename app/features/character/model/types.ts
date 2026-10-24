@@ -15,11 +15,10 @@ export interface TypedLinkGroup {
   items: Array<TypedLink>;
 }
 
-/** Короткая характеристика расы в карточке. */
+/** Свойство расы в колонке слева: подпись и значение. */
 export interface RaceStat {
   key: string;
   label: string;
-  hint: string;
   value: string;
 }
 

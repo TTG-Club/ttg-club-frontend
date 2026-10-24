@@ -22,6 +22,7 @@ import {
   getRaceAbilitiesLabel,
   getRaceEditPath,
   getRaceSpeedLabel,
+  getRaceStats,
   getRequirementsLabel,
   getSpellComponentLabels,
   getSpellGroup,
@@ -196,6 +197,23 @@ describe('расы', () => {
     expect(groups.map((group) => [group.name, group.items.length])).toEqual([
       ['Официальные источники', 2],
       ['UA', 1],
+    ]);
+  });
+
+  it('показывает слева только заполненные свойства расы', () => {
+    const stats = getRaceStats({
+      name: { rus: 'Эльф', eng: 'Elf' },
+      type: 'Гуманоид',
+      size: 'Средний',
+      speed: [{ value: 30 }],
+      darkvision: 60,
+    });
+
+    expect(stats.map(({ label, value }) => [label, value])).toEqual([
+      ['Тип', 'Гуманоид'],
+      ['Размер', 'Средний'],
+      ['Скорость', '30 фт.'],
+      ['Тёмное зрение', '60 фт.'],
     ]);
   });
 
