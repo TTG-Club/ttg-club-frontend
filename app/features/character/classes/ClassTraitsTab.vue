@@ -1,13 +1,11 @@
 <script setup lang="ts">
-  import type { ClassDetail, ClassFeature, ClassTraits } from '../model';
+  import type { ClassDetail, ClassTraits } from '../model';
 
   import { ContentRender } from '~content/render';
   import { DiceRoller } from '~dice-roller/roller';
-  import { SectionDrawer } from '~section/entry-drawer';
 
   import {
     CLASS_TEXT,
-    findClassFeature,
     getClassHitPoints,
     getClassSkillsLabel,
     OPTIONAL_FEATURES_PATH,
@@ -75,28 +73,6 @@
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  const openedFeature = ref<ClassFeature>();
-
-  const isFeatureOpen = ref(false);
-
-  /**
-   * Открывает умение из таблицы уровней в дровере, а без описания
-   * прокручивает к нему.
-   * @param anchor - якорь вида `#c12`
-   */
-  function openFeature(anchor: string) {
-    const feature = findClassFeature(traits, anchor);
-
-    if (!feature?.description) {
-      scrollToFeature(anchor);
-
-      return;
-    }
-
-    openedFeature.value = feature;
-    isFeatureOpen.value = true;
-  }
-
   // Ссылка на умение из адреса, как в старом SPA
   onMounted(() => {
     if (route.hash) {
@@ -150,7 +126,7 @@
 
     <ClassLevelTable
       :traits="traits"
-      @select="openFeature"
+      @select="scrollToFeature"
     />
 
     <details open>
@@ -271,19 +247,6 @@
       v-if="archetypes.length"
       :archetypes="archetypes"
     />
-
-    <SectionDrawer
-      v-model:open="isFeatureOpen"
-      :title="openedFeature?.name ?? ''"
-      :subtitle="openedFeature?.type ?? undefined"
-    >
-      <div class="content-render">
-        <ContentRender
-          v-if="openedFeature?.description"
-          :html="openedFeature.description"
-        />
-      </div>
-    </SectionDrawer>
   </div>
 </template>
 

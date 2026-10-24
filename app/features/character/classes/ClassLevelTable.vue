@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { ClassTraits } from '../model';
 
-  import { CLASS_TEXT, REFERENCE_SEPARATOR } from '../model';
+  import { CLASS_TEXT, findClassFeature, REFERENCE_SEPARATOR } from '../model';
   import ClassTraitAnchor from './ClassTraitAnchor.vue';
 
   /**
@@ -42,6 +42,7 @@
       proficiencyBonus: `+${level.proficiencyBonus}`,
       traits: level.traits.map((traitLink, index) => ({
         traitLink,
+        feature: findClassFeature(traits, traitLink.anchor),
         separator:
           index < level.traits.length - 1 ? REFERENCE_SEPARATOR : undefined,
       })),
@@ -187,6 +188,7 @@
               class="mr-1"
               ><ClassTraitAnchor
                 :trait-link="trait.traitLink"
+                :feature="trait.feature"
                 @select="select"
               />{{ trait.separator }}</span
             >
