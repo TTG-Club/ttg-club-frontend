@@ -2,27 +2,35 @@
   import type { ClassDetail } from '../model';
 
   import { useSectionOpener } from '~section/composables';
-  import { filterResponseSchema, normalizeFilter } from '~section/model';
 
   import { CharacterLinkPicker } from '../link-card';
   import {
     CLASS_ICON,
     CLASS_TEXT,
     findClassArchetype,
+    getClassOptionsLink,
+    getClassOptionTabs,
     getClassSpellsFilterUrl,
     getClassSpellsLink,
     getParentClassName,
   } from '../model';
+  import ClassFilterLink from './ClassFilterLink.vue';
 
   /**
    * Переходы со страницы класса, как на new.ttg.club: к самому классу,
-   * к его подклассам и к списку его заклинаний в разделе заклинаний.
+   * к его подклассам, к его заклинаниям и особенностям (воззваниям,
+   * манёврам…) в их разделах.
    * Класс и подкласс открываются так, как велит режим раздела.
    */
   const { entry, path } = defineProps<{
     entry: ClassDetail;
     /** Адрес открытой записи: класса или архетипа. */
     path: string;
+  }>();
+
+  defineSlots<{
+    /** Кнопки страницы класса после переходов, например описание. */
+    default?: () => unknown;
   }>();
 
   const router = useRouter();
@@ -64,25 +72,7 @@
 
   const spellsFilterUrl = computed(() => getClassSpellsFilterUrl(entry));
 
-  // Класс в фильтре заклинаний задаётся его номером, а его знает только
-  // фильтр класса, поэтому ссылка собирается из него.
-  const { data: spellsLink } = useLazyAsyncData(
-    () => `class-spells-link-${spellsFilterUrl.value ?? entry.url}`,
-    async () => {
-      const url = spellsFilterUrl.value;
-
-      if (!url) {
-        return null;
-      }
-
-      const filter = normalizeFilter(
-        filterResponseSchema.parse(await $fetch(url, { method: 'POST' })),
-      );
-
-      return getClassSpellsLink(filter) ?? null;
-    },
-    { deep: false },
-  );
+  const optionTabs = computed(() => getClassOptionTabs(entry));
 </script>
 
 <template>
@@ -112,19 +102,25 @@
       @select="openEntry"
     />
 
-    <UButton
-      v-if="spellsLink"
-      :to="spellsLink"
+    <ClassFilterLink
+      v-if="spellsFilterUrl"
+      :filter-url="spellsFilterUrl"
+      :get-link="getClassSpellsLink"
       :icon="CLASS_ICON.spells"
-      target="_blank"
-      variant="soft"
-      color="neutral"
-    >
-      <span class="flex flex-col items-start leading-tight">
-        <span class="text-xs text-muted">{{ CLASS_TEXT.listLabel }}</span>
+      :label="CLASS_TEXT.listLabel"
+      :text="CLASS_TEXT.spellsList"
+    />
 
-        <span>{{ CLASS_TEXT.spellsList }}</span>
-      </span>
-    </UButton>
+    <ClassFilterLink
+      v-for="tab in optionTabs"
+      :key="tab.key"
+      :filter-url="tab.filterUrl"
+      :get-link="getClassOptionsLink"
+      :icon="CLASS_ICON.options"
+      :label="CLASS_TEXT.listLabel"
+      :text="tab.name"
+    />
+
+    <slot />
   </div>
 </template>

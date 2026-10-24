@@ -1,5 +1,5 @@
 import type { LocationQueryRaw } from 'vue-router';
-import type { FilterDefinition, SectionConfig } from '~section/model';
+import type { FilterDefinition } from '~section/model';
 
 import type {
   ArchetypeSpell,
@@ -37,15 +37,15 @@ import {
   ARCHETYPE_SPELL_LEVEL_TYPE,
   CHARACTER_LIST_SEPARATOR,
   CHARACTER_NO_REQUIREMENTS,
-  CLASS_HIDDEN_TABS,
   CLASS_HIT_DICE_PREFIX,
   CLASS_ICON_COLLECTION_PREFIX,
   CLASS_ICON_PREFIX,
   CLASS_ICONS,
-  CLASS_TAB_SECTIONS,
   CLASS_TAB_TYPE,
   CLASS_TEXT,
   FEAT_TEXT,
+  OPTION_CLASS_FILTER_KEY,
+  OPTIONS_SECTION,
   RACE_STATS,
   RACE_TEXT,
   RACES_WORKSHOP_PATH,
@@ -299,20 +299,19 @@ export function getClassIcon(icon?: string | null): string | undefined {
 }
 
 /**
- * Вкладки страницы класса по порядку. Ключ собирается из типа и порядка:
- * у класса и его архетипа могут быть две вкладки особенностей. Заклинаний
- * среди них нет: их открывает кнопка.
+ * Особенности класса (воззвания, манёвры…) по порядку: у класса и его
+ * архетипа их может быть две. Ключ собирается из типа и порядка, а ручка
+ * фильтра выбирает особенности класса.
  * @param entry - класс или архетип
  */
-export function getClassTabs(entry: ClassDetail): Array<ClassTab> {
+export function getClassOptionTabs(entry: ClassDetail): Array<ClassTab> {
   return sortBy(
-    (entry.tabs ?? []).filter((tab) => !CLASS_HIDDEN_TABS.has(tab.type)),
+    (entry.tabs ?? []).filter((tab) => tab.type === CLASS_TAB_TYPE.options),
     [(tab) => tab.order],
   ).map((tab) => ({
     key: `${tab.type}-${tab.order}`,
     name: tab.name,
-    type: tab.type,
-    url: tab.url,
+    filterUrl: getEntryApiPath(tab.url),
   }));
 }
 
@@ -330,20 +329,24 @@ export function getClassSpellsFilterUrl(
 }
 
 /**
- * Ссылка на раздел заклинаний с фильтром класса. Класс берётся из фильтра
- * класса: у Мистического рыцаря и Мистического ловкача это Волшебник.
- * @param filter - фильтр заклинаний класса
+ * Ссылка на раздел с фильтром класса: значения скрытой группы фильтра
+ * класса подставляются в адрес раздела.
+ * @param filter - фильтр класса
+ * @param key - группа, которая выбирает класс
+ * @param path - адрес раздела
  */
-export function getClassSpellsLink(
+function getClassFilterLink(
   filter: FilterDefinition,
+  key: string,
+  path: string,
 ): { path: string; query: LocationQueryRaw } | undefined {
   const group = getFilterGroups(filter).find(
-    (item) => item.key === SPELL_CLASS_FILTER_KEY && item.values.length,
+    (item) => item.key === key && item.values.length,
   );
 
   return group
     ? {
-        path: SPELLS_SECTION.path,
+        path,
         query: {
           [group.key]: group.values
             .map((value) => String(value.key))
@@ -351,6 +354,32 @@ export function getClassSpellsLink(
         },
       }
     : undefined;
+}
+
+/**
+ * Ссылка на раздел заклинаний с фильтром класса. Класс берётся из фильтра
+ * класса: у Мистического рыцаря и Мистического ловкача это Волшебник.
+ * @param filter - фильтр заклинаний класса
+ */
+export function getClassSpellsLink(filter: FilterDefinition) {
+  return getClassFilterLink(
+    filter,
+    SPELL_CLASS_FILTER_KEY,
+    SPELLS_SECTION.path,
+  );
+}
+
+/**
+ * Ссылка на раздел особенностей с особенностями класса, например
+ * воззваниями колдуна.
+ * @param filter - фильтр особенностей класса
+ */
+export function getClassOptionsLink(filter: FilterDefinition) {
+  return getClassFilterLink(
+    filter,
+    OPTION_CLASS_FILTER_KEY,
+    OPTIONS_SECTION.path,
+  );
 }
 
 /**
@@ -382,24 +411,6 @@ export function getParentClassName(
   return suffix && entry.name.rus.endsWith(suffix)
     ? entry.name.rus.slice(0, -suffix.length)
     : entry.name.rus;
-}
-
-/**
- * Список во вкладке класса: заклинания или особенности с фильтром класса.
- * Ключ свой у каждой вкладки, иначе данные соседних классов смешаются.
- * @param tab - вкладка класса
- */
-export function getClassTabSection(tab: ClassTab): SectionConfig | undefined {
-  const section = CLASS_TAB_SECTIONS[tab.type];
-
-  return section
-    ? {
-        ...section,
-        key: `${section.key}:${tab.url}`,
-        title: tab.name,
-        filterUrl: getEntryApiPath(tab.url),
-      }
-    : undefined;
 }
 
 /**

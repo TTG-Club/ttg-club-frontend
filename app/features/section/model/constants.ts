@@ -69,6 +69,8 @@ export const SECTION_ICON = {
   detailEmpty: 'tabler:click',
   more: 'tabler:dots',
   expand: 'tabler:chevron-down',
+  imageCount: 'tabler:photo',
+  zoom: 'tabler:zoom-in',
 } as const;
 
 /**

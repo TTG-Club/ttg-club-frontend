@@ -13,11 +13,11 @@ import {
   getClassDescription,
   getClassHitPoints,
   getClassIcon,
+  getClassOptionsLink,
+  getClassOptionTabs,
   getClassSkillsLabel,
   getClassSpellsFilterUrl,
   getClassSpellsLink,
-  getClassTabs,
-  getClassTabSection,
   getParentClassName,
   getRaceAbilitiesLabel,
   getRaceEditPath,
@@ -293,20 +293,34 @@ describe('классы', () => {
     expect(getClassIcon(null)).toBeUndefined();
   });
 
-  it('сортирует вкладки, прячет заклинания и даёт вкладкам ключи', () => {
-    expect(getClassTabs(wizard).map((tab) => tab.key)).toEqual([
-      'traits-0',
-      'options-3',
+  it('берёт из вкладок только особенности с ручкой их фильтра', () => {
+    expect(getClassOptionTabs(wizard)).toEqual([
+      {
+        key: 'options-3',
+        name: 'Особенности',
+        filterUrl: '/api/v1/filters/options/wizard',
+      },
     ]);
   });
 
-  it('вкладка особенностей читает фильтр класса и свой ключ', () => {
-    const [, options] = getClassTabs(wizard);
-    const section = options ? getClassTabSection(options) : undefined;
+  it('особенности класса открываются в разделе с фильтром класса', () => {
+    const filter = normalizeFilter({
+      other: [
+        {
+          name: 'Классовые особенности',
+          key: 'classOption',
+          hidden: true,
+          values: [{ label: 'Колдун', key: 'INVOCATION', default: true }],
+        },
+      ],
+    });
 
-    expect(section?.listUrl).toBe('/api/v1/options');
-    expect(section?.filterUrl).toBe('/api/v1/filters/options/wizard');
-    expect(section?.key).toBe('options:/filters/options/wizard');
+    expect(getClassOptionsLink(filter)).toEqual({
+      path: '/options',
+      query: { classOption: 'INVOCATION' },
+    });
+
+    expect(getClassOptionsLink(normalizeFilter([]))).toBeUndefined();
   });
 
   it('заклинания класса открываются в разделе с фильтром класса', () => {
@@ -358,12 +372,6 @@ describe('классы', () => {
 
     expect(getParentClassName(evocation, archetype)).toBe('Волшебник');
     expect(getParentClassName(wizard)).toBe('Волшебник');
-  });
-
-  it('у вкладки умений списка нет', () => {
-    const [traitsTab] = getClassTabs(wizard);
-
-    expect(traitsTab && getClassTabSection(traitsTab)).toBeUndefined();
   });
 
   it('считает хиты как в старом SPA', () => {
