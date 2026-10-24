@@ -41,6 +41,7 @@ export {
   getGroupSelection,
   getQueryString,
   getSelectAllState,
+  getSourceFilterValue,
   getWorkshopEditPath,
   groupItems,
   hasSourceGroupLabel,

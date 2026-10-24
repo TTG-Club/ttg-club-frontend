@@ -144,6 +144,7 @@
           :group="match.group"
           :values="match.values"
           :selected="getSelected(match.group)"
+          :is-sources="isSources"
           @toggle="toggle(match.group, $event)"
           @update:selected="setGroup(match.group, $event)"
         />

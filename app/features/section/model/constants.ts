@@ -138,3 +138,6 @@ export const SECTION_GRID_CLASS = {
   covers:
     'grid grid-cols-1 gap-3 @md:grid-cols-2 @xl:grid-cols-3 @4xl:grid-cols-4 @6xl:grid-cols-5 @7xl:grid-cols-6',
 } as const;
+
+/** Метки книг в фильтре источников: в тёмной теме текст белый. */
+export const SOURCE_FILTER_BADGE_CLASS = 'dark:text-white';

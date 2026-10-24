@@ -8,6 +8,7 @@ import {
   getDetailPath,
   getDetailSlug,
   getSelectAllState,
+  getSourceFilterValue,
   groupItems,
   isFilterSearchable,
   isPartCustomized,
@@ -257,6 +258,49 @@ describe('searchFilterGroups', () => {
     }
 
     expect(searchFilterGroups(groups, 'нет такого значения')).toEqual([]);
+  });
+
+  it('находит книгу по названию из подсказки', () => {
+    const book = {
+      label: 'PHB',
+      key: 'PHB',
+      default: true,
+      tooltip: 'Книга игрока',
+    };
+
+    const group = {
+      name: 'Официальные',
+      key: 'OFFICIAL',
+      param: 'book',
+      hidden: false,
+      values: [book],
+    };
+
+    expect(searchFilterGroups([group], 'игрока')[0]?.values).toEqual([book]);
+  });
+});
+
+describe('getSourceFilterValue', () => {
+  it('подписывает книгу названием, а сокращение уносит в подсказку', () => {
+    expect(
+      getSourceFilterValue({
+        label: 'PHB',
+        key: 'PHB',
+        default: true,
+        tooltip: 'Книга игрока',
+      }),
+    ).toEqual({
+      label: 'Книга игрока',
+      key: 'PHB',
+      default: true,
+      tooltip: 'PHB',
+    });
+  });
+
+  it('без названия оставляет сокращение', () => {
+    const value = { label: 'HB', key: 'HB', default: false };
+
+    expect(getSourceFilterValue(value)).toBe(value);
   });
 });
 

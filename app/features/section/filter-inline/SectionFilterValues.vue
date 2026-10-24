@@ -1,14 +1,24 @@
 <script setup lang="ts">
+  import type { BadgeProps } from '@nuxt/ui';
+
   import type { FilterValue } from '../model';
 
   /**
    * Значения группы фильтра метками, как на new.ttg.club: выбранная
    * залита акцентом, клик отмечает её или снимает отметку.
    */
-  const { values, selected } = defineProps<{
+  const {
+    values,
+    selected,
+    size = 'lg',
+    badgeClass = undefined,
+  } = defineProps<{
     values: Array<FilterValue>;
     /** Выбранные ключи группы. */
     selected: Array<string>;
+    size?: BadgeProps['size'];
+    /** Дополнительные классы меток, например цвет текста. */
+    badgeClass?: string;
   }>();
 
   const emit = defineEmits<{
@@ -63,7 +73,8 @@
         :aria-pressed="isSelected(value)"
         role="button"
         tabindex="0"
-        size="lg"
+        :size="size"
+        :class="badgeClass"
         class="max-w-full min-w-8 cursor-pointer justify-center rounded-md px-2 font-normal select-none hover:brightness-95"
         @click.left.exact.prevent="toggle(value)"
         @keydown.enter.prevent="toggle(value)"

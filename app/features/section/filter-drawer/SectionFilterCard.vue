@@ -2,24 +2,43 @@
   import type { FilterGroup, FilterValue } from '../model';
 
   import { SectionFilterValues } from '../filter-inline';
-  import { getSelectAllState, SECTION_TEXT } from '../model';
+  import {
+    getSelectAllState,
+    getSourceFilterValue,
+    SECTION_TEXT,
+    SOURCE_FILTER_BADGE_CLASS,
+  } from '../model';
 
   /**
    * Группа фильтра карточкой, как источники на new.ttg.club: название и
    * «Выбрать все» в шапке, под чертой значения метками.
    */
-  const { group, values, selected } = defineProps<{
+  const {
+    group,
+    values,
+    selected,
+    isSources = false,
+  } = defineProps<{
     group: FilterGroup;
     /** Значения, подошедшие под поиск. */
     values: Array<FilterValue>;
     /** Выбранные ключи группы. */
     selected: Array<string>;
+    /**
+     * Группа источников: книги подписаны названием, а сокращение — в
+     * подсказке.
+     */
+    isSources?: boolean;
   }>();
 
   const emit = defineEmits<{
     'toggle': [key: string];
     'update:selected': [keys: Array<string>];
   }>();
+
+  const shownValues = computed(() =>
+    isSources ? values.map(getSourceFilterValue) : values,
+  );
 
   const allKeys = computed(() =>
     group.values.map((value) => String(value.key)),
@@ -63,8 +82,10 @@
     </header>
 
     <SectionFilterValues
-      :values="values"
+      :values="shownValues"
       :selected="selected"
+      :size="isSources ? 'md' : 'lg'"
+      :badge-class="isSources ? SOURCE_FILTER_BADGE_CLASS : undefined"
       class="p-4"
       @toggle="toggle"
     />
