@@ -54,6 +54,45 @@
     })),
   );
 
+  interface HoveredCell {
+    row: number;
+    column: number;
+  }
+
+  /** Первые колонки — уровень, бонус мастерства и умения, дальше значения. */
+  const VALUES_COLUMN_OFFSET = 3;
+
+  const hoveredCell = ref<HoveredCell>();
+
+  /**
+   * Подсветка крестом, как на new.ttg.club: строка и колонка под курсором,
+   * а сама ячейка ярче.
+   * @param row - номер строки
+   * @param column - номер колонки
+   */
+  function getCellClass(row: number, column: number): string | undefined {
+    if (!hoveredCell.value) {
+      return undefined;
+    }
+
+    const isRow = hoveredCell.value.row === row;
+    const isColumn = hoveredCell.value.column === column;
+
+    if (isRow && isColumn) {
+      return 'bg-row-highlighted';
+    }
+
+    return isRow || isColumn ? 'bg-row-highlighted/50' : undefined;
+  }
+
+  function hoverCell(row: number, column: number): void {
+    hoveredCell.value = { row, column };
+  }
+
+  function leaveTable(): void {
+    hoveredCell.value = undefined;
+  }
+
   /**
    * Передаёт выбранный якорь наверх: прокручивает вкладка.
    * @param anchor - якорь умения
@@ -65,7 +104,7 @@
 
 <template>
   <div class="table-responsive class">
-    <table>
+    <table @mouseleave="leaveTable">
       <thead>
         <tr class="text-center">
           <th
@@ -121,15 +160,28 @@
 
       <tbody>
         <tr
-          v-for="row in rows"
+          v-for="(row, rowIndex) in rows"
           :key="row.level"
           class="text-center"
         >
-          <td>{{ row.level }}</td>
+          <td
+            :class="getCellClass(rowIndex, 0)"
+            @mouseenter="hoverCell(rowIndex, 0)"
+          >
+            {{ row.level }}
+          </td>
 
-          <td>{{ row.proficiencyBonus }}</td>
+          <td
+            :class="getCellClass(rowIndex, 1)"
+            @mouseenter="hoverCell(rowIndex, 1)"
+          >
+            {{ row.proficiencyBonus }}
+          </td>
 
-          <td class="align_left">
+          <td
+            :class="['align_left', getCellClass(rowIndex, 2)]"
+            @mouseenter="hoverCell(rowIndex, 2)"
+          >
             <span
               v-for="trait in row.traits"
               :key="trait.traitLink.anchor"
@@ -145,6 +197,8 @@
           <td
             v-for="(value, index) in row.values"
             :key="index"
+            :class="getCellClass(rowIndex, index + VALUES_COLUMN_OFFSET)"
+            @mouseenter="hoverCell(rowIndex, index + VALUES_COLUMN_OFFSET)"
           >
             {{ value }}
           </td>
