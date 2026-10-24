@@ -1,9 +1,34 @@
+// Цветные залитые кнопки и вкладки: в тёмной теме Nuxt UI красит их текст
+// в тёмный, а нужен белый
+const SOLID_COLORS = [
+  'primary',
+  'secondary',
+  'success',
+  'info',
+  'warning',
+  'error',
+] as const;
+
 export default defineAppConfig({
   icon: {
     mode: 'css',
     cssLayer: 'base',
   },
   ui: {
+    button: {
+      compoundVariants: SOLID_COLORS.map((color) => ({
+        color,
+        variant: 'solid' as const,
+        class: 'text-white',
+      })),
+    },
+    tabs: {
+      compoundVariants: SOLID_COLORS.map((color) => ({
+        color,
+        variant: 'pill' as const,
+        class: { trigger: 'data-[state=active]:text-white' },
+      })),
+    },
     icons: {
       arrowLeft: 'tabler:arrow-left',
       arrowRight: 'tabler:arrow-right',
