@@ -8,13 +8,17 @@
   import { SectionSourceBar } from '~section/source-bar';
 
   import { getRaceStats, RACE_TEXT, sortRaceSkills } from '../model';
+  import RaceRoutingBar from './RaceRoutingBar.vue';
 
   /**
-   * Карточка расы, как вида на new.ttg.club: слева обложка и свойства,
-   * справа описание, особенности (раскрыты сразу) и разновидности.
+   * Карточка расы, как вида на new.ttg.club: сверху переходы к основной
+   * расе и разновидностям, слева обложка и свойства, справа описание,
+   * особенности (раскрыты сразу) и разновидности.
    */
-  const { race } = defineProps<{
+  const { race, path } = defineProps<{
     race: RaceDetail;
+    /** Адрес открытой записи: расы или разновидности. */
+    path: string;
   }>();
 
   const stats = computed(() => getRaceStats(race));
@@ -29,6 +33,12 @@
 <template>
   <div class="flex flex-col gap-4">
     <SectionSourceBar :source="race.source" />
+
+    <RaceRoutingBar
+      v-if="race.baseRace"
+      :base-race="race.baseRace"
+      :path="path"
+    />
 
     <SectionDetailLayout>
       <template

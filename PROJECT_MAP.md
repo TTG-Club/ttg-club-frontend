@@ -22,7 +22,7 @@
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
 │   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (filter column + list + entry pane), controls (search, sources, menu), filter-inline (filter groups in the left column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview (round preview, square cover, viewer), collapse (titled block with an arrow), detail-layout (properties column + text)
-│   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (cover card of a race or class, drawer with subraces or archetypes), references (links to classes, races…)
+│   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (cover card of a race or class, drawer with subraces or archetypes, picker of a subclass or subrace), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items, magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards

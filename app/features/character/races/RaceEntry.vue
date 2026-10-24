@@ -11,6 +11,10 @@
   const { path = undefined } = defineProps<{
     path?: string;
   }>();
+
+  const route = useRoute();
+
+  const entryPath = computed(() => path ?? route.path);
 </script>
 
 <template>
@@ -21,7 +25,10 @@
     :get-edit-path="getRaceEditPath"
   >
     <template #default="{ entry }">
-      <RaceBody :race="entry" />
+      <RaceBody
+        :race="entry"
+        :path="entryPath"
+      />
     </template>
   </SectionEntry>
 </template>

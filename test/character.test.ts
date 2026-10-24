@@ -29,6 +29,7 @@ import {
   getSpellTypeLabel,
   groupByBookType,
   hasPersonalization,
+  raceDetailSchema,
   raceLinkSchema,
   sortByGroup,
   sortClassFeatures,
@@ -214,6 +215,24 @@ describe('расы', () => {
       ['Размер', 'Средний'],
       ['Скорость', '30 фт.'],
       ['Тёмное зрение', '60 фт.'],
+    ]);
+  });
+
+  it('берёт основную расу и её разновидности для выбора', () => {
+    const detail = raceDetailSchema.parse({
+      name: { rus: 'Высший эльф', eng: 'High elf' },
+      baseRace: {
+        ...race('Эльф'),
+        subraces: [
+          { ...race('Высший эльф'), url: '/races/elf/high_elf' },
+          { ...race('Лесной эльф'), url: '/races/elf/wood_elf' },
+        ],
+      },
+    });
+
+    expect(detail.baseRace?.subraces?.map((link) => link.url)).toEqual([
+      '/races/elf/high_elf',
+      '/races/elf/wood_elf',
     ]);
   });
 
