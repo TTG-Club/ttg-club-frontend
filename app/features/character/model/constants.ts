@@ -171,6 +171,10 @@ export const RACE_TEXT = {
   everyAbility: '+1 к каждой',
   feet: 'фт.',
   subraces: 'Разновидности',
+  raceLabel: 'Раса:',
+  subraceLabel: 'Разновидность:',
+  chooseSubrace: 'Выбрать',
+  searchSubrace: 'Поиск разновидности…',
 } as const;
 
 /** Подписи свойств расы в колонке слева, как у видов на new.ttg.club. */

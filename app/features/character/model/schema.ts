@@ -199,6 +199,8 @@ export const raceDetailSchema = z.object({
   description: z.string().nullish(),
   skills: z.array(raceSkillSchema).nullish(),
   subraces: z.array(subraceDetailSchema).nullish(),
+  /** Основная раса со ссылками на разновидности, для выбора разновидности. */
+  baseRace: raceLinkSchema.nullish(),
 });
 
 export type RaceDetail = z.infer<typeof raceDetailSchema>;
