@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  getEntryApiPath,
-  getWorkshopEditPath,
-  hasSourceGroupLabel,
-} from '~section/model';
+import { getEntryApiPath, getWorkshopEditPath } from '~section/model';
 import {
   bookLinkSchema,
   getBookGroup,
@@ -23,28 +19,6 @@ describe('адреса записи', () => {
     expect(getWorkshopEditPath('/rules/Advantage')).toBe(
       '/workshop/rules/Advantage/edit',
     );
-  });
-});
-
-describe('источник записи', () => {
-  it('подписывает группу только у стороннего материала и хомбрю', () => {
-    const base = { shortName: 'PHB', name: 'Книга игрока' };
-
-    expect(
-      hasSourceGroupLabel({
-        ...base,
-        group: { shortName: 'HB', name: 'Хомбрю' },
-      }),
-    ).toBe(true);
-
-    expect(
-      hasSourceGroupLabel({
-        ...base,
-        group: { shortName: 'Basic', name: 'Официальные источники' },
-      }),
-    ).toBe(false);
-
-    expect(hasSourceGroupLabel(base)).toBe(false);
   });
 });
 

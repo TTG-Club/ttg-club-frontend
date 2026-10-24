@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   backgroundDetailSchema,
   classDetailSchema,
+  expandClassSearch,
   findClassArchetype,
   findClassFeature,
   getArchetypeSpellLevelHeader,
@@ -13,11 +14,11 @@ import {
   getClassDescription,
   getClassHitPoints,
   getClassIcon,
+  getClassOptionsLink,
+  getClassOptionTabs,
   getClassSkillsLabel,
   getClassSpellsFilterUrl,
   getClassSpellsLink,
-  getClassTabs,
-  getClassTabSection,
   getParentClassName,
   getRaceAbilitiesLabel,
   getRaceEditPath,
@@ -293,20 +294,34 @@ describe('классы', () => {
     expect(getClassIcon(null)).toBeUndefined();
   });
 
-  it('сортирует вкладки, прячет заклинания и даёт вкладкам ключи', () => {
-    expect(getClassTabs(wizard).map((tab) => tab.key)).toEqual([
-      'traits-0',
-      'options-3',
+  it('берёт из вкладок только особенности с ручкой их фильтра', () => {
+    expect(getClassOptionTabs(wizard)).toEqual([
+      {
+        key: 'options-3',
+        name: 'Особенности',
+        filterUrl: '/api/v1/filters/options/wizard',
+      },
     ]);
   });
 
-  it('вкладка особенностей читает фильтр класса и свой ключ', () => {
-    const [, options] = getClassTabs(wizard);
-    const section = options ? getClassTabSection(options) : undefined;
+  it('особенности класса открываются в разделе с фильтром класса', () => {
+    const filter = normalizeFilter({
+      other: [
+        {
+          name: 'Классовые особенности',
+          key: 'classOption',
+          hidden: true,
+          values: [{ label: 'Колдун', key: 'INVOCATION', default: true }],
+        },
+      ],
+    });
 
-    expect(section?.listUrl).toBe('/api/v1/options');
-    expect(section?.filterUrl).toBe('/api/v1/filters/options/wizard');
-    expect(section?.key).toBe('options:/filters/options/wizard');
+    expect(getClassOptionsLink(filter)).toEqual({
+      path: '/options',
+      query: { classOption: 'INVOCATION' },
+    });
+
+    expect(getClassOptionsLink(normalizeFilter([]))).toBeUndefined();
   });
 
   it('заклинания класса открываются в разделе с фильтром класса', () => {
@@ -358,12 +373,6 @@ describe('классы', () => {
 
     expect(getParentClassName(evocation, archetype)).toBe('Волшебник');
     expect(getParentClassName(wizard)).toBe('Волшебник');
-  });
-
-  it('у вкладки умений списка нет', () => {
-    const [traitsTab] = getClassTabs(wizard);
-
-    expect(traitsTab && getClassTabSection(traitsTab)).toBeUndefined();
   });
 
   it('считает хиты как в старом SPA', () => {
@@ -435,5 +444,46 @@ describe('классы', () => {
     ).toBe(' (в бою),');
 
     expect(getArchetypeSpellSuffix(spell, true)).toBe('');
+  });
+});
+
+describe('поиск классов', () => {
+  const source = { shortName: 'PHB', name: 'Книга игрока' };
+  const type = { name: 'Официальные', order: 0 };
+
+  const wizard = {
+    name: { rus: 'Волшебник', eng: 'Wizard' },
+    url: '/classes/wizard',
+    source,
+    image: '/wizard.webp',
+    icon: 'class/wizard',
+    archetypes: [
+      {
+        name: { rus: 'Школа воплощения', eng: 'School of Evocation' },
+        url: '/classes/wizard/evocation',
+        type,
+        source,
+      },
+    ],
+  };
+
+  it('без поиска оставляет классы как есть', () => {
+    expect(expandClassSearch([wizard], ' ')).toEqual([wizard]);
+  });
+
+  it('класс, найденный по названию, остаётся карточкой', () => {
+    expect(expandClassSearch([wizard], 'волш')).toEqual([wizard]);
+    expect(expandClassSearch([wizard], 'WIZ')).toEqual([wizard]);
+  });
+
+  it('найденные подклассы встают карточками с обложкой класса', () => {
+    expect(expandClassSearch([wizard], 'воплощ')).toEqual([
+      {
+        ...wizard,
+        name: { rus: 'Школа воплощения', eng: 'School of Evocation' },
+        url: '/classes/wizard/evocation',
+        archetypes: [],
+      },
+    ]);
   });
 });

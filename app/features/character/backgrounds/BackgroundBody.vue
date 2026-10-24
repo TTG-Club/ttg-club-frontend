@@ -3,7 +3,6 @@
 
   import { ContentRender } from '~content/render';
   import { RollTable } from '~content/roll-table';
-  import { SectionSourceBar } from '~section/source-bar';
 
   import {
     BACKGROUND_TEXT,
@@ -51,8 +50,6 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="background.source" />
-
     <ul class="flex flex-col gap-1.5">
       <li v-if="skills">
         <b>{{ BACKGROUND_TEXT.skills }}</b> {{ skills }}

@@ -37,7 +37,6 @@ export const SECTION_TEXT = {
   linkCopied: 'Ссылка скопирована',
   copyError: 'Не удалось скопировать ссылку',
   edit: 'Редактировать',
-  source: 'Источник:',
   openImage: 'Открыть изображение',
   grouping: 'Группировка списка',
   previousImage: 'Предыдущее изображение',
@@ -70,6 +69,8 @@ export const SECTION_ICON = {
   detailEmpty: 'tabler:click',
   more: 'tabler:dots',
   expand: 'tabler:chevron-down',
+  imageCount: 'tabler:photo',
+  zoom: 'tabler:zoom-in',
 } as const;
 
 /**
@@ -101,21 +102,20 @@ export const WORKSHOP_EDIT_SUFFIX = '/edit';
 export const SECTION_API_PREFIX = '/api/v1';
 
 /**
- * Группы источников, которые подписываются рядом с книгой, как в старом
- * SPA: у официальных и тестовых книг подпись группы ничего не добавляет.
- */
-export const SOURCE_GROUPS_WITH_LABEL: ReadonlySet<string> = new Set([
-  '3rd',
-  'HB',
-]);
-
-/**
  * Оттенок метки группы источника по её короткому названию. У официальных
  * и тестовых книг метка нейтральная.
  */
 export const SOURCE_BADGE_CLASSES: Partial<Record<string, string>> = {
   'hb': 'homebrew',
   '3rd': 'thirdParty',
+};
+
+/** Цвет метки книги в шапке записи по группе; остальные — нейтральные. */
+export const SOURCE_TAG_COLORS: Partial<
+  Record<string, 'secondary' | 'success'>
+> = {
+  'hb': 'success',
+  '3rd': 'secondary',
 };
 
 /** Где хранится ширина списка в широком режиме. */
@@ -141,3 +141,15 @@ export const SECTION_GRID_CLASS = {
 
 /** Метки книг в фильтре источников: в тёмной теме текст белый. */
 export const SOURCE_FILTER_BADGE_CLASS = 'dark:text-white';
+
+/**
+ * Сколько пикселей пройти пальцем по странице записи, чтобы перейти к
+ * соседней записи списка.
+ */
+export const SECTION_SWIPE_THRESHOLD = 80;
+
+/**
+ * Во сколько раз сдвиг по горизонтали должен быть больше вертикального,
+ * чтобы прокрутка страницы не листала записи.
+ */
+export const SECTION_SWIPE_AXIS_RATIO = 2;

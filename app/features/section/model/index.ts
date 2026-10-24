@@ -44,7 +44,6 @@ export {
   getSourceFilterValue,
   getWorkshopEditPath,
   groupItems,
-  hasSourceGroupLabel,
   isFilterSearchable,
   isPartCustomized,
   isSelectionCustomized,

@@ -3,7 +3,6 @@
 
   import { ContentRender } from '~content/render';
   import { SectionImagePreview } from '~section/image-preview';
-  import { SectionSourceBar } from '~section/source-bar';
 
   import { GOD_TEXT, joinWikiList } from '../model';
 
@@ -22,8 +21,6 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="god.source" />
-
     <div class="flow-root">
       <SectionImagePreview
         v-if="god.images?.length"

@@ -1,6 +1,8 @@
 export type {
   BrushColor,
   BugReportRequest,
+  BugReportType,
+  BugReportTypeText,
   CanvasPoint,
   DrawingTool,
   Stroke,
@@ -12,6 +14,7 @@ export {
   formatSelectionText,
   getScreenshotFileName,
   getSelectionContext,
+  isBugReportType,
 } from './utils';
 
 export * from './constants';

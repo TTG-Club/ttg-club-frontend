@@ -5,7 +5,6 @@
   import { SectionCollapse } from '~section/collapse';
   import { SectionDetailLayout } from '~section/detail-layout';
   import { SectionImageCover } from '~section/image-preview';
-  import { SectionSourceBar } from '~section/source-bar';
 
   import { getRaceStats, RACE_TEXT, sortRaceSkills } from '../model';
   import RaceRoutingBar from './RaceRoutingBar.vue';
@@ -32,8 +31,6 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="race.source" />
-
     <RaceRoutingBar
       v-if="race.baseRace"
       :base-race="race.baseRace"

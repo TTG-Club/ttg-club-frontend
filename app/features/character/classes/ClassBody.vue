@@ -2,53 +2,25 @@
   import type { ClassDetail } from '../model';
 
   import { ContentRender } from '~content/render';
-  import { SectionImageViewer } from '~section/image-preview';
-  import { SectionSourceBar } from '~section/source-bar';
+  import { SectionDetailLayout } from '~section/detail-layout';
+  import { SectionDrawer } from '~section/entry-drawer';
+  import { SectionImageCover } from '~section/image-preview';
 
-  import {
-    CLASS_ICON,
-    CLASS_TAB_TYPE,
-    CLASS_TEXT,
-    getClassDescription,
-    getClassTabs,
-    getClassTabSection,
-  } from '../model';
+  import { CLASS_ICON, CLASS_TEXT, getClassDescription } from '../model';
   import ArchetypeSpells from './ArchetypeSpells.vue';
-  import ClassOptionsTab from './ClassOptionsTab.vue';
   import ClassRoutingBar from './ClassRoutingBar.vue';
   import ClassTraitsTab from './ClassTraitsTab.vue';
 
   /**
-   * Страница класса или архетипа по вкладкам: умения, описание и список
-   * особенностей. Над вкладками переходы к классу, подклассам и
-   * заклинаниям. Галерея открывается во весь экран.
+   * Страница класса или архетипа, как на new.ttg.club: слева обложка с
+   * галереей, справа умения. Над ними переходы к классу, подклассам,
+   * заклинаниям и особенностям, а описание открывается в дровере.
    */
   const { entry, path } = defineProps<{
     entry: ClassDetail;
     /** Адрес открытой записи: класса или архетипа. */
     path: string;
   }>();
-
-  const tabs = computed(() => getClassTabs(entry));
-
-  const tabItems = computed(() =>
-    tabs.value.map((tab) => ({ label: tab.name, value: tab.key })),
-  );
-
-  /** Страница открывается с первой вкладки. */
-  function getFirstTabKey() {
-    return tabs.value[0]?.key ?? '';
-  }
-
-  const activeKey = ref<string | number>(getFirstTabKey());
-
-  const activeTab = computed(() =>
-    tabs.value.find((tab) => tab.key === activeKey.value),
-  );
-
-  const listSection = computed(() =>
-    activeTab.value ? getClassTabSection(activeTab.value) : undefined,
-  );
 
   const description = computed(() => getClassDescription(entry));
 
@@ -60,83 +32,68 @@
 
   const images = computed(() => entry.images ?? []);
 
-  const isGalleryOpen = ref(false);
+  const isDescriptionOpen = ref(false);
 
-  function openGallery() {
-    isGalleryOpen.value = true;
+  function openDescription() {
+    isDescriptionOpen.value = true;
   }
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="entry.source" />
-
     <ClassRoutingBar
       :entry="entry"
       :path="path"
-    />
-
-    <div class="flex flex-wrap items-center gap-2">
-      <UTabs
-        v-model="activeKey"
-        :items="tabItems"
-        :content="false"
-        :ui="{ list: 'w-auto flex-wrap', trigger: 'flex-none' }"
-      />
-
-      <UButton
-        v-if="images.length"
-        :icon="CLASS_ICON.gallery"
-        :label="CLASS_TEXT.gallery"
-        color="neutral"
-        variant="subtle"
-        @click.left.exact.prevent="openGallery"
-      />
-    </div>
-
-    <ClassTraitsTab
-      v-if="activeTab?.type === CLASS_TAB_TYPE.traits && entry.traits"
-      :entry="entry"
-      :traits="entry.traits"
-    />
-
-    <div
-      v-else-if="activeTab?.type === CLASS_TAB_TYPE.description"
-      class="content-render"
     >
-      <ContentRender
-        v-if="description"
-        :html="description"
-      />
+      <UButton
+        v-if="description || spellTable"
+        :icon="CLASS_ICON.description"
+        variant="soft"
+        color="neutral"
+        @click.left.exact.prevent="openDescription"
+      >
+        <span class="flex flex-col items-start leading-tight">
+          <span class="text-xs text-muted">{{ CLASS_TEXT.aboutLabel }}</span>
 
-      <ArchetypeSpells
-        v-if="spellTable"
-        :table="spellTable"
-      />
-    </div>
+          <span>{{ CLASS_TEXT.description }}</span>
+        </span>
+      </UButton>
+    </ClassRoutingBar>
 
-    <Suspense v-else-if="listSection && activeTab">
-      <ClassOptionsTab
-        :key="activeTab.key"
-        :section="listSection"
-      />
-
-      <template #fallback>
-        <div class="flex flex-col gap-2">
-          <USkeleton
-            v-for="index in 8"
-            :key="index"
-            class="h-12 w-full"
-          />
-        </div>
+    <SectionDetailLayout>
+      <template
+        v-if="images.length"
+        #aside
+      >
+        <SectionImageCover
+          :images="images"
+          :alt="entry.name.rus"
+        />
       </template>
-    </Suspense>
 
-    <SectionImageViewer
-      v-if="images.length"
-      v-model:open="isGalleryOpen"
-      :images="images"
-      :alt="entry.name.rus"
-    />
+      <ClassTraitsTab
+        v-if="entry.traits"
+        :entry="entry"
+        :traits="entry.traits"
+      />
+    </SectionDetailLayout>
+
+    <SectionDrawer
+      v-model:open="isDescriptionOpen"
+      :title="CLASS_TEXT.description"
+      :subtitle="entry.name.rus"
+    >
+      <div class="content-render">
+        <ContentRender
+          v-if="description"
+          :html="description"
+        />
+
+        <ArchetypeSpells
+          v-if="spellTable"
+          :table="spellTable"
+        />
+      </div>
+    </SectionDrawer>
   </div>
 </template>

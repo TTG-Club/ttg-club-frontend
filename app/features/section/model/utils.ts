@@ -4,12 +4,7 @@ import type {
   LocationQueryValueRaw,
 } from 'vue-router';
 
-import type {
-  EntryName,
-  EntrySource,
-  FilterGroupResponse,
-  FilterResponse,
-} from './schema';
+import type { EntryName, FilterGroupResponse, FilterResponse } from './schema';
 import type {
   FilterDefinition,
   FilterGroup,
@@ -31,7 +26,6 @@ import {
   QUERY_VALUES_SEPARATOR,
   SECTION_API_PREFIX,
   SECTION_DETAIL_FORBIDDEN_SEGMENTS,
-  SOURCE_GROUPS_WITH_LABEL,
   SOURCES_PARAM,
   WORKSHOP_EDIT_SUFFIX,
   WORKSHOP_PREFIX,
@@ -408,15 +402,6 @@ export function setGroupSelection(
  */
 export function getEntryApiPath(path: string): string {
   return `${SECTION_API_PREFIX}${path}`;
-}
-
-/**
- * Проверяет, нужна ли рядом с книгой подпись её группы: сторонний
- * материал и хомбрю помечаются, официальные книги — нет.
- * @param source - источник записи
- */
-export function hasSourceGroupLabel(source: EntrySource): boolean {
-  return !!source.group && SOURCE_GROUPS_WITH_LABEL.has(source.group.shortName);
 }
 
 /**

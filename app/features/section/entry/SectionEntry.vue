@@ -1,12 +1,22 @@
-<script setup lang="ts" generic="T extends { name: EntryName }">
+<script
+  setup
+  lang="ts"
+  generic="T extends { name: EntryName; source?: EntrySource | null }"
+>
   import type { z } from 'zod';
 
-  import type { EntryName, SectionConfig } from '../model';
+  import type { ComponentPublicInstance } from 'vue';
+
+  import type { EntryName, EntrySource, SectionConfig } from '../model';
 
   import { BookmarkButton } from '~bookmarks/button';
   import { CommentsBlock } from '~comments/section';
 
-  import { useSectionEntry, useSectionOpener } from '../composables';
+  import {
+    useSectionEntry,
+    useSectionOpener,
+    useSectionSwipe,
+  } from '../composables';
   import { SectionDetailPane } from '../detail-pane';
 
   /**
@@ -59,6 +69,16 @@
     isEmbedded ? undefined : 'mx-auto w-full max-w-4xl',
   );
 
+  const pane = useTemplateRef<ComponentPublicInstance>('pane');
+
+  // Свайпом листается только страница записи: поверх списка жест занят
+  // дровером
+  useSectionSwipe(
+    section.key,
+    () => (isEmbedded ? undefined : unrefElement(pane)),
+    entryPath,
+  );
+
   function close(): void {
     opener?.close();
   }
@@ -66,9 +86,11 @@
 
 <template>
   <SectionDetailPane
+    ref="pane"
     :class="wrapperClass"
     :title="entry?.name.rus ?? ''"
     :subtitle="entry?.name.eng"
+    :source="entry?.source"
     :path="path"
     :close-to="closeTo"
     :edit-url="editUrl"

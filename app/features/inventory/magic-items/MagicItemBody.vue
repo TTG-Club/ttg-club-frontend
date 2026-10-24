@@ -45,7 +45,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar :source="item.source">
+    <SectionSourceBar>
       <template #left>
         <template
           v-for="part in typeParts"

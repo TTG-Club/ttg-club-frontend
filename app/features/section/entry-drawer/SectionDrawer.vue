@@ -1,7 +1,10 @@
 <script setup lang="ts">
+  import type { EntrySource } from '../model';
+
   import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 
   import { SECTION_ICON, SECTION_TEXT } from '../model';
+  import { SectionSourceTag } from '../source-tag';
 
   /**
    * Дровер справа, как карточки на new.ttg.club: заголовок, кнопки
@@ -10,12 +13,15 @@
   const {
     title,
     subtitle = undefined,
+    source = undefined,
     path = undefined,
     isLoading = false,
     isError = false,
   } = defineProps<{
     title: string;
     subtitle?: string;
+    /** Источник записи: метки справа от английского названия. */
+    source?: EntrySource | null;
     /** Адрес страницы записи; без него кнопки перехода нет. */
     path?: string;
     isLoading?: boolean;
@@ -45,6 +51,7 @@
     direction="right"
     :ui="{
       content: 'w-full max-w-2xl',
+      header: 'flex-col items-stretch gap-1',
       title: 'sr-only',
       description: 'sr-only',
     }"
@@ -54,13 +61,6 @@
         <div class="min-w-0 flex-auto">
           <p class="font-serif text-xl text-title">
             {{ title }}
-          </p>
-
-          <p
-            v-if="subtitle"
-            class="text-sm text-muted"
-          >
-            {{ subtitle }}
           </p>
         </div>
 
@@ -84,6 +84,18 @@
           color="neutral"
           variant="ghost"
           @click.left.exact.prevent="close"
+        />
+      </div>
+
+      <div
+        v-if="subtitle || source"
+        class="flex w-full items-center justify-between gap-2"
+      >
+        <span class="truncate text-sm text-muted">{{ subtitle }}</span>
+
+        <SectionSourceTag
+          v-if="source"
+          :source="source"
         />
       </div>
     </template>

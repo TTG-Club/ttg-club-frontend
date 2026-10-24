@@ -7,14 +7,22 @@
   import {
     CLASSES_SECTION,
     classLinkSchema,
+    expandClassSearch,
     getGroupName,
     sortByGroup,
   } from '../model';
   import ClassCard from './ClassCard.vue';
   import ClassEntry from './ClassEntry.vue';
 
-  // Тип задан явно: иначе список выводит тип записи из общей сортировки
-  const sortItems: (items: Array<ClassLink>) => Array<ClassLink> = sortByGroup;
+  /**
+   * Классы по группам, а при поиске найденные подклассы встают отдельными
+   * карточками.
+   * @param items - классы из ответа
+   * @param search - строка поиска
+   */
+  function sortItems(items: Array<ClassLink>, search: string) {
+    return expandClassSearch(sortByGroup(items), search);
+  }
 </script>
 
 <template>

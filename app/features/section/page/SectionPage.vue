@@ -10,6 +10,7 @@
     useSectionDetail,
     useSectionFilter,
     useSectionList,
+    useSectionPaths,
     useSectionSearch,
   } from '../composables';
   import { SectionControls } from '../controls';
@@ -43,8 +44,11 @@
     getGroupOrder?: (item: T, group: string) => number;
     /** Адрес записи на сайте; без него строки списка никуда не ведут. */
     getPath?: (item: T) => string;
-    /** Порядок записей на странице, если ручка отдаёт их не так. */
-    sortItems?: (items: Array<T>) => Array<T>;
+    /**
+     * Порядок записей на странице, если ручка отдаёт их не так; при поиске
+     * получает и строку поиска.
+     */
+    sortItems?: (items: Array<T>, search: string) => Array<T>;
     /** Вид списка: плитки-строки, карточки рас или обложки классов. */
     view?: SectionListView;
   }>();
@@ -82,7 +86,7 @@
     });
 
   const sortedItems = computed(() =>
-    sortItems ? sortItems(items.value) : items.value,
+    sortItems ? sortItems(items.value, term.value) : items.value,
   );
 
   // Слот записи у раздела не меняется, поэтому условный вызов безопасен
@@ -111,17 +115,33 @@
     },
   });
 
-  // Первая запись на экране: после группировки она может быть не первой в
-  // ответе ручки
-  const firstPath = computed(() => {
-    const [firstGroup] = getGroup
-      ? groupItems(sortedItems.value, getGroup, getGroupOrder)
-      : [];
+  // Записи в порядке экрана: после группировки он может отличаться от
+  // ответа ручки, а запись из нескольких групп считается по первой
+  const visiblePaths = computed(() => {
+    if (!getPath) {
+      return [];
+    }
 
-    const [first] = firstGroup?.items ?? sortedItems.value;
+    const visibleItems = getGroup
+      ? groupItems(sortedItems.value, getGroup, getGroupOrder).flatMap(
+          (group) => group.items,
+        )
+      : sortedItems.value;
 
-    return first && getPath ? getPath(first) : undefined;
+    return [...new Set(visibleItems.map(getPath))];
   });
+
+  const firstPath = computed(() => visiblePaths.value[0]);
+
+  // Страница записи на телефоне листает соседние записи этого списка;
+  // серверу порядок не нужен, и в ответ страницы он не попадает
+  const sectionPaths = useSectionPaths(section.key);
+
+  if (import.meta.client) {
+    watchImmediate(visiblePaths, (paths) => {
+      sectionPaths.value = paths;
+    });
+  }
 
   // Пустую панель заполняет первая запись списка — уже в браузере, чтобы
   // разметка сервера совпала с первой отрисовкой, и при включении широкого

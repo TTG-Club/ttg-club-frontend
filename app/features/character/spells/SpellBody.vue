@@ -48,10 +48,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="typeLabel"
-      :source="spell.source"
-    />
+    <SectionSourceBar :left="typeLabel" />
 
     <SectionStatGrid>
       <SectionStat :label="SPELL_TEXT.time">

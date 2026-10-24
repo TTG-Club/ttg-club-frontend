@@ -49,6 +49,7 @@ export {
 } from './schema';
 
 export {
+  expandClassSearch,
   findClassArchetype,
   findClassFeature,
   getArchetypeFeatures,
@@ -58,11 +59,11 @@ export {
   getClassDescription,
   getClassHitPoints,
   getClassIcon,
+  getClassOptionsLink,
+  getClassOptionTabs,
   getClassSkillsLabel,
   getClassSpellsFilterUrl,
   getClassSpellsLink,
-  getClassTabs,
-  getClassTabSection,
   getGroupName,
   getParentClassName,
   getRaceAbilitiesLabel,

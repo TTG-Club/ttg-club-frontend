@@ -1,7 +1,10 @@
 <script setup lang="ts">
   import type { RouteLocationRaw } from 'vue-router';
 
+  import type { EntrySource } from '../model';
+
   import { SECTION_ICON, SECTION_TEXT } from '../model';
+  import { SectionSourceTag } from '../source-tag';
 
   /**
    * Панель открытой записи раздела: заголовок, ссылка на запись, правка
@@ -10,6 +13,7 @@
   const {
     title,
     subtitle = undefined,
+    source = undefined,
     closeTo = undefined,
     path = undefined,
     editUrl = undefined,
@@ -18,6 +22,8 @@
   } = defineProps<{
     title: string;
     subtitle?: string;
+    /** Источник записи: метки справа от английского названия. */
+    source?: EntrySource | null;
     /** Куда ведёт закрытие; без адреса панель просит закрыть себя событием. */
     closeTo?: RouteLocationRaw;
     /**
@@ -79,86 +85,93 @@
 
 <template>
   <article class="flex flex-col gap-4 pt-2">
-    <header class="flex items-start gap-3 border-b border-default pb-3">
-      <div class="min-w-0 flex-auto">
-        <USkeleton
-          v-if="isLoading && !title"
-          class="h-8 w-2/3"
-        />
+    <header class="flex flex-col gap-1 border-b border-default pb-3">
+      <div class="flex items-start gap-3">
+        <div class="min-w-0 flex-auto">
+          <USkeleton
+            v-if="isLoading && !title"
+            class="h-8 w-2/3"
+          />
 
-        <h2
-          v-else
-          class="text-2xl text-highlighted"
-        >
-          {{ title }}
-        </h2>
+          <h2
+            v-else
+            class="text-2xl text-highlighted"
+          >
+            {{ title }}
+          </h2>
+        </div>
 
-        <div
-          v-if="subtitle"
-          class="text-sm text-muted"
-        >
-          {{ subtitle }}
+        <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
+        <div :class="ACTIONS_CLASS">
+          <template v-if="isReady">
+            <UTooltip :text="SECTION_TEXT.copyLink">
+              <UButton
+                :icon="SECTION_ICON.copy"
+                :aria-label="SECTION_TEXT.copyLink"
+                color="neutral"
+                variant="ghost"
+                @click.left.exact.prevent="copyLink"
+              />
+            </UTooltip>
+
+            <slot name="actions" />
+
+            <UTooltip
+              v-if="path"
+              :text="SECTION_TEXT.openPage"
+            >
+              <UButton
+                :to="path"
+                :icon="SECTION_ICON.openPage"
+                :aria-label="SECTION_TEXT.openPage"
+                color="neutral"
+                variant="ghost"
+              />
+            </UTooltip>
+
+            <UTooltip
+              v-if="isEditAvailable"
+              :text="SECTION_TEXT.edit"
+            >
+              <UButton
+                :to="editUrl"
+                :icon="SECTION_ICON.edit"
+                :aria-label="SECTION_TEXT.edit"
+                color="neutral"
+                variant="ghost"
+              />
+            </UTooltip>
+          </template>
+
+          <UButton
+            v-if="closeTo"
+            :to="closeTo"
+            :icon="SECTION_ICON.close"
+            :aria-label="SECTION_TEXT.close"
+            color="neutral"
+            variant="ghost"
+          />
+
+          <UButton
+            v-else
+            :icon="SECTION_ICON.close"
+            :aria-label="SECTION_TEXT.close"
+            color="neutral"
+            variant="ghost"
+            @click.left.exact.prevent="close"
+          />
         </div>
       </div>
 
-      <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
-      <div :class="ACTIONS_CLASS">
-        <template v-if="isReady">
-          <UTooltip :text="SECTION_TEXT.copyLink">
-            <UButton
-              :icon="SECTION_ICON.copy"
-              :aria-label="SECTION_TEXT.copyLink"
-              color="neutral"
-              variant="ghost"
-              @click.left.exact.prevent="copyLink"
-            />
-          </UTooltip>
+      <div
+        v-if="subtitle || source"
+        class="flex items-center justify-between gap-2"
+      >
+        <span class="truncate text-sm text-muted">{{ subtitle }}</span>
 
-          <slot name="actions" />
-
-          <UTooltip
-            v-if="path"
-            :text="SECTION_TEXT.openPage"
-          >
-            <UButton
-              :to="path"
-              :icon="SECTION_ICON.openPage"
-              :aria-label="SECTION_TEXT.openPage"
-              color="neutral"
-              variant="ghost"
-            />
-          </UTooltip>
-
-          <UTooltip
-            v-if="isEditAvailable"
-            :text="SECTION_TEXT.edit"
-          >
-            <UButton
-              :to="editUrl"
-              :icon="SECTION_ICON.edit"
-              :aria-label="SECTION_TEXT.edit"
-              color="neutral"
-              variant="ghost"
-            />
-          </UTooltip>
-        </template>
-
-        <UButton
-          v-if="closeTo"
-          :to="closeTo"
-          :icon="SECTION_ICON.close"
-          :aria-label="SECTION_TEXT.close"
-          color="neutral"
-          variant="ghost"
-        />
-
-        <UButton
-          v-else
-          :icon="SECTION_ICON.close"
-          :aria-label="SECTION_TEXT.close"
-          color="neutral"
-          variant="ghost"
-          @click.left.exact.prevent="close"
+        <SectionSourceTag
+          v-if="source"
+          :source="source"
         />
       </div>
     </header>

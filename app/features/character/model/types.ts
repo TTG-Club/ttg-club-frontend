@@ -33,6 +33,6 @@ export interface ClassTab {
   /** Ключ вкладки: тип и порядок, у двух вкладок особенностей типы совпадают. */
   key: string;
   name: string;
-  type: string;
-  url: string;
+  /** Ручка фильтра, в которой скрыто выбран сам класс. */
+  filterUrl: string;
 }

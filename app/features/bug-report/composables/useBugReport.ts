@@ -1,4 +1,4 @@
-import type { BugReportRequest, TextSelection } from '../model';
+import type { BugReportRequest, BugReportType, TextSelection } from '../model';
 
 import { consola } from 'consola';
 
@@ -12,6 +12,8 @@ import {
   BUG_REPORT_SOURCE_PLATFORM,
   BUG_REPORT_TEXT,
   BUG_REPORT_TOO_MANY_REQUESTS_STATUS,
+  BUG_REPORT_TYPE_ICON,
+  BUG_REPORT_TYPE_TEXT,
   formatSelectionText,
   getScreenshotFileName,
 } from '../model';
@@ -78,14 +80,16 @@ export function useBugReport() {
   }
 
   /**
-   * Отправляет репорт.
-   * @param description - описание проблемы
+   * Отправляет баг-репорт или пожелание.
+   * @param description - описание
    * @param screenshot - скриншот с пометками
+   * @param type - баг или пожелание
    * @returns удалось ли отправить
    */
   async function submit(
     description: string,
     screenshot: Blob | null,
+    type: BugReportType,
   ): Promise<boolean> {
     const token = userToken.value;
 
@@ -97,6 +101,7 @@ export function useBugReport() {
       selectedText: textSelection.value
         ? formatSelectionText(textSelection.value)
         : undefined,
+      type,
     };
 
     const body = new FormData();
@@ -119,10 +124,10 @@ export function useBugReport() {
       });
 
       toast.add({
-        title: BUG_REPORT_TEXT.sent,
-        description: BUG_REPORT_TEXT.sentDescription,
+        title: BUG_REPORT_TYPE_TEXT[type].sent,
+        description: BUG_REPORT_TYPE_TEXT[type].sentDescription,
         color: 'success',
-        icon: BUG_REPORT_ICON.bug,
+        icon: BUG_REPORT_TYPE_ICON[type],
       });
 
       close();
