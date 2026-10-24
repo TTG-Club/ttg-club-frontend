@@ -3,8 +3,9 @@
   import SectionImageViewer from './SectionImageViewer.vue';
 
   /**
-   * Квадратная обложка записи в колонке свойств. По клику картинки
-   * открываются во весь экран с листанием.
+   * Квадратная обложка записи в колонке свойств. Картинки — портреты
+   * в полный рост, поэтому обложка прижата к верху и показывает голову
+   * и торс. По клику картинки открываются во весь экран с листанием.
    */
   const { images, alt } = defineProps<{
     images: Array<string>;
@@ -30,7 +31,7 @@
         :src="images[0]"
         :alt="alt"
         loading="lazy"
-        class="size-full object-cover"
+        class="size-full object-cover object-top"
       />
     </button>
 
