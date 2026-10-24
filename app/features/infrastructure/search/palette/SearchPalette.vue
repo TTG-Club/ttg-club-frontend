@@ -21,8 +21,9 @@
   }
 
   /**
-   * Окно быстрого поиска, как в старом SPA: первые результаты, случайные
-   * записи по кубику и переход на страницу со всеми результатами.
+   * Окно быстрого поиска, как в старом SPA: строка поиска в рамке, первые
+   * результаты или подсказка, а под ними случайные записи по кубику
+   * и переход на страницу поиска.
    */
   const isOpen = defineModel<boolean>('open', { default: false });
 
@@ -62,21 +63,12 @@
     trimmed.value ? !!searchError.value : isRandomError.value,
   );
 
-  const groups = computed<Array<CommandPaletteGroup<SearchPaletteItem>>>(() => [
-    {
-      id: 'results',
-      ignoreFilter: true,
-      items: results.value.map((result) => ({
-        label: result.name,
-        suffix: result.englishName ? `[${result.englishName}]` : undefined,
-        description: result.section,
-        to: result.url,
-        result,
-      })),
-    },
-  ]);
+  /** Подсказка вместо результатов: пока пусто, грузится или не нашлось. */
+  const statusText = computed(() => {
+    if (!trimmed.value && !isRandomLoading.value && !isRandomError.value) {
+      return randomResults.value.length ? '' : SEARCH_TEXT.start;
+    }
 
-  const emptyText = computed(() => {
     if (isLoading.value) {
       return SEARCH_TEXT.loading;
     }
@@ -85,15 +77,60 @@
       return SEARCH_TEXT.error;
     }
 
-    return trimmed.value ? SEARCH_TEXT.empty : SEARCH_TEXT.start;
+    return results.value.length ? '' : SEARCH_TEXT.empty;
   });
 
   const total = computed(() => (trimmed.value ? data.value.total : 0));
 
-  const allResultsLink = computed(() => ({
+  const pageLink = computed(() => ({
     path: SEARCH_PAGE_PATH,
-    query: { [SEARCH_QUERY_KEY]: trimmed.value },
+    query: trimmed.value ? { [SEARCH_QUERY_KEY]: trimmed.value } : undefined,
   }));
+
+  const groups = computed<Array<CommandPaletteGroup<SearchPaletteItem>>>(() => [
+    {
+      id: 'results',
+      ignoreFilter: true,
+      items: statusText.value
+        ? [
+            {
+              label: statusText.value,
+              slot: 'status',
+              disabled: true,
+              class: 'justify-center opacity-100',
+            },
+          ]
+        : results.value.map((result) => ({
+            label: result.name,
+            suffix: result.englishName ? `[${result.englishName}]` : undefined,
+            description: result.section,
+            to: result.url,
+            result,
+          })),
+    },
+    {
+      id: 'page',
+      ignoreFilter: true,
+      items: [
+        {
+          label: SEARCH_TEXT.random,
+          icon: SEARCH_ICON.random,
+          onSelect: (event: Event) => {
+            event.preventDefault();
+            void showRandom();
+          },
+        },
+        {
+          label: SEARCH_TEXT.openPage,
+          icon: SEARCH_ICON.page,
+          suffix: total.value
+            ? `${SEARCH_TEXT.found} ${total.value}`
+            : undefined,
+          to: pageLink.value,
+        },
+      ],
+    },
+  ]);
 
   /** Подменяет результаты случайными записями и очищает строку поиска. */
   async function showRandom(): Promise<void> {
@@ -144,9 +181,16 @@
         :loading="isLoading"
         :icon="SEARCH_ICON.search"
         :placeholder="SEARCH_TEXT.placeholder"
-        :ui="{ footer: 'p-2' }"
+        :input="{ variant: 'outline', size: 'lg', class: 'w-full' }"
+        :ui="{ root: 'divide-y-0', input: 'p-2', viewport: 'divide-y-0' }"
         @update:model-value="close"
       >
+        <template #status="{ item }">
+          <p class="w-full py-4 text-center text-sm text-muted">
+            {{ item.label }}
+          </p>
+        </template>
+
         <template #item-trailing="{ item }">
           <UTooltip
             v-if="item.result?.source"
@@ -156,46 +200,6 @@
               {{ item.result.source.shortName }}
             </span>
           </UTooltip>
-        </template>
-
-        <template #empty>
-          <p class="py-6 text-center text-sm text-muted">
-            {{ emptyText }}
-          </p>
-        </template>
-
-        <template #footer>
-          <div class="flex items-center justify-between gap-2">
-            <span class="px-1 text-xs text-muted">
-              <template v-if="total"
-                >{{ SEARCH_TEXT.found }} {{ total }}</template
-              >
-            </span>
-
-            <div class="flex items-center gap-1">
-              <UButton
-                :icon="SEARCH_ICON.random"
-                :label="SEARCH_TEXT.random"
-                :aria-label="SEARCH_TEXT.randomLabel"
-                :loading="isRandomLoading"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                @click.left.exact.prevent="showRandom"
-              />
-
-              <UButton
-                v-if="trimmed"
-                :icon="SEARCH_ICON.page"
-                :label="SEARCH_TEXT.allResults"
-                :to="allResultsLink"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                @click.left.exact="close"
-              />
-            </div>
-          </div>
         </template>
       </UCommandPalette>
     </template>
