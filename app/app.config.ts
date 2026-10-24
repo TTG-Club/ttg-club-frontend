@@ -1,5 +1,5 @@
-// Цветные залитые кнопки и вкладки: в тёмной теме Nuxt UI красит их текст
-// в тёмный, а нужен белый
+// Цветные залитые кнопки, вкладки, плашки фильтров, галочки и метки:
+// в тёмной теме Nuxt UI красит их текст в тёмный, а нужен белый
 const SOLID_COLORS = [
   'primary',
   'secondary',
@@ -20,6 +20,25 @@ export default defineAppConfig({
         color,
         variant: 'solid' as const,
         class: 'text-white',
+      })),
+    },
+    badge: {
+      compoundVariants: SOLID_COLORS.map((color) => ({
+        color,
+        variant: 'solid' as const,
+        class: 'text-white',
+      })),
+    },
+    checkbox: {
+      compoundVariants: SOLID_COLORS.map((color) => ({
+        color,
+        class: { indicator: 'text-white' },
+      })),
+    },
+    chip: {
+      compoundVariants: SOLID_COLORS.map((color) => ({
+        color,
+        class: { base: 'text-white' },
       })),
     },
     tabs: {
