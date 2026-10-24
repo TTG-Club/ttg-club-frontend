@@ -7,6 +7,7 @@ import type {
   BackgroundDetail,
   ClassDetail,
   ClassFeature,
+  ClassLink,
   ClassTraits,
   RaceAbility,
   RaceDetail,
@@ -223,6 +224,43 @@ export function sortByGroup<T extends GroupedLink>(
     (entry) => (entry.group ? entry.group.order + 1 : 0),
     (entry) => entry.name.rus,
   ]);
+}
+
+/**
+ * Классы в поиске, как на new.ttg.club: класс, найденный по своему
+ * названию, остаётся карточкой со всеми архетипами, а у остальных ручка
+ * нашла архетипы, и они встают отдельными карточками на место класса с его
+ * обложкой, значком и группой.
+ * @param classes - классы из списка
+ * @param search - строка поиска
+ */
+export function expandClassSearch(
+  classes: Array<ClassLink>,
+  search: string,
+): Array<ClassLink> {
+  const term = search.trim().toLocaleLowerCase();
+
+  if (!term) {
+    return classes;
+  }
+
+  return classes.flatMap((item) => {
+    const isClassFound = [item.name.rus, item.name.eng].some((name) =>
+      name.toLocaleLowerCase().includes(term),
+    );
+
+    if (isClassFound || !item.archetypes?.length) {
+      return [item];
+    }
+
+    return item.archetypes.map((archetype) => ({
+      ...item,
+      name: archetype.name,
+      url: archetype.url,
+      source: archetype.source ?? item.source,
+      archetypes: [],
+    }));
+  });
 }
 
 /**

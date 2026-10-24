@@ -44,8 +44,11 @@
     getGroupOrder?: (item: T, group: string) => number;
     /** Адрес записи на сайте; без него строки списка никуда не ведут. */
     getPath?: (item: T) => string;
-    /** Порядок записей на странице, если ручка отдаёт их не так. */
-    sortItems?: (items: Array<T>) => Array<T>;
+    /**
+     * Порядок записей на странице, если ручка отдаёт их не так; при поиске
+     * получает и строку поиска.
+     */
+    sortItems?: (items: Array<T>, search: string) => Array<T>;
     /** Вид списка: плитки-строки, карточки рас или обложки классов. */
     view?: SectionListView;
   }>();
@@ -83,7 +86,7 @@
     });
 
   const sortedItems = computed(() =>
-    sortItems ? sortItems(items.value) : items.value,
+    sortItems ? sortItems(items.value, term.value) : items.value,
   );
 
   // Слот записи у раздела не меняется, поэтому условный вызов безопасен

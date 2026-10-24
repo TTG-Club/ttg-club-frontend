@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   backgroundDetailSchema,
   classDetailSchema,
+  expandClassSearch,
   findClassArchetype,
   findClassFeature,
   getArchetypeSpellLevelHeader,
@@ -443,5 +444,46 @@ describe('классы', () => {
     ).toBe(' (в бою),');
 
     expect(getArchetypeSpellSuffix(spell, true)).toBe('');
+  });
+});
+
+describe('поиск классов', () => {
+  const source = { shortName: 'PHB', name: 'Книга игрока' };
+  const type = { name: 'Официальные', order: 0 };
+
+  const wizard = {
+    name: { rus: 'Волшебник', eng: 'Wizard' },
+    url: '/classes/wizard',
+    source,
+    image: '/wizard.webp',
+    icon: 'class/wizard',
+    archetypes: [
+      {
+        name: { rus: 'Школа воплощения', eng: 'School of Evocation' },
+        url: '/classes/wizard/evocation',
+        type,
+        source,
+      },
+    ],
+  };
+
+  it('без поиска оставляет классы как есть', () => {
+    expect(expandClassSearch([wizard], ' ')).toEqual([wizard]);
+  });
+
+  it('класс, найденный по названию, остаётся карточкой', () => {
+    expect(expandClassSearch([wizard], 'волш')).toEqual([wizard]);
+    expect(expandClassSearch([wizard], 'WIZ')).toEqual([wizard]);
+  });
+
+  it('найденные подклассы встают карточками с обложкой класса', () => {
+    expect(expandClassSearch([wizard], 'воплощ')).toEqual([
+      {
+        ...wizard,
+        name: { rus: 'Школа воплощения', eng: 'School of Evocation' },
+        url: '/classes/wizard/evocation',
+        archetypes: [],
+      },
+    ]);
   });
 });
