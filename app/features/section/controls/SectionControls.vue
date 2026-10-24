@@ -31,6 +31,11 @@
 
   const search = defineModel<string>('search', { required: true });
 
+  defineSlots<{
+    /** Настройки списка под поиском, например переключатель группировки. */
+    toolbar?: () => unknown;
+  }>();
+
   const route = useRoute();
   const siteConfig = useSiteConfig();
   const toast = useToast();
@@ -181,6 +186,8 @@
         />
       </UDropdownMenu>
     </div>
+
+    <slot name="toolbar" />
 
     <template v-if="hasOther">
       <USeparator class="hidden lg:flex" />

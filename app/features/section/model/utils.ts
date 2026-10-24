@@ -325,16 +325,18 @@ export function buildListRequest(options: {
 /**
  * Делит список на группы по подписи, как старый SPA: записи одной группы
  * собираются вместе, даже если ручка отдала их вперемешку (оружие идёт по
- * названию, а группируется по типу). Группы идут по `getOrder`, а без него —
- * в порядке первой записи; записи внутри группы сохраняют свой порядок.
+ * названию, а группируется по типу). Запись с несколькими подписями попадает
+ * в каждую из своих групп (снаряжение по категориям). Группы идут по
+ * `getOrder`, а без него — в порядке первой записи; записи внутри группы
+ * сохраняют свой порядок.
  * @param items - записи списка
- * @param getGroup - подпись группы записи
+ * @param getGroup - подпись группы записи или несколько подписей
  * @param getOrder - порядок группы записи
  */
 export function groupItems<T>(
   items: Array<T>,
-  getGroup: (item: T) => string,
-  getOrder?: (item: T) => number,
+  getGroup: (item: T) => string | Array<string>,
+  getOrder?: (item: T, group: string) => number,
 ): Array<{ name: string; items: Array<T> }> {
   const groups = new Map<
     string,
@@ -342,17 +344,18 @@ export function groupItems<T>(
   >();
 
   for (const item of items) {
-    const name = getGroup(item);
-    const group = groups.get(name);
+    for (const name of [getGroup(item)].flat()) {
+      const group = groups.get(name);
 
-    if (group) {
-      group.items.push(item);
-    } else {
-      groups.set(name, {
-        name,
-        order: getOrder?.(item) ?? groups.size,
-        items: [item],
-      });
+      if (group) {
+        group.items.push(item);
+      } else {
+        groups.set(name, {
+          name,
+          order: getOrder?.(item, name) ?? groups.size,
+          items: [item],
+        });
+      }
     }
   }
 

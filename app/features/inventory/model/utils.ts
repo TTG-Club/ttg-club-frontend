@@ -1,12 +1,13 @@
 import type {
   ArmorLink,
   ItemDetail,
+  ItemLink,
   MagicItemDetail,
   MagicItemLink,
   Treasure,
   WeaponLink,
 } from './schema';
-import type { MagicItemTypePart } from './types';
+import type { ItemsGrouping, MagicItemTypePart } from './types';
 
 import { capitalize } from 'es-toolkit';
 
@@ -14,7 +15,9 @@ import { WORKSHOP_EDIT_SUFFIX } from '~section/model';
 
 import {
   INVENTORY_LIST_SEPARATOR,
+  ITEM_NO_CATEGORY_ORDER,
   ITEM_TEXT,
+  ITEMS_GROUPINGS,
   MAGIC_ITEM_TEXT,
   MAGIC_ITEMS_WORKSHOP_PATH,
   TREASURE_CURRENCY,
@@ -44,6 +47,41 @@ export function getTypeOrder(entry: WeaponLink | ArmorLink): number {
  */
 export function getRarityGroup(item: MagicItemLink): string {
   return capitalize(item.rarity.name);
+}
+
+const ITEMS_GROUPING_SET: ReadonlySet<string> = new Set(ITEMS_GROUPINGS);
+
+/**
+ * Проверяет, что значение из cookie — известная группировка снаряжения.
+ * @param value - значение cookie
+ */
+export function isItemsGrouping(value: unknown): value is ItemsGrouping {
+  return typeof value === 'string' && ITEMS_GROUPING_SET.has(value);
+}
+
+/**
+ * Группы снаряжения по категориям: предмет из нескольких категорий есть в
+ * каждой, без категорий — в «Без категории».
+ * @param item - снаряжение из списка
+ */
+export function getItemCategoryGroups(item: ItemLink): Array<string> {
+  const groups = item.categoryGroups ?? [];
+
+  return groups.length
+    ? groups.map(({ name }) => name)
+    : [ITEM_TEXT.noCategory];
+}
+
+/**
+ * Порядок категории снаряжения — как в справочнике категорий.
+ * @param item - снаряжение из списка
+ * @param group - категория, в которую попал предмет
+ */
+export function getItemCategoryOrder(item: ItemLink, group: string): number {
+  return (
+    item.categoryGroups?.find(({ name }) => name === group)?.order
+    ?? ITEM_NO_CATEGORY_ORDER
+  );
 }
 
 /**

@@ -37,9 +37,10 @@
     section: SectionConfig;
     schema: z.ZodType<T>;
     getKey: (item: T) => string;
-    getGroup?: (item: T) => string;
+    /** Подпись группы записи; с несколькими запись есть в каждой группе. */
+    getGroup?: (item: T) => string | Array<string>;
     /** Порядок группы записи; без него группы идут по первой записи. */
-    getGroupOrder?: (item: T) => number;
+    getGroupOrder?: (item: T, group: string) => number;
     /** Адрес записи на сайте; без него строки списка никуда не ведут. */
     getPath?: (item: T) => string;
     /** Порядок записей на странице, если ручка отдаёт их не так. */
@@ -56,6 +57,8 @@
      * своей страницей.
      */
     entry?: (props: { path: string }) => unknown;
+    /** Настройки списка под поиском, например переключатель группировки. */
+    toolbar?: () => unknown;
   }>();
 
   const { input, term } = useSectionSearch();
@@ -159,7 +162,14 @@
         :is-customized="filter?.isCustomized.value"
         @update:selection="filter?.setSelection($event)"
         @reset="filter?.reset($event)"
-      />
+      >
+        <template
+          v-if="slots.toolbar"
+          #toolbar
+        >
+          <slot name="toolbar" />
+        </template>
+      </SectionControls>
     </template>
 
     <SectionList
