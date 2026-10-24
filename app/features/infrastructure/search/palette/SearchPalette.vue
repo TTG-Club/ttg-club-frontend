@@ -22,8 +22,8 @@
 
   /**
    * Окно быстрого поиска, как в старом SPA: строка поиска в рамке, первые
-   * результаты или подсказка, а под ними случайные записи по кубику
-   * и переход на страницу поиска.
+   * результаты или подсказка, а под ними переход на страницу поиска.
+   * Кубик справа от строки показывает случайные записи.
    */
   const isOpen = defineModel<boolean>('open', { default: false });
 
@@ -113,14 +113,6 @@
       ignoreFilter: true,
       items: [
         {
-          label: SEARCH_TEXT.random,
-          icon: SEARCH_ICON.random,
-          onSelect: (event: Event) => {
-            event.preventDefault();
-            void showRandom();
-          },
-        },
-        {
           label: SEARCH_TEXT.openPage,
           icon: SEARCH_ICON.page,
           suffix: total.value
@@ -153,6 +145,14 @@
     }
   }
 
+  /** Строка в рамке, а справа от неё, за рамкой, кнопка с кубиком. */
+  const SEARCH_INPUT = {
+    variant: 'outline',
+    size: 'lg',
+    class: 'w-full',
+    ui: { base: 'pe-3', trailing: 'pe-2' },
+  } as const;
+
   function close(): void {
     isOpen.value = false;
   }
@@ -181,10 +181,24 @@
         :loading="isLoading"
         :icon="SEARCH_ICON.search"
         :placeholder="SEARCH_TEXT.placeholder"
-        :input="{ variant: 'outline', size: 'lg', class: 'w-full' }"
-        :ui="{ root: 'divide-y-0', input: 'p-2', viewport: 'divide-y-0' }"
+        :input="SEARCH_INPUT"
+        :ui="{ root: 'divide-y-0', input: 'p-2 pe-12', viewport: 'divide-y-0' }"
         @update:model-value="close"
       >
+        <template #close>
+          <UTooltip :text="SEARCH_TEXT.random">
+            <UButton
+              :icon="SEARCH_ICON.random"
+              :aria-label="SEARCH_TEXT.random"
+              :loading="isRandomLoading"
+              color="neutral"
+              variant="ghost"
+              size="lg"
+              @click.left.exact.prevent="showRandom"
+            />
+          </UTooltip>
+        </template>
+
         <template #status="{ item }">
           <p class="w-full py-4 text-center text-sm text-muted">
             {{ item.label }}
