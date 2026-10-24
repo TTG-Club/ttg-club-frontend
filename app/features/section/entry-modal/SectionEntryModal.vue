@@ -1,9 +1,14 @@
-<script setup lang="ts" generic="T extends { name: EntryName }">
+<script
+  setup
+  lang="ts"
+  generic="T extends { name: EntryName; source?: EntrySource | null }"
+>
   import type { z } from 'zod';
 
-  import type { EntryName } from '../model';
+  import type { EntryName, EntrySource } from '../model';
 
   import { getEntryApiPath, SECTION_ICON, SECTION_TEXT } from '../model';
+  import { SectionSourceTag } from '../source-tag';
 
   /**
    * Запись раздела в окне поверх страницы, как заклинание из вкладки
@@ -52,6 +57,17 @@
     :description="entry?.name.eng ?? ''"
     :ui="{ content: 'max-w-3xl' }"
   >
+    <template #description>
+      <span class="flex items-center justify-between gap-2">
+        <span class="truncate">{{ entry?.name.eng }}</span>
+
+        <SectionSourceTag
+          v-if="entry?.source"
+          :source="entry.source"
+        />
+      </span>
+    </template>
+
     <template #body>
       <div
         v-if="isLoading"

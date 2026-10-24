@@ -22,10 +22,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="armor.type.name"
-      :source="armor.source"
-    />
+    <SectionSourceBar :left="armor.type.name" />
 
     <SectionStatGrid>
       <SectionStat :label="ARMOR_TEXT.armorClass">

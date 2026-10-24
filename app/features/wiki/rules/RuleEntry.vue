@@ -37,10 +37,7 @@
     :get-edit-path="getWorkshopEditPath"
   >
     <template #default="{ entry }">
-      <SectionSourceBar
-        :left="getCategory(entry)"
-        :source="entry.source"
-      />
+      <SectionSourceBar :left="getCategory(entry)" />
 
       <ContentRender
         v-if="entry.description"

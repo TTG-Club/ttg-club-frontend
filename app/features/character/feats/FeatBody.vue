@@ -16,10 +16,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionSourceBar
-      :left="requirements"
-      :source="feat.source"
-    />
+    <SectionSourceBar :left="requirements" />
 
     <ContentRender
       v-if="feat.description"

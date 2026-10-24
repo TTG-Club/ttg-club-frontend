@@ -1,7 +1,11 @@
-<script setup lang="ts" generic="T extends { name: EntryName }">
+<script
+  setup
+  lang="ts"
+  generic="T extends { name: EntryName; source?: EntrySource | null }"
+>
   import type { z } from 'zod';
 
-  import type { EntryName, SectionConfig } from '../model';
+  import type { EntryName, EntrySource, SectionConfig } from '../model';
 
   import { BookmarkButton } from '~bookmarks/button';
   import { CommentsBlock } from '~comments/section';
@@ -69,6 +73,7 @@
     :class="wrapperClass"
     :title="entry?.name.rus ?? ''"
     :subtitle="entry?.name.eng"
+    :source="entry?.source"
     :path="path"
     :close-to="closeTo"
     :edit-url="editUrl"
