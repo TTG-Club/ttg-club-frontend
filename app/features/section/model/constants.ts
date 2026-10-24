@@ -139,3 +139,15 @@ export const SECTION_GRID_CLASS = {
 
 /** Метки книг в фильтре источников: в тёмной теме текст белый. */
 export const SOURCE_FILTER_BADGE_CLASS = 'dark:text-white';
+
+/**
+ * Сколько пикселей пройти пальцем по странице записи, чтобы перейти к
+ * соседней записи списка.
+ */
+export const SECTION_SWIPE_THRESHOLD = 80;
+
+/**
+ * Во сколько раз сдвиг по горизонтали должен быть больше вертикального,
+ * чтобы прокрутка страницы не листала записи.
+ */
+export const SECTION_SWIPE_AXIS_RATIO = 2;

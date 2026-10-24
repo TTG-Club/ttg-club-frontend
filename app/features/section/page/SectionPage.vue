@@ -10,6 +10,7 @@
     useSectionDetail,
     useSectionFilter,
     useSectionList,
+    useSectionPaths,
     useSectionSearch,
   } from '../composables';
   import { SectionControls } from '../controls';
@@ -111,17 +112,33 @@
     },
   });
 
-  // Первая запись на экране: после группировки она может быть не первой в
-  // ответе ручки
-  const firstPath = computed(() => {
-    const [firstGroup] = getGroup
-      ? groupItems(sortedItems.value, getGroup, getGroupOrder)
-      : [];
+  // Записи в порядке экрана: после группировки он может отличаться от
+  // ответа ручки, а запись из нескольких групп считается по первой
+  const visiblePaths = computed(() => {
+    if (!getPath) {
+      return [];
+    }
 
-    const [first] = firstGroup?.items ?? sortedItems.value;
+    const visibleItems = getGroup
+      ? groupItems(sortedItems.value, getGroup, getGroupOrder).flatMap(
+          (group) => group.items,
+        )
+      : sortedItems.value;
 
-    return first && getPath ? getPath(first) : undefined;
+    return [...new Set(visibleItems.map(getPath))];
   });
+
+  const firstPath = computed(() => visiblePaths.value[0]);
+
+  // Страница записи на телефоне листает соседние записи этого списка;
+  // серверу порядок не нужен, и в ответ страницы он не попадает
+  const sectionPaths = useSectionPaths(section.key);
+
+  if (import.meta.client) {
+    watchImmediate(visiblePaths, (paths) => {
+      sectionPaths.value = paths;
+    });
+  }
 
   // Пустую панель заполняет первая запись списка — уже в браузере, чтобы
   // разметка сервера совпала с первой отрисовкой, и при включении широкого
