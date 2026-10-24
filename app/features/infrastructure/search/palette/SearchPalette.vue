@@ -5,12 +5,15 @@
 
   import { useSiteSearch } from '../composables';
   import {
+    buildSearchRequest,
     SEARCH_DEBOUNCE_MS,
     SEARCH_ICON,
     SEARCH_PAGE_PATH,
     SEARCH_PALETTE_SIZE,
     SEARCH_QUERY_KEY,
+    SEARCH_RANDOM_API_URL,
     SEARCH_TEXT,
+    searchResponseSchema,
   } from '../model';
 
   interface SearchPaletteItem extends CommandPaletteItem {
@@ -19,7 +22,8 @@
 
   /**
    * Окно быстрого поиска, как в старом SPA: строка поиска в рамке, первые
-   * результаты или подсказка, а под ними переход на страницу поиска.
+   * результаты или подсказка, а под ними случайные записи по кубику
+   * и переход на страницу поиска.
    */
   const isOpen = defineModel<boolean>('open', { default: false });
 
@@ -38,20 +42,31 @@
     server: false,
   });
 
-  const results = computed(() => (trimmed.value ? data.value.items : []));
+  const randomResults = shallowRef<Array<SearchResult>>([]);
+  const isRandomLoading = ref(false);
+  const isRandomError = ref(false);
+
+  /** Пока строка поиска пуста, в окне остаются случайные записи. */
+  const results = computed(() =>
+    trimmed.value ? data.value.items : randomResults.value,
+  );
 
   const isLoading = computed(
     () =>
-      !!trimmed.value
-      && (status.value === 'pending' || trimmed.value !== query.value.trim()),
+      isRandomLoading.value
+      || (!!trimmed.value
+        && (status.value === 'pending'
+          || trimmed.value !== query.value.trim())),
   );
 
-  const isError = computed(() => !!trimmed.value && !!searchError.value);
+  const isError = computed(() =>
+    trimmed.value ? !!searchError.value : isRandomError.value,
+  );
 
   /** Подсказка вместо результатов: пока пусто, грузится или не нашлось. */
   const statusText = computed(() => {
-    if (!trimmed.value) {
-      return SEARCH_TEXT.start;
+    if (!trimmed.value && !isRandomLoading.value && !isRandomError.value) {
+      return randomResults.value.length ? '' : SEARCH_TEXT.start;
     }
 
     if (isLoading.value) {
@@ -98,6 +113,14 @@
       ignoreFilter: true,
       items: [
         {
+          label: SEARCH_TEXT.random,
+          icon: SEARCH_ICON.random,
+          onSelect: (event: Event) => {
+            event.preventDefault();
+            void showRandom();
+          },
+        },
+        {
           label: SEARCH_TEXT.openPage,
           icon: SEARCH_ICON.page,
           suffix: total.value
@@ -109,14 +132,39 @@
     },
   ]);
 
+  /** Подменяет результаты случайными записями и очищает строку поиска. */
+  async function showRandom(): Promise<void> {
+    term.value = '';
+    isRandomLoading.value = true;
+    isRandomError.value = false;
+
+    try {
+      const response = await $fetch(SEARCH_RANDOM_API_URL, {
+        method: 'POST',
+        body: buildSearchRequest('', 1, SEARCH_PALETTE_SIZE),
+      });
+
+      randomResults.value = searchResponseSchema.parse(response).items;
+    } catch {
+      randomResults.value = [];
+      isRandomError.value = true;
+    } finally {
+      isRandomLoading.value = false;
+    }
+  }
+
   function close(): void {
     isOpen.value = false;
   }
 
   watch(isOpen, (value) => {
-    if (!value) {
-      term.value = '';
+    if (value) {
+      return;
     }
+
+    term.value = '';
+    randomResults.value = [];
+    isRandomError.value = false;
   });
 </script>
 
