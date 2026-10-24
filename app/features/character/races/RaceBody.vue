@@ -10,8 +10,8 @@
   import RaceRoutingBar from './RaceRoutingBar.vue';
 
   /**
-   * Карточка расы, как вида на new.ttg.club: сверху переходы к основной
-   * расе и разновидностям, слева обложка и свойства, справа описание,
+   * Карточка расы, как вида на new.ttg.club: слева обложка и свойства,
+   * справа над текстом переходы к основной расе и разновидностям, ниже описание,
    * особенности (раскрыты сразу) и разновидности.
    */
   const { race, path } = defineProps<{
@@ -31,13 +31,17 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <RaceRoutingBar
-      v-if="race.baseRace"
-      :base-race="race.baseRace"
-      :path="path"
-    />
-
     <SectionDetailLayout>
+      <template
+        v-if="race.baseRace"
+        #header
+      >
+        <RaceRoutingBar
+          :base-race="race.baseRace"
+          :path="path"
+        />
+      </template>
+
       <template
         v-if="hasAside"
         #aside
