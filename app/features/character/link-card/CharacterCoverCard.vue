@@ -90,11 +90,12 @@
     <div
       class="relative flex aspect-square w-full flex-none items-center justify-center overflow-hidden bg-elevated @max-md:size-25"
     >
+      <!-- Обложки — портреты в полный рост: показываем голову и торс -->
       <img
         v-if="image"
         :src="image"
         :alt="name.rus"
-        class="absolute size-full object-cover opacity-90"
+        class="absolute size-full object-cover object-top opacity-90"
         loading="lazy"
       />
 
