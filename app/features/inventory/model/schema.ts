@@ -71,10 +71,17 @@ export type ArmorDetail = z.infer<typeof armorDetailSchema>;
 
 /* --- Снаряжение --------------------------------------------------------- */
 
+/** Категория снаряжения в списке: название и место в справочнике. */
+const itemCategoryGroupSchema = z.object({
+  name: z.string(),
+  order: z.number(),
+});
+
 export const itemLinkSchema = z.object({
   name: entryNameSchema,
   url: z.string().min(1),
   source: entrySourceSchema.nullish(),
+  categoryGroups: z.array(itemCategoryGroupSchema).nullish(),
 });
 
 export type ItemLink = z.infer<typeof itemLinkSchema>;

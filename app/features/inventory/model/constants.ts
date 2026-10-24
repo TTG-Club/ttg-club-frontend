@@ -1,4 +1,4 @@
-import type { SectionConfig } from '~section/model';
+import type { SectionConfig, SectionGroupingOption } from '~section/model';
 
 import { SECTION_PAGE_SIZE_ALL } from '~section/model';
 
@@ -59,9 +59,32 @@ export const ITEMS_SECTION: SectionConfig = {
   listUrl: '/api/v1/items',
   filterUrl: '/api/v1/filters/items',
   order: [{ field: 'name', direction: 'asc' }],
+  // Список грузится целиком: иначе группы по категориям дополнялись бы
+  // при прокрутке
+  pageSize: SECTION_PAGE_SIZE_ALL,
 };
 
+/** Как сгруппирован список снаряжения: по категориям или по алфавиту. */
+export const ITEMS_GROUPINGS = ['category', 'alphabet'] as const;
+
+export const ITEMS_GROUPING_DEFAULT = 'category';
+
+/** Выбранная группировка запоминается в cookie, чтобы сервер отдал её же. */
+export const ITEMS_GROUPING_COOKIE = 'ttg_items_grouping';
+
+/** Срок хранения выбранной группировки: год. */
+export const ITEMS_GROUPING_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+
+export const ITEMS_GROUPING_OPTIONS: Array<SectionGroupingOption> = [
+  { value: 'category', label: 'По категориям', icon: 'tabler:category' },
+  { value: 'alphabet', label: 'По алфавиту', icon: 'tabler:sort-a-z' },
+];
+
+/** Снаряжение без категорий идёт последней группой. */
+export const ITEM_NO_CATEGORY_ORDER = Number.MAX_SAFE_INTEGER;
+
 export const ITEM_TEXT = {
+  noCategory: 'Без категории',
   category: 'Категория:',
   categories: 'Категории:',
   price: 'Стоимость:',

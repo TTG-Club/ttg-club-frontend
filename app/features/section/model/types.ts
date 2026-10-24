@@ -102,3 +102,10 @@ export interface FilterGroupMatch {
   group: FilterGroup;
   values: Array<FilterValue>;
 }
+
+/** Вариант группировки списка в переключателе. */
+export interface SectionGroupingOption {
+  value: string;
+  label: string;
+  icon: string;
+}

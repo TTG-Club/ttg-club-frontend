@@ -11,7 +11,7 @@ export type {
   WeaponLink,
   WeaponProperty,
 } from './schema';
-export type { MagicItemTypePart } from './types';
+export type { ItemsGrouping, MagicItemTypePart } from './types';
 
 export {
   armorDetailSchema,
@@ -27,6 +27,8 @@ export {
 
 export {
   getItemCategoriesLabel,
+  getItemCategoryGroups,
+  getItemCategoryOrder,
   getMagicItemEditPath,
   getMagicItemTypeParts,
   getRarityGroup,
@@ -34,6 +36,7 @@ export {
   getTreasurePrice,
   getTypeGroup,
   getTypeOrder,
+  isItemsGrouping,
 } from './utils';
 
 export * from './constants';

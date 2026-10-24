@@ -14,6 +14,7 @@ export type {
   FilterSelection,
   FilterValue,
   SectionConfig,
+  SectionGroupingOption,
   SectionListRequest,
   SectionListView,
   SectionOpener,

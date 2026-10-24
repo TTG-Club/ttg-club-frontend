@@ -39,6 +39,7 @@ export const SECTION_TEXT = {
   edit: 'Редактировать',
   source: 'Источник:',
   openImage: 'Открыть изображение',
+  grouping: 'Группировка списка',
   previousImage: 'Предыдущее изображение',
   nextImage: 'Следующее изображение',
   openPage: 'Открыть страницу',
