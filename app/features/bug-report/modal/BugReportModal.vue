@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { DrawingTool } from '../model';
+  import type { BugReportType, DrawingTool } from '../model';
 
   import { useBugReport } from '../composables';
   import {
@@ -7,8 +7,12 @@
     BUG_REPORT_DESCRIPTION_MAX_LENGTH,
     BUG_REPORT_ICON,
     BUG_REPORT_TEXT,
+    BUG_REPORT_TYPE_TABS,
+    BUG_REPORT_TYPE_TEXT,
     DEFAULT_BRUSH_COLOR,
+    DEFAULT_BUG_REPORT_TYPE,
     DRAWING_TOOL_BUTTONS,
+    isBugReportType,
   } from '../model';
   import {
     BugReportAuthor,
@@ -18,8 +22,8 @@
   } from './ui';
 
   /**
-   * Окно баг-репорта: описание, страница, выделенный текст и скриншот с
-   * пометками. Скриншот вставляется из буфера обмена или выбирается файлом.
+   * Окно баг-репорта или пожелания, как на new.ttg.club: вкладка типа,
+   * описание, страница, выделенный текст и скриншот с пометками. Скриншот вставляется из буфера обмена или выбирается файлом.
    */
   const { isOpen, pageUrl, textSelection, clearTextSelection, close, submit } =
     useBugReport();
@@ -34,6 +38,21 @@
   const tool = ref<DrawingTool>('brush');
   const isSubmitting = ref(false);
   const screenshotUrl = ref('');
+
+  /** Что отправляем: баг или пожелание. */
+  const reportType = ref<BugReportType>(DEFAULT_BUG_REPORT_TYPE);
+
+  const typeText = computed(() => BUG_REPORT_TYPE_TEXT[reportType.value]);
+
+  /**
+   * Переключает тип записи по вкладке.
+   * @param value - значение вкладки
+   */
+  function onTypeChange(value: string | number): void {
+    if (isBugReportType(value)) {
+      reportType.value = value;
+    }
+  }
 
   const hasScreenshot = computed(() => !!screenshotUrl.value);
 
@@ -133,7 +152,7 @@
     try {
       const screenshot = (await canvasRef.value?.exportToBlob()) ?? null;
 
-      await submit(description.value.trim(), screenshot);
+      await submit(description.value.trim(), screenshot, reportType.value);
     } finally {
       isSubmitting.value = false;
     }
@@ -150,7 +169,10 @@
     }
   }
 
+  // Окно живёт между открытиями, поэтому каждое начинается с бага
   watch(isOpen, (opened) => {
+    reportType.value = DEFAULT_BUG_REPORT_TYPE;
+
     if (!opened) {
       reset();
     }
@@ -185,10 +207,19 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="BUG_REPORT_TEXT.title"
+    :title="typeText.title"
     class="sm:w-fit sm:max-w-[90vw]"
   >
     <template #body>
+      <UTabs
+        :model-value="reportType"
+        :items="BUG_REPORT_TYPE_TABS"
+        :content="false"
+        size="sm"
+        class="mb-4 w-full sm:w-fit"
+        @update:model-value="onTypeChange"
+      />
+
       <div class="flex flex-col gap-4 lg:flex-row">
         <!-- Скриншот на телефоне не нужен: снимок экрана там не вставить -->
         <div class="hidden shrink-0 gap-2 lg:flex">
@@ -328,13 +359,13 @@
           </p>
 
           <UFormField
-            :label="BUG_REPORT_TEXT.description"
+            :label="typeText.description"
             :help="BUG_REPORT_TEXT.submitHint"
             required
           >
             <UTextarea
               v-model="description"
-              :placeholder="BUG_REPORT_TEXT.descriptionPlaceholder"
+              :placeholder="typeText.descriptionPlaceholder"
               :maxlength="BUG_REPORT_DESCRIPTION_MAX_LENGTH"
               :rows="6"
               autoresize

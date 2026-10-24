@@ -5,6 +5,7 @@ import {
   formatSelectionText,
   getScreenshotFileName,
   getSelectionContext,
+  isBugReportType,
   SELECTION_CONTEXT_LENGTH,
 } from '~bug-report/model';
 
@@ -53,5 +54,12 @@ describe('баг-репорт', () => {
     expect(
       fitImageSize({ width: 400, height: 300 }, { width: 1000, height: 800 }),
     ).toEqual({ width: 400, height: 300 });
+  });
+
+  it('узнаёт тип записи по значению вкладки', () => {
+    expect(isBugReportType('BUG')).toBe(true);
+    expect(isBugReportType('WISH')).toBe(true);
+    expect(isBugReportType('wish')).toBe(false);
+    expect(isBugReportType(0)).toBe(false);
   });
 });

@@ -1,4 +1,16 @@
-import type { DRAWING_TOOLS } from './constants';
+import type { BUG_REPORT_TYPES, DRAWING_TOOLS } from './constants';
+
+/** Что отправляется: баг или пожелание. */
+export type BugReportType = (typeof BUG_REPORT_TYPES)[number];
+
+/** Тексты окна и тоста под тип записи. */
+export interface BugReportTypeText {
+  title: string;
+  description: string;
+  descriptionPlaceholder: string;
+  sent: string;
+  sentDescription: string;
+}
 
 /** Выделенный текст и его окружение на странице. */
 export interface TextSelection {
@@ -18,6 +30,8 @@ export interface BugReportRequest {
   /** Ключ гостя; вошедшего сервис узнаёт по токену. */
   sessionId?: string;
   selectedText?: string;
+  /** Без него сервис считает запись багом. */
+  type?: BugReportType;
 }
 
 /** Цвет кисти. */
