@@ -1,9 +1,6 @@
 /** Ручка поиска по сайту. */
 export const SEARCH_API_URL = '/api/v1/search';
 
-/** Ручка случайных записей для кнопки с кубиком. */
-export const SEARCH_RANDOM_API_URL = '/api/v1/search/random';
-
 /** Страница поиска. */
 export const SEARCH_PAGE_PATH = '/search';
 
@@ -35,15 +32,12 @@ export const SEARCH_TEXT = {
   empty: 'Боги не нашли ответа на твой запрос',
   error: 'Произошла ошибка, попробуйте ещё раз',
   found: 'Найдено:',
-  random: 'Случайные',
-  randomLabel: 'Показать случайные записи',
-  allResults: 'Все результаты',
+  openPage: 'Открыть страницу поиска',
   range: 'Результат:',
   of: 'из',
 } as const;
 
 export const SEARCH_ICON = {
   search: 'tabler:search',
-  random: 'ttg:dice-d20',
-  page: 'tabler:list-search',
+  page: 'tabler:file-search',
 } as const;
