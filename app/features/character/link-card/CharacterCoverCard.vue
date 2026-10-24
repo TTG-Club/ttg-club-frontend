@@ -83,9 +83,10 @@
 </script>
 
 <template>
+  <!-- Рамку фокуса ссылки заменяет кольцо всей карточки и только с клавиатуры -->
   <div
     :class="cardClass"
-    class="group relative flex flex-col overflow-hidden rounded-xl border transition-colors @max-md:flex-row"
+    class="group relative flex flex-col overflow-hidden rounded-xl border transition-colors has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-primary @max-md:flex-row"
   >
     <div
       class="relative flex aspect-square w-full flex-none items-center justify-center overflow-hidden bg-elevated @max-md:size-25"
@@ -110,9 +111,10 @@
         class="absolute inset-0 bg-linear-to-t from-muted to-transparent to-50% transition-all duration-300 @max-md:bg-linear-to-l @md:group-hover:top-full"
       />
 
+      <!-- Источник на обложке, как на new.ttg.club: строке остаётся место под название -->
       <span
         v-if="source?.group"
-        class="absolute top-2 right-2 z-10 flex @max-md:hidden"
+        class="absolute top-2 right-2 z-10 flex"
       >
         <SectionSourceBadge
           :group="source.group"
@@ -127,7 +129,7 @@
     >
       <NuxtLink
         :to="to"
-        class="flex min-w-0 flex-auto flex-col justify-center gap-0.5 after:absolute after:inset-0"
+        class="flex min-w-0 flex-auto flex-col justify-center gap-0.5 outline-none after:absolute after:inset-0"
         @click.left.exact.capture="openEntry"
       >
         <span
@@ -144,17 +146,6 @@
           {{ name.eng }}
         </span>
       </NuxtLink>
-
-      <span
-        v-if="source?.group"
-        class="relative z-10 flex @md:hidden"
-      >
-        <SectionSourceBadge
-          :group="source.group"
-          :label="source.shortName"
-          :tooltip="source.name"
-        />
-      </span>
 
       <UTooltip
         v-if="hasLinks"
