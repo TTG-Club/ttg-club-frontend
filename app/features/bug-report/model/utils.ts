@@ -1,6 +1,7 @@
-import type { TextSelection } from './types';
+import type { BugReportType, TextSelection } from './types';
 
 import {
+  BUG_REPORT_TYPES,
   SCREENSHOT_EXPORT_MIME,
   SCREENSHOT_FILE_NAME,
   SELECTION_CONTEXT_LENGTH,
@@ -77,4 +78,18 @@ export function fitImageSize(
     width: Math.floor(natural.width * scale),
     height: Math.floor(natural.height * scale),
   };
+}
+
+const BUG_REPORT_TYPE_SET: ReadonlySet<string | number> = new Set(
+  BUG_REPORT_TYPES,
+);
+
+/**
+ * Проверяет значение вкладки: тип записи или что-то чужое.
+ * @param value - значение вкладки
+ */
+export function isBugReportType(
+  value: string | number,
+): value is BugReportType {
+  return BUG_REPORT_TYPE_SET.has(value);
 }

@@ -1,4 +1,4 @@
-import type { BrushColor } from './types';
+import type { BrushColor, BugReportType, BugReportTypeText } from './types';
 
 /**
  * Сервис баг-репортов. Запрос идёт в него напрямую, как из старого SPA:
@@ -83,7 +83,6 @@ export const DRAWING_TOOL_BUTTONS = [
 /** Тексты баг-репорта. */
 export const BUG_REPORT_TEXT = {
   open: 'Сообщить о баге',
-  title: 'Сообщить о баге',
   author: 'Автор',
   anonymous: 'Аноним',
   signInHint: 'Войдите, чтобы ваше имя было видно в репорте',
@@ -92,8 +91,6 @@ export const BUG_REPORT_TEXT = {
   removeSelection: 'Убрать выделенный текст',
   selectionHint: 'Выделите текст на странице и нажмите «Ошибка в тексте»',
   selectionButton: 'Ошибка в тексте',
-  description: 'Описание проблемы',
-  descriptionPlaceholder: 'Опишите, что произошло...',
   submitHint: 'Ctrl + Enter — отправить',
   screenshot: 'Вставьте скриншот',
   screenshotHint: 'Сделайте снимок экрана и вставьте его сочетанием Ctrl + V',
@@ -102,8 +99,6 @@ export const BUG_REPORT_TEXT = {
   removeScreenshot: 'Убрать скриншот',
   cancel: 'Отменить',
   submit: 'Отправить',
-  sent: 'Репорт отправлен',
-  sentDescription: 'Спасибо за обратную связь! Мы рассмотрим ваш репорт.',
   failed: 'Ошибка отправки',
   failedDescription:
     'Не удалось отправить баг-репорт. Пожалуйста, попробуйте позже.',
@@ -124,3 +119,43 @@ export const BUG_REPORT_ICON = {
   undo: 'tabler:arrow-back-up',
   remove: 'tabler:trash',
 } as const;
+
+/** Типы записи в сервисе баг-репортов: ошибка или пожелание. */
+export const BUG_REPORT_TYPES = ['BUG', 'WISH'] as const;
+
+/** Окно каждый раз открывается на баге. */
+export const DEFAULT_BUG_REPORT_TYPE: BugReportType = 'BUG';
+
+/** Иконки типов записи. */
+export const BUG_REPORT_TYPE_ICON: Record<BugReportType, string> = {
+  BUG: 'tabler:bug',
+  WISH: 'tabler:bulb',
+};
+
+/** Вкладки типа в окне отправки, как на new.ttg.club. */
+export const BUG_REPORT_TYPE_TABS: Array<{
+  label: string;
+  value: BugReportType;
+  icon: string;
+}> = [
+  { label: 'Баг-репорт', value: 'BUG', icon: BUG_REPORT_TYPE_ICON.BUG },
+  { label: 'Пожелание', value: 'WISH', icon: BUG_REPORT_TYPE_ICON.WISH },
+];
+
+/** Заголовок, описание и тост окна под тип записи. */
+export const BUG_REPORT_TYPE_TEXT: Record<BugReportType, BugReportTypeText> = {
+  BUG: {
+    title: 'Сообщить о баге',
+    description: 'Описание проблемы',
+    descriptionPlaceholder: 'Опишите, что произошло...',
+    sent: 'Репорт отправлен',
+    sentDescription: 'Спасибо за обратную связь! Мы рассмотрим ваш репорт.',
+  },
+  WISH: {
+    title: 'Предложить идею',
+    description: 'Описание пожелания',
+    descriptionPlaceholder: 'Опишите, что хотелось бы добавить или улучшить...',
+    sent: 'Пожелание отправлено',
+    sentDescription: 'Спасибо за идею! Мы рассмотрим ваше пожелание.',
+  },
+};
