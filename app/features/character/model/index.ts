@@ -49,6 +49,7 @@ export {
 } from './schema';
 
 export {
+  expandClassSearch,
   findClassArchetype,
   findClassFeature,
   getArchetypeFeatures,
