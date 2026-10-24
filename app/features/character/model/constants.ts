@@ -210,21 +210,11 @@ export const CLASS_TAB_TYPE = {
   options: 'options',
 } as const;
 
-/**
- * Разделы, списки которых показываются во вкладках класса. Заклинания
- * открываются кнопкой в своём разделе, как на new.ttg.club.
- */
-export const CLASS_TAB_SECTIONS: Partial<Record<string, SectionConfig>> = {
-  [CLASS_TAB_TYPE.options]: OPTIONS_SECTION,
-};
-
-/** Вкладки, которых нет на странице класса: их заменяют кнопки. */
-export const CLASS_HIDDEN_TABS: ReadonlySet<string> = new Set([
-  CLASS_TAB_TYPE.spells,
-]);
-
 /** Группа фильтра заклинаний, которая выбирает класс. */
 export const SPELL_CLASS_FILTER_KEY = 'class';
+
+/** Группа фильтра особенностей, которая выбирает особенности класса. */
+export const OPTION_CLASS_FILTER_KEY = 'classOption';
 
 /** Значки классов из коллекции `ttg`: `class/wizard` → `ttg:class-wizard`. */
 export const CLASS_ICON_PREFIX = 'class/';
@@ -260,7 +250,6 @@ export const OPTIONAL_FEATURES_PATH = '/rules/optional_class_features';
 
 export const CLASS_TEXT = {
   archetypes: 'Архетипы',
-  gallery: 'Галерея',
   hitPoints: 'Хиты',
   hitDice: 'Кость Хитов:',
   perLevel: 'за каждый уровень',
@@ -303,11 +292,14 @@ export const CLASS_TEXT = {
   searchSubclass: 'Поиск подкласса…',
   listLabel: 'Список:',
   spellsList: 'Заклинаний',
+  aboutLabel: 'О классе:',
+  description: 'Описание',
 } as const;
 
 export const CLASS_ICON = {
-  gallery: 'tabler:photo',
   spells: 'tabler:vocabulary',
+  description: 'tabler:file-description',
+  options: 'tabler:list-details',
 } as const;
 
 /** Уровень в таблице заклинаний архетипа — уровень заклинания. */
