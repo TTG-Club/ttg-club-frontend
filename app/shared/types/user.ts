@@ -17,6 +17,11 @@ export const userProfileSchema = z.object({
   /** Отображаемое имя для комментариев; без него показывается логин. */
   displayName: z.string().nullish(),
   roles: z.array(z.string()),
+  /**
+   * Книги, снятые в фильтре источников по умолчанию: разделы открываются
+   * без них, пока посетитель не выберет источники сам.
+   */
+  excludedSources: z.array(z.string()).nullish(),
 });
 
 export type UserProfile = z.infer<typeof userProfileSchema>;

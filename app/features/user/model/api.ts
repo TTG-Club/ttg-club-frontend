@@ -1,3 +1,5 @@
+import type { FilterDefinition } from '~section/model';
+
 import type { RedeemResult, SignUpState, Subscription } from './schema';
 
 import {
@@ -12,7 +14,9 @@ import {
   SUBSCRIPTIONS_PATH,
   SUBSCRIPTIONS_REDEEM_PATH,
   USER_DISPLAY_NAME_PATH,
+  USER_SOURCES_PATH,
 } from '~/shared/consts';
+import { filterResponseSchema, normalizeFilter } from '~section/model';
 
 import { LEGAL_DOCUMENTS } from './constants';
 import {
@@ -159,4 +163,24 @@ export async function activateSubscription(id: string): Promise<Subscription> {
   );
 
   return subscriptionSchema.parse(response);
+}
+
+/**
+ * Загружает все книги группами по типу; книги, снятые в источниках по
+ * умолчанию, не выбраны.
+ */
+export async function getDefaultSources(): Promise<FilterDefinition> {
+  const response: unknown = await $fetch(USER_SOURCES_PATH);
+
+  return normalizeFilter(filterResponseSchema.parse(response));
+}
+
+/**
+ * Сохраняет источники по умолчанию: разделы откроются без снятых книг.
+ * @param excluded - ключи снятых книг; пустой список выбирает все книги
+ */
+export async function saveDefaultSources(
+  excluded: ReadonlyArray<string>,
+): Promise<void> {
+  await $fetch(USER_SOURCES_PATH, { method: 'PUT', body: { excluded } });
 }

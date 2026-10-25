@@ -73,6 +73,52 @@ export function normalizeFilter(response: FilterResponse): FilterDefinition {
 }
 
 /**
+ * Снимает в источниках по умолчанию книги, которые пользователь убрал в
+ * личном кабинете. Остальные значения и группы не меняются.
+ * @param definition - фильтр раздела из API
+ * @param excluded - ключи снятых книг
+ */
+export function applyExcludedSources(
+  definition: FilterDefinition,
+  excluded: ReadonlyArray<string>,
+): FilterDefinition {
+  if (!excluded.length) {
+    return definition;
+  }
+
+  const excludedKeys = new Set(excluded);
+
+  return {
+    ...definition,
+    sources: definition.sources.map((group) => ({
+      ...group,
+      values: group.values.map((value) => ({
+        ...value,
+        default: value.default && !excludedKeys.has(String(value.key)),
+      })),
+    })),
+  };
+}
+
+/**
+ * Ключи книг, снятых в выборе источников: их пользователь сохраняет как
+ * источники по умолчанию.
+ * @param definition - источники
+ * @param selection - выбор
+ */
+export function getExcludedSources(
+  definition: FilterDefinition,
+  selection: FilterSelection,
+): Array<string> {
+  const selected = new Set(selection[SOURCES_PARAM] ?? []);
+
+  return definition.sources
+    .flatMap((group) => group.values)
+    .map((value) => String(value.key))
+    .filter((key) => !selected.has(key));
+}
+
+/**
  * Возвращает все группы фильтра подряд.
  * @param definition - фильтр раздела
  */

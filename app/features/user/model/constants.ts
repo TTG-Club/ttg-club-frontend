@@ -232,7 +232,18 @@ export const PROFILE_TEXT = {
   changePassword: 'Сменить пароль',
   passwordSaved: 'Пароль успешно изменён',
   passwordFailed: 'Не удалось сменить пароль',
+  sources: 'Источники по умолчанию',
+  sourcesHelp:
+    'С этими источниками открываются все разделы. Ссылка с выбранными источниками показывает их как есть.',
+  sourcesSelectAll: 'Выбрать все',
+  sourcesSaved: 'Источники по умолчанию сохранены',
+  sourcesFailed: 'Не удалось сохранить источники',
+  sourcesLoadFailed: 'Не удалось загрузить источники',
+  sourcesNoneSelected: 'Выберите хотя бы один источник',
 } as const;
+
+/** Ключ данных источников по умолчанию в личном кабинете. */
+export const PROFILE_SOURCES_KEY = 'profile-default-sources';
 
 /** Отображаемое имя, как в старом SPA и на new.ttg.club. */
 export const DISPLAY_NAME_LIMIT = {
@@ -271,6 +282,8 @@ export const PROFILE_ICON = {
   saved: 'tabler:circle-check',
   failed: 'tabler:alert-circle',
   signOut: 'tabler:logout',
+  sources: 'tabler:books',
+  selectAll: 'tabler:checks',
 } as const;
 
 /** Статусы подписки из сервиса подписок. */

@@ -2,7 +2,11 @@
   import { SectionLayout } from '~section/layout';
   import { AuthModal } from '~user/auth-modal';
   import { PROFILE_ICON, PROFILE_TEXT } from '~user/model';
-  import { ProfilePassword, ProfilePersonal } from '~user/profile';
+  import {
+    ProfilePassword,
+    ProfilePersonal,
+    ProfileSources,
+  } from '~user/profile';
   import { ProfileSubscription } from '~user/subscription';
 
   definePageMeta({ layout: 'section' });
@@ -64,6 +68,8 @@
       class="flex max-w-3xl flex-col gap-4"
     >
       <ProfilePersonal />
+
+      <ProfileSources />
 
       <ProfileSubscription />
 

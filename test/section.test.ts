@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  applyExcludedSources,
   buildFilterPayload,
   buildListRequest,
   filterResponseSchema,
   getDefaultSelection,
   getDetailPath,
   getDetailSlug,
+  getExcludedSources,
   getSelectAllState,
   getSourceFilterValue,
   groupItems,
@@ -325,5 +327,42 @@ describe('getSelectAllState', () => {
     expect(getSelectAllState(['PHB', 'XGE'], [])).toBe(false);
     expect(getSelectAllState(['PHB', 'XGE'], ['PHB'])).toBe('indeterminate');
     expect(getSelectAllState(['PHB', 'XGE'], ['XGE', 'PHB'])).toBe(true);
+  });
+});
+
+describe('источники по умолчанию из личного кабинета', () => {
+  it('снимает убранные книги в выборе по умолчанию', () => {
+    const personal = applyExcludedSources(definition, ['XGE']);
+
+    expect(getDefaultSelection(personal)).toEqual({
+      book: ['PHB'],
+      level: [],
+    });
+
+    // Условия по содержимому не трогаются
+    expect(personal.other).toBe(definition.other);
+  });
+
+  it('без убранных книг оставляет фильтр как есть', () => {
+    expect(applyExcludedSources(definition, [])).toBe(definition);
+  });
+
+  it('адрес остаётся чистым, а запрос получает личный выбор', () => {
+    const personal = applyExcludedSources(definition, ['XGE']);
+    const selection = selectionFromQuery(personal, {});
+
+    expect(isSelectionCustomized(personal, selection)).toBe(false);
+    expect(isSelectionCustomized(definition, selection)).toBe(true);
+
+    expect(buildFilterPayload(personal, selection)).toEqual({
+      book: ['PHB'],
+      level: [],
+    });
+  });
+
+  it('собирает снятые книги из выбора', () => {
+    expect(
+      getExcludedSources(definition, { book: ['PHB'], level: ['1'] }),
+    ).toEqual(['XGE', 'HB']);
   });
 });
