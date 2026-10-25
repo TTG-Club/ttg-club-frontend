@@ -52,17 +52,18 @@
     :ui="{
       content: 'w-full max-w-2xl',
       header: 'flex-col items-stretch gap-1',
+      // Первый блок текста без верхнего отступа: заголовки и спойлеры
+      // в тексте записи начинаются с большого margin-top
+      body: '[&_.content-render>:first-child]:mt-0!',
       title: 'sr-only',
       description: 'sr-only',
     }"
   >
     <template #header>
-      <div class="flex w-full items-start gap-3">
-        <div class="min-w-0 flex-auto">
-          <p class="font-serif text-xl text-title">
-            {{ title }}
-          </p>
-        </div>
+      <div class="flex w-full items-center gap-1">
+        <h2 class="min-w-0 flex-auto truncate text-lg text-highlighted">
+          {{ title }}
+        </h2>
 
         <UTooltip
           v-if="path"
@@ -74,6 +75,7 @@
             :aria-label="SECTION_TEXT.openPage"
             color="neutral"
             variant="ghost"
+            size="sm"
             @click.left.exact="close"
           />
         </UTooltip>
@@ -83,6 +85,7 @@
           :aria-label="SECTION_TEXT.close"
           color="neutral"
           variant="ghost"
+          size="sm"
           @click.left.exact.prevent="close"
         />
       </div>
