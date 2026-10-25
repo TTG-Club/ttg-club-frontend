@@ -29,6 +29,7 @@ export {
 } from './schema';
 
 export {
+  applyExcludedSources,
   buildFilterPayload,
   buildListRequest,
   getDefaultSelection,
@@ -36,6 +37,7 @@ export {
   getDetailSlug,
   getEntryApiPath,
   getEntryUrl,
+  getExcludedSources,
   getFilterGroups,
   getFirstLetterGroup,
   getGroupSelection,

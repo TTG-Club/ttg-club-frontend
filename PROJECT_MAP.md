@@ -33,7 +33,7 @@
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
 │   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, actions), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
-│   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, password change), subscription (status, activation, promo codes)
+│   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile: display name, default sources, password change), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
 │   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks)
@@ -135,7 +135,11 @@ through `useSectionOpener`; Ctrl-click still opens the entry page.
 (`POST` with `page`, `size`, `search`, `order`, `filter`). `useSectionFilter` takes the groups from
 the section's filter endpoint and keeps only the groups changed from their
 defaults in the URL (`?level=0,1&book=PHB`); sources of every type share the
-`book` parameter, as in the legacy SPA. On a wide screen the groups sit in the
+`book` parameter, as in the legacy SPA. A signed-in user can untick books in the
+profile (default sources, `/api/v1/user/sources`); the profile from
+`/api/v1/user/info` carries them as `excludedSources`, and every section
+treats them as unticked by default, so the address stays clean while the list
+request carries the personal choice. On a wide screen the groups sit in the
 left column as collapsible rows with value tags, as on new.ttg.club, with a
 search over the filter when there are more than five groups or twenty values;
 a choice applies at once. Sources open from their own button, and on a phone

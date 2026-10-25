@@ -1,6 +1,7 @@
 import type { FilterPart, FilterSelection, SectionQueryStore } from '../model';
 
 import {
+  applyExcludedSources,
   buildFilterPayload,
   filterResponseSchema,
   getDefaultSelection,
@@ -24,7 +25,8 @@ interface SectionFilterOptions {
 
 /**
  * Фильтр раздела: группы приходят из API, выбор живёт в адресе страницы,
- * поэтому ссылкой на отфильтрованный список можно поделиться.
+ * поэтому ссылкой на отфильтрованный список можно поделиться. Книги, снятые
+ * пользователем в личном кабинете, сняты и в источниках по умолчанию.
  * @param key - ключ раздела
  * @param url - ручка фильтра, например `/api/v1/filters/spells`
  * @param options - где живёт выбор и всегда ли отправлять фильтр
@@ -36,13 +38,22 @@ export async function useSectionFilter(
 ) {
   const { store = useRouteQueryStore(), isAlwaysSent = false } = options;
 
-  const { data: definition, status } = await useAsyncData(
+  const { user } = useUser();
+
+  const { data: response, status } = await useAsyncData(
     `section-filter-${key}`,
     async () =>
       normalizeFilter(
         filterResponseSchema.parse(await $fetch(url, { method: 'POST' })),
       ),
     { deep: false },
+  );
+
+  // Выбор по умолчанию с учётом источников из личного кабинета
+  const definition = computed(() =>
+    response.value
+      ? applyExcludedSources(response.value, user.value?.excludedSources ?? [])
+      : null,
   );
 
   const selection = computed<FilterSelection>(() =>
@@ -57,9 +68,13 @@ export async function useSectionFilter(
       && isSelectionCustomized(definition.value, selection.value),
   );
 
-  // Фильтр уходит в запрос списка, только если его меняли или он нужен всегда.
+  // Фильтр уходит в запрос списка, только если он нужен всегда или выбор
+  // отличается от общего по умолчанию из API: источники из личного кабинета
+  // бэкенд сам не знает.
   const payload = computed(() =>
-    definition.value && (isAlwaysSent || isCustomized.value)
+    definition.value
+    && response.value
+    && (isAlwaysSent || isSelectionCustomized(response.value, selection.value))
       ? buildFilterPayload(definition.value, selection.value)
       : undefined,
   );

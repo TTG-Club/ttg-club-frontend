@@ -46,6 +46,12 @@ export const ACCOUNT_CHANGE_PASSWORD_PATH = '/api/account/change-password';
  */
 export const USER_DISPLAY_NAME_PATH = '/api/v1/user/display-name';
 
+/**
+ * Источники по умолчанию: `GET` отдаёт все книги группами, снятые — с
+ * `default: false`; `PUT` сохраняет снятые книги.
+ */
+export const USER_SOURCES_PATH = '/api/v1/user/sources';
+
 /** Сервис подписок; активация — `/{id}/activate`. */
 export const SUBSCRIPTIONS_PATH = '/api/subscriptions';
 
