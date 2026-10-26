@@ -77,9 +77,11 @@
 
   const {
     hitPoints,
+    temporaryHitPoints,
     maxHitPoints,
     armorClass,
     setHitPoints,
+    setTemporaryHitPoints,
     setMaxHitPoints,
     setArmorClass,
   } = useParticipantStats(
@@ -440,6 +442,7 @@
         :order="index + 1"
         :summary="getSummary(participant)"
         :hit-points="hitPoints[participant.id]"
+        :temporary-hit-points="temporaryHitPoints[participant.id]"
         :max-hit-points="maxHitPoints[participant.id]"
         :armor-class="armorClass[participant.id]"
         :is-combat="isActive"
@@ -450,6 +453,7 @@
         @roll="roll"
         @toggle-dead="toggleDead"
         @set-hit-points="setHitPoints"
+        @set-temporary-hit-points="setTemporaryHitPoints"
         @set-max-hit-points="setMaxHitPoints"
         @set-armor-class="setArmorClass"
       />

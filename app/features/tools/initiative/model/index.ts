@@ -11,6 +11,7 @@ export type {
   AddPlayerRequest,
   CreatureOption,
   CreatureSummary,
+  HitPointsState,
   HitPointsTone,
   ParticipantType,
   TrackerStatus,
@@ -36,6 +37,7 @@ export {
 } from './schema';
 
 export {
+  applyHitPointsDelta,
   applyHitPointsInput,
   clampHitPoints,
   countParticipants,
@@ -50,6 +52,7 @@ export {
   getTurnReel,
   isParticipantCurrent,
   isParticipantRolled,
+  mergeTemporaryHitPoints,
   parseParticipantValues,
   parseTrackerSlot,
   pickPairRoll,
