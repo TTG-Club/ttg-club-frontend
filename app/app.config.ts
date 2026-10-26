@@ -19,33 +19,33 @@ export default defineAppConfig({
       compoundVariants: SOLID_COLORS.map((color) => ({
         color,
         variant: 'solid' as const,
-        class: 'text-white',
+        class: 'text-on-accent',
       })),
     },
     badge: {
       compoundVariants: SOLID_COLORS.map((color) => ({
         color,
         variant: 'solid' as const,
-        class: 'text-white',
+        class: 'text-on-accent',
       })),
     },
     checkbox: {
       compoundVariants: SOLID_COLORS.map((color) => ({
         color,
-        class: { indicator: 'text-white' },
+        class: { indicator: 'text-on-accent' },
       })),
     },
     chip: {
       compoundVariants: SOLID_COLORS.map((color) => ({
         color,
-        class: { base: 'text-white' },
+        class: { base: 'text-on-accent' },
       })),
     },
     tabs: {
       compoundVariants: SOLID_COLORS.map((color) => ({
         color,
         variant: 'pill' as const,
-        class: { trigger: 'data-[state=active]:text-white' },
+        class: { trigger: 'data-[state=active]:text-on-accent' },
       })),
     },
     icons: {

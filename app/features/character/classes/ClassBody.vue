@@ -33,6 +33,8 @@
 
   const images = computed(() => entry.images ?? []);
 
+  const hasAside = computed(() => images.value.length > 0 || !!entry.traits);
+
   const isDescriptionOpen = ref(false);
 
   function openDescription() {
@@ -68,7 +70,7 @@
       </template>
 
       <template
-        v-if="images.length || entry.traits"
+        v-if="hasAside"
         #aside
       >
         <!-- В узкой колонке хиты стоят справа от обложки, а не под ней -->
