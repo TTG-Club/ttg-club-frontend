@@ -73,7 +73,7 @@
 
   // Свайпом листается только страница записи: поверх списка жест занят
   // дровером
-  useSectionSwipe(
+  const { style: swipeStyle } = useSectionSwipe(
     section.key,
     () => (isEmbedded ? undefined : unrefElement(pane)),
     entryPath,
@@ -88,6 +88,7 @@
   <SectionDetailPane
     ref="pane"
     :class="wrapperClass"
+    :style="swipeStyle"
     :title="entry?.name.rus ?? ''"
     :subtitle="entry?.name.eng"
     :source="entry?.source"
