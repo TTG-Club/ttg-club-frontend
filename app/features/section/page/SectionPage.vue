@@ -222,8 +222,11 @@
       direction="right"
       :ui="{
         content: 'w-full max-w-2xl',
+        // Свои отступы только у тела: отступ контейнера складывался
+        // с отступом тела, а у записи свой pt-2, и сверху оставалась пустота
+        container: 'gap-0 p-0',
         header: 'sr-only',
-        body: 'p-4 sm:p-6',
+        body: 'px-4 pt-2 pb-4 sm:px-6 sm:pb-6',
       }"
     >
       <template #body>
