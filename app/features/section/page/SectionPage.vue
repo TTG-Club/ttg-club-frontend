@@ -223,7 +223,7 @@
       :ui="{
         content: 'w-full max-w-2xl',
         header: 'sr-only',
-        body: 'p-4 sm:p-6',
+        body: 'p-0',
       }"
     >
       <template #body>
