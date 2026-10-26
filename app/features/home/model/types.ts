@@ -53,3 +53,15 @@ export interface HomeVideo {
   id: string;
   name: string;
 }
+
+/** Новость нового сайта для ленты рядом с роликами */
+export interface HomeNews {
+  /** Слаг новости на новом сайте */
+  url: string;
+  title: string;
+}
+
+/** Запись ленты под плеером: ролик или новость */
+export type HomeFeedEntry =
+  | { kind: 'video'; video: HomeVideo; url: string }
+  | { kind: 'news'; news: HomeNews; url: string };

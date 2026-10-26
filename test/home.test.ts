@@ -4,12 +4,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   findLatestGame,
+  getHomeFeed,
   getHomeGameFormatSummary,
   getHomeGameGenresLabel,
   getHomeSections,
   getHomeSiteImageUrl,
   getHomeTools,
   HOME_SECTION_DEFAULT_ICON,
+  parseHomeNews,
   parseHomePartners,
   parseHomeVideos,
 } from '~home/model';
@@ -167,5 +169,51 @@ describe('разбор ответов', () => {
     ).toEqual([{ id: 'abc', name: 'Ролик' }]);
 
     expect(parseHomeVideos(null)).toEqual([]);
+  });
+});
+
+describe('лента под плеером', () => {
+  const videos = [
+    { id: 'v1', name: 'Ролик 1' },
+    { id: 'v2', name: 'Ролик 2' },
+    { id: 'v3', name: 'Ролик 3' },
+  ];
+
+  const newsList = [{ url: 'first-news', title: 'Новость 1' }];
+
+  it('чередует новости с роликами, начиная с новости', () => {
+    expect(getHomeFeed(videos, newsList).map((entry) => entry.kind)).toEqual([
+      'news',
+      'video',
+      'video',
+      'video',
+    ]);
+
+    expect(
+      getHomeFeed(videos.slice(0, 1), [
+        ...newsList,
+        { url: 'second-news', title: 'Новость 2' },
+      ]).map((entry) => entry.kind),
+    ).toEqual(['news', 'video', 'news']);
+  });
+
+  it('ведёт новость на новый сайт, ролик — на YouTube', () => {
+    expect(
+      getHomeFeed(videos.slice(0, 1), newsList).map((entry) => entry.url),
+    ).toEqual([
+      'https://new.ttg.club/articles/first-news',
+      'https://youtu.be/v1',
+    ]);
+  });
+
+  it('берёт из ответа core-api только целые новости', () => {
+    expect(
+      parseHomeNews([
+        { url: 'news', title: 'Новость', type: 'NEWS' },
+        { url: '', title: 'без слага' },
+      ]),
+    ).toEqual([{ url: 'news', title: 'Новость' }]);
+
+    expect(parseHomeNews(null)).toEqual([]);
   });
 });
