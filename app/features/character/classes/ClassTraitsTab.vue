@@ -2,11 +2,9 @@
   import type { ClassDetail, ClassTraits } from '../model';
 
   import { ContentRender } from '~content/render';
-  import { DiceRoller } from '~dice-roller/roller';
 
   import {
     CLASS_TEXT,
-    getClassHitPoints,
     getClassSkillsLabel,
     OPTIONAL_FEATURES_PATH,
     sortClassFeatures,
@@ -16,7 +14,7 @@
   import ClassLevelTable from './ClassLevelTable.vue';
 
   /**
-   * Умения класса: хиты, таблица уровней, владения, снаряжение, умения
+   * Умения класса: таблица уровней, владения, снаряжение, умения
    * по уровням и архетипы класса.
    */
   const { entry, traits } = defineProps<{
@@ -26,8 +24,6 @@
 
   const route = useRoute();
   const container = useTemplateRef('container');
-
-  const hitPoints = computed(() => getClassHitPoints(traits.diceHp));
 
   const skills = computed(() => getClassSkillsLabel(traits));
 
@@ -87,43 +83,6 @@
     :class="$style.traits"
     class="content-render"
   >
-    <details open>
-      <summary class="h4">
-        <span>{{ CLASS_TEXT.hitPoints }}</span>
-      </summary>
-
-      <div class="content">
-        <p class="class_stats">
-          <b class="mr-1">{{ CLASS_TEXT.hitDice }}</b>
-
-          <DiceRoller :formula="hitPoints.formula" />
-
-          {{ CLASS_TEXT.perLevel }}
-        </p>
-
-        <p class="class_stats">
-          <b>{{ CLASS_TEXT.firstLevel }}</b>
-
-          {{ traits.diceHp }} {{ CLASS_TEXT.firstLevelModifier }}
-
-          <strong>{{ CLASS_TEXT.constitution }}</strong>
-        </p>
-
-        <p class="class_stats">
-          <b class="mr-1">{{ CLASS_TEXT.nextLevels }}</b>
-
-          <DiceRoller :formula="hitPoints.formula" />
-
-          ({{ CLASS_TEXT.or }} {{ hitPoints.average }})
-          {{ CLASS_TEXT.nextLevelsModifier }}
-
-          <strong>{{ CLASS_TEXT.constitution }}</strong>
-
-          {{ CLASS_TEXT.nextLevelsSuffix }}
-        </p>
-      </div>
-    </details>
-
     <ClassLevelTable
       :traits="traits"
       @select="scrollToFeature"
@@ -251,8 +210,8 @@
 </template>
 
 <style lang="scss" module>
-  /* Первый спойлер сразу под вкладками, без отступа сверху */
-  .traits > details:first-child {
+  /* Первый блок сразу под обложкой, без отступа сверху */
+  .traits:global(.content-render) > :first-child {
     margin-top: 0;
   }
 </style>
