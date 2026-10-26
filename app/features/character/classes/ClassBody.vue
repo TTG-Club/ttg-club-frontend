@@ -8,6 +8,7 @@
 
   import { CLASS_ICON, CLASS_TEXT, getClassDescription } from '../model';
   import ArchetypeSpells from './ArchetypeSpells.vue';
+  import ClassHitPoints from './ClassHitPoints.vue';
   import ClassRoutingBar from './ClassRoutingBar.vue';
   import ClassTraitsTab from './ClassTraitsTab.vue';
 
@@ -67,13 +68,22 @@
       </template>
 
       <template
-        v-if="images.length"
+        v-if="images.length || entry.traits"
         #aside
       >
-        <SectionImageCover
-          :images="images"
-          :alt="entry.name.rus"
-        />
+        <!-- В узкой колонке хиты стоят справа от обложки, а не под ней -->
+        <div class="flex flex-col gap-4 @min-xl:@max-3xl:flex-row">
+          <SectionImageCover
+            v-if="images.length"
+            :images="images"
+            :alt="entry.name.rus"
+          />
+
+          <ClassHitPoints
+            v-if="entry.traits"
+            :dice-hp="entry.traits.diceHp"
+          />
+        </div>
       </template>
 
       <ClassTraitsTab
