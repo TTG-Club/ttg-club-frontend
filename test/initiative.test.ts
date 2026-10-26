@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  applyHitPointsDelta,
   applyHitPointsInput,
   clampHitPoints,
   countParticipants,
@@ -14,6 +15,7 @@ import {
   getTurnReel,
   isParticipantCurrent,
   isParticipantRolled,
+  mergeTemporaryHitPoints,
   parseParticipantValues,
   parseTrackerSlot,
   pickPairRoll,
@@ -114,12 +116,58 @@ describe('хиты', () => {
   });
 
   it('разбирает ввод: значение, лечение и урон', () => {
-    expect(applyHitPointsInput('12', 30, 40)).toBe(12);
-    expect(applyHitPointsInput('+7', 30, 40)).toBe(37);
-    expect(applyHitPointsInput('+70', 30, 40)).toBe(40);
-    expect(applyHitPointsInput('-6', 30, 40)).toBe(24);
-    expect(applyHitPointsInput(' -60 ', 30, 0)).toBe(0);
-    expect(applyHitPointsInput('abc', 30, 40)).toBeUndefined();
+    const state = { current: 30, temporary: 0 };
+
+    expect(applyHitPointsInput('12', state, 40)).toEqual({
+      current: 12,
+      temporary: 0,
+    });
+
+    expect(applyHitPointsInput('+7', state, 40)?.current).toBe(37);
+    expect(applyHitPointsInput('+70', state, 40)?.current).toBe(40);
+    expect(applyHitPointsInput('-6', state, 40)?.current).toBe(24);
+    expect(applyHitPointsInput(' -60 ', state, 0)?.current).toBe(0);
+    expect(applyHitPointsInput('abc', state, 40)).toBeUndefined();
+  });
+
+  it('урон сначала снимает временные хиты, лечение их не трогает', () => {
+    const state = { current: 20, temporary: 5 };
+
+    expect(applyHitPointsDelta(state, -3, 30)).toEqual({
+      current: 20,
+      temporary: 2,
+    });
+
+    expect(applyHitPointsDelta(state, -8, 30)).toEqual({
+      current: 17,
+      temporary: 0,
+    });
+
+    expect(applyHitPointsDelta(state, -50, 30)).toEqual({
+      current: 0,
+      temporary: 0,
+    });
+
+    expect(applyHitPointsDelta(state, 20, 30)).toEqual({
+      current: 30,
+      temporary: 5,
+    });
+
+    expect(applyHitPointsInput('-7', state, 30)).toEqual({
+      current: 18,
+      temporary: 0,
+    });
+
+    expect(applyHitPointsInput('12', state, 30)).toEqual({
+      current: 12,
+      temporary: 5,
+    });
+  });
+
+  it('временные хиты заменяются, только если новые больше', () => {
+    expect(mergeTemporaryHitPoints(5, 8)).toBe(8);
+    expect(mergeTemporaryHitPoints(8, 5)).toBe(8);
+    expect(mergeTemporaryHitPoints(0, 6)).toBe(6);
   });
 
   it('окрашивает остаток', () => {

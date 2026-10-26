@@ -8,6 +8,7 @@ import type {
 import type {
   CreatureOption,
   CreatureSummary,
+  HitPointsState,
   HitPointsTone,
   ParticipantType,
   TurnReelCell,
@@ -199,17 +200,44 @@ export function clampHitPoints(value: number, max: number): number {
 }
 
 /**
- * Хиты после ввода: число ставит значение, со знаком — сдвигает текущее.
+ * Сдвиг хитов с учётом временных: урон сначала снимает временные хиты,
+ * остаток — текущие; лечение восстанавливает только текущие (временные хиты
+ * не лечатся).
+ * @param state - текущие и временные хиты
+ * @param delta - сдвиг хитов, отрицательный — урон
+ * @param max - максимум, `0` — неизвестен
+ */
+export function applyHitPointsDelta(
+  state: HitPointsState,
+  delta: number,
+  max: number,
+): HitPointsState {
+  if (delta >= 0) {
+    return { ...state, current: clampHitPoints(state.current + delta, max) };
+  }
+
+  const damage = -delta;
+  const absorbed = Math.min(state.temporary, damage);
+
+  return {
+    current: clampHitPoints(state.current - (damage - absorbed), max),
+    temporary: state.temporary - absorbed,
+  };
+}
+
+/**
+ * Хиты после ввода: число ставит текущие хиты (временные не трогает), со
+ * знаком — сдвигает их, урон сначала снимает временные хиты.
  * @param input - введённое, например `58`, `+7` или `-6`
- * @param current - текущие хиты
+ * @param state - текущие и временные хиты
  * @param max - максимум, `0` — неизвестен
  * @returns новые хиты или `undefined`, если ввод не распознан
  */
 export function applyHitPointsInput(
   input: string,
-  current: number,
+  state: HitPointsState,
   max: number,
-): number | undefined {
+): HitPointsState | undefined {
   const match = HIT_POINT_INPUT_PATTERN.exec(input.trim());
 
   if (!match) {
@@ -220,10 +248,23 @@ export function applyHitPointsInput(
   const amount = Number(digits);
 
   if (!sign) {
-    return clampHitPoints(amount, max);
+    return { ...state, current: clampHitPoints(amount, max) };
   }
 
-  return clampHitPoints(current + (sign === '-' ? -amount : amount), max);
+  return applyHitPointsDelta(state, sign === '-' ? -amount : amount, max);
+}
+
+/**
+ * Временные хиты не складываются: новое значение заменяет прежнее, только
+ * если оно больше.
+ * @param current - временные хиты, что уже есть
+ * @param incoming - новые временные хиты
+ */
+export function mergeTemporaryHitPoints(
+  current: number,
+  incoming: number,
+): number {
+  return Math.max(current, incoming, 0);
 }
 
 /**

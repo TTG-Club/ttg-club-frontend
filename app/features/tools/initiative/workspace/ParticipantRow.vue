@@ -35,6 +35,7 @@
     order,
     summary = undefined,
     hitPoints = undefined,
+    temporaryHitPoints = 0,
     maxHitPoints = undefined,
     armorClass = undefined,
     isCombat = false,
@@ -47,6 +48,8 @@
     summary?: CreatureSummary;
     /** Записанные хиты. */
     hitPoints?: number;
+    /** Временные хиты; `0` — нет. */
+    temporaryHitPoints?: number;
     /** Прокинутый максимум хитов. */
     maxHitPoints?: number;
     /** КД игрока, заданный ведущим. */
@@ -62,7 +65,8 @@
     'remove': [id: string];
     'roll': [id: string];
     'toggle-dead': [id: string, isDead: boolean];
-    'set-hit-points': [id: string, value: number];
+    'set-hit-points': [id: string, value: number, temporary?: number];
+    'set-temporary-hit-points': [id: string, value: number];
     'set-max-hit-points': [id: string, value: number];
     'set-armor-class': [id: string, value: number];
   }>();
@@ -207,9 +211,18 @@
   /**
    * Сохраняет хиты.
    * @param value - новые хиты
+   * @param temporary - остаток временных хитов, если урон снял часть из них
    */
-  function setHitPoints(value: number): void {
-    emit('set-hit-points', participant.id, value);
+  function setHitPoints(value: number, temporary?: number): void {
+    emit('set-hit-points', participant.id, value, temporary);
+  }
+
+  /**
+   * Сохраняет временные хиты.
+   * @param value - новые временные хиты, `0` — снять
+   */
+  function setTemporaryHitPoints(value: number): void {
+    emit('set-temporary-hit-points', participant.id, value);
   }
 
   /**
@@ -292,12 +305,14 @@
       <ParticipantStat :label="INITIATIVE_TEXT.hitPoints">
         <ParticipantHitPoints
           :current="hitPoints"
+          :temporary="temporaryHitPoints"
           :max="hitPointsMax"
           :formula="summary?.hitFormula"
           :name="participant.name"
           :is-player="isPlayer"
           :is-disabled="isDisabled"
           @change="setHitPoints"
+          @set-temporary="setTemporaryHitPoints"
           @set-max="setMaxHitPoints"
         />
       </ParticipantStat>

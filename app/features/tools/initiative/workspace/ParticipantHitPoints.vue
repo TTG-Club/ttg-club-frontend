@@ -1,14 +1,18 @@
 <script setup lang="ts">
+  import type { HitPointsState } from '../model';
+
   import { useDiceRoll } from '~dice-roller/composables';
 
   import {
+    applyHitPointsDelta,
     applyHitPointsInput,
-    clampHitPoints,
     formatHitPointStep,
     getHitPointsTone,
     HIT_POINT_STEPS,
     INITIATIVE_ICON,
     INITIATIVE_TEXT,
+    mergeTemporaryHitPoints,
+    TEMPORARY_HIT_POINT_INPUT_PATTERN,
   } from '../model';
 
   /** Цвет остатка хитов. */
@@ -25,10 +29,12 @@
 
   /**
    * Хиты участника: по клику урон и лечение шагами, точное значение или
-   * сдвиг, полные хиты и бросок максимума по формуле статблока.
+   * сдвиг, полные хиты, бросок максимума по формуле статблока и временные
+   * хиты, которые урон снимает первыми.
    */
   const {
     current = undefined,
+    temporary = 0,
     max = 0,
     formula = undefined,
     name,
@@ -37,6 +43,8 @@
   } = defineProps<{
     /** Записанные хиты; нет записи — существо на полных, у игрока пусто. */
     current?: number;
+    /** Временные хиты; `0` — нет. */
+    temporary?: number;
     /** Максимум хитов; `0` — неизвестен. */
     max?: number;
     /** Формула хитов из статблока. */
@@ -49,7 +57,10 @@
   }>();
 
   const emit = defineEmits<{
-    'change': [value: number];
+    /** Новые хиты; временные — только когда урон снял часть из них. */
+    'change': [value: number, temporary?: number];
+    /** Новые временные хиты, `0` — снять. */
+    'set-temporary': [value: number];
     'set-max': [value: number];
   }>();
 
@@ -66,6 +77,19 @@
   const hasValue = computed(() => isKnown.value || current !== undefined);
 
   const value = computed(() => current ?? max);
+
+  const hitPointsState = computed<HitPointsState>(() => ({
+    current: value.value,
+    temporary,
+  }));
+
+  const hasTemporary = computed(() => temporary > 0);
+
+  const temporaryLabel = computed(() => `+${temporary}`);
+
+  const temporaryPlaceholder = computed(() => String(temporary));
+
+  const temporaryDraft = ref('');
 
   const label = computed(() => {
     if (isKnown.value) {
@@ -103,21 +127,74 @@
     }
   });
 
+  // Поле временных хитов каждый раз открывается пустым: в нём новые
+  // временные хиты, а не правка прежних
+  watch(isOpen, (open) => {
+    if (open) {
+      temporaryDraft.value = '';
+    }
+  });
+
+  /**
+   * Отправляет хиты после урона или лечения. Временные уходят вместе с
+   * текущими, только если урон снял часть из них.
+   * @param next - хиты после сдвига
+   */
+  function emitHitPoints(next: HitPointsState): void {
+    if (next.temporary !== temporary) {
+      emit('change', next.current, next.temporary);
+
+      return;
+    }
+
+    if (next.current !== value.value) {
+      emit('change', next.current);
+    }
+  }
+
   /**
    * Урон или лечение шагом, окно остаётся открытым.
    * @param delta - сдвиг хитов
    */
   function applyStep(delta: number): void {
-    emit('change', clampHitPoints(value.value + delta, max));
+    emitHitPoints(applyHitPointsDelta(hitPointsState.value, delta, max));
   }
 
   function applyDraft(): void {
     isOpen.value = false;
 
-    const next = applyHitPointsInput(draft.value, value.value, max);
+    const next = applyHitPointsInput(draft.value, hitPointsState.value, max);
 
-    if (next !== undefined && next !== value.value) {
-      emit('change', next);
+    if (next) {
+      emitHitPoints(next);
+    }
+  }
+
+  /**
+   * Временные хиты не складываются: новое значение заменяет прежнее, только
+   * если оно больше.
+   */
+  function applyTemporaryDraft(): void {
+    isOpen.value = false;
+
+    const input = temporaryDraft.value.trim();
+
+    if (!TEMPORARY_HIT_POINT_INPUT_PATTERN.test(input)) {
+      return;
+    }
+
+    const next = mergeTemporaryHitPoints(temporary, Number(input));
+
+    if (next !== temporary) {
+      emit('set-temporary', next);
+    }
+  }
+
+  function clearTemporary(): void {
+    isOpen.value = false;
+
+    if (hasTemporary.value) {
+      emit('set-temporary', 0);
     }
   }
 
@@ -171,6 +248,13 @@
       class="min-w-16 justify-center font-semibold tabular-nums"
     >
       <span :class="toneClass">{{ label }}</span>
+
+      <span
+        v-if="hasTemporary"
+        class="text-info"
+      >
+        {{ temporaryLabel }}
+      </span>
     </UButton>
 
     <template #content>
@@ -238,6 +322,45 @@
             variant="subtle"
           />
         </form>
+
+        <form
+          class="flex items-end gap-2"
+          @submit.prevent="applyTemporaryDraft"
+        >
+          <UFormField
+            :label="INITIATIVE_TEXT.temporaryHitPoints"
+            :ui="{ label: 'whitespace-nowrap' }"
+            class="flex-auto"
+          >
+            <UInput
+              v-model="temporaryDraft"
+              inputmode="numeric"
+              :placeholder="temporaryPlaceholder"
+              class="w-full"
+              @focus="selectDraft"
+            />
+          </UFormField>
+
+          <UButton
+            type="submit"
+            :label="INITIATIVE_TEXT.temporaryHitPointsApply"
+            color="info"
+            variant="subtle"
+          />
+
+          <UButton
+            v-if="hasTemporary"
+            :icon="INITIATIVE_ICON.clearTemporaryHitPoints"
+            :aria-label="INITIATIVE_TEXT.clearTemporaryHitPoints"
+            color="neutral"
+            variant="subtle"
+            @click.left.exact.prevent="clearTemporary"
+          />
+        </form>
+
+        <p class="text-xs text-muted">
+          {{ INITIATIVE_TEXT.temporaryHitPointsHint }}
+        </p>
       </div>
     </template>
   </UPopover>

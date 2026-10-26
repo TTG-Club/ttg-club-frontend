@@ -48,6 +48,14 @@ export interface CreatureSummary {
   hitFormula?: string;
 }
 
+/** Хиты участника вместе с временными. */
+export interface HitPointsState {
+  /** Текущие хиты. */
+  current: number;
+  /** Временные хиты; `0` — их нет. */
+  temporary: number;
+}
+
 /** Окраска остатка хитов. */
 export type HitPointsTone = 'error' | 'warning';
 

@@ -18,6 +18,7 @@ export const PARTICIPANT_STAT_STORAGE_KEY = {
   hitPoints: 'initiative:hit-points',
   maxHitPoints: 'initiative:max-hit-points',
   armorClass: 'initiative:armor-class',
+  temporaryHitPoints: 'initiative:temporary-hit-points',
 } as const;
 
 /** Заголовок с ключом доступа к трекеру гостя. */
@@ -52,6 +53,9 @@ export const HIT_POINT_STEPS: ReadonlyArray<number> = [-5, -1, 1, 5];
 
 /** Ввод хитов: `58` ставит значение, `+7` лечит, `-6` ранит. */
 export const HIT_POINT_INPUT_PATTERN = /^([+-])?(\d+)$/;
+
+/** Ввод временных хитов — только целое неотрицательное число. */
+export const TEMPORARY_HIT_POINT_INPUT_PATTERN = /^\d+$/;
 
 /** Лента ходов: шаг между токенами в пикселях и токенов по сторонам. */
 export const TURN_REEL = {
@@ -151,6 +155,11 @@ export const INITIATIVE_TEXT = {
   rollHitPoints: 'Бросить хиты',
   hitPointsInput: 'Точное значение, + или −',
   hitPointsSource: 'Трекер инициативы',
+  temporaryHitPoints: 'Временные хиты',
+  temporaryHitPointsHint:
+    'Новое значение заменит текущее, только если оно больше. Урон сначала снимает временные хиты.',
+  temporaryHitPointsApply: 'Задать',
+  clearTemporaryHitPoints: 'Снять временные хиты',
   ok: 'ОК',
   armorClass: 'КД',
   changeArmorClass: 'Изменить КД',
@@ -178,6 +187,7 @@ export const INITIATIVE_ICON = {
   disadvantage: 'tabler:chevrons-down',
   kill: 'tabler:skull',
   revive: 'tabler:heart',
+  clearTemporaryHitPoints: 'tabler:shield-x',
   open: 'tabler:external-link',
   add: 'tabler:plus',
   loading: 'tabler:loader-2',
