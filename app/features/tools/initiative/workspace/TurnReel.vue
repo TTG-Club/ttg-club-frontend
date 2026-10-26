@@ -96,7 +96,7 @@
    */
   function getBadgeClass(isCurrent: boolean): string {
     return isCurrent
-      ? 'bg-primary text-white'
+      ? 'bg-primary text-on-accent'
       : 'bg-elevated text-muted ring-1 ring-default';
   }
 

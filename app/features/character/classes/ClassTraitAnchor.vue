@@ -3,6 +3,8 @@
 
   import { ContentRender } from '~content/render';
 
+  import { CLASS_TRAIT_HINT_OPEN_DELAY_MS } from '../model';
+
   /**
    * Умение в таблице уровней: клик ведёт к его описанию ниже, а при
    * наведении описание видно сразу.
@@ -12,9 +14,6 @@
     /** Умение, на которое ведёт ссылка; без него подсказки нет. */
     feature?: ClassFeature;
   }>();
-
-  // Подсказка ждёт, чтобы не всплывать, пока курсор идёт по таблице
-  const HINT_OPEN_DELAY_MS = 700;
 
   const emit = defineEmits<{
     select: [anchor: string];
@@ -33,7 +32,7 @@
   <UPopover
     v-if="feature?.description"
     mode="hover"
-    :open-delay="HINT_OPEN_DELAY_MS"
+    :open-delay="CLASS_TRAIT_HINT_OPEN_DELAY_MS"
   >
     <a
       :href="traitLink.anchor"

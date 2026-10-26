@@ -239,6 +239,12 @@ export const CLASS_ICONS: ReadonlySet<string> = new Set([
   'wizard',
 ]);
 
+/**
+ * Задержка подсказки умения в таблице уровней, мс: подсказка не всплывает,
+ * пока курсор идёт по таблице.
+ */
+export const CLASS_TRAIT_HINT_OPEN_DELAY_MS = 700;
+
 /** Префикс кости хитов в формуле броска. */
 export const CLASS_HIT_DICE_PREFIX = '1к';
 
