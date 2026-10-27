@@ -2,7 +2,13 @@ import type { CSSProperties } from 'vue';
 import type { SiteMenuItem } from '~infrastructure/sidebar/menu/model';
 
 import type { HomeGame } from './schema';
-import type { HomeNavLink, HomeSectionLink } from './types';
+import type {
+  HomeFeedEntry,
+  HomeNavLink,
+  HomeNews,
+  HomeSectionLink,
+  HomeVideo,
+} from './types';
 
 import { sortBy } from 'es-toolkit';
 
@@ -18,6 +24,7 @@ import {
   HOME_LATEST_GAME_GENRES_SEPARATOR,
   HOME_LATEST_GAME_SITE_URL,
   HOME_LATEST_GAME_TYPE_LABELS,
+  HOME_NEWS_ARTICLE_URL,
   HOME_SECTION_DEFAULT_ICON,
   HOME_SECTION_ICONS,
   HOME_SECTION_TEXTURE,
@@ -178,6 +185,48 @@ export function getHomeTools(
  */
 export function getHomeVideoUrl(videoId: string): string {
   return `${HOME_VIDEO_SHORT_URL}${encodeURIComponent(videoId)}`;
+}
+
+/**
+ * Адрес новости на новом сайте.
+ *
+ * @param newsUrl - слаг новости
+ * @returns адрес страницы новости
+ */
+export function getHomeNewsUrl(newsUrl: string): string {
+  return `${HOME_NEWS_ARTICLE_URL}/${encodeURIComponent(newsUrl)}`;
+}
+
+/**
+ * Собирает ленту под плеером: новости и ролики строго чередуются, начиная с
+ * новости, — свежий ролик уже стоит в плеере. Когда одного вида не хватает,
+ * хвост другого идёт подряд, в своём порядке.
+ *
+ * @param videos - ролики без того, что в плеере, свежие первыми
+ * @param newsList - новости, свежие первыми
+ * @returns записи ленты с адресами
+ */
+export function getHomeFeed(
+  videos: ReadonlyArray<HomeVideo>,
+  newsList: ReadonlyArray<HomeNews>,
+): Array<HomeFeedEntry> {
+  const length = Math.max(videos.length, newsList.length);
+
+  return Array.from({ length }, (_, index) => index).flatMap((index) => {
+    const entries: Array<HomeFeedEntry> = [];
+    const news = newsList[index];
+    const video = videos[index];
+
+    if (news) {
+      entries.push({ kind: 'news', news, url: getHomeNewsUrl(news.url) });
+    }
+
+    if (video) {
+      entries.push({ kind: 'video', video, url: getHomeVideoUrl(video.id) });
+    }
+
+    return entries;
+  });
 }
 
 /**

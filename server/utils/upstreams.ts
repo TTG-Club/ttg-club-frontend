@@ -14,6 +14,7 @@ export function getUpstreams(): ProxyUpstreams {
     NITRO_API_URL: api = '',
     NITRO_SUBSCRIBER_API_URL: subscriber = '',
     NITRO_COMMENTS_API_URL: comments = '',
+    NITRO_CORE_API_URL: core = '',
   } = process.env;
 
   if (!api) {
@@ -23,5 +24,5 @@ export function getUpstreams(): ProxyUpstreams {
     });
   }
 
-  return { api, subscriber, comments };
+  return { api, subscriber, comments, core };
 }

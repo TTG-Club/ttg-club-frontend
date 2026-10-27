@@ -107,7 +107,7 @@ export const HOME_DISCORD_BOT_CARD: HomePromoCardContent = {
 
 /* --- Видео -------------------------------------------------------------- */
 
-export const HOME_VIDEOS_LABEL = 'Видео';
+export const HOME_VIDEOS_LABEL = 'Видео и новости';
 
 export const HOME_VIDEOS_ICON = 'tabler:brand-youtube';
 
@@ -143,6 +143,36 @@ export const HOME_VIDEO_EMBED_ALLOW =
 
 export const HOME_VIDEO_PLAY_LABEL = 'Смотреть';
 
+/* --- Новости ------------------------------------------------------------ */
+
+/** Новый сайт: там публикуются новости и живёт каталог игр */
+export const HOME_NEW_SITE_URL = 'https://new.ttg.club';
+
+export const HOME_NEWS_ICON = 'tabler:news';
+
+export const HOME_NEWS_DATA_KEY = 'home-news';
+
+/** Новости отдаёт core-api: Nitro проксирует путь туда (см. `NITRO_CORE_API_URL`) */
+export const HOME_NEWS_PATH = '/api/v2/articles/search';
+
+/**
+ * Запрос свежих опубликованных новостей. Четыре новости вперемешку с
+ * четырьмя роликами под плеером дают ровную сетку в две колонки.
+ */
+export const HOME_NEWS_QUERY = {
+  type: 'NEWS',
+  cnt: 4,
+} as const;
+
+/** Значки плиток ленты под плеером по виду записи */
+export const HOME_FEED_ICONS = {
+  video: HOME_VIDEOS_ICON,
+  news: HOME_NEWS_ICON,
+} as const;
+
+/** Страница новости на новом сайте, к пути добавляется слаг */
+export const HOME_NEWS_ARTICLE_URL = `${HOME_NEW_SITE_URL}/articles`;
+
 /* --- Новая игра --------------------------------------------------------- */
 
 export const HOME_LATEST_GAME_LABEL = 'Новая игра';
@@ -151,7 +181,7 @@ export const HOME_LATEST_GAME_ICON = 'tabler:users';
 
 export const HOME_LATEST_GAME_DATA_KEY = 'home-latest-game';
 
-export const HOME_LATEST_GAME_SITE_URL = 'https://new.ttg.club';
+export const HOME_LATEST_GAME_SITE_URL = HOME_NEW_SITE_URL;
 
 export const HOME_LATEST_GAME_CATALOG_URL = `${HOME_LATEST_GAME_SITE_URL}/games`;
 

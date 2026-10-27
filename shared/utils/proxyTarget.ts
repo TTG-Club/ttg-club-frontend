@@ -1,4 +1,8 @@
-import { COMMENTS_PATH_PREFIXES, SUBSCRIBER_PATH_PREFIXES } from '../consts';
+import {
+  COMMENTS_PATH_PREFIXES,
+  CORE_PATH_PREFIXES,
+  SUBSCRIBER_PATH_PREFIXES,
+} from '../consts';
 
 /** Адреса внешних сервисов, в которые Nitro проксирует `/api/**`. */
 export interface ProxyUpstreams {
@@ -8,6 +12,8 @@ export interface ProxyUpstreams {
   subscriber: string;
   /** comments-service; пустая строка — запросы идут в основной API. */
   comments: string;
+  /** core-api нового сайта; пустая строка — запросы идут в основной API. */
+  core: string;
 }
 
 /**
@@ -44,7 +50,7 @@ function trimTrailingSlashes(url: string): string {
 /**
  * Возвращает полный адрес, на который нужно проксировать запрос.
  *
- * Подписки и комментарии уходят в свои сервисы, если их адреса заданы,
+ * Подписки, комментарии и новости уходят в свои сервисы, если их адреса заданы,
  * остальное — в основной API. Путь запроса сохраняется как есть.
  *
  * @param path - Путь запроса вместе с query-строкой
@@ -64,6 +70,10 @@ export function getProxyTarget(
 
   if (upstreams.comments && isPathWithPrefix(path, COMMENTS_PATH_PREFIXES)) {
     return trimTrailingSlashes(upstreams.comments) + path;
+  }
+
+  if (upstreams.core && isPathWithPrefix(path, CORE_PATH_PREFIXES)) {
+    return trimTrailingSlashes(upstreams.core) + path;
   }
 
   return trimTrailingSlashes(upstreams.api) + path;
