@@ -50,15 +50,16 @@
 
 ## 🌍 Environment
 
-| Variable                        | Purpose                                               |
-| ------------------------------- | ----------------------------------------------------- |
-| `NITRO_API_URL`                 | Backend (or gateway) base URL, required               |
-| `NITRO_SUBSCRIBER_API_URL`      | subscriber-service; empty → `NITRO_API_URL`           |
-| `NITRO_COMMENTS_API_URL`        | comments-service; empty → `NITRO_API_URL`             |
-| `NUXT_SITE_URL`                 | Canonical origin, defaults to `https://5e14.ttg.club` |
-| `NUXT_SITE_ENV`                 | `preview` on the dev stand to disable indexing        |
-| `NUXT_PUBLIC_GTAG_ID`           | Google Analytics id, empty disables it                |
-| `NUXT_PUBLIC_YANDEX_METRIKA_ID` | Yandex.Metrika id, empty disables it                  |
+| Variable                        | Purpose                                                   |
+| ------------------------------- | --------------------------------------------------------- |
+| `NITRO_API_URL`                 | Backend (or gateway) base URL, required                   |
+| `NITRO_SUBSCRIBER_API_URL`      | subscriber-service; empty → `NITRO_API_URL`               |
+| `NITRO_COMMENTS_API_URL`        | comments-service; empty → `NITRO_API_URL`                 |
+| `NITRO_CORE_API_URL`            | core-api (news on the home page); empty → `NITRO_API_URL` |
+| `NUXT_SITE_URL`                 | Canonical origin, defaults to `https://5e14.ttg.club`     |
+| `NUXT_SITE_ENV`                 | `preview` on the dev stand to disable indexing            |
+| `NUXT_PUBLIC_GTAG_ID`           | Google Analytics id, empty disables it                    |
+| `NUXT_PUBLIC_YANDEX_METRIKA_ID` | Yandex.Metrika id, empty disables it                      |
 
 ## 🚚 Migration status
 

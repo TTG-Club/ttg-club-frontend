@@ -6,6 +6,7 @@ const upstreams = {
   api: 'http://backend:8080/',
   subscriber: 'http://subscriber:3000',
   comments: 'http://comments:3000',
+  core: 'http://core:8080',
 };
 
 describe('isPathWithPrefix', () => {
@@ -43,8 +44,19 @@ describe('getProxyTarget', () => {
     );
   });
 
+  it('отправляет новости в core-api', () => {
+    expect(getProxyTarget('/api/v2/articles/search?type=NEWS', upstreams)).toBe(
+      'http://core:8080/api/v2/articles/search?type=NEWS',
+    );
+  });
+
   it('без адресов сервисов отправляет всё в основной API', () => {
-    const onlyApi = { ...upstreams, subscriber: '', comments: '' };
+    const onlyApi = {
+      ...upstreams,
+      subscriber: '',
+      comments: '',
+      core: '',
+    };
 
     expect(getProxyTarget('/api/subscriptions/my', onlyApi)).toBe(
       'http://backend:8080/api/subscriptions/my',
@@ -52,6 +64,10 @@ describe('getProxyTarget', () => {
 
     expect(getProxyTarget('/api/v1/comments', onlyApi)).toBe(
       'http://backend:8080/api/v1/comments',
+    );
+
+    expect(getProxyTarget('/api/v2/articles/search', onlyApi)).toBe(
+      'http://backend:8080/api/v2/articles/search',
     );
   });
 });
