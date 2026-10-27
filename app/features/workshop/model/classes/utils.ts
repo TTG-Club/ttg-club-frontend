@@ -1,3 +1,5 @@
+import type { ClassDetail } from '~character/model';
+
 import type { ArchetypeForm, ClassForm } from './schemas';
 import type {
   ClassTableColumn,
@@ -263,4 +265,21 @@ export function getArchetypeHtmlFields(
     description: form.description ?? '',
     ...getTraitHtmlFields('traits', form.traits),
   };
+}
+
+/**
+ * Адрес архетипа в карточке класса: по нему карточка понимает, что открыт
+ * архетип, а не сам класс.
+ * @param entry - карточка архетипа из предпросмотра
+ * @param englishName - английское название архетипа из формы
+ */
+export function getArchetypePreviewPath(
+  entry: ClassDetail,
+  englishName: string,
+): string {
+  const name = englishName.trim();
+
+  return (
+    entry.archetypes?.find((link) => link.name.eng === name)?.url ?? entry.url
+  );
 }

@@ -10,6 +10,7 @@ import {
   WORKSHOP_API_PATH,
   WORKSHOP_BOOKS_PATH,
   WORKSHOP_BOOKS_QUERY,
+  WORKSHOP_PREVIEW_SEGMENT,
 } from './constants';
 import {
   parseBookSources,
@@ -26,6 +27,28 @@ export async function fetchReferenceEntry(path: string): Promise<unknown> {
   return await $fetch<unknown>(`${REFERENCE_API_PATH}${path}`, {
     method: 'POST',
   });
+}
+
+/**
+ * Карточка записи по данным формы: бэкенд сохраняет запись и откатывает
+ * изменения, поэтому карточка такая же, как после сохранения.
+ * @param apiSection - раздел в ручках мастерской
+ * @param payload - данные формы, как при сохранении
+ * @param entryId - идентификатор записи при правке
+ */
+export async function fetchWorkshopPreview(
+  apiSection: string,
+  payload: Record<string, unknown>,
+  entryId: number | undefined,
+): Promise<unknown> {
+  return await $fetch<unknown>(
+    `${WORKSHOP_API_PATH}/${apiSection}/${WORKSHOP_PREVIEW_SEGMENT}`,
+    {
+      method: 'POST',
+      body: payload,
+      query: entryId === undefined ? {} : { id: entryId },
+    },
+  );
 }
 
 /**

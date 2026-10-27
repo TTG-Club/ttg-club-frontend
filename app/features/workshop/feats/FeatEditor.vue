@@ -3,7 +3,10 @@
 
   import type { FeatForm, WorkshopFeat } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { FeatBody } from '~character/feats';
+  import { featDetailSchema } from '~character/model';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -21,8 +24,11 @@
     WORKSHOP_ABILITY_OPTIONS,
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма черты: без записи — создание новой. */
   const { feat = undefined } = defineProps<{
@@ -51,6 +57,31 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(FEATS_WORKSHOP_KEY, () => feat?.id, featDetailSchema);
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getFeatPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описания: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -70,10 +101,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="featFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -85,6 +117,7 @@
     <UFormField
       :label="FEAT_EDITOR_TEXT.requirement"
       name="requirement"
+      class="col-span-2 md:col-span-3"
     >
       <UInput
         v-model="state.requirement"
@@ -106,6 +139,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.abilities"
       name="abilities"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.abilities"
@@ -120,6 +154,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.skills"
       name="skills"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.skills"
@@ -134,7 +169,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -143,7 +178,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -151,7 +186,26 @@
       :is-editing="!!feat"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <FeatBody :feat="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

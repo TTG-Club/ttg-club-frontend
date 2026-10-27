@@ -8,6 +8,9 @@ export const WORKSHOP_ROUTE = '/workshop';
 /** Ручки мастерской: создание, правка и ревизии записей. */
 export const WORKSHOP_API_PATH = '/api/v1/workshop';
 
+/** Последний сегмент ручки предпросмотра: `/api/v1/workshop/spells/preview`. */
+export const WORKSHOP_PREVIEW_SEGMENT = 'preview';
+
 /** Префикс ручек справочника: запись читается по адресу её страницы. */
 export const REFERENCE_API_PATH = '/api/v1';
 
@@ -150,6 +153,8 @@ export const WORKSHOP_TEXT = {
   sourcePlaceholder: 'Homebrew (по умолчанию)',
   sourceHelp:
     'Без источника новая запись попадёт в самодельный контент, а у существующей источник не изменится.',
+  preview: 'Предпросмотр',
+  previewError: 'Не удалось собрать предпросмотр',
 } as const;
 
 /** Иконки мастерской. */
@@ -163,6 +168,7 @@ export const WORKSHOP_ICON = {
   error: 'tabler:alert-triangle',
   success: 'tabler:check',
   back: 'tabler:arrow-left',
+  preview: 'tabler:eye',
 } as const;
 
 /** Операции ревизий. */

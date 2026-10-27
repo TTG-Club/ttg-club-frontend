@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { CreatureLegendaryAction } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
     createCreatureLegendaryAction,
@@ -73,25 +74,18 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-highlighted">
-        {{ CREATURE_BLOCK_TEXT.legendary }}
-      </h3>
-
-      <UButton
-        :label="CREATURE_BLOCK_TEXT.add"
-        :icon="CREATURE_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addAction"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="CREATURE_BLOCK_TEXT.legendary"
+    :add-label="CREATURE_BLOCK_TEXT.add"
+    :add-icon="CREATURE_LIST_ICON.add"
+    :is-empty="!actions.length"
+    :empty-text="CREATURE_BLOCK_TEXT.empty"
+    @add="addAction"
+  >
     <UCard
       v-for="(action, actionIndex) in actions"
       :key="actionIndex"
-      :ui="{ body: 'flex flex-col gap-3' }"
+      :ui="{ body: 'flex flex-col gap-3 p-3 sm:p-4' }"
     >
       <div class="flex items-end gap-3">
         <UFormField
@@ -127,12 +121,5 @@
         />
       </UFormField>
     </UCard>
-
-    <UEmpty
-      v-if="!actions.length"
-      :icon="CREATURE_LIST_ICON.empty"
-      :title="CREATURE_BLOCK_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

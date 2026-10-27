@@ -3,7 +3,10 @@
 
   import type { SpellForm, WorkshopSpell } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { spellDetailSchema } from '~character/model';
+  import { SpellBody } from '~character/spells';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import { WorkshopFormActions, WorkshopSourceSelect } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
@@ -19,7 +22,10 @@
     SPELL_UPPER_ROWS,
     spellFormSchema,
     SPELLS_WORKSHOP_KEY,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма заклинания: без записи — создание нового. */
   const { spell = undefined } = defineProps<{
@@ -55,6 +61,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    SPELLS_WORKSHOP_KEY,
+    () => spell?.id,
+    spellDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getSpellPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -77,16 +112,18 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="spellFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <UFormField
       :label="SPELL_EDITOR_TEXT.name"
       name="name"
       required
+      class="col-span-2"
     >
       <UInput
         v-model="state.name"
@@ -98,6 +135,7 @@
       :label="SPELL_EDITOR_TEXT.englishName"
       name="englishName"
       required
+      class="col-span-2"
     >
       <UInput
         v-model="state.englishName"
@@ -134,6 +172,7 @@
     <UFormField
       :label="SPELL_EDITOR_TEXT.additionalType"
       name="additionalType"
+      class="col-span-2"
     >
       <UInput
         v-model="state.additionalType"
@@ -141,7 +180,7 @@
       />
     </UFormField>
 
-    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 md:col-span-2">
+    <div class="col-span-full flex flex-wrap items-center gap-x-6 gap-y-3">
       <UCheckbox
         v-model="state.ritual"
         :label="SPELL_EDITOR_TEXT.ritual"
@@ -171,7 +210,7 @@
     <UFormField
       :label="SPELL_EDITOR_TEXT.material"
       name="materialComponent"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <UInput
         v-model="state.materialComponent"
@@ -206,7 +245,7 @@
     <UFormField
       :label="SPELL_EDITOR_TEXT.timeCondition"
       name="timeCondition"
-      class="md:col-span-2"
+      class="col-span-2"
     >
       <UInput
         v-model="state.timeCondition"
@@ -218,6 +257,7 @@
       :label="SPELL_EDITOR_TEXT.range"
       name="range"
       required
+      class="col-span-2"
     >
       <UInput
         v-model="state.range"
@@ -229,6 +269,7 @@
       :label="SPELL_EDITOR_TEXT.duration"
       name="duration"
       required
+      class="col-span-2"
     >
       <UInput
         v-model="state.duration"
@@ -239,7 +280,7 @@
     <UFormField
       :label="SPELL_EDITOR_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -251,7 +292,7 @@
     <UFormField
       :label="SPELL_EDITOR_TEXT.upper"
       name="upper"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.upper"
@@ -259,7 +300,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -267,7 +308,26 @@
       :is-editing="!!spell"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <SpellBody :spell="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

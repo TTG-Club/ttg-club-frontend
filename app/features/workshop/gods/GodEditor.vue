@@ -3,7 +3,14 @@
 
   import type { GodForm, WorkshopGod } from '../model';
 
-  import { useFilterGroups, useWorkshopSave } from '../composables';
+  import { GodBody } from '~wiki/gods';
+  import { godDetailSchema } from '~wiki/model';
+
+  import {
+    useFilterGroups,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -23,8 +30,11 @@
     GODS_FILTER_PATH,
     GODS_WORKSHOP_KEY,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
     WORKSHOP_ROUTE,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма божества: богов можно только править. */
   const { god } = defineProps<{
@@ -55,6 +65,31 @@
     error: GOD_EDITOR_TEXT.saveError,
   });
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(GODS_WORKSHOP_KEY, () => god.id, godDetailSchema);
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getGodPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -77,10 +112,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="godFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -92,6 +128,7 @@
     <UFormField
       :label="GOD_EDITOR_TEXT.commitment"
       name="commitment"
+      class="col-span-2"
     >
       <UInput
         v-model="state.commitment"
@@ -103,6 +140,7 @@
       :label="GOD_EDITOR_TEXT.sex"
       name="sex"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.sex"
@@ -115,6 +153,7 @@
       :label="GOD_EDITOR_TEXT.rank"
       name="rank"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.rank"
@@ -128,6 +167,7 @@
       :label="GOD_EDITOR_TEXT.alignment"
       name="alignment"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.alignment"
@@ -141,6 +181,7 @@
       :label="GOD_EDITOR_TEXT.pantheon"
       name="pantheonId"
       required
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.pantheonId"
@@ -152,9 +193,20 @@
     </UFormField>
 
     <UFormField
+      :label="WORKSHOP_FIELD_TEXT.page"
+      name="page"
+    >
+      <UInputNumber
+        v-model="state.page"
+        :min="1"
+        class="w-full"
+      />
+    </UFormField>
+
+    <UFormField
       :label="GOD_EDITOR_TEXT.domains"
       name="domains"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <USelectMenu
@@ -171,6 +223,7 @@
     <UFormField
       :label="GOD_EDITOR_TEXT.symbol"
       name="symbol"
+      class="col-span-2"
     >
       <UInput
         v-model="state.symbol"
@@ -182,6 +235,7 @@
       :label="GOD_EDITOR_TEXT.nicknames"
       :help="GOD_EDITOR_TEXT.nicknamesHelp"
       name="nicknames"
+      class="col-span-2"
     >
       <UInput
         v-model="state.nicknames"
@@ -192,7 +246,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -203,7 +257,7 @@
     <UFormField
       :label="GOD_EDITOR_TEXT.alternativeDescription"
       name="alternativeDescription"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.alternativeDescription"
@@ -211,26 +265,34 @@
       />
     </UFormField>
 
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.page"
-      name="page"
-    >
-      <UInputNumber
-        v-model="state.page"
-        :min="1"
-        class="w-full"
-      />
-    </UFormField>
-
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
     <WorkshopFormActions
       :is-saving="isSaving"
       :cancel-to="WORKSHOP_ROUTE"
-      class="md:col-span-2"
       is-editing
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <GodBody :god="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

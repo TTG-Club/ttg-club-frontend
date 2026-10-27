@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { PersonalizationTable, SelectOption } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import {
     findFreePersonalizationType,
     PERSONALIZATION_ICON,
@@ -135,32 +136,20 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-start justify-between gap-3">
-      <div class="flex flex-col gap-1">
-        <h3 class="text-base font-semibold text-highlighted">
-          {{ PERSONALIZATION_TEXT.title }}
-        </h3>
-
-        <p class="text-sm text-muted">
-          {{ PERSONALIZATION_TEXT.description }}
-        </p>
-      </div>
-
-      <UButton
-        :label="PERSONALIZATION_TEXT.addTable"
-        :icon="PERSONALIZATION_ICON.add"
-        :disabled="!freeType"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addTable"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="PERSONALIZATION_TEXT.title"
+    :description="PERSONALIZATION_TEXT.description"
+    :add-label="PERSONALIZATION_TEXT.addTable"
+    :add-icon="PERSONALIZATION_ICON.add"
+    :is-add-disabled="!freeType"
+    :is-empty="!tables.length"
+    :empty-text="PERSONALIZATION_TEXT.empty"
+    @add="addTable"
+  >
     <UCard
       v-for="(table, tableIndex) in tables"
       :key="table.type"
-      :ui="{ body: 'flex flex-col gap-3' }"
+      :ui="{ body: 'flex flex-col gap-3 p-3 sm:p-4' }"
     >
       <div class="flex flex-wrap items-end gap-3">
         <UFormField
@@ -223,12 +212,5 @@
         />
       </div>
     </UCard>
-
-    <UEmpty
-      v-if="!tables.length"
-      :icon="PERSONALIZATION_ICON.empty"
-      :title="PERSONALIZATION_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

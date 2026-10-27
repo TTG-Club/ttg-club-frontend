@@ -3,7 +3,10 @@
 
   import type { RuleForm, WorkshopRule } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { ruleDetailSchema } from '~wiki/model';
+  import { RuleBody } from '~wiki/rules';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -19,8 +22,11 @@
     ruleFormSchema,
     RULES_WORKSHOP_KEY,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
     WORKSHOP_ROUTE,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма правила или термина: их можно только править. */
   const { rule } = defineProps<{
@@ -44,6 +50,31 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(RULES_WORKSHOP_KEY, () => rule.id, ruleDetailSchema);
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getRulePayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описания: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -63,10 +94,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="ruleFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -79,22 +111,11 @@
       :label="RULE_EDITOR_TEXT.type"
       name="type"
       required
+      class="col-span-2"
     >
       <UInput
         v-model="state.type"
         class="w-full"
-      />
-    </UFormField>
-
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.description"
-      name="description"
-      class="md:col-span-2"
-      required
-    >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="RULE_DESCRIPTION_ROWS"
       />
     </UFormField>
 
@@ -109,15 +130,46 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <UFormField
+      :label="WORKSHOP_FIELD_TEXT.description"
+      name="description"
+      class="col-span-full"
+      required
+    >
+      <WorkshopHtmlEditor
+        v-model="state.description"
+        :rows="RULE_DESCRIPTION_ROWS"
+      />
+    </UFormField>
+
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
     <WorkshopFormActions
       :is-saving="isSaving"
       :cancel-to="WORKSHOP_ROUTE"
-      class="md:col-span-2"
       is-editing
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <RuleBody :rule="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

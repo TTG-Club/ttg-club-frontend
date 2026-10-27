@@ -3,7 +3,14 @@
 
   import type { RaceForm, WorkshopRace } from '../model';
 
-  import { useRaceParentOptions, useWorkshopSave } from '../composables';
+  import { raceDetailSchema } from '~character/model';
+  import { RaceBody } from '~character/races';
+
+  import {
+    useRaceParentOptions,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -15,6 +22,7 @@
     getHtmlFieldErrors,
     getRaceHtmlFields,
     getRacePayload,
+    getRacePreviewPath,
     getWorkshopSectionRoute,
     RACE_EDITOR_TEXT,
     RACE_SIZE_OPTIONS,
@@ -23,7 +31,10 @@
     RACES_WORKSHOP_KEY,
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
   import RaceAbilitiesEditor from './RaceAbilitiesEditor.vue';
   import RaceFeaturesEditor from './RaceFeaturesEditor.vue';
 
@@ -57,6 +68,31 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(RACES_WORKSHOP_KEY, () => race?.id, raceDetailSchema);
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getRacePayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -76,10 +112,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="raceFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -92,6 +129,7 @@
       :label="RACE_EDITOR_TEXT.parent"
       :help="RACE_EDITOR_TEXT.parentHelp"
       name="parentId"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.parentId"
@@ -108,6 +146,7 @@
       :label="RACE_EDITOR_TEXT.size"
       name="size"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.size"
@@ -120,6 +159,7 @@
       :label="RACE_EDITOR_TEXT.creatureType"
       name="type"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.type"
@@ -152,7 +192,6 @@
 
     <UFormField
       :label="RACE_EDITOR_TEXT.speed"
-      :help="RACE_EDITOR_TEXT.feetHelp"
       name="speed"
       required
     >
@@ -165,7 +204,6 @@
 
     <UFormField
       :label="RACE_EDITOR_TEXT.darkvision"
-      :help="RACE_EDITOR_TEXT.feetHelp"
       name="darkvision"
     >
       <UInputNumber
@@ -177,7 +215,6 @@
 
     <UFormField
       :label="RACE_EDITOR_TEXT.fly"
-      :help="RACE_EDITOR_TEXT.feetHelp"
       name="fly"
     >
       <UInputNumber
@@ -189,7 +226,6 @@
 
     <UFormField
       :label="RACE_EDITOR_TEXT.climb"
-      :help="RACE_EDITOR_TEXT.feetHelp"
       name="climb"
     >
       <UInputNumber
@@ -201,7 +237,6 @@
 
     <UFormField
       :label="RACE_EDITOR_TEXT.swim"
-      :help="RACE_EDITOR_TEXT.feetHelp"
       name="swim"
     >
       <UInputNumber
@@ -214,6 +249,7 @@
     <UFormField
       :label="RACE_EDITOR_TEXT.icon"
       name="icon"
+      class="col-span-2"
     >
       <UInput
         v-model="state.icon"
@@ -232,7 +268,7 @@
       />
     </UFormField>
 
-    <div class="flex flex-col gap-3 md:col-span-2">
+    <div class="col-span-full flex flex-wrap gap-x-6 gap-y-3">
       <UCheckbox
         v-model="state.origin"
         :label="RACE_EDITOR_TEXT.origin"
@@ -246,18 +282,18 @@
       />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <RaceAbilitiesEditor v-model="state.abilities" />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <RaceFeaturesEditor v-model="state.features" />
     </div>
 
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -266,7 +302,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -274,7 +310,29 @@
       :is-editing="!!race"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <RaceBody
+          :race="entry"
+          :path="getRacePreviewPath(entry, state.englishName)"
+        />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

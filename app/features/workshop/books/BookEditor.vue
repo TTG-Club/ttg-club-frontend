@@ -70,7 +70,7 @@
     :schema="bookFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -82,6 +82,7 @@
     <UFormField
       :label="BOOK_EDITOR_TEXT.source"
       :help="BOOK_EDITOR_TEXT.sourceHelp"
+      class="col-span-2"
     >
       <UInput
         :model-value="book.source"
@@ -94,6 +95,7 @@
       :label="BOOK_EDITOR_TEXT.type"
       name="type"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.type"
@@ -117,7 +119,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -128,7 +130,6 @@
     <WorkshopFormActions
       :is-saving="isSaving"
       :cancel-to="WORKSHOP_ROUTE"
-      class="md:col-span-2"
       is-editing
     />
   </UForm>

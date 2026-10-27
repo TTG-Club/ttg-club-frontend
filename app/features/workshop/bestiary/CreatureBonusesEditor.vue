@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { CreatureBonus, SelectOption } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import {
     createCreatureBonus,
     CREATURE_BONUS_TEXT,
@@ -99,25 +100,18 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-highlighted">
-        {{ title }}
-      </h3>
-
-      <UButton
-        :label="CREATURE_BONUS_TEXT.add"
-        :icon="CREATURE_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addBonus"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="title"
+    :add-label="CREATURE_BONUS_TEXT.add"
+    :add-icon="CREATURE_LIST_ICON.add"
+    :is-empty="!bonuses.length"
+    :empty-text="emptyText"
+    @add="addBonus"
+  >
     <div
       v-for="(bonus, bonusIndex) in bonuses"
       :key="bonusIndex"
-      class="grid grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)_auto]"
+      class="grid grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto]"
     >
       <UFormField
         :label="keyLabel"
@@ -165,12 +159,5 @@
         @click.left.exact.prevent="removeBonus(bonusIndex)"
       />
     </div>
-
-    <UEmpty
-      v-if="!bonuses.length"
-      :icon="CREATURE_LIST_ICON.empty"
-      :title="emptyText"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

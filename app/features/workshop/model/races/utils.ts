@@ -1,3 +1,5 @@
+import type { RaceDetail } from '~character/model';
+
 import type { RaceForm } from './schemas';
 import type { RaceAbility, RaceFeature, WorkshopRace } from './types';
 
@@ -104,4 +106,23 @@ export function getRaceHtmlFields(
       ]),
     ),
   };
+}
+
+/**
+ * Адрес расы в её карточке: по нему переключатель рас и разновидностей
+ * отмечает открытую запись. У записи без основной расы переключателя нет.
+ * @param race - карточка расы из предпросмотра
+ * @param englishName - английское название из формы
+ */
+export function getRacePreviewPath(
+  race: RaceDetail,
+  englishName: string,
+): string {
+  const name = englishName.trim();
+
+  const subrace = race.baseRace?.subraces?.find(
+    (link) => link.name.eng === name,
+  );
+
+  return subrace?.url ?? race.baseRace?.url ?? '';
 }
