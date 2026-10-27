@@ -2,7 +2,11 @@
   import { SectionEntry } from '~section/entry';
   import { getWorkshopEditPath } from '~section/model';
 
-  import { classDetailSchema, CLASSES_SECTION } from '../model';
+  import {
+    classDetailSchema,
+    CLASSES_SECTION,
+    getArchetypeSwipePaths,
+  } from '../model';
   import ClassBody from './ClassBody.vue';
 
   /**
@@ -24,6 +28,7 @@
     :section="CLASSES_SECTION"
     :schema="classDetailSchema"
     :get-edit-path="getWorkshopEditPath"
+    :get-swipe-paths="getArchetypeSwipePaths"
   >
     <template #default="{ entry }">
       <!-- Другой класс или архетип открывается с первой вкладки -->

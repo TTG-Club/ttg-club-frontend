@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import { SectionEntry } from '~section/entry';
 
-  import { getRaceEditPath, raceDetailSchema, RACES_SECTION } from '../model';
+  import {
+    getRaceEditPath,
+    getSubraceSwipePaths,
+    raceDetailSchema,
+    RACES_SECTION,
+  } from '../model';
   import RaceBody from './RaceBody.vue';
 
   /**
@@ -23,6 +28,7 @@
     :section="RACES_SECTION"
     :schema="raceDetailSchema"
     :get-edit-path="getRaceEditPath"
+    :get-swipe-paths="getSubraceSwipePaths"
   >
     <template #default="{ entry }">
       <RaceBody
