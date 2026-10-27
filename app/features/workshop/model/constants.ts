@@ -155,6 +155,9 @@ export const WORKSHOP_TEXT = {
     'Без источника новая запись попадёт в самодельный контент, а у существующей источник не изменится.',
   preview: 'Предпросмотр',
   previewError: 'Не удалось собрать предпросмотр',
+  expand: 'Развернуть',
+  collapse: 'Свернуть',
+  untitled: 'Без названия',
 } as const;
 
 /** Иконки мастерской. */
@@ -169,6 +172,24 @@ export const WORKSHOP_ICON = {
   success: 'tabler:check',
   back: 'tabler:arrow-left',
   preview: 'tabler:eye',
+  expand: 'tabler:chevron-down',
+  collapse: 'tabler:chevron-up',
+  remove: 'tabler:trash',
+} as const;
+
+/** Оформление шапки раскрытого элемента списка: прилипает к верху экрана. */
+export const WORKSHOP_PINNED_HEADER_CLASS =
+  'sticky top-0 z-10 rounded-t-lg border-b border-default bg-elevated';
+
+/**
+ * Оформление вкладок редактора. На узком экране подписи не сжимаются до
+ * многоточий: список вкладок прокручивается вбок.
+ */
+export const WORKSHOP_TABS_UI = {
+  root: 'col-span-full',
+  list: 'mb-3 overflow-x-auto',
+  trigger: 'shrink-0',
+  content: 'grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4',
 } as const;
 
 /** Операции ревизий. */

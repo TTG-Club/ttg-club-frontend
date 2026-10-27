@@ -1,19 +1,31 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type {
+    FormError,
+    FormErrorEvent,
+    FormSubmitEvent,
+    TabsItem,
+  } from '@nuxt/ui';
 
   import type { ArchetypeForm, WorkshopArchetype } from '../model';
 
   import { ClassBody } from '~character/classes';
   import { classDetailSchema } from '~character/model';
 
-  import { useWorkshopPreview, useWorkshopSave } from '../composables';
+  import {
+    useWorkshopFormTabs,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
     ARCHETYPE_EDITOR_TEXT,
+    ARCHETYPE_FIELD_TABS,
     ARCHETYPE_SPELL_LEVEL_OPTIONS,
     archetypeFormSchema,
     ARCHETYPES_API_SECTION,
+    CLASS_EDITOR_TAB,
+    CLASS_EDITOR_TAB_TEXT,
     CLASS_LEVELS,
     createArchetypeForm,
     getArchetypeHtmlFields,
@@ -23,6 +35,7 @@
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
+    WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
@@ -55,6 +68,48 @@
   );
 
   const editorForm = useTemplateRef('form');
+  const traitsEditor = useTemplateRef('traits');
+
+  const { activeTab, openErrorTab } = useWorkshopFormTabs(
+    ARCHETYPE_FIELD_TABS,
+    CLASS_EDITOR_TAB.main,
+  );
+
+  const tabItems = computed<Array<TabsItem>>(() => [
+    {
+      label: CLASS_EDITOR_TAB_TEXT.main,
+      value: CLASS_EDITOR_TAB.main,
+      slot: CLASS_EDITOR_TAB.main,
+    },
+    {
+      label: CLASS_EDITOR_TAB_TEXT.table,
+      value: CLASS_EDITOR_TAB.table,
+      slot: CLASS_EDITOR_TAB.table,
+      badge: state.tableColumns.length || undefined,
+    },
+    {
+      label: CLASS_EDITOR_TAB_TEXT.traits,
+      value: CLASS_EDITOR_TAB.traits,
+      slot: CLASS_EDITOR_TAB.traits,
+      badge: state.traits.length || undefined,
+    },
+  ]);
+
+  /**
+   * Показывает ошибки проверки: открывает их вкладку и раскрывает умения.
+   * @param errors - ошибки формы
+   */
+  function revealErrors(errors: Array<FormError>): void {
+    traitsEditor.value?.expandErrors(openErrorTab(errors));
+  }
+
+  /**
+   * Ошибки при сохранении.
+   * @param event - событие ошибки формы
+   */
+  function handleError(event: FormErrorEvent): void {
+    revealErrors(event.errors);
+  }
 
   const {
     isPreviewOpen,
@@ -78,9 +133,13 @@
       silent: true,
     });
 
-    if (data) {
-      await showPreview(getArchetypePayload(data, archetype));
+    if (!data) {
+      revealErrors(editorForm.value?.getErrors() ?? []);
+
+      return;
     }
+
+    await showPreview(getArchetypePayload(data, archetype));
   }
 
   /**
@@ -108,84 +167,102 @@
     :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
+    @error="handleError"
   >
     <WorkshopNameFields
       v-model:name="state.name"
       v-model:english-name="state.englishName"
     />
 
-    <UFormField
-      :label="ARCHETYPE_EDITOR_TEXT.genitiveName"
-      name="genitiveName"
-      class="col-span-2"
+    <!-- Вкладки не размонтируются: поля скрытых вкладок остаются в форме,
+      и сохранение проверяет их наравне с открытой -->
+    <UTabs
+      v-model="activeTab"
+      :items="tabItems"
+      :unmount-on-hide="false"
+      :ui="WORKSHOP_TABS_UI"
+      variant="pill"
     >
-      <UInput
-        v-model="state.genitiveName"
-        class="w-full"
-      />
-    </UFormField>
+      <template #main>
+        <UFormField
+          :label="ARCHETYPE_EDITOR_TEXT.genitiveName"
+          name="genitiveName"
+          class="col-span-2"
+        >
+          <UInput
+            v-model="state.genitiveName"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="ARCHETYPE_EDITOR_TEXT.level"
-      name="level"
-      required
-    >
-      <UInputNumber
-        v-model="state.level"
-        :min="1"
-        :max="CLASS_LEVELS.length"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="ARCHETYPE_EDITOR_TEXT.level"
+          name="level"
+          required
+        >
+          <UInputNumber
+            v-model="state.level"
+            :min="1"
+            :max="CLASS_LEVELS.length"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.page"
-      name="page"
-    >
-      <UInputNumber
-        v-model="state.page"
-        :min="1"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.page"
+          name="page"
+        >
+          <UInputNumber
+            v-model="state.page"
+            :min="1"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="ARCHETYPE_EDITOR_TEXT.spellLevelType"
-      name="spellLevelType"
-      class="col-span-2"
-    >
-      <USelect
-        v-model="state.spellLevelType"
-        :items="spellLevelItems"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="ARCHETYPE_EDITOR_TEXT.spellLevelType"
+          name="spellLevelType"
+          class="col-span-2"
+        >
+          <USelect
+            v-model="state.spellLevelType"
+            :items="spellLevelItems"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.description"
-      name="description"
-      class="col-span-full"
-      required
-    >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
-    </UFormField>
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.description"
+          name="description"
+          class="col-span-full"
+          required
+        >
+          <WorkshopHtmlEditor
+            v-model="state.description"
+            :rows="WORKSHOP_DESCRIPTION_ROWS"
+          />
+        </UFormField>
+      </template>
 
-    <div class="col-span-full">
-      <ClassTraitsEditor
-        v-model="state.traits"
-        field-name="traits"
-      />
-    </div>
+      <template #table>
+        <div class="col-span-full">
+          <ClassTableEditor
+            v-model="state.tableColumns"
+            field-name="tableColumns"
+          />
+        </div>
+      </template>
 
-    <div class="col-span-full">
-      <ClassTableEditor
-        v-model="state.tableColumns"
-        field-name="tableColumns"
-      />
-    </div>
+      <template #traits>
+        <div class="col-span-full">
+          <ClassTraitsEditor
+            ref="traits"
+            v-model="state.traits"
+            field-name="traits"
+          />
+        </div>
+      </template>
+    </UTabs>
 
     <WorkshopFormActions
       :is-saving="isSaving"

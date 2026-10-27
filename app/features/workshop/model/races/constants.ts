@@ -105,8 +105,50 @@ export const RACE_FEATURES_TEXT = {
   replace: 'Заменяет особенность',
   replaceHelp: 'Идентификатор особенности родительской расы',
   opened: 'Открывать по умолчанию',
+  openedBadge: 'Открыта',
   empty: 'Особенности не добавлены',
 } as const;
+
+/** Поле формы расы со списком особенностей. */
+export const RACE_FEATURES_FIELD = 'features';
+
+/** Вкладки редактора расы. */
+export const RACE_EDITOR_TAB = {
+  main: 'main',
+  properties: 'properties',
+  features: 'features',
+} as const;
+
+/** Подписи вкладок редактора расы. */
+export const RACE_EDITOR_TAB_TEXT = {
+  main: 'Основное',
+  properties: 'Характеристики',
+  features: 'Особенности',
+} as const;
+
+/**
+ * Вкладки полей формы расы: при ошибке открывается вкладка с ней.
+ * Названия стоят над вкладками и видны всегда.
+ */
+export const RACE_FIELD_TABS: Readonly<Record<string, string>> = {
+  parentId: RACE_EDITOR_TAB.main,
+  size: RACE_EDITOR_TAB.main,
+  type: RACE_EDITOR_TAB.main,
+  minAge: RACE_EDITOR_TAB.main,
+  maxAge: RACE_EDITOR_TAB.main,
+  icon: RACE_EDITOR_TAB.main,
+  page: RACE_EDITOR_TAB.main,
+  origin: RACE_EDITOR_TAB.main,
+  view: RACE_EDITOR_TAB.main,
+  description: RACE_EDITOR_TAB.main,
+  speed: RACE_EDITOR_TAB.properties,
+  darkvision: RACE_EDITOR_TAB.properties,
+  fly: RACE_EDITOR_TAB.properties,
+  climb: RACE_EDITOR_TAB.properties,
+  swim: RACE_EDITOR_TAB.properties,
+  abilities: RACE_EDITOR_TAB.properties,
+  [RACE_FEATURES_FIELD]: RACE_EDITOR_TAB.features,
+};
 
 /** Иконки списков редактора рас. */
 export const RACE_LIST_ICON = {
