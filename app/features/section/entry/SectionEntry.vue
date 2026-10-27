@@ -1,8 +1,15 @@
 <script
   setup
   lang="ts"
-  generic="T extends { name: EntryName; source?: EntrySource | null }"
+  generic="
+    T extends {
+      id?: number | null;
+      name: EntryName;
+      source?: EntrySource | null;
+    }
+  "
 >
+  import type { DropdownMenuItem } from '@nuxt/ui';
   import type { z } from 'zod';
 
   import type { ComponentPublicInstance } from 'vue';
@@ -13,11 +20,13 @@
   import { CommentsBlock } from '~comments/section';
 
   import {
+    useEntryExport,
     useSectionEntry,
     useSectionOpener,
     useSectionSwipe,
   } from '../composables';
   import { SectionDetailPane } from '../detail-pane';
+  import { ENTRY_EXPORT_LABELS, SECTION_ICON } from '../model';
 
   /**
    * Запись раздела: загрузка, заголовок, закладка, ссылка на правку,
@@ -69,6 +78,30 @@
     isEmbedded ? undefined : 'mx-auto w-full max-w-4xl',
   );
 
+  const { exportEntry } = useEntryExport();
+
+  // Экспорт есть только у разделов, которые его объявили, и только у записей
+  // с идентификатором: по нему ручка находит запись
+  const exportItems = computed<Array<DropdownMenuItem>>(() => {
+    const sectionExport = section.export;
+    const exportedId = entry.value?.id;
+    const exportedName = entry.value?.name;
+
+    if (!sectionExport || !exportedId || !exportedName) {
+      return [];
+    }
+
+    return sectionExport.platforms.map((platform) => ({
+      label: ENTRY_EXPORT_LABELS[platform],
+      icon: SECTION_ICON.export,
+      onSelect: () =>
+        exportEntry(platform, sectionExport.type, {
+          id: exportedId,
+          name: exportedName.eng || exportedName.rus,
+        }),
+    }));
+  });
+
   const pane = useTemplateRef<ComponentPublicInstance>('pane');
 
   // Свайпом листается только страница записи: поверх списка жест занят
@@ -97,6 +130,7 @@
     :edit-url="editUrl"
     :is-loading="isLoading"
     :is-error="isError"
+    :menu-items="exportItems"
     @close="close"
   >
     <template #actions>
@@ -113,7 +147,10 @@
       <slot :entry="entry" />
 
       <!-- Блок сам решает, есть ли у раздела обсуждение -->
-      <CommentsBlock :path="entryPath" />
+      <CommentsBlock
+        :path="entryPath"
+        class="print:hidden"
+      />
     </template>
   </SectionDetailPane>
 </template>

@@ -1,3 +1,4 @@
+export { useEntryExport } from './useEntryExport';
 export { useSectionDetail } from './useSectionDetail';
 export { useSectionEntry } from './useSectionEntry';
 export { useSectionFilter } from './useSectionFilter';

@@ -154,9 +154,14 @@ loads a short section in one request, `sortItems` reorders it on the page and
 (header, bookmark, close) around the section's own body: by the page address
 on the entry page, or by `path` in the pane and the drawer. It reads
 `POST /api/v1<path>`; a missing entry renders a real 404 on its page and an
-error in the pane. `SectionDetailPane` copies the canonical link of the entry
-and, for moderators and admins, links to its editor in the workshop
-(`/workshop/<path>/edit`). `SectionSourceBar` replaces `DetailTopBar`.
+error in the pane. The header of `SectionDetailPane` keeps the bookmark and
+close buttons; the rest sits in the «⋯» menu: open the page (pane and drawer),
+copy the canonical link, the workshop editor for moderators and admins
+(`/workshop/<path>/edit`), print and export. Print hides everything but the
+entry (`data-print-target`); an entry next to the list opens its page with
+`?print=1` and prints there. Sections with `export` in `SectionConfig`
+download JSON from `/api/v1/<fvtt|lss>/<type>?id=` (spells: FVTT and LSS,
+creatures: FVTT). `SectionSourceBar` replaces `DetailTopBar`.
 
 Search and filter live in a `SectionQueryStore`: the page address by default,
 or memory for `SectionTabList`, the list inside a tab (options of a class). A tab list always sends its filter, because a hidden group of the

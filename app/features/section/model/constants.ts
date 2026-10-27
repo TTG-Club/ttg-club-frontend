@@ -51,6 +51,9 @@ export const SECTION_TEXT = {
   sourceSearchLabel: 'Поиск по источникам',
   selectAll: 'Выбрать все',
   more: 'Ещё',
+  actions: 'Действия с записью',
+  print: 'Печать',
+  exportError: 'Не удалось выгрузить запись',
 } as const;
 
 /** Иконки раздела. */
@@ -72,7 +75,27 @@ export const SECTION_ICON = {
   expand: 'tabler:chevron-down',
   imageCount: 'tabler:photo',
   zoom: 'tabler:zoom-in',
+  print: 'tabler:printer',
+  export: 'tabler:file-export',
 } as const;
+
+/** Платформы экспорта записи в JSON, как в старом SPA. */
+export enum EntryExportPlatform {
+  FOUNDRY = 'fvtt',
+  LSS = 'lss',
+}
+
+/** Подписи пунктов экспорта. */
+export const ENTRY_EXPORT_LABELS: Record<EntryExportPlatform, string> = {
+  [EntryExportPlatform.FOUNDRY]: 'Экспорт для FVTT (JSON)',
+  [EntryExportPlatform.LSS]: 'Экспорт для LSS (JSON)',
+};
+
+/** Расширение выгружаемого файла, если сервер не назвал его сам. */
+export const ENTRY_EXPORT_EXTENSION = '.json';
+
+/** Имя файла в заголовке ответа: `attachment; filename="Fire Bolt.json"`. */
+export const CONTENT_DISPOSITION_FILENAME = /filename="?([^";]+)"?/;
 
 /**
  * Поиск по фильтрам появляется, когда групп больше пяти или значений во всех
@@ -87,6 +110,15 @@ export const FILTER_SEARCH_DEBOUNCE_MS = 200;
 
 /** Параметр адреса с открытой записью в широком режиме, как на new.ttg.club. */
 export const SECTION_DETAIL_QUERY_KEY = 'detail';
+
+/**
+ * Параметр адреса: открыть печать записи. Запись рядом со списком
+ * печатается со своей страницы, где вёрстка не зависит от ширины листа.
+ */
+export const SECTION_PRINT_QUERY_KEY = 'print';
+
+/** Значение параметра печати. */
+export const SECTION_PRINT_QUERY_VALUE = '1';
 
 /** Сегменты пути, которых не бывает в адресе записи. */
 export const SECTION_DETAIL_FORBIDDEN_SEGMENTS: ReadonlySet<string> = new Set([

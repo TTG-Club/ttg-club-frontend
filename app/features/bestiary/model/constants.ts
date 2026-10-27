@@ -2,6 +2,8 @@ import type { SectionConfig } from '~section/model';
 
 import type { AbilityKey } from './types';
 
+import { EntryExportPlatform } from '~section/model';
+
 /** Бестиарий грузится постранично, по опыту и затем по названию. */
 export const BESTIARY_SECTION: SectionConfig = {
   key: 'bestiary',
@@ -13,6 +15,10 @@ export const BESTIARY_SECTION: SectionConfig = {
     { field: 'exp', direction: 'asc' },
     { field: 'name', direction: 'asc' },
   ],
+  export: {
+    type: 'bestiary',
+    platforms: [EntryExportPlatform.FOUNDRY],
+  },
 };
 
 export const CREATURE_TEXT = {

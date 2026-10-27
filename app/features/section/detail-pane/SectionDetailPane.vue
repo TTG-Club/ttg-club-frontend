@@ -1,14 +1,22 @@
 <script setup lang="ts">
+  import type { DropdownMenuItem } from '@nuxt/ui';
+
   import type { RouteLocationRaw } from 'vue-router';
 
   import type { EntrySource } from '../model';
 
-  import { SECTION_ICON, SECTION_TEXT } from '../model';
+  import {
+    SECTION_ICON,
+    SECTION_PRINT_QUERY_KEY,
+    SECTION_PRINT_QUERY_VALUE,
+    SECTION_TEXT,
+  } from '../model';
   import { SectionSourceTag } from '../source-tag';
 
   /**
-   * Панель открытой записи раздела: заголовок, ссылка на запись, правка
-   * для редакторов, закрытие и содержимое.
+   * Панель открытой записи раздела: заголовок, закладка, закрытие и
+   * содержимое. Остальные действия (ссылка, правка, печать, экспорт)
+   * спрятаны в меню «три точки», чтобы шапка не обрастала кнопками.
    */
   const {
     title,
@@ -19,6 +27,7 @@
     editUrl = undefined,
     isLoading = false,
     isError = false,
+    menuItems = [],
   } = defineProps<{
     title: string;
     subtitle?: string;
@@ -35,6 +44,8 @@
     editUrl?: string;
     isLoading?: boolean;
     isError?: boolean;
+    /** Дополнительные пункты меню записи, например экспорт. */
+    menuItems?: Array<DropdownMenuItem>;
   }>();
 
   /** Кнопки записи: в шапке, а на телефоне плавают в правом нижнем углу. */
@@ -50,6 +61,7 @@
   }>();
 
   const route = useRoute();
+  const router = useRouter();
   const siteConfig = useSiteConfig();
   const toast = useToast();
   const { copy, isSupported } = useClipboard({ legacy: true });
@@ -61,9 +73,98 @@
     () => !!editUrl && isEditor.value && isReady.value,
   );
 
+  /** Запись печатается: печать прячет всё остальное на странице. */
+  const isPrinting = ref(false);
+
+  const printTarget = computed(() => (isPrinting.value ? '' : undefined));
+
+  useEventListener('afterprint', () => {
+    isPrinting.value = false;
+  });
+
+  const actionItems = computed<Array<Array<DropdownMenuItem>>>(() => {
+    const linkItems: Array<DropdownMenuItem> = [
+      {
+        label: SECTION_TEXT.copyLink,
+        icon: SECTION_ICON.copy,
+        onSelect: copyLink,
+      },
+    ];
+
+    if (path) {
+      linkItems.unshift({
+        label: SECTION_TEXT.openPage,
+        icon: SECTION_ICON.openPage,
+        to: path,
+      });
+    }
+
+    const editItems: Array<DropdownMenuItem> = isEditAvailable.value
+      ? [{ label: SECTION_TEXT.edit, icon: SECTION_ICON.edit, to: editUrl }]
+      : [];
+
+    const outputItems: Array<DropdownMenuItem> = [
+      { label: SECTION_TEXT.print, icon: SECTION_ICON.print, onSelect: print },
+      ...menuItems,
+    ];
+
+    return [linkItems, editItems, outputItems].filter(
+      (group) => group.length > 0,
+    );
+  });
+
   function close(): void {
     emit('close');
   }
+
+  /** Печатает только запись, как кнопка печати старого SPA. */
+  async function printEntry(): Promise<void> {
+    isPrinting.value = true;
+
+    await nextTick();
+
+    window.print();
+  }
+
+  /**
+   * Печать из меню. Запись рядом со списком открывается на своей странице
+   * и печатается там: на узком листе панель рядом со списком не видна.
+   */
+  async function print(): Promise<void> {
+    if (path) {
+      await navigateTo({
+        path,
+        query: { [SECTION_PRINT_QUERY_KEY]: SECTION_PRINT_QUERY_VALUE },
+      });
+
+      return;
+    }
+
+    await printEntry();
+  }
+
+  /** Печать, заказанная адресом: параметр снимается, чтобы не повторить её. */
+  async function printRequested(): Promise<void> {
+    const { [SECTION_PRINT_QUERY_KEY]: _printRequest, ...query } = route.query;
+
+    await router.replace({ query });
+    await printEntry();
+  }
+
+  onMounted(() => {
+    watch(
+      isReady,
+      (ready) => {
+        const isRequested =
+          route.query[SECTION_PRINT_QUERY_KEY] === SECTION_PRINT_QUERY_VALUE;
+
+        if (ready && !path && isRequested) {
+          void printRequested();
+        }
+      },
+      { immediate: true },
+    );
+  });
 
   /** Копирует каноничную ссылку на запись, без параметров списка. */
   async function copyLink() {
@@ -84,7 +185,10 @@
 </script>
 
 <template>
-  <article class="flex flex-col gap-4 pt-2">
+  <article
+    class="flex flex-col gap-4 pt-2"
+    :data-print-target="printTarget"
+  >
     <header class="flex flex-col gap-1 border-b border-default pb-3">
       <div class="flex items-start gap-3">
         <div class="min-w-0 flex-auto">
@@ -102,45 +206,24 @@
         </div>
 
         <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
-        <div :class="ACTIONS_CLASS">
+        <div
+          :class="ACTIONS_CLASS"
+          class="print:hidden"
+        >
           <template v-if="isReady">
-            <UTooltip :text="SECTION_TEXT.copyLink">
-              <UButton
-                :icon="SECTION_ICON.copy"
-                :aria-label="SECTION_TEXT.copyLink"
-                color="neutral"
-                variant="ghost"
-                @click.left.exact.prevent="copyLink"
-              />
-            </UTooltip>
-
             <slot name="actions" />
 
-            <UTooltip
-              v-if="path"
-              :text="SECTION_TEXT.openPage"
+            <UDropdownMenu
+              :items="actionItems"
+              :content="{ align: 'end' }"
             >
               <UButton
-                :to="path"
-                :icon="SECTION_ICON.openPage"
-                :aria-label="SECTION_TEXT.openPage"
+                :icon="SECTION_ICON.more"
+                :aria-label="SECTION_TEXT.actions"
                 color="neutral"
                 variant="ghost"
               />
-            </UTooltip>
-
-            <UTooltip
-              v-if="isEditAvailable"
-              :text="SECTION_TEXT.edit"
-            >
-              <UButton
-                :to="editUrl"
-                :icon="SECTION_ICON.edit"
-                :aria-label="SECTION_TEXT.edit"
-                color="neutral"
-                variant="ghost"
-              />
-            </UTooltip>
+            </UDropdownMenu>
           </template>
 
           <UButton

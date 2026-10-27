@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 
-import type { SECTION_GRID_CLASS } from './constants';
+import type { EntryExportPlatform, SECTION_GRID_CLASS } from './constants';
 
 /** Вид списка раздела: плитки, карточки или обложки. */
 export type SectionListView = keyof typeof SECTION_GRID_CLASS;
@@ -60,6 +60,13 @@ export interface SectionListRequest {
   filter?: FilterPayload;
 }
 
+/** Экспорт записей раздела в JSON для внешних программ. */
+export interface SectionExport {
+  /** Тип записи в ручке экспорта: `/api/v1/<платформа>/<тип>?id=`. */
+  type: string;
+  platforms: Array<EntryExportPlatform>;
+}
+
 /** Раздел справочника: заголовок, адрес, ручки списка и фильтра и сортировка. */
 export interface SectionConfig {
   /** Ключ раздела для данных SSR. */
@@ -73,6 +80,8 @@ export interface SectionConfig {
   order: Array<SectionOrder>;
   /** Размер страницы; по умолчанию `SECTION_PAGE_SIZE`. */
   pageSize?: number;
+  /** Экспорт записей; без него у записей нет кнопок экспорта. */
+  export?: SectionExport;
 }
 
 /**
