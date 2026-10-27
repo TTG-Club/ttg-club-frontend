@@ -2,12 +2,7 @@
   import { SectionLayout } from '~section/layout';
   import { AuthModal } from '~user/auth-modal';
   import { PROFILE_ICON, PROFILE_TEXT } from '~user/model';
-  import {
-    ProfilePassword,
-    ProfilePersonal,
-    ProfileSources,
-  } from '~user/profile';
-  import { ProfileSubscription } from '~user/subscription';
+  import { ProfileNavigation } from '~user/profile';
 
   definePageMeta({ layout: 'section' });
 
@@ -52,11 +47,14 @@
           </span>
         </div>
 
+        <ProfileNavigation />
+
         <UButton
           :label="PROFILE_TEXT.signOut"
           :icon="PROFILE_ICON.signOut"
           color="error"
           variant="subtle"
+          class="hidden lg:flex"
           block
           @click.left.exact.prevent="handleSignOut"
         />
@@ -67,13 +65,7 @@
       v-if="isLoggedIn"
       class="flex max-w-3xl flex-col gap-4"
     >
-      <ProfilePersonal />
-
-      <ProfileSources />
-
-      <ProfileSubscription />
-
-      <ProfilePassword />
+      <NuxtPage />
     </div>
 
     <UEmpty
