@@ -250,6 +250,12 @@ the entry inside a rolled back transaction and returns the reference card,
 which `WorkshopPreviewDrawer` shows with the section's body component.
 Books have no preview.
 
+Class, archetype and race editors split fields into `UTabs` that stay mounted
+(`useWorkshopFormTabs`): on a validation error the form opens the tab of the
+first error. Class traits and race features are collapsed rows
+(`WorkshopCollapsibleItem` + `useExpandedItems`); a new row opens at once and
+rows with errors open on save or preview.
+
 ## 🔍 Search
 
 Site search uses `POST /api/v1/search` (and `/search/random` for the dice

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   archetypeFormSchema,
   bookFormSchema,
+  CLASS_EDITOR_TAB,
+  CLASS_FIELD_TABS,
   classFormSchema,
   createArchetypeForm,
   createArmorForm,
@@ -47,6 +49,8 @@ import {
   getSpellSchoolValue,
   getWeaponPayload,
   getWorkshopEditRoute,
+  getWorkshopErrorIndexes,
+  getWorkshopFieldTab,
   getWorkshopSlug,
   parseBookSources,
   parseFilterGroups,
@@ -70,6 +74,7 @@ import {
   parseWorkshopScreen,
   parseWorkshopSpell,
   parseWorkshopWeapon,
+  shiftIndexesAfterRemoval,
   splitList,
   weaponFormSchema,
 } from '~workshop/model';
@@ -948,5 +953,34 @@ describe('источники', () => {
     expect(
       bookFormSchema.safeParse({ ...createBookForm(book), type: '' }).success,
     ).toBe(false);
+  });
+});
+
+describe('вкладки и спойлеры редакторов', () => {
+  it('находит вкладку поля по корню имени', () => {
+    expect(getWorkshopFieldTab(CLASS_FIELD_TABS, 'classTraits.2.name')).toBe(
+      CLASS_EDITOR_TAB.traits,
+    );
+
+    expect(getWorkshopFieldTab(CLASS_FIELD_TABS, 'armor')).toBe(
+      CLASS_EDITOR_TAB.proficiencies,
+    );
+
+    expect(getWorkshopFieldTab(CLASS_FIELD_TABS, 'name')).toBeUndefined();
+  });
+
+  it('собирает номера элементов списка с ошибками', () => {
+    expect(
+      getWorkshopErrorIndexes(
+        ['classTraits.0.name', 'description', 'classTraits.3.description'],
+        'classTraits',
+      ),
+    ).toEqual([0, 3]);
+  });
+
+  it('сдвигает раскрытые элементы после удаления', () => {
+    expect([...shiftIndexesAfterRemoval(new Set([0, 2, 4]), 2)]).toEqual([
+      0, 3,
+    ]);
   });
 });

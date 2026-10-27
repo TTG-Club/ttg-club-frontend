@@ -1,18 +1,23 @@
 <script setup lang="ts">
   import type { RaceFeature } from '../model';
 
-  import { WorkshopListSection } from '../form';
+  import { useExpandedItems } from '../composables';
+  import { WorkshopCollapsibleItem, WorkshopListSection } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
     createRaceFeature,
+    getWorkshopErrorIndexes,
     RACE_FEATURE_ROWS,
+    RACE_FEATURES_FIELD,
     RACE_FEATURES_TEXT,
     RACE_LIST_ICON,
     WORKSHOP_FIELD_TEXT,
   } from '../model';
 
-  /** Особенности расы. */
+  /** Особенности расы, каждая свёрнута под спойлер. */
   const features = defineModel<Array<RaceFeature>>({ required: true });
+
+  const { isExpanded, toggle, expand, drop } = useExpandedItems();
 
   /**
    * Заменяет особенность по номеру.
@@ -28,8 +33,12 @@
     );
   }
 
+  /** Добавляет особенность и сразу раскрывает её для заполнения. */
   function addFeature(): void {
+    const addedIndex = features.value.length;
+
     features.value = [...features.value, createRaceFeature()];
+    expand([addedIndex]);
   }
 
   /**
@@ -40,6 +49,16 @@
     features.value = features.value.filter(
       (_, index) => index !== featureIndex,
     );
+
+    drop(featureIndex);
+  }
+
+  /**
+   * Раскрывает особенности с ошибками проверки, иначе их не видно.
+   * @param fieldNames - имена полей с ошибками
+   */
+  function expandErrors(fieldNames: Array<string>): void {
+    expand(getWorkshopErrorIndexes(fieldNames, RACE_FEATURES_FIELD));
   }
 
   /**
@@ -99,7 +118,7 @@
     featureIndex: number,
     field: keyof RaceFeature,
   ): string {
-    return `features.${featureIndex}.${field}`;
+    return `${RACE_FEATURES_FIELD}.${featureIndex}.${field}`;
   }
 
   /**
@@ -110,6 +129,8 @@
   function getFeatureKey(feature: RaceFeature, featureIndex: number): string {
     return feature.id ? String(feature.id) : `new-${featureIndex}`;
   }
+
+  defineExpose({ expandErrors });
 </script>
 
 <template>
@@ -121,75 +142,84 @@
     :empty-text="RACE_FEATURES_TEXT.empty"
     @add="addFeature"
   >
-    <UCard
+    <WorkshopCollapsibleItem
       v-for="(feature, featureIndex) in features"
       :key="getFeatureKey(feature, featureIndex)"
-      :ui="{ body: 'grid grid-cols-1 gap-3 p-3 sm:p-4 md:grid-cols-2' }"
+      :title="feature.name"
+      :is-open="isExpanded(featureIndex)"
+      :remove-label="RACE_FEATURES_TEXT.remove"
+      @toggle="toggle(featureIndex)"
+      @remove="removeFeature(featureIndex)"
     >
-      <UFormField
-        :label="WORKSHOP_FIELD_TEXT.name"
-        :name="getFieldName(featureIndex, 'name')"
-        required
-      >
-        <UInput
-          :model-value="feature.name"
-          class="w-full"
-          @update:model-value="changeName(featureIndex, $event)"
+      <template #trailing>
+        <UBadge
+          v-if="feature.feature"
+          :label="RACE_FEATURES_TEXT.openedBadge"
+          color="neutral"
+          variant="subtle"
+          size="sm"
+          class="shrink-0"
         />
-      </UFormField>
+      </template>
 
-      <UFormField
-        :label="WORKSHOP_FIELD_TEXT.englishName"
-        :name="getFieldName(featureIndex, 'englishName')"
-      >
-        <UInput
-          :model-value="feature.englishName"
-          class="w-full"
-          @update:model-value="changeEnglishName(featureIndex, $event)"
-        />
-      </UFormField>
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.name"
+          :name="getFieldName(featureIndex, 'name')"
+          required
+        >
+          <UInput
+            :model-value="feature.name"
+            class="w-full"
+            @update:model-value="changeName(featureIndex, $event)"
+          />
+        </UFormField>
 
-      <UFormField
-        :label="RACE_FEATURES_TEXT.replace"
-        :help="RACE_FEATURES_TEXT.replaceHelp"
-        :name="getFieldName(featureIndex, 'replaceFeatureId')"
-      >
-        <UInputNumber
-          :model-value="feature.replaceFeatureId"
-          :min="1"
-          class="w-full"
-          @update:model-value="changeReplace(featureIndex, $event)"
-        />
-      </UFormField>
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.englishName"
+          :name="getFieldName(featureIndex, 'englishName')"
+        >
+          <UInput
+            :model-value="feature.englishName"
+            class="w-full"
+            @update:model-value="changeEnglishName(featureIndex, $event)"
+          />
+        </UFormField>
 
-      <div class="flex items-center justify-between gap-3 md:pt-6">
-        <UCheckbox
-          :model-value="feature.feature"
-          :label="RACE_FEATURES_TEXT.opened"
-          @update:model-value="changeOpened(featureIndex, $event)"
-        />
+        <UFormField
+          :label="RACE_FEATURES_TEXT.replace"
+          :help="RACE_FEATURES_TEXT.replaceHelp"
+          :name="getFieldName(featureIndex, 'replaceFeatureId')"
+        >
+          <UInputNumber
+            :model-value="feature.replaceFeatureId"
+            :min="1"
+            class="w-full"
+            @update:model-value="changeReplace(featureIndex, $event)"
+          />
+        </UFormField>
 
-        <UButton
-          :aria-label="RACE_FEATURES_TEXT.remove"
-          :icon="RACE_LIST_ICON.remove"
-          color="error"
-          variant="ghost"
-          @click.left.exact.prevent="removeFeature(featureIndex)"
-        />
+        <div class="flex items-center md:pt-6">
+          <UCheckbox
+            :model-value="feature.feature"
+            :label="RACE_FEATURES_TEXT.opened"
+            @update:model-value="changeOpened(featureIndex, $event)"
+          />
+        </div>
+
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.description"
+          :name="getFieldName(featureIndex, 'description')"
+          class="md:col-span-2"
+          required
+        >
+          <WorkshopHtmlEditor
+            :model-value="feature.description"
+            :rows="RACE_FEATURE_ROWS"
+            @update:model-value="changeDescription(featureIndex, $event)"
+          />
+        </UFormField>
       </div>
-
-      <UFormField
-        :label="WORKSHOP_FIELD_TEXT.description"
-        :name="getFieldName(featureIndex, 'description')"
-        class="md:col-span-2"
-        required
-      >
-        <WorkshopHtmlEditor
-          :model-value="feature.description"
-          :rows="RACE_FEATURE_ROWS"
-          @update:model-value="changeDescription(featureIndex, $event)"
-        />
-      </UFormField>
-    </UCard>
+    </WorkshopCollapsibleItem>
   </WorkshopListSection>
 </template>

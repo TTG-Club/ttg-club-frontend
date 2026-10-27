@@ -71,6 +71,69 @@ export const CLASS_DEFAULT = {
   level: 1,
 } as const;
 
+/** Подпись уровня: в таблице прогрессии и в шапке умения. */
+export const CLASS_LEVEL_SUFFIX = 'ур.';
+
+/** Вкладки редакторов класса и архетипа. */
+export const CLASS_EDITOR_TAB = {
+  main: 'main',
+  proficiencies: 'proficiencies',
+  spellcasting: 'spellcasting',
+  table: 'table',
+  traits: 'traits',
+  equipment: 'equipment',
+} as const;
+
+/** Подписи вкладок редакторов класса и архетипа. */
+export const CLASS_EDITOR_TAB_TEXT = {
+  main: 'Основное',
+  proficiencies: 'Владения',
+  spellcasting: 'Заклинательство',
+  table: 'Таблица',
+  traits: 'Умения',
+  equipment: 'Снаряжение',
+} as const;
+
+/**
+ * Вкладки полей формы класса: при ошибке открывается вкладка с ней.
+ * Названия стоят над вкладками и видны всегда.
+ */
+export const CLASS_FIELD_TABS: Readonly<Record<string, string>> = {
+  accusativeName: CLASS_EDITOR_TAB.main,
+  diceHp: CLASS_EDITOR_TAB.main,
+  archetypeName: CLASS_EDITOR_TAB.main,
+  enabledArhitypeLevel: CLASS_EDITOR_TAB.main,
+  page: CLASS_EDITOR_TAB.main,
+  optionType: CLASS_EDITOR_TAB.main,
+  icon: CLASS_EDITOR_TAB.main,
+  sidekick: CLASS_EDITOR_TAB.main,
+  description: CLASS_EDITOR_TAB.main,
+  primaryAbilities: CLASS_EDITOR_TAB.proficiencies,
+  savingThrows: CLASS_EDITOR_TAB.proficiencies,
+  skillAvailableCount: CLASS_EDITOR_TAB.proficiencies,
+  availableSkills: CLASS_EDITOR_TAB.proficiencies,
+  armor: CLASS_EDITOR_TAB.proficiencies,
+  weapon: CLASS_EDITOR_TAB.proficiencies,
+  tools: CLASS_EDITOR_TAB.proficiencies,
+  spellcasterType: CLASS_EDITOR_TAB.spellcasting,
+  spellAbility: CLASS_EDITOR_TAB.spellcasting,
+  slotsReset: CLASS_EDITOR_TAB.spellcasting,
+  equipment: CLASS_EDITOR_TAB.equipment,
+  tableColumns: CLASS_EDITOR_TAB.table,
+  classTraits: CLASS_EDITOR_TAB.traits,
+};
+
+/** Вкладки полей формы архетипа. */
+export const ARCHETYPE_FIELD_TABS: Readonly<Record<string, string>> = {
+  genitiveName: CLASS_EDITOR_TAB.main,
+  level: CLASS_EDITOR_TAB.main,
+  page: CLASS_EDITOR_TAB.main,
+  spellLevelType: CLASS_EDITOR_TAB.main,
+  description: CLASS_EDITOR_TAB.main,
+  tableColumns: CLASS_EDITOR_TAB.table,
+  traits: CLASS_EDITOR_TAB.traits,
+};
+
 /** Подписи редактора классов. */
 export const CLASS_EDITOR_TEXT = {
   createTitle: 'Создание класса',
@@ -116,6 +179,7 @@ export const CLASS_TRAITS_TEXT = {
   suffix: 'Суффикс',
   child: 'Дочерний якорь',
   optional: 'Опциональное умение',
+  optionalBadge: 'Опциональное',
   empty: 'Умения не добавлены',
 } as const;
 
@@ -128,7 +192,7 @@ export const CLASS_TABLE_TEXT = {
   column: 'Колонка',
   prefix: 'Префикс значения',
   suffix: 'Суффикс значения',
-  levelSuffix: 'ур.',
+  levelSuffix: CLASS_LEVEL_SUFFIX,
   empty: 'Дополнительные колонки не добавлены',
 } as const;
 

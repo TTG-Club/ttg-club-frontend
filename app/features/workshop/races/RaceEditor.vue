@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type {
+    FormError,
+    FormErrorEvent,
+    FormSubmitEvent,
+    TabsItem,
+  } from '@nuxt/ui';
 
   import type { RaceForm, WorkshopRace } from '../model';
 
@@ -8,6 +13,7 @@
 
   import {
     useRaceParentOptions,
+    useWorkshopFormTabs,
     useWorkshopPreview,
     useWorkshopSave,
   } from '../composables';
@@ -24,7 +30,10 @@
     getRacePayload,
     getRacePreviewPath,
     getWorkshopSectionRoute,
+    RACE_EDITOR_TAB,
+    RACE_EDITOR_TAB_TEXT,
     RACE_EDITOR_TEXT,
+    RACE_FIELD_TABS,
     RACE_SIZE_OPTIONS,
     RACE_TYPE_OPTIONS,
     raceFormSchema,
@@ -32,6 +41,7 @@
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
+    WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
@@ -69,6 +79,48 @@
   );
 
   const editorForm = useTemplateRef('form');
+  const featuresEditor = useTemplateRef('features');
+
+  const { activeTab, openErrorTab } = useWorkshopFormTabs(
+    RACE_FIELD_TABS,
+    RACE_EDITOR_TAB.main,
+  );
+
+  const tabItems = computed<Array<TabsItem>>(() => [
+    {
+      label: RACE_EDITOR_TAB_TEXT.main,
+      value: RACE_EDITOR_TAB.main,
+      slot: RACE_EDITOR_TAB.main,
+    },
+    {
+      label: RACE_EDITOR_TAB_TEXT.properties,
+      value: RACE_EDITOR_TAB.properties,
+      slot: RACE_EDITOR_TAB.properties,
+    },
+    {
+      label: RACE_EDITOR_TAB_TEXT.features,
+      value: RACE_EDITOR_TAB.features,
+      slot: RACE_EDITOR_TAB.features,
+      badge: state.features.length || undefined,
+    },
+  ]);
+
+  /**
+   * Показывает ошибки проверки: открывает их вкладку и раскрывает
+   * особенности.
+   * @param errors - ошибки формы
+   */
+  function revealErrors(errors: Array<FormError>): void {
+    featuresEditor.value?.expandErrors(openErrorTab(errors));
+  }
+
+  /**
+   * Ошибки при сохранении.
+   * @param event - событие ошибки формы
+   */
+  function handleError(event: FormErrorEvent): void {
+    revealErrors(event.errors);
+  }
 
   const {
     isPreviewOpen,
@@ -88,9 +140,13 @@
       silent: true,
     });
 
-    if (data) {
-      await showPreview(getRacePayload(data, source.value));
+    if (!data) {
+      revealErrors(editorForm.value?.getErrors() ?? []);
+
+      return;
     }
+
+    await showPreview(getRacePayload(data, source.value));
   }
 
   /**
@@ -118,6 +174,7 @@
     :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
+    @error="handleError"
   >
     <WorkshopNameFields
       v-model:name="state.name"
@@ -125,186 +182,205 @@
       v-model:alt-name="state.altName"
     />
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.parent"
-      :help="RACE_EDITOR_TEXT.parentHelp"
-      name="parentId"
-      class="col-span-2"
+    <!-- Вкладки не размонтируются: поля скрытых вкладок остаются в форме,
+      и сохранение проверяет их наравне с открытой -->
+    <UTabs
+      v-model="activeTab"
+      :items="tabItems"
+      :unmount-on-hide="false"
+      :ui="WORKSHOP_TABS_UI"
+      variant="pill"
     >
-      <USelectMenu
-        v-model="state.parentId"
-        :items="parentItems"
-        :loading="isParentsLoading"
-        :placeholder="WORKSHOP_FIELD_TEXT.selectPlaceholder"
-        value-key="value"
-        class="w-full"
-        clear
-      />
-    </UFormField>
+      <template #main>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.parent"
+          :help="RACE_EDITOR_TEXT.parentHelp"
+          name="parentId"
+          class="col-span-2"
+        >
+          <USelectMenu
+            v-model="state.parentId"
+            :items="parentItems"
+            :loading="isParentsLoading"
+            :placeholder="WORKSHOP_FIELD_TEXT.selectPlaceholder"
+            value-key="value"
+            class="w-full"
+            clear
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.size"
-      name="size"
-      required
-      class="col-span-2"
-    >
-      <USelect
-        v-model="state.size"
-        :items="sizeItems"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.size"
+          name="size"
+          required
+          class="col-span-2"
+        >
+          <USelect
+            v-model="state.size"
+            :items="sizeItems"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.creatureType"
-      name="type"
-      required
-      class="col-span-2"
-    >
-      <USelect
-        v-model="state.type"
-        :items="typeItems"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.creatureType"
+          name="type"
+          required
+          class="col-span-2"
+        >
+          <USelect
+            v-model="state.type"
+            :items="typeItems"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.minAge"
-      name="minAge"
-    >
-      <UInputNumber
-        v-model="state.minAge"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.minAge"
+          name="minAge"
+        >
+          <UInputNumber
+            v-model="state.minAge"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.maxAge"
-      name="maxAge"
-    >
-      <UInputNumber
-        v-model="state.maxAge"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.maxAge"
+          name="maxAge"
+        >
+          <UInputNumber
+            v-model="state.maxAge"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.speed"
-      name="speed"
-      required
-    >
-      <UInputNumber
-        v-model="state.speed"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.icon"
+          name="icon"
+          class="col-span-2"
+        >
+          <UInput
+            v-model="state.icon"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.darkvision"
-      name="darkvision"
-    >
-      <UInputNumber
-        v-model="state.darkvision"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.page"
+          name="page"
+        >
+          <UInputNumber
+            v-model="state.page"
+            :min="1"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.fly"
-      name="fly"
-    >
-      <UInputNumber
-        v-model="state.fly"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+        <div class="col-span-full flex flex-wrap gap-x-6 gap-y-3">
+          <UCheckbox
+            v-model="state.origin"
+            :label="RACE_EDITOR_TEXT.origin"
+            name="origin"
+          />
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.climb"
-      name="climb"
-    >
-      <UInputNumber
-        v-model="state.climb"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+          <UCheckbox
+            v-model="state.view"
+            :label="RACE_EDITOR_TEXT.view"
+            name="view"
+          />
+        </div>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.swim"
-      name="swim"
-    >
-      <UInputNumber
-        v-model="state.swim"
-        :min="0"
-        class="w-full"
-      />
-    </UFormField>
+        <UFormField
+          :label="WORKSHOP_FIELD_TEXT.description"
+          name="description"
+          class="col-span-full"
+          required
+        >
+          <WorkshopHtmlEditor
+            v-model="state.description"
+            :rows="WORKSHOP_DESCRIPTION_ROWS"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="RACE_EDITOR_TEXT.icon"
-      name="icon"
-      class="col-span-2"
-    >
-      <UInput
-        v-model="state.icon"
-        class="w-full"
-      />
-    </UFormField>
+        <div class="col-span-full">
+          <WorkshopSourceSelect v-model="source" />
+        </div>
+      </template>
 
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.page"
-      name="page"
-    >
-      <UInputNumber
-        v-model="state.page"
-        :min="1"
-        class="w-full"
-      />
-    </UFormField>
+      <template #properties>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.speed"
+          name="speed"
+          required
+        >
+          <UInputNumber
+            v-model="state.speed"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-    <div class="col-span-full flex flex-wrap gap-x-6 gap-y-3">
-      <UCheckbox
-        v-model="state.origin"
-        :label="RACE_EDITOR_TEXT.origin"
-        name="origin"
-      />
+        <UFormField
+          :label="RACE_EDITOR_TEXT.darkvision"
+          name="darkvision"
+        >
+          <UInputNumber
+            v-model="state.darkvision"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-      <UCheckbox
-        v-model="state.view"
-        :label="RACE_EDITOR_TEXT.view"
-        name="view"
-      />
-    </div>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.fly"
+          name="fly"
+        >
+          <UInputNumber
+            v-model="state.fly"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-    <div class="col-span-full">
-      <RaceAbilitiesEditor v-model="state.abilities" />
-    </div>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.climb"
+          name="climb"
+        >
+          <UInputNumber
+            v-model="state.climb"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-    <div class="col-span-full">
-      <RaceFeaturesEditor v-model="state.features" />
-    </div>
+        <UFormField
+          :label="RACE_EDITOR_TEXT.swim"
+          name="swim"
+        >
+          <UInputNumber
+            v-model="state.swim"
+            :min="0"
+            class="w-full"
+          />
+        </UFormField>
 
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.description"
-      name="description"
-      class="col-span-full"
-      required
-    >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
-    </UFormField>
+        <div class="col-span-full">
+          <RaceAbilitiesEditor v-model="state.abilities" />
+        </div>
+      </template>
 
-    <div class="col-span-full">
-      <WorkshopSourceSelect v-model="source" />
-    </div>
+      <template #features>
+        <div class="col-span-full">
+          <RaceFeaturesEditor
+            ref="features"
+            v-model="state.features"
+          />
+        </div>
+      </template>
+    </UTabs>
 
     <WorkshopFormActions
       :is-editing="!!race"
