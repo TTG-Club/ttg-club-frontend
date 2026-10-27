@@ -211,15 +211,6 @@
     class="sm:w-fit sm:max-w-[90vw]"
   >
     <template #body>
-      <UTabs
-        :model-value="reportType"
-        :items="BUG_REPORT_TYPE_TABS"
-        :content="false"
-        size="sm"
-        class="mb-4 w-full sm:w-fit"
-        @update:model-value="onTypeChange"
-      />
-
       <div class="flex flex-col gap-4 lg:flex-row">
         <!-- Скриншот на телефоне не нужен: снимок экрана там не вставить -->
         <div class="hidden shrink-0 gap-2 lg:flex">
@@ -323,6 +314,15 @@
         </div>
 
         <div class="flex w-full shrink-0 flex-col gap-4 lg:w-100">
+          <UTabs
+            :model-value="reportType"
+            :items="BUG_REPORT_TYPE_TABS"
+            :content="false"
+            size="sm"
+            class="w-full"
+            @update:model-value="onTypeChange"
+          />
+
           <div class="flex flex-col gap-3">
             <BugReportAuthor />
 
