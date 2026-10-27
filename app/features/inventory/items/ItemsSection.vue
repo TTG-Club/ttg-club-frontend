@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import type { ItemLink, ItemsGrouping } from '../model';
 
-  import { SectionGroupingSwitch } from '~section/controls';
   import { SectionLink } from '~section/list';
   import { getEntryUrl, getFirstLetterGroup } from '~section/model';
   import { SectionPage } from '~section/page';
@@ -50,20 +49,15 @@
 <template>
   <!-- Снаряжение по категориям или по первой букве названия -->
   <SectionPage
+    v-model:grouping="grouping"
     :section="ITEMS_SECTION"
     :schema="itemLinkSchema"
     :get-key="getEntryUrl"
     :get-group="getGroup"
     :get-group-order="getGroupOrder"
     :get-path="getEntryUrl"
+    :grouping-options="ITEMS_GROUPING_OPTIONS"
   >
-    <template #toolbar>
-      <SectionGroupingSwitch
-        v-model="grouping"
-        :options="ITEMS_GROUPING_OPTIONS"
-      />
-    </template>
-
     <template #item="{ item, to }">
       <SectionLink
         :to="to"

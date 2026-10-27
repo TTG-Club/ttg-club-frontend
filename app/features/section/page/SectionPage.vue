@@ -1,7 +1,11 @@
 <script setup lang="ts" generic="T">
   import type { z } from 'zod';
 
-  import type { SectionConfig, SectionListView } from '../model';
+  import type {
+    SectionConfig,
+    SectionGroupingOption,
+    SectionListView,
+  } from '../model';
 
   import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 
@@ -33,6 +37,7 @@
     getPath = undefined,
     sortItems = undefined,
     view = undefined,
+    groupingOptions = undefined,
   } = defineProps<{
     /** Заголовок, ручки, сортировка и размер страницы раздела. */
     section: SectionConfig;
@@ -51,6 +56,8 @@
     sortItems?: (items: Array<T>, search: string) => Array<T>;
     /** Вид списка: плитки-строки, карточки рас или обложки классов. */
     view?: SectionListView;
+    /** Варианты группировки списка для меню «Ещё». */
+    groupingOptions?: Array<SectionGroupingOption>;
   }>();
 
   const slots = defineSlots<{
@@ -61,9 +68,10 @@
      * своей страницей.
      */
     entry?: (props: { path: string }) => unknown;
-    /** Настройки списка под поиском, например переключатель группировки. */
-    toolbar?: () => unknown;
   }>();
+
+  /** Выбранная группировка из `groupingOptions`. */
+  const grouping = defineModel<string>('grouping');
 
   const { input, term } = useSectionSearch();
 
@@ -177,19 +185,14 @@
     <template #controls>
       <SectionControls
         v-model:search="input"
+        v-model:grouping="grouping"
+        :grouping-options="groupingOptions"
         :definition="filter?.definition.value"
         :selection="filter?.selection.value ?? {}"
         :is-customized="filter?.isCustomized.value"
         @update:selection="filter?.setSelection($event)"
         @reset="filter?.reset($event)"
-      >
-        <template
-          v-if="slots.toolbar"
-          #toolbar
-        >
-          <slot name="toolbar" />
-        </template>
-      </SectionControls>
+      />
     </template>
 
     <SectionList

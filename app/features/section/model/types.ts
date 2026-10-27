@@ -112,7 +112,7 @@ export interface FilterGroupMatch {
   values: Array<FilterValue>;
 }
 
-/** Вариант группировки списка в переключателе. */
+/** Вариант группировки списка в меню «Ещё». */
 export interface SectionGroupingOption {
   value: string;
   label: string;
