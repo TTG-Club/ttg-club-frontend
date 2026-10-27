@@ -53,7 +53,6 @@
           <UButton
             v-if="description || spellTable"
             :icon="CLASS_ICON.description"
-            class="ml-auto"
             variant="soft"
             color="neutral"
             @click.left.exact.prevent="openDescription"
