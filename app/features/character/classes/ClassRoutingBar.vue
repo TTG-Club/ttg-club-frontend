@@ -76,50 +76,61 @@
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2">
-    <UButton
-      :to="entry.url"
-      :active="!archetype"
-      active-variant="subtle"
-      variant="soft"
-      color="neutral"
-      @click.left.exact.capture="openClass"
+  <!--
+    В узком контейнере все кнопки идут ровной сеткой по две, а кнопка слота
+    при чётном числе переходов занимает всю строку. В широком переходы идут
+    строкой с переносом, а кнопка слота стоит справа от них.
+  -->
+  <div
+    class="grid grid-cols-2 gap-2 @min-2xl:flex @min-2xl:items-start [&:has(>div>:nth-child(even):last-child)>:last-child]:col-span-2"
+  >
+    <div
+      class="contents @min-2xl:flex @min-2xl:min-w-0 @min-2xl:flex-1 @min-2xl:flex-wrap @min-2xl:gap-2"
     >
-      <span class="flex flex-col items-start leading-tight">
-        <span class="text-xs text-muted">{{ CLASS_TEXT.classLabel }}</span>
+      <UButton
+        :to="entry.url"
+        :active="!archetype"
+        active-variant="subtle"
+        variant="soft"
+        color="neutral"
+        @click.left.exact.capture="openClass"
+      >
+        <span class="flex flex-col items-start leading-tight">
+          <span class="text-xs text-muted">{{ CLASS_TEXT.classLabel }}</span>
 
-        <span>{{ className }}</span>
-      </span>
-    </UButton>
+          <span>{{ className }}</span>
+        </span>
+      </UButton>
 
-    <CharacterLinkPicker
-      v-if="archetypes.length"
-      :label="CLASS_TEXT.subclassLabel"
-      :placeholder="CLASS_TEXT.searchSubclass"
-      :empty-text="CLASS_TEXT.chooseSubclass"
-      :links="archetypes"
-      :active-path="path"
-      @select="openEntry"
-    />
+      <CharacterLinkPicker
+        v-if="archetypes.length"
+        :label="CLASS_TEXT.subclassLabel"
+        :placeholder="CLASS_TEXT.searchSubclass"
+        :empty-text="CLASS_TEXT.chooseSubclass"
+        :links="archetypes"
+        :active-path="path"
+        @select="openEntry"
+      />
 
-    <ClassFilterLink
-      v-if="spellsFilterUrl"
-      :filter-url="spellsFilterUrl"
-      :get-link="getClassSpellsLink"
-      :icon="CLASS_ICON.spells"
-      :label="CLASS_TEXT.listLabel"
-      :text="CLASS_TEXT.spellsList"
-    />
+      <ClassFilterLink
+        v-if="spellsFilterUrl"
+        :filter-url="spellsFilterUrl"
+        :get-link="getClassSpellsLink"
+        :icon="CLASS_ICON.spells"
+        :label="CLASS_TEXT.listLabel"
+        :text="CLASS_TEXT.spellsList"
+      />
 
-    <ClassFilterLink
-      v-for="tab in optionTabs"
-      :key="tab.key"
-      :filter-url="tab.filterUrl"
-      :get-link="getClassOptionsLink"
-      :icon="CLASS_ICON.options"
-      :label="CLASS_TEXT.listLabel"
-      :text="tab.name"
-    />
+      <ClassFilterLink
+        v-for="tab in optionTabs"
+        :key="tab.key"
+        :filter-url="tab.filterUrl"
+        :get-link="getClassOptionsLink"
+        :icon="CLASS_ICON.options"
+        :label="CLASS_TEXT.listLabel"
+        :text="tab.name"
+      />
+    </div>
 
     <slot />
   </div>
