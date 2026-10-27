@@ -104,6 +104,8 @@ export const spellLinkSchema = z.object({
 export type SpellLink = z.infer<typeof spellLinkSchema>;
 
 export const spellDetailSchema = spellLinkSchema.omit({ url: true }).extend({
+  /** Идентификатор: по нему заклинание выгружается для FVTT и LSS. */
+  id: z.number().nullish(),
   range: z.string().nullish(),
   duration: z.string().nullish(),
   time: z.string().nullish(),

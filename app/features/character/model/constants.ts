@@ -1,6 +1,6 @@
 import type { SectionConfig } from '~section/model';
 
-import { SECTION_PAGE_SIZE_ALL } from '~section/model';
+import { EntryExportPlatform, SECTION_PAGE_SIZE_ALL } from '~section/model';
 
 /** Подпись, когда у черты или особенности нет требований. */
 export const CHARACTER_NO_REQUIREMENTS = 'Нет';
@@ -83,6 +83,10 @@ export const SPELLS_SECTION: SectionConfig = {
     { field: 'level', direction: 'asc' },
     { field: 'name', direction: 'asc' },
   ],
+  export: {
+    type: 'spell',
+    platforms: [EntryExportPlatform.FOUNDRY, EntryExportPlatform.LSS],
+  },
 };
 
 export const SPELL_TEXT = {

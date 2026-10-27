@@ -4,6 +4,7 @@ import type {
   LocationQueryValueRaw,
 } from 'vue-router';
 
+import type { EntryExportPlatform } from './constants';
 import type { EntryName, FilterGroupResponse, FilterResponse } from './schema';
 import type {
   FilterDefinition,
@@ -21,6 +22,8 @@ import type {
 import { sortBy } from 'es-toolkit';
 
 import {
+  CONTENT_DISPOSITION_FILENAME,
+  ENTRY_EXPORT_EXTENSION,
   FILTER_SEARCH_MIN_GROUPS,
   FILTER_SEARCH_MIN_VALUES,
   QUERY_VALUES_SEPARATOR,
@@ -621,4 +624,36 @@ export function getSelectAllState(
   }
 
   return keys.every((key) => selected.includes(key)) || 'indeterminate';
+}
+
+/**
+ * Ручка экспорта записи, как в старом SPA: `/api/v1/fvtt/spell?id=7`.
+ * @param platform - платформа экспорта
+ * @param type - тип записи в ручке экспорта
+ * @param id - идентификатор записи
+ */
+export function getEntryExportUrl(
+  platform: EntryExportPlatform,
+  type: string,
+  id: number,
+): string {
+  const query = new URLSearchParams({ id: String(id) });
+
+  return `${SECTION_API_PREFIX}/${platform}/${type}?${query.toString()}`;
+}
+
+/**
+ * Имя выгружаемого файла: из заголовка ответа, а без него — по названию
+ * записи.
+ * @param contentDisposition - заголовок `Content-Disposition`
+ * @param entryName - название записи
+ */
+export function getExportFileName(
+  contentDisposition: string | null,
+  entryName: string,
+): string {
+  const [, fileName] =
+    contentDisposition?.match(CONTENT_DISPOSITION_FILENAME) ?? [];
+
+  return fileName || `${entryName}${ENTRY_EXPORT_EXTENSION}`;
 }

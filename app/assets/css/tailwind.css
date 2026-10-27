@@ -149,3 +149,30 @@ html {
     cursor: pointer;
   }
 }
+
+/*
+ * Печать записи: на листе остаётся только она, как в старом SPA. Запись
+ * помечает себя на время печати, всё остальное на странице скрывается.
+ */
+@media print {
+  html:has([data-print-target]) body * {
+    visibility: hidden;
+  }
+
+  html:has([data-print-target]) body {
+    background: none;
+  }
+
+  /* Селекторы того же веса, что и скрытие выше, иначе оно их перебьёт */
+  html:has([data-print-target]) body [data-print-target],
+  html:has([data-print-target]) body [data-print-target] * {
+    visibility: visible;
+  }
+
+  html:has([data-print-target]) body [data-print-target] {
+    position: absolute;
+    inset: 0 0 auto;
+    max-width: none;
+    margin: 0;
+  }
+}

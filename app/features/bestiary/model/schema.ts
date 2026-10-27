@@ -54,6 +54,8 @@ const creatureSensesSchema = z.object({
 export type CreatureSenses = z.infer<typeof creatureSensesSchema>;
 
 export const creatureDetailSchema = creatureLinkSchema.extend({
+  /** Идентификатор: по нему существо выгружается для FVTT. */
+  id: z.number().nullish(),
   /** Тип существа с уточнениями, например «гуманоид (человек)». */
   type: z.object({
     name: z.string(),

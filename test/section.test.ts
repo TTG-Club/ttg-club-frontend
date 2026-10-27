@@ -4,11 +4,14 @@ import {
   applyExcludedSources,
   buildFilterPayload,
   buildListRequest,
+  EntryExportPlatform,
   filterResponseSchema,
   getDefaultSelection,
   getDetailPath,
   getDetailSlug,
+  getEntryExportUrl,
   getExcludedSources,
+  getExportFileName,
   getSelectAllState,
   getSourceFilterValue,
   groupItems,
@@ -364,5 +367,23 @@ describe('источники по умолчанию из личного каб�
     expect(
       getExcludedSources(definition, { book: ['PHB'], level: ['1'] }),
     ).toEqual(['XGE', 'HB']);
+  });
+});
+
+describe('экспорт записи', () => {
+  it('собирает ручку экспорта, как старый SPA', () => {
+    expect(getEntryExportUrl(EntryExportPlatform.FOUNDRY, 'spell', 7)).toBe(
+      '/api/v1/fvtt/spell?id=7',
+    );
+  });
+
+  it('берёт имя файла из заголовка ответа', () => {
+    expect(
+      getExportFileName('attachment; filename="Fire Bolt.json"', 'Fire Bolt'),
+    ).toBe('Fire Bolt.json');
+  });
+
+  it('без заголовка называет файл по записи', () => {
+    expect(getExportFileName(null, 'Goblin')).toBe('Goblin.json');
   });
 });
