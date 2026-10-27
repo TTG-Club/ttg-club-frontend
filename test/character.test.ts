@@ -10,6 +10,7 @@ import {
   findClassFeature,
   getArchetypeSpellLevelHeader,
   getArchetypeSpellSuffix,
+  getArchetypeSwipePaths,
   getBackgroundLanguages,
   getClassDescription,
   getClassHitPoints,
@@ -28,6 +29,7 @@ import {
   getSpellComponentLabels,
   getSpellGroup,
   getSpellTypeLabel,
+  getSubraceSwipePaths,
   groupByBookType,
   hasPersonalization,
   raceDetailSchema,
@@ -237,6 +239,35 @@ describe('расы', () => {
     ]);
   });
 
+  it('со страницы разновидности листает разновидности своей расы', () => {
+    const elf = {
+      ...race('Эльф'),
+      url: '/races/elf',
+      subraces: [
+        {
+          ...race('Морской эльф'),
+          url: '/races/elf/sea_elf',
+          type: { name: 'UA', order: 2 },
+        },
+        { ...race('Высший эльф'), url: '/races/elf/high_elf' },
+        { ...race('Лесной эльф'), url: '/races/elf/wood_elf' },
+      ],
+    };
+
+    const detail = raceDetailSchema.parse({
+      name: { rus: 'Высший эльф', eng: 'High elf' },
+      baseRace: elf,
+    });
+
+    expect(getSubraceSwipePaths(detail, '/races/elf/high_elf')).toEqual([
+      '/races/elf/high_elf',
+      '/races/elf/wood_elf',
+      '/races/elf/sea_elf',
+    ]);
+
+    expect(getSubraceSwipePaths(detail, '/races/elf')).toBeUndefined();
+  });
+
   it('правка разновидности ведёт в мастерскую рас', () => {
     expect(getRaceEditPath('/races/elf/high')).toBe(
       '/workshop/races/high/edit',
@@ -373,6 +404,39 @@ describe('классы', () => {
 
     expect(getParentClassName(evocation, archetype)).toBe('Волшебник');
     expect(getParentClassName(wizard)).toBe('Волшебник');
+  });
+
+  it('со страницы архетипа листает архетипы своего класса', () => {
+    const evocation = {
+      name: { rus: 'Школа воплощения', eng: 'School of Evocation' },
+      url: '/classes/wizard/evocation',
+      type: { name: 'Официальные', order: 0 },
+    };
+
+    const chronurgy = {
+      name: { rus: 'Магия хронургии', eng: 'Chronurgy Magic' },
+      url: '/classes/wizard/chronurgy',
+      type: { name: 'Хомбрю', order: 3 },
+    };
+
+    const abjuration = {
+      name: { rus: 'Школа ограждения', eng: 'School of Abjuration' },
+      url: '/classes/wizard/abjuration',
+      type: { name: 'Официальные', order: 0 },
+    };
+
+    const entry = classDetailSchema.parse({
+      ...wizard,
+      archetypes: [chronurgy, evocation, abjuration],
+    });
+
+    expect(getArchetypeSwipePaths(entry, evocation.url)).toEqual([
+      evocation.url,
+      abjuration.url,
+      chronurgy.url,
+    ]);
+
+    expect(getArchetypeSwipePaths(entry, entry.url)).toBeUndefined();
   });
 
   it('считает хиты как в старом SPA', () => {

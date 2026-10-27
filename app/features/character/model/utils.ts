@@ -298,6 +298,49 @@ export function groupByBookType(
 }
 
 /**
+ * Адреса разновидностей или архетипов в том порядке, в каком их видно в
+ * выборе варианта: по типу книги.
+ * @param links - ссылки на варианты
+ */
+function getBookTypePaths(links?: Array<TypedLink> | null): Array<string> {
+  return groupByBookType(links).flatMap((group) =>
+    group.items.map((link) => link.url),
+  );
+}
+
+/**
+ * Что листать свайпом со страницы архетипа: соседние архетипы того же
+ * класса. У самого класса своего порядка нет — он листает список классов.
+ * @param entry - класс или архетип
+ * @param path - адрес открытой записи
+ */
+export function getArchetypeSwipePaths(
+  entry: ClassDetail,
+  path: string,
+): Array<string> | undefined {
+  return findClassArchetype(entry, path)
+    ? getBookTypePaths(entry.archetypes)
+    : undefined;
+}
+
+/**
+ * Что листать свайпом со страницы разновидности: соседние разновидности
+ * той же расы. У основной расы своего порядка нет — она листает список рас.
+ * @param race - раса или разновидность
+ * @param path - адрес открытой записи
+ */
+export function getSubraceSwipePaths(
+  race: RaceDetail,
+  path: string,
+): Array<string> | undefined {
+  const subraces = race.baseRace?.subraces;
+
+  return subraces?.some((subrace) => subrace.url === path)
+    ? getBookTypePaths(subraces)
+    : undefined;
+}
+
+/**
  * Особенности расы в порядке старого SPA: сначала свёрнутые, особенности
  * разновидности — после особенностей самой расы.
  * @param race - раса

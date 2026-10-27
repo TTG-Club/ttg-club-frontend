@@ -39,6 +39,7 @@
     schema,
     path = undefined,
     getEditPath = undefined,
+    getSwipePaths = undefined,
   } = defineProps<{
     section: SectionConfig;
     schema: z.ZodType<T>;
@@ -46,6 +47,11 @@
     path?: string;
     /** Страница правки в мастерской; без неё правки у записей нет. */
     getEditPath?: (path: string) => string;
+    /**
+     * Что листать свайпом со страницы записи вместо списка раздела, например
+     * архетипы класса; без ответа листается список.
+     */
+    getSwipePaths?: (entry: T, path: string) => Array<string> | undefined;
   }>();
 
   defineSlots<{
@@ -106,10 +112,15 @@
 
   // Свайпом листается только страница записи: поверх списка жест занят
   // дровером
+  const swipePaths = computed(() =>
+    entry.value ? getSwipePaths?.(entry.value, entryPath.value) : undefined,
+  );
+
   const { style: swipeStyle } = useSectionSwipe(
     section.key,
     () => (isEmbedded ? undefined : unrefElement(pane)),
     entryPath,
+    swipePaths,
   );
 
   function close(): void {
