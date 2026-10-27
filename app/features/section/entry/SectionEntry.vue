@@ -80,10 +80,6 @@
 
   const editUrl = computed(() => getEditPath?.(entryPath.value));
 
-  const wrapperClass = computed(() =>
-    isEmbedded ? undefined : 'mx-auto w-full max-w-4xl',
-  );
-
   const { exportEntry } = useEntryExport();
 
   // Экспорт есть только у разделов, которые его объявили, и только у записей
@@ -131,7 +127,6 @@
 <template>
   <SectionDetailPane
     ref="pane"
-    :class="wrapperClass"
     :style="swipeStyle"
     :title="entry?.name.rus ?? ''"
     :subtitle="entry?.name.eng"
