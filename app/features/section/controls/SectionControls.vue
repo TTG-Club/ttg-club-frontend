@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { FilterDefinition, FilterPart, FilterSelection } from '../model';
+  import type {
+    FilterDefinition,
+    FilterPart,
+    FilterSelection,
+    SectionGroupingOption,
+  } from '../model';
 
   import { SectionFilterDrawer } from '../filter-drawer';
   import { SectionFilterInline } from '../filter-inline';
@@ -10,17 +15,20 @@
   /**
    * Поиск и фильтр раздела в левой колонке, как на new.ttg.club: строка с
    * поиском, источниками и меню «Ещё», под ней фильтр по содержимому
-   * группами. На узком экране колонка становится строкой над списком, и
+   * группами. Группировка списка, если раздел её задаёт, — подменю в «Ещё». На узком экране колонка становится строкой над списком, и
    * фильтр открывается кнопкой в панели.
    */
   const {
     definition = undefined,
     selection,
     isCustomized = false,
+    groupingOptions = undefined,
   } = defineProps<{
     definition?: FilterDefinition | null;
     selection: FilterSelection;
     isCustomized?: boolean;
+    /** Варианты группировки списка; без них пункта в меню нет. */
+    groupingOptions?: Array<SectionGroupingOption>;
   }>();
 
   const emit = defineEmits<{
@@ -31,10 +39,7 @@
 
   const search = defineModel<string>('search', { required: true });
 
-  defineSlots<{
-    /** Настройки списка под поиском, например переключатель группировки. */
-    toolbar?: () => unknown;
-  }>();
+  const grouping = defineModel<string>('grouping');
 
   const route = useRoute();
   const siteConfig = useSiteConfig();
@@ -108,7 +113,40 @@
     }
   }
 
+  /**
+   * Пункт подменю группировки.
+   * @param option - вариант группировки
+   */
+  function getGroupingItem({
+    value,
+    label,
+    icon,
+  }: SectionGroupingOption): DropdownMenuItem {
+    return {
+      label,
+      icon,
+      type: 'checkbox',
+      checked: grouping.value === value,
+      onSelect: () => {
+        grouping.value = value;
+      },
+    };
+  }
+
+  const groupingItems = computed<Array<DropdownMenuItem>>(() =>
+    groupingOptions?.length
+      ? [
+          {
+            label: SECTION_TEXT.grouping,
+            icon: SECTION_ICON.grouping,
+            children: groupingOptions.map(getGroupingItem),
+          },
+        ]
+      : [],
+  );
+
   const menuItems = computed<Array<DropdownMenuItem>>(() => [
+    ...groupingItems.value,
     {
       label: SECTION_TEXT.copyLink,
       icon: SECTION_ICON.copy,
@@ -186,8 +224,6 @@
         />
       </UDropdownMenu>
     </div>
-
-    <slot name="toolbar" />
 
     <template v-if="hasOther">
       <USeparator class="hidden lg:flex" />
