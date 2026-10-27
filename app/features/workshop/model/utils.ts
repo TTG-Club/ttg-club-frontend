@@ -139,3 +139,57 @@ export function getWorkshopErrorReason(error: unknown): string | undefined {
 
   return reason && !reason.startsWith('<') ? reason : undefined;
 }
+
+/**
+ * Вкладка редактора, на которой лежит поле. Поля списков вида
+ * `classTraits.2.name` ищутся по корню.
+ * @param fieldTabs - вкладки полей формы
+ * @param fieldName - имя поля из ошибки проверки
+ */
+export function getWorkshopFieldTab(
+  fieldTabs: Readonly<Record<string, string>>,
+  fieldName: string,
+): string | undefined {
+  const [rootField = fieldName] = fieldName.split('.');
+
+  return fieldTabs[rootField];
+}
+
+/**
+ * Номера элементов списка, в полях которых есть ошибки.
+ * @param fieldNames - имена полей с ошибками
+ * @param listField - поле формы со списком
+ */
+export function getWorkshopErrorIndexes(
+  fieldNames: Array<string>,
+  listField: string,
+): Array<number> {
+  const prefix = `${listField}.`;
+
+  return fieldNames.flatMap((fieldName) => {
+    if (!fieldName.startsWith(prefix)) {
+      return [];
+    }
+
+    const index = Number.parseInt(fieldName.slice(prefix.length), 10);
+
+    return Number.isNaN(index) ? [] : [index];
+  });
+}
+
+/**
+ * Номера раскрытых элементов после удаления одного из них: следующие
+ * сдвигаются на его место, иначе раскрытым оказался бы сосед.
+ * @param indexes - номера раскрытых элементов
+ * @param removedIndex - номер удалённого элемента
+ */
+export function shiftIndexesAfterRemoval(
+  indexes: ReadonlySet<number>,
+  removedIndex: number,
+): Set<number> {
+  return new Set(
+    [...indexes]
+      .filter((index) => index !== removedIndex)
+      .map((index) => (index > removedIndex ? index - 1 : index)),
+  );
+}
