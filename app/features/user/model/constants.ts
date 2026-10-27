@@ -240,7 +240,32 @@ export const PROFILE_TEXT = {
   sourcesFailed: 'Не удалось сохранить источники',
   sourcesLoadFailed: 'Не удалось загрузить источники',
   sourcesNoneSelected: 'Выберите хотя бы один источник',
+  navigation: 'Разделы личного кабинета',
 } as const;
+
+/** Разделы личного кабинета: общие данные живут по старому адресу. */
+export const PROFILE_SECTIONS = [
+  {
+    to: PROFILE_ROUTE,
+    label: 'Общие',
+    icon: 'tabler:user',
+  },
+  {
+    to: `${PROFILE_ROUTE}/sources`,
+    label: 'Источники',
+    icon: 'tabler:books',
+  },
+  {
+    to: `${PROFILE_ROUTE}/subscription`,
+    label: 'Подписка',
+    icon: 'tabler:crown',
+  },
+  {
+    to: `${PROFILE_ROUTE}/security`,
+    label: 'Безопасность',
+    icon: 'tabler:shield-lock',
+  },
+] as const;
 
 /** Ключ данных источников по умолчанию в личном кабинете. */
 export const PROFILE_SOURCES_KEY = 'profile-default-sources';
