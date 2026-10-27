@@ -80,7 +80,6 @@ export const PERSONALIZATION_TEXT = {
 export const PERSONALIZATION_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
-  empty: 'tabler:table-off',
 } as const;
 
 /** Строки полей предыстории в редакторе. */

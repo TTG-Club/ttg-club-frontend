@@ -3,7 +3,14 @@
 
   import type { WeaponForm, WorkshopWeapon } from '../model';
 
-  import { useFilterGroups, useWorkshopSave } from '../composables';
+  import { weaponDetailSchema } from '~inventory/model';
+  import { WeaponBody } from '~inventory/weapons';
+
+  import {
+    useFilterGroups,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -27,8 +34,11 @@
     WEAPONS_WORKSHOP_KEY,
     WORKSHOP_CURRENCY_OPTIONS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
     WORKSHOP_WEIGHT_STEP,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма оружия: без записи — создание нового. */
   const { weapon = undefined } = defineProps<{
@@ -67,6 +77,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    WEAPONS_WORKSHOP_KEY,
+    () => weapon?.id,
+    weaponDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getWeaponPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -89,10 +128,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="weaponFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -104,6 +144,7 @@
       :label="WORKSHOP_FIELD_TEXT.type"
       name="type"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.type"
@@ -116,6 +157,7 @@
       :label="WEAPON_EDITOR_TEXT.damageType"
       name="damageType"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.damageType"
@@ -154,6 +196,7 @@
       :label="WEAPON_EDITOR_TEXT.twoHandDamageDice"
       :help="WEAPON_EDITOR_TEXT.twoHandHelp"
       name="twoHandDamageDice"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.twoHandDamageDice"
@@ -219,6 +262,7 @@
     <UFormField
       :label="WEAPON_EDITOR_TEXT.properties"
       name="properties"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.properties"
@@ -258,7 +302,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -269,7 +313,7 @@
     <UFormField
       :label="WEAPON_EDITOR_TEXT.special"
       name="special"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.special"
@@ -277,7 +321,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -285,7 +329,26 @@
       :is-editing="!!weapon"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <WeaponBody :weapon="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

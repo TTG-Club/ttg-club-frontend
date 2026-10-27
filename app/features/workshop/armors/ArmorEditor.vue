@@ -3,7 +3,10 @@
 
   import type { ArmorForm, WorkshopArmor } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { ArmorBody } from '~inventory/armors';
+  import { armorDetailSchema } from '~inventory/model';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -21,8 +24,11 @@
     getHtmlFieldErrors,
     getWorkshopSectionRoute,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
     WORKSHOP_WEIGHT_STEP,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма доспеха: без записи — создание нового. */
   const { armor = undefined } = defineProps<{
@@ -50,6 +56,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    ARMORS_WORKSHOP_KEY,
+    () => armor?.id,
+    armorDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getArmorPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описания: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -69,10 +104,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="armorFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -84,6 +120,7 @@
       :label="WORKSHOP_FIELD_TEXT.type"
       name="type"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.type"
@@ -138,7 +175,7 @@
       />
     </UFormField>
 
-    <div class="flex items-center md:pt-6">
+    <div class="flex items-center pt-6">
       <UCheckbox
         v-model="state.stealthHindrance"
         :label="ARMOR_EDITOR_TEXT.stealthHindrance"
@@ -148,7 +185,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -156,7 +193,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -164,7 +201,26 @@
       :is-editing="!!armor"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <ArmorBody :armor="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { RaceFeature } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
     createRaceFeature,
@@ -112,25 +113,18 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-highlighted">
-        {{ RACE_FEATURES_TEXT.title }}
-      </h3>
-
-      <UButton
-        :label="RACE_FEATURES_TEXT.add"
-        :icon="RACE_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addFeature"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="RACE_FEATURES_TEXT.title"
+    :add-label="RACE_FEATURES_TEXT.add"
+    :add-icon="RACE_LIST_ICON.add"
+    :is-empty="!features.length"
+    :empty-text="RACE_FEATURES_TEXT.empty"
+    @add="addFeature"
+  >
     <UCard
       v-for="(feature, featureIndex) in features"
       :key="getFeatureKey(feature, featureIndex)"
-      :ui="{ body: 'grid grid-cols-1 gap-3 md:grid-cols-2' }"
+      :ui="{ body: 'grid grid-cols-1 gap-3 p-3 sm:p-4 md:grid-cols-2' }"
     >
       <UFormField
         :label="WORKSHOP_FIELD_TEXT.name"
@@ -197,12 +191,5 @@
         />
       </UFormField>
     </UCard>
-
-    <UEmpty
-      v-if="!features.length"
-      :icon="RACE_LIST_ICON.empty"
-      :title="RACE_FEATURES_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

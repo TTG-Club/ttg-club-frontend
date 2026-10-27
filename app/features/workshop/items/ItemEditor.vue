@@ -3,7 +3,14 @@
 
   import type { ItemForm, WorkshopItem } from '../model';
 
-  import { useFilterGroups, useWorkshopSave } from '../composables';
+  import { ItemBody } from '~inventory/items';
+  import { itemDetailSchema } from '~inventory/model';
+
+  import {
+    useFilterGroups,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -23,8 +30,11 @@
     ITEMS_WORKSHOP_KEY,
     WORKSHOP_CURRENCY_OPTIONS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
     WORKSHOP_WEIGHT_STEP,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма снаряжения: без записи — создание нового. */
   const { item = undefined } = defineProps<{
@@ -58,6 +68,31 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(ITEMS_WORKSHOP_KEY, () => item?.id, itemDetailSchema);
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getItemPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описания: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -77,10 +112,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="itemFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -92,6 +128,7 @@
     <UFormField
       :label="ITEM_EDITOR_TEXT.categories"
       name="categories"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.categories"
@@ -146,7 +183,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -154,7 +191,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -162,7 +199,26 @@
       :is-editing="!!item"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <ItemBody :item="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

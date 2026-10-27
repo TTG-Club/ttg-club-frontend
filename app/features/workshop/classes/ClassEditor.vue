@@ -3,7 +3,14 @@
 
   import type { ClassForm, WorkshopClass } from '../model';
 
-  import { useFilterGroups, useWorkshopSave } from '../composables';
+  import { ClassBody } from '~character/classes';
+  import { classDetailSchema } from '~character/model';
+
+  import {
+    useFilterGroups,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -30,8 +37,11 @@
     WORKSHOP_ABILITY_OPTIONS,
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
   import ClassTableEditor from './ClassTableEditor.vue';
   import ClassTraitsEditor from './ClassTraitsEditor.vue';
 
@@ -71,6 +81,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    CLASSES_WORKSHOP_KEY,
+    () => heroClass?.id,
+    classDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getClassPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -90,10 +129,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="classFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -104,6 +144,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.accusativeName"
       name="accusativeName"
+      class="col-span-2"
     >
       <UInput
         v-model="state.accusativeName"
@@ -115,6 +156,7 @@
       :label="CLASS_EDITOR_TEXT.diceHp"
       name="diceHp"
       required
+      class="col-span-2"
     >
       <USelect
         v-model="state.diceHp"
@@ -126,6 +168,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.primaryAbilities"
       name="primaryAbilities"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.primaryAbilities"
@@ -141,6 +184,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.savingThrows"
       name="savingThrows"
+      class="col-span-2"
     >
       <UInput
         v-model="state.savingThrows"
@@ -162,6 +206,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.availableSkills"
       name="availableSkills"
+      class="col-span-2 md:col-span-3"
     >
       <USelectMenu
         v-model="state.availableSkills"
@@ -176,6 +221,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.spellcasterType"
       name="spellcasterType"
+      class="col-span-2"
     >
       <USelect
         v-model="state.spellcasterType"
@@ -187,6 +233,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.spellAbility"
       name="spellAbility"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.spellAbility"
@@ -202,6 +249,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.slotsReset"
       name="slotsReset"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.slotsReset"
@@ -217,6 +265,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.archetypeName"
       name="archetypeName"
+      class="col-span-2"
     >
       <UInput
         v-model="state.archetypeName"
@@ -237,8 +286,20 @@
     </UFormField>
 
     <UFormField
+      :label="WORKSHOP_FIELD_TEXT.page"
+      name="page"
+    >
+      <UInputNumber
+        v-model="state.page"
+        :min="1"
+        class="w-full"
+      />
+    </UFormField>
+
+    <UFormField
       :label="CLASS_EDITOR_TEXT.optionType"
       name="optionType"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.optionType"
@@ -254,6 +315,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.icon"
       name="icon"
+      class="col-span-2"
     >
       <UInput
         v-model="state.icon"
@@ -261,18 +323,7 @@
       />
     </UFormField>
 
-    <UFormField
-      :label="WORKSHOP_FIELD_TEXT.page"
-      name="page"
-    >
-      <UInputNumber
-        v-model="state.page"
-        :min="1"
-        class="w-full"
-      />
-    </UFormField>
-
-    <div class="flex items-center md:pt-6">
+    <div class="flex items-center pt-6">
       <UCheckbox
         v-model="state.sidekick"
         :label="CLASS_EDITOR_TEXT.sidekick"
@@ -283,7 +334,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.armor"
       name="armor"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.armor"
@@ -294,7 +345,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.weapon"
       name="weapon"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.weapon"
@@ -305,7 +356,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.tools"
       name="tools"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.tools"
@@ -316,7 +367,7 @@
     <UFormField
       :label="CLASS_EDITOR_TEXT.equipment"
       name="equipment"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.equipment"
@@ -327,7 +378,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -336,7 +387,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <ClassTraitsEditor
         v-model="state.classTraits"
         field-name="classTraits"
@@ -344,14 +395,14 @@
       />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <ClassTableEditor
         v-model="state.tableColumns"
         field-name="tableColumns"
       />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -359,7 +410,29 @@
       :is-editing="!!heroClass"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <ClassBody
+          :entry="entry"
+          :path="entry.url"
+        />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

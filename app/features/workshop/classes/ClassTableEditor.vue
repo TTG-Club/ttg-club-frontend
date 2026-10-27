@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassTableColumn } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import {
     CLASS_LEVELS,
     CLASS_LIST_ICON,
@@ -140,31 +141,19 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-start justify-between gap-3">
-      <div class="flex flex-col gap-1">
-        <h3 class="text-base font-semibold text-highlighted">
-          {{ CLASS_TABLE_TEXT.title }}
-        </h3>
-
-        <p class="text-sm text-muted">
-          {{ CLASS_TABLE_TEXT.description }}
-        </p>
-      </div>
-
-      <UButton
-        :label="CLASS_TABLE_TEXT.add"
-        :icon="CLASS_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addColumn"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="CLASS_TABLE_TEXT.title"
+    :description="CLASS_TABLE_TEXT.description"
+    :add-label="CLASS_TABLE_TEXT.add"
+    :add-icon="CLASS_LIST_ICON.add"
+    :is-empty="!columns.length"
+    :empty-text="CLASS_TABLE_TEXT.empty"
+    @add="addColumn"
+  >
     <UCard
       v-for="(column, columnIndex) in columns"
       :key="getColumnKey(column, columnIndex)"
-      :ui="{ body: 'flex flex-col gap-3' }"
+      :ui="{ body: 'flex flex-col gap-3 p-3 sm:p-4' }"
     >
       <div class="flex items-center justify-between gap-3">
         <h4 class="text-sm font-semibold text-highlighted">
@@ -236,12 +225,5 @@
         </UFormField>
       </div>
     </UCard>
-
-    <UEmpty
-      v-if="!columns.length"
-      :icon="CLASS_LIST_ICON.tableEmpty"
-      :title="CLASS_TABLE_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { CreatureBlock, CreatureBlockField } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
     createCreatureBlock,
@@ -108,31 +109,26 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-highlighted">
-        {{ title }}
-      </h3>
-
-      <UButton
-        :label="CREATURE_BLOCK_TEXT.add"
-        :icon="CREATURE_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addBlock"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="title"
+    :add-label="CREATURE_BLOCK_TEXT.add"
+    :add-icon="CREATURE_LIST_ICON.add"
+    :is-empty="!blocks.length"
+    :empty-text="CREATURE_BLOCK_TEXT.empty"
+    @add="addBlock"
+  >
     <UCard
       v-for="(block, blockIndex) in blocks"
       :key="blockIndex"
-      :ui="{ body: 'grid grid-cols-1 gap-3 md:grid-cols-2' }"
+      :ui="{
+        body: 'grid grid-cols-1 gap-3 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]',
+      }"
     >
       <UAlert
         v-if="isShared(block)"
         :title="getSharedText(block)"
         :icon="CREATURE_LIST_ICON.shared"
-        class="md:col-span-2"
+        class="md:col-span-3"
         color="warning"
         variant="subtle"
       />
@@ -160,40 +156,35 @@
         />
       </UFormField>
 
+      <UButton
+        :aria-label="CREATURE_BLOCK_TEXT.remove"
+        :icon="CREATURE_LIST_ICON.remove"
+        class="self-start justify-self-end md:mt-6"
+        color="error"
+        variant="ghost"
+        @click.left.exact.prevent="removeBlock(blockIndex)"
+      />
+
       <UFormField
         :label="WORKSHOP_FIELD_TEXT.description"
         :name="getFieldName(blockIndex, 'description')"
-        class="md:col-span-2"
+        class="md:col-span-3"
       >
+        <template #hint>
+          <UCheckbox
+            :model-value="block.markdown"
+            :label="CREATURE_BLOCK_TEXT.markdown"
+            size="sm"
+            @update:model-value="changeMarkdown(blockIndex, $event)"
+          />
+        </template>
+
         <WorkshopHtmlEditor
           :model-value="block.description"
           :rows="CREATURE_ROWS.block"
           @update:model-value="changeDescription(blockIndex, $event)"
         />
       </UFormField>
-
-      <div class="flex items-center justify-between gap-3 md:col-span-2">
-        <UCheckbox
-          :model-value="block.markdown"
-          :label="CREATURE_BLOCK_TEXT.markdown"
-          @update:model-value="changeMarkdown(blockIndex, $event)"
-        />
-
-        <UButton
-          :aria-label="CREATURE_BLOCK_TEXT.remove"
-          :icon="CREATURE_LIST_ICON.remove"
-          color="error"
-          variant="ghost"
-          @click.left.exact.prevent="removeBlock(blockIndex)"
-        />
-      </div>
     </UCard>
-
-    <UEmpty
-      v-if="!blocks.length"
-      :icon="CREATURE_LIST_ICON.empty"
-      :title="CREATURE_BLOCK_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

@@ -3,7 +3,10 @@
 
   import type { BackgroundForm, WorkshopBackground } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { BackgroundBody } from '~character/backgrounds';
+  import { backgroundDetailSchema } from '~character/model';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -22,8 +25,11 @@
     LIFE_STYLE_OPTIONS,
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
   import PersonalizationTablesEditor from './PersonalizationTablesEditor.vue';
 
   /** Форма предыстории: без записи — создание новой. */
@@ -53,6 +59,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    BACKGROUNDS_WORKSHOP_KEY,
+    () => background?.id,
+    backgroundDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getBackgroundPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -76,10 +111,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="backgroundFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -91,6 +127,7 @@
     <UFormField
       :label="BACKGROUND_EDITOR_TEXT.lifeStyle"
       name="lifeStyle"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.lifeStyle"
@@ -105,6 +142,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.skills"
       name="skills"
+      class="col-span-2"
     >
       <USelectMenu
         v-model="state.skills"
@@ -120,6 +158,7 @@
       :label="BACKGROUND_EDITOR_TEXT.otherSkills"
       :help="BACKGROUND_EDITOR_TEXT.otherSkillsHelp"
       name="otherSkills"
+      class="col-span-2"
     >
       <UInput
         v-model="state.otherSkills"
@@ -130,6 +169,7 @@
     <UFormField
       :label="BACKGROUND_EDITOR_TEXT.toolOwnership"
       name="toolOwnership"
+      class="col-span-2"
     >
       <UInput
         v-model="state.toolOwnership"
@@ -152,7 +192,7 @@
       :label="BACKGROUND_EDITOR_TEXT.equipments"
       :help="BACKGROUND_EDITOR_TEXT.listHelp"
       name="equipments"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <UInput
         v-model="state.equipments"
@@ -164,6 +204,7 @@
       :label="BACKGROUND_EDITOR_TEXT.languages"
       :help="BACKGROUND_EDITOR_TEXT.listHelp"
       name="languages"
+      class="col-span-2"
     >
       <UInput
         v-model="state.languages"
@@ -175,6 +216,7 @@
       :label="BACKGROUND_EDITOR_TEXT.language"
       :help="BACKGROUND_EDITOR_TEXT.languageHelp"
       name="language"
+      class="col-span-2"
     >
       <UInput
         v-model="state.language"
@@ -185,7 +227,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -197,7 +239,7 @@
     <UFormField
       :label="BACKGROUND_EDITOR_TEXT.skillName"
       name="skillName"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <UInput
         v-model="state.skillName"
@@ -208,7 +250,7 @@
     <UFormField
       :label="BACKGROUND_EDITOR_TEXT.skillDescription"
       name="skillDescription"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.skillDescription"
@@ -219,7 +261,7 @@
     <UFormField
       :label="BACKGROUND_EDITOR_TEXT.personalization"
       name="personalization"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.personalization"
@@ -227,11 +269,11 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <PersonalizationTablesEditor v-model="state.personalizationTables" />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -239,7 +281,26 @@
       :is-editing="!!background"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <BackgroundBody :background="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

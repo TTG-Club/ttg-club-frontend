@@ -3,7 +3,10 @@
 
   import type { CreatureForm, WorkshopCreature } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { CreatureBody } from '~bestiary/creatures';
+  import { creatureDetailSchema } from '~bestiary/model';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -36,8 +39,11 @@
     saveWorkshopCreature,
     WORKSHOP_ABILITY_OPTIONS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
   import CreatureBlocksEditor from './CreatureBlocksEditor.vue';
   import CreatureBonusesEditor from './CreatureBonusesEditor.vue';
   import CreatureLegendaryEditor from './CreatureLegendaryEditor.vue';
@@ -89,6 +95,35 @@
     saveWorkshopCreature,
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    BESTIARY_WORKSHOP_KEY,
+    () => creature?.id,
+    creatureDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getCreaturePayload(data, creature?.id, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -110,10 +145,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="creatureFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4 lg:grid-cols-6"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -125,6 +161,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.size"
       name="size"
+      class="col-span-2"
       required
     >
       <USelect
@@ -137,6 +174,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.type"
       name="type"
+      class="col-span-2"
       required
     >
       <USelect
@@ -149,6 +187,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.alignment"
       name="alignment"
+      class="col-span-2"
       required
     >
       <USelect
@@ -184,6 +223,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.armorText"
       name="armorText"
+      class="col-span-2"
     >
       <UInput
         v-model="state.armorText"
@@ -194,7 +234,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.armors"
       name="armors"
-      class="md:col-span-2"
+      class="col-span-2 md:col-span-4 lg:col-span-2"
     >
       <USelectMenu
         v-model="state.armors"
@@ -206,7 +246,7 @@
       />
     </UFormField>
 
-    <h3 class="text-base font-semibold text-highlighted md:col-span-2">
+    <h3 class="col-span-full pt-2 text-base font-semibold text-highlighted">
       {{ CREATURE_EDITOR_TEXT.hitsTitle }}
     </h3>
 
@@ -218,16 +258,6 @@
       <UInputNumber
         v-model="state.diceCount"
         :min="1"
-        class="w-full"
-      />
-    </UFormField>
-
-    <UFormField
-      :label="CREATURE_EDITOR_TEXT.hitText"
-      name="hitText"
-    >
-      <UInput
-        v-model="state.hitText"
         class="w-full"
       />
     </UFormField>
@@ -248,13 +278,23 @@
       />
     </UFormField>
 
-    <h3 class="text-base font-semibold text-highlighted md:col-span-2">
+    <UFormField
+      :label="CREATURE_EDITOR_TEXT.hitText"
+      name="hitText"
+      class="col-span-2 md:col-span-1 lg:col-span-3"
+    >
+      <UInput
+        v-model="state.hitText"
+        class="w-full"
+      />
+    </UFormField>
+
+    <h3 class="col-span-full pt-2 text-base font-semibold text-highlighted">
       {{ CREATURE_EDITOR_TEXT.speedTitle }}
     </h3>
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.speed"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="speed"
       required
     >
@@ -267,7 +307,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.fly"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="fly"
     >
       <UInputNumber
@@ -279,7 +318,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.swim"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="swim"
     >
       <UInputNumber
@@ -291,7 +329,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.climb"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="climb"
     >
       <UInputNumber
@@ -303,7 +340,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.dig"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="dig"
     >
       <UInputNumber
@@ -313,7 +349,7 @@
       />
     </UFormField>
 
-    <div class="flex items-center md:pt-6">
+    <div class="flex items-center pt-6">
       <UCheckbox
         v-model="state.hover"
         :label="CREATURE_EDITOR_TEXT.hover"
@@ -321,13 +357,11 @@
       />
     </div>
 
-    <h3 class="text-base font-semibold text-highlighted md:col-span-2">
+    <h3 class="col-span-full pt-2 text-base font-semibold text-highlighted">
       {{ CREATURE_EDITOR_TEXT.abilitiesTitle }}
     </h3>
 
-    <div
-      class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:col-span-2 lg:grid-cols-6"
-    >
+    <div class="col-span-full grid grid-cols-3 gap-x-4 gap-y-3 lg:grid-cols-6">
       <UFormField
         v-for="ability in CREATURE_ABILITIES"
         :key="ability.key"
@@ -344,7 +378,7 @@
       </UFormField>
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full lg:col-span-3">
       <CreatureBonusesEditor
         v-model="state.savingThrows"
         :title="CREATURE_BONUS_TEXT.savingThrows"
@@ -355,7 +389,7 @@
       />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full lg:col-span-3">
       <CreatureBonusesEditor
         v-model="state.skills"
         :title="CREATURE_BONUS_TEXT.skills"
@@ -366,13 +400,14 @@
       />
     </div>
 
-    <h3 class="text-base font-semibold text-highlighted md:col-span-2">
+    <h3 class="col-span-full pt-2 text-base font-semibold text-highlighted">
       {{ CREATURE_EDITOR_TEXT.sensesTitle }}
     </h3>
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.passivePerception"
       name="passivePerception"
+      class="col-span-2"
     >
       <UInput
         v-model="state.passivePerception"
@@ -382,7 +417,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.darkvision"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="darkvision"
     >
       <UInputNumber
@@ -394,7 +428,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.truesight"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="truesight"
     >
       <UInputNumber
@@ -406,7 +439,6 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.tremorsense"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="tremorsense"
     >
       <UInputNumber
@@ -418,28 +450,28 @@
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.blindsight"
-      :help="CREATURE_EDITOR_TEXT.feetHelp"
       name="blindsight"
+      class="col-span-2 md:col-span-1"
     >
       <UInputNumber
         v-model="state.blindsight"
         :min="0"
         class="w-full"
       />
-    </UFormField>
 
-    <div class="flex items-center md:pt-6">
       <UCheckbox
         v-model="state.blindBeyond"
         :label="CREATURE_EDITOR_TEXT.blindBeyond"
         name="blindBeyond"
+        size="sm"
+        class="mt-2"
       />
-    </div>
+    </UFormField>
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.languages"
       name="languages"
-      class="md:col-span-2"
+      class="col-span-2 lg:col-span-3"
     >
       <UInput
         v-model="state.languages"
@@ -450,7 +482,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.language"
       name="language"
-      class="md:col-span-2"
+      class="col-span-2 lg:col-span-3"
     >
       <UInput
         v-model="state.language"
@@ -462,7 +494,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.tags"
       name="tags"
-      class="md:col-span-2"
+      class="col-span-2 lg:col-span-3"
     >
       <UInput
         v-model="state.tags"
@@ -473,6 +505,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.damageResistances"
       name="damageResistances"
+      class="col-span-2 lg:col-span-3"
     >
       <USelectMenu
         v-model="state.damageResistances"
@@ -487,6 +520,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.damageImmunities"
       name="damageImmunities"
+      class="col-span-2 lg:col-span-3"
     >
       <USelectMenu
         v-model="state.damageImmunities"
@@ -501,6 +535,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.damageVulnerabilities"
       name="damageVulnerabilities"
+      class="col-span-2 lg:col-span-3"
     >
       <USelectMenu
         v-model="state.damageVulnerabilities"
@@ -515,6 +550,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.conditionImmunities"
       name="conditionImmunities"
+      class="col-span-2 lg:col-span-3"
     >
       <USelectMenu
         v-model="state.conditionImmunities"
@@ -529,7 +565,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.environment"
       name="environment"
-      class="md:col-span-2"
+      class="col-span-2 lg:col-span-3"
     >
       <USelectMenu
         v-model="state.environment"
@@ -544,7 +580,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -555,7 +591,7 @@
     <div
       v-for="section in CREATURE_BLOCK_SECTIONS"
       :key="section.field"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <CreatureBlocksEditor
         v-model="state[section.field]"
@@ -567,7 +603,7 @@
     <UFormField
       :label="CREATURE_EDITOR_TEXT.reaction"
       name="reaction"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.reaction"
@@ -575,14 +611,14 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <CreatureLegendaryEditor v-model="state.legendary" />
     </div>
 
     <UFormField
       :label="CREATURE_EDITOR_TEXT.legendaryDescription"
       name="legendaryDescription"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.legendaryDescription"
@@ -590,7 +626,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <CreatureBlocksEditor
         v-model="state.mysticalActions"
         :title="CREATURE_BLOCK_TEXT.mystical"
@@ -598,14 +634,14 @@
       />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full lg:col-span-4">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
     <UFormField
       :help="CREATURE_EDITOR_TEXT.npcHelp"
       name="npc"
-      class="md:col-span-2"
+      class="col-span-full lg:col-span-2 lg:pt-6"
     >
       <UCheckbox
         v-model="state.npc"
@@ -617,7 +653,26 @@
       :is-editing="!!creature"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <CreatureBody :creature="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

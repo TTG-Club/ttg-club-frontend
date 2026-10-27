@@ -3,7 +3,10 @@
 
   import type { ScreenForm, WorkshopScreen } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { screenDetailSchema } from '~wiki/model';
+  import { ScreenBody } from '~wiki/screens';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -20,7 +23,10 @@
     screenFormSchema,
     SCREENS_WORKSHOP_KEY,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма раздела ширмы мастера: разделы можно только править. */
   const { screen } = defineProps<{
@@ -46,6 +52,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    SCREENS_WORKSHOP_KEY,
+    () => screen.id,
+    screenDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getScreenPayload(data, screen, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описания: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -67,10 +102,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="screenFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -82,6 +118,7 @@
     <UFormField
       :label="SCREEN_EDITOR_TEXT.category"
       name="category"
+      class="col-span-2"
     >
       <UInput
         v-model="state.category"
@@ -92,6 +129,7 @@
     <UFormField
       :label="SCREEN_EDITOR_TEXT.icon"
       name="icon"
+      class="col-span-2"
     >
       <UInput
         v-model="state.icon"
@@ -113,6 +151,7 @@
     <UFormField
       v-if="screen.parent"
       :label="SCREEN_EDITOR_TEXT.parent"
+      class="col-span-2 md:col-span-3"
     >
       <UButton
         :to="screen.parent.url"
@@ -125,7 +164,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
     >
       <WorkshopHtmlEditor
         v-model="state.description"
@@ -133,15 +172,34 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
     <WorkshopFormActions
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
       is-editing
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <ScreenBody :screen="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassTrait } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
     CLASS_LEVEL_OPTIONS,
@@ -120,25 +121,20 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-highlighted">
-        {{ CLASS_TRAITS_TEXT.title }}
-      </h3>
-
-      <UButton
-        :label="CLASS_TRAITS_TEXT.add"
-        :icon="CLASS_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addTrait"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="CLASS_TRAITS_TEXT.title"
+    :add-label="CLASS_TRAITS_TEXT.add"
+    :add-icon="CLASS_LIST_ICON.add"
+    :is-empty="!traits.length"
+    :empty-text="CLASS_TRAITS_TEXT.empty"
+    @add="addTrait"
+  >
     <UCard
       v-for="(trait, traitIndex) in traits"
       :key="getTraitKey(trait, traitIndex)"
-      :ui="{ body: 'grid grid-cols-1 gap-3 md:grid-cols-[8rem_1fr_1fr]' }"
+      :ui="{
+        body: 'grid grid-cols-1 gap-3 p-3 sm:p-4 md:grid-cols-[8rem_1fr_1fr]',
+      }"
     >
       <UFormField
         :label="WORKSHOP_FIELD_TEXT.level"
@@ -219,12 +215,5 @@
         />
       </UFormField>
     </UCard>
-
-    <UEmpty
-      v-if="!traits.length"
-      :icon="CLASS_LIST_ICON.traitsEmpty"
-      :title="CLASS_TRAITS_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

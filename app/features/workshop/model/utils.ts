@@ -1,5 +1,7 @@
 import type { WorkshopSection } from './constants';
 
+import { getApiErrorMessage } from '~user/model';
+
 import {
   WORKSHOP_CREATE_SUFFIX,
   WORKSHOP_EDIT_SUFFIX,
@@ -125,4 +127,15 @@ export function splitList(text: string): Array<string> {
     .split(WORKSHOP_LIST_SEPARATOR)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+/**
+ * Причина ошибки бэкенда для уведомления. HTML-страница ошибки (ответ
+ * прокси) в причину не выводится.
+ * @param error - пойманная ошибка
+ */
+export function getWorkshopErrorReason(error: unknown): string | undefined {
+  const reason = getApiErrorMessage(error, '').trim();
+
+  return reason && !reason.startsWith('<') ? reason : undefined;
 }

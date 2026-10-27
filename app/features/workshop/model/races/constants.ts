@@ -74,12 +74,11 @@ export const RACE_EDITOR_TEXT = {
   creatureType: 'Тип существа',
   minAge: 'Минимальный возраст',
   maxAge: 'Максимальный возраст',
-  speed: 'Скорость',
-  darkvision: 'Тёмное зрение',
-  fly: 'Полёт',
-  climb: 'Лазание',
-  swim: 'Плавание',
-  feetHelp: 'В футах',
+  speed: 'Скорость, фт',
+  darkvision: 'Тёмное зрение, фт',
+  fly: 'Полёт, фт',
+  climb: 'Лазание, фт',
+  swim: 'Плавание, фт',
   icon: 'Иконка',
   origin: 'Происхождение',
   view: 'Скрывать в списке как отдельную расу',
@@ -113,7 +112,6 @@ export const RACE_FEATURES_TEXT = {
 export const RACE_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
-  empty: 'tabler:list',
 } as const;
 
 /** Строки описания особенности расы. */

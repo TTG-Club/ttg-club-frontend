@@ -136,8 +136,6 @@ export const CLASS_TABLE_TEXT = {
 export const CLASS_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
-  traitsEmpty: 'tabler:list',
-  tableEmpty: 'tabler:table-off',
 } as const;
 
 /** Строки полей редактора классов. */

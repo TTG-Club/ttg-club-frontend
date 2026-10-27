@@ -3,7 +3,14 @@
 
   import type { OptionForm, WorkshopOption } from '../model';
 
-  import { useFilterGroups, useWorkshopSave } from '../composables';
+  import { optionDetailSchema } from '~character/model';
+  import { OptionBody } from '~character/options';
+
+  import {
+    useFilterGroups,
+    useWorkshopPreview,
+    useWorkshopSave,
+  } from '../composables';
   import {
     WorkshopFormActions,
     WorkshopNameFields,
@@ -22,7 +29,10 @@
     OPTIONS_WORKSHOP_KEY,
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
 
   /** Форма особенности класса: без записи — создание новой. */
   const { option = undefined } = defineProps<{
@@ -54,6 +64,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    OPTIONS_WORKSHOP_KEY,
+    () => option?.id,
+    optionDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getOptionPayload(data, source.value));
+    }
+  }
+
   /**
    * Ошибки разметки описания: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -73,10 +112,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="optionFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -88,6 +128,7 @@
     <UFormField
       :label="OPTION_EDITOR_TEXT.prerequisite"
       name="prerequisite"
+      class="col-span-2 md:col-span-3"
     >
       <UInput
         v-model="state.prerequisite"
@@ -109,7 +150,7 @@
     <UFormField
       :label="OPTION_EDITOR_TEXT.optionTypes"
       name="optionTypes"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <USelectMenu
@@ -126,7 +167,7 @@
     <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -135,7 +176,7 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
@@ -143,7 +184,26 @@
       :is-editing="!!option"
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <OptionBody :option="entry" />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

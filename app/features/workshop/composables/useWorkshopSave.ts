@@ -2,10 +2,9 @@ import type { Ref } from 'vue';
 
 import type { SavedEntry } from '../model';
 
-import { getApiErrorMessage } from '~user/model';
-
 import {
   createWorkshopEntry,
+  getWorkshopErrorReason,
   updateWorkshopEntry,
   WORKSHOP_ICON,
 } from '../model';
@@ -31,16 +30,6 @@ export interface UseWorkshopSaveReturn {
    * @returns сохранённая запись или `undefined` при ошибке
    */
   save: (payload: Record<string, unknown>) => Promise<SavedEntry | undefined>;
-}
-
-/**
- * HTML-страница ошибки (ответ прокси) в причину не выводится.
- * @param error - пойманная ошибка
- */
-function getErrorReason(error: unknown): string | undefined {
-  const reason = getApiErrorMessage(error, '').trim();
-
-  return reason && !reason.startsWith('<') ? reason : undefined;
 }
 
 /**
@@ -93,7 +82,7 @@ export function useWorkshopSave(
     } catch (error) {
       toast.add({
         title: texts.error,
-        description: getErrorReason(error),
+        description: getWorkshopErrorReason(error),
         color: 'error',
         icon: WORKSHOP_ICON.error,
       });

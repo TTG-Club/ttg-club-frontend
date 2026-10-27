@@ -3,7 +3,10 @@
 
   import type { ArchetypeForm, WorkshopArchetype } from '../model';
 
-  import { useWorkshopSave } from '../composables';
+  import { ClassBody } from '~character/classes';
+  import { classDetailSchema } from '~character/model';
+
+  import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import {
@@ -15,10 +18,14 @@
     createArchetypeForm,
     getArchetypeHtmlFields,
     getArchetypePayload,
+    getArchetypePreviewPath,
     getHtmlFieldErrors,
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
+    WORKSHOP_ICON,
+    WORKSHOP_TEXT,
   } from '../model';
+  import { WorkshopPreviewDrawer } from '../preview';
   import ClassTableEditor from './ClassTableEditor.vue';
   import ClassTraitsEditor from './ClassTraitsEditor.vue';
 
@@ -47,6 +54,35 @@
     },
   );
 
+  const editorForm = useTemplateRef('form');
+
+  const {
+    isPreviewOpen,
+    previewEntry,
+    isPreviewLoading,
+    isPreviewError,
+    showPreview,
+  } = useWorkshopPreview(
+    ARCHETYPES_API_SECTION,
+    () => archetype.id,
+    classDetailSchema,
+  );
+
+  /**
+   * Предпросмотр по текущим данным формы. С ошибками в форме он не
+   * открывается: ошибки подсвечиваются у полей, как при сохранении.
+   */
+  async function openPreview(): Promise<void> {
+    const data = await editorForm.value?.validate({
+      transform: true,
+      silent: true,
+    });
+
+    if (data) {
+      await showPreview(getArchetypePayload(data, archetype));
+    }
+  }
+
   /**
    * Ошибки разметки описаний: бэкенд не примет такой текст.
    * @param form - состояние формы
@@ -66,10 +102,11 @@
 
 <template>
   <UForm
+    ref="form"
     :schema="archetypeFormSchema"
     :state="state"
     :validate="validate"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+    class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
     <WorkshopNameFields
@@ -80,6 +117,7 @@
     <UFormField
       :label="ARCHETYPE_EDITOR_TEXT.genitiveName"
       name="genitiveName"
+      class="col-span-2"
     >
       <UInput
         v-model="state.genitiveName"
@@ -101,17 +139,6 @@
     </UFormField>
 
     <UFormField
-      :label="ARCHETYPE_EDITOR_TEXT.spellLevelType"
-      name="spellLevelType"
-    >
-      <USelect
-        v-model="state.spellLevelType"
-        :items="spellLevelItems"
-        class="w-full"
-      />
-    </UFormField>
-
-    <UFormField
       :label="WORKSHOP_FIELD_TEXT.page"
       name="page"
     >
@@ -123,9 +150,21 @@
     </UFormField>
 
     <UFormField
+      :label="ARCHETYPE_EDITOR_TEXT.spellLevelType"
+      name="spellLevelType"
+      class="col-span-2"
+    >
+      <USelect
+        v-model="state.spellLevelType"
+        :items="spellLevelItems"
+        class="w-full"
+      />
+    </UFormField>
+
+    <UFormField
       :label="WORKSHOP_FIELD_TEXT.description"
       name="description"
-      class="md:col-span-2"
+      class="col-span-full"
       required
     >
       <WorkshopHtmlEditor
@@ -134,14 +173,14 @@
       />
     </UFormField>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <ClassTraitsEditor
         v-model="state.traits"
         field-name="traits"
       />
     </div>
 
-    <div class="md:col-span-2">
+    <div class="col-span-full">
       <ClassTableEditor
         v-model="state.tableColumns"
         field-name="tableColumns"
@@ -151,8 +190,30 @@
     <WorkshopFormActions
       :is-saving="isSaving"
       :cancel-to="cancelTo"
-      class="md:col-span-2"
       is-editing
-    />
+    >
+      <UButton
+        :label="WORKSHOP_TEXT.preview"
+        :icon="WORKSHOP_ICON.preview"
+        :loading="isPreviewLoading"
+        color="neutral"
+        variant="soft"
+        @click.left.exact.prevent="openPreview"
+      />
+    </WorkshopFormActions>
+
+    <WorkshopPreviewDrawer
+      v-model:open="isPreviewOpen"
+      :entry="previewEntry"
+      :is-loading="isPreviewLoading"
+      :is-error="isPreviewError"
+    >
+      <template #default="{ entry }">
+        <ClassBody
+          :entry="entry"
+          :path="getArchetypePreviewPath(entry, state.englishName)"
+        />
+      </template>
+    </WorkshopPreviewDrawer>
   </UForm>
 </template>

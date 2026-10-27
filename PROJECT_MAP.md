@@ -32,7 +32,7 @@
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
-│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, actions), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
+│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
@@ -240,6 +240,15 @@ instead of the reference API. Lists that mirror backend enums (option types, cla
 weapon properties, item categories, god ranks, alignments, domains, pantheons) come from `/api/v1/filters/<section>`
 through `useFilterGroups`. Magic items live at `/workshop/magic-items` but save
 through `/api/v1/workshop/items/magic`.
+
+Editor forms use a four-column grid (two on phones) and keep the save bar
+(`WorkshopFormActions`) stuck to the bottom of the screen. Lists of blocks
+share `WorkshopListSection`: an empty list is a note next to its heading.
+«Предпросмотр» sends the form to `POST /api/v1/workshop/<section>/preview`
+(`?id=` when editing; creatures send the id in the body): the backend saves
+the entry inside a rolled back transaction and returns the reference card,
+which `WorkshopPreviewDrawer` shows with the section's body component.
+Books have no preview.
 
 ## 🔍 Search
 

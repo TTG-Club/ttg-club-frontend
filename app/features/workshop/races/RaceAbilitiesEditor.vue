@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { RaceAbility } from '../model';
 
+  import { WorkshopListSection } from '../form';
   import {
     createRaceAbility,
     RACE_ABILITIES_TEXT,
@@ -69,21 +70,14 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-highlighted">
-        {{ RACE_ABILITIES_TEXT.title }}
-      </h3>
-
-      <UButton
-        :label="RACE_ABILITIES_TEXT.add"
-        :icon="RACE_LIST_ICON.add"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="addAbility"
-      />
-    </div>
-
+  <WorkshopListSection
+    :title="RACE_ABILITIES_TEXT.title"
+    :add-label="RACE_ABILITIES_TEXT.add"
+    :add-icon="RACE_LIST_ICON.add"
+    :is-empty="!abilities.length"
+    :empty-text="RACE_ABILITIES_TEXT.empty"
+    @add="addAbility"
+  >
     <div
       v-for="(ability, abilityIndex) in abilities"
       :key="abilityIndex"
@@ -121,12 +115,5 @@
         @click.left.exact.prevent="removeAbility(abilityIndex)"
       />
     </div>
-
-    <UEmpty
-      v-if="!abilities.length"
-      :icon="RACE_LIST_ICON.empty"
-      :title="RACE_ABILITIES_TEXT.empty"
-      variant="naked"
-    />
-  </section>
+  </WorkshopListSection>
 </template>

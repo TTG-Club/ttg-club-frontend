@@ -210,16 +210,15 @@ export const CREATURE_EDITOR_TEXT = {
   average: 'Среднее',
   formula: 'Формула',
   hitText: 'Текст хитов',
-  speedTitle: 'Скорость',
+  speedTitle: 'Скорость (в футах)',
   speed: 'Ходьба',
   fly: 'Полёт',
   swim: 'Плавание',
   climb: 'Лазание',
   dig: 'Копание',
   hover: 'Парит',
-  feetHelp: 'В футах',
   abilitiesTitle: 'Характеристики',
-  sensesTitle: 'Чувства',
+  sensesTitle: 'Чувства (дистанции в футах)',
   passivePerception: 'Пассивная внимательность',
   darkvision: 'Тёмное зрение',
   truesight: 'Истинное зрение',
@@ -279,15 +278,14 @@ export const CREATURE_BLOCK_TEXT = {
 export const CREATURE_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
-  empty: 'tabler:list',
   shared: 'tabler:alert-triangle',
 } as const;
 
 /** Строки полей разметки в редакторе существ. */
 export const CREATURE_ROWS = {
-  description: 8,
-  block: 6,
-  short: 4,
+  description: 6,
+  block: 4,
+  short: 3,
 } as const;
 
 /** Списки особенностей и действий в порядке карточки; мистические — в конце формы. */
