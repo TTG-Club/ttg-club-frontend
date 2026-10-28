@@ -37,7 +37,11 @@
     :inset="isInset"
     :handle="false"
     direction="right"
+    handle-only
     :ui="{
+      // Тянуть дровер можно только за ручку (её нет), иначе свайп
+      // перехватывает мышь и текст внутри не выделяется
+      container: 'select-text **:select-text',
       content: 'w-full max-w-2xl',
       header: 'sr-only',
       body: 'p-4 sm:p-6',
