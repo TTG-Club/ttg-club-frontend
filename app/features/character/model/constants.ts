@@ -178,6 +178,7 @@ export const RACES_SECTION: SectionConfig = {
   filterUrl: '/api/v1/filters/races',
   order: [{ field: 'name', direction: 'asc' }],
   pageSize: SECTION_PAGE_SIZE_ALL,
+  isDrawerDisabled: true,
 };
 
 /** Сколько всего характеристик: бонус ко всем пишется одной фразой. */
@@ -216,6 +217,8 @@ export const CLASSES_SECTION: SectionConfig = {
   filterUrl: '/api/v1/filters/classes',
   order: [{ field: 'name', direction: 'asc' }],
   pageSize: SECTION_PAGE_SIZE_ALL,
+  wideDetail: true,
+  isDrawerDisabled: true,
 };
 
 /** Типы вкладок страницы класса из API. */

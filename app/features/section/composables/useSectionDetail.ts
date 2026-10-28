@@ -10,8 +10,12 @@ import {
  * запись стоит рядом со списком и хранится в `?detail=`, в обычном
  * открывается дровером без смены адреса, а на телефоне — своей страницей.
  * @param sectionPath - адрес раздела, например `/spells`
+ * @param isDrawerDisabled - в обычном режиме тоже открывать своей страницей
  */
-export async function useSectionDetail(sectionPath: string) {
+export async function useSectionDetail(
+  sectionPath: string,
+  isDrawerDisabled = false,
+) {
   const route = useRoute();
   const router = useRouter();
   const { isSplitActive, isDrawerAvailable } = useLayoutWidth();
@@ -74,7 +78,7 @@ export async function useSectionDetail(sectionPath: string) {
       return;
     }
 
-    if (!isDrawerAvailable.value) {
+    if (isDrawerDisabled || !isDrawerAvailable.value) {
       navigateTo(path);
 
       return;

@@ -72,8 +72,14 @@
         v-if="hasAside"
         #aside
       >
-        <!-- В узкой колонке хиты стоят справа от обложки, а не под ней -->
-        <div class="flex flex-col gap-4 @min-xl:@max-3xl:flex-row">
+        <!--
+          В узкой колонке хиты стоят справа от обложки, а не под ней. Рядом с
+          текстом колонка липнет к верху и едет за прокруткой, иначе слева от
+          умений остаётся пустая полоса.
+        -->
+        <div
+          class="flex flex-col gap-4 @min-xl:@max-3xl:flex-row @min-3xl:sticky @min-3xl:top-4"
+        >
           <SectionImageCover
             v-if="images.length"
             :images="images"
