@@ -181,6 +181,7 @@
   <SectionLayout
     :title="section.title"
     :is-split="isSplit"
+    is-top-bar
   >
     <template #controls>
       <SectionControls
