@@ -35,6 +35,20 @@
 
   const hasAside = computed(() => images.value.length > 0 || !!entry.traits);
 
+  // В виде «Модерн», как в старом SPA, обложка и хиты всегда над таблицей:
+  // в колонке слева под ними оставалась пустая полоса
+  const { isModern } = useCharacterListView();
+
+  const asideClass = computed(() =>
+    isModern.value
+      ? 'flex flex-col gap-4 @min-xl:flex-row'
+      : 'flex flex-col gap-4 @min-xl:@max-3xl:flex-row @min-3xl:sticky @min-3xl:top-4',
+  );
+
+  const coverClass = computed(() =>
+    isModern.value ? '@min-xl:w-50 @min-xl:flex-none' : '',
+  );
+
   const isDescriptionOpen = ref(false);
 
   function openDescription() {
@@ -44,7 +58,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionDetailLayout>
+    <SectionDetailLayout :is-aside-on-top="isModern">
       <template #header>
         <ClassRoutingBar
           :entry="entry"
@@ -77,14 +91,16 @@
           текстом колонка липнет к верху и едет за прокруткой, иначе слева от
           умений остаётся пустая полоса.
         -->
-        <div
-          class="flex flex-col gap-4 @min-xl:@max-3xl:flex-row @min-3xl:sticky @min-3xl:top-4"
-        >
-          <SectionImageCover
+        <div :class="asideClass">
+          <div
             v-if="images.length"
-            :images="images"
-            :alt="entry.name.rus"
-          />
+            :class="coverClass"
+          >
+            <SectionImageCover
+              :images="images"
+              :alt="entry.name.rus"
+            />
+          </div>
 
           <ClassHitPoints
             v-if="entry.traits"
