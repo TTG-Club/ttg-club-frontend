@@ -191,6 +191,7 @@
       </div>
     </div>
 
+    <!-- Выше списка вариантов: раскрытый, он ложится на угол карточки -->
     <UTooltip
       v-if="hasLinks"
       :text="linksLabel"
@@ -199,7 +200,7 @@
         :icon="toggleIcon"
         :aria-label="linksLabel"
         :aria-expanded="isLinksOpen"
-        class="absolute right-0 bottom-0 z-10 rounded-none rounded-tl-xl"
+        class="absolute right-0 bottom-0 z-20 rounded-none rounded-tl-xl"
         @click.left.exact.prevent="toggleLinks"
       />
     </UTooltip>
