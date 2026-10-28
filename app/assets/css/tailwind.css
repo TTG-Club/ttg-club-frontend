@@ -1,0 +1,185 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+@import './theme.css';
+
+@theme {
+  --font-sans:
+    'Open Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --font-serif: 'Lora', ui-serif, Georgia, serif;
+
+  /* Самые узкие телефоны (360px и уже) и мониторы шире Full HD-ноутбука */
+  --breakpoint-2xs: 361px;
+  --breakpoint-3xl: 1700px;
+
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono',
+    'Consolas', 'Liberation Mono', monospace;
+}
+
+/*
+ * Семантические цвета Tailwind поверх палитры старого сайта: в шаблонах
+ * пишем `bg-main`, `text-link`, `border-default` и т.п., без `dark:`.
+ */
+@theme inline {
+  --color-main: var(--bg-main);
+  --color-secondary-surface: var(--bg-secondary);
+  --color-sub-menu: var(--bg-sub-menu);
+  --color-table-list: var(--bg-table-list);
+  --color-body: var(--text-color);
+  --color-title: var(--text-color-title);
+  --color-link: var(--link-color);
+  --color-link-hover: var(--link-color-hover);
+  --color-hover: var(--hover);
+  --color-overlay: var(--bg-light-main);
+  --color-dice: var(--bg-dice);
+  --color-advantage: var(--bg-advantage);
+  --color-disadvantage: var(--bg-disadvantage);
+  --color-saving-throw: var(--bg-saving-throw);
+  --color-row-highlighted: var(--bg-table-row-highlighted);
+  --color-primary-select: var(--primary-select);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-on-image: var(--text-btn-color);
+  --color-on-accent: var(--text-btn-color);
+  --color-legacy-success: var(--success);
+  --color-legacy-warning: var(--warning);
+  --shadow-legacy: var(--box-shadow);
+  --color-youtube: var(--youtube-base);
+  --color-youtube-hover: var(--youtube-hover);
+}
+
+/* Nuxt UI берёт цвета из той же палитры. */
+:root {
+  --max-content: 1320px;
+
+  /* Расширенная колонка главной: на широких мониторах ширина уходит в
+     контент, а не в пустые поля. */
+  --max-content-wide: 1600px;
+  --navbar-height: calc(56px + env(safe-area-inset-bottom));
+  --navbar-width: calc(64px + env(safe-area-inset-left));
+
+  --ui-primary: var(--primary);
+  --ui-bg: var(--bg-main);
+  --ui-bg-muted: var(--bg-secondary);
+  --ui-bg-elevated: var(--bg-sub-menu);
+  --ui-bg-accented: var(--bg-table-list);
+  --ui-text: var(--text-color);
+  --ui-text-highlighted: var(--text-color-title);
+  --ui-text-muted: var(--text-g-color);
+  --ui-text-dimmed: var(--text-color-disabled);
+  --ui-border: var(--border);
+  --ui-border-accented: var(--secondary-hover);
+}
+
+@media (width >= 2100px) {
+  :root {
+    --max-content-wide: 1880px;
+  }
+}
+
+body {
+  @apply bg-main font-sans text-body;
+}
+
+/*
+ * Прокрутка без видимой полосы, как на new.ttg.club: колесо, тачпад и
+ * свайп работают, а полоса не съедает место и не мигает.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * Тонкие полосы прокрутки у всех прокручиваемых блоков, как на
+ * new.ttg.club: скруглённый бегунок без дорожки и стрелок. Chrome и Safari
+ * рисуют их через `::-webkit-scrollbar` (стандартные свойства их бы
+ * отключили), остальные — через стандартные.
+ */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+
+    background-color: var(--ui-border-accented);
+    background-clip: content-box;
+
+    transition: background-color 200ms ease;
+
+    &:hover {
+      background-color: var(--ui-text-dimmed);
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-color: var(--ui-border-accented) transparent;
+      scrollbar-width: thin;
+    }
+  }
+}
+
+/*
+ * Tailwind 4 убрал руку с кнопок; на сайте всё кликабельное с ней, как в
+ * старом SPA и на new.ttg.club.
+ */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='checkbox']:not([data-disabled]),
+  [role='radio']:not([data-disabled]),
+  [role='switch']:not([data-disabled]),
+  [role='tab']:not([data-disabled]),
+  [role='option']:not([data-disabled]),
+  [role='menuitem']:not([data-disabled]),
+  summary,
+  label[for],
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/*
+ * Печать записи: на листе остаётся только она, как в старом SPA. Запись
+ * помечает себя на время печати, всё остальное на странице скрывается.
+ */
+@media print {
+  html:has([data-print-target]) body * {
+    visibility: hidden;
+  }
+
+  html:has([data-print-target]) body {
+    background: none;
+  }
+
+  /* Селекторы того же веса, что и скрытие выше, иначе оно их перебьёт */
+  html:has([data-print-target]) body [data-print-target],
+  html:has([data-print-target]) body [data-print-target] * {
+    visibility: visible;
+  }
+
+  html:has([data-print-target]) body [data-print-target] {
+    position: absolute;
+    inset: 0 0 auto;
+    max-width: none;
+    margin: 0;
+  }
+}

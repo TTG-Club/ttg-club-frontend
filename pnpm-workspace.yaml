@@ -1,0 +1,15 @@
+shellEmulator: true
+
+overrides:
+  esbuild: '>=0.28.1'
+  # Dev-инструмент devframe тянет h3@2.0.1-rc, который при shamefully-hoist
+  # поднимается в корень и ломает Nitro-сервер (TypeError getSetCookie в
+  # deleteCookie). Nitro/Nuxt работают на h3 v1 — фиксируем единственную версию.
+  h3: 1.15.11
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - unrs-resolver
+  - vue-demi
