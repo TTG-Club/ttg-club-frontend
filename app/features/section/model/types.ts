@@ -82,6 +82,11 @@ export interface SectionConfig {
   pageSize?: number;
   /** Экспорт записей; без него у записей нет кнопок экспорта. */
   export?: SectionExport;
+  /**
+   * В обычном режиме запись открывается своей страницей, а не дровером:
+   * классы и виды слишком велики для дровера.
+   */
+  isDrawerDisabled?: boolean;
 }
 
 /**
