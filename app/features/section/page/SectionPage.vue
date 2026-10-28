@@ -184,6 +184,7 @@
   <SectionLayout
     :title="section.title"
     :is-split="isSplit"
+    :is-wide-detail="section.wideDetail"
   >
     <template #controls>
       <SectionControls
