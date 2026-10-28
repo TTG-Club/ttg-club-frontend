@@ -38,9 +38,12 @@
     :handle="false"
     direction="right"
     :ui="{
+      // Отступы как у дровера записи в разделе: отступ контейнера
+      // складывался с отступом тела и pt-2 записи, по краям была пустота
+      container: 'gap-0 p-0',
       content: 'w-full max-w-2xl',
       header: 'sr-only',
-      body: 'p-4 sm:p-6',
+      body: 'px-4 pt-2 pb-4 sm:px-6 sm:pb-6',
     }"
   >
     <template #body>
