@@ -228,11 +228,14 @@
       :inset="isDrawerInset"
       :handle="false"
       direction="right"
+      handle-only
       :ui="{
         content: 'w-full max-w-2xl',
         // Свои отступы только у тела: отступ контейнера складывался
-        // с отступом тела, а у записи свой pt-2, и сверху оставалась пустота
-        container: 'gap-0 p-0',
+        // с отступом тела, а у записи свой pt-2, и сверху оставалась пустота.
+        // Тянуть дровер можно только за ручку (её нет), иначе свайп
+        // перехватывает мышь и текст внутри не выделяется
+        container: 'gap-0 p-0 select-text **:select-text',
         header: 'sr-only',
         body: 'px-4 pt-2 pb-4 sm:px-6 sm:pb-6',
       }"
