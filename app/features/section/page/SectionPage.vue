@@ -25,7 +25,8 @@
   /**
    * Страница раздела целиком: поиск, фильтр, список с подгрузкой и открытая
    * запись. В широком режиме запись стоит рядом со списком (`?detail=`), в
-   * обычном открывается дровером, на телефоне — своей страницей. Раздел
+   * обычном открывается дровером или, если раздел так велит, своей
+   * страницей, на телефоне — своей страницей. Раздел
    * задаёт только ручки, проверку записей, вид строки списка и запись.
    */
   const {
@@ -98,7 +99,9 @@
   );
 
   // Слот записи у раздела не меняется, поэтому условный вызов безопасен
-  const detail = slots.entry ? await useSectionDetail(section.path) : undefined;
+  const detail = slots.entry
+    ? await useSectionDetail(section.path, section.isDrawerDisabled)
+    : undefined;
 
   if (detail) {
     provideSectionOpener({
@@ -181,6 +184,8 @@
   <SectionLayout
     :title="section.title"
     :is-split="isSplit"
+    is-top-bar
+    :is-wide-detail="section.wideDetail"
   >
     <template #controls>
       <SectionControls

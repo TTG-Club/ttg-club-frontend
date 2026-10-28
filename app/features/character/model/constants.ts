@@ -1,4 +1,5 @@
-import type { SectionConfig } from '~section/model';
+import type { CharacterListView } from '~/shared/consts';
+import type { SectionConfig, SectionListView } from '~section/model';
 
 import { EntryExportPlatform, SECTION_PAGE_SIZE_ALL } from '~section/model';
 
@@ -10,7 +11,18 @@ export const CHARACTER_LIST_SEPARATOR = ', ';
 /** Кнопка карточки расы или класса: её разновидности или архетипы. */
 export const LINK_CARD_ICON = {
   links: 'tabler:subtask',
+  expand: 'tabler:plus',
+  collapse: 'tabler:minus',
 } as const;
+
+/** Раскладка списка классов и видов для каждого вида из настроек. */
+export const CHARACTER_LIST_SECTION_VIEW = {
+  modern: 'rows',
+  covers: 'covers',
+} as const satisfies Record<CharacterListView, SectionListView>;
+
+/** Между книгой и английским названием варианта в карточке «Модерн». */
+export const LINK_CARD_CAPTION_SEPARATOR = ' / ';
 
 /* --- Черты -------------------------------------------------------------- */
 
@@ -166,6 +178,7 @@ export const RACES_SECTION: SectionConfig = {
   filterUrl: '/api/v1/filters/races',
   order: [{ field: 'name', direction: 'asc' }],
   pageSize: SECTION_PAGE_SIZE_ALL,
+  isDrawerDisabled: true,
 };
 
 /** Сколько всего характеристик: бонус ко всем пишется одной фразой. */
@@ -204,6 +217,8 @@ export const CLASSES_SECTION: SectionConfig = {
   filterUrl: '/api/v1/filters/classes',
   order: [{ field: 'name', direction: 'asc' }],
   pageSize: SECTION_PAGE_SIZE_ALL,
+  wideDetail: true,
+  isDrawerDisabled: true,
 };
 
 /** Типы вкладок страницы класса из API. */

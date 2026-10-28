@@ -9,14 +9,13 @@
   } from '../model';
 
   import { SectionFilterDrawer } from '../filter-drawer';
-  import { SectionFilterInline } from '../filter-inline';
   import { isPartCustomized, SECTION_ICON, SECTION_TEXT } from '../model';
 
   /**
-   * Поиск и фильтр раздела в левой колонке, как на new.ttg.club: строка с
-   * поиском, источниками и меню «Ещё», под ней фильтр по содержимому
-   * группами. Группировка списка, если раздел её задаёт, — подменю в «Ещё». На узком экране колонка становится строкой над списком, и
-   * фильтр открывается кнопкой в панели.
+   * Поиск и фильтр раздела строкой в шапке над списком, как в старом SPA:
+   * поиск, кнопки фильтра и источников, меню «Ещё». Фильтр и источники
+   * открываются панелью сбоку. Группировка списка, если раздел её задаёт, —
+   * подменю в «Ещё».
    */
   const {
     definition = undefined,
@@ -92,10 +91,6 @@
     openDrawer('sources');
   }
 
-  function resetOther() {
-    emit('reset', 'other');
-  }
-
   /** Копирует ссылку на раздел с текущими поиском и фильтром. */
   async function copyLink() {
     if (!isSupported.value) {
@@ -162,81 +157,64 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <div class="flex gap-2">
-      <UInput
-        v-model="search"
-        :icon="SECTION_ICON.search"
-        :placeholder="SECTION_TEXT.searchPlaceholder"
-        :aria-label="SECTION_TEXT.searchLabel"
-        type="search"
-        autocomplete="off"
-        class="min-w-0 flex-auto"
-      />
+  <div class="flex gap-2">
+    <UInput
+      v-model="search"
+      :icon="SECTION_ICON.search"
+      :placeholder="SECTION_TEXT.searchPlaceholder"
+      :aria-label="SECTION_TEXT.searchLabel"
+      type="search"
+      autocomplete="off"
+      class="min-w-0 flex-auto"
+    />
 
-      <!-- Кнопка фильтра — только на узком экране: на широком он в колонке -->
-      <UTooltip
-        v-if="hasOther"
-        :text="SECTION_TEXT.filter"
-      >
-        <UChip
-          :show="isOtherCustomized"
-          inset
-          class="lg:hidden"
-        >
-          <UButton
-            :icon="SECTION_ICON.filter"
-            :aria-label="SECTION_TEXT.filter"
-            variant="subtle"
-            square
-            @click.left.exact.prevent="openFilter"
-          />
-        </UChip>
-      </UTooltip>
-
-      <UTooltip
-        v-if="hasSources"
-        :text="SECTION_TEXT.sources"
-      >
-        <UChip
-          :show="isSourcesCustomized"
-          inset
-        >
-          <UButton
-            :icon="SECTION_ICON.sources"
-            :aria-label="SECTION_TEXT.sources"
-            variant="subtle"
-            square
-            @click.left.exact.prevent="openSources"
-          />
-        </UChip>
-      </UTooltip>
-
-      <UDropdownMenu
-        :items="menuItems"
-        :ui="{ content: 'w-64' }"
+    <UTooltip
+      v-if="hasOther"
+      :text="SECTION_TEXT.filter"
+    >
+      <UChip
+        :show="isOtherCustomized"
+        inset
       >
         <UButton
-          :icon="SECTION_ICON.more"
-          :aria-label="SECTION_TEXT.more"
+          :icon="SECTION_ICON.filter"
+          :aria-label="SECTION_TEXT.filter"
           variant="subtle"
           square
+          @click.left.exact.prevent="openFilter"
         />
-      </UDropdownMenu>
-    </div>
+      </UChip>
+    </UTooltip>
 
-    <template v-if="hasOther">
-      <USeparator class="hidden lg:flex" />
+    <UTooltip
+      v-if="hasSources"
+      :text="SECTION_TEXT.sources"
+    >
+      <UChip
+        :show="isSourcesCustomized"
+        inset
+      >
+        <UButton
+          :icon="SECTION_ICON.sources"
+          :aria-label="SECTION_TEXT.sources"
+          variant="subtle"
+          square
+          @click.left.exact.prevent="openSources"
+        />
+      </UChip>
+    </UTooltip>
 
-      <SectionFilterInline
-        :groups="otherGroups"
-        :selection="selection"
-        :is-customized="isOtherCustomized"
-        class="hidden lg:flex"
-        @update:selection="emit('update:selection', $event)"
-        @reset="resetOther"
+    <UDropdownMenu
+      :items="menuItems"
+      :ui="{ content: 'w-64' }"
+    >
+      <UButton
+        :icon="SECTION_ICON.more"
+        :aria-label="SECTION_TEXT.more"
+        variant="subtle"
+        square
       />
-    </template>
+    </UDropdownMenu>
 
     <SectionFilterDrawer
       v-if="definition"

@@ -160,6 +160,18 @@ export const SECTION_SPLIT_MIN_SIZE = 30;
 export const SECTION_SPLIT_MAX_SIZE = 70;
 
 /**
+ * Ширина списка у раздела с широкой записью (класс), проценты: запись сразу
+ * встаёт в две колонки — обложка и хиты слева, текст справа.
+ */
+export const SECTION_SPLIT_WIDE_DETAIL_SIZE = 35;
+
+/**
+ * Где хранится ширина списка у раздела с широкой записью. Ключ свой: иначе
+ * ширина, сохранённая в обычном разделе, перебивает ширину по умолчанию.
+ */
+export const SECTION_SPLIT_WIDE_DETAIL_STORAGE_KEY = 'ttg-section-split-wide';
+
+/**
  * Сетка списка: плитки-строки справочника, крупные карточки рас и обложки
  * классов, как на new.ttg.club.
  */
@@ -170,6 +182,7 @@ export const SECTION_GRID_CLASS = {
     'grid grid-cols-1 items-start gap-4 @lg:grid-cols-2 @3xl:grid-cols-3 @7xl:grid-cols-4',
   covers:
     'grid grid-cols-1 gap-3 @md:grid-cols-2 @xl:grid-cols-3 @4xl:grid-cols-4 @6xl:grid-cols-5 @7xl:grid-cols-6',
+  rows: 'grid grid-cols-1 items-start gap-4 @3xl:grid-cols-2 @6xl:grid-cols-3',
 } as const;
 
 /** Метки книг в фильтре источников: в тёмной теме текст белый. */
