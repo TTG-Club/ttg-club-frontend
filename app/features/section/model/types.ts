@@ -87,6 +87,11 @@ export interface SectionConfig {
    * рядом с текстом.
    */
   wideDetail?: boolean;
+  /**
+   * В обычном режиме запись открывается своей страницей, а не дровером:
+   * классы и виды слишком велики для дровера.
+   */
+  isDrawerDisabled?: boolean;
 }
 
 /**

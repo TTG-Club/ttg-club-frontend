@@ -2,10 +2,12 @@
   import type { DropdownMenuItem } from '@nuxt/ui';
 
   import type { ThemeMode } from '#shared/consts';
-  import type { LayoutWidth } from '~/shared/consts';
+  import type { CharacterListView, LayoutWidth } from '~/shared/consts';
 
   import { THEME_MODES } from '#shared/consts';
   import {
+    CHARACTER_LIST_VIEW_OPTIONS,
+    CHARACTER_LIST_VIEWS,
     LAYOUT_DRAWER_QUERY,
     LAYOUT_WIDTH_OPTIONS,
     LAYOUT_WIDTHS,
@@ -17,10 +19,13 @@
   /**
    * Настройки отображения в боковой панели, как на new.ttg.club: тема и
    * ширина разделов — обычная с карточкой в дровере или широкая с карточкой
-   * рядом со списком.
+   * рядом со списком, — и вид списков классов и видов.
    */
   const { mode, change: changeTheme } = useTheme();
   const { width, change: changeWidth } = useLayoutWidth();
+
+  const { view: characterView, change: changeCharacterView } =
+    useCharacterListView();
 
   const isMenuOnLeft = useMediaQuery(LAYOUT_DRAWER_QUERY);
 
@@ -60,6 +65,23 @@
     };
   }
 
+  /**
+   * Пункт выбора вида списков классов и видов.
+   * @param option - вид списка
+   */
+  function getCharacterViewItem(option: CharacterListView): DropdownMenuItem {
+    return {
+      label: CHARACTER_LIST_VIEW_OPTIONS[option].label,
+      icon: CHARACTER_LIST_VIEW_OPTIONS[option].icon,
+      type: 'checkbox',
+      checked: characterView.value === option,
+      onSelect: (event: Event) => {
+        event.preventDefault();
+        changeCharacterView(option);
+      },
+    };
+  }
+
   const items = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
       { label: DISPLAY_SETTINGS_TEXT.theme, type: 'label' },
@@ -68,6 +90,10 @@
     [
       { label: DISPLAY_SETTINGS_TEXT.width, type: 'label' },
       ...LAYOUT_WIDTHS.map(getWidthItem),
+    ],
+    [
+      { label: DISPLAY_SETTINGS_TEXT.characterView, type: 'label' },
+      ...CHARACTER_LIST_VIEWS.map(getCharacterViewItem),
     ],
   ]);
 </script>
