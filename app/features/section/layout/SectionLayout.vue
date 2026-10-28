@@ -7,20 +7,27 @@
     SECTION_SPLIT_WIDE_DETAIL_SIZE,
     SECTION_SPLIT_WIDE_DETAIL_STORAGE_KEY,
   } from '../model';
+  import SectionTopBar from './SectionTopBar.vue';
 
   /**
    * Раскладка раздела, как на new.ttg.club: слева колонка с заголовком,
    * поиском и фильтром, справа список. В широком режиме рядом со списком
    * стоит панель записи, а граница между ними перетаскивается.
+   *
+   * Списки справочника ставят заголовок, поиск и фильтр шапкой над списком,
+   * как в старом SPA: колонка слева отнимает у них слишком много места.
    */
   const {
     title,
     isSplit = false,
+    isTopBar = false,
     isWideDetail = false,
   } = defineProps<{
     title: string;
     /** Широкий режим: список и запись рядом на весь экран. */
     isSplit?: boolean;
+    /** Заголовок и управление шапкой над списком, а не колонкой слева. */
+    isTopBar?: boolean;
     /** Запись по умолчанию шире списка, как у классов. */
     isWideDetail?: boolean;
   }>();
@@ -48,6 +55,7 @@
     class="flex h-dvh w-full"
   >
     <aside
+      v-if="!isTopBar"
       class="scrollbar-none flex w-75 shrink-0 flex-col gap-4 overflow-y-auto border-r border-default p-4 pt-6"
     >
       <h1 class="text-2xl text-highlighted">
@@ -70,7 +78,23 @@
         :max-size="SECTION_SPLIT_MAX_SIZE"
         class="border-r border-default"
       >
-        <div class="h-full overflow-y-auto px-4 pt-6 pb-8">
+        <div
+          v-if="isTopBar"
+          class="h-full overflow-y-auto"
+        >
+          <SectionTopBar :title="title">
+            <slot name="controls" />
+          </SectionTopBar>
+
+          <div class="px-4 pt-4 pb-8">
+            <slot />
+          </div>
+        </div>
+
+        <div
+          v-else
+          class="h-full overflow-y-auto px-4 pt-6 pb-8"
+        >
           <slot />
         </div>
       </UDashboardPanel>
@@ -81,6 +105,19 @@
         </div>
       </UDashboardPanel>
     </UDashboardGroup>
+  </div>
+
+  <div
+    v-else-if="isTopBar"
+    class="mx-auto flex w-full flex-col lg:max-w-330"
+  >
+    <SectionTopBar :title="title">
+      <slot name="controls" />
+    </SectionTopBar>
+
+    <div class="flex min-w-0 flex-auto flex-col px-4 pt-4 pb-8">
+      <slot />
+    </div>
   </div>
 
   <div
