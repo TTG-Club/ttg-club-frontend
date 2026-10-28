@@ -49,7 +49,11 @@
     :inset="isWide"
     :handle="false"
     direction="right"
+    handle-only
     :ui="{
+      // Тянуть дровер можно только за ручку (её нет), иначе свайп
+      // перехватывает мышь и текст внутри не выделяется
+      container: 'select-text **:select-text',
       content: 'w-full max-w-2xl',
       header: 'flex-col items-stretch gap-1',
       // Первый блок текста без верхнего отступа: заголовки и спойлеры
