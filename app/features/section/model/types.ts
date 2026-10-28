@@ -82,6 +82,11 @@ export interface SectionConfig {
   pageSize?: number;
   /** Экспорт записей; без него у записей нет кнопок экспорта. */
   export?: SectionExport;
+  /**
+   * Запись в широком режиме шире списка: ей нужно место под колонку свойств
+   * рядом с текстом.
+   */
+  wideDetail?: boolean;
 }
 
 /**

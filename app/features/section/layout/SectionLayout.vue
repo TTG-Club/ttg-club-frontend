@@ -4,6 +4,8 @@
     SECTION_SPLIT_MAX_SIZE,
     SECTION_SPLIT_MIN_SIZE,
     SECTION_SPLIT_STORAGE_KEY,
+    SECTION_SPLIT_WIDE_DETAIL_SIZE,
+    SECTION_SPLIT_WIDE_DETAIL_STORAGE_KEY,
   } from '../model';
 
   /**
@@ -11,11 +13,27 @@
    * поиском и фильтром, справа список. В широком режиме рядом со списком
    * стоит панель записи, а граница между ними перетаскивается.
    */
-  const { title, isSplit = false } = defineProps<{
+  const {
+    title,
+    isSplit = false,
+    isWideDetail = false,
+  } = defineProps<{
     title: string;
     /** Широкий режим: список и запись рядом на весь экран. */
     isSplit?: boolean;
+    /** Запись по умолчанию шире списка, как у классов. */
+    isWideDetail?: boolean;
   }>();
+
+  const listDefaultSize = computed(() =>
+    isWideDetail ? SECTION_SPLIT_WIDE_DETAIL_SIZE : SECTION_SPLIT_DEFAULT_SIZE,
+  );
+
+  const splitStorageKey = computed(() =>
+    isWideDetail
+      ? SECTION_SPLIT_WIDE_DETAIL_STORAGE_KEY
+      : SECTION_SPLIT_STORAGE_KEY,
+  );
 
   defineSlots<{
     controls?: () => unknown;
@@ -41,13 +59,13 @@
 
     <UDashboardGroup
       storage="cookie"
-      :storage-key="SECTION_SPLIT_STORAGE_KEY"
+      :storage-key="splitStorageKey"
       :ui="{ base: 'relative inset-auto flex h-dvh flex-1 overflow-hidden' }"
     >
       <UDashboardPanel
         id="section-list"
         resizable
-        :default-size="SECTION_SPLIT_DEFAULT_SIZE"
+        :default-size="listDefaultSize"
         :min-size="SECTION_SPLIT_MIN_SIZE"
         :max-size="SECTION_SPLIT_MAX_SIZE"
         class="border-r border-default"
