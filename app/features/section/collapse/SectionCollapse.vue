@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { AccordionItem } from '@nuxt/ui';
 
-  import { SECTION_COLLAPSE_VALUE, SECTION_ICON } from '../model';
+  import { SECTION_COLLAPSE_VALUE } from '../model';
 
   /**
    * Аккордеон записи, как на new.ttg.club: крупный заголовок со стрелкой,
@@ -34,22 +34,17 @@
       item: 'border-b-0',
       trigger:
         'cursor-pointer gap-2 py-0 text-xl font-semibold text-highlighted',
-      content: 'pt-3',
+      label: 'flex items-center gap-2',
+      body: 'pt-3 text-base',
     }"
   >
-    <template #leading="{ open }">
-      <UIcon
-        :name="SECTION_ICON.expand"
-        :class="open ? '-rotate-180' : undefined"
-        class="flex-none transition-transform duration-200 ease-out motion-reduce:transition-none"
-      />
-    </template>
+    <template #default>
+      <span>{{ title }}</span>
 
-    <template #trailing>
       <slot name="badge" />
     </template>
 
-    <template #content>
+    <template #body>
       <slot />
     </template>
   </UAccordion>
