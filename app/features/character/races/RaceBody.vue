@@ -136,7 +136,7 @@
               </UTooltip>
             </template>
 
-            <div class="flex flex-col gap-4 pl-6">
+            <div class="flex flex-col gap-4">
               <ContentRender
                 v-if="subrace.description"
                 :html="subrace.description"
