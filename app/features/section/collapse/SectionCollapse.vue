@@ -1,9 +1,11 @@
 <script setup lang="ts">
-  import { SECTION_ICON } from '../model';
+  import type { AccordionItem } from '@nuxt/ui';
+
+  import { SECTION_COLLAPSE_VALUE, SECTION_ICON } from '../model';
 
   /**
-   * Раскрывающийся блок записи, как на new.ttg.club: крупный заголовок со
-   * стрелкой, по клику текст прячется и открывается снова.
+   * Аккордеон записи, как на new.ttg.club: крупный заголовок со стрелкой,
+   * по клику текст плавно прячется и открывается снова.
    */
   const { title, defaultOpen = false } = defineProps<{
     title: string;
@@ -16,31 +18,39 @@
     badge?: () => unknown;
     default: () => unknown;
   }>();
+
+  const items = computed<AccordionItem[]>(() => [
+    { label: title, value: SECTION_COLLAPSE_VALUE },
+  ]);
+
+  const defaultValue = defaultOpen ? SECTION_COLLAPSE_VALUE : undefined;
 </script>
 
 <template>
-  <UCollapsible
-    :default-open="defaultOpen"
-    :ui="{ content: 'pt-3' }"
+  <UAccordion
+    :items="items"
+    :default-value="defaultValue"
+    :ui="{
+      item: 'border-b-0',
+      trigger:
+        'cursor-pointer gap-2 py-0 text-xl font-semibold text-highlighted',
+      content: 'pt-3',
+    }"
   >
-    <template #default="{ open }">
-      <h4
-        class="flex cursor-pointer items-center gap-2 text-xl font-semibold text-highlighted"
-      >
-        <UIcon
-          :name="SECTION_ICON.expand"
-          :class="open ? '-rotate-180' : undefined"
-          class="flex-none transition-transform duration-150 ease-in-out"
-        />
+    <template #leading="{ open }">
+      <UIcon
+        :name="SECTION_ICON.expand"
+        :class="open ? '-rotate-180' : undefined"
+        class="flex-none transition-transform duration-200 ease-out motion-reduce:transition-none"
+      />
+    </template>
 
-        <span>{{ title }}</span>
-
-        <slot name="badge" />
-      </h4>
+    <template #trailing>
+      <slot name="badge" />
     </template>
 
     <template #content>
       <slot />
     </template>
-  </UCollapsible>
+  </UAccordion>
 </template>
