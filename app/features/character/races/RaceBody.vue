@@ -4,15 +4,16 @@
   import { ContentRender } from '~content/render';
   import { SectionCollapse } from '~section/collapse';
   import { SectionDetailLayout } from '~section/detail-layout';
+  import { SectionDrawer } from '~section/entry-drawer';
   import { SectionImageCover } from '~section/image-preview';
 
-  import { getRaceStats, RACE_TEXT, sortRaceSkills } from '../model';
+  import { getRaceStats, RACE_ICON, RACE_TEXT, sortRaceSkills } from '../model';
   import RaceRoutingBar from './RaceRoutingBar.vue';
 
   /**
    * Карточка расы, как вида на new.ttg.club: слева обложка и свойства,
-   * справа над текстом переходы к основной расе и разновидностям, ниже описание,
-   * особенности (раскрыты сразу) и разновидности.
+   * справа переходы к основной расе и разновидностям, особенности и
+   * разновидности. Описание открывается кнопкой в дровере, как у классов.
    */
   const { race, path } = defineProps<{
     race: RaceDetail;
@@ -27,19 +28,40 @@
   const hasAside = computed(
     () => !!race.images?.length || stats.value.length > 0,
   );
+
+  const isDescriptionOpen = ref(false);
+
+  /** Открывает описание расы в дровере. */
+  function openDescription(): void {
+    isDescriptionOpen.value = true;
+  }
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <SectionDetailLayout>
       <template
-        v-if="race.baseRace"
+        v-if="race.baseRace || race.description"
         #header
       >
         <RaceRoutingBar
           :base-race="race.baseRace"
           :path="path"
-        />
+        >
+          <UButton
+            v-if="race.description"
+            :icon="RACE_ICON.description"
+            variant="soft"
+            color="neutral"
+            @click.left.exact.prevent="openDescription"
+          >
+            <span class="flex flex-col items-start leading-tight">
+              <span class="text-xs text-muted">{{ RACE_TEXT.aboutLabel }}</span>
+
+              <span>{{ RACE_TEXT.description }}</span>
+            </span>
+          </UButton>
+        </RaceRoutingBar>
       </template>
 
       <template
@@ -75,11 +97,6 @@
       </template>
 
       <div class="flex flex-col gap-6">
-        <ContentRender
-          v-if="race.description"
-          :html="race.description"
-        />
-
         <SectionCollapse
           v-for="skill in skills"
           :key="skill.name"
@@ -119,7 +136,7 @@
               </UTooltip>
             </template>
 
-            <div class="flex flex-col gap-4 pl-6">
+            <div class="flex flex-col gap-4">
               <ContentRender
                 v-if="subrace.description"
                 :html="subrace.description"
@@ -146,5 +163,18 @@
         </section>
       </div>
     </SectionDetailLayout>
+
+    <SectionDrawer
+      v-model:open="isDescriptionOpen"
+      :title="RACE_TEXT.description"
+      :subtitle="race.name.rus"
+    >
+      <div class="content-render">
+        <ContentRender
+          v-if="race.description"
+          :html="race.description"
+        />
+      </div>
+    </SectionDrawer>
   </div>
 </template>

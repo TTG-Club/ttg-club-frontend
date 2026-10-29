@@ -16,6 +16,9 @@ export const SECTION_PAGE_SIZE_ALL = -1;
 /** Задержка перед записью поиска в адрес. */
 export const SEARCH_DEBOUNCE_MS = 400;
 
+/** Значение единственного элемента общего аккордеона записи. */
+export const SECTION_COLLAPSE_VALUE = 'section-collapse';
+
 /** Сколько пикселей до конца списка начинать подгрузку. */
 export const INFINITE_SCROLL_DISTANCE = 1080;
 

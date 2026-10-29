@@ -192,6 +192,12 @@ export const RACE_TEXT = {
   subraceLabel: 'Разновидность:',
   chooseSubrace: 'Выбрать',
   searchSubrace: 'Поиск разновидности…',
+  aboutLabel: 'О расе:',
+  description: 'Описание',
+} as const;
+
+export const RACE_ICON = {
+  description: 'tabler:file-description',
 } as const;
 
 /** Подписи свойств расы в колонке слева, как у видов на new.ttg.club. */

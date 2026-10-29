@@ -1,9 +1,11 @@
 <script setup lang="ts">
-  import { SECTION_ICON } from '../model';
+  import type { AccordionItem } from '@nuxt/ui';
+
+  import { SECTION_COLLAPSE_VALUE } from '../model';
 
   /**
-   * Раскрывающийся блок записи, как на new.ttg.club: крупный заголовок со
-   * стрелкой, по клику текст прячется и открывается снова.
+   * Аккордеон записи, как на new.ttg.club: крупный заголовок со стрелкой,
+   * по клику текст плавно прячется и открывается снова.
    */
   const { title, defaultOpen = false } = defineProps<{
     title: string;
@@ -16,31 +18,34 @@
     badge?: () => unknown;
     default: () => unknown;
   }>();
+
+  const items = computed<AccordionItem[]>(() => [
+    { label: title, value: SECTION_COLLAPSE_VALUE },
+  ]);
+
+  const defaultValue = defaultOpen ? SECTION_COLLAPSE_VALUE : undefined;
 </script>
 
 <template>
-  <UCollapsible
-    :default-open="defaultOpen"
-    :ui="{ content: 'pt-3' }"
+  <UAccordion
+    :items="items"
+    :default-value="defaultValue"
+    :ui="{
+      item: 'border-b-0',
+      trigger:
+        'cursor-pointer gap-2 py-0 text-xl font-semibold text-highlighted',
+      label: 'flex items-center gap-2',
+      body: 'pt-3 text-base',
+    }"
   >
-    <template #default="{ open }">
-      <h4
-        class="flex cursor-pointer items-center gap-2 text-xl font-semibold text-highlighted"
-      >
-        <UIcon
-          :name="SECTION_ICON.expand"
-          :class="open ? '-rotate-180' : undefined"
-          class="flex-none transition-transform duration-150 ease-in-out"
-        />
+    <template #default>
+      <span>{{ title }}</span>
 
-        <span>{{ title }}</span>
-
-        <slot name="badge" />
-      </h4>
+      <slot name="badge" />
     </template>
 
-    <template #content>
+    <template #body>
       <slot />
     </template>
-  </UCollapsible>
+  </UAccordion>
 </template>
