@@ -11,7 +11,7 @@
    * разновидностям. Открываются так, как велит режим раздела. В слоте
    * размещаются дополнительные кнопки, например описание.
    */
-  const { baseRace, path } = defineProps<{
+  const { baseRace = undefined, path } = defineProps<{
     baseRace?: RaceLink | null;
     /** Адрес открытой записи: расы или разновидности. */
     path: string;
