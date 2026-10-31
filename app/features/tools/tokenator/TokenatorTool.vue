@@ -39,7 +39,10 @@
 </script>
 
 <template>
-  <SectionLayout :title="TOKENATOR_TEXT.title">
+  <SectionLayout
+    :title="TOKENATOR_TEXT.title"
+    is-full-width
+  >
     <template #controls>
       <div class="flex flex-col gap-4">
         <UFormField :label="TOKENATOR_TEXT.scale">

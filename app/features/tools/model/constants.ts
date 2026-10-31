@@ -24,6 +24,7 @@ export const WILD_MAGIC_DEFAULT_SOURCE = 'PHB';
 export const TOOLS_TEXT = {
   generate: 'Сгенерировать',
   clear: 'Очистить',
+  close: 'Закрыть',
   count: 'Количество',
   error: 'Не удалось получить результат, попробуйте ещё раз',
   optionsError: 'Не удалось загрузить настройки генератора',
@@ -273,6 +274,7 @@ export const TREASURY_COINS = [
 export const TOOLS_ICON = {
   generate: 'ttg:dice-d20',
   clear: 'tabler:trash',
+  close: 'tabler:x',
   empty: 'tabler:sparkles',
   table: 'tabler:table',
   reset: 'tabler:restore',

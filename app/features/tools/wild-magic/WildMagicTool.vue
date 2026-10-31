@@ -48,7 +48,7 @@
     { immediate: true },
   );
 
-  const { results, isPending, generate, clear } = useToolGenerator(
+  const { results, isPending, generate, clear, remove } = useToolGenerator(
     async (signal) => {
       const body: WildMagicRequest = {
         count: normalizeToolCount(count.value),
@@ -111,6 +111,7 @@
       v-for="result in results"
       :key="result.id"
       :html="result.value.description"
+      @close="remove(result.id)"
     >
       <template #trailing>
         <UTooltip :text="result.value.source.name">

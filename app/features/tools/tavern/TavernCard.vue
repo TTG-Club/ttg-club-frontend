@@ -3,12 +3,13 @@
 
   import { ContentRender } from '~content/render';
 
+  import { ToolCloseButton } from '../generator';
   import { getTavernTags, TAVERN_SECTIONS, TAVERN_TEXT } from '../model';
   import TavernReroll from './TavernReroll.vue';
 
   /**
    * Карточка таверны: название с метками и части из бэкенда, каждую можно
-   * перегенерировать отдельно.
+   * перегенерировать отдельно, а всю карточку убрать из списка.
    */
   const { tavern, pending = [] } = defineProps<{
     tavern: Tavern;
@@ -18,6 +19,7 @@
 
   const emit = defineEmits<{
     reroll: [field: TavernField];
+    close: [];
   }>();
 
   const tags = computed(() => getTavernTags(tavern));
@@ -28,6 +30,10 @@
    */
   function reroll(field: TavernField): void {
     emit('reroll', field);
+  }
+
+  function close(): void {
+    emit('close');
   }
 </script>
 
@@ -57,6 +63,8 @@
         :is-pending="pending.includes('name')"
         @reroll="reroll('name')"
       />
+
+      <ToolCloseButton @close="close" />
     </header>
 
     <section

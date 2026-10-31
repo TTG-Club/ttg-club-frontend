@@ -101,7 +101,7 @@
           v-for="skill in skills"
           :key="skill.name"
           :title="skill.name"
-          default-open
+          :default-open="Boolean(skill.opened)"
         >
           <ContentRender
             v-if="skill.description"

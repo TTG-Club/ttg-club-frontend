@@ -46,7 +46,7 @@
     })),
   );
 
-  const { results, isPending, generate, clear } = useToolGenerator(
+  const { results, isPending, generate, clear, remove } = useToolGenerator(
     async (signal) => [
       encounterResultSchema.parse(
         await $fetch(TOOLS_API_URL.encounters, {
@@ -137,6 +137,7 @@
       v-for="result in results"
       :key="result.id"
       :html="result.value.description"
+      @close="remove(result.id)"
     >
       <template
         v-if="result.value.source || result.value.tableName"

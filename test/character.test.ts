@@ -36,6 +36,7 @@ import {
   raceLinkSchema,
   sortByGroup,
   sortClassFeatures,
+  sortRaceSkills,
   spellDetailSchema,
 } from '~character/model';
 import { normalizeFilter } from '~section/model';
@@ -272,6 +273,25 @@ describe('расы', () => {
     expect(getRaceEditPath('/races/elf/high')).toBe(
       '/workshop/races/high/edit',
     );
+  });
+
+  it('ставит основные особенности перед второстепенными', () => {
+    const detail = raceDetailSchema.parse({
+      name: { rus: 'Эльф', eng: 'Elf' },
+      skills: [
+        { name: 'Имена' },
+        { name: 'Тёмное зрение', opened: true },
+        { name: 'Языки' },
+        { name: 'Транс', opened: true },
+      ],
+    });
+
+    expect(sortRaceSkills(detail)?.map((skill) => skill.name)).toEqual([
+      'Тёмное зрение',
+      'Транс',
+      'Имена',
+      'Языки',
+    ]);
   });
 });
 

@@ -341,13 +341,14 @@ export function getSubraceSwipePaths(
 }
 
 /**
- * Особенности расы в порядке старого SPA: сначала свёрнутые, особенности
- * разновидности — после особенностей самой расы.
+ * Особенности расы: сначала основные (`feature` в API, у нас `opened`),
+ * за ними второстепенные, которые на странице свёрнуты под спойлер.
+ * Внутри группы порядок разновидности и расы сохраняется.
  * @param race - раса
  */
 export function sortRaceSkills(race: RaceDetail): RaceDetail['skills'] {
   return sortBy(race.skills ?? [], [
-    (skill) => Boolean(skill.opened),
+    (skill) => !skill.opened,
     (skill) => !skill.subrace,
   ]);
 }

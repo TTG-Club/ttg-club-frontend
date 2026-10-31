@@ -281,7 +281,10 @@
 </script>
 
 <template>
-  <SectionLayout :title="title">
+  <SectionLayout
+    :title="title"
+    is-full-width
+  >
     <template #controls>
       <div
         v-if="tracker"
