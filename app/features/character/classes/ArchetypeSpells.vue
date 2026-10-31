@@ -1,13 +1,18 @@
 <script setup lang="ts">
   import type { ArchetypeSpellTable } from '../model';
 
+  import { DetailTooltip } from '~content/detail-tooltip';
+
   import {
     CLASS_TEXT,
     getArchetypeSpellLevelHeader,
     getArchetypeSpellSuffix,
   } from '../model';
 
-  /** Таблица заклинаний архетипа: уровень и заклинания со ссылками. */
+  /**
+   * Таблица заклинаний архетипа: уровень и заклинания со ссылками. Клик по
+   * заклинанию открывает его в дровере, как ссылки в тексте.
+   */
   const { table } = defineProps<{
     table: ArchetypeSpellTable;
   }>();
@@ -56,7 +61,13 @@
               v-for="spell in row.spells"
               :key="spell.url"
               class="mr-1"
-              ><NuxtLink :to="spell.url">{{ spell.label }}</NuxtLink
+              ><DetailTooltip
+                type="spell"
+                :url="spell.url"
+                :title="spell.label"
+                ><NuxtLink :to="spell.url">{{
+                  spell.label
+                }}</NuxtLink></DetailTooltip
               >{{ spell.suffix }}</span
             >
           </td>
