@@ -5,6 +5,7 @@
 
   import type { EntrySource } from '../model';
 
+  import { useSectionCopy } from '../composables';
   import {
     SECTION_ICON,
     SECTION_PRINT_QUERY_KEY,
@@ -63,8 +64,7 @@
   const route = useRoute();
   const router = useRouter();
   const siteConfig = useSiteConfig();
-  const toast = useToast();
-  const { copy, isSupported } = useClipboard({ legacy: true });
+  const { copyLink: copyToClipboard, copyTitle } = useSectionCopy();
   const { isEditor } = useUser();
 
   const isReady = computed(() => !isLoading && !isError);
@@ -166,21 +166,16 @@
     );
   });
 
+  /** Копирует английское название записи, если оно есть. */
+  async function copySubtitle(): Promise<void> {
+    if (subtitle) {
+      await copyTitle(subtitle);
+    }
+  }
+
   /** Копирует каноничную ссылку на запись, без параметров списка. */
-  async function copyLink() {
-    if (!isSupported.value) {
-      toast.add({ title: SECTION_TEXT.copyError, color: 'error' });
-
-      return;
-    }
-
-    try {
-      await copy(`${siteConfig.url}${path ?? route.path}`);
-
-      toast.add({ title: SECTION_TEXT.linkCopied, icon: SECTION_ICON.copy });
-    } catch {
-      toast.add({ title: SECTION_TEXT.copyError, color: 'error' });
-    }
+  function copyLink(): Promise<void> {
+    return copyToClipboard(`${siteConfig.url}${path ?? route.path}`);
   }
 </script>
 
@@ -199,7 +194,8 @@
 
           <h2
             v-else
-            class="text-2xl text-highlighted"
+            class="cursor-pointer text-2xl text-highlighted"
+            @click.left.exact.prevent="copyTitle(title)"
           >
             {{ title }}
           </h2>
@@ -250,7 +246,13 @@
         v-if="subtitle || source"
         class="flex items-center justify-between gap-2"
       >
-        <span class="truncate text-sm text-muted">{{ subtitle }}</span>
+        <span
+          class="truncate text-sm text-muted"
+          :class="{ 'cursor-pointer': subtitle }"
+          @click.left.exact.prevent="copySubtitle"
+        >
+          {{ subtitle }}
+        </span>
 
         <SectionSourceTag
           v-if="source"

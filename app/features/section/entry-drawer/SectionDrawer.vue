@@ -3,6 +3,7 @@
 
   import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 
+  import { useSectionCopy } from '../composables';
   import { SECTION_ICON, SECTION_TEXT } from '../model';
   import { SectionSourceTag } from '../source-tag';
 
@@ -35,9 +36,17 @@
   }>();
 
   const isWide = useMediaQuery(LAYOUT_DRAWER_QUERY);
+  const { copyTitle } = useSectionCopy();
 
   function close(): void {
     isOpen.value = false;
+  }
+
+  /** Копирует английское название записи, если оно есть. */
+  async function copySubtitle(): Promise<void> {
+    if (subtitle) {
+      await copyTitle(subtitle);
+    }
   }
 </script>
 
@@ -65,7 +74,10 @@
   >
     <template #header>
       <div class="flex w-full items-center gap-1">
-        <h2 class="min-w-0 flex-auto truncate text-lg text-highlighted">
+        <h2
+          class="min-w-0 flex-auto cursor-pointer truncate text-lg text-highlighted"
+          @click.left.exact.prevent="copyTitle(title)"
+        >
           {{ title }}
         </h2>
 
@@ -98,7 +110,13 @@
         v-if="subtitle || source"
         class="flex w-full items-center justify-between gap-2"
       >
-        <span class="truncate text-sm text-muted">{{ subtitle }}</span>
+        <span
+          class="truncate text-sm text-muted"
+          :class="{ 'cursor-pointer': subtitle }"
+          @click.left.exact.prevent="copySubtitle"
+        >
+          {{ subtitle }}
+        </span>
 
         <SectionSourceTag
           v-if="source"
