@@ -7,6 +7,7 @@
     ToolCountField,
     ToolGenerator,
     ToolResultCard,
+    ToolResultGrid,
   } from '../generator';
   import {
     getDefaultSources,
@@ -107,22 +108,24 @@
       </UFormField>
     </template>
 
-    <ToolResultCard
-      v-for="result in results"
-      :key="result.id"
-      :html="result.value.description"
-      @close="remove(result.id)"
-    >
-      <template #trailing>
-        <UTooltip :text="result.value.source.name">
-          <UBadge
-            :label="result.value.source.shortName"
-            color="neutral"
-            variant="subtle"
-            class="shrink-0"
-          />
-        </UTooltip>
-      </template>
-    </ToolResultCard>
+    <ToolResultGrid>
+      <ToolResultCard
+        v-for="result in results"
+        :key="result.id"
+        :html="result.value.description"
+        @close="remove(result.id)"
+      >
+        <template #trailing>
+          <UTooltip :text="result.value.source.name">
+            <UBadge
+              :label="result.value.source.shortName"
+              color="neutral"
+              variant="subtle"
+              class="shrink-0"
+            />
+          </UTooltip>
+        </template>
+      </ToolResultCard>
+    </ToolResultGrid>
   </ToolGenerator>
 </template>
