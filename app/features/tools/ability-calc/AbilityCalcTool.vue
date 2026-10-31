@@ -60,7 +60,10 @@
 </script>
 
 <template>
-  <SectionLayout :title="ABILITY_CALC_TEXT.title">
+  <SectionLayout
+    :title="ABILITY_CALC_TEXT.title"
+    is-full-width
+  >
     <template #controls>
       <AbilityRaceBonuses
         v-model="bonuses"
