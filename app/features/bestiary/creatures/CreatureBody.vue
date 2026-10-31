@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { CreatureDetail } from '../model';
 
+  import { DetailTooltip } from '~content/detail-tooltip';
   import { ContentLink, ContentRender } from '~content/render';
   import { DiceRoller } from '~dice-roller/roller';
   import { SectionImagePreview } from '~section/image-preview';
@@ -116,12 +117,17 @@
             >(<span
               v-for="(armor, index) in armors"
               :key="armor.name"
-              ><ContentLink
+              ><DetailTooltip
                 v-if="armor.url"
-                class="text-link hover:text-link-hover"
-                :href="armor.url"
-                :attributes="{}"
-                >{{ armor.name }}</ContentLink
+                type="armor"
+                :url="armor.url"
+                :title="armor.name"
+                ><ContentLink
+                  class="text-link hover:text-link-hover"
+                  :href="armor.url"
+                  :attributes="{}"
+                  >{{ armor.name }}</ContentLink
+                ></DetailTooltip
               >
 
               <template v-else>{{ armor.name }}</template>
