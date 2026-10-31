@@ -65,7 +65,7 @@
     );
   }
 
-  const { results, isPending, generate, clear } = useToolGenerator(
+  const { results, isPending, generate, clear, remove } = useToolGenerator(
     async (signal): Promise<Array<Tavern>> => {
       const settings = resolveTavernSettings({
         type: type.value,
@@ -147,6 +147,18 @@
     }
   }
 
+  /**
+   * Убирает таверну из списка вместе с отметками обновления.
+   * @param id - ключ результата
+   */
+  function close(id: number): void {
+    remove(id);
+
+    const { [id]: _removed, ...rest } = pending.value;
+
+    pending.value = rest;
+  }
+
   function clearAll(): void {
     clear();
     pending.value = {};
@@ -205,6 +217,7 @@
       :tavern="result.value"
       :pending="pending[result.id]"
       @reroll="reroll(result, $event)"
+      @close="close(result.id)"
     />
   </ToolGenerator>
 </template>

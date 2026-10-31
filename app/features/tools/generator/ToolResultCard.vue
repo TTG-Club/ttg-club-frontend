@@ -1,12 +1,18 @@
 <script setup lang="ts">
   import { ContentRender } from '~content/render';
 
+  import ToolCloseButton from './ToolCloseButton.vue';
+
   /**
    * Результат генератора: подписи сверху и описание из базы с кубиками и
-   * подсказками.
+   * подсказками. Крестик справа убирает карточку из списка.
    */
   const { html } = defineProps<{
     html: string;
+  }>();
+
+  const emit = defineEmits<{
+    close: [];
   }>();
 
   defineSlots<{
@@ -15,6 +21,10 @@
     /** Метка справа, например книга. */
     trailing?: () => unknown;
   }>();
+
+  function close(): void {
+    emit('close');
+  }
 </script>
 
 <template>
@@ -32,6 +42,10 @@
       <ContentRender :html="html" />
     </div>
 
-    <slot name="trailing" />
+    <div class="flex shrink-0 items-start gap-2">
+      <slot name="trailing" />
+
+      <ToolCloseButton @close="close" />
+    </div>
   </article>
 </template>

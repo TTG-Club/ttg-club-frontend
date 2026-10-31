@@ -2,7 +2,12 @@
   import type { NameComponent, NameGenerationType, NameSex } from '../model';
 
   import { useToolGenerator } from '../composables';
-  import { ToolChip, ToolCountField, ToolGenerator } from '../generator';
+  import {
+    ToolChip,
+    ToolCloseButton,
+    ToolCountField,
+    ToolGenerator,
+  } from '../generator';
   import {
     buildNameRaceGroups,
     buildNamesRequest,
@@ -50,7 +55,7 @@
   // У семьи, клана и дома состав имени задан самой генерацией
   const isComponentsLocked = computed(() => !!sharedHint.value);
 
-  const { results, isPending, generate, clear } = useToolGenerator(
+  const { results, isPending, generate, clear, remove } = useToolGenerator(
     async (signal) => {
       const body = buildNamesRequest({
         type: type.value,
@@ -157,9 +162,13 @@
           :key="result.id"
           class="flex flex-col gap-2 rounded-xl border border-default bg-elevated/50 p-4"
         >
-          <p class="text-lg text-highlighted">
-            {{ result.value.value }}
-          </p>
+          <div class="flex items-start gap-2">
+            <p class="min-w-0 flex-auto text-lg text-highlighted">
+              {{ result.value.value }}
+            </p>
+
+            <ToolCloseButton @close="remove(result.id)" />
+          </div>
 
           <div class="flex flex-wrap gap-1.5">
             <UBadge
