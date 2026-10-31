@@ -22,6 +22,7 @@
     isSplit = false,
     isTopBar = false,
     isWideDetail = false,
+    isFullWidth = false,
   } = defineProps<{
     title: string;
     /** Широкий режим: список и запись рядом на весь экран. */
@@ -30,7 +31,16 @@
     isTopBar?: boolean;
     /** Запись по умолчанию шире списка, как у классов. */
     isWideDetail?: boolean;
+    /**
+     * Раздел на всю ширину: колонка слева прижата к меню, а не центрируется
+     * вместе с содержимым. Нужно инструментам, где справа растёт результат.
+     */
+    isFullWidth?: boolean;
   }>();
+
+  const columnsClass = computed(() =>
+    isFullWidth ? 'w-full' : 'mx-auto w-full lg:max-w-330',
+  );
 
   const listDefaultSize = computed(() =>
     isWideDetail ? SECTION_SPLIT_WIDE_DETAIL_SIZE : SECTION_SPLIT_DEFAULT_SIZE,
@@ -122,7 +132,8 @@
 
   <div
     v-else
-    class="mx-auto flex w-full flex-col lg:max-w-330 lg:flex-row"
+    class="flex flex-col lg:flex-row"
+    :class="columnsClass"
   >
     <aside
       class="sticky top-0 z-10 scrollbar-none shrink-0 border-default bg-default/80 backdrop-blur-lg lg:h-dvh lg:overflow-y-auto lg:border-r"
