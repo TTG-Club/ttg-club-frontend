@@ -38,6 +38,7 @@ export type {
   TavernSettings,
   TavernType,
   ToolResult,
+  ToolResultGridView,
   TraderRequest,
   TreasuryCoin,
   TreasuryKind,

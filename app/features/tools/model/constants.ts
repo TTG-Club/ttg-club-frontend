@@ -18,6 +18,17 @@ export const TOOL_COUNT_MAX = 99;
 /** Пауза между нажатиями «Сгенерировать», как в старом SPA. */
 export const TOOL_GENERATE_THROTTLE_MS = 300;
 
+/**
+ * Сетка карточек результатов по ширине области результатов: короткие
+ * (имена) влезают по три уже на средних экранах, карточки с текстом
+ * (столкновения, дикая магия, безумие, бои трекера) — по две, а по три
+ * на широких.
+ */
+export const TOOL_RESULT_GRID_CLASS = {
+  compact: 'grid grid-cols-1 gap-3 @lg:grid-cols-2 @3xl:grid-cols-3',
+  text: 'grid grid-cols-1 gap-3 @3xl:grid-cols-2 @6xl:grid-cols-3',
+} as const;
+
 /** Источник дикой магии, выбранный по умолчанию. */
 export const WILD_MAGIC_DEFAULT_SOURCE = 'PHB';
 

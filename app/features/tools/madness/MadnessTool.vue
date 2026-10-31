@@ -7,6 +7,7 @@
     ToolCountField,
     ToolGenerator,
     ToolResultCard,
+    ToolResultGrid,
   } from '../generator';
   import {
     MADNESS_TEXT,
@@ -83,23 +84,25 @@
       </UFormField>
     </template>
 
-    <ToolResultCard
-      v-for="result in results"
-      :key="result.id"
-      :html="result.value.description"
-      @close="remove(result.id)"
-    >
-      <template #header>
-        <p>
-          <b class="text-highlighted">{{ MADNESS_TEXT.type }}</b>
-          {{ result.value.type.name }}
-        </p>
+    <ToolResultGrid>
+      <ToolResultCard
+        v-for="result in results"
+        :key="result.id"
+        :html="result.value.description"
+        @close="remove(result.id)"
+      >
+        <template #header>
+          <p>
+            <b class="text-highlighted">{{ MADNESS_TEXT.type }}</b>
+            {{ result.value.type.name }}
+          </p>
 
-        <p v-if="result.value.type.additional">
-          <b class="text-highlighted">{{ MADNESS_TEXT.duration }}</b>
-          {{ result.value.type.additional }}
-        </p>
-      </template>
-    </ToolResultCard>
+          <p v-if="result.value.type.additional">
+            <b class="text-highlighted">{{ MADNESS_TEXT.duration }}</b>
+            {{ result.value.type.additional }}
+          </p>
+        </template>
+      </ToolResultCard>
+    </ToolResultGrid>
   </ToolGenerator>
 </template>

@@ -5,7 +5,7 @@
   import { RollTable } from '~content/roll-table';
 
   import { useToolGenerator } from '../composables';
-  import { ToolGenerator, ToolResultCard } from '../generator';
+  import { ToolGenerator, ToolResultCard, ToolResultGrid } from '../generator';
   import {
     buildEncounterRequest,
     encounterOptionsSchema,
@@ -133,27 +133,29 @@
       />
     </template>
 
-    <ToolResultCard
-      v-for="result in results"
-      :key="result.id"
-      :html="result.value.description"
-      @close="remove(result.id)"
-    >
-      <template
-        v-if="result.value.source || result.value.tableName"
-        #header
+    <ToolResultGrid>
+      <ToolResultCard
+        v-for="result in results"
+        :key="result.id"
+        :html="result.value.description"
+        @close="remove(result.id)"
       >
-        <p v-if="result.value.source">
-          <b class="text-highlighted">{{ ENCOUNTERS_TEXT.source }}</b>
-          {{ result.value.source.name }}
-        </p>
+        <template
+          v-if="result.value.source || result.value.tableName"
+          #header
+        >
+          <p v-if="result.value.source">
+            <b class="text-highlighted">{{ ENCOUNTERS_TEXT.source }}</b>
+            {{ result.value.source.name }}
+          </p>
 
-        <p v-if="result.value.tableName">
-          <b class="text-highlighted">{{ ENCOUNTERS_TEXT.table }}</b>
-          {{ result.value.tableName }}
-        </p>
-      </template>
-    </ToolResultCard>
+          <p v-if="result.value.tableName">
+            <b class="text-highlighted">{{ ENCOUNTERS_TEXT.table }}</b>
+            {{ result.value.tableName }}
+          </p>
+        </template>
+      </ToolResultCard>
+    </ToolResultGrid>
 
     <UModal
       v-if="table"
