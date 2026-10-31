@@ -30,7 +30,7 @@
   const count = ref(TOOL_COUNT_MIN);
   const selectedType = ref<string>();
 
-  const { results, isPending, generate, clear } = useToolGenerator(
+  const { results, isPending, generate, clear, remove } = useToolGenerator(
     async (signal) => {
       const body: MadnessRequest = {
         count: normalizeToolCount(count.value),
@@ -87,6 +87,7 @@
       v-for="result in results"
       :key="result.id"
       :html="result.value.description"
+      @close="remove(result.id)"
     >
       <template #header>
         <p>

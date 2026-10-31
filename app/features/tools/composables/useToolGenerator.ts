@@ -56,7 +56,15 @@ export function useToolGenerator<T>(
     results.value = [];
   }
 
+  /**
+   * Убирает один результат из списка, без запросов к серверу.
+   * @param id - ключ результата
+   */
+  function remove(id: number): void {
+    results.value = results.value.filter((result) => result.id !== id);
+  }
+
   onScopeDispose(() => controller?.abort());
 
-  return { results, isPending, generate, clear };
+  return { results, isPending, generate, clear, remove };
 }
