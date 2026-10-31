@@ -136,7 +136,10 @@
 </script>
 
 <template>
-  <SectionLayout :title="INITIATIVE_TEXT.title">
+  <SectionLayout
+    :title="INITIATIVE_TEXT.title"
+    is-full-width
+  >
     <template #controls>
       <div class="flex flex-col gap-3">
         <p class="text-sm text-muted">

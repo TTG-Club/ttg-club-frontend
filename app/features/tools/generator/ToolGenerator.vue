@@ -41,7 +41,10 @@
 </script>
 
 <template>
-  <SectionLayout :title="title">
+  <SectionLayout
+    :title="title"
+    is-full-width
+  >
     <template #controls>
       <form
         class="flex flex-col gap-4"
