@@ -7,6 +7,7 @@
     ToolCloseButton,
     ToolCountField,
     ToolGenerator,
+    ToolResultGrid,
   } from '../generator';
   import {
     buildNameRaceGroups,
@@ -155,37 +156,35 @@
       </UFormField>
     </template>
 
-    <div class="@container">
-      <div class="grid grid-cols-1 gap-3 @lg:grid-cols-2 @3xl:grid-cols-3">
-        <article
-          v-for="result in results"
-          :key="result.id"
-          class="flex flex-col gap-2 rounded-xl border border-default bg-elevated/50 p-4"
-        >
-          <div class="flex items-start gap-2">
-            <p class="min-w-0 flex-auto text-lg text-highlighted">
-              {{ result.value.value }}
-            </p>
+    <ToolResultGrid view="compact">
+      <article
+        v-for="result in results"
+        :key="result.id"
+        class="flex flex-col gap-2 rounded-xl border border-default bg-elevated/50 p-4"
+      >
+        <div class="flex items-start gap-2">
+          <p class="min-w-0 flex-auto text-lg text-highlighted">
+            {{ result.value.value }}
+          </p>
 
-            <ToolCloseButton @close="remove(result.id)" />
-          </div>
+          <ToolCloseButton @close="remove(result.id)" />
+        </div>
 
-          <div class="flex flex-wrap gap-1.5">
-            <UBadge
-              :label="result.value.race"
-              color="neutral"
-              variant="subtle"
-            />
+        <div class="flex flex-wrap gap-1.5">
+          <UBadge
+            :label="result.value.race"
+            color="neutral"
+            variant="subtle"
+          />
 
-            <UBadge
-              v-if="result.value.sex"
-              :label="NAME_SEX_LABEL[result.value.sex]"
-              color="neutral"
-              variant="subtle"
-            />
-          </div>
-        </article>
-      </div>
-    </div>
+          <UBadge
+            v-if="result.value.sex"
+            :label="NAME_SEX_LABEL[result.value.sex]"
+            color="neutral"
+            variant="subtle"
+          />
+        </div>
+      </article>
+    </ToolResultGrid>
   </ToolGenerator>
 </template>

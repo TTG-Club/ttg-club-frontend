@@ -9,6 +9,7 @@ import type {
   TAVERN_PATH,
   TAVERN_SERVICE_LEVELS,
   TAVERN_TYPES,
+  TOOL_RESULT_GRID_CLASS,
   TREASURY_COINS,
   TREASURY_KINDS,
 } from './constants';
@@ -43,6 +44,9 @@ export type NameGenerationType =
 export type NameComponent = (typeof NAME_COMPONENTS)[number]['value'];
 
 export type NameSex = (typeof NAME_SEXES)[number]['value'];
+
+/** Вид сетки результатов: плотная для коротких карточек или для карточек с текстом. */
+export type ToolResultGridView = keyof typeof TOOL_RESULT_GRID_CLASS;
 
 /** Запрос имён: без рас бэкенд берёт любую расу с именами. */
 export interface NamesRequest {

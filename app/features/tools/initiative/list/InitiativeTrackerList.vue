@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { SectionLayout } from '~section/layout';
+  import { ToolResultGrid } from '~tools/generator';
   import { AuthModal } from '~user/auth-modal';
 
   import { useTrackerList, useTrackerSlot } from '../composables';
@@ -175,13 +176,13 @@
       v-if="isLoggedIn"
       class="flex flex-col gap-4"
     >
-      <template v-if="isLoading && !isLoaded">
+      <ToolResultGrid v-if="isLoading && !isLoaded">
         <USkeleton
           v-for="index in 3"
           :key="index"
           class="h-16 w-full rounded-xl"
         />
-      </template>
+      </ToolResultGrid>
 
       <UEmpty
         v-else-if="errorStatus !== undefined"
@@ -216,10 +217,7 @@
           <span class="text-sm text-muted">{{ countLabel }}</span>
         </div>
 
-        <div
-          v-if="activeTrackers.length"
-          class="flex flex-col gap-2"
-        >
+        <ToolResultGrid v-if="activeTrackers.length">
           <TrackerListRow
             v-for="tracker in activeTrackers"
             :key="tracker.id"
@@ -228,7 +226,7 @@
             @rename="rename"
             @remove="remove"
           />
-        </div>
+        </ToolResultGrid>
 
         <UEmpty
           v-else
@@ -251,13 +249,13 @@
           />
 
           <template #content>
-            <div class="flex flex-col gap-2">
+            <ToolResultGrid>
               <TrackerListRow
                 v-for="tracker in deletedTrackers"
                 :key="tracker.id"
                 :tracker="tracker"
               />
-            </div>
+            </ToolResultGrid>
           </template>
         </UCollapsible>
       </template>
