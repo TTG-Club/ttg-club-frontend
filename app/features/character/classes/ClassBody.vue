@@ -31,7 +31,15 @@
       : undefined,
   );
 
-  const images = computed(() => entry.images ?? []);
+  // Своих картинок у большинства подклассов нет: как в старом SPA,
+  // показываем вместо них фон класса
+  const images = computed(() => {
+    if (entry.images?.length) {
+      return entry.images;
+    }
+
+    return entry.image ? [entry.image] : [];
+  });
 
   const hasAside = computed(() => images.value.length > 0 || !!entry.traits);
 
