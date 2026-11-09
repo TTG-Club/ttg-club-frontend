@@ -66,6 +66,7 @@
 | `NUXT_SITE_ENV`                  | `preview` on the dev stand to disable indexing                                                            |
 | `NUXT_PUBLIC_GTAG_ID`            | Google Analytics id, empty disables it                                                                    |
 | `NUXT_PUBLIC_YANDEX_METRIKA_ID`  | Yandex.Metrika id, empty disables it                                                                      |
+| `NUXT_PUBLIC_NEW_SITE_URL`       | D&D 2024 site origin for the edition card, defaults to `https://new.ttg.club`                             |
 
 ## 🚚 Migration status
 

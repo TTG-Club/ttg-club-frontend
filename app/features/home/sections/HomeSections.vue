@@ -1,10 +1,20 @@
 <script setup lang="ts">
+  import type { HomePromoCardContent } from '../model';
+
   import { useHomeLink, useHomeMenu } from '../composables';
   import { HOME_EDITION_CARD, HOME_LINK_ARROW_ICON } from '../model';
   import { HomePromoCard } from '../ui-kit';
 
   const { sections } = useHomeMenu();
   const { isExternalLink } = useHomeLink();
+
+  const { newSiteUrl } = useRuntimeConfig().public;
+
+  /** Карточка редакции ведёт на сайт 2024 того же окружения (dev → dev). */
+  const editionCard: HomePromoCardContent = {
+    ...HOME_EDITION_CARD,
+    to: newSiteUrl,
+  };
 </script>
 
 <template>
@@ -61,7 +71,7 @@
     <!-- Ниже xl карточка редакции уходит под плиту, с xl — встаёт справа на
       всю её высоту -->
     <HomePromoCard
-      :card="HOME_EDITION_CARD"
+      :card="editionCard"
       compact
       muted
       class="order-last xl:order-0"

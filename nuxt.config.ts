@@ -80,6 +80,11 @@ export default defineNuxtConfig({
       yandexMetrika: {
         id: '',
       },
+      // Origin сайта другой редакции (D&D 2024) без завершающего слэша — на
+      // него ведёт карточка «Редакция D&D 2024» на главной. Задаётся в рантайме
+      // через NUXT_PUBLIC_NEW_SITE_URL: dev-стенд ведёт на dev-сайт 2024,
+      // прод — на прод. По умолчанию — нынешний прод-адрес.
+      newSiteUrl: 'https://new.ttg.club',
     },
   },
 
