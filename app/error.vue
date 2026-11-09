@@ -7,6 +7,8 @@
     ERROR_PAGE,
     NOT_FOUND_STATUS,
   } from '~/shared/consts';
+  import { useMaintenanceGate } from '~infrastructure/maintenance/composables';
+  import { MaintenanceScreen } from '~infrastructure/maintenance/ui';
 
   const { error } = defineProps<{
     error: NuxtError;
@@ -28,6 +30,10 @@
     robots: 'noindex',
   });
 
+  // При закрытом сайте ошибка (например, 404) не показывается — посетитель
+  // видит ту же заглушку.
+  const { isBlocked: isMaintenanceBlocked } = useMaintenanceGate();
+
   function goHome() {
     clearError({ redirect: '/' });
   }
@@ -35,7 +41,9 @@
 
 <template>
   <UApp>
-    <NuxtLayout>
+    <MaintenanceScreen v-if="isMaintenanceBlocked" />
+
+    <NuxtLayout v-else>
       <section
         class="flex min-h-[60dvh] flex-col items-center justify-center gap-4 text-center"
       >
