@@ -1,19 +1,19 @@
-import type { SignInCredentials, UserProfile } from '~/shared/types';
+import type { SignInCredentials, UserProfile } from '#shared/types';
 
 import { consola } from 'consola';
 
 import {
+  USER_INFO_PATH,
   USER_SESSION_MARKER_COOKIE,
   USER_SESSION_MARKER_MAX_AGE_SECONDS,
   USER_TOKEN_COOKIE,
 } from '#shared/consts';
+import { authTokenSchema, Role, userProfileSchema } from '#shared/types';
 import {
   AUTH_REFRESH_PATH,
   AUTH_SIGN_IN_PATH,
   AUTH_SIGN_OUT_PATH,
-  USER_INFO_PATH,
 } from '~/shared/consts';
-import { authTokenSchema, Role, userProfileSchema } from '~/shared/types';
 
 /** Ключ состояния профиля: на клиент оно приходит в payload SSR. */
 const USER_STATE_KEY = 'user-profile';

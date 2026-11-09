@@ -1,6 +1,3 @@
-/** Профиль текущего пользователя. */
-export const USER_INFO_PATH = '/api/v1/user/info';
-
 /** Вход по логину или почте. */
 export const AUTH_SIGN_IN_PATH = '/api/v1/auth/signin';
 

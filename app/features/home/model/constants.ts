@@ -70,13 +70,16 @@ export const HOME_SECTION_TEXTURE = {
 
 /* --- Промо-карточки ----------------------------------------------------- */
 
-/** Ссылка на сайт новой редакции — стоит рядом с плитой разделов */
-export const HOME_EDITION_CARD: HomePromoCardContent = {
+/**
+ * Ссылка на сайт новой редакции — стоит рядом с плитой разделов. Адреса здесь
+ * нет: он берётся из `runtimeConfig.public.newSiteUrl`, чтобы dev вёл на dev,
+ * а прод — на прод.
+ */
+export const HOME_EDITION_CARD: Omit<HomePromoCardContent, 'to'> = {
   eyebrow: 'Новинка',
   title: 'Редакция D&D 2024',
   linkLabel: 'Перейти',
   image: '/img/banner_2024.webp',
-  to: 'https://new.ttg.club',
   external: true,
 };
 

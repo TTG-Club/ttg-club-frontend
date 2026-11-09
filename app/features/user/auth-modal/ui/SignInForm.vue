@@ -9,6 +9,14 @@
     WRONG_CREDENTIALS_STATUS,
   } from '../../model';
 
+  const { signInOnly = false } = defineProps<{
+    /**
+     * Только вход, без восстановления пароля и регистрации: так форма стоит на
+     * заглушке режима обновления, где остальные страницы закрыты.
+     */
+    signInOnly?: boolean;
+  }>();
+
   const emit = defineEmits<{
     'close': [];
     'sign-up': [];
@@ -120,6 +128,7 @@
         />
 
         <UButton
+          v-if="!signInOnly"
           :label="SIGN_IN_FORM.forgotPassword"
           variant="link"
           class="p-0"
@@ -137,6 +146,7 @@
     </UForm>
 
     <div
+      v-if="!signInOnly"
       class="flex flex-wrap items-center justify-center gap-x-2 border-t border-default pt-5 text-sm text-muted"
     >
       {{ SIGN_IN_FORM.noAccount }}

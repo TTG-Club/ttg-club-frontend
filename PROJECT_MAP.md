@@ -30,36 +30,43 @@
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
-│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat)
+│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (theme and section width), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
 │   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
-│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks)
-│   └── shared/                 # consts (API paths, UI texts), types (user), ui (logo, hamburger)
+│   ├── middleware/             # maintenance.global (rechecks the maintenance gate on client navigation)
+│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
+│   └── shared/                 # consts (API paths, UI texts), ui (logo, hamburger)
 ├── server/
 │   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
 │   ├── api/tools/tavern/       # Proxy /api/tools/tavern/** → backend /tools/tavern/** (HTML outside /api)
+│   ├── api/maintenance.get.ts  # Maintenance gate for the current visitor (served by Nitro, not proxied)
+│   ├── consts/                 # Server constants (maintenance response, settings cache)
+│   ├── middleware/maintenance.ts # Maintenance gate before render, page requests only
+│   ├── plugins/maintenanceResponse.ts # 503, Retry-After, X-Robots-Tag, no-store while the gate is on
 │   ├── routes/sitemap.xml.ts   # Sitemap from the backend
-│   └── utils/upstreams.ts      # Reads upstream URLs from the environment
-├── shared/                     # Isomorphic consts and utils (cookie names, proxy routing)
+│   └── utils/                  # upstreams (upstream URLs from the environment), maintenance (settings from core-app, gate by the visitor's roles)
+├── shared/                     # Isomorphic consts, types and utils (cookie names, proxy routing, user profile, maintenance)
 ├── test/                       # Vitest unit tests
 └── Dockerfile                  # Standalone image: `node server/index.mjs`, port 3000
 ```
 
 ## 🌍 Environment
 
-| Variable                        | Purpose                                                   |
-| ------------------------------- | --------------------------------------------------------- |
-| `NITRO_API_URL`                 | Backend (or gateway) base URL, required                   |
-| `NITRO_SUBSCRIBER_API_URL`      | subscriber-service; empty → `NITRO_API_URL`               |
-| `NITRO_COMMENTS_API_URL`        | comments-service; empty → `NITRO_API_URL`                 |
-| `NITRO_CORE_API_URL`            | core-api (news on the home page); empty → `NITRO_API_URL` |
-| `NUXT_SITE_URL`                 | Canonical origin, defaults to `https://5e14.ttg.club`     |
-| `NUXT_SITE_ENV`                 | `preview` on the dev stand to disable indexing            |
-| `NUXT_PUBLIC_GTAG_ID`           | Google Analytics id, empty disables it                    |
-| `NUXT_PUBLIC_YANDEX_METRIKA_ID` | Yandex.Metrika id, empty disables it                      |
+| Variable                         | Purpose                                                                                                   |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `NITRO_API_URL`                  | Backend (or gateway) base URL, required                                                                   |
+| `NITRO_SUBSCRIBER_API_URL`       | subscriber-service; empty → `NITRO_API_URL`                                                               |
+| `NITRO_COMMENTS_API_URL`         | comments-service; empty → `NITRO_API_URL`                                                                 |
+| `NITRO_CORE_API_URL`             | core-api (news on the home page); empty → `NITRO_API_URL`                                                 |
+| `NITRO_MAINTENANCE_SETTINGS_URL` | core-app maintenance settings of this site (`<core-app>/api/maintenance/sites/5e14`); empty → site closed |
+| `NUXT_SITE_URL`                  | Canonical origin, defaults to `https://5e14.ttg.club`                                                     |
+| `NUXT_SITE_ENV`                  | `preview` on the dev stand to disable indexing                                                            |
+| `NUXT_PUBLIC_GTAG_ID`            | Google Analytics id, empty disables it                                                                    |
+| `NUXT_PUBLIC_YANDEX_METRIKA_ID`  | Yandex.Metrika id, empty disables it                                                                      |
+| `NUXT_PUBLIC_NEW_SITE_URL`       | D&D 2024 site origin for the edition card, defaults to `https://new.ttg.club`                             |
 
 ## 🚚 Migration status
 
@@ -96,6 +103,21 @@ and `dnd5_refresh_token` (path `/api/v1/auth`). SSR sees only the access cookie
 and loads the profile with it; an expired session is refreshed in the browser
 after hydration, and only when the visible marker `ttg-user-token` (shared with
 the legacy SPA) says the visitor has signed in before.
+
+## 🚧 Maintenance mode
+
+"Site closed for an update" is switched in the core-app admin
+(`/admin/maintenance`, tab "Сайт D&D 2014"); this site only reads it from
+`NITRO_MAINTENANCE_SETTINGS_URL` (core-app `/api/maintenance/sites/5e14`),
+cached for a minute. No address, a failed request or a foreign response means
+the site is closed with the default text, and core-app is not asked again for
+30 seconds. While closed, `server/middleware/maintenance.ts` decides before
+render, for page requests only, whether the visitor gets the screen: admins
+(roles from `/api/v1/user/info` with the visitor's cookie) see the site,
+everyone else gets `MaintenanceScreen` with a 503. API, the build and Nuxt
+islands pass through. The screen signs in with `SignInForm`; an admin is
+reloaded into the site, anyone else sees "Вход воспрещён" with a sign-out
+button. Client navigation rechecks `/api/maintenance` every 30 seconds.
 
 ## 📄 Content
 
