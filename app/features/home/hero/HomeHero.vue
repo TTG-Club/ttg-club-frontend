@@ -89,16 +89,15 @@
         class="h-4"
       />
 
-      <!-- Кегль на всех ширинах примерно на четверть мельче, чем на
-        new.ttg.club, — при переносе раскладки его не возвращать. На 360px и
-        уже заголовок ужат: в полный размер он занимал пять строк и
-        выталкивал поиск за первый экран -->
+      <!-- Кегль — как на new.ttg.club. На 360px и уже заголовок ужат: в
+        полный размер он занимал пять строк и выталкивал поиск за первый
+        экран -->
       <h1
-        class="max-w-4xl text-center text-2xl leading-tight font-semibold tracking-tight text-balance max-2xs:text-xl 3xl:text-4xl sm:text-[28px] xl:text-[32px]"
+        class="max-w-4xl text-center text-3xl leading-tight font-semibold tracking-tight text-balance max-2xs:text-2xl 3xl:text-5xl sm:text-4xl xl:text-[2.5rem]"
       >
         <span class="block text-highlighted">{{ HOME_HERO_TITLE }}</span>
 
-        <span class="block text-muted max-2xs:text-base">
+        <span class="block text-muted max-2xs:text-lg/tight">
           {{ HOME_HERO_SUBTITLE }}
         </span>
       </h1>
