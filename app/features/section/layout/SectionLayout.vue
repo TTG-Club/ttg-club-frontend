@@ -291,10 +291,12 @@
           :ui="{ handle: innerSplitHandleClass }"
           @layout="handleSplitLayout"
         >
+          <!-- Шапка над списком не прокручивается: полоса прокрутки — у списка -->
           <template #list>
-            <div class="h-full overflow-y-auto">
+            <div class="flex h-full flex-col">
               <SectionTopBar
                 v-if="isTopBarInSplit"
+                class="shrink-0"
                 :title="title"
               >
                 <slot
@@ -304,7 +306,7 @@
               </SectionTopBar>
 
               <div
-                class="px-4 pb-8"
+                class="min-h-0 flex-auto overflow-y-auto px-4 pb-8"
                 :class="isTopBarInSplit ? 'pt-4' : 'pt-6'"
               >
                 <slot />

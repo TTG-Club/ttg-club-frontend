@@ -26,7 +26,7 @@
     <button
       :aria-label="SECTION_TEXT.openImage"
       type="button"
-      class="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg border border-default bg-elevated @min-xl:@max-3xl:w-50 @min-xl:@max-3xl:flex-none"
+      class="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg border border-default bg-elevated @min-xl:@max-6xl:w-50 @min-xl:@max-6xl:flex-none"
       @click.left.exact.prevent="open"
     >
       <img
