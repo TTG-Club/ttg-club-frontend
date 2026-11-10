@@ -23,6 +23,7 @@
     WorkshopSourceSelect,
   } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
+  import { WorkshopImages } from '../images';
   import {
     createRaceForm,
     getHtmlFieldErrors,
@@ -41,8 +42,11 @@
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
+    WORKSHOP_IMAGE_TEXT,
+    WORKSHOP_IMAGES_TAB,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
+    WorkshopImageType,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
   import RaceAbilitiesEditor from './RaceAbilitiesEditor.vue';
@@ -86,6 +90,13 @@
     RACE_EDITOR_TAB.main,
   );
 
+  /** Картинки есть только у сохранённой записи: им нужен её id. */
+  const imagesEntryId = computed(() => {
+    const id = race?.id;
+
+    return typeof id === 'number' ? id : undefined;
+  });
+
   const tabItems = computed<Array<TabsItem>>(() => [
     {
       label: RACE_EDITOR_TAB_TEXT.main,
@@ -103,6 +114,15 @@
       slot: RACE_EDITOR_TAB.features,
       badge: state.features.length || undefined,
     },
+    ...(imagesEntryId.value === undefined
+      ? []
+      : [
+          {
+            label: WORKSHOP_IMAGE_TEXT.title,
+            value: WORKSHOP_IMAGES_TAB,
+            slot: WORKSHOP_IMAGES_TAB,
+          },
+        ]),
   ]);
 
   /**
@@ -379,6 +399,15 @@
             v-model="state.features"
           />
         </div>
+      </template>
+
+      <template #images>
+        <WorkshopImages
+          v-if="imagesEntryId !== undefined"
+          :type="WorkshopImageType.RACE"
+          :entry-id="imagesEntryId"
+          is-title-hidden
+        />
       </template>
     </UTabs>
 

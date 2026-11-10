@@ -9,6 +9,7 @@
     GOD_EDITOR_TEXT,
     GODS_WORKSHOP_KEY,
     parseWorkshopGod,
+    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -43,6 +44,7 @@
         <WorkshopEditFrame
           :api-section="GODS_WORKSHOP_KEY"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.GOD"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"

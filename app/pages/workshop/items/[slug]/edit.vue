@@ -10,6 +10,7 @@
     ITEMS_REFERENCE_PATH,
     ITEMS_WORKSHOP_KEY,
     parseWorkshopItem,
+    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -44,6 +45,7 @@
         <WorkshopEditFrame
           :api-section="ITEMS_WORKSHOP_KEY"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.ITEM"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"
