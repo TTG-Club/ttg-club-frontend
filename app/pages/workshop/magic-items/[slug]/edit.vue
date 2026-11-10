@@ -11,6 +11,7 @@
     MAGIC_ITEMS_REFERENCE_PATH,
     MAGIC_ITEMS_WORKSHOP_KEY,
     parseWorkshopMagicItem,
+    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -45,6 +46,7 @@
         <WorkshopEditFrame
           :api-section="MAGIC_ITEMS_API_SECTION"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.MAGIC_ITEM"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"

@@ -10,6 +10,7 @@ export * from './constants';
 export * from './feats';
 export * from './gods';
 export * from './html-editor';
+export * from './images';
 export * from './items';
 export * from './magic-items';
 export * from './options';

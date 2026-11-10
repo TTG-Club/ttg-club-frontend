@@ -9,6 +9,7 @@
     CREATURE_EDITOR_TEXT,
     fetchWorkshopCreature,
     parseWorkshopCreature,
+    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -44,6 +45,7 @@
         <WorkshopEditFrame
           :api-section="BESTIARY_WORKSHOP_KEY"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.CREATURE"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"

@@ -13,6 +13,7 @@
     getArchetypeReferencePath,
     getRouteSlug,
     parseWorkshopArchetype,
+    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -60,6 +61,7 @@
         <WorkshopEditFrame
           :api-section="ARCHETYPES_API_SECTION"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.SUBCLASS"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"
