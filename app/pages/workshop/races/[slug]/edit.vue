@@ -9,7 +9,6 @@
     RACE_EDITOR_TEXT,
     RACES_REFERENCE_PATH,
     RACES_WORKSHOP_KEY,
-    WorkshopImageType,
   } from '~workshop/model';
   import { RaceEditor } from '~workshop/races';
 
@@ -46,7 +45,6 @@
         <WorkshopEditFrame
           :api-section="RACES_WORKSHOP_KEY"
           :entry-id="entry?.id"
-          :image-type="WorkshopImageType.RACE"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"

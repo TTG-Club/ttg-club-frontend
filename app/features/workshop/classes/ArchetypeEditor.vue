@@ -18,6 +18,7 @@
   } from '../composables';
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
+  import { WorkshopImages } from '../images';
   import {
     ARCHETYPE_EDITOR_TEXT,
     ARCHETYPE_FIELD_TABS,
@@ -35,8 +36,11 @@
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
+    WORKSHOP_IMAGE_TEXT,
+    WORKSHOP_IMAGES_TAB,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
+    WorkshopImageType,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
   import ClassTableEditor from './ClassTableEditor.vue';
@@ -75,6 +79,13 @@
     CLASS_EDITOR_TAB.main,
   );
 
+  /** Картинки есть только у сохранённой записи: им нужен её id. */
+  const imagesEntryId = computed(() => {
+    const id = archetype.id;
+
+    return typeof id === 'number' ? id : undefined;
+  });
+
   const tabItems = computed<Array<TabsItem>>(() => [
     {
       label: CLASS_EDITOR_TAB_TEXT.main,
@@ -93,6 +104,15 @@
       slot: CLASS_EDITOR_TAB.traits,
       badge: state.traits.length || undefined,
     },
+    ...(imagesEntryId.value === undefined
+      ? []
+      : [
+          {
+            label: WORKSHOP_IMAGE_TEXT.title,
+            value: WORKSHOP_IMAGES_TAB,
+            slot: WORKSHOP_IMAGES_TAB,
+          },
+        ]),
   ]);
 
   /**
@@ -261,6 +281,15 @@
             field-name="traits"
           />
         </div>
+      </template>
+
+      <template #images>
+        <WorkshopImages
+          v-if="imagesEntryId !== undefined"
+          :type="WorkshopImageType.SUBCLASS"
+          :entry-id="imagesEntryId"
+          is-title-hidden
+        />
       </template>
     </UTabs>
 

@@ -20,6 +20,12 @@ export enum WorkshopImageType {
   ARMOR = 'ARMOR',
 }
 
+/**
+ * Вкладка «Изображения» в редакторах с вкладками (класс, архетип, раса).
+ * У остальных редакторов блок картинок стоит под формой.
+ */
+export const WORKSHOP_IMAGES_TAB = 'images';
+
 /** Разделы, у записей которых есть обложка карточки. */
 export const WORKSHOP_COVER_IMAGE_TYPES: ReadonlySet<WorkshopImageType> =
   new Set([WorkshopImageType.CLASS, WorkshopImageType.RACE]);
@@ -38,7 +44,7 @@ export const WORKSHOP_IMAGE_ACCEPT =
 
 /** Подписи блока картинок. */
 export const WORKSHOP_IMAGE_TEXT = {
-  title: 'Картинки',
+  title: 'Изображения',
   description:
     'Файлы перекодируются в WebP и уменьшаются до 2048 пикселей по большей стороне. Изменения сохраняются сразу.',
   coverTitle: 'Обложка карточки',
