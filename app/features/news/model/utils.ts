@@ -1,7 +1,7 @@
 import type { RenderNode } from '../markup';
 import type { NewsKind, NewsShort } from './types';
 
-import { getNodeText, parse, toMarkupSource } from '../markup';
+import { getMarkupText, parseStoredMarkup } from '../markup';
 import { getVideoPoster } from '../video/utils';
 import {
   NEWS_DATE_FORMAT,
@@ -13,20 +13,15 @@ import {
 } from './constants';
 
 /**
- * Приводит поле описания новости (`preview`/`content`) к узлам разметки.
- *
- * Бэкенд непоследователен: в одних ответах описание приходит уже разобранным
- * деревом, в других — сырой хранимой JSON-строкой вида `["текст"]`. Строку
- * разворачиваем и разбираем, готовое дерево отдаём как есть — иначе на
- * странице были бы видны скобки и кавычки.
+ * Приводит поле описания новости (`preview`/`content`) к виду для отрисовки.
  *
  * @param value - Поле описания из ответа API
- * @returns Узлы разметки
+ * @returns Описание для MarkupRender
  */
 export function toNewsMarkup(
   value: RenderNode,
 ): RenderNode | Array<RenderNode> {
-  return typeof value === 'string' ? parse(toMarkupSource(value)) : value;
+  return parseStoredMarkup(value);
 }
 
 /**
@@ -36,7 +31,7 @@ export function toNewsMarkup(
  * @returns Текст анонса
  */
 export function getNewsPreviewText(value: RenderNode): string {
-  return getNodeText(toNewsMarkup(value)).trim();
+  return getMarkupText(parseStoredMarkup(value));
 }
 
 /**

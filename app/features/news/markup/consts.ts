@@ -12,11 +12,6 @@ export const MAX_STRING_LENGTH = 65536;
 // Первый символ маркера
 export const LEADING_CHARACTER = '@';
 
-// Заглушка ПУСТОЙ ячейки таблицы: zero-width space (U+200B). НЕ вырезается
-// String.trim() (категория Cf, не WhiteSpace), поэтому `{@td …}` с пустой
-// ячейкой не падает в convertMarker («must have text») и остаётся невидимой.
-export const CELL_PLACEHOLDER = '\u200B';
-
 // Тип блочного маркера-разделителя. Вертикальную отбивку вокруг него задаёт сам
 // MarkupSeparator (паддингом), поэтому MarkupRender гасит margin'ы и у него, и у
 // соседних блоков — см. GROUP_SPACING_*.

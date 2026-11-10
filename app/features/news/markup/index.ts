@@ -1,4 +1,4 @@
 export { parse } from './parser';
-export { toMarkupSource } from './serializer';
+export { getMarkupText, parseStoredMarkup } from './stored';
 export * from './types';
 export { getNodeText } from './utils';

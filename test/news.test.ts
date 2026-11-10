@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getNodeText } from '~news/markup';
+import { getMarkupText, parseStoredMarkup } from '~news/markup';
 import {
   getNewsCover,
   getNewsListUrl,
@@ -59,7 +59,20 @@ describe('разбор новостей core-api', () => {
     });
 
     expect(news.sourceUrl).toBe('https://example.com');
-    expect(getNodeText(toNewsMarkup(news.content))).toBe('Текст');
+    expect(getMarkupText(toNewsMarkup(news.content))).toBe('Текст');
+  });
+});
+
+describe('хранимая разметка', () => {
+  it('оставляет абзац с маркерами одним абзацем', () => {
+    expect(
+      parseStoredMarkup('["Короткий {@b анонс} новости", "Второй"]'),
+    ).toEqual(['Короткий {@b анонс} новости', 'Второй']);
+  });
+
+  it('не трогает обычную разметку и текст, похожий на JSON', () => {
+    expect(parseStoredMarkup('{@b жирный}')).toBe('{@b жирный}');
+    expect(parseStoredMarkup('[15')).toBe('[15');
   });
 });
 

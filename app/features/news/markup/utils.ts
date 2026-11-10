@@ -176,7 +176,7 @@ export interface MarkupTableCell {
  * @param value - Произвольное значение из JSON таблицы
  * @returns Является ли значение узлом разметки
  */
-function isRenderNodeValue(value: unknown): value is RenderNode {
+export function isRenderNodeValue(value: unknown): value is RenderNode {
   return (
     typeof value === 'string'
     || Array.isArray(value)

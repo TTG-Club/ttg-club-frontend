@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { NewsDetailed } from '../model';
 
-  import { getNodeText } from '../markup';
+  import { getMarkupText } from '../markup';
   import { MarkupRender } from '../markup/ui';
   import {
     NEWS_FALLBACK_IMAGE,
@@ -32,11 +32,11 @@
 
   // Пустые блоки не рендерим: иначе остаётся призрачный отступ
   const hasPreview = computed(
-    () => getNodeText(previewNodes.value).trim().length > 0,
+    () => getMarkupText(previewNodes.value).length > 0,
   );
 
   const hasContent = computed(
-    () => getNodeText(contentNodes.value).trim().length > 0,
+    () => getMarkupText(contentNodes.value).length > 0,
   );
 </script>
 
