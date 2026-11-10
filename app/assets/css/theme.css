@@ -4,8 +4,10 @@
  * переименований.
  *
  * Тема выбирается cookie `ttg_theme_name` (общая со старым SPA на том же
- * домене): класс `dark`/`light` на `<html>` ставит сервер. Без класса (режим
- * `auto`) действует системная тема.
+ * домене): класс `dark`/`light`/`svifty7` на `<html>` ставит сервер. Без
+ * класса (режим `auto`) действует системная тема. Своя тема — класс основы
+ * (`dark`/`light`) и `ttg-custom-theme`, а её переменные приходят тегом
+ * `<style>` (см. `~infrastructure/custom-theme`).
  */
 
 :root,
@@ -254,7 +256,7 @@ html.light {
 }
 
 @media (prefers-color-scheme: light) {
-  html:not(.dark) {
+  html:not(.dark, .light, .svifty7) {
     --bg-transparent: rgba(255, 255, 255, 0);
     --bg-light-main: rgba(249, 246, 235, 0.3);
     --bg-main: #f9f6f1;
@@ -379,4 +381,135 @@ html.light {
       ),
       linear-gradient(to top, rgba(0, 0, 0, 0.41) 0%, rgba(0, 0, 0, 0.075) 100%);
   }
+}
+
+/*
+ * svifty7 — тёмная тема new.ttg.club: тёплый графит (оттенок 75), бежевый
+ * текст вместо белого и мягкий оранжевый акцент. Переменные, которых здесь
+ * нет (редкости, метки, соцсети, карта на главной), — от тёмной темы.
+ */
+html.svifty7 {
+  --color-primary-50: #fff0e7;
+  --color-primary-100: #ffe3d3;
+  --color-primary-200: #fecdb1;
+  --color-primary-300: #f9b48a;
+  --color-primary-400: #f19357;
+  --color-primary-500: #ce7942;
+  --color-primary-600: #ac602c;
+  --color-primary-700: #8b4717;
+  --color-primary-800: #6b3000;
+  --color-primary-900: #491e00;
+  --color-primary-950: #2a0b00;
+
+  --ui-color-primary-50: var(--color-primary-50);
+  --ui-color-primary-100: var(--color-primary-100);
+  --ui-color-primary-200: var(--color-primary-200);
+  --ui-color-primary-300: var(--color-primary-300);
+  --ui-color-primary-400: var(--color-primary-400);
+  --ui-color-primary-500: var(--color-primary-500);
+  --ui-color-primary-600: var(--color-primary-600);
+  --ui-color-primary-700: var(--color-primary-700);
+  --ui-color-primary-800: var(--color-primary-800);
+  --ui-color-primary-900: var(--color-primary-900);
+  --ui-color-primary-950: var(--color-primary-950);
+
+  --ui-color-neutral-50: #e6e1d8;
+  --ui-color-neutral-100: #d2ccc1;
+  --ui-color-neutral-200: #c0baaf;
+  --ui-color-neutral-300: #b2aca1;
+  --ui-color-neutral-400: #ada69b;
+  --ui-color-neutral-500: #a59f94;
+  --ui-color-neutral-600: #8a857f;
+  --ui-color-neutral-700: oklch(0.375 0.006 75);
+  --ui-color-neutral-800: oklch(0.335 0.006 75);
+  --ui-color-neutral-900: oklch(0.3 0.006 75);
+  --ui-color-neutral-950: oklch(0.25 0.006 75);
+
+  --ui-success: #2ed47a;
+  --ui-info: #60afff;
+  --ui-warning: #f7c325;
+  --ui-error: #ff8688;
+  --ui-text-toned: #b2aca1;
+  --ui-text-inverted: #22201d;
+  --ui-bg-inverted: #d2ccc1;
+  --ui-border-muted: oklch(0.33 0.006 75);
+  --ui-border-inverted: #d2ccc1;
+
+  --bg-light-main: oklch(0.3 0.006 75 / 0.3);
+  --bg-main: oklch(0.3 0.006 75);
+  --bg-secondary: oklch(0.315 0.006 75);
+  --bg-secondary-gradient: linear-gradient(
+    135deg,
+    oklch(0.335 0.006 75),
+    oklch(0.315 0.006 75)
+  );
+  --bg-sub-menu: oklch(0.335 0.006 75);
+  --bg-dice: #60afff;
+  --bg-advantage: #2ed47a;
+  --bg-disadvantage: #ff8688;
+  --bg-blockquote: oklch(0.335 0.006 75);
+  --bg-inpur-hover: rgb(255 247 238 / 0.1);
+  --bg-inpur-focus: rgb(255 247 238 / 0.08);
+  --bg-details-title: rgb(255 247 238 / 0.05);
+  --bg-table-list: oklch(0.325 0.006 75);
+  --bg-liner-menu: linear-gradient(
+    to bottom,
+    oklch(0.25 0.006 75),
+    transparent
+  );
+  --bg-liner-menu-scroll: linear-gradient(
+    to bottom,
+    oklch(0.25 0.006 75),
+    var(--bg-main)
+  );
+  --bg-theme-selected: #f19357;
+  --text-color: #c0baaf;
+  --text-color-disabled: #a59f94;
+  --text-color-active: #d2ccc1;
+  --text-color-title: #d2ccc1;
+  --text-b-color: #d2ccc1;
+  --text-g-color: #ada69b;
+  --text-s-color: #c9a77e;
+  --text-a-color: #2ed47a;
+  --text-on-accent: #22201d;
+  --link-color: #f19357;
+  --link-color-hover: #f9b48a;
+  --hover: rgb(255 247 238 / 0.05);
+  --checkbox-bg: rgb(255 247 238 / 0.15);
+  --bg-table-row: rgb(255 247 238 / 0.03);
+  --bg-table-row-highlighted: rgb(255 247 238 / 0.15);
+  --border: oklch(0.36 0.006 75);
+  --border-hover: #c0baaf;
+  --primary: #f19357;
+  --primary-hover: #f9b48a;
+  --primary-active: #ce7942;
+  --primary-disabled: rgb(241 147 87 / 0.67);
+  --primary-select: rgb(241 147 87 / 0.16);
+  --secondary: rgb(255 247 238 / 0.1);
+  --secondary-hover: rgb(255 247 238 / 0.18);
+  --box-shadow: 0 8px 22px rgb(20 18 15 / 0.7);
+  --bg-gradient: linear-gradient(
+    135deg,
+    oklch(0.335 0.006 75 / 0.78),
+    oklch(0.3 0.006 75 / 0.78)
+  );
+  --border-gradient: #6b3000;
+  --background-color-thumb: rgb(210 204 193 / 0.6);
+  --background-color-thumb-hover: rgb(210 204 193 / 0.8);
+  --logo-stroke: #c9a77e;
+  --logo-skull: #6b3000;
+  --logo-section-1: #fecdb1;
+  --logo-section-2: #f9b48a;
+  --logo-section-3: #f19357;
+  --logo-section-4: #ce7942;
+  --logo-section-5: #ac602c;
+  --logo-section-6: #8b4717;
+  --logo-section-7: #6b3000;
+  --logo-section-8: #491e00;
+  --success: #2ed47a;
+  --success-hover: #03b362;
+  --warning: #f7c325;
+  --warning-hover: #d0a207;
+  --error: #ff8688;
+  --error-hover: #da6d6f;
 }

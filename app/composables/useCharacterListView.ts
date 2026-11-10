@@ -23,6 +23,7 @@ function isCharacterListView(value: unknown): value is CharacterListView {
 
 /**
  * Вид списков классов и видов: «Модерн», как в старом SPA, или обложки.
+ * При списках строками — всегда «Модерн».
  *
  * @returns Выбранный вид и его смена
  */
@@ -38,7 +39,11 @@ export function useCharacterListView() {
       : CHARACTER_LIST_VIEW_DEFAULT,
   );
 
-  const isModern = computed(() => view.value === 'modern');
+  // Списки строками: обложки в одну колонку были бы огромными — классы и
+  // виды тогда тоже строками «Модерн»
+  const { isRows } = useListView();
+
+  const isModern = computed(() => view.value === 'modern' || isRows.value);
 
   function change(next: CharacterListView) {
     cookie.value = next;
