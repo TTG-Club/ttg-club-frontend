@@ -23,6 +23,7 @@
     WorkshopSourceSelect,
   } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
+  import { WorkshopImages } from '../images';
   import {
     CLASS_DICE_OPTIONS,
     CLASS_EDITOR_TAB,
@@ -47,9 +48,12 @@
     WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
+    WORKSHOP_IMAGE_TEXT,
+    WORKSHOP_IMAGES_TAB,
     WORKSHOP_SKILL_OPTIONS,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
+    WorkshopImageType,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
   import ClassTableEditor from './ClassTableEditor.vue';
@@ -99,6 +103,13 @@
     CLASS_EDITOR_TAB.main,
   );
 
+  /** Картинки есть только у сохранённой записи: им нужен её id. */
+  const imagesEntryId = computed(() => {
+    const id = heroClass?.id;
+
+    return typeof id === 'number' ? id : undefined;
+  });
+
   // Поля скрытых вкладок не размонтируются: сохранение видит их все
   const tabItems = computed<Array<TabsItem>>(() => [
     {
@@ -133,6 +144,15 @@
       value: CLASS_EDITOR_TAB.equipment,
       slot: CLASS_EDITOR_TAB.equipment,
     },
+    ...(imagesEntryId.value === undefined
+      ? []
+      : [
+          {
+            label: WORKSHOP_IMAGE_TEXT.title,
+            value: WORKSHOP_IMAGES_TAB,
+            slot: WORKSHOP_IMAGES_TAB,
+          },
+        ]),
   ]);
 
   /**
@@ -498,6 +518,15 @@
             :rows="CLASS_EQUIPMENT_ROWS"
           />
         </UFormField>
+      </template>
+
+      <template #images>
+        <WorkshopImages
+          v-if="imagesEntryId !== undefined"
+          :type="WorkshopImageType.CLASS"
+          :entry-id="imagesEntryId"
+          is-title-hidden
+        />
       </template>
     </UTabs>
 

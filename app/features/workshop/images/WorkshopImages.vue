@@ -13,9 +13,15 @@
    * Картинки записи: обложка карточки (у классов и рас) и галерея.
    * Изменения уходят на бэкенд сразу, отдельно от формы записи.
    */
-  const { type, entryId } = defineProps<{
+  const {
+    type,
+    entryId,
+    isTitleHidden = false,
+  } = defineProps<{
     type: WorkshopImageType;
     entryId: number;
+    /** Во вкладке «Изображения» заголовок повторял бы её название. */
+    isTitleHidden?: boolean;
   }>();
 
   const {
@@ -109,9 +115,12 @@
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
+  <section class="col-span-full flex flex-col gap-4">
     <div class="flex flex-col gap-1">
-      <h2 class="flex items-center gap-2 font-semibold text-highlighted">
+      <h2
+        v-if="!isTitleHidden"
+        class="flex items-center gap-2 font-semibold text-highlighted"
+      >
         <UIcon
           :name="WORKSHOP_IMAGE_ICON.title"
           class="size-5 text-primary"
