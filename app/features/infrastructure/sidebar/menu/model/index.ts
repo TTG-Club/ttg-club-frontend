@@ -6,6 +6,6 @@ export type {
   SupportLink,
 } from './types';
 
+export { siteMenuItemSchema, siteMenuSchema } from '#shared/types';
 export * from './constants';
-export { siteMenuItemSchema, siteMenuSchema } from './schema';
-export { buildMenuGroups, toTtgIcon } from './utils';
+export { buildMenuGroups, getMenuLinkIcon } from './utils';

@@ -7,9 +7,6 @@ import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
 /** Стрелка ссылок главной: плитки разделов, «Подробнее», «Перейти» */
 export const HOME_LINK_ARROW_ICON = 'tabler:arrow-right';
 
-/** Ключ данных меню для плиты разделов и ленты инструментов */
-export const HOME_MENU_DATA_KEY = 'home-menu';
-
 /* --- Инструменты -------------------------------------------------------- */
 
 /**
@@ -99,13 +96,6 @@ export const HOME_TOKENATOR_CARD: HomePromoCardContent = {
   image: '/img/bg_token_library.webp',
   to: TOKENATOR_URL,
   external: true,
-};
-
-export const HOME_DISCORD_BOT_CARD: HomePromoCardContent = {
-  eyebrow: 'Весь сайт у вас на сервере!',
-  title: 'Discord Bot',
-  image: '/img/bg_discord_bot.webp',
-  to: '/info/discord_bot',
 };
 
 /* --- Новости ------------------------------------------------------------ */
