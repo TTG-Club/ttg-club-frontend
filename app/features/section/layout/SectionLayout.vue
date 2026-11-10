@@ -201,6 +201,11 @@
     detailSide.value === 'left' ? 'py-3 pr-3' : 'py-3 pl-3',
   );
 
+  // Под шапкой отступ меньше: шапка сама отделена от списка линией
+  const listScrollClass = computed(() =>
+    isTopBarInSplit.value ? 'pt-4' : 'pt-6',
+  );
+
   const listIndex = computed(() => (detailSide.value === 'left' ? 1 : 0));
 
   const filtersIndex = computed(() => (filtersSide.value === 'right' ? 1 : 0));
@@ -307,7 +312,7 @@
 
               <div
                 class="min-h-0 flex-auto overflow-y-auto px-4 pb-8"
-                :class="isTopBarInSplit ? 'pt-4' : 'pt-6'"
+                :class="listScrollClass"
               >
                 <slot />
               </div>
