@@ -1,0 +1,112 @@
+import type { RenderNode } from '../markup';
+import type { NewsKind, NewsShort } from './types';
+
+import { getNodeText, parse, toMarkupSource } from '../markup';
+import { getVideoPoster } from '../video/utils';
+import {
+  NEWS_DATE_FORMAT,
+  NEWS_DATE_LOCALE,
+  NEWS_FALLBACK_IMAGE,
+  NEWS_KINDS,
+  NEWS_META_SEPARATOR,
+} from './constants';
+
+/**
+ * Приводит поле описания новости (`preview`/`content`) к узлам разметки.
+ *
+ * Бэкенд непоследователен: в одних ответах описание приходит уже разобранным
+ * деревом, в других — сырой хранимой JSON-строкой вида `["текст"]`. Строку
+ * разворачиваем и разбираем, готовое дерево отдаём как есть — иначе на
+ * странице были бы видны скобки и кавычки.
+ *
+ * @param value - Поле описания из ответа API
+ * @returns Узлы разметки
+ */
+export function toNewsMarkup(
+  value: RenderNode,
+): RenderNode | Array<RenderNode> {
+  return typeof value === 'string' ? parse(toMarkupSource(value)) : value;
+}
+
+/**
+ * Читаемый текст анонса для карточек: без маркеров и JSON-обёртки.
+ *
+ * @param value - Анонс из ответа API
+ * @returns Текст анонса
+ */
+export function getNewsPreviewText(value: RenderNode): string {
+  return getNodeText(toNewsMarkup(value)).trim();
+}
+
+/**
+ * Обложка новости: своя картинка, превью ролика или заглушка.
+ *
+ * @param news - Новость
+ * @returns Адрес картинки
+ */
+export function getNewsCover(
+  news: Pick<NewsShort, 'previewImageUrl' | 'videoUrl'>,
+): string {
+  return (
+    getVideoPoster(news.videoUrl, news.previewImageUrl) ?? NEWS_FALLBACK_IMAGE
+  );
+}
+
+/**
+ * Дата публикации по-русски.
+ *
+ * @param dateTime - Дата из ответа API
+ * @returns Дата вида «10 ноября 2026 г.» или пустая строка
+ */
+export function formatNewsDate(dateTime: string | null): string {
+  if (!dateTime) {
+    return '';
+  }
+
+  const date = new Date(dateTime);
+
+  return Number.isNaN(date.getTime())
+    ? ''
+    : date.toLocaleDateString(NEWS_DATE_LOCALE, NEWS_DATE_FORMAT);
+}
+
+/**
+ * Подпись над заголовком: автор (у новостей сообщества) и дата.
+ *
+ * @param news - Новость
+ * @returns Строка подписи или пустая строка
+ */
+export function getNewsMeta(
+  news: Pick<NewsShort, 'authorName' | 'publishDateTime'>,
+): string {
+  return [news.authorName, formatNewsDate(news.publishDateTime)]
+    .filter(Boolean)
+    .join(NEWS_META_SEPARATOR);
+}
+
+/**
+ * Адрес страницы новости на новом сайте.
+ *
+ * @param kind - Вид новости
+ * @param url - Слаг новости
+ * @param newSiteUrl - Origin нового сайта
+ * @returns Полный адрес страницы
+ */
+export function getNewsPageUrl(
+  kind: NewsKind,
+  url: string,
+  newSiteUrl: string,
+): string {
+  return `${newSiteUrl}${NEWS_KINDS[kind].pagePath}/${encodeURIComponent(url)}`;
+}
+
+/**
+ * Адрес списка всех новостей этого вида на новом сайте.
+ *
+ * @param kind - Вид новости
+ * @param newSiteUrl - Origin нового сайта
+ * @returns Полный адрес списка
+ */
+export function getNewsListUrl(kind: NewsKind, newSiteUrl: string): string {
+  return `${newSiteUrl}${NEWS_KINDS[kind].listPath}`;
+}

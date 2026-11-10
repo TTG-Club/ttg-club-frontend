@@ -1,4 +1,4 @@
-import type { HomeNews, HomePartner, HomeVideo } from './types';
+import type { HomePartner } from './types';
 
 import { z } from 'zod';
 
@@ -12,26 +12,6 @@ const partnerSchema = z.object({
   img: z.string(),
   url: z.string().min(1),
   order: z.number().nullish(),
-});
-
-/**
- * Ролик из `GET /api/v1/youtube`. На главной нужны только `id` и `name`,
- * остальные поля могут отсутствовать — это не повод прятать ролик.
- */
-const videoSchema = z.object({
-  id: z.string().min(1),
-  name: z.string(),
-});
-
-const videoPageSchema = z.object({ items: z.array(z.unknown()) });
-
-/**
- * Новость из `GET /api/v2/articles/search` core-api. Для плитки нужны только
- * слаг и заголовок.
- */
-const newsSchema = z.object({
-  url: z.string().min(1),
-  title: z.string().min(1),
 });
 
 /**
@@ -112,31 +92,6 @@ export function parseHomePartners(input: unknown): Array<HomePartner> {
     img: partner.img,
     url: partner.url,
     order: partner.order ?? 0,
-  }));
-}
-
-/**
- * Проверяет страницу роликов для панели видео.
- *
- * @param input - ответ `GET /api/v1/youtube`
- * @returns ролики в порядке ответа
- */
-export function parseHomeVideos(input: unknown): Array<HomeVideo> {
-  const page = videoPageSchema.safeParse(input);
-
-  return page.success ? parseList(page.data.items, videoSchema) : [];
-}
-
-/**
- * Проверяет список новостей нового сайта.
- *
- * @param input - ответ `GET /api/v2/articles/search`
- * @returns новости в порядке ответа, свежие первыми
- */
-export function parseHomeNews(input: unknown): Array<HomeNews> {
-  return parseList(input, newsSchema).map((news) => ({
-    url: news.url,
-    title: news.title,
   }));
 }
 

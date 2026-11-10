@@ -1,13 +1,13 @@
 <script setup lang="ts">
-  import type { HomeVideo } from '../model';
+  import type { YoutubeVideo } from '../../model';
 
   import {
-    HOME_VIDEO_EMBED_ALLOW,
-    HOME_VIDEO_EMBED_PARAMS,
-    HOME_VIDEO_EMBED_URL,
-    HOME_VIDEO_PLAY_LABEL,
-    HOME_VIDEO_POSTER_URL,
-  } from '../model';
+    YOUTUBE_EMBED_ALLOW,
+    YOUTUBE_EMBED_PARAMS,
+    YOUTUBE_EMBED_URL,
+    YOUTUBE_PLAY_LABEL,
+    YOUTUBE_POSTER_URL,
+  } from '../../model';
 
   /**
    * Плеер YouTube «по требованию»: до клика это обложка с кнопкой, фрейм
@@ -15,7 +15,7 @@
    * ради ролика, который могут и не включить.
    */
   const { video } = defineProps<{
-    video: HomeVideo;
+    video: Pick<YoutubeVideo, 'id' | 'name'>;
   }>();
 
   const isStarted = ref(false);
@@ -23,11 +23,11 @@
   const videoId = computed(() => encodeURIComponent(video.id));
 
   const posterStyle = computed(() => ({
-    backgroundImage: `url(${HOME_VIDEO_POSTER_URL}/${videoId.value}/hqdefault.webp)`,
+    backgroundImage: `url(${YOUTUBE_POSTER_URL}/${videoId.value}/hqdefault.webp)`,
   }));
 
   const embedUrl = computed(
-    () => `${HOME_VIDEO_EMBED_URL}/${videoId.value}?${HOME_VIDEO_EMBED_PARAMS}`,
+    () => `${YOUTUBE_EMBED_URL}/${videoId.value}?${YOUTUBE_EMBED_PARAMS}`,
   );
 
   /** Запускает ролик: на место обложки встаёт фрейм YouTube. */
@@ -45,7 +45,7 @@
       v-if="isStarted"
       :src="embedUrl"
       :title="video.name"
-      :allow="HOME_VIDEO_EMBED_ALLOW"
+      :allow="YOUTUBE_EMBED_ALLOW"
       allowfullscreen
       class="absolute inset-0 size-full border-0"
     />
@@ -53,7 +53,7 @@
     <button
       v-else
       type="button"
-      :aria-label="HOME_VIDEO_PLAY_LABEL"
+      :aria-label="YOUTUBE_PLAY_LABEL"
       class="absolute inset-0 flex cursor-pointer items-center justify-center"
       @click.left.exact.prevent="start"
     >

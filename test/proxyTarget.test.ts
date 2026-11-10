@@ -48,6 +48,10 @@ describe('getProxyTarget', () => {
     expect(getProxyTarget('/api/v2/articles/search?type=NEWS', upstreams)).toBe(
       'http://core:8080/api/v2/articles/search?type=NEWS',
     );
+
+    expect(getProxyTarget('/api/v2/community-news/search', upstreams)).toBe(
+      'http://core:8080/api/v2/community-news/search',
+    );
   });
 
   it('без адресов сервисов отправляет всё в основной API', () => {

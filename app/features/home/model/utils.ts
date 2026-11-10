@@ -2,13 +2,7 @@ import type { CSSProperties } from 'vue';
 import type { SiteMenuItem } from '~infrastructure/sidebar/menu/model';
 
 import type { HomeGame } from './schema';
-import type {
-  HomeFeedEntry,
-  HomeNavLink,
-  HomeNews,
-  HomeSectionLink,
-  HomeVideo,
-} from './types';
+import type { HomeNavLink, HomeSectionLink } from './types';
 
 import { sortBy } from 'es-toolkit';
 
@@ -24,14 +18,12 @@ import {
   HOME_LATEST_GAME_GENRES_SEPARATOR,
   HOME_LATEST_GAME_SITE_URL,
   HOME_LATEST_GAME_TYPE_LABELS,
-  HOME_NEWS_ARTICLE_URL,
   HOME_SECTION_DEFAULT_ICON,
   HOME_SECTION_ICONS,
   HOME_SECTION_TEXTURE,
   HOME_TOOL_DEFAULT_ICON,
   HOME_TOOL_ICONS,
   HOME_TOOLS_PATH_PREFIX,
-  HOME_VIDEO_SHORT_URL,
 } from './constants';
 
 /** Пункт меню, у которого точно есть адрес */
@@ -175,58 +167,6 @@ export function getHomeTools(
     );
 
   return sortBy(tools, ['order']).map(toToolLink);
-}
-
-/**
- * Короткая ссылка на ролик YouTube.
- *
- * @param videoId - идентификатор ролика
- * @returns адрес ролика
- */
-export function getHomeVideoUrl(videoId: string): string {
-  return `${HOME_VIDEO_SHORT_URL}${encodeURIComponent(videoId)}`;
-}
-
-/**
- * Адрес новости на новом сайте.
- *
- * @param newsUrl - слаг новости
- * @returns адрес страницы новости
- */
-export function getHomeNewsUrl(newsUrl: string): string {
-  return `${HOME_NEWS_ARTICLE_URL}/${encodeURIComponent(newsUrl)}`;
-}
-
-/**
- * Собирает ленту под плеером: новости и ролики строго чередуются, начиная с
- * новости, — свежий ролик уже стоит в плеере. Когда одного вида не хватает,
- * хвост другого идёт подряд, в своём порядке.
- *
- * @param videos - ролики без того, что в плеере, свежие первыми
- * @param newsList - новости, свежие первыми
- * @returns записи ленты с адресами
- */
-export function getHomeFeed(
-  videos: ReadonlyArray<HomeVideo>,
-  newsList: ReadonlyArray<HomeNews>,
-): Array<HomeFeedEntry> {
-  const length = Math.max(videos.length, newsList.length);
-
-  return Array.from({ length }, (_, index) => index).flatMap((index) => {
-    const entries: Array<HomeFeedEntry> = [];
-    const news = newsList[index];
-    const video = videos[index];
-
-    if (news) {
-      entries.push({ kind: 'news', news, url: getHomeNewsUrl(news.url) });
-    }
-
-    if (video) {
-      entries.push({ kind: 'video', video, url: getHomeVideoUrl(video.id) });
-    }
-
-    return entries;
-  });
 }
 
 /**
