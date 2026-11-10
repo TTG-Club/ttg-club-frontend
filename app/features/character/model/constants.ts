@@ -1,4 +1,3 @@
-import type { CharacterListView } from '~/shared/consts';
 import type { SectionConfig, SectionListView } from '~section/model';
 
 import { EntryExportPlatform, SECTION_PAGE_SIZE_ALL } from '~section/model';
@@ -15,13 +14,16 @@ export const LINK_CARD_ICON = {
   collapse: 'tabler:minus',
 } as const;
 
-/** Раскладка списка классов и видов для каждого вида из настроек. */
+/**
+ * Раскладка списка классов и видов, как на new.ttg.club: обложками, а при
+ * списках строками — строками.
+ */
 export const CHARACTER_LIST_SECTION_VIEW = {
-  modern: 'rows',
+  rows: 'rows',
   covers: 'covers',
-} as const satisfies Record<CharacterListView, SectionListView>;
+} as const satisfies Record<string, SectionListView>;
 
-/** Между книгой и английским названием варианта в карточке «Модерн». */
+/** Между книгой и английским названием варианта в карточке-строке. */
 export const LINK_CARD_CAPTION_SEPARATOR = ' / ';
 
 /* --- Черты -------------------------------------------------------------- */

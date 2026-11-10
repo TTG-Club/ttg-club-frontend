@@ -7,6 +7,7 @@ import type {
 
 import {
   CUSTOM_THEME_COOKIE,
+  DEFAULT_THEME_MODE,
   THEME_COOKIE,
   THEME_COOKIE_MAX_AGE_SECONDS,
   THEME_MODES,
@@ -64,20 +65,19 @@ function getCustomThemePalette(
 }
 
 /**
- * Тема сайта из общей со старым SPA cookie: готовая (тёмная, светлая,
- * svifty7, как в системе) или своя, собранная из настроек посетителя, как
- * на new.ttg.club.
+ * Тема сайта из cookie: готовая (тёмная, светлая, svifty7) или своя,
+ * собранная из настроек посетителя, как на new.ttg.club. Без выбора и при
+ * неизвестном значении — тёмная.
  *
  * Класс темы на `<html>` и переменные своей темы ставятся ещё на сервере,
- * поэтому страница не мигает. В режиме `auto` класса нет и действует
- * системная тема (см. `theme.css`).
+ * поэтому страница не мигает.
  *
  * @returns Текущий режим, класс для `<html>`, CSS своей темы и их смена
  */
 export function useTheme() {
   const cookie = useCookie<string>(THEME_COOKIE, {
     maxAge: THEME_COOKIE_MAX_AGE_SECONDS,
-    default: () => 'auto',
+    default: () => DEFAULT_THEME_MODE,
   });
 
   const customSettingsCookie = useCookie<unknown>(CUSTOM_THEME_COOKIE, {
@@ -86,7 +86,7 @@ export function useTheme() {
   });
 
   const mode = computed<ThemeMode>(() =>
-    isThemeMode(cookie.value) ? cookie.value : 'auto',
+    isThemeMode(cookie.value) ? cookie.value : DEFAULT_THEME_MODE,
   );
 
   // Настройки читаются из общего состояния, а cookie только сохраняет их.
@@ -113,7 +113,7 @@ export function useTheme() {
       return `${customBase.value} ${CUSTOM_THEME_CLASS}`;
     }
 
-    return mode.value === 'auto' ? '' : mode.value;
+    return mode.value;
   });
 
   /** CSS с переменными своей темы; у готовых тем пусто. */

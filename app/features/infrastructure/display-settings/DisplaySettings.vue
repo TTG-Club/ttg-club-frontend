@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type { ThemeMode } from '#shared/consts';
-  import type { CharacterListView, ListView } from '~/shared/consts';
+  import type { ListView } from '~/shared/consts';
 
   import {
     LAYOUT_DRAWER_QUERY,
@@ -12,9 +12,6 @@
   import { useSectionLayout } from './composables';
   import {
     APPEARANCE_GROUP_TITLE,
-    CHARACTER_VIEW_OPTIONS,
-    CHARACTER_VIEW_ROWS_HINT,
-    CHARACTER_VIEW_SETTING_TITLE,
     DISPLAY_SETTINGS_ARIA,
     LIST_VIEW_SETTING_TITLE,
     SECTION_LAYOUT_OPTIONS,
@@ -30,14 +27,10 @@
 
   /**
    * Настройки отображения в боковой панели, как на new.ttg.club: тема (в том
-   * числе своя), раскладка разделов миниатюрами, вид списков и вид классов
-   * и видов.
+   * числе своя), раскладка разделов миниатюрами и вид списков.
    */
   const { mode: themeMode, change: changeTheme } = useTheme();
   const { view: listView, setView: setListView } = useListView();
-
-  const { view: characterView, change: changeCharacterView } =
-    useCharacterListView();
 
   const isMounted = useMounted();
   const isMenuOnLeft = useMediaQuery(LAYOUT_DRAWER_QUERY);
@@ -75,15 +68,6 @@
     get: () => listView.value,
     set: (value: ListView) => setListView(value),
   });
-
-  const character = computed({
-    get: () => characterView.value,
-    set: (value: CharacterListView) => changeCharacterView(value),
-  });
-
-  const characterHint = computed(() =>
-    listView.value === 'rows' ? CHARACTER_VIEW_ROWS_HINT : undefined,
-  );
 </script>
 
 <template>
@@ -147,14 +131,6 @@
               <DisplaySettingsListPreview :columns="option.columns" />
             </template>
           </DisplaySettingsChoice>
-
-          <DisplaySettingsChoice
-            v-model="character"
-            :title="CHARACTER_VIEW_SETTING_TITLE"
-            :options="CHARACTER_VIEW_OPTIONS"
-            :hint="characterHint"
-            shape="pill"
-          />
         </section>
       </div>
     </template>

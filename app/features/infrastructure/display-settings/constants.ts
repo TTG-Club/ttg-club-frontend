@@ -1,5 +1,4 @@
 import type { ThemeMode } from '#shared/consts';
-import type { CharacterListView } from '~/shared/consts';
 
 import type { DisplaySettingsOption } from './choice';
 
@@ -8,7 +7,6 @@ export const THEME_OPTIONS = [
   { value: 'dark', label: 'Тёмная', icon: 'tabler:moon' },
   { value: 'svifty7', label: 'svifty7', icon: 'tabler:palette' },
   { value: 'custom', label: 'Своя', icon: 'tabler:color-swatch' },
-  { value: 'auto', label: 'Как в системе', icon: 'tabler:device-desktop' },
 ] as const satisfies ReadonlyArray<DisplaySettingsOption<ThemeMode>>;
 
 export const DISPLAY_SETTINGS_ARIA = 'Настройки отображения';
@@ -103,14 +101,3 @@ export const SECTION_LAYOUT_OPTIONS = [
 
 /** Настройка вида списков разделов. */
 export const LIST_VIEW_SETTING_TITLE = 'Списки';
-
-/** Настройка вида списков классов и видов. */
-export const CHARACTER_VIEW_SETTING_TITLE = 'Классы и виды';
-
-/** При списках строками классы и виды тоже строками. */
-export const CHARACTER_VIEW_ROWS_HINT = 'при списках строками — «Модерн»';
-
-export const CHARACTER_VIEW_OPTIONS = [
-  { value: 'modern', label: 'Модерн', icon: 'tabler:layout-list' },
-  { value: 'covers', label: 'Обложки', icon: 'tabler:layout-grid' },
-] as const satisfies ReadonlyArray<DisplaySettingsOption<CharacterListView>>;

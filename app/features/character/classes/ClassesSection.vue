@@ -16,11 +16,11 @@
   import ClassEntry from './ClassEntry.vue';
   import ClassRowCard from './ClassRowCard.vue';
 
-  const { isModern } = useCharacterListView();
+  const { isRows } = useListView();
 
   const listView = computed(() =>
-    isModern.value
-      ? CHARACTER_LIST_SECTION_VIEW.modern
+    isRows.value
+      ? CHARACTER_LIST_SECTION_VIEW.rows
       : CHARACTER_LIST_SECTION_VIEW.covers,
   );
 
@@ -37,8 +37,8 @@
 
 <template>
   <!--
-    Классы карточками: сначала основные, затем напарники, UA и хомбрю. Вид
-    «Модерн» — строками, как в старом SPA, иначе обложками.
+    Классы карточками: сначала основные, затем напарники, UA и хомбрю.
+    Обложками, а при списках строками — строками, как на new.ttg.club.
   -->
   <SectionPage
     :section="CLASSES_SECTION"
@@ -51,7 +51,7 @@
   >
     <template #item="{ item, to }">
       <ClassRowCard
-        v-if="isModern"
+        v-if="isRows"
         :class-link="item"
         :to="to"
       />
