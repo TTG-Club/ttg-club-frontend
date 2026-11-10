@@ -15,16 +15,3 @@ export const CHARACTER_LIST_VIEW_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 /** По умолчанию списки выглядят как в старом SPA. */
 export const CHARACTER_LIST_VIEW_DEFAULT: CharacterListView = 'modern';
-
-/** Пункт меню вида списков. */
-export interface CharacterListViewOption {
-  label: string;
-  icon: string;
-}
-
-export const CHARACTER_LIST_VIEW_OPTIONS: Readonly<
-  Record<CharacterListView, CharacterListViewOption>
-> = {
-  modern: { label: 'Модерн', icon: 'tabler:layout-list' },
-  covers: { label: 'Обложки', icon: 'tabler:layout-grid' },
-};

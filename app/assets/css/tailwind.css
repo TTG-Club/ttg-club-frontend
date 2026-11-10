@@ -41,7 +41,8 @@
   --color-primary-select: var(--primary-select);
   --color-secondary-hover: var(--secondary-hover);
   --color-on-image: var(--text-btn-color);
-  --color-on-accent: var(--text-btn-color);
+  /* Надпись на заливке акцента: у тем с ярким акцентом — тёмная */
+  --color-on-accent: var(--text-on-accent, var(--text-btn-color));
   --color-legacy-success: var(--success);
   --color-legacy-warning: var(--warning);
   --shadow-legacy: var(--box-shadow);

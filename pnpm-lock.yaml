@@ -45,6 +45,9 @@ importers:
       '@vueuse/nuxt':
         specifier: ^14.4.0
         version: 14.4.0(6164d57d49c7b1c9418c5cd1fd168cf8)
+      colorjs.io:
+        specifier: ^0.6.1
+        version: 0.6.1
       consola:
         specifier: ^3.4.2
         version: 3.4.2
@@ -3460,6 +3463,9 @@ packages:
 
   colord@2.10.0:
     resolution: {integrity: sha512-AidJptpBJmjTclAp9BkLwJi0T93fo5epJnbaZslpg6QVzpHjAiveF55mE9AcUJiGMqRHgMDY8soMsQtuNYMHfw==}
+
+  colorjs.io@0.6.1:
+    resolution: {integrity: sha512-8lyR2wHzuIykCpqHKgluGsqQi5iDm3/a2IgP2GBZrasn2sBRkE4NOGsglZxWLs/jZQoNkmA/KM/8NV16rLUdBg==}
 
   colortranslator@5.0.0:
     resolution: {integrity: sha512-Z3UPUKasUVDFCDYAjP2fmlVRf1jFHJv1izAmPjiOa0OCIw1W7iC8PZ2GsoDa8uZv+mKyWopxxStT9q05+27h7w==}
@@ -10687,6 +10693,8 @@ snapshots:
   color-name@1.1.4: {}
 
   colord@2.10.0: {}
+
+  colorjs.io@0.6.1: {}
 
   colortranslator@5.0.0: {}
 

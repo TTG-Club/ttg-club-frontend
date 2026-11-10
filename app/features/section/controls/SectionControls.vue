@@ -9,6 +9,7 @@
   } from '../model';
 
   import { SectionFilterDrawer } from '../filter-drawer';
+  import { SectionFilterInline } from '../filter-inline';
   import { isPartCustomized, SECTION_ICON, SECTION_TEXT } from '../model';
 
   /**
@@ -16,18 +17,25 @@
    * поиск, кнопки фильтра и источников, меню «Ещё». Фильтр и источники
    * открываются панелью сбоку. Группировка списка, если раздел её задаёт, —
    * подменю в «Ещё».
+   *
+   * В колонке фильтров (раскладки с фильтрами слева или справа) фильтр по
+   * содержимому стоит прямо под строкой поиска группами, как на
+   * new.ttg.club, и отдельной кнопки у него нет.
    */
   const {
     definition = undefined,
     selection,
     isCustomized = false,
     groupingOptions = undefined,
+    isInline = false,
   } = defineProps<{
     definition?: FilterDefinition | null;
     selection: FilterSelection;
     isCustomized?: boolean;
     /** Варианты группировки списка; без них пункта в меню нет. */
     groupingOptions?: Array<SectionGroupingOption>;
+    /** Колонка фильтров: фильтр по содержимому — группами под поиском. */
+    isInline?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -55,6 +63,10 @@
   );
 
   const hasOther = computed(() => otherGroups.value.length > 0);
+
+  const isOtherButtonVisible = computed(() => hasOther.value && !isInline);
+
+  const isOtherInline = computed(() => hasOther.value && isInline);
 
   const hasSources = computed(
     () => !!definition?.sources.some((group) => !group.hidden),
@@ -89,6 +101,14 @@
 
   function openSources() {
     openDrawer('sources');
+  }
+
+  function updateSelection(next: FilterSelection) {
+    emit('update:selection', next);
+  }
+
+  function resetOther() {
+    emit('reset', 'other');
   }
 
   /** Копирует ссылку на раздел с текущими поиском и фильтром. */
@@ -157,64 +177,75 @@
 </script>
 
 <template>
-  <div class="flex gap-2">
-    <UInput
-      v-model="search"
-      :icon="SECTION_ICON.search"
-      :placeholder="SECTION_TEXT.searchPlaceholder"
-      :aria-label="SECTION_TEXT.searchLabel"
-      type="search"
-      autocomplete="off"
-      class="min-w-0 flex-auto"
-    />
-
-    <UTooltip
-      v-if="hasOther"
-      :text="SECTION_TEXT.filter"
-    >
-      <UChip
-        :show="isOtherCustomized"
-        inset
-      >
-        <UButton
-          :icon="SECTION_ICON.filter"
-          :aria-label="SECTION_TEXT.filter"
-          variant="subtle"
-          square
-          @click.left.exact.prevent="openFilter"
-        />
-      </UChip>
-    </UTooltip>
-
-    <UTooltip
-      v-if="hasSources"
-      :text="SECTION_TEXT.sources"
-    >
-      <UChip
-        :show="isSourcesCustomized"
-        inset
-      >
-        <UButton
-          :icon="SECTION_ICON.sources"
-          :aria-label="SECTION_TEXT.sources"
-          variant="subtle"
-          square
-          @click.left.exact.prevent="openSources"
-        />
-      </UChip>
-    </UTooltip>
-
-    <UDropdownMenu
-      :items="menuItems"
-      :ui="{ content: 'w-64' }"
-    >
-      <UButton
-        :icon="SECTION_ICON.more"
-        :aria-label="SECTION_TEXT.more"
-        variant="subtle"
-        square
+  <div class="flex flex-col gap-4">
+    <div class="flex gap-2">
+      <UInput
+        v-model="search"
+        :icon="SECTION_ICON.search"
+        :placeholder="SECTION_TEXT.searchPlaceholder"
+        :aria-label="SECTION_TEXT.searchLabel"
+        type="search"
+        autocomplete="off"
+        class="min-w-0 flex-auto"
       />
-    </UDropdownMenu>
+
+      <UTooltip
+        v-if="isOtherButtonVisible"
+        :text="SECTION_TEXT.filter"
+      >
+        <UChip
+          :show="isOtherCustomized"
+          inset
+        >
+          <UButton
+            :icon="SECTION_ICON.filter"
+            :aria-label="SECTION_TEXT.filter"
+            variant="subtle"
+            square
+            @click.left.exact.prevent="openFilter"
+          />
+        </UChip>
+      </UTooltip>
+
+      <UTooltip
+        v-if="hasSources"
+        :text="SECTION_TEXT.sources"
+      >
+        <UChip
+          :show="isSourcesCustomized"
+          inset
+        >
+          <UButton
+            :icon="SECTION_ICON.sources"
+            :aria-label="SECTION_TEXT.sources"
+            variant="subtle"
+            square
+            @click.left.exact.prevent="openSources"
+          />
+        </UChip>
+      </UTooltip>
+
+      <UDropdownMenu
+        :items="menuItems"
+        :ui="{ content: 'w-64' }"
+      >
+        <UButton
+          :icon="SECTION_ICON.more"
+          :aria-label="SECTION_TEXT.more"
+          variant="subtle"
+          square
+        />
+      </UDropdownMenu>
+    </div>
+
+    <SectionFilterInline
+      v-if="isOtherInline"
+      :groups="otherGroups"
+      :selection="selection"
+      :is-customized="isOtherCustomized"
+      @update:selection="updateSelection"
+      @reset="resetOther"
+    />
 
     <SectionFilterDrawer
       v-if="definition"

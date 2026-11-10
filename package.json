@@ -30,6 +30,7 @@
     "@ttg-club/dice-roller-parser": "^0.3.2",
     "@vueuse/core": "^14.4.0",
     "@vueuse/nuxt": "^14.4.0",
+    "colorjs.io": "^0.6.1",
     "consola": "^3.4.2",
     "es-toolkit": "^1.48.1",
     "htmlparser2": "^10.1.0",
