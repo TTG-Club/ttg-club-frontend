@@ -16,7 +16,6 @@
 
   const { gate, setSignedIn } = useMaintenanceGate();
   const { isAdmin, isLoggedIn, signOut } = useUser();
-  const { htmlClass } = useTheme();
 
   const isSigningOut = ref(false);
 
@@ -28,11 +27,7 @@
     robots: MAINTENANCE_ROBOTS_RULE,
   });
 
-  useHead({
-    htmlAttrs: {
-      class: htmlClass,
-    },
-  });
+  useThemeHead();
 
   // Вход через форму и продление истёкшей сессии в браузере (плагин
   // user-session) меняют пользователя уже после рендера. Администратору

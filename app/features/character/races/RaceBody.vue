@@ -68,7 +68,7 @@
         v-if="hasAside"
         #aside
       >
-        <div class="flex flex-col gap-4 @min-xl:@max-3xl:flex-row">
+        <div class="flex flex-col gap-4 @min-xl:@max-6xl:flex-row">
           <SectionImageCover
             v-if="race.images?.length"
             :images="race.images"

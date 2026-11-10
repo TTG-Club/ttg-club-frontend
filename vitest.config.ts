@@ -22,6 +22,7 @@ export default defineConfig({
       '~admin': fileURLToPath(new URL('./app/features/admin', import.meta.url)),
       '~info': fileURLToPath(new URL('./app/features/info', import.meta.url)),
       '~home': fileURLToPath(new URL('./app/features/home', import.meta.url)),
+      '~news': fileURLToPath(new URL('./app/features/news', import.meta.url)),
       '~content': fileURLToPath(
         new URL('./app/features/content', import.meta.url),
       ),

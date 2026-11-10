@@ -520,14 +520,17 @@
     color: var(--text-color);
   }
 
+  /* Шапка таблицы на заливке акцента: у тем с ярким акцентом надпись тёмная */
   table thead {
+    --thead-text: var(--text-on-accent, var(--text-btn-color));
+
     font-size: calc(var(--main-font-size) - 2px);
-    color: var(--text-btn-color);
+    color: var(--thead-text);
     background-color: var(--primary);
 
     .dice-roller {
-      border-bottom: 1px solid var(--text-btn-color);
-      color: var(--text-btn-color) !important;
+      border-bottom: 1px solid var(--thead-text);
+      color: var(--thead-text) !important;
     }
   }
 

@@ -79,7 +79,8 @@ export function useHomeHeroMotion(
   return {
     state,
     isSupported,
-    isEnabled: readonly(isEnabled),
+    // localStorage-ссылка допускает null после удаления ключа — наружу отдаём boolean
+    isEnabled: computed(() => isEnabled.value !== false),
     isVisible: readonly(isVisible),
     toggle,
   };

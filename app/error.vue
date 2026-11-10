@@ -30,6 +30,9 @@
     robots: 'noindex',
   });
 
+  // Страница ошибки рисуется без app.vue — тему ставит сама
+  useThemeHead();
+
   // При закрытом сайте ошибка (например, 404) не показывается — посетитель
   // видит ту же заглушку.
   const { isBlocked: isMaintenanceBlocked } = useMaintenanceGate();

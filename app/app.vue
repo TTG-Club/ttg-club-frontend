@@ -4,12 +4,11 @@
   import { useMaintenanceGate } from '~infrastructure/maintenance/composables';
   import { MaintenanceScreen } from '~infrastructure/maintenance/ui';
 
-  const { htmlClass } = useTheme();
+  useThemeHead();
 
   useHead({
     htmlAttrs: {
       lang: 'ru',
-      class: htmlClass,
     },
   });
 

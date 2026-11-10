@@ -6,11 +6,11 @@
     HOME_TOKENATOR_CARD,
     HOME_VTTG_CARD,
   } from '~home/model';
+  import { HomeCommunityNews, HomeNews } from '~home/news';
   import { HomePartners } from '~home/partners';
   import { HomeSections } from '~home/sections';
   import { HomeSocialLinks } from '~home/social-links';
   import { HomePromoCard } from '~home/ui-kit';
-  import { HomeVideos } from '~home/videos';
 
   definePageMeta({
     layout: 'home',
@@ -31,20 +31,24 @@
       <!--
         Ниже xl все обёртки схлопываются в display: contents: блоки становятся
         прямыми флекс-элементами ленты и выстраиваются одним потоком в порядке
-        order: VTTG → Соцсети → Видео → Новая игра → Токенатор → Discord Bot →
-        Друзья.
+        order: VTTG → Соцсети → Новости → Новая игра → Новости сообщества →
+        Токенатор → Discord Bot → Друзья.
 
         С xl лента делится на две половины, растянутые друг под друга. Слева
-        видео. Справа два узких столбца: игра с Токенатором и Discord Bot, и
-        VTTG с соцсетями и друзьями. Столбцы стоят в одном ряду `stretch`,
+        новости сайта (обложка и ряд свежих), под ними новости сообщества —
+        как на new.ttg.club. Справа два узких столбца: игра с Токенатором и
+        Discord Bot, и VTTG с соцсетями и друзьями. Столбцы стоят в одном ряду `stretch`,
         поэтому их низы совпадают: высоту задаёт столбец с игрой, обложка игры
         забирает разницу, а друзья занимают остаток под соцсетями и
-        прокручиваются. VTTG и промо-карточки остаются своей высоты. Видео
-        добирает высоту до правой половины, чтобы низ ленты шёл одной линией.
+        прокручиваются. VTTG и промо-карточки остаются своей высоты. Новости
+        сообщества добирают высоту до правой половины, чтобы низ ленты шёл
+        одной линией.
       -->
       <div class="flex flex-col gap-3 xl:flex-row xl:items-stretch">
         <div class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3">
-          <HomeVideos class="order-2 xl:order-0 xl:flex-auto" />
+          <HomeNews class="order-2 xl:order-0" />
+
+          <HomeCommunityNews class="order-4 xl:order-0 xl:flex-auto" />
         </div>
 
         <div class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3">
@@ -57,13 +61,13 @@
               <HomePromoCard
                 :card="HOME_TOKENATOR_CARD"
                 compact
-                class="order-4 xl:order-0"
+                class="order-5 xl:order-0"
               />
 
               <HomePromoCard
                 :card="HOME_DISCORD_BOT_CARD"
                 compact
-                class="order-5 xl:order-0"
+                class="order-6 xl:order-0"
               />
             </div>
 
@@ -81,7 +85,7 @@
                 Поэтому он не участвует в высоте ряда (flex-basis 0): берёт то,
                 что осталось в колонке под соцсетями, и прокручивается внутри -->
               <HomePartners
-                class="order-6 xl:order-0 xl:min-h-60 xl:flex-[1_1_0]"
+                class="order-7 xl:order-0 xl:min-h-60 xl:flex-[1_1_0]"
               />
             </div>
           </div>

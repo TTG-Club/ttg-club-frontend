@@ -5,6 +5,8 @@
    * и на телефоне они идут столбиком, на широкой странице — рядом.
    * Шапка на широкой странице стоит над текстом, правее свойств, а
    * столбиком — над всем.
+   * Рядом колонки встают только в широком контейнере (от 72rem): в панели
+   * записи рядом со списком таблице класса и тексту расы иначе тесно.
    */
   const { isAsideOnTop = false } = defineProps<{
     /** Колонка свойств всегда над текстом, даже на широкой странице. */
@@ -23,11 +25,11 @@
   const isSideBySide = computed(() => !!slots.aside && !isAsideOnTop);
 
   const gridClass = computed(() =>
-    isSideBySide.value ? '@min-3xl:grid-cols-[20rem_minmax(0,1fr)]' : '',
+    isSideBySide.value ? '@min-6xl:grid-cols-[20rem_minmax(0,1fr)]' : '',
   );
 
   const headerClass = computed(() =>
-    isSideBySide.value ? '@min-3xl:col-start-2' : '',
+    isSideBySide.value ? '@min-6xl:col-start-2' : '',
   );
 
   const asideClass = computed(() => {
@@ -36,15 +38,15 @@
     }
 
     return slots.header
-      ? '@min-3xl:col-start-1 @min-3xl:row-span-2 @min-3xl:row-start-1'
-      : '@min-3xl:col-start-1 @min-3xl:row-start-1';
+      ? '@min-6xl:col-start-1 @min-6xl:row-span-2 @min-6xl:row-start-1'
+      : '@min-6xl:col-start-1 @min-6xl:row-start-1';
   });
 </script>
 
 <template>
   <div class="@container w-full min-w-0">
     <div
-      class="grid grid-cols-1 gap-4 @min-3xl:gap-x-7"
+      class="grid grid-cols-1 gap-4 @min-6xl:gap-x-7"
       :class="gridClass"
     >
       <div

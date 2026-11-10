@@ -15,11 +15,11 @@
   import RaceEntry from './RaceEntry.vue';
   import RaceRowCard from './RaceRowCard.vue';
 
-  const { isModern } = useCharacterListView();
+  const { isRows } = useListView();
 
   const listView = computed(() =>
-    isModern.value
-      ? CHARACTER_LIST_SECTION_VIEW.modern
+    isRows.value
+      ? CHARACTER_LIST_SECTION_VIEW.rows
       : CHARACTER_LIST_SECTION_VIEW.covers,
   );
 
@@ -29,8 +29,8 @@
 
 <template>
   <!--
-    Сначала основные расы, затем группы по порядку. Вид «Модерн» — строками,
-    как в старом SPA, иначе обложками, как виды на new.ttg.club.
+    Сначала основные расы, затем группы по порядку. Обложками, а при списках
+    строками — строками, как виды на new.ttg.club.
   -->
   <SectionPage
     :section="RACES_SECTION"
@@ -43,7 +43,7 @@
   >
     <template #item="{ item, to }">
       <RaceRowCard
-        v-if="isModern"
+        v-if="isRows"
         :race="item"
         :to="to"
       />

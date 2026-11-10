@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { SECTION_GRID_CLASS } from '~section/model';
+  import { SECTION_TILES_GRID_CLASS } from '~section/model';
 
   /**
    * Группа добычи с заголовком между линиями, как группы в списках
    * разделов, и плитками под ним.
    */
-  const { title, gridClass = SECTION_GRID_CLASS.tiles } = defineProps<{
+  const { title, gridClass = SECTION_TILES_GRID_CLASS } = defineProps<{
     title: string;
     /** Сетка плиток; у монет своя, помельче. */
     gridClass?: string;
