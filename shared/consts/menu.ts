@@ -214,11 +214,19 @@ export const MENU_FALLBACK: Array<SiteMenuItem> = [
         url: '/info/bookmarks',
         order: 4,
       },
-      {
-        name: 'Discord Bot',
-        url: '/info/discord_bot',
-        order: 1,
-      },
     ],
   },
 ];
+
+/**
+ * Пункты, которые не показываются в меню, даже если их вернул API. Меню
+ * хранится в базе, и без этого списка выключенный пункт вернулся бы при
+ * восстановлении базы из дампа.
+ *
+ * `/info/discord_bot` — бот сейчас не работает: с сервера в России Discord
+ * недоступен. Вернуть пункт — убрать адрес отсюда (и из базы ничего удалять
+ * не нужно).
+ */
+export const MENU_HIDDEN_URLS: ReadonlySet<string> = new Set([
+  '/info/discord_bot',
+]);

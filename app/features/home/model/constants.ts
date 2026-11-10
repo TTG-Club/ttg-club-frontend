@@ -98,13 +98,6 @@ export const HOME_TOKENATOR_CARD: HomePromoCardContent = {
   external: true,
 };
 
-export const HOME_DISCORD_BOT_CARD: HomePromoCardContent = {
-  eyebrow: 'Весь сайт у вас на сервере!',
-  title: 'Discord Bot',
-  image: '/img/bg_discord_bot.webp',
-  to: '/info/discord_bot',
-};
-
 /* --- Новости ------------------------------------------------------------ */
 
 /** Новый сайт: там публикуются новости и живёт каталог игр */

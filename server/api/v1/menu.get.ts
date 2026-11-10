@@ -2,7 +2,7 @@ import type { SiteMenuItem } from '#shared/types';
 
 import { MENU_FALLBACK, MENU_PATH } from '#shared/consts';
 import { siteMenuSchema } from '#shared/types';
-import { getProxyTarget } from '#shared/utils';
+import { getProxyTarget, withoutHiddenMenuItems } from '#shared/utils';
 
 /** Сколько секунд меню отдаётся из кеша, прежде чем сервер спросит API снова. */
 const MENU_CACHE_MAX_AGE = 10 * 60;
@@ -26,7 +26,7 @@ export default defineCachedEventHandler(
         timeout: MENU_FETCH_TIMEOUT,
       });
 
-      lastMenu = siteMenuSchema.parse(response);
+      lastMenu = withoutHiddenMenuItems(siteMenuSchema.parse(response));
     } catch (error) {
       console.error('[menu] API недоступен, отдаём сохранённое меню', error);
     }
