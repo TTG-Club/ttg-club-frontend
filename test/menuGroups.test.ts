@@ -2,19 +2,21 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildMenuGroups,
+  getMenuLinkIcon,
+  MENU_DEFAULT_ICON,
   TOKENATOR_LEGACY_URL,
   TOKENATOR_URL,
-  toTtgIcon,
   VTTG_MENU_GROUP,
 } from '~infrastructure/sidebar/menu/model';
 
-describe('toTtgIcon', () => {
-  it('переводит путь спрайта в иконку локальной коллекции', () => {
-    expect(toTtgIcon('menu/filled/wiki')).toBe('ttg:menu-filled-wiki');
+describe('getMenuLinkIcon', () => {
+  it('подбирает иконку пункта по адресу', () => {
+    expect(getMenuLinkIcon('/classes')).toBe('tabler:sword');
   });
 
-  it('оставляет группу без иконки', () => {
-    expect(toTtgIcon(undefined)).toBeUndefined();
+  it('ставит общую иконку пункту без своей', () => {
+    expect(getMenuLinkIcon('/draft')).toBe(MENU_DEFAULT_ICON);
+    expect(getMenuLinkIcon(undefined)).toBe(MENU_DEFAULT_ICON);
   });
 });
 
@@ -48,13 +50,16 @@ describe('buildMenuGroups', () => {
       'Инструменты',
       VTTG_MENU_GROUP.label,
     ]);
-
-    expect(groups[1]?.icon).toBe('ttg:menu-filled-tools');
   });
 
   it('прячет пункты только для разработки вне dev', () => {
     expect(buildMenuGroups(items, false)[0]?.links).toEqual([
-      { label: 'Классы', url: '/classes', external: false },
+      {
+        label: 'Классы',
+        url: '/classes',
+        icon: 'tabler:sword',
+        external: false,
+      },
     ]);
 
     expect(buildMenuGroups(items, true)).toHaveLength(4);
@@ -62,11 +67,22 @@ describe('buildMenuGroups', () => {
 
   it('ведёт токенатор на новый сайт и оставляет старую версию рядом', () => {
     expect(buildMenuGroups(items, false)[1]?.links).toEqual([
-      { label: 'Таверна', url: '/tools/tavern', external: false },
-      { label: 'Токенатор', url: TOKENATOR_URL, external: true },
+      {
+        label: 'Таверна',
+        url: '/tools/tavern',
+        icon: 'tabler:beer',
+        external: false,
+      },
+      {
+        label: 'Токенатор',
+        url: TOKENATOR_URL,
+        icon: 'tabler:photo-circle',
+        external: true,
+      },
       {
         label: 'Токенатор (старая версия)',
         url: TOKENATOR_LEGACY_URL,
+        icon: 'tabler:photo',
         external: false,
       },
     ]);

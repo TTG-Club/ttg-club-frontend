@@ -7,9 +7,6 @@ import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
 /** Стрелка ссылок главной: плитки разделов, «Подробнее», «Перейти» */
 export const HOME_LINK_ARROW_ICON = 'tabler:arrow-right';
 
-/** Ключ данных меню для плиты разделов и ленты инструментов */
-export const HOME_MENU_DATA_KEY = 'home-menu';
-
 /* --- Инструменты -------------------------------------------------------- */
 
 /**

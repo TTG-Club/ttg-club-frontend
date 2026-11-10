@@ -3,22 +3,20 @@ import type { MenuGroup, MenuLink, SiteMenuItem } from './types';
 import { sortBy } from 'es-toolkit';
 
 import {
+  MENU_DEFAULT_ICON,
+  MENU_LINK_ICONS,
   TOKENATOR_LEGACY_SUFFIX,
   TOKENATOR_LEGACY_URL,
   TOKENATOR_URL,
-  TTG_ICON_PREFIX,
   VTTG_MENU_GROUP,
 } from './constants';
 
 /**
- * Превращает путь иконки из API (`menu/filled/wiki`) в имя иконки локальной
- * коллекции (`ttg:menu-filled-wiki`).
- * @param iconPath - путь иконки из старого спрайта
+ * Иконка пункта меню по его адресу.
+ * @param url - адрес пункта
  */
-export function toTtgIcon(iconPath: string | undefined): string | undefined {
-  return iconPath
-    ? `${TTG_ICON_PREFIX}${iconPath.replaceAll('/', '-')}`
-    : undefined;
+export function getMenuLinkIcon(url: string | undefined): string {
+  return (url && MENU_LINK_ICONS[url]) || MENU_DEFAULT_ICON;
 }
 
 /**
@@ -30,6 +28,7 @@ function toMenuLinks(item: SiteMenuItem): Array<MenuLink> {
   const link: MenuLink = {
     label: item.name,
     url: item.url,
+    icon: getMenuLinkIcon(item.url),
     external: !!item.external,
   };
 
@@ -38,7 +37,12 @@ function toMenuLinks(item: SiteMenuItem): Array<MenuLink> {
   }
 
   return [
-    { ...link, url: TOKENATOR_URL, external: true },
+    {
+      ...link,
+      url: TOKENATOR_URL,
+      icon: getMenuLinkIcon(TOKENATOR_URL),
+      external: true,
+    },
     { ...link, label: `${item.name}${TOKENATOR_LEGACY_SUFFIX}` },
   ];
 }
@@ -57,7 +61,6 @@ export function buildMenuGroups(
 
   const groups = sortBy(items.filter(isVisible), ['order']).map((group) => ({
     label: group.name,
-    icon: toTtgIcon(group.icon),
     links: sortBy((group.children ?? []).filter(isVisible), ['order']).flatMap(
       toMenuLinks,
     ),
