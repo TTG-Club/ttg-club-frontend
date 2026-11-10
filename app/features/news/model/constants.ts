@@ -16,6 +16,12 @@ export const NEWS_KINDS: Record<NewsKind, NewsKindConfig> = {
   },
 };
 
+/** Поиск свежих опубликованных новостей, добавляется к пути API вида. */
+export const NEWS_SEARCH_PATH = '/search';
+
+/** Сколько строк текста показывает скелетон панели, пока новость грузится. */
+export const NEWS_DRAWER_SKELETON_LINES = 5;
+
 /** Заглушка обложки новости без картинки и ролика. */
 export const NEWS_FALLBACK_IMAGE = '/img/no-img.webp';
 

@@ -9,6 +9,13 @@ import { MARKER_ALIASES, MARKER_ALIASES_LOWERCASE, MARKER_MAP } from './config';
 import { LEADING_CHARACTER, MAX_DEPTH, MAX_STRING_LENGTH } from './consts';
 import { logError } from './utils';
 
+/**
+ * Разбирает строку разметки `{@...}` в дерево узлов. Слишком длинная или
+ * битая строка не роняет страницу — ошибка пишется в лог, текст пропадает.
+ *
+ * @param text - Строка разметки
+ * @returns Узлы разметки
+ */
 export function parse(text: string): RenderNode[] {
   if (text.length > MAX_STRING_LENGTH) {
     logError('Parser', 'String is too long', { text });
@@ -20,13 +27,20 @@ export function parse(text: string): RenderNode[] {
     const depth = 0;
 
     return recursiveParse(text, depth);
-  } catch (err) {
-    logError('Parser', 'Unexpected error', { text, err });
+  } catch (error) {
+    logError('Parser', 'Unexpected error', { text, error });
 
     return [];
   }
 }
 
+/**
+ * Разбирает строку на текст и маркеры с учётом глубины вложенности.
+ *
+ * @param text - Строка разметки
+ * @param depth - Текущая глубина вложенности маркеров
+ * @returns Узлы разметки
+ */
 function recursiveParse(text: string, depth: number): RenderNode[] {
   if (depth > MAX_DEPTH) {
     logError('Parser', 'Maximum nesting depth exceeded', { text });
@@ -38,38 +52,32 @@ function recursiveParse(text: string, depth: number): RenderNode[] {
 
   try {
     tagSplit = splitByMarkers(text);
-  } catch (err) {
-    logError('Parser', 'Splitting error', { text, err });
+  } catch (error) {
+    logError('Parser', 'Splitting error', { text, error });
 
     return [];
   }
 
-  const len = tagSplit.length;
   const result: RenderNode[] = [];
 
-  for (let i = 0; i < len; ++i) {
-    const str = tagSplit[i];
-
-    if (!str) {
+  for (const chunk of tagSplit) {
+    if (!chunk) {
       continue;
     }
 
     try {
-      if (str.startsWith(`{${LEADING_CHARACTER}`)) {
-        const markerStr = str.slice(1, -1);
-        const marker = convertMarker(markerStr, depth);
-
-        result.push(marker);
+      if (chunk.startsWith(`{${LEADING_CHARACTER}`)) {
+        result.push(convertMarker(chunk.slice(1, -1), depth));
       } else {
-        result.push(convertText(str));
+        result.push(convertText(chunk));
       }
-    } catch (err) {
-      logError('Parser', 'Converting error', { str, err });
+    } catch (error) {
+      logError('Parser', 'Converting error', { chunk, error });
 
       // Разобрать маркер не удалось (неизвестное имя, битые атрибуты) —
       // оставляем хотя бы его текст. Молчаливый пропуск вырезал бы кусок
       // предложения вместе со знаками препинания вокруг.
-      const fallback = recoverMarkerText(str, depth);
+      const fallback = recoverMarkerText(chunk, depth);
 
       if (fallback.length) {
         result.push(...fallback);
@@ -124,8 +132,15 @@ function recoverMarkerText(chunk: string, depth: number): RenderNode[] {
   }
 }
 
-function convertMarker(string: string, depth: number): MarkerNode {
-  const { text: rawMarker, rest } = splitFirstSpace(string);
+/**
+ * Превращает тело маркера `@name текст | key:value` в узел.
+ *
+ * @param source - Тело маркера без внешних фигурных скобок
+ * @param depth - Текущая глубина вложенности
+ * @returns Узел маркера
+ */
+function convertMarker(source: string, depth: number): MarkerNode {
+  const { text: rawMarker, rest } = splitFirstSpace(source);
   const name = rawMarker.replace(/^@/, '');
 
   // Регистр имени не важен: в данных попадается `{@I ...}` вместо
@@ -177,7 +192,7 @@ function convertMarker(string: string, depth: number): MarkerNode {
 
   try {
     attrs = splitAttrs(params);
-  } catch (err) {
+  } catch (error) {
     // Атрибуты не распарсились: скорее всего `|` — это часть текста, а не
     // разделитель key:value (например форматирующий маркер над текстом
     // «5 | 10»).
@@ -185,7 +200,7 @@ function convertMarker(string: string, depth: number): MarkerNode {
     // литеральным. Так текст не пропадает со страницы.
     logError('Parser', 'Invalid attributes, treating body as content', {
       rest,
-      err,
+      error,
     });
 
     attrs = undefined;
@@ -199,15 +214,26 @@ function convertMarker(string: string, depth: number): MarkerNode {
   };
 }
 
-/** Разбирает верхнеуровневый чанк `{@name body}` на имя и тело. */
+/**
+ * Разбирает верхнеуровневый чанк `{@name body}` на имя и тело.
+ *
+ * @param chunk - Чанк маркера вместе с фигурными скобками
+ * @returns Имя маркера без `@` и его тело
+ */
 function readMarker(chunk: string): { name: string; body: string } {
-  const inner = chunk.slice(1, -1); // срезаем внешние { }
+  // Срезаем внешние фигурные скобки
+  const inner = chunk.slice(1, -1);
   const { text: rawName, rest } = splitFirstSpace(inner);
 
   return { name: rawName.replace(/^@/, ''), body: rest };
 }
 
-/** splitAttrs, который не бросает (кривые атрибуты ячейки не рушат таблицу). */
+/**
+ * Разбирает атрибуты, не бросая: кривые атрибуты ячейки не рушат таблицу.
+ *
+ * @param params - Части после `|`
+ * @returns Атрибуты или `undefined`
+ */
 function safeAttrs(params: string[]): MarkerAttributes | undefined {
   try {
     return splitAttrs(params);
@@ -240,6 +266,10 @@ interface TableNode extends MarkerNode {
  * `{@td}` → rows. Форма идентична бэкенд-AST, поэтому MarkupTable не
  * меняется. Содержимое ячеек и подписи разбираются рекурсивно (внутри
  * может быть {@dice}, {@creature}…).
+ *
+ * @param rest - Тело маркера таблицы
+ * @param depth - Текущая глубина вложенности
+ * @returns Узел таблицы
  */
 function buildTableNode(rest: string, depth: number): MarkerNode {
   const { text } = splitByPipeBase(rest); // params таблицы зарезервированы
@@ -262,9 +292,9 @@ function buildTableNode(rest: string, depth: number): MarkerNode {
     const { name, body } = readMarker(chunk);
 
     if (name === 'caption') {
-      const { text: capText } = splitByPipeBase(body);
+      const { text: captionText } = splitByPipeBase(body);
 
-      caption = recursiveParse(capText ?? '', depth + 1);
+      caption = recursiveParse(captionText ?? '', depth + 1);
 
       continue;
     }
@@ -337,6 +367,12 @@ function buildTableNode(rest: string, depth: number): MarkerNode {
   return node;
 }
 
+/**
+ * Превращает кусок обычного текста в текстовый узел.
+ *
+ * @param text - Текст между маркерами
+ * @returns Текстовый узел
+ */
 function convertText(text: string | undefined): SimpleTextNode {
   if (!text) {
     throw new Error(`Text marker must have text`);
@@ -348,8 +384,15 @@ function convertText(text: string | undefined): SimpleTextNode {
   };
 }
 
+/**
+ * Делит строку на куски обычного текста и маркеры верхнего уровня; вложенные
+ * маркеры остаются внутри своего родителя.
+ *
+ * @param source - Строка разметки
+ * @returns Куски текста и маркеров по порядку
+ */
 function splitByMarkers(source: string): string[] {
-  let acc = '';
+  let buffer = '';
   let level = 0;
 
   const result: string[] = [];
@@ -357,12 +400,12 @@ function splitByMarkers(source: string): string[] {
   for (let i = 0; i < source.length; i++) {
     // Открытие маркера
     if (source[i] === '{' && source[i + 1] === LEADING_CHARACTER) {
-      if (level++ === 0 && acc) {
-        result.push(acc);
-        acc = '';
+      if (level++ === 0 && buffer) {
+        result.push(buffer);
+        buffer = '';
       }
 
-      acc += `{${LEADING_CHARACTER}`;
+      buffer += `{${LEADING_CHARACTER}`;
       i++;
 
       continue;
@@ -370,28 +413,35 @@ function splitByMarkers(source: string): string[] {
 
     // Закрытие маркера
     if (source[i] === '}') {
-      acc += '}';
+      buffer += '}';
 
       if (level && --level === 0) {
-        result.push(acc);
-        acc = '';
+        result.push(buffer);
+        buffer = '';
       }
 
       continue;
     }
 
-    acc += source[i];
+    buffer += source[i];
   }
 
-  if (acc) {
-    result.push(acc);
+  if (buffer) {
+    result.push(buffer);
   }
 
   return result;
 }
 
+/**
+ * Делит тело маркера по `|` верхнего уровня на текст и параметры; `|` внутри
+ * вложенных маркеров не считается разделителем.
+ *
+ * @param input - Тело маркера
+ * @returns Текст до первого `|` и параметры после него
+ */
 function splitByPipeBase(input: string): { text?: string; params: string[] } {
-  let acc = '';
+  let buffer = '';
   let level = 0;
 
   const params: string[] = [];
@@ -404,14 +454,14 @@ function splitByPipeBase(input: string): { text?: string; params: string[] } {
 
     if (isMarkerOpen) {
       level++;
-      acc += `{${LEADING_CHARACTER}`;
+      buffer += `{${LEADING_CHARACTER}`;
       i++;
 
       continue;
     }
 
     if (char === '}') {
-      acc += '}';
+      buffer += '}';
 
       if (level) {
         --level;
@@ -423,41 +473,54 @@ function splitByPipeBase(input: string): { text?: string; params: string[] } {
     // Основная логика: разделитель pipe, если не во вложенностях
     if (char === '|' && level === 0) {
       if (text === undefined) {
-        text = acc.trim();
+        text = buffer.trim();
       } else {
-        params.push(acc.trim());
+        params.push(buffer.trim());
       }
 
-      acc = '';
+      buffer = '';
     } else {
-      acc += char;
+      buffer += char;
     }
   }
 
-  if (acc) {
+  if (buffer) {
     if (text === undefined) {
-      text = acc.trim();
+      text = buffer.trim();
     } else {
-      params.push(acc.trim());
+      params.push(buffer.trim());
     }
   }
 
   return { text, params };
 }
 
-function splitFirstSpace(string: string): { text: string; rest: string } {
-  const index = string.indexOf(' ');
+/**
+ * Делит строку по первому пробелу.
+ *
+ * @param source - Исходная строка
+ * @returns Часть до пробела и остаток после него
+ */
+function splitFirstSpace(source: string): { text: string; rest: string } {
+  const index = source.indexOf(' ');
 
   if (index < 0) {
-    return { text: string, rest: '' };
+    return { text: source, rest: '' };
   }
 
   return {
-    text: string.substring(0, index),
-    rest: string.substring(index + 1),
+    text: source.substring(0, index),
+    rest: source.substring(index + 1),
   };
 }
 
+/**
+ * Разбирает параметры `key:value` (или `key=value`) в атрибуты маркера.
+ *
+ * @param params - Части после `|`
+ * @returns Атрибуты или `undefined`, если их нет
+ * @throws Если у параметра нет имени или значения
+ */
 function splitAttrs(params: string[]): MarkerAttributes | undefined {
   if (!params.length) {
     return undefined;
@@ -490,10 +553,26 @@ function splitAttrs(params: string[]): MarkerAttributes | undefined {
   return Object.keys(attrs).length > 0 ? attrs : undefined;
 }
 
-function parseAttrValue(attrValue: string): string | number | boolean | null {
+/**
+ * Приводит значение атрибута к типу: число, `true`/`false` и `null` читаются
+ * как JSON, всё остальное остаётся строкой.
+ *
+ * @param attributeValue - Значение атрибута из разметки
+ * @returns Значение нужного типа
+ */
+function parseAttrValue(
+  attributeValue: string,
+): string | number | boolean | null {
   try {
-    return JSON.parse(attrValue);
-  } catch (err) {
-    return attrValue;
+    const parsed: unknown = JSON.parse(attributeValue);
+
+    return typeof parsed === 'number'
+      || typeof parsed === 'boolean'
+      || typeof parsed === 'string'
+      || parsed === null
+      ? parsed
+      : attributeValue;
+  } catch {
+    return attributeValue;
   }
 }

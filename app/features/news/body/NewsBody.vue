@@ -19,6 +19,13 @@
     news: NewsDetailed;
   }>();
 
+  /** Своя обложка новости: заставка ролика или картинка над текстом */
+  const poster = computed(() => news.previewImageUrl ?? undefined);
+
+  const coverImage = computed(
+    () => news.previewImageUrl ?? NEWS_FALLBACK_IMAGE,
+  );
+
   const previewNodes = computed(() => toNewsMarkup(news.preview));
 
   const contentNodes = computed(() => toNewsMarkup(news.content));
@@ -40,12 +47,12 @@
       v-if="news.videoUrl"
       :url="news.videoUrl"
       :title="news.title"
-      :poster="news.previewImageUrl ?? undefined"
+      :poster="poster"
     />
 
     <img
       v-else
-      :src="news.previewImageUrl ?? NEWS_FALLBACK_IMAGE"
+      :src="coverImage"
       :alt="news.title"
       class="aspect-video w-full rounded-xl object-cover"
     />

@@ -1,14 +1,8 @@
-import type { MarkerAttributes, MarkerNode, RenderNode } from './types';
+import type { MarkerAttributes, MarkerNode } from './types';
 
 import { MARKER_MAP } from './config';
-import {
-  CELL_PLACEHOLDER,
-  EMPTY_PARAGRAPH_MARKDOWN,
-  THEMATIC_BREAK_REGEXP,
-} from './consts';
-import { unescapeEditorMarkdown } from './editor-markdown';
-import { parse } from './parser';
-import { isBlockNode, isMarkerNode, isSimpleTextNode } from './utils';
+import { CELL_PLACEHOLDER } from './consts';
+import { isMarkerNode, isSimpleTextNode } from './utils';
 
 /**
  * Сериализует атрибуты маркера в хвост `| key:value | key:value`.
@@ -62,7 +56,7 @@ function serializeMarker(node: MarkerNode): string {
 
   // Таблица: и бэкенд-AST (caption/colLabels/colStyles/rows), и разобранная
   // строка-{@table} дают одну структуру — сериализуем в {@table {@tr {@th}}…},
-  // чтобы редактор загрузил её нативной редактируемой таблицей.
+  // которую парсер снова разберёт в ту же таблицу.
   if (node.type === 'table') {
     return serializeTable(node);
   }
@@ -70,8 +64,7 @@ function serializeMarker(node: MarkerNode): string {
   // Цитата: бэкенд-AST хранит content как МАССИВ-МАССИВОВ (каждый вложенный
   // массив — абзац), разобранная строка-{@quote} — как плоский инлайн. Абзацы
   // соединяем `{@br}{@br}` (граница), внутри абзаца — как есть. НИКАКИХ `\n`
-  // внутри маркера (бэкенд бьёт описание по `\n\n`). Так редактор грузит цитату
-  // нативным blockquote (см. ttg-quote.ts).
+  // внутри маркера (бэкенд бьёт описание по `\n\n`).
   if (node.type === 'quote') {
     return serializeQuote(node);
   }
@@ -222,18 +215,6 @@ function serializeNodes(nodes: unknown[], separator = ''): string {
 }
 
 /**
- * Сериализует массив узлов в ИНЛАЙН-строку (склейка без разделителя между
- * блоками). Единый хелпер для содержимого ячеек/пунктов/абзацев/заголовков в
- * редакторе (ttg-*), чтобы не дублировать `nodes.map(serializeMarkup).join('')`.
- *
- * @param nodes - Узлы разметки для инлайн-сериализации
- * @returns Строка-исходник `{@...}` без разделителей
- */
-export function serializeInlineNodes(nodes: RenderNode[]): string {
-  return serializeNodes(nodes);
-}
-
-/**
  * Преобразует узел разметки (`RenderNode`) обратно в строку формата
  * «Markdown + маркеры {@...}». Обратный к `parse()`.
  *
@@ -268,72 +249,6 @@ export function serializeMarkup(node: unknown): string {
 }
 
 /**
- * Преобразует строку-исходник разметки (что редактирует автор) в СТРУКТУРНУЮ
- * форму хранения — JSON-строку массива, где блочные маркеры разобраны в узлы
- * (`{@table}`/`{@list}`/`{@quote}`/`{@h}`/`{@separator}` → объекты), а обычные
- * абзацы остаются строками (инлайн `{@...}` в них разбирает рендер). Обратна
- * `toMarkupSource`.
- *
- * Результат отдаётся строкой (JSON), чтобы поле описания осталось строковым во
- * всех формах и DTO; бэкенд-десериализатор разберёт её как массив и сохранит
- * структурой. Так блоки хранятся узлами, а не сырыми `{@...}`-строками.
- *
- * @param source - Строка-исходник «Markdown + {@...}» из редактора
- * @returns JSON-строка массива узлов, либо пустая строка для пустого описания
- */
-export function toStoredMarkup(source: string): string {
-  if (!source.trim()) {
-    return '';
-  }
-
-  const stored: RenderNode[] = [];
-
-  // Блоки верхнего уровня разделены пустой строкой (\n\n); внутри маркера
-  // переносов нет, поэтому делить по \n\n безопасно.
-  for (const segment of source.split(/\n{2,}/)) {
-    const text = segment.trim();
-
-    // Пустой абзац редактора (`&nbsp;`) своего содержимого не несёт — на
-    // странице он напечатался бы буквально, поэтому отбрасывается вместе с
-    // по-настоящему пустыми сегментами.
-    if (!text || text === EMPTY_PARAGRAPH_MARKDOWN) {
-      continue;
-    }
-
-    // Тематический разрыв Markdown — это наш разделитель. Он приходит и из
-    // визуального редактора (штатный `horizontalRule` TipTap сериализуется в
-    // `---`), и из режима кода; без этой ветки линия выходила бы на страницу
-    // текстом «---», потому что маркера `---` в разметке нет.
-    if (THEMATIC_BREAK_REGEXP.test(text)) {
-      stored.push({ type: 'separator' });
-
-      continue;
-    }
-
-    // Текст из визуального редактора приходит с экранированием @tiptap/markdown
-    // (`\~`, `\*`, `&amp;`): для round-trip'а внутри редактора оно нужно, а на
-    // странице печаталось бы буквально — снимаем его ровно здесь, на границе
-    // хранения. Пустой абзац и `---` сверяются ДО этого: их экранирование не
-    // касается.
-    const markup = unescapeEditorMarkdown(text);
-
-    const nodes = parse(markup);
-    const [node] = nodes;
-
-    // Сегмент-блок — это РОВНО один блочный узел. Его кладём объектом. Абзац
-    // (текст + инлайн-маркеры) оставляем строкой: её распарсит рендер на
-    // странице (toBlockGroups → parse), как и обычные строки-абзацы с бэкенда.
-    if (nodes.length === 1 && node !== undefined && isBlockNode(node)) {
-      stored.push(node);
-    } else {
-      stored.push(markup);
-    }
-  }
-
-  return stored.length ? JSON.stringify(stored) : '';
-}
-
-/**
  * Приводит «сырое» значение описания с бэкенда к строке-исходнику для правки.
  *
  * Обрабатывает три формы хранения: обычную строку «Markdown + {@...}»,
@@ -362,8 +277,8 @@ export function toMarkupSource(value: unknown): string {
       const parsed: unknown = JSON.parse(trimmed);
 
       // Пустой AST-массив `[]` — это естественная сериализация ПУСТОГО описания
-      // (JSON.stringify пустого дерева). Возвращаем пустую строку (пустой
-      // редактор), а не литерал «[]».
+      // (JSON.stringify пустого дерева). Возвращаем пустую строку, а не
+      // литерал «[]».
       if (Array.isArray(parsed) && parsed.length === 0) {
         return '';
       }

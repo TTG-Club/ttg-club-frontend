@@ -28,10 +28,11 @@
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
 │   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace with turn reel, hit points and armor class on the device, guest key slot)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
-│   │   ├── home/               # hero (map, search, tools), sections, videos, latest-game, social-links, partners, ui-kit
+│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), latest-game, social-links, partners, ui-kit
+│   │   ├── news/               # news of new.ttg.club read here: model (core-api articles and community news), card (hero, tile), drawer (quick reading, page opens on new.ttg.club), body, video (YouTube / VK player), markup (render of the new site markup `{@...}`; links lead to new.ttg.club)
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state)
-│   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, show on home); editors only
+│   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, active flag; the home page no longer shows videos); editors only
 │   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
@@ -60,7 +61,7 @@
 | `NITRO_API_URL`                  | Backend (or gateway) base URL, required                                                                   |
 | `NITRO_SUBSCRIBER_API_URL`       | subscriber-service; empty → `NITRO_API_URL`                                                               |
 | `NITRO_COMMENTS_API_URL`         | comments-service; empty → `NITRO_API_URL`                                                                 |
-| `NITRO_CORE_API_URL`             | core-api (news on the home page); empty → `NITRO_API_URL`                                                 |
+| `NITRO_CORE_API_URL`             | core-api (site news and community news on the home page); empty → `NITRO_API_URL`                         |
 | `NITRO_MAINTENANCE_SETTINGS_URL` | core-app maintenance settings of this site (`<core-app>/api/maintenance/sites/5e14`); empty → site closed |
 | `NUXT_SITE_URL`                  | Canonical origin, defaults to `https://5e14.ttg.club`                                                     |
 | `NUXT_SITE_ENV`                  | `preview` on the dev stand to disable indexing                                                            |
@@ -93,7 +94,8 @@
 | Section modes like new.ttg.club: drawer and wide                                                                                                                               | ✅     |
 | Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker                                              | ✅     |
 | Account, comments, subscription, bug report                                                                                                                                    | ✅     |
-| Admin: home page videos (`/admin/youtube`)                                                                                                                                     | ✅     |
+| Admin: videos (`/admin/youtube`)                                                                                                                                               | ✅     |
+| Home: news and community news from new.ttg.club                                                                                                                                | ✅     |
 | Workshop: shell, revisions, HTML editor, spells, creatures, feats, options, backgrounds, classes, archetypes, races, screens, gods, rules, weapons, armors, items, magic items | ✅     |
 
 ## 🔐 Session
@@ -230,13 +232,19 @@ default group and adds it to any custom group from its menu.
 
 The home page repeats the legacy one block for block. Section tiles and the
 tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
-render on SSR; videos (`/api/v1/youtube`) and friends (`/api/v1/partners`) too.
-The latest game comes from the new.ttg.club game service and core-api, so it
-loads only in the browser. The search field opens the search palette.
+render on SSR; friends (`/api/v1/partners`) too. The latest game comes from the
+new.ttg.club game service and core-api, so it loads only in the browser. The
+search field opens the search palette.
+
+News and community news are written and published on new.ttg.club and shown
+here as on its home page: core-api `/api/v2/articles/search?type=NEWS` and
+`/api/v2/community-news/search`, loaded in the browser. A click opens the news
+in a right drawer for quick reading; the "open page" button and ctrl+click open
+it on new.ttg.club in a new tab. Articles are not shown here.
 
 Moderators and administrators manage the videos at `/admin/youtube` (also in
-the user menu): add by link or ID, rename, delete, and switch up to five on for
-the home page. The page is closed to search engines and to other users.
+the user menu): add by link or ID, rename, delete, and switch up to five on.
+The home page no longer shows them. The page is closed to search engines and to other users.
 
 ## 🛠️ Workshop
 

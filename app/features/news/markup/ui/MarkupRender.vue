@@ -2,7 +2,6 @@
   import type { Group, RenderNode, RenderResult } from '../types';
 
   import { consola } from 'consola';
-  import { computed } from 'vue';
 
   import {
     GROUP_SPACING,
@@ -61,7 +60,7 @@
       }
 
       // Каждый элемент описания разбиваем на блочные/инлайновые группы, чтобы
-      // блочные маркеры ({@h}/{@list}/{@quote}/…) рисовались вне <p>, а не внутри.
+      // блочные маркеры ({@h}/{@list}/{@quote}/…) рисовались вне абзаца, а не внутри.
       const blockGroups = renderNode.flatMap((entry) => toBlockGroups(entry));
 
       const groups: Group[] = blockGroups.map((group, index) => ({
@@ -78,8 +77,8 @@
         isSingle: false,
         groups,
       };
-    } catch (e) {
-      consola.error('[Markup] Error rendering entries:', e);
+    } catch (error) {
+      consola.error('[Markup] Error rendering entries:', error);
 
       return { isSingle: true, vnodes: [] };
     }

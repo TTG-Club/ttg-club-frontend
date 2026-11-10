@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import { NewsHero, NewsTile } from '~news/card';
   import { NewsDrawer } from '~news/drawer';
-  import { getNewsListUrl, NEWS_KINDS, parseNewsList } from '~news/model';
+  import {
+    getNewsListUrl,
+    getNewsSearchPath,
+    NEWS_KINDS,
+    parseNewsList,
+  } from '~news/model';
 
   import { useHomeNewsReader } from '../composables';
   import {
@@ -11,6 +16,7 @@
     HOME_NEWS_EMPTY_TEXT,
     HOME_NEWS_ICON,
     HOME_NEWS_LABEL,
+    HOME_NEWS_TILE_COUNT,
   } from '../model';
   import { HomePanel } from '../ui-kit';
 
@@ -31,7 +37,7 @@
     HOME_NEWS_DATA_KEY,
     async () =>
       parseNewsList(
-        await $fetch(`${NEWS_KINDS.site.apiPath}/search`, {
+        await $fetch(getNewsSearchPath('site'), {
           query: { ...NEWS_KINDS.site.searchQuery, cnt: HOME_NEWS_COUNT },
         }),
       ),
@@ -70,7 +76,7 @@
 
       <div class="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2">
         <div
-          v-for="index in HOME_NEWS_COUNT - 1"
+          v-for="index in HOME_NEWS_TILE_COUNT"
           :key="index"
           class="flex items-center gap-3 p-2"
         >

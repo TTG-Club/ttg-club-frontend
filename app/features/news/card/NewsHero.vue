@@ -3,11 +3,10 @@
 
   import {
     getNewsCover,
-    getNewsMeta,
+    getNewsHeroMeta,
     getNewsPageUrl,
     getNewsPreviewText,
     NEWS_ICON,
-    NEWS_META_SEPARATOR,
     NEWS_TEXT,
   } from '../model';
   import { NewsVideoModal, VIDEO_PLAY_ICON, VIDEO_PLAY_LABEL } from '../video';
@@ -18,7 +17,7 @@
   }>();
 
   defineEmits<{
-    (e: 'open'): void;
+    open: [];
   }>();
 
   const { newSiteUrl } = useRuntimeConfig().public;
@@ -27,25 +26,19 @@
 
   const pageUrl = computed(() => getNewsPageUrl(kind, news.url, newSiteUrl));
 
-  const meta = computed(() =>
-    [news.typeName, getNewsMeta(news)]
-      .filter(Boolean)
-      .join(NEWS_META_SEPARATOR),
-  );
+  const meta = computed(() => getNewsHeroMeta(news));
 
   const previewText = computed(() => getNewsPreviewText(news.preview));
 
+  const playLabel = computed(() => `${VIDEO_PLAY_LABEL}: ${news.title}`);
+
   // Ролик смотрят прямо с главной, в окне поверх страницы: кнопка «Смотреть»
   // по центру обложки. Клик мимо неё по-прежнему открывает саму новость
-  const overlay = useOverlay();
-
-  const videoModal = overlay.create(NewsVideoModal, { destroyOnClose: true });
+  const isVideoOpen = ref(false);
 
   /** Открывает ролик новости в окне поверх страницы. */
   function playVideo(): void {
-    if (news.videoUrl) {
-      videoModal.open({ url: news.videoUrl, title: news.title });
-    }
+    isVideoOpen.value = true;
   }
 </script>
 
@@ -60,7 +53,7 @@
       :href="pageUrl"
       target="_blank"
       rel="noopener noreferrer"
-      class="relative block text-white no-underline"
+      class="relative block text-on-image no-underline"
       @click.left.exact.prevent="$emit('open')"
     >
       <img
@@ -71,7 +64,7 @@
 
       <span
         aria-hidden="true"
-        class="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-black/5"
+        class="absolute inset-0 bg-linear-to-t from-image-scrim/80 via-image-scrim/25 to-image-scrim/5"
       />
 
       <span
@@ -79,20 +72,20 @@
       >
         <span
           v-if="meta"
-          class="font-mono text-[11px] leading-none tracking-[0.16em] text-white/70 uppercase"
+          class="font-mono text-[11px] leading-none tracking-[0.16em] text-on-image/70 uppercase"
         >
           {{ meta }}
         </span>
 
         <span
-          class="line-clamp-2 text-xl leading-tight font-semibold text-balance [text-shadow:0_2px_8px_#000000a0] sm:text-2xl xl:text-3xl"
+          class="line-clamp-2 text-xl leading-tight font-semibold text-balance text-shadow-image-scrim/60 text-shadow-md sm:text-2xl xl:text-3xl"
         >
           {{ news.title }}
         </span>
 
         <span
           v-if="previewText"
-          class="line-clamp-2 max-w-3xl text-sm leading-snug text-white/80 [text-shadow:0_2px_6px_#00000090] sm:text-base"
+          class="line-clamp-2 max-w-3xl text-sm leading-snug text-on-image/80 text-shadow-image-scrim/55 text-shadow-sm sm:text-base"
         >
           {{ previewText }}
         </span>
@@ -102,8 +95,8 @@
     <button
       v-if="news.videoUrl"
       type="button"
-      class="absolute top-1/2 left-1/2 z-20 flex size-16 -translate-x-1/2 -translate-y-[75%] cursor-pointer items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/30 backdrop-blur-sm transition-transform hover:scale-110 sm:size-20"
-      :aria-label="`${VIDEO_PLAY_LABEL}: ${news.title}`"
+      class="absolute top-1/2 left-1/2 z-20 flex size-16 -translate-x-1/2 -translate-y-[75%] cursor-pointer items-center justify-center rounded-full bg-image-scrim/60 text-on-image ring-1 ring-on-image/30 backdrop-blur-sm transition-transform hover:scale-110 sm:size-20"
+      :aria-label="playLabel"
       @click.left.exact.prevent="playVideo"
     >
       <UIcon
@@ -120,7 +113,14 @@
       :aria-label="NEWS_TEXT.openPage"
       variant="ghost"
       size="sm"
-      class="absolute top-2 right-2 z-20 bg-black/40 text-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-black/60 hover:text-white"
+      class="absolute top-2 right-2 z-20 bg-image-scrim/40 text-on-image ring-1 ring-on-image/20 backdrop-blur-sm hover:bg-image-scrim/60 hover:text-on-image"
+    />
+
+    <NewsVideoModal
+      v-if="news.videoUrl"
+      v-model:open="isVideoOpen"
+      :url="news.videoUrl"
+      :title="news.title"
     />
   </div>
 </template>

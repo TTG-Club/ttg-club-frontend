@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import { NewsTile } from '~news/card';
   import { NewsDrawer } from '~news/drawer';
-  import { getNewsListUrl, NEWS_KINDS, parseNewsList } from '~news/model';
+  import {
+    getNewsListUrl,
+    getNewsSearchPath,
+    NEWS_KINDS,
+    parseNewsList,
+  } from '~news/model';
 
   import { useHomeNewsReader } from '../composables';
   import {
@@ -28,7 +33,7 @@
     HOME_COMMUNITY_NEWS_DATA_KEY,
     async () =>
       parseNewsList(
-        await $fetch(`${NEWS_KINDS.community.apiPath}/search`, {
+        await $fetch(getNewsSearchPath('community'), {
           query: {
             ...NEWS_KINDS.community.searchQuery,
             cnt: HOME_COMMUNITY_NEWS_COUNT,

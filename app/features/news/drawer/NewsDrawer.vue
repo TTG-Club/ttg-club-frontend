@@ -6,9 +6,10 @@
   import { NewsBody } from '../body';
   import {
     formatNewsDate,
+    getNewsDetailPath,
     getNewsPageUrl,
+    NEWS_DRAWER_SKELETON_LINES,
     NEWS_ICON,
-    NEWS_KINDS,
     NEWS_TEXT,
     parseNewsDetailed,
   } from '../model';
@@ -34,7 +35,7 @@
     () => `news-drawer-${kind}-${url}`,
     async () =>
       url
-        ? parseNewsDetailed(await $fetch(`${NEWS_KINDS[kind].apiPath}/${url}`))
+        ? parseNewsDetailed(await $fetch(getNewsDetailPath(kind, url)))
         : null,
     { server: false },
   );
@@ -46,6 +47,8 @@
   const isError = computed(() => status.value === 'error');
 
   const pageUrl = computed(() => getNewsPageUrl(kind, url, newSiteUrl));
+
+  const title = computed(() => news.value?.title ?? '');
 
   const publishedAt = computed(() =>
     formatNewsDate(news.value?.publishDateTime ?? null),
@@ -60,7 +63,7 @@
 <template>
   <UDrawer
     v-model:open="isOpen"
-    :title="news?.title ?? ''"
+    :title="title"
     :description="publishedAt"
     :inset="isWide"
     :handle="false"
@@ -79,7 +82,7 @@
     <template #header>
       <div class="flex w-full items-center gap-1">
         <h2 class="min-w-0 flex-auto truncate text-lg text-highlighted">
-          {{ news?.title }}
+          {{ title }}
         </h2>
 
         <UTooltip :text="NEWS_TEXT.openPage">
@@ -121,7 +124,7 @@
         <USkeleton class="aspect-video w-full rounded-xl" />
 
         <USkeleton
-          v-for="index in 5"
+          v-for="index in NEWS_DRAWER_SKELETON_LINES"
           :key="index"
           class="h-6 w-full"
         />

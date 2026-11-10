@@ -15,19 +15,7 @@ export const LEADING_CHARACTER = '@';
 // Заглушка ПУСТОЙ ячейки таблицы: zero-width space (U+200B). НЕ вырезается
 // String.trim() (категория Cf, не WhiteSpace), поэтому `{@td …}` с пустой
 // ячейкой не падает в convertMarker («must have text») и остаётся невидимой.
-// Общая для сериализатора разметки и редактора (ttg-table.ts).
 export const CELL_PLACEHOLDER = '\u200B';
-
-// Тематический разрыв Markdown (`---`, `***`, `___`) отдельной строкой. Нашей
-// разметке он неизвестен, поэтому на границе хранения приводится к
-// `{@separator}` — иначе линия из редактора выходит на страницу текстом «---».
-export const THEMATIC_BREAK_REGEXP = /^(?:-{3,}|\*{3,}|_{3,})$/;
-
-// Пустой абзац: этим маркером @tiptap/markdown сохраняет пустую строку между
-// абзацами при round-trip. Своего содержимого такой абзац не несёт, и на странице
-// маркер печатался бы буквально — на границе хранения сегмент отбрасывается.
-// Общий для редактора (ttg-paragraph.ts) и сериализатора.
-export const EMPTY_PARAGRAPH_MARKDOWN = '&nbsp;';
 
 // Тип блочного маркера-разделителя. Вертикальную отбивку вокруг него задаёт сам
 // MarkupSeparator (паддингом), поэтому MarkupRender гасит margin'ы и у него, и у
@@ -67,3 +55,86 @@ export const SECTION_LINK_PATHS: ReadonlyMap<string, string> = new Map([
   ['creature', 'bestiary'],
   ['glossary', 'glossary'],
 ]);
+
+/** Цвета Nuxt UI, которые можно задать маркеру атрибутом `color`. */
+export const MARKUP_COLORS = [
+  'error',
+  'primary',
+  'secondary',
+  'success',
+  'info',
+  'warning',
+  'neutral',
+] as const;
+
+/** Варианты оформления Nuxt UI для атрибута `variant`. */
+export const MARKUP_VARIANTS = ['solid', 'outline', 'soft', 'subtle'] as const;
+
+/** Размеры Nuxt UI для атрибута `size`. */
+export const MARKUP_SIZES = ['sm', 'md', 'lg'] as const;
+
+export const MARKUP_DEFAULT_COLOR = 'neutral';
+
+export const MARKUP_DEFAULT_VARIANT = 'soft';
+
+export const MARKUP_DEFAULT_SIZE = 'md';
+
+/**
+ * Оформление цитаты по цвету. Классы выписаны целиком: Tailwind находит
+ * классы по тексту исходников, и собранные из кусков строки не попали бы в
+ * сборку.
+ */
+export const MARKUP_QUOTE_CLASSES = {
+  error: 'text-error bg-error/10 border-error ring-error',
+  primary: 'text-primary bg-primary/10 border-primary ring-primary',
+  secondary: 'text-secondary bg-secondary/10 border-secondary ring-secondary',
+  success: 'text-success bg-success/10 border-success ring-success',
+  info: 'text-info bg-info/10 border-info ring-info',
+  warning: 'text-warning bg-warning/10 border-warning ring-warning',
+  neutral: 'text-neutral bg-neutral/10 border-neutral ring-neutral',
+} as const;
+
+/** Классы выравнивания абзаца и заголовка (`left` — по умолчанию, без класса). */
+export const MARKUP_ALIGN_CLASSES: Readonly<Record<string, string>> = {
+  center: 'text-center',
+  right: 'text-right',
+};
+
+/** Уровень заголовка в разметке (1–4) → тег на странице (h3–h6). */
+export const MARKUP_HEADING_TAGS = {
+  1: 'h3',
+  2: 'h4',
+  3: 'h5',
+  4: 'h6',
+} as const;
+
+/** Общие классы заголовков разметки. */
+export const MARKUP_HEADING_BASE_CLASS =
+  'scroll-mt-4 font-semibold text-default tracking-tight';
+
+/** Классы заголовка по уровню: от главного в тексте до минимального. */
+export const MARKUP_HEADING_LEVEL_CLASSES = {
+  1: 'text-xl mt-6 mb-3 border-b border-default pb-2',
+  2: 'text-lg mt-5 mb-2',
+  3: 'text-base mt-4 mb-2',
+  4: 'text-sm mt-3 mb-1 uppercase tracking-wide',
+} as const;
+
+/** Значение атрибута `type` нумерованного списка. */
+export const MARKUP_ORDERED_LIST_TYPE = 'ordered';
+
+/** Тип маркера вложенного списка. */
+export const MARKUP_LIST_TYPE = 'list';
+
+/** Подпись колонки таблицы без заголовка: «#1», «#2»… */
+export const MARKUP_TABLE_COLUMN_PREFIX = '#';
+
+/** Выравнивание заголовков таблицы по умолчанию — исторический вид. */
+export const MARKUP_TABLE_HEADER_ALIGN_CLASS = 'text-center';
+
+/** Классы выравнивания ячейки и заголовка таблицы по атрибуту `align`. */
+export const MARKUP_TABLE_ALIGN_CLASSES: Readonly<Record<string, string>> = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right',
+};

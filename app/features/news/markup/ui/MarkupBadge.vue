@@ -3,99 +3,38 @@
 
   import type { MarkerNode, RenderNode } from '../types';
 
-  import { computed } from 'vue';
-
-  import { UBadge } from '#components';
+  import {
+    MARKUP_COLORS,
+    MARKUP_DEFAULT_COLOR,
+    MARKUP_DEFAULT_SIZE,
+    MARKUP_DEFAULT_VARIANT,
+    MARKUP_SIZES,
+    MARKUP_VARIANTS,
+  } from '../consts';
+  import { pickMarkupOption } from '../utils';
 
   const { node, renderNodes } = defineProps<{
     node: MarkerNode;
     renderNodes: (nodes: RenderNode[]) => VNode[];
   }>();
 
-  function validateColor(
-    color: string | number | boolean | null | undefined,
-  ):
-    | 'error'
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'info'
-    | 'warning'
-    | 'neutral' {
-    if (color === 'error') {
-      return 'error';
-    }
+  // Узел читаем внутри computed: ключи в MarkupRender порядковые, и компонент
+  // может достаться другому узлу
+  const color = computed(() =>
+    pickMarkupOption(node.attrs?.color, MARKUP_COLORS, MARKUP_DEFAULT_COLOR),
+  );
 
-    if (color === 'primary') {
-      return 'primary';
-    }
+  const variant = computed(() =>
+    pickMarkupOption(
+      node.attrs?.variant,
+      MARKUP_VARIANTS,
+      MARKUP_DEFAULT_VARIANT,
+    ),
+  );
 
-    if (color === 'secondary') {
-      return 'secondary';
-    }
-
-    if (color === 'success') {
-      return 'success';
-    }
-
-    if (color === 'info') {
-      return 'info';
-    }
-
-    if (color === 'warning') {
-      return 'warning';
-    }
-
-    if (color === 'neutral') {
-      return 'neutral';
-    }
-
-    return 'neutral';
-  }
-
-  function validateVariant(
-    variant: string | number | boolean | null | undefined,
-  ): 'solid' | 'outline' | 'soft' | 'subtle' {
-    if (variant === 'solid') {
-      return 'solid';
-    }
-
-    if (variant === 'outline') {
-      return 'outline';
-    }
-
-    if (variant === 'soft') {
-      return 'soft';
-    }
-
-    if (variant === 'subtle') {
-      return 'subtle';
-    }
-
-    return 'soft';
-  }
-
-  function validateSize(
-    size: string | number | boolean | null | undefined,
-  ): 'sm' | 'md' | 'lg' {
-    if (size === 'sm') {
-      return 'sm';
-    }
-
-    if (size === 'md') {
-      return 'md';
-    }
-
-    if (size === 'lg') {
-      return 'lg';
-    }
-
-    return 'md';
-  }
-
-  const color = validateColor(node.attrs?.color);
-  const variant = validateVariant(node.attrs?.variant);
-  const size = validateSize(node.attrs?.size);
+  const size = computed(() =>
+    pickMarkupOption(node.attrs?.size, MARKUP_SIZES, MARKUP_DEFAULT_SIZE),
+  );
 
   const children = computed(() =>
     node.content ? renderNodes(node.content) : [],

@@ -9,6 +9,7 @@ import {
   NEWS_FALLBACK_IMAGE,
   NEWS_KINDS,
   NEWS_META_SEPARATOR,
+  NEWS_SEARCH_PATH,
 } from './constants';
 
 /**
@@ -98,6 +99,41 @@ export function getNewsPageUrl(
   newSiteUrl: string,
 ): string {
   return `${newSiteUrl}${NEWS_KINDS[kind].pagePath}/${encodeURIComponent(url)}`;
+}
+
+/**
+ * Путь API свежих новостей этого вида.
+ *
+ * @param kind - Вид новости
+ * @returns Путь поиска в core-api
+ */
+export function getNewsSearchPath(kind: NewsKind): string {
+  return `${NEWS_KINDS[kind].apiPath}${NEWS_SEARCH_PATH}`;
+}
+
+/**
+ * Путь API полной новости.
+ *
+ * @param kind - Вид новости
+ * @param url - Слаг новости
+ * @returns Путь новости в core-api
+ */
+export function getNewsDetailPath(kind: NewsKind, url: string): string {
+  return `${NEWS_KINDS[kind].apiPath}/${encodeURIComponent(url)}`;
+}
+
+/**
+ * Подпись над заголовком обложки: тип записи, автор и дата.
+ *
+ * @param news - Новость
+ * @returns Строка подписи или пустая строка
+ */
+export function getNewsHeroMeta(
+  news: Pick<NewsShort, 'typeName' | 'authorName' | 'publishDateTime'>,
+): string {
+  return [news.typeName, getNewsMeta(news)]
+    .filter(Boolean)
+    .join(NEWS_META_SEPARATOR);
 }
 
 /**

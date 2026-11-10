@@ -1,5 +1,6 @@
 import type {
   HeadingLevel,
+  MarkerAttributes,
   MarkerNode,
   RenderNode,
   SimpleTextNode,
@@ -9,68 +10,6 @@ import { consola } from 'consola';
 
 import { MARKER_MAP } from './config';
 import { SECTION_LINK_PATHS } from './consts';
-
-/**
- * Символы, парные в Markdown: без экранирования текст вроде `_подчерк_`
- * превратится в курсив.
- */
-const MARKDOWN_SPECIAL_REGEXP = /([\\`*_])/g;
-
-/**
- * Перенос строки вместе с окружающими пробелами. Схлопывается в пробел там,
- * где текст обязан остаться однострочным: в строке свойства и в ячейке
- * таблицы перенос разорвал бы разметку.
- */
-export const MARKDOWN_NEWLINE_REGEXP = /\s*\n\s*/g;
-
-/**
- * Литеральный пайп. В потоке текста он безобиден, а в ячейке таблицы
- * читается как граница колонки: неэкранированный добавит лишнюю колонку и
- * сдвинет всю строку относительно шапки.
- */
-const MARKDOWN_PIPE_REGEXP = /\|/g;
-
-/**
- * Экранирует парные символы Markdown в сыром тексте из данных.
- *
- * Скобки и решётка не трогаются — они безопасны в потоке текста, а
- * экранирование сделало бы «\[PHB\]» в источнике. Апостроф-бэктик
- * (`Mordenkainen\`s Private Sanctum`) без экранирования открыл бы код-спан до
- * конца строки.
- *
- * @param value - Сырой текст из данных
- * @returns Текст с экранированными `\`, бэктиком, `*` и `_`
- */
-export function escapeMarkdown(value: string | undefined): string {
-  return value ? value.replace(MARKDOWN_SPECIAL_REGEXP, '\\$1') : '';
-}
-
-/**
- * Экранирует пайпы в готовом Markdown-тексте ячейки.
- *
- * Отдельно от `escapeMarkdown`, потому что на вход идёт уже собранная
- * разметка (`**жирный**`): повторное экранирование парных символов
- * превратило бы её в литеральные звёздочки.
- *
- * @param value - Готовый Markdown-текст ячейки
- * @returns Текст с экранированными пайпами
- */
-export function escapePipes(value: string): string {
-  return value.replace(MARKDOWN_PIPE_REGEXP, '\\|');
-}
-
-/**
- * Экранирует сырой текст из данных для ячейки Markdown-таблицы.
- *
- * Сверх `escapeMarkdown` гасит пайп: таблица, собранная вручную, идёт мимо
- * `renderCell`, и литеральный пайп в значении развалил бы её.
- *
- * @param value - Сырой текст из данных
- * @returns Текст, безопасный внутри ячейки таблицы
- */
-export function escapeMarkdownCell(value: string | undefined): string {
-  return escapePipes(escapeMarkdown(value));
-}
 
 /**
  * Логирует ошибку с контекстом разметки.
@@ -89,8 +28,7 @@ export function logError(
 
 /**
  * Клампит пользовательский уровень заголовка в 1–4 (1 — крупный … 4 —
- * минимальный). Общая доменная логика для рендера страницы (MarkupHeading) и
- * редактора (ttg-heading). Нечисловое/пустое значение сводится к 1.
+ * минимальный). Нечисловое или пустое значение сводится к 1.
  *
  * @param value - Сырое значение уровня (атрибут `level`, любого типа)
  * @returns Уровень в диапазоне 1–4
@@ -158,19 +96,6 @@ export function isBlockNode(node: unknown): boolean {
   const config = MARKER_MAP.get(node.type);
 
   return config?.isBlock === true;
-}
-
-/**
- * Нормализует узлы рендеринга в массив.
- * Если передан один узел, возвращает массив с этим узлом.
- *
- * @param value - Узел или массив узлов
- * @returns Массив узлов RenderNode
- */
-export function normalizeRenderNodes(
-  value: RenderNode | RenderNode[],
-): RenderNode[] {
-  return Array.isArray(value) ? value : [value];
 }
 
 /**
@@ -308,4 +233,21 @@ export function normalizeTableCell(value: unknown): MarkupTableCell {
   }
 
   return isRenderNodeValue(value) ? { content: [value] } : { content: [] };
+}
+
+/**
+ * Выбирает значение атрибута маркера из допустимых вариантов: незнакомое или
+ * пустое значение заменяется значением по умолчанию.
+ *
+ * @param value - Значение атрибута из разметки
+ * @param options - Допустимые значения
+ * @param fallback - Значение по умолчанию
+ * @returns Допустимое значение
+ */
+export function pickMarkupOption<T extends string>(
+  value: MarkerAttributes[string] | undefined,
+  options: ReadonlyArray<T>,
+  fallback: T,
+): T {
+  return options.find((option) => option === value) ?? fallback;
 }

@@ -52,6 +52,9 @@ export const VIDEO_PLAY_ICON = 'tabler:player-play-filled';
 /** Подпись кнопки запуска ролика (для экранных читалок). */
 export const VIDEO_PLAY_LABEL = 'Смотреть видео';
 
+/** Иконка ссылки «открыть ролик на сайте площадки». */
+export const VIDEO_OPEN_SOURCE_ICON = 'tabler:external-link';
+
 /** Подпись ссылки «открыть ролик на сайте площадки». */
 export const VIDEO_OPEN_SOURCE_LABEL = 'Открыть на сайте площадки';
 

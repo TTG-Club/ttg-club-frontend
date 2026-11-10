@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import {
     VIDEO_IFRAME_ALLOW,
+    VIDEO_OPEN_SOURCE_ICON,
     VIDEO_OPEN_SOURCE_LABEL,
     VIDEO_PLAY_ICON,
     VIDEO_PLAY_LABEL,
@@ -39,6 +40,8 @@
     source.value ? VIDEO_PROVIDER_LABELS[source.value.provider] : '',
   );
 
+  const playLabel = computed(() => `${VIDEO_PLAY_LABEL}: ${title}`);
+
   const isPlaying = ref(autoplay);
 
   // Сменили ролик (листание записей в панели) — снова показываем заставку,
@@ -59,7 +62,7 @@
 <template>
   <div
     v-if="source"
-    class="group relative aspect-video w-full overflow-hidden rounded-xl bg-black"
+    class="group relative aspect-video w-full overflow-hidden rounded-xl bg-image-scrim"
   >
     <iframe
       v-if="isPlaying"
@@ -75,7 +78,7 @@
       v-else
       type="button"
       class="absolute inset-0 flex cursor-pointer items-center justify-center"
-      :aria-label="`${VIDEO_PLAY_LABEL}: ${title}`"
+      :aria-label="playLabel"
       @click.left.exact.prevent="play"
     >
       <img
@@ -87,11 +90,11 @@
 
       <span
         aria-hidden="true"
-        class="absolute inset-0 bg-black/35 transition-colors group-hover:bg-black/20"
+        class="absolute inset-0 bg-image-scrim/35 transition-colors group-hover:bg-image-scrim/20"
       />
 
       <span
-        class="relative flex size-16 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/30 backdrop-blur-sm transition-transform group-hover:scale-110"
+        class="relative flex size-16 items-center justify-center rounded-full bg-image-scrim/60 text-on-image ring-1 ring-on-image/30 backdrop-blur-sm transition-transform group-hover:scale-110"
       >
         <UIcon
           :name="VIDEO_PLAY_ICON"
@@ -100,7 +103,7 @@
       </span>
 
       <span
-        class="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-1 font-mono text-[10px] leading-none tracking-[0.14em] text-white/80 uppercase"
+        class="absolute bottom-2 left-2 rounded-md bg-image-scrim/60 px-2 py-1 font-mono text-[10px] leading-none tracking-[0.14em] text-on-image/80 uppercase"
       >
         {{ providerLabel }}
       </span>
@@ -109,10 +112,10 @@
     <UButton
       :to="source.url"
       target="_blank"
-      icon="tabler:external-link"
+      :icon="VIDEO_OPEN_SOURCE_ICON"
       size="xs"
       variant="ghost"
-      class="absolute top-2 right-2 bg-black/50 text-white opacity-0 ring-1 ring-white/20 backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-black/70 hover:text-white focus-visible:opacity-100"
+      class="absolute top-2 right-2 bg-image-scrim/50 text-on-image opacity-0 ring-1 ring-on-image/20 backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-image-scrim/70 hover:text-on-image focus-visible:opacity-100"
       :aria-label="VIDEO_OPEN_SOURCE_LABEL"
     />
   </div>

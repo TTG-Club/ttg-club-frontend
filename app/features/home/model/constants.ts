@@ -122,6 +122,9 @@ export const HOME_NEWS_DATA_KEY = 'home-news';
 /** Обложка свежей новости и ряд из четырёх плиток под ней */
 export const HOME_NEWS_COUNT = 5;
 
+/** Плиток под обложкой: все новости, кроме самой свежей */
+export const HOME_NEWS_TILE_COUNT = HOME_NEWS_COUNT - 1;
+
 export const HOME_NEWS_ALL_LABEL = 'Все новости';
 
 export const HOME_NEWS_EMPTY_TEXT = 'Новостей пока нет';

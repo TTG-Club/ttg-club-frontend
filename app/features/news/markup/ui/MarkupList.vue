@@ -3,14 +3,18 @@
 
   import type { MarkerNode, RenderNode } from '../types';
 
-  import { computed } from 'vue';
+  import { MARKUP_LIST_TYPE, MARKUP_ORDERED_LIST_TYPE } from '../consts';
+  import { isMarkerNode } from '../utils';
 
   const { node, renderNodes } = defineProps<{
     node: MarkerNode;
     renderNodes: (nodes: RenderNode[]) => VNode[];
   }>();
 
-  const isOrdered = computed(() => node.attrs?.type === 'ordered');
+  const isOrdered = computed(
+    () => node.attrs?.type === MARKUP_ORDERED_LIST_TYPE,
+  );
+
   const tag = computed(() => (isOrdered.value ? 'ol' : 'ul'));
 
   const listClass = computed(() => {
@@ -20,17 +24,7 @@
     return ['my-2 list-outside pl-6', baseClass];
   });
 
-  function isMarkerNode(value: unknown): value is MarkerNode {
-    return (
-      typeof value === 'object'
-      && value !== null
-      && 'type' in value
-      && typeof value.type === 'string'
-      && value.type !== 'text'
-    );
-  }
-
-  const liBatches = computed(() => {
+  const listItemBatches = computed(() => {
     const batches: VNode[][] = [];
     const content = node.content ?? [];
 
@@ -42,7 +36,7 @@
       }
 
       // Вложенный список
-      if (isMarkerNode(item) && item.type === 'list') {
+      if (isMarkerNode(item) && item.type === MARKUP_LIST_TYPE) {
         const nestedList = renderNodes([item]);
         const lastBatch = batches[batches.length - 1];
 
@@ -69,7 +63,7 @@
     :class="listClass"
   >
     <li
-      v-for="(batch, index) in liBatches"
+      v-for="(batch, index) in listItemBatches"
       :key="index"
       class="not-first:mt-1"
     >

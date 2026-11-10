@@ -87,7 +87,12 @@ function validateContent(
   }
 }
 
-// Нормализация: всегда возвращает массив VNode
+/**
+ * Рисует список узлов; результат всегда плоский массив.
+ *
+ * @param nodes - Узлы разметки
+ * @returns Узлы Vue
+ */
 export function renderNodes(nodes: RenderNode[]): VNode[] {
   return nodes.flatMap((node) => {
     const result = renderNode(node);
@@ -96,7 +101,14 @@ export function renderNodes(nodes: RenderNode[]): VNode[] {
   });
 }
 
-// Основной рендер - может возвращать VNode или VNode[]
+/**
+ * Рисует один узел: строку разбирает, текст выводит как есть, маркер — тегом
+ * или компонентом из `MARKER_COMPONENTS`.
+ *
+ * @param node - Узел разметки
+ * @returns Узел или узлы Vue
+ * @throws Если тип маркера незнаком или блочный маркер лежит внутри строчного
+ */
 function renderNode(node: RenderNode): VNode | VNode[] {
   // Строка
   if (typeof node === 'string') {
@@ -129,14 +141,10 @@ function renderNode(node: RenderNode): VNode | VNode[] {
 
     validateContent(node.content, node.type, isBlock);
 
-    // Empty маркер
-    if (config.isEmpty) {
-      return h(config.tag!);
-    }
-
-    // HTML-тег
+    // HTML-тег; у пустого маркера (перенос строки) детей нет
     if (config.tag) {
-      const children = node.content ? renderNodes(node.content) : [];
+      const children =
+        !config.isEmpty && node.content ? renderNodes(node.content) : [];
 
       return h(config.tag, children);
     }
@@ -156,6 +164,12 @@ function renderNode(node: RenderNode): VNode | VNode[] {
   throw new Error('[Markup] Unknown node type');
 }
 
+/**
+ * Рисует описание: узел или массив узлов.
+ *
+ * @param content - Описание
+ * @returns Узлы Vue
+ */
 export function render(content: RenderNode | RenderNode[]): VNode[] {
   if (Array.isArray(content)) {
     return renderNodes(content);
@@ -166,7 +180,7 @@ export function render(content: RenderNode | RenderNode[]): VNode[] {
   return Array.isArray(result) ? result : [result];
 }
 
-/** Группа отрендеренных VNode: блочная (рисуется как есть) или инлайновая (в `<p>`). */
+/** Группа отрендеренных VNode: блочная (рисуется как есть) или инлайновая (в абзаце). */
 export interface RenderGroup {
   isBlock: boolean;
   /**
@@ -177,7 +191,13 @@ export interface RenderGroup {
   vnodes: VNode[];
 }
 
-/** Приводит элемент описания к массиву узлов: строку парсит, массив отдаёт как есть. */
+/**
+ * Приводит элемент описания к массиву узлов: строку парсит, массив отдаёт как
+ * есть.
+ *
+ * @param entry - Элемент описания
+ * @returns Узлы разметки
+ */
 function entryToNodes(entry: RenderNode): RenderNode[] {
   if (typeof entry === 'string') {
     return parse(entry);
@@ -193,13 +213,14 @@ function entryToNodes(entry: RenderNode): RenderNode[] {
 /**
  * Разбивает элемент описания на блочные/инлайновые группы. Строку парсит в узлы,
  * затем разводит их: блочные маркеры (заголовок, список, цитата, разделитель,
- * таблица) идут отдельными БЛОЧНЫМИ группами (без обёртки <p>), а идущие подряд
+ * таблица) идут отдельными БЛОЧНЫМИ группами (без обёртки абзацем), а идущие подряд
  * текст/инлайн-маркеры сливаются в одну инлайновую группу.
  *
- * Нужно, чтобы блочный маркер НИКОГДА не оказался внутри <p> — даже если в одной
+ * Нужно, чтобы блочный маркер НИКОГДА не оказался внутри абзаца — даже если в одной
  * строке-исходнике идут вперемешку `{@h ...}` и обычный текст.
  *
  * @param entry - Элемент описания (строка-исходник, узел или массив узлов)
+ * @returns Группы узлов Vue по порядку
  */
 export function toBlockGroups(entry: RenderNode): RenderGroup[] {
   const nodes = entryToNodes(entry);

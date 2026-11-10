@@ -3,6 +3,11 @@
 
   import type { MarkerNode, RenderNode } from '../types';
 
+  import {
+    MARKUP_TABLE_ALIGN_CLASSES,
+    MARKUP_TABLE_COLUMN_PREFIX,
+    MARKUP_TABLE_HEADER_ALIGN_CLASS,
+  } from '../consts';
   import { normalizeTableCell, normalizeTableRows } from '../utils';
 
   /** Таблица из `{@table ...}`: на сайте она приходит готовым узлом из JSON. */
@@ -30,12 +35,13 @@
   const columns = computed(() =>
     Array.from({ length: colCount.value }, (_, index) => ({
       index,
-      label: renderNodes([node.colLabels?.[index] ?? `#${index + 1}`]),
+      label: renderNodes([
+        node.colLabels?.[index] ?? `${MARKUP_TABLE_COLUMN_PREFIX}${index + 1}`,
+      ]),
       style: node.colStyles?.[index] ?? '',
-      // Заголовки по умолчанию по центру — исторический вид таблиц
-      align: node.colAligns?.[index]
-        ? `text-${node.colAligns[index]}`
-        : 'text-center',
+      align:
+        MARKUP_TABLE_ALIGN_CLASSES[node.colAligns?.[index] ?? '']
+        ?? MARKUP_TABLE_HEADER_ALIGN_CLASS,
     })),
   );
 
@@ -60,7 +66,7 @@
         return {
           id: column.index,
           style: column.style,
-          align: cell.align ? `text-${cell.align}` : '',
+          align: MARKUP_TABLE_ALIGN_CLASSES[cell.align ?? ''],
           vnodes: renderNodes(cell.content),
         };
       }),

@@ -46,6 +46,8 @@
   --color-legacy-success: var(--success);
   --color-legacy-warning: var(--warning);
   --shadow-legacy: var(--box-shadow);
+  /* Затемнение под текстом и кнопками поверх картинки — во всех темах тёмное */
+  --color-image-scrim: var(--image-scrim);
   --color-youtube: var(--youtube-base);
   --color-youtube-hover: var(--youtube-hover);
 }
@@ -57,6 +59,10 @@
   /* Расширенная колонка главной: на широких мониторах ширина уходит в
      контент, а не в пустые поля. */
   --max-content-wide: 1600px;
+
+  /* Основа затемнения картинок (`bg-image-scrim/40`): тёмная в любой теме,
+     иначе светлый текст на обложке не читается */
+  --image-scrim: #000;
   --navbar-height: calc(56px + env(safe-area-inset-bottom));
   --navbar-width: calc(64px + env(safe-area-inset-left));
 

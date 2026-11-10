@@ -10,7 +10,7 @@
   }>();
 
   defineEmits<{
-    (e: 'open'): void;
+    open: [];
   }>();
 
   const { newSiteUrl } = useRuntimeConfig().public;
@@ -48,10 +48,10 @@
       <span
         v-if="news.videoUrl"
         aria-hidden="true"
-        class="absolute inset-0 flex items-center justify-center bg-black/25"
+        class="absolute inset-0 flex items-center justify-center bg-image-scrim/25"
       >
         <span
-          class="flex size-7 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/30"
+          class="flex size-7 items-center justify-center rounded-full bg-image-scrim/60 text-on-image ring-1 ring-on-image/30"
         >
           <UIcon
             :name="VIDEO_PLAY_ICON"

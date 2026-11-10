@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { HOME_LINK_ARROW_ICON } from '../model';
   import HomeEyebrow from './HomeEyebrow.vue';
 
   const {
@@ -61,7 +62,7 @@
       {{ linkLabel }}
 
       <UIcon
-        name="tabler:arrow-right"
+        :name="HOME_LINK_ARROW_ICON"
         class="size-3.5"
       />
     </NuxtLink>
