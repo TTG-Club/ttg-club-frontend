@@ -15,6 +15,7 @@ import {
   createCustomThemePalette,
   CUSTOM_THEME_CLASS,
   CUSTOM_THEME_DEFAULT_SETTINGS,
+  getCustomThemeBase,
   parseCustomThemeSettings,
   renderCustomThemeCss,
 } from '~infrastructure/custom-theme/model';
@@ -79,7 +80,6 @@ export function useTheme() {
     default: () => 'auto',
   });
 
-  // Значение из cookie приходит извне — проверяется схемой при каждом чтении
   const customSettingsCookie = useCookie<unknown>(CUSTOM_THEME_COOKIE, {
     maxAge: THEME_COOKIE_MAX_AGE_SECONDS,
     default: () => CUSTOM_THEME_DEFAULT_SETTINGS,
@@ -89,7 +89,11 @@ export function useTheme() {
     isThemeMode(cookie.value) ? cookie.value : 'auto',
   );
 
-  const customSettings = computed(() =>
+  // Настройки читаются из общего состояния, а cookie только сохраняет их.
+  // Браузер сообщает об изменении cookie с опозданием: пока тянут ползунок,
+  // приходят уже устаревшие значения, и чтение из cookie отбрасывало бегунок
+  // назад. Значение из cookie приходит извне — проверяется схемой
+  const customSettings = useState(CUSTOM_THEME_COOKIE, () =>
     parseCustomThemeSettings(customSettingsCookie.value),
   );
 
@@ -100,7 +104,9 @@ export function useTheme() {
   );
 
   /** Основа своей темы: тёмная или светлая палитра под её переменными. */
-  const customBase = computed<CustomThemeBase>(() => customSettings.value.base);
+  const customBase = computed<CustomThemeBase>(() =>
+    getCustomThemeBase(customSettings.value.background),
+  );
 
   const htmlClass = computed(() => {
     if (isCustom.value) {
@@ -130,11 +136,13 @@ export function useTheme() {
    * @param patch - Изменённые настройки
    */
   function changeCustomSettings(patch: Partial<CustomThemeSettings>) {
-    customSettingsCookie.value = { ...customSettings.value, ...patch };
+    customSettings.value = { ...customSettings.value, ...patch };
+    customSettingsCookie.value = customSettings.value;
   }
 
   /** Возвращает своей теме настройки по умолчанию. */
   function resetCustomSettings() {
+    customSettings.value = CUSTOM_THEME_DEFAULT_SETTINGS;
     customSettingsCookie.value = CUSTOM_THEME_DEFAULT_SETTINGS;
   }
 

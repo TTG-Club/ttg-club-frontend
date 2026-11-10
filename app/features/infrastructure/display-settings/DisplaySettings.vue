@@ -9,6 +9,7 @@
   } from '~/shared/consts';
 
   import { DisplaySettingsChoice } from './choice';
+  import { useSectionLayout } from './composables';
   import {
     APPEARANCE_GROUP_TITLE,
     CHARACTER_VIEW_OPTIONS,
@@ -27,24 +28,12 @@
   import { DisplaySettingsLayoutPreview } from './layout-preview';
   import { DisplaySettingsListPreview } from './list-preview';
 
-  type SectionLayout = (typeof SECTION_LAYOUT_OPTIONS)[number]['value'];
-
   /**
    * Настройки отображения в боковой панели, как на new.ttg.club: тема (в том
    * числе своя), раскладка разделов миниатюрами, вид списков и вид классов
    * и видов.
    */
   const { mode: themeMode, change: changeTheme } = useTheme();
-  const { width: layoutWidth, change: changeLayoutWidth } = useLayoutWidth();
-
-  const { isCollapsed: isFiltersCollapsed, setCollapsed: setFiltersCollapsed } =
-    useSectionFiltersCollapsed();
-
-  const { filtersSide, detailSide, setFiltersSide, setDetailSide } =
-    useSectionColumnSides();
-
-  const { isCentered, setCentered } = useSectionCentered();
-
   const { view: listView, setView: setListView } = useListView();
 
   const { view: characterView, change: changeCharacterView } =
@@ -80,64 +69,7 @@
 
   const isCustomTheme = computed(() => themeMode.value === 'custom');
 
-  // Раскладка складывается из настроек: ширины сайта, узкой колонки, места
-  // фильтров (над списком — это свёрнутая колонка) и стороны записи
-  const layout = computed({
-    get: (): SectionLayout => {
-      if (layoutWidth.value !== 'wide') {
-        return 'default';
-      }
-
-      if (isCentered.value) {
-        return 'centered';
-      }
-
-      const filters = isFiltersCollapsed.value ? 'top' : filtersSide.value;
-
-      return (
-        SECTION_LAYOUT_OPTIONS.find(
-          (option) =>
-            option.width === 'wide'
-            && option.filters === filters
-            && !option.centered
-            && option.detail === detailSide.value,
-        )?.value ?? 'default'
-      );
-    },
-    set: (value: SectionLayout) => {
-      const option = SECTION_LAYOUT_OPTIONS.find(
-        (entry) => entry.value === value,
-      );
-
-      if (!option) {
-        return;
-      }
-
-      changeLayoutWidth(option.width);
-
-      // Обычной ширине место колонок не важно — оставляем прежние
-      if (option.width !== 'wide') {
-        return;
-      }
-
-      setCentered(option.centered);
-
-      // Узкой раскладке колонки фильтров не нужно — прежний выбор сохраняем
-      if (option.centered) {
-        setDetailSide(option.detail);
-
-        return;
-      }
-
-      setFiltersCollapsed(option.filters === 'top');
-
-      if (option.filters !== 'top') {
-        setFiltersSide(option.filters);
-      }
-
-      setDetailSide(option.detail);
-    },
-  });
+  const layout = useSectionLayout();
 
   const view = computed({
     get: () => listView.value,

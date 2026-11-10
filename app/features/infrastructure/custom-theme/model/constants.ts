@@ -14,6 +14,7 @@ export const CUSTOM_THEME_STYLE_KEY = 'ttg-custom-theme';
 /**
  * Яркость фона по умолчанию для каждой основы: у тёмной — сине-серый фон
  * тёмной темы сайта (`#131a20`), у светлой — бумага светлой (`#f9f6f1`).
+ * Ставится при смене основы.
  */
 export const CUSTOM_THEME_DEFAULT_LIGHTNESS: Record<CustomThemeBase, number> = {
   dark: 46,
@@ -21,16 +22,43 @@ export const CUSTOM_THEME_DEFAULT_LIGHTNESS: Record<CustomThemeBase, number> = {
 };
 
 /**
+ * Светлота OKLCH, ниже которой фон считается тёмным. Цвет между пределами
+ * основ подтягивается к ближайшему краю — середина не читается ни светлым, ни
+ * тёмным текстом.
+ */
+export const CUSTOM_THEME_BASE_THRESHOLD = 0.6;
+
+/**
+ * Наибольшая насыщенность фона: ярче фон отвлекает от текста, поэтому
+ * сочный цвет приглушается.
+ */
+export const CUSTOM_THEME_MAX_BACKGROUND_CHROMA = 0.08;
+
+/** Наибольшая насыщенность текста — цветной текст кажется грязным. */
+export const CUSTOM_THEME_MAX_TEXT_CHROMA = 0.012;
+
+/**
  * Настройки по умолчанию — повторяют тёмную тему сайта: сине-серый фон и
  * синий акцент.
  */
 export const CUSTOM_THEME_DEFAULT_SETTINGS: CustomThemeSettings = {
-  base: 'dark',
+  background: '#131a20',
   accent: '#5691c7',
-  backgroundLightness: CUSTOM_THEME_DEFAULT_LIGHTNESS.dark,
-  backgroundHue: 244,
-  backgroundTint: 79,
 };
+
+/** Готовые фоны для быстрого выбора: сначала тёмные, потом светлые. */
+export const CUSTOM_THEME_BACKGROUND_PRESETS = [
+  { label: 'Графит', value: '#15171b' },
+  { label: 'Чёрный', value: '#0b0b0b' },
+  { label: 'Ночь', value: '#0d1626' },
+  { label: 'Лес', value: '#0c1c12' },
+  { label: 'Вино', value: '#250e12' },
+  { label: 'Какао', value: '#24180f' },
+  { label: 'Бумага', value: '#f5f8fe' },
+  { label: 'Пергамент', value: '#f8edd8' },
+  { label: 'Мята', value: '#e2f8ef' },
+  { label: 'Белый', value: '#fcfcfc' },
+] as const;
 
 /**
  * Поверхности основ. Сдвиги сняты с тёмной (графит) и светлой (бумага и
@@ -77,14 +105,31 @@ export const CUSTOM_THEME_TEXT_TARGETS: Record<
 /** Насколько ярко должны читаться акцент и цвета состояний (Lc по APCA). */
 export const CUSTOM_THEME_ACCENT_TARGET = 60;
 
+/**
+ * Дальний предел светлоты акцента на ползунке яркости: на тёмной основе
+ * светлее акцент становится почти белым, на светлой темнее — почти чёрным.
+ * Ближний предел задаёт контраст: дальше акцент перестаёт читаться.
+ */
+export const CUSTOM_THEME_ACCENT_LIGHTNESS_LIMIT: Record<
+  CustomThemeBase,
+  number
+> = {
+  dark: 0.92,
+  light: 0.32,
+};
+
 /** Надпись на сплошной кнопке акцента должна читаться не хуже этого (Lc). */
 export const CUSTOM_THEME_SOLID_TEXT_TARGET = 60;
 
-/** Наибольшая насыщенность серых тонов при оттенке фона на 100%. */
-export const CUSTOM_THEME_MAX_TINT_CHROMA = 0.02;
-
 /** Тексту достаётся только часть оттенка фона — иначе он кажется грязным. */
 export const CUSTOM_THEME_TEXT_TINT_SHARE = 0.6;
+
+/**
+ * Прежний вид настроек (основа, яркость, оттенок и насыщенность фона):
+ * насыщенность серых при оттенке 100%. Нужна, чтобы перевести старую cookie в
+ * цвет фона без смены темы.
+ */
+export const CUSTOM_THEME_LEGACY_MAX_TINT_CHROMA = 0.02;
 
 /** Цвета состояний: оттенок и насыщенность OKLCH. */
 export const CUSTOM_THEME_STATUS_COLORS = {

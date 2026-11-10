@@ -72,8 +72,8 @@
    * Вариант по значению кнопки — списком из одного элемента, чтобы шаблон
    * получил его без проверки на пустоту.
    *
-   * @param value Значение кнопки.
-   * @returns Найденный вариант или пустой список.
+   * @param value - Значение кнопки
+   * @returns Найденный вариант или пустой список
    */
   function matchOptions(value: unknown): Array<TOption> {
     return options.filter((entry) => entry.value === value);
@@ -83,7 +83,7 @@
    * Принимает выбор кнопки. Значение ищется среди вариантов, чтобы наружу
    * ушёл вариант нужного типа.
    *
-   * @param value Значение выбранной кнопки.
+   * @param value - Значение выбранной кнопки
    */
   function select(value: unknown): void {
     const [option] = matchOptions(value);
