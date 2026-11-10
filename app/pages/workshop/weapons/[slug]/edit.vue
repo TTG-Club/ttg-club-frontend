@@ -9,6 +9,7 @@
     WEAPON_EDITOR_TEXT,
     WEAPONS_REFERENCE_PATH,
     WEAPONS_WORKSHOP_KEY,
+    WorkshopImageType,
   } from '~workshop/model';
   import { WeaponEditor } from '~workshop/weapons';
 
@@ -44,6 +45,7 @@
         <WorkshopEditFrame
           :api-section="WEAPONS_WORKSHOP_KEY"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.WEAPON"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"

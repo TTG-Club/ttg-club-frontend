@@ -4,5 +4,6 @@ export * from './useFilterGroups';
 export * from './useRaceParentOptions';
 export * from './useWorkshopEditPage';
 export * from './useWorkshopFormTabs';
+export * from './useWorkshopImages';
 export * from './useWorkshopPreview';
 export * from './useWorkshopSave';

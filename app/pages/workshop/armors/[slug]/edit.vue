@@ -10,6 +10,7 @@
     ARMORS_WORKSHOP_KEY,
     fetchReferenceEntry,
     parseWorkshopArmor,
+    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -44,6 +45,7 @@
         <WorkshopEditFrame
           :api-section="ARMORS_WORKSHOP_KEY"
           :entry-id="entry?.id"
+          :image-type="WorkshopImageType.ARMOR"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"
