@@ -71,6 +71,7 @@
             v-for="group in groups"
             :key="group.label"
             :group
+            :class="{ [$style.tools]: group.isTools }"
           />
         </div>
       </nav>
@@ -111,6 +112,15 @@
       grid-auto-flow: column;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       grid-template-rows: repeat(2, auto);
+    }
+  }
+
+  // Инструменты — самая длинная группа: на широком меню она стоит справа
+  // в первой строке во весь рост, и меню становится ниже.
+  .tools {
+    @container (width >= 860px) {
+      grid-row: 1 / span 2;
+      grid-column: 4;
     }
   }
 </style>

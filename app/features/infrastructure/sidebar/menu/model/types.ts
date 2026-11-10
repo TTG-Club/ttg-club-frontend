@@ -14,6 +14,11 @@ export interface MenuLink {
 export interface MenuGroup {
   label: string;
   links: Array<MenuLink>;
+  /**
+   * Группа инструментов: самая длинная, на широком меню стоит справа во
+   * весь рост, чтобы меню было ниже.
+   */
+  isTools?: boolean;
 }
 
 /** Ссылка на соцсеть в подвале меню и в боковой панели. */

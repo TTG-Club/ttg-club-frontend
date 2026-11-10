@@ -5,6 +5,7 @@ import { sortBy } from 'es-toolkit';
 import {
   MENU_DEFAULT_ICON,
   MENU_LINK_ICONS,
+  MENU_TOOLS_PATH_PREFIX,
   TOKENATOR_LEGACY_SUFFIX,
   TOKENATOR_LEGACY_URL,
   TOKENATOR_URL,
@@ -59,12 +60,19 @@ export function buildMenuGroups(
 ): Array<MenuGroup> {
   const isVisible = (item: SiteMenuItem) => isDevelopment || !item.onlyDev;
 
-  const groups = sortBy(items.filter(isVisible), ['order']).map((group) => ({
-    label: group.name,
-    links: sortBy((group.children ?? []).filter(isVisible), ['order']).flatMap(
-      toMenuLinks,
-    ),
-  }));
+  const groups = sortBy(items.filter(isVisible), ['order']).map((group) => {
+    const children = sortBy((group.children ?? []).filter(isVisible), [
+      'order',
+    ]);
+
+    return {
+      label: group.name,
+      links: children.flatMap(toMenuLinks),
+      isTools: children.some((item) =>
+        item.url?.startsWith(MENU_TOOLS_PATH_PREFIX),
+      ),
+    };
+  });
 
   return [...groups, VTTG_MENU_GROUP];
 }

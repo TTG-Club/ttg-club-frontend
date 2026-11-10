@@ -52,6 +52,12 @@ describe('buildMenuGroups', () => {
     ]);
   });
 
+  it('отмечает группу инструментов', () => {
+    expect(
+      buildMenuGroups(items, false).map((group) => !!group.isTools),
+    ).toEqual([false, true, false]);
+  });
+
   it('прячет пункты только для разработки вне dev', () => {
     expect(buildMenuGroups(items, false)[0]?.links).toEqual([
       {

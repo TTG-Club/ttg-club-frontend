@@ -58,6 +58,9 @@ export const MENU_LINK_ICONS: Record<string, string> = {
   '/info/bookmarks': 'tabler:bookmarks',
 };
 
+/** Начало адресов инструментов: по нему находится группа инструментов. */
+export const MENU_TOOLS_PATH_PREFIX = '/tools/';
+
 /** Токенатор переехал на новый сайт. */
 export const TOKENATOR_URL = 'https://new.ttg.club/tokenator';
 
