@@ -17,11 +17,11 @@ const SITE_MENU_DATA_KEY = 'site-menu';
  * @returns пункты меню
  */
 export function useSiteMenu(): Ref<Array<SiteMenuItem>> {
-  const { data } = useAsyncData(
+  const { data: menuItems } = useAsyncData(
     SITE_MENU_DATA_KEY,
     async () => siteMenuSchema.parse(await $fetch(MENU_PATH)),
     { default: () => MENU_FALLBACK },
   );
 
-  return data;
+  return menuItems;
 }

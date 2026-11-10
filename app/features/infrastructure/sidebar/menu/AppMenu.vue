@@ -20,8 +20,14 @@
   // поэтому при открытии оно уже готово: ни скелетона, ни запроса.
   const menuItems = useSiteMenu();
 
-  const groups = computed(() =>
-    buildMenuGroups(menuItems.value, import.meta.dev),
+  const style = useCssModule();
+
+  // Группа инструментов на широком меню встаёт справа во весь рост.
+  const sections = computed(() =>
+    buildMenuGroups(menuItems.value, import.meta.dev).map((group) => ({
+      group,
+      className: group.isTools ? style.tools : undefined,
+    })),
   );
 
   watch(
@@ -68,10 +74,10 @@
       <nav :class="$style.navigation">
         <div :class="$style.content">
           <MenuSection
-            v-for="group in groups"
-            :key="group.label"
-            :group
-            :class="{ [$style.tools]: group.isTools }"
+            v-for="section in sections"
+            :key="section.group.label"
+            :group="section.group"
+            :class="section.className"
           />
         </div>
       </nav>
@@ -119,8 +125,8 @@
   // в первой строке во весь рост, и меню становится ниже.
   .tools {
     @container (width >= 860px) {
-      grid-row: 1 / span 2;
       grid-column: 4;
+      grid-row: 1 / span 2;
     }
   }
 </style>
