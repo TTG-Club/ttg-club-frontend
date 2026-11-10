@@ -53,7 +53,6 @@ export const MENU_LINK_ICONS: Record<string, string> = {
   '/gods': 'tabler:building-church',
   '/rules': 'tabler:book-2',
   '/books': 'tabler:books',
-  '/info/discord_bot': 'tabler:brand-discord',
   '/info/exporting': 'tabler:file-export',
   '/info/bookmarks': 'tabler:bookmarks',
 };
