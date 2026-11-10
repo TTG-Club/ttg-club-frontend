@@ -10,7 +10,6 @@
     CLASSES_WORKSHOP_KEY,
     fetchReferenceEntry,
     parseWorkshopClass,
-    WorkshopImageType,
   } from '~workshop/model';
 
   definePageMeta({ layout: 'section' });
@@ -46,7 +45,6 @@
         <WorkshopEditFrame
           :api-section="CLASSES_WORKSHOP_KEY"
           :entry-id="entry?.id"
-          :image-type="WorkshopImageType.CLASS"
           :version="version"
           :is-loading="isLoading"
           :is-not-found="isNotFound"
