@@ -42,17 +42,8 @@
           :href="partner.url"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 rounded-lg border border-default bg-overlay px-2.5 py-1.5 text-sm leading-5 text-default no-underline transition-colors duration-200 hover:border-secondary-hover hover:bg-elevated hover:text-highlighted"
+          class="inline-flex items-center rounded-lg border border-default bg-overlay px-2.5 py-1.5 text-sm leading-5 text-default no-underline transition-colors duration-200 hover:border-secondary-hover hover:bg-elevated hover:text-highlighted"
         >
-          <img
-            :src="partner.img"
-            :alt="partner.name"
-            width="20"
-            height="20"
-            loading="lazy"
-            class="size-5 shrink-0 overflow-hidden rounded-full border border-default"
-          />
-
           {{ partner.name }}
         </a>
       </UTooltip>
