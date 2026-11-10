@@ -47,6 +47,7 @@
 │   ├── consts/                 # Server constants (maintenance response, settings cache)
 │   ├── middleware/maintenance.ts # Maintenance gate before render, page requests only
 │   ├── plugins/maintenanceResponse.ts # 503, Retry-After, X-Robots-Tag, no-store while the gate is on
+│   ├── routes/s3/[...].ts      # Proxy GET /s3/** → backend (site images from S3, /s3/5e14/<path>)
 │   ├── routes/sitemap.xml.ts   # Sitemap from the backend
 │   └── utils/                  # upstreams (upstream URLs from the environment), maintenance (settings from core-app, gate by the visitor's roles)
 ├── shared/                     # Isomorphic consts, types and utils (cookie names, proxy routing, user profile, maintenance)
