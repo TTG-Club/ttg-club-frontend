@@ -102,3 +102,16 @@ export const ADMIN_YOUTUBE_ICON = {
   empty: 'tabler:video-off',
   success: 'tabler:check',
 } as const;
+
+/** Обложка ролика с серверов YouTube */
+export const YOUTUBE_POSTER_URL = 'https://i.ytimg.com/vi_webp';
+
+/** Плеер YouTube во фрейме, запускается сразу после клика */
+export const YOUTUBE_EMBED_URL = 'https://www.youtube.com/embed';
+
+export const YOUTUBE_EMBED_PARAMS = 'autoplay=1&enablejsapi=1&state=1';
+
+export const YOUTUBE_EMBED_ALLOW =
+  'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+
+export const YOUTUBE_PLAY_LABEL = 'Смотреть';

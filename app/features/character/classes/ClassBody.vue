@@ -43,18 +43,19 @@
 
   const hasAside = computed(() => images.value.length > 0 || !!entry.traits);
 
-  // В виде «Модерн», как в старом SPA, обложка и хиты всегда над таблицей:
-  // в колонке слева под ними оставалась пустая полоса
-  const { isModern } = useCharacterListView();
+  // При списках строками обложка и хиты всегда над таблицей: в колонке слева
+  // под ними оставалась пустая полоса. Иначе они встают колонкой слева только
+  // в широком контейнере: рядом с ними таблице ячеек не хватает места
+  const { isRows } = useListView();
 
   const asideClass = computed(() =>
-    isModern.value
+    isRows.value
       ? 'flex flex-col gap-4 @min-xl:flex-row'
-      : 'flex flex-col gap-4 @min-xl:@max-3xl:flex-row @min-3xl:sticky @min-3xl:top-4',
+      : 'flex flex-col gap-4 @min-xl:@max-6xl:flex-row @min-6xl:sticky @min-6xl:top-4',
   );
 
   const coverClass = computed(() =>
-    isModern.value ? '@min-xl:w-50 @min-xl:flex-none' : '',
+    isRows.value ? '@min-xl:w-50 @min-xl:flex-none' : '',
   );
 
   const isDescriptionOpen = ref(false);
@@ -66,7 +67,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <SectionDetailLayout :is-aside-on-top="isModern">
+    <SectionDetailLayout :is-aside-on-top="isRows">
       <template #header>
         <ClassRoutingBar
           :entry="entry"

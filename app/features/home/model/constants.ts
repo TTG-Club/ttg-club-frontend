@@ -108,73 +108,39 @@ export const HOME_DISCORD_BOT_CARD: HomePromoCardContent = {
   to: '/info/discord_bot',
 };
 
-/* --- Видео -------------------------------------------------------------- */
-
-export const HOME_VIDEOS_LABEL = 'Видео и новости';
-
-export const HOME_VIDEOS_ICON = 'tabler:brand-youtube';
-
-export const HOME_VIDEOS_DATA_KEY = 'home-videos';
-
-export const HOME_VIDEOS_PATH = '/api/v1/youtube';
-
-/**
- * Запрос роликов для главной: первая страница из пяти активных, свежие
- * сверху, при одной дате — по названию. Первый ролик уходит в плеер,
- * остальные списком под ним.
- */
-export const HOME_VIDEOS_QUERY = {
-  page: 0,
-  size: 5,
-  activeStatus: true,
-  order: 'created desc,name asc',
-} as const;
-
-/** Короткая ссылка на ролик — для ctrl+click и средней кнопки мыши */
-export const HOME_VIDEO_SHORT_URL = 'https://youtu.be/';
-
-/** Обложка ролика с серверов YouTube */
-export const HOME_VIDEO_POSTER_URL = 'https://i.ytimg.com/vi_webp';
-
-/** Плеер YouTube во фрейме, запускается сразу после клика */
-export const HOME_VIDEO_EMBED_URL = 'https://www.youtube.com/embed';
-
-export const HOME_VIDEO_EMBED_PARAMS = 'autoplay=1&enablejsapi=1&state=1';
-
-export const HOME_VIDEO_EMBED_ALLOW =
-  'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
-
-export const HOME_VIDEO_PLAY_LABEL = 'Смотреть';
-
 /* --- Новости ------------------------------------------------------------ */
 
 /** Новый сайт: там публикуются новости и живёт каталог игр */
 export const HOME_NEW_SITE_URL = 'https://new.ttg.club';
 
+export const HOME_NEWS_LABEL = 'Новости';
+
 export const HOME_NEWS_ICON = 'tabler:news';
 
 export const HOME_NEWS_DATA_KEY = 'home-news';
 
-/** Новости отдаёт core-api: Nitro проксирует путь туда (см. `NITRO_CORE_API_URL`) */
-export const HOME_NEWS_PATH = '/api/v2/articles/search';
+/** Обложка свежей новости и ряд из четырёх плиток под ней */
+export const HOME_NEWS_COUNT = 5;
 
-/**
- * Запрос свежих опубликованных новостей. Четыре новости вперемешку с
- * четырьмя роликами под плеером дают ровную сетку в две колонки.
- */
-export const HOME_NEWS_QUERY = {
-  type: 'NEWS',
-  cnt: 4,
-} as const;
+/** Плиток под обложкой: все новости, кроме самой свежей */
+export const HOME_NEWS_TILE_COUNT = HOME_NEWS_COUNT - 1;
 
-/** Значки плиток ленты под плеером по виду записи */
-export const HOME_FEED_ICONS = {
-  video: HOME_VIDEOS_ICON,
-  news: HOME_NEWS_ICON,
-} as const;
+export const HOME_NEWS_ALL_LABEL = 'Все новости';
 
-/** Страница новости на новом сайте, к пути добавляется слаг */
-export const HOME_NEWS_ARTICLE_URL = `${HOME_NEW_SITE_URL}/articles`;
+export const HOME_NEWS_EMPTY_TEXT = 'Новостей пока нет';
+
+export const HOME_COMMUNITY_NEWS_LABEL = 'Новости сообщества';
+
+export const HOME_COMMUNITY_NEWS_ICON = 'tabler:users-group';
+
+export const HOME_COMMUNITY_NEWS_DATA_KEY = 'home-community-news';
+
+/** Столбик из четырёх строк */
+export const HOME_COMMUNITY_NEWS_COUNT = 4;
+
+export const HOME_COMMUNITY_NEWS_ALL_LABEL = 'Все новости сообщества';
+
+export const HOME_COMMUNITY_NEWS_EMPTY_TEXT = 'Новостей сообщества пока нет';
 
 /* --- Новая игра --------------------------------------------------------- */
 

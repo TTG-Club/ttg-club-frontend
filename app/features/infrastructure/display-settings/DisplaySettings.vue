@@ -1,114 +1,138 @@
 <script setup lang="ts">
-  import type { DropdownMenuItem } from '@nuxt/ui';
-
   import type { ThemeMode } from '#shared/consts';
-  import type { CharacterListView, LayoutWidth } from '~/shared/consts';
+  import type { ListView } from '~/shared/consts';
 
-  import { THEME_MODES } from '#shared/consts';
   import {
-    CHARACTER_LIST_VIEW_OPTIONS,
-    CHARACTER_LIST_VIEWS,
     LAYOUT_DRAWER_QUERY,
-    LAYOUT_WIDTH_OPTIONS,
-    LAYOUT_WIDTHS,
-    THEME_OPTIONS,
+    LAYOUT_SPLIT_QUERY,
+    LIST_VIEW_OPTIONS,
   } from '~/shared/consts';
 
-  import { DISPLAY_SETTINGS_ICON, DISPLAY_SETTINGS_TEXT } from './constants';
+  import { DisplaySettingsChoice } from './choice';
+  import { useSectionLayout } from './composables';
+  import {
+    APPEARANCE_GROUP_TITLE,
+    DISPLAY_SETTINGS_ARIA,
+    LIST_VIEW_SETTING_TITLE,
+    SECTION_LAYOUT_OPTIONS,
+    SECTION_LAYOUT_SETTING_TITLE,
+    SECTION_LAYOUT_UNAVAILABLE_HINT,
+    SECTIONS_GROUP_TITLE,
+    THEME_OPTIONS,
+    THEME_SECTION_TITLE,
+  } from './constants';
+  import { DisplaySettingsCustomTheme } from './custom-theme';
+  import { DisplaySettingsLayoutPreview } from './layout-preview';
+  import { DisplaySettingsListPreview } from './list-preview';
 
   /**
-   * Настройки отображения в боковой панели, как на new.ttg.club: тема и
-   * ширина разделов — обычная с карточкой в дровере или широкая с карточкой
-   * рядом со списком, — и вид списков классов и видов.
+   * Настройки отображения в боковой панели, как на new.ttg.club: тема (в том
+   * числе своя), раскладка разделов миниатюрами и вид списков.
    */
-  const { mode, change: changeTheme } = useTheme();
-  const { width, change: changeWidth } = useLayoutWidth();
+  const { mode: themeMode, change: changeTheme } = useTheme();
+  const { view: listView, setView: setListView } = useListView();
 
-  const { view: characterView, change: changeCharacterView } =
-    useCharacterListView();
-
+  const isMounted = useMounted();
   const isMenuOnLeft = useMediaQuery(LAYOUT_DRAWER_QUERY);
+  const isSplitScreen = useMediaQuery(LAYOUT_SPLIT_QUERY);
 
   const side = computed(() => (isMenuOnLeft.value ? 'right' : 'top'));
 
-  /**
-   * Пункт выбора темы.
-   * @param theme - режим темы
-   */
-  function getThemeItem(theme: ThemeMode): DropdownMenuItem {
-    return {
-      label: THEME_OPTIONS[theme].label,
-      icon: THEME_OPTIONS[theme].icon,
-      type: 'checkbox',
-      checked: mode.value === theme,
-      onSelect: (event: Event) => {
-        event.preventDefault();
-        changeTheme(theme);
-      },
-    };
-  }
+  // Колонки рядом бывают только на широком экране: на узком такие раскладки
+  // гаснут, а не прячутся — видно, что они есть.
+  const isWideAvailable = computed(
+    () => isMounted.value && isSplitScreen.value,
+  );
 
-  /**
-   * Пункт выбора ширины разделов.
-   * @param option - ширина
-   */
-  function getWidthItem(option: LayoutWidth): DropdownMenuItem {
-    return {
-      label: LAYOUT_WIDTH_OPTIONS[option].label,
-      icon: LAYOUT_WIDTH_OPTIONS[option].icon,
-      type: 'checkbox',
-      checked: width.value === option,
-      onSelect: (event: Event) => {
-        event.preventDefault();
-        changeWidth(option);
-      },
-    };
-  }
+  const layoutHint = computed(() =>
+    isWideAvailable.value ? undefined : SECTION_LAYOUT_UNAVAILABLE_HINT,
+  );
 
-  /**
-   * Пункт выбора вида списков классов и видов.
-   * @param option - вид списка
-   */
-  function getCharacterViewItem(option: CharacterListView): DropdownMenuItem {
-    return {
-      label: CHARACTER_LIST_VIEW_OPTIONS[option].label,
-      icon: CHARACTER_LIST_VIEW_OPTIONS[option].icon,
-      type: 'checkbox',
-      checked: characterView.value === option,
-      onSelect: (event: Event) => {
-        event.preventDefault();
-        changeCharacterView(option);
-      },
-    };
-  }
+  const layoutOptions = computed(() =>
+    SECTION_LAYOUT_OPTIONS.map((option) => ({
+      ...option,
+      disabled: option.width === 'wide' && !isWideAvailable.value,
+    })),
+  );
 
-  const items = computed<Array<Array<DropdownMenuItem>>>(() => [
-    [
-      { label: DISPLAY_SETTINGS_TEXT.theme, type: 'label' },
-      ...THEME_MODES.map(getThemeItem),
-    ],
-    [
-      { label: DISPLAY_SETTINGS_TEXT.width, type: 'label' },
-      ...LAYOUT_WIDTHS.map(getWidthItem),
-    ],
-    [
-      { label: DISPLAY_SETTINGS_TEXT.characterView, type: 'label' },
-      ...CHARACTER_LIST_VIEWS.map(getCharacterViewItem),
-    ],
-  ]);
+  const theme = computed({
+    get: () => themeMode.value,
+    set: (value: ThemeMode) => changeTheme(value),
+  });
+
+  const isCustomTheme = computed(() => themeMode.value === 'custom');
+
+  const layout = useSectionLayout();
+
+  const view = computed({
+    get: () => listView.value,
+    set: (value: ListView) => setListView(value),
+  });
 </script>
 
 <template>
-  <UDropdownMenu
-    :items="items"
-    :content="{ side, align: 'start', sideOffset: 8 }"
-    :ui="{ content: 'w-56' }"
-  >
+  <UPopover :content="{ side, align: 'start', sideOffset: 8 }">
     <UButton
-      :icon="DISPLAY_SETTINGS_ICON"
-      :aria-label="DISPLAY_SETTINGS_TEXT.title"
-      color="neutral"
       variant="ghost"
+      icon="tabler:settings"
+      color="neutral"
+      :aria-label="DISPLAY_SETTINGS_ARIA"
     />
-  </UDropdownMenu>
+
+    <template #content>
+      <!-- На телефоне панель не шире экрана, а высокая (своя тема) прокручивается -->
+      <div
+        class="flex max-h-(--reka-popover-content-available-height) w-104 max-w-[calc(100vw-1rem)] flex-col gap-4 overflow-y-auto p-3"
+      >
+        <section class="flex flex-col gap-3">
+          <h3 class="text-sm font-semibold text-highlighted">
+            {{ APPEARANCE_GROUP_TITLE }}
+          </h3>
+
+          <DisplaySettingsChoice
+            v-model="theme"
+            :title="THEME_SECTION_TITLE"
+            :options="THEME_OPTIONS"
+            shape="pill"
+          />
+
+          <DisplaySettingsCustomTheme v-if="isCustomTheme" />
+        </section>
+
+        <USeparator />
+
+        <section class="flex flex-col gap-3">
+          <h3 class="text-sm font-semibold text-highlighted">
+            {{ SECTIONS_GROUP_TITLE }}
+          </h3>
+
+          <DisplaySettingsChoice
+            v-model="layout"
+            :title="SECTION_LAYOUT_SETTING_TITLE"
+            :options="layoutOptions"
+            :hint="layoutHint"
+          >
+            <template #preview="{ option }">
+              <DisplaySettingsLayoutPreview
+                :filters="option.filters"
+                :detail="option.detail"
+                :overlay="option.width !== 'wide'"
+                :centered="option.centered"
+              />
+            </template>
+          </DisplaySettingsChoice>
+
+          <DisplaySettingsChoice
+            v-model="view"
+            :title="LIST_VIEW_SETTING_TITLE"
+            :options="LIST_VIEW_OPTIONS"
+          >
+            <template #preview="{ option }">
+              <DisplaySettingsListPreview :columns="option.columns" />
+            </template>
+          </DisplaySettingsChoice>
+        </section>
+      </div>
+    </template>
+  </UPopover>
 </template>

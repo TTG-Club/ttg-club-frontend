@@ -156,14 +156,19 @@
 
   // Пустую панель заполняет первая запись списка — уже в браузере, чтобы
   // разметка сервера совпала с первой отрисовкой, и при включении широкого
-  // режима
+  // режима. В узкой раскладке без записи список занимает всю колонку —
+  // там запись открывает только посетитель
   const isMounted = useMounted();
+  const { isCenteredInSplit } = useSectionCentered();
 
-  watch([isMounted, firstPath, isSplit], ([mounted, path, split]) => {
-    if (mounted && split) {
-      detail?.selectFirst(path);
-    }
-  });
+  watch(
+    [isMounted, firstPath, isSplit, isCenteredInSplit],
+    ([mounted, path, split, centered]) => {
+      if (mounted && split && !centered) {
+        detail?.selectFirst(path);
+      }
+    },
+  );
 
   /**
    * Адрес записи для строки списка.
@@ -187,7 +192,7 @@
     is-top-bar
     :is-wide-detail="section.wideDetail"
   >
-    <template #controls>
+    <template #controls="{ isColumn }">
       <SectionControls
         v-model:search="input"
         v-model:grouping="grouping"
@@ -195,6 +200,7 @@
         :definition="filter?.definition.value"
         :selection="filter?.selection.value ?? {}"
         :is-customized="filter?.isCustomized.value"
+        :is-inline="isColumn"
         @update:selection="filter?.setSelection($event)"
         @reset="filter?.reset($event)"
       />

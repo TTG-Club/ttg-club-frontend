@@ -1,14 +1,13 @@
 <script setup lang="ts">
   import type { YoutubeVideo } from '../../model';
 
-  import { HomeYoutubePlayer } from '~home/videos';
-
   import {
     ADMIN_YOUTUBE_ICON,
     ADMIN_YOUTUBE_TEXT,
     YOUTUBE_DATE_FORMAT,
   } from '../../model';
   import YoutubeEditModal from './YoutubeEditModal.vue';
+  import YoutubePlayer from './YoutubePlayer.vue';
 
   /** Ролик в админке: плеер, название, дата, показ на главной и действия. */
   const {
@@ -72,7 +71,7 @@
 
 <template>
   <UCard :ui="{ body: 'flex flex-col gap-3 p-0 sm:p-0' }">
-    <HomeYoutubePlayer
+    <YoutubePlayer
       :key="video.id"
       :video="video"
     />

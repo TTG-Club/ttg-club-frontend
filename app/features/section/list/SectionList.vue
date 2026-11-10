@@ -54,8 +54,11 @@
   );
 
   // Колонки считаются от ширины самого списка, а не экрана: в широком
-  // режиме рядом стоит панель записи, и списку достаётся меньше места
-  const groupClass = computed(() => SECTION_GRID_CLASS[view]);
+  // режиме рядом стоит панель записи, и списку достаётся меньше места.
+  // Больше колонок, чем выбрано в настройке вида списков, не бывает
+  const { columns } = useListView();
+
+  const groupClass = computed(() => SECTION_GRID_CLASS[view][columns.value]);
 
   const isFirstLoading = computed(() => status === 'pending' && !items.length);
 

@@ -8,6 +8,12 @@ export const THEME_COOKIE = 'ttg_theme_name';
 export const THEME_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 /**
+ * Cookie с настройками своей темы: основа, яркость, оттенок и насыщенность
+ * фона и акцент. В cookie — чтобы сервер сразу отдал страницу в её цветах.
+ */
+export const CUSTOM_THEME_COOKIE = 'ttg_custom_theme';
+
+/**
  * Access-токен пользователя. Cookie ставит бэкенд с флагом httpOnly, поэтому
  * прочитать его можно только на сервере.
  */
