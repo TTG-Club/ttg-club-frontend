@@ -10,7 +10,9 @@ import { BOOKMARK_CATEGORY_PATH, bookmarkCategorySchema } from '../model';
 export async function fetchBookmarkCategory(
   url: string,
 ): Promise<BookmarkCategoryInfo> {
-  const response: unknown = await $fetch(BOOKMARK_CATEGORY_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(BOOKMARK_CATEGORY_PATH, {
     query: { url },
   });
 

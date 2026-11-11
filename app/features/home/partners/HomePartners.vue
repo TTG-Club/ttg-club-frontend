@@ -10,10 +10,12 @@
   } from '../model';
   import { HomePanel } from '../ui-kit';
 
+  const api = useApi();
+
   // Блок необязательный: при ошибке запроса его просто нет
   const { data: partners } = useAsyncData(
     HOME_PARTNERS_DATA_KEY,
-    async () => parseHomePartners(await $fetch(HOME_PARTNERS_PATH)),
+    async () => parseHomePartners(await api(HOME_PARTNERS_PATH)),
     { default: () => [] },
   );
 

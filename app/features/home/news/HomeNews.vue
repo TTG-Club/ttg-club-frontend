@@ -20,6 +20,8 @@
   } from '../model';
   import { HomePanel } from '../ui-kit';
 
+  const api = useApi();
+
   /**
    * Новости сайта как на new.ttg.club: обложка свежей новости и ряд плиток
    * под ней. Новости пишут и публикуют на новом сайте, здесь они только
@@ -37,7 +39,7 @@
     HOME_NEWS_DATA_KEY,
     async () =>
       parseNewsList(
-        await $fetch(getNewsSearchPath('site'), {
+        await api(getNewsSearchPath('site'), {
           query: { ...NEWS_KINDS.site.searchQuery, cnt: HOME_NEWS_COUNT },
         }),
       ),

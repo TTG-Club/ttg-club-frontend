@@ -25,13 +25,15 @@
     TOOLS_API_URL,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Генератор имён: одно имя или группа, семья, клан, дом с общей частью.
    * Расы можно не выбирать — тогда бэкенд берёт любую с именами.
    */
   const { data: races } = await useAsyncData(
     'tools-names-races',
-    async () => nameRacesSchema.parse(await $fetch(TOOLS_API_URL.names)),
+    async () => nameRacesSchema.parse(await api(TOOLS_API_URL.names)),
     { deep: false, default: () => [] },
   );
 
@@ -69,7 +71,7 @@
       return nameResultSchema
         .array()
         .parse(
-          await $fetch(TOOLS_API_URL.names, { method: 'POST', body, signal }),
+          await api(TOOLS_API_URL.names, { method: 'POST', body, signal }),
         );
     },
   );

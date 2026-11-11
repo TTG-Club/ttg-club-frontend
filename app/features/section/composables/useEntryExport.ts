@@ -40,6 +40,8 @@ export function useEntryExport(): {
     entry: ExportedEntry,
   ) => Promise<void>;
 } {
+  const api = useApi();
+
   const toast = useToast();
 
   /**
@@ -54,7 +56,7 @@ export function useEntryExport(): {
     entry: ExportedEntry,
   ): Promise<void> {
     try {
-      const response = await $fetch.raw<Blob>(
+      const response = await api.raw<Blob>(
         getEntryExportUrl(platform, type, entry.id),
         { responseType: 'blob' },
       );

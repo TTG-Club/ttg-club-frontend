@@ -44,6 +44,7 @@ export async function useSectionFilter(
   options: SectionFilterOptions = {},
 ) {
   const { store = useRouteQueryStore(), isAlwaysSent = false } = options;
+  const api = useApi();
 
   // Запоминается только выбор в адресе: у списков во вкладках он свой
   const savedCookie = options.store
@@ -66,7 +67,7 @@ export async function useSectionFilter(
     `section-filter-${key}`,
     async () =>
       normalizeFilter(
-        filterResponseSchema.parse(await $fetch(url, { method: 'POST' })),
+        filterResponseSchema.parse(await api(url, { method: 'POST' })),
       ),
     { deep: false },
   );

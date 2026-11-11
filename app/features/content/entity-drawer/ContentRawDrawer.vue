@@ -5,6 +5,8 @@
 
   import { ContentRender } from '../render';
 
+  const api = useApi();
+
   /**
    * Подсказка без типа: HTML с адреса API в дровере. Заголовок — текст
    * ссылки, по которой её открыли.
@@ -22,7 +24,7 @@
     execute,
   } = useAsyncData(
     () => `content-raw-drawer:${url}`,
-    async () => z.string().parse(await $fetch(url, { responseType: 'text' })),
+    async () => z.string().parse(await api(url, { responseType: 'text' })),
     { server: false, immediate: false },
   );
 

@@ -43,13 +43,15 @@ function toCanonicalPath(path: string): string {
  * адрес страницы на каноничном домене без query-строки.
  */
 export function usePageMeta() {
+  const api = useApi();
+
   const route = useRoute();
   const siteConfig = useSiteConfig();
 
   const { data } = useAsyncData(
     () => `page-meta:${route.path}`,
     () =>
-      $fetch<unknown>(`/api/v1/meta${route.path}`)
+      api<unknown>(`/api/v1/meta${route.path}`)
         .then(parsePageMeta)
         .catch(() => null),
     {

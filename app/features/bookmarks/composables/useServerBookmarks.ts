@@ -13,11 +13,13 @@ import { fetchBookmarkCategory } from './useBookmarkCategory';
 
 /** Закладки вошедшего пользователя: хранятся на бэкенде, с группами. */
 export function useServerBookmarks() {
+  const api = useApi();
+
   const entries = useState<Array<BookmarkEntry>>('bookmarks-server', () => []);
   const isLoaded = useState('bookmarks-server-loaded', () => false);
 
   async function load() {
-    const response: unknown = await $fetch(BOOKMARKS_PATH);
+    const response: unknown = await api(BOOKMARKS_PATH);
 
     entries.value = bookmarkListSchema.parse(response);
     isLoaded.value = true;
@@ -34,7 +36,7 @@ export function useServerBookmarks() {
    * @param body - новая запись без uuid
    */
   async function create(body: Omit<Partial<BookmarkEntry>, 'uuid'>) {
-    const response: unknown = await $fetch(BOOKMARKS_PATH, {
+    const response: unknown = await api(BOOKMARKS_PATH, {
       method: 'POST',
       body,
     });
@@ -81,7 +83,7 @@ export function useServerBookmarks() {
    * @param uuid - запись
    */
   async function remove(uuid: string) {
-    await $fetch(`${BOOKMARKS_PATH}/${uuid}`, { method: 'DELETE' });
+    await api(`${BOOKMARKS_PATH}/${uuid}`, { method: 'DELETE' });
     await load();
   }
 
@@ -99,7 +101,7 @@ export function useServerBookmarks() {
    * @param name - новое название
    */
   async function rename(entry: BookmarkEntry, name: string) {
-    await $fetch(BOOKMARKS_PATH, { method: 'PUT', body: { ...entry, name } });
+    await api(BOOKMARKS_PATH, { method: 'PUT', body: { ...entry, name } });
     await load();
   }
 

@@ -15,7 +15,7 @@
 │   ├── app.config.ts           # Nuxt UI icons
 │   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css), content typography (content.scss)
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
-│   ├── composables/            # useTheme / useThemeHead (shared cookie with the legacy SPA, svifty7 and custom theme), useLayoutWidth (section width), useSectionFiltersCollapsed / useSectionColumnSides / useSectionCentered / useSectionSplitSize (wide-mode layouts), useListView (list columns), usePageMeta, useUser (session)
+│   ├── composables/            # useTheme / useThemeHead (shared cookie with the legacy SPA, svifty7 and custom theme), useLayoutWidth (section width), useSectionFiltersCollapsed / useSectionColumnSides / useSectionCentered / useSectionSplitSize (wide-mode layouts), useListView (list columns), usePageMeta, useUser (session), useApi (API client)
 │   ├── features/               # DDD domains
 │   │   ├── bug-report/         # button (sidebar), modal (description, page, selected text, screenshot with marks), selection ("Ошибка в тексте" under a selection); posts to bug-report.api.ttg.club
 │   │   ├── comments/           # section (discussion under an entry: collapsed preview, tree of replies, composer with cooldown, edit, delete, report, moderator restore, #comment-<id> links); talks to comments-service via /api/v1/comments
@@ -38,7 +38,7 @@
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
 │   ├── middleware/             # maintenance.global (rechecks the maintenance gate on client navigation)
-│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
+│   ├── plugins/                # api ($api: API client, renews the session on 401 and retries), user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
 │   └── shared/                 # consts (API paths, UI texts), ui (logo, hamburger)
 ├── server/
 │   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
