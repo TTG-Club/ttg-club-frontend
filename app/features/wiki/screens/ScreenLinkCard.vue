@@ -23,6 +23,7 @@
     emit('open', {
       path: screen.url,
       title: screen.name.rus,
+      icon: screen.icon,
       origin: { x: event.clientX, y: event.clientY },
     });
   }

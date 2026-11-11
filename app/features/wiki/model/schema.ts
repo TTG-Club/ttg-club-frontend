@@ -106,6 +106,8 @@ export const screenWindowSchema = z.object({
   id: z.string().min(1),
   path: z.string().min(1),
   title: z.string(),
+  /** SVG-разметка иконки раздела; у корневых разделов её нет. */
+  icon: z.string().nullish(),
   x: z.number(),
   y: z.number(),
   width: z.number().positive(),
