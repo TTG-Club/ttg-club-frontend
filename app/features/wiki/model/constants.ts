@@ -82,6 +82,15 @@ export const SCREEN_BACK_ICON = 'tabler:arrow-left';
 /** Иконка вложенного раздела, когда своей в базе нет. */
 export const SCREEN_ICON_FALLBACK = 'tabler:book-2';
 
+/**
+ * Классы иконки раздела по размеру: рамка, своя SVG-иконка и запасная.
+ * Маленькая — для шапки и плашки окна ширмы.
+ */
+export const SCREEN_ICON_SIZE_CLASS = {
+  md: { frame: 'size-10', fallback: 'size-8' },
+  sm: { frame: 'size-5 [&>svg]:size-full', fallback: 'size-4' },
+} as const;
+
 /** Теги SVG-иконки раздела ширмы, которые выводятся как есть. */
 export const SVG_ALLOWED_TAGS: ReadonlySet<string> = new Set([
   'svg',
@@ -181,7 +190,6 @@ export const SCREEN_WINDOW_TEXT = {
 } as const;
 
 export const SCREEN_WINDOW_ICON = {
-  window: 'tabler:app-window',
   minimize: 'tabler:minus',
   close: 'tabler:x',
 } as const;

@@ -15,6 +15,7 @@
     SCREENS_SECTION,
   } from '../model';
   import ScreenEntry from './ScreenEntry.vue';
+  import ScreenIcon from './ScreenIcon.vue';
 
   /**
    * Окно раздела ширмы поверх сайта, не блокирующее страницу. Тянется за
@@ -142,9 +143,9 @@
       ref="handle"
       class="flex shrink-0 cursor-move items-center gap-2 border-b border-default bg-elevated py-1 pr-1 pl-3 select-none"
     >
-      <UIcon
-        :name="SCREEN_WINDOW_ICON.window"
-        class="size-4 shrink-0 text-muted"
+      <ScreenIcon
+        :markup="screenWindow.icon"
+        size="sm"
       />
 
       <span class="min-w-0 flex-auto truncate text-sm text-highlighted">

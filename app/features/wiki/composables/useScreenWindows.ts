@@ -126,6 +126,7 @@ export const useScreenWindows = createSharedComposable(() => {
         id: crypto.randomUUID(),
         path: request.path,
         title: request.title,
+        icon: request.icon,
         ...position,
         ...size,
         layer: topLayer.value + 1,
