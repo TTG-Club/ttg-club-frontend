@@ -45,8 +45,10 @@ export async function updateWorkshopBook(
   source: string,
   payload: Record<string, unknown>,
 ): Promise<SavedEntry> {
+  const api = useApi();
+
   return parseSavedEntry(
-    await $fetch<unknown>(
+    await api<unknown>(
       `${WORKSHOP_API_PATH}/${BOOKS_WORKSHOP_KEY}/${encodeURIComponent(source)}`,
       { method: 'PATCH', body: payload },
     ),

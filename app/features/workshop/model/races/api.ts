@@ -10,8 +10,10 @@ import { parseRaceParentOptions } from './schemas';
 export async function fetchRaceParentOptions(
   excludeId?: number,
 ): Promise<Array<SelectOption>> {
+  const api = useApi();
+
   return parseRaceParentOptions(
-    await $fetch<unknown>(RACES_LIST_PATH, { method: 'POST', body: {} }),
+    await api<unknown>(RACES_LIST_PATH, { method: 'POST', body: {} }),
     excludeId,
   );
 }

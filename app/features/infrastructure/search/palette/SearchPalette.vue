@@ -16,6 +16,8 @@
     searchResponseSchema,
   } from '../model';
 
+  const api = useApi();
+
   interface SearchPaletteItem extends CommandPaletteItem {
     result?: SearchResult;
   }
@@ -131,7 +133,7 @@
     isRandomError.value = false;
 
     try {
-      const response = await $fetch(SEARCH_RANDOM_API_URL, {
+      const response = await api(SEARCH_RANDOM_API_URL, {
         method: 'POST',
         body: buildSearchRequest('', 1, SEARCH_PALETTE_SIZE),
       });

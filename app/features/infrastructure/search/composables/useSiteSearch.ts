@@ -24,6 +24,8 @@ interface SiteSearchOptions {
  * @param options - ключ, строка поиска, страница и размер страницы
  */
 export function useSiteSearch(options: SiteSearchOptions) {
+  const api = useApi();
+
   const term = computed(() => toValue(options.term).trim());
   const page = computed(() => toValue(options.page) ?? 1);
 
@@ -35,7 +37,7 @@ export function useSiteSearch(options: SiteSearchOptions) {
       }
 
       return searchResponseSchema.parse(
-        await $fetch(SEARCH_API_URL, {
+        await api(SEARCH_API_URL, {
           method: 'POST',
           body: buildSearchRequest(term.value, page.value, options.size),
         }),

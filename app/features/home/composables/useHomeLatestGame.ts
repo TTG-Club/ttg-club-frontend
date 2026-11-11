@@ -39,9 +39,11 @@ interface HomeLatestGame {
 async function fetchMaster(
   masterId: string,
 ): Promise<HomeDisplayName | undefined> {
+  const api = useApi();
+
   try {
     const names = parseHomeDisplayNames(
-      await $fetch(HOME_LATEST_GAME_NAMES_API_URL, {
+      await api(HOME_LATEST_GAME_NAMES_API_URL, {
         method: 'POST',
         body: { userIds: [masterId] },
       }),
@@ -60,8 +62,10 @@ async function fetchMaster(
  * @returns системы; пустой список — справочник не загрузился
  */
 async function fetchGameSystems(): Promise<Array<HomeGameSystem>> {
+  const api = useApi();
+
   try {
-    return parseHomeGameSystems(await $fetch(HOME_LATEST_GAME_SYSTEMS_API_URL));
+    return parseHomeGameSystems(await api(HOME_LATEST_GAME_SYSTEMS_API_URL));
   } catch {
     return [];
   }
@@ -74,9 +78,11 @@ async function fetchGameSystems(): Promise<Array<HomeGameSystem>> {
  * @returns игра с мастером и системой или `undefined`, если игр нет
  */
 async function fetchLatestGame(): Promise<HomeLatestGameData | undefined> {
+  const api = useApi();
+
   const game = findLatestGame(
     parseHomeGames(
-      await $fetch(HOME_LATEST_GAME_API_URL, {
+      await api(HOME_LATEST_GAME_API_URL, {
         query: { page: 0, size: HOME_LATEST_GAME_LOOKUP_SIZE },
       }),
     ),

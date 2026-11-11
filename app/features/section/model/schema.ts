@@ -53,3 +53,6 @@ export const entrySourceSchema = z.object({
 });
 
 export type EntrySource = z.infer<typeof entrySourceSchema>;
+
+/** Сохранённый фильтр раздела: параметры адреса, как их пишет фильтр. */
+export const savedFilterQuerySchema = z.record(z.string(), z.string());

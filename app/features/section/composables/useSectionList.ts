@@ -33,6 +33,8 @@ interface SectionListOptions<T> {
  * @param options - ручка, проверка записей, сортировка, поиск и фильтр
  */
 export async function useSectionList<T>(options: SectionListOptions<T>) {
+  const api = useApi();
+
   const listSchema = z.array(options.schema);
   const size = options.size ?? SECTION_PAGE_SIZE;
 
@@ -49,7 +51,7 @@ export async function useSectionList<T>(options: SectionListOptions<T>) {
    * @param page - номер страницы с нуля
    */
   async function fetchPage(page: number): Promise<Array<T>> {
-    const response: unknown = await $fetch(options.url, {
+    const response: unknown = await api(options.url, {
       method: 'POST',
       body: buildListRequest({
         page,

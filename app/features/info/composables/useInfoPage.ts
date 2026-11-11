@@ -10,11 +10,13 @@ import { INFO_API_PREFIX, infoPageSchema } from '../model';
  * @param slug - адрес страницы после `/info/`
  */
 export async function useInfoPage(slug: MaybeRefOrGetter<string>) {
+  const api = useApi();
+
   const { data, error } = await useAsyncData(
     () => `info-page:${toValue(slug)}`,
     async () =>
       infoPageSchema.parse(
-        await $fetch(`${INFO_API_PREFIX}${encodeURIComponent(toValue(slug))}`),
+        await api(`${INFO_API_PREFIX}${encodeURIComponent(toValue(slug))}`),
       ),
     { deep: false },
   );

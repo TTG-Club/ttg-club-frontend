@@ -4,6 +4,8 @@
 
   import { filterResponseSchema, normalizeFilter } from '~section/model';
 
+  const api = useApi();
+
   /**
    * Кнопка перехода в раздел с фильтром класса, как «Заклинания» на
    * new.ttg.club. Класс в фильтре раздела задаётся значением, а его знает
@@ -28,9 +30,7 @@
     async () =>
       getLink(
         normalizeFilter(
-          filterResponseSchema.parse(
-            await $fetch(filterUrl, { method: 'POST' }),
-          ),
+          filterResponseSchema.parse(await api(filterUrl, { method: 'POST' })),
         ),
       ) ?? null,
     { deep: false },
