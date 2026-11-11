@@ -1,52 +1,34 @@
 <script setup lang="ts">
-  import { MENU_PATH } from '~/shared/consts';
   import { HamburgerIcon } from '~/shared/ui/hamburger-icon';
   import { SiteLogo } from '~/shared/ui/site-logo';
 
   import { SidebarPopover } from '../popover';
+  import { useSiteMenu } from './composables';
   import {
     buildMenuGroups,
-    MENU_ERROR_TEXT,
     MENU_SITE_DESCRIPTION,
     MENU_SITE_TITLE,
     MENU_TOGGLE_LABEL,
-    siteMenuSchema,
   } from './model';
-  import { MenuFooter, MenuSection, MenuSkeleton } from './ui';
-
-  /** Ключ данных меню: одно на всё приложение. */
-  const MENU_DATA_KEY = 'site-menu';
+  import { MenuFooter, MenuSection } from './ui';
 
   const route = useRoute();
 
   const isOpened = ref(false);
 
-  // Меню грузится при первом открытии, как в старом SPA: на каждой странице
-  // оно не нужно, а его запрос не должен задерживать рендер.
-  const {
-    data: groups,
-    status,
-    execute,
-  } = useAsyncData(
-    MENU_DATA_KEY,
-    async () =>
-      buildMenuGroups(
-        siteMenuSchema.parse(await $fetch(MENU_PATH)),
-        import.meta.dev,
-      ),
-    { server: false, immediate: false, default: () => [] },
+  // Меню приходит вместе со страницей (а до ответа API стоит запасная копия),
+  // поэтому при открытии оно уже готово: ни скелетона, ни запроса.
+  const menuItems = useSiteMenu();
+
+  const style = useCssModule();
+
+  // Группа инструментов на широком меню встаёт справа во весь рост.
+  const sections = computed(() =>
+    buildMenuGroups(menuItems.value, import.meta.dev).map((group) => ({
+      group,
+      className: group.isTools ? style.tools : undefined,
+    })),
   );
-
-  // До первого открытия статус `idle`: скелетон и для него, иначе на миг
-  // мелькает пустое меню.
-  const isLoaded = computed(() => status.value === 'success');
-  const isFailed = computed(() => status.value === 'error');
-
-  watch(isOpened, (value) => {
-    if (value && status.value !== 'success') {
-      execute();
-    }
-  });
 
   watch(
     () => route.fullPath,
@@ -70,46 +52,33 @@
     </template>
 
     <template #default>
-      <header class="flex items-center gap-4 px-4 py-4">
+      <header class="flex items-center gap-4 px-6 py-5">
         <NuxtLink
           to="/"
-          class="size-16 shrink-0"
+          class="w-14 shrink-0"
         >
           <SiteLogo />
         </NuxtLink>
 
         <div class="flex min-w-0 flex-col gap-1">
-          <span class="text-sm text-muted">{{ MENU_SITE_DESCRIPTION }}</span>
-
           <span class="text-2xl leading-none font-semibold text-title">
             {{ MENU_SITE_TITLE }}
           </span>
+
+          <span class="text-sm text-muted">{{ MENU_SITE_DESCRIPTION }}</span>
         </div>
       </header>
 
       <USeparator />
 
-      <nav class="@container px-2 pt-4">
-        <p
-          v-if="isFailed"
-          class="px-2.5 pb-6 text-muted"
-        >
-          {{ MENU_ERROR_TEXT }}
-        </p>
-
-        <div
-          v-else
-          class="columns-1 gap-3 @sm:columns-2 @2xl:columns-3 @4xl:columns-4"
-        >
-          <MenuSkeleton v-if="!isLoaded" />
-
-          <template v-else>
-            <MenuSection
-              v-for="group in groups"
-              :key="group.label"
-              :group
-            />
-          </template>
+      <nav :class="$style.navigation">
+        <div :class="$style.content">
+          <MenuSection
+            v-for="section in sections"
+            :key="section.group.label"
+            :group="section.group"
+            :class="section.className"
+          />
         </div>
       </nav>
 
@@ -119,3 +88,45 @@
     </template>
   </SidebarPopover>
 </template>
+
+<style lang="scss" module>
+  // Колонки считаются от ширины самого меню, а не окна: меню уже окна
+  .navigation {
+    container-type: inline-size;
+    padding: 24px 14px 0;
+  }
+
+  // Разделы идут сверху вниз и сами раскладываются по колонкам равной высоты,
+  // поэтому под короткими разделами не остаётся пустых полей.
+  .content {
+    column-count: 2;
+    column-gap: 12px;
+
+    @container (width < 340px) {
+      column-count: 1;
+    }
+
+    @container (width >= 620px) {
+      column-count: 3;
+    }
+
+    // На широком меню разделы встают сеткой в два ряда: заполняются по
+    // колонкам, поэтому порядок чтения тот же, а заголовки второго ряда
+    // стоят на одной линии.
+    @container (width >= 860px) {
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(2, auto);
+    }
+  }
+
+  // Инструменты — самая длинная группа: на широком меню она стоит справа
+  // в первой строке во весь рост, и меню становится ниже.
+  .tools {
+    @container (width >= 860px) {
+      grid-column: 4;
+      grid-row: 1 / span 2;
+    }
+  }
+</style>

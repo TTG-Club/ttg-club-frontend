@@ -27,11 +27,13 @@ interface SectionEntryOptions<T> {
  * @param options - ключ раздела, адрес записи и проверка ответа
  */
 export async function useSectionEntry<T>(options: SectionEntryOptions<T>) {
+  const api = useApi();
+
   const { data, status, error } = await useAsyncData(
     () => `section-entry-${options.key}:${toValue(options.path)}`,
     async () =>
       options.schema.parse(
-        await $fetch(getEntryApiPath(toValue(options.path)), {
+        await api(getEntryApiPath(toValue(options.path)), {
           method: 'POST',
         }),
       ),

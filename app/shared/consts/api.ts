@@ -10,9 +10,6 @@ export const AUTH_REFRESH_PATH = '/api/v1/auth/refresh';
 /** Выход из аккаунта. */
 export const AUTH_SIGN_OUT_PATH = '/api/v1/auth/signout';
 
-/** Пункты главного меню. */
-export const MENU_PATH = '/api/v1/menu';
-
 /** Регистрация. */
 export const AUTH_SIGN_UP_PATH = '/api/v1/auth/signup';
 

@@ -15,7 +15,7 @@
 
   const { newSiteUrl } = useRuntimeConfig().public;
 
-  const coverImage = computed(() => getNewsCover(news));
+  const coverImage = computed(() => getNewsCover(news, newSiteUrl));
 
   const pageUrl = computed(() => getNewsPageUrl(kind, news.url, newSiteUrl));
 

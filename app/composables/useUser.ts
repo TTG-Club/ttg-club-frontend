@@ -108,6 +108,26 @@ export function useUser() {
   }
 
   /**
+   * Продлевает сессию по refresh-cookie. При отказе пользователь считается
+   * вышедшим.
+   * @returns удалось ли продлить сессию
+   */
+  async function refreshSession(): Promise<boolean> {
+    try {
+      sessionMarker.value = parseAccessToken(
+        await $fetch(AUTH_REFRESH_PATH, { method: 'POST' }),
+      );
+
+      return true;
+    } catch {
+      sessionMarker.value = null;
+      user.value = null;
+
+      return false;
+    }
+  }
+
+  /**
    * Продлевает сессию в браузере, если SSR не узнал пользователя, а отметка о
    * входе осталась (истёк access-токен). Без отметки запрос не делается, чтобы
    * не дёргать бэкенд на каждый визит гостя.
@@ -117,13 +137,7 @@ export function useUser() {
       return;
     }
 
-    try {
-      sessionMarker.value = parseAccessToken(
-        await $fetch(AUTH_REFRESH_PATH, { method: 'POST' }),
-      );
-    } catch {
-      sessionMarker.value = null;
-
+    if (!(await refreshSession())) {
       return;
     }
 
@@ -171,6 +185,7 @@ export function useUser() {
     fetchProfile,
     restoreOnServer,
     restoreOnClient,
+    refreshSession,
     signIn,
     signOut,
   };

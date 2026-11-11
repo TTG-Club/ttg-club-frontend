@@ -3,11 +3,16 @@ import type { FilterPart, FilterSelection, SectionQueryStore } from '../model';
 import {
   applyExcludedSources,
   buildFilterPayload,
+  compactFilterQuery,
   filterResponseSchema,
   getDefaultSelection,
+  hasFilterQuery,
   isSelectionCustomized,
   normalizeFilter,
   resetSelectionPart,
+  savedFilterQuerySchema,
+  SECTION_FILTER_COOKIE_MAX_AGE_SECONDS,
+  SECTION_FILTER_COOKIE_PREFIX,
   selectionFromQuery,
   selectionToQuery,
 } from '../model';
@@ -25,7 +30,9 @@ interface SectionFilterOptions {
 
 /**
  * Фильтр раздела: группы приходят из API, выбор живёт в адресе страницы,
- * поэтому ссылкой на отфильтрованный список можно поделиться. Книги, снятые
+ * поэтому ссылкой на отфильтрованный список можно поделиться. Выбор в адресе
+ * ещё и запоминается: раздел, открытый без фильтра в адресе, например
+ * после записи, показывает последний выбор, как в старом SPA. Книги, снятые
  * пользователем в личном кабинете, сняты и в источниках по умолчанию.
  * @param key - ключ раздела
  * @param url - ручка фильтра, например `/api/v1/filters/spells`
@@ -37,6 +44,22 @@ export async function useSectionFilter(
   options: SectionFilterOptions = {},
 ) {
   const { store = useRouteQueryStore(), isAlwaysSent = false } = options;
+  const api = useApi();
+
+  // Запоминается только выбор в адресе: у списков во вкладках он свой
+  const savedCookie = options.store
+    ? undefined
+    : useCookie<unknown>(`${SECTION_FILTER_COOKIE_PREFIX}${key}`, {
+        maxAge: SECTION_FILTER_COOKIE_MAX_AGE_SECONDS,
+        default: () => undefined,
+      });
+
+  // В cookie может попасть что угодно — без проверки выбор не берётся
+  const savedQuery = computed(() => {
+    const parsed = savedFilterQuerySchema.safeParse(savedCookie?.value);
+
+    return parsed.success ? parsed.data : {};
+  });
 
   const { user } = useUser();
 
@@ -44,7 +67,7 @@ export async function useSectionFilter(
     `section-filter-${key}`,
     async () =>
       normalizeFilter(
-        filterResponseSchema.parse(await $fetch(url, { method: 'POST' })),
+        filterResponseSchema.parse(await api(url, { method: 'POST' })),
       ),
     { deep: false },
   );
@@ -56,10 +79,16 @@ export async function useSectionFilter(
       : null,
   );
 
+  // Фильтр из адреса главнее запомненного: так работает ссылка на
+  // отфильтрованный список
+  const query = computed(() =>
+    definition.value && !hasFilterQuery(definition.value, store.query.value)
+      ? { ...savedQuery.value, ...store.query.value }
+      : store.query.value,
+  );
+
   const selection = computed<FilterSelection>(() =>
-    definition.value
-      ? selectionFromQuery(definition.value, store.query.value)
-      : {},
+    definition.value ? selectionFromQuery(definition.value, query.value) : {},
   );
 
   const isCustomized = computed(
@@ -90,7 +119,15 @@ export async function useSectionFilter(
       return;
     }
 
-    store.update(selectionToQuery(definition.value, next));
+    const patch = selectionToQuery(definition.value, next);
+
+    store.update(patch);
+
+    if (savedCookie) {
+      const saved = compactFilterQuery(patch);
+
+      savedCookie.value = Object.keys(saved).length > 0 ? saved : undefined;
+    }
   }
 
   /**

@@ -27,12 +27,14 @@ export {
   entryNameSchema,
   entrySourceSchema,
   filterResponseSchema,
+  savedFilterQuerySchema,
 } from './schema';
 
 export {
   applyExcludedSources,
   buildFilterPayload,
   buildListRequest,
+  compactFilterQuery,
   getDefaultSelection,
   getDetailPath,
   getDetailSlug,
@@ -49,6 +51,7 @@ export {
   getSourceFilterValue,
   getWorkshopEditPath,
   groupItems,
+  hasFilterQuery,
   isFilterSearchable,
   isPartCustomized,
   isSelectionCustomized,

@@ -98,6 +98,7 @@
       transform-origin: top left;
 
       max-width: 1100px;
+      max-height: calc(100dvh - 32px);
 
       &.menu {
         width: calc(100vw - 88px);

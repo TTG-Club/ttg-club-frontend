@@ -21,6 +21,8 @@ import {
  * @returns решение о заглушке и действия с ним
  */
 export function useMaintenanceGate() {
+  const api = useApi();
+
   const gate = useState<MaintenanceGate>(
     MAINTENANCE_GATE_STATE_KEY,
     () => MAINTENANCE_OPEN_GATE,
@@ -51,7 +53,7 @@ export function useMaintenanceGate() {
   async function refresh(): Promise<void> {
     try {
       gate.value = maintenanceGateSchema.parse(
-        await $fetch<unknown>(MAINTENANCE_API_PATH),
+        await api<unknown>(MAINTENANCE_API_PATH),
       );
 
       checkedAt.value = Date.now();

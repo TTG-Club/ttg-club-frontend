@@ -19,6 +19,8 @@
   } from '../model';
   import { HomePanel } from '../ui-kit';
 
+  const api = useApi();
+
   /**
    * Новости сообщества как на new.ttg.club: столбик плиток с автором и
    * датой. Создают их на новом сайте, здесь они только читаются.
@@ -33,7 +35,7 @@
     HOME_COMMUNITY_NEWS_DATA_KEY,
     async () =>
       parseNewsList(
-        await $fetch(getNewsSearchPath('community'), {
+        await api(getNewsSearchPath('community'), {
           query: {
             ...NEWS_KINDS.community.searchQuery,
             cnt: HOME_COMMUNITY_NEWS_COUNT,

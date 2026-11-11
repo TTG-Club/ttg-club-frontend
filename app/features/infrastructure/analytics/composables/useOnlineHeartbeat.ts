@@ -24,6 +24,8 @@ import {
  * статистики.
  */
 export function useOnlineHeartbeat(): void {
+  const api = useApi();
+
   const { user } = useUser();
   const visibility = useDocumentVisibility();
 
@@ -72,7 +74,7 @@ export function useOnlineHeartbeat(): void {
     lastSentAt = Date.now();
 
     try {
-      await $fetch(ONLINE_HEARTBEAT_PATH, {
+      await api(ONLINE_HEARTBEAT_PATH, {
         method: 'POST',
         body: getBody(),
         retry: 0,

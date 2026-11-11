@@ -7,9 +7,6 @@ import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
 /** Стрелка ссылок главной: плитки разделов, «Подробнее», «Перейти» */
 export const HOME_LINK_ARROW_ICON = 'tabler:arrow-right';
 
-/** Ключ данных меню для плиты разделов и ленты инструментов */
-export const HOME_MENU_DATA_KEY = 'home-menu';
-
 /* --- Инструменты -------------------------------------------------------- */
 
 /**
@@ -91,21 +88,6 @@ export const HOME_VTTG_CARD: HomePromoCardContent = {
   image: '/img/vttg-banner.webp',
   to: 'https://new.ttg.club/vttg',
   external: true,
-};
-
-export const HOME_TOKENATOR_CARD: HomePromoCardContent = {
-  eyebrow: 'Всегда под рукой!',
-  title: 'Токенатор',
-  image: '/img/bg_token_library.webp',
-  to: TOKENATOR_URL,
-  external: true,
-};
-
-export const HOME_DISCORD_BOT_CARD: HomePromoCardContent = {
-  eyebrow: 'Весь сайт у вас на сервере!',
-  title: 'Discord Bot',
-  image: '/img/bg_discord_bot.webp',
-  to: '/info/discord_bot',
 };
 
 /* --- Новости ------------------------------------------------------------ */
@@ -274,3 +256,16 @@ export const HOME_PARTNERS_ICON = 'tabler:heart-handshake';
 export const HOME_PARTNERS_DATA_KEY = 'home-partners';
 
 export const HOME_PARTNERS_PATH = '/api/v1/partners';
+
+/* --- Обсуждения --------------------------------------------------------- */
+
+export const HOME_COMMENTS_LABEL = 'Обсуждения';
+
+export const HOME_COMMENTS_ICON = 'tabler:message-circle';
+
+export const HOME_COMMENTS_DATA_KEY = 'home-comments';
+
+/** Сколько последних комментариев показывает блок */
+export const HOME_COMMENTS_COUNT = 10;
+
+export const HOME_COMMENTS_EMPTY_TEXT = 'Комментариев пока нет';

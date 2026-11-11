@@ -116,6 +116,15 @@ export const FILTER_SEARCH_MIN_VALUES = 20;
 /** Задержка перед пересчётом групп под поиск по фильтрам. */
 export const FILTER_SEARCH_DEBOUNCE_MS = 200;
 
+/**
+ * Начало имени cookie с выбранным фильтром раздела: выбор переживает уход
+ * со списка, как в старом SPA, а сервер сразу отдаёт отфильтрованный список.
+ */
+export const SECTION_FILTER_COOKIE_PREFIX = 'ttg_section_filter_';
+
+/** Сколько секунд помнить выбранный фильтр раздела. */
+export const SECTION_FILTER_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+
 /** Параметр адреса с открытой записью в широком режиме, как на new.ttg.club. */
 export const SECTION_DETAIL_QUERY_KEY = 'detail';
 

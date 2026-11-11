@@ -117,6 +117,21 @@
     emit('close');
   }
 
+  /**
+   * Закрытие страницы записи. Пришли сюда с сайта — возвращаемся назад по
+   * истории: к списку с тем же фильтром и прокруткой или во вкладку класса.
+   * Открыли запись по ссылке — ссылка ведёт в раздел.
+   * @param event - щелчок по кнопке
+   */
+  function closePage(event: MouseEvent): void {
+    if (typeof router.options.history.state.back !== 'string') {
+      return;
+    }
+
+    event.preventDefault();
+    router.back();
+  }
+
   /** Печатает только запись, как кнопка печати старого SPA. */
   async function printEntry(): Promise<void> {
     isPrinting.value = true;
@@ -229,6 +244,7 @@
             :aria-label="SECTION_TEXT.close"
             color="neutral"
             variant="ghost"
+            @click.left.exact="closePage"
           />
 
           <UButton
