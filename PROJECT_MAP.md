@@ -60,7 +60,7 @@
 | Variable                         | Purpose                                                                                                   |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `NITRO_API_URL`                  | Backend (or gateway) base URL, required                                                                   |
-| `NITRO_SUBSCRIBER_API_URL`       | subscriber-service; empty → `NITRO_API_URL`                                                               |
+| `NITRO_SUBSCRIBER_API_URL`       | subscriber-service (Nitro passes the token cookie as `Bearer`); empty → `NITRO_API_URL`                   |
 | `NITRO_COMMENTS_API_URL`         | comments-service (Nitro passes the token cookie as `Bearer`); empty → `NITRO_API_URL`                     |
 | `NITRO_CORE_API_URL`             | core-api (site news and community news on the home page); empty → `NITRO_API_URL`                         |
 | `NITRO_MAINTENANCE_SETTINGS_URL` | core-app maintenance settings of this site (`<core-app>/api/maintenance/sites/5e14`); empty → site closed |

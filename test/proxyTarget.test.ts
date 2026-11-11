@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  getCommentsAuthorization,
   getProxyTarget,
+  getServiceAuthorization,
   isPathWithPrefix,
 } from '#shared/utils';
 
@@ -80,11 +80,22 @@ describe('getProxyTarget', () => {
   });
 });
 
-describe('getCommentsAuthorization', () => {
+describe('getServiceAuthorization', () => {
   it('перекладывает токен из cookie в Bearer для comments-service', () => {
     expect(
-      getCommentsAuthorization(
+      getServiceAuthorization(
         '/api/v1/comments?page=0',
+        upstreams,
+        undefined,
+        'token',
+      ),
+    ).toBe('Bearer token');
+  });
+
+  it('перекладывает токен из cookie в Bearer для subscriber-service', () => {
+    expect(
+      getServiceAuthorization(
+        '/api/subscriptions/redeem',
         upstreams,
         undefined,
         'token',
@@ -94,11 +105,11 @@ describe('getCommentsAuthorization', () => {
 
   it('не трогает запрос без токена, с заголовком или в другой сервис', () => {
     expect(
-      getCommentsAuthorization('/api/v1/comments', upstreams, undefined, ''),
+      getServiceAuthorization('/api/v1/comments', upstreams, undefined, ''),
     ).toBeUndefined();
 
     expect(
-      getCommentsAuthorization(
+      getServiceAuthorization(
         '/api/v1/comments',
         upstreams,
         'Bearer other',
@@ -107,13 +118,22 @@ describe('getCommentsAuthorization', () => {
     ).toBeUndefined();
 
     expect(
-      getCommentsAuthorization('/api/v1/spells', upstreams, undefined, 'token'),
+      getServiceAuthorization('/api/v1/spells', upstreams, undefined, 'token'),
     ).toBeUndefined();
   });
 
   it('оставляет cookie бэкенду, если адрес сервиса не задан', () => {
     expect(
-      getCommentsAuthorization(
+      getServiceAuthorization(
+        '/api/subscriptions/my',
+        { ...upstreams, subscriber: '' },
+        undefined,
+        'token',
+      ),
+    ).toBeUndefined();
+
+    expect(
+      getServiceAuthorization(
         '/api/v1/comments',
         { ...upstreams, comments: '' },
         undefined,

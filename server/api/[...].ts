@@ -5,6 +5,6 @@ export default defineEventHandler((event) => {
   const upstreams = getUpstreams();
 
   return proxyRequest(event, getProxyTarget(event.path, upstreams), {
-    headers: getCommentsAuthHeaders(event, upstreams),
+    headers: getServiceAuthHeaders(event, upstreams),
   });
 });
