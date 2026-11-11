@@ -31,6 +31,8 @@ export interface ScreenWindowRequest {
   path: string;
   /** Название в шапке окна и на плашке свёрнутого окна. */
   title: string;
+  /** SVG-разметка иконки раздела для шапки и плашки окна. */
+  icon?: string | null;
   /** Точка клика: окно встаёт рядом с ней, а не в центре экрана. */
   origin?: ScreenWindowPoint;
 }

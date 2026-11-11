@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { useScreenWindows } from '../composables';
   import { SCREEN_WINDOW_ICON, SCREEN_WINDOW_TEXT } from '../model';
+  import ScreenIcon from './ScreenIcon.vue';
   import ScreenWindow from './ScreenWindow.vue';
 
   /**
@@ -39,7 +40,6 @@
         class="flex items-center rounded-md border border-default bg-elevated shadow-lg"
       >
         <UButton
-          :icon="SCREEN_WINDOW_ICON.window"
           :label="screenWindow.title"
           :aria-label="`${SCREEN_WINDOW_TEXT.restore}: ${screenWindow.title}`"
           color="neutral"
@@ -48,7 +48,14 @@
           class="max-w-56"
           :ui="{ label: 'truncate' }"
           @click.left.exact.prevent="restore(screenWindow.id)"
-        />
+        >
+          <template #leading>
+            <ScreenIcon
+              :markup="screenWindow.icon"
+              size="sm"
+            />
+          </template>
+        </UButton>
 
         <UButton
           :icon="SCREEN_WINDOW_ICON.close"
