@@ -127,6 +127,19 @@
   function closeWindow(): void {
     close(screenWindow.id);
   }
+
+  /**
+   * Двойной клик по шапке сворачивает окно, как в оконных системах.
+   * Быстрые клики по кнопкам шапки окно не сворачивают.
+   * @param event - двойной клик
+   */
+  function minimizeByHeader(event: MouseEvent): void {
+    if (event.target instanceof Element && event.target.closest('button')) {
+      return;
+    }
+
+    minimizeWindow();
+  }
 </script>
 
 <template>
@@ -142,6 +155,7 @@
     <header
       ref="handle"
       class="flex shrink-0 cursor-move items-center gap-2 border-b border-default bg-elevated py-1 pr-1 pl-3 select-none"
+      @dblclick.left.exact.prevent="minimizeByHeader"
     >
       <ScreenIcon
         :markup="screenWindow.icon"
