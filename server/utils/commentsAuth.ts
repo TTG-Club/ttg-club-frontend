@@ -1,15 +1,12 @@
 import type { ProxyUpstreams } from '#shared/utils';
 import type { H3Event } from 'h3';
 
-import { COMMENTS_PATH_PREFIXES, USER_TOKEN_COOKIE } from '#shared/consts';
-import { isPathWithPrefix } from '#shared/utils';
+import { USER_TOKEN_COOKIE } from '#shared/consts';
+import { getCommentsAuthorization } from '#shared/utils';
 
 /**
- * Заголовок авторизации для comments-service.
- *
- * Сервис принимает только `Authorization: Bearer`, а токен лежит в
- * httpOnly-cookie. Без отдельного адреса сервиса запрос идёт через бэкенд,
- * и тот перекладывает cookie сам; при прямом проксировании это делает Nitro.
+ * Заголовки авторизации для прямого проксирования в comments-service:
+ * токен из httpOnly-cookie уходит как `Authorization: Bearer`.
  *
  * @param event - Входящий запрос
  * @param upstreams - Адреса сервисов
@@ -19,15 +16,12 @@ export function getCommentsAuthHeaders(
   event: H3Event,
   upstreams: ProxyUpstreams,
 ): Record<string, string> {
-  if (
-    !upstreams.comments
-    || !isPathWithPrefix(event.path, COMMENTS_PATH_PREFIXES)
-    || getRequestHeader(event, 'authorization')
-  ) {
-    return {};
-  }
+  const authorization = getCommentsAuthorization(
+    event.path,
+    upstreams,
+    getRequestHeader(event, 'authorization'),
+    getCookie(event, USER_TOKEN_COOKIE),
+  );
 
-  const token = getCookie(event, USER_TOKEN_COOKIE);
-
-  return token ? { authorization: `Bearer ${token}` } : {};
+  return authorization ? { authorization } : {};
 }
