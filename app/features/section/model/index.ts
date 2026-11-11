@@ -47,6 +47,7 @@ export {
   getFirstLetterGroup,
   getGroupSelection,
   getQueryString,
+  getSectionEntryKey,
   getSelectAllState,
   getSourceFilterValue,
   getWorkshopEditPath,
