@@ -90,14 +90,6 @@ export const HOME_VTTG_CARD: HomePromoCardContent = {
   external: true,
 };
 
-export const HOME_TOKENATOR_CARD: HomePromoCardContent = {
-  eyebrow: 'Всегда под рукой!',
-  title: 'Токенатор',
-  image: '/img/bg_token_library.webp',
-  to: TOKENATOR_URL,
-  external: true,
-};
-
 /* --- Новости ------------------------------------------------------------ */
 
 /** Новый сайт: там публикуются новости и живёт каталог игр */
@@ -264,3 +256,16 @@ export const HOME_PARTNERS_ICON = 'tabler:heart-handshake';
 export const HOME_PARTNERS_DATA_KEY = 'home-partners';
 
 export const HOME_PARTNERS_PATH = '/api/v1/partners';
+
+/* --- Обсуждения --------------------------------------------------------- */
+
+export const HOME_COMMENTS_LABEL = 'Обсуждения';
+
+export const HOME_COMMENTS_ICON = 'tabler:message-circle';
+
+export const HOME_COMMENTS_DATA_KEY = 'home-comments';
+
+/** Сколько последних комментариев показывает блок */
+export const HOME_COMMENTS_COUNT = 10;
+
+export const HOME_COMMENTS_EMPTY_TEXT = 'Комментариев пока нет';

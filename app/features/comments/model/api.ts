@@ -12,6 +12,7 @@ import {
   COMMENTS_API_PATH,
   COMMENTS_HTTP_STATUS,
   COMMENTS_PAGE_SIZE,
+  COMMENTS_RECENT_PATH,
   COMMENTS_ROOT_SORT,
   COMMENTS_SOURCE_PLATFORM,
 } from './constants';
@@ -71,6 +72,24 @@ export async function fetchRootComments(
       size,
       sort: COMMENTS_ROOT_SORT,
     },
+    retry: 0,
+  });
+
+  return parseCommentsPage(response);
+}
+
+/**
+ * Последние комментарии всех страниц этого сайта, свежие сверху: сервис
+ * отбирает их по платформе, комментарии нового сайта сюда не попадают.
+ * @param page - номер страницы с нуля
+ * @param size - размер страницы
+ */
+export async function fetchRecentComments(
+  page: number,
+  size: number,
+): Promise<CommentsPage> {
+  const response: unknown = await $fetch(COMMENTS_RECENT_PATH, {
+    query: { sourcePlatform: COMMENTS_SOURCE_PLATFORM, page, size },
     retry: 0,
   });
 
