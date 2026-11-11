@@ -483,6 +483,16 @@ export function getEntryApiPath(path: string): string {
 }
 
 /**
+ * Ключ загруженной записи в данных Nuxt: по нему запись читают и вне
+ * карточки, например окно ширмы берёт из неё свою иконку.
+ * @param sectionKey - ключ раздела
+ * @param path - адрес страницы записи
+ */
+export function getSectionEntryKey(sectionKey: string, path: string): string {
+  return `section-entry-${sectionKey}:${path}`;
+}
+
+/**
  * Возвращает страницу правки записи в мастерской: `/gods/Bane` правится
  * на `/workshop/gods/Bane/edit`, как в старом SPA.
  * @param path - адрес страницы записи

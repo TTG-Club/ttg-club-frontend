@@ -4,6 +4,7 @@
   import type { ScreenWindowState } from '../model';
 
   import { provideSectionOpener } from '~section/composables';
+  import { getSectionEntryKey } from '~section/model';
 
   import { useScreenWindows } from '../composables';
   import {
@@ -12,6 +13,7 @@
     SCREEN_WINDOW_MIN_SIZE,
     SCREEN_WINDOW_RESIZE_SAVE_DELAY,
     SCREEN_WINDOW_TEXT,
+    screenDetailSchema,
     SCREENS_SECTION,
   } from '../model';
   import ScreenEntry from './ScreenEntry.vue';
@@ -73,6 +75,24 @@
   useResizeObserver(root, () => {
     if (root.value) {
       void saveSize(root.value.offsetWidth, root.value.offsetHeight);
+    }
+  });
+
+  // Иконку знает не каждая карточка, открывшая окно (её нет, например, в
+  // результатах поиска), а запись знает всегда: окно берёт её оттуда
+  const { data: loadedEntry } = useNuxtData(
+    getSectionEntryKey(SCREENS_SECTION.key, screenWindow.path),
+  );
+
+  watchImmediate(loadedEntry, (value) => {
+    const parsed = screenDetailSchema.safeParse(value);
+
+    // Иконка уже та же: запись в localStorage не нужна
+    if (
+      parsed.success
+      && (parsed.data.icon ?? null) !== (screenWindow.icon ?? null)
+    ) {
+      update(screenWindow.id, { icon: parsed.data.icon ?? null });
     }
   });
 
