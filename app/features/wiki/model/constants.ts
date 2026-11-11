@@ -73,7 +73,11 @@ export const SCREENS_SECTION: SectionConfig = {
 
 export const SCREEN_TEXT = {
   parent: 'Раздел:',
+  back: 'Назад к разделу',
 } as const;
+
+/** Иконка возврата из вложенного раздела к корневому. */
+export const SCREEN_BACK_ICON = 'tabler:arrow-left';
 
 /** Иконка вложенного раздела, когда своей в базе нет. */
 export const SCREEN_ICON_FALLBACK = 'tabler:book-2';

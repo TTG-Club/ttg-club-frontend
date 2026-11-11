@@ -4,30 +4,28 @@
   import { ContentRender } from '~content/render';
 
   import { groupScreens } from '../model';
-  import ScreenChildDrawer from './ScreenChildDrawer.vue';
   import ScreenLinkCard from './ScreenLinkCard.vue';
 
   /**
    * Корневой раздел ширмы: описание и вложенные разделы по группам.
-   * Вложенный раздел открывается в дровере справа.
+   * Вложенный раздел открывает запись на месте корневого.
    */
   const { screen } = defineProps<{
     screen: ScreenDetail;
   }>();
 
+  const emit = defineEmits<{
+    open: [path: string];
+  }>();
+
   const groups = computed(() => groupScreens(screen.chields ?? []));
 
-  const openPath = ref<string>();
-
-  const isOpen = ref(false);
-
   /**
-   * Открывает вложенный раздел в дровере.
+   * Открывает вложенный раздел.
    * @param path - адрес вложенного раздела
    */
   function open(path: string): void {
-    openPath.value = path;
-    isOpen.value = true;
+    emit('open', path);
   }
 </script>
 
@@ -59,11 +57,5 @@
         />
       </div>
     </section>
-
-    <ScreenChildDrawer
-      v-if="openPath"
-      v-model:path="openPath"
-      v-model:open="isOpen"
-    />
   </div>
 </template>
