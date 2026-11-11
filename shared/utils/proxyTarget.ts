@@ -78,3 +78,46 @@ export function getProxyTarget(
 
   return trimTrailingSlashes(upstreams.api) + path;
 }
+
+/**
+ * Проверяет, что запрос уходит напрямую в сервис, который принимает токен
+ * только как `Bearer`: subscriber-service или comments-service с заданным
+ * адресом.
+ *
+ * @param path - Путь запроса вместе с query-строкой
+ * @param upstreams - Адреса сервисов
+ * @returns `true`, если запрос идёт в такой сервис напрямую
+ */
+function isBearerOnlyService(path: string, upstreams: ProxyUpstreams): boolean {
+  return (
+    (!!upstreams.subscriber && isPathWithPrefix(path, SUBSCRIBER_PATH_PREFIXES))
+    || (!!upstreams.comments && isPathWithPrefix(path, COMMENTS_PATH_PREFIXES))
+  );
+}
+
+/**
+ * Возвращает значение заголовка `Authorization` для subscriber-service и
+ * comments-service.
+ *
+ * Сервисы принимают токен только как `Bearer`, а сайт держит его в
+ * httpOnly-cookie. Без отдельного адреса сервиса запрос уходит в основной API,
+ * и бэкенд перекладывает cookie сам; уже заданный заголовок не трогается.
+ *
+ * @param path - Путь запроса вместе с query-строкой
+ * @param upstreams - Адреса сервисов
+ * @param authorization - Заголовок `Authorization` входящего запроса
+ * @param token - Access-токен из cookie
+ * @returns Значение заголовка либо `undefined`, если добавлять его не нужно
+ */
+export function getServiceAuthorization(
+  path: string,
+  upstreams: ProxyUpstreams,
+  authorization: string | undefined,
+  token: string | undefined,
+): string | undefined {
+  if (!token || authorization || !isBearerOnlyService(path, upstreams)) {
+    return undefined;
+  }
+
+  return `Bearer ${token}`;
+}
