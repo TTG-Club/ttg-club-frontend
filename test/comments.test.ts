@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest';
 import {
   countCommentDescendants,
   createCommentNode,
+  filterLiveComments,
   findCommentNode,
   getCommentErrorMessage,
   getCommentIdFromHash,
+  getCommentPageLink,
   getCommentRateLimit,
+  getCommentSectionLabel,
   getCommentsTarget,
   getPluralWord,
   getTokenSubject,
@@ -199,5 +202,34 @@ describe('комментарии', () => {
     expect(getPluralWord(1, forms)).toBe('ответ');
     expect(getPluralWord(3, forms)).toBe('ответа');
     expect(getPluralWord(11, forms)).toBe('ответов');
+  });
+
+  it('готовит ленту последних комментариев', () => {
+    const page = parseCommentsPage({
+      content: [
+        makeRawComment(),
+        makeRawComment({
+          id: 'c2',
+          status: 'DELETED',
+          authorId: null,
+          authorName: null,
+          content: null,
+        }),
+      ],
+      last: true,
+      totalElements: 2,
+    });
+
+    const live = filterLiveComments(page.items);
+
+    expect(live.map((comment) => comment.id)).toEqual(['c1']);
+
+    expect(getCommentPageLink({ id: 'c1', url: '/spells/fireball' })).toBe(
+      '/spells/fireball#comment-c1',
+    );
+
+    expect(getCommentPageLink({ id: 'c1', url: null })).toBeUndefined();
+    expect(getCommentSectionLabel('magic-items')).toBe('Магические предметы');
+    expect(getCommentSectionLabel('unknown')).toBe('unknown');
   });
 });

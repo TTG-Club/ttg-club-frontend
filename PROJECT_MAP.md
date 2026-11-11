@@ -28,7 +28,7 @@
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
 │   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace with turn reel, hit points and armor class on the device, guest key slot)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
-│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), latest-game, social-links, partners, ui-kit
+│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
 │   │   ├── news/               # news of new.ttg.club read here: model (core-api articles and community news), card (hero, tile), drawer (quick reading, page opens on new.ttg.club), body, video (YouTube / VK player), markup (render of the new site markup `{@...}`; links lead to new.ttg.club)
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu like new.ttg.club from /api/v1/menu, cached by Nitro with a built-in fallback copy), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state)
@@ -242,6 +242,12 @@ here as on its home page: core-api `/api/v2/articles/search?type=NEWS` and
 `/api/v2/community-news/search`, loaded in the browser. A click opens the news
 in a right drawer for quick reading; the "open page" button and ctrl+click open
 it on new.ttg.club in a new tab. Articles are not shown here.
+
+The "Discussions" block under the latest game shows the latest comments of
+this site only: comments-service `/api/v1/comments/recent` with the
+`SITE_5E14` platform, loaded in the browser and refreshed when the tab becomes
+visible again. A row opens the comment on its page (`#comment-<id>`). The
+tokenator card is no longer on the home page.
 
 Moderators and administrators manage the videos at `/admin/youtube` (also in
 the user menu): add by link or ID, rename, delete, and switch up to five on.

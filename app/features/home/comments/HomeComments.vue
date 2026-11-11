@@ -20,14 +20,20 @@
    * сервис отбирает их по платформе. Грузятся на клиенте — блок ниже сгиба
    * и не должен задерживать ответ сервера.
    */
-  const { data, status, refresh } = useAsyncData(
+  const {
+    data: recentComments,
+    status,
+    refresh,
+  } = useAsyncData(
     HOME_COMMENTS_DATA_KEY,
     () =>
       readWithoutStaleToken(() => fetchRecentComments(0, HOME_COMMENTS_COUNT)),
     { lazy: true, server: false },
   );
 
-  const comments = computed(() => filterLiveComments(data.value?.items ?? []));
+  const comments = computed(() =>
+    filterLiveComments(recentComments.value?.items ?? []),
+  );
 
   // Главную держат открытой, а комментарии пишут прямо во время чтения —
   // при возврате на вкладку блок обновляется без F5
