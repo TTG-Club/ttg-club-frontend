@@ -7,7 +7,11 @@
   <div class="min-h-dvh pb-(--navbar-height) md:pb-0 md:pl-(--navbar-width)">
     <SidebarPanel />
 
-    <main class="mx-auto w-full max-w-(--max-content) px-4 py-6">
+    <!--
+      Изоляция держит слои страницы (липкие панели и т. п.) внутри main:
+      иначе они ложились бы поверх окон ширмы.
+    -->
+    <main class="isolate mx-auto w-full max-w-(--max-content) px-4 py-6">
       <slot />
     </main>
 

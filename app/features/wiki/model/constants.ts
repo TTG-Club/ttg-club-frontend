@@ -133,3 +133,55 @@ export const SVG_NO_PAINT = 'none';
 
 /** Разделитель значений в строке свойства: домены, титулы */
 export const WIKI_LIST_SEPARATOR = ', ';
+
+/** Ключ открытых окон ширмы в localStorage. */
+export const SCREEN_WINDOWS_STORAGE_KEY = 'screens:windows';
+
+/** Размер нового окна ширмы, px. */
+export const SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
+
+/** Меньше этого окно не сжимается, px. */
+export const SCREEN_WINDOW_MIN_SIZE = { width: 320, height: 240 } as const;
+
+/** Отступ окна от краёв экрана, px. */
+export const SCREEN_WINDOW_MARGIN = 16;
+
+/**
+ * Ширина боковой панели сайта (`--navbar-width` без безопасной зоны), px:
+ * новое окно не встаёт под неё.
+ */
+export const SCREEN_WINDOW_LEFT_INSET = 64;
+
+/**
+ * Сколько окна остаётся на экране по ширине, когда его утащили за край, px:
+ * за эту часть его можно вытянуть обратно.
+ */
+export const SCREEN_WINDOW_VISIBLE_PART = 96;
+
+/** Высота шапки окна, px: шапка не уходит за нижний край экрана. */
+export const SCREEN_WINDOW_HEADER_HEIGHT = 40;
+
+/** Сдвиг окна от точки клика, px. */
+export const SCREEN_WINDOW_CLICK_OFFSET = 16;
+
+/** Сдвиг каждого следующего окна, открытого без точки клика, px. */
+export const SCREEN_WINDOW_CASCADE_STEP = 32;
+
+/** Сколько окон лесенкой, прежде чем она начнётся заново. */
+export const SCREEN_WINDOW_CASCADE_LENGTH = 8;
+
+/** Пауза перед сохранением размера при растягивании окна, мс. */
+export const SCREEN_WINDOW_RESIZE_SAVE_DELAY = 300;
+
+export const SCREEN_WINDOW_TEXT = {
+  minimize: 'Свернуть окно',
+  restore: 'Развернуть окно',
+  close: 'Закрыть окно',
+  dock: 'Свёрнутые окна ширмы',
+} as const;
+
+export const SCREEN_WINDOW_ICON = {
+  window: 'tabler:app-window',
+  minimize: 'tabler:minus',
+  close: 'tabler:x',
+} as const;

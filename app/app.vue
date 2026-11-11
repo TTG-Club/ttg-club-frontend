@@ -3,6 +3,7 @@
 
   import { useMaintenanceGate } from '~infrastructure/maintenance/composables';
   import { MaintenanceScreen } from '~infrastructure/maintenance/ui';
+  import { ScreenWindows } from '~wiki/screens';
 
   useThemeHead();
 
@@ -25,8 +26,15 @@
 
     <MaintenanceScreen v-if="isMaintenanceBlocked" />
 
-    <NuxtLayout v-else>
-      <NuxtPage />
-    </NuxtLayout>
+    <template v-else>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+
+      <!-- Окна ширмы живут поверх всех страниц и переживают переходы -->
+      <ClientOnly>
+        <ScreenWindows />
+      </ClientOnly>
+    </template>
   </UApp>
 </template>

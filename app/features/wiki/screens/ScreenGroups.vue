@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { ScreenDetail } from '../model';
+  import type { ScreenDetail, ScreenWindowRequest } from '../model';
 
   import { ContentRender } from '~content/render';
 
@@ -8,29 +8,30 @@
 
   /**
    * Корневой раздел ширмы: описание и вложенные разделы по группам.
-   * Вложенный раздел открывает запись на месте корневого.
+   * Что делать с нажатым вложенным разделом, решает запись ширмы.
    */
   const { screen } = defineProps<{
     screen: ScreenDetail;
   }>();
 
   const emit = defineEmits<{
-    open: [path: string];
+    open: [request: ScreenWindowRequest];
   }>();
 
   const groups = computed(() => groupScreens(screen.chields ?? []));
 
   /**
-   * Открывает вложенный раздел.
-   * @param path - адрес вложенного раздела
+   * Просит открыть вложенный раздел.
+   * @param request - раздел, название и точка клика
    */
-  function open(path: string): void {
-    emit('open', path);
+  function open(request: ScreenWindowRequest): void {
+    emit('open', request);
   }
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <!-- Колонки считаются по ширине записи: она бывает и узким окном -->
+  <div class="@container flex flex-col gap-4">
     <ContentRender
       v-if="screen.description"
       :html="screen.description"
@@ -48,7 +49,7 @@
         {{ group.name }}
       </h3>
 
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      <div class="grid grid-cols-1 gap-2 @sm:grid-cols-2 @3xl:grid-cols-3">
         <ScreenLinkCard
           v-for="item in group.items"
           :key="item.url"

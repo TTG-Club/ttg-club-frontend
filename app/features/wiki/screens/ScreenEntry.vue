@@ -1,9 +1,10 @@
 <script setup lang="ts">
-  import type { ScreenDetail } from '../model';
+  import type { ScreenDetail, ScreenWindowRequest } from '../model';
 
   import { SectionEntry } from '~section/entry';
   import { getWorkshopEditPath } from '~section/model';
 
+  import { useScreenWindows } from '../composables';
   import { screenDetailSchema, SCREENS_SECTION } from '../model';
   import ScreenBody from './ScreenBody.vue';
   import ScreenChildPane from './ScreenChildPane.vue';
@@ -11,12 +12,16 @@
 
   /**
    * Запись поверх списка раздела; без адреса — страница записи по адресу
-   * страницы. Вложенный раздел открывается на месте корневого: корневой
-   * прячется, но остаётся смонтированным, чтобы возврат был мгновенным.
+   * страницы. Вложенный раздел открывается своим окном поверх сайта, а где
+   * окон нет (телефон) — на месте корневого: корневой прячется, но остаётся
+   * смонтированным, чтобы возврат был мгновенным.
    */
   const { path = undefined } = defineProps<{
     path?: string;
   }>();
+
+  const { isAvailable: isWindowAvailable, open: openWindow } =
+    useScreenWindows();
 
   const childPath = ref<string>();
 
@@ -25,13 +30,19 @@
   const root = useTemplateRef<HTMLElement>('root');
 
   /**
-   * Открывает вложенный раздел вместо корневого.
-   * @param next - адрес вложенного раздела
+   * Открывает вложенный раздел окном или вместо корневого.
+   * @param request - раздел, название и точка клика
    * @param parent - корневой раздел, к которому ведёт возврат
    */
-  function openChild(next: string, parent: ScreenDetail): void {
+  function openChild(request: ScreenWindowRequest, parent: ScreenDetail): void {
+    if (isWindowAvailable.value) {
+      openWindow(request);
+
+      return;
+    }
+
     parentTitle.value = parent.name.rus;
-    childPath.value = next;
+    childPath.value = request.path;
   }
 
   /** Возвращает к корневому разделу и показывает карточку, с которой ушли. */
@@ -70,7 +81,7 @@
           <ScreenGroups
             v-if="entry.chields?.length"
             :screen="entry"
-            @open="(next) => openChild(next, entry)"
+            @open="(request) => openChild(request, entry)"
           />
 
           <ScreenBody
