@@ -4,11 +4,10 @@
 
   import { screenLinkSchema, SCREENS_SECTION } from '../model';
   import ScreenCard from './ScreenCard.vue';
-  import ScreenEntry from './ScreenEntry.vue';
 </script>
 
 <template>
-  <!-- Корневые разделы ширмы карточками в сетку -->
+  <!-- Корневые разделы ширмы карточками в сетку; открываются окнами -->
   <SectionPage
     :section="SCREENS_SECTION"
     :schema="screenLinkSchema"
@@ -22,10 +21,6 @@
         :title="item.name.rus"
         :subtitle="item.name.eng"
       />
-    </template>
-
-    <template #entry="{ path }">
-      <ScreenEntry :path="path" />
     </template>
   </SectionPage>
 </template>

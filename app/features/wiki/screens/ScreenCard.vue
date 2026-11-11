@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { useSectionOpener } from '~section/composables';
+  import { useScreenWindows } from '../composables';
 
   /**
    * Корневой раздел ширмы в списке: карточка с названиями. Клик открывает
-   * раздел так, как велит режим страницы ширмы.
+   * раздел окном поверх сайта, а где окон нет (телефон) — его страницей.
    */
   const {
     to = undefined,
@@ -16,25 +16,30 @@
     subtitle: string;
   }>();
 
-  const opener = useSectionOpener();
+  const { isAvailable, isOpen, open: openWindow } = useScreenWindows();
 
   const cardClass = computed(() =>
-    !!to && opener?.activePath.value === to
+    !!to && isOpen(to)
       ? 'border-primary bg-primary/10 ring-1 ring-primary/50'
       : 'border-default bg-elevated/50 hover:bg-elevated',
   );
 
   /**
-   * Открывает раздел через страницу ширмы, если она умеет.
+   * Открывает раздел окном рядом с точкой клика, если окна есть.
    * @param event - клик по карточке
    */
   function open(event: MouseEvent): void {
-    if (!to || !opener) {
+    if (!to || !isAvailable.value) {
       return;
     }
 
     event.preventDefault();
-    opener.open(to);
+
+    openWindow({
+      path: to,
+      title,
+      origin: { x: event.clientX, y: event.clientY },
+    });
   }
 </script>
 

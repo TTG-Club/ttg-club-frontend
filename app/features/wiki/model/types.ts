@@ -13,3 +13,24 @@ export interface SvgNode {
   attributes: Record<string, string>;
   children: Array<SvgNode>;
 }
+
+/** Точка на экране, px. */
+export interface ScreenWindowPoint {
+  x: number;
+  y: number;
+}
+
+/** Размер окна или экрана, px. */
+export interface ScreenWindowSize {
+  width: number;
+  height: number;
+}
+
+/** Просьба открыть раздел ширмы в окне. */
+export interface ScreenWindowRequest {
+  path: string;
+  /** Название в шапке окна и на плашке свёрнутого окна. */
+  title: string;
+  /** Точка клика: окно встаёт рядом с ней, а не в центре экрана. */
+  origin?: ScreenWindowPoint;
+}

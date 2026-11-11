@@ -97,3 +97,24 @@ export const screenDetailSchema = screenLinkSchema.extend({
 });
 
 export type ScreenDetail = z.infer<typeof screenDetailSchema>;
+
+/**
+ * Окно ширмы поверх сайта, сохранённое в браузере: раздел, место, размер,
+ * слой и свёрнутость.
+ */
+export const screenWindowSchema = z.object({
+  id: z.string().min(1),
+  path: z.string().min(1),
+  title: z.string(),
+  x: z.number(),
+  y: z.number(),
+  width: z.number().positive(),
+  height: z.number().positive(),
+  /** Чем больше, тем выше окно среди остальных. */
+  layer: z.number().int(),
+  isMinimized: z.boolean(),
+});
+
+export type ScreenWindowState = z.infer<typeof screenWindowSchema>;
+
+export const screenWindowListSchema = z.array(screenWindowSchema);

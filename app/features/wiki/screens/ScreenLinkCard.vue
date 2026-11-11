@@ -1,22 +1,30 @@
 <script setup lang="ts">
-  import type { ScreenLink } from '../model';
+  import type { ScreenLink, ScreenWindowRequest } from '../model';
 
   import ScreenIcon from './ScreenIcon.vue';
 
   /**
    * Вложенный раздел ширмы: иконка, название, источник. Клик открывает
-   * раздел в дровере, а ссылка ведёт на его страницу.
+   * раздел окном или на месте корневого, а ссылка ведёт на его страницу.
    */
   const { screen } = defineProps<{
     screen: ScreenLink;
   }>();
 
   const emit = defineEmits<{
-    open: [path: string];
+    open: [request: ScreenWindowRequest];
   }>();
 
-  function open() {
-    emit('open', screen.url);
+  /**
+   * Просит открыть раздел рядом с точкой клика.
+   * @param event - клик по карточке
+   */
+  function open(event: MouseEvent): void {
+    emit('open', {
+      path: screen.url,
+      title: screen.name.rus,
+      origin: { x: event.clientX, y: event.clientY },
+    });
   }
 </script>
 
