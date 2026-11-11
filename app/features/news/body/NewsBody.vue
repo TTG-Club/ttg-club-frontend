@@ -4,6 +4,7 @@
   import { getMarkupText } from '../markup';
   import { MarkupRender } from '../markup/ui';
   import {
+    getNewsImageUrl,
     NEWS_FALLBACK_IMAGE,
     NEWS_ICON,
     NEWS_TEXT,
@@ -19,12 +20,16 @@
     news: NewsDetailed;
   }>();
 
-  /** Своя обложка новости: заставка ролика или картинка над текстом */
-  const poster = computed(() => news.previewImageUrl ?? undefined);
+  const { newSiteUrl } = useRuntimeConfig().public;
 
-  const coverImage = computed(
-    () => news.previewImageUrl ?? NEWS_FALLBACK_IMAGE,
+  /** Своя обложка новости: заставка ролика или картинка над текстом */
+  const ownImage = computed(() =>
+    getNewsImageUrl(news.previewImageUrl, newSiteUrl),
   );
+
+  const poster = computed(() => ownImage.value ?? undefined);
+
+  const coverImage = computed(() => ownImage.value ?? NEWS_FALLBACK_IMAGE);
 
   const previewNodes = computed(() => toNewsMarkup(news.preview));
 

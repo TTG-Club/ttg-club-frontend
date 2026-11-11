@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { MENU_FALLBACK, MENU_HIDDEN_URLS } from '#shared/consts';
-import { withoutHiddenMenuItems } from '#shared/utils';
+// Прямой путь, а не `#shared/consts`: в Linux vitest разрешает этот алиас в
+// app/shared/consts (там свои константы), и тест получал пустой модуль.
+import { MENU_FALLBACK, MENU_HIDDEN_URLS } from '../shared/consts/menu';
+import { withoutHiddenMenuItems } from '../shared/utils/menu';
 
 describe('withoutHiddenMenuItems', () => {
   it('убирает скрытые пункты на любой глубине, остальное не трогает', () => {
