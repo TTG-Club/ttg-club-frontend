@@ -35,16 +35,43 @@ export function getNewsPreviewText(value: RenderNode): string {
 }
 
 /**
+ * Полный адрес загруженной картинки нового сайта. API отдаёт путь вида
+ * `/s3/...` без домена: на этом сайте такого пути нет, поэтому дописываем
+ * origin нового сайта. Полные адреса возвращаются как есть.
+ *
+ * @param image - Адрес или путь картинки из ответа API
+ * @param newSiteUrl - Origin нового сайта
+ * @returns Полный адрес картинки или `null`, если картинки нет
+ */
+export function getNewsImageUrl(
+  image: string | null | undefined,
+  newSiteUrl: string,
+): string | null {
+  if (!image) {
+    return null;
+  }
+
+  const isSiteRelative = image.startsWith('/') && !image.startsWith('//');
+
+  return isSiteRelative ? `${newSiteUrl}${image}` : image;
+}
+
+/**
  * Обложка новости: своя картинка, превью ролика или заглушка.
  *
  * @param news - Новость
+ * @param newSiteUrl - Origin нового сайта
  * @returns Адрес картинки
  */
 export function getNewsCover(
   news: Pick<NewsShort, 'previewImageUrl' | 'videoUrl'>,
+  newSiteUrl: string,
 ): string {
   return (
-    getVideoPoster(news.videoUrl, news.previewImageUrl) ?? NEWS_FALLBACK_IMAGE
+    getVideoPoster(
+      news.videoUrl,
+      getNewsImageUrl(news.previewImageUrl, newSiteUrl),
+    ) ?? NEWS_FALLBACK_IMAGE
   );
 }
 
