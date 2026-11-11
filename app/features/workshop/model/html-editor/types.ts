@@ -49,6 +49,35 @@ export interface HtmlEditorCommand {
   isStyled?: boolean;
 }
 
+/** Кнопка панели, которая оборачивает выделение в тег (`mark`, `kbd`). */
+export interface HtmlEditorWrapTag {
+  tag: string;
+  icon: string;
+  title: string;
+  /** Текст, если выделение пустое. */
+  placeholder: string;
+}
+
+/** Операция над таблицей под кареткой. */
+export type HtmlTableAction =
+  | 'row-before'
+  | 'row-after'
+  | 'row-delete'
+  | 'column-before'
+  | 'column-after'
+  | 'column-delete'
+  | 'header-toggle'
+  | 'caption'
+  | 'table-delete';
+
+/** Ссылка из окна ссылки или ссылки на раздел. */
+export interface HtmlEditorLink {
+  /** Текст ссылки. */
+  text: string;
+  /** Адрес: внешний или путь раздела сайта. */
+  url: string;
+}
+
 /** Ошибка поля формы для `UForm`. */
 export interface HtmlFieldError {
   name: string;

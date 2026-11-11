@@ -160,6 +160,22 @@ function removeEmptyParagraphs(root: HTMLElement): void {
       element.remove();
     }
   }
+
+  // Пустой абзац в самом конце редактор ставит за таблицей и разделителем,
+  // чтобы было куда продолжить текст; в описании он лишний
+  let last = root.lastElementChild;
+
+  while (
+    last?.tagName === 'P'
+    && last.childNodes.length === 1
+    && last.firstChild?.nodeName === 'BR'
+    && !last.nextSibling
+  ) {
+    const previous = last.previousElementSibling;
+
+    last.remove();
+    last = previous;
+  }
 }
 
 /**
