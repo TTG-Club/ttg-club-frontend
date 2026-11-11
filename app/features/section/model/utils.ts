@@ -240,6 +240,35 @@ export function selectionToQuery(
 }
 
 /**
+ * Проверяет, задан ли в адресе хотя бы один параметр фильтра.
+ * @param definition - фильтр раздела
+ * @param query - параметры адреса
+ */
+export function hasFilterQuery(
+  definition: FilterDefinition,
+  query: LocationQuery,
+): boolean {
+  return getFilterGroups(definition).some(
+    (group) => query[group.param] !== undefined,
+  );
+}
+
+/**
+ * Оставляет из параметров фильтра только заданные: в таком виде выбор
+ * сохраняется между заходами в раздел.
+ * @param query - параметры фильтра из `selectionToQuery`
+ */
+export function compactFilterQuery(
+  query: LocationQueryRaw,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(query).filter(
+      (entry): entry is [string, string] => typeof entry[1] === 'string',
+    ),
+  );
+}
+
+/**
  * Проверяет, отличается ли выбор от выбора по умолчанию.
  * @param definition - фильтр раздела
  * @param selection - текущий выбор
