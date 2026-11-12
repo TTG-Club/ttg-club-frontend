@@ -48,6 +48,7 @@ export {
   placeDmScreenWindow,
   resizeDmScreenWindow,
   resolveDmScreenSection,
+  snapDmScreenResize,
   snapDmScreenWindow,
 } from './utils';
 

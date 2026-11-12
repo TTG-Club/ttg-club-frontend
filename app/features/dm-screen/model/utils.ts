@@ -517,3 +517,81 @@ export function resizeDmScreenWindow(
     height: Math.round(height),
   };
 }
+
+/**
+ * Примагничивает растягиваемое окно: подвижные края (те, за которые
+ * тянут) притягиваются к краям холста и других окон — вровень или через
+ * промежуток сетки, если ближе расстояния примагничивания. Неподвижные края
+ * стоят; меньше минимального окно не становится.
+ * @param rect - окно после растягивания
+ * @param edge - сторона или угол, за которые тянут
+ * @param others - остальные развёрнутые окна
+ * @param viewport - размер экрана
+ */
+export function snapDmScreenResize(
+  rect: DmScreenRect,
+  edge: DmScreenResizeEdge,
+  others: ReadonlyArray<DmScreenRect>,
+  viewport: DmScreenSize,
+): DmScreenRect {
+  let { x, y, width, height } = rect;
+
+  const right = x + width;
+  const bottom = y + height;
+
+  if (edge.includes('e')) {
+    const snapped = snapToNearest(right, [
+      viewport.width - DM_SCREEN_WINDOW_MARGIN,
+      ...others.flatMap((other) => [
+        other.x - DM_SCREEN_GRID_GAP,
+        other.x,
+        other.x + other.width,
+      ]),
+    ]);
+
+    width = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.width, snapped - x);
+  }
+
+  if (edge.includes('w')) {
+    const snapped = snapToNearest(x, [
+      DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
+      ...others.flatMap((other) => [
+        other.x + other.width + DM_SCREEN_GRID_GAP,
+        other.x,
+        other.x + other.width,
+      ]),
+    ]);
+
+    width = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.width, right - snapped);
+    x = right - width;
+  }
+
+  if (edge.includes('s')) {
+    const snapped = snapToNearest(bottom, [
+      viewport.height - DM_SCREEN_WINDOW_MARGIN,
+      ...others.flatMap((other) => [
+        other.y - DM_SCREEN_GRID_GAP,
+        other.y,
+        other.y + other.height,
+      ]),
+    ]);
+
+    height = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.height, snapped - y);
+  }
+
+  if (edge.includes('n')) {
+    const snapped = snapToNearest(y, [
+      DM_SCREEN_TOP_INSET,
+      ...others.flatMap((other) => [
+        other.y + other.height + DM_SCREEN_GRID_GAP,
+        other.y,
+        other.y + other.height,
+      ]),
+    ]);
+
+    height = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.height, bottom - snapped);
+    y = bottom - height;
+  }
+
+  return { x, y, width, height };
+}

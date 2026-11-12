@@ -19,6 +19,7 @@ import {
   isDmScreenPath,
   resizeDmScreenWindow,
   resolveDmScreenSection,
+  snapDmScreenResize,
   snapDmScreenWindow,
 } from '~dm-screen/model';
 
@@ -291,6 +292,45 @@ describe('ширма мастера', () => {
 
       expect(shrunk.width).toBe(DM_SCREEN_WINDOW_MIN_SIZE.width);
       expect(shrunk.x + shrunk.width).toBe(start.x + start.width);
+    });
+  });
+
+  describe('примагничивание при растягивании', () => {
+    const viewport = { width: 1600, height: 900 };
+    const other = { x: 700, y: 100, width: 400, height: 300 };
+
+    it('правый край встаёт перед соседним окном через промежуток', () => {
+      const snapped = snapDmScreenResize(
+        { x: 200, y: 100, width: 485, height: 300 },
+        'e',
+        [other],
+        viewport,
+      );
+
+      expect(snapped).toEqual({
+        x: 200,
+        y: 100,
+        width: 700 - DM_SCREEN_GRID_GAP - 200,
+        height: 300,
+      });
+    });
+
+    it('верхний край прилипает под шапку, нижний стоит', () => {
+      const snapped = snapDmScreenResize(
+        { x: 200, y: DM_SCREEN_TOP_INSET + 7, width: 300, height: 400 },
+        'n',
+        [],
+        viewport,
+      );
+
+      expect(snapped.y).toBe(DM_SCREEN_TOP_INSET);
+      expect(snapped.y + snapped.height).toBe(DM_SCREEN_TOP_INSET + 7 + 400);
+    });
+
+    it('неподвижные края не трогает, далеко от краёв — без магнита', () => {
+      const rect = { x: 300, y: 500, width: 300, height: 200 };
+
+      expect(snapDmScreenResize(rect, 'se', [other], viewport)).toEqual(rect);
     });
   });
 });

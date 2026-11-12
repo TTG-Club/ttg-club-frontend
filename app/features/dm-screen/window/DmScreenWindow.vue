@@ -27,6 +27,7 @@
     isDmScreenPath,
     keepDmScreenWindowReachable,
     resizeDmScreenWindow,
+    snapDmScreenResize,
     snapDmScreenWindow,
   } from '../model';
   import DmScreenEntry from './DmScreenEntry.vue';
@@ -35,7 +36,8 @@
   /**
    * Окно записи на ширме, не блокирующее страницу. Тянется за шапку и
    * примагничивается к краям холста и других окон (Alt — без магнита),
-   * растягивается за любую сторону и любой угол (видимого уголка нет),
+   * растягивается за любую сторону и любой угол (видимого уголка нет) и
+   * тоже примагничивается,
    * сворачивается в плашку (кнопкой или
    * двойным кликом по шапке) и закрывается. Внутри — карточка записи любого
    * раздела; переходы внутри записи (вкладки класса, подрасы) остаются в
@@ -146,7 +148,8 @@
   }
 
   /**
-   * Растягивает окно вслед за указателем.
+   * Растягивает окно вслед за указателем; подвижные края примагничиваются
+   * к краям холста и других окон. С зажатым Alt — без магнита.
    * @param event - движение указателя
    */
   function moveResize(event: PointerEvent): void {
@@ -154,10 +157,19 @@
       return;
     }
 
-    const next = resizeDmScreenWindow(resizeStart.rect, resizeStart.edge, {
+    const resized = resizeDmScreenWindow(resizeStart.rect, resizeStart.edge, {
       x: event.clientX - resizeStart.pointer.x,
       y: event.clientY - resizeStart.pointer.y,
     });
+
+    const next = event.altKey
+      ? resized
+      : snapDmScreenResize(
+          resized,
+          resizeStart.edge,
+          visibleWindows.value.filter((item) => item.id !== screenWindow.id),
+          { width: viewportWidth.value, height: viewportHeight.value },
+        );
 
     x.value = next.x;
     y.value = next.y;
