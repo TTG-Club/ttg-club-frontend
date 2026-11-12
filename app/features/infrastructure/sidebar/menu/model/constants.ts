@@ -1,4 +1,6 @@
-import type { MenuGroup, SocialLink, SupportLink } from './types';
+import type { MenuGroup, MenuLink, SocialLink, SupportLink } from './types';
+
+import { DM_SCREEN_PAGE_PATH } from '~/shared/consts';
 
 /** Название сайта в шапке меню. */
 export const MENU_SITE_TITLE = 'TTG Club';
@@ -21,6 +23,9 @@ export const MENU_EXTERNAL_ICON = 'tabler:external-link';
 /** Иконка пункта, для адреса которого своей иконки нет. */
 export const MENU_DEFAULT_ICON = 'tabler:point';
 
+/** Иконка ширмы Мастера в меню и на самой ширме. */
+const DM_SCREEN_MENU_ICON = 'tabler:layout-dashboard';
+
 /**
  * Иконки пунктов по адресу: в меню из API иконки есть только у групп, а на
  * новом сайте они стоят у каждого пункта.
@@ -39,6 +44,7 @@ export const MENU_LINK_ICONS: Record<string, string> = {
   '/items/magic': 'tabler:wand',
   '/bestiary': 'tabler:paw',
   '/screens': 'tabler:layout-board-split',
+  [DM_SCREEN_PAGE_PATH]: DM_SCREEN_MENU_ICON,
   '/tools/ability-calc': 'tabler:calculator',
   '/tools/trader': 'tabler:building-store',
   '/tools/encounters': 'tabler:skull',
@@ -70,6 +76,17 @@ export const TOKENATOR_LEGACY_URL = '/tools/tokenator';
 export const TOKENATOR_LEGACY_SUFFIX = ' (старая версия)';
 
 /** Раздел Virtual TTG: в меню бэкенда его нет, как и в старом SPA. */
+/**
+ * Ширма Мастера: своей записи в меню API у неё нет, пункт встаёт сразу за
+ * справочником.
+ */
+export const DM_SCREEN_MENU_LINK: MenuLink = {
+  label: 'Ширма',
+  url: DM_SCREEN_PAGE_PATH,
+  icon: DM_SCREEN_MENU_ICON,
+  external: false,
+};
+
 export const VTTG_MENU_GROUP: MenuGroup = {
   label: 'Virtual TTG',
   links: [

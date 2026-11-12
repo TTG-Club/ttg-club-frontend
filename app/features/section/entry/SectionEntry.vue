@@ -18,10 +18,17 @@
 
   import { BookmarkButton } from '~bookmarks/button';
   import { CommentsBlock } from '~comments/section';
+  import { useDmScreenAdd } from '~dm-screen/composables';
+  import {
+    DM_SCREEN_ICON,
+    DM_SCREEN_PATH,
+    DM_SCREEN_TEXT,
+  } from '~dm-screen/model';
 
   import {
     useEntryExport,
     useSectionEntry,
+    useSectionEntryCompact,
     useSectionOpener,
     useSectionSwipe,
   } from '../composables';
@@ -59,6 +66,9 @@
   }>();
 
   const route = useRoute();
+
+  // В окне ширмы обсуждение записи не нужно
+  const isCompact = useSectionEntryCompact();
   const opener = useSectionOpener();
 
   const entryPath = computed(() => path ?? route.path);
@@ -104,6 +114,36 @@
     }));
   });
 
+  const { addToScreen, isAvailable: isScreenAvailable } = useDmScreenAdd();
+
+  // «В ширму» у записей разделов, которые ширма умеет показывать; на самой
+  // ширме запись уже в окне
+  const screenItems = computed<Array<DropdownMenuItem>>(() => {
+    const entryName = entry.value?.name.rus;
+
+    if (
+      !entryName
+      || route.path === DM_SCREEN_PATH
+      || !isScreenAvailable(entryPath.value)
+    ) {
+      return [];
+    }
+
+    return [
+      {
+        label: DM_SCREEN_TEXT.add,
+        icon: DM_SCREEN_ICON.add,
+        onSelect: () =>
+          addToScreen({ path: entryPath.value, title: entryName }),
+      },
+    ];
+  });
+
+  const menuItems = computed(() => [
+    ...screenItems.value,
+    ...exportItems.value,
+  ]);
+
   const pane = useTemplateRef<ComponentPublicInstance>('pane');
 
   // Свайпом листается только страница записи: поверх списка жест занят
@@ -136,7 +176,7 @@
     :edit-url="editUrl"
     :is-loading="isLoading"
     :is-error="isError"
-    :menu-items="exportItems"
+    :menu-items="menuItems"
     @close="close"
   >
     <template #actions>
@@ -154,6 +194,7 @@
 
       <!-- Блок сам решает, есть ли у раздела обсуждение -->
       <CommentsBlock
+        v-if="!isCompact"
         :path="entryPath"
         class="print:hidden"
       />

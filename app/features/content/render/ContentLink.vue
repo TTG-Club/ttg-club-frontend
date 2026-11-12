@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { useContentLinkHandler } from '../composables';
   import {
     EXTERNAL_LINK_REL,
     EXTERNAL_LINK_TARGET,
@@ -30,6 +31,30 @@
   );
 
   const isHttp = computed(() => EXTERNAL_URL.test(href));
+
+  const linkHandler = useContentLinkHandler();
+
+  /**
+   * Отдаёт внутреннюю ссылку своему обработчику (например, окну ширмы);
+   * если он за неё взялся, перехода нет.
+   * @param event - клик левой кнопкой без модификаторов
+   */
+  function handleInternal(event: MouseEvent): void {
+    const target = event.currentTarget;
+
+    const isHandled = !!linkHandler?.({
+      path: href,
+      title:
+        target instanceof HTMLElement
+          ? (target.textContent ?? '').trim()
+          : href,
+      origin: { x: event.clientX, y: event.clientY },
+    });
+
+    if (isHandled) {
+      event.preventDefault();
+    }
+  }
 </script>
 
 <template>
@@ -38,6 +63,7 @@
     v-bind="attributes"
     :to="href"
     :external="!isNuxtPage"
+    @click.left.exact.capture="handleInternal"
   >
     <slot />
   </NuxtLink>

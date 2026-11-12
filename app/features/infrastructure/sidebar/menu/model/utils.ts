@@ -2,7 +2,10 @@ import type { MenuGroup, MenuLink, SiteMenuItem } from './types';
 
 import { sortBy } from 'es-toolkit';
 
+import { SCREENS_REFERENCE_PAGE_PATH } from '~/shared/consts';
+
 import {
+  DM_SCREEN_MENU_LINK,
   MENU_DEFAULT_ICON,
   MENU_LINK_ICONS,
   MENU_TOOLS_PATH_PREFIX,
@@ -32,6 +35,11 @@ function toMenuLinks(item: SiteMenuItem): Array<MenuLink> {
     icon: getMenuLinkIcon(item.url),
     external: !!item.external,
   };
+
+  // Ширма своей записи в меню API не имеет: встаёт за справочником
+  if (item.url === SCREENS_REFERENCE_PAGE_PATH) {
+    return [link, DM_SCREEN_MENU_LINK];
+  }
 
   if (item.url !== TOKENATOR_LEGACY_URL) {
     return [link];

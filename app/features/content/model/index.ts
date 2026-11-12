@@ -1,5 +1,7 @@
 export type {
   ContentElementNode,
+  ContentLinkHandler,
+  ContentLinkRequest,
   ContentNode,
   ContentRenderItem,
   ContentTextNode,

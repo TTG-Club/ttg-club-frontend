@@ -48,3 +48,12 @@ export const ERROR_MESSAGE_UNKNOWN: ErrorMessage = {
   link: 'в другом',
   after: 'месте',
 };
+
+/**
+ * Страница ширмы Мастера. Общая: её знают и сама ширма, и меню сайта, где
+ * пункт ширмы встаёт за справочником.
+ */
+export const DM_SCREEN_PAGE_PATH = '/dm-screen';
+
+/** Справочник Мастера: за ним в меню встаёт пункт ширмы. */
+export const SCREENS_REFERENCE_PAGE_PATH = '/screens';
