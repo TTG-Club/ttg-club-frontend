@@ -111,7 +111,7 @@ export const MENU_FALLBACK: Array<SiteMenuItem> = [
         indexOrder: 11,
       },
       {
-        name: 'Ширма (Справочник)',
+        name: 'Справочник',
         url: '/screens',
         order: 2,
         onIndex: true,

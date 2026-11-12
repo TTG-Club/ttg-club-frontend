@@ -1,1 +1,0 @@
-export { useScreenWindows } from './useScreenWindows';

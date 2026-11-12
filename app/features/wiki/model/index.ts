@@ -7,15 +7,8 @@ export type {
   RuleLink,
   ScreenDetail,
   ScreenLink,
-  ScreenWindowState,
 } from './schema';
-export type {
-  ScreenGroup,
-  ScreenWindowPoint,
-  ScreenWindowRequest,
-  ScreenWindowSize,
-  SvgNode,
-} from './types';
+export type { ScreenGroup, SvgNode } from './types';
 
 export {
   bookDetailSchema,
@@ -26,19 +19,17 @@ export {
   ruleLinkSchema,
   screenDetailSchema,
   screenLinkSchema,
-  screenWindowListSchema,
 } from './schema';
 
 export {
-  fitScreenWindowSize,
   getBookGroup,
   getBookOrder,
   getGodGroup,
+  getScreenGroup,
+  getScreenGroupOrder,
   groupScreens,
   joinWikiList,
-  keepScreenWindowReachable,
   parseSvgIcon,
-  placeScreenWindow,
 } from './utils';
 
 export * from './constants';
