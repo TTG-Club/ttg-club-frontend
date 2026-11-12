@@ -7,6 +7,7 @@ import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 import {
   arrangeDmScreenWindows,
   DM_SCREEN_STORAGE_KEY,
+  DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenWindowListSchema,
   fitDmScreenWindowSize,
   placeDmScreenWindow,
@@ -166,6 +167,22 @@ export const useDmScreen = createSharedComposable(() => {
     update(id, { isMinimized: true });
   }
 
+  /**
+   * Уменьшает все развёрнутые окна до минимального размера, не сворачивая
+   * и не сдвигая их: на холсте видно больше окон сразу.
+   */
+  function shrinkAll(): void {
+    windows.value = windows.value.map((item) =>
+      item.isMinimized
+        ? item
+        : {
+            ...item,
+            width: DM_SCREEN_WINDOW_MIN_SIZE.width,
+            height: DM_SCREEN_WINDOW_MIN_SIZE.height,
+          },
+    );
+  }
+
   /** Сворачивает все окна в плашки: холст освобождается целиком. */
   function minimizeAll(): void {
     windows.value = windows.value.map((item) => ({
@@ -183,12 +200,12 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
-   * Раскладывает развёрнутые окна ровной сеткой. Порядок — как окна стоят
-   * сейчас (сверху вниз, слева направо), чтобы раскладка не перемешивала
-   * их; свёрнутые окна остаются в плашках.
+   * Раскладывает все окна ровной сеткой, свёрнутые тоже разворачиваются.
+   * Порядок — как окна стоят сейчас (сверху вниз, слева направо), свёрнутые
+   * встают в конец, чтобы раскладка не перемешивала окна.
    */
   function arrange(): void {
-    const ordered = sortBy(visibleWindows.value, ['y', 'x']);
+    const ordered = sortBy(windows.value, ['isMinimized', 'y', 'x']);
 
     const tiles = new Map(
       arrangeDmScreenWindows(
@@ -207,6 +224,7 @@ export const useDmScreen = createSharedComposable(() => {
             y: tile.y,
             width: tile.width,
             height: tile.height,
+            isMinimized: false,
           }
         : item;
     });
@@ -231,6 +249,7 @@ export const useDmScreen = createSharedComposable(() => {
     close,
     minimize,
     minimizeAll,
+    shrinkAll,
     restore,
     focus,
     update,

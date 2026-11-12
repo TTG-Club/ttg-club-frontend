@@ -29,6 +29,9 @@ export default defineConfig({
       '~section': fileURLToPath(
         new URL('./app/features/section', import.meta.url),
       ),
+      '~dm-screen': fileURLToPath(
+        new URL('./app/features/dm-screen', import.meta.url),
+      ),
       '~dice-roller': fileURLToPath(
         new URL('./app/features/dice-roller', import.meta.url),
       ),
