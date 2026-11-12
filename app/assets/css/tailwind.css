@@ -120,6 +120,40 @@ html[data-graphics='performance'] *::after {
 @custom-variant performance (html[data-graphics='performance'] &);
 
 /*
+ * Место под полосу прокрутки, когда меню или окно блокирует прокрутку
+ * страницы (перенесено с new.ttg.club). Блокировка убирает полосу, страница
+ * становится шире на её ширину, и контент прыгает вправо — отступ на `html`
+ * держит его на месте.
+ *
+ * Признаки `data-scroll-locked` и `data-scroll-compensated` и переменную
+ * `--app-scrollbar-width` ставит плагин `scrollbar-width.client.ts`. Отступ
+ * нужен, только пока место не держит кто-то другой: Reka UI делает это сам
+ * отступом на `body`, и второй такой же сдвинул бы контент влево.
+ */
+@layer base {
+  html {
+    --app-scrollbar-width: 0;
+
+    &[data-scroll-locked]:not([data-scroll-compensated]) {
+      padding-right: var(--app-scrollbar-width);
+    }
+  }
+}
+
+/*
+ * То же для элементов с `position: fixed` у правого края: они считают место
+ * от окна, а не от страницы, и отступ на `html` на них не действует. Сдвиг —
+ * через `margin-right`: у таких элементов своя ширина, внутренний отступ
+ * ужал бы содержимое, но не сдвинул сам элемент. Действует при любой
+ * блокировке, даже если место в потоке держит Reka UI.
+ */
+@utility fixed-scrollbar-offset {
+  html[data-scroll-locked] & {
+    margin-right: var(--app-scrollbar-width);
+  }
+}
+
+/*
  * Прокрутка без видимой полосы, как на new.ttg.club: колесо, тачпад и
  * свайп работают, а полоса не съедает место и не мигает.
  */
