@@ -1,3 +1,8 @@
+export {
+  provideSectionEntryCompact,
+  useSectionEntryCompact,
+} from './useSectionEntryCompact';
+
 export { useEntryExport } from './useEntryExport';
 export { useSectionCopy } from './useSectionCopy';
 export { useSectionDetail } from './useSectionDetail';
