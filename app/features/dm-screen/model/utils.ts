@@ -5,6 +5,8 @@ import type {
   DmScreenTile,
 } from './types';
 
+import { sortBy } from 'es-toolkit';
+
 import {
   DM_SCREEN_CASCADE_LENGTH,
   DM_SCREEN_CASCADE_STEP,
@@ -189,10 +191,56 @@ export function keepDmScreenWindowReachable(
 }
 
 /**
+ * Число колонок для сетки окон. Сначала — варианты, где клетка не меньше
+ * минимального окна: из них берутся самые крупные клетки в долях обычного
+ * окна (по меньшей доле, чтобы клетки не вытягивались в полосы). Если окон
+ * так много, что такого варианта нет, берётся самый близкий к минимальному
+ * окну.
+ * @param count - сколько окон
+ * @param area - свободное место
+ */
+function pickGridColumns(count: number, area: DmScreenSize): number {
+  const cells = Array.from({ length: count }, (_, index) => {
+    const columns = index + 1;
+    const rows = Math.ceil(count / columns);
+
+    return {
+      columns,
+      width: (area.width - DM_SCREEN_GRID_GAP * (columns - 1)) / columns,
+      height: (area.height - DM_SCREEN_GRID_GAP * (rows - 1)) / rows,
+    };
+  });
+
+  const fitting = cells.filter(
+    (cell) =>
+      cell.width >= DM_SCREEN_WINDOW_MIN_SIZE.width
+      && cell.height >= DM_SCREEN_WINDOW_MIN_SIZE.height,
+  );
+
+  const [best] = fitting.length
+    ? sortBy(fitting, [
+        (cell) =>
+          -Math.min(
+            cell.width / DM_SCREEN_WINDOW_SIZE.width,
+            cell.height / DM_SCREEN_WINDOW_SIZE.height,
+          ),
+      ])
+    : sortBy(cells, [
+        (cell) =>
+          -Math.min(
+            cell.width / DM_SCREEN_WINDOW_MIN_SIZE.width,
+            cell.height / DM_SCREEN_WINDOW_MIN_SIZE.height,
+          ),
+      ]);
+
+  return best?.columns ?? 1;
+}
+
+/**
  * Раскладывает окна ровной сеткой на свободном месте ширмы: под шапкой,
- * правее боковой панели. Колонок столько, чтобы клетки были близки к
- * пропорциям экрана, но не уже окна минимальной ширины; если окон много,
- * нижние ряды уходят за край экрана, но клетки не меньше минимального окна.
+ * правее боковой панели. Сетка целиком помещается на экран: колонок
+ * столько, чтобы клетки были крупнее всего; меньше минимального окна клетки
+ * не становятся — тогда нижний ряд может немного уйти за край.
  * @param ids - окна в порядке чтения: слева направо, сверху вниз
  * @param viewport - размер экрана
  */
@@ -205,34 +253,23 @@ export function arrangeDmScreenWindows(
   }
 
   const left = DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN;
-  const areaWidth = viewport.width - left - DM_SCREEN_WINDOW_MARGIN;
 
-  const areaHeight =
-    viewport.height - DM_SCREEN_TOP_INSET - DM_SCREEN_WINDOW_MARGIN;
+  const area = {
+    width: viewport.width - left - DM_SCREEN_WINDOW_MARGIN,
+    height: viewport.height - DM_SCREEN_TOP_INSET - DM_SCREEN_WINDOW_MARGIN,
+  };
 
-  const maxColumns = Math.max(
-    1,
-    Math.floor(
-      (areaWidth + DM_SCREEN_GRID_GAP)
-        / (DM_SCREEN_WINDOW_MIN_SIZE.width + DM_SCREEN_GRID_GAP),
-    ),
-  );
-
-  const columns = Math.min(
-    ids.length,
-    maxColumns,
-    Math.max(1, Math.ceil(Math.sqrt((ids.length * areaWidth) / areaHeight))),
-  );
-
+  const columns = pickGridColumns(ids.length, area);
   const rows = Math.ceil(ids.length / columns);
 
-  const width = Math.floor(
-    (areaWidth - DM_SCREEN_GRID_GAP * (columns - 1)) / columns,
+  const width = Math.max(
+    DM_SCREEN_WINDOW_MIN_SIZE.width,
+    Math.floor((area.width - DM_SCREEN_GRID_GAP * (columns - 1)) / columns),
   );
 
   const height = Math.max(
     DM_SCREEN_WINDOW_MIN_SIZE.height,
-    Math.floor((areaHeight - DM_SCREEN_GRID_GAP * (rows - 1)) / rows),
+    Math.floor((area.height - DM_SCREEN_GRID_GAP * (rows - 1)) / rows),
   );
 
   return ids.map((id, index) => ({

@@ -72,8 +72,11 @@ export const DM_SCREEN_STORAGE_KEY = 'dm-screen:windows';
 /** Размер нового окна, px. */
 export const DM_SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
 
-/** Меньше этого окно не сжимается, px. */
-export const DM_SCREEN_WINDOW_MIN_SIZE = { width: 320, height: 240 } as const;
+/**
+ * Меньше этого окно не сжимается, px: видны шапка и начало записи. До этого
+ * размера окна уменьшает и «Уменьшить все».
+ */
+export const DM_SCREEN_WINDOW_MIN_SIZE = { width: 240, height: 120 } as const;
 
 /** Отступ окна от краёв экрана, px. */
 export const DM_SCREEN_WINDOW_MARGIN = 16;
@@ -133,6 +136,7 @@ export const DM_SCREEN_TEXT = {
   remove: 'Убрать из ширмы',
   arrange: 'Выровнять по сетке',
   minimizeAll: 'Свернуть все',
+  shrinkAll: 'Уменьшить все',
   unknownEntry: 'Эту запись нельзя показать в ширме',
 } as const;
 
@@ -144,5 +148,6 @@ export const DM_SCREEN_ICON = {
   search: 'tabler:search',
   arrange: 'tabler:layout-grid',
   minimizeAll: 'tabler:layout-bottombar-collapse',
+  shrinkAll: 'tabler:arrows-minimize',
   unknown: 'tabler:file-unknown',
 } as const;

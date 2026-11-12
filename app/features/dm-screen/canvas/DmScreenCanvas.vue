@@ -9,8 +9,14 @@
    * Ширма Мастера: пустой холст с поиском сверху. Добавленные записи на
    * широком экране — окна, на телефоне — список.
    */
-  const { windows, visibleWindows, isWindowed, arrange, minimizeAll } =
-    useDmScreen();
+  const {
+    windows,
+    visibleWindows,
+    isWindowed,
+    arrange,
+    shrinkAll,
+    minimizeAll,
+  } = useDmScreen();
 
   // Выравнивать и сворачивать есть что, только пока окна развёрнуты
   const isArrangeAvailable = computed(
@@ -33,12 +39,21 @@
       <DmScreenSearch />
 
       <UButton
-        v-if="isArrangeAvailable"
+        v-if="!isEmpty && isWindowed"
         :icon="DM_SCREEN_ICON.arrange"
         :label="DM_SCREEN_TEXT.arrange"
         color="neutral"
         variant="outline"
         @click.left.exact.prevent="arrange"
+      />
+
+      <UButton
+        v-if="isArrangeAvailable"
+        :icon="DM_SCREEN_ICON.shrinkAll"
+        :label="DM_SCREEN_TEXT.shrinkAll"
+        color="neutral"
+        variant="outline"
+        @click.left.exact.prevent="shrinkAll"
       />
 
       <UButton
