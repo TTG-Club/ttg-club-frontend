@@ -81,7 +81,14 @@ export function useDmScreenAdd() {
 
     // Модалка создаётся только на время выбора и убирается после него
     const picker = overlay.create(DmScreenPickModal, { destroyOnClose: true });
-    const id = await picker.open({ screens }).result;
+
+    // Проверка типов не видит свойств компонента, взятого из `.vue`: без
+    // явного описания список ширм считался бы лишним свойством
+    const pickerProps: NonNullable<Parameters<typeof picker.open>[0]> & {
+      screens: ReadonlyArray<DmScreenSummary>;
+    } = { screens };
+
+    const id = await picker.open(pickerProps).result;
 
     return screens.find((screen) => screen.id === id);
   }
