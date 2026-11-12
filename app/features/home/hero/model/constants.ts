@@ -27,6 +27,14 @@ export const HOME_HERO_MOTION_QUERY =
  */
 export const HOME_HERO_MOTION_STORAGE_KEY = 'home:hero-motion';
 
+/**
+ * Ключ выбора «живой фон в режиме производительности»: там фон по умолчанию
+ * стоит, а включённый кнопкой — остаётся включённым. Свой ключ нужен потому,
+ * что обычный хранит «включено» у всех, кто кнопку не трогал.
+ */
+export const HOME_HERO_MOTION_PERFORMANCE_STORAGE_KEY =
+  'home:hero-motion-performance';
+
 export const HOME_HERO_MOTION_PLAY_ICON = 'tabler:player-play-filled';
 
 export const HOME_HERO_MOTION_PAUSE_ICON = 'tabler:player-pause-filled';
