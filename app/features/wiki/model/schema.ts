@@ -67,7 +67,18 @@ export const bookDetailSchema = z.object({
 
 export type BookDetail = z.infer<typeof bookDetailSchema>;
 
-/** Раздел ширмы в списке или в группе родительского раздела. */
+/** Корневой раздел, к которому относится вложенный. */
+const screenParentSchema = z.object({
+  name: entryNameSchema,
+  url: z.string().min(1),
+  /** Порядок корневого раздела: по нему идут группы справочника. */
+  order: z.number().nullish(),
+});
+
+/**
+ * Раздел справочника в списке или в группе корневого раздела. Корневой
+ * раздел есть у вложенных разделов в списке справочника.
+ */
 export const screenLinkSchema = z.object({
   name: entryNameSchema,
   url: z.string().min(1),
@@ -77,46 +88,18 @@ export const screenLinkSchema = z.object({
   icon: z.string().nullish(),
   /** Группа внутри родительского раздела. */
   group: z.string().nullish(),
+  parent: screenParentSchema.nullish(),
 });
 
 export type ScreenLink = z.infer<typeof screenLinkSchema>;
 
 /**
- * Раздел ширмы: у корневого раздела вложенные разделы, у вложенного —
+ * Раздел справочника: у корневого раздела вложенные разделы, у вложенного —
  * ссылка на родителя.
  */
 export const screenDetailSchema = screenLinkSchema.extend({
   description: z.string().nullish(),
-  parent: z
-    .object({
-      name: entryNameSchema,
-      url: z.string().min(1),
-    })
-    .nullish(),
   chields: z.array(screenLinkSchema).nullish(),
 });
 
 export type ScreenDetail = z.infer<typeof screenDetailSchema>;
-
-/**
- * Окно ширмы поверх сайта, сохранённое в браузере: раздел, место, размер,
- * слой и свёрнутость.
- */
-export const screenWindowSchema = z.object({
-  id: z.string().min(1),
-  path: z.string().min(1),
-  title: z.string(),
-  /** SVG-разметка иконки раздела; у корневых разделов её нет. */
-  icon: z.string().nullish(),
-  x: z.number(),
-  y: z.number(),
-  width: z.number().positive(),
-  height: z.number().positive(),
-  /** Чем больше, тем выше окно среди остальных. */
-  layer: z.number().int(),
-  isMinimized: z.boolean(),
-});
-
-export type ScreenWindowState = z.infer<typeof screenWindowSchema>;
-
-export const screenWindowListSchema = z.array(screenWindowSchema);

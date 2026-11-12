@@ -2,7 +2,13 @@ import type { ScreenLink } from '~wiki/model';
 
 import { describe, expect, it } from 'vitest';
 
-import { groupScreens, parseSvgIcon } from '~wiki/model';
+import {
+  getScreenGroup,
+  getScreenGroupOrder,
+  groupScreens,
+  parseSvgIcon,
+  screenLinkSchema,
+} from '~wiki/model';
 
 /**
  * Раздел ширмы для теста.
@@ -14,7 +20,7 @@ function screen(rus: string, order: number, group?: string): ScreenLink {
   return { name: { rus, eng: rus }, url: `/screens/${rus}`, order, group };
 }
 
-describe('ширма', () => {
+describe('справочник мастера', () => {
   it('группирует вложенные разделы: сначала без группы', () => {
     const groups = groupScreens([
       screen('Б', 1, 'Укрытие'),
@@ -34,6 +40,37 @@ describe('ширма', () => {
       ['Бой', ['В', 'Д']],
       ['Укрытие', ['Б']],
     ]);
+  });
+
+  it('группирует список по корневому разделу в его порядке', () => {
+    const child = screenLinkSchema.parse({
+      name: { rus: 'Укрытие', eng: 'Cover' },
+      url: '/screens/cover',
+      parent: {
+        name: { rus: 'Бой', eng: 'Combat' },
+        url: '/screens/combat',
+        order: 2,
+      },
+    });
+
+    expect(getScreenGroup(child)).toBe('Бой');
+    expect(getScreenGroupOrder(child)).toBe(2);
+  });
+
+  it('раздел без корневого (старый ответ API) — вне групп и в конце', () => {
+    const screenWithoutParent = screen('А', 1);
+
+    expect(getScreenGroup(screenWithoutParent)).toBe('');
+    expect(getScreenGroupOrder(screenWithoutParent)).toBeGreaterThan(1000);
+
+    expect(
+      getScreenGroupOrder(
+        screenLinkSchema.parse({
+          ...screenWithoutParent,
+          parent: { name: { rus: 'Бой', eng: 'Combat' }, url: '/screens/c' },
+        }),
+      ),
+    ).toBeGreaterThan(1000);
   });
 
   it('очищает SVG-иконку', () => {

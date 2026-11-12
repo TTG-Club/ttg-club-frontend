@@ -54,17 +54,18 @@ export const BOOKS_SECTION: SectionConfig = {
 
 export const BOOK_SHORT_NAME_LABEL = 'Аббревиатура:';
 
-/* --- Ширма ------------------------------------------------------------- */
+/* --- Справочник Мастера ------------------------------------------------ */
 
 /**
- * В списке ширмы только корневые разделы; поиск ищет и по вложенным.
- * Ручки фильтра у ширмы на бэкенде нет.
+ * В списке справочника вложенные разделы, сгруппированные по корневым;
+ * фильтр — по источникам и корневым разделам.
  */
 export const SCREENS_SECTION: SectionConfig = {
   key: 'screens',
-  title: 'Ширма Мастера',
+  title: 'Справочник Мастера',
   path: '/screens',
   listUrl: '/api/v1/screens',
+  filterUrl: '/api/v1/filters/screens',
   order: [
     { field: 'ordering', direction: 'asc' },
     { field: 'name', direction: 'asc' },
@@ -73,25 +74,18 @@ export const SCREENS_SECTION: SectionConfig = {
 
 export const SCREEN_TEXT = {
   parent: 'Раздел:',
-  back: 'Назад к разделу',
 } as const;
-
-/** Иконка возврата из вложенного раздела к корневому. */
-export const SCREEN_BACK_ICON = 'tabler:arrow-left';
 
 /** Иконка вложенного раздела, когда своей в базе нет. */
 export const SCREEN_ICON_FALLBACK = 'tabler:book-2';
 
 /**
- * Классы иконки раздела по размеру: рамка, своя SVG-иконка и запасная.
- * Маленькая — для шапки и плашки окна ширмы.
+ * Группы справочника без порядка корневого раздела идут после
+ * упорядоченных.
  */
-export const SCREEN_ICON_SIZE_CLASS = {
-  md: { frame: 'size-10', fallback: 'size-8' },
-  sm: { frame: 'size-5 [&>svg]:size-full', fallback: 'size-4' },
-} as const;
+export const SCREEN_GROUP_LAST_ORDER = Number.MAX_SAFE_INTEGER;
 
-/** Теги SVG-иконки раздела ширмы, которые выводятся как есть. */
+/** Теги SVG-иконки раздела справочника, которые выводятся как есть. */
 export const SVG_ALLOWED_TAGS: ReadonlySet<string> = new Set([
   'svg',
   'g',
@@ -142,54 +136,3 @@ export const SVG_NO_PAINT = 'none';
 
 /** Разделитель значений в строке свойства: домены, титулы */
 export const WIKI_LIST_SEPARATOR = ', ';
-
-/** Ключ открытых окон ширмы в localStorage. */
-export const SCREEN_WINDOWS_STORAGE_KEY = 'screens:windows';
-
-/** Размер нового окна ширмы, px. */
-export const SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
-
-/** Меньше этого окно не сжимается, px. */
-export const SCREEN_WINDOW_MIN_SIZE = { width: 320, height: 240 } as const;
-
-/** Отступ окна от краёв экрана, px. */
-export const SCREEN_WINDOW_MARGIN = 16;
-
-/**
- * Ширина боковой панели сайта (`--navbar-width` без безопасной зоны), px:
- * новое окно не встаёт под неё.
- */
-export const SCREEN_WINDOW_LEFT_INSET = 64;
-
-/**
- * Сколько окна остаётся на экране по ширине, когда его утащили за край, px:
- * за эту часть его можно вытянуть обратно.
- */
-export const SCREEN_WINDOW_VISIBLE_PART = 96;
-
-/** Высота шапки окна, px: шапка не уходит за нижний край экрана. */
-export const SCREEN_WINDOW_HEADER_HEIGHT = 40;
-
-/** Сдвиг окна от точки клика, px. */
-export const SCREEN_WINDOW_CLICK_OFFSET = 16;
-
-/** Сдвиг каждого следующего окна, открытого без точки клика, px. */
-export const SCREEN_WINDOW_CASCADE_STEP = 32;
-
-/** Сколько окон лесенкой, прежде чем она начнётся заново. */
-export const SCREEN_WINDOW_CASCADE_LENGTH = 8;
-
-/** Пауза перед сохранением размера при растягивании окна, мс. */
-export const SCREEN_WINDOW_RESIZE_SAVE_DELAY = 300;
-
-export const SCREEN_WINDOW_TEXT = {
-  minimize: 'Свернуть окно',
-  restore: 'Развернуть окно',
-  close: 'Закрыть окно',
-  dock: 'Свёрнутые окна ширмы',
-} as const;
-
-export const SCREEN_WINDOW_ICON = {
-  minimize: 'tabler:minus',
-  close: 'tabler:x',
-} as const;

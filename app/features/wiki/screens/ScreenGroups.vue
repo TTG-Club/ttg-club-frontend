@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { ScreenDetail, ScreenWindowRequest } from '../model';
+  import type { ScreenDetail } from '../model';
 
   import { ContentRender } from '~content/render';
 
@@ -7,30 +7,18 @@
   import ScreenLinkCard from './ScreenLinkCard.vue';
 
   /**
-   * Корневой раздел ширмы: описание и вложенные разделы по группам.
-   * Что делать с нажатым вложенным разделом, решает запись ширмы.
+   * Корневой раздел справочника: описание и вложенные разделы по группам
+   * ссылками на их страницы.
    */
   const { screen } = defineProps<{
     screen: ScreenDetail;
   }>();
 
-  const emit = defineEmits<{
-    open: [request: ScreenWindowRequest];
-  }>();
-
   const groups = computed(() => groupScreens(screen.chields ?? []));
-
-  /**
-   * Просит открыть вложенный раздел.
-   * @param request - раздел, название и точка клика
-   */
-  function open(request: ScreenWindowRequest): void {
-    emit('open', request);
-  }
 </script>
 
 <template>
-  <!-- Колонки считаются по ширине записи: она бывает и узким окном -->
+  <!-- Колонки считаются по ширине записи: она бывает узкой колонкой -->
   <div class="@container flex flex-col gap-4">
     <ContentRender
       v-if="screen.description"
@@ -54,7 +42,6 @@
           v-for="item in group.items"
           :key="item.url"
           :screen="item"
-          @open="open"
         />
       </div>
     </section>
