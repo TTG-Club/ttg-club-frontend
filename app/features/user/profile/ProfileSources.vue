@@ -15,6 +15,7 @@
   import {
     getApiErrorMessage,
     getDefaultSources,
+    PROFILE_CARD_UI,
     PROFILE_ICON,
     PROFILE_SOURCES_KEY,
     PROFILE_TEXT,
@@ -146,9 +147,9 @@
 </script>
 
 <template>
-  <UCard>
+  <UCard :ui="PROFILE_CARD_UI">
     <template #header>
-      <h2 class="flex items-center gap-2 font-semibold text-highlighted">
+      <h2 class="flex items-center gap-2 font-semibold text-primary">
         <UIcon
           :name="PROFILE_ICON.sources"
           class="size-5 text-primary"

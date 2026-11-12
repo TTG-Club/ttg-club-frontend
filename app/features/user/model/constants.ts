@@ -244,6 +244,24 @@ export const PROFILE_TEXT = {
   sourcesLoadFailed: 'Не удалось загрузить источники',
   sourcesNoneSelected: 'Выберите хотя бы один источник',
   navigation: 'Разделы личного кабинета',
+  guestName: 'Путешественник',
+} as const;
+
+/** Отступы карточек личного кабинета, как на new.ttg.club. */
+export const PROFILE_CARD_UI = {
+  header: 'px-6 py-4',
+  body: 'p-6',
+} as const;
+
+/** За сколько пикселей до края лента вкладок считается долистанной. */
+export const PROFILE_NAVIGATION_SCROLL_OFFSET = 8;
+
+/** Затухание краёв ленты вкладок: с какой стороны ещё есть что листать. */
+export const PROFILE_NAVIGATION_FADE = {
+  both: 'linear-gradient(to right, transparent, black 72px, black calc(100% - 96px), transparent)',
+  right: 'linear-gradient(to right, black calc(100% - 96px), transparent)',
+  left: 'linear-gradient(to right, transparent, black 72px)',
+  none: 'none',
 } as const;
 
 /** Разделы личного кабинета: общие данные живут по старому адресу. */
@@ -312,6 +330,8 @@ export const PROFILE_ICON = {
   signOut: 'tabler:logout',
   sources: 'tabler:books',
   selectAll: 'tabler:checks',
+  scrollLeft: 'tabler:chevron-left',
+  scrollRight: 'tabler:chevron-right',
 } as const;
 
 /** Статусы подписки из сервиса подписок. */

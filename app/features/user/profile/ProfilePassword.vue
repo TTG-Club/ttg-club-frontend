@@ -10,6 +10,7 @@
     changePassword,
     getApiErrorMessage,
     passwordChangeSchema,
+    PROFILE_CARD_UI,
     PROFILE_ICON,
     PROFILE_TEXT,
   } from '../model';
@@ -64,9 +65,9 @@
 </script>
 
 <template>
-  <UCard>
+  <UCard :ui="PROFILE_CARD_UI">
     <template #header>
-      <h2 class="flex items-center gap-2 font-semibold text-highlighted">
+      <h2 class="flex items-center gap-2 font-semibold text-primary">
         <UIcon
           :name="PROFILE_ICON.password"
           class="size-5 text-primary"
