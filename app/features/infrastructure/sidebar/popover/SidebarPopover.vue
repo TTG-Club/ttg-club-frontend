@@ -75,9 +75,10 @@
       @after-enter="graphicsProbe.finish"
       @enter-cancelled="graphicsProbe.cancel"
     >
+      <!-- Без размытия полупрозрачная панель нечитаема: под градиент ложится плотный фон -->
       <div
         v-if="isOpened"
-        class="flex flex-col overflow-auto overscroll-contain rounded-xl border border-default shadow-2xl backdrop-blur-lg"
+        class="flex flex-col overflow-auto overscroll-contain rounded-xl border border-default shadow-2xl backdrop-blur-lg performance:bg-main"
         :class="bodyClasses"
       >
         <slot :close="close" />

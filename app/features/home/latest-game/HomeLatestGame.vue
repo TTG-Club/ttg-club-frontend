@@ -140,6 +140,7 @@
       <span :class="$style.cover">
         <img
           v-if="coverUrl"
+          decoding="async"
           :src="coverUrl"
           :alt="game.title"
           loading="lazy"
@@ -233,6 +234,7 @@
 
             <img
               v-if="masterAvatarUrl"
+              decoding="async"
               :src="masterAvatarUrl"
               alt=""
               width="16"

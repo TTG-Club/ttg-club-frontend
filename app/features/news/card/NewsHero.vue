@@ -57,6 +57,7 @@
       @click.left.exact.prevent="$emit('open')"
     >
       <img
+        decoding="async"
         :src="coverImage"
         :alt="news.title"
         class="aspect-16/10 w-full object-cover transition-transform duration-500 group-hover:scale-105 sm:aspect-2/1 xl:aspect-21/9"

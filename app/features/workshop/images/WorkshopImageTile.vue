@@ -45,6 +45,7 @@
       class="block aspect-square bg-muted"
     >
       <img
+        decoding="async"
         :src="url"
         :alt="imageAlt"
         loading="lazy"

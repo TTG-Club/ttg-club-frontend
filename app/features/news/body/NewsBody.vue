@@ -57,6 +57,7 @@
 
     <img
       v-else
+      decoding="async"
       :src="coverImage"
       :alt="news.title"
       class="aspect-video w-full rounded-xl object-cover"

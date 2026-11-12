@@ -27,6 +27,7 @@
       @click.left.exact.prevent="open"
     >
       <img
+        decoding="async"
         :src="images[0]"
         :alt="alt"
         loading="lazy"

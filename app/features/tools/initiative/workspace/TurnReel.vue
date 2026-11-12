@@ -66,7 +66,10 @@
   }
 
   /**
-   * Кольцо токена: текущий крупнее и подсвечен, поверженный блёклый.
+   * Кольцо токена: текущий крупнее и подсвечен, поверженный блёклый. Размер
+   * меняется масштабом, а не шириной: так браузер не раскладывает ленту
+   * заново на каждом кадре. Кольцо обычного токена толще на величину
+   * масштаба — на экране выходят те же 2px.
    * @param participant - участник
    * @param isCurrent - сейчас его ход
    */
@@ -76,10 +79,19 @@
   ): Array<string> {
     return [
       isCurrent
-        ? 'size-20 ring-2 ring-primary shadow-lg'
-        : 'size-14 ring-2 ring-default',
+        ? 'ring-2 ring-primary shadow-lg'
+        : 'scale-70 ring-3 ring-default',
       participant.dead ? 'opacity-40 grayscale' : '',
     ];
+  }
+
+  /**
+   * Значок токена без картинки: у обычного крупнее на величину масштаба,
+   * чтобы на экране оба были одного размера.
+   * @param isCurrent - сейчас его ход
+   */
+  function getIconClass(isCurrent: boolean): string {
+    return isCurrent ? 'size-6' : 'size-8.5';
   }
 
   /**
@@ -154,7 +166,7 @@
               <div class="relative grid size-20 place-items-center">
                 <span
                   v-if="cell.isCurrent"
-                  class="absolute inset-0 rounded-full bg-primary/25 blur-xl motion-safe:animate-pulse"
+                  class="absolute inset-0 rounded-full bg-primary/25 blur-xl motion-safe:animate-pulse performance:hidden"
                 />
 
                 <UAvatar
@@ -162,9 +174,9 @@
                   :icon="getIcon(cell.participant)"
                   :alt="cell.participant.name"
                   color="neutral"
-                  class="bg-elevated transition-all motion-safe:duration-300"
+                  class="size-20 bg-elevated transition-[scale,box-shadow,opacity] motion-safe:duration-300"
                   :class="getRingClass(cell.participant, cell.isCurrent)"
-                  :ui="{ icon: 'size-6' }"
+                  :ui="{ icon: getIconClass(cell.isCurrent) }"
                 />
 
                 <span

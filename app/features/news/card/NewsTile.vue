@@ -38,6 +38,7 @@
   >
     <span class="relative h-16 w-24 shrink-0 overflow-hidden rounded-md">
       <img
+        decoding="async"
         :src="coverImage"
         :alt="news.title"
         loading="lazy"

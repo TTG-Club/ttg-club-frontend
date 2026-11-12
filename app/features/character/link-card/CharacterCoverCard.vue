@@ -94,6 +94,7 @@
       <!-- Обложки — портреты в полный рост: показываем голову и торс -->
       <img
         v-if="image"
+        decoding="async"
         :src="image"
         :alt="name.rus"
         class="absolute size-full object-cover object-top opacity-90"
@@ -108,7 +109,7 @@
 
       <!-- Градиент уезжает при наведении и открывает обложку целиком -->
       <div
-        class="absolute inset-0 bg-linear-to-t from-muted to-transparent to-50% transition-all duration-300 @max-md:bg-linear-to-l @md:group-hover:top-full"
+        class="absolute inset-0 bg-linear-to-t from-muted to-transparent to-50% transition-transform duration-300 @max-md:bg-linear-to-l @md:group-hover:translate-y-full"
       />
 
       <!-- Источник на обложке, как на new.ttg.club: строке остаётся место под название -->
