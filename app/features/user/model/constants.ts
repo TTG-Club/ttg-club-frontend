@@ -53,9 +53,12 @@ export const SIGN_IN_FORM = {
   submitLabel: 'Войти',
   closeLabel: 'Закрыть',
   forgotPassword: 'Забыли пароль?',
-  noAccount: 'Нет аккаунта?',
+  noAccount: 'Ещё нет аккаунта?',
   signUp: 'Зарегистрироваться',
 } as const;
+
+/** Картинка слева в окне входа, та же, что на new.ttg.club. */
+export const AUTH_MODAL_IMAGE = '/img/bg-login.png';
 
 /** Формы окна входа. */
 export const AUTH_VIEWS = ['sign-in', 'sign-up', 'password-reset'] as const;
@@ -184,7 +187,7 @@ export const AUTH_ICON = {
   email: 'tabler:mail',
   password: 'tabler:lock',
   repeat: 'tabler:lock-check',
-  show: 'tabler:eye',
+  show: 'tabler:eye-filled',
   hide: 'tabler:eye-off',
   error: 'tabler:user-exclamation',
   success: 'tabler:user-check',
