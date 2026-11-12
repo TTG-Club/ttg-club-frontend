@@ -18,6 +18,7 @@
     SECTION_WIDE_DETAIL_LIST_SIZE,
     SECTION_WIDE_DETAIL_SPLIT_ID,
   } from '~/shared/consts';
+  import { AppFooter } from '~infrastructure/footer';
 
   import { getQueryString, SECTION_DETAIL_QUERY_KEY } from '../model';
   import SectionTopBar from './SectionTopBar.vue';
@@ -344,44 +345,54 @@
     </USplitter>
   </div>
 
-  <div
-    v-else-if="isTopBar"
-    class="mx-auto flex w-full flex-col lg:max-w-330"
-  >
-    <SectionTopBar :title="title">
-      <slot
-        name="controls"
-        :is-column="false"
-      />
-    </SectionTopBar>
-
-    <div class="flex min-w-0 flex-auto flex-col px-4 pt-4 pb-8">
-      <slot />
-    </div>
-  </div>
-
+  <!-- Обычный режим: страница прокручивается целиком, под ней подвал. В -->
+  <!-- широком режиме подвала нет — раздел занимает экран, как приложение. -->
+  <!-- На телефоне высота экрана — за вычетом нижней панели меню. -->
   <div
     v-else
-    class="flex flex-col lg:flex-row"
-    :class="columnsClass"
+    class="flex min-h-[calc(100dvh-var(--navbar-height))] flex-col md:min-h-dvh"
   >
-    <aside
-      class="sticky top-0 z-10 scrollbar-none shrink-0 border-default bg-default lg:h-dvh lg:overflow-y-auto lg:border-r"
+    <div
+      v-if="isTopBar"
+      class="mx-auto flex w-full flex-auto flex-col lg:max-w-330"
     >
-      <div class="flex w-full flex-col gap-4 p-4 md:pt-6 lg:w-75">
-        <h1 class="text-2xl text-highlighted">
-          {{ title }}
-        </h1>
-
+      <SectionTopBar :title="title">
         <slot
           name="controls"
           :is-column="false"
         />
-      </div>
-    </aside>
+      </SectionTopBar>
 
-    <div class="flex min-w-0 flex-auto flex-col px-4 pb-8 lg:pt-6">
-      <slot />
+      <div class="flex min-w-0 flex-auto flex-col px-4 pt-4 pb-8">
+        <slot />
+      </div>
     </div>
+
+    <div
+      v-else
+      class="flex flex-auto flex-col lg:flex-row"
+      :class="columnsClass"
+    >
+      <aside
+        class="sticky top-0 z-10 scrollbar-none shrink-0 border-default bg-default lg:h-dvh lg:overflow-y-auto lg:border-r"
+      >
+        <div class="flex w-full flex-col gap-4 p-4 md:pt-6 lg:w-75">
+          <h1 class="text-2xl text-highlighted">
+            {{ title }}
+          </h1>
+
+          <slot
+            name="controls"
+            :is-column="false"
+          />
+        </div>
+      </aside>
+
+      <div class="flex min-w-0 flex-auto flex-col px-4 pb-8 lg:pt-6">
+        <slot />
+      </div>
+    </div>
+
+    <AppFooter />
   </div>
 </template>
