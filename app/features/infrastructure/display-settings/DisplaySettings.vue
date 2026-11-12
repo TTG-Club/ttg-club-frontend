@@ -14,7 +14,6 @@
     APPEARANCE_GROUP_TITLE,
     DISPLAY_SETTINGS_ARIA,
     GRAPHICS_OPTIONS,
-    GRAPHICS_SETTING_HINT,
     GRAPHICS_SETTING_TITLE,
     LIST_VIEW_SETTING_TITLE,
     SECTION_LAYOUT_OPTIONS,
@@ -71,10 +70,6 @@
     set: (value: GraphicsMode) => setGraphicsMode(value),
   });
 
-  const graphicsHint = computed(
-    () => GRAPHICS_SETTING_HINT[graphicsMode.value],
-  );
-
   const layout = useSectionLayout();
 
   const view = computed({
@@ -103,6 +98,13 @@
           </h3>
 
           <DisplaySettingsChoice
+            v-model="graphics"
+            :title="GRAPHICS_SETTING_TITLE"
+            :options="GRAPHICS_OPTIONS"
+            shape="pill"
+          />
+
+          <DisplaySettingsChoice
             v-model="theme"
             :title="THEME_SECTION_TITLE"
             :options="THEME_OPTIONS"
@@ -110,14 +112,6 @@
           />
 
           <DisplaySettingsCustomTheme v-if="isCustomTheme" />
-
-          <DisplaySettingsChoice
-            v-model="graphics"
-            :title="GRAPHICS_SETTING_TITLE"
-            :options="GRAPHICS_OPTIONS"
-            :hint="graphicsHint"
-            shape="pill"
-          />
         </section>
 
         <USeparator />

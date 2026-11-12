@@ -16,13 +16,7 @@ export const GRAPHICS_OPTIONS = [
 ] as const satisfies ReadonlyArray<DisplaySettingsOption<GraphicsMode>>;
 
 /** Настройка режима графики. */
-export const GRAPHICS_SETTING_TITLE = 'Графика';
-
-/** Пояснения к режимам графики: что меняет выбранный. */
-export const GRAPHICS_SETTING_HINT: Record<GraphicsMode, string> = {
-  beauty: 'с размытием фона',
-  performance: 'без размытия — быстрее',
-};
+export const GRAPHICS_SETTING_TITLE = 'Производительность';
 
 export const DISPLAY_SETTINGS_ARIA = 'Настройки отображения';
 export const THEME_SECTION_TITLE = 'Тема';
