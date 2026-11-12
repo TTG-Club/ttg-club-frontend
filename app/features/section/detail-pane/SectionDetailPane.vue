@@ -5,7 +5,7 @@
 
   import type { EntrySource } from '../model';
 
-  import { useSectionCopy } from '../composables';
+  import { useSectionCopy, useSectionEntryCompact } from '../composables';
   import {
     SECTION_ICON,
     SECTION_PRINT_QUERY_KEY,
@@ -66,6 +66,9 @@
   const siteConfig = useSiteConfig();
   const { copyLink: copyToClipboard, copyTitle } = useSectionCopy();
   const { isEditor } = useUser();
+
+  // В окне ширмы у окна свои кнопки, кнопки записи там лишние
+  const isActionsHidden = useSectionEntryCompact();
 
   const isReady = computed(() => !isLoading && !isError);
 
@@ -218,6 +221,7 @@
 
         <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
         <div
+          v-if="!isActionsHidden"
           :class="ACTIONS_CLASS"
           class="print:hidden"
         >

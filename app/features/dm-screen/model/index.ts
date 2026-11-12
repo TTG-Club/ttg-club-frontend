@@ -4,9 +4,11 @@ export type {
   DmScreenRequest,
   DmScreenSection,
   DmScreenSize,
+  DmScreenTile,
 } from './types';
 
 export {
+  arrangeDmScreenWindows,
   fitDmScreenWindowSize,
   getDmScreenEntryRoot,
   getDmScreenPathname,

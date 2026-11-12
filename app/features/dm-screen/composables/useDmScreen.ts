@@ -1,8 +1,11 @@
 import type { DmScreenRequest, DmScreenWindow } from '../model';
 
+import { sortBy } from 'es-toolkit';
+
 import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 
 import {
+  arrangeDmScreenWindows,
   DM_SCREEN_STORAGE_KEY,
   dmScreenWindowListSchema,
   fitDmScreenWindowSize,
@@ -163,12 +166,50 @@ export const useDmScreen = createSharedComposable(() => {
     update(id, { isMinimized: true });
   }
 
+  /** Сворачивает все окна в плашки: холст освобождается целиком. */
+  function minimizeAll(): void {
+    windows.value = windows.value.map((item) => ({
+      ...item,
+      isMinimized: true,
+    }));
+  }
+
   /**
    * Разворачивает свёрнутое окно поверх остальных.
    * @param id - окно
    */
   function restore(id: string): void {
     update(id, { isMinimized: false, layer: topLayer.value + 1 });
+  }
+
+  /**
+   * Раскладывает развёрнутые окна ровной сеткой. Порядок — как окна стоят
+   * сейчас (сверху вниз, слева направо), чтобы раскладка не перемешивала
+   * их; свёрнутые окна остаются в плашках.
+   */
+  function arrange(): void {
+    const ordered = sortBy(visibleWindows.value, ['y', 'x']);
+
+    const tiles = new Map(
+      arrangeDmScreenWindows(
+        ordered.map((item) => item.id),
+        { width: viewportWidth.value, height: viewportHeight.value },
+      ).map((tile) => [tile.id, tile]),
+    );
+
+    windows.value = windows.value.map((item) => {
+      const tile = tiles.get(item.id);
+
+      return tile
+        ? {
+            ...item,
+            x: tile.x,
+            y: tile.y,
+            width: tile.width,
+            height: tile.height,
+          }
+        : item;
+    });
   }
 
   /**
@@ -185,9 +226,11 @@ export const useDmScreen = createSharedComposable(() => {
     visibleWindows,
     minimizedWindows,
     add,
+    arrange,
     navigate,
     close,
     minimize,
+    minimizeAll,
     restore,
     focus,
     update,

@@ -1,9 +1,15 @@
-import type { DmScreenPoint, DmScreenSection, DmScreenSize } from './types';
+import type {
+  DmScreenPoint,
+  DmScreenSection,
+  DmScreenSize,
+  DmScreenTile,
+} from './types';
 
 import {
   DM_SCREEN_CASCADE_LENGTH,
   DM_SCREEN_CASCADE_STEP,
   DM_SCREEN_CLICK_OFFSET,
+  DM_SCREEN_GRID_GAP,
   DM_SCREEN_LEFT_INSET,
   DM_SCREEN_SECTIONS,
   DM_SCREEN_TOP_INSET,
@@ -180,4 +186,62 @@ export function keepDmScreenWindowReachable(
       ),
     ),
   };
+}
+
+/**
+ * Раскладывает окна ровной сеткой на свободном месте ширмы: под шапкой,
+ * правее боковой панели. Колонок столько, чтобы клетки были близки к
+ * пропорциям экрана, но не уже окна минимальной ширины; если окон много,
+ * нижние ряды уходят за край экрана, но клетки не меньше минимального окна.
+ * @param ids - окна в порядке чтения: слева направо, сверху вниз
+ * @param viewport - размер экрана
+ */
+export function arrangeDmScreenWindows(
+  ids: ReadonlyArray<string>,
+  viewport: DmScreenSize,
+): Array<DmScreenTile> {
+  if (!ids.length) {
+    return [];
+  }
+
+  const left = DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN;
+  const areaWidth = viewport.width - left - DM_SCREEN_WINDOW_MARGIN;
+
+  const areaHeight =
+    viewport.height - DM_SCREEN_TOP_INSET - DM_SCREEN_WINDOW_MARGIN;
+
+  const maxColumns = Math.max(
+    1,
+    Math.floor(
+      (areaWidth + DM_SCREEN_GRID_GAP)
+        / (DM_SCREEN_WINDOW_MIN_SIZE.width + DM_SCREEN_GRID_GAP),
+    ),
+  );
+
+  const columns = Math.min(
+    ids.length,
+    maxColumns,
+    Math.max(1, Math.ceil(Math.sqrt((ids.length * areaWidth) / areaHeight))),
+  );
+
+  const rows = Math.ceil(ids.length / columns);
+
+  const width = Math.floor(
+    (areaWidth - DM_SCREEN_GRID_GAP * (columns - 1)) / columns,
+  );
+
+  const height = Math.max(
+    DM_SCREEN_WINDOW_MIN_SIZE.height,
+    Math.floor((areaHeight - DM_SCREEN_GRID_GAP * (rows - 1)) / rows),
+  );
+
+  return ids.map((id, index) => ({
+    id,
+    x: left + (index % columns) * (width + DM_SCREEN_GRID_GAP),
+    y:
+      DM_SCREEN_TOP_INSET
+      + Math.floor(index / columns) * (height + DM_SCREEN_GRID_GAP),
+    width,
+    height,
+  }));
 }

@@ -28,6 +28,7 @@
   import {
     useEntryExport,
     useSectionEntry,
+    useSectionEntryCompact,
     useSectionOpener,
     useSectionSwipe,
   } from '../composables';
@@ -65,6 +66,9 @@
   }>();
 
   const route = useRoute();
+
+  // В окне ширмы обсуждение записи не нужно
+  const isCompact = useSectionEntryCompact();
   const opener = useSectionOpener();
 
   const entryPath = computed(() => path ?? route.path);
@@ -190,6 +194,7 @@
 
       <!-- Блок сам решает, есть ли у раздела обсуждение -->
       <CommentsBlock
+        v-if="!isCompact"
         :path="entryPath"
         class="print:hidden"
       />

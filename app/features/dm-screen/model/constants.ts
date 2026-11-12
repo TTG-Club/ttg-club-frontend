@@ -99,6 +99,9 @@ export const DM_SCREEN_WINDOW_VISIBLE_PART = 96;
 /** Высота шапки окна, px: шапка не уходит за нижний край экрана. */
 export const DM_SCREEN_WINDOW_HEADER_HEIGHT = 40;
 
+/** Промежуток между окнами, разложенными по сетке, px. */
+export const DM_SCREEN_GRID_GAP = 12;
+
 /** Сдвиг окна от точки клика, px. */
 export const DM_SCREEN_CLICK_OFFSET = 16;
 
@@ -128,6 +131,8 @@ export const DM_SCREEN_TEXT = {
   emptyDescription:
     'Найдите заклинание, монстра, правило или любую другую запись поиском выше или выберите «В ширму» в меню записи на сайте. Каждая запись встанет отдельным окном: его можно двигать, растягивать и сворачивать.',
   remove: 'Убрать из ширмы',
+  arrange: 'Выровнять по сетке',
+  minimizeAll: 'Свернуть все',
   unknownEntry: 'Эту запись нельзя показать в ширме',
 } as const;
 
@@ -137,5 +142,7 @@ export const DM_SCREEN_ICON = {
   close: 'tabler:x',
   add: 'tabler:layout-grid-add',
   search: 'tabler:search',
+  arrange: 'tabler:layout-grid',
+  minimizeAll: 'tabler:layout-bottombar-collapse',
   unknown: 'tabler:file-unknown',
 } as const;

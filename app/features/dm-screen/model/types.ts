@@ -10,6 +10,11 @@ export interface DmScreenSize {
   height: number;
 }
 
+/** Место и размер окна, разложенного по сетке. */
+export interface DmScreenTile extends DmScreenPoint, DmScreenSize {
+  id: string;
+}
+
 /** Раздел, чьи записи открываются в ширме. */
 export interface DmScreenSection {
   /** Ключ раздела: по нему ищется загруженная запись. */

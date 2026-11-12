@@ -5,7 +5,10 @@
 
   import { provideContentLinkHandler } from '~content/composables';
   import { EXTERNAL_LINK_TARGET } from '~content/model';
-  import { provideSectionOpener } from '~section/composables';
+  import {
+    provideSectionEntryCompact,
+    provideSectionOpener,
+  } from '~section/composables';
 
   import { useDmScreen } from '../composables';
   import {
@@ -64,6 +67,15 @@
     onEnd: savePosition,
   });
 
+  // Место может поменять не только перетаскивание, но и раскладка по сетке
+  watch(
+    () => [screenWindow.x, screenWindow.y],
+    ([nextX = 0, nextY = 0]) => {
+      x.value = nextX;
+      y.value = nextY;
+    },
+  );
+
   const windowStyle = computed(() => ({
     left: `${x.value}px`,
     top: `${y.value}px`,
@@ -94,6 +106,10 @@
     open: (path: string) => navigate(screenWindow.id, path),
     close: closeWindow,
   });
+
+  // Закладка, меню и закрытие записи дублировали бы кнопки окна, а
+  // обсуждение во время игры не нужно
+  provideSectionEntryCompact();
 
   // Ссылки из текста на записи ширмы встают новыми окнами рядом с кликом
   provideContentLinkHandler((request) => {
