@@ -229,19 +229,17 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
-   * Уменьшает все развёрнутые окна до минимального размера, не сворачивая
-   * и не сдвигая их: на холсте видно больше окон сразу.
+   * Уменьшает все окна до минимального размера, не сдвигая их: на холсте
+   * видно больше окон сразу. Свёрнутые окна тоже разворачиваются —
+   * уменьшенными.
    */
   function shrinkAll(): void {
-    windows.value = windows.value.map((item) =>
-      item.isMinimized
-        ? item
-        : {
-            ...item,
-            width: DM_SCREEN_WINDOW_MIN_SIZE.width,
-            height: DM_SCREEN_WINDOW_MIN_SIZE.height,
-          },
-    );
+    windows.value = windows.value.map((item) => ({
+      ...item,
+      width: DM_SCREEN_WINDOW_MIN_SIZE.width,
+      height: DM_SCREEN_WINDOW_MIN_SIZE.height,
+      isMinimized: false,
+    }));
   }
 
   /** Сворачивает все окна в плашки: холст освобождается целиком. */
