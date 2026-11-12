@@ -150,12 +150,22 @@ html[data-graphics='performance'] *::after {
 }
 
 /*
- * Тонкие полосы прокрутки у всех прокручиваемых блоков, как на
- * new.ttg.club: скруглённый бегунок без дорожки и стрелок. Chrome и Safari
- * рисуют их через `::-webkit-scrollbar` (стандартные свойства их бы
- * отключили), остальные — через стандартные.
+ * Полосы прокрутки у всех прокручиваемых блоков — те же, что на
+ * new.ttg.club (правила перенесены оттуда как есть, менять оба сайта разом).
+ *
+ * Стандартные свойства стоят без условий: современные Chrome, Edge и
+ * Firefox рисуют по ним свою «тонкую» полосу, а правила
+ * `::-webkit-scrollbar` при этом не действуют. Те остаются для Safari и
+ * старых Chrome, которые стандартных свойств не знают. Раньше стандартные
+ * свойства были спрятаны от Chrome, и он рисовал полосу по
+ * `::-webkit-scrollbar` — бегунок выходил вдвое тоньше, чем на новом сайте.
  */
 @layer base {
+  * {
+    scrollbar-color: var(--ui-border-accented) transparent;
+    scrollbar-width: thin;
+  }
+
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -168,26 +178,21 @@ html[data-graphics='performance'] *::after {
 
   ::-webkit-scrollbar-button {
     display: none;
+    width: 0;
+    height: 0;
   }
 
   ::-webkit-scrollbar-thumb {
     border: 2px solid transparent;
-    border-radius: 9999px;
+    border-radius: 6px;
 
     background-color: var(--ui-border-accented);
-    background-clip: content-box;
+    background-clip: padding-box;
 
     transition: background-color 200ms ease;
 
     &:hover {
       background-color: var(--ui-text-dimmed);
-    }
-  }
-
-  @supports not selector(::-webkit-scrollbar) {
-    * {
-      scrollbar-color: var(--ui-border-accented) transparent;
-      scrollbar-width: thin;
     }
   }
 }
