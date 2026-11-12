@@ -365,12 +365,8 @@
     class="flex flex-col lg:flex-row"
     :class="columnsClass"
   >
-    <!--
-      Размытие нужно, только пока колонка липнет над списком (до lg): сбоку
-      под ней ничего не прокручивается, а видеокарта считала бы его зря.
-    -->
     <aside
-      class="sticky top-0 z-10 scrollbar-none shrink-0 border-default bg-default/80 backdrop-blur-lg lg:h-dvh lg:overflow-y-auto lg:border-r lg:backdrop-blur-none"
+      class="sticky top-0 z-10 scrollbar-none shrink-0 border-default bg-default lg:h-dvh lg:overflow-y-auto lg:border-r"
     >
       <div class="flex w-full flex-col gap-4 p-4 md:pt-6 lg:w-75">
         <h1 class="text-2xl text-highlighted">

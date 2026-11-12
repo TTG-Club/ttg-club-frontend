@@ -1,4 +1,5 @@
 import type { ThemeMode } from '#shared/consts';
+import type { GraphicsMode } from '~/shared/consts';
 
 import type { DisplaySettingsOption } from './choice';
 
@@ -8,6 +9,20 @@ export const THEME_OPTIONS = [
   { value: 'svifty7', label: 'svifty7', icon: 'tabler:palette' },
   { value: 'custom', label: 'Своя', icon: 'tabler:color-swatch' },
 ] as const satisfies ReadonlyArray<DisplaySettingsOption<ThemeMode>>;
+
+export const GRAPHICS_OPTIONS = [
+  { value: 'beauty', label: 'Красота', icon: 'tabler:sparkles' },
+  { value: 'performance', label: 'Производительность', icon: 'tabler:bolt' },
+] as const satisfies ReadonlyArray<DisplaySettingsOption<GraphicsMode>>;
+
+/** Настройка режима графики. */
+export const GRAPHICS_SETTING_TITLE = 'Графика';
+
+/** Пояснения к режимам графики: что меняет выбранный. */
+export const GRAPHICS_SETTING_HINT: Record<GraphicsMode, string> = {
+  beauty: 'с размытием фона',
+  performance: 'без размытия — быстрее',
+};
 
 export const DISPLAY_SETTINGS_ARIA = 'Настройки отображения';
 export const THEME_SECTION_TITLE = 'Тема';
