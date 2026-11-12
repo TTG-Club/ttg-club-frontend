@@ -6,6 +6,7 @@ export type {
 } from './schema';
 export type {
   DmScreenPoint,
+  DmScreenRect,
   DmScreenRequest,
   DmScreenSection,
   DmScreenSize,
@@ -42,6 +43,7 @@ export {
   keepDmScreenWindowReachable,
   placeDmScreenWindow,
   resolveDmScreenSection,
+  snapDmScreenWindow,
 } from './utils';
 
 export * from './constants';

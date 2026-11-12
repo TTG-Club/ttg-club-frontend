@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   appendDmScreenWindow,
   arrangeDmScreenWindows,
+  DM_SCREEN_GRID_GAP,
+  DM_SCREEN_LEFT_INSET,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
   dmScreenDetailSchema,
@@ -11,6 +13,7 @@ import {
   getDmScreenEntryRoot,
   isDmScreenPath,
   resolveDmScreenSection,
+  snapDmScreenWindow,
 } from '~dm-screen/model';
 
 /** Небольшой экран: под шапкой помещается лишь один ряд обычных окон. */
@@ -149,5 +152,47 @@ describe('ширма мастера', () => {
     expect(formatDmScreenDate('2026-11-12T14:05:00')).toContain('ноября');
     expect(formatDmScreenDate('не дата')).toBe('');
     expect(formatDmScreenDate(null)).toBe('');
+  });
+
+  describe('примагничивание', () => {
+    const viewport = { width: 1600, height: 900 };
+    const other = { x: 500, y: 200, width: 400, height: 300 };
+    const size = { width: 300, height: 200 };
+
+    it('ставит окно рядом с другим с промежутком сетки', () => {
+      const snapped = snapDmScreenWindow(
+        { x: 500 + 400 + DM_SCREEN_GRID_GAP + 7, y: 205, ...size },
+        [other],
+        viewport,
+      );
+
+      expect(snapped).toEqual({
+        x: 500 + 400 + DM_SCREEN_GRID_GAP,
+        y: 200,
+      });
+    });
+
+    it('прижимает к краю холста под шапкой и у боковой панели', () => {
+      const snapped = snapDmScreenWindow(
+        { x: DM_SCREEN_LEFT_INSET + 20, y: DM_SCREEN_TOP_INSET + 9, ...size },
+        [],
+        viewport,
+      );
+
+      expect(snapped).toEqual({
+        x: DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
+        y: DM_SCREEN_TOP_INSET,
+      });
+    });
+
+    it('далеко от краёв окно остаётся, где его держат', () => {
+      const snapped = snapDmScreenWindow(
+        { x: 1100, y: 600, ...size },
+        [other],
+        viewport,
+      );
+
+      expect(snapped).toEqual({ x: 1100, y: 600 });
+    });
   });
 });

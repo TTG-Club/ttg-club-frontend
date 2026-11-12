@@ -1,6 +1,7 @@
 import type { DmScreenWindow } from './schema';
 import type {
   DmScreenPoint,
+  DmScreenRect,
   DmScreenRequest,
   DmScreenSection,
   DmScreenSize,
@@ -19,6 +20,7 @@ import {
   DM_SCREEN_LEFT_INSET,
   DM_SCREEN_PATH,
   DM_SCREEN_SECTIONS,
+  DM_SCREEN_SNAP_DISTANCE,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_HEADER_HEIGHT,
   DM_SCREEN_WINDOW_MARGIN,
@@ -365,4 +367,77 @@ export function formatDmScreenDate(value?: string | null): string {
     DM_SCREEN_DATE_LOCALE,
     DM_SCREEN_DATE_FORMAT,
   ).format(date);
+}
+
+/**
+ * Ближайшее к значению место из возможных, если оно не дальше расстояния
+ * примагничивания; иначе значение как есть.
+ * @param value - где окно сейчас
+ * @param candidates - куда его можно притянуть
+ */
+function snapToNearest(
+  value: number,
+  candidates: ReadonlyArray<number>,
+): number {
+  const nearest = candidates.reduce<number | undefined>((best, candidate) => {
+    const distance = Math.abs(candidate - value);
+
+    if (distance > DM_SCREEN_SNAP_DISTANCE) {
+      return best;
+    }
+
+    return best === undefined || distance < Math.abs(best - value)
+      ? candidate
+      : best;
+  }, undefined);
+
+  return nearest ?? value;
+}
+
+/**
+ * Примагничивает перетаскиваемое окно: к краям холста (под шапкой, у
+ * боковой панели, у краёв экрана) и к другим окнам — край к краю или рядом
+ * с промежутком сетки. По каждой оси выбирается ближайший край в пределах
+ * расстояния примагничивания, иначе окно остаётся, где его держат.
+ * @param rect - где окно сейчас
+ * @param others - остальные развёрнутые окна
+ * @param viewport - размер экрана
+ */
+export function snapDmScreenWindow(
+  rect: DmScreenRect,
+  others: ReadonlyArray<DmScreenRect>,
+  viewport: DmScreenSize,
+): DmScreenPoint {
+  const left = DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN;
+  const right = viewport.width - DM_SCREEN_WINDOW_MARGIN;
+  const bottom = viewport.height - DM_SCREEN_WINDOW_MARGIN;
+
+  const xCandidates = [
+    left,
+    right - rect.width,
+    ...others.flatMap((other) => [
+      // Левые и правые края вровень
+      other.x,
+      other.x + other.width - rect.width,
+      // Рядом слева или справа с промежутком сетки
+      other.x + other.width + DM_SCREEN_GRID_GAP,
+      other.x - DM_SCREEN_GRID_GAP - rect.width,
+    ]),
+  ];
+
+  const yCandidates = [
+    DM_SCREEN_TOP_INSET,
+    bottom - rect.height,
+    ...others.flatMap((other) => [
+      other.y,
+      other.y + other.height - rect.height,
+      other.y + other.height + DM_SCREEN_GRID_GAP,
+      other.y - DM_SCREEN_GRID_GAP - rect.height,
+    ]),
+  ];
+
+  return {
+    x: snapToNearest(rect.x, xCandidates),
+    y: snapToNearest(rect.y, yCandidates),
+  };
 }

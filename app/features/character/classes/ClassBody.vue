@@ -2,6 +2,7 @@
   import type { ClassDetail } from '../model';
 
   import { ContentRender } from '~content/render';
+  import { useSectionEntryCompact } from '~section/composables';
   import { SectionDetailLayout } from '~section/detail-layout';
   import { SectionDrawer } from '~section/entry-drawer';
   import { SectionImageCover } from '~section/image-preview';
@@ -22,6 +23,9 @@
     /** Адрес открытой записи: класса или архетипа. */
     path: string;
   }>();
+
+  // В окне ширмы класс читают, а не листают: переходы и описание не нужны
+  const isCompact = useSectionEntryCompact();
 
   const description = computed(() => getClassDescription(entry));
 
@@ -68,7 +72,10 @@
 <template>
   <div class="flex flex-col gap-4">
     <SectionDetailLayout :is-aside-on-top="isRows">
-      <template #header>
+      <template
+        v-if="!isCompact"
+        #header
+      >
         <ClassRoutingBar
           :entry="entry"
           :path="path"

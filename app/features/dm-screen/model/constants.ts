@@ -127,8 +127,17 @@ export const DM_SCREEN_WINDOW_VISIBLE_PART = 96;
 /** Высота шапки окна, px: шапка не уходит за нижний край экрана. */
 export const DM_SCREEN_WINDOW_HEADER_HEIGHT = 40;
 
-/** Промежуток между окнами, разложенными по сетке, px. */
+/**
+ * Промежуток между окнами, px: в сетке и когда окно примагничивается
+ * рядом с другим.
+ */
 export const DM_SCREEN_GRID_GAP = 12;
+
+/**
+ * Насколько близко край окна должен подойти к краю другого окна или холста,
+ * чтобы примагнититься, px.
+ */
+export const DM_SCREEN_SNAP_DISTANCE = 12;
 
 /** Сдвиг окна от точки клика, px. */
 export const DM_SCREEN_CLICK_OFFSET = 16;

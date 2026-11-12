@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { useSectionEntryCompact } from '../composables';
   import { SECTION_ICON, SECTION_TEXT } from '../model';
   import SectionImageViewer from './SectionImageViewer.vue';
 
@@ -7,7 +8,8 @@
    * в полный рост, поэтому обложка прижата к верху и показывает голову
    * и торс. По клику картинки открываются во весь экран с листанием.
    * Как на new.ttg.club, поверх обложки лупа и число картинок: не все
-   * догадываются, что она открывает галерею.
+   * догадываются, что она открывает галерею. В компактном виде записи
+   * (окно ширмы) обложка — невысокая полоса: квадрат занимал бы всё окно.
    */
   const { images, alt } = defineProps<{
     images: Array<string>;
@@ -15,6 +17,14 @@
   }>();
 
   const isOpen = ref(false);
+
+  const isCompact = useSectionEntryCompact();
+
+  const shapeClass = computed(() =>
+    isCompact
+      ? 'h-40'
+      : 'aspect-square @min-xl:@max-6xl:w-50 @min-xl:@max-6xl:flex-none',
+  );
 
   function open() {
     isOpen.value = true;
@@ -26,7 +36,8 @@
     <button
       :aria-label="SECTION_TEXT.openImage"
       type="button"
-      class="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg border border-default bg-elevated @min-xl:@max-6xl:w-50 @min-xl:@max-6xl:flex-none"
+      :class="shapeClass"
+      class="group relative w-full cursor-zoom-in overflow-hidden rounded-lg border border-default bg-elevated"
       @click.left.exact.prevent="open"
     >
       <img
