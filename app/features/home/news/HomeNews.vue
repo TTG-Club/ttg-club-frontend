@@ -65,9 +65,12 @@
   // стрелках тоже должен придерживать отсчёт
   const panel = useTemplateRef<ComponentPublicInstance>('panel');
 
-  const isHovered = useElementHover(panel);
+  // Наведению нужен сам элемент панели, а не её компонент
+  const panelElement = computed(() => unrefElement(panel));
 
-  const { focused: isFocused } = useFocusWithin(panel);
+  const isHovered = useElementHover(panelElement);
+
+  const { focused: isFocused } = useFocusWithin(panelElement);
 
   const isVideoOpen = ref(false);
 
