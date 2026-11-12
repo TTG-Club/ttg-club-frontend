@@ -1,16 +1,11 @@
+import type { FooterLegalLink } from './types';
+
 import { NEW_SITE_URL } from '~/shared/consts';
 
 import {
   MENU_CONTACT_LINKS,
   MENU_SUPPORT_LINKS,
 } from '../../sidebar/menu/model';
-
-/** Ссылка на юридический документ в подвале. */
-interface FooterLegalLink {
-  label: string;
-  url: string;
-  icon: string;
-}
 
 /** Соцсети в подвале — те же, что в меню. */
 export const FOOTER_SOCIAL_LINKS = MENU_CONTACT_LINKS;

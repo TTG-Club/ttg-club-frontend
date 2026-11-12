@@ -350,7 +350,7 @@
   <!-- На телефоне высота экрана — за вычетом нижней панели меню. -->
   <div
     v-else
-    class="flex min-h-[calc(100dvh-var(--navbar-height))] flex-col md:min-h-dvh"
+    class="flex min-h-page flex-col md:min-h-dvh"
   >
     <div
       v-if="isTopBar"
