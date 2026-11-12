@@ -234,9 +234,8 @@ default group and adds it to any custom group from its menu.
 The home page repeats the legacy one block for block. Section tiles and the
 tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
 render on SSR; friends (`/api/v1/partners`) too — they run as a one-line
-marquee, shuffled in the browser on every visit (it stops on hover and focus;
-with reduced motion or in the "performance" graphics mode it stands still and
-scrolls by hand). Under them is the bug hunters rating, the same as on
+marquee, shuffled in the browser on every visit: an endless loop that only
+moves by itself (no manual scroll) and stops on hover and focus. Under them is the bug hunters rating, the same as on
 new.ttg.club: the server route `/api/v1/bug-stats` fetches
 `<new site>/api/bug-report/stats` (the new site does not answer other sites'
 browsers), caches it for 5 minutes and keeps the last good answer. The latest game comes from the

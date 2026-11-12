@@ -57,15 +57,17 @@
       Бегущая строка в одну линию. Под курсором и при фокусе с клавиатуры
       она замирает, чтобы по другу можно было попасть.
 
-      Тем, кто просил поменьше движения, и в режиме «производительность»
-      строка стоит на месте и листается пальцем или колесом.
+      Строку нельзя прокрутить рукой — она только едет сама, в любом режиме
+      графики: движется один слой через transform, вёрстка не
+      пересчитывается. Обрезка — `clip`, а не `hidden`: у `hidden` остаётся
+      прокрутка, и фокус на друге за краем сдвинул бы строку.
     -->
     <div
-      class="overflow-hidden py-3 motion-reduce:overflow-x-auto performance:overflow-x-auto"
+      class="overflow-clip py-3"
       :class="$style.viewport"
     >
       <div
-        class="flex w-max motion-reduce:animate-none performance:animate-none"
+        class="flex w-max"
         :class="$style.track"
         :style="trackStyle"
       >
@@ -90,11 +92,11 @@
           </li>
         </ul>
 
-        <!-- Повтор списка — только для глаз: скринридер и Tab его не видят,
-          а там, где строка не едет, он убран -->
+        <!-- Повтор списка — только для глаз: скринридер и Tab его не
+          видят -->
         <div
           aria-hidden="true"
-          class="flex shrink-0 gap-2 pr-2 motion-reduce:hidden performance:hidden"
+          class="flex shrink-0 gap-2 pr-2"
         >
           <a
             v-for="partner in orderedPartners"
