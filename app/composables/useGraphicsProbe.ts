@@ -46,67 +46,84 @@ function rateFrames(
 }
 
 /**
+ * Счёт замеров на всё посещение: панелей несколько, а счёт у них один. Здесь
+ * только счётчики и подсчёт кадров — ничего от посетителя: такое состояние
+ * на сервере общее для всех запросов.
+ */
+const useGraphicsProbeState = createGlobalState(() => {
+  const frameDurations = ref<Array<number>>([]);
+  const sampleCount = ref(0);
+  const slowCount = ref(0);
+
+  const { isActive, pause, resume } = useRafFn(
+    ({ delta }) => {
+      frameDurations.value.push(delta);
+    },
+    { immediate: false },
+  );
+
+  return { frameDurations, sampleCount, slowCount, isActive, pause, resume };
+});
+
+/**
  * Замер плавности анимаций: пока режим графики не выбран, считает кадры при
  * открытии всплывающих панелей. Если панели несколько раз открылись рывками,
- * сам включает «производительность» и сообщает об этом. Состояние общее на
- * всё посещение: панелей несколько, а счёт у них один.
+ * сам включает «производительность» и сообщает об этом.
+ *
+ * @returns Начало, конец и отмена замера
  */
-export const useGraphicsProbe = createGlobalState(
-  (): UseGraphicsProbeReturn => {
-    const { isChosen, setMode } = useGraphicsMode();
-    const toast = useToast();
+export function useGraphicsProbe(): UseGraphicsProbeReturn {
+  const { isChosen, setMode } = useGraphicsMode();
+  const toast = useToast();
 
-    let frameDurations: Array<number> = [];
-    let sampleCount = 0;
-    let slowCount = 0;
+  const { frameDurations, sampleCount, slowCount, isActive, pause, resume } =
+    useGraphicsProbeState();
 
-    const { isActive, pause, resume } = useRafFn(
-      ({ delta }) => {
-        frameDurations.push(delta);
-      },
-      { immediate: false },
-    );
-
-    function start(): void {
-      if (isChosen.value || sampleCount >= GRAPHICS_PROBE_SAMPLE_LIMIT) {
-        return;
-      }
-
-      frameDurations = [];
-      resume();
+  /** Начинает считать кадры, если режим ещё не выбран и замеры не исчерпаны. */
+  function start(): void {
+    if (isChosen.value || sampleCount.value >= GRAPHICS_PROBE_SAMPLE_LIMIT) {
+      return;
     }
 
-    function cancel(): void {
-      pause();
+    frameDurations.value = [];
+    resume();
+  }
+
+  /** Останавливает счёт кадров без учёта замера. */
+  function cancel(): void {
+    pause();
+  }
+
+  /**
+   * Заканчивает замер. После нужного числа открытий рывками включает
+   * «производительность» и сообщает об этом.
+   */
+  function finish(): void {
+    if (!isActive.value) {
+      return;
     }
 
-    function finish(): void {
-      if (!isActive.value) {
-        return;
-      }
+    pause();
 
-      pause();
+    const verdict = rateFrames(frameDurations.value);
 
-      const verdict = rateFrames(frameDurations);
-
-      if (verdict === 'skipped') {
-        return;
-      }
-
-      sampleCount += 1;
-
-      if (verdict === 'slow') {
-        slowCount += 1;
-      }
-
-      if (slowCount < GRAPHICS_PROBE_SLOW_LIMIT) {
-        return;
-      }
-
-      setMode('performance');
-      toast.add(GRAPHICS_PROBE_TOAST);
+    if (verdict === 'skipped') {
+      return;
     }
 
-    return { start, finish, cancel };
-  },
-);
+    sampleCount.value += 1;
+
+    if (verdict === 'slow') {
+      slowCount.value += 1;
+    }
+
+    if (slowCount.value < GRAPHICS_PROBE_SLOW_LIMIT) {
+      return;
+    }
+
+    setMode('performance');
+    toast.add(GRAPHICS_PROBE_TOAST);
+  }
+
+  return { start, finish, cancel };
+}

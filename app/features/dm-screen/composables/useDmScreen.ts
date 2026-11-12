@@ -304,7 +304,9 @@ export const useDmScreen = createSharedComposable(() => {
     screenId: readonly(screenId),
     // Не `readonly`: у ссылки на localStorage тип записи шире типа чтения
     // (допускает `null` для удаления ключа), и обёртка отдала бы наружу его
-    localWindows: computed(() => localWindows.value),
+    localWindows: computed<ReadonlyArray<DmScreenWindow>>(
+      () => localWindows.value,
+    ),
     windows,
     attach,
     detach,
