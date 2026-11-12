@@ -19,21 +19,16 @@
     actions?: () => unknown;
   }>();
 
-  const {
-    windows,
-    visibleWindows,
-    isWindowed,
-    arrange,
-    shrinkAll,
-    minimizeAll,
-  } = useDmScreen();
-
-  // Выравнивать и сворачивать есть что, только пока окна развёрнуты
-  const isArrangeAvailable = computed(
-    () => isWindowed.value && visibleWindows.value.length > 0,
-  );
+  const { windows, isWindowed, arrange, shrinkAll, minimizeAll } =
+    useDmScreen();
 
   const isEmpty = computed(() => !windows.value.length);
+
+  // Кнопки раскладки видны, пока на ширме есть записи, в том числе когда
+  // все окна свёрнуты: «Выровнять» и «Уменьшить» их и развернут
+  const isLayoutControlsVisible = computed(
+    () => isWindowed.value && !isEmpty.value,
+  );
 </script>
 
 <template>
@@ -51,7 +46,7 @@
       <DmScreenSearch />
 
       <UButton
-        v-if="!isEmpty && isWindowed"
+        v-if="isLayoutControlsVisible"
         :icon="DM_SCREEN_ICON.arrange"
         :label="DM_SCREEN_TEXT.arrange"
         color="neutral"
@@ -60,7 +55,7 @@
       />
 
       <UButton
-        v-if="isArrangeAvailable"
+        v-if="isLayoutControlsVisible"
         :icon="DM_SCREEN_ICON.shrinkAll"
         :label="DM_SCREEN_TEXT.shrinkAll"
         color="neutral"
@@ -69,7 +64,7 @@
       />
 
       <UButton
-        v-if="isArrangeAvailable"
+        v-if="isLayoutControlsVisible"
         :icon="DM_SCREEN_ICON.minimizeAll"
         :label="DM_SCREEN_TEXT.minimizeAll"
         color="neutral"
