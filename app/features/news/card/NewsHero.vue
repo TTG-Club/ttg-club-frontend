@@ -25,8 +25,10 @@
     compact?: boolean;
   }>();
 
-  defineEmits<{
+  const emit = defineEmits<{
     open: [];
+    /** Ролик новости открыли или закрыли */
+    video: [isOpen: boolean];
   }>();
 
   const { newSiteUrl } = useRuntimeConfig().public;
@@ -76,6 +78,10 @@
   // Ролик смотрят прямо с главной, в окне поверх страницы: кнопка «Смотреть»
   // по центру обложки. Клик мимо неё по-прежнему открывает саму новость
   const isVideoOpen = ref(false);
+
+  // Тот, кто листает новости сам, должен знать, что ролик смотрят: смена
+  // новости закрыла бы окно посреди просмотра
+  watch(isVideoOpen, (isOpen) => emit('video', isOpen));
 
   /** Открывает ролик новости в окне поверх страницы. */
   function playVideo(): void {

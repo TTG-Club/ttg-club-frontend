@@ -109,11 +109,27 @@ export const HOME_NEWS_ICON = 'tabler:news';
 
 export const HOME_NEWS_DATA_KEY = 'home-news';
 
-/** Обложка свежей новости и ряд из четырёх плиток под ней */
+/** Сколько свежих новостей листается в блоке */
 export const HOME_NEWS_COUNT = 5;
 
-/** Плиток под обложкой: все новости, кроме самой свежей */
-export const HOME_NEWS_TILE_COUNT = HOME_NEWS_COUNT - 1;
+/** Сколько секунд новость стоит на месте до смены следующей */
+export const HOME_NEWS_ROTATE_SECONDS = 8;
+
+export const HOME_NEWS_ROTATION_TEXT = {
+  switcher: 'Переключатель новостей',
+  pause: 'Остановить смену новостей',
+  play: 'Запустить смену новостей',
+  previous: 'Предыдущая новость',
+  next: 'Следующая новость',
+  item: 'Новость',
+} as const;
+
+export const HOME_NEWS_ROTATION_ICON = {
+  pause: 'tabler:player-pause-filled',
+  play: 'tabler:player-play-filled',
+  previous: 'tabler:chevron-left',
+  next: 'tabler:chevron-right',
+} as const;
 
 export const HOME_NEWS_ALL_LABEL = 'Все новости';
 

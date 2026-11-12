@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { NewsHero, NewsTile } from '~news/card';
+  import { NewsHero } from '~news/card';
   import { NewsDrawer } from '~news/drawer';
   import {
     getNewsListUrl,
@@ -8,7 +8,7 @@
     parseNewsList,
   } from '~news/model';
 
-  import { useHomeNewsReader } from '../composables';
+  import { useHomeNewsReader, useHomeNewsRotation } from '../composables';
   import {
     HOME_NEWS_ALL_LABEL,
     HOME_NEWS_COUNT,
@@ -16,16 +16,21 @@
     HOME_NEWS_EMPTY_TEXT,
     HOME_NEWS_ICON,
     HOME_NEWS_LABEL,
-    HOME_NEWS_TILE_COUNT,
+    HOME_NEWS_ROTATE_SECONDS,
+    HOME_NEWS_ROTATION_ICON,
+    HOME_NEWS_ROTATION_TEXT,
   } from '../model';
   import { HomePanel } from '../ui-kit';
 
   const api = useApi();
 
+  const style = useCssModule();
+
   /**
-   * Новости сайта как на new.ttg.club: обложка свежей новости и ряд плиток
-   * под ней. Новости пишут и публикуют на новом сайте, здесь они только
-   * читаются — в панели справа, а страница открывается на новом сайте.
+   * Новости сайта: на месте всегда одна новость обложкой, свежие сменяют
+   * друг друга по таймеру или по переключателю под обложкой. Новости пишут
+   * и публикуют на новом сайте, здесь они только читаются — в панели
+   * справа, а страница открывается на новом сайте.
    */
   const { newSiteUrl } = useRuntimeConfig().public;
 
@@ -52,10 +57,86 @@
     refresh,
   );
 
-  const heroNews = computed(() => newsList.value[0]);
+  const newsCount = computed(() => newsList.value.length);
 
-  /** Остальные новости после обложки — плитками в две колонки */
-  const restNews = computed(() => newsList.value.slice(1));
+  const stage = useTemplateRef<HTMLElement>('stage');
+
+  const isHovered = useElementHover(stage);
+
+  const { focused: isFocused } = useFocusWithin(stage);
+
+  const isVideoOpen = ref(false);
+
+  // Отсчёт замирает, пока новость разглядывают или читают: курсор или фокус
+  // на блоке, открыта панель чтения или ролик
+  const isHeld = computed(
+    () =>
+      isHovered.value
+      || isFocused.value
+      || isDrawerOpen.value
+      || isVideoOpen.value,
+  );
+
+  const {
+    activeIndex,
+    isStopped,
+    isRunning,
+    select,
+    showNext,
+    showPrevious,
+    toggleStopped,
+  } = useHomeNewsRotation(newsCount, isHeld);
+
+  const activeNews = computed(() => newsList.value[activeIndex.value]);
+
+  const hasSwitcher = computed(() => newsCount.value > 1);
+
+  const dots = computed(() =>
+    newsList.value.map((news, index) => {
+      const isActive = index === activeIndex.value;
+
+      return {
+        id: news.id,
+        index,
+        isActive,
+        label: `${HOME_NEWS_ROTATION_TEXT.item} ${index + 1}: ${news.title}`,
+        current: isActive ? ('true' as const) : undefined,
+        trackClass: isActive
+          ? 'w-8 bg-current/40'
+          : 'w-1.5 bg-current group-hover/dot:text-primary',
+      };
+    }),
+  );
+
+  // Пока кнопка паузы не нажата, полоска показывает отсчёт; на паузе стоит
+  // заполненной — видно, какая новость открыта, но ничего не «тикает»
+  const fillClass = computed(() => [
+    isStopped.value ? undefined : style.countdown,
+    isRunning.value ? undefined : style.held,
+  ]);
+
+  const fillStyle = { '--rotate-duration': `${HOME_NEWS_ROTATE_SECONDS}s` };
+
+  const toggleIcon = computed(() =>
+    isStopped.value
+      ? HOME_NEWS_ROTATION_ICON.play
+      : HOME_NEWS_ROTATION_ICON.pause,
+  );
+
+  const toggleLabel = computed(() =>
+    isStopped.value
+      ? HOME_NEWS_ROTATION_TEXT.play
+      : HOME_NEWS_ROTATION_TEXT.pause,
+  );
+
+  /**
+   * Запоминает, открыт ли ролик показанной новости.
+   *
+   * @param isOpen - открыт ли ролик
+   */
+  function handleVideo(isOpen: boolean): void {
+    isVideoOpen.value = isOpen;
+  }
 
   const listUrl = getNewsListUrl('site', newSiteUrl);
 </script>
@@ -68,6 +149,8 @@
     :link-label="HOME_NEWS_ALL_LABEL"
     flush
   >
+    <!-- Скелетон повторяет обложку и строку переключателя, чтобы лента не
+      прыгала, когда новости приедут -->
     <div
       v-if="isLoading"
       class="flex flex-col"
@@ -76,25 +159,15 @@
         class="aspect-16/10 w-full rounded-none sm:aspect-2/1 xl:aspect-21/9"
       />
 
-      <div class="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2">
-        <div
-          v-for="index in HOME_NEWS_TILE_COUNT"
-          :key="index"
-          class="flex items-center gap-3 p-2"
-        >
-          <USkeleton class="h-16 w-24 shrink-0 rounded-md" />
+      <div class="flex h-11 items-center justify-between px-3">
+        <USkeleton class="h-1.5 w-24 rounded-full" />
 
-          <div class="flex flex-1 flex-col gap-2">
-            <USkeleton class="h-2.5 w-16 rounded" />
-
-            <USkeleton class="h-4 w-3/4 rounded" />
-          </div>
-        </div>
+        <USkeleton class="h-6 w-20 rounded-md" />
       </div>
     </div>
 
     <p
-      v-else-if="!heroNews"
+      v-else-if="!activeNews"
       class="m-3 rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
     >
       {{ HOME_NEWS_EMPTY_TEXT }}
@@ -102,25 +175,92 @@
 
     <div
       v-else
+      ref="stage"
       class="flex flex-col"
     >
+      <!-- Новая обложка проявляется поверх места прежней: обложки одного
+        размера, вёрстка под ними не двигается. Проявление — CSS-анимация
+        самой обложки, а не Transition: ей не нужно ждать ухода прежней -->
       <NewsHero
-        :news="heroNews"
+        :key="activeNews.id"
+        :news="activeNews"
         kind="site"
-        @open="open(heroNews.url)"
+        :class="$style.appear"
+        @open="open(activeNews.url)"
+        @video="handleVideo"
       />
 
       <div
-        v-if="restNews.length"
-        class="grid grid-cols-1 gap-1 border-t border-default p-2 sm:grid-cols-2"
+        v-if="hasSwitcher"
+        class="flex h-11 items-center justify-between gap-3 border-t border-default px-3"
       >
-        <NewsTile
-          v-for="news in restNews"
-          :key="news.id"
-          :news="news"
-          kind="site"
-          @open="open(news.url)"
-        />
+        <div
+          role="group"
+          :aria-label="HOME_NEWS_ROTATION_TEXT.switcher"
+          class="flex min-w-0 items-center"
+        >
+          <!-- Кнопка шире своей точки: попасть в полтора пикселя пальцем
+            нельзя, а зазор между точками — это её поля -->
+          <button
+            v-for="dot in dots"
+            :key="dot.id"
+            type="button"
+            :aria-label="dot.label"
+            :aria-current="dot.current"
+            :title="dot.label"
+            class="group/dot flex h-8 cursor-pointer items-center px-1"
+            @click.left.exact.prevent="select(dot.index)"
+          >
+            <span
+              class="relative block h-1.5 overflow-hidden rounded-full text-dimmed transition-colors"
+              :class="dot.trackClass"
+            >
+              <!-- Полоска пересоздаётся с каждой новостью — отсчёт
+                начинается заново. Растёт через transform, без пересчёта
+                вёрстки; её конец и листает новость -->
+              <span
+                v-if="dot.isActive"
+                :key="activeIndex"
+                class="absolute inset-0 origin-left rounded-full bg-primary"
+                :class="fillClass"
+                :style="fillStyle"
+                @animationend="showNext"
+              />
+            </span>
+          </button>
+        </div>
+
+        <div class="flex shrink-0 items-center gap-1">
+          <UButton
+            :icon="toggleIcon"
+            :aria-label="toggleLabel"
+            :title="toggleLabel"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            @click.left.exact.prevent="toggleStopped"
+          />
+
+          <UButton
+            :icon="HOME_NEWS_ROTATION_ICON.previous"
+            :aria-label="HOME_NEWS_ROTATION_TEXT.previous"
+            :title="HOME_NEWS_ROTATION_TEXT.previous"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            @click.left.exact.prevent="showPrevious"
+          />
+
+          <UButton
+            :icon="HOME_NEWS_ROTATION_ICON.next"
+            :aria-label="HOME_NEWS_ROTATION_TEXT.next"
+            :title="HOME_NEWS_ROTATION_TEXT.next"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            @click.left.exact.prevent="showNext"
+          />
+        </div>
       </div>
     </div>
 
@@ -131,3 +271,43 @@
     />
   </HomePanel>
 </template>
+
+<style lang="scss" module>
+  .countdown {
+    animation: news-countdown var(--rotate-duration) linear both;
+  }
+
+  .held {
+    animation-play-state: paused;
+  }
+
+  .appear {
+    animation: news-appear 0.25s ease-out both;
+  }
+
+  @keyframes news-appear {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .appear {
+      animation: none;
+    }
+  }
+
+  @keyframes news-countdown {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>
