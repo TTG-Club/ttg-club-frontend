@@ -1,3 +1,4 @@
+export * from './bugStats';
 export * from './cookies';
 export * from './maintenance';
 export * from './menu';

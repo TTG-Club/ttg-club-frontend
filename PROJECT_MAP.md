@@ -28,10 +28,10 @@
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
 │   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace with turn reel, hit points and armor class on the device, guest key slot)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
-│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
+│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), bug-hunters (rating from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
 │   │   ├── news/               # news of new.ttg.club read here: model (core-api articles and community news), card (hero, tile), drawer (quick reading, page opens on new.ttg.club), body, video (YouTube / VK player), markup (render of the new site markup `{@...}`; links lead to new.ttg.club)
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
-│   │   ├── infrastructure/     # sidebar (panel, menu like new.ttg.club from /api/v1/menu, cached by Nitro with a built-in fallback copy), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state)
+│   │   ├── infrastructure/     # sidebar (panel, menu like new.ttg.club from /api/v1/menu, cached by Nitro with a built-in fallback copy), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state), footer (site footer like new.ttg.club: legal links lead to new.ttg.club; shown by layouts and by SectionLayout outside the wide split mode)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, active flag; the home page no longer shows videos); editors only
 │   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), images (gallery and class/race cover uploaded to S3 via `/api/v1/workshop/images`: "Images" tab in class, archetype and race editors, block under the form elsewhere), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
@@ -233,7 +233,13 @@ default group and adds it to any custom group from its menu.
 
 The home page repeats the legacy one block for block. Section tiles and the
 tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
-render on SSR; friends (`/api/v1/partners`) too. The latest game comes from the
+render on SSR; friends (`/api/v1/partners`) too — they run as a one-line
+marquee, shuffled in the browser on every visit (it stops on hover and focus;
+with reduced motion or in the "performance" graphics mode it stands still and
+scrolls by hand). Under them is the bug hunters rating, the same as on
+new.ttg.club: the server route `/api/v1/bug-stats` fetches
+`<new site>/api/bug-report/stats` (the new site does not answer other sites'
+browsers), caches it for 5 minutes and keeps the last good answer. The latest game comes from the
 new.ttg.club game service and core-api, so it loads only in the browser. The
 search field opens the search palette.
 
@@ -241,7 +247,12 @@ News and community news are written and published on new.ttg.club and shown
 here as on its home page: core-api `/api/v2/articles/search?type=NEWS` and
 `/api/v2/community-news/search`, loaded in the browser. A click opens the news
 in a right drawer for quick reading; the "open page" button and ctrl+click open
-it on new.ttg.club in a new tab. Articles are not shown here.
+it on new.ttg.club in a new tab. Articles are not shown here. Each block shows
+one news as a cover and rotates the latest ones on a timer; the switcher in the
+panel footer (dots with a countdown bar, pause, arrows) sits in one row with
+the "all news" link. The countdown pauses on hover, on focus, while a news or
+its video is open and on a hidden tab. Left of the community news there is a
+"Reserved" placeholder for a future block (desktop only).
 
 The "Discussions" block under the latest game shows the latest comments of
 this site only: comments-service `/api/v1/comments/recent` with the

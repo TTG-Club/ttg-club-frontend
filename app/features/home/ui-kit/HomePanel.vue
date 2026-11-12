@@ -54,6 +54,15 @@
         :label="label"
         :icon="icon"
       />
+
+      <!-- Место справа в шапке — под мелкое действие панели, например
+        подсказку -->
+      <div
+        v-if="$slots.actions"
+        class="flex shrink-0 items-center gap-1"
+      >
+        <slot name="actions" />
+      </div>
     </header>
 
     <div :class="bodyClass">
@@ -69,19 +78,35 @@
       <slot v-else />
     </div>
 
-    <NuxtLink
+    <!-- Подвал — одна строка: ссылка «смотреть всё» и, если панель их
+      дала, свои органы управления справа. Они лежат рядом со ссылкой, а не
+      внутри неё: кнопка внутри ссылки — невалидная разметка. Без соседей
+      стрелка ссылки уходит к правому краю, с соседями (`has-[+div]`) остаётся
+      у подписи — иначе повисла бы посреди строки -->
+    <footer
       v-if="hasFooter"
-      :to="to"
-      external
-      target="_blank"
-      class="mt-auto flex shrink-0 items-center justify-between gap-2 border-t border-default px-3 py-2.5 font-mono text-[11px] tracking-[0.14em] text-muted uppercase no-underline transition-colors hover:bg-elevated hover:text-primary"
+      class="@container mt-auto flex shrink-0 items-stretch border-t border-default"
     >
-      {{ linkLabel }}
+      <NuxtLink
+        :to="to"
+        external
+        target="_blank"
+        class="flex min-w-0 flex-auto items-center justify-between gap-2 px-3 py-2.5 font-mono text-[11px] tracking-[0.14em] text-muted uppercase no-underline transition-colors hover:bg-elevated hover:text-primary has-[+div]:justify-start"
+      >
+        <span class="truncate">{{ linkLabel }}</span>
 
-      <UIcon
-        :name="HOME_LINK_ARROW_ICON"
-        class="size-3.5"
-      />
-    </NuxtLink>
+        <UIcon
+          :name="HOME_LINK_ARROW_ICON"
+          class="size-3.5 shrink-0"
+        />
+      </NuxtLink>
+
+      <div
+        v-if="$slots.aside"
+        class="flex shrink-0 items-center gap-2 px-2"
+      >
+        <slot name="aside" />
+      </div>
+    </footer>
   </section>
 </template>

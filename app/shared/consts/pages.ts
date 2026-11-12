@@ -57,3 +57,6 @@ export const DM_SCREEN_PAGE_PATH = '/dm-screen';
 
 /** Справочник: за ним в меню встаёт пункт ширмы. */
 export const SCREENS_REFERENCE_PAGE_PATH = '/screens';
+
+/** Новый сайт (редакция 2024): там же живут юридические документы. */
+export const NEW_SITE_URL = 'https://new.ttg.club';

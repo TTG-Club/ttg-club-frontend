@@ -109,11 +109,27 @@ export const HOME_NEWS_ICON = 'tabler:news';
 
 export const HOME_NEWS_DATA_KEY = 'home-news';
 
-/** Обложка свежей новости и ряд из четырёх плиток под ней */
+/** Сколько свежих новостей листается в блоке */
 export const HOME_NEWS_COUNT = 5;
 
-/** Плиток под обложкой: все новости, кроме самой свежей */
-export const HOME_NEWS_TILE_COUNT = HOME_NEWS_COUNT - 1;
+/** Сколько секунд новость стоит на месте до смены следующей */
+export const HOME_NEWS_ROTATE_SECONDS = 8;
+
+export const HOME_NEWS_ROTATION_TEXT = {
+  switcher: 'Переключатель новостей',
+  pause: 'Остановить смену новостей',
+  play: 'Запустить смену новостей',
+  previous: 'Предыдущая новость',
+  next: 'Следующая новость',
+  item: 'Новость',
+} as const;
+
+export const HOME_NEWS_ROTATION_ICON = {
+  pause: 'tabler:player-pause-filled',
+  play: 'tabler:player-play-filled',
+  previous: 'tabler:chevron-left',
+  next: 'tabler:chevron-right',
+} as const;
 
 export const HOME_NEWS_ALL_LABEL = 'Все новости';
 
@@ -125,10 +141,11 @@ export const HOME_COMMUNITY_NEWS_ICON = 'tabler:users-group';
 
 export const HOME_COMMUNITY_NEWS_DATA_KEY = 'home-community-news';
 
-/** На главной — только последняя новость сообщества */
-export const HOME_COMMUNITY_NEWS_COUNT = 1;
+/** Сколько свежих новостей сообщества листается в блоке */
+export const HOME_COMMUNITY_NEWS_COUNT = 4;
 
-export const HOME_COMMUNITY_NEWS_ALL_LABEL = 'Все новости сообщества';
+/** Коротко: в узкой панели подпись делит строку с переключателем */
+export const HOME_COMMUNITY_NEWS_ALL_LABEL = 'Все новости';
 
 export const HOME_COMMUNITY_NEWS_EMPTY_TEXT = 'Новостей сообщества пока нет';
 
@@ -264,6 +281,79 @@ export const HOME_PARTNERS_ICON = 'tabler:heart-handshake';
 export const HOME_PARTNERS_DATA_KEY = 'home-partners';
 
 export const HOME_PARTNERS_PATH = '/api/v1/partners';
+
+/**
+ * Сколько секунд бегущая строка тратит на одного друга: скорость не
+ * зависит от того, сколько их в списке
+ */
+export const HOME_PARTNERS_MARQUEE_SECONDS_PER_ITEM = 5;
+
+/* --- Охотники за багами ------------------------------------------------- */
+
+export const HOME_BUG_HUNTERS_LABEL = 'Охотники за багами';
+
+export const HOME_BUG_HUNTERS_ICON = 'tabler:bug';
+
+export const HOME_BUG_HUNTERS_DATA_KEY = 'home-bug-hunters';
+
+export const HOME_BUG_HUNTERS_TROPHY_ICON = 'tabler:trophy-filled';
+
+export const HOME_BUG_HUNTERS_HELP_ICON = 'tabler:help-circle-filled';
+
+/** Подсказка к рейтингу охотников */
+export const HOME_BUG_HUNTERS_TOOLTIP =
+  'В зачёт идут только те баги, которые мы отметили как исправленные, а не просто все ваши отправленные баги';
+
+/** Периоды рейтинга в порядке показа; первый открыт по умолчанию */
+export const HOME_BUG_HUNTERS_PERIODS = [
+  { value: 'month', label: 'За текущий месяц' },
+  { value: 'all', label: 'За всё время' },
+] as const;
+
+export const HOME_BUG_HUNTERS_PERIOD_DEFAULT =
+  HOME_BUG_HUNTERS_PERIODS[0].value;
+
+/** Заглушка, когда за текущий месяц ещё нет исправленных багов */
+export const HOME_BUG_HUNTERS_EMPTY_MONTH_TEXT =
+  'Пока никто не исправил багов в этом месяце';
+
+/** Заглушка, когда рейтинг пуст за оба периода */
+export const HOME_BUG_HUNTERS_EMPTY_TEXT =
+  'Пока никто не исправил ни одного бага';
+
+export const HOME_BUG_HUNTERS_ERROR_TEXT = 'Не удалось загрузить рейтинг';
+
+/**
+ * Размер рейтинга: приходит десятка, недостающие до неё места дорисовываются
+ * строками-заглушками (в начале месяца охотников меньше)
+ */
+export const HOME_BUG_HUNTERS_TOP_SIZE = 10;
+
+/** Сколько первых мест выделены цветом */
+export const HOME_BUG_HUNTERS_PODIUM_SIZE = 3;
+
+/**
+ * Подписи свободных мест рейтинга. Раздаются по порядку среди пустых строк,
+ * по кругу, если пустых больше, чем фраз
+ */
+export const HOME_BUG_HUNTERS_EMPTY_SLOT_TEXTS: ReadonlyArray<string> = [
+  'Ждёт своего героя',
+  'Здесь водятся драконы',
+  'Проверка Восприятия провалена',
+  'Ячейка заклинания свободна',
+  'Кости ещё не брошены',
+  'Квест пока никто не взял',
+  'Ловушка не обезврежена',
+  'Логово ещё не зачищено',
+  'Стул у очага пустует',
+  'Сокровище ждёт искателя',
+];
+
+/** Шаг задержки появления строк рейтинга, мс */
+export const HOME_BUG_HUNTERS_ROW_STAGGER_MS = 80;
+
+/** Задержка роста полосок: после того как строки начали появляться, мс */
+export const HOME_BUG_HUNTERS_BAR_DELAY_MS = 300;
 
 /* --- Обсуждения --------------------------------------------------------- */
 

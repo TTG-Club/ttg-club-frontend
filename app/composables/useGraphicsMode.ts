@@ -1,12 +1,17 @@
 import type { ComputedRef } from 'vue';
 import type { GraphicsMode } from '~/shared/consts';
 
+import { z } from 'zod';
+
 import {
   GRAPHICS_MODE_COOKIE,
   GRAPHICS_MODE_COOKIE_MAX_AGE_SECONDS,
   GRAPHICS_MODE_DEFAULT,
   GRAPHICS_MODES,
 } from '~/shared/consts';
+
+/** В cookie может попасть что угодно — принимаем только известные режимы. */
+const graphicsModeSchema = z.enum(GRAPHICS_MODES);
 
 export interface UseGraphicsModeReturn {
   /** Действующий режим графики */
@@ -30,9 +35,8 @@ export function useGraphicsMode(): UseGraphicsModeReturn {
     maxAge: GRAPHICS_MODE_COOKIE_MAX_AGE_SECONDS,
   });
 
-  // В cookie может попасть что угодно — принимаем только известные режимы
-  const savedMode = computed(() =>
-    GRAPHICS_MODES.find((entry) => entry === cookie.value),
+  const savedMode = computed(
+    () => graphicsModeSchema.safeParse(cookie.value).data,
   );
 
   const mode = computed<GraphicsMode>(
@@ -41,11 +45,13 @@ export function useGraphicsMode(): UseGraphicsModeReturn {
 
   const isChosen = computed(() => savedMode.value !== undefined);
 
-  return {
-    mode,
-    isChosen,
-    setMode: (value) => {
-      cookie.value = value;
-    },
-  };
+  /**
+   * Запоминает режим графики в cookie.
+   * @param value - Новый режим
+   */
+  function setMode(value: GraphicsMode): void {
+    cookie.value = value;
+  }
+
+  return { mode, isChosen, setMode };
 }
