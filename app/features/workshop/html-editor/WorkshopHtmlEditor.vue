@@ -4,34 +4,71 @@
   import type {
     DiceToken,
     HtmlEditorCommand,
+    HtmlEditorLink,
     HtmlEditorMode,
+    HtmlEditorWrapTag,
     HtmlProblem,
+    HtmlTableAction,
   } from '../model';
 
   import {
+    applyTableAction,
+    BLOCK_TAGS,
+    closestInEditor,
     compressHtml,
     createDiceToken,
+    createLinkElement,
+    createTable,
     createTokenElement,
     DICE_DEFAULT_LABEL,
     DICE_TOKEN_CLASS,
     editableToHtml,
     extractFormula,
     findHtmlProblems,
+    findLinkElement,
     fixHtmlProblems,
     HTML_EDITOR_ALIGN_COMMANDS,
     HTML_EDITOR_BLOCKS,
+    HTML_EDITOR_HIGHLIGHT,
     HTML_EDITOR_ICON,
     HTML_EDITOR_INLINE_COMMANDS,
+    HTML_EDITOR_KBD,
     HTML_EDITOR_LIST_COMMANDS,
     HTML_EDITOR_MODE_VARIANT,
     HTML_EDITOR_MODES,
     HTML_EDITOR_ROW_HEIGHT,
+    HTML_EDITOR_TABLE_ACTIONS,
+    HTML_EDITOR_TABLE_SIZE,
     HTML_EDITOR_TEXT,
     htmlToEditable,
+    insertBlock,
+    linkFromElement,
+    placeCaret,
     tokenFromElement,
+    unwrapElement,
+    wrapRange,
   } from '../model';
   import HtmlEditorDiceModal from './HtmlEditorDiceModal.vue';
+  import HtmlEditorLinkModal from './HtmlEditorLinkModal.vue';
   import HtmlEditorProblems from './HtmlEditorProblems.vue';
+  import HtmlEditorSectionModal from './HtmlEditorSectionModal.vue';
+
+  /** Кнопка панели инструментов. */
+  interface ToolbarButton {
+    key: string;
+    icon: string;
+    title: string;
+    onClick: () => void;
+    /** Оформление уже применено к тексту под кареткой. */
+    isActive?: boolean;
+    class?: string;
+  }
+
+  /**
+   * Кнопка нужна только на сенсорном экране: она заменяет Shift+Enter,
+   * которого нет на экранной клавиатуре.
+   */
+  const TOUCH_ONLY_CLASS = 'pointer-fine:hidden';
 
   /**
    * HTML-редактор описаний: визуальный режим с броском кубиков и режим
@@ -73,6 +110,18 @@
   const editingToken = shallowRef<HTMLElement>();
   const insertRange = shallowRef<Range>();
 
+  const isLinkOpen = ref(false);
+  const isSectionOpen = ref(false);
+  const linkValue = ref<HtmlEditorLink>({ text: '', url: '' });
+  const sectionText = ref('');
+  const editingLink = shallowRef<HTMLElement>();
+
+  /** Команды и теги, которые уже применены к тексту под кареткой. */
+  const activeKeys = shallowRef<ReadonlySet<string>>(new Set());
+
+  /** Ячейка таблицы под кареткой: без неё операции с таблицей недоступны. */
+  const activeCell = shallowRef<HTMLTableCellElement>();
+
   const isVisual = computed(() => mode.value === 'html');
   const isToolbarDisabled = computed(() => disabled || !isVisual.value);
   const problems = computed(() => findHtmlProblems(model.value));
@@ -91,6 +140,109 @@
       onSelect: () => formatBlock(block.tag),
     })),
   );
+
+  const tableItems = computed<Array<Array<DropdownMenuItem>>>(() => [
+    [
+      {
+        label: HTML_EDITOR_TEXT.insertTable,
+        icon: HTML_EDITOR_ICON.insertTable,
+        onSelect: insertTable,
+      },
+    ],
+    HTML_EDITOR_TABLE_ACTIONS.map((item) => ({
+      label: item.label,
+      icon: item.icon,
+      disabled: !activeCell.value,
+      onSelect: () => runTableAction(item.action),
+    })),
+  ]);
+
+  const formatButtons = computed<Array<ToolbarButton>>(() => [
+    ...HTML_EDITOR_INLINE_COMMANDS.map((item) => ({
+      key: item.command,
+      icon: item.icon,
+      title: item.title,
+      isActive: activeKeys.value.has(item.command),
+      onClick: () => applyCommand(item),
+    })),
+    wrapButton(HTML_EDITOR_HIGHLIGHT),
+  ]);
+
+  const alignButtons = computed<Array<ToolbarButton>>(() =>
+    HTML_EDITOR_ALIGN_COMMANDS.map((item) => ({
+      key: item.command,
+      icon: item.icon,
+      title: item.title,
+      onClick: () => applyCommand(item),
+    })),
+  );
+
+  const blockButtons = computed<Array<ToolbarButton>>(() => [
+    ...HTML_EDITOR_LIST_COMMANDS.map((item) => ({
+      key: item.command,
+      icon: item.icon,
+      title: item.title,
+      isActive: activeKeys.value.has(item.command),
+      onClick: () => applyCommand(item),
+    })),
+    {
+      key: 'blockquote',
+      icon: HTML_EDITOR_ICON.quote,
+      title: HTML_EDITOR_TEXT.quote,
+      isActive: activeKeys.value.has('blockquote'),
+      onClick: toggleQuote,
+    },
+    {
+      key: 'separator',
+      icon: HTML_EDITOR_ICON.separator,
+      title: HTML_EDITOR_TEXT.separator,
+      onClick: insertSeparator,
+    },
+  ]);
+
+  const insertButtons = computed<Array<ToolbarButton>>(() => [
+    {
+      key: 'line-break',
+      icon: HTML_EDITOR_ICON.lineBreak,
+      title: HTML_EDITOR_TEXT.lineBreak,
+      class: TOUCH_ONLY_CLASS,
+      onClick: () => runCommand('insertLineBreak'),
+    },
+    wrapButton(HTML_EDITOR_KBD),
+    {
+      key: 'link',
+      icon: HTML_EDITOR_ICON.link,
+      title: HTML_EDITOR_TEXT.link,
+      isActive: activeKeys.value.has('link'),
+      onClick: openLink,
+    },
+    {
+      key: 'dice',
+      icon: HTML_EDITOR_ICON.dice,
+      title: HTML_EDITOR_TEXT.dice,
+      onClick: () => openDice(false),
+    },
+    {
+      key: 'roll',
+      icon: HTML_EDITOR_ICON.roll,
+      title: HTML_EDITOR_TEXT.roll,
+      onClick: () => openDice(true),
+    },
+    {
+      key: 'section',
+      icon: HTML_EDITOR_ICON.section,
+      title: HTML_EDITOR_TEXT.section,
+      onClick: openSection,
+    },
+  ]);
+
+  /** Группы кнопок в порядке нового сайта: оформление, блок, вставки. */
+  const toolbarGroups = computed(() => [
+    formatButtons.value,
+    alignButtons.value,
+    blockButtons.value,
+    insertButtons.value,
+  ]);
 
   const modeItems = computed(() =>
     HTML_EDITOR_MODES.map((option) => ({
@@ -147,12 +299,89 @@
       : undefined;
   }
 
+  /**
+   * Что уже применено под кареткой: для подсветки кнопок и меню таблицы.
+   * @param range - выделение внутри редактора
+   */
+  function updateActiveState(range: Range): void {
+    const root = editor.value;
+
+    if (!root) {
+      return;
+    }
+
+    const node = range.startContainer;
+    const keys = new Set<string>();
+
+    for (const item of [
+      ...HTML_EDITOR_INLINE_COMMANDS,
+      ...HTML_EDITOR_LIST_COMMANDS,
+    ]) {
+      if (document.queryCommandState(item.command)) {
+        keys.add(item.command);
+      }
+    }
+
+    for (const tag of [
+      HTML_EDITOR_HIGHLIGHT.tag,
+      HTML_EDITOR_KBD.tag,
+      'blockquote',
+    ]) {
+      if (closestInEditor(node, tag, root)) {
+        keys.add(tag);
+      }
+    }
+
+    if (findLinkElement(node, root)) {
+      keys.add('link');
+    }
+
+    activeKeys.value = keys;
+
+    const cell = closestInEditor(node, 'td, th', root);
+
+    activeCell.value = cell instanceof HTMLTableCellElement ? cell : undefined;
+  }
+
   function rememberRange(): void {
     const range = getEditorRange();
 
     if (range) {
       lastRange.value = range.cloneRange();
+      updateActiveState(range);
     }
+  }
+
+  /**
+   * Возвращает фокус и выделение в редактор перед правкой.
+   * @returns выделение; `undefined` — панель недоступна
+   */
+  function prepareSelection(): Range | undefined {
+    if (isToolbarDisabled.value || !editor.value) {
+      return undefined;
+    }
+
+    editor.value.focus();
+    restoreRange();
+
+    return getEditorRange() ?? lastRange.value;
+  }
+
+  /**
+   * Завершает правку: ставит каретку и отдаёт разметку наружу.
+   * @param caret - куда поставить каретку
+   * @param isSelect - выделить содержимое узла
+   */
+  function finishEdit(caret?: Node, isSelect = false): void {
+    if (caret?.isConnected) {
+      placeCaret(caret, isSelect);
+    } else {
+      lastRange.value = undefined;
+      activeCell.value = undefined;
+    }
+
+    rememberRange();
+    emitFromEditor();
   }
 
   function restoreRange(): void {
@@ -210,6 +439,192 @@
 
   function formatBlock(tag: string): void {
     runCommand('formatBlock', tag);
+  }
+
+  /**
+   * Кнопка тега-обёртки (`mark`, `kbd`): повторное нажатие снимает тег.
+   * @param item - тег
+   */
+  function wrapButton(item: HtmlEditorWrapTag): ToolbarButton {
+    return {
+      key: item.tag,
+      icon: item.icon,
+      title: item.title,
+      isActive: activeKeys.value.has(item.tag),
+      onClick: () => toggleWrap(item),
+    };
+  }
+
+  function toggleWrap(item: HtmlEditorWrapTag): void {
+    const range = prepareSelection();
+    const root = editor.value;
+
+    if (!range || !root) {
+      return;
+    }
+
+    const existing = closestInEditor(
+      range.commonAncestorContainer,
+      item.tag,
+      root,
+    );
+
+    if (existing) {
+      const first = existing.firstChild;
+
+      unwrapElement(existing);
+      finishEdit(first ?? undefined);
+
+      return;
+    }
+
+    finishEdit(wrapRange(root, range, item.tag, item.placeholder), true);
+  }
+
+  /**
+   * Цитата: абзац с кареткой становится цитатой, в цитате — снова абзацем.
+   */
+  function toggleQuote(): void {
+    const range = prepareSelection();
+    const root = editor.value;
+
+    if (!range || !root) {
+      return;
+    }
+
+    const quote = closestInEditor(range.startContainer, 'blockquote', root);
+
+    if (!quote) {
+      runCommand('formatBlock', 'blockquote');
+
+      return;
+    }
+
+    const hasBlocks = Array.from(quote.children).some(
+      (child) => child.tagName !== 'BR' && BLOCK_TAGS.includes(child.tagName),
+    );
+
+    if (hasBlocks) {
+      const first = quote.firstChild;
+
+      unwrapElement(quote);
+      finishEdit(first ?? undefined);
+
+      return;
+    }
+
+    const paragraph = document.createElement('p');
+
+    paragraph.append(...Array.from(quote.childNodes));
+    quote.replaceWith(paragraph);
+    finishEdit(paragraph);
+  }
+
+  function insertSeparator(): void {
+    const range = prepareSelection();
+
+    if (!editor.value || isToolbarDisabled.value) {
+      return;
+    }
+
+    const separator = document.createElement('hr');
+
+    insertBlock(editor.value, separator, range);
+    finishEdit(separator.nextElementSibling ?? undefined);
+  }
+
+  function insertTable(): void {
+    const range = prepareSelection();
+
+    if (!editor.value || isToolbarDisabled.value) {
+      return;
+    }
+
+    const table = createTable(
+      document,
+      HTML_EDITOR_TABLE_SIZE.rows,
+      HTML_EDITOR_TABLE_SIZE.columns,
+    );
+
+    insertBlock(editor.value, table, range);
+    finishEdit(table.rows[0]?.cells[0]);
+  }
+
+  function runTableAction(action: HtmlTableAction): void {
+    const cell = activeCell.value;
+
+    if (!cell?.isConnected || isToolbarDisabled.value) {
+      return;
+    }
+
+    prepareSelection();
+    finishEdit(applyTableAction(cell, action), action === 'caption');
+  }
+
+  /**
+   * Открывает окно ссылки: для ссылки под кареткой — на правку.
+   */
+  function openLink(): void {
+    if (isToolbarDisabled.value || !editor.value) {
+      return;
+    }
+
+    const range = getEditorRange() ?? lastRange.value;
+    const existing = findLinkElement(range?.startContainer, editor.value);
+
+    editingLink.value = existing;
+    insertRange.value = existing ? undefined : range;
+
+    linkValue.value = existing
+      ? linkFromElement(existing)
+      : { text: range?.toString().trim() ?? '', url: '' };
+
+    isLinkOpen.value = true;
+  }
+
+  /**
+   * Открывает поиск записи; ссылка под кареткой будет заменена.
+   */
+  function openSection(): void {
+    if (isToolbarDisabled.value || !editor.value) {
+      return;
+    }
+
+    const range = getEditorRange() ?? lastRange.value;
+    const existing = findLinkElement(range?.startContainer, editor.value);
+
+    editingLink.value = existing;
+    insertRange.value = existing ? undefined : range;
+
+    sectionText.value = existing
+      ? linkFromElement(existing).text
+      : (range?.toString().trim() ?? '');
+
+    isSectionOpen.value = true;
+  }
+
+  function applyLink(link: HtmlEditorLink): void {
+    const element = createLinkElement(link);
+
+    if (editingLink.value?.isConnected) {
+      editingLink.value.replaceWith(element);
+    } else {
+      insertElement(element);
+    }
+
+    isLinkOpen.value = false;
+    isSectionOpen.value = false;
+    emitFromEditor();
+  }
+
+  /** Снимает ссылку, текст остаётся. */
+  function removeLink(): void {
+    const element = editingLink.value;
+
+    element?.replaceWith(document.createTextNode(element.textContent));
+
+    isLinkOpen.value = false;
+    emitFromEditor();
   }
 
   function openDice(isExtended: boolean, token?: HTMLElement): void {
@@ -376,112 +791,67 @@
       class="flex flex-wrap items-center justify-between gap-2 border-b border-default bg-elevated/50 p-1"
     >
       <div class="flex flex-wrap items-center gap-0.5">
-        <UTooltip
-          v-for="item in HTML_EDITOR_INLINE_COMMANDS"
-          :key="item.command"
-          :text="item.title"
+        <template
+          v-for="(group, index) in toolbarGroups"
+          :key="index"
         >
-          <UButton
-            :icon="item.icon"
-            :aria-label="item.title"
-            :disabled="isToolbarDisabled"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @mousedown.prevent
-            @click.left.exact.prevent="applyCommand(item)"
+          <USeparator
+            v-if="index"
+            orientation="vertical"
+            class="mx-1 h-5"
           />
-        </UTooltip>
 
-        <USeparator
-          orientation="vertical"
-          class="mx-1 h-5"
-        />
-
-        <UDropdownMenu
-          :items="blockItems"
-          :disabled="isToolbarDisabled"
-        >
-          <UButton
-            :icon="HTML_EDITOR_ICON.heading"
-            :aria-label="HTML_EDITOR_TEXT.heading"
+          <UDropdownMenu
+            v-if="index === 1"
+            :items="blockItems"
             :disabled="isToolbarDisabled"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @mousedown.prevent
-          />
-        </UDropdownMenu>
+          >
+            <UButton
+              :icon="HTML_EDITOR_ICON.heading"
+              :aria-label="HTML_EDITOR_TEXT.heading"
+              :disabled="isToolbarDisabled"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              @mousedown.prevent
+            />
+          </UDropdownMenu>
 
-        <UTooltip
-          v-for="item in HTML_EDITOR_LIST_COMMANDS"
-          :key="item.command"
-          :text="item.title"
-        >
-          <UButton
-            :icon="item.icon"
-            :aria-label="item.title"
+          <UTooltip
+            v-for="item in group"
+            :key="item.key"
+            :text="item.title"
+          >
+            <UButton
+              :icon="item.icon"
+              :aria-label="item.title"
+              :aria-pressed="item.isActive"
+              :disabled="isToolbarDisabled"
+              :variant="item.isActive ? 'soft' : 'ghost'"
+              :class="item.class"
+              color="neutral"
+              size="sm"
+              @mousedown.prevent
+              @click.left.exact.prevent="item.onClick"
+            />
+          </UTooltip>
+
+          <UDropdownMenu
+            v-if="index === 2"
+            :items="tableItems"
             :disabled="isToolbarDisabled"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @mousedown.prevent
-            @click.left.exact.prevent="applyCommand(item)"
-          />
-        </UTooltip>
-
-        <USeparator
-          orientation="vertical"
-          class="mx-1 h-5"
-        />
-
-        <UTooltip
-          v-for="item in HTML_EDITOR_ALIGN_COMMANDS"
-          :key="item.command"
-          :text="item.title"
-        >
-          <UButton
-            :icon="item.icon"
-            :aria-label="item.title"
-            :disabled="isToolbarDisabled"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @mousedown.prevent
-            @click.left.exact.prevent="applyCommand(item)"
-          />
-        </UTooltip>
-
-        <USeparator
-          orientation="vertical"
-          class="mx-1 h-5"
-        />
-
-        <UTooltip :text="HTML_EDITOR_TEXT.dice">
-          <UButton
-            :icon="HTML_EDITOR_ICON.dice"
-            :aria-label="HTML_EDITOR_TEXT.dice"
-            :disabled="isToolbarDisabled"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @mousedown.prevent
-            @click.left.exact.prevent="openDice(false)"
-          />
-        </UTooltip>
-
-        <UTooltip :text="HTML_EDITOR_TEXT.roll">
-          <UButton
-            :icon="HTML_EDITOR_ICON.roll"
-            :aria-label="HTML_EDITOR_TEXT.roll"
-            :disabled="isToolbarDisabled"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @mousedown.prevent
-            @click.left.exact.prevent="openDice(true)"
-          />
-        </UTooltip>
+          >
+            <UButton
+              :icon="HTML_EDITOR_ICON.table"
+              :aria-label="HTML_EDITOR_TEXT.table"
+              :disabled="isToolbarDisabled"
+              :variant="activeCell ? 'soft' : 'ghost'"
+              color="neutral"
+              size="sm"
+              @mousedown.prevent
+            />
+          </UDropdownMenu>
+        </template>
       </div>
 
       <div class="flex items-center gap-0.5">
@@ -533,6 +903,20 @@
       spellcheck="false"
       @change="handleSourceChange"
       @input="handleSourceInput"
+    />
+
+    <HtmlEditorLinkModal
+      v-model:open="isLinkOpen"
+      :link="linkValue"
+      :is-editing="!!editingLink"
+      @apply="applyLink"
+      @remove="removeLink"
+    />
+
+    <HtmlEditorSectionModal
+      v-model:open="isSectionOpen"
+      :text="sectionText"
+      @apply="applyLink"
     />
 
     <HtmlEditorDiceModal

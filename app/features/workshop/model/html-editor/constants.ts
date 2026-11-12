@@ -1,4 +1,12 @@
-import type { DiceVariant, HtmlEditorCommand, HtmlEditorMode } from './types';
+import type { DetailType } from '~content/model';
+
+import type {
+  DiceVariant,
+  HtmlEditorCommand,
+  HtmlEditorMode,
+  HtmlEditorWrapTag,
+  HtmlTableAction,
+} from './types';
 
 /** Тег, которым бросок хранится в описании. */
 export const DICE_TAG = 'dice-roller';
@@ -35,6 +43,8 @@ export const DICE_FORMULA = /\d*\s*[кkdд]\s*\d+(?:\s*[+-]\s*\d+)?/i;
 export const INLINE_TAG_REPLACEMENTS: ReadonlyArray<[string, string]> = [
   ['b', 'strong'],
   ['i', 'em'],
+  // Зачёркивание `execCommand` пишет устаревшим `strike`, а сайт его не выводит
+  ['strike', 's'],
 ];
 
 /** Атрибуты, с которыми `div` всё ещё считается обычным абзацем. */
@@ -267,11 +277,113 @@ export const HTML_EDITOR_BLOCKS: ReadonlyArray<{ label: string; tag: string }> =
     { label: 'Заголовок 5', tag: 'h5' },
   ];
 
-/** Жирный и курсив. */
+/** Оформление текста: тот же набор и порядок, что на новом сайте. */
 export const HTML_EDITOR_INLINE_COMMANDS: ReadonlyArray<HtmlEditorCommand> = [
   { command: 'bold', icon: 'tabler:bold', title: 'Жирный (Ctrl+B)' },
   { command: 'italic', icon: 'tabler:italic', title: 'Курсив (Ctrl+I)' },
+  {
+    command: 'underline',
+    icon: 'tabler:underline',
+    title: 'Подчёркнутый (Ctrl+U)',
+  },
+  {
+    command: 'strikeThrough',
+    icon: 'tabler:strikethrough',
+    title: 'Зачёркнутый',
+  },
+  {
+    command: 'superscript',
+    icon: 'tabler:superscript',
+    title: 'Верхний индекс',
+  },
+  { command: 'subscript', icon: 'tabler:subscript', title: 'Нижний индекс' },
 ];
+
+/** Выделение маркером: `execCommand` такого тега не знает. */
+export const HTML_EDITOR_HIGHLIGHT: HtmlEditorWrapTag = {
+  tag: 'mark',
+  icon: 'tabler:highlight',
+  title: 'Выделение',
+  placeholder: 'текст',
+};
+
+/** Клавиша: `<kbd>Ctrl</kbd>`. */
+export const HTML_EDITOR_KBD: HtmlEditorWrapTag = {
+  tag: 'kbd',
+  icon: 'tabler:keyboard',
+  title: 'Клавиша',
+  placeholder: 'Ctrl',
+};
+
+/** Пункты меню таблицы; вне таблицы доступна только вставка. */
+export const HTML_EDITOR_TABLE_ACTIONS: ReadonlyArray<{
+  action: HtmlTableAction;
+  label: string;
+  icon: string;
+}> = [
+  { action: 'caption', label: 'Подпись таблицы', icon: 'tabler:text-caption' },
+  { action: 'row-before', label: 'Строку выше', icon: 'tabler:row-insert-top' },
+  {
+    action: 'row-after',
+    label: 'Строку ниже',
+    icon: 'tabler:row-insert-bottom',
+  },
+  { action: 'row-delete', label: 'Удалить строку', icon: 'tabler:row-remove' },
+  {
+    action: 'column-before',
+    label: 'Столбец слева',
+    icon: 'tabler:column-insert-left',
+  },
+  {
+    action: 'column-after',
+    label: 'Столбец справа',
+    icon: 'tabler:column-insert-right',
+  },
+  {
+    action: 'column-delete',
+    label: 'Удалить столбец',
+    icon: 'tabler:column-remove',
+  },
+  {
+    action: 'header-toggle',
+    label: 'Строка-заголовок',
+    icon: 'tabler:heading',
+  },
+  { action: 'table-delete', label: 'Удалить таблицу', icon: 'tabler:trash' },
+];
+
+/** Размер новой таблицы: строка-заголовок и строки тела. */
+export const HTML_EDITOR_TABLE_SIZE = { rows: 2, columns: 3 } as const;
+
+/** Подпись новой таблицы. */
+export const HTML_EDITOR_TABLE_CAPTION = 'Подпись';
+
+/**
+ * Начало адреса записи → тип `detail-tooltip`: по нему ссылка открывает
+ * карточку дровером. `/items/magic/` проверяется раньше `/items/`.
+ */
+export const DETAIL_TYPE_BY_PATH: ReadonlyArray<[string, DetailType]> = [
+  ['/spells/', 'spell'],
+  ['/bestiary/', 'creature'],
+  ['/feats/', 'feat'],
+  ['/traits/', 'trait'],
+  ['/options/', 'option'],
+  ['/armors/', 'armor'],
+  ['/weapons/', 'weapon'],
+  ['/items/magic/', 'magic-item'],
+  ['/items/', 'item'],
+  ['/screens/', 'screen'],
+  ['/gods/', 'god'],
+];
+
+/** Схема, которую получает адрес без неё: `ttg.club` → `https://ttg.club`. */
+export const DEFAULT_URL_SCHEME = 'https://';
+
+/** Сколько результатов поиска показывать в окне ссылки на раздел. */
+export const SECTION_SEARCH_SIZE = 8;
+
+/** Задержка поиска в окне ссылки на раздел. */
+export const SECTION_SEARCH_DEBOUNCE_MS = 300;
 
 /** Списки. */
 export const HTML_EDITOR_LIST_COMMANDS: ReadonlyArray<HtmlEditorCommand> = [
@@ -313,6 +425,28 @@ export const HTML_EDITOR_ALIGN_COMMANDS: ReadonlyArray<HtmlEditorCommand> = [
 export const HTML_EDITOR_TEXT = {
   placeholder: 'Описание в формате HTML',
   heading: 'Заголовок (H1–H5)',
+  quote: 'Цитата',
+  separator: 'Разделитель',
+  table: 'Таблица',
+  insertTable: 'Вставить таблицу',
+  lineBreak: 'Перенос строки',
+  link: 'Ссылка',
+  linkTitle: 'Ссылка',
+  linkEditTitle: 'Редактирование ссылки',
+  linkUrl: 'Адрес',
+  linkUrlPlaceholder: 'https://… или /spells/…',
+  linkText: 'Текст',
+  linkTextPlaceholder: 'Совпадает с адресом',
+  section: 'Ссылка на раздел — заклинание, существо, предмет…',
+  sectionTitle: 'Ссылка на раздел',
+  sectionSearch: 'Поиск',
+  sectionSearchPlaceholder: 'Название записи',
+  sectionStart: 'Введите название, чтобы найти запись',
+  sectionLoading: 'Ищем…',
+  sectionEmpty: 'Ничего не нашлось',
+  sectionError: 'Не удалось выполнить поиск, попробуйте ещё раз',
+  sectionText: 'Текст ссылки',
+  sectionTextPlaceholder: 'Название записи',
   dice: 'Дайс — кликабельная формула, например 2к6',
   roll: 'Бросок — формула с подписью, преимуществом или спасброском',
   problemsTitle: 'Ошибка в разметке — сервер не примет этот текст',
@@ -346,6 +480,13 @@ export const HTML_EDITOR_TEXT = {
 /** Иконки HTML-редактора. */
 export const HTML_EDITOR_ICON = {
   heading: 'tabler:heading',
+  quote: 'tabler:quote',
+  separator: 'tabler:separator-horizontal',
+  table: 'tabler:table',
+  insertTable: 'tabler:table-plus',
+  lineBreak: 'tabler:corner-down-left',
+  link: 'tabler:link',
+  section: 'tabler:external-link',
   dice: 'tabler:dice-5',
   roll: 'tabler:dice-6-filled',
   problems: 'tabler:alert-triangle',
