@@ -55,5 +55,5 @@ export const ERROR_MESSAGE_UNKNOWN: ErrorMessage = {
  */
 export const DM_SCREEN_PAGE_PATH = '/dm-screen';
 
-/** Справочник Мастера: за ним в меню встаёт пункт ширмы. */
+/** Справочник: за ним в меню встаёт пункт ширмы. */
 export const SCREENS_REFERENCE_PAGE_PATH = '/screens';

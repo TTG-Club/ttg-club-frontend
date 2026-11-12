@@ -28,6 +28,7 @@
     isCustomized = false,
     groupingOptions = undefined,
     isInline = false,
+    isFilterSearchDisabled = false,
   } = defineProps<{
     definition?: FilterDefinition | null;
     selection: FilterSelection;
@@ -36,6 +37,8 @@
     groupingOptions?: Array<SectionGroupingOption>;
     /** Колонка фильтров: фильтр по содержимому — группами под поиском. */
     isInline?: boolean;
+    /** Без поиска по фильтру по содержимому. */
+    isFilterSearchDisabled?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -243,6 +246,7 @@
       :groups="otherGroups"
       :selection="selection"
       :is-customized="isOtherCustomized"
+      :is-search-disabled="isFilterSearchDisabled"
       @update:selection="updateSelection"
       @reset="resetOther"
     />
@@ -254,6 +258,7 @@
       :definition="definition"
       :selection="selection"
       :is-customized="isDrawerPartCustomized"
+      :is-search-disabled="isFilterSearchDisabled"
       @update:selection="emit('update:selection', $event)"
       @reset="emit('reset', drawerPart)"
     />
