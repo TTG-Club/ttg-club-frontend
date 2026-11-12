@@ -22,7 +22,7 @@
     <!-- Плита разделов и лента — разные по смыслу полосы, им нужен воздух
       шире, чем зазор между соседними панелями внутри ленты -->
     <div
-      class="mx-auto flex w-full max-w-(--max-content) flex-col gap-6 px-4 pt-6 pb-8 lg:gap-8 lg:pt-8 xl:px-6 2xl:max-w-(--max-content-wide)"
+      class="mx-auto flex w-full max-w-(--max-content) flex-col gap-6 px-4 pt-6 pb-8 lg:gap-8 lg:pt-8 2xl:max-w-(--max-content-wide)"
     >
       <HomeSections />
 

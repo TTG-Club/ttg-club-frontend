@@ -30,12 +30,14 @@
   /**
    * Рейтинг охотников за багами — тот же, что на new.ttg.club: десятка за
    * текущий месяц и за всё время. Грузится на клиенте: блок ниже первого
-   * экрана и не должен держать ответ главной.
+   * экрана и не должен держать ответ главной. Ту же статистику по тому же
+   * ключу читает счётчик багов в шапке: `dedupe: 'defer'` — чтобы второй
+   * читатель дождался общего запроса, а не отменил его.
    */
   const { data: bugStats, status } = useAsyncData(
     HOME_BUG_HUNTERS_DATA_KEY,
     async () => bugStatsSchema.parse(await api(BUG_STATS_PATH)),
-    { lazy: true, server: false },
+    { lazy: true, server: false, dedupe: 'defer' },
   );
 
   const selectedPeriod = ref<HomeBugHuntersPeriod>(

@@ -44,7 +44,9 @@ export default defineCachedEventHandler(
   },
   {
     name: 'bug-stats',
-    getKey: () => 'bug-stats',
+    // Ключ меняется вместе с составом ответа: иначе после выкладки сервер
+    // отдавал бы сохранённый ответ старого состава, пока тот не устареет
+    getKey: () => 'fixed-count-and-top',
     maxAge: BUG_STATS_CACHE_MAX_AGE,
     swr: true,
   },

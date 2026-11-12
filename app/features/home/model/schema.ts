@@ -80,6 +80,16 @@ function parseList<T>(input: unknown, schema: z.ZodType<T>): Array<T> {
 }
 
 /**
+ * Проверяет число материалов сайта: бэкенд отдаёт его одним числом.
+ *
+ * @param input - ответ `GET /api/v1/statistics/count-all`
+ * @returns неотрицательное целое число материалов
+ */
+export function parseHomeMaterialsCount(input: unknown): number {
+  return z.number().int().nonnegative().parse(input);
+}
+
+/**
  * Проверяет список друзей для блока «Наши друзья».
  *
  * @param input - ответ `GET /api/v1/partners`

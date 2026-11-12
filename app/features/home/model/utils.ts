@@ -12,6 +12,7 @@ import {
 } from '~infrastructure/sidebar/menu/model';
 
 import {
+  HOME_COUNTERS_NUMBER_LOCALE,
   HOME_LATEST_GAME_DATE_FORMAT,
   HOME_LATEST_GAME_DATE_LOCALE,
   HOME_LATEST_GAME_DURATION_LABELS,
@@ -167,6 +168,16 @@ export function getHomeTools(
     );
 
   return sortBy(tools, ['order']).map(toToolLink);
+}
+
+/**
+ * Число для счётчика шапки с разделителями разрядов: `3389` → «3 389».
+ *
+ * @param value - число
+ * @returns число строкой по правилам русской локали
+ */
+export function formatHomeCount(value: number): string {
+  return value.toLocaleString(HOME_COUNTERS_NUMBER_LOCALE);
 }
 
 /**

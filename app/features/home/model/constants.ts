@@ -16,6 +16,24 @@ export const HOME_RESERVED_ICON = 'tabler:lock';
 /** Сколько строк ленты нарисовано в очертаниях запасного места */
 export const HOME_RESERVED_ROW_COUNT = 3;
 
+/* --- Счётчики шапки ----------------------------------------------------- */
+
+/** Число материалов этого сайта: одно число в ответе бэкенда */
+export const HOME_COUNTERS_MATERIALS_PATH = '/api/v1/statistics/count-all';
+
+export const HOME_COUNTERS_MATERIALS_DATA_KEY = 'home-materials-count';
+
+export const HOME_COUNTERS_MATERIALS_LABEL = 'Материалов';
+
+export const HOME_COUNTERS_MATERIALS_ICON = 'tabler:books';
+
+export const HOME_COUNTERS_FIXED_LABEL = 'Багов исправлено';
+
+export const HOME_COUNTERS_FIXED_ICON = 'tabler:bug';
+
+/** Разряды числа в счётчике разделяются по-русски: «3 389» */
+export const HOME_COUNTERS_NUMBER_LOCALE = 'ru-RU';
+
 /* --- Инструменты -------------------------------------------------------- */
 
 /**

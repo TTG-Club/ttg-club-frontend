@@ -231,7 +231,10 @@ default group and adds it to any custom group from its menu.
 
 ## 🏠 Home
 
-The home page repeats the legacy one block for block. Section tiles and the
+The home page repeats the legacy one block for block. Above the hero title is
+a row of counters, as on new.ttg.club: materials of this site (backend
+`/api/v1/statistics/count-all`, a bare number) and fixed bugs (`fixedCount`
+from `/api/v1/bug-stats`); a counter whose number did not arrive is not shown. Section tiles and the
 tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
 render on SSR; friends (`/api/v1/partners`) too — they run as a one-line
 marquee, shuffled in the browser on every visit: an endless loop that only
