@@ -15,8 +15,13 @@
   defineSlots<{
     /** Заголовок ширмы; без него — «Ширма Мастера». */
     heading?: () => unknown;
-    /** Кнопки в конце шапки, например «Войти». */
+    /** Кнопки в конце шапки. */
     actions?: () => unknown;
+    /**
+     * Подсказка по центру пустой ширмы под её описанием, например
+     * приглашение войти у гостя.
+     */
+    emptyNote?: () => unknown;
   }>();
 
   const { windows, isWindowed, addNote, arrange, shrinkAll, minimizeAll } =
@@ -91,13 +96,18 @@
       <slot name="actions" />
     </header>
 
-    <UEmpty
+    <div
       v-if="isEmpty"
-      :icon="DM_SCREEN_ICON.screen"
-      :title="DM_SCREEN_TEXT.emptyTitle"
-      :description="DM_SCREEN_TEXT.emptyDescription"
-      class="m-auto max-w-lg"
-    />
+      class="m-auto flex max-w-lg flex-col items-center gap-4"
+    >
+      <UEmpty
+        :icon="DM_SCREEN_ICON.screen"
+        :title="DM_SCREEN_TEXT.emptyTitle"
+        :description="DM_SCREEN_TEXT.emptyDescription"
+      />
+
+      <slot name="emptyNote" />
+    </div>
 
     <DmScreenList v-else-if="!isWindowed" />
   </div>
