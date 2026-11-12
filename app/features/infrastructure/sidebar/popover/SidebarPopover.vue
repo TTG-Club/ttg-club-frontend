@@ -53,10 +53,15 @@
       />
     </div>
 
+    <!--
+      Затемнение без размытия: размытие во весь экран видеокарта пересчитывает
+      на каждом кадре, пока меню открывается и пока в нём что-то движется, —
+      на встроенной графике с экраном высокого разрешения меню от этого дёргалось.
+    -->
     <Transition name="fade">
       <div
         v-if="isOpened"
-        class="fixed inset-0 z-180 cursor-pointer bg-overlay backdrop-blur-xs"
+        class="fixed inset-0 z-180 cursor-pointer bg-overlay"
         @click.left.exact.self.prevent.stop="close"
       />
     </Transition>
@@ -117,6 +122,9 @@
 
   .sidebar-popover-enter-active,
   .sidebar-popover-leave-active {
+    /* Размытие под панелью включается после анимации: пока панель меняет
+       размер, оно пересчитывалось бы на каждом кадре. */
+    backdrop-filter: none;
     transition:
       transform 0.25s cubic-bezier(0.215, 0.61, 0.355, 1),
       opacity 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
