@@ -1,4 +1,4 @@
-import type { DmScreenRequest, DmScreenWindow } from '../model';
+import type { DmScreenPoint, DmScreenRequest, DmScreenWindow } from '../model';
 
 import { sortBy } from 'es-toolkit';
 
@@ -8,6 +8,7 @@ import { getApiErrorMessage } from '~user/model';
 import {
   appendDmScreenWindow,
   arrangeDmScreenWindows,
+  createDmScreenNotePath,
   DM_SCREEN_SAVE_DELAY,
   DM_SCREEN_STORAGE_KEY,
   DM_SCREEN_TEXT,
@@ -204,6 +205,20 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
+   * Кладёт на ширму пустую заметку окном рядом с местом клика.
+   * @param origin - точка клика
+   */
+  function addNote(origin?: DmScreenPoint): void {
+    const id = crypto.randomUUID();
+
+    add({
+      path: createDmScreenNotePath(id),
+      title: DM_SCREEN_TEXT.noteTitle,
+      origin,
+    });
+  }
+
+  /**
    * Открывает в окне другую запись: вкладку класса, подрасу и т. п.
    * @param id - окно
    * @param path - адрес записи
@@ -313,6 +328,7 @@ export const useDmScreen = createSharedComposable(() => {
     visibleWindows,
     minimizedWindows,
     add,
+    addNote,
     arrange,
     navigate,
     close,

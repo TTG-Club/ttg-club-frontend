@@ -16,6 +16,8 @@ export const dmScreenWindowSchema = z.object({
   /** Чем больше, тем выше окно среди остальных. */
   layer: z.number().int(),
   isMinimized: z.boolean(),
+  /** HTML заметки мастера; есть только у окон-заметок. */
+  content: z.string().nullish(),
 });
 
 export type DmScreenWindow = z.infer<typeof dmScreenWindowSchema>;

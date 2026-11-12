@@ -91,6 +91,21 @@ export const DM_SCREEN_DATE_LOCALE = 'ru-RU';
 /** Пауза перед сохранением ширмы на сервер после изменения окон, мс. */
 export const DM_SCREEN_SAVE_DELAY = 800;
 
+/**
+ * Начало пути окна-заметки: у заметки нет страницы на сайте, путь только
+ * отличает её от записей.
+ */
+export const DM_SCREEN_NOTE_PATH_PREFIX = 'note:';
+
+/** Сколько символов разметки помещается в заметку. */
+export const DM_SCREEN_NOTE_MAX_LENGTH = 20000;
+
+/** Высота редактора заметки в строках. */
+export const DM_SCREEN_NOTE_EDITOR_ROWS = 10;
+
+/** Пауза перед записью текста заметки, пока его набирают, мс. */
+export const DM_SCREEN_NOTE_SAVE_DELAY = 400;
+
 /** Ключ окон ширмы в localStorage. */
 export const DM_SCREEN_STORAGE_KEY = 'dm-screen:windows';
 
@@ -169,6 +184,14 @@ export const DM_SCREEN_TEXT = {
     'Найдите заклинание, монстра, правило или любую другую запись поиском выше или выберите «В ширму» в меню записи на сайте. Каждая запись встанет отдельным окном: его можно двигать, растягивать и сворачивать.',
   remove: 'Убрать из ширмы',
   arrange: 'Выровнять по сетке',
+  addNote: 'Заметка',
+  noteTitle: 'Заметка',
+  noteTitlePlaceholder: 'Название заметки',
+  noteEdit: 'Править',
+  noteDone: 'Готово',
+  noteEmpty: 'Заметка пуста. Нажмите «Править», чтобы написать её.',
+  noteTooLong:
+    'Заметка слишком длинная: сократите её, иначе она не сохранится.',
   screens: 'Мои ширмы',
   allScreens: 'Все ширмы',
   create: 'Новая ширма',
@@ -222,6 +245,9 @@ export const DM_SCREEN_ICON = {
   add: 'tabler:layout-grid-add',
   search: 'tabler:search',
   arrange: 'tabler:layout-grid',
+  note: 'tabler:note',
+  noteEdit: 'tabler:pencil',
+  noteDone: 'tabler:check',
   create: 'tabler:plus',
   rename: 'tabler:pencil',
   delete: 'tabler:trash',

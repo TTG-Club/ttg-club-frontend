@@ -19,8 +19,16 @@
     actions?: () => unknown;
   }>();
 
-  const { windows, isWindowed, arrange, shrinkAll, minimizeAll } =
+  const { windows, isWindowed, addNote, arrange, shrinkAll, minimizeAll } =
     useDmScreen();
+
+  /**
+   * Кладёт пустую заметку рядом с кнопкой.
+   * @param event - клик по кнопке
+   */
+  function createNote(event: MouseEvent): void {
+    addNote({ x: event.clientX, y: event.clientY });
+  }
 
   const isEmpty = computed(() => !windows.value.length);
 
@@ -44,6 +52,14 @@
       </slot>
 
       <DmScreenSearch />
+
+      <UButton
+        :icon="DM_SCREEN_ICON.note"
+        :label="DM_SCREEN_TEXT.addNote"
+        color="neutral"
+        variant="outline"
+        @click.left.exact.prevent="createNote"
+      />
 
       <UButton
         v-if="isLayoutControlsVisible"

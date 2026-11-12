@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import {
   appendDmScreenWindow,
   arrangeDmScreenWindows,
+  createDmScreenNotePath,
   DM_SCREEN_GRID_GAP,
+  DM_SCREEN_ICON,
   DM_SCREEN_LEFT_INSET,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
@@ -11,6 +13,8 @@ import {
   dmScreenListSchema,
   formatDmScreenDate,
   getDmScreenEntryRoot,
+  getDmScreenWindowIcon,
+  isDmScreenNotePath,
   isDmScreenPath,
   resolveDmScreenSection,
   snapDmScreenWindow,
@@ -193,6 +197,62 @@ describe('ширма мастера', () => {
       );
 
       expect(snapped).toEqual({ x: 1100, y: 600 });
+    });
+  });
+
+  describe('заметки', () => {
+    it('путь заметки не путает с записями сайта', () => {
+      const path = createDmScreenNotePath('n1');
+
+      expect(isDmScreenNotePath(path)).toBe(true);
+      expect(isDmScreenPath(path)).toBe(false);
+      expect(isDmScreenNotePath('/spells/fireball')).toBe(false);
+    });
+
+    it('у заметки своя иконка, у записи — раздела', () => {
+      expect(getDmScreenWindowIcon(createDmScreenNotePath('n1'))).toBe(
+        DM_SCREEN_ICON.note,
+      );
+
+      expect(getDmScreenWindowIcon('/tools/trader')).toBe(
+        DM_SCREEN_ICON.unknown,
+      );
+    });
+
+    it('сервер отдаёт заметку с текстом, запись — без', () => {
+      const screen = dmScreenDetailSchema.parse({
+        id: 's1',
+        name: 'Подземелье',
+        windows: [
+          {
+            id: 'n1',
+            path: 'note:n1',
+            title: 'Логово',
+            x: 0,
+            y: 0,
+            width: 300,
+            height: 200,
+            layer: 1,
+            isMinimized: false,
+            content: '<p>Вожак — <strong>21 хит</strong></p>',
+          },
+          {
+            id: 'w1',
+            path: '/bestiary/goblin',
+            title: 'Гоблин',
+            x: 0,
+            y: 0,
+            width: 300,
+            height: 200,
+            layer: 2,
+            isMinimized: false,
+            content: null,
+          },
+        ],
+      });
+
+      expect(screen.windows[0]?.content).toContain('21 хит');
+      expect(screen.windows[1]?.content).toBeNull();
     });
   });
 });
