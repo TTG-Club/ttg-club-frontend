@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import type { ComponentPublicInstance } from 'vue';
+
   import { NewsHero } from '~news/card';
   import { NewsDrawer } from '~news/drawer';
   import {
@@ -8,7 +10,7 @@
     parseNewsList,
   } from '~news/model';
 
-  import { useHomeNewsReader } from '../composables';
+  import { useHomeNewsReader, useHomeNewsRotation } from '../composables';
   import {
     HOME_COMMUNITY_NEWS_ALL_LABEL,
     HOME_COMMUNITY_NEWS_COUNT,
@@ -18,12 +20,14 @@
     HOME_COMMUNITY_NEWS_LABEL,
   } from '../model';
   import { HomePanel } from '../ui-kit';
+  import { HomeNewsSwitcher } from './ui';
 
   const api = useApi();
 
   /**
-   * Последняя новость сообщества — обложкой, как главная новость сайта,
-   * только в узкой панели. Создают их на новом сайте, здесь они только
+   * Новости сообщества — как новости сайта, только в узкой панели: одна
+   * новость обложкой, свежие сменяют друг друга по таймеру или по
+   * переключателю в подвале. Создают их на новом сайте, здесь они только
    * читаются.
    */
   const { newSiteUrl } = useRuntimeConfig().public;
@@ -52,7 +56,24 @@
     refresh,
   );
 
-  const latestNews = computed(() => newsList.value[0]);
+  const newsCount = computed(() => newsList.value.length);
+
+  const panel = useTemplateRef<ComponentPublicInstance>('panel');
+
+  const {
+    activeIndex,
+    isStopped,
+    isRunning,
+    select,
+    showNext,
+    showPrevious,
+    toggleStopped,
+    setVideoOpen,
+  } = useHomeNewsRotation(newsCount, panel, isDrawerOpen);
+
+  const activeNews = computed(() => newsList.value[activeIndex.value]);
+
+  const hasSwitcher = computed(() => newsCount.value > 1);
 
   const listUrl = getNewsListUrl('community', newSiteUrl);
 </script>
@@ -61,6 +82,7 @@
   <!-- Блок виден всегда: если новостей нет или бэкенд их не отдаёт, стоит
     заглушка — раскладка ленты не прыгает -->
   <HomePanel
+    ref="panel"
     :label="HOME_COMMUNITY_NEWS_LABEL"
     :icon="HOME_COMMUNITY_NEWS_ICON"
     :to="listUrl"
@@ -68,6 +90,23 @@
     flush
     fill
   >
+    <template
+      v-if="hasSwitcher"
+      #aside
+    >
+      <HomeNewsSwitcher
+        :items="newsList"
+        :active-index="activeIndex"
+        :is-stopped="isStopped"
+        :is-running="isRunning"
+        compact
+        @select="select"
+        @next="showNext"
+        @previous="showPrevious"
+        @toggle="toggleStopped"
+      />
+    </template>
+
     <!-- Скелетон тех же пропорций, что обложка: панель не прыгает, когда
       новость приедет -->
     <USkeleton
@@ -76,7 +115,7 @@
     />
 
     <p
-      v-else-if="!latestNews"
+      v-else-if="!activeNews"
       class="m-3 flex flex-auto items-center justify-center rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
     >
       {{ HOME_COMMUNITY_NEWS_EMPTY_TEXT }}
@@ -84,10 +123,13 @@
 
     <NewsHero
       v-else
-      :news="latestNews"
+      :key="activeNews.id"
+      :news="activeNews"
       kind="community"
       compact
-      @open="open(latestNews.url)"
+      class="animate-appear motion-reduce:animate-none"
+      @open="open(activeNews.url)"
+      @video="setVideoOpen"
     />
 
     <NewsDrawer

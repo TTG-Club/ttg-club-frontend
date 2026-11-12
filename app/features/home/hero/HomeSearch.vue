@@ -57,6 +57,7 @@
     <span
       aria-hidden="true"
       :class="$style.glow"
+      class="performance:hidden"
     >
       <span :class="$style.arcs" />
     </span>
@@ -159,14 +160,6 @@
   .search:hover .glow,
   .search:focus-visible .glow {
     filter: brightness(1.35) saturate(1.1);
-  }
-
-  /* Режим «производительность»: света по контуру нет — застывшие дуги
-     выглядели бы обрывками, поэтому у поля ровная рамка основного цвета */
-  :global(html[data-graphics='performance']) {
-    .glow {
-      display: none;
-    }
   }
 
   /* Поворот дорожки вокруг центра поля — то же, что сдвиг начального угла

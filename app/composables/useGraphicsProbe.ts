@@ -1,9 +1,11 @@
-import { mean } from 'es-toolkit';
+import { mean, median } from 'es-toolkit';
 
 import {
+  GRAPHICS_PROBE_BASELINE_FRAMES,
   GRAPHICS_PROBE_SAMPLE_LIMIT,
   GRAPHICS_PROBE_SLOW_FRAME_MS,
   GRAPHICS_PROBE_SLOW_LIMIT,
+  GRAPHICS_PROBE_SLOW_RATIO,
   GRAPHICS_PROBE_STALLED_FRAME_MS,
   GRAPHICS_PROBE_TOAST,
 } from '~/shared/consts';
@@ -11,100 +13,165 @@ import {
 /** Итог одного замера: рывками, плавно или замер не состоялся. */
 type GraphicsProbeVerdict = 'slow' | 'smooth' | 'skipped';
 
+/** Что сейчас считается: кадры анимации или кадры в покое после неё. */
+type GraphicsProbePhase = 'animation' | 'baseline';
+
 export interface UseGraphicsProbeReturn {
   /** Начинает считать кадры: вызывается перед анимацией */
   start: () => void;
-  /** Заканчивает замер и учитывает его: вызывается после анимации */
+  /** Заканчивает счёт кадров анимации: вызывается после неё */
   finish: () => void;
   /** Бросает замер, если анимацию прервали */
   cancel: () => void;
 }
 
 /**
- * Оценивает плавность анимации по длительностям её кадров.
+ * Длительности кадров, пригодные для оценки.
  *
  * @param frameDurations - Длительности кадров в миллисекундах
- * @returns Итог замера
+ * @returns Кадры без точки отсчёта или `undefined`, если замер не состоялся
  */
-function rateFrames(
+function getUsableDurations(
   frameDurations: ReadonlyArray<number>,
-): GraphicsProbeVerdict {
-  // Первый кадр — точка отсчёта, его длительность всегда нулевая
+): Array<number> | undefined {
+  // Первый кадр не в счёт: у анимации это нулевая точка отсчёта, у покоя —
+  // кадр, на котором под панелью включается размытие
   const durations = frameDurations.slice(1);
 
-  if (!durations.length) {
-    return 'skipped';
-  }
+  const isStalled = durations.some(
+    (duration) => duration > GRAPHICS_PROBE_STALLED_FRAME_MS,
+  );
 
-  if (
-    durations.some((duration) => duration > GRAPHICS_PROBE_STALLED_FRAME_MS)
-  ) {
-    return 'skipped';
-  }
-
-  return mean(durations) > GRAPHICS_PROBE_SLOW_FRAME_MS ? 'slow' : 'smooth';
+  return durations.length && !isStalled ? durations : undefined;
 }
 
 /**
- * Замер плавности анимаций: пока режим графики не выбран, считает кадры при
- * открытии всплывающих панелей. Если панели несколько раз открылись рывками,
- * сам включает «производительность» и сообщает об этом. Состояние общее на
- * всё посещение: панелей несколько, а счёт у них один.
+ * Оценивает плавность анимации: её кадры сравниваются с обычными кадрами
+ * этого же устройства в покое.
+ *
+ * @param animationFrames - Длительности кадров анимации в миллисекундах
+ * @param baselineFrames - Длительности кадров в покое в миллисекундах
+ * @returns Итог замера
  */
-export const useGraphicsProbe = createGlobalState(
+function rateFrames(
+  animationFrames: ReadonlyArray<number>,
+  baselineFrames: ReadonlyArray<number>,
+): GraphicsProbeVerdict {
+  const animation = getUsableDurations(animationFrames);
+  const baseline = getUsableDurations(baselineFrames);
+
+  if (!animation || !baseline) {
+    return 'skipped';
+  }
+
+  const slowFrame = Math.max(
+    GRAPHICS_PROBE_SLOW_FRAME_MS,
+    median(baseline) * GRAPHICS_PROBE_SLOW_RATIO,
+  );
+
+  return mean(animation) > slowFrame ? 'slow' : 'smooth';
+}
+
+/**
+ * Счёт замеров на всё посещение: панелей несколько, а счёт у них один. Здесь
+ * только счётчики и подсчёт кадров — ничего от посетителя: такое состояние
+ * на сервере общее для всех запросов.
+ */
+const useGraphicsProbeState = createGlobalState(() => {
+  const phase = ref<GraphicsProbePhase>('animation');
+  const animationFrames = ref<Array<number>>([]);
+  const baselineFrames = ref<Array<number>>([]);
+  const sampleCount = ref(0);
+  const slowCount = ref(0);
+
+  return { phase, animationFrames, baselineFrames, sampleCount, slowCount };
+});
+
+/**
+ * Замер плавности анимаций: пока режим графики не выбран, считает кадры при
+ * открытии всплывающих панелей, а сразу после — несколько кадров в покое.
+ * Если панели несколько раз открылись заметно медленнее, чем устройство
+ * рисует обычно, сам включает «производительность» и сообщает об этом.
+ *
+ * @returns Начало, конец и отмена замера
+ */
+export const useGraphicsProbe = createSharedComposable(
   (): UseGraphicsProbeReturn => {
     const { isChosen, setMode } = useGraphicsMode();
     const toast = useToast();
 
-    let frameDurations: Array<number> = [];
-    let sampleCount = 0;
-    let slowCount = 0;
+    const { phase, animationFrames, baselineFrames, sampleCount, slowCount } =
+      useGraphicsProbeState();
 
     const { isActive, pause, resume } = useRafFn(
       ({ delta }) => {
-        frameDurations.push(delta);
+        if (phase.value === 'animation') {
+          animationFrames.value.push(delta);
+
+          return;
+        }
+
+        baselineFrames.value.push(delta);
+
+        // Точка отсчёта в счёт не идёт
+        if (baselineFrames.value.length > GRAPHICS_PROBE_BASELINE_FRAMES) {
+          settle();
+        }
       },
       { immediate: false },
     );
 
-    function start(): void {
-      if (isChosen.value || sampleCount >= GRAPHICS_PROBE_SAMPLE_LIMIT) {
-        return;
-      }
-
-      frameDurations = [];
-      resume();
-    }
-
-    function cancel(): void {
-      pause();
-    }
-
-    function finish(): void {
-      if (!isActive.value) {
-        return;
-      }
-
+    /**
+     * Подводит итог замера. После нужного числа открытий рывками включает
+     * «производительность» и сообщает об этом.
+     */
+    function settle(): void {
       pause();
 
-      const verdict = rateFrames(frameDurations);
+      const verdict = rateFrames(animationFrames.value, baselineFrames.value);
 
       if (verdict === 'skipped') {
         return;
       }
 
-      sampleCount += 1;
+      sampleCount.value += 1;
 
       if (verdict === 'slow') {
-        slowCount += 1;
+        slowCount.value += 1;
       }
 
-      if (slowCount < GRAPHICS_PROBE_SLOW_LIMIT) {
+      if (slowCount.value < GRAPHICS_PROBE_SLOW_LIMIT) {
         return;
       }
 
       setMode('performance');
       toast.add(GRAPHICS_PROBE_TOAST);
+    }
+
+    /** Начинает считать кадры, если режим ещё не выбран и замеры не исчерпаны. */
+    function start(): void {
+      if (isChosen.value || sampleCount.value >= GRAPHICS_PROBE_SAMPLE_LIMIT) {
+        return;
+      }
+
+      phase.value = 'animation';
+      animationFrames.value = [];
+      baselineFrames.value = [];
+      resume();
+    }
+
+    /** Останавливает счёт кадров без учёта замера. */
+    function cancel(): void {
+      pause();
+    }
+
+    /** Анимация кончилась: дальше считаются кадры в покое. */
+    function finish(): void {
+      if (!isActive.value || phase.value !== 'animation') {
+        return;
+      }
+
+      phase.value = 'baseline';
     }
 
     return { start, finish, cancel };

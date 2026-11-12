@@ -8,6 +8,7 @@
     isParticipantRolled,
     PARTICIPANT_TYPE_META,
     TURN_REEL,
+    TURN_REEL_TOKEN_CLASS,
   } from '../model';
 
   /**
@@ -66,6 +67,18 @@
   }
 
   /**
+   * Классы токена: текущего или обычного.
+   * @param isCurrent - сейчас его ход
+   */
+  function getTokenClass(
+    isCurrent: boolean,
+  ): (typeof TURN_REEL_TOKEN_CLASS)[keyof typeof TURN_REEL_TOKEN_CLASS] {
+    return isCurrent
+      ? TURN_REEL_TOKEN_CLASS.current
+      : TURN_REEL_TOKEN_CLASS.regular;
+  }
+
+  /**
    * Кольцо токена: текущий крупнее и подсвечен, поверженный блёклый. Размер
    * меняется масштабом, а не шириной: так браузер не раскладывает ленту
    * заново на каждом кадре. Кольцо обычного токена толще на величину
@@ -78,20 +91,17 @@
     isCurrent: boolean,
   ): Array<string> {
     return [
-      isCurrent
-        ? 'ring-2 ring-primary shadow-lg'
-        : 'scale-70 ring-3 ring-default',
+      getTokenClass(isCurrent).ring,
       participant.dead ? 'opacity-40 grayscale' : '',
     ];
   }
 
   /**
-   * Значок токена без картинки: у обычного крупнее на величину масштаба,
-   * чтобы на экране оба были одного размера.
+   * Значок токена без картинки.
    * @param isCurrent - сейчас его ход
    */
   function getIconClass(isCurrent: boolean): string {
-    return isCurrent ? 'size-6' : 'size-8.5';
+    return getTokenClass(isCurrent).icon;
   }
 
   /**

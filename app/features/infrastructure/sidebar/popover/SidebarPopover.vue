@@ -94,8 +94,13 @@
       />
     </Transition>
 
-    <!-- По кадрам открытия сайт понимает, тянет ли устройство размытие -->
+    <!--
+      По кадрам открытия сайт понимает, тянет ли устройство размытие. Условие
+      сборки стоит на самой анимации, а не на панели: иначе заранее собранная
+      скрытая панель «открывалась» бы для неё и портила замер.
+    -->
     <Transition
+      v-if="isRendered"
       name="sidebar-popover"
       @before-enter="graphicsProbe.start"
       @enter="resetScroll"
@@ -104,7 +109,6 @@
     >
       <!-- Без размытия полупрозрачная панель нечитаема: под градиент ложится плотный фон -->
       <div
-        v-if="isRendered"
         v-show="isOpened"
         class="flex flex-col overflow-auto overscroll-contain rounded-xl border border-default shadow-2xl backdrop-blur-lg performance:bg-main"
         :class="bodyClasses"
@@ -160,7 +164,10 @@
   .sidebar-popover-enter-active,
   .sidebar-popover-leave-active {
     /* Размытие под панелью включается после анимации: пока панель меняет
-       размер, оно пересчитывалось бы на каждом кадре. */
+       размер, оно пересчитывалось бы на каждом кадре. Запись с приставкой —
+       для Safari до 18-й версии: Tailwind задаёт размытие и ею тоже. */
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-backdrop-filter: none;
     backdrop-filter: none;
     transition:
       transform 0.25s cubic-bezier(0.215, 0.61, 0.355, 1),

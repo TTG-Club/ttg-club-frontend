@@ -16,6 +16,20 @@
   --font-mono:
     'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono',
     'Consolas', 'Liberation Mono', monospace;
+
+  /* Плавное появление содержимого на месте прежнего (`animate-appear`):
+     только прозрачность, вёрстка не пересчитывается */
+  --animate-appear: appear 0.25s ease-out both;
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /*
@@ -125,6 +139,14 @@ html[data-graphics='performance'] *::after {
 @utility lazy-render-tile {
   content-visibility: auto;
   contain-intrinsic-block-size: auto 3.5rem;
+}
+
+/*
+ * Наименьшая высота страницы: весь экран за вычетом нижней панели меню
+ * телефона. С `md` панель стоит сбоку — там ставим `md:min-h-dvh`.
+ */
+@utility min-h-page {
+  min-height: calc(100dvh - var(--navbar-height));
 }
 
 /*
