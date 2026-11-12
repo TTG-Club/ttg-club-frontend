@@ -6,9 +6,19 @@
   import DmScreenWindows from './DmScreenWindows.vue';
 
   /**
-   * Ширма Мастера: пустой холст с поиском сверху. Добавленные записи на
-   * широком экране — окна, на телефоне — список.
+   * Холст ширмы с поиском сверху. Добавленные записи на широком экране —
+   * окна, на телефоне — список. Заголовок и кнопки в шапке задаёт
+   * страница: у гостевой ширмы — приглашение войти, у ширмы из аккаунта —
+   * её имя и путь к списку ширм. Плашек под шапкой нет: их перекрыли бы
+   * окна.
    */
+  defineSlots<{
+    /** Заголовок ширмы; без него — «Ширма Мастера». */
+    heading?: () => unknown;
+    /** Кнопки в конце шапки, например «Войти». */
+    actions?: () => unknown;
+  }>();
+
   const {
     windows,
     visibleWindows,
@@ -32,9 +42,11 @@
     <DmScreenWindows v-if="isWindowed" />
 
     <header class="relative flex flex-wrap items-center gap-x-6 gap-y-3">
-      <h1 class="text-2xl text-highlighted">
-        {{ DM_SCREEN_TITLE }}
-      </h1>
+      <slot name="heading">
+        <h1 class="text-2xl text-highlighted">
+          {{ DM_SCREEN_TITLE }}
+        </h1>
+      </slot>
 
       <DmScreenSearch />
 
@@ -64,6 +76,8 @@
         variant="outline"
         @click.left.exact.prevent="minimizeAll"
       />
+
+      <slot name="actions" />
     </header>
 
     <UEmpty

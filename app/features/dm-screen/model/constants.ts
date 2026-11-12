@@ -66,6 +66,31 @@ export const DM_SCREEN_SECTIONS: ReadonlyArray<DmScreenSection> = [
   ),
 }));
 
+/** Ручки ширм пользователя на сервере. */
+export const DM_SCREENS_API_URL = '/api/v1/dm-screens';
+
+/** Страница подписки: она снимает ограничение на число ширм. */
+export const DM_SCREEN_SUBSCRIPTION_PATH = '/profile/subscription';
+
+/** Имя ширмы: сколько символов можно. */
+export const DM_SCREEN_NAME_MAX_LENGTH = 64;
+
+/** Имя ширмы, которую сайт создаёт сам: при первом «В ширму» и переносе. */
+export const DM_SCREEN_DEFAULT_NAME = 'Моя ширма';
+
+/** Дата изменения ширмы в списке: «12 ноября, 14:05». */
+export const DM_SCREEN_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'long',
+  hour: '2-digit',
+  minute: '2-digit',
+};
+
+export const DM_SCREEN_DATE_LOCALE = 'ru-RU';
+
+/** Пауза перед сохранением ширмы на сервер после изменения окон, мс. */
+export const DM_SCREEN_SAVE_DELAY = 800;
+
 /** Ключ окон ширмы в localStorage. */
 export const DM_SCREEN_STORAGE_KEY = 'dm-screen:windows';
 
@@ -135,6 +160,47 @@ export const DM_SCREEN_TEXT = {
     'Найдите заклинание, монстра, правило или любую другую запись поиском выше или выберите «В ширму» в меню записи на сайте. Каждая запись встанет отдельным окном: его можно двигать, растягивать и сворачивать.',
   remove: 'Убрать из ширмы',
   arrange: 'Выровнять по сетке',
+  screens: 'Мои ширмы',
+  allScreens: 'Все ширмы',
+  create: 'Новая ширма',
+  createTitle: 'Новая ширма',
+  rename: 'Переименовать',
+  renameTitle: 'Имя ширмы',
+  namePlaceholder: 'Например, «Подземелье гоблинов»',
+  save: 'Сохранить',
+  cancel: 'Отмена',
+  delete: 'Удалить',
+  deleteTitle: 'Удалить ширму?',
+  deleteDescription: 'Ширма и все её окна пропадут. Это нельзя отменить.',
+  open: 'Открыть',
+  entries: 'записей',
+  updated: 'Изменена',
+  limit: 'Ширм',
+  limitReached:
+    'Ширм уже столько, сколько можно. С подпиской можно вести до 30 ширм.',
+  subscribe: 'Оформить подписку',
+  listEmptyTitle: 'Ширм пока нет',
+  listEmptyDescription:
+    'Создайте ширму под игру или сцену: в неё можно сложить заклинания, монстров, правила и любые другие записи сайта.',
+  loadFailed: 'Не удалось загрузить ширмы',
+  screenLoadFailed: 'Не удалось открыть ширму',
+  retry: 'Повторить',
+  errorCreate: 'Не удалось создать ширму',
+  errorRename: 'Не удалось переименовать ширму',
+  errorDelete: 'Не удалось удалить ширму',
+  errorSave: 'Не удалось сохранить ширму',
+  errorAdd: 'Не удалось добавить в ширму',
+  guestTitle: 'Ширма в этом браузере',
+  guestDescription:
+    'Войдите, чтобы ширмы сохранялись в аккаунте, открывались на любом устройстве и чтобы их можно было вести несколько.',
+  signIn: 'Войти',
+  guestImportTitle: 'В этом браузере есть ширма без входа',
+  guestImportDescription:
+    'Её можно сохранить в аккаунт отдельной ширмой, иначе она останется только в этом браузере.',
+  guestImport: 'Сохранить в аккаунт',
+  guestDiscard: 'Удалить её',
+  pickTitle: 'В какую ширму?',
+  pickDescription: 'Запись встанет окном в выбранную ширму.',
   minimizeAll: 'Свернуть все',
   shrinkAll: 'Уменьшить все',
   unknownEntry: 'Эту запись нельзя показать в ширме',
@@ -147,6 +213,13 @@ export const DM_SCREEN_ICON = {
   add: 'tabler:layout-grid-add',
   search: 'tabler:search',
   arrange: 'tabler:layout-grid',
+  create: 'tabler:plus',
+  rename: 'tabler:pencil',
+  delete: 'tabler:trash',
+  back: 'tabler:arrow-left',
+  subscribe: 'tabler:crown',
+  signIn: 'tabler:login',
+  import: 'tabler:cloud-upload',
   minimizeAll: 'tabler:layout-bottombar-collapse',
   shrinkAll: 'tabler:arrows-minimize',
   unknown: 'tabler:file-unknown',

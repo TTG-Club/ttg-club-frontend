@@ -21,3 +21,32 @@ export const dmScreenWindowSchema = z.object({
 export type DmScreenWindow = z.infer<typeof dmScreenWindowSchema>;
 
 export const dmScreenWindowListSchema = z.array(dmScreenWindowSchema);
+
+/** Ширма в списке пользователя. */
+export const dmScreenSummarySchema = z.object({
+  id: z.coerce.string().min(1),
+  name: z.string(),
+  windowCount: z.number().int().nonnegative(),
+  updatedAt: z.string().nullish(),
+});
+
+export type DmScreenSummary = z.infer<typeof dmScreenSummarySchema>;
+
+/** Ответ списка ширм: сами ширмы, сколько создано и сколько можно. */
+export const dmScreenListSchema = z.object({
+  items: z.array(dmScreenSummarySchema),
+  used: z.number().int().nonnegative(),
+  limit: z.number().int().nonnegative(),
+});
+
+export type DmScreenList = z.infer<typeof dmScreenListSchema>;
+
+/** Ширма целиком: имя и окна. */
+export const dmScreenDetailSchema = z.object({
+  id: z.coerce.string().min(1),
+  name: z.string(),
+  windows: dmScreenWindowListSchema,
+  updatedAt: z.string().nullish(),
+});
+
+export type DmScreenDetail = z.infer<typeof dmScreenDetailSchema>;

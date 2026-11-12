@@ -48,7 +48,7 @@
   /** Кладёт запись из дровера в ширму окном. */
   function addEntryToScreen(): void {
     if (path) {
-      addToScreen({ path, title });
+      void addToScreen({ path, title });
     }
   }
 

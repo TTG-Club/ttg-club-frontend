@@ -134,7 +134,7 @@
         label: DM_SCREEN_TEXT.add,
         icon: DM_SCREEN_ICON.add,
         onSelect: () =>
-          addToScreen({ path: entryPath.value, title: entryName }),
+          void addToScreen({ path: entryPath.value, title: entryName }),
       },
     ];
   });
