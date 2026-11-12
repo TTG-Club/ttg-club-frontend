@@ -90,6 +90,22 @@ body {
 }
 
 /*
+ * Режим «производительность» (настройки отображения): размытие фона под
+ * элементом видеокарта пересчитывает на каждом кадре, пока рядом что-то
+ * движется, — на слабой графике от этого дёргаются меню и прокрутка.
+ * Отключается разом у всего сайта, в том числе у компонентов Nuxt UI.
+ */
+html[data-graphics='performance'] *,
+html[data-graphics='performance'] *::before,
+html[data-graphics='performance'] *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Вариант для замены полупрозрачного фона плотным, когда размытия нет. */
+@custom-variant performance (html[data-graphics='performance'] &);
+
+/*
  * Прокрутка без видимой полосы, как на new.ttg.club: колесо, тачпад и
  * свайп работают, а полоса не съедает место и не мигает.
  */
