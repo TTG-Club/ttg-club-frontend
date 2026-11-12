@@ -1,4 +1,4 @@
-import type { DmScreenSection } from './types';
+import type { DmScreenResizeEdge, DmScreenSection } from './types';
 
 import { DM_SCREEN_PAGE_PATH } from '~/shared/consts';
 import { BESTIARY_SECTION } from '~bestiary/model';
@@ -163,8 +163,24 @@ export const DM_SCREEN_CASCADE_STEP = 32;
 /** Сколько окон лесенкой, прежде чем она начнётся заново. */
 export const DM_SCREEN_CASCADE_LENGTH = 8;
 
-/** Пауза перед сохранением размера при растягивании окна, мс. */
-export const DM_SCREEN_RESIZE_SAVE_DELAY = 300;
+/**
+ * Невидимые полосы по краям окна, за которые его растягивают: у каждой
+ * стороны и угла — место и курсор. Углы шире, чтобы в них было легко
+ * попасть, и лежат поверх сторон.
+ */
+export const DM_SCREEN_RESIZE_EDGES: ReadonlyArray<{
+  edge: DmScreenResizeEdge;
+  class: string;
+}> = [
+  { edge: 'n', class: 'inset-x-4 top-0 h-2 cursor-n-resize' },
+  { edge: 's', class: 'inset-x-4 bottom-0 h-2 cursor-s-resize' },
+  { edge: 'e', class: 'inset-y-4 right-0 w-2 cursor-e-resize' },
+  { edge: 'w', class: 'inset-y-4 left-0 w-2 cursor-w-resize' },
+  { edge: 'nw', class: 'top-0 left-0 z-10 size-4 cursor-nw-resize' },
+  { edge: 'ne', class: 'top-0 right-0 z-10 size-4 cursor-ne-resize' },
+  { edge: 'sw', class: 'bottom-0 left-0 z-10 size-4 cursor-sw-resize' },
+  { edge: 'se', class: 'right-0 bottom-0 z-10 size-4 cursor-se-resize' },
+];
 
 /** Сколько результатов поиска показывать на ширме. */
 export const DM_SCREEN_SEARCH_SIZE = 10;

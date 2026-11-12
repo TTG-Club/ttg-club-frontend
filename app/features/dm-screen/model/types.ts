@@ -13,6 +13,13 @@ export interface DmScreenSize {
 /** Прямоугольник окна на экране, px. */
 export interface DmScreenRect extends DmScreenPoint, DmScreenSize {}
 
+/**
+ * Сторона или угол окна, за которые его растягивают: стороны света, как у
+ * курсоров `n-resize`, `se-resize` и т. п.
+ */
+export type DmScreenResizeEdge =
+  'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
 /** Место и размер окна, разложенного по сетке. */
 export interface DmScreenTile extends DmScreenPoint, DmScreenSize {
   id: string;

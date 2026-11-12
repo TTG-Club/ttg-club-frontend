@@ -9,6 +9,7 @@ import {
   DM_SCREEN_LEFT_INSET,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
+  DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenDetailSchema,
   dmScreenListSchema,
   formatDmScreenDate,
@@ -16,6 +17,7 @@ import {
   getDmScreenWindowIcon,
   isDmScreenNotePath,
   isDmScreenPath,
+  resizeDmScreenWindow,
   resolveDmScreenSection,
   snapDmScreenWindow,
 } from '~dm-screen/model';
@@ -253,6 +255,42 @@ describe('ширма мастера', () => {
 
       expect(screen.windows[0]?.content).toContain('21 хит');
       expect(screen.windows[1]?.content).toBeNull();
+    });
+  });
+
+  describe('растягивание за край', () => {
+    const start = { x: 200, y: 150, width: 400, height: 300 };
+
+    it('правый нижний угол тянет ширину и высоту, место не меняется', () => {
+      expect(resizeDmScreenWindow(start, 'se', { x: 50, y: 30 })).toEqual({
+        x: 200,
+        y: 150,
+        width: 450,
+        height: 330,
+      });
+    });
+
+    it('левый верхний угол двигает место, правый и нижний края стоят', () => {
+      expect(resizeDmScreenWindow(start, 'nw', { x: -40, y: 20 })).toEqual({
+        x: 160,
+        y: 170,
+        width: 440,
+        height: 280,
+      });
+    });
+
+    it('сторона тянет только свою ось', () => {
+      expect(resizeDmScreenWindow(start, 'e', { x: 25, y: 99 })).toEqual({
+        ...start,
+        width: 425,
+      });
+    });
+
+    it('меньше минимального не сжимает, край упирается', () => {
+      const shrunk = resizeDmScreenWindow(start, 'w', { x: 1000, y: 0 });
+
+      expect(shrunk.width).toBe(DM_SCREEN_WINDOW_MIN_SIZE.width);
+      expect(shrunk.x + shrunk.width).toBe(start.x + start.width);
     });
   });
 });

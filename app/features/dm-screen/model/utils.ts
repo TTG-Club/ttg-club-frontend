@@ -3,6 +3,7 @@ import type {
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
+  DmScreenResizeEdge,
   DmScreenSection,
   DmScreenSize,
   DmScreenTile,
@@ -470,4 +471,49 @@ export function getDmScreenWindowIcon(path: string): string {
   }
 
   return resolveDmScreenSection(path)?.icon ?? DM_SCREEN_ICON.unknown;
+}
+
+/**
+ * Окно после растягивания за сторону или угол: тянутся только задетые
+ * стороны, противоположные стоят на месте. Меньше минимального окно не
+ * становится — тогда край, за который тянут, упирается.
+ * @param start - окно в начале растягивания
+ * @param edge - сторона или угол
+ * @param delta - насколько сдвинулся указатель с начала
+ */
+export function resizeDmScreenWindow(
+  start: DmScreenRect,
+  edge: DmScreenResizeEdge,
+  delta: DmScreenPoint,
+): DmScreenRect {
+  const right = start.x + start.width;
+  const bottom = start.y + start.height;
+
+  let { x, y, width, height } = start;
+
+  if (edge.includes('e')) {
+    width = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.width, start.width + delta.x);
+  }
+
+  if (edge.includes('w')) {
+    width = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.width, start.width - delta.x);
+    x = right - width;
+  }
+
+  if (edge.includes('s')) {
+    height = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.height, start.height + delta.y);
+  }
+
+  if (edge.includes('n')) {
+    height = Math.max(DM_SCREEN_WINDOW_MIN_SIZE.height, start.height - delta.y);
+
+    y = bottom - height;
+  }
+
+  return {
+    x: Math.round(x),
+    y: Math.round(y),
+    width: Math.round(width),
+    height: Math.round(height),
+  };
 }
