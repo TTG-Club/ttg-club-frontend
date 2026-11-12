@@ -1,10 +1,10 @@
 import type { BrushColor, BugReportType, BugReportTypeText } from './types';
 
 /**
- * Отправка баг-репорта. Сервис баг-репортов не разрешает CORS для этого
- * сайта, поэтому репорт уходит через свой сервер (`server/api/bug-report`).
+ * Сервис баг-репортов. Запрос идёт в него напрямую, как из старого SPA:
+ * сервис принимает запросы с любого сайта TTG.
  */
-export const BUG_REPORT_API_URL = '/api/bug-report';
+export const BUG_REPORT_API_URL = 'https://bug-report.api.ttg.club/api/v1/bugs';
 
 /** Платформа этого сайта в сервисе баг-репортов. */
 export const BUG_REPORT_SOURCE_PLATFORM = 'SITE_5E14';
