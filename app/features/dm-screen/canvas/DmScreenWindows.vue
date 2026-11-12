@@ -3,7 +3,7 @@
   import {
     DM_SCREEN_ICON,
     DM_SCREEN_TEXT,
-    resolveDmScreenSection,
+    getDmScreenWindowIcon,
   } from '../model';
   import { DmScreenWindow } from '../window';
 
@@ -15,14 +15,6 @@
    * бросков выше окон.
    */
   const { visibleWindows, minimizedWindows, restore, close } = useDmScreen();
-
-  /**
-   * Иконка раздела записи на плашке.
-   * @param path - адрес записи
-   */
-  function getIcon(path: string): string {
-    return resolveDmScreenSection(path)?.icon ?? DM_SCREEN_ICON.unknown;
-  }
 </script>
 
 <template>
@@ -46,7 +38,7 @@
       class="flex items-center rounded-md border border-default bg-elevated shadow-lg"
     >
       <UButton
-        :icon="getIcon(screenWindow.path)"
+        :icon="getDmScreenWindowIcon(screenWindow.path)"
         :label="screenWindow.title"
         :aria-label="`${DM_SCREEN_TEXT.restore}: ${screenWindow.title}`"
         color="neutral"

@@ -5,8 +5,10 @@
   import { DM_SCREEN_ICON, DM_SCREEN_TEXT } from '../model';
 
   /**
-   * Ширма гостя: одна, в этом браузере. В шапке — приглашение войти: после
-   * входа ширмы живут в аккаунте, а эта переносится туда.
+   * Ширма гостя: одна, в этом браузере. Пока ширма пуста, по центру —
+   * приглашение войти: после входа ширмы живут в аккаунте, а эта
+   * переносится туда. В шапке кнопки входа нет: кто захочет сохранить
+   * ширму, войдёт сам.
    */
   const isAuthOpen = ref(false);
 
@@ -17,14 +19,18 @@
 
 <template>
   <DmScreenCanvas>
-    <template #actions>
-      <UTooltip :text="DM_SCREEN_TEXT.guestDescription">
-        <UButton
-          :icon="DM_SCREEN_ICON.signIn"
-          :label="DM_SCREEN_TEXT.signIn"
-          @click.left.exact.prevent="openAuth"
-        />
-      </UTooltip>
+    <template #emptyNote>
+      <p class="text-center text-sm text-muted">
+        {{ DM_SCREEN_TEXT.guestDescription }}
+      </p>
+
+      <UButton
+        :icon="DM_SCREEN_ICON.signIn"
+        :label="DM_SCREEN_TEXT.signIn"
+        color="neutral"
+        variant="outline"
+        @click.left.exact.prevent="openAuth"
+      />
     </template>
   </DmScreenCanvas>
 

@@ -15,25 +15,33 @@
   defineSlots<{
     /** Заголовок ширмы; без него — «Ширма Мастера». */
     heading?: () => unknown;
-    /** Кнопки в конце шапки, например «Войти». */
+    /** Кнопки в конце шапки. */
     actions?: () => unknown;
+    /**
+     * Подсказка по центру пустой ширмы под её описанием, например
+     * приглашение войти у гостя.
+     */
+    emptyNote?: () => unknown;
   }>();
 
-  const {
-    windows,
-    visibleWindows,
-    isWindowed,
-    arrange,
-    shrinkAll,
-    minimizeAll,
-  } = useDmScreen();
+  const { windows, isWindowed, addNote, arrange, shrinkAll, minimizeAll } =
+    useDmScreen();
 
-  // Выравнивать и сворачивать есть что, только пока окна развёрнуты
-  const isArrangeAvailable = computed(
-    () => isWindowed.value && visibleWindows.value.length > 0,
-  );
+  /**
+   * Кладёт пустую заметку рядом с кнопкой.
+   * @param event - клик по кнопке
+   */
+  function createNote(event: MouseEvent): void {
+    addNote({ x: event.clientX, y: event.clientY });
+  }
 
   const isEmpty = computed(() => !windows.value.length);
+
+  // Кнопки раскладки видны, пока на ширме есть записи, в том числе когда
+  // все окна свёрнуты: «Выровнять» и «Уменьшить» их и развернут
+  const isLayoutControlsVisible = computed(
+    () => isWindowed.value && !isEmpty.value,
+  );
 </script>
 
 <template>
@@ -51,7 +59,15 @@
       <DmScreenSearch />
 
       <UButton
-        v-if="!isEmpty && isWindowed"
+        :icon="DM_SCREEN_ICON.note"
+        :label="DM_SCREEN_TEXT.addNote"
+        color="neutral"
+        variant="outline"
+        @click.left.exact.prevent="createNote"
+      />
+
+      <UButton
+        v-if="isLayoutControlsVisible"
         :icon="DM_SCREEN_ICON.arrange"
         :label="DM_SCREEN_TEXT.arrange"
         color="neutral"
@@ -60,7 +76,7 @@
       />
 
       <UButton
-        v-if="isArrangeAvailable"
+        v-if="isLayoutControlsVisible"
         :icon="DM_SCREEN_ICON.shrinkAll"
         :label="DM_SCREEN_TEXT.shrinkAll"
         color="neutral"
@@ -69,7 +85,7 @@
       />
 
       <UButton
-        v-if="isArrangeAvailable"
+        v-if="isLayoutControlsVisible"
         :icon="DM_SCREEN_ICON.minimizeAll"
         :label="DM_SCREEN_TEXT.minimizeAll"
         color="neutral"
@@ -80,13 +96,18 @@
       <slot name="actions" />
     </header>
 
-    <UEmpty
+    <div
       v-if="isEmpty"
-      :icon="DM_SCREEN_ICON.screen"
-      :title="DM_SCREEN_TEXT.emptyTitle"
-      :description="DM_SCREEN_TEXT.emptyDescription"
-      class="m-auto max-w-lg"
-    />
+      class="m-auto flex max-w-lg flex-col items-center gap-4"
+    >
+      <UEmpty
+        :icon="DM_SCREEN_ICON.screen"
+        :title="DM_SCREEN_TEXT.emptyTitle"
+        :description="DM_SCREEN_TEXT.emptyDescription"
+      />
+
+      <slot name="emptyNote" />
+    </div>
 
     <DmScreenList v-else-if="!isWindowed" />
   </div>

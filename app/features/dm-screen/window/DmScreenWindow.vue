@@ -17,12 +17,14 @@
     DM_SCREEN_TEXT,
     DM_SCREEN_WINDOW_MIN_SIZE,
     getDmScreenEntryRoot,
+    getDmScreenWindowIcon,
+    isDmScreenNotePath,
     isDmScreenPath,
     keepDmScreenWindowReachable,
-    resolveDmScreenSection,
     snapDmScreenWindow,
   } from '../model';
   import DmScreenEntry from './DmScreenEntry.vue';
+  import DmScreenNote from './DmScreenNote.vue';
 
   /**
    * Окно записи на ширме, не блокирующее страницу. Тянется за шапку и
@@ -45,10 +47,9 @@
 
   const { width: viewportWidth, height: viewportHeight } = useWindowSize();
 
-  const sectionIcon = computed(
-    () =>
-      resolveDmScreenSection(screenWindow.path)?.icon ?? DM_SCREEN_ICON.unknown,
-  );
+  const isNote = computed(() => isDmScreenNotePath(screenWindow.path));
+
+  const sectionIcon = computed(() => getDmScreenWindowIcon(screenWindow.path));
 
   /**
    * Место, с которого окно можно ухватить на текущем экране.
@@ -134,6 +135,14 @@
    * @param event - клик левой кнопкой без модификаторов
    */
   function handleLinkClick(event: MouseEvent): void {
+    // В редакторе заметки по ссылке ставят курсор, а не переходят
+    if (
+      event.target instanceof Element
+      && event.target.closest('[contenteditable="true"], textarea')
+    ) {
+      return;
+    }
+
     const link =
       event.target instanceof Element ? event.target.closest('a[href]') : null;
 
@@ -318,7 +327,13 @@
       class="min-h-0 flex-auto overflow-y-auto px-4 pb-4"
       @click.left.exact.capture="handleLinkClick"
     >
+      <DmScreenNote
+        v-if="isNote"
+        :screen-window="screenWindow"
+      />
+
       <DmScreenEntry
+        v-else
         :key="screenWindow.path"
         :path="screenWindow.path"
         @loaded="syncTitle"

@@ -3,22 +3,17 @@
   import {
     DM_SCREEN_ICON,
     DM_SCREEN_TEXT,
-    resolveDmScreenSection,
+    getDmScreenWindowIcon,
+    isDmScreenNotePath,
   } from '../model';
+  import { DmScreenNote } from '../window';
 
   /**
    * Ширма на телефоне: окнам негде встать рядом, поэтому добавленные записи
-   * идут списком ссылок на их страницы.
+   * идут списком ссылок на их страницы. У заметки страницы нет: она
+   * раскрывается прямо в списке, там же её можно править.
    */
   const { windows, close } = useDmScreen();
-
-  /**
-   * Иконка раздела записи.
-   * @param path - адрес записи
-   */
-  function getIcon(path: string): string {
-    return resolveDmScreenSection(path)?.icon ?? DM_SCREEN_ICON.unknown;
-  }
 </script>
 
 <template>
@@ -26,26 +21,51 @@
     <li
       v-for="screenWindow in windows"
       :key="screenWindow.id"
-      class="flex items-center gap-2 rounded-lg border border-default bg-elevated/50 pr-1"
+      class="flex flex-col rounded-lg border border-default bg-elevated/50"
     >
-      <NuxtLink
-        :to="screenWindow.path"
-        class="flex min-w-0 flex-auto items-center gap-3 p-3"
-      >
-        <UIcon
-          :name="getIcon(screenWindow.path)"
-          class="size-5 shrink-0 text-primary"
+      <div class="flex items-center gap-2 pr-1">
+        <span
+          v-if="isDmScreenNotePath(screenWindow.path)"
+          class="flex min-w-0 flex-auto items-center gap-3 p-3"
+        >
+          <UIcon
+            :name="DM_SCREEN_ICON.note"
+            class="size-5 shrink-0 text-primary"
+          />
+
+          <span class="truncate text-highlighted">{{
+            screenWindow.title
+          }}</span>
+        </span>
+
+        <NuxtLink
+          v-else
+          :to="screenWindow.path"
+          class="flex min-w-0 flex-auto items-center gap-3 p-3"
+        >
+          <UIcon
+            :name="getDmScreenWindowIcon(screenWindow.path)"
+            class="size-5 shrink-0 text-primary"
+          />
+
+          <span class="truncate text-highlighted">{{
+            screenWindow.title
+          }}</span>
+        </NuxtLink>
+
+        <UButton
+          :icon="DM_SCREEN_ICON.close"
+          :aria-label="`${DM_SCREEN_TEXT.remove}: ${screenWindow.title}`"
+          color="neutral"
+          variant="ghost"
+          @click.left.exact.prevent="close(screenWindow.id)"
         />
+      </div>
 
-        <span class="truncate text-highlighted">{{ screenWindow.title }}</span>
-      </NuxtLink>
-
-      <UButton
-        :icon="DM_SCREEN_ICON.close"
-        :aria-label="`${DM_SCREEN_TEXT.remove}: ${screenWindow.title}`"
-        color="neutral"
-        variant="ghost"
-        @click.left.exact.prevent="close(screenWindow.id)"
+      <DmScreenNote
+        v-if="isDmScreenNotePath(screenWindow.path)"
+        :screen-window="screenWindow"
+        class="px-3 pb-3"
       />
     </li>
   </ul>

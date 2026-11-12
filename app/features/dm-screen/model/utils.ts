@@ -17,7 +17,9 @@ import {
   DM_SCREEN_DATE_FORMAT,
   DM_SCREEN_DATE_LOCALE,
   DM_SCREEN_GRID_GAP,
+  DM_SCREEN_ICON,
   DM_SCREEN_LEFT_INSET,
+  DM_SCREEN_NOTE_PATH_PREFIX,
   DM_SCREEN_PATH,
   DM_SCREEN_SECTIONS,
   DM_SCREEN_SNAP_DISTANCE,
@@ -440,4 +442,32 @@ export function snapDmScreenWindow(
     x: snapToNearest(rect.x, xCandidates),
     y: snapToNearest(rect.y, yCandidates),
   };
+}
+
+/**
+ * Окно — заметка мастера, а не запись сайта.
+ * @param path - путь окна
+ */
+export function isDmScreenNotePath(path: string): boolean {
+  return path.startsWith(DM_SCREEN_NOTE_PATH_PREFIX);
+}
+
+/**
+ * Путь новой заметки.
+ * @param id - идентификатор заметки
+ */
+export function createDmScreenNotePath(id: string): string {
+  return `${DM_SCREEN_NOTE_PATH_PREFIX}${id}`;
+}
+
+/**
+ * Иконка окна: у заметки — своя, у записи — как у её раздела в меню.
+ * @param path - путь окна
+ */
+export function getDmScreenWindowIcon(path: string): string {
+  if (isDmScreenNotePath(path)) {
+    return DM_SCREEN_ICON.note;
+  }
+
+  return resolveDmScreenSection(path)?.icon ?? DM_SCREEN_ICON.unknown;
 }
