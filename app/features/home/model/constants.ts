@@ -1,5 +1,6 @@
 import type { HomePromoCardContent, HomeSocialLink } from './types';
 
+import { NEW_SITE_URL } from '~/shared/consts';
 import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
 
 /* --- Общее -------------------------------------------------------------- */
@@ -101,7 +102,7 @@ export const HOME_VTTG_CARD: HomePromoCardContent = {
 /* --- Новости ------------------------------------------------------------ */
 
 /** Новый сайт: там публикуются новости и живёт каталог игр */
-export const HOME_NEW_SITE_URL = 'https://new.ttg.club';
+export const HOME_NEW_SITE_URL = NEW_SITE_URL;
 
 export const HOME_NEWS_LABEL = 'Новости';
 
