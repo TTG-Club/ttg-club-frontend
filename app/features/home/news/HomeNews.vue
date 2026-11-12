@@ -85,6 +85,7 @@
     :to="listUrl"
     :link-label="HOME_NEWS_ALL_LABEL"
     flush
+    fill
   >
     <!-- Переключатель стоит в подвале, в одной строке со ссылкой на все
       новости -->
@@ -108,12 +109,12 @@
       приедут -->
     <USkeleton
       v-if="isLoading"
-      class="aspect-16/10 w-full rounded-none sm:aspect-2/1 xl:aspect-21/9"
+      class="aspect-16/10 min-h-0 w-full flex-auto rounded-none sm:aspect-2/1 xl:aspect-21/9"
     />
 
     <p
       v-else-if="!activeNews"
-      class="m-3 rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
+      class="m-3 flex flex-auto items-center justify-center rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
     >
       {{ HOME_NEWS_EMPTY_TEXT }}
     </p>

@@ -54,6 +54,15 @@
         :label="label"
         :icon="icon"
       />
+
+      <!-- Место справа в шапке — под мелкое действие панели, например
+        подсказку -->
+      <div
+        v-if="$slots.actions"
+        class="flex shrink-0 items-center gap-1"
+      >
+        <slot name="actions" />
+      </div>
     </header>
 
     <div :class="bodyClass">

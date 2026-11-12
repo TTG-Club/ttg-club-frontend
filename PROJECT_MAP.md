@@ -28,7 +28,7 @@
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
 │   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace with turn reel, hit points and armor class on the device, guest key slot)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
-│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
+│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), bug-hunters (rating from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
 │   │   ├── news/               # news of new.ttg.club read here: model (core-api articles and community news), card (hero, tile), drawer (quick reading, page opens on new.ttg.club), body, video (YouTube / VK player), markup (render of the new site markup `{@...}`; links lead to new.ttg.club)
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # sidebar (panel, menu like new.ttg.club from /api/v1/menu, cached by Nitro with a built-in fallback copy), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state), footer (site footer like new.ttg.club: legal links lead to new.ttg.club; shown by layouts and by SectionLayout outside the wide split mode)
@@ -233,7 +233,13 @@ default group and adds it to any custom group from its menu.
 
 The home page repeats the legacy one block for block. Section tiles and the
 tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
-render on SSR; friends (`/api/v1/partners`) too. The latest game comes from the
+render on SSR; friends (`/api/v1/partners`) too — they run as a one-line
+marquee, shuffled in the browser on every visit (it stops on hover and focus;
+with reduced motion or in the "performance" graphics mode it stands still and
+scrolls by hand). Under them is the bug hunters rating, the same as on
+new.ttg.club: the server route `/api/v1/bug-stats` fetches
+`<new site>/api/bug-report/stats` (the new site does not answer other sites'
+browsers), caches it for 5 minutes and keeps the last good answer. The latest game comes from the
 new.ttg.club game service and core-api, so it loads only in the browser. The
 search field opens the search palette.
 

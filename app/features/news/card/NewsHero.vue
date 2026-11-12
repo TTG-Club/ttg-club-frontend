@@ -18,10 +18,7 @@
   } = defineProps<{
     news: NewsShort;
     kind: NewsKind;
-    /**
-     * Малая обложка — для узкой панели: кегль заголовка меньше, анонса нет,
-     * а картинка добирает высоту панели, если ту растянул ряд
-     */
+    /** Малая обложка — для узкой панели: кегль заголовка меньше, анонса нет */
     compact?: boolean;
   }>();
 
@@ -41,19 +38,11 @@
 
   const previewText = computed(() => getNewsPreviewText(news.preview));
 
-  // Малая обложка стоит в панели-столбце и тянется вместе с ней: вся цепочка
-  // до картинки — флекс-столбцы, пропорции задают только её наименьшую высоту
-  const rootClass = computed(() =>
-    compact ? 'flex flex-auto flex-col' : undefined,
-  );
-
-  const linkClass = computed(() =>
-    compact ? 'flex flex-auto flex-col' : 'block',
-  );
-
+  // Пропорции задают только наименьшую высоту картинки: в панели-столбце,
+  // которую растянул ряд, обложка добирает высоту вместе с ней
   const imageClass = computed(() =>
     compact
-      ? 'min-h-0 flex-auto aspect-16/10 sm:aspect-2/1 xl:aspect-16/10'
+      ? 'aspect-16/10 sm:aspect-2/1 xl:aspect-16/10'
       : 'aspect-16/10 sm:aspect-2/1 xl:aspect-21/9',
   );
 
@@ -95,23 +84,19 @@
     ссылки — невалидная разметка. Обычный клик открывает новость в панели,
     ctrl+click и средняя кнопка — страницу на новом сайте.
   -->
-  <div
-    class="group relative overflow-hidden"
-    :class="rootClass"
-  >
+  <div class="group relative flex flex-auto flex-col overflow-hidden">
     <a
       :href="pageUrl"
       target="_blank"
       rel="noopener noreferrer"
-      class="relative text-on-image no-underline"
-      :class="linkClass"
+      class="relative flex flex-auto flex-col text-on-image no-underline"
       @click.left.exact.prevent="$emit('open')"
     >
       <img
         decoding="async"
         :src="coverImage"
         :alt="news.title"
-        class="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        class="min-h-0 w-full flex-auto object-cover transition-transform duration-500 group-hover:scale-105"
         :class="imageClass"
       />
 
