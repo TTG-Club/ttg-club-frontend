@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import type { Position } from '@vueuse/core';
 
-  import type { DmScreenWindow } from '../model';
+  import type {
+    DmScreenPoint,
+    DmScreenRect,
+    DmScreenResizeEdge,
+    DmScreenWindow,
+  } from '../model';
 
   import { provideContentLinkHandler } from '~content/composables';
   import { EXTERNAL_LINK_TARGET } from '~content/model';
@@ -13,7 +18,7 @@
   import { useDmScreen } from '../composables';
   import {
     DM_SCREEN_ICON,
-    DM_SCREEN_RESIZE_SAVE_DELAY,
+    DM_SCREEN_RESIZE_EDGES,
     DM_SCREEN_TEXT,
     DM_SCREEN_WINDOW_MIN_SIZE,
     getDmScreenEntryRoot,
@@ -21,6 +26,7 @@
     isDmScreenNotePath,
     isDmScreenPath,
     keepDmScreenWindowReachable,
+    resizeDmScreenWindow,
     snapDmScreenWindow,
   } from '../model';
   import DmScreenEntry from './DmScreenEntry.vue';
@@ -29,7 +35,8 @@
   /**
    * Окно записи на ширме, не блокирующее страницу. Тянется за шапку и
    * примагничивается к краям холста и других окон (Alt — без магнита),
-   * растягивается за правый нижний угол, сворачивается в плашку (кнопкой или
+   * растягивается за любую сторону и любой угол (видимого уголка нет),
+   * сворачивается в плашку (кнопкой или
    * двойным кликом по шапке) и закрывается. Внутри — карточка записи любого
    * раздела; переходы внутри записи (вкладки класса, подрасы) остаются в
    * окне, ссылки на другие записи открывают новые окна, а остальные
@@ -81,28 +88,98 @@
     },
   );
 
+  /** Размер окна сейчас: пока окно тянут, он меняется до сохранения. */
+  const width = ref(screenWindow.width);
+  const height = ref(screenWindow.height);
+
+  // Размер может поменять и раскладка: «Выровнять», «Уменьшить все»
+  watch(
+    () => [screenWindow.width, screenWindow.height],
+    ([nextWidth = width.value, nextHeight = height.value]) => {
+      width.value = nextWidth;
+      height.value = nextHeight;
+    },
+  );
+
+  /** Начало растягивания: за что тянут, откуда и каким было окно. */
+  interface ResizeStart {
+    edge: DmScreenResizeEdge;
+    pointer: DmScreenPoint;
+    rect: DmScreenRect;
+  }
+
+  let resizeStart: ResizeStart | undefined;
+
   const windowStyle = computed(() => ({
     left: `${x.value}px`,
     top: `${y.value}px`,
-    width: `${screenWindow.width}px`,
-    height: `${screenWindow.height}px`,
+    width: `${width.value}px`,
+    height: `${height.value}px`,
     minWidth: `${DM_SCREEN_WINDOW_MIN_SIZE.width}px`,
     minHeight: `${DM_SCREEN_WINDOW_MIN_SIZE.height}px`,
     zIndex: screenWindow.layer,
   }));
 
-  // Браузер сам меняет размер за уголок; сохраняется итог, а не каждый шаг
-  const saveSize = useDebounceFn((width: number, height: number) => {
-    if (width !== screenWindow.width || height !== screenWindow.height) {
-      update(screenWindow.id, { width, height });
+  /**
+   * Начинает растягивать окно за сторону или угол: указатель захватывается,
+   * чтобы движение доходило, даже когда он уходит с узкой полосы.
+   * @param edge - сторона или угол
+   * @param event - нажатие на полосу
+   */
+  function startResize(edge: DmScreenResizeEdge, event: PointerEvent): void {
+    if (event.currentTarget instanceof Element) {
+      event.currentTarget.setPointerCapture(event.pointerId);
     }
-  }, DM_SCREEN_RESIZE_SAVE_DELAY);
 
-  useResizeObserver(root, () => {
-    if (root.value) {
-      void saveSize(root.value.offsetWidth, root.value.offsetHeight);
+    focus(screenWindow.id);
+
+    resizeStart = {
+      edge,
+      pointer: { x: event.clientX, y: event.clientY },
+      rect: {
+        x: x.value,
+        y: y.value,
+        width: width.value,
+        height: height.value,
+      },
+    };
+  }
+
+  /**
+   * Растягивает окно вслед за указателем.
+   * @param event - движение указателя
+   */
+  function moveResize(event: PointerEvent): void {
+    if (!resizeStart) {
+      return;
     }
-  });
+
+    const next = resizeDmScreenWindow(resizeStart.rect, resizeStart.edge, {
+      x: event.clientX - resizeStart.pointer.x,
+      y: event.clientY - resizeStart.pointer.y,
+    });
+
+    x.value = next.x;
+    y.value = next.y;
+    width.value = next.width;
+    height.value = next.height;
+  }
+
+  /** Сохраняет итог растягивания: место и размер разом. */
+  function endResize(): void {
+    if (!resizeStart) {
+      return;
+    }
+
+    resizeStart = undefined;
+
+    update(screenWindow.id, {
+      x: x.value,
+      y: y.value,
+      width: width.value,
+      height: height.value,
+    });
+  }
 
   // Переходы самой записи (вкладки класса, подрасы) — в этом же окне, а
   // закрытие карточки закрывает окно
@@ -283,7 +360,7 @@
     aria-modal="false"
     :aria-label="screenWindow.title"
     :style="windowStyle"
-    class="pointer-events-auto absolute flex resize flex-col overflow-hidden rounded-lg border border-default bg-default shadow-xl"
+    class="pointer-events-auto absolute flex flex-col overflow-hidden rounded-lg border border-default bg-default shadow-xl"
     @pointerdown.capture="focusWindow"
   >
     <header
@@ -339,5 +416,17 @@
         @loaded="syncTitle"
       />
     </div>
+
+    <!-- Невидимые полосы по краям: растягивание за любую сторону и угол -->
+    <div
+      v-for="item in DM_SCREEN_RESIZE_EDGES"
+      :key="item.edge"
+      :class="item.class"
+      class="absolute touch-none"
+      @pointerdown.left="startResize(item.edge, $event)"
+      @pointermove="moveResize"
+      @pointerup="endResize"
+      @pointercancel="endResize"
+    />
   </section>
 </template>

@@ -8,6 +8,7 @@ export type {
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
+  DmScreenResizeEdge,
   DmScreenSection,
   DmScreenSize,
   DmScreenTile,
@@ -45,6 +46,7 @@ export {
   isDmScreenPath,
   keepDmScreenWindowReachable,
   placeDmScreenWindow,
+  resizeDmScreenWindow,
   resolveDmScreenSection,
   snapDmScreenWindow,
 } from './utils';
