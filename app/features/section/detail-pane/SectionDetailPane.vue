@@ -55,6 +55,8 @@
     'max-md:fixed max-md:right-2 max-md:bottom-(--navbar-height) max-md:z-10 max-md:mb-2',
     'max-md:rounded-md max-md:border max-md:border-default max-md:p-1',
     'max-md:bg-default/50 max-md:shadow-md max-md:backdrop-blur-lg',
+    // Без размытия текст под полупрозрачной плашкой мешал бы кнопкам
+    'performance:max-md:bg-default',
   ];
 
   const emit = defineEmits<{

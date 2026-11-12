@@ -12,6 +12,8 @@
 
   const style = useCssModule();
 
+  const graphicsProbe = useGraphicsProbe();
+
   const bodyClasses = computed(() => [style.body, { [style.menu]: isMenu }]);
 
   const isScrollLocked = useScrollLock(() =>
@@ -54,19 +56,25 @@
     </div>
 
     <!--
-      Затемнение без размытия: размытие во весь экран видеокарта пересчитывает
-      на каждом кадре, пока меню открывается и пока в нём что-то движется, —
-      на встроенной графике с экраном высокого разрешения меню от этого дёргалось.
+      Размытие во весь экран видеокарта пересчитывает на каждом кадре, пока
+      меню открывается и пока в нём что-то движется: в режиме
+      «производительность» его нет (см. `tailwind.css`).
     -->
     <Transition name="fade">
       <div
         v-if="isOpened"
-        class="fixed inset-0 z-180 cursor-pointer bg-overlay"
+        class="fixed inset-0 z-180 cursor-pointer bg-overlay backdrop-blur-xs"
         @click.left.exact.self.prevent.stop="close"
       />
     </Transition>
 
-    <Transition name="sidebar-popover">
+    <!-- По кадрам открытия сайт понимает, тянет ли устройство размытие -->
+    <Transition
+      name="sidebar-popover"
+      @before-enter="graphicsProbe.start"
+      @after-enter="graphicsProbe.finish"
+      @enter-cancelled="graphicsProbe.cancel"
+    >
       <div
         v-if="isOpened"
         class="flex flex-col overflow-auto overscroll-contain rounded-xl border border-default shadow-2xl backdrop-blur-lg"
