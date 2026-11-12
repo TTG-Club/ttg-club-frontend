@@ -117,8 +117,8 @@ export const HOME_COMMUNITY_NEWS_ICON = 'tabler:users-group';
 
 export const HOME_COMMUNITY_NEWS_DATA_KEY = 'home-community-news';
 
-/** Столбик из четырёх строк */
-export const HOME_COMMUNITY_NEWS_COUNT = 4;
+/** На главной — только последняя новость сообщества */
+export const HOME_COMMUNITY_NEWS_COUNT = 1;
 
 export const HOME_COMMUNITY_NEWS_ALL_LABEL = 'Все новости сообщества';
 

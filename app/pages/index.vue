@@ -31,51 +31,67 @@
         order: VTTG → Соцсети → Новости → Новая игра → Новости сообщества →
         Обсуждения → Друзья.
 
-        С xl лента делится на две половины, растянутые друг под друга. Слева
-        новости сайта (обложка и ряд свежих), под ними новости сообщества —
-        как на new.ttg.club. Справа два узких столбца: игра с обсуждениями, и
-        VTTG с соцсетями и друзьями. Столбцы стоят в одном ряду `stretch`,
-        поэтому их низы совпадают. Обсуждения и друзья не участвуют в высоте
-        ряда (flex-basis 0): занимают остаток своего столбца и прокручиваются
-        внутри. Игра и VTTG остаются своей высоты. Новости сообщества
-        добирают высоту до правой половины, чтобы низ ленты шёл одной линией.
+        С xl лента делится на две половины, растянутые друг под друга, — та
+        же сетка, что на new.ttg.club. Слева новости сайта, под ними две
+        четверти: место в запасе и последняя новость сообщества. Справа два
+        ряда из двух четвертей:
+
+        - верхний — новая игра и VTTG с соцсетями. Ряд `stretch`, поэтому низ
+          игры совпадает с низом соцсетей: разницу забирает обложка игры;
+        - нижний — обсуждения и друзья, оба начинаются с одной линии и равны
+          по высоте. Ряд добирает правую половину до низа левой, а сами
+          панели в его высоте не участвуют (`detached`) и прокручиваются
+          внутри.
+
+        Связать высоты можно только у соседей по одному ряду — поэтому игра
+        и VTTG стоят в общем ряду, а не в разных столбцах.
       -->
       <div class="flex flex-col gap-3 xl:flex-row xl:items-stretch">
         <div class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3">
           <HomeNews class="order-2 xl:order-0" />
 
-          <HomeCommunityNews class="order-4 xl:order-0 xl:flex-auto" />
+          <div class="contents xl:flex xl:flex-auto xl:items-stretch xl:gap-3">
+            <!-- Место в запасе под будущий блок (на new.ttg.club здесь
+              статьи): четверть ленты пустует, новости сообщества не
+              растягиваются на всю половину -->
+            <div
+              aria-hidden="true"
+              class="hidden xl:block xl:min-w-0 xl:flex-1"
+            />
+
+            <HomeCommunityNews
+              class="order-4 xl:order-0 xl:min-w-0 xl:flex-1"
+            />
+          </div>
         </div>
 
         <div class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3">
-          <div class="contents xl:flex xl:flex-auto xl:items-stretch xl:gap-3">
-            <div
-              class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3"
-            >
-              <HomeLatestGame class="order-3 xl:order-0" />
-
-              <HomeComments
-                class="order-5 xl:order-0 xl:min-h-60 xl:flex-[1_1_0]"
-              />
-            </div>
+          <div class="contents xl:flex xl:items-stretch xl:gap-3">
+            <HomeLatestGame class="order-3 xl:order-0 xl:min-w-0 xl:flex-1" />
 
             <div
               class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3"
             >
               <HomePromoCard
                 :card="HOME_VTTG_CARD"
-                class="order-0"
+                class="order-0 xl:flex-auto"
               />
 
               <HomeSocialLinks class="order-1 xl:order-0" />
-
-              <!-- Друзей много, и в узкой колонке список вытянул бы всю ленту.
-                Поэтому он не участвует в высоте ряда (flex-basis 0): берёт то,
-                что осталось в колонке под соцсетями, и прокручивается внутри -->
-              <HomePartners
-                class="order-6 xl:order-0 xl:min-h-60 xl:flex-[1_1_0]"
-              />
             </div>
+          </div>
+
+          <!-- min-h — страховка на случай, когда левая половина короче
+            обычного (скажем, новости не загрузились): без неё лентам
+            досталась бы только шапка -->
+          <div class="contents xl:flex xl:flex-auto xl:items-stretch xl:gap-3">
+            <HomeComments
+              class="order-5 xl:order-0 xl:min-h-80 xl:min-w-0 xl:flex-1"
+            />
+
+            <HomePartners
+              class="order-6 xl:order-0 xl:min-h-80 xl:min-w-0 xl:flex-1"
+            />
           </div>
         </div>
       </div>

@@ -275,7 +275,7 @@
 
     <p
       v-else
-      class="m-3 rounded-lg border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
+      class="m-3 flex flex-auto items-center justify-center rounded-lg border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
     >
       {{ placeholderText }}
     </p>

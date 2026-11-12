@@ -7,6 +7,7 @@
     icon = undefined,
     flush = false,
     fill = false,
+    detached = false,
     to = undefined,
     linkLabel = undefined,
   } = defineProps<{
@@ -18,6 +19,12 @@
     flush?: boolean;
     /** Тело тянется на высоту панели и раскладывает содержимое столбцом */
     fill?: boolean;
+    /**
+     * С xl содержимое не участвует в высоте панели: её задаёт ряд, а
+     * содержимое занимает ровно эту высоту и прокручивается внутри. Ниже xl
+     * ряда нет, и панель живёт по содержимому
+     */
+    detached?: boolean;
     /** Куда ведёт подвал панели — внешний адрес открывается в новой вкладке */
     to?: string;
     /** Подпись подвала; без неё или без адреса подвал не рисуется */
@@ -31,6 +38,7 @@
   const bodyClass = computed(() => [
     flush ? undefined : 'p-3',
     fill ? 'flex min-h-0 flex-auto flex-col' : undefined,
+    detached ? 'xl:relative xl:min-h-0 xl:flex-auto' : undefined,
   ]);
 </script>
 
@@ -49,7 +57,16 @@
     </header>
 
     <div :class="bodyClass">
-      <slot />
+      <!-- Обёртка вынута из потока: у неё нет своей высоты, поэтому длинная
+        лента не раздувает ряд и не растягивает соседей -->
+      <div
+        v-if="detached"
+        class="xl:absolute xl:inset-0 xl:overflow-hidden"
+      >
+        <slot />
+      </div>
+
+      <slot v-else />
     </div>
 
     <NuxtLink

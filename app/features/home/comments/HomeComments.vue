@@ -59,7 +59,7 @@
     :label="HOME_COMMENTS_LABEL"
     :icon="HOME_COMMENTS_ICON"
     flush
-    fill
+    detached
   >
     <div
       v-if="isLoading"
@@ -80,8 +80,8 @@
       {{ HOME_COMMENTS_EMPTY_TEXT }}
     </p>
 
-    <!-- С xl лента занимает остаток колонки под игрой, ниже xl её держит
-      собственный предел высоты -->
+    <!-- С xl лента занимает высоту панели, которую задал ряд, ниже xl её
+      держит собственный предел высоты -->
     <UScrollArea
       v-else
       class="max-h-150 xl:h-full xl:max-h-none"

@@ -27,12 +27,13 @@
     v-if="sortedPartners.length"
     :label="HOME_PARTNERS_LABEL"
     :icon="HOME_PARTNERS_ICON"
-    fill
+    flush
+    detached
   >
-    <!-- С xl высоту панели задаёт колонка: друзей много, и список
+    <!-- С xl высоту панели задаёт ряд: друзей много, и список
       прокручивается внутри, а не вытягивает всю ленту -->
     <div
-      class="flex flex-wrap content-start gap-2 xl:min-h-0 xl:flex-[1_1_0] xl:overflow-y-auto"
+      class="flex flex-wrap content-start gap-2 p-3 xl:h-full xl:overflow-y-auto"
     >
       <UTooltip
         v-for="partner in sortedPartners"

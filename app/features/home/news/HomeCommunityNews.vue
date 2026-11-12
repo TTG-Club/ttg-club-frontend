@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { NewsTile } from '~news/card';
+  import { NewsHero } from '~news/card';
   import { NewsDrawer } from '~news/drawer';
   import {
     getNewsListUrl,
@@ -22,8 +22,9 @@
   const api = useApi();
 
   /**
-   * Новости сообщества как на new.ttg.club: столбик плиток с автором и
-   * датой. Создают их на новом сайте, здесь они только читаются.
+   * Последняя новость сообщества — обложкой, как главная новость сайта,
+   * только в узкой панели. Создают их на новом сайте, здесь они только
+   * читаются.
    */
   const { newSiteUrl } = useRuntimeConfig().public;
 
@@ -51,6 +52,8 @@
     refresh,
   );
 
+  const latestNews = computed(() => newsList.value[0]);
+
   const listUrl = getNewsListUrl('community', newSiteUrl);
 </script>
 
@@ -63,48 +66,29 @@
     :to="listUrl"
     :link-label="HOME_COMMUNITY_NEWS_ALL_LABEL"
     flush
+    fill
   >
-    <!-- Столбец или две колонки — по ширине самой панели, а не экрана -->
-    <div class="@container p-2">
-      <div
-        v-if="isLoading"
-        class="grid grid-cols-1 gap-1 @lg:grid-cols-2"
-      >
-        <div
-          v-for="index in HOME_COMMUNITY_NEWS_COUNT"
-          :key="index"
-          class="flex items-center gap-3 p-2"
-        >
-          <USkeleton class="h-16 w-24 shrink-0 rounded-md" />
+    <!-- Скелетон тех же пропорций, что обложка: панель не прыгает, когда
+      новость приедет -->
+    <USkeleton
+      v-if="isLoading"
+      class="aspect-16/10 min-h-0 w-full flex-auto rounded-none sm:aspect-2/1 xl:aspect-16/10"
+    />
 
-          <div class="flex flex-1 flex-col gap-2">
-            <USkeleton class="h-2.5 w-16 rounded" />
+    <p
+      v-else-if="!latestNews"
+      class="m-3 flex flex-auto items-center justify-center rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
+    >
+      {{ HOME_COMMUNITY_NEWS_EMPTY_TEXT }}
+    </p>
 
-            <USkeleton class="h-4 w-3/4 rounded" />
-          </div>
-        </div>
-      </div>
-
-      <p
-        v-else-if="!newsList.length"
-        class="m-1 rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
-      >
-        {{ HOME_COMMUNITY_NEWS_EMPTY_TEXT }}
-      </p>
-
-      <div
-        v-else
-        class="grid grid-cols-1 gap-1 @lg:grid-cols-2"
-      >
-        <NewsTile
-          v-for="news in newsList"
-          :key="news.id"
-          :news="news"
-          kind="community"
-          @open="open(news.url)"
-        />
-      </div>
-    </div>
+    <NewsHero
+      v-else
+      :news="latestNews"
+      kind="community"
+      compact
+      @open="open(latestNews.url)"
+    />
 
     <NewsDrawer
       v-model:open="isDrawerOpen"
