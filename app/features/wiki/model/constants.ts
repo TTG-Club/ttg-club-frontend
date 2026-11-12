@@ -54,22 +54,30 @@ export const BOOKS_SECTION: SectionConfig = {
 
 export const BOOK_SHORT_NAME_LABEL = 'Аббревиатура:';
 
-/* --- Справочник Мастера ------------------------------------------------ */
+/* --- Справочник ------------------------------------------------------- */
 
 /**
  * В списке справочника вложенные разделы, сгруппированные по корневым;
- * фильтр — по источникам и корневым разделам.
+ * фильтр — по источникам и корневым разделам, без поиска по нему: разделов
+ * немного, и они видны целиком.
+ *
+ * Список грузится страницами, а группы собираются в браузере, поэтому
+ * сортировка сначала по корневому разделу: иначе на первой странице
+ * оказывалось по паре разделов из каждой группы, а остальные — дальше.
  */
 export const SCREENS_SECTION: SectionConfig = {
   key: 'screens',
-  title: 'Справочник Мастера',
+  title: 'Справочник',
   path: '/screens',
   listUrl: '/api/v1/screens',
   filterUrl: '/api/v1/filters/screens',
   order: [
+    { field: 'parent.ordering', direction: 'asc' },
+    { field: 'parent.name', direction: 'asc' },
     { field: 'ordering', direction: 'asc' },
     { field: 'name', direction: 'asc' },
   ],
+  isFilterSearchDisabled: true,
 };
 
 export const SCREEN_TEXT = {

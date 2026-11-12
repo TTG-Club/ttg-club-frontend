@@ -72,6 +72,10 @@
   // В окне ширмы у окна свои кнопки, кнопки записи там лишние
   const isActionsHidden = useSectionEntryCompact();
 
+  // Источник — под заголовком справа; в компактном виде он поднимается в
+  // угол, на место кнопок
+  const isSourceInSubtitle = computed(() => !isActionsHidden && !!source);
+
   const isReady = computed(() => !isLoading && !isError);
 
   const isEditAvailable = computed(
@@ -221,9 +225,16 @@
           </h2>
         </div>
 
+        <!-- В компактном виде кнопок нет: их место в углу занимает источник -->
+        <SectionSourceTag
+          v-if="isActionsHidden && source"
+          :source="source"
+          class="mt-1.5 shrink-0"
+        />
+
         <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
         <div
-          v-if="!isActionsHidden"
+          v-else-if="!isActionsHidden"
           :class="ACTIONS_CLASS"
           class="print:hidden"
         >
@@ -265,7 +276,7 @@
       </div>
 
       <div
-        v-if="subtitle || source"
+        v-if="subtitle || isSourceInSubtitle"
         class="flex items-center justify-between gap-2"
       >
         <span
@@ -277,7 +288,7 @@
         </span>
 
         <SectionSourceTag
-          v-if="source"
+          v-if="isSourceInSubtitle && source"
           :source="source"
         />
       </div>
