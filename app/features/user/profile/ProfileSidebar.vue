@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { getRoleLabels, PROFILE_TEXT } from '../model';
+  import { getRoleLabels } from '../model';
 
   /**
    * Шапка личного кабинета, как на new.ttg.club: круглая аватарка с
@@ -9,8 +9,7 @@
 
   // Без отображаемого имени на сайте показывается логин
   const shownName = computed(
-    () =>
-      user.value?.displayName || user.value?.username || PROFILE_TEXT.guestName,
+    () => user.value?.displayName || user.value?.username || '',
   );
 
   const roleLabels = computed(() => getRoleLabels(roles.value));

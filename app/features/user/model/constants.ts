@@ -244,7 +244,6 @@ export const PROFILE_TEXT = {
   sourcesLoadFailed: 'Не удалось загрузить источники',
   sourcesNoneSelected: 'Выберите хотя бы один источник',
   navigation: 'Разделы личного кабинета',
-  guestName: 'Путешественник',
 } as const;
 
 /** Отступы карточек личного кабинета, как на new.ttg.club. */
