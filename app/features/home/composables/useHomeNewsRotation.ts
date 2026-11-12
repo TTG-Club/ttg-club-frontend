@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from 'vue';
+import type { ComponentPublicInstance, ComputedRef, Ref } from 'vue';
 
 /** Перелистывание новостей в блоке главной. */
 interface HomeNewsRotation {
@@ -16,6 +16,8 @@ interface HomeNewsRotation {
   showPrevious: () => void;
   /** Ставит автосмену на паузу или снимает с неё */
   toggleStopped: () => void;
+  /** Запоминает, открыт ли ролик показанной новости */
+  setVideoOpen: (isOpen: boolean) => void;
 }
 
 /**
@@ -24,15 +26,39 @@ interface HomeNewsRotation {
  * `showNext`, а остановка анимации и есть пауза — отдельного таймера нет,
  * поэтому полоска и смена новости не могут разойтись.
  *
+ * Отсчёт замирает, пока новость разглядывают или читают: курсор или фокус
+ * на панели, открыта панель чтения или ролик.
+ *
  * @param count - сколько новостей в блоке
- * @param isHeld - отсчёт придержан: курсор на блоке, открыта новость и т.п.
+ * @param panel - панель блока: курсор и фокус на ней придерживают отсчёт
+ * @param isReading - открыта ли панель чтения новости
  * @returns номер показанной новости и управление перелистыванием
  */
 export function useHomeNewsRotation(
   count: Ref<number>,
-  isHeld: Ref<boolean>,
+  panel: Ref<ComponentPublicInstance | null>,
+  isReading: Ref<boolean>,
 ): HomeNewsRotation {
   const activeIndex = ref(0);
+
+  // Следим за всей панелью: переключатель стоит в её подвале, и курсор на
+  // стрелках тоже должен придерживать отсчёт. Наведению нужен сам элемент
+  // панели, а не её компонент
+  const panelElement = computed(() => unrefElement(panel));
+
+  const isHovered = useElementHover(panelElement);
+
+  const { focused: isFocused } = useFocusWithin(panelElement);
+
+  const isVideoOpen = ref(false);
+
+  const isHeld = computed(
+    () =>
+      isHovered.value
+      || isFocused.value
+      || isReading.value
+      || isVideoOpen.value,
+  );
 
   // Тем, кто просил поменьше движения, новости сами не листаются — только
   // по кнопкам. Кнопка «запустить» при этом остаётся рабочей
@@ -94,6 +120,15 @@ export function useHomeNewsRotation(
     isStopped.value = !isStopped.value;
   }
 
+  /**
+   * Запоминает, открыт ли ролик показанной новости.
+   *
+   * @param isOpen - открыт ли ролик
+   */
+  function setVideoOpen(isOpen: boolean): void {
+    isVideoOpen.value = isOpen;
+  }
+
   return {
     activeIndex,
     isStopped,
@@ -102,5 +137,6 @@ export function useHomeNewsRotation(
     showNext,
     showPrevious,
     toggleStopped,
+    setVideoOpen,
   };
 }

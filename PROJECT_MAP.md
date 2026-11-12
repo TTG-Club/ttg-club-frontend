@@ -241,7 +241,12 @@ News and community news are written and published on new.ttg.club and shown
 here as on its home page: core-api `/api/v2/articles/search?type=NEWS` and
 `/api/v2/community-news/search`, loaded in the browser. A click opens the news
 in a right drawer for quick reading; the "open page" button and ctrl+click open
-it on new.ttg.club in a new tab. Articles are not shown here.
+it on new.ttg.club in a new tab. Articles are not shown here. Each block shows
+one news as a cover and rotates the latest ones on a timer; the switcher in the
+panel footer (dots with a countdown bar, pause, arrows) sits in one row with
+the "all news" link. The countdown pauses on hover, on focus, while a news or
+its video is open and on a hidden tab. Left of the community news there is a
+"Reserved" placeholder for a future block (desktop only).
 
 The "Discussions" block under the latest game shows the latest comments of
 this site only: comments-service `/api/v1/comments/recent` with the

@@ -16,6 +16,20 @@
   --font-mono:
     'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono',
     'Consolas', 'Liberation Mono', monospace;
+
+  /* Плавное появление содержимого на месте прежнего (`animate-appear`):
+     только прозрачность, вёрстка не пересчитывается */
+  --animate-appear: appear 0.25s ease-out both;
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /*

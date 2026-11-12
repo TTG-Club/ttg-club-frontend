@@ -72,18 +72,17 @@
     <!-- Подвал — одна строка: ссылка «смотреть всё» и, если панель их
       дала, свои органы управления справа. Они лежат рядом со ссылкой, а не
       внутри неё: кнопка внутри ссылки — невалидная разметка. Без соседей
-      стрелка ссылки уходит к правому краю, с соседями остаётся у подписи —
-      иначе повисла бы посреди строки -->
+      стрелка ссылки уходит к правому краю, с соседями (`has-[+div]`) остаётся
+      у подписи — иначе повисла бы посреди строки -->
     <footer
       v-if="hasFooter"
-      class="mt-auto flex shrink-0 items-stretch border-t border-default"
+      class="@container mt-auto flex shrink-0 items-stretch border-t border-default"
     >
       <NuxtLink
         :to="to"
         external
         target="_blank"
-        class="flex min-w-0 flex-auto items-center gap-2 px-3 py-2.5 font-mono text-[11px] tracking-[0.14em] text-muted uppercase no-underline transition-colors hover:bg-elevated hover:text-primary"
-        :class="{ 'justify-between': !$slots.aside }"
+        class="flex min-w-0 flex-auto items-center justify-between gap-2 px-3 py-2.5 font-mono text-[11px] tracking-[0.14em] text-muted uppercase no-underline transition-colors hover:bg-elevated hover:text-primary has-[+div]:justify-start"
       >
         <span class="truncate">{{ linkLabel }}</span>
 

@@ -141,10 +141,11 @@ export const HOME_COMMUNITY_NEWS_ICON = 'tabler:users-group';
 
 export const HOME_COMMUNITY_NEWS_DATA_KEY = 'home-community-news';
 
-/** На главной — только последняя новость сообщества */
-export const HOME_COMMUNITY_NEWS_COUNT = 1;
+/** Сколько свежих новостей сообщества листается в блоке */
+export const HOME_COMMUNITY_NEWS_COUNT = 4;
 
-export const HOME_COMMUNITY_NEWS_ALL_LABEL = 'Все новости сообщества';
+/** Коротко: в узкой панели подпись делит строку с переключателем */
+export const HOME_COMMUNITY_NEWS_ALL_LABEL = 'Все новости';
 
 export const HOME_COMMUNITY_NEWS_EMPTY_TEXT = 'Новостей сообщества пока нет';
 
