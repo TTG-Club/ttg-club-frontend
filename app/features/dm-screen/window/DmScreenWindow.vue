@@ -20,11 +20,13 @@
     isDmScreenPath,
     keepDmScreenWindowReachable,
     resolveDmScreenSection,
+    snapDmScreenWindow,
   } from '../model';
   import DmScreenEntry from './DmScreenEntry.vue';
 
   /**
-   * Окно записи на ширме, не блокирующее страницу. Тянется за шапку,
+   * Окно записи на ширме, не блокирующее страницу. Тянется за шапку и
+   * примагничивается к краям холста и других окон (Alt — без магнита),
    * растягивается за правый нижний угол, сворачивается в плашку (кнопкой или
    * двойным кликом по шапке) и закрывается. Внутри — карточка записи любого
    * раздела; переходы внутри записи (вкладки класса, подрасы) остаются в
@@ -35,7 +37,8 @@
     screenWindow: DmScreenWindow;
   }>();
 
-  const { add, navigate, close, minimize, focus, update } = useDmScreen();
+  const { add, navigate, close, minimize, focus, update, visibleWindows } =
+    useDmScreen();
 
   const root = useTemplateRef<HTMLElement>('root');
   const handle = useTemplateRef<HTMLElement>('handle');
@@ -64,6 +67,7 @@
     initialValue: reachable(screenWindow),
     preventDefault: true,
     onStart: startDrag,
+    onMove: snapPosition,
     onEnd: savePosition,
   });
 
@@ -191,6 +195,36 @@
     focus(screenWindow.id);
 
     return undefined;
+  }
+
+  /**
+   * Примагничивает окно, пока его тащат: к краям холста и других окон. С
+   * зажатым Alt окно двигается свободно.
+   * @param position - куда окно притащили
+   * @param event - движение указателя
+   */
+  function snapPosition(position: Position, event: PointerEvent): void {
+    if (event.altKey || !root.value) {
+      return;
+    }
+
+    const others = visibleWindows.value.filter(
+      (item) => item.id !== screenWindow.id,
+    );
+
+    // Размер — с самого окна: после растягивания сохранённый мог отстать
+    const snapped = snapDmScreenWindow(
+      {
+        ...position,
+        width: root.value.offsetWidth,
+        height: root.value.offsetHeight,
+      },
+      others,
+      { width: viewportWidth.value, height: viewportHeight.value },
+    );
+
+    x.value = snapped.x;
+    y.value = snapped.y;
   }
 
   /**

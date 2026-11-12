@@ -10,6 +10,9 @@ export interface DmScreenSize {
   height: number;
 }
 
+/** Прямоугольник окна на экране, px. */
+export interface DmScreenRect extends DmScreenPoint, DmScreenSize {}
+
 /** Место и размер окна, разложенного по сетке. */
 export interface DmScreenTile extends DmScreenPoint, DmScreenSize {
   id: string;
