@@ -3,14 +3,18 @@ import type { DmScreenRequest, DmScreenWindow } from '../model';
 import { sortBy } from 'es-toolkit';
 
 import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
+import { getApiErrorMessage } from '~user/model';
 
 import {
+  appendDmScreenWindow,
   arrangeDmScreenWindows,
+  DM_SCREEN_SAVE_DELAY,
   DM_SCREEN_STORAGE_KEY,
+  DM_SCREEN_TEXT,
   DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenWindowListSchema,
-  fitDmScreenWindowSize,
-  placeDmScreenWindow,
+  saveDmScreenWindows,
+  saveDmScreenWindowsOnLeave,
 } from '../model';
 
 /** Изменяемые поля окна. */
@@ -31,16 +35,19 @@ function readWindows(raw: string): Array<DmScreenWindow> {
 }
 
 /**
- * Ширма Мастера: записи сайта, разложенные окнами на странице ширмы. Какие
- * записи добавлены, где стоят их окна, какого они размера и свёрнуты ли,
- * лежит в localStorage: запись добавляют с любой страницы, а ширма
- * переживает перезагрузку. Окна есть на экранах, где помещаются рядом с
+ * Открытая ширма Мастера: записи сайта, разложенные окнами. Окна берутся из
+ * одного из двух мест. У гостя ширма одна и лежит в localStorage. У
+ * пользователя ширм несколько и они на сервере: страница ширмы
+ * подключает открытую (`attach`), её изменения сохраняются с паузой, а при
+ * уходе со страницы — сразу. Окна есть на экранах, где помещаются рядом с
  * контентом; на телефоне ширма — список записей.
  */
 export const useDmScreen = createSharedComposable(() => {
+  const toast = useToast();
+
   // Читается после монтирования: иначе отметки добавленных записей в
   // браузере разошлись бы с разметкой сервера
-  const windows = useLocalStorage<Array<DmScreenWindow>>(
+  const localWindows = useLocalStorage<Array<DmScreenWindow>>(
     DM_SCREEN_STORAGE_KEY,
     [],
     {
@@ -51,6 +58,89 @@ export const useDmScreen = createSharedComposable(() => {
       },
     },
   );
+
+  /** Открытая ширма с сервера; без неё окна — гостевые из браузера. */
+  const screenId = ref<string>();
+
+  const remoteWindows = shallowRef<Array<DmScreenWindow>>([]);
+
+  /** Есть изменения, ещё не ушедшие на сервер. */
+  let isDirty = false;
+
+  /**
+   * Сохраняет окна открытой ширмы, если они менялись.
+   * @param id - ширма, чьи окна сохраняются
+   */
+  async function save(id = screenId.value): Promise<void> {
+    if (!id || !isDirty) {
+      return;
+    }
+
+    isDirty = false;
+
+    try {
+      await saveDmScreenWindows(id, remoteWindows.value);
+    } catch (error) {
+      toast.add({
+        title: getApiErrorMessage(error, DM_SCREEN_TEXT.errorSave),
+        color: 'error',
+      });
+    }
+  }
+
+  const saveLater = useDebounceFn(() => save(), DM_SCREEN_SAVE_DELAY);
+
+  const windows = computed<Array<DmScreenWindow>>({
+    get: () => (screenId.value ? remoteWindows.value : localWindows.value),
+    set: (value) => {
+      if (!screenId.value) {
+        localWindows.value = value;
+
+        return;
+      }
+
+      remoteWindows.value = value;
+      isDirty = true;
+      void saveLater();
+    },
+  });
+
+  /**
+   * Подключает ширму с сервера: дальше окна читаются и пишутся в неё.
+   * @param id - идентификатор ширмы
+   * @param initial - окна ширмы с сервера
+   */
+  function attach(id: string, initial: ReadonlyArray<DmScreenWindow>): void {
+    screenId.value = id;
+    remoteWindows.value = [...initial];
+    isDirty = false;
+  }
+
+  /** Отключает ширму с сервера, досохранив изменения. */
+  function detach(): void {
+    void save();
+
+    screenId.value = undefined;
+    remoteWindows.value = [];
+  }
+
+  /**
+   * Досохраняет изменения, когда страницу закрывают или прячут: обычный
+   * запрос браузер может оборвать.
+   */
+  function saveOnLeave(): void {
+    if (!screenId.value || !isDirty) {
+      return;
+    }
+
+    isDirty = false;
+    saveDmScreenWindowsOnLeave(screenId.value, remoteWindows.value);
+  }
+
+  /** Убирает гостевую ширму из браузера: её перенесли в аккаунт или удалили. */
+  function clearLocal(): void {
+    localWindows.value = [];
+  }
 
   const isWindowed = useMediaQuery(LAYOUT_DRAWER_QUERY);
 
@@ -101,45 +191,16 @@ export const useDmScreen = createSharedComposable(() => {
    * @returns добавлена ли новая запись
    */
   function add(request: DmScreenRequest): boolean {
-    const existing = windows.value.find((item) => item.path === request.path);
-
-    if (existing) {
-      update(existing.id, {
-        isMinimized: false,
-        layer: topLayer.value + 1,
-      });
-
-      return false;
-    }
-
-    const viewport = {
-      width: viewportWidth.value,
-      height: viewportHeight.value,
-    };
-
-    const size = fitDmScreenWindowSize(viewport);
-
-    const position = placeDmScreenWindow(
-      viewport,
-      size,
-      request.origin,
-      visibleWindows.value.length,
+    const result = appendDmScreenWindow(
+      windows.value,
+      request,
+      { width: viewportWidth.value, height: viewportHeight.value },
+      crypto.randomUUID(),
     );
 
-    windows.value = [
-      ...windows.value,
-      {
-        id: crypto.randomUUID(),
-        path: request.path,
-        title: request.title,
-        ...position,
-        ...size,
-        layer: topLayer.value + 1,
-        isMinimized: false,
-      },
-    ];
+    windows.value = result.windows;
 
-    return true;
+    return result.isAdded;
   }
 
   /**
@@ -240,7 +301,13 @@ export const useDmScreen = createSharedComposable(() => {
 
   return {
     isWindowed,
+    screenId: readonly(screenId),
+    localWindows: readonly(localWindows),
     windows,
+    attach,
+    detach,
+    saveOnLeave,
+    clearLocal,
     visibleWindows,
     minimizedWindows,
     add,

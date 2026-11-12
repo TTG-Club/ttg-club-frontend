@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  appendDmScreenWindow,
   arrangeDmScreenWindows,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
+  dmScreenDetailSchema,
+  dmScreenListSchema,
+  formatDmScreenDate,
   getDmScreenEntryRoot,
   isDmScreenPath,
   resolveDmScreenSection,
@@ -77,5 +81,73 @@ describe('ширма мастера', () => {
     );
 
     expect(overlaps).toBe(false);
+  });
+
+  it('добавляет запись окном и не дублирует уже добавленную', () => {
+    const viewport = { width: 1600, height: 900 };
+
+    const first = appendDmScreenWindow(
+      [],
+      { path: '/spells/fireball', title: 'Огненный шар' },
+      viewport,
+      'w1',
+    );
+
+    expect(first.isAdded).toBe(true);
+    expect(first.windows).toHaveLength(1);
+    expect(first.windows[0]?.layer).toBe(1);
+
+    const minimized = first.windows.map((item) => ({
+      ...item,
+      isMinimized: true,
+    }));
+
+    const again = appendDmScreenWindow(
+      minimized,
+      { path: '/spells/fireball', title: 'Огненный шар' },
+      viewport,
+      'w2',
+    );
+
+    expect(again.isAdded).toBe(false);
+    expect(again.windows).toHaveLength(1);
+    expect(again.windows[0]?.isMinimized).toBe(false);
+    expect(again.windows[0]?.layer).toBe(2);
+  });
+
+  it('читает список ширм и ширму с сервера, числовой id — строкой', () => {
+    const list = dmScreenListSchema.parse({
+      items: [{ id: 7, name: 'Подземелье', windowCount: 3, updatedAt: null }],
+      used: 1,
+      limit: 1,
+    });
+
+    expect(list.items[0]?.id).toBe('7');
+
+    const screen = dmScreenDetailSchema.parse({
+      id: 'abc',
+      name: 'Подземелье',
+      windows: [
+        {
+          id: 'w1',
+          path: '/bestiary/goblin',
+          title: 'Гоблин',
+          x: 100,
+          y: 80,
+          width: 480,
+          height: 600,
+          layer: 1,
+          isMinimized: false,
+        },
+      ],
+    });
+
+    expect(screen.windows).toHaveLength(1);
+  });
+
+  it('пишет дату изменения ширмы по-русски, битую — пусто', () => {
+    expect(formatDmScreenDate('2026-11-12T14:05:00')).toContain('ноября');
+    expect(formatDmScreenDate('не дата')).toBe('');
+    expect(formatDmScreenDate(null)).toBe('');
   });
 });

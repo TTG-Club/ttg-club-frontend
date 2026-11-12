@@ -1,5 +1,7 @@
+import type { DmScreenWindow } from './schema';
 import type {
   DmScreenPoint,
+  DmScreenRequest,
   DmScreenSection,
   DmScreenSize,
   DmScreenTile,
@@ -11,8 +13,11 @@ import {
   DM_SCREEN_CASCADE_LENGTH,
   DM_SCREEN_CASCADE_STEP,
   DM_SCREEN_CLICK_OFFSET,
+  DM_SCREEN_DATE_FORMAT,
+  DM_SCREEN_DATE_LOCALE,
   DM_SCREEN_GRID_GAP,
   DM_SCREEN_LEFT_INSET,
+  DM_SCREEN_PATH,
   DM_SCREEN_SECTIONS,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_HEADER_HEIGHT,
@@ -24,6 +29,60 @@ import {
 
 /** Конец адреса: строка запроса и якорь. */
 const PATH_TAIL_PATTERN = /[?#].*$/;
+
+/**
+ * Добавляет запись окном в список окон ширмы. Уже добавленная запись не
+ * дублируется: её окно разворачивается и встаёт сверху.
+ * @param windows - окна ширмы
+ * @param request - запись, название и точка клика
+ * @param viewport - размер экрана
+ * @param id - идентификатор нового окна
+ * @returns новые окна и добавлена ли новая запись
+ */
+export function appendDmScreenWindow(
+  windows: ReadonlyArray<DmScreenWindow>,
+  request: DmScreenRequest,
+  viewport: DmScreenSize,
+  id: string,
+): { windows: Array<DmScreenWindow>; isAdded: boolean } {
+  const topLayer = windows.reduce((top, item) => Math.max(top, item.layer), 0);
+
+  if (windows.some((item) => item.path === request.path)) {
+    return {
+      windows: windows.map((item) =>
+        item.path === request.path
+          ? { ...item, isMinimized: false, layer: topLayer + 1 }
+          : item,
+      ),
+      isAdded: false,
+    };
+  }
+
+  const size = fitDmScreenWindowSize(viewport);
+
+  const position = placeDmScreenWindow(
+    viewport,
+    size,
+    request.origin,
+    windows.filter((item) => !item.isMinimized).length,
+  );
+
+  return {
+    windows: [
+      ...windows,
+      {
+        id,
+        path: request.path,
+        title: request.title,
+        ...position,
+        ...size,
+        layer: topLayer + 1,
+        isMinimized: false,
+      },
+    ],
+    isAdded: true,
+  };
+}
 
 /**
  * Ограничивает число отрезком; если отрезок пуст, отдаёт его начало.
@@ -281,4 +340,29 @@ export function arrangeDmScreenWindows(
     width,
     height,
   }));
+}
+
+/**
+ * Страница ширмы пользователя.
+ * @param id - идентификатор ширмы
+ */
+export function getDmScreenPagePath(id: string): string {
+  return `${DM_SCREEN_PATH}/${encodeURIComponent(id)}`;
+}
+
+/**
+ * Дата изменения ширмы для списка; нет даты или она битая — пусто.
+ * @param value - дата в ISO-формате
+ */
+export function formatDmScreenDate(value?: string | null): string {
+  const date = value ? new Date(value) : undefined;
+
+  if (!date || Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return new Intl.DateTimeFormat(
+    DM_SCREEN_DATE_LOCALE,
+    DM_SCREEN_DATE_FORMAT,
+  ).format(date);
 }
