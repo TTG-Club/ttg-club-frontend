@@ -7,7 +7,7 @@
   import { HomePartners } from '~home/partners';
   import { HomeSections } from '~home/sections';
   import { HomeSocialLinks } from '~home/social-links';
-  import { HomePromoCard } from '~home/ui-kit';
+  import { HomePromoCard, HomeReserved } from '~home/ui-kit';
 
   definePageMeta({
     layout: 'home',
@@ -52,12 +52,9 @@
 
           <div class="contents xl:flex xl:flex-auto xl:items-stretch xl:gap-3">
             <!-- Место в запасе под будущий блок (на new.ttg.club здесь
-              статьи): четверть ленты пустует, новости сообщества не
-              растягиваются на всю половину -->
-            <div
-              aria-hidden="true"
-              class="hidden xl:block xl:min-w-0 xl:flex-1"
-            />
+              статьи). Ниже xl его нет: в ленте одним столбцом пустая
+              заглушка только удлиняла бы страницу -->
+            <HomeReserved class="hidden xl:flex xl:min-w-0 xl:flex-1" />
 
             <HomeCommunityNews
               class="order-4 xl:order-0 xl:min-w-0 xl:flex-1"

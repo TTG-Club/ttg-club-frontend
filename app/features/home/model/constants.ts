@@ -7,6 +7,14 @@ import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
 /** Стрелка ссылок главной: плитки разделов, «Подробнее», «Перейти» */
 export const HOME_LINK_ARROW_ICON = 'tabler:arrow-right';
 
+/** Подпись места, оставленного под будущий блок */
+export const HOME_RESERVED_LABEL = 'Зарезервировано';
+
+export const HOME_RESERVED_ICON = 'tabler:lock';
+
+/** Сколько строк ленты нарисовано в очертаниях запасного места */
+export const HOME_RESERVED_ROW_COUNT = 3;
+
 /* --- Инструменты -------------------------------------------------------- */
 
 /**
