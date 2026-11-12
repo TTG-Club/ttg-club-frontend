@@ -32,6 +32,14 @@
   }>();
 
   const hasFooter = computed(() => Boolean(to && linkLabel));
+
+  // min-h-0 — чтобы содержимое могло прокручиваться внутри, когда высоту
+  // панели задаёт раскладка, а не содержимое
+  const bodyClass = computed(() => [
+    flush ? undefined : 'p-3',
+    fill ? 'flex min-h-0 flex-auto flex-col' : undefined,
+    detached ? 'xl:relative xl:min-h-0 xl:flex-auto' : undefined,
+  ]);
 </script>
 
 <template>
