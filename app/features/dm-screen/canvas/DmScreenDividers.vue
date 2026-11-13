@@ -5,6 +5,7 @@
   import {
     DM_SCREEN_DIVIDER_ACTIVE_CLASS,
     DM_SCREEN_DIVIDER_CLASS,
+    getDmScreenDividerPointer,
     getDmScreenDividerRect,
     getDmScreenDividers,
     getDmScreenRectStyle,
@@ -53,18 +54,6 @@
   );
 
   /**
-   * Где указатель вдоль оси, по которой двигается граница.
-   * @param divider - граница
-   * @param event - событие указателя
-   */
-  function getPointerPosition(
-    divider: DmScreenDivider,
-    event: PointerEvent,
-  ): number {
-    return divider.isVertical ? event.clientX : event.clientY;
-  }
-
-  /**
    * Границу начали тянуть: указатель закрепляется за ней, чтобы она не
    * терялась, когда он уходит с неё.
    * @param divider - граница
@@ -79,7 +68,10 @@
 
     dragged.value = {
       divider,
-      origin: getPointerPosition(divider, event),
+      origin: getDmScreenDividerPointer(divider, {
+        x: event.clientX,
+        y: event.clientY,
+      }),
       position: divider.position,
       tiles: [],
     };
@@ -98,7 +90,10 @@
 
     const moved = moveDmScreenDivider(
       active.divider,
-      getPointerPosition(active.divider, event) - active.origin,
+      getDmScreenDividerPointer(active.divider, {
+        x: event.clientX,
+        y: event.clientY,
+      }) - active.origin,
       visibleWindows.value,
     );
 

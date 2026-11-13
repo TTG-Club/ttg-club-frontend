@@ -1,7 +1,11 @@
 <script setup lang="ts">
   import type { Position } from '@vueuse/core';
 
-  import type { DmScreenResizeEdges, DmScreenWindow } from '../model';
+  import type {
+    DmScreenRect,
+    DmScreenResizeEdges,
+    DmScreenWindow,
+  } from '../model';
 
   import { provideContentLinkHandler } from '~content/composables';
   import { EXTERNAL_LINK_TARGET } from '~content/model';
@@ -119,35 +123,26 @@
   const width = ref(screenWindow.width);
   const height = ref(screenWindow.height);
 
-  // Место и размер может поменять не только указатель, но и раскладка по
-  // сетке
-  watch(
-    () => [
-      screenWindow.x,
-      screenWindow.y,
-      screenWindow.width,
-      screenWindow.height,
-    ],
-    ([nextX = 0, nextY = 0, nextWidth = 0, nextHeight = 0]) => {
-      x.value = nextX;
-      y.value = nextY;
-      width.value = nextWidth;
-      height.value = nextHeight;
-    },
+  // Где окно должно стоять по данным ширмы. Пока общую границу с соседним
+  // окном тянут, это её предпросмотр, иначе — сохранённое место
+  const targetRect = computed<DmScreenRect>(
+    () =>
+      previewRects.value.get(screenWindow.id) ?? {
+        x: screenWindow.x,
+        y: screenWindow.y,
+        width: screenWindow.width,
+        height: screenWindow.height,
+      },
   );
 
-  // Общую границу с соседним окном тянут: окно меняется вслед за ней
-  watch(
-    () => previewRects.value.get(screenWindow.id),
-    (rect) => {
-      if (rect) {
-        x.value = rect.x;
-        y.value = rect.y;
-        width.value = rect.width;
-        height.value = rect.height;
-      }
-    },
-  );
+  // Место и размер меняет не только указатель над самим окном, но и
+  // раскладка по сетке, и общая граница с соседом
+  watch(targetRect, (rect) => {
+    x.value = rect.x;
+    y.value = rect.y;
+    width.value = rect.width;
+    height.value = rect.height;
+  });
 
   // Шапка ширмы стала выше (кнопки перенеслись): окно выходит из-под неё
   watch(

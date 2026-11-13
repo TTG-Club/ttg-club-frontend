@@ -44,6 +44,7 @@ export {
   arrangeDmScreenWindows,
   createDmScreenNotePath,
   fitDmScreenWindowSize,
+  getDmScreenDividerPointer,
   getDmScreenDividerRect,
   getDmScreenDividers,
   getDmScreenEdgeTarget,

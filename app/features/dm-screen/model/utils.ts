@@ -808,6 +808,19 @@ export function getDmScreenDividers(
 }
 
 /**
+ * Где указатель вдоль оси, по которой двигается граница: по горизонтали
+ * для вертикальной и по вертикали для горизонтальной.
+ * @param divider - граница
+ * @param pointer - где указатель
+ */
+export function getDmScreenDividerPointer(
+  divider: DmScreenDivider,
+  pointer: DmScreenPoint,
+): number {
+  return divider.isVertical ? pointer.x : pointer.y;
+}
+
+/**
  * Прямоугольник общей границы на холсте: промежуток между окнами.
  * @param divider - граница
  * @param position - где граница сейчас; пока её тянут, она не на своём месте

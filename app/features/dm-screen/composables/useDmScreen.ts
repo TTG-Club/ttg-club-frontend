@@ -417,7 +417,7 @@ export const useDmScreen = createSharedComposable(() => {
     focus,
     update,
     updateRects,
-    previewRects,
+    previewRects: shallowReadonly(previewRects),
     setPreviewRects,
     isAdded,
   };
