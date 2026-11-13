@@ -246,6 +246,14 @@ export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
       { x: 2 / 3, y: 0.5, width: 1 / 3, height: 0.5 },
     ],
   },
+  {
+    key: 'main-right',
+    zones: [
+      { x: 0, y: 0, width: 1 / 3, height: 0.5 },
+      { x: 0, y: 0.5, width: 1 / 3, height: 0.5 },
+      { x: 1 / 3, y: 0, width: 2 / 3, height: 1 },
+    ],
+  },
 ];
 
 /**
