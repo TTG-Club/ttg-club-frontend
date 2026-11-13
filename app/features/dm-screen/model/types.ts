@@ -1,3 +1,5 @@
+import type { DmScreenSnapPickerPosition } from './schema';
+
 /** Точка на экране, px. */
 export interface DmScreenPoint {
   x: number;
@@ -42,6 +44,14 @@ export interface DmScreenSnapZone {
 export interface DmScreenSnapLayout {
   key: string;
   zones: ReadonlyArray<DmScreenSnapZone>;
+}
+
+/** Вариант места панели раскладок в её настройках. */
+export interface DmScreenSnapPickerOption {
+  value: DmScreenSnapPickerPosition;
+  /** Подпись пункта в настройках. */
+  label: string;
+  icon: string;
 }
 
 /** Место раскладки, над которым держат окно. */

@@ -3,6 +3,7 @@ import type {
   DmScreenResizeHandle,
   DmScreenSection,
   DmScreenSnapLayout,
+  DmScreenSnapPickerOption,
   DmScreenSnapZone,
 } from './types';
 
@@ -32,6 +33,8 @@ import {
   RULES_SECTION,
   SCREENS_SECTION,
 } from '~wiki/model';
+
+import { dmScreenSnapPickerPositionSchema } from './schema';
 
 /** Страница ширмы. */
 export const DM_SCREEN_PATH = DM_SCREEN_PAGE_PATH;
@@ -268,20 +271,33 @@ export const DM_SCREEN_SNAP_PICKER_OFFSET = 8;
 export const DM_SCREEN_SNAP_PICKER_STORAGE_KEY =
   'dm-screen:snap-picker-position';
 
+/** Места панели раскладок по именам: у верха холста, у низа, скрыта. */
+export const DM_SCREEN_SNAP_PICKER_POSITION =
+  dmScreenSnapPickerPositionSchema.enum;
+
 /** Где панель раскладок, пока пользователь не выбрал сам. */
 export const DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION: DmScreenSnapPickerPosition =
-  'top';
+  DM_SCREEN_SNAP_PICKER_POSITION.top;
 
 /** Варианты места панели раскладок в её настройках. */
-export const DM_SCREEN_SNAP_PICKER_POSITIONS: ReadonlyArray<{
-  value: DmScreenSnapPickerPosition;
-  label: string;
-  icon: string;
-}> = [
-  { value: 'top', label: 'Сверху', icon: 'tabler:layout-navbar' },
-  { value: 'bottom', label: 'Снизу', icon: 'tabler:layout-bottombar' },
-  { value: 'hidden', label: 'Скрыть', icon: 'tabler:eye-off' },
-];
+export const DM_SCREEN_SNAP_PICKER_POSITIONS: ReadonlyArray<DmScreenSnapPickerOption> =
+  [
+    {
+      value: DM_SCREEN_SNAP_PICKER_POSITION.top,
+      label: 'Сверху',
+      icon: 'tabler:layout-navbar',
+    },
+    {
+      value: DM_SCREEN_SNAP_PICKER_POSITION.bottom,
+      label: 'Снизу',
+      icon: 'tabler:layout-bottombar',
+    },
+    {
+      value: DM_SCREEN_SNAP_PICKER_POSITION.hidden,
+      label: 'Скрыть',
+      icon: 'tabler:eye-off',
+    },
+  ];
 
 /** Вид места в панели раскладок: под указателем и остальные. */
 export const DM_SCREEN_SNAP_ZONE_CLASS = {

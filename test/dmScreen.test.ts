@@ -9,6 +9,7 @@ import {
   DM_SCREEN_LEFT_INSET,
   DM_SCREEN_SNAP_HALVES,
   DM_SCREEN_SNAP_LAYOUTS,
+  DM_SCREEN_SNAP_PICKER_OFFSET,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
   DM_SCREEN_WINDOW_MIN_SIZE,
@@ -17,10 +18,12 @@ import {
   getDmScreenDividers,
   getDmScreenEdgeTarget,
   getDmScreenEntryRoot,
+  getDmScreenPickerStyle,
   getDmScreenWindowIcon,
   getDmScreenZoneRect,
   isDmScreenNotePath,
   isDmScreenPath,
+  isDmScreenPickerBand,
   moveDmScreenDivider,
   resizeDmScreenWindow,
   resolveDmScreenSection,
@@ -324,6 +327,44 @@ describe('ширма мастера', () => {
       expect(getDmScreenEdgeTarget({ x: 800, y: 400 }, viewport)).toBe(
         undefined,
       );
+    });
+
+    it('панель раскладок видна в полосе у выбранного края холста', () => {
+      const nearTop = { x: 800, y: DM_SCREEN_TOP_INSET + 20 };
+      const nearBottom = { x: 800, y: viewport.height - 20 };
+
+      expect(isDmScreenPickerBand(nearTop, viewport, 'top')).toBe(true);
+      expect(isDmScreenPickerBand(nearBottom, viewport, 'top')).toBe(false);
+      expect(isDmScreenPickerBand(nearBottom, viewport, 'bottom')).toBe(true);
+      expect(isDmScreenPickerBand(nearTop, viewport, 'bottom')).toBe(false);
+    });
+
+    it('скрытая панель раскладок не появляется ни у одного края', () => {
+      expect(
+        isDmScreenPickerBand(
+          { x: 800, y: DM_SCREEN_TOP_INSET + 20 },
+          viewport,
+          'hidden',
+        ),
+      ).toBe(false);
+
+      expect(
+        isDmScreenPickerBand(
+          { x: 800, y: viewport.height - 20 },
+          viewport,
+          'hidden',
+        ),
+      ).toBe(false);
+    });
+
+    it('панель раскладок прижата к выбранному краю холста', () => {
+      expect(getDmScreenPickerStyle(viewport, 'top')).toEqual({
+        top: `${DM_SCREEN_TOP_INSET + DM_SCREEN_SNAP_PICKER_OFFSET}px`,
+      });
+
+      expect(getDmScreenPickerStyle(viewport, 'bottom')).toEqual({
+        bottom: `${DM_SCREEN_SNAP_PICKER_OFFSET}px`,
+      });
     });
 
     it('места каждой раскладки покрывают холст целиком', () => {

@@ -4,10 +4,10 @@
   import { useDmScreen, useDmScreenSnap } from '../composables';
   import {
     DM_SCREEN_SNAP_LAYOUTS,
-    DM_SCREEN_SNAP_PICKER_OFFSET,
     DM_SCREEN_SNAP_ZONE_CLASS,
     DM_SCREEN_SNAP_ZONE_SELECTOR,
     DM_SCREEN_TEXT,
+    getDmScreenPickerStyle,
     getDmScreenRectStyle,
     getDmScreenWindowIcon,
     getDmScreenZoneStyle,
@@ -66,11 +66,7 @@
   );
 
   const pickerStyle = computed(() =>
-    pickerPosition.value === 'bottom'
-      ? { bottom: `${DM_SCREEN_SNAP_PICKER_OFFSET}px` }
-      : {
-          top: `${(viewport.value.top ?? 0) + DM_SCREEN_SNAP_PICKER_OFFSET}px`,
-        },
+    getDmScreenPickerStyle(viewport.value, pickerPosition.value),
   );
 
   /**

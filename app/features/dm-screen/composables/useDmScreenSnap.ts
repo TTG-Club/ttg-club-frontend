@@ -4,16 +4,15 @@ import type {
   DmScreenSnapAssist,
   DmScreenSnapPickerPosition,
   DmScreenSnapTarget,
-  DmScreenViewport,
 } from '../model';
 
 import {
   DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION,
-  DM_SCREEN_SNAP_PICKER_DISTANCE,
   DM_SCREEN_SNAP_PICKER_STORAGE_KEY,
   dmScreenSnapPickerPositionSchema,
   getDmScreenEdgeTarget,
   getDmScreenZoneRect,
+  isDmScreenPickerBand,
 } from '../model';
 import { useDmScreen } from './useDmScreen';
 
@@ -29,32 +28,10 @@ function readPickerPosition(raw: string): DmScreenSnapPickerPosition {
 }
 
 /**
- * Находится ли указатель в полосе, где видна панель раскладок: под шапкой
- * ширмы или у низа холста. У скрытой панели полосы нет.
- * @param point - где указатель
- * @param viewport - экран ширмы
- * @param position - где панель раскладок
- */
-function isInPickerBand(
-  point: DmScreenPoint,
-  viewport: DmScreenViewport,
-  position: DmScreenSnapPickerPosition,
-): boolean {
-  if (position === 'top') {
-    return point.y < (viewport.top ?? 0) + DM_SCREEN_SNAP_PICKER_DISTANCE;
-  }
-
-  if (position === 'bottom') {
-    return point.y > viewport.height - DM_SCREEN_SNAP_PICKER_DISTANCE;
-  }
-
-  return false;
-}
-
-/**
  * Раскладки окон ширмы, как у окон Windows 11. Пока окно тащат, у бокового
- * края холста оно предлагает занять половину, а у верха появляется панель
- * раскладок: окно отпускают над местом в ней. Когда окно встало в
+ * края холста оно предлагает занять половину, а у верха или низа (как
+ * выбрал пользователь) появляется панель раскладок: окно отпускают над
+ * местом в ней. Когда окно встало в
  * раскладку, остальные её места по очереди предлагают выбрать окно — пока
  * места или окна не кончатся.
  */
@@ -95,7 +72,11 @@ export const useDmScreenSnap = createSharedComposable(() => {
     () =>
       !!draggingId.value
       && !!pointer.value
-      && isInPickerBand(pointer.value, viewport.value, pickerPosition.value),
+      && isDmScreenPickerBand(
+        pointer.value,
+        viewport.value,
+        pickerPosition.value,
+      ),
   );
 
   /** Место, которое окно займёт, если его отпустить. */
@@ -256,7 +237,11 @@ export const useDmScreenSnap = createSharedComposable(() => {
   return {
     pointer: readonly(pointer),
     target,
-    pickerPosition: computed(() => pickerPosition.value),
+    // Не `readonly`: у ссылки на localStorage тип записи шире типа чтения
+    // (допускает `null` для удаления ключа), и обёртка отдала бы наружу его
+    pickerPosition: computed<DmScreenSnapPickerPosition>(
+      () => pickerPosition.value,
+    ),
     setPickerPosition,
     isPickerVisible,
     previewRect,

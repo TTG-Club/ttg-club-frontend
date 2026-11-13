@@ -1,4 +1,4 @@
-import type { DmScreenWindow } from './schema';
+import type { DmScreenSnapPickerPosition, DmScreenWindow } from './schema';
 import type {
   DmScreenAxisTile,
   DmScreenDivider,
@@ -32,6 +32,9 @@ import {
   DM_SCREEN_SNAP_DISTANCE,
   DM_SCREEN_SNAP_EDGE_DISTANCE,
   DM_SCREEN_SNAP_HALVES,
+  DM_SCREEN_SNAP_PICKER_DISTANCE,
+  DM_SCREEN_SNAP_PICKER_OFFSET,
+  DM_SCREEN_SNAP_PICKER_POSITION,
   DM_SCREEN_TEXT,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_HEADER_HEIGHT,
@@ -644,6 +647,44 @@ export function getDmScreenEdgeTarget(
   }
 
   return undefined;
+}
+
+/**
+ * Находится ли указатель в полосе, где видна панель раскладок: под шапкой
+ * ширмы или у низа холста. У скрытой панели полосы нет.
+ * @param pointer - где указатель
+ * @param viewport - экран ширмы
+ * @param position - где панель раскладок
+ */
+export function isDmScreenPickerBand(
+  pointer: DmScreenPoint,
+  viewport: DmScreenViewport,
+  position: DmScreenSnapPickerPosition,
+): boolean {
+  if (position === DM_SCREEN_SNAP_PICKER_POSITION.top) {
+    return pointer.y < getTopInset(viewport) + DM_SCREEN_SNAP_PICKER_DISTANCE;
+  }
+
+  if (position === DM_SCREEN_SNAP_PICKER_POSITION.bottom) {
+    return pointer.y > viewport.height - DM_SCREEN_SNAP_PICKER_DISTANCE;
+  }
+
+  return false;
+}
+
+/**
+ * Место панели раскладок для привязки `style`: под шапкой ширмы или у низа
+ * холста.
+ * @param viewport - экран ширмы
+ * @param position - где панель раскладок
+ */
+export function getDmScreenPickerStyle(
+  viewport: DmScreenViewport,
+  position: DmScreenSnapPickerPosition,
+): Partial<Record<'top' | 'bottom', string>> {
+  return position === DM_SCREEN_SNAP_PICKER_POSITION.bottom
+    ? { bottom: `${DM_SCREEN_SNAP_PICKER_OFFSET}px` }
+    : { top: `${getTopInset(viewport) + DM_SCREEN_SNAP_PICKER_OFFSET}px` };
 }
 
 /**
