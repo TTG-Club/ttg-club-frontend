@@ -41,6 +41,9 @@ export const DM_SCREEN_PATH = DM_SCREEN_PAGE_PATH;
 
 export const DM_SCREEN_TITLE = DM_SCREEN_PAGE_TITLE;
 
+/** Имя ширмы в учёте работы с инструментами; общее с сайтом 2024. */
+export const DM_SCREEN_USAGE_FEATURE = 'dm-screen';
+
 /** Старый адрес черт: записи по нему тоже открываются в ширме. */
 export const DM_SCREEN_TRAITS_PATH = '/traits';
 

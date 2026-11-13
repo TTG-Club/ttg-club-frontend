@@ -1,10 +1,17 @@
 <script setup lang="ts">
-  import { DM_SCREEN_PATH, DM_SCREEN_TITLE } from '~dm-screen/model';
+  import {
+    DM_SCREEN_PATH,
+    DM_SCREEN_TITLE,
+    DM_SCREEN_USAGE_FEATURE,
+  } from '~dm-screen/model';
   import { DmScreenAccount } from '~dm-screen/screen';
+  import { useFeatureUsage } from '~infrastructure/analytics/composables';
 
   definePageMeta({ layout: 'section' });
 
   useSeoMeta({ title: DM_SCREEN_TITLE });
+
+  useFeatureUsage(DM_SCREEN_USAGE_FEATURE);
 
   const route = useRoute();
   const { isLoggedIn, pending } = useUser();
