@@ -340,6 +340,14 @@ export const useDmScreen = createSharedComposable(() => {
     }));
   }
 
+  /** Разворачивает все свёрнутые окна на их прежних местах. */
+  function restoreAll(): void {
+    windows.value = windows.value.map((item) => ({
+      ...item,
+      isMinimized: false,
+    }));
+  }
+
   /**
    * Разворачивает свёрнутое окно поверх остальных.
    * @param id - окно
@@ -414,6 +422,7 @@ export const useDmScreen = createSharedComposable(() => {
     minimize,
     minimizeAll,
     restore,
+    restoreAll,
     focus,
     update,
     updateRects,

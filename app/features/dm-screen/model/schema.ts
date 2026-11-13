@@ -24,6 +24,20 @@ export type DmScreenWindow = z.infer<typeof dmScreenWindowSchema>;
 
 export const dmScreenWindowListSchema = z.array(dmScreenWindowSchema);
 
+/**
+ * Где показывать панель раскладок, пока окно тащат: у верха холста, у низа
+ * или не показывать совсем.
+ */
+export const dmScreenSnapPickerPositionSchema = z.enum([
+  'top',
+  'bottom',
+  'hidden',
+]);
+
+export type DmScreenSnapPickerPosition = z.infer<
+  typeof dmScreenSnapPickerPositionSchema
+>;
+
 /** Ширма в списке пользователя. */
 export const dmScreenSummarySchema = z.object({
   id: z.coerce.string().min(1),

@@ -1,3 +1,4 @@
+import type { DmScreenSnapPickerPosition } from './schema';
 import type {
   DmScreenResizeHandle,
   DmScreenSection,
@@ -212,15 +213,20 @@ export const DM_SCREEN_SNAP_HALVES: DmScreenSnapLayout = {
 /**
  * Раскладки в панели, которая появляется, когда окно тащат к верху холста.
  * Мельче, чем у окон Windows: карточки записей небольшие, на холст их
- * встаёт до восьми.
+ * встаёт до восемнадцати. В панели раскладки идут в два ряда.
  */
 export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
   DM_SCREEN_SNAP_HALVES,
   { key: 'columns-3', zones: createGridZones(3, 1) },
   { key: 'columns-4', zones: createGridZones(4, 1) },
+  { key: 'columns-6', zones: createGridZones(6, 1) },
   { key: 'grid-2x2', zones: createGridZones(2, 2) },
   { key: 'grid-3x2', zones: createGridZones(3, 2) },
   { key: 'grid-4x2', zones: createGridZones(4, 2) },
+  { key: 'grid-6x2', zones: createGridZones(6, 2) },
+  { key: 'grid-3x3', zones: createGridZones(3, 3) },
+  { key: 'grid-4x3', zones: createGridZones(4, 3) },
+  { key: 'grid-6x3', zones: createGridZones(6, 3) },
   {
     key: 'main-left',
     zones: [
@@ -246,16 +252,36 @@ export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
 export const DM_SCREEN_SNAP_EDGE_DISTANCE = 24;
 
 /**
- * Высота полосы под шапкой ширмы, px: пока указатель с окном в ней, видна
- * панель раскладок.
+ * Высота полосы под шапкой ширмы или у низа холста, px: пока указатель с
+ * окном в ней, видна панель раскладок. Панель в два ряда помещается в полосу
+ * целиком.
  */
-export const DM_SCREEN_SNAP_PICKER_DISTANCE = 140;
+export const DM_SCREEN_SNAP_PICKER_DISTANCE = 190;
 
 /** По чему в разметке панели раскладок находятся её места. */
 export const DM_SCREEN_SNAP_ZONE_SELECTOR = '[data-zone]';
 
-/** Отступ панели раскладок от шапки ширмы, px. */
+/** Отступ панели раскладок от шапки ширмы или от низа холста, px. */
 export const DM_SCREEN_SNAP_PICKER_OFFSET = 8;
+
+/** Ключ места панели раскладок в localStorage. */
+export const DM_SCREEN_SNAP_PICKER_STORAGE_KEY =
+  'dm-screen:snap-picker-position';
+
+/** Где панель раскладок, пока пользователь не выбрал сам. */
+export const DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION: DmScreenSnapPickerPosition =
+  'top';
+
+/** Варианты места панели раскладок в её настройках. */
+export const DM_SCREEN_SNAP_PICKER_POSITIONS: ReadonlyArray<{
+  value: DmScreenSnapPickerPosition;
+  label: string;
+  icon: string;
+}> = [
+  { value: 'top', label: 'Сверху', icon: 'tabler:layout-navbar' },
+  { value: 'bottom', label: 'Снизу', icon: 'tabler:layout-bottombar' },
+  { value: 'hidden', label: 'Скрыть', icon: 'tabler:eye-off' },
+];
 
 /** Вид места в панели раскладок: под указателем и остальные. */
 export const DM_SCREEN_SNAP_ZONE_CLASS = {
@@ -378,6 +404,8 @@ export const DM_SCREEN_TEXT = {
   pickTitle: 'В какую ширму?',
   pickDescription: 'Запись встанет окном в выбранную ширму.',
   minimizeAll: 'Свернуть все',
+  restoreAll: 'Развернуть все',
+  snapPickerSettings: 'Панель раскладок',
   unknownEntry: 'Эту запись нельзя показать в ширме',
 } as const;
 
@@ -395,5 +423,7 @@ export const DM_SCREEN_ICON = {
   delete: 'tabler:trash',
   signIn: 'tabler:login',
   minimizeAll: 'tabler:layout-bottombar-collapse',
+  restoreAll: 'tabler:layout-bottombar-expand',
+  snapPickerSettings: 'tabler:adjustments-horizontal',
   unknown: 'tabler:file-unknown',
 } as const;

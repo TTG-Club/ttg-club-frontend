@@ -15,7 +15,8 @@
 
   /**
    * Раскладки окон поверх холста. Пока окно тащат: подсветка места, которое
-   * оно займёт, и у верха холста — панель раскладок. После того как окно
+   * оно займёт, и у верха или низа холста — панель раскладок (где именно и
+   * показывать ли её, выбирают в настройках в шапке ширмы). После того как окно
    * встало в раскладку: в следующем свободном месте — список окон, которые
    * можно туда поставить; Escape или клик мимо заканчивает подбор.
    *
@@ -27,6 +28,7 @@
   const {
     pointer,
     target,
+    pickerPosition,
     isPickerVisible,
     previewRect,
     assistRect,
@@ -63,9 +65,13 @@
     })),
   );
 
-  const pickerStyle = computed(() => ({
-    top: `${(viewport.value.top ?? 0) + DM_SCREEN_SNAP_PICKER_OFFSET}px`,
-  }));
+  const pickerStyle = computed(() =>
+    pickerPosition.value === 'bottom'
+      ? { bottom: `${DM_SCREEN_SNAP_PICKER_OFFSET}px` }
+      : {
+          top: `${(viewport.value.top ?? 0) + DM_SCREEN_SNAP_PICKER_OFFSET}px`,
+        },
+  );
 
   /**
    * Место панели раскладок, над которым находится точка.
@@ -131,7 +137,7 @@
     ref="picker"
     aria-hidden="true"
     :style="pickerStyle"
-    class="pointer-events-none fixed left-[calc(50%+var(--navbar-width)/2)] flex -translate-x-1/2 gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
+    class="pointer-events-none fixed left-[calc(50%+var(--navbar-width)/2)] grid w-max -translate-x-1/2 grid-cols-7 gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
   >
     <div
       v-for="layout in pickerLayouts"

@@ -1,6 +1,7 @@
 export type {
   DmScreenDetail,
   DmScreenList,
+  DmScreenSnapPickerPosition,
   DmScreenSummary,
   DmScreenWindow,
 } from './schema';
@@ -34,6 +35,7 @@ export {
 export {
   dmScreenDetailSchema,
   dmScreenListSchema,
+  dmScreenSnapPickerPositionSchema,
   dmScreenSummarySchema,
   dmScreenWindowListSchema,
   dmScreenWindowSchema,

@@ -2,15 +2,54 @@ import type {
   DmScreenPoint,
   DmScreenRect,
   DmScreenSnapAssist,
+  DmScreenSnapPickerPosition,
   DmScreenSnapTarget,
+  DmScreenViewport,
 } from '../model';
 
 import {
+  DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION,
   DM_SCREEN_SNAP_PICKER_DISTANCE,
+  DM_SCREEN_SNAP_PICKER_STORAGE_KEY,
+  dmScreenSnapPickerPositionSchema,
   getDmScreenEdgeTarget,
   getDmScreenZoneRect,
 } from '../model';
 import { useDmScreen } from './useDmScreen';
+
+/**
+ * Читает сохранённое место панели раскладок; незнакомое значение — место
+ * по умолчанию.
+ * @param raw - строка из localStorage
+ */
+function readPickerPosition(raw: string): DmScreenSnapPickerPosition {
+  const parsed = dmScreenSnapPickerPositionSchema.safeParse(raw);
+
+  return parsed.success ? parsed.data : DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION;
+}
+
+/**
+ * Находится ли указатель в полосе, где видна панель раскладок: под шапкой
+ * ширмы или у низа холста. У скрытой панели полосы нет.
+ * @param point - где указатель
+ * @param viewport - экран ширмы
+ * @param position - где панель раскладок
+ */
+function isInPickerBand(
+  point: DmScreenPoint,
+  viewport: DmScreenViewport,
+  position: DmScreenSnapPickerPosition,
+): boolean {
+  if (position === 'top') {
+    return point.y < (viewport.top ?? 0) + DM_SCREEN_SNAP_PICKER_DISTANCE;
+  }
+
+  if (position === 'bottom') {
+    return point.y > viewport.height - DM_SCREEN_SNAP_PICKER_DISTANCE;
+  }
+
+  return false;
+}
 
 /**
  * Раскладки окон ширмы, как у окон Windows 11. Пока окно тащат, у бокового
@@ -32,12 +71,31 @@ export const useDmScreenSnap = createSharedComposable(() => {
 
   const assist = shallowRef<DmScreenSnapAssist>();
 
+  /** Где панель раскладок: выбор пользователя, хранится в браузере. */
+  const pickerPosition = useLocalStorage<DmScreenSnapPickerPosition>(
+    DM_SCREEN_SNAP_PICKER_STORAGE_KEY,
+    DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION,
+    {
+      serializer: {
+        read: readPickerPosition,
+        write: (value) => value,
+      },
+    },
+  );
+
+  /**
+   * Переносит панель раскладок или прячет её.
+   * @param position - где показывать панель
+   */
+  function setPickerPosition(position: DmScreenSnapPickerPosition): void {
+    pickerPosition.value = position;
+  }
+
   const isPickerVisible = computed(
     () =>
       !!draggingId.value
       && !!pointer.value
-      && pointer.value.y
-        < (viewport.value.top ?? 0) + DM_SCREEN_SNAP_PICKER_DISTANCE,
+      && isInPickerBand(pointer.value, viewport.value, pickerPosition.value),
   );
 
   /** Место, которое окно займёт, если его отпустить. */
@@ -198,6 +256,8 @@ export const useDmScreenSnap = createSharedComposable(() => {
   return {
     pointer: readonly(pointer),
     target,
+    pickerPosition: computed(() => pickerPosition.value),
+    setPickerPosition,
     isPickerVisible,
     previewRect,
     assistRect,

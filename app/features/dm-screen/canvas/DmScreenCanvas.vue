@@ -1,8 +1,11 @@
 <script setup lang="ts">
-  import { useDmScreen } from '../composables';
+  import type { DropdownMenuItem } from '@nuxt/ui';
+
+  import { useDmScreen, useDmScreenSnap } from '../composables';
   import { DmScreenClearModal } from '../dialogs';
   import {
     DM_SCREEN_ICON,
+    DM_SCREEN_SNAP_PICKER_POSITIONS,
     DM_SCREEN_TEXT,
     DM_SCREEN_TITLE,
     DM_SCREEN_TOP_GAP,
@@ -35,13 +38,17 @@
 
   const {
     windows,
+    visibleWindows,
     isWindowed,
     addNote,
     arrange,
     minimizeAll,
+    restoreAll,
     clear,
     setTopInset,
   } = useDmScreen();
+
+  const { pickerPosition, setPickerPosition } = useDmScreenSnap();
 
   const header = useTemplateRef<HTMLElement>('header');
 
@@ -83,6 +90,35 @@
   const isLayoutControlsVisible = computed(
     () => isWindowed.value && !isEmpty.value,
   );
+
+  // Когда свёрнуты все окна, сворачивать нечего: кнопка разворачивает их
+  const minimizeToggle = computed(() =>
+    visibleWindows.value.length
+      ? {
+          text: DM_SCREEN_TEXT.minimizeAll,
+          icon: DM_SCREEN_ICON.minimizeAll,
+          run: minimizeAll,
+        }
+      : {
+          text: DM_SCREEN_TEXT.restoreAll,
+          icon: DM_SCREEN_ICON.restoreAll,
+          run: restoreAll,
+        },
+  );
+
+  /** Настройки панели раскладок: где её показывать или скрыть. */
+  const snapPickerItems = computed<Array<DropdownMenuItem>>(() => [
+    { type: 'label', label: DM_SCREEN_TEXT.snapPickerSettings },
+    ...DM_SCREEN_SNAP_PICKER_POSITIONS.map(
+      ({ value, label, icon }): DropdownMenuItem => ({
+        label,
+        icon,
+        type: 'checkbox',
+        checked: pickerPosition.value === value,
+        onSelect: () => setPickerPosition(value),
+      }),
+    ),
+  ]);
 </script>
 
 <template>
@@ -133,16 +169,28 @@
 
         <UTooltip
           v-if="isLayoutControlsVisible"
-          :text="DM_SCREEN_TEXT.minimizeAll"
+          :text="minimizeToggle.text"
         >
           <UButton
-            :icon="DM_SCREEN_ICON.minimizeAll"
-            :aria-label="DM_SCREEN_TEXT.minimizeAll"
+            :icon="minimizeToggle.icon"
+            :aria-label="minimizeToggle.text"
             color="neutral"
             variant="outline"
-            @click.left.exact.prevent="minimizeAll"
+            @click.left.exact.prevent="minimizeToggle.run"
           />
         </UTooltip>
+
+        <UDropdownMenu
+          v-if="isWindowed"
+          :items="snapPickerItems"
+        >
+          <UButton
+            :icon="DM_SCREEN_ICON.snapPickerSettings"
+            :aria-label="DM_SCREEN_TEXT.snapPickerSettings"
+            color="neutral"
+            variant="outline"
+          />
+        </UDropdownMenu>
 
         <UButton
           v-if="!isEmpty"
