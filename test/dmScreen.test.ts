@@ -347,6 +347,13 @@ describe('ширма мастера', () => {
       });
     });
 
+    it('граница идёт только вдоль общей части окон разного размера', () => {
+      const small = { ...right, id: 'small', y: 200, height: 100 };
+      const [divider] = getDmScreenDividers([left, small]);
+
+      expect(divider).toMatchObject({ start: 200, end: 300 });
+    });
+
     it('в сетке 2×2 вертикальная граница одна на оба ряда', () => {
       const row = 300 + DM_SCREEN_GRID_GAP;
 

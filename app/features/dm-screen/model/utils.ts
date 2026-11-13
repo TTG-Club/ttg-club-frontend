@@ -725,7 +725,8 @@ function withAxisSpan(
 
 /**
  * Общие границы окон по одной оси. Соседи — окна, между которыми ровно
- * промежуток сетки и которые перекрываются поперёк оси. Соседи на одной
+ * промежуток сетки и которые перекрываются поперёк оси. Граница идёт вдоль
+ * общей части соседей. Соседи на одной
  * линии, стоящие друг за другом, делят одну границу: в сетке 2×2 она идёт
  * через весь холст.
  * @param tiles - окна вдоль оси
@@ -748,8 +749,10 @@ function getAxisDividers(
       .map((trailing) => ({
         leading,
         trailing,
-        start: Math.min(leading.crossStart, trailing.crossStart),
-        end: Math.max(leading.crossEnd, trailing.crossEnd),
+        // Граница — только там, где окна стоят друг против друга: полоска
+        // на ней встаёт по центру общей части, а не сбоку от меньшего окна
+        start: Math.max(leading.crossStart, trailing.crossStart),
+        end: Math.min(leading.crossEnd, trailing.crossEnd),
       })),
   );
 
