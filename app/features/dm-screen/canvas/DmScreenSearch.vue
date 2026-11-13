@@ -57,7 +57,8 @@
 </script>
 
 <template>
-  <div class="relative w-full max-w-xl">
+  <!-- Поиск сжимается раньше, чем кнопки шапки уйдут на вторую строку -->
+  <div class="relative max-w-xl min-w-64 flex-1">
     <UInput
       v-model="input"
       :icon="DM_SCREEN_ICON.search"

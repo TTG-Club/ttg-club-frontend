@@ -3,9 +3,11 @@ import type {
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
+  DmScreenResizeEdges,
   DmScreenSection,
   DmScreenSize,
   DmScreenTile,
+  DmScreenViewport,
 } from './types';
 
 import { sortBy } from 'es-toolkit';
@@ -35,6 +37,14 @@ import {
 const PATH_TAIL_PATTERN = /[?#].*$/;
 
 /**
+ * Где кончается шапка ширмы: выше окна не встают.
+ * @param viewport - экран ширмы
+ */
+function getTopInset(viewport: DmScreenViewport): number {
+  return viewport.top ?? DM_SCREEN_TOP_INSET;
+}
+
+/**
  * Добавляет запись окном в список окон ширмы. Уже добавленная запись не
  * дублируется: её окно разворачивается и встаёт сверху.
  * @param windows - окна ширмы
@@ -46,7 +56,7 @@ const PATH_TAIL_PATTERN = /[?#].*$/;
 export function appendDmScreenWindow(
   windows: ReadonlyArray<DmScreenWindow>,
   request: DmScreenRequest,
-  viewport: DmScreenSize,
+  viewport: DmScreenViewport,
   id: string,
 ): { windows: Array<DmScreenWindow>; isAdded: boolean } {
   const topLayer = windows.reduce((top, item) => Math.max(top, item.layer), 0);
@@ -160,12 +170,14 @@ export function isDmScreenPath(path: string): boolean {
  * панели и отступов.
  * @param viewport - размер экрана
  */
-export function fitDmScreenWindowSize(viewport: DmScreenSize): DmScreenSize {
+export function fitDmScreenWindowSize(
+  viewport: DmScreenViewport,
+): DmScreenSize {
   const availableWidth =
     viewport.width - DM_SCREEN_LEFT_INSET - DM_SCREEN_WINDOW_MARGIN * 2;
 
   const availableHeight =
-    viewport.height - DM_SCREEN_TOP_INSET - DM_SCREEN_WINDOW_MARGIN;
+    viewport.height - getTopInset(viewport) - DM_SCREEN_WINDOW_MARGIN;
 
   return {
     width: Math.max(
@@ -188,7 +200,7 @@ export function fitDmScreenWindowSize(viewport: DmScreenSize): DmScreenSize {
  * @param index - сколько окон уже открыто
  */
 export function placeDmScreenWindow(
-  viewport: DmScreenSize,
+  viewport: DmScreenViewport,
   size: DmScreenSize,
   origin: DmScreenPoint | undefined,
   index: number,
@@ -216,7 +228,7 @@ export function placeDmScreenWindow(
     y: Math.round(
       clampToRange(
         preferred.y,
-        DM_SCREEN_TOP_INSET,
+        getTopInset(viewport),
         viewport.height - size.height - DM_SCREEN_WINDOW_MARGIN,
       ),
     ),
@@ -233,7 +245,7 @@ export function placeDmScreenWindow(
 export function keepDmScreenWindowReachable(
   position: DmScreenPoint,
   size: DmScreenSize,
-  viewport: DmScreenSize,
+  viewport: DmScreenViewport,
 ): DmScreenPoint {
   return {
     x: Math.round(
@@ -246,7 +258,7 @@ export function keepDmScreenWindowReachable(
     y: Math.round(
       clampToRange(
         position.y,
-        DM_SCREEN_TOP_INSET,
+        getTopInset(viewport),
         viewport.height - DM_SCREEN_WINDOW_HEADER_HEIGHT,
       ),
     ),
@@ -309,17 +321,18 @@ function pickGridColumns(count: number, area: DmScreenSize): number {
  */
 export function arrangeDmScreenWindows(
   ids: ReadonlyArray<string>,
-  viewport: DmScreenSize,
+  viewport: DmScreenViewport,
 ): Array<DmScreenTile> {
   if (!ids.length) {
     return [];
   }
 
   const left = DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN;
+  const top = getTopInset(viewport);
 
   const area = {
     width: viewport.width - left - DM_SCREEN_WINDOW_MARGIN,
-    height: viewport.height - DM_SCREEN_TOP_INSET - DM_SCREEN_WINDOW_MARGIN,
+    height: viewport.height - top - DM_SCREEN_WINDOW_MARGIN,
   };
 
   const columns = pickGridColumns(ids.length, area);
@@ -338,9 +351,7 @@ export function arrangeDmScreenWindows(
   return ids.map((id, index) => ({
     id,
     x: left + (index % columns) * (width + DM_SCREEN_GRID_GAP),
-    y:
-      DM_SCREEN_TOP_INSET
-      + Math.floor(index / columns) * (height + DM_SCREEN_GRID_GAP),
+    y: top + Math.floor(index / columns) * (height + DM_SCREEN_GRID_GAP),
     width,
     height,
   }));
@@ -408,7 +419,7 @@ function snapToNearest(
 export function snapDmScreenWindow(
   rect: DmScreenRect,
   others: ReadonlyArray<DmScreenRect>,
-  viewport: DmScreenSize,
+  viewport: DmScreenViewport,
 ): DmScreenPoint {
   const left = DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN;
   const right = viewport.width - DM_SCREEN_WINDOW_MARGIN;
@@ -428,7 +439,7 @@ export function snapDmScreenWindow(
   ];
 
   const yCandidates = [
-    DM_SCREEN_TOP_INSET,
+    getTopInset(viewport),
     bottom - rect.height,
     ...others.flatMap((other) => [
       other.y,
@@ -441,6 +452,110 @@ export function snapDmScreenWindow(
   return {
     x: snapToNearest(rect.x, xCandidates),
     y: snapToNearest(rect.y, yCandidates),
+  };
+}
+
+/**
+ * Меняет размер окна, которое тянут за сторону или угол. Противоположные
+ * стороны остаются на месте, окно не становится меньше минимального и не
+ * заходит под шапку ширмы. Сторона, которую тянут, примагничивается: к краям
+ * холста, к краям других окон (вровень или рядом с промежутком сетки) и к
+ * такой же ширине или высоте, как у другого окна.
+ * @param start - окно до растягивания
+ * @param edges - за какие стороны тянут
+ * @param delta - на сколько сдвинулся указатель
+ * @param viewport - экран ширмы
+ * @param others - остальные развёрнутые окна; без них окно не магнитится
+ */
+export function resizeDmScreenWindow(
+  start: DmScreenRect,
+  edges: DmScreenResizeEdges,
+  delta: DmScreenPoint,
+  viewport: DmScreenViewport,
+  others?: ReadonlyArray<DmScreenRect>,
+): DmScreenRect {
+  const top = getTopInset(viewport);
+  const startRight = start.x + start.width;
+  const startBottom = start.y + start.height;
+  const neighbours = others ?? [];
+
+  const snap = (value: number, candidates: Array<number>): number =>
+    others ? snapToNearest(value, candidates) : value;
+
+  const left =
+    edges.x < 0
+      ? clampToRange(
+          snap(start.x + delta.x, [
+            DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
+            ...neighbours.flatMap((other) => [
+              other.x,
+              other.x + other.width,
+              other.x + other.width + DM_SCREEN_GRID_GAP,
+              // Та же ширина, что у другого окна
+              startRight - other.width,
+            ]),
+          ]),
+          // Под боковую панель сайта окно не растягивается
+          Math.min(start.x, DM_SCREEN_LEFT_INSET),
+          startRight - DM_SCREEN_WINDOW_MIN_SIZE.width,
+        )
+      : start.x;
+
+  const right =
+    edges.x > 0
+      ? Math.max(
+          snap(startRight + delta.x, [
+            viewport.width - DM_SCREEN_WINDOW_MARGIN,
+            ...neighbours.flatMap((other) => [
+              other.x + other.width,
+              other.x,
+              other.x - DM_SCREEN_GRID_GAP,
+              start.x + other.width,
+            ]),
+          ]),
+          start.x + DM_SCREEN_WINDOW_MIN_SIZE.width,
+        )
+      : startRight;
+
+  const topEdge =
+    edges.y < 0
+      ? clampToRange(
+          snap(start.y + delta.y, [
+            top,
+            ...neighbours.flatMap((other) => [
+              other.y,
+              other.y + other.height,
+              other.y + other.height + DM_SCREEN_GRID_GAP,
+              // Та же высота, что у другого окна
+              startBottom - other.height,
+            ]),
+          ]),
+          top,
+          startBottom - DM_SCREEN_WINDOW_MIN_SIZE.height,
+        )
+      : start.y;
+
+  const bottom =
+    edges.y > 0
+      ? Math.max(
+          snap(startBottom + delta.y, [
+            viewport.height - DM_SCREEN_WINDOW_MARGIN,
+            ...neighbours.flatMap((other) => [
+              other.y + other.height,
+              other.y,
+              other.y - DM_SCREEN_GRID_GAP,
+              start.y + other.height,
+            ]),
+          ]),
+          start.y + DM_SCREEN_WINDOW_MIN_SIZE.height,
+        )
+      : startBottom;
+
+  return {
+    x: Math.round(left),
+    y: Math.round(topEdge),
+    width: Math.round(right - left),
+    height: Math.round(bottom - topEdge),
   };
 }
 

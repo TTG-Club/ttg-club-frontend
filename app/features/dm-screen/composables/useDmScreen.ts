@@ -1,4 +1,9 @@
-import type { DmScreenPoint, DmScreenRequest, DmScreenWindow } from '../model';
+import type {
+  DmScreenPoint,
+  DmScreenRequest,
+  DmScreenViewport,
+  DmScreenWindow,
+} from '../model';
 
 import { sortBy } from 'es-toolkit';
 
@@ -9,11 +14,14 @@ import {
   appendDmScreenWindow,
   arrangeDmScreenWindows,
   createDmScreenNotePath,
+  DM_SCREEN_HIGHLIGHT_DURATION,
   DM_SCREEN_SAVE_DELAY,
   DM_SCREEN_STORAGE_KEY,
   DM_SCREEN_TEXT,
+  DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenWindowListSchema,
+  isDmScreenNotePath,
   saveDmScreenWindows,
   saveDmScreenWindowsOnLeave,
 } from '../model';
@@ -147,6 +155,30 @@ export const useDmScreen = createSharedComposable(() => {
 
   const { width: viewportWidth, height: viewportHeight } = useWindowSize();
 
+  /** Нижний край шапки ширмы: его сообщает холст, когда меряет шапку. */
+  const topInset = ref<number>(DM_SCREEN_TOP_INSET);
+
+  /** Экран ширмы: размер окна браузера и место, занятое шапкой. */
+  const viewport = computed<DmScreenViewport>(() => ({
+    width: viewportWidth.value,
+    height: viewportHeight.value,
+    top: topInset.value,
+  }));
+
+  /**
+   * Запоминает, где кончается шапка ширмы; без значения — обычная высота.
+   * @param value - нижний край шапки, px
+   */
+  function setTopInset(value: number = DM_SCREEN_TOP_INSET): void {
+    topInset.value = value;
+  }
+
+  /** Окно, на которое указали вместо нового: недолго подсвечивается. */
+  const highlightedId = refAutoReset<string | undefined>(
+    undefined,
+    DM_SCREEN_HIGHLIGHT_DURATION,
+  );
+
   const topLayer = computed(() =>
     windows.value.reduce((top, item) => Math.max(top, item.layer), 0),
   );
@@ -195,7 +227,7 @@ export const useDmScreen = createSharedComposable(() => {
     const result = appendDmScreenWindow(
       windows.value,
       request,
-      { width: viewportWidth.value, height: viewportHeight.value },
+      viewport.value,
       crypto.randomUUID(),
     );
 
@@ -205,10 +237,23 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
-   * Кладёт на ширму пустую заметку окном рядом с местом клика.
+   * Кладёт на ширму пустую заметку окном рядом с местом клика. Если пустая
+   * заметка уже есть, новая не создаётся: та разворачивается, встаёт сверху
+   * и подсвечивается — иначе пустые заметки копились бы.
    * @param origin - точка клика
    */
   function addNote(origin?: DmScreenPoint): void {
+    const draft = windows.value.find(
+      (item) => isDmScreenNotePath(item.path) && !item.content?.trim(),
+    );
+
+    if (draft) {
+      update(draft.id, { isMinimized: false, layer: topLayer.value + 1 });
+      highlightedId.value = draft.id;
+
+      return;
+    }
+
     const id = crypto.randomUUID();
 
     add({
@@ -233,6 +278,11 @@ export const useDmScreen = createSharedComposable(() => {
    */
   function close(id: string): void {
     windows.value = windows.value.filter((item) => item.id !== id);
+  }
+
+  /** Убирает с ширмы все окна и заметки. */
+  function clear(): void {
+    windows.value = [];
   }
 
   /**
@@ -284,7 +334,7 @@ export const useDmScreen = createSharedComposable(() => {
     const tiles = new Map(
       arrangeDmScreenWindows(
         ordered.map((item) => item.id),
-        { width: viewportWidth.value, height: viewportHeight.value },
+        viewport.value,
       ).map((tile) => [tile.id, tile]),
     );
 
@@ -325,6 +375,9 @@ export const useDmScreen = createSharedComposable(() => {
     detach,
     saveOnLeave,
     clearLocal,
+    viewport,
+    setTopInset,
+    highlightedId: readonly(highlightedId),
     visibleWindows,
     minimizedWindows,
     add,
@@ -332,6 +385,7 @@ export const useDmScreen = createSharedComposable(() => {
     arrange,
     navigate,
     close,
+    clear,
     minimize,
     minimizeAll,
     shrinkAll,

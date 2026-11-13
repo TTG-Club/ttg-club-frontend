@@ -10,6 +10,24 @@ export interface DmScreenSize {
   height: number;
 }
 
+/**
+ * Экран ширмы: его размер и где кончается шапка ширмы. Без `top` шапка
+ * считается обычной высоты.
+ */
+export interface DmScreenViewport extends DmScreenSize {
+  /** Нижний край шапки ширмы, px: выше окна не встают. */
+  top?: number;
+}
+
+/**
+ * Стороны окна, за которые его тянут, меняя размер: `-1` — левая или
+ * верхняя, `1` — правая или нижняя, `0` — сторона на месте.
+ */
+export interface DmScreenResizeEdges {
+  x: -1 | 0 | 1;
+  y: -1 | 0 | 1;
+}
+
 /** Прямоугольник окна на экране, px. */
 export interface DmScreenRect extends DmScreenPoint, DmScreenSize {}
 

@@ -8,7 +8,7 @@
   import { DmScreenWindow } from '../window';
 
   /**
-   * Окна ширмы и плашки свёрнутых окон внизу экрана.
+   * Окна ширмы и плашки свёрнутых окон, прижатые к левому нижнему углу.
    *
    * Слой окон без `z-index`: меню, подсказки и дроверы Nuxt UI выносятся в
    * конец `body` и поэтому ложатся поверх окон. Боковая панель и история
@@ -30,7 +30,7 @@
     v-if="minimizedWindows.length"
     role="toolbar"
     :aria-label="DM_SCREEN_TEXT.dock"
-    class="fixed bottom-6 left-[calc(var(--navbar-width)+1rem)] flex max-w-[calc(100vw-var(--navbar-width)-6rem)] flex-wrap gap-2"
+    class="fixed bottom-2 left-[calc(var(--navbar-width)+0.5rem)] flex max-w-[calc(100vw-var(--navbar-width)-5rem)] flex-wrap gap-1.5"
   >
     <div
       v-for="screenWindow in minimizedWindows"

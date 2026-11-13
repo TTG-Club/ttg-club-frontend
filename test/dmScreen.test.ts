@@ -9,6 +9,7 @@ import {
   DM_SCREEN_LEFT_INSET,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
+  DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenDetailSchema,
   dmScreenListSchema,
   formatDmScreenDate,
@@ -16,6 +17,7 @@ import {
   getDmScreenWindowIcon,
   isDmScreenNotePath,
   isDmScreenPath,
+  resizeDmScreenWindow,
   resolveDmScreenSection,
   snapDmScreenWindow,
 } from '~dm-screen/model';
@@ -197,6 +199,74 @@ describe('ширма мастера', () => {
       );
 
       expect(snapped).toEqual({ x: 1100, y: 600 });
+    });
+  });
+
+  describe('растягивание', () => {
+    const viewport = { width: 1600, height: 900 };
+    const start = { x: 500, y: 200, width: 400, height: 300 };
+    const other = { x: 1000, y: 200, width: 320, height: 450 };
+
+    it('тянет левую сторону, правая остаётся на месте', () => {
+      const resized = resizeDmScreenWindow(
+        start,
+        { x: -1, y: 0 },
+        { x: -150, y: 40 },
+        viewport,
+      );
+
+      expect(resized).toEqual({ x: 350, y: 200, width: 550, height: 300 });
+    });
+
+    it('примагничивает высоту к высоте соседнего окна', () => {
+      const resized = resizeDmScreenWindow(
+        start,
+        { x: 0, y: 1 },
+        { x: 0, y: 143 },
+        viewport,
+        [other],
+      );
+
+      expect(resized.height).toBe(other.height);
+    });
+
+    it('примагничивает ширину к ширине соседнего окна', () => {
+      const resized = resizeDmScreenWindow(
+        start,
+        { x: 1, y: 0 },
+        { x: -75, y: 0 },
+        viewport,
+        [other],
+      );
+
+      expect(resized.width).toBe(other.width);
+    });
+
+    it('не пускает верхнюю сторону под шапку ширмы', () => {
+      const resized = resizeDmScreenWindow(
+        start,
+        { x: 0, y: -1 },
+        { x: 0, y: -500 },
+        { ...viewport, top: 120 },
+      );
+
+      expect(resized.y).toBe(120);
+      expect(resized.height).toBe(380);
+    });
+
+    it('не сжимает окно меньше минимального', () => {
+      const resized = resizeDmScreenWindow(
+        start,
+        { x: 1, y: 1 },
+        { x: -1000, y: -1000 },
+        viewport,
+      );
+
+      expect(resized).toEqual({
+        x: 500,
+        y: 200,
+        ...DM_SCREEN_WINDOW_MIN_SIZE,
+      });
     });
   });
 

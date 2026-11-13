@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { Position } from '@vueuse/core';
 
-  import type { DmScreenWindow } from '../model';
+  import type { DmScreenResizeEdges, DmScreenWindow } from '../model';
 
   import { provideContentLinkHandler } from '~content/composables';
   import { EXTERNAL_LINK_TARGET } from '~content/model';
@@ -13,7 +13,6 @@
   import { useDmScreen } from '../composables';
   import {
     DM_SCREEN_ICON,
-    DM_SCREEN_RESIZE_SAVE_DELAY,
     DM_SCREEN_TEXT,
     DM_SCREEN_WINDOW_MIN_SIZE,
     getDmScreenEntryRoot,
@@ -21,6 +20,7 @@
     isDmScreenNotePath,
     isDmScreenPath,
     keepDmScreenWindowReachable,
+    resizeDmScreenWindow,
     snapDmScreenWindow,
   } from '../model';
   import DmScreenEntry from './DmScreenEntry.vue';
@@ -29,8 +29,10 @@
   /**
    * Окно записи на ширме, не блокирующее страницу. Тянется за шапку и
    * примагничивается к краям холста и других окон (Alt — без магнита),
-   * растягивается за правый нижний угол, сворачивается в плашку (кнопкой или
-   * двойным кликом по шапке) и закрывается. Внутри — карточка записи любого
+   * растягивается за любую сторону или угол — тоже с магнитом, в том числе
+   * до ширины или высоты соседнего окна, — сворачивается в плашку (кнопкой
+   * или двойным кликом по шапке) и закрывается. Под шапку ширмы окно не
+   * заходит. Внутри — карточка записи любого
    * раздела; переходы внутри записи (вкладки класса, подрасы) остаются в
    * окне, ссылки на другие записи открывают новые окна, а остальные
    * страницы сайта — новую вкладку: со страницы ширмы клик не уводит.
@@ -39,13 +41,70 @@
     screenWindow: DmScreenWindow;
   }>();
 
-  const { add, navigate, close, minimize, focus, update, visibleWindows } =
-    useDmScreen();
+  /** Ручки растягивания: четыре стороны и четыре угла поверх них. */
+  const RESIZE_HANDLES: ReadonlyArray<{
+    key: string;
+    edges: DmScreenResizeEdges;
+    class: string;
+  }> = [
+    {
+      key: 'top',
+      edges: { x: 0, y: -1 },
+      class: 'inset-x-0 top-0 h-1.5 cursor-ns-resize',
+    },
+    {
+      key: 'bottom',
+      edges: { x: 0, y: 1 },
+      class: 'inset-x-0 bottom-0 h-1.5 cursor-ns-resize',
+    },
+    {
+      key: 'left',
+      edges: { x: -1, y: 0 },
+      class: 'inset-y-0 left-0 w-1.5 cursor-ew-resize',
+    },
+    {
+      key: 'right',
+      edges: { x: 1, y: 0 },
+      class: 'inset-y-0 right-0 w-1.5 cursor-ew-resize',
+    },
+    {
+      key: 'top-left',
+      edges: { x: -1, y: -1 },
+      class: 'top-0 left-0 size-3 cursor-nwse-resize',
+    },
+    {
+      key: 'top-right',
+      edges: { x: 1, y: -1 },
+      class: 'top-0 right-0 size-3 cursor-nesw-resize',
+    },
+    {
+      key: 'bottom-left',
+      edges: { x: -1, y: 1 },
+      class: 'bottom-0 left-0 size-3 cursor-nesw-resize',
+    },
+    {
+      key: 'bottom-right',
+      edges: { x: 1, y: 1 },
+      class: 'right-0 bottom-0 size-3 cursor-nwse-resize',
+    },
+  ];
+
+  const {
+    add,
+    navigate,
+    close,
+    minimize,
+    focus,
+    update,
+    visibleWindows,
+    viewport,
+    highlightedId,
+  } = useDmScreen();
 
   const root = useTemplateRef<HTMLElement>('root');
   const handle = useTemplateRef<HTMLElement>('handle');
 
-  const { width: viewportWidth, height: viewportHeight } = useWindowSize();
+  const isHighlighted = computed(() => highlightedId.value === screenWindow.id);
 
   const isNote = computed(() => isDmScreenNotePath(screenWindow.path));
 
@@ -56,10 +115,7 @@
    * @param position - желаемое место
    */
   function reachable(position: Position): Position {
-    return keepDmScreenWindowReachable(position, screenWindow, {
-      width: viewportWidth.value,
-      height: viewportHeight.value,
-    });
+    return keepDmScreenWindowReachable(position, screenWindow, viewport.value);
   }
 
   // Сохранённое место могло остаться за краем меньшего экрана
@@ -72,37 +128,129 @@
     onEnd: savePosition,
   });
 
-  // Место может поменять не только перетаскивание, но и раскладка по сетке
+  // Размер, пока окно растягивают: сохраняется итог, а не каждый шаг
+  const width = ref(screenWindow.width);
+  const height = ref(screenWindow.height);
+
+  // Место и размер может поменять не только указатель, но и раскладка по
+  // сетке и «Уменьшить все»
   watch(
-    () => [screenWindow.x, screenWindow.y],
-    ([nextX = 0, nextY = 0]) => {
+    () => [
+      screenWindow.x,
+      screenWindow.y,
+      screenWindow.width,
+      screenWindow.height,
+    ],
+    ([nextX = 0, nextY = 0, nextWidth = 0, nextHeight = 0]) => {
       x.value = nextX;
       y.value = nextY;
+      width.value = nextWidth;
+      height.value = nextHeight;
+    },
+  );
+
+  // Шапка ширмы стала выше (кнопки перенеслись): окно выходит из-под неё
+  watch(
+    () => viewport.value.top,
+    () => {
+      const next = reachable({ x: x.value, y: y.value });
+
+      x.value = next.x;
+      y.value = next.y;
     },
   );
 
   const windowStyle = computed(() => ({
     left: `${x.value}px`,
     top: `${y.value}px`,
-    width: `${screenWindow.width}px`,
-    height: `${screenWindow.height}px`,
+    width: `${width.value}px`,
+    height: `${height.value}px`,
     minWidth: `${DM_SCREEN_WINDOW_MIN_SIZE.width}px`,
     minHeight: `${DM_SCREEN_WINDOW_MIN_SIZE.height}px`,
     zIndex: screenWindow.layer,
   }));
 
-  // Браузер сам меняет размер за уголок; сохраняется итог, а не каждый шаг
-  const saveSize = useDebounceFn((width: number, height: number) => {
-    if (width !== screenWindow.width || height !== screenWindow.height) {
-      update(screenWindow.id, { width, height });
-    }
-  }, DM_SCREEN_RESIZE_SAVE_DELAY);
+  /** Остальные развёрнутые окна: к ним окно примагничивается. */
+  function getOthers(): Array<DmScreenWindow> {
+    return visibleWindows.value.filter((item) => item.id !== screenWindow.id);
+  }
 
-  useResizeObserver(root, () => {
-    if (root.value) {
-      void saveSize(root.value.offsetWidth, root.value.offsetHeight);
+  /** Растягивание, которое идёт сейчас: с чего оно началось. */
+  let resizing:
+    | {
+        edges: DmScreenResizeEdges;
+        pointer: Position;
+        rect: Position & { width: number; height: number };
+      }
+    | undefined;
+
+  /**
+   * Начало растягивания за сторону или угол: указатель закрепляется за
+   * ручкой, чтобы она не терялась, когда он уходит с неё.
+   * @param edges - за какие стороны тянут
+   * @param event - нажатие на ручку
+   */
+  function startResize(edges: DmScreenResizeEdges, event: PointerEvent): void {
+    if (!(event.currentTarget instanceof HTMLElement)) {
+      return;
     }
-  });
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    resizing = {
+      edges,
+      pointer: { x: event.clientX, y: event.clientY },
+      rect: {
+        x: x.value,
+        y: y.value,
+        width: width.value,
+        height: height.value,
+      },
+    };
+  }
+
+  /**
+   * Меняет размер окна вслед за указателем, примагничивая сторону, которую
+   * тянут. С зажатым Alt окно растягивается свободно.
+   * @param event - движение указателя
+   */
+  function moveResize(event: PointerEvent): void {
+    if (!resizing) {
+      return;
+    }
+
+    const next = resizeDmScreenWindow(
+      resizing.rect,
+      resizing.edges,
+      {
+        x: event.clientX - resizing.pointer.x,
+        y: event.clientY - resizing.pointer.y,
+      },
+      viewport.value,
+      event.altKey ? undefined : getOthers(),
+    );
+
+    x.value = next.x;
+    y.value = next.y;
+    width.value = next.width;
+    height.value = next.height;
+  }
+
+  /** Конец растягивания: место и размер окна сохраняются. */
+  function endResize(): void {
+    if (!resizing) {
+      return;
+    }
+
+    resizing = undefined;
+
+    update(screenWindow.id, {
+      x: x.value,
+      y: y.value,
+      width: width.value,
+      height: height.value,
+    });
+  }
 
   // Переходы самой записи (вкладки класса, подрасы) — в этом же окне, а
   // закрытие карточки закрывает окно
@@ -208,32 +356,22 @@
 
   /**
    * Примагничивает окно, пока его тащат: к краям холста и других окон. С
-   * зажатым Alt окно двигается свободно.
+   * зажатым Alt окно двигается свободно, но под шапку ширмы не заходит и
+   * тогда.
    * @param position - куда окно притащили
    * @param event - движение указателя
    */
   function snapPosition(position: Position, event: PointerEvent): void {
-    if (event.altKey || !root.value) {
-      return;
-    }
-
-    const others = visibleWindows.value.filter(
-      (item) => item.id !== screenWindow.id,
-    );
-
-    // Размер — с самого окна: после растягивания сохранённый мог отстать
-    const snapped = snapDmScreenWindow(
-      {
-        ...position,
-        width: root.value.offsetWidth,
-        height: root.value.offsetHeight,
-      },
-      others,
-      { width: viewportWidth.value, height: viewportHeight.value },
-    );
+    const snapped = event.altKey
+      ? position
+      : snapDmScreenWindow(
+          { ...position, width: width.value, height: height.value },
+          getOthers(),
+          viewport.value,
+        );
 
     x.value = snapped.x;
-    y.value = snapped.y;
+    y.value = Math.max(snapped.y, viewport.value.top ?? 0);
   }
 
   /**
@@ -283,7 +421,8 @@
     aria-modal="false"
     :aria-label="screenWindow.title"
     :style="windowStyle"
-    class="pointer-events-auto absolute flex resize flex-col overflow-hidden rounded-lg border border-default bg-default shadow-xl"
+    class="pointer-events-auto absolute flex flex-col overflow-hidden rounded-lg border border-default bg-default shadow-xl"
+    :class="{ 'ring-2 ring-primary': isHighlighted }"
     @pointerdown.capture="focusWindow"
   >
     <header
@@ -339,5 +478,18 @@
         @loaded="syncTitle"
       />
     </div>
+
+    <!-- Ручки поверх краёв окна: углы после сторон, поэтому выше них -->
+    <div
+      v-for="resizeHandle in RESIZE_HANDLES"
+      :key="resizeHandle.key"
+      aria-hidden="true"
+      class="absolute touch-none"
+      :class="resizeHandle.class"
+      @pointerdown.left.prevent="startResize(resizeHandle.edges, $event)"
+      @pointermove="moveResize"
+      @pointerup="endResize"
+      @pointercancel="endResize"
+    />
   </section>
 </template>
