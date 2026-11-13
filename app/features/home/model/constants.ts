@@ -4,7 +4,7 @@ import { DM_SCREEN_PAGE_PATH, NEW_SITE_URL } from '~/shared/consts';
 import {
   DM_SCREEN_MENU_ICON,
   TOKENATOR_URL,
-} from '~infrastructure/sidebar/menu/model';
+} from '~infrastructure/navigation/model';
 
 /* --- Общее -------------------------------------------------------------- */
 

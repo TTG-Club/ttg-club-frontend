@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { HomePromoCardContent } from '../model';
 
-  import { MENU_SECTIONS } from '~infrastructure/sidebar/menu/model';
+  import { MENU_SECTIONS } from '~infrastructure/navigation/model';
 
   import { useHomeLink } from '../composables';
   import {

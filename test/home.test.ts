@@ -17,7 +17,7 @@ import {
   MENU_DEFAULT_ICON,
   MENU_SECTIONS,
   TOKENATOR_URL,
-} from '~infrastructure/sidebar/menu/model';
+} from '~infrastructure/navigation/model';
 
 const menu = [
   {

@@ -2,9 +2,9 @@
   import { HamburgerIcon } from '~/shared/ui/hamburger-icon';
   import { SiteLogo } from '~/shared/ui/site-logo';
 
+  import { MENU_SECTIONS } from '../../navigation/model';
   import { SidebarPopover } from '../popover';
   import {
-    MENU_SECTIONS,
     MENU_SITE_DESCRIPTION,
     MENU_SITE_TITLE,
     MENU_TOGGLE_LABEL,

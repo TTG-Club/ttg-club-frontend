@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { MenuItem } from '../model';
+  import type { MenuItem } from '../../../navigation/model';
 
   import { MENU_EXTERNAL_ICON, MENU_EXTERNAL_TARGET } from '../model';
 

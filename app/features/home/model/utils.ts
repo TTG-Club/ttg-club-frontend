@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'vue';
-import type { MenuItem, MenuSection } from '~infrastructure/sidebar/menu/model';
+import type { MenuItem, MenuSection } from '~infrastructure/navigation/model';
 
 import type { HomeGame } from './schema';
 import type { HomeNavLink, HomeSectionLink } from './types';

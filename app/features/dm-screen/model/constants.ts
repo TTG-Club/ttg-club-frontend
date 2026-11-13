@@ -18,7 +18,7 @@ import {
 import {
   DM_SCREEN_MENU_ICON,
   getMenuLinkIcon,
-} from '~infrastructure/sidebar/menu/model';
+} from '~infrastructure/navigation/model';
 import {
   ARMORS_SECTION,
   ITEMS_SECTION,
