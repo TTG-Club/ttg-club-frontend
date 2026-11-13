@@ -12,6 +12,7 @@
 
   import { useDmScreen, useDmScreenSnap } from '../composables';
   import {
+    DM_SCREEN_BACKGROUND_CLASS,
     DM_SCREEN_HIGHLIGHT_CLASS,
     DM_SCREEN_ICON,
     DM_SCREEN_RESIZE_HANDLES,
@@ -36,7 +37,8 @@
    * до ширины или высоты соседнего окна, — сворачивается в плашку (кнопкой
    * или двойным кликом по шапке) и закрывается. Под шапку ширмы окно не
    * заходит. Если окно отпустить у бокового края холста или над местом в
-   * панели раскладок, оно занимает это место целиком. Внутри — карточка записи любого
+   * панели раскладок, оно занимает это место целиком. Размер соседних
+   * окон разом меняет общая граница между ними (`DmScreenDividers`). Внутри — карточка записи любого
    * раздела; переходы внутри записи (вкладки класса, подрасы) остаются в
    * окне, ссылки на другие записи открывают новые окна, а остальные
    * страницы сайта — новую вкладку: со страницы ширмы клик не уводит.
@@ -55,6 +57,7 @@
     visibleWindows,
     viewport,
     highlightedId,
+    previewRects,
   } = useDmScreen();
 
   const root = useTemplateRef<HTMLElement>('root');
@@ -83,7 +86,14 @@
     startDrag: startSnapDrag,
     moveDrag: moveSnapDrag,
     endDrag: endSnapDrag,
+    isBackground,
   } = useDmScreenSnap();
+
+  // Пока в раскладку подбирают окна, не поставленные в неё уходят на
+  // второй план
+  const backgroundClass = computed(() =>
+    isBackground(screenWindow.id) ? DM_SCREEN_BACKGROUND_CLASS : '',
+  );
 
   const sectionIcon = computed(() => getDmScreenWindowIcon(screenWindow.path));
 
@@ -110,7 +120,7 @@
   const height = ref(screenWindow.height);
 
   // Место и размер может поменять не только указатель, но и раскладка по
-  // сетке и «Уменьшить все»
+  // сетке
   watch(
     () => [
       screenWindow.x,
@@ -123,6 +133,19 @@
       y.value = nextY;
       width.value = nextWidth;
       height.value = nextHeight;
+    },
+  );
+
+  // Общую границу с соседним окном тянут: окно меняется вслед за ней
+  watch(
+    () => previewRects.value.get(screenWindow.id),
+    (rect) => {
+      if (rect) {
+        x.value = rect.x;
+        y.value = rect.y;
+        width.value = rect.width;
+        height.value = rect.height;
+      }
     },
   );
 
@@ -416,7 +439,7 @@
     :aria-label="screenWindow.title"
     :style="windowStyle"
     class="pointer-events-auto absolute flex flex-col overflow-hidden rounded-lg border border-default bg-default shadow-xl"
-    :class="highlightClass"
+    :class="[highlightClass, backgroundClass]"
     @pointerdown.capture="focusWindow"
   >
     <header

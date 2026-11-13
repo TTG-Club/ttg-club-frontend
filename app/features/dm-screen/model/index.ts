@@ -5,6 +5,8 @@ export type {
   DmScreenWindow,
 } from './schema';
 export type {
+  DmScreenAxisTile,
+  DmScreenDivider,
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
@@ -42,6 +44,8 @@ export {
   arrangeDmScreenWindows,
   createDmScreenNotePath,
   fitDmScreenWindowSize,
+  getDmScreenDividerRect,
+  getDmScreenDividers,
   getDmScreenEdgeTarget,
   getDmScreenEntryRoot,
   getDmScreenNoteToggle,
@@ -54,6 +58,7 @@ export {
   isDmScreenNotePath,
   isDmScreenPath,
   keepDmScreenWindowReachable,
+  moveDmScreenDivider,
   placeDmScreenWindow,
   resizeDmScreenWindow,
   resolveDmScreenSection,

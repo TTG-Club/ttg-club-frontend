@@ -105,8 +105,7 @@ export const DM_SCREEN_STORAGE_KEY = 'dm-screen:windows';
 export const DM_SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
 
 /**
- * Меньше этого окно не сжимается, px: видны шапка и начало записи. До этого
- * размера окна уменьшает и «Уменьшить все».
+ * Меньше этого окно не сжимается, px: видны шапка и начало записи.
  */
 export const DM_SCREEN_WINDOW_MIN_SIZE = { width: 240, height: 120 } as const;
 
@@ -251,6 +250,31 @@ export const DM_SCREEN_SNAP_ZONE_CLASS = {
   idle: 'border-accented bg-accented/40',
 } as const;
 
+/**
+ * На сколько промежуток между окнами может отличаться от промежутка сетки,
+ * чтобы окна считались соседними, px: место и размер окна округляются.
+ */
+export const DM_SCREEN_DIVIDER_TOLERANCE = 1;
+
+/**
+ * Вид общей границы соседних окон: сама граница и полоска, которая
+ * появляется на ней при наведении.
+ */
+export const DM_SCREEN_DIVIDER_CLASS = {
+  vertical: { root: 'cursor-ew-resize', bar: 'h-16 max-h-full w-1' },
+  horizontal: { root: 'cursor-ns-resize', bar: 'h-1 w-16 max-w-full' },
+} as const;
+
+/** Полоска на границе, пока границу тянут: видна и без наведения. */
+export const DM_SCREEN_DIVIDER_ACTIVE_CLASS = 'opacity-100';
+
+/**
+ * Окно на втором плане, пока в раскладку подбирают окна: размыто, а в
+ * режиме «производительность», где размытие выключено, приглушено.
+ */
+export const DM_SCREEN_BACKGROUND_CLASS =
+  'blur-sm performance:opacity-40 performance:blur-none';
+
 /** Рамка окна, на которое указали вместо нового. */
 export const DM_SCREEN_HIGHLIGHT_CLASS = 'ring-2 ring-primary';
 
@@ -338,7 +362,6 @@ export const DM_SCREEN_TEXT = {
   pickTitle: 'В какую ширму?',
   pickDescription: 'Запись встанет окном в выбранную ширму.',
   minimizeAll: 'Свернуть все',
-  shrinkAll: 'Уменьшить все',
   unknownEntry: 'Эту запись нельзя показать в ширме',
 } as const;
 
@@ -356,6 +379,5 @@ export const DM_SCREEN_ICON = {
   delete: 'tabler:trash',
   signIn: 'tabler:login',
   minimizeAll: 'tabler:layout-bottombar-collapse',
-  shrinkAll: 'tabler:arrows-minimize',
   unknown: 'tabler:file-unknown',
 } as const;

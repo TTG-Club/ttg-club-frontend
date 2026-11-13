@@ -14,12 +14,14 @@ import {
   DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenDetailSchema,
   dmScreenListSchema,
+  getDmScreenDividers,
   getDmScreenEdgeTarget,
   getDmScreenEntryRoot,
   getDmScreenWindowIcon,
   getDmScreenZoneRect,
   isDmScreenNotePath,
   isDmScreenPath,
+  moveDmScreenDivider,
   resizeDmScreenWindow,
   resolveDmScreenSection,
   snapDmScreenWindow,
@@ -316,6 +318,77 @@ describe('ширма мастера', () => {
 
         expect(area).toBeCloseTo(1);
       });
+    });
+  });
+
+  describe('общие границы', () => {
+    const left = { id: 'left', x: 80, y: 76, width: 400, height: 300 };
+
+    const right = {
+      id: 'right',
+      x: 480 + DM_SCREEN_GRID_GAP,
+      y: 76,
+      width: 400,
+      height: 300,
+    };
+
+    const far = { id: 'far', x: 1200, y: 500, width: 300, height: 200 };
+
+    it('находит границу между окнами через промежуток сетки', () => {
+      const dividers = getDmScreenDividers([left, right, far]);
+
+      expect(dividers).toHaveLength(1);
+
+      expect(dividers[0]).toMatchObject({
+        isVertical: true,
+        position: 480,
+        leadingIds: ['left'],
+        trailingIds: ['right'],
+      });
+    });
+
+    it('в сетке 2×2 вертикальная граница одна на оба ряда', () => {
+      const row = 300 + DM_SCREEN_GRID_GAP;
+
+      const dividers = getDmScreenDividers([
+        left,
+        right,
+        { ...left, id: 'left-bottom', y: left.y + row },
+        { ...right, id: 'right-bottom', y: right.y + row },
+      ]);
+
+      const vertical = dividers.filter((divider) => divider.isVertical);
+
+      expect(vertical).toHaveLength(1);
+      expect(vertical[0]?.leadingIds).toEqual(['left', 'left-bottom']);
+      expect(vertical[0]?.trailingIds).toEqual(['right', 'right-bottom']);
+    });
+
+    it('сдвиг границы меняет оба окна и сохраняет промежуток', () => {
+      const [divider] = getDmScreenDividers([left, right]);
+
+      if (!divider) {
+        throw new Error('Граница между окнами не найдена');
+      }
+
+      const moved = moveDmScreenDivider(divider, 100, [left, right]);
+
+      expect(moved.tiles).toEqual([
+        { ...left, width: 500 },
+        { ...right, x: 580 + DM_SCREEN_GRID_GAP, width: 300 },
+      ]);
+    });
+
+    it('граница не сжимает окно меньше минимального', () => {
+      const [divider] = getDmScreenDividers([left, right]);
+
+      if (!divider) {
+        throw new Error('Граница между окнами не найдена');
+      }
+
+      const moved = moveDmScreenDivider(divider, 5000, [left, right]);
+
+      expect(moved.tiles[1]?.width).toBe(DM_SCREEN_WINDOW_MIN_SIZE.width);
     });
   });
 

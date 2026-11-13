@@ -82,6 +82,15 @@ export const useDmScreenSnap = createSharedComposable(() => {
   });
 
   /**
+   * Уходит ли окно на второй план: идёт подбор, а окно в раскладку ещё не
+   * поставлено.
+   * @param id - окно
+   */
+  function isBackground(id: string): boolean {
+    return !!assist.value && !assist.value.placedIds.includes(id);
+  }
+
+  /**
    * Продолжает подбор со следующего места; без мест или окон подбор
    * заканчивается.
    * @param pending - свободные места
@@ -194,6 +203,7 @@ export const useDmScreenSnap = createSharedComposable(() => {
     assistRect,
     assistPendingRects,
     assistCandidates,
+    isBackground,
     startDrag,
     moveDrag,
     endDrag,

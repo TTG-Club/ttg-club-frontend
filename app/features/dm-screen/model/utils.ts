@@ -1,5 +1,7 @@
 import type { DmScreenWindow } from './schema';
 import type {
+  DmScreenAxisTile,
+  DmScreenDivider,
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
@@ -14,12 +16,13 @@ import type {
   DmScreenViewport,
 } from './types';
 
-import { sortBy } from 'es-toolkit';
+import { sortBy, uniq } from 'es-toolkit';
 
 import {
   DM_SCREEN_CASCADE_LENGTH,
   DM_SCREEN_CASCADE_STEP,
   DM_SCREEN_CLICK_OFFSET,
+  DM_SCREEN_DIVIDER_TOLERANCE,
   DM_SCREEN_GRID_GAP,
   DM_SCREEN_ICON,
   DM_SCREEN_LEFT_INSET,
@@ -580,24 +583,29 @@ export function getDmScreenZoneRect(
   const top = getTopInset(viewport);
 
   // Промежуток добавлен к холсту и вычтен из каждого места: так он между
-  // местами один и тот же, а у краёв холста его нет
+  // местами один и тот же, а у краёв холста его нет. Место считается по
+  // своим краям, а не по ширине: иначе из-за округления промежуток между
+  // соседними местами гулял бы на пиксель
   const width =
     viewport.width - left - DM_SCREEN_WINDOW_MARGIN + DM_SCREEN_GRID_GAP;
 
   const height =
     viewport.height - top - DM_SCREEN_WINDOW_MARGIN + DM_SCREEN_GRID_GAP;
 
+  const x = Math.round(left + zone.x * width);
+  const y = Math.round(top + zone.y * height);
+
+  const right =
+    Math.round(left + (zone.x + zone.width) * width) - DM_SCREEN_GRID_GAP;
+
+  const bottom =
+    Math.round(top + (zone.y + zone.height) * height) - DM_SCREEN_GRID_GAP;
+
   return {
-    x: Math.round(left + zone.x * width),
-    y: Math.round(top + zone.y * height),
-    width: Math.max(
-      DM_SCREEN_WINDOW_MIN_SIZE.width,
-      Math.round(zone.width * width - DM_SCREEN_GRID_GAP),
-    ),
-    height: Math.max(
-      DM_SCREEN_WINDOW_MIN_SIZE.height,
-      Math.round(zone.height * height - DM_SCREEN_GRID_GAP),
-    ),
+    x,
+    y,
+    width: Math.max(DM_SCREEN_WINDOW_MIN_SIZE.width, right - x),
+    height: Math.max(DM_SCREEN_WINDOW_MIN_SIZE.height, bottom - y),
   };
 }
 
@@ -669,6 +677,222 @@ export function getDmScreenNoteToggle(isEditing: boolean): {
   return isEditing
     ? { label: DM_SCREEN_TEXT.noteDone, icon: DM_SCREEN_ICON.noteDone }
     : { label: DM_SCREEN_TEXT.noteEdit, icon: DM_SCREEN_ICON.noteEdit };
+}
+
+/**
+ * Окно вдоль оси: по горизонтали для вертикальной границы и по вертикали
+ * для горизонтальной.
+ * @param tile - окно
+ * @param isVertical - граница вертикальная
+ */
+function toAxisTile(tile: DmScreenTile, isVertical: boolean): DmScreenAxisTile {
+  return isVertical
+    ? {
+        id: tile.id,
+        start: tile.x,
+        end: tile.x + tile.width,
+        crossStart: tile.y,
+        crossEnd: tile.y + tile.height,
+      }
+    : {
+        id: tile.id,
+        start: tile.y,
+        end: tile.y + tile.height,
+        crossStart: tile.x,
+        crossEnd: tile.x + tile.width,
+      };
+}
+
+/**
+ * Окно с новым отрезком вдоль оси; поперёк оси оно не меняется.
+ * @param tile - окно
+ * @param isVertical - граница вертикальная
+ * @param start - начало окна по оси
+ * @param end - конец окна по оси
+ */
+function withAxisSpan(
+  tile: DmScreenTile,
+  isVertical: boolean,
+  start: number,
+  end: number,
+): DmScreenTile {
+  const { id, x, y, width, height } = tile;
+
+  return isVertical
+    ? { id, x: start, y, width: end - start, height }
+    : { id, x, y: start, width, height: end - start };
+}
+
+/**
+ * Общие границы окон по одной оси. Соседи — окна, между которыми ровно
+ * промежуток сетки и которые перекрываются поперёк оси. Соседи на одной
+ * линии, стоящие друг за другом, делят одну границу: в сетке 2×2 она идёт
+ * через весь холст.
+ * @param tiles - окна вдоль оси
+ * @param isVertical - границы вертикальные
+ */
+function getAxisDividers(
+  tiles: ReadonlyArray<DmScreenAxisTile>,
+  isVertical: boolean,
+): Array<DmScreenDivider> {
+  const pairs = tiles.flatMap((leading) =>
+    tiles
+      .filter(
+        (trailing) =>
+          trailing.id !== leading.id
+          && Math.abs(trailing.start - leading.end - DM_SCREEN_GRID_GAP)
+            <= DM_SCREEN_DIVIDER_TOLERANCE
+          && trailing.crossStart < leading.crossEnd
+          && leading.crossStart < trailing.crossEnd,
+      )
+      .map((trailing) => ({
+        leading,
+        trailing,
+        start: Math.min(leading.crossStart, trailing.crossStart),
+        end: Math.max(leading.crossEnd, trailing.crossEnd),
+      })),
+  );
+
+  return sortBy(pairs, [(pair) => pair.leading.end, 'start']).reduce<
+    Array<DmScreenDivider>
+  >((dividers, pair) => {
+    const last = dividers.at(-1);
+
+    const isSameDivider =
+      last
+      && Math.abs(last.position - pair.leading.end)
+        <= DM_SCREEN_DIVIDER_TOLERANCE
+      && pair.start
+        <= last.end + DM_SCREEN_GRID_GAP + DM_SCREEN_DIVIDER_TOLERANCE;
+
+    if (last && isSameDivider) {
+      return [
+        ...dividers.slice(0, -1),
+        {
+          ...last,
+          end: Math.max(last.end, pair.end),
+          leadingIds: uniq([...last.leadingIds, pair.leading.id]),
+          trailingIds: uniq([...last.trailingIds, pair.trailing.id]),
+        },
+      ];
+    }
+
+    return [
+      ...dividers,
+      {
+        key: `${isVertical ? 'x' : 'y'}:${pair.leading.end}:${pair.start}`,
+        isVertical,
+        position: pair.leading.end,
+        start: pair.start,
+        end: pair.end,
+        leadingIds: [pair.leading.id],
+        trailingIds: [pair.trailing.id],
+      },
+    ];
+  }, []);
+}
+
+/**
+ * Общие границы соседних окон: вертикальные и горизонтальные.
+ * @param tiles - развёрнутые окна
+ */
+export function getDmScreenDividers(
+  tiles: ReadonlyArray<DmScreenTile>,
+): Array<DmScreenDivider> {
+  return [true, false].flatMap((isVertical) =>
+    getAxisDividers(
+      tiles.map((tile) => toAxisTile(tile, isVertical)),
+      isVertical,
+    ),
+  );
+}
+
+/**
+ * Прямоугольник общей границы на холсте: промежуток между окнами.
+ * @param divider - граница
+ * @param position - где граница сейчас; пока её тянут, она не на своём месте
+ */
+export function getDmScreenDividerRect(
+  divider: DmScreenDivider,
+  position: number = divider.position,
+): DmScreenRect {
+  return divider.isVertical
+    ? {
+        x: position,
+        y: divider.start,
+        width: DM_SCREEN_GRID_GAP,
+        height: divider.end - divider.start,
+      }
+    : {
+        x: divider.start,
+        y: position,
+        width: divider.end - divider.start,
+        height: DM_SCREEN_GRID_GAP,
+      };
+}
+
+/**
+ * Сдвигает общую границу: окна перед ней растут или сжимаются концом, окна
+ * за ней — началом, промежуток между ними остаётся. Граница не идёт дальше,
+ * чем позволяет наименьший размер окон по обе стороны.
+ * @param divider - граница
+ * @param delta - на сколько сдвинулся указатель
+ * @param tiles - развёрнутые окна
+ * @returns новое место границы и окна, которые изменились
+ */
+export function moveDmScreenDivider(
+  divider: DmScreenDivider,
+  delta: number,
+  tiles: ReadonlyArray<DmScreenTile>,
+): { position: number; tiles: Array<DmScreenTile> } {
+  const { isVertical } = divider;
+
+  const minSize = isVertical
+    ? DM_SCREEN_WINDOW_MIN_SIZE.width
+    : DM_SCREEN_WINDOW_MIN_SIZE.height;
+
+  const leading = tiles.filter((tile) => divider.leadingIds.includes(tile.id));
+
+  const trailing = tiles.filter((tile) =>
+    divider.trailingIds.includes(tile.id),
+  );
+
+  const min = Math.max(
+    ...leading.map((tile) => toAxisTile(tile, isVertical).start + minSize),
+  );
+
+  const max =
+    Math.min(
+      ...trailing.map((tile) => toAxisTile(tile, isVertical).end - minSize),
+    ) - DM_SCREEN_GRID_GAP;
+
+  // Окнам уже некуда сжиматься: граница остаётся на месте
+  const position =
+    min > max
+      ? divider.position
+      : clampToRange(Math.round(divider.position + delta), min, max);
+
+  return {
+    position,
+    tiles: [
+      ...leading.map((tile) =>
+        withAxisSpan(
+          tile,
+          isVertical,
+          toAxisTile(tile, isVertical).start,
+          position,
+        ),
+      ),
+      ...trailing.map((tile) =>
+        withAxisSpan(
+          tile,
+          isVertical,
+          position + DM_SCREEN_GRID_GAP,
+          toAxisTile(tile, isVertical).end,
+        ),
+      ),
+    ],
+  };
 }
 
 /**

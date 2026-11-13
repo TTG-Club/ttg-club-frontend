@@ -1,6 +1,8 @@
 import type {
   DmScreenPoint,
+  DmScreenRect,
   DmScreenRequest,
+  DmScreenTile,
   DmScreenViewport,
   DmScreenWindow,
 } from '../model';
@@ -19,7 +21,6 @@ import {
   DM_SCREEN_STORAGE_KEY,
   DM_SCREEN_TEXT,
   DM_SCREEN_TOP_INSET,
-  DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenWindowListSchema,
   isDmScreenNotePath,
   saveDmScreenWindows,
@@ -203,6 +204,43 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
+   * Место и размер окон, пока их меняют за общую границу: окна показывают
+   * их сразу, а в ширму они пишутся один раз, когда границу отпускают.
+   */
+  const previewRects = shallowRef<ReadonlyMap<string, DmScreenRect>>(new Map());
+
+  /**
+   * Показывает окна на новых местах, не записывая их; без окон — убирает
+   * предпросмотр.
+   * @param tiles - окна с новым местом и размером
+   */
+  function setPreviewRects(tiles: ReadonlyArray<DmScreenTile> = []): void {
+    previewRects.value = new Map(tiles.map((tile) => [tile.id, tile]));
+  }
+
+  /**
+   * Записывает место и размер нескольких окон одним изменением ширмы.
+   * @param tiles - окна с новым местом и размером
+   */
+  function updateRects(tiles: ReadonlyArray<DmScreenTile>): void {
+    const rects = new Map(tiles.map((tile) => [tile.id, tile]));
+
+    windows.value = windows.value.map((screenWindow) => {
+      const rect = rects.get(screenWindow.id);
+
+      return rect
+        ? {
+            ...screenWindow,
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+          }
+        : screenWindow;
+    });
+  }
+
+  /**
    * Поднимает окно над остальными.
    * @param id - окно
    */
@@ -294,20 +332,6 @@ export const useDmScreen = createSharedComposable(() => {
     update(id, { isMinimized: true });
   }
 
-  /**
-   * Уменьшает все окна до минимального размера, не сдвигая их: на холсте
-   * видно больше окон сразу. Свёрнутые окна тоже разворачиваются —
-   * уменьшенными.
-   */
-  function shrinkAll(): void {
-    windows.value = windows.value.map((item) => ({
-      ...item,
-      width: DM_SCREEN_WINDOW_MIN_SIZE.width,
-      height: DM_SCREEN_WINDOW_MIN_SIZE.height,
-      isMinimized: false,
-    }));
-  }
-
   /** Сворачивает все окна в плашки: холст освобождается целиком. */
   function minimizeAll(): void {
     windows.value = windows.value.map((item) => ({
@@ -389,10 +413,12 @@ export const useDmScreen = createSharedComposable(() => {
     clear,
     minimize,
     minimizeAll,
-    shrinkAll,
     restore,
     focus,
     update,
+    updateRects,
+    previewRects,
+    setPreviewRects,
     isAdded,
   };
 });

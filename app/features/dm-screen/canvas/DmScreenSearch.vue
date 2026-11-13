@@ -57,15 +57,15 @@
 </script>
 
 <template>
-  <!-- Поиск сжимается раньше, чем кнопки шапки уйдут на вторую строку -->
-  <div class="relative max-w-xl min-w-64 flex-1">
+  <!-- На телефоне поиск занимает строку целиком, на широком экране стоит
+  справа от кнопок шапки -->
+  <div class="relative w-full md:w-72">
     <UInput
       v-model="input"
       :icon="DM_SCREEN_ICON.search"
       :placeholder="DM_SCREEN_TEXT.searchPlaceholder"
       :loading="status === 'pending'"
       class="w-full"
-      size="lg"
     />
 
     <div

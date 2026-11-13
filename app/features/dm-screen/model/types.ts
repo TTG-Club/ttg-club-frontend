@@ -58,6 +58,35 @@ export interface DmScreenSnapAssist {
   placedIds: ReadonlyArray<string>;
 }
 
+/** Окно вдоль одной оси: его отрезок по оси и отрезок поперёк неё, px. */
+export interface DmScreenAxisTile {
+  id: string;
+  start: number;
+  end: number;
+  crossStart: number;
+  crossEnd: number;
+}
+
+/**
+ * Общая граница соседних окон: промежуток сетки между ними. За неё тянут,
+ * меняя размер окон по обе стороны сразу.
+ */
+export interface DmScreenDivider {
+  key: string;
+  /** Граница вертикальная: окна стоят слева и справа от неё. */
+  isVertical: boolean;
+  /** Где граница начинается по своей оси: конец окон перед ней, px. */
+  position: number;
+  /** Начало границы поперёк оси, px. */
+  start: number;
+  /** Конец границы поперёк оси, px. */
+  end: number;
+  /** Окна перед границей: слева или сверху. */
+  leadingIds: ReadonlyArray<string>;
+  /** Окна за границей: справа или снизу. */
+  trailingIds: ReadonlyArray<string>;
+}
+
 /** Ручка растягивания окна: сторона или угол. */
 export interface DmScreenResizeHandle {
   key: string;

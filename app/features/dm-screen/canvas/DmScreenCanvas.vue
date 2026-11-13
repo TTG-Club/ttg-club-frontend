@@ -7,6 +7,7 @@
     DM_SCREEN_TITLE,
     DM_SCREEN_TOP_GAP,
   } from '../model';
+  import DmScreenDividers from './DmScreenDividers.vue';
   import DmScreenList from './DmScreenList.vue';
   import DmScreenSearch from './DmScreenSearch.vue';
   import DmScreenSnap from './DmScreenSnap.vue';
@@ -37,7 +38,6 @@
     isWindowed,
     addNote,
     arrange,
-    shrinkAll,
     minimizeAll,
     clear,
     setTopInset,
@@ -79,7 +79,7 @@
   const isEmpty = computed(() => !windows.value.length);
 
   // Кнопки раскладки видны, пока на ширме есть записи, в том числе когда
-  // все окна свёрнуты: «Выровнять» и «Уменьшить» их и развернут
+  // все окна свёрнуты: «Выровнять» их и развернёт
   const isLayoutControlsVisible = computed(
     () => isWindowed.value && !isEmpty.value,
   );
@@ -89,6 +89,8 @@
   <div class="flex min-h-dvh flex-col gap-4 p-4">
     <!-- Шапка после слоя окон в разметке: поиск ложится поверх окон -->
     <DmScreenWindows v-if="isWindowed" />
+
+    <DmScreenDividers v-if="isWindowed" />
 
     <DmScreenSnap v-if="isWindowed" />
 
@@ -102,53 +104,57 @@
         </h1>
       </slot>
 
-      <DmScreenSearch />
+      <!-- Кнопки и поиск прижаты к правому краю, поиск — последним -->
+      <div
+        class="ml-auto flex flex-auto flex-wrap items-center justify-end gap-2"
+      >
+        <UButton
+          :icon="DM_SCREEN_ICON.note"
+          :label="DM_SCREEN_TEXT.addNote"
+          color="neutral"
+          variant="outline"
+          @click.left.exact.prevent="createNote"
+        />
 
-      <UButton
-        :icon="DM_SCREEN_ICON.note"
-        :label="DM_SCREEN_TEXT.addNote"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="createNote"
-      />
+        <UTooltip
+          v-if="isLayoutControlsVisible"
+          :text="DM_SCREEN_TEXT.arrange"
+        >
+          <UButton
+            :icon="DM_SCREEN_ICON.arrange"
+            :aria-label="DM_SCREEN_TEXT.arrange"
+            color="neutral"
+            variant="outline"
+            @click.left.exact.prevent="arrange"
+          />
+        </UTooltip>
 
-      <UButton
-        v-if="isLayoutControlsVisible"
-        :icon="DM_SCREEN_ICON.arrange"
-        :label="DM_SCREEN_TEXT.arrange"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="arrange"
-      />
+        <UTooltip
+          v-if="isLayoutControlsVisible"
+          :text="DM_SCREEN_TEXT.minimizeAll"
+        >
+          <UButton
+            :icon="DM_SCREEN_ICON.minimizeAll"
+            :aria-label="DM_SCREEN_TEXT.minimizeAll"
+            color="neutral"
+            variant="outline"
+            @click.left.exact.prevent="minimizeAll"
+          />
+        </UTooltip>
 
-      <UButton
-        v-if="isLayoutControlsVisible"
-        :icon="DM_SCREEN_ICON.shrinkAll"
-        :label="DM_SCREEN_TEXT.shrinkAll"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="shrinkAll"
-      />
+        <UButton
+          v-if="!isEmpty"
+          :icon="DM_SCREEN_ICON.delete"
+          :label="DM_SCREEN_TEXT.clear"
+          color="error"
+          variant="outline"
+          @click.left.exact.prevent="openClear"
+        />
 
-      <UButton
-        v-if="isLayoutControlsVisible"
-        :icon="DM_SCREEN_ICON.minimizeAll"
-        :label="DM_SCREEN_TEXT.minimizeAll"
-        color="neutral"
-        variant="outline"
-        @click.left.exact.prevent="minimizeAll"
-      />
+        <slot name="actions" />
 
-      <UButton
-        v-if="!isEmpty"
-        :icon="DM_SCREEN_ICON.delete"
-        :label="DM_SCREEN_TEXT.clear"
-        color="error"
-        variant="outline"
-        @click.left.exact.prevent="openClear"
-      />
-
-      <slot name="actions" />
+        <DmScreenSearch />
+      </div>
     </header>
 
     <div

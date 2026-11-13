@@ -104,7 +104,9 @@
 
   <DmScreenCanvas v-else>
     <template #heading>
-      <div class="flex min-w-0 items-center gap-1">
+      <!-- На широком экране карандаш виден по наведению на имя или с
+      клавиатуры, на телефоне наведения нет — он виден всегда -->
+      <div class="group flex min-w-0 items-center gap-1">
         <h1 class="truncate text-2xl text-highlighted">
           {{ name }}
         </h1>
@@ -116,6 +118,7 @@
             color="neutral"
             variant="ghost"
             size="sm"
+            class="transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
             @click.left.exact.prevent="openRename"
           />
         </UTooltip>
