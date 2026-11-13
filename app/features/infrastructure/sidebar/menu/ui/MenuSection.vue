@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { MenuItem } from '../model';
 
-  import { MENU_EXTERNAL_ICON } from '../model';
+  import { MENU_EXTERNAL_ICON, MENU_EXTERNAL_TARGET } from '../model';
 
   const { items } = defineProps<{
     label: string;
@@ -12,7 +12,7 @@
   const links = computed(() =>
     items.map((link) => ({
       ...link,
-      target: link.external ? '_blank' : undefined,
+      target: link.external ? MENU_EXTERNAL_TARGET : undefined,
       trailingIcon: link.external ? MENU_EXTERNAL_ICON : undefined,
     })),
   );

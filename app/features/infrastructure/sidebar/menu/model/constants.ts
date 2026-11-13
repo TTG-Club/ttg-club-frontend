@@ -1,6 +1,10 @@
 import type { MenuSection, SocialLink, SupportLink } from './types';
 
-import { DM_SCREEN_PAGE_PATH, NEW_SITE_URL } from '~/shared/consts';
+import {
+  DM_SCREEN_PAGE_PATH,
+  DM_SCREEN_PAGE_TITLE,
+  NEW_SITE_URL,
+} from '~/shared/consts';
 
 /** Название сайта в шапке меню. */
 export const MENU_SITE_TITLE = 'TTG Club';
@@ -16,6 +20,9 @@ export const MENU_CONTACTS_LABEL = 'Контакты:';
 
 /** Подпись блока поддержки в подвале меню. */
 export const MENU_SUPPORT_LABEL = 'Поддержка:';
+
+/** Пункт на другой сайт открывается в новой вкладке. */
+export const MENU_EXTERNAL_TARGET = '_blank';
 
 /** Иконка пункта, который ведёт на другой сайт. */
 export const MENU_EXTERNAL_ICON = 'tabler:external-link';
@@ -198,7 +205,7 @@ export const MENU_SECTIONS: Array<MenuSection> = [
       },
       {
         href: DM_SCREEN_PAGE_PATH,
-        label: 'Ширма Мастера',
+        label: DM_SCREEN_PAGE_TITLE,
         icon: DM_SCREEN_MENU_ICON,
         onHome: true,
       },

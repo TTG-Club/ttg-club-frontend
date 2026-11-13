@@ -5,7 +5,7 @@ import type {
   DmScreenSnapZone,
 } from './types';
 
-import { DM_SCREEN_PAGE_PATH } from '~/shared/consts';
+import { DM_SCREEN_PAGE_PATH, DM_SCREEN_PAGE_TITLE } from '~/shared/consts';
 import { BESTIARY_SECTION } from '~bestiary/model';
 import {
   BACKGROUNDS_SECTION,
@@ -35,7 +35,7 @@ import {
 /** Страница ширмы. */
 export const DM_SCREEN_PATH = DM_SCREEN_PAGE_PATH;
 
-export const DM_SCREEN_TITLE = 'Ширма Мастера';
+export const DM_SCREEN_TITLE = DM_SCREEN_PAGE_TITLE;
 
 /** Старый адрес черт: записи по нему тоже открываются в ширме. */
 export const DM_SCREEN_TRAITS_PATH = '/traits';

@@ -2,7 +2,6 @@ import type { DmScreenRequest, DmScreenSummary } from '../model';
 
 import { getApiErrorMessage } from '~user/model';
 
-import { DmScreenPickModal } from '../dialogs';
 import {
   appendDmScreenWindow,
   createDmScreen,
@@ -27,15 +26,16 @@ interface DmScreenTarget {
 /**
  * «В ширму» с любой страницы: запись встаёт окном на ширме, а тост
  * предлагает перейти к ней. У гостя ширма одна, в браузере. У пользователя
- * ширмы на сервере: если их нет, создаётся «Моя ширма»; если одна — запись
- * идёт в неё; если несколько — пользователь выбирает. Записи разделов,
- * которых ширма не умеет показывать, не добавляются.
+ * ширма на сервере: если её нет, создаётся «Моя ширма». Ширма у пользователя
+ * пока одна, поэтому запись идёт в ту же, что открывает страница ширмы, —
+ * первую в списке; выбор ширмы (`DmScreenPickModal`) вернётся вместе с
+ * несколькими ширмами. Записи разделов, которых ширма не умеет показывать,
+ * не добавляются.
  */
 export function useDmScreenAdd() {
   const { add, screenId } = useDmScreen();
   const { isLoggedIn } = useUser();
   const toast = useToast();
-  const overlay = useOverlay();
   const { width: viewportWidth, height: viewportHeight } = useWindowSize();
 
   /**
@@ -60,30 +60,22 @@ export function useDmScreenAdd() {
   }
 
   /**
-   * Ширма для записи: единственная, новая «Моя ширма» или выбранная.
+   * Ширма для записи: первая в списке или новая «Моя ширма».
    * @param screens - ширмы пользователя
-   * @returns ширма или `undefined`, если выбор отменили
+   * @returns ширма, в которую ляжет запись
    */
   async function pickTarget(
     screens: ReadonlyArray<DmScreenSummary>,
-  ): Promise<DmScreenTarget | undefined> {
-    const [single] = screens;
+  ): Promise<DmScreenTarget> {
+    const [existing] = screens;
 
-    if (!single) {
-      const created = await createDmScreen(DM_SCREEN_DEFAULT_NAME);
-
-      return { id: created.id, name: created.name };
+    if (existing) {
+      return existing;
     }
 
-    if (screens.length === 1) {
-      return single;
-    }
+    const created = await createDmScreen(DM_SCREEN_DEFAULT_NAME);
 
-    // Модалка создаётся только на время выбора и убирается после него
-    const picker = overlay.create(DmScreenPickModal, { destroyOnClose: true });
-    const id = await picker.open({ screens }).result;
-
-    return screens.find((screen) => screen.id === id);
+    return { id: created.id, name: created.name };
   }
 
   /**
@@ -94,10 +86,6 @@ export function useDmScreenAdd() {
   async function addToAccount(request: DmScreenRequest): Promise<void> {
     const { items } = await fetchDmScreenList();
     const target = await pickTarget(items);
-
-    if (!target) {
-      return;
-    }
 
     if (target.id === screenId.value) {
       add(request);
