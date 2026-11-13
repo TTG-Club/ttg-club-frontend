@@ -159,6 +159,23 @@ describe('ширма мастера', () => {
     expect(screen.windows).toHaveLength(1);
   });
 
+  it('сетка доходит до краёв холста с одинаковым отступом', () => {
+    const viewport = { width: 1600, height: 900 };
+    const tiles = arrangeDmScreenWindows(['a', 'b', 'c'], viewport);
+
+    expect(Math.min(...tiles.map((tile) => tile.x))).toBe(
+      DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
+    );
+
+    expect(Math.max(...tiles.map((tile) => tile.x + tile.width))).toBe(
+      viewport.width - DM_SCREEN_WINDOW_MARGIN,
+    );
+
+    expect(Math.max(...tiles.map((tile) => tile.y + tile.height))).toBe(
+      viewport.height - DM_SCREEN_WINDOW_MARGIN,
+    );
+  });
+
   describe('примагничивание', () => {
     const viewport = { width: 1600, height: 900 };
     const other = { x: 500, y: 200, width: 400, height: 300 };
