@@ -69,9 +69,6 @@ export const DM_SCREEN_SECTIONS: ReadonlyArray<DmScreenSection> = [
 /** Ручки ширм пользователя на сервере. */
 export const DM_SCREENS_API_URL = '/api/v1/dm-screens';
 
-/** Страница подписки: она снимает ограничение на число ширм. */
-export const DM_SCREEN_SUBSCRIPTION_PATH = '/profile/subscription';
-
 /** Имя ширмы: сколько символов можно. */
 export const DM_SCREEN_NAME_MAX_LENGTH = 64;
 
@@ -209,8 +206,7 @@ export const DM_SCREEN_TEXT = {
   updated: 'Изменена',
   limit: 'Ширм',
   limitReached:
-    'Ширм уже столько, сколько можно. С подпиской можно вести до 30 ширм.',
-  subscribe: 'Оформить подписку',
+    'Ширм уже столько, сколько можно. Чтобы создать новую, удалите одну из них.',
   listEmptyTitle: 'Ширм пока нет',
   listEmptyDescription:
     'Создайте ширму под игру или сцену: в неё можно сложить заклинания, монстров, правила и любые другие записи сайта.',
@@ -252,7 +248,7 @@ export const DM_SCREEN_ICON = {
   rename: 'tabler:pencil',
   delete: 'tabler:trash',
   back: 'tabler:arrow-left',
-  subscribe: 'tabler:crown',
+  limit: 'tabler:info-circle',
   signIn: 'tabler:login',
   import: 'tabler:cloud-upload',
   minimizeAll: 'tabler:layout-bottombar-collapse',

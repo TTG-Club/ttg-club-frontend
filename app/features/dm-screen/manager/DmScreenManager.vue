@@ -8,7 +8,6 @@
   import {
     DM_SCREEN_DEFAULT_NAME,
     DM_SCREEN_ICON,
-    DM_SCREEN_SUBSCRIPTION_PATH,
     DM_SCREEN_TEXT,
     getDmScreenPagePath,
   } from '../model';
@@ -16,8 +15,8 @@
 
   /**
    * Ширмы пользователя: список, создание с именем, переименование и
-   * удаление. Сколько ширм можно вести, решает сервер (без подписки — одну);
-   * когда лимит исчерпан, создание ведёт на страницу подписки. Ширма, которую
+   * удаление. Сколько ширм можно вести, решает сервер; когда лимит
+   * исчерпан, создать новую нельзя, пока не удалена одна из старых. Ширма, которую
    * гость собрал в этом браузере до входа, переносится в аккаунт: сама, если
    * ширм ещё нет, или по кнопке.
    */
@@ -182,28 +181,18 @@
         variant="soft"
       />
 
-      <div class="ml-auto flex gap-2">
-        <UButton
-          v-if="isLoaded && !canCreate"
-          :to="DM_SCREEN_SUBSCRIPTION_PATH"
-          :icon="DM_SCREEN_ICON.subscribe"
-          :label="DM_SCREEN_TEXT.subscribe"
-          color="neutral"
-          variant="outline"
-        />
-
-        <UButton
-          :icon="DM_SCREEN_ICON.create"
-          :label="DM_SCREEN_TEXT.create"
-          :disabled="!isLoaded || !canCreate || isMutating"
-          @click.left.exact.prevent="openCreate"
-        />
-      </div>
+      <UButton
+        :icon="DM_SCREEN_ICON.create"
+        :label="DM_SCREEN_TEXT.create"
+        :disabled="!isLoaded || !canCreate || isMutating"
+        class="ml-auto"
+        @click.left.exact.prevent="openCreate"
+      />
     </header>
 
     <UAlert
       v-if="isLoaded && !errorStatus && !canCreate"
-      :icon="DM_SCREEN_ICON.subscribe"
+      :icon="DM_SCREEN_ICON.limit"
       :description="DM_SCREEN_TEXT.limitReached"
       color="neutral"
       variant="subtle"
