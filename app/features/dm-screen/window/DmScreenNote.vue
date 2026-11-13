@@ -25,16 +25,25 @@
    * сам. В просмотре ссылки на записи сайта открываются окнами, как в
    * любом окне ширмы; в правке — название и редактор мастерской. Новая
    * пустая заметка сразу открывается в правке. Текст сохраняется сам.
+   * Правку переключает шапка окна (`v-model:editing`); в списке на
+   * телефоне шапки нет, там кнопка внутри заметки.
    */
-  const { screenWindow } = defineProps<{
+  const { screenWindow, isToggleShown = false } = defineProps<{
     screenWindow: DmScreenWindow;
+    /** Показать кнопку правки внутри заметки: шапки окна рядом нет. */
+    isToggleShown?: boolean;
   }>();
+
+  const isEditing = defineModel<boolean>('editing', { default: false });
 
   const { update } = useDmScreen();
 
   const title = ref(screenWindow.title);
   const content = ref(screenWindow.content ?? '');
-  const isEditing = ref(!screenWindow.content);
+
+  if (!screenWindow.content) {
+    isEditing.value = true;
+  }
 
   const isTooLong = computed(
     () => content.value.length > DM_SCREEN_NOTE_MAX_LENGTH,
@@ -71,19 +80,36 @@
   // Окно закрывают или уводят в плашку посреди набора: не потерять текст
   onBeforeUnmount(save);
 
-  /** Переключает просмотр и правку; выход из правки сохраняет сразу. */
-  function toggle(): void {
-    if (isEditing.value) {
-      save();
+  // Выход из правки сохраняет сразу, а слишком длинный текст из правки не
+  // выпускает. Цикла нет: возврат в правку на втором проходе ничего не делает
+  watch(isEditing, (editing) => {
+    if (editing) {
+      return;
     }
 
+    if (isTooLong.value) {
+      isEditing.value = true;
+
+      return;
+    }
+
+    save();
+  });
+
+  const isHeadShown = computed(() => isEditing.value || isToggleShown);
+
+  /** Переключает просмотр и правку. */
+  function toggle(): void {
     isEditing.value = !isEditing.value;
   }
 </script>
 
 <template>
   <div class="flex flex-col gap-3 pt-3">
-    <div class="flex items-center gap-2">
+    <div
+      v-if="isHeadShown"
+      class="flex items-center gap-2"
+    >
       <UInput
         v-if="isEditing"
         v-model="title"
@@ -93,6 +119,7 @@
       />
 
       <UButton
+        v-if="isToggleShown"
         :icon="toggleIcon"
         :label="toggleLabel"
         :disabled="isEditing && isTooLong"

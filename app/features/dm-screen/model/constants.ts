@@ -1,4 +1,9 @@
-import type { DmScreenResizeHandle, DmScreenSection } from './types';
+import type {
+  DmScreenResizeHandle,
+  DmScreenSection,
+  DmScreenSnapLayout,
+  DmScreenSnapZone,
+} from './types';
 
 import { DM_SCREEN_PAGE_PATH } from '~/shared/consts';
 import { BESTIARY_SECTION } from '~bestiary/model';
@@ -74,16 +79,6 @@ export const DM_SCREEN_NAME_MAX_LENGTH = 64;
 
 /** Имя ширмы, которую сайт создаёт сам: при первом «В ширму» и переносе. */
 export const DM_SCREEN_DEFAULT_NAME = 'Моя ширма';
-
-/** Дата изменения ширмы в списке: «12 ноября, 14:05». */
-export const DM_SCREEN_DATE_FORMAT: Intl.DateTimeFormatOptions = {
-  day: 'numeric',
-  month: 'long',
-  hour: '2-digit',
-  minute: '2-digit',
-};
-
-export const DM_SCREEN_DATE_LOCALE = 'ru-RU';
 
 /** Пауза перед сохранением ширмы на сервер после изменения окон, мс. */
 export const DM_SCREEN_SAVE_DELAY = 800;
@@ -178,6 +173,81 @@ export const DM_SCREEN_RESIZE_HANDLES: ReadonlyArray<DmScreenResizeHandle> = [
   },
 ];
 
+/**
+ * Места ровной сетки раскладки: одинаковые клетки слева направо, сверху
+ * вниз.
+ * @param columns - сколько колонок
+ * @param rows - сколько рядов
+ */
+function createGridZones(
+  columns: number,
+  rows: number,
+): Array<DmScreenSnapZone> {
+  return Array.from({ length: columns * rows }, (_, index) => ({
+    x: (index % columns) / columns,
+    y: Math.floor(index / columns) / rows,
+    width: 1 / columns,
+    height: 1 / rows,
+  }));
+}
+
+/** Две половины холста: в них окно встаёт и у боковых краёв. */
+export const DM_SCREEN_SNAP_HALVES: DmScreenSnapLayout = {
+  key: 'columns-2',
+  zones: createGridZones(2, 1),
+};
+
+/**
+ * Раскладки в панели, которая появляется, когда окно тащат к верху холста.
+ * Мельче, чем у окон Windows: карточки записей небольшие, на холст их
+ * встаёт до восьми.
+ */
+export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
+  DM_SCREEN_SNAP_HALVES,
+  { key: 'columns-3', zones: createGridZones(3, 1) },
+  { key: 'columns-4', zones: createGridZones(4, 1) },
+  { key: 'grid-2x2', zones: createGridZones(2, 2) },
+  { key: 'grid-3x2', zones: createGridZones(3, 2) },
+  { key: 'grid-4x2', zones: createGridZones(4, 2) },
+  {
+    key: 'main-left',
+    zones: [
+      { x: 0, y: 0, width: 0.5, height: 1 },
+      { x: 0.5, y: 0, width: 0.5, height: 0.5 },
+      { x: 0.5, y: 0.5, width: 0.5, height: 0.5 },
+    ],
+  },
+  {
+    key: 'main-wide',
+    zones: [
+      { x: 0, y: 0, width: 2 / 3, height: 1 },
+      { x: 2 / 3, y: 0, width: 1 / 3, height: 0.5 },
+      { x: 2 / 3, y: 0.5, width: 1 / 3, height: 0.5 },
+    ],
+  },
+];
+
+/**
+ * Насколько близко к боковому краю холста нужно подвести указатель, чтобы
+ * окно заняло половину, px.
+ */
+export const DM_SCREEN_SNAP_EDGE_DISTANCE = 24;
+
+/**
+ * Высота полосы под шапкой ширмы, px: пока указатель с окном в ней, видна
+ * панель раскладок.
+ */
+export const DM_SCREEN_SNAP_PICKER_DISTANCE = 140;
+
+/** Отступ панели раскладок от шапки ширмы, px. */
+export const DM_SCREEN_SNAP_PICKER_OFFSET = 8;
+
+/** Вид места в панели раскладок: под указателем и остальные. */
+export const DM_SCREEN_SNAP_ZONE_CLASS = {
+  active: 'border-primary bg-primary/40',
+  idle: 'border-accented bg-accented/40',
+} as const;
+
 /** Рамка окна, на которое указали вместо нового. */
 export const DM_SCREEN_HIGHLIGHT_CLASS = 'ring-2 ring-primary';
 
@@ -235,6 +305,10 @@ export const DM_SCREEN_TEXT = {
     'Найдите заклинание, монстра, правило или любую другую запись поиском выше или выберите «В ширму» в меню записи на сайте. Каждая запись встанет отдельным окном: его можно двигать, растягивать и сворачивать.',
   remove: 'Убрать из ширмы',
   arrange: 'Выровнять по сетке',
+  snapPicker: 'Раскладки окон',
+  snapAssistTitle: 'Что поставить сюда?',
+  snapAssistSkip: 'Пропустить',
+  snapAssistStop: 'Закончить',
   clear: 'Очистить',
   clearTitle: 'Очистить ширму?',
   clearDescription: 'Все окна и заметки пропадут с ширмы. Это нельзя отменить.',
@@ -246,44 +320,19 @@ export const DM_SCREEN_TEXT = {
   noteEmpty: 'Заметка пуста. Нажмите «Править», чтобы написать её.',
   noteTooLong:
     'Заметка слишком длинная: сократите её, иначе она не сохранится.',
-  screens: 'Мои ширмы',
-  allScreens: 'Все ширмы',
-  create: 'Новая ширма',
-  createTitle: 'Новая ширма',
   rename: 'Переименовать',
   renameTitle: 'Имя ширмы',
   namePlaceholder: 'Например, «Подземелье гоблинов»',
   save: 'Сохранить',
   cancel: 'Отмена',
-  delete: 'Удалить',
-  deleteTitle: 'Удалить ширму?',
-  deleteDescription: 'Ширма и все её окна пропадут. Это нельзя отменить.',
-  open: 'Открыть',
-  entries: 'записей',
-  updated: 'Изменена',
-  limit: 'Ширм',
-  limitReached:
-    'Ширм уже столько, сколько можно. Чтобы создать новую, удалите одну из них.',
-  listEmptyTitle: 'Ширм пока нет',
-  listEmptyDescription:
-    'Создайте ширму под игру или сцену: в неё можно сложить заклинания, монстров, правила и любые другие записи сайта.',
-  loadFailed: 'Не удалось загрузить ширмы',
   screenLoadFailed: 'Не удалось открыть ширму',
   retry: 'Повторить',
-  errorCreate: 'Не удалось создать ширму',
   errorRename: 'Не удалось переименовать ширму',
-  errorDelete: 'Не удалось удалить ширму',
   errorSave: 'Не удалось сохранить ширму',
   errorAdd: 'Не удалось добавить в ширму',
-  guestTitle: 'Ширма в этом браузере',
   guestDescription:
     'Войдите, чтобы ширма сохранялась в аккаунте и открывалась на любом устройстве.',
   signIn: 'Войти',
-  guestImportTitle: 'В этом браузере есть ширма без входа',
-  guestImportDescription:
-    'Её можно сохранить в аккаунт отдельной ширмой, иначе она останется только в этом браузере.',
-  guestImport: 'Сохранить в аккаунт',
-  guestDiscard: 'Удалить её',
   pickTitle: 'В какую ширму?',
   pickDescription: 'Запись встанет окном в выбранную ширму.',
   minimizeAll: 'Свернуть все',
@@ -301,13 +350,9 @@ export const DM_SCREEN_ICON = {
   note: 'tabler:note',
   noteEdit: 'tabler:pencil',
   noteDone: 'tabler:check',
-  create: 'tabler:plus',
   rename: 'tabler:pencil',
   delete: 'tabler:trash',
-  back: 'tabler:arrow-left',
-  limit: 'tabler:info-circle',
   signIn: 'tabler:login',
-  import: 'tabler:cloud-upload',
   minimizeAll: 'tabler:layout-bottombar-collapse',
   shrinkAll: 'tabler:arrows-minimize',
   unknown: 'tabler:file-unknown',

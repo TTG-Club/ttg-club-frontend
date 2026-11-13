@@ -105,13 +105,3 @@ export function saveDmScreenWindowsOnLeave(
     body: JSON.stringify(windows),
   });
 }
-
-/**
- * Удаляет ширму.
- * @param id - идентификатор ширмы
- */
-export async function deleteDmScreen(id: string): Promise<void> {
-  const api = useApi();
-
-  await api(getScreenUrl(id), { method: 'DELETE' });
-}

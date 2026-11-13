@@ -7,6 +7,8 @@ import type {
   DmScreenResizeLimits,
   DmScreenSection,
   DmScreenSize,
+  DmScreenSnapTarget,
+  DmScreenSnapZone,
   DmScreenSpan,
   DmScreenTile,
   DmScreenViewport,
@@ -18,8 +20,6 @@ import {
   DM_SCREEN_CASCADE_LENGTH,
   DM_SCREEN_CASCADE_STEP,
   DM_SCREEN_CLICK_OFFSET,
-  DM_SCREEN_DATE_FORMAT,
-  DM_SCREEN_DATE_LOCALE,
   DM_SCREEN_GRID_GAP,
   DM_SCREEN_ICON,
   DM_SCREEN_LEFT_INSET,
@@ -27,6 +27,8 @@ import {
   DM_SCREEN_PATH,
   DM_SCREEN_SECTIONS,
   DM_SCREEN_SNAP_DISTANCE,
+  DM_SCREEN_SNAP_EDGE_DISTANCE,
+  DM_SCREEN_SNAP_HALVES,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_HEADER_HEIGHT,
   DM_SCREEN_WINDOW_MARGIN,
@@ -368,23 +370,6 @@ export function getDmScreenPagePath(id: string): string {
 }
 
 /**
- * Дата изменения ширмы для списка; нет даты или она битая — пусто.
- * @param value - дата в ISO-формате
- */
-export function formatDmScreenDate(value?: string | null): string {
-  const date = value ? new Date(value) : undefined;
-
-  if (!date || Number.isNaN(date.getTime())) {
-    return '';
-  }
-
-  return new Intl.DateTimeFormat(
-    DM_SCREEN_DATE_LOCALE,
-    DM_SCREEN_DATE_FORMAT,
-  ).format(date);
-}
-
-/**
  * Ближайшее к значению место из возможных, если оно не дальше расстояния
  * примагничивания; иначе значение как есть.
  * @param value - где окно сейчас
@@ -577,6 +562,68 @@ export function resizeDmScreenWindow(
     width: Math.round(horizontal.size),
     height: Math.round(vertical.size),
   };
+}
+
+/**
+ * Прямоугольник места раскладки на холсте: под шапкой ширмы, правее боковой
+ * панели, с промежутком сетки между соседними местами. Меньше минимального
+ * окна место не становится.
+ * @param zone - место раскладки в долях холста
+ * @param viewport - экран ширмы
+ */
+export function getDmScreenZoneRect(
+  zone: DmScreenSnapZone,
+  viewport: DmScreenViewport,
+): DmScreenRect {
+  const left = DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN;
+  const top = getTopInset(viewport);
+
+  // Промежуток добавлен к холсту и вычтен из каждого места: так он между
+  // местами один и тот же, а у краёв холста его нет
+  const width =
+    viewport.width - left - DM_SCREEN_WINDOW_MARGIN + DM_SCREEN_GRID_GAP;
+
+  const height =
+    viewport.height - top - DM_SCREEN_WINDOW_MARGIN + DM_SCREEN_GRID_GAP;
+
+  return {
+    x: Math.round(left + zone.x * width),
+    y: Math.round(top + zone.y * height),
+    width: Math.max(
+      DM_SCREEN_WINDOW_MIN_SIZE.width,
+      Math.round(zone.width * width - DM_SCREEN_GRID_GAP),
+    ),
+    height: Math.max(
+      DM_SCREEN_WINDOW_MIN_SIZE.height,
+      Math.round(zone.height * height - DM_SCREEN_GRID_GAP),
+    ),
+  };
+}
+
+/**
+ * Половина холста, которую займёт окно, если его отпустить: указатель у
+ * левого или правого края холста. Вдали от краёв — ничего.
+ * @param pointer - где указатель
+ * @param viewport - экран ширмы
+ */
+export function getDmScreenEdgeTarget(
+  pointer: DmScreenPoint,
+  viewport: DmScreenViewport,
+): DmScreenSnapTarget | undefined {
+  const [leftZone, rightZone] = DM_SCREEN_SNAP_HALVES.zones;
+
+  if (
+    leftZone
+    && pointer.x <= DM_SCREEN_LEFT_INSET + DM_SCREEN_SNAP_EDGE_DISTANCE
+  ) {
+    return { layout: DM_SCREEN_SNAP_HALVES, zone: leftZone };
+  }
+
+  if (rightZone && pointer.x >= viewport.width - DM_SCREEN_SNAP_EDGE_DISTANCE) {
+    return { layout: DM_SCREEN_SNAP_HALVES, zone: rightZone };
+  }
+
+  return undefined;
 }
 
 /**

@@ -65,6 +65,7 @@
       <DmScreenNote
         v-if="isDmScreenNotePath(screenWindow.path)"
         :screen-window="screenWindow"
+        is-toggle-shown
         class="px-3 pb-3"
       />
     </li>

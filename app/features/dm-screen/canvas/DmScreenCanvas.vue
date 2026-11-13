@@ -9,6 +9,7 @@
   } from '../model';
   import DmScreenList from './DmScreenList.vue';
   import DmScreenSearch from './DmScreenSearch.vue';
+  import DmScreenSnap from './DmScreenSnap.vue';
   import DmScreenWindows from './DmScreenWindows.vue';
 
   /**
@@ -89,9 +90,11 @@
     <!-- Шапка после слоя окон в разметке: поиск ложится поверх окон -->
     <DmScreenWindows v-if="isWindowed" />
 
+    <DmScreenSnap v-if="isWindowed" />
+
     <header
       ref="header"
-      class="relative -mx-4 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-accented px-4 pb-4"
+      class="relative -mx-4 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-default px-4 pb-4"
     >
       <slot name="heading">
         <h1 class="text-2xl text-highlighted">

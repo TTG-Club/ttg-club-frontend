@@ -10,7 +10,7 @@
     provideSectionOpener,
   } from '~section/composables';
 
-  import { useDmScreen } from '../composables';
+  import { useDmScreen, useDmScreenSnap } from '../composables';
   import {
     DM_SCREEN_HIGHLIGHT_CLASS,
     DM_SCREEN_ICON,
@@ -34,7 +34,8 @@
    * растягивается за любую сторону или угол — тоже с магнитом, в том числе
    * до ширины или высоты соседнего окна, — сворачивается в плашку (кнопкой
    * или двойным кликом по шапке) и закрывается. Под шапку ширмы окно не
-   * заходит. Внутри — карточка записи любого
+   * заходит. Если окно отпустить у бокового края холста или над местом в
+   * панели раскладок, оно занимает это место целиком. Внутри — карточка записи любого
    * раздела; переходы внутри записи (вкладки класса, подрасы) остаются в
    * окне, ссылки на другие записи открывают новые окна, а остальные
    * страницы сайта — новую вкладку: со страницы ширмы клик не уводит.
@@ -64,6 +65,28 @@
   );
 
   const isNote = computed(() => isDmScreenNotePath(screenWindow.path));
+
+  // Правку заметки переключает кнопка в шапке окна
+  const isNoteEditing = ref(false);
+
+  const noteToggleLabel = computed(() =>
+    isNoteEditing.value ? DM_SCREEN_TEXT.noteDone : DM_SCREEN_TEXT.noteEdit,
+  );
+
+  const noteToggleIcon = computed(() =>
+    isNoteEditing.value ? DM_SCREEN_ICON.noteDone : DM_SCREEN_ICON.noteEdit,
+  );
+
+  /** Переключает просмотр и правку заметки. */
+  function toggleNoteEditing(): void {
+    isNoteEditing.value = !isNoteEditing.value;
+  }
+
+  const {
+    startDrag: startSnapDrag,
+    moveDrag: moveSnapDrag,
+    endDrag: endSnapDrag,
+  } = useDmScreenSnap();
 
   const sectionIcon = computed(() => getDmScreenWindowIcon(screenWindow.path));
 
@@ -307,6 +330,7 @@
     }
 
     focus(screenWindow.id);
+    startSnapDrag(screenWindow.id);
 
     return undefined;
   }
@@ -329,6 +353,8 @@
 
     x.value = snapped.x;
     y.value = Math.max(snapped.y, viewport.value.top ?? 0);
+
+    moveSnapDrag({ x: event.clientX, y: event.clientY });
   }
 
   /**
@@ -337,6 +363,20 @@
    * @param position - новое место
    */
   function savePosition(position: Position): void {
+    // Окно отпустили над местом раскладки: оно занимает это место целиком
+    const zoneRect = endSnapDrag();
+
+    if (zoneRect) {
+      x.value = zoneRect.x;
+      y.value = zoneRect.y;
+      width.value = zoneRect.width;
+      height.value = zoneRect.height;
+
+      update(screenWindow.id, zoneRect);
+
+      return;
+    }
+
     const next = reachable(position);
 
     x.value = next.x;
@@ -396,6 +436,20 @@
         {{ screenWindow.title }}
       </span>
 
+      <UTooltip
+        v-if="isNote"
+        :text="noteToggleLabel"
+      >
+        <UButton
+          :icon="noteToggleIcon"
+          :aria-label="noteToggleLabel"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          @click.left.exact.prevent="toggleNoteEditing"
+        />
+      </UTooltip>
+
       <UTooltip :text="DM_SCREEN_TEXT.minimize">
         <UButton
           :icon="DM_SCREEN_ICON.minimize"
@@ -425,6 +479,7 @@
     >
       <DmScreenNote
         v-if="isNote"
+        v-model:editing="isNoteEditing"
         :screen-window="screenWindow"
       />
 

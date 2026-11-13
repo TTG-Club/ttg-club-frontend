@@ -7,14 +7,17 @@ import {
   DM_SCREEN_GRID_GAP,
   DM_SCREEN_ICON,
   DM_SCREEN_LEFT_INSET,
+  DM_SCREEN_SNAP_HALVES,
+  DM_SCREEN_SNAP_LAYOUTS,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_MARGIN,
   DM_SCREEN_WINDOW_MIN_SIZE,
   dmScreenDetailSchema,
   dmScreenListSchema,
-  formatDmScreenDate,
+  getDmScreenEdgeTarget,
   getDmScreenEntryRoot,
   getDmScreenWindowIcon,
+  getDmScreenZoneRect,
   isDmScreenNotePath,
   isDmScreenPath,
   resizeDmScreenWindow,
@@ -154,12 +157,6 @@ describe('ширма мастера', () => {
     expect(screen.windows).toHaveLength(1);
   });
 
-  it('пишет дату изменения ширмы по-русски, битую — пусто', () => {
-    expect(formatDmScreenDate('2026-11-12T14:05:00')).toContain('ноября');
-    expect(formatDmScreenDate('не дата')).toBe('');
-    expect(formatDmScreenDate(null)).toBe('');
-  });
-
   describe('примагничивание', () => {
     const viewport = { width: 1600, height: 900 };
     const other = { x: 500, y: 200, width: 400, height: 300 };
@@ -266,6 +263,58 @@ describe('ширма мастера', () => {
         x: 500,
         y: 200,
         ...DM_SCREEN_WINDOW_MIN_SIZE,
+      });
+    });
+  });
+
+  describe('раскладки', () => {
+    const viewport = { width: 1600, height: 900 };
+    const [leftZone, rightZone] = DM_SCREEN_SNAP_HALVES.zones;
+
+    it('половины делят холст с промежутком сетки между ними', () => {
+      if (!leftZone || !rightZone) {
+        throw new Error('В раскладке половин должно быть два места');
+      }
+
+      const left = getDmScreenZoneRect(leftZone, viewport);
+      const right = getDmScreenZoneRect(rightZone, viewport);
+
+      expect(left.x).toBe(DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN);
+      expect(left.y).toBe(DM_SCREEN_TOP_INSET);
+      expect(right.x - (left.x + left.width)).toBe(DM_SCREEN_GRID_GAP);
+
+      expect(right.x + right.width).toBe(
+        viewport.width - DM_SCREEN_WINDOW_MARGIN,
+      );
+
+      expect(left.y + left.height).toBe(
+        viewport.height - DM_SCREEN_WINDOW_MARGIN,
+      );
+    });
+
+    it('у боковых краёв холста предлагает половину', () => {
+      expect(
+        getDmScreenEdgeTarget({ x: DM_SCREEN_LEFT_INSET + 5, y: 400 }, viewport)
+          ?.zone,
+      ).toBe(leftZone);
+
+      expect(getDmScreenEdgeTarget({ x: 1595, y: 400 }, viewport)?.zone).toBe(
+        rightZone,
+      );
+
+      expect(getDmScreenEdgeTarget({ x: 800, y: 400 }, viewport)).toBe(
+        undefined,
+      );
+    });
+
+    it('места каждой раскладки покрывают холст целиком', () => {
+      DM_SCREEN_SNAP_LAYOUTS.forEach((layout) => {
+        const area = layout.zones.reduce(
+          (sum, zone) => sum + zone.width * zone.height,
+          0,
+        );
+
+        expect(area).toBeCloseTo(1);
       });
     });
   });

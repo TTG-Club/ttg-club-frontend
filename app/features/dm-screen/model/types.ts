@@ -28,6 +28,36 @@ export interface DmScreenResizeEdges {
   y: -1 | 0 | 1;
 }
 
+/**
+ * Место в раскладке окон: доли свободного места холста, от 0 до 1.
+ */
+export interface DmScreenSnapZone {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** Раскладка окон: на какие места делится холст. */
+export interface DmScreenSnapLayout {
+  key: string;
+  zones: ReadonlyArray<DmScreenSnapZone>;
+}
+
+/** Место раскладки, над которым держат окно. */
+export interface DmScreenSnapTarget {
+  layout: DmScreenSnapLayout;
+  zone: DmScreenSnapZone;
+}
+
+/** Подбор окон в оставшиеся места раскладки. */
+export interface DmScreenSnapAssist {
+  /** Свободные места по порядку; первое заполняется сейчас. */
+  pending: ReadonlyArray<DmScreenSnapZone>;
+  /** Окна, которые уже стоят в раскладке. */
+  placedIds: ReadonlyArray<string>;
+}
+
 /** Ручка растягивания окна: сторона или угол. */
 export interface DmScreenResizeHandle {
   key: string;

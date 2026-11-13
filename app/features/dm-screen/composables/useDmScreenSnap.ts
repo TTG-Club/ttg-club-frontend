@@ -1,0 +1,201 @@
+import type {
+  DmScreenPoint,
+  DmScreenRect,
+  DmScreenSnapAssist,
+  DmScreenSnapTarget,
+} from '../model';
+
+import {
+  DM_SCREEN_SNAP_PICKER_DISTANCE,
+  getDmScreenEdgeTarget,
+  getDmScreenZoneRect,
+} from '../model';
+import { useDmScreen } from './useDmScreen';
+
+/**
+ * Раскладки окон ширмы, как у окон Windows 11. Пока окно тащат, у бокового
+ * края холста оно предлагает занять половину, а у верха появляется панель
+ * раскладок: окно отпускают над местом в ней. Когда окно встало в
+ * раскладку, остальные её места по очереди предлагают выбрать окно — пока
+ * места или окна не кончатся.
+ */
+export const useDmScreenSnap = createSharedComposable(() => {
+  const { windows, viewport, update, restore } = useDmScreen();
+
+  /** Окно, которое тащат сейчас. */
+  const draggingId = ref<string>();
+
+  const pointer = ref<DmScreenPoint>();
+
+  /** Место в панели раскладок под указателем: его сообщает сама панель. */
+  const pickerTarget = shallowRef<DmScreenSnapTarget>();
+
+  const assist = shallowRef<DmScreenSnapAssist>();
+
+  const isPickerVisible = computed(
+    () =>
+      !!draggingId.value
+      && !!pointer.value
+      && pointer.value.y
+        < (viewport.value.top ?? 0) + DM_SCREEN_SNAP_PICKER_DISTANCE,
+  );
+
+  /** Место, которое окно займёт, если его отпустить. */
+  const target = computed<DmScreenSnapTarget | undefined>(() => {
+    if (!draggingId.value || !pointer.value) {
+      return undefined;
+    }
+
+    return isPickerVisible.value
+      ? pickerTarget.value
+      : getDmScreenEdgeTarget(pointer.value, viewport.value);
+  });
+
+  const previewRect = computed<DmScreenRect | undefined>(() =>
+    target.value
+      ? getDmScreenZoneRect(target.value.zone, viewport.value)
+      : undefined,
+  );
+
+  const assistRect = computed<DmScreenRect | undefined>(() => {
+    const [zone] = assist.value?.pending ?? [];
+
+    return zone ? getDmScreenZoneRect(zone, viewport.value) : undefined;
+  });
+
+  /** Места, до которых очередь ещё не дошла. */
+  const assistPendingRects = computed<Array<DmScreenRect>>(() =>
+    (assist.value?.pending ?? [])
+      .slice(1)
+      .map((zone) => getDmScreenZoneRect(zone, viewport.value)),
+  );
+
+  /** Окна, которые ещё можно поставить в раскладку. */
+  const assistCandidates = computed(() => {
+    const state = assist.value;
+
+    return state
+      ? windows.value.filter(
+          (screenWindow) => !state.placedIds.includes(screenWindow.id),
+        )
+      : [];
+  });
+
+  /**
+   * Продолжает подбор со следующего места; без мест или окон подбор
+   * заканчивается.
+   * @param pending - свободные места
+   * @param placedIds - окна, уже стоящие в раскладке
+   */
+  function continueAssist(
+    pending: DmScreenSnapAssist['pending'],
+    placedIds: DmScreenSnapAssist['placedIds'],
+  ): void {
+    const hasCandidates = windows.value.some(
+      (screenWindow) => !placedIds.includes(screenWindow.id),
+    );
+
+    assist.value =
+      pending.length && hasCandidates ? { pending, placedIds } : undefined;
+  }
+
+  /**
+   * Окно начали тащить: подбор окон в прошлую раскладку заканчивается.
+   * @param id - окно
+   */
+  function startDrag(id: string): void {
+    draggingId.value = id;
+    assist.value = undefined;
+  }
+
+  /**
+   * Окно тащат дальше.
+   * @param point - где указатель
+   */
+  function moveDrag(point: DmScreenPoint): void {
+    pointer.value = point;
+  }
+
+  /**
+   * Окно отпустили. Над местом раскладки оно занимает это место, а
+   * остальные места начинают подбор окон.
+   * @returns место, которое заняло окно, или `undefined`
+   */
+  function endDrag(): DmScreenRect | undefined {
+    const id = draggingId.value;
+    const snapped = target.value;
+    const rect = previewRect.value;
+
+    draggingId.value = undefined;
+    pointer.value = undefined;
+    pickerTarget.value = undefined;
+
+    if (!id || !snapped || !rect) {
+      return undefined;
+    }
+
+    continueAssist(
+      snapped.layout.zones.filter((zone) => zone !== snapped.zone),
+      [id],
+    );
+
+    return rect;
+  }
+
+  /**
+   * Запоминает место в панели раскладок под указателем.
+   * @param next - место или `undefined`, если указатель не над местом
+   */
+  function setPickerTarget(next?: DmScreenSnapTarget): void {
+    pickerTarget.value = next;
+  }
+
+  /**
+   * Ставит окно в место, которое заполняется сейчас, и переходит к
+   * следующему.
+   * @param id - окно
+   */
+  function place(id: string): void {
+    const state = assist.value;
+    const rect = assistRect.value;
+
+    if (!state || !rect) {
+      return;
+    }
+
+    restore(id);
+    update(id, rect);
+    continueAssist(state.pending.slice(1), [...state.placedIds, id]);
+  }
+
+  /** Оставляет место пустым и переходит к следующему. */
+  function skip(): void {
+    const state = assist.value;
+
+    if (state) {
+      continueAssist(state.pending.slice(1), state.placedIds);
+    }
+  }
+
+  /** Заканчивает подбор окон. */
+  function stopAssist(): void {
+    assist.value = undefined;
+  }
+
+  return {
+    pointer: readonly(pointer),
+    target,
+    isPickerVisible,
+    previewRect,
+    assistRect,
+    assistPendingRects,
+    assistCandidates,
+    startDrag,
+    moveDrag,
+    endDrag,
+    setPickerTarget,
+    place,
+    skip,
+    stopAssist,
+  };
+});
