@@ -1,17 +1,16 @@
 <script setup lang="ts">
-  import type {
-    DmScreenRect,
-    DmScreenSnapTarget,
-    DmScreenSnapZone,
-  } from '../model';
+  import type { DmScreenPoint, DmScreenSnapTarget } from '../model';
 
   import { useDmScreen, useDmScreenSnap } from '../composables';
   import {
     DM_SCREEN_SNAP_LAYOUTS,
     DM_SCREEN_SNAP_PICKER_OFFSET,
     DM_SCREEN_SNAP_ZONE_CLASS,
+    DM_SCREEN_SNAP_ZONE_SELECTOR,
     DM_SCREEN_TEXT,
+    getDmScreenRectStyle,
     getDmScreenWindowIcon,
+    getDmScreenZoneStyle,
   } from '../model';
 
   /**
@@ -41,32 +40,6 @@
 
   const picker = useTemplateRef<HTMLElement>('picker');
 
-  /**
-   * Место и размер прямоугольника холста для `style`.
-   * @param rect - прямоугольник, px
-   */
-  function toRectStyle(rect: DmScreenRect): Record<string, string> {
-    return {
-      left: `${rect.x}px`,
-      top: `${rect.y}px`,
-      width: `${rect.width}px`,
-      height: `${rect.height}px`,
-    };
-  }
-
-  /**
-   * Место и размер места раскладки внутри её миниатюры для `style`.
-   * @param zone - место в долях холста
-   */
-  function toZoneStyle(zone: DmScreenSnapZone): Record<string, string> {
-    return {
-      left: `${zone.x * 100}%`,
-      top: `${zone.y * 100}%`,
-      width: `${zone.width * 100}%`,
-      height: `${zone.height * 100}%`,
-    };
-  }
-
   /** Все места всех раскладок подряд: по номеру в этом списке их находят. */
   const pickerTargets = computed<Array<DmScreenSnapTarget>>(() =>
     DM_SCREEN_SNAP_LAYOUTS.flatMap((layout) =>
@@ -81,7 +54,7 @@
         index: pickerTargets.value.findIndex(
           (candidate) => candidate.zone === zone,
         ),
-        style: toZoneStyle(zone),
+        style: getDmScreenZoneStyle(zone),
         class:
           target.value?.zone === zone
             ? DM_SCREEN_SNAP_ZONE_CLASS.active
@@ -98,12 +71,12 @@
    * Место панели раскладок, над которым находится точка.
    * @param point - где указатель
    */
-  function findPickerTarget(point: {
-    x: number;
-    y: number;
-  }): DmScreenSnapTarget | undefined {
-    const zoneElements =
-      picker.value?.querySelectorAll<HTMLElement>('[data-zone]');
+  function findPickerTarget(
+    point: DmScreenPoint,
+  ): DmScreenSnapTarget | undefined {
+    const zoneElements = picker.value?.querySelectorAll<HTMLElement>(
+      DM_SCREEN_SNAP_ZONE_SELECTOR,
+    );
 
     const hit = [...(zoneElements ?? [])].find((zoneElement) => {
       const bounds = zoneElement.getBoundingClientRect();
@@ -129,17 +102,17 @@
   );
 
   const previewStyle = computed(() =>
-    previewRect.value ? toRectStyle(previewRect.value) : undefined,
+    previewRect.value ? getDmScreenRectStyle(previewRect.value) : undefined,
   );
 
   const assistStyle = computed(() =>
-    assistRect.value ? toRectStyle(assistRect.value) : undefined,
+    assistRect.value ? getDmScreenRectStyle(assistRect.value) : undefined,
   );
 
   const assistPendingStyles = computed(() =>
     assistPendingRects.value.map((rect) => ({
       key: `${rect.x}:${rect.y}`,
-      style: toRectStyle(rect),
+      style: getDmScreenRectStyle(rect),
     })),
   );
 
@@ -156,8 +129,7 @@
   <div
     v-if="isPickerVisible"
     ref="picker"
-    role="presentation"
-    :aria-label="DM_SCREEN_TEXT.snapPicker"
+    aria-hidden="true"
     :style="pickerStyle"
     class="pointer-events-none fixed left-[calc(50%+var(--navbar-width)/2)] flex -translate-x-1/2 gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
   >

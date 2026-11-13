@@ -18,6 +18,7 @@
     DM_SCREEN_TEXT,
     DM_SCREEN_WINDOW_MIN_SIZE,
     getDmScreenEntryRoot,
+    getDmScreenNoteToggle,
     getDmScreenWindowIcon,
     isDmScreenNotePath,
     isDmScreenPath,
@@ -69,12 +70,8 @@
   // Правку заметки переключает кнопка в шапке окна
   const isNoteEditing = ref(false);
 
-  const noteToggleLabel = computed(() =>
-    isNoteEditing.value ? DM_SCREEN_TEXT.noteDone : DM_SCREEN_TEXT.noteEdit,
-  );
-
-  const noteToggleIcon = computed(() =>
-    isNoteEditing.value ? DM_SCREEN_ICON.noteDone : DM_SCREEN_ICON.noteEdit,
+  const noteToggleButton = computed(() =>
+    getDmScreenNoteToggle(isNoteEditing.value),
   );
 
   /** Переключает просмотр и правку заметки. */
@@ -438,11 +435,11 @@
 
       <UTooltip
         v-if="isNote"
-        :text="noteToggleLabel"
+        :text="noteToggleButton.label"
       >
         <UButton
-          :icon="noteToggleIcon"
-          :aria-label="noteToggleLabel"
+          :icon="noteToggleButton.icon"
+          :aria-label="noteToggleButton.label"
           color="neutral"
           variant="ghost"
           size="sm"

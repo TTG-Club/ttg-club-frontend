@@ -5,11 +5,11 @@
 
   import { useDmScreen } from '../composables';
   import {
-    DM_SCREEN_ICON,
     DM_SCREEN_NOTE_EDITOR_ROWS,
     DM_SCREEN_NOTE_MAX_LENGTH,
     DM_SCREEN_NOTE_SAVE_DELAY,
     DM_SCREEN_TEXT,
+    getDmScreenNoteToggle,
   } from '../model';
 
   // Редактор мастерской тяжёлый, а нужен только при правке заметки
@@ -41,6 +41,7 @@
   const title = ref(screenWindow.title);
   const content = ref(screenWindow.content ?? '');
 
+  // Пустую заметку читать незачем: она сразу открывается в правке
   if (!screenWindow.content) {
     isEditing.value = true;
   }
@@ -51,13 +52,7 @@
 
   const isEmpty = computed(() => !content.value.trim());
 
-  const toggleLabel = computed(() =>
-    isEditing.value ? DM_SCREEN_TEXT.noteDone : DM_SCREEN_TEXT.noteEdit,
-  );
-
-  const toggleIcon = computed(() =>
-    isEditing.value ? DM_SCREEN_ICON.noteDone : DM_SCREEN_ICON.noteEdit,
-  );
+  const toggleButton = computed(() => getDmScreenNoteToggle(isEditing.value));
 
   /** Пишет название и текст в окно; слишком длинный текст не пишется. */
   function save(): void {
@@ -120,8 +115,8 @@
 
       <UButton
         v-if="isToggleShown"
-        :icon="toggleIcon"
-        :label="toggleLabel"
+        :icon="toggleButton.icon"
+        :label="toggleButton.label"
         :disabled="isEditing && isTooLong"
         color="neutral"
         variant="soft"

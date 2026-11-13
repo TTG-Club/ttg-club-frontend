@@ -239,6 +239,9 @@ export const DM_SCREEN_SNAP_EDGE_DISTANCE = 24;
  */
 export const DM_SCREEN_SNAP_PICKER_DISTANCE = 140;
 
+/** По чему в разметке панели раскладок находятся её места. */
+export const DM_SCREEN_SNAP_ZONE_SELECTOR = '[data-zone]';
+
 /** Отступ панели раскладок от шапки ширмы, px. */
 export const DM_SCREEN_SNAP_PICKER_OFFSET = 8;
 
@@ -305,7 +308,6 @@ export const DM_SCREEN_TEXT = {
     'Найдите заклинание, монстра, правило или любую другую запись поиском выше или выберите «В ширму» в меню записи на сайте. Каждая запись встанет отдельным окном: его можно двигать, растягивать и сворачивать.',
   remove: 'Убрать из ширмы',
   arrange: 'Выровнять по сетке',
-  snapPicker: 'Раскладки окон',
   snapAssistTitle: 'Что поставить сюда?',
   snapAssistSkip: 'Пропустить',
   snapAssistStop: 'Закончить',

@@ -72,11 +72,11 @@ export const useDmScreenSnap = createSharedComposable(() => {
 
   /** Окна, которые ещё можно поставить в раскладку. */
   const assistCandidates = computed(() => {
-    const state = assist.value;
+    const activeAssist = assist.value;
 
-    return state
+    return activeAssist
       ? windows.value.filter(
-          (screenWindow) => !state.placedIds.includes(screenWindow.id),
+          (screenWindow) => !activeAssist.placedIds.includes(screenWindow.id),
         )
       : [];
   });
@@ -156,24 +156,28 @@ export const useDmScreenSnap = createSharedComposable(() => {
    * @param id - окно
    */
   function place(id: string): void {
-    const state = assist.value;
+    const activeAssist = assist.value;
     const rect = assistRect.value;
 
-    if (!state || !rect) {
+    if (!activeAssist || !rect) {
       return;
     }
 
     restore(id);
     update(id, rect);
-    continueAssist(state.pending.slice(1), [...state.placedIds, id]);
+
+    continueAssist(activeAssist.pending.slice(1), [
+      ...activeAssist.placedIds,
+      id,
+    ]);
   }
 
   /** Оставляет место пустым и переходит к следующему. */
   function skip(): void {
-    const state = assist.value;
+    const activeAssist = assist.value;
 
-    if (state) {
-      continueAssist(state.pending.slice(1), state.placedIds);
+    if (activeAssist) {
+      continueAssist(activeAssist.pending.slice(1), activeAssist.placedIds);
     }
   }
 

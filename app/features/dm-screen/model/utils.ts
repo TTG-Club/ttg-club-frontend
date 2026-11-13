@@ -29,6 +29,7 @@ import {
   DM_SCREEN_SNAP_DISTANCE,
   DM_SCREEN_SNAP_EDGE_DISTANCE,
   DM_SCREEN_SNAP_HALVES,
+  DM_SCREEN_TEXT,
   DM_SCREEN_TOP_INSET,
   DM_SCREEN_WINDOW_HEADER_HEIGHT,
   DM_SCREEN_WINDOW_MARGIN,
@@ -624,6 +625,50 @@ export function getDmScreenEdgeTarget(
   }
 
   return undefined;
+}
+
+/**
+ * Место и размер прямоугольника холста для привязки `style`.
+ * @param rect - прямоугольник, px
+ */
+export function getDmScreenRectStyle(
+  rect: DmScreenRect,
+): Record<'left' | 'top' | 'width' | 'height', string> {
+  return {
+    left: `${rect.x}px`,
+    top: `${rect.y}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+  };
+}
+
+/**
+ * Место и размер места раскладки внутри её миниатюры для привязки `style`:
+ * в процентах от миниатюры.
+ * @param zone - место в долях холста
+ */
+export function getDmScreenZoneStyle(
+  zone: DmScreenSnapZone,
+): Record<'left' | 'top' | 'width' | 'height', string> {
+  return {
+    left: `${zone.x * 100}%`,
+    top: `${zone.y * 100}%`,
+    width: `${zone.width * 100}%`,
+    height: `${zone.height * 100}%`,
+  };
+}
+
+/**
+ * Подпись и иконка кнопки, которая переключает просмотр и правку заметки.
+ * @param isEditing - заметка сейчас в правке
+ */
+export function getDmScreenNoteToggle(isEditing: boolean): {
+  label: string;
+  icon: string;
+} {
+  return isEditing
+    ? { label: DM_SCREEN_TEXT.noteDone, icon: DM_SCREEN_ICON.noteDone }
+    : { label: DM_SCREEN_TEXT.noteEdit, icon: DM_SCREEN_ICON.noteEdit };
 }
 
 /**
