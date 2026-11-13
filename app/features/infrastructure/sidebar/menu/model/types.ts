@@ -1,21 +1,24 @@
-export type { SiteMenuItem } from '#shared/types';
-
-/** Ссылка в группе меню. */
-export interface MenuLink {
+/** Пункт меню сайта. */
+export interface MenuItem {
   label: string;
-  /** Пусто у пункта-заглушки, который ещё никуда не ведёт. */
-  url?: string;
+  href: string;
   /** Иконка слева от подписи. */
   icon: string;
-  external: boolean;
+  /** Пункт ведёт на другой сайт и открывается в новой вкладке. */
+  external?: boolean;
+  /**
+   * Пункт стоит и на главной: раздел — плиткой, инструмент — в ленте под
+   * поиском.
+   */
+  onHome?: boolean;
 }
 
-/** Группа меню с заголовком. */
-export interface MenuGroup {
+/** Раздел меню с заголовком. */
+export interface MenuSection {
   label: string;
-  links: Array<MenuLink>;
+  items: Array<MenuItem>;
   /**
-   * Группа инструментов: самая длинная, на широком меню стоит справа во
+   * Раздел инструментов: самый длинный, на широком меню стоит справа во
    * весь рост, чтобы меню было ниже.
    */
   isTools?: boolean;

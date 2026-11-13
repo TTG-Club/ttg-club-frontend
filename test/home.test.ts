@@ -12,50 +12,70 @@ import {
   HOME_SECTION_DEFAULT_ICON,
   parseHomePartners,
 } from '~home/model';
-import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
+import {
+  getMenuLinkIcon,
+  MENU_DEFAULT_ICON,
+  MENU_SECTIONS,
+  TOKENATOR_URL,
+} from '~infrastructure/sidebar/menu/model';
 
 const menu = [
   {
-    name: 'Персонаж',
-    order: 1,
-    children: [
-      { name: 'Расы', url: '/races', order: 2, onIndex: true, indexOrder: 2 },
-      {
-        name: 'Классы',
-        url: '/classes',
-        order: 1,
-        onIndex: true,
-        indexOrder: 1,
-      },
-      {
-        name: 'Новое',
-        url: '/new',
-        order: 3,
-        onIndex: true,
-        indexOrder: 3,
-        onlyDev: true,
-      },
-      { name: 'Скрытое', url: '/hidden', order: 4 },
+    label: 'Персонаж',
+    items: [
+      { label: 'Классы', href: '/classes', icon: 'tabler:sword', onHome: true },
+      { label: 'Новое', href: '/new', icon: 'tabler:point', onHome: true },
+      { label: 'Скрытое', href: '/hidden', icon: 'tabler:point' },
     ],
   },
   {
-    name: 'Инструменты',
-    order: 2,
-    children: [
-      { name: 'Таверна', url: '/tools/tavern', order: 2 },
-      { name: 'Токенатор', url: '/tools/tokenator', order: 1 },
-      { name: 'Магазин', url: '/tools/trader', order: 3, onlyDev: true },
+    label: 'Инструменты',
+    isTools: true,
+    items: [
+      {
+        label: 'Токенатор',
+        href: TOKENATOR_URL,
+        icon: 'tabler:photo-circle',
+        external: true,
+        onHome: true,
+      },
+      {
+        label: 'Токенатор (старая версия)',
+        href: '/tools/tokenator',
+        icon: 'tabler:photo',
+      },
+      {
+        label: 'Таверна',
+        href: '/tools/tavern',
+        icon: 'tabler:beer',
+        onHome: true,
+      },
     ],
   },
 ];
 
+describe('меню сайта', () => {
+  it('адреса пунктов не повторяются', () => {
+    const hrefs = MENU_SECTIONS.flatMap((section) =>
+      section.items.map((menuItem) => menuItem.href),
+    );
+
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+  });
+
+  it('отдаёт иконку раздела по адресу, незнакомому адресу — общую', () => {
+    expect(getMenuLinkIcon('/classes')).toBe('tabler:sword');
+    expect(getMenuLinkIcon('/draft')).toBe(MENU_DEFAULT_ICON);
+  });
+});
+
 describe('getHomeSections', () => {
-  it('берёт пункты для главной в порядке indexOrder и прячет пункты разработки', () => {
-    const sections = getHomeSections(menu, false);
+  it('берёт отмеченные для главной пункты в порядке меню, без инструментов', () => {
+    const sections = getHomeSections(menu);
 
     expect(sections.map((section) => section.url)).toEqual([
       '/classes',
-      '/races',
+      '/new',
     ]);
 
     expect(sections[0]).toMatchObject({
@@ -68,10 +88,8 @@ describe('getHomeSections', () => {
     });
   });
 
-  it('в режиме разработки показывает всё, незнакомый раздел получает общую иконку', () => {
-    const sections = getHomeSections(menu, true);
-
-    expect(sections.at(-1)).toMatchObject({
+  it('незнакомый раздел получает общую иконку', () => {
+    expect(getHomeSections(menu).at(-1)).toMatchObject({
       url: '/new',
       icon: HOME_SECTION_DEFAULT_ICON,
     });
@@ -79,8 +97,8 @@ describe('getHomeSections', () => {
 });
 
 describe('getHomeTools', () => {
-  it('ведёт токенатор на новый сайт и сортирует по порядку меню', () => {
-    expect(getHomeTools(menu, false)).toEqual([
+  it('берёт отмеченные инструменты в порядке меню, без старого токенатора', () => {
+    expect(getHomeTools(menu)).toEqual([
       {
         name: 'Токенатор',
         url: TOKENATOR_URL,

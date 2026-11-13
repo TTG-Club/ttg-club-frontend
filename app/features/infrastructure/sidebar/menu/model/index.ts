@@ -1,11 +1,4 @@
-export type {
-  MenuGroup,
-  MenuLink,
-  SiteMenuItem,
-  SocialLink,
-  SupportLink,
-} from './types';
+export type { MenuItem, MenuSection, SocialLink, SupportLink } from './types';
 
-export { siteMenuItemSchema, siteMenuSchema } from '#shared/types';
 export * from './constants';
-export { buildMenuGroups, getMenuIconKey, getMenuLinkIcon } from './utils';
+export { getMenuLinkIcon } from './utils';

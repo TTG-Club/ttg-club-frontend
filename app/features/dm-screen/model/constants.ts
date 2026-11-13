@@ -15,7 +15,10 @@ import {
   RACES_SECTION,
   SPELLS_SECTION,
 } from '~character/model';
-import { getMenuLinkIcon } from '~infrastructure/sidebar/menu/model';
+import {
+  DM_SCREEN_MENU_ICON,
+  getMenuLinkIcon,
+} from '~infrastructure/sidebar/menu/model';
 import {
   ARMORS_SECTION,
   ITEMS_SECTION,
@@ -379,7 +382,7 @@ export const DM_SCREEN_TEXT = {
 } as const;
 
 export const DM_SCREEN_ICON = {
-  screen: getMenuLinkIcon(DM_SCREEN_PAGE_PATH),
+  screen: DM_SCREEN_MENU_ICON,
   minimize: 'tabler:minus',
   close: 'tabler:x',
   add: 'tabler:layout-grid-add',

@@ -39,13 +39,6 @@ export const HOME_COUNTERS_NUMBER_LOCALE = 'ru-RU';
 
 /* --- Инструменты -------------------------------------------------------- */
 
-/**
- * Группа инструментов в меню — та, где есть пункты с адресом внутри этого
- * раздела. Переехавшие на новый сайт инструменты лежат в той же группе, но
- * адрес у них внешний.
- */
-export const HOME_TOOLS_PATH_PREFIX = '/tools';
-
 /** Иконки инструментов по адресу; неизвестный инструмент получит общую */
 export const HOME_TOOL_ICONS: Partial<Record<string, string>> = {
   [TOKENATOR_URL]: 'tabler:photo-circle',
@@ -89,7 +82,7 @@ export const HOME_SECTION_DEFAULT_ICON = 'tabler:book-2';
 
 /**
  * Спрайт фактур разделов: кадры 220×56 стоят друг под другом в том же порядке,
- * что и разделы на главной (`indexOrder`).
+ * что и разделы на главной (порядок меню).
  */
 export const HOME_SECTION_TEXTURE = {
   url: '/img/bg_main_page_button_nav.webp',
