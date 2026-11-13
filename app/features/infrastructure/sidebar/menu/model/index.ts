@@ -8,4 +8,4 @@ export type {
 
 export { siteMenuItemSchema, siteMenuSchema } from '#shared/types';
 export * from './constants';
-export { buildMenuGroups, getMenuLinkIcon } from './utils';
+export { buildMenuGroups, getMenuIconKey, getMenuLinkIcon } from './utils';

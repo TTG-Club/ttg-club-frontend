@@ -51,12 +51,9 @@ export const ERROR_MESSAGE_UNKNOWN: ErrorMessage = {
 
 /**
  * Страница ширмы Мастера. Общая: её знают и сама ширма, и меню сайта, где
- * пункт ширмы встаёт за справочником.
+ * по этому адресу подбирается иконка пункта.
  */
 export const DM_SCREEN_PAGE_PATH = '/dm-screen';
-
-/** Справочник: за ним в меню встаёт пункт ширмы. */
-export const SCREENS_REFERENCE_PAGE_PATH = '/screens';
 
 /** Новый сайт (редакция 2024): там же живут юридические документы. */
 export const NEW_SITE_URL = 'https://new.ttg.club';

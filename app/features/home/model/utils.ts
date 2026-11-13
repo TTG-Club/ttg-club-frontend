@@ -7,6 +7,7 @@ import type { HomeNavLink, HomeSectionLink } from './types';
 import { sortBy } from 'es-toolkit';
 
 import {
+  getMenuIconKey,
   TOKENATOR_LEGACY_URL,
   TOKENATOR_URL,
 } from '~infrastructure/sidebar/menu/model';
@@ -142,7 +143,7 @@ function toToolLink(menuItem: LinkedMenuItem): HomeNavLink {
   return {
     name: menuItem.name,
     url,
-    icon: HOME_TOOL_ICONS[url] ?? HOME_TOOL_DEFAULT_ICON,
+    icon: HOME_TOOL_ICONS[getMenuIconKey(url)] ?? HOME_TOOL_DEFAULT_ICON,
     external: isTokenator || !!menuItem.external,
   };
 }

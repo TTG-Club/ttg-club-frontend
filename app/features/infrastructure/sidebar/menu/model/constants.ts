@@ -1,6 +1,6 @@
-import type { MenuGroup, MenuLink, SocialLink, SupportLink } from './types';
+import type { MenuGroup, SocialLink, SupportLink } from './types';
 
-import { DM_SCREEN_PAGE_PATH } from '~/shared/consts';
+import { DM_SCREEN_PAGE_PATH, NEW_SITE_URL } from '~/shared/consts';
 
 /** Название сайта в шапке меню. */
 export const MENU_SITE_TITLE = 'TTG Club';
@@ -76,24 +76,19 @@ export const TOKENATOR_LEGACY_URL = '/tools/tokenator';
 export const TOKENATOR_LEGACY_SUFFIX = ' (старая версия)';
 
 /** Раздел Virtual TTG: в меню бэкенда его нет, как и в старом SPA. */
-/**
- * Ширма Мастера: своей записи в меню API у неё нет, пункт встаёт сразу за
- * справочником.
- */
-export const DM_SCREEN_MENU_LINK: MenuLink = {
-  label: 'Ширма',
-  url: DM_SCREEN_PAGE_PATH,
-  icon: DM_SCREEN_MENU_ICON,
-  external: false,
-};
-
 export const VTTG_MENU_GROUP: MenuGroup = {
   label: 'Virtual TTG',
   links: [
     {
       label: 'Информация',
-      url: 'https://new.ttg.club/vttg',
+      url: `${NEW_SITE_URL}/vttg`,
       icon: 'tabler:info-circle',
+      external: true,
+    },
+    {
+      label: 'Сброс мастер-пароля',
+      url: `${NEW_SITE_URL}/vttg/reset-password`,
+      icon: 'tabler:key',
       external: true,
     },
   ],

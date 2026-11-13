@@ -2,10 +2,7 @@ import type { MenuGroup, MenuLink, SiteMenuItem } from './types';
 
 import { sortBy } from 'es-toolkit';
 
-import { SCREENS_REFERENCE_PAGE_PATH } from '~/shared/consts';
-
 import {
-  DM_SCREEN_MENU_LINK,
   MENU_DEFAULT_ICON,
   MENU_LINK_ICONS,
   MENU_TOOLS_PATH_PREFIX,
@@ -16,11 +13,20 @@ import {
 } from './constants';
 
 /**
+ * Адрес пункта без косой черты в конце: в меню из API встречается и
+ * `/dm-screen/`, а иконки записаны по адресу без неё.
+ * @param url - адрес пункта
+ */
+export function getMenuIconKey(url: string): string {
+  return url.length > 1 ? url.replace(/\/+$/, '') : url;
+}
+
+/**
  * Иконка пункта меню по его адресу.
  * @param url - адрес пункта
  */
 export function getMenuLinkIcon(url: string | undefined): string {
-  return (url && MENU_LINK_ICONS[url]) || MENU_DEFAULT_ICON;
+  return (url && MENU_LINK_ICONS[getMenuIconKey(url)]) || MENU_DEFAULT_ICON;
 }
 
 /**
@@ -35,11 +41,6 @@ function toMenuLinks(item: SiteMenuItem): Array<MenuLink> {
     icon: getMenuLinkIcon(item.url),
     external: !!item.external,
   };
-
-  // Ширма своей записи в меню API не имеет: встаёт за справочником
-  if (item.url === SCREENS_REFERENCE_PAGE_PATH) {
-    return [link, DM_SCREEN_MENU_LINK];
-  }
 
   if (item.url !== TOKENATOR_LEGACY_URL) {
     return [link];

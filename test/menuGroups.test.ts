@@ -14,6 +14,10 @@ describe('getMenuLinkIcon', () => {
     expect(getMenuLinkIcon('/classes')).toBe('tabler:sword');
   });
 
+  it('находит иконку и по адресу с косой чертой в конце', () => {
+    expect(getMenuLinkIcon('/dm-screen/')).toBe('tabler:layout-dashboard');
+  });
+
   it('ставит общую иконку пункту без своей', () => {
     expect(getMenuLinkIcon('/draft')).toBe(MENU_DEFAULT_ICON);
     expect(getMenuLinkIcon(undefined)).toBe(MENU_DEFAULT_ICON);

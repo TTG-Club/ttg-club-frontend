@@ -1,6 +1,6 @@
 import type { HomePromoCardContent, HomeSocialLink } from './types';
 
-import { NEW_SITE_URL } from '~/shared/consts';
+import { DM_SCREEN_PAGE_PATH, NEW_SITE_URL } from '~/shared/consts';
 import { TOKENATOR_URL } from '~infrastructure/sidebar/menu/model';
 
 /* --- Общее -------------------------------------------------------------- */
@@ -55,6 +55,7 @@ export const HOME_TOOL_ICONS: Partial<Record<string, string>> = {
   '/tools/names': 'tabler:signature',
   '/tools/tavern': 'tabler:beer',
   '/tools/initiative': 'tabler:swords',
+  [DM_SCREEN_PAGE_PATH]: 'tabler:layout-dashboard',
 };
 
 export const HOME_TOOL_DEFAULT_ICON = 'tabler:tool';
