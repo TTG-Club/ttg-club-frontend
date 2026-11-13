@@ -12,13 +12,16 @@ import {
   VTTG_MENU_GROUP,
 } from './constants';
 
+/** Косые черты в конце адреса. */
+const TRAILING_SLASHES_PATTERN = /\/+$/;
+
 /**
  * Адрес пункта без косой черты в конце: в меню из API встречается и
  * `/dm-screen/`, а иконки записаны по адресу без неё.
  * @param url - адрес пункта
  */
 export function getMenuIconKey(url: string): string {
-  return url.length > 1 ? url.replace(/\/+$/, '') : url;
+  return url.length > 1 ? url.replace(TRAILING_SLASHES_PATTERN, '') : url;
 }
 
 /**

@@ -21,6 +21,7 @@
   const id = ref('');
   const isFailed = ref(false);
 
+  /** Находит ширму пользователя, а если её нет — создаёт. */
   async function load(): Promise<void> {
     isFailed.value = false;
 

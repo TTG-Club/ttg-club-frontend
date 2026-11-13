@@ -1,4 +1,4 @@
-import type { DmScreenSection } from './types';
+import type { DmScreenResizeHandle, DmScreenSection } from './types';
 
 import { DM_SCREEN_PAGE_PATH } from '~/shared/consts';
 import { BESTIARY_SECTION } from '~bestiary/model';
@@ -130,6 +130,56 @@ export const DM_SCREEN_LEFT_INSET = 64;
  * перенеслись на вторую, холст меряет шапку сам.
  */
 export const DM_SCREEN_TOP_INSET = 72;
+
+/**
+ * Ручки растягивания окна: четыре стороны и четыре угла. Углы идут после
+ * сторон, поэтому в разметке лежат поверх них.
+ */
+export const DM_SCREEN_RESIZE_HANDLES: ReadonlyArray<DmScreenResizeHandle> = [
+  {
+    key: 'top',
+    edges: { x: 0, y: -1 },
+    class: 'inset-x-0 top-0 h-1.5 cursor-ns-resize',
+  },
+  {
+    key: 'bottom',
+    edges: { x: 0, y: 1 },
+    class: 'inset-x-0 bottom-0 h-1.5 cursor-ns-resize',
+  },
+  {
+    key: 'left',
+    edges: { x: -1, y: 0 },
+    class: 'inset-y-0 left-0 w-1.5 cursor-ew-resize',
+  },
+  {
+    key: 'right',
+    edges: { x: 1, y: 0 },
+    class: 'inset-y-0 right-0 w-1.5 cursor-ew-resize',
+  },
+  {
+    key: 'top-left',
+    edges: { x: -1, y: -1 },
+    class: 'top-0 left-0 size-3 cursor-nwse-resize',
+  },
+  {
+    key: 'top-right',
+    edges: { x: 1, y: -1 },
+    class: 'top-0 right-0 size-3 cursor-nesw-resize',
+  },
+  {
+    key: 'bottom-left',
+    edges: { x: -1, y: 1 },
+    class: 'bottom-0 left-0 size-3 cursor-nesw-resize',
+  },
+  {
+    key: 'bottom-right',
+    edges: { x: 1, y: 1 },
+    class: 'right-0 bottom-0 size-3 cursor-nwse-resize',
+  },
+];
+
+/** Рамка окна, на которое указали вместо нового. */
+export const DM_SCREEN_HIGHLIGHT_CLASS = 'ring-2 ring-primary';
 
 /** Зазор между полосой под шапкой ширмы и окнами, px. */
 export const DM_SCREEN_TOP_GAP = 7;

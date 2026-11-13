@@ -244,7 +244,8 @@ export const useDmScreen = createSharedComposable(() => {
    */
   function addNote(origin?: DmScreenPoint): void {
     const draft = windows.value.find(
-      (item) => isDmScreenNotePath(item.path) && !item.content?.trim(),
+      (screenWindow) =>
+        isDmScreenNotePath(screenWindow.path) && !screenWindow.content?.trim(),
     );
 
     if (draft) {

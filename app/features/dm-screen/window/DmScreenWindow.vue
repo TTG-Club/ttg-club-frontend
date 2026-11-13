@@ -12,7 +12,9 @@
 
   import { useDmScreen } from '../composables';
   import {
+    DM_SCREEN_HIGHLIGHT_CLASS,
     DM_SCREEN_ICON,
+    DM_SCREEN_RESIZE_HANDLES,
     DM_SCREEN_TEXT,
     DM_SCREEN_WINDOW_MIN_SIZE,
     getDmScreenEntryRoot,
@@ -41,54 +43,6 @@
     screenWindow: DmScreenWindow;
   }>();
 
-  /** Ручки растягивания: четыре стороны и четыре угла поверх них. */
-  const RESIZE_HANDLES: ReadonlyArray<{
-    key: string;
-    edges: DmScreenResizeEdges;
-    class: string;
-  }> = [
-    {
-      key: 'top',
-      edges: { x: 0, y: -1 },
-      class: 'inset-x-0 top-0 h-1.5 cursor-ns-resize',
-    },
-    {
-      key: 'bottom',
-      edges: { x: 0, y: 1 },
-      class: 'inset-x-0 bottom-0 h-1.5 cursor-ns-resize',
-    },
-    {
-      key: 'left',
-      edges: { x: -1, y: 0 },
-      class: 'inset-y-0 left-0 w-1.5 cursor-ew-resize',
-    },
-    {
-      key: 'right',
-      edges: { x: 1, y: 0 },
-      class: 'inset-y-0 right-0 w-1.5 cursor-ew-resize',
-    },
-    {
-      key: 'top-left',
-      edges: { x: -1, y: -1 },
-      class: 'top-0 left-0 size-3 cursor-nwse-resize',
-    },
-    {
-      key: 'top-right',
-      edges: { x: 1, y: -1 },
-      class: 'top-0 right-0 size-3 cursor-nesw-resize',
-    },
-    {
-      key: 'bottom-left',
-      edges: { x: -1, y: 1 },
-      class: 'bottom-0 left-0 size-3 cursor-nesw-resize',
-    },
-    {
-      key: 'bottom-right',
-      edges: { x: 1, y: 1 },
-      class: 'right-0 bottom-0 size-3 cursor-nwse-resize',
-    },
-  ];
-
   const {
     add,
     navigate,
@@ -104,7 +58,10 @@
   const root = useTemplateRef<HTMLElement>('root');
   const handle = useTemplateRef<HTMLElement>('handle');
 
-  const isHighlighted = computed(() => highlightedId.value === screenWindow.id);
+  // Рамка окна, на которое указали вместо создания нового
+  const highlightClass = computed(() =>
+    highlightedId.value === screenWindow.id ? DM_SCREEN_HIGHLIGHT_CLASS : '',
+  );
 
   const isNote = computed(() => isDmScreenNotePath(screenWindow.path));
 
@@ -172,7 +129,7 @@
 
   /** Остальные развёрнутые окна: к ним окно примагничивается. */
   function getOthers(): Array<DmScreenWindow> {
-    return visibleWindows.value.filter((item) => item.id !== screenWindow.id);
+    return visibleWindows.value.filter((other) => other.id !== screenWindow.id);
   }
 
   /** Растягивание, которое идёт сейчас: с чего оно началось. */
@@ -422,7 +379,7 @@
     :aria-label="screenWindow.title"
     :style="windowStyle"
     class="pointer-events-auto absolute flex flex-col overflow-hidden rounded-lg border border-default bg-default shadow-xl"
-    :class="{ 'ring-2 ring-primary': isHighlighted }"
+    :class="highlightClass"
     @pointerdown.capture="focusWindow"
   >
     <header
@@ -481,7 +438,7 @@
 
     <!-- Ручки поверх краёв окна: углы после сторон, поэтому выше них -->
     <div
-      v-for="resizeHandle in RESIZE_HANDLES"
+      v-for="resizeHandle in DM_SCREEN_RESIZE_HANDLES"
       :key="resizeHandle.key"
       aria-hidden="true"
       class="absolute touch-none"

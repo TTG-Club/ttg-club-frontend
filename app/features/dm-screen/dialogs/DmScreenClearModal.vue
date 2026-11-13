@@ -8,10 +8,12 @@
 
   const isOpen = defineModel<boolean>('open', { default: false });
 
+  /** Закрывает окно, ничего не очищая. */
   function close(): void {
     isOpen.value = false;
   }
 
+  /** Сообщает о согласии и закрывает окно. */
   function confirm(): void {
     emit('confirm');
     isOpen.value = false;

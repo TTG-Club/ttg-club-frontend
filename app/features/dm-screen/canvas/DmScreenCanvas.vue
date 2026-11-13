@@ -62,6 +62,7 @@
 
   const isClearOpen = ref(false);
 
+  /** Спрашивает, очистить ли ширму. */
   function openClear(): void {
     isClearOpen.value = true;
   }

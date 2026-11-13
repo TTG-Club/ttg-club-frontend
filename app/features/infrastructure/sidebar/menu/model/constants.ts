@@ -24,7 +24,7 @@ export const MENU_EXTERNAL_ICON = 'tabler:external-link';
 export const MENU_DEFAULT_ICON = 'tabler:point';
 
 /** Иконка ширмы Мастера в меню и на самой ширме. */
-const DM_SCREEN_MENU_ICON = 'tabler:layout-dashboard';
+export const DM_SCREEN_MENU_ICON = 'tabler:layout-dashboard';
 
 /**
  * Иконки пунктов по адресу: в меню из API иконки есть только у групп, а на

@@ -4,8 +4,10 @@ import type {
   DmScreenRect,
   DmScreenRequest,
   DmScreenResizeEdges,
+  DmScreenResizeLimits,
   DmScreenSection,
   DmScreenSize,
+  DmScreenSpan,
   DmScreenTile,
   DmScreenViewport,
 } from './types';
@@ -456,11 +458,78 @@ export function snapDmScreenWindow(
 }
 
 /**
+ * Двигает одну сторону окна по одной оси; противоположная остаётся на
+ * месте. Сторона примагничивается к краю холста, к краям соседних окон
+ * (вровень или рядом с промежутком сетки) и к такой же длине, как у соседа.
+ * @param span - отрезок окна по оси до растягивания
+ * @param edge - какую сторону тянут: `-1` — начало, `1` — конец
+ * @param delta - на сколько сдвинулся указатель
+ * @param limits - границы холста и наименьший размер окна
+ * @param neighbours - отрезки соседних окон; без них сторона не магнитится
+ */
+function resizeDmScreenSpan(
+  span: DmScreenSpan,
+  edge: DmScreenResizeEdges['x'],
+  delta: number,
+  limits: DmScreenResizeLimits,
+  neighbours?: ReadonlyArray<DmScreenSpan>,
+): DmScreenSpan {
+  const spanEnd = span.start + span.size;
+
+  if (edge < 0) {
+    const dragged = span.start + delta;
+
+    const snapped = neighbours
+      ? snapToNearest(dragged, [
+          limits.snapMin,
+          ...neighbours.flatMap((other) => [
+            other.start,
+            other.start + other.size,
+            other.start + other.size + DM_SCREEN_GRID_GAP,
+            spanEnd - other.size,
+          ]),
+        ])
+      : dragged;
+
+    const start = clampToRange(
+      snapped,
+      Math.min(span.start, limits.min),
+      spanEnd - limits.minSize,
+    );
+
+    return { start, size: spanEnd - start };
+  }
+
+  if (edge > 0) {
+    const dragged = spanEnd + delta;
+
+    const snapped = neighbours
+      ? snapToNearest(dragged, [
+          limits.snapMax,
+          ...neighbours.flatMap((other) => [
+            other.start + other.size,
+            other.start,
+            other.start - DM_SCREEN_GRID_GAP,
+            span.start + other.size,
+          ]),
+        ])
+      : dragged;
+
+    return {
+      start: span.start,
+      size: Math.max(snapped, span.start + limits.minSize) - span.start,
+    };
+  }
+
+  return span;
+}
+
+/**
  * Меняет размер окна, которое тянут за сторону или угол. Противоположные
  * стороны остаются на месте, окно не становится меньше минимального и не
- * заходит под шапку ширмы. Сторона, которую тянут, примагничивается: к краям
- * холста, к краям других окон (вровень или рядом с промежутком сетки) и к
- * такой же ширине или высоте, как у другого окна.
+ * заходит под шапку ширмы и боковую панель сайта. Сторона, которую тянут,
+ * примагничивается: к краям холста, к краям других окон и к такой же ширине
+ * или высоте, как у другого окна.
  * @param start - окно до растягивания
  * @param edges - за какие стороны тянут
  * @param delta - на сколько сдвинулся указатель
@@ -475,87 +544,38 @@ export function resizeDmScreenWindow(
   others?: ReadonlyArray<DmScreenRect>,
 ): DmScreenRect {
   const top = getTopInset(viewport);
-  const startRight = start.x + start.width;
-  const startBottom = start.y + start.height;
-  const neighbours = others ?? [];
 
-  const snap = (value: number, candidates: Array<number>): number =>
-    others ? snapToNearest(value, candidates) : value;
+  const horizontal = resizeDmScreenSpan(
+    { start: start.x, size: start.width },
+    edges.x,
+    delta.x,
+    {
+      min: DM_SCREEN_LEFT_INSET,
+      snapMin: DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
+      snapMax: viewport.width - DM_SCREEN_WINDOW_MARGIN,
+      minSize: DM_SCREEN_WINDOW_MIN_SIZE.width,
+    },
+    others?.map((other) => ({ start: other.x, size: other.width })),
+  );
 
-  const left =
-    edges.x < 0
-      ? clampToRange(
-          snap(start.x + delta.x, [
-            DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
-            ...neighbours.flatMap((other) => [
-              other.x,
-              other.x + other.width,
-              other.x + other.width + DM_SCREEN_GRID_GAP,
-              // Та же ширина, что у другого окна
-              startRight - other.width,
-            ]),
-          ]),
-          // Под боковую панель сайта окно не растягивается
-          Math.min(start.x, DM_SCREEN_LEFT_INSET),
-          startRight - DM_SCREEN_WINDOW_MIN_SIZE.width,
-        )
-      : start.x;
-
-  const right =
-    edges.x > 0
-      ? Math.max(
-          snap(startRight + delta.x, [
-            viewport.width - DM_SCREEN_WINDOW_MARGIN,
-            ...neighbours.flatMap((other) => [
-              other.x + other.width,
-              other.x,
-              other.x - DM_SCREEN_GRID_GAP,
-              start.x + other.width,
-            ]),
-          ]),
-          start.x + DM_SCREEN_WINDOW_MIN_SIZE.width,
-        )
-      : startRight;
-
-  const topEdge =
-    edges.y < 0
-      ? clampToRange(
-          snap(start.y + delta.y, [
-            top,
-            ...neighbours.flatMap((other) => [
-              other.y,
-              other.y + other.height,
-              other.y + other.height + DM_SCREEN_GRID_GAP,
-              // Та же высота, что у другого окна
-              startBottom - other.height,
-            ]),
-          ]),
-          top,
-          startBottom - DM_SCREEN_WINDOW_MIN_SIZE.height,
-        )
-      : start.y;
-
-  const bottom =
-    edges.y > 0
-      ? Math.max(
-          snap(startBottom + delta.y, [
-            viewport.height - DM_SCREEN_WINDOW_MARGIN,
-            ...neighbours.flatMap((other) => [
-              other.y + other.height,
-              other.y,
-              other.y - DM_SCREEN_GRID_GAP,
-              start.y + other.height,
-            ]),
-          ]),
-          start.y + DM_SCREEN_WINDOW_MIN_SIZE.height,
-        )
-      : startBottom;
+  const vertical = resizeDmScreenSpan(
+    { start: start.y, size: start.height },
+    edges.y,
+    delta.y,
+    {
+      min: top,
+      snapMin: top,
+      snapMax: viewport.height - DM_SCREEN_WINDOW_MARGIN,
+      minSize: DM_SCREEN_WINDOW_MIN_SIZE.height,
+    },
+    others?.map((other) => ({ start: other.y, size: other.height })),
+  );
 
   return {
-    x: Math.round(left),
-    y: Math.round(topEdge),
-    width: Math.round(right - left),
-    height: Math.round(bottom - topEdge),
+    x: Math.round(horizontal.start),
+    y: Math.round(vertical.start),
+    width: Math.round(horizontal.size),
+    height: Math.round(vertical.size),
   };
 }
 

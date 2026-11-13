@@ -28,6 +28,33 @@ export interface DmScreenResizeEdges {
   y: -1 | 0 | 1;
 }
 
+/** Ручка растягивания окна: сторона или угол. */
+export interface DmScreenResizeHandle {
+  key: string;
+  /** За какие стороны тянет ручка. */
+  edges: DmScreenResizeEdges;
+  /** Классы места, размера и курсора ручки. */
+  class: string;
+}
+
+/** Отрезок окна по одной оси: начало и длина, px. */
+export interface DmScreenSpan {
+  start: number;
+  size: number;
+}
+
+/** Границы, в которых сторона окна двигается при растягивании, px. */
+export interface DmScreenResizeLimits {
+  /** Дальше этого начало окна не уходит. */
+  min: number;
+  /** Край холста, к которому примагничивается начало окна. */
+  snapMin: number;
+  /** Край холста, к которому примагничивается конец окна. */
+  snapMax: number;
+  /** Меньше этого окно не сжимается. */
+  minSize: number;
+}
+
 /** Прямоугольник окна на экране, px. */
 export interface DmScreenRect extends DmScreenPoint, DmScreenSize {}
 

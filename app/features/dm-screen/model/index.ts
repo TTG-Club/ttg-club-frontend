@@ -9,6 +9,7 @@ export type {
   DmScreenRect,
   DmScreenRequest,
   DmScreenResizeEdges,
+  DmScreenResizeHandle,
   DmScreenSection,
   DmScreenSize,
   DmScreenTile,
