@@ -36,8 +36,9 @@
       return;
     }
 
-    isOpen.value = false;
+    // Сначала событие: закрытие окна сбрасывает у родителя выбранную ширму
     emit('save', trimmed.value);
+    isOpen.value = false;
   }
 </script>
 

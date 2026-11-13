@@ -19,9 +19,10 @@
     isOpen.value = false;
   }
 
+  // Сначала событие: закрытие окна сбрасывает у родителя выбранную ширму
   function confirm(): void {
-    isOpen.value = false;
     emit('confirm');
+    isOpen.value = false;
   }
 </script>
 
