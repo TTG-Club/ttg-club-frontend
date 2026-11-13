@@ -104,10 +104,12 @@
         </h1>
       </slot>
 
-      <!-- Кнопки и поиск прижаты к правому краю, поиск — последним -->
+      <!-- Поиск и кнопки прижаты к правому краю, поиск — первым -->
       <div
         class="ml-auto flex flex-auto flex-wrap items-center justify-end gap-2"
       >
+        <DmScreenSearch />
+
         <UButton
           :icon="DM_SCREEN_ICON.note"
           :label="DM_SCREEN_TEXT.addNote"
@@ -152,8 +154,6 @@
         />
 
         <slot name="actions" />
-
-        <DmScreenSearch />
       </div>
     </header>
 

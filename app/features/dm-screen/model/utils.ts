@@ -346,23 +346,33 @@ export function arrangeDmScreenWindows(
   const columns = pickGridColumns(ids.length, area);
   const rows = Math.ceil(ids.length / columns);
 
-  const width = Math.max(
-    DM_SCREEN_WINDOW_MIN_SIZE.width,
-    Math.floor((area.width - DM_SCREEN_GRID_GAP * (columns - 1)) / columns),
+  // Клетка считается по своим краям, а не по ширине: иначе из-за округления
+  // последняя колонка и нижний ряд не доходили бы до края холста. Меньше
+  // минимального окна клетка не становится — тогда сетка уходит за край
+  const stepX = Math.max(
+    DM_SCREEN_WINDOW_MIN_SIZE.width + DM_SCREEN_GRID_GAP,
+    (area.width + DM_SCREEN_GRID_GAP) / columns,
   );
 
-  const height = Math.max(
-    DM_SCREEN_WINDOW_MIN_SIZE.height,
-    Math.floor((area.height - DM_SCREEN_GRID_GAP * (rows - 1)) / rows),
+  const stepY = Math.max(
+    DM_SCREEN_WINDOW_MIN_SIZE.height + DM_SCREEN_GRID_GAP,
+    (area.height + DM_SCREEN_GRID_GAP) / rows,
   );
 
-  return ids.map((id, index) => ({
-    id,
-    x: left + (index % columns) * (width + DM_SCREEN_GRID_GAP),
-    y: top + Math.floor(index / columns) * (height + DM_SCREEN_GRID_GAP),
-    width,
-    height,
-  }));
+  return ids.map((id, index) => {
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    const x = left + Math.round(column * stepX);
+    const y = top + Math.round(row * stepY);
+
+    return {
+      id,
+      x,
+      y,
+      width: left + Math.round((column + 1) * stepX) - DM_SCREEN_GRID_GAP - x,
+      height: top + Math.round((row + 1) * stepY) - DM_SCREEN_GRID_GAP - y,
+    };
+  });
 }
 
 /**

@@ -109,8 +109,11 @@ export const DM_SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
  */
 export const DM_SCREEN_WINDOW_MIN_SIZE = { width: 240, height: 120 } as const;
 
-/** Отступ окна от краёв экрана, px. */
-export const DM_SCREEN_WINDOW_MARGIN = 16;
+/**
+ * Отступ окна от краёв холста, px: слева, справа и снизу — тот же, что
+ * сверху от полосы под шапкой.
+ */
+export const DM_SCREEN_WINDOW_MARGIN = 8;
 
 /**
  * Ширина боковой панели сайта (`--navbar-width` без безопасной зоны), px:
@@ -123,7 +126,7 @@ export const DM_SCREEN_LEFT_INSET = 64;
  * перетаскиваются под неё. Это высота шапки в одну строку; если кнопки
  * перенеслись на вторую, холст меряет шапку сам.
  */
-export const DM_SCREEN_TOP_INSET = 72;
+export const DM_SCREEN_TOP_INSET = 73;
 
 /**
  * Ручки растягивания окна: четыре стороны и четыре угла. Углы идут после
@@ -278,8 +281,11 @@ export const DM_SCREEN_BACKGROUND_CLASS =
 /** Рамка окна, на которое указали вместо нового. */
 export const DM_SCREEN_HIGHLIGHT_CLASS = 'ring-2 ring-primary';
 
-/** Зазор между полосой под шапкой ширмы и окнами, px. */
-export const DM_SCREEN_TOP_GAP = 7;
+/**
+ * Зазор между полосой под шапкой ширмы и окнами, px: как отступ окна от
+ * остальных краёв холста.
+ */
+export const DM_SCREEN_TOP_GAP = DM_SCREEN_WINDOW_MARGIN;
 
 /** Сколько подсвечивается окно, на которое указали вместо нового, мс. */
 export const DM_SCREEN_HIGHLIGHT_DURATION = 1500;
