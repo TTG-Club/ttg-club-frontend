@@ -1,4 +1,5 @@
 export type {
+  DmScreenCache,
   DmScreenDetail,
   DmScreenList,
   DmScreenSnapPickerPosition,
@@ -34,6 +35,7 @@ export {
 } from './api';
 
 export {
+  dmScreenCacheSchema,
   dmScreenDetailSchema,
   dmScreenListSchema,
   dmScreenSnapPickerPositionSchema,

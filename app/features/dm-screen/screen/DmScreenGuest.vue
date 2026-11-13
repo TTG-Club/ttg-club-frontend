@@ -2,6 +2,7 @@
   import { AuthModal } from '~user/auth-modal';
 
   import { DmScreenCanvas } from '../canvas';
+  import { useDmScreen } from '../composables';
   import { DM_SCREEN_ICON, DM_SCREEN_TEXT } from '../model';
 
   /**
@@ -10,7 +11,15 @@
    * переносится туда. В шапке кнопки входа нет: кто захочет сохранить
    * ширму, войдёт сам.
    */
+  const { cachedScreen } = useDmScreen();
+
   const isAuthOpen = ref(false);
+
+  // Копия ширмы из аккаунта гостю не нужна: после выхода её не должен
+  // увидеть тот, кто войдёт в этом браузере следующим
+  onMounted(() => {
+    cachedScreen.value = null;
+  });
 
   function openAuth(): void {
     isAuthOpen.value = true;

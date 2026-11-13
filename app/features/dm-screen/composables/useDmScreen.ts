@@ -1,4 +1,5 @@
 import type {
+  DmScreenCache,
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
@@ -7,7 +8,7 @@ import type {
   DmScreenWindow,
 } from '../model';
 
-import { sortBy } from 'es-toolkit';
+import { isEqual, sortBy } from 'es-toolkit';
 
 import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
 import { getApiErrorMessage } from '~user/model';
@@ -16,11 +17,13 @@ import {
   appendDmScreenWindow,
   arrangeDmScreenWindows,
   createDmScreenNotePath,
+  DM_SCREEN_CACHE_STORAGE_KEY,
   DM_SCREEN_HIGHLIGHT_DURATION,
   DM_SCREEN_SAVE_DELAY,
   DM_SCREEN_STORAGE_KEY,
   DM_SCREEN_TEXT,
   DM_SCREEN_TOP_INSET,
+  dmScreenCacheSchema,
   dmScreenWindowListSchema,
   isDmScreenNotePath,
   saveDmScreenWindows,
@@ -41,6 +44,20 @@ function readWindows(raw: string): Array<DmScreenWindow> {
     return parsed.success ? parsed.data : [];
   } catch {
     return [];
+  }
+}
+
+/**
+ * Читает копию ширмы из аккаунта; чужой формат или битый JSON — копии нет.
+ * @param raw - строка из localStorage
+ */
+function readCache(raw: string): DmScreenCache | null {
+  try {
+    const parsed = dmScreenCacheSchema.safeParse(JSON.parse(raw));
+
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
   }
 }
 
@@ -69,6 +86,23 @@ export const useDmScreen = createSharedComposable(() => {
     },
   );
 
+  /**
+   * Копия ширмы из аккаунта: после обновления страницы ширма открывается с
+   * неё сразу, а ответ сервера приходит следом. Читается сразу, не после
+   * монтирования: ширма рисуется только в браузере, и копия нужна уже при
+   * создании страницы.
+   */
+  const cachedScreen = useLocalStorage<DmScreenCache | null>(
+    DM_SCREEN_CACHE_STORAGE_KEY,
+    null,
+    {
+      serializer: {
+        read: readCache,
+        write: (value) => JSON.stringify(value),
+      },
+    },
+  );
+
   /** Открытая ширма с сервера; без неё окна — гостевые из браузера. */
   const screenId = ref<string>();
 
@@ -76,6 +110,9 @@ export const useDmScreen = createSharedComposable(() => {
 
   /** Есть изменения, ещё не ушедшие на сервер. */
   let isDirty = false;
+
+  /** Окна открытой ширмы меняли с тех пор, как её подключили. */
+  let isTouched = false;
 
   /**
    * Сохраняет окна открытой ширмы, если они менялись.
@@ -111,19 +148,31 @@ export const useDmScreen = createSharedComposable(() => {
 
       remoteWindows.value = value;
       isDirty = true;
+      isTouched = true;
       void saveLater();
     },
   });
 
   /**
    * Подключает ширму с сервера: дальше окна читаются и пишутся в неё.
+   * Ширма, уже открытая с копии из браузера, окна не теряет: если их
+   * успели изменить, правки новее ответа сервера, а одинаковые окна
+   * заново не рисуются.
    * @param id - идентификатор ширмы
-   * @param initial - окна ширмы с сервера
+   * @param initial - окна ширмы с сервера или из копии в браузере
    */
   function attach(id: string, initial: ReadonlyArray<DmScreenWindow>): void {
+    if (
+      screenId.value === id
+      && (isTouched || isEqual(remoteWindows.value, initial))
+    ) {
+      return;
+    }
+
     screenId.value = id;
     remoteWindows.value = [...initial];
     isDirty = false;
+    isTouched = false;
   }
 
   /** Отключает ширму с сервера, досохранив изменения. */
@@ -132,6 +181,7 @@ export const useDmScreen = createSharedComposable(() => {
 
     screenId.value = undefined;
     remoteWindows.value = [];
+    isTouched = false;
   }
 
   /**
@@ -404,6 +454,7 @@ export const useDmScreen = createSharedComposable(() => {
       () => localWindows.value,
     ),
     windows,
+    cachedScreen,
     attach,
     detach,
     saveOnLeave,

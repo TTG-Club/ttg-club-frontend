@@ -24,15 +24,38 @@
   }>();
 
   const toast = useToast();
-  const { attach, detach, saveOnLeave } = useDmScreen();
 
-  const name = ref('');
-  const isLoading = ref(true);
+  const { attach, detach, saveOnLeave, screenId, windows, cachedScreen } =
+    useDmScreen();
+
+  // Копия этой ширмы из браузера: с ней ширма видна сразу после обновления
+  // страницы, без заглушки на время ответа сервера
+  const cached = cachedScreen.value?.id === id ? cachedScreen.value : undefined;
+
+  if (cached) {
+    attach(cached.id, cached.windows);
+  }
+
+  const name = ref(cached?.name ?? '');
+  const isLoading = ref(!cached);
   const isFailed = ref(false);
   const isRenameOpen = ref(false);
 
+  // Копия в браузере повторяет открытую ширму; пока ширма не подключена,
+  // окна на странице гостевые, и в копию они не попадают
+  watch([name, windows], () => {
+    if (screenId.value === id) {
+      cachedScreen.value = {
+        id,
+        name: name.value,
+        windows: [...windows.value],
+      };
+    }
+  });
+
   async function load(): Promise<void> {
-    isLoading.value = true;
+    // Ширма, открытая с копии, остаётся на экране, пока отвечает сервер
+    isLoading.value = screenId.value !== id;
     isFailed.value = false;
 
     try {

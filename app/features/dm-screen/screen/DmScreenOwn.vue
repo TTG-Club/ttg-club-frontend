@@ -16,9 +16,11 @@
    * списка. Если ширмы ещё нет, она создаётся сама — и забирает окна,
    * которые гость собрал в этом браузере до входа.
    */
-  const { localWindows, clearLocal } = useDmScreen();
+  const { localWindows, clearLocal, cachedScreen } = useDmScreen();
 
-  const id = ref('');
+  // Ширма из копии в браузере открывается сразу; список с сервера следом
+  // подтверждает её или подменяет, если ширма у пользователя уже другая
+  const id = ref(cachedScreen.value?.id ?? '');
   const isFailed = ref(false);
 
   /** Находит ширму пользователя, а если её нет — создаёт. */
@@ -41,7 +43,8 @@
       clearLocal();
       id.value = created.id;
     } catch {
-      isFailed.value = true;
+      // Ширма, открытая с копии, о сбое загрузки сообщит сама
+      isFailed.value = !id.value;
     }
   }
 

@@ -66,3 +66,15 @@ export const dmScreenDetailSchema = z.object({
 });
 
 export type DmScreenDetail = z.infer<typeof dmScreenDetailSchema>;
+
+/**
+ * Копия ширмы из аккаунта в браузере: с неё ширма открывается сразу, не
+ * дожидаясь ответа сервера.
+ */
+export const dmScreenCacheSchema = z.object({
+  id: z.string().min(1),
+  name: z.string(),
+  windows: dmScreenWindowListSchema,
+});
+
+export type DmScreenCache = z.infer<typeof dmScreenCacheSchema>;

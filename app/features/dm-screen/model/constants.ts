@@ -108,6 +108,9 @@ export const DM_SCREEN_NOTE_SAVE_DELAY = 400;
 /** Ключ окон ширмы в localStorage. */
 export const DM_SCREEN_STORAGE_KEY = 'dm-screen:windows';
 
+/** Ключ копии ширмы из аккаунта в localStorage. */
+export const DM_SCREEN_CACHE_STORAGE_KEY = 'dm-screen:account-screen';
+
 /** Размер нового окна, px. */
 export const DM_SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
 
