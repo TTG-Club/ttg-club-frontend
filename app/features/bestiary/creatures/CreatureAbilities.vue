@@ -6,7 +6,8 @@
   /**
    * Таблица характеристик, как в старом SPA: плитки с тёмной шапкой-сокращением
    * и броском проверки под ней. Колонок столько, сколько влезает рядом с
-   * картинкой: две, три или все шесть в ряд.
+   * картинкой: две, три или все шесть в ряд. Минимальная ширина
+   * сталкивает таблицу под картинку, если рядом с ней слишком тесно.
    */
   const { scores, source } = defineProps<{
     scores: Array<CreatureAbilityScore>;
@@ -16,7 +17,7 @@
 </script>
 
 <template>
-  <div class="@container flow-root">
+  <div class="@container flow-root min-w-[min(15rem,100%)]">
     <dl class="grid grid-cols-2 gap-2 @3xs:grid-cols-3 @3xl:grid-cols-6">
       <div
         v-for="score in scores"

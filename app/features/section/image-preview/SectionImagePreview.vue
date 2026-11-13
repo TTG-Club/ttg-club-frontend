@@ -3,7 +3,9 @@
   import SectionImageViewer from './SectionImageViewer.vue';
 
   /**
-   * Круглое превью картинки записи справа от текста. По клику картинки
+   * Круглое превью картинки записи справа от текста. Размер зависит от
+   * ширины контейнера-обёртки (@container), а не окна: в узкой ширме
+   * картинка мельче и не налезает на текст. По клику картинки
    * открываются во весь экран с листанием.
    */
   const { images, alt } = defineProps<{
@@ -23,7 +25,7 @@
     <button
       :aria-label="SECTION_TEXT.openImage"
       type="button"
-      class="float-right mb-8 ml-8 size-50 cursor-pointer overflow-hidden rounded-full max-2xl:size-45 max-sm:mb-4 max-sm:ml-4 max-sm:size-30"
+      class="float-right mb-4 ml-4 size-30 cursor-pointer overflow-hidden rounded-full @md:mb-8 @md:ml-8 @md:size-45 @2xl:size-50"
       @click.left.exact.prevent="open"
     >
       <img
