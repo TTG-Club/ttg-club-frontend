@@ -651,22 +651,31 @@ export function getDmScreenEdgeTarget(
 
 /**
  * Находится ли указатель в полосе, где видна панель раскладок: под шапкой
- * ширмы или у низа холста. У скрытой панели полосы нет.
+ * ширмы или у низа холста. У скрытой панели полосы нет. Полоса не ниже
+ * самой панели: до раскладок второго ряда указатель должен дотянуться, не
+ * спрятав панель.
  * @param pointer - где указатель
  * @param viewport - экран ширмы
  * @param position - где панель раскладок
+ * @param pickerHeight - высота панели, px; пока её не мерили — ноль
  */
 export function isDmScreenPickerBand(
   pointer: DmScreenPoint,
   viewport: DmScreenViewport,
   position: DmScreenSnapPickerPosition,
+  pickerHeight = 0,
 ): boolean {
+  const band = Math.max(
+    DM_SCREEN_SNAP_PICKER_DISTANCE,
+    pickerHeight + DM_SCREEN_SNAP_PICKER_OFFSET * 2,
+  );
+
   if (position === DM_SCREEN_SNAP_PICKER_POSITION.top) {
-    return pointer.y < getTopInset(viewport) + DM_SCREEN_SNAP_PICKER_DISTANCE;
+    return pointer.y < getTopInset(viewport) + band;
   }
 
   if (position === DM_SCREEN_SNAP_PICKER_POSITION.bottom) {
-    return pointer.y > viewport.height - DM_SCREEN_SNAP_PICKER_DISTANCE;
+    return pointer.y > viewport.height - band;
   }
 
   return false;

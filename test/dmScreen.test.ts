@@ -339,6 +339,13 @@ describe('ширма мастера', () => {
       expect(isDmScreenPickerBand(nearTop, viewport, 'bottom')).toBe(false);
     });
 
+    it('полоса панели раскладок растёт вместе с панелью в два ряда', () => {
+      const belowBand = { x: 800, y: DM_SCREEN_TOP_INSET + 140 };
+
+      expect(isDmScreenPickerBand(belowBand, viewport, 'top')).toBe(false);
+      expect(isDmScreenPickerBand(belowBand, viewport, 'top', 136)).toBe(true);
+    });
+
     it('скрытая панель раскладок не появляется ни у одного края', () => {
       expect(
         isDmScreenPickerBand(

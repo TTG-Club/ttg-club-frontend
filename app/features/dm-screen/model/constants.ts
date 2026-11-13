@@ -216,7 +216,8 @@ export const DM_SCREEN_SNAP_HALVES: DmScreenSnapLayout = {
 /**
  * Раскладки в панели, которая появляется, когда окно тащат к верху холста.
  * Мельче, чем у окон Windows: карточки записей небольшие, на холст их
- * встаёт до восемнадцати. В панели раскладки идут в два ряда.
+ * встаёт до восемнадцати. Набор тот же, что у ширмы на сайте 2024. В панели
+ * раскладки идут в один ряд, а на узком холсте переносятся на второй.
  */
 export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
   DM_SCREEN_SNAP_HALVES,
@@ -231,10 +232,10 @@ export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
   { key: 'grid-4x3', zones: createGridZones(4, 3) },
   { key: 'grid-6x3', zones: createGridZones(6, 3) },
   {
-    key: 'main-left',
+    key: 'main-top',
     zones: [
-      { x: 0, y: 0, width: 0.5, height: 1 },
-      { x: 0.5, y: 0, width: 0.5, height: 0.5 },
+      { x: 0, y: 0, width: 1, height: 0.5 },
+      { x: 0, y: 0.5, width: 0.5, height: 0.5 },
       { x: 0.5, y: 0.5, width: 0.5, height: 0.5 },
     ],
   },
@@ -244,14 +245,6 @@ export const DM_SCREEN_SNAP_LAYOUTS: ReadonlyArray<DmScreenSnapLayout> = [
       { x: 0, y: 0, width: 2 / 3, height: 1 },
       { x: 2 / 3, y: 0, width: 1 / 3, height: 0.5 },
       { x: 2 / 3, y: 0.5, width: 1 / 3, height: 0.5 },
-    ],
-  },
-  {
-    key: 'main-right',
-    zones: [
-      { x: 0, y: 0, width: 1 / 3, height: 0.5 },
-      { x: 0, y: 0.5, width: 1 / 3, height: 0.5 },
-      { x: 1 / 3, y: 0, width: 2 / 3, height: 1 },
     ],
   },
 ];
@@ -264,10 +257,10 @@ export const DM_SCREEN_SNAP_EDGE_DISTANCE = 24;
 
 /**
  * Высота полосы под шапкой ширмы или у низа холста, px: пока указатель с
- * окном в ней, видна панель раскладок. Панель в два ряда помещается в полосу
- * целиком.
+ * окном в ней, видна панель раскладок. Если панель выше (раскладки
+ * перенеслись на второй ряд), полоса растёт вместе с ней.
  */
-export const DM_SCREEN_SNAP_PICKER_DISTANCE = 190;
+export const DM_SCREEN_SNAP_PICKER_DISTANCE = 132;
 
 /** По чему в разметке панели раскладок находятся её места. */
 export const DM_SCREEN_SNAP_ZONE_SELECTOR = '[data-zone]';

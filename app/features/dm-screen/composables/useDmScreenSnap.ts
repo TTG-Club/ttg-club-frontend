@@ -68,6 +68,17 @@ export const useDmScreenSnap = createSharedComposable(() => {
     pickerPosition.value = position;
   }
 
+  /** Высота панели раскладок: её сообщает сама панель, когда видна. */
+  const pickerHeight = ref(0);
+
+  /**
+   * Запоминает высоту панели раскладок.
+   * @param height - высота панели, px
+   */
+  function setPickerHeight(height: number): void {
+    pickerHeight.value = height;
+  }
+
   const isPickerVisible = computed(
     () =>
       !!draggingId.value
@@ -76,6 +87,7 @@ export const useDmScreenSnap = createSharedComposable(() => {
         pointer.value,
         viewport.value,
         pickerPosition.value,
+        pickerHeight.value,
       ),
   );
 
@@ -243,6 +255,7 @@ export const useDmScreenSnap = createSharedComposable(() => {
       () => pickerPosition.value,
     ),
     setPickerPosition,
+    setPickerHeight,
     isPickerVisible,
     previewRect,
     assistRect,

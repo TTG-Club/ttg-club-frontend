@@ -35,12 +35,24 @@
     assistPendingRects,
     assistCandidates,
     setPickerTarget,
+    setPickerHeight,
     place,
     skip,
     stopAssist,
   } = useDmScreenSnap();
 
   const picker = useTemplateRef<HTMLElement>('picker');
+
+  const { height: measuredPickerHeight } = useElementSize(picker);
+
+  // Раскладки на узком холсте переносятся на второй ряд: полоса, в которой
+  // панель видна, растёт вместе с ней. Спрятанная панель высоту не
+  // сбрасывает — иначе нижние раскладки пропадали бы из-под указателя
+  watch(measuredPickerHeight, (height) => {
+    if (height > 0) {
+      setPickerHeight(height);
+    }
+  });
 
   /** Все места всех раскладок подряд: по номеру в этом списке их находят. */
   const pickerTargets = computed<Array<DmScreenSnapTarget>>(() =>
@@ -133,7 +145,7 @@
     ref="picker"
     aria-hidden="true"
     :style="pickerStyle"
-    class="pointer-events-none fixed left-[calc(50%+var(--navbar-width)/2)] grid w-max -translate-x-1/2 grid-cols-7 gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
+    class="pointer-events-none fixed left-[calc(50%+var(--navbar-width)/2)] flex w-max max-w-[calc(100vw-var(--navbar-width)-1rem)] -translate-x-1/2 flex-wrap justify-center gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
   >
     <div
       v-for="layout in pickerLayouts"
