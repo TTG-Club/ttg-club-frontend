@@ -10,6 +10,9 @@ export const FOOTER_SOCIAL_LINKS = MENU_CONTACT_LINKS;
 /** Поддержка проекта в подвале: только основной Boosty. */
 export const FOOTER_SUPPORT_LINKS = MENU_SUPPORT_LINKS.slice(0, 1);
 
+/** Ссылки подвала ведут на другие сайты и открываются в новой вкладке. */
+export const FOOTER_EXTERNAL_TARGET = '_blank';
+
 /** Почта службы поддержки. */
 export const FOOTER_SUPPORT_EMAIL = 'support@ttg.club';
 

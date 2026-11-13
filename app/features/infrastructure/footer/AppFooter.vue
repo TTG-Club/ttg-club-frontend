@@ -2,6 +2,7 @@
   import {
     FOOTER_COPYRIGHT,
     FOOTER_DISCLAIMER,
+    FOOTER_EXTERNAL_TARGET,
     FOOTER_LEGAL_LINKS,
     FOOTER_SOCIAL_LINKS,
     FOOTER_SUPPORT_EMAIL,
@@ -60,7 +61,7 @@
             :label="link.label"
             :to="link.url"
             :icon="link.icon"
-            target="_blank"
+            :target="FOOTER_EXTERNAL_TARGET"
             variant="link"
             color="neutral"
             size="xs"
@@ -79,7 +80,7 @@
             :to="link.url"
             :icon="link.icon"
             :aria-label="link.label"
-            target="_blank"
+            :target="FOOTER_EXTERNAL_TARGET"
             variant="ghost"
             color="neutral"
             size="sm"
@@ -97,7 +98,7 @@
             :to="link.url"
             :icon="link.icon"
             :aria-label="link.label"
-            target="_blank"
+            :target="FOOTER_EXTERNAL_TARGET"
             variant="ghost"
             color="neutral"
             size="sm"
