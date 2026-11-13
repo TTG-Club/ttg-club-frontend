@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import type { EntrySource } from '../model';
 
+  import { HoverTooltip } from '~/shared/ui/hover-tooltip';
+
   import { SOURCE_BADGE_CLASSES } from '../model';
 
   /**
@@ -34,9 +36,9 @@
 </script>
 
 <template>
-  <UTooltip :text="hint">
+  <HoverTooltip :text="hint">
     <span :class="badgeClass">{{ text }}</span>
-  </UTooltip>
+  </HoverTooltip>
 </template>
 
 <style lang="scss" module>

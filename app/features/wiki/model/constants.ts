@@ -54,21 +54,30 @@ export const BOOKS_SECTION: SectionConfig = {
 
 export const BOOK_SHORT_NAME_LABEL = 'Аббревиатура:';
 
-/* --- Ширма ------------------------------------------------------------- */
+/* --- Справочник ------------------------------------------------------- */
 
 /**
- * В списке ширмы только корневые разделы; поиск ищет и по вложенным.
- * Ручки фильтра у ширмы на бэкенде нет.
+ * В списке справочника вложенные разделы, сгруппированные по корневым;
+ * фильтр — по источникам и корневым разделам, без поиска по нему: разделов
+ * немного, и они видны целиком.
+ *
+ * Список грузится страницами, а группы собираются в браузере, поэтому
+ * сортировка сначала по корневому разделу: иначе на первой странице
+ * оказывалось по паре разделов из каждой группы, а остальные — дальше.
  */
 export const SCREENS_SECTION: SectionConfig = {
   key: 'screens',
-  title: 'Ширма Мастера',
+  title: 'Справочник',
   path: '/screens',
   listUrl: '/api/v1/screens',
+  filterUrl: '/api/v1/filters/screens',
   order: [
+    { field: 'parent.ordering', direction: 'asc' },
+    { field: 'parent.name', direction: 'asc' },
     { field: 'ordering', direction: 'asc' },
     { field: 'name', direction: 'asc' },
   ],
+  isFilterSearchDisabled: true,
 };
 
 export const SCREEN_TEXT = {
@@ -78,7 +87,13 @@ export const SCREEN_TEXT = {
 /** Иконка вложенного раздела, когда своей в базе нет. */
 export const SCREEN_ICON_FALLBACK = 'tabler:book-2';
 
-/** Теги SVG-иконки раздела ширмы, которые выводятся как есть. */
+/**
+ * Группы справочника без порядка корневого раздела идут после
+ * упорядоченных.
+ */
+export const SCREEN_GROUP_LAST_ORDER = Number.MAX_SAFE_INTEGER;
+
+/** Теги SVG-иконки раздела справочника, которые выводятся как есть. */
 export const SVG_ALLOWED_TAGS: ReadonlySet<string> = new Set([
   'svg',
   'g',

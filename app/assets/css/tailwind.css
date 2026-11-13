@@ -16,6 +16,20 @@
   --font-mono:
     'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono',
     'Consolas', 'Liberation Mono', monospace;
+
+  /* Плавное появление содержимого на месте прежнего (`animate-appear`):
+     только прозрачность, вёрстка не пересчитывается */
+  --animate-appear: appear 0.25s ease-out both;
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /*
@@ -90,6 +104,56 @@ body {
 }
 
 /*
+ * Режим «производительность» (настройки отображения): размытие фона под
+ * элементом видеокарта пересчитывает на каждом кадре, пока рядом что-то
+ * движется, — на слабой графике от этого дёргаются меню и прокрутка.
+ * Отключается разом у всего сайта, в том числе у компонентов Nuxt UI.
+ */
+html[data-graphics='performance'] *,
+html[data-graphics='performance'] *::before,
+html[data-graphics='performance'] *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Вариант для замены полупрозрачного фона плотным, когда размытия нет. */
+@custom-variant performance (html[data-graphics='performance'] &);
+
+/*
+ * Место под полосу прокрутки, когда меню или окно блокирует прокрутку
+ * страницы (перенесено с new.ttg.club). Блокировка убирает полосу, страница
+ * становится шире на её ширину, и контент прыгает вправо — отступ на `html`
+ * держит его на месте.
+ *
+ * Признаки `data-scroll-locked` и `data-scroll-compensated` и переменную
+ * `--app-scrollbar-width` ставит плагин `scrollbar-width.client.ts`. Отступ
+ * нужен, только пока место не держит кто-то другой: Reka UI делает это сам
+ * отступом на `body`, и второй такой же сдвинул бы контент влево.
+ */
+@layer base {
+  html {
+    --app-scrollbar-width: 0;
+
+    &[data-scroll-locked]:not([data-scroll-compensated]) {
+      padding-right: var(--app-scrollbar-width);
+    }
+  }
+}
+
+/*
+ * То же для элементов с `position: fixed` у правого края: они считают место
+ * от окна, а не от страницы, и отступ на `html` на них не действует. Сдвиг —
+ * через `margin-right`: у таких элементов своя ширина, внутренний отступ
+ * ужал бы содержимое, но не сдвинул сам элемент. Действует при любой
+ * блокировке, даже если место в потоке держит Reka UI.
+ */
+@utility fixed-scrollbar-offset {
+  html[data-scroll-locked] & {
+    margin-right: var(--app-scrollbar-width);
+  }
+}
+
+/*
  * Прокрутка без видимой полосы, как на new.ttg.club: колесо, тачпад и
  * свайп работают, а полоса не съедает место и не мигает.
  */
@@ -102,12 +166,40 @@ body {
 }
 
 /*
- * Тонкие полосы прокрутки у всех прокручиваемых блоков, как на
- * new.ttg.club: скруглённый бегунок без дорожки и стрелок. Chrome и Safari
- * рисуют их через `::-webkit-scrollbar` (стандартные свойства их бы
- * отключили), остальные — через стандартные.
+ * Плитка длинного списка: пока она за экраном, браузер не раскладывает и не
+ * рисует её содержимое, а место держит по запомненной высоте (до первого
+ * показа — по высоте обычной плитки). Поиск по странице такие плитки находит.
+ */
+@utility lazy-render-tile {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 3.5rem;
+}
+
+/*
+ * Наименьшая высота страницы: весь экран за вычетом нижней панели меню
+ * телефона. С `md` панель стоит сбоку — там ставим `md:min-h-dvh`.
+ */
+@utility min-h-page {
+  min-height: calc(100dvh - var(--navbar-height));
+}
+
+/*
+ * Полосы прокрутки у всех прокручиваемых блоков — те же, что на
+ * new.ttg.club (правила перенесены оттуда как есть, менять оба сайта разом).
+ *
+ * Стандартные свойства стоят без условий: современные Chrome, Edge и
+ * Firefox рисуют по ним свою «тонкую» полосу, а правила
+ * `::-webkit-scrollbar` при этом не действуют. Те остаются для Safari и
+ * старых Chrome, которые стандартных свойств не знают. Раньше стандартные
+ * свойства были спрятаны от Chrome, и он рисовал полосу по
+ * `::-webkit-scrollbar` — бегунок выходил вдвое тоньше, чем на новом сайте.
  */
 @layer base {
+  * {
+    scrollbar-color: var(--ui-border-accented) transparent;
+    scrollbar-width: thin;
+  }
+
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -120,26 +212,21 @@ body {
 
   ::-webkit-scrollbar-button {
     display: none;
+    width: 0;
+    height: 0;
   }
 
   ::-webkit-scrollbar-thumb {
     border: 2px solid transparent;
-    border-radius: 9999px;
+    border-radius: 6px;
 
     background-color: var(--ui-border-accented);
-    background-clip: content-box;
+    background-clip: padding-box;
 
     transition: background-color 200ms ease;
 
     &:hover {
       background-color: var(--ui-text-dimmed);
-    }
-  }
-
-  @supports not selector(::-webkit-scrollbar) {
-    * {
-      scrollbar-color: var(--ui-border-accented) transparent;
-      scrollbar-width: thin;
     }
   }
 }

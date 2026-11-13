@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { HomeBugHunters } from '~home/bug-hunters';
   import { HomeComments } from '~home/comments';
   import { HomeHero } from '~home/hero';
   import { HomeLatestGame } from '~home/latest-game';
@@ -7,7 +8,7 @@
   import { HomePartners } from '~home/partners';
   import { HomeSections } from '~home/sections';
   import { HomeSocialLinks } from '~home/social-links';
-  import { HomePromoCard } from '~home/ui-kit';
+  import { HomePromoCard, HomeReserved } from '~home/ui-kit';
 
   definePageMeta({
     layout: 'home',
@@ -21,7 +22,7 @@
     <!-- Плита разделов и лента — разные по смыслу полосы, им нужен воздух
       шире, чем зазор между соседними панелями внутри ленты -->
     <div
-      class="mx-auto flex w-full max-w-(--max-content) flex-col gap-6 px-4 pt-6 pb-8 lg:gap-8 lg:pt-8 xl:px-6 2xl:max-w-(--max-content-wide)"
+      class="mx-auto flex w-full max-w-(--max-content) flex-col gap-6 px-4 pt-6 pb-8 lg:gap-8 lg:pt-8 2xl:max-w-(--max-content-wide)"
     >
       <HomeSections />
 
@@ -29,52 +30,72 @@
         Ниже xl все обёртки схлопываются в display: contents: блоки становятся
         прямыми флекс-элементами ленты и выстраиваются одним потоком в порядке
         order: VTTG → Соцсети → Новости → Новая игра → Новости сообщества →
-        Обсуждения → Друзья.
+        Обсуждения → Друзья → Охотники за багами.
 
-        С xl лента делится на две половины, растянутые друг под друга. Слева
-        новости сайта (обложка и ряд свежих), под ними новости сообщества —
-        как на new.ttg.club. Справа два узких столбца: игра с обсуждениями, и
-        VTTG с соцсетями и друзьями. Столбцы стоят в одном ряду `stretch`,
-        поэтому их низы совпадают. Обсуждения и друзья не участвуют в высоте
-        ряда (flex-basis 0): занимают остаток своего столбца и прокручиваются
-        внутри. Игра и VTTG остаются своей высоты. Новости сообщества
-        добирают высоту до правой половины, чтобы низ ленты шёл одной линией.
+        С xl лента делится на две половины, растянутые друг под друга, — та
+        же сетка, что на new.ttg.club. Слева новости сайта, под ними две
+        четверти: место в запасе и новости сообщества. Справа два
+        ряда из двух четвертей:
+
+        - верхний — новая игра и VTTG с соцсетями. Ряд `stretch`, поэтому низ
+          игры совпадает с низом соцсетей: разницу забирает обложка игры;
+        - нижний — обсуждения и столбец из друзей (бегущая строка) и
+          охотников за багами; оба начинаются с одной линии и равны по
+          высоте. Высоту ряда задают друзья с охотниками, а лента обсуждений
+          в ней не участвует (`detached`): занимает её целиком и
+          прокручивается внутри.
+
+        Связать высоты можно только у соседей по одному ряду — поэтому игра
+        и VTTG стоят в общем ряду, а не в разных столбцах.
       -->
       <div class="flex flex-col gap-3 xl:flex-row xl:items-stretch">
         <div class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3">
-          <HomeNews class="order-2 xl:order-0" />
+          <!-- Если правая половина выше, разницу забирает обложка новостей
+            сайта, а не узкая карточка новостей сообщества -->
+          <HomeNews class="order-2 xl:order-0 xl:flex-auto" />
 
-          <HomeCommunityNews class="order-4 xl:order-0 xl:flex-auto" />
+          <div class="contents xl:flex xl:items-stretch xl:gap-3">
+            <!-- Место в запасе под будущий блок (на new.ttg.club здесь
+              статьи). Ниже xl его нет: в ленте одним столбцом пустая
+              заглушка только удлиняла бы страницу -->
+            <HomeReserved class="hidden xl:flex xl:min-w-0 xl:flex-1" />
+
+            <HomeCommunityNews
+              class="order-4 xl:order-0 xl:min-w-0 xl:flex-1"
+            />
+          </div>
         </div>
 
         <div class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3">
-          <div class="contents xl:flex xl:flex-auto xl:items-stretch xl:gap-3">
-            <div
-              class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3"
-            >
-              <HomeLatestGame class="order-3 xl:order-0" />
-
-              <HomeComments
-                class="order-5 xl:order-0 xl:min-h-60 xl:flex-[1_1_0]"
-              />
-            </div>
+          <div class="contents xl:flex xl:items-stretch xl:gap-3">
+            <HomeLatestGame class="order-3 xl:order-0 xl:min-w-0 xl:flex-1" />
 
             <div
               class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3"
             >
               <HomePromoCard
                 :card="HOME_VTTG_CARD"
-                class="order-0"
+                class="order-0 xl:flex-auto"
               />
 
               <HomeSocialLinks class="order-1 xl:order-0" />
+            </div>
+          </div>
 
-              <!-- Друзей много, и в узкой колонке список вытянул бы всю ленту.
-                Поэтому он не участвует в высоте ряда (flex-basis 0): берёт то,
-                что осталось в колонке под соцсетями, и прокручивается внутри -->
-              <HomePartners
-                class="order-6 xl:order-0 xl:min-h-60 xl:flex-[1_1_0]"
-              />
+          <!-- min-h — страховка на случай, когда остальное короче обычного
+            (скажем, рейтинг не загрузился): без неё ленте обсуждений
+            досталась бы только шапка -->
+          <div class="contents xl:flex xl:flex-auto xl:items-stretch xl:gap-3">
+            <HomeComments
+              class="order-5 xl:order-0 xl:min-h-80 xl:min-w-0 xl:flex-1"
+            />
+
+            <div
+              class="contents xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:gap-3"
+            >
+              <HomePartners class="order-6 xl:order-0" />
+
+              <HomeBugHunters class="order-7 xl:order-0" />
             </div>
           </div>
         </div>

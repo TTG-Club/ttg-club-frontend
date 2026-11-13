@@ -1,10 +1,13 @@
 <script setup lang="ts">
   import type { HomeNavLink } from '../model';
 
-  import { useHomeLink, useHomeMenu } from '../composables';
+  import { MENU_SECTIONS } from '~infrastructure/navigation/model';
+
+  import { useHomeLink } from '../composables';
+  import { getHomeTools } from '../model';
   import { HOME_TOOLS_LABEL } from './model';
 
-  const { tools } = useHomeMenu();
+  const tools = getHomeTools(MENU_SECTIONS);
   const { isExternalLink } = useHomeLink();
 
   /**

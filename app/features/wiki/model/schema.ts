@@ -67,7 +67,18 @@ export const bookDetailSchema = z.object({
 
 export type BookDetail = z.infer<typeof bookDetailSchema>;
 
-/** Раздел ширмы в списке или в группе родительского раздела. */
+/** Корневой раздел, к которому относится вложенный. */
+const screenParentSchema = z.object({
+  name: entryNameSchema,
+  url: z.string().min(1),
+  /** Порядок корневого раздела: по нему идут группы справочника. */
+  order: z.number().nullish(),
+});
+
+/**
+ * Раздел справочника в списке или в группе корневого раздела. Корневой
+ * раздел есть у вложенных разделов в списке справочника.
+ */
 export const screenLinkSchema = z.object({
   name: entryNameSchema,
   url: z.string().min(1),
@@ -77,22 +88,17 @@ export const screenLinkSchema = z.object({
   icon: z.string().nullish(),
   /** Группа внутри родительского раздела. */
   group: z.string().nullish(),
+  parent: screenParentSchema.nullish(),
 });
 
 export type ScreenLink = z.infer<typeof screenLinkSchema>;
 
 /**
- * Раздел ширмы: у корневого раздела вложенные разделы, у вложенного —
+ * Раздел справочника: у корневого раздела вложенные разделы, у вложенного —
  * ссылка на родителя.
  */
 export const screenDetailSchema = screenLinkSchema.extend({
   description: z.string().nullish(),
-  parent: z
-    .object({
-      name: entryNameSchema,
-      url: z.string().min(1),
-    })
-    .nullish(),
   chields: z.array(screenLinkSchema).nullish(),
 });
 

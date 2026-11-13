@@ -15,6 +15,13 @@ export default defineAppConfig({
     cssLayer: 'base',
   },
   ui: {
+    // Уведомления прибиты к правому краю окна: держим их на месте, когда
+    // меню или окно блокирует прокрутку и полоса пропадает
+    toaster: {
+      slots: {
+        viewport: 'fixed-scrollbar-offset',
+      },
+    },
     button: {
       compoundVariants: SOLID_COLORS.map((color) => ({
         color,

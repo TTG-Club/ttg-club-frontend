@@ -27,11 +27,17 @@
     definition,
     selection,
     isCustomized = false,
+    isSearchDisabled = false,
   } = defineProps<{
     part: FilterPart;
     definition: FilterDefinition;
     selection: FilterSelection;
     isCustomized?: boolean;
+    /**
+     * Раздел не хочет поиска по фильтру по содержимому; поиск по
+     * источникам остаётся.
+     */
+    isSearchDisabled?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -61,6 +67,8 @@
   const isEmpty = computed(() => !matches.value.length);
 
   const isSources = computed(() => part === 'sources');
+
+  const isSearchVisible = computed(() => isSources.value || !isSearchDisabled);
 
   const title = computed(() =>
     isSources.value ? SECTION_TEXT.sources : SECTION_TEXT.filterTitle,
@@ -122,6 +130,7 @@
     <template #body>
       <div class="flex flex-col gap-4">
         <UInput
+          v-if="isSearchVisible"
           v-model="search"
           :icon="SECTION_ICON.search"
           :placeholder="searchPlaceholder"

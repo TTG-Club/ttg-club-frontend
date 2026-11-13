@@ -4,7 +4,7 @@ import type { MaybeRefOrGetter } from 'vue';
 
 import { NOT_FOUND_STATUS } from '~/shared/consts';
 
-import { getEntryApiPath } from '../model';
+import { getEntryApiPath, getSectionEntryKey } from '../model';
 
 interface SectionEntryOptions<T> {
   /** Ключ раздела для данных SSR. */
@@ -30,7 +30,7 @@ export async function useSectionEntry<T>(options: SectionEntryOptions<T>) {
   const api = useApi();
 
   const { data, status, error } = await useAsyncData(
-    () => `section-entry-${options.key}:${toValue(options.path)}`,
+    () => getSectionEntryKey(options.key, toValue(options.path)),
     async () =>
       options.schema.parse(
         await api(getEntryApiPath(toValue(options.path)), {

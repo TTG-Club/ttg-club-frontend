@@ -1,11 +1,17 @@
 <script setup lang="ts">
   import type { HomePromoCardContent } from '../model';
 
-  import { useHomeLink, useHomeMenu } from '../composables';
-  import { HOME_EDITION_CARD, HOME_LINK_ARROW_ICON } from '../model';
+  import { MENU_SECTIONS } from '~infrastructure/navigation/model';
+
+  import { useHomeLink } from '../composables';
+  import {
+    getHomeSections,
+    HOME_EDITION_CARD,
+    HOME_LINK_ARROW_ICON,
+  } from '../model';
   import { HomePromoCard } from '../ui-kit';
 
-  const { sections } = useHomeMenu();
+  const sections = getHomeSections(MENU_SECTIONS);
   const { isExternalLink } = useHomeLink();
 
   const { newSiteUrl } = useRuntimeConfig().public;

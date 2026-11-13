@@ -2,10 +2,9 @@
   import { HamburgerIcon } from '~/shared/ui/hamburger-icon';
   import { SiteLogo } from '~/shared/ui/site-logo';
 
+  import { MENU_SECTIONS } from '../../navigation/model';
   import { SidebarPopover } from '../popover';
-  import { useSiteMenu } from './composables';
   import {
-    buildMenuGroups,
     MENU_SITE_DESCRIPTION,
     MENU_SITE_TITLE,
     MENU_TOGGLE_LABEL,
@@ -16,19 +15,14 @@
 
   const isOpened = ref(false);
 
-  // Меню приходит вместе со страницей (а до ответа API стоит запасная копия),
-  // поэтому при открытии оно уже готово: ни скелетона, ни запроса.
-  const menuItems = useSiteMenu();
-
   const style = useCssModule();
 
-  // Группа инструментов на широком меню встаёт справа во весь рост.
-  const sections = computed(() =>
-    buildMenuGroups(menuItems.value, import.meta.dev).map((group) => ({
-      group,
-      className: group.isTools ? style.tools : undefined,
-    })),
-  );
+  // Раздел инструментов на широком меню встаёт справа во весь рост.
+  const sections = MENU_SECTIONS.map((section) => ({
+    label: section.label,
+    items: section.items,
+    className: section.isTools ? style.tools : undefined,
+  }));
 
   watch(
     () => route.fullPath,
@@ -75,8 +69,9 @@
         <div :class="$style.content">
           <MenuSection
             v-for="section in sections"
-            :key="section.group.label"
-            :group="section.group"
+            :key="section.label"
+            :label="section.label"
+            :items="section.items"
             :class="section.className"
           />
         </div>
@@ -121,7 +116,7 @@
     }
   }
 
-  // Инструменты — самая длинная группа: на широком меню она стоит справа
+  // Инструменты — самый длинный раздел: на широком меню он стоит справа
   // в первой строке во весь рост, и меню становится ниже.
   .tools {
     @container (width >= 860px) {

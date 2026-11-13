@@ -171,6 +171,7 @@
           >
             <img
               v-if="isCoverVisible"
+              decoding="async"
               :src="coverUrl"
               :alt="WORKSHOP_IMAGE_TEXT.coverAlt"
               class="size-full object-cover"

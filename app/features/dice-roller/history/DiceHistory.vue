@@ -26,7 +26,7 @@
   <section
     v-if="isOpen"
     :aria-label="ROLL_HISTORY_TEXT.title"
-    class="fixed inset-x-2 bottom-[calc(var(--navbar-height)+0.5rem)] z-90 flex h-[60dvh] flex-col rounded-lg border border-default bg-elevated shadow-lg md:inset-x-auto md:right-4 md:bottom-20 md:h-[min(60dvh,32rem)] md:w-96"
+    class="fixed inset-x-2 bottom-[calc(var(--navbar-height)+0.5rem)] z-90 flex h-[60dvh] flex-col rounded-lg border border-default bg-elevated shadow-lg md:inset-x-auto md:right-4 md:bottom-20 md:fixed-scrollbar-offset md:h-[min(60dvh,32rem)] md:w-96"
   >
     <header
       class="flex items-center justify-between border-b border-default py-1 pr-1 pl-3"
@@ -73,7 +73,9 @@
   </section>
 
   <!-- Как плавающая кнопка старого SPA: круг 40px цвета всплывающих окон -->
-  <div class="fixed right-4 bottom-6 z-90 hidden md:block">
+  <div
+    class="fixed right-4 bottom-6 z-90 fixed-scrollbar-offset hidden md:block"
+  >
     <DiceHistoryToggle
       class="size-10 justify-center rounded-full bg-elevated p-2 text-default shadow-lg"
     />

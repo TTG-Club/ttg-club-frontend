@@ -57,3 +57,6 @@ export const SUBSCRIPTIONS_REDEEM_PATH = `${SUBSCRIPTIONS_PATH}/redeem`;
 
 /** Учёт посетителей онлайн: бэкенд пересылает отметку в сервис онлайна. */
 export const ONLINE_HEARTBEAT_PATH = '/api/online/heartbeat';
+
+/** Учёт работы с инструментами сайта: бэкенд пересылает отметку в сервис онлайна. */
+export const FEATURE_USAGE_PATH = '/api/online/usage';

@@ -1,9 +1,12 @@
 <script setup lang="ts">
   import {
     MENU_CONTACT_LINKS,
-    MENU_CONTACTS_LABEL,
-    MENU_SUPPORT_LABEL,
     MENU_SUPPORT_LINKS,
+  } from '../../../navigation/model';
+  import {
+    MENU_CONTACTS_LABEL,
+    MENU_EXTERNAL_TARGET,
+    MENU_SUPPORT_LABEL,
   } from '../model';
 </script>
 
@@ -22,7 +25,7 @@
           :to="link.url"
           :icon="link.icon"
           :aria-label="link.label"
-          target="_blank"
+          :target="MENU_EXTERNAL_TARGET"
           color="neutral"
           variant="link"
         />
@@ -44,7 +47,7 @@
           :icon="link.icon"
           :aria-label="link.label"
           :label="link.title"
-          target="_blank"
+          :target="MENU_EXTERNAL_TARGET"
           color="neutral"
           variant="link"
         />

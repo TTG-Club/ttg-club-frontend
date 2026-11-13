@@ -8,6 +8,7 @@
     isParticipantRolled,
     PARTICIPANT_TYPE_META,
     TURN_REEL,
+    TURN_REEL_TOKEN_CLASS,
   } from '../model';
 
   /**
@@ -66,7 +67,22 @@
   }
 
   /**
-   * Кольцо токена: текущий крупнее и подсвечен, поверженный блёклый.
+   * Классы токена: текущего или обычного.
+   * @param isCurrent - сейчас его ход
+   */
+  function getTokenClass(
+    isCurrent: boolean,
+  ): (typeof TURN_REEL_TOKEN_CLASS)[keyof typeof TURN_REEL_TOKEN_CLASS] {
+    return isCurrent
+      ? TURN_REEL_TOKEN_CLASS.current
+      : TURN_REEL_TOKEN_CLASS.regular;
+  }
+
+  /**
+   * Кольцо токена: текущий крупнее и подсвечен, поверженный блёклый. Размер
+   * меняется масштабом, а не шириной: так браузер не раскладывает ленту
+   * заново на каждом кадре. Кольцо обычного токена толще на величину
+   * масштаба — на экране выходят те же 2px.
    * @param participant - участник
    * @param isCurrent - сейчас его ход
    */
@@ -75,11 +91,17 @@
     isCurrent: boolean,
   ): Array<string> {
     return [
-      isCurrent
-        ? 'size-20 ring-2 ring-primary shadow-lg'
-        : 'size-14 ring-2 ring-default',
+      getTokenClass(isCurrent).ring,
       participant.dead ? 'opacity-40 grayscale' : '',
     ];
+  }
+
+  /**
+   * Значок токена без картинки.
+   * @param isCurrent - сейчас его ход
+   */
+  function getIconClass(isCurrent: boolean): string {
+    return getTokenClass(isCurrent).icon;
   }
 
   /**
@@ -154,7 +176,7 @@
               <div class="relative grid size-20 place-items-center">
                 <span
                   v-if="cell.isCurrent"
-                  class="absolute inset-0 rounded-full bg-primary/25 blur-xl motion-safe:animate-pulse"
+                  class="absolute inset-0 rounded-full bg-primary/25 blur-xl motion-safe:animate-pulse performance:hidden"
                 />
 
                 <UAvatar
@@ -162,9 +184,9 @@
                   :icon="getIcon(cell.participant)"
                   :alt="cell.participant.name"
                   color="neutral"
-                  class="bg-elevated transition-all motion-safe:duration-300"
+                  class="size-20 bg-elevated transition-[scale,box-shadow,opacity] motion-safe:duration-300"
                   :class="getRingClass(cell.participant, cell.isCurrent)"
-                  :ui="{ icon: 'size-6' }"
+                  :ui="{ icon: getIconClass(cell.isCurrent) }"
                 />
 
                 <span

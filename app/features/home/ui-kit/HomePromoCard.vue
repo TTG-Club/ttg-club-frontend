@@ -54,6 +54,7 @@
     :class="heightClass"
   >
     <img
+      decoding="async"
       :src="card.image"
       alt=""
       aria-hidden="true"

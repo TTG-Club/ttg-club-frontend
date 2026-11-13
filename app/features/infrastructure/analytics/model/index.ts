@@ -1,6 +1,20 @@
-export type { OnlineHeartbeatBody, YandexMetrikaQueue } from './types';
+export type {
+  FeatureUsageBody,
+  OnlineHeartbeatBody,
+  YandexMetrikaQueue,
+} from './types';
 
 export {
+  FEATURE_USAGE_ACTIVITY_EVENTS,
+  FEATURE_USAGE_IDLE_MS,
+  FEATURE_USAGE_OPENED_SECONDS,
+  FEATURE_USAGE_REJECTED_MIN_STATUS,
+  FEATURE_USAGE_REPORT_SECONDS,
+  FEATURE_USAGE_SAMPLE_MS,
+  FEATURE_USAGE_SAMPLE_SECONDS,
+  FEATURE_USAGE_SERVER_ERROR_MIN_STATUS,
+  FEATURE_USAGE_SESSION_WAIT_MS,
+  FEATURE_USAGE_TOO_MANY_REQUESTS_STATUS,
   GOOGLE_ANALYTICS_ID_QUERY_PARAMETER,
   GOOGLE_ANALYTICS_SCRIPT_MARKER,
   ONLINE_HEARTBEAT_COOLDOWN_MS,
@@ -19,5 +33,6 @@ export {
 export {
   getGuestHeartbeatBody,
   getRegisteredHeartbeatBody,
+  isFeatureUsageRejected,
   parseOnlineVisitorId,
 } from './utils';

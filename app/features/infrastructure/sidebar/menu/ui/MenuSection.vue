@@ -1,27 +1,18 @@
 <script setup lang="ts">
-  import type { MenuGroup } from '../model';
+  import type { MenuItem } from '../../../navigation/model';
 
-  import { MENU_EXTERNAL_ICON } from '../model';
+  import { MENU_EXTERNAL_ICON, MENU_EXTERNAL_TARGET } from '../model';
 
-  const { group } = defineProps<{
-    group: MenuGroup;
+  const { items } = defineProps<{
+    label: string;
+    items: Array<MenuItem>;
   }>();
 
-  const router = useRouter();
-
-  /**
-   * Перенесённые разделы открываются без перезагрузки, остальные уходят на
-   * сервер: шлюз отдаёт их старому SPA.
-   */
+  // Пункт на другой сайт открывается в новой вкладке и помечен стрелкой
   const links = computed(() =>
-    group.links.map((link) => ({
+    items.map((link) => ({
       ...link,
-      key: `${link.label}:${link.url ?? ''}`,
-      isFullReload:
-        link.external
-        || !link.url
-        || router.resolve(link.url).matched.length === 0,
-      target: link.external ? '_blank' : undefined,
+      target: link.external ? MENU_EXTERNAL_TARGET : undefined,
       trailingIcon: link.external ? MENU_EXTERNAL_ICON : undefined,
     })),
   );
@@ -32,30 +23,16 @@
     <h3
       class="mb-1 px-2.5 font-mono text-[11px] tracking-[0.14em] text-muted uppercase"
     >
-      {{ group.label }}
+      {{ label }}
     </h3>
 
     <ul class="flex flex-col gap-0.5">
       <li
         v-for="link in links"
-        :key="link.key"
+        :key="link.href"
       >
-        <span
-          v-if="!link.url"
-          class="flex items-center gap-2.5 px-2.5 py-2 text-dimmed"
-        >
-          <UIcon
-            :name="link.icon"
-            class="size-4.5 shrink-0"
-          />
-
-          {{ link.label }}
-        </span>
-
         <UButton
-          v-else
-          :to="link.url"
-          :external="link.isFullReload"
+          :to="link.href"
           :target="link.target"
           :icon="link.icon"
           :trailing-icon="link.trailingIcon"

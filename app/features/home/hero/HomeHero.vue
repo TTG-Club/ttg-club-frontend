@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { HomeCounters } from '../counters';
   import { useHomeHeroMotion } from './composables';
   import HomeHeroMotion from './HomeHeroMotion.vue';
   import HomeSearch from './HomeSearch.vue';
@@ -52,7 +53,7 @@
   -->
   <section
     ref="heroRef"
-    class="relative isolate w-full overflow-hidden border-b border-default bg-main px-4 xl:px-6"
+    class="relative isolate w-full overflow-hidden border-b border-default bg-main px-4"
     :class="heroClass"
   >
     <div
@@ -79,15 +80,7 @@
     <div
       class="mx-auto flex w-full max-w-(--max-content) flex-col items-center gap-5 pt-6 pb-8 sm:gap-6 lg:pt-10 lg:pb-12 2xl:max-w-(--max-content-wide)"
     >
-      <!--
-        Место строки живых счётчиков, как на new.ttg.club. Своей статистики у
-        этого сайта нет, поэтому строка пустая, но высоту держим: шапка
-        сохраняет ритм, и счётчики встанут сюда без перекройки.
-      -->
-      <div
-        aria-hidden="true"
-        class="h-4"
-      />
+      <HomeCounters />
 
       <!-- Кегль — как на new.ttg.club. На 360px и уже заголовок ужат: в
         полный размер он занимал пять строк и выталкивал поиск за первый
@@ -122,7 +115,7 @@
         variant="outline"
         size="xs"
         square
-        class="absolute bottom-2.5 left-4 rounded-full xl:left-6"
+        class="absolute bottom-2.5 left-4 rounded-full"
         @click.left.exact.prevent="toggleMotion"
       />
     </UTooltip>

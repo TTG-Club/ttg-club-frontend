@@ -1,5 +1,7 @@
 <script setup lang="ts">
-  import { NewsHero, NewsTile } from '~news/card';
+  import type { ComponentPublicInstance } from 'vue';
+
+  import { NewsHero } from '~news/card';
   import { NewsDrawer } from '~news/drawer';
   import {
     getNewsListUrl,
@@ -8,7 +10,7 @@
     parseNewsList,
   } from '~news/model';
 
-  import { useHomeNewsReader } from '../composables';
+  import { useHomeNewsReader, useHomeNewsRotation } from '../composables';
   import {
     HOME_NEWS_ALL_LABEL,
     HOME_NEWS_COUNT,
@@ -16,16 +18,17 @@
     HOME_NEWS_EMPTY_TEXT,
     HOME_NEWS_ICON,
     HOME_NEWS_LABEL,
-    HOME_NEWS_TILE_COUNT,
   } from '../model';
   import { HomePanel } from '../ui-kit';
+  import { HomeNewsSwitcher } from './ui';
 
   const api = useApi();
 
   /**
-   * Новости сайта как на new.ttg.club: обложка свежей новости и ряд плиток
-   * под ней. Новости пишут и публикуют на новом сайте, здесь они только
-   * читаются — в панели справа, а страница открывается на новом сайте.
+   * Новости сайта: на месте всегда одна новость обложкой, свежие сменяют
+   * друг друга по таймеру или по переключателю в подвале панели. Новости
+   * пишут и публикуют на новом сайте, здесь они только читаются — в панели
+   * справа, а страница открывается на новом сайте.
    */
   const { newSiteUrl } = useRuntimeConfig().public;
 
@@ -52,77 +55,82 @@
     refresh,
   );
 
-  const heroNews = computed(() => newsList.value[0]);
+  const newsCount = computed(() => newsList.value.length);
 
-  /** Остальные новости после обложки — плитками в две колонки */
-  const restNews = computed(() => newsList.value.slice(1));
+  const panel = useTemplateRef<ComponentPublicInstance>('panel');
+
+  const {
+    activeIndex,
+    isStopped,
+    isRunning,
+    select,
+    showNext,
+    showPrevious,
+    toggleStopped,
+    setVideoOpen,
+  } = useHomeNewsRotation(newsCount, panel, isDrawerOpen);
+
+  const activeNews = computed(() => newsList.value[activeIndex.value]);
+
+  const hasSwitcher = computed(() => newsCount.value > 1);
 
   const listUrl = getNewsListUrl('site', newSiteUrl);
 </script>
 
 <template>
   <HomePanel
+    ref="panel"
     :label="HOME_NEWS_LABEL"
     :icon="HOME_NEWS_ICON"
     :to="listUrl"
     :link-label="HOME_NEWS_ALL_LABEL"
     flush
+    fill
   >
-    <div
-      v-if="isLoading"
-      class="flex flex-col"
+    <!-- Переключатель стоит в подвале, в одной строке со ссылкой на все
+      новости -->
+    <template
+      v-if="hasSwitcher"
+      #aside
     >
-      <USkeleton
-        class="aspect-16/10 w-full rounded-none sm:aspect-2/1 xl:aspect-21/9"
+      <HomeNewsSwitcher
+        :items="newsList"
+        :active-index="activeIndex"
+        :is-stopped="isStopped"
+        :is-running="isRunning"
+        @select="select"
+        @next="showNext"
+        @previous="showPrevious"
+        @toggle="toggleStopped"
       />
+    </template>
 
-      <div class="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2">
-        <div
-          v-for="index in HOME_NEWS_TILE_COUNT"
-          :key="index"
-          class="flex items-center gap-3 p-2"
-        >
-          <USkeleton class="h-16 w-24 shrink-0 rounded-md" />
-
-          <div class="flex flex-1 flex-col gap-2">
-            <USkeleton class="h-2.5 w-16 rounded" />
-
-            <USkeleton class="h-4 w-3/4 rounded" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Скелетон повторяет обложку, чтобы лента не прыгала, когда новости
+      приедут -->
+    <USkeleton
+      v-if="isLoading"
+      class="aspect-16/10 min-h-0 w-full flex-auto rounded-none sm:aspect-2/1 xl:aspect-21/9"
+    />
 
     <p
-      v-else-if="!heroNews"
-      class="m-3 rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
+      v-else-if="!activeNews"
+      class="m-3 flex flex-auto items-center justify-center rounded-xl border border-dashed border-default px-3 py-8 text-center text-sm text-muted"
     >
       {{ HOME_NEWS_EMPTY_TEXT }}
     </p>
 
-    <div
+    <!-- Новая обложка проявляется на месте прежней: обложки одного размера,
+      вёрстка под ними не двигается. Проявление — CSS-анимация самой обложки,
+      а не Transition: ей не нужно ждать ухода прежней -->
+    <NewsHero
       v-else
-      class="flex flex-col"
-    >
-      <NewsHero
-        :news="heroNews"
-        kind="site"
-        @open="open(heroNews.url)"
-      />
-
-      <div
-        v-if="restNews.length"
-        class="grid grid-cols-1 gap-1 border-t border-default p-2 sm:grid-cols-2"
-      >
-        <NewsTile
-          v-for="news in restNews"
-          :key="news.id"
-          :news="news"
-          kind="site"
-          @open="open(news.url)"
-        />
-      </div>
-    </div>
+      :key="activeNews.id"
+      :news="activeNews"
+      kind="site"
+      class="animate-appear motion-reduce:animate-none"
+      @open="open(activeNews.url)"
+      @video="setVideoOpen"
+    />
 
     <NewsDrawer
       v-model:open="isDrawerOpen"

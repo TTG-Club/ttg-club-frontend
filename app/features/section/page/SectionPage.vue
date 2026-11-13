@@ -201,6 +201,7 @@
         :selection="filter?.selection.value ?? {}"
         :is-customized="filter?.isCustomized.value"
         :is-inline="isColumn"
+        :is-filter-search-disabled="section.isFilterSearchDisabled"
         @update:selection="filter?.setSelection($event)"
         @reset="filter?.reset($event)"
       />

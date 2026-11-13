@@ -2,6 +2,8 @@
   import type { EntrySource } from '../model';
 
   import { LAYOUT_DRAWER_QUERY } from '~/shared/consts';
+  import { useDmScreenAdd } from '~dm-screen/composables';
+  import { DM_SCREEN_ICON, DM_SCREEN_TEXT } from '~dm-screen/model';
 
   import { useSectionCopy } from '../composables';
   import { SECTION_ICON, SECTION_TEXT } from '../model';
@@ -37,6 +39,18 @@
 
   const isWide = useMediaQuery(LAYOUT_DRAWER_QUERY);
   const { copyTitle } = useSectionCopy();
+  const { addToScreen, isAvailable: isScreenAvailable } = useDmScreenAdd();
+
+  const isScreenAddable = computed(
+    () => !!path && !isLoading && !isError && isScreenAvailable(path),
+  );
+
+  /** Кладёт запись из дровера в ширму окном. */
+  function addEntryToScreen(): void {
+    if (path) {
+      void addToScreen({ path, title });
+    }
+  }
 
   function close(): void {
     isOpen.value = false;
@@ -80,6 +94,20 @@
         >
           {{ title }}
         </h2>
+
+        <UTooltip
+          v-if="isScreenAddable"
+          :text="DM_SCREEN_TEXT.add"
+        >
+          <UButton
+            :icon="DM_SCREEN_ICON.add"
+            :aria-label="DM_SCREEN_TEXT.add"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click.left.exact.prevent="addEntryToScreen"
+          />
+        </UTooltip>
 
         <UTooltip
           v-if="path"
