@@ -1,21 +1,21 @@
 <script setup lang="ts">
-  import { DmScreenManager } from '~dm-screen/manager';
   import { DM_SCREEN_TITLE } from '~dm-screen/model';
-  import { DmScreenGuest } from '~dm-screen/screen';
+  import { DmScreenGuest, DmScreenOwn } from '~dm-screen/screen';
 
   definePageMeta({ layout: 'section' });
 
   useSeoMeta({ title: DM_SCREEN_TITLE });
 
-  // Пользователю — список его ширм, гостю — его единственная ширма в
-  // браузере. И то и другое читается из браузера, поэтому только там
+  // Ширма у каждого одна: у пользователя — в аккаунте, у гостя — в
+  // браузере. Списка ширм (`~dm-screen/manager`) на странице пока нет: он
+  // вернётся, когда ширм снова можно будет вести несколько
   const { isLoggedIn, pending } = useUser();
 </script>
 
 <template>
   <ClientOnly>
     <template v-if="!pending">
-      <DmScreenManager v-if="isLoggedIn" />
+      <DmScreenOwn v-if="isLoggedIn" />
 
       <DmScreenGuest v-else />
     </template>

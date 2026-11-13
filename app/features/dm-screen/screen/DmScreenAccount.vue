@@ -8,7 +8,6 @@
   import { DmScreenNameModal } from '../dialogs';
   import {
     DM_SCREEN_ICON,
-    DM_SCREEN_PATH,
     DM_SCREEN_TEXT,
     fetchDmScreen,
     renameDmScreen,
@@ -16,8 +15,9 @@
 
   /**
    * Ширма из аккаунта по её идентификатору: загружается с сервера и
-   * подключается к окнам, изменения сохраняются сами. В шапке — путь к
-   * списку ширм и имя ширмы с переименованием.
+   * подключается к окнам, изменения сохраняются сами. В шапке — имя ширмы
+   * с переименованием; пути к списку ширм нет, пока ширма у пользователя
+   * одна.
    */
   const { id } = defineProps<{
     id: string;
@@ -49,12 +49,6 @@
 
   const failedActions = computed<Array<ButtonProps>>(() => [
     { label: DM_SCREEN_TEXT.retry, onClick: load },
-    {
-      label: DM_SCREEN_TEXT.allScreens,
-      to: DM_SCREEN_PATH,
-      color: 'neutral',
-      variant: 'outline',
-    },
   ]);
 
   onMounted(load);
@@ -111,16 +105,6 @@
   <DmScreenCanvas v-else>
     <template #heading>
       <div class="flex min-w-0 items-center gap-1">
-        <UTooltip :text="DM_SCREEN_TEXT.allScreens">
-          <UButton
-            :to="DM_SCREEN_PATH"
-            :icon="DM_SCREEN_ICON.back"
-            :aria-label="DM_SCREEN_TEXT.allScreens"
-            color="neutral"
-            variant="ghost"
-          />
-        </UTooltip>
-
         <h1 class="truncate text-2xl text-highlighted">
           {{ name }}
         </h1>
