@@ -142,9 +142,9 @@
         indicator="hidden"
         size="md"
         :ui="{
-          root: 'group items-start rounded-md border-0 px-2 py-1.5 hover:bg-accented/50 has-focus-visible:ring has-focus-visible:ring-accented has-data-[state=checked]:bg-transparent has-data-[state=checked]:hover:bg-accented/50',
+          root: 'group cursor-pointer items-start rounded-md border-0 px-2 py-1.5 hover:bg-accented/50 has-focus-visible:ring has-focus-visible:ring-accented has-data-[state=checked]:bg-transparent has-data-[state=checked]:hover:bg-accented/50',
           wrapper: 'block min-w-0 grow text-left',
-          label: 'block',
+          label: 'block cursor-pointer',
         }"
         @update:model-value="toggle(entry.key)"
       >
@@ -170,7 +170,7 @@
             <UBadge
               v-if="entry.acronym"
               :label="entry.acronym"
-              color="neutral"
+              :color="entry.selected ? 'primary' : 'neutral'"
               variant="subtle"
               size="sm"
               class="min-w-14 shrink-0 justify-center font-mono"

@@ -95,8 +95,6 @@ export const SECTION_ICON = {
   clearAll: 'tabler:square-off',
   /** Место обложки у книги в панели источников. */
   book: 'tabler:book',
-  /** Отметка на обложке выбранной книги. */
-  checked: 'tabler:check',
   /** Стрелка группы источников: у раскрытой повёрнута вниз. */
   groupToggle: 'tabler:chevron-right',
 } as const;
@@ -129,6 +127,18 @@ export const FILTER_SEARCH_MIN_VALUES = 20;
 
 /** Задержка перед пересчётом групп под поиск по фильтрам. */
 export const FILTER_SEARCH_DEBOUNCE_MS = 200;
+
+/**
+ * Сторона и ширина панелей фильтра и источников. Общие у обеих: они
+ * открываются кнопками в начале строки фильтров раздела и выезжают с той же
+ * стороны одинаковыми, как на new.ttg.club. Вариант `sm:` перебивает
+ * штатную ширину панели Nuxt UI на широком экране.
+ */
+export const FILTER_DRAWER_SIDE = 'left';
+
+export const FILTER_DRAWER_UI = {
+  content: 'w-full max-w-240 min-w-80 sm:max-w-240',
+};
 
 /**
  * Начало имени cookie с выбранным фильтром раздела: выбор переживает уход
