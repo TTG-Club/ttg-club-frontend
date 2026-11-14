@@ -4,6 +4,8 @@
   import { xor } from 'es-toolkit';
 
   import {
+    FILTER_DRAWER_SIDE,
+    FILTER_DRAWER_UI,
     FILTER_SEARCH_DEBOUNCE_MS,
     getGroupSelection,
     searchFilterGroups,
@@ -97,6 +99,8 @@
   <USlideover
     v-model:open="isOpen"
     :title="SECTION_TEXT.filterTitle"
+    :side="FILTER_DRAWER_SIDE"
+    :ui="FILTER_DRAWER_UI"
   >
     <template #body>
       <div class="flex flex-col gap-4">

@@ -9,6 +9,8 @@
   import {
     applySourcePreset,
     countSources,
+    FILTER_DRAWER_SIDE,
+    FILTER_DRAWER_UI,
     FILTER_SEARCH_DEBOUNCE_MS,
     getGroupSelection,
     getSourceEntries,
@@ -197,8 +199,8 @@
     v-model:open="isOpen"
     :title="SECTION_TEXT.sources"
     :description="summary"
-    side="left"
-    :ui="{ content: 'w-full max-w-192 min-w-80 sm:max-w-192' }"
+    :side="FILTER_DRAWER_SIDE"
+    :ui="FILTER_DRAWER_UI"
   >
     <template #body>
       <!-- Блок растянут на отступы прокручиваемого тела во все стороны, -->
