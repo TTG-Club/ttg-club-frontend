@@ -11,6 +11,7 @@
   import { SectionFilterDrawer } from '../filter-drawer';
   import { SectionFilterInline } from '../filter-inline';
   import { isPartCustomized, SECTION_ICON, SECTION_TEXT } from '../model';
+  import { SectionSourcesDrawer } from '../sources-drawer';
 
   /**
    * Поиск и фильтр раздела строкой в шапке над списком, как в старом SPA:
@@ -56,10 +57,9 @@
   const toast = useToast();
   const { copy, isSupported } = useClipboard({ legacy: true });
 
-  const isDrawerOpen = ref(false);
+  const isFilterOpen = ref(false);
 
-  // Часть остаётся после закрытия, чтобы панель не менялась на анимации
-  const drawerPart = ref<FilterPart>('other');
+  const isSourcesOpen = ref(false);
 
   const otherGroups = computed(
     () => definition?.other.filter((group) => !group.hidden) ?? [],
@@ -71,9 +71,11 @@
 
   const isOtherInline = computed(() => hasOther.value && isInline);
 
-  const hasSources = computed(
-    () => !!definition?.sources.some((group) => !group.hidden),
+  const sourceGroups = computed(
+    () => definition?.sources.filter((group) => !group.hidden) ?? [],
   );
+
+  const hasSources = computed(() => sourceGroups.value.length > 0);
 
   const isOtherCustomized = computed(
     () => !!definition && isPartCustomized(definition, selection, 'other'),
@@ -83,27 +85,14 @@
     () => !!definition && isPartCustomized(definition, selection, 'sources'),
   );
 
-  const isDrawerPartCustomized = computed(() =>
-    drawerPart.value === 'sources'
-      ? isSourcesCustomized.value
-      : isOtherCustomized.value,
-  );
-
-  /**
-   * Открывает панель части фильтра.
-   * @param part - источники или условия по содержимому
-   */
-  function openDrawer(part: FilterPart) {
-    drawerPart.value = part;
-    isDrawerOpen.value = true;
-  }
-
+  /** Открывает панель фильтра по содержимому. */
   function openFilter() {
-    openDrawer('other');
+    isFilterOpen.value = true;
   }
 
+  /** Открывает панель источников. */
   function openSources() {
-    openDrawer('sources');
+    isSourcesOpen.value = true;
   }
 
   function updateSelection(next: FilterSelection) {
@@ -112,6 +101,11 @@
 
   function resetOther() {
     emit('reset', 'other');
+  }
+
+  /** Возвращает источники к выбору по умолчанию. */
+  function resetSources() {
+    emit('reset', 'sources');
   }
 
   /** Копирует ссылку на раздел с текущими поиском и фильтром. */
@@ -252,15 +246,24 @@
     />
 
     <SectionFilterDrawer
-      v-if="definition"
-      v-model:open="isDrawerOpen"
-      :part="drawerPart"
-      :definition="definition"
+      v-if="isOtherButtonVisible"
+      v-model:open="isFilterOpen"
+      :groups="otherGroups"
       :selection="selection"
-      :is-customized="isDrawerPartCustomized"
+      :is-customized="isOtherCustomized"
       :is-search-disabled="isFilterSearchDisabled"
-      @update:selection="emit('update:selection', $event)"
-      @reset="emit('reset', drawerPart)"
+      @update:selection="updateSelection"
+      @reset="resetOther"
+    />
+
+    <SectionSourcesDrawer
+      v-if="hasSources"
+      v-model:open="isSourcesOpen"
+      :groups="sourceGroups"
+      :selection="selection"
+      :is-customized="isSourcesCustomized"
+      @update:selection="updateSelection"
+      @reset="resetSources"
     />
   </div>
 </template>

@@ -13,3 +13,4 @@ export { useSectionPaths, useSectionSwipe } from './useSectionNeighbours';
 export { provideSectionOpener, useSectionOpener } from './useSectionOpener';
 export { useLocalQueryStore, useRouteQueryStore } from './useSectionQuery';
 export { useSectionSearch } from './useSectionSearch';
+export { useSourceCatalog } from './useSourceCatalog';

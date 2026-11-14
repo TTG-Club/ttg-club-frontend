@@ -21,6 +21,9 @@ export type {
   SectionOpener,
   SectionOrder,
   SectionQueryStore,
+  SourceEntry,
+  SourceGroupEntries,
+  SourcePreset,
 } from './types';
 
 export {
@@ -32,9 +35,11 @@ export {
 
 export {
   applyExcludedSources,
+  applySourcePreset,
   buildFilterPayload,
   buildListRequest,
   compactFilterQuery,
+  countSources,
   getDefaultSelection,
   getDetailPath,
   getDetailSlug,
@@ -49,6 +54,7 @@ export {
   getQueryString,
   getSectionEntryKey,
   getSelectAllState,
+  getSourceEntries,
   getSourceFilterValue,
   getWorkshopEditPath,
   groupItems,
@@ -56,13 +62,18 @@ export {
   isFilterSearchable,
   isPartCustomized,
   isSelectionCustomized,
+  isSourcePresetActive,
+  isSourcePresetAvailable,
   mergeQuery,
   normalizeFilter,
+  parseSourceCatalog,
   resetSelectionPart,
   searchFilterGroups,
+  searchSourceEntries,
   selectionFromQuery,
   selectionToQuery,
   setGroupSelection,
+  setSourcesSelected,
 } from './utils';
 
 export * from './constants';
