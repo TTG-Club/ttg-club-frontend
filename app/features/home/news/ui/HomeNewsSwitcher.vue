@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import {
+    HOME_NEWS_FIRST_ROTATE_SECONDS,
     HOME_NEWS_ROTATE_SECONDS,
     HOME_NEWS_ROTATION_ICON,
     HOME_NEWS_ROTATION_TEXT,
@@ -63,7 +64,14 @@
     isRunning ? 'bg-primary/65' : [style.held, 'bg-primary'],
   ]);
 
-  const fillStyle = { '--rotate-duration': `${HOME_NEWS_ROTATE_SECONDS}s` };
+  const fillStyle = computed(() => {
+    const seconds =
+      activeIndex === 0
+        ? HOME_NEWS_FIRST_ROTATE_SECONDS
+        : HOME_NEWS_ROTATE_SECONDS;
+
+    return { '--rotate-duration': `${seconds}s` };
+  });
 
   const toggleIcon = computed(() =>
     isStopped ? HOME_NEWS_ROTATION_ICON.play : HOME_NEWS_ROTATION_ICON.pause,
