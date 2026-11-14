@@ -17,9 +17,11 @@ import type {
   FilterValue,
   SectionListRequest,
   SectionOrder,
+  SourceEntry,
 } from './types';
 
 import { sortBy } from 'es-toolkit';
+import { z } from 'zod';
 
 import {
   CONTENT_DISPOSITION_FILENAME,
@@ -33,6 +35,7 @@ import {
   WORKSHOP_EDIT_SUFFIX,
   WORKSHOP_PREFIX,
 } from './constants';
+import { sourceCatalogBookSchema } from './schema';
 
 /**
  * Приводит группу из API к единому виду.
@@ -695,4 +698,164 @@ export function getExportFileName(
     contentDisposition?.match(CONTENT_DISPOSITION_FILENAME) ?? [];
 
   return fileName || `${entryName}${ENTRY_EXPORT_EXTENSION}`;
+}
+
+/**
+ * Книги группы строками панели источников: русское название, сокращение и
+ * английское название из общего списка книг.
+ * @param group - группа источников
+ * @param selected - выбранные ключи группы
+ * @param englishNames - английские названия по сокращению
+ */
+export function getSourceEntries(
+  group: FilterGroup,
+  selected: ReadonlyArray<string>,
+  englishNames: ReadonlyMap<string, string>,
+): Array<SourceEntry> {
+  const selectedKeys = new Set(selected);
+
+  return group.values.map((value) => ({
+    key: String(value.key),
+    // У книги без названия им служит сокращение — второй раз его не пишем
+    name: value.tooltip || value.label,
+    acronym: value.tooltip ? value.label : undefined,
+    english: englishNames.get(value.label),
+    selected: selectedKeys.has(String(value.key)),
+  }));
+}
+
+/**
+ * Книги группы под поиск: по русскому и английскому названию и по
+ * сокращению. Совпало название группы — она остаётся целиком. Выбранные
+ * книги под поиском не держатся: по умолчанию выбраны все, и поиск иначе
+ * ничего бы не прятал.
+ * @param group - группа источников
+ * @param entries - книги группы
+ * @param query - строка поиска
+ */
+export function searchSourceEntries(
+  group: FilterGroup,
+  entries: Array<SourceEntry>,
+  query: string,
+): Array<SourceEntry> {
+  const needle = query.trim().toLocaleLowerCase();
+
+  if (!needle || group.name.toLocaleLowerCase().includes(needle)) {
+    return entries;
+  }
+
+  return entries.filter((entry) =>
+    [entry.name, entry.english, entry.acronym].some((text) =>
+      text?.toLocaleLowerCase().includes(needle),
+    ),
+  );
+}
+
+/**
+ * Сколько книг выбрано во всех группах источников и сколько их всего.
+ * @param groups - группы источников
+ * @param selection - текущий выбор
+ */
+export function countSources(
+  groups: ReadonlyArray<FilterGroup>,
+  selection: FilterSelection,
+): { selected: number; total: number } {
+  return groups.reduce(
+    (count, group) => ({
+      selected: count.selected + getGroupSelection(selection, group).length,
+      total: count.total + group.values.length,
+    }),
+    { selected: 0, total: 0 },
+  );
+}
+
+/**
+ * Есть ли в панели все группы быстрого набора: «Базовые и сеттинги» без
+ * сеттингов выбрали бы не то, что написано на кнопке.
+ * @param groups - группы источников
+ * @param keys - ключи групп набора
+ */
+export function isSourcePresetAvailable(
+  groups: ReadonlyArray<FilterGroup>,
+  keys: ReadonlyArray<string>,
+): boolean {
+  return keys.every((key) => groups.some((group) => group.key === key));
+}
+
+/**
+ * Применяет быстрый набор: книги его групп выбраны целиком, остальные сняты.
+ * @param groups - группы источников
+ * @param selection - текущий выбор
+ * @param keys - ключи групп набора
+ */
+export function applySourcePreset(
+  groups: ReadonlyArray<FilterGroup>,
+  selection: FilterSelection,
+  keys: ReadonlyArray<string>,
+): FilterSelection {
+  return groups.reduce(
+    (next, group) =>
+      setGroupSelection(
+        next,
+        group,
+        keys.includes(group.key)
+          ? group.values.map((value) => String(value.key))
+          : [],
+      ),
+    selection,
+  );
+}
+
+/**
+ * Совпадает ли выбор с быстрым набором: в его группах выбрано всё, в
+ * остальных — ничего.
+ * @param groups - группы источников
+ * @param selection - текущий выбор
+ * @param keys - ключи групп набора
+ */
+export function isSourcePresetActive(
+  groups: ReadonlyArray<FilterGroup>,
+  selection: FilterSelection,
+  keys: ReadonlyArray<string>,
+): boolean {
+  return groups.every((group) => {
+    const count = getGroupSelection(selection, group).length;
+
+    return keys.includes(group.key) ? count === group.values.length : !count;
+  });
+}
+
+/**
+ * Отмечает или снимает книги с перечисленными ключами, не трогая остальные.
+ * @param selected - выбранные ключи группы
+ * @param keys - ключи меняемых книг
+ * @param isSelected - отметить или снять
+ */
+export function setSourcesSelected(
+  selected: ReadonlyArray<string>,
+  keys: ReadonlyArray<string>,
+  isSelected: boolean,
+): Array<string> {
+  const rest = selected.filter((key) => !keys.includes(key));
+
+  return isSelected ? [...rest, ...keys] : rest;
+}
+
+/**
+ * Английские названия книг по сокращению из общего списка; книги, которые
+ * не подошли под схему, пропускаются.
+ * @param input - ответ списка книг
+ */
+export function parseSourceCatalog(input: unknown): Map<string, string> {
+  const englishNames = new Map<string, string>();
+
+  for (const book of z.array(z.unknown()).catch([]).parse(input)) {
+    const parsed = sourceCatalogBookSchema.safeParse(book);
+
+    if (parsed.success) {
+      englishNames.set(parsed.data.source.shortName, parsed.data.name.eng);
+    }
+  }
+
+  return englishNames;
 }

@@ -131,6 +131,9 @@ export const HOME_NEWS_COUNT = 5;
 /** Сколько секунд новость стоит на месте до смены следующей */
 export const HOME_NEWS_ROTATE_SECONDS = 8;
 
+/** Первая — самая свежая — новость стоит дольше остальных */
+export const HOME_NEWS_FIRST_ROTATE_SECONDS = 20;
+
 export const HOME_NEWS_ROTATION_TEXT = {
   switcher: 'Переключатель новостей',
   pause: 'Остановить смену новостей',

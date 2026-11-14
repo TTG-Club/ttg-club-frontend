@@ -56,3 +56,12 @@ export type EntrySource = z.infer<typeof entrySourceSchema>;
 
 /** Сохранённый фильтр раздела: параметры адреса, как их пишет фильтр. */
 export const savedFilterQuerySchema = z.record(z.string(), z.string());
+
+/**
+ * Книга из общего списка: панели источников из неё нужны сокращение и
+ * английское название, остального фильтр разделов и так не отдаёт.
+ */
+export const sourceCatalogBookSchema = z.object({
+  name: z.object({ eng: z.string() }),
+  source: z.object({ shortName: z.string() }),
+});

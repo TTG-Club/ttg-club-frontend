@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import type {
-    FilterDefinition,
-    FilterGroup,
-    FilterPart,
-    FilterSelection,
-  } from '../model';
+  import type { FilterGroup, FilterSelection } from '../model';
 
   import { xor } from 'es-toolkit';
 
@@ -19,24 +14,21 @@
   import SectionFilterCard from './SectionFilterCard.vue';
 
   /**
-   * Панель части фильтра, как источники на new.ttg.club: поиск сверху и
-   * группы карточками со «Выбрать все» и значениями метками.
+   * Панель фильтра по содержимому: поиск сверху и группы карточками со
+   * «Выбрать все» и значениями метками. У источников своя панель —
+   * `SectionSourcesDrawer`.
    */
   const {
-    part,
-    definition,
+    groups,
     selection,
     isCustomized = false,
     isSearchDisabled = false,
   } = defineProps<{
-    part: FilterPart;
-    definition: FilterDefinition;
+    /** Видимые группы фильтра по содержимому. */
+    groups: Array<FilterGroup>;
     selection: FilterSelection;
     isCustomized?: boolean;
-    /**
-     * Раздел не хочет поиска по фильтру по содержимому; поиск по
-     * источникам остаётся.
-     */
+    /** Раздел не хочет поиска по фильтру. */
     isSearchDisabled?: boolean;
   }>();
 
@@ -56,33 +48,11 @@
     search.value ? debouncedSearch.value : '',
   );
 
-  const groups = computed(() =>
-    definition[part].filter((group) => !group.hidden),
-  );
-
   const matches = computed(() =>
-    searchFilterGroups(groups.value, appliedSearch.value),
+    searchFilterGroups(groups, appliedSearch.value),
   );
 
   const isEmpty = computed(() => !matches.value.length);
-
-  const isSources = computed(() => part === 'sources');
-
-  const isSearchVisible = computed(() => isSources.value || !isSearchDisabled);
-
-  const title = computed(() =>
-    isSources.value ? SECTION_TEXT.sources : SECTION_TEXT.filterTitle,
-  );
-
-  const searchPlaceholder = computed(() =>
-    isSources.value ? SECTION_TEXT.sourceSearch : SECTION_TEXT.filterSearch,
-  );
-
-  const searchLabel = computed(() =>
-    isSources.value
-      ? SECTION_TEXT.sourceSearchLabel
-      : SECTION_TEXT.filterSearchLabel,
-  );
 
   /**
    * Выбранные ключи группы.
@@ -110,6 +80,7 @@
     setGroup(group, xor(getSelected(group), [key]));
   }
 
+  /** Возвращает фильтр по содержимому к выбору по умолчанию. */
   function reset(): void {
     emit('reset');
   }
@@ -125,16 +96,16 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    :title="title"
+    :title="SECTION_TEXT.filterTitle"
   >
     <template #body>
       <div class="flex flex-col gap-4">
         <UInput
-          v-if="isSearchVisible"
+          v-if="!isSearchDisabled"
           v-model="search"
           :icon="SECTION_ICON.search"
-          :placeholder="searchPlaceholder"
-          :aria-label="searchLabel"
+          :placeholder="SECTION_TEXT.filterSearch"
+          :aria-label="SECTION_TEXT.filterSearchLabel"
           type="search"
           autocomplete="off"
           class="w-full"
@@ -153,7 +124,6 @@
           :group="match.group"
           :values="match.values"
           :selected="getSelected(match.group)"
-          :is-sources="isSources"
           @toggle="toggle(match.group, $event)"
           @update:selected="setGroup(match.group, $event)"
         />

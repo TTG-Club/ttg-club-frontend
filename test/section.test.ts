@@ -1,9 +1,13 @@
+import type { FilterGroup } from '~section/model';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   applyExcludedSources,
+  applySourcePreset,
   buildFilterPayload,
   buildListRequest,
+  countSources,
   EntryExportPlatform,
   filterResponseSchema,
   getDefaultSelection,
@@ -13,18 +17,24 @@ import {
   getExcludedSources,
   getExportFileName,
   getSelectAllState,
+  getSourceEntries,
   getSourceFilterValue,
   groupItems,
   isFilterSearchable,
   isPartCustomized,
   isSelectionCustomized,
+  isSourcePresetActive,
+  isSourcePresetAvailable,
   mergeQuery,
   normalizeFilter,
+  parseSourceCatalog,
   resetSelectionPart,
   searchFilterGroups,
+  searchSourceEntries,
   selectionFromQuery,
   selectionToQuery,
   setGroupSelection,
+  setSourcesSelected,
 } from '~section/model';
 
 const definition = normalizeFilter(
@@ -385,5 +395,110 @@ describe('экспорт записи', () => {
 
   it('без заголовка называет файл по записи', () => {
     expect(getExportFileName(null, 'Goblin')).toBe('Goblin.json');
+  });
+});
+
+describe('панель источников', () => {
+  const official: FilterGroup = {
+    name: 'Базовые',
+    key: 'OFFICAL',
+    param: 'book',
+    hidden: false,
+    values: [
+      { label: 'PHB', key: 'PHB', tooltip: 'Книга игрока', default: true },
+      {
+        label: 'XGE',
+        key: 'XGE',
+        tooltip: 'Руководство Занатара',
+        default: true,
+      },
+    ],
+  };
+
+  const settings: FilterGroup = {
+    name: 'Сеттинги',
+    key: 'SETTING',
+    param: 'book',
+    hidden: false,
+    values: [{ label: 'SCAG', key: 'SCAG', default: true }],
+  };
+
+  const groups = [official, settings];
+
+  const englishNames = parseSourceCatalog([
+    { name: { eng: "Player's Handbook" }, source: { shortName: 'PHB' } },
+    { name: { rus: 'без английского' }, source: { shortName: 'XGE' } },
+  ]);
+
+  it('берёт английские названия из списка книг, пропуская битые', () => {
+    expect([...englishNames]).toEqual([['PHB', "Player's Handbook"]]);
+    expect(parseSourceCatalog({ error: true }).size).toBe(0);
+  });
+
+  it('раскладывает книги на название, сокращение и английское название', () => {
+    expect(getSourceEntries(official, ['PHB'], englishNames)).toEqual([
+      {
+        key: 'PHB',
+        name: 'Книга игрока',
+        acronym: 'PHB',
+        english: "Player's Handbook",
+        selected: true,
+      },
+      {
+        key: 'XGE',
+        name: 'Руководство Занатара',
+        acronym: 'XGE',
+        english: undefined,
+        selected: false,
+      },
+    ]);
+
+    // Книга без названия подписана сокращением, второй раз его не пишем
+    expect(getSourceEntries(settings, [], englishNames)[0]).toMatchObject({
+      name: 'SCAG',
+      acronym: undefined,
+    });
+  });
+
+  it('ищет по английскому названию, сокращению и названию группы', () => {
+    const entries = getSourceEntries(official, [], englishNames);
+
+    expect(searchSourceEntries(official, entries, 'handbook')).toHaveLength(1);
+    expect(searchSourceEntries(official, entries, 'xge')).toHaveLength(1);
+    expect(searchSourceEntries(official, entries, 'базов')).toHaveLength(2);
+    expect(searchSourceEntries(official, entries, '')).toHaveLength(2);
+  });
+
+  it('считает выбранные книги во всех группах', () => {
+    expect(countSources(groups, { book: ['PHB', 'SCAG'] })).toEqual({
+      selected: 2,
+      total: 3,
+    });
+  });
+
+  it('применяет быстрый набор и узнаёт его в выборе', () => {
+    const selection = applySourcePreset(groups, { book: ['SCAG'] }, [
+      'OFFICAL',
+    ]);
+
+    expect(selection.book).toEqual(['PHB', 'XGE']);
+    expect(isSourcePresetActive(groups, selection, ['OFFICAL'])).toBe(true);
+
+    expect(
+      isSourcePresetActive(groups, selection, ['OFFICAL', 'SETTING']),
+    ).toBe(false);
+  });
+
+  it('показывает набор, только если в разделе есть все его группы', () => {
+    expect(isSourcePresetAvailable(groups, ['OFFICAL', 'SETTING'])).toBe(true);
+
+    expect(isSourcePresetAvailable([official], ['OFFICAL', 'SETTING'])).toBe(
+      false,
+    );
+  });
+
+  it('отмечает и снимает книги, не трогая остальные', () => {
+    expect(setSourcesSelected(['PHB'], ['XGE'], true)).toEqual(['PHB', 'XGE']);
+    expect(setSourcesSelected(['PHB', 'XGE'], ['XGE'], false)).toEqual(['PHB']);
   });
 });
