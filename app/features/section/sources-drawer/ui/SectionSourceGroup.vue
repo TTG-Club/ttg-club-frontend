@@ -170,7 +170,7 @@
             <UBadge
               v-if="entry.acronym"
               :label="entry.acronym"
-              color="neutral"
+              :color="entry.selected ? 'primary' : 'neutral'"
               variant="subtle"
               size="sm"
               class="min-w-14 shrink-0 justify-center font-mono"

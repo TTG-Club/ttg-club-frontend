@@ -95,8 +95,6 @@ export const SECTION_ICON = {
   clearAll: 'tabler:square-off',
   /** Место обложки у книги в панели источников. */
   book: 'tabler:book',
-  /** Отметка на обложке выбранной книги. */
-  checked: 'tabler:check',
   /** Стрелка группы источников: у раскрытой повёрнута вниз. */
   groupToggle: 'tabler:chevron-right',
 } as const;
