@@ -10,6 +10,7 @@
     getBookOrder,
   } from '../model';
   import BookEntry from './BookEntry.vue';
+  import BookListCover from './BookListCover.vue';
 </script>
 
 <template>
@@ -27,7 +28,14 @@
         :to="to"
         :title="item.name.rus"
         :subtitle="item.name.eng"
-      />
+      >
+        <template #leading>
+          <BookListCover
+            :url="item.image"
+            :alt="item.name.rus"
+          />
+        </template>
+      </SectionLink>
     </template>
 
     <template #entry="{ path }">

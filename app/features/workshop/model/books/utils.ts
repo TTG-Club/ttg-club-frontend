@@ -3,9 +3,11 @@ import type { BookForm } from './schemas';
 import type { WorkshopBook } from './types';
 
 import { WORKSHOP_API_PATH } from '../constants';
+import { WORKSHOP_IMAGES_API_PATH } from '../images';
 import { parseSavedEntry } from '../schemas';
 import { toOptionalNumber, toOptionalText } from '../utils';
-import { BOOKS_WORKSHOP_KEY } from './constants';
+import { BOOK_COVER_SEGMENT, BOOKS_WORKSHOP_KEY } from './constants';
+import { parseBookCover } from './schemas';
 
 /**
  * Форма источника, заполненная записью.
@@ -53,4 +55,39 @@ export async function updateWorkshopBook(
       { method: 'PATCH', body: payload },
     ),
   );
+}
+
+/**
+ * Адрес ручки обложки: `/api/v1/workshop/images/books/PHB/cover`.
+ * @param source - аббревиатура источника
+ */
+function getBookCoverPath(source: string): string {
+  return `${WORKSHOP_IMAGES_API_PATH}/${BOOKS_WORKSHOP_KEY}/${encodeURIComponent(source)}/${BOOK_COVER_SEGMENT}`;
+}
+
+/**
+ * Загружает обложку источника вместо прежней.
+ * @param source - аббревиатура источника
+ * @param file - выбранный файл
+ * @returns адрес новой обложки с меткой версии
+ */
+export async function uploadBookCover(
+  source: string,
+  file: File,
+): Promise<string> {
+  const body = new FormData();
+
+  body.append('file', file);
+
+  return parseBookCover(
+    await $fetch<unknown>(getBookCoverPath(source), { method: 'POST', body }),
+  );
+}
+
+/**
+ * Удаляет обложку источника.
+ * @param source - аббревиатура источника
+ */
+export async function removeBookCover(source: string): Promise<void> {
+  await $fetch(getBookCoverPath(source), { method: 'DELETE' });
 }
