@@ -1,3 +1,5 @@
+import type { SourceCatalogBook } from '../model';
+
 import {
   parseSourceCatalog,
   SOURCE_CATALOG_KEY,
@@ -6,8 +8,8 @@ import {
 } from '../model';
 
 /**
- * Английские названия книг для панели источников: фильтры разделов отдают
- * книгу сокращением и русским названием. Список грузится только по `load`,
+ * Английские названия и обложки книг для панели источников: фильтры
+ * разделов отдают книгу сокращением и русским названием. Список грузится только по `load`,
  * при первом открытии панели, и кэшируется по ключу — панели других
  * разделов его заново не тянут.
  */
@@ -15,7 +17,7 @@ export function useSourceCatalog() {
   const api = useApi();
 
   const {
-    data: englishNames,
+    data: catalog,
     status,
     execute,
   } = useAsyncData(
@@ -31,7 +33,7 @@ export function useSourceCatalog() {
       server: false,
       immediate: false,
       deep: false,
-      default: () => new Map<string, string>(),
+      default: () => new Map<string, SourceCatalogBook>(),
     },
   );
 
@@ -42,5 +44,5 @@ export function useSourceCatalog() {
     }
   }
 
-  return { englishNames, load };
+  return { catalog, load };
 }

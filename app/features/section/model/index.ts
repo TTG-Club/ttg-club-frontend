@@ -21,6 +21,7 @@ export type {
   SectionOpener,
   SectionOrder,
   SectionQueryStore,
+  SourceCatalogBook,
   SourceEntry,
   SourceGroupEntries,
   SourcePreset,

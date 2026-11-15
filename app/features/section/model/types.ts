@@ -145,7 +145,15 @@ export interface SourceEntry {
   acronym?: string;
   /** Английское название из списка книг. */
   english?: string;
+  /** Обложка из списка книг. */
+  cover?: string;
   selected: boolean;
+}
+
+/** Книга из общего списка: английское название и обложка. */
+export interface SourceCatalogBook {
+  english: string;
+  cover?: string;
 }
 
 /** Группа панели источников с книгами, которые сейчас показаны. */

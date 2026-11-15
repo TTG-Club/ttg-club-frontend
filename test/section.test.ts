@@ -425,23 +425,37 @@ describe('панель источников', () => {
 
   const groups = [official, settings];
 
-  const englishNames = parseSourceCatalog([
-    { name: { eng: "Player's Handbook" }, source: { shortName: 'PHB' } },
+  const catalog = parseSourceCatalog([
+    {
+      name: { eng: "Player's Handbook" },
+      source: { shortName: 'PHB' },
+      image: '/s3/5e14/books/covers/phb.webp',
+    },
     { name: { rus: 'без английского' }, source: { shortName: 'XGE' } },
   ]);
 
-  it('берёт английские названия из списка книг, пропуская битые', () => {
-    expect([...englishNames]).toEqual([['PHB', "Player's Handbook"]]);
+  it('берёт английские названия и обложки из списка книг, пропуская битые', () => {
+    expect([...catalog]).toEqual([
+      [
+        'PHB',
+        {
+          english: "Player's Handbook",
+          cover: '/s3/5e14/books/covers/phb.webp',
+        },
+      ],
+    ]);
+
     expect(parseSourceCatalog({ error: true }).size).toBe(0);
   });
 
   it('раскладывает книги на название, сокращение и английское название', () => {
-    expect(getSourceEntries(official, ['PHB'], englishNames)).toEqual([
+    expect(getSourceEntries(official, ['PHB'], catalog)).toEqual([
       {
         key: 'PHB',
         name: 'Книга игрока',
         acronym: 'PHB',
         english: "Player's Handbook",
+        cover: '/s3/5e14/books/covers/phb.webp',
         selected: true,
       },
       {
@@ -449,19 +463,20 @@ describe('панель источников', () => {
         name: 'Руководство Занатара',
         acronym: 'XGE',
         english: undefined,
+        cover: undefined,
         selected: false,
       },
     ]);
 
     // Книга без названия подписана сокращением, второй раз его не пишем
-    expect(getSourceEntries(settings, [], englishNames)[0]).toMatchObject({
+    expect(getSourceEntries(settings, [], catalog)[0]).toMatchObject({
       name: 'SCAG',
       acronym: undefined,
     });
   });
 
   it('ищет по английскому названию, сокращению и названию группы', () => {
-    const entries = getSourceEntries(official, [], englishNames);
+    const entries = getSourceEntries(official, [], catalog);
 
     expect(searchSourceEntries(official, entries, 'handbook')).toHaveLength(1);
     expect(searchSourceEntries(official, entries, 'xge')).toHaveLength(1);
