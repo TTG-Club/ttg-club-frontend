@@ -68,7 +68,7 @@
 
   const isSearching = computed(() => !!appliedSearch.value);
 
-  const { englishNames, load } = useSourceCatalog();
+  const { catalog, load } = useSourceCatalog();
 
   // Поиск — способ пройти по списку, а не часть выбора: при новом открытии
   // забытый запрос прятал бы часть книг без видимой причины
@@ -101,7 +101,7 @@
         isOpenByDefault: !hasAnySelected.value || !!getSelected(group).length,
         entries: searchSourceEntries(
           group,
-          getSourceEntries(group, getSelected(group), englishNames.value),
+          getSourceEntries(group, getSelected(group), catalog.value),
           appliedSearch.value,
         ),
       }))

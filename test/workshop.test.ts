@@ -52,6 +52,7 @@ import {
   getWorkshopErrorIndexes,
   getWorkshopFieldTab,
   getWorkshopSlug,
+  parseBookCover,
   parseBookSources,
   parseFilterGroups,
   parseRaceParentOptions,
@@ -930,7 +931,17 @@ describe('источники', () => {
       type: 'OFFICAL',
       year: 2014,
       description: '',
+      cover: null,
     });
+  });
+
+  it('берёт адрес обложки из ответа загрузки', () => {
+    expect(
+      parseBookCover({
+        url: '/s3/5e14/books/covers/phb.webp?v=1',
+        editable: true,
+      }),
+    ).toBe('/s3/5e14/books/covers/phb.webp?v=1');
   });
 
   it('не отправляет пустые необязательные поля', () => {

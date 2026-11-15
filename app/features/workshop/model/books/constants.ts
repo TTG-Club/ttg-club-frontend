@@ -26,3 +26,23 @@ export const BOOK_EDITOR_TEXT = {
 
 /** Строки описания источника в редакторе. */
 export const BOOK_DESCRIPTION_ROWS = 18;
+
+/** Последний сегмент ручки обложки источника. */
+export const BOOK_COVER_SEGMENT = 'cover';
+
+/** Подписи обложки источника в редакторе. */
+export const BOOK_COVER_TEXT = {
+  title: 'Обложка',
+  description:
+    'Показывается в списке источников и в карточке. Файл перекодируется в WebP, новый заменяет прежний. Изменения сохраняются сразу.',
+  missing: 'Обложки пока нет',
+  upload: 'Загрузить обложку',
+  remove: 'Удалить',
+  uploaded: 'Обложка обновлена',
+  removed: 'Обложка удалена',
+  uploadError: 'Не удалось загрузить обложку',
+  removeError: 'Не удалось удалить обложку',
+  removeTitle: 'Удалить обложку?',
+  removeDescription: 'Файл обложки удалится из хранилища.',
+  alt: 'Обложка источника',
+} as const;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { SectionLayout } from '~section/layout';
-  import { BookEditor } from '~workshop/books';
+  import { BookCoverField, BookEditor } from '~workshop/books';
   import { useWorkshopEditPage } from '~workshop/composables';
   import { WorkshopEditFrame } from '~workshop/entry-state';
   import { WorkshopAccessGate } from '~workshop/gate';
@@ -56,6 +56,13 @@
             :key="version"
             :book="entry"
             @saved="handleSaved"
+          />
+
+          <BookCoverField
+            v-if="entry"
+            :key="version"
+            :source="entry.source"
+            :initial-cover="entry.cover"
           />
         </WorkshopEditFrame>
       </ClientOnly>

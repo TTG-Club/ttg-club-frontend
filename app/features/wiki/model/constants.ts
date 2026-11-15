@@ -54,6 +54,9 @@ export const BOOKS_SECTION: SectionConfig = {
 
 export const BOOK_SHORT_NAME_LABEL = 'Аббревиатура:';
 
+/** Заглушка в списке у источника без обложки. */
+export const BOOK_COVER_PLACEHOLDER_ICON = 'tabler:book-2';
+
 /* --- Справочник ------------------------------------------------------- */
 
 /**

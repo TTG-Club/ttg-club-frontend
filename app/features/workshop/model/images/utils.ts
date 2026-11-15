@@ -1,3 +1,14 @@
+import { WORKSHOP_IMAGE_LIMIT } from './constants';
+
+/**
+ * Файл, который бэкенд точно не примет по размеру: о нём сообщаем сразу,
+ * не отправляя запрос.
+ * @param file - выбранный файл
+ */
+export function isWorkshopImageTooLarge(file: File): boolean {
+  return file.size > WORKSHOP_IMAGE_LIMIT.maxBytes;
+}
+
 /**
  * Список с элементом, переставленным на соседнее место.
  * @param images - адреса картинок
