@@ -60,3 +60,44 @@ export const ONLINE_VISITOR_TYPE = {
 
 /** Длина ключа посетителя, которую принимает сервис онлайна. */
 export const ONLINE_VISITOR_KEY_MAX_LENGTH = 128;
+
+/** Как часто проверяется, работает ли посетитель с инструментом, — раз в 15 секунд */
+export const FEATURE_USAGE_SAMPLE_SECONDS = 15;
+
+/** Тот же шаг проверки в миллисекундах — для таймера */
+export const FEATURE_USAGE_SAMPLE_MS = FEATURE_USAGE_SAMPLE_SECONDS * 1000;
+
+/** Сколько секунд работы копится до отправки отметки — минута */
+export const FEATURE_USAGE_REPORT_SECONDS = 60;
+
+/**
+ * Сколько после последнего действия посетитель считается работающим — 15 минут.
+ * Мастер подолгу читает запись, не трогая страницу, но забытая на экране вкладка
+ * время не накручивает.
+ */
+export const FEATURE_USAGE_IDLE_MS = 15 * 60 * 1000;
+
+/** Действия посетителя, по которым видно, что с инструментом работают */
+export const FEATURE_USAGE_ACTIVITY_EVENTS: Array<keyof WindowEventMap> = [
+  'pointerdown',
+  'keydown',
+  'wheel',
+];
+
+/** Отметка «инструмент открыт»: времени работы в ней ещё нет */
+export const FEATURE_USAGE_OPENED_SECONDS = 0;
+
+/**
+ * Сколько отметка ждёт восстановления сессии, чтобы вошедший не ушёл в учёт
+ * гостем, — 5 секунд. Не дождалась — сессию продлить не удалось.
+ */
+export const FEATURE_USAGE_SESSION_WAIT_MS = 5000;
+
+/** С этого кода ответа сервис учёта считается отказавшим: отметки прекращаются */
+export const FEATURE_USAGE_REJECTED_MIN_STATUS = 400;
+
+/** С этого кода ответа сбой считается временным: отметки продолжаются */
+export const FEATURE_USAGE_SERVER_ERROR_MIN_STATUS = 500;
+
+/** Превышение лимита запросов — тоже временное, отметки продолжаются */
+export const FEATURE_USAGE_TOO_MANY_REQUESTS_STATUS = 429;

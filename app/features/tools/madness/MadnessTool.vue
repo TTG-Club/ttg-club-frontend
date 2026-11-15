@@ -18,13 +18,15 @@
     TOOLS_API_URL,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Генератор безумия: вид можно выбрать или оставить случайным, длительность
    * выбрасывает бэкенд.
    */
   const { data: types } = await useAsyncData(
     'tools-madness-types',
-    async () => madnessTypesSchema.parse(await $fetch(TOOLS_API_URL.madness)),
+    async () => madnessTypesSchema.parse(await api(TOOLS_API_URL.madness)),
     { deep: false, default: () => [] },
   );
 
@@ -41,7 +43,7 @@
       return madnessResultSchema
         .array()
         .parse(
-          await $fetch(TOOLS_API_URL.madness, { method: 'POST', body, signal }),
+          await api(TOOLS_API_URL.madness, { method: 'POST', body, signal }),
         );
     },
   );

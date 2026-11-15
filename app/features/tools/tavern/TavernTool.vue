@@ -26,6 +26,8 @@
   } from '../model';
   import TavernCard from './TavernCard.vue';
 
+  const api = useApi();
+
   /**
    * Генератор таверны: название, меню, атмосфера, слухи, событие, столики и
    * хозяин. Пустые настройки выбираются случайно, любую часть можно обновить.
@@ -57,7 +59,7 @@
     const { path, query } = getTavernRequest(field, tavern);
 
     return tavernHtmlSchema.parse(
-      await $fetch(`${TOOLS_API_URL.tavern}/${path}`, {
+      await api(`${TOOLS_API_URL.tavern}/${path}`, {
         query,
         signal,
         responseType: 'text',

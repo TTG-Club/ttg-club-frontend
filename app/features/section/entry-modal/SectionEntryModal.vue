@@ -10,6 +10,8 @@
   import { getEntryApiPath, SECTION_ICON, SECTION_TEXT } from '../model';
   import { SectionSourceTag } from '../source-tag';
 
+  const api = useApi();
+
   /**
    * Запись раздела в окне поверх страницы, как заклинание из вкладки
    * класса в старом SPA. Окно открыто, пока задан адрес записи.
@@ -39,7 +41,7 @@
     async () =>
       path.value
         ? schema.parse(
-            await $fetch(getEntryApiPath(path.value), { method: 'POST' }),
+            await api(getEntryApiPath(path.value), { method: 'POST' }),
           )
         : null,
     { server: false, deep: false },

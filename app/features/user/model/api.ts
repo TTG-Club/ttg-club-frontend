@@ -31,7 +31,9 @@ import {
  * @param state - заполненная форма
  */
 export async function signUp(state: SignUpState): Promise<void> {
-  await $fetch(AUTH_SIGN_UP_PATH, {
+  const api = useApi();
+
+  await api(AUTH_SIGN_UP_PATH, {
     method: 'POST',
     body: {
       username: state.username.trim(),
@@ -54,7 +56,9 @@ export async function checkAccountExists(
   field: 'username' | 'email',
   value: string,
 ): Promise<void> {
-  await $fetch(AUTH_EXIST_PATH, {
+  const api = useApi();
+
+  await api(AUTH_EXIST_PATH, {
     method: 'POST',
     body: { [field]: value.trim() },
   });
@@ -65,7 +69,9 @@ export async function checkAccountExists(
  * @param email - почта аккаунта
  */
 export async function requestPasswordReset(email: string): Promise<void> {
-  await $fetch(PASSWORD_RESET_REQUEST_PATH, {
+  const api = useApi();
+
+  await api(PASSWORD_RESET_REQUEST_PATH, {
     method: 'POST',
     body: { email: email.trim() },
   });
@@ -76,7 +82,9 @@ export async function requestPasswordReset(email: string): Promise<void> {
  * @param token - ключ из письма
  */
 export async function validatePasswordResetToken(token: string): Promise<void> {
-  await $fetch(PASSWORD_RESET_VALIDATE_PATH, { query: { token } });
+  const api = useApi();
+
+  await api(PASSWORD_RESET_VALIDATE_PATH, { query: { token } });
 }
 
 /**
@@ -88,7 +96,9 @@ export async function confirmPasswordReset(
   token: string,
   password: string,
 ): Promise<void> {
-  await $fetch(PASSWORD_RESET_CONFIRM_PATH, {
+  const api = useApi();
+
+  await api(PASSWORD_RESET_CONFIRM_PATH, {
     method: 'POST',
     body: { token, newPassword: password.trim() },
   });
@@ -99,7 +109,9 @@ export async function confirmPasswordReset(
  * @param token - ключ из письма
  */
 export async function verifyEmail(token: string): Promise<void> {
-  await $fetch(AUTH_VERIFY_EMAIL_PATH, { query: { token } });
+  const api = useApi();
+
+  await api(AUTH_VERIFY_EMAIL_PATH, { query: { token } });
 }
 
 /**
@@ -107,7 +119,9 @@ export async function verifyEmail(token: string): Promise<void> {
  * @param displayName - новое имя
  */
 export async function changeDisplayName(displayName: string): Promise<void> {
-  await $fetch(USER_DISPLAY_NAME_PATH, {
+  const api = useApi();
+
+  await api(USER_DISPLAY_NAME_PATH, {
     method: 'PATCH',
     body: { displayName: displayName.trim() },
   });
@@ -122,7 +136,9 @@ export async function changePassword(
   currentPassword: string,
   password: string,
 ): Promise<void> {
-  await $fetch(ACCOUNT_CHANGE_PASSWORD_PATH, {
+  const api = useApi();
+
+  await api(ACCOUNT_CHANGE_PASSWORD_PATH, {
     method: 'POST',
     body: {
       currentPassword: currentPassword.trim(),
@@ -133,7 +149,9 @@ export async function changePassword(
 
 /** Загружает подписки текущего пользователя. */
 export async function getMySubscriptions(): Promise<Subscription[]> {
-  const response: unknown = await $fetch(SUBSCRIPTIONS_MY_PATH);
+  const api = useApi();
+
+  const response: unknown = await api(SUBSCRIPTIONS_MY_PATH);
 
   return subscriptionListSchema.parse(response);
 }
@@ -144,7 +162,9 @@ export async function getMySubscriptions(): Promise<Subscription[]> {
  * @returns что выдано впервые
  */
 export async function redeemCode(code: string): Promise<RedeemResult> {
-  const response: unknown = await $fetch(SUBSCRIPTIONS_REDEEM_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(SUBSCRIPTIONS_REDEEM_PATH, {
     method: 'POST',
     body: { code: code.trim() },
   });
@@ -157,7 +177,9 @@ export async function redeemCode(code: string): Promise<RedeemResult> {
  * @param id - подписка в статусе `REGISTERED`
  */
 export async function activateSubscription(id: string): Promise<Subscription> {
-  const response: unknown = await $fetch(
+  const api = useApi();
+
+  const response: unknown = await api(
     `${SUBSCRIPTIONS_PATH}/${encodeURIComponent(id)}/activate`,
     { method: 'POST' },
   );
@@ -170,7 +192,9 @@ export async function activateSubscription(id: string): Promise<Subscription> {
  * умолчанию, не выбраны.
  */
 export async function getDefaultSources(): Promise<FilterDefinition> {
-  const response: unknown = await $fetch(USER_SOURCES_PATH);
+  const api = useApi();
+
+  const response: unknown = await api(USER_SOURCES_PATH);
 
   return normalizeFilter(filterResponseSchema.parse(response));
 }
@@ -182,5 +206,7 @@ export async function getDefaultSources(): Promise<FilterDefinition> {
 export async function saveDefaultSources(
   excluded: ReadonlyArray<string>,
 ): Promise<void> {
-  await $fetch(USER_SOURCES_PATH, { method: 'PUT', body: { excluded } });
+  const api = useApi();
+
+  await api(USER_SOURCES_PATH, { method: 'PUT', body: { excluded } });
 }

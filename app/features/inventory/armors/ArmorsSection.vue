@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { HoverTooltip } from '~/shared/ui/hover-tooltip';
   import { SectionLink } from '~section/list';
   import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
@@ -31,19 +32,19 @@
         :source="item.source"
       >
         <template #details>
-          <UTooltip
+          <HoverTooltip
             v-if="item.armorClass"
             :text="ARMOR_TEXT.armorClassHint"
           >
             <span class="shrink-0">{{ item.armorClass }}</span>
-          </UTooltip>
+          </HoverTooltip>
 
-          <UTooltip
+          <HoverTooltip
             v-if="item.price"
             :text="ARMOR_TEXT.price"
           >
             <span class="shrink-0 text-highlighted">{{ item.price }}</span>
-          </UTooltip>
+          </HoverTooltip>
         </template>
       </SectionLink>
     </template>

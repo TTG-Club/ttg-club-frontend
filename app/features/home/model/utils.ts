@@ -1,17 +1,11 @@
 import type { CSSProperties } from 'vue';
-import type { SiteMenuItem } from '~infrastructure/sidebar/menu/model';
+import type { MenuItem, MenuSection } from '~infrastructure/navigation/model';
 
 import type { HomeGame } from './schema';
 import type { HomeNavLink, HomeSectionLink } from './types';
 
-import { sortBy } from 'es-toolkit';
-
 import {
-  TOKENATOR_LEGACY_URL,
-  TOKENATOR_URL,
-} from '~infrastructure/sidebar/menu/model';
-
-import {
+  HOME_COUNTERS_NUMBER_LOCALE,
   HOME_LATEST_GAME_DATE_FORMAT,
   HOME_LATEST_GAME_DATE_LOCALE,
   HOME_LATEST_GAME_DURATION_LABELS,
@@ -23,54 +17,23 @@ import {
   HOME_SECTION_TEXTURE,
   HOME_TOOL_DEFAULT_ICON,
   HOME_TOOL_ICONS,
-  HOME_TOOLS_PATH_PREFIX,
 } from './constants';
 
-/** Пункт меню, у которого точно есть адрес */
-type LinkedMenuItem = SiteMenuItem & { url: string };
-
 /**
- * Проверяет, что у пункта меню есть непустой адрес.
+ * Пункты меню, отмеченные для главной, в порядке меню.
  *
- * @param menuItem - пункт меню
- * @returns есть ли адрес
+ * @param menuSections - разделы меню сайта
+ * @param isTools - брать инструменты (`true`) или остальные разделы (`false`)
+ * @returns пункты с флагом `onHome`
  */
-function hasUrl(menuItem: SiteMenuItem): menuItem is LinkedMenuItem {
-  return typeof menuItem.url === 'string' && menuItem.url.length > 0;
-}
-
-/**
- * Проверяет, виден ли пункт меню: пункты только для разработки видны лишь в
- * режиме разработки.
- *
- * @param menuItem - пункт меню
- * @param isDevelopment - режим разработки
- * @returns виден ли пункт
- */
-function isVisibleItem(
-  menuItem: SiteMenuItem,
-  isDevelopment: boolean,
-): boolean {
-  return isDevelopment || !menuItem.onlyDev;
-}
-
-/**
- * Собирает пункты меню, отмеченные для главной, со всех уровней вложенности.
- *
- * @param menuItems - пункты меню (группы со вложенными пунктами)
- * @param isDevelopment - режим разработки
- * @returns плоский список пунктов с адресом и флагом `onIndex`
- */
-function collectIndexItems(
-  menuItems: Array<SiteMenuItem>,
-  isDevelopment: boolean,
-): Array<LinkedMenuItem> {
-  return menuItems
-    .filter((menuItem) => isVisibleItem(menuItem, isDevelopment))
-    .flatMap((menuItem) => [
-      ...collectIndexItems(menuItem.children ?? [], isDevelopment),
-      ...(menuItem.onIndex && hasUrl(menuItem) ? [menuItem] : []),
-    ]);
+function collectHomeItems(
+  menuSections: Array<MenuSection>,
+  isTools: boolean,
+): Array<MenuItem> {
+  return menuSections
+    .filter((menuSection) => !!menuSection.isTools === isTools)
+    .flatMap((menuSection) => menuSection.items)
+    .filter((menuItem) => menuItem.onHome);
 }
 
 /**
@@ -93,80 +56,50 @@ function getSectionTextureStyle(index: number): CSSProperties | undefined {
 }
 
 /**
- * Разделы для плиты главной: пункты меню с флагом `onIndex` в порядке
- * `indexOrder`, с иконкой и кадром фактуры.
+ * Разделы для плиты главной: отмеченные для главной пункты меню, кроме
+ * инструментов, с иконкой и кадром фактуры.
  *
- * @param menuItems - группы меню сайта
- * @param isDevelopment - режим разработки
+ * @param menuSections - разделы меню сайта
  * @returns плитки разделов
  */
 export function getHomeSections(
-  menuItems: Array<SiteMenuItem>,
-  isDevelopment: boolean,
+  menuSections: Array<MenuSection>,
 ): Array<HomeSectionLink> {
-  const sections = sortBy(collectIndexItems(menuItems, isDevelopment), [
-    'indexOrder',
-  ]);
-
-  return sections.map((section, index) => ({
-    name: section.name,
-    url: section.url,
-    icon: HOME_SECTION_ICONS[section.url] ?? HOME_SECTION_DEFAULT_ICON,
-    external: !!section.external,
+  return collectHomeItems(menuSections, false).map((menuItem, index) => ({
+    name: menuItem.label,
+    url: menuItem.href,
+    icon: HOME_SECTION_ICONS[menuItem.href] ?? HOME_SECTION_DEFAULT_ICON,
+    external: !!menuItem.external,
     textureStyle: getSectionTextureStyle(index),
   }));
 }
 
 /**
- * Проверяет, что пункт меню ведёт внутрь раздела инструментов.
+ * Инструменты для ленты под поиском: отмеченные для главной пункты раздела
+ * инструментов — и здешние, и переехавшие на новый сайт.
  *
- * @param menuItem - пункт меню
- * @returns ведёт ли пункт в инструменты
- */
-function isToolItem(menuItem: SiteMenuItem): boolean {
-  return hasUrl(menuItem) && menuItem.url.startsWith(HOME_TOOLS_PATH_PREFIX);
-}
-
-/**
- * Пункт инструмента: здешний токенатор заменяется переехавшим на новый сайт,
- * его старая версия остаётся только в меню.
- *
- * @param menuItem - пункт меню с адресом
- * @returns ссылка на инструмент
- */
-function toToolLink(menuItem: LinkedMenuItem): HomeNavLink {
-  const isTokenator = menuItem.url === TOKENATOR_LEGACY_URL;
-  const url = isTokenator ? TOKENATOR_URL : menuItem.url;
-
-  return {
-    name: menuItem.name,
-    url,
-    icon: HOME_TOOL_ICONS[url] ?? HOME_TOOL_DEFAULT_ICON,
-    external: isTokenator || !!menuItem.external,
-  };
-}
-
-/**
- * Инструменты для ленты под поиском: пункты группы инструментов в порядке
- * меню — и здешние, и переехавшие на новый сайт.
- *
- * @param menuItems - группы меню сайта
- * @param isDevelopment - режим разработки
+ * @param menuSections - разделы меню сайта
  * @returns ссылки на инструменты
  */
 export function getHomeTools(
-  menuItems: Array<SiteMenuItem>,
-  isDevelopment: boolean,
+  menuSections: Array<MenuSection>,
 ): Array<HomeNavLink> {
-  const tools = menuItems
-    .filter((group) => group.children?.some(isToolItem))
-    .flatMap((group) => group.children ?? [])
-    .filter(
-      (menuItem): menuItem is LinkedMenuItem =>
-        hasUrl(menuItem) && isVisibleItem(menuItem, isDevelopment),
-    );
+  return collectHomeItems(menuSections, true).map((menuItem) => ({
+    name: menuItem.label,
+    url: menuItem.href,
+    icon: HOME_TOOL_ICONS[menuItem.href] ?? HOME_TOOL_DEFAULT_ICON,
+    external: !!menuItem.external,
+  }));
+}
 
-  return sortBy(tools, ['order']).map(toToolLink);
+/**
+ * Число для счётчика шапки с разделителями разрядов: `3389` → «3 389».
+ *
+ * @param value - число
+ * @returns число строкой по правилам русской локали
+ */
+export function formatHomeCount(value: number): string {
+  return value.toLocaleString(HOME_COUNTERS_NUMBER_LOCALE);
 }
 
 /**

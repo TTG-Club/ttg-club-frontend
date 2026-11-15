@@ -30,3 +30,13 @@ export interface OnlineHeartbeatBody {
   previousGuestKey?: string;
   type: (typeof ONLINE_VISITOR_TYPE)[keyof typeof ONLINE_VISITOR_TYPE];
 }
+
+/** Отметка работы посетителя с инструментом сайта. */
+export interface FeatureUsageBody {
+  /** Сколько секунд посетитель работал с инструментом с прошлой отметки; ноль — только открыл. */
+  activeSeconds: number;
+  /** Инструмент, например `dm-screen`. */
+  feature: string;
+  key: OnlineHeartbeatBody['key'];
+  type: OnlineHeartbeatBody['type'];
+}

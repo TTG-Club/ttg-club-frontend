@@ -11,7 +11,9 @@ export async function fetchWorkshopArchetype(
   classSlug: string,
   archetypeSlug: string,
 ): Promise<unknown> {
-  return await $fetch<unknown>(
+  const api = useApi();
+
+  return await api<unknown>(
     `${WORKSHOP_API_PATH}/${CLASSES_WORKSHOP_KEY}/${classSlug}/${archetypeSlug}`,
     { method: 'POST' },
   );

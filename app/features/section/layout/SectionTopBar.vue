@@ -16,7 +16,7 @@
 
 <template>
   <header
-    class="@container sticky top-0 z-10 border-b border-default bg-default/80 backdrop-blur-lg"
+    class="@container sticky top-0 z-10 border-b border-default bg-default"
   >
     <div
       class="flex flex-col gap-3 px-4 py-3 md:py-4 @3xl:flex-row @3xl:items-center @3xl:gap-6"

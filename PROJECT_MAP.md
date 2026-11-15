@@ -15,30 +15,31 @@
 │   ├── app.config.ts           # Nuxt UI icons
 │   ├── assets/css/             # Tailwind v4 + legacy palette (theme.css), content typography (content.scss)
 │   ├── assets/icons/           # Custom SVG icons (`ttg` collection)
-│   ├── composables/            # useTheme / useThemeHead (shared cookie with the legacy SPA, svifty7 and custom theme), useLayoutWidth (section width), useSectionFiltersCollapsed / useSectionColumnSides / useSectionCentered / useSectionSplitSize (wide-mode layouts), useListView (list columns), usePageMeta, useUser (session)
+│   ├── composables/            # useTheme / useThemeHead (shared cookie with the legacy SPA, svifty7 and custom theme), useLayoutWidth (section width), useSectionFiltersCollapsed / useSectionColumnSides / useSectionCentered / useSectionSplitSize (wide-mode layouts), useListView (list columns), usePageMeta, useUser (session), useApi (API client)
 │   ├── features/               # DDD domains
 │   │   ├── bug-report/         # button (sidebar), modal (description, page, selected text, screenshot with marks), selection ("Ошибка в тексте" under a selection); posts to bug-report.api.ttg.club
 │   │   ├── comments/           # section (discussion under an entry: collapsed preview, tree of replies, composer with cooldown, edit, delete, report, moderator restore, #comment-<id> links); talks to comments-service via /api/v1/comments
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
 │   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
-│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (top bar or filter column + list + entry pane in 8 wide-mode arrangements, resizable), controls (search, sources, menu, grouping switch), filter-inline (filter groups in the filters column), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview (round preview, square cover, viewer), collapse (titled block with an arrow), detail-layout (properties column + text)
+│   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (top bar or filter column + list + entry pane in 8 wide-mode arrangements, resizable), controls (search, sources, menu, grouping switch), filter-inline (filter groups in the filters column), filter-drawer (content filter in a right drawer), sources-drawer (sources like new.ttg.club: left drawer, books as rows with English names from `/api/v1/books`, collapsible groups, presets), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview (round preview, square cover, viewer), collapse (titled block with an arrow), detail-layout (properties column + text)
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (cover card of a race or class, drawer with subraces or archetypes, picker of a subclass or subrace), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items (by category or alphabet), magic items, treasures
 │   │   ├── bestiary/           # creatures: list by challenge rating, stat block with rolls
 │   │   ├── wiki/               # gods, rules, books, screens: list rows and entry cards
 │   │   ├── tools/              # generator (form + results shell), madness, wild-magic, encounters (with the table modal), names, loot (shared tiles + drawer), trader, treasury, ability-calc, tavern, tokenator (client-only token maker), initiative (tracker list, combat workspace with turn reel, hit points and armor class on the device, guest key slot)
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
-│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), latest-game, social-links, partners, ui-kit
+│   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), bug-hunters (rating from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
 │   │   ├── news/               # news of new.ttg.club read here: model (core-api articles and community news), card (hero, tile), drawer (quick reading, page opens on new.ttg.club), body, video (YouTube / VK player), markup (render of the new site markup `{@...}`; links lead to new.ttg.club)
+│   │   ├── dm-screen/          # Master's screen (/dm-screen): canvas (header with search, windows, snap layouts and shared dividers like Windows 11, phone list), window (entry or note: drag, resize by any side, snapping), screen (guest in the browser, own screen from the account — one per user for now), dialogs
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
-│   │   ├── infrastructure/     # sidebar (panel, menu from /api/v1/menu), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat), maintenance ("site closed for an update" screen with sign in, gate state)
+│   │   ├── infrastructure/     # navigation (site menu as a static list `MENU_SECTIONS`, like new.ttg.club, no API request; shared by the sidebar menu, the home page, the footer and the DM screen), sidebar (panel, menu drawn from `navigation`), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat, tool usage marks: `useFeatureUsage` reports time worked with the DM screen), maintenance ("site closed for an update" screen with sign in, gate state), footer (site footer like new.ttg.club: legal links lead to new.ttg.club; shown by layouts and by SectionLayout outside the wide split mode)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, active flag; the home page no longer shows videos); editors only
 │   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), images (gallery and class/race cover uploaded to S3 via `/api/v1/workshop/images`: "Images" tab in class, archetype and race editors, block under the form elsewhere), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
 │   ├── middleware/             # maintenance.global (rechecks the maintenance gate on client navigation)
-│   ├── plugins/                # user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
+│   ├── plugins/                # api ($api: API client, renews the session on 401 and retries), user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
 │   └── shared/                 # consts (API paths, UI texts), ui (logo, hamburger)
 ├── server/
 │   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
@@ -47,6 +48,7 @@
 │   ├── consts/                 # Server constants (maintenance response, settings cache)
 │   ├── middleware/maintenance.ts # Maintenance gate before render, page requests only
 │   ├── plugins/maintenanceResponse.ts # 503, Retry-After, X-Robots-Tag, no-store while the gate is on
+│   ├── routes/s3/[...].ts      # Proxy GET /s3/** → backend (site images from S3, /s3/5e14/<path>)
 │   ├── routes/sitemap.xml.ts   # Sitemap from the backend
 │   └── utils/                  # upstreams (upstream URLs from the environment), maintenance (settings from core-app, gate by the visitor's roles)
 ├── shared/                     # Isomorphic consts, types and utils (cookie names, proxy routing, user profile, maintenance)
@@ -59,8 +61,8 @@
 | Variable                         | Purpose                                                                                                   |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `NITRO_API_URL`                  | Backend (or gateway) base URL, required                                                                   |
-| `NITRO_SUBSCRIBER_API_URL`       | subscriber-service; empty → `NITRO_API_URL`                                                               |
-| `NITRO_COMMENTS_API_URL`         | comments-service; empty → `NITRO_API_URL`                                                                 |
+| `NITRO_SUBSCRIBER_API_URL`       | subscriber-service (Nitro passes the token cookie as `Bearer`); empty → `NITRO_API_URL`                   |
+| `NITRO_COMMENTS_API_URL`         | comments-service (Nitro passes the token cookie as `Bearer`); empty → `NITRO_API_URL`                     |
 | `NITRO_CORE_API_URL`             | core-api (site news and community news on the home page); empty → `NITRO_API_URL`                         |
 | `NITRO_MAINTENANCE_SETTINGS_URL` | core-app maintenance settings of this site (`<core-app>/api/maintenance/sites/5e14`); empty → site closed |
 | `NUXT_SITE_URL`                  | Canonical origin, defaults to `https://5e14.ttg.club`                                                     |
@@ -230,9 +232,17 @@ default group and adds it to any custom group from its menu.
 
 ## 🏠 Home
 
-The home page repeats the legacy one block for block. Section tiles and the
-tools under the search come from `/api/v1/menu` (`onIndex`, `indexOrder`) and
-render on SSR; friends (`/api/v1/partners`) too. The latest game comes from the
+The home page repeats the legacy one block for block. Above the hero title is
+a row of counters, as on new.ttg.club: materials of this site (backend
+`/api/v1/statistics/count-all`, a bare number) and fixed bugs (`fixedCount`
+from `/api/v1/bug-stats`); a counter whose number did not arrive is not shown. Section tiles and the
+tools under the search come from the site menu (`MENU_SECTIONS`, items with
+`onHome`, in the menu order) and render on SSR; friends (`/api/v1/partners`) too — they run as a one-line
+marquee, shuffled in the browser on every visit: an endless loop that only
+moves by itself (no manual scroll) and stops on hover and focus. Under them is the bug hunters rating, the same as on
+new.ttg.club: the server route `/api/v1/bug-stats` fetches
+`<new site>/api/bug-report/stats` (the new site does not answer other sites'
+browsers), caches it for 5 minutes and keeps the last good answer. The latest game comes from the
 new.ttg.club game service and core-api, so it loads only in the browser. The
 search field opens the search palette.
 
@@ -240,7 +250,18 @@ News and community news are written and published on new.ttg.club and shown
 here as on its home page: core-api `/api/v2/articles/search?type=NEWS` and
 `/api/v2/community-news/search`, loaded in the browser. A click opens the news
 in a right drawer for quick reading; the "open page" button and ctrl+click open
-it on new.ttg.club in a new tab. Articles are not shown here.
+it on new.ttg.club in a new tab. Articles are not shown here. Each block shows
+one news as a cover and rotates the latest ones on a timer; the switcher in the
+panel footer (dots with a countdown bar, pause, arrows) sits in one row with
+the "all news" link. The countdown pauses on hover, on focus, while a news or
+its video is open and on a hidden tab. Left of the community news there is a
+"Reserved" placeholder for a future block (desktop only).
+
+The "Discussions" block under the latest game shows the latest comments of
+this site only: comments-service `/api/v1/comments/recent` with the
+`SITE_5E14` platform, loaded in the browser and refreshed when the tab becomes
+visible again. A row opens the comment on its page (`#comment-<id>`). The
+tokenator card is no longer on the home page.
 
 Moderators and administrators manage the videos at `/admin/youtube` (also in
 the user menu): add by link or ID, rename, delete, and switch up to five on.

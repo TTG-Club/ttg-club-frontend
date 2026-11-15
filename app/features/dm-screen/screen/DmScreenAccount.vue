@@ -1,0 +1,158 @@
+<script setup lang="ts">
+  import type { ButtonProps } from '@nuxt/ui';
+
+  import { getApiErrorMessage } from '~user/model';
+
+  import { DmScreenCanvas } from '../canvas';
+  import { useDmScreen } from '../composables';
+  import { DmScreenNameModal } from '../dialogs';
+  import {
+    DM_SCREEN_ICON,
+    DM_SCREEN_TEXT,
+    fetchDmScreen,
+    renameDmScreen,
+  } from '../model';
+
+  /**
+   * Ширма из аккаунта по её идентификатору: загружается с сервера и
+   * подключается к окнам, изменения сохраняются сами. В шапке — имя ширмы
+   * с переименованием; пути к списку ширм нет, пока ширма у пользователя
+   * одна.
+   */
+  const { id } = defineProps<{
+    id: string;
+  }>();
+
+  const toast = useToast();
+
+  const { attach, detach, saveOnLeave, screenId, windows, cachedScreen } =
+    useDmScreen();
+
+  // Копия этой ширмы из браузера: с ней ширма видна сразу после обновления
+  // страницы, без заглушки на время ответа сервера
+  const cached = cachedScreen.value?.id === id ? cachedScreen.value : undefined;
+
+  if (cached) {
+    attach(cached.id, cached.windows);
+  }
+
+  const name = ref(cached?.name ?? '');
+  const isLoading = ref(!cached);
+  const isFailed = ref(false);
+  const isRenameOpen = ref(false);
+
+  // Копия в браузере повторяет открытую ширму; пока ширма не подключена,
+  // окна на странице гостевые, и в копию они не попадают
+  watch([name, windows], () => {
+    if (screenId.value === id) {
+      cachedScreen.value = {
+        id,
+        name: name.value,
+        windows: [...windows.value],
+      };
+    }
+  });
+
+  async function load(): Promise<void> {
+    // Ширма, открытая с копии, остаётся на экране, пока отвечает сервер
+    isLoading.value = screenId.value !== id;
+    isFailed.value = false;
+
+    try {
+      const screen = await fetchDmScreen(id);
+
+      name.value = screen.name;
+      attach(screen.id, screen.windows);
+    } catch {
+      isFailed.value = true;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  const failedActions = computed<Array<ButtonProps>>(() => [
+    { label: DM_SCREEN_TEXT.retry, onClick: load },
+  ]);
+
+  onMounted(load);
+
+  onBeforeUnmount(detach);
+
+  // Закрытие вкладки или уход в фон: сохранить, пока браузер не оборвал
+  useEventListener('pagehide', saveOnLeave);
+
+  useEventListener(document, 'visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      saveOnLeave();
+    }
+  });
+
+  function openRename(): void {
+    isRenameOpen.value = true;
+  }
+
+  /**
+   * Переименовывает ширму.
+   * @param next - новое имя
+   */
+  async function rename(next: string): Promise<void> {
+    try {
+      name.value = (await renameDmScreen(id, next)).name;
+    } catch (error) {
+      toast.add({
+        title: getApiErrorMessage(error, DM_SCREEN_TEXT.errorRename),
+        color: 'error',
+      });
+    }
+  }
+</script>
+
+<template>
+  <div
+    v-if="isLoading"
+    class="flex flex-col gap-3 p-4"
+  >
+    <USkeleton class="h-9 w-64" />
+
+    <USkeleton class="h-64 w-full max-w-xl" />
+  </div>
+
+  <UEmpty
+    v-else-if="isFailed"
+    :icon="DM_SCREEN_ICON.screen"
+    :title="DM_SCREEN_TEXT.screenLoadFailed"
+    :actions="failedActions"
+    class="m-auto min-h-dvh"
+  />
+
+  <DmScreenCanvas v-else>
+    <template #heading>
+      <!-- На широком экране карандаш виден по наведению на имя или с
+      клавиатуры, на телефоне наведения нет — он виден всегда -->
+      <div class="group flex min-w-0 items-center gap-1">
+        <h1 class="truncate text-2xl text-highlighted">
+          {{ name }}
+        </h1>
+
+        <UTooltip :text="DM_SCREEN_TEXT.rename">
+          <UButton
+            :icon="DM_SCREEN_ICON.rename"
+            :aria-label="DM_SCREEN_TEXT.rename"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            class="transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+            @click.left.exact.prevent="openRename"
+          />
+        </UTooltip>
+      </div>
+    </template>
+  </DmScreenCanvas>
+
+  <DmScreenNameModal
+    v-model:open="isRenameOpen"
+    :title="DM_SCREEN_TEXT.renameTitle"
+    :name="name"
+    @save="rename"
+  />
+</template>

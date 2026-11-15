@@ -8,7 +8,9 @@ import { BESTIARY_API_PATH } from './constants';
  * @param slug - сегмент адреса записи
  */
 export async function fetchWorkshopCreature(slug: string): Promise<unknown> {
-  return await $fetch<unknown>(`${BESTIARY_API_PATH}/${slug}`);
+  const api = useApi();
+
+  return await api<unknown>(`${BESTIARY_API_PATH}/${slug}`);
 }
 
 /**
@@ -21,8 +23,10 @@ export async function saveWorkshopCreature(
   payload: Record<string, unknown>,
   entryId: number | undefined,
 ): Promise<SavedEntry> {
+  const api = useApi();
+
   return parseSavedEntry(
-    await $fetch<unknown>(BESTIARY_API_PATH, {
+    await api<unknown>(BESTIARY_API_PATH, {
       method: entryId === undefined ? 'POST' : 'PUT',
       body: payload,
     }),

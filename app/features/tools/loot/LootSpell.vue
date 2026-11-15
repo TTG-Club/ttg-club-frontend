@@ -5,6 +5,8 @@
   import { SpellBody } from '~character/spells';
   import { getEntryApiPath } from '~section/model';
 
+  const api = useApi();
+
   /**
    * Заклинание свитка под описанием предмета, как в старом SPA: свиток
    * без него бесполезен.
@@ -20,7 +22,7 @@
     () => `tools-loot-spell:${spell.url}`,
     async () =>
       spellDetailSchema.parse(
-        await $fetch(getEntryApiPath(spell.url), { method: 'POST' }),
+        await api(getEntryApiPath(spell.url), { method: 'POST' }),
       ),
     { server: false, deep: false },
   );

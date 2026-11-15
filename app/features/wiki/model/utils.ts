@@ -7,6 +7,7 @@ import { capitalize, groupBy, sortBy } from 'es-toolkit';
 import { parseDocument } from 'htmlparser2';
 
 import {
+  SCREEN_GROUP_LAST_ORDER,
   SVG_ALLOWED_ATTRIBUTES,
   SVG_ALLOWED_TAGS,
   SVG_CURRENT_COLOR,
@@ -48,8 +49,26 @@ export function joinWikiList(values?: Array<string> | null): string {
 }
 
 /**
+ * Группа раздела в списке справочника — его корневой раздел; без него
+ * раздел вне групп.
+ * @param screen - раздел из списка
+ */
+export function getScreenGroup(screen: ScreenLink): string {
+  return screen.parent?.name.rus ?? '';
+}
+
+/**
+ * Порядок группы справочника — порядок корневого раздела; группы без него
+ * идут последними.
+ * @param screen - раздел из списка
+ */
+export function getScreenGroupOrder(screen: ScreenLink): number {
+  return screen.parent?.order ?? SCREEN_GROUP_LAST_ORDER;
+}
+
+/**
  * Разделы по порядку, затем по названию.
- * @param screens - разделы ширмы
+ * @param screens - разделы справочника
  */
 function sortScreens(screens: Array<ScreenLink>): Array<ScreenLink> {
   return sortBy(screens, [
@@ -123,7 +142,7 @@ function toSvgNode(node: ChildNode): SvgNode | undefined {
 }
 
 /**
- * Иконка раздела ширмы из SVG-разметки базы: только геометрия, без
+ * Иконка раздела справочника из SVG-разметки базы: только геометрия, без
  * скриптов и ссылок. Без корневого `svg` иконки нет.
  * @param markup - SVG-разметка
  */

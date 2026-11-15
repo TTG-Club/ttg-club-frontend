@@ -70,7 +70,7 @@
     :is="tag"
     v-bind="linkAttributes"
     :class="tileClass"
-    class="flex min-h-14 items-center gap-3 rounded-xl border px-3 py-2"
+    class="flex min-h-14 items-center gap-3 rounded-xl border px-3 py-2 lazy-render-tile"
     @click.left.exact.capture="open"
   >
     <slot name="leading" />

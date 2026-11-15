@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { HoverTooltip } from '~/shared/ui/hover-tooltip';
   import { SectionLink } from '~section/list';
   import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
@@ -35,7 +36,7 @@
             class="shrink-0"
           />
 
-          <UTooltip
+          <HoverTooltip
             v-if="item.customization"
             :text="MAGIC_ITEM_TEXT.attunementHint"
           >
@@ -44,7 +45,7 @@
             >
               {{ MAGIC_ITEM_TEXT.attunementShort }}
             </span>
-          </UTooltip>
+          </HoverTooltip>
         </template>
       </SectionLink>
     </template>

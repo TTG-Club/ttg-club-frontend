@@ -15,6 +15,8 @@
     TOOLS_ICON,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Генератор случайных столкновений: уровень группы и окружение можно
    * задать или оставить случайными. Для заданных обоих открывается вся
@@ -23,7 +25,7 @@
   const { data: options } = await useAsyncData(
     'tools-encounters-options',
     async () =>
-      encounterOptionsSchema.parse(await $fetch(TOOLS_API_URL.encounters)),
+      encounterOptionsSchema.parse(await api(TOOLS_API_URL.encounters)),
     { deep: false },
   );
 
@@ -49,7 +51,7 @@
   const { results, isPending, generate, clear, remove } = useToolGenerator(
     async (signal) => [
       encounterResultSchema.parse(
-        await $fetch(TOOLS_API_URL.encounters, {
+        await api(TOOLS_API_URL.encounters, {
           method: 'POST',
           body: buildEncounterRequest(level.value, environment.value),
           signal,
@@ -72,7 +74,7 @@
 
     try {
       table.value = rollTableSchema.parse(
-        await $fetch(TOOLS_API_URL.encountersTable, {
+        await api(TOOLS_API_URL.encountersTable, {
           method: 'POST',
           body: buildEncounterRequest(level.value, environment.value),
         }),

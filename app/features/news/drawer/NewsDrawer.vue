@@ -14,6 +14,8 @@
     parseNewsDetailed,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Панель справа для быстрого чтения новости нового сайта, как на
    * new.ttg.club. Кнопка «Открыть на новом сайте» ведёт на страницу новости
@@ -34,9 +36,7 @@
   const { data: news, status } = useAsyncData(
     () => `news-drawer-${kind}-${url}`,
     async () =>
-      url
-        ? parseNewsDetailed(await $fetch(getNewsDetailPath(kind, url)))
-        : null,
+      url ? parseNewsDetailed(await api(getNewsDetailPath(kind, url))) : null,
     { server: false },
   );
 

@@ -21,7 +21,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flow-root">
+    <div class="@container flow-root">
       <SectionImagePreview
         v-if="god.images?.length"
         :images="god.images"

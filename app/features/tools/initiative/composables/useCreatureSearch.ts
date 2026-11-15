@@ -14,6 +14,8 @@ import {
  * после ввода. Поздний ответ на старый запрос не затирает свежий.
  */
 export function useCreatureSearch() {
+  const api = useApi();
+
   const searchTerm = ref('');
   const debouncedTerm = refDebounced(searchTerm, CREATURE_SEARCH.debounceMs);
   const options = shallowRef<Array<CreatureOption>>([]);
@@ -32,7 +34,7 @@ export function useCreatureSearch() {
 
     try {
       const creatures = creatureOptionsSchema.parse(
-        await $fetch(BESTIARY_SECTION.listUrl, {
+        await api(BESTIARY_SECTION.listUrl, {
           method: 'POST',
           body: buildListRequest({
             page: 0,

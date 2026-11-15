@@ -1,10 +1,7 @@
 <script setup lang="ts">
-  import { SectionLayout } from '~section/layout';
   import { AuthModal } from '~user/auth-modal';
   import { PROFILE_ICON, PROFILE_TEXT } from '~user/model';
-  import { ProfileNavigation } from '~user/profile';
-
-  definePageMeta({ layout: 'section' });
+  import { ProfileNavigation, ProfileSidebar } from '~user/profile';
 
   // Кабинет личный, поисковикам он не нужен
   useSeoMeta({
@@ -12,14 +9,9 @@
     robots: 'noindex, nofollow',
   });
 
-  const { user, isLoggedIn, pending, signOut } = useUser();
+  const { isLoggedIn, pending, signOut } = useUser();
 
   const isAuthOpen = ref(false);
-
-  // Без отображаемого имени на сайте показывается логин
-  const shownName = computed(
-    () => user.value?.displayName || user.value?.username || '',
-  );
 
   function openAuth(): void {
     isAuthOpen.value = true;
@@ -31,41 +23,36 @@
 </script>
 
 <template>
-  <SectionLayout :title="PROFILE_TEXT.title">
-    <template
-      v-if="isLoggedIn"
-      #controls
-    >
-      <div class="flex flex-col gap-3">
-        <div class="flex flex-col">
-          <span class="truncate font-semibold text-highlighted">
-            {{ shownName }}
-          </span>
+  <div>
+    <h1 class="sr-only">{{ PROFILE_TEXT.title }}</h1>
 
-          <span class="truncate text-sm text-muted">
-            {{ user?.username }}
-          </span>
-        </div>
-
-        <ProfileNavigation />
-
-        <UButton
-          :label="PROFILE_TEXT.signOut"
-          :icon="PROFILE_ICON.signOut"
-          color="error"
-          variant="subtle"
-          class="hidden lg:flex"
-          block
-          @click.left.exact.prevent="handleSignOut"
-        />
-      </div>
-    </template>
-
+    <!-- Раскладка как на new.ttg.club: слева пользователь и разделы -->
     <div
       v-if="isLoggedIn"
-      class="flex max-w-3xl flex-col gap-4"
+      class="grid grid-cols-1 items-start gap-8 pb-12 lg:grid-cols-16"
     >
-      <NuxtPage />
+      <div class="flex min-w-0 flex-col gap-6 lg:col-span-5">
+        <ProfileSidebar />
+
+        <div class="hidden flex-col gap-2 lg:flex">
+          <ProfileNavigation is-full />
+
+          <UButton
+            :label="PROFILE_TEXT.signOut"
+            :icon="PROFILE_ICON.signOut"
+            color="error"
+            variant="ghost"
+            size="lg"
+            @click.left.exact.prevent="handleSignOut"
+          />
+        </div>
+      </div>
+
+      <div class="flex min-w-0 flex-col gap-6 lg:col-span-11">
+        <ProfileNavigation class="lg:hidden" />
+
+        <NuxtPage />
+      </div>
     </div>
 
     <UEmpty
@@ -85,5 +72,5 @@
     </UEmpty>
 
     <AuthModal v-model="isAuthOpen" />
-  </SectionLayout>
+  </div>
 </template>

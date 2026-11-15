@@ -73,3 +73,19 @@ export type ContentRenderItem =
       attributes: Record<string, string>;
       children: Array<ContentNode>;
     };
+
+/** Запись, на которую нажали в тексте. */
+export interface ContentLinkRequest {
+  /** Адрес записи на сайте. */
+  path: string;
+  /** Текст ссылки. */
+  title: string;
+  /** Точка клика. */
+  origin: { x: number; y: number };
+}
+
+/**
+ * Свой способ открыть запись по ссылке из текста.
+ * @returns взялся ли обработчик за запись; иначе ссылка ведёт себя как обычно
+ */
+export type ContentLinkHandler = (request: ContentLinkRequest) => boolean;

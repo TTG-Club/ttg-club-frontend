@@ -22,7 +22,9 @@ const blobSchema = z.instanceof(Blob);
  * @param url - адрес картинки
  */
 async function fetchBlob(url: string): Promise<Blob> {
-  return blobSchema.parse(await $fetch(url, { responseType: 'blob' }));
+  const api = useApi();
+
+  return blobSchema.parse(await api(url, { responseType: 'blob' }));
 }
 
 /**

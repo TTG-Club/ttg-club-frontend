@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 import {
   COMMENT_ANCHOR_PREFIX,
+  COMMENT_SECTION_LABELS,
   COMMENT_SECTION_MAX_LENGTH,
   COMMENT_URL_MAX_LENGTH,
   COMMENTS_ENABLED_SECTIONS,
@@ -253,6 +254,40 @@ export function isCommentTombstone(
   comment: PublicComment,
 ): comment is CommentTombstone {
   return comment.status === 'DELETED' && comment.content === null;
+}
+
+/**
+ * Живые комментарии без надгробий: в ленте вне страницы обсуждения
+ * заглушке без автора и текста показать нечего.
+ * @param comments - комментарии публичной выдачи
+ */
+export function filterLiveComments(
+  comments: Array<PublicComment>,
+): Array<CommentEntry> {
+  return comments.filter(
+    (comment): comment is CommentEntry => !isCommentTombstone(comment),
+  );
+}
+
+/**
+ * Русское название раздела комментария; незнакомый — как есть.
+ * @param section - раздел в сервисе комментариев
+ */
+export function getCommentSectionLabel(section: string): string {
+  return COMMENT_SECTION_LABELS[section] ?? section;
+}
+
+/**
+ * Ссылка на комментарий на странице его обсуждения.
+ * @param comment - комментарий с адресом страницы
+ * @returns ссылка либо `undefined`, если адрес страницы неизвестен
+ */
+export function getCommentPageLink(
+  comment: Pick<CommentEntry, 'id' | 'url'>,
+): string | undefined {
+  return comment.url
+    ? `${comment.url}#${getCommentAnchorId(comment.id)}`
+    : undefined;
 }
 
 /**

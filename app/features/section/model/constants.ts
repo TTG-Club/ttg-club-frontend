@@ -1,5 +1,7 @@
 import type { ListColumnCount } from '~/shared/consts';
 
+import type { SourcePreset } from './types';
+
 /** Параметр источников в запросе и в адресе. */
 export const SOURCES_PARAM = 'book';
 
@@ -57,6 +59,10 @@ export const SECTION_TEXT = {
   sourceSearch: 'Поиск по источникам...',
   sourceSearchLabel: 'Поиск по источникам',
   selectAll: 'Выбрать все',
+  clearAll: 'Снять все',
+  /** Сводка под заголовком панели источников: «Выбрано 3 из 24». */
+  sourcesSelected: 'Выбрано',
+  sourcesOf: 'из',
   more: 'Ещё',
   actions: 'Действия с записью',
   print: 'Печать',
@@ -85,6 +91,12 @@ export const SECTION_ICON = {
   zoom: 'tabler:zoom-in',
   print: 'tabler:printer',
   export: 'tabler:file-export',
+  selectAll: 'tabler:checks',
+  clearAll: 'tabler:square-off',
+  /** Место обложки у книги в панели источников. */
+  book: 'tabler:book',
+  /** Стрелка группы источников: у раскрытой повёрнута вниз. */
+  groupToggle: 'tabler:chevron-right',
 } as const;
 
 /** Платформы экспорта записи в JSON, как в старом SPA. */
@@ -115,6 +127,27 @@ export const FILTER_SEARCH_MIN_VALUES = 20;
 
 /** Задержка перед пересчётом групп под поиск по фильтрам. */
 export const FILTER_SEARCH_DEBOUNCE_MS = 200;
+
+/**
+ * Сторона и ширина панелей фильтра и источников. Общие у обеих: они
+ * открываются кнопками в начале строки фильтров раздела и выезжают с той же
+ * стороны одинаковыми, как на new.ttg.club. Вариант `sm:` перебивает
+ * штатную ширину панели Nuxt UI на широком экране.
+ */
+export const FILTER_DRAWER_SIDE = 'left';
+
+export const FILTER_DRAWER_UI = {
+  content: 'w-full max-w-240 min-w-80 sm:max-w-240',
+};
+
+/**
+ * Начало имени cookie с выбранным фильтром раздела: выбор переживает уход
+ * со списка, как в старом SPA, а сервер сразу отдаёт отфильтрованный список.
+ */
+export const SECTION_FILTER_COOKIE_PREFIX = 'ttg_section_filter_';
+
+/** Сколько секунд помнить выбранный фильтр раздела. */
+export const SECTION_FILTER_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 /** Параметр адреса с открытой записью в широком режиме, как на new.ttg.club. */
 export const SECTION_DETAIL_QUERY_KEY = 'detail';
@@ -236,3 +269,27 @@ export const SECTION_SWIPE_ENTER_SHIFT = 0.3;
 
 /** Длительность ухода, въезда и возврата записи на место, мс. */
 export const SECTION_SWIPE_DURATION_MS = 200;
+
+/**
+ * Общий список книг: из него панель источников берёт английские названия.
+ * Размер `-1` — все книги сразу.
+ */
+export const SOURCE_CATALOG_PATH = '/api/v1/books';
+
+export const SOURCE_CATALOG_QUERY = { page: 0, size: -1 } as const;
+
+/** Ключ кэша списка книг: один на панели всех разделов. */
+export const SOURCE_CATALOG_KEY = 'section-source-catalog';
+
+/**
+ * Быстрые наборы над списком источников, как на new.ttg.club. Ключи — группы
+ * источников из фильтров разделов; `OFFICAL` с опечаткой — так его отдаёт API.
+ */
+export const SOURCE_PRESETS: ReadonlyArray<SourcePreset> = [
+  { id: 'official', label: 'Только базовые', keys: ['OFFICAL'] },
+  {
+    id: 'official-settings',
+    label: 'Базовые и сеттинги',
+    keys: ['OFFICAL', 'SETTING'],
+  },
+];

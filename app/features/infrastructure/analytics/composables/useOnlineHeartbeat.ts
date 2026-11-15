@@ -1,21 +1,13 @@
-import type { OnlineHeartbeatBody } from '../model';
-
 import { consola } from 'consola';
 
-import {
-  ONLINE_VISITOR_ID_COOKIE,
-  ONLINE_VISITOR_ID_MAX_AGE_SECONDS,
-} from '#shared/consts';
 import { ONLINE_HEARTBEAT_PATH } from '~/shared/consts';
 
 import {
-  getGuestHeartbeatBody,
-  getRegisteredHeartbeatBody,
   ONLINE_HEARTBEAT_COOLDOWN_MS,
   ONLINE_HEARTBEAT_INTERVAL_MS,
   ONLINE_HEARTBEAT_LOCK_NAME,
-  parseOnlineVisitorId,
 } from '../model';
+import { useOnlineVisitor } from './useOnlineVisitor';
 
 /**
  * Отмечает посетителя онлайн, как старый SPA. Отмечает одна вкладка сайта:
@@ -24,34 +16,15 @@ import {
  * статистики.
  */
 export function useOnlineHeartbeat(): void {
+  const api = useApi();
+
+  const { getVisitor } = useOnlineVisitor();
   const { user } = useUser();
   const visibility = useDocumentVisibility();
-
-  const visitorIdCookie = useCookie<unknown>(ONLINE_VISITOR_ID_COOKIE, {
-    maxAge: ONLINE_VISITOR_ID_MAX_AGE_SECONDS,
-    path: '/',
-    sameSite: 'lax',
-  });
 
   let isLeader = false;
   let isSending = false;
   let lastSentAt = Number.NEGATIVE_INFINITY;
-
-  /** Тело отметки; гостю при первой отметке выдаётся идентификатор. */
-  function getBody(): OnlineHeartbeatBody {
-    const saved = parseOnlineVisitorId(visitorIdCookie.value);
-    const username = user.value?.username;
-
-    if (username) {
-      return getRegisteredHeartbeatBody(username, saved);
-    }
-
-    const visitorId = saved ?? crypto.randomUUID();
-
-    visitorIdCookie.value = visitorId;
-
-    return getGuestHeartbeatBody(visitorId);
-  }
 
   /**
    * Отправляет одну отметку.
@@ -72,9 +45,9 @@ export function useOnlineHeartbeat(): void {
     lastSentAt = Date.now();
 
     try {
-      await $fetch(ONLINE_HEARTBEAT_PATH, {
+      await api(ONLINE_HEARTBEAT_PATH, {
         method: 'POST',
-        body: getBody(),
+        body: getVisitor(),
         retry: 0,
       });
     } catch (error) {

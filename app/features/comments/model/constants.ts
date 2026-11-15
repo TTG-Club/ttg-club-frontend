@@ -4,6 +4,9 @@
  */
 export const COMMENTS_API_PATH = '/api/v1/comments';
 
+/** Лента последних комментариев сайта, свежие сверху. */
+export const COMMENTS_RECENT_PATH = `${COMMENTS_API_PATH}/recent`;
+
 /** Платформа этого сайта в сервисе комментариев. */
 export const COMMENTS_SOURCE_PLATFORM = 'SITE_5E14';
 
@@ -37,6 +40,28 @@ export const COMMENTS_ENABLED_SECTIONS: Readonly<Record<string, string>> = {
   '/screens': 'screens',
   '/spells': 'spells',
   '/weapons': 'weapons',
+};
+
+/**
+ * Русские названия разделов для ленты последних комментариев. Незнакомый
+ * раздел показывается как есть.
+ */
+export const COMMENT_SECTION_LABELS: Readonly<Record<string, string>> = {
+  'armors': 'Доспехи',
+  'backgrounds': 'Предыстории',
+  'bestiary': 'Бестиарий',
+  'books': 'Источники',
+  'classes': 'Классы',
+  'feats': 'Черты',
+  'gods': 'Боги',
+  'items': 'Снаряжение',
+  'magic-items': 'Магические предметы',
+  'options': 'Особенности классов',
+  'races': 'Расы',
+  'rules': 'Правила',
+  'screens': 'Ширма',
+  'spells': 'Заклинания',
+  'weapons': 'Оружие',
 };
 
 /** Размер страницы корневых комментариев. */

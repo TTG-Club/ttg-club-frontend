@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { DetailType } from '../model';
 
+  import { useContentLinkHandler } from '../composables';
   import { RAW_TOOLTIP_PREFIX } from '../model';
 
   /**
@@ -44,12 +45,30 @@
   const isOpen = ref(false);
   const isMounted = ref(false);
 
+  const linkHandler = useContentLinkHandler();
+
   /**
-   * Открывает дровер вместо перехода по ссылке внутри подсказки.
+   * Открывает дровер вместо перехода по ссылке внутри подсказки, если
+   * запись не взял на себя свой обработчик (например, окно ширмы).
    * @param event - клик левой кнопкой без модификаторов
    */
   function open(event: MouseEvent): void {
     event.preventDefault();
+
+    const isHandled =
+      !!url
+      && !!linkHandler?.({
+        path: url,
+        title,
+        origin: { x: event.clientX, y: event.clientY },
+      });
+
+    // Ссылка внутри подсказки спросила бы обработчик второй раз
+    if (isHandled) {
+      event.stopPropagation();
+
+      return;
+    }
 
     isMounted.value = true;
     isOpen.value = true;

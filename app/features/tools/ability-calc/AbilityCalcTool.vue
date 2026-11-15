@@ -16,6 +16,8 @@
   import AbilityStandard from './AbilityStandard.vue';
   import AbilityTable from './AbilityTable.vue';
 
+  const api = useApi();
+
   /**
    * Калькулятор характеристик: слева раса с бонусами, справа способ
    * получить значения и итог с модификаторами. У каждого способа свои
@@ -25,7 +27,7 @@
     'tools-ability-calc-races',
     async () =>
       abilityRacesSchema.parse(
-        await $fetch(RACES_SECTION.listUrl, {
+        await api(RACES_SECTION.listUrl, {
           method: 'POST',
           body: buildListRequest({
             page: 0,

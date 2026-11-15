@@ -63,6 +63,17 @@ export const TURN_REEL = {
   window: 8,
 } as const;
 
+/**
+ * Токен на ленте ходов. Размер меняется масштабом, а не шириной: так браузер
+ * не раскладывает ленту заново на каждом кадре. У обычного токена кольцо и
+ * значок крупнее на величину масштаба — на экране выходят те же размеры,
+ * что у текущего.
+ */
+export const TURN_REEL_TOKEN_CLASS = {
+  current: { ring: 'ring-2 ring-primary shadow-lg', icon: 'size-6' },
+  regular: { ring: 'scale-70 ring-3 ring-default', icon: 'size-8.5' },
+} as const;
+
 /** Поиск существ для добавления: сколько и через сколько миллисекунд. */
 export const CREATURE_SEARCH = {
   size: 20,

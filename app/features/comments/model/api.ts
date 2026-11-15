@@ -12,6 +12,7 @@ import {
   COMMENTS_API_PATH,
   COMMENTS_HTTP_STATUS,
   COMMENTS_PAGE_SIZE,
+  COMMENTS_RECENT_PATH,
   COMMENTS_ROOT_SORT,
   COMMENTS_SOURCE_PLATFORM,
 } from './constants';
@@ -62,7 +63,9 @@ export async function fetchRootComments(
   page: number,
   size: number = COMMENTS_PAGE_SIZE,
 ): Promise<CommentsPage> {
-  const response: unknown = await $fetch(COMMENTS_API_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(COMMENTS_API_PATH, {
     query: {
       sourcePlatform: COMMENTS_SOURCE_PLATFORM,
       section: target.section,
@@ -78,13 +81,35 @@ export async function fetchRootComments(
 }
 
 /**
+ * Последние комментарии всех страниц этого сайта, свежие сверху: сервис
+ * отбирает их по платформе, комментарии нового сайта сюда не попадают.
+ * @param page - номер страницы с нуля
+ * @param size - размер страницы
+ */
+export async function fetchRecentComments(
+  page: number,
+  size: number,
+): Promise<CommentsPage> {
+  const api = useApi();
+
+  const response: unknown = await api(COMMENTS_RECENT_PATH, {
+    query: { sourcePlatform: COMMENTS_SOURCE_PLATFORM, page, size },
+    retry: 0,
+  });
+
+  return parseCommentsPage(response);
+}
+
+/**
  * Число опубликованных комментариев страницы вместе с ответами.
  * @param target - тред страницы
  */
 export async function fetchCommentsCount(
   target: CommentsTarget,
 ): Promise<number> {
-  const response: unknown = await $fetch(`${COMMENTS_API_PATH}/count`, {
+  const api = useApi();
+
+  const response: unknown = await api(`${COMMENTS_API_PATH}/count`, {
     query: { sourcePlatform: COMMENTS_SOURCE_PLATFORM, ...target },
     retry: 0,
   });
@@ -100,7 +125,9 @@ export async function fetchCommentsCount(
 export async function fetchLatestComment(
   target: CommentsTarget,
 ): Promise<PublicComment | null> {
-  const response: unknown = await $fetch(`${COMMENTS_API_PATH}/latest`, {
+  const api = useApi();
+
+  const response: unknown = await api(`${COMMENTS_API_PATH}/latest`, {
     query: { sourcePlatform: COMMENTS_SOURCE_PLATFORM, ...target },
     retry: 0,
   });
@@ -116,7 +143,9 @@ export async function fetchLatestComment(
 export async function fetchCommentById(
   commentId: string,
 ): Promise<PublicComment> {
-  const response: unknown = await $fetch(`${COMMENTS_API_PATH}/${commentId}`, {
+  const api = useApi();
+
+  const response: unknown = await api(`${COMMENTS_API_PATH}/${commentId}`, {
     retry: 0,
   });
 
@@ -130,7 +159,9 @@ export async function fetchCommentById(
 export async function fetchCommentReplies(
   parentId: string,
 ): Promise<Array<PublicComment>> {
-  const response: unknown = await $fetch(
+  const api = useApi();
+
+  const response: unknown = await api(
     `${COMMENTS_API_PATH}/${parentId}/replies`,
     { retry: 0 },
   );
@@ -145,7 +176,9 @@ export async function fetchCommentReplies(
 export async function createRootComment(
   draft: CommentDraft,
 ): Promise<CommentEntry> {
-  const response: unknown = await $fetch(COMMENTS_API_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(COMMENTS_API_PATH, {
     method: 'POST',
     body: parseCreateCommentRequest({
       ...draft,
@@ -166,7 +199,9 @@ export async function createCommentReply(
   parentId: string,
   draft: CommentDraft,
 ): Promise<CommentEntry> {
-  const response: unknown = await $fetch(
+  const api = useApi();
+
+  const response: unknown = await api(
     `${COMMENTS_API_PATH}/${parentId}/replies`,
     {
       method: 'POST',
@@ -190,7 +225,9 @@ export async function updateComment(
   commentId: string,
   content: string,
 ): Promise<CommentEntry> {
-  const response: unknown = await $fetch(`${COMMENTS_API_PATH}/${commentId}`, {
+  const api = useApi();
+
+  const response: unknown = await api(`${COMMENTS_API_PATH}/${commentId}`, {
     method: 'PATCH',
     body: { content: normalizeCommentContent(content) },
     retry: 0,
@@ -205,7 +242,9 @@ export async function updateComment(
  * @param commentId - идентификатор комментария
  */
 export async function deleteComment(commentId: string): Promise<void> {
-  await $fetch(`${COMMENTS_API_PATH}/${commentId}`, {
+  const api = useApi();
+
+  await api(`${COMMENTS_API_PATH}/${commentId}`, {
     method: 'DELETE',
     retry: 0,
   });
@@ -216,7 +255,9 @@ export async function deleteComment(commentId: string): Promise<void> {
  * @param commentId - идентификатор комментария
  */
 export async function restoreComment(commentId: string): Promise<CommentEntry> {
-  const response: unknown = await $fetch(
+  const api = useApi();
+
+  const response: unknown = await api(
     `${COMMENTS_API_PATH}/${commentId}/restore`,
     { method: 'POST', retry: 0 },
   );
@@ -229,7 +270,9 @@ export async function restoreComment(commentId: string): Promise<CommentEntry> {
  * @param commentId - идентификатор комментария
  */
 export async function reportComment(commentId: string): Promise<CommentEntry> {
-  const response: unknown = await $fetch(
+  const api = useApi();
+
+  const response: unknown = await api(
     `${COMMENTS_API_PATH}/${commentId}/dislike`,
     { method: 'POST', retry: 0 },
   );

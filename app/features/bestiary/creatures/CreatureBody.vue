@@ -102,7 +102,7 @@
   <div class="flex flex-col gap-4">
     <SectionSourceBar :left="typeLabel" />
 
-    <div class="flow-root">
+    <div class="@container flow-root">
       <SectionImagePreview
         v-if="creature.images?.length"
         :images="creature.images"

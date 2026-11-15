@@ -24,7 +24,9 @@ import {
  * @param path - адрес страницы записи
  */
 export async function fetchReferenceEntry(path: string): Promise<unknown> {
-  return await $fetch<unknown>(`${REFERENCE_API_PATH}${path}`, {
+  const api = useApi();
+
+  return await api<unknown>(`${REFERENCE_API_PATH}${path}`, {
     method: 'POST',
   });
 }
@@ -41,7 +43,9 @@ export async function fetchWorkshopPreview(
   payload: Record<string, unknown>,
   entryId: number | undefined,
 ): Promise<unknown> {
-  return await $fetch<unknown>(
+  const api = useApi();
+
+  return await api<unknown>(
     `${WORKSHOP_API_PATH}/${apiSection}/${WORKSHOP_PREVIEW_SEGMENT}`,
     {
       method: 'POST',
@@ -60,7 +64,9 @@ export async function fetchWorkshopEntry(
   apiSection: string,
   slug: string,
 ): Promise<unknown> {
-  return await $fetch<unknown>(`${WORKSHOP_API_PATH}/${apiSection}/${slug}`);
+  const api = useApi();
+
+  return await api<unknown>(`${WORKSHOP_API_PATH}/${apiSection}/${slug}`);
 }
 
 /**
@@ -70,8 +76,10 @@ export async function fetchWorkshopEntry(
 export async function fetchFilterGroups(
   filterPath: string,
 ): Promise<Map<string, Array<SelectOption>>> {
+  const api = useApi();
+
   return parseFilterGroups(
-    await $fetch<unknown>(filterPath, { method: 'POST', body: {} }),
+    await api<unknown>(filterPath, { method: 'POST', body: {} }),
   );
 }
 
@@ -84,8 +92,10 @@ export async function createWorkshopEntry(
   apiSection: string,
   payload: Record<string, unknown>,
 ): Promise<SavedEntry> {
+  const api = useApi();
+
   return parseSavedEntry(
-    await $fetch<unknown>(`${WORKSHOP_API_PATH}/${apiSection}`, {
+    await api<unknown>(`${WORKSHOP_API_PATH}/${apiSection}`, {
       method: 'POST',
       body: payload,
     }),
@@ -103,8 +113,10 @@ export async function updateWorkshopEntry(
   entryId: number,
   payload: Record<string, unknown>,
 ): Promise<SavedEntry> {
+  const api = useApi();
+
   return parseSavedEntry(
-    await $fetch<unknown>(`${WORKSHOP_API_PATH}/${apiSection}/${entryId}`, {
+    await api<unknown>(`${WORKSHOP_API_PATH}/${apiSection}/${entryId}`, {
       method: 'PATCH',
       body: payload,
     }),
@@ -120,8 +132,10 @@ export async function fetchRevisions(
   apiSection: string,
   entryId: number,
 ): Promise<Array<RevisionInfo>> {
+  const api = useApi();
+
   return parseRevisions(
-    await $fetch<unknown>(
+    await api<unknown>(
       `${WORKSHOP_API_PATH}/${apiSection}/${entryId}/revisions`,
     ),
   );
@@ -138,7 +152,9 @@ export async function restoreRevision(
   entryId: number,
   revision: number,
 ): Promise<void> {
-  await $fetch(
+  const api = useApi();
+
+  await api(
     `${WORKSHOP_API_PATH}/${apiSection}/${entryId}/revisions/${revision}/restore`,
     { method: 'POST' },
   );
@@ -146,8 +162,10 @@ export async function restoreRevision(
 
 /** Книги для выбора источника. */
 export async function fetchBookSources(): Promise<Array<BookSourceOption>> {
+  const api = useApi();
+
   return parseBookSources(
-    await $fetch<unknown>(WORKSHOP_BOOKS_PATH, {
+    await api<unknown>(WORKSHOP_BOOKS_PATH, {
       method: 'POST',
       body: WORKSHOP_BOOKS_QUERY,
     }),

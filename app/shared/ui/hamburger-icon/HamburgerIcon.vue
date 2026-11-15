@@ -15,7 +15,7 @@
       v-for="key in 3"
       :key
       :class="$style.line"
-      class="mx-auto my-1 block aspect-20/2 h-0.5 rounded-sm bg-current transition-all duration-300 ease-in-out"
+      class="mx-auto my-1 block aspect-20/2 h-0.5 rounded-sm bg-current transition-[transform,opacity] duration-300 ease-in-out"
     />
   </UButton>
 </template>
@@ -38,9 +38,9 @@
 
     &:hover:not(.isActive) {
       .line {
+        // Линия укорачивается масштабом, а не шириной: без пересчёта вёрстки
         &:nth-child(1) {
-          transform: translateX(-6px) translate3d(0, 0, 0);
-          width: 14px;
+          transform: translateX(-6px) scaleX(0.7);
         }
       }
     }

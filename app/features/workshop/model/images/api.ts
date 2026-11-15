@@ -37,8 +37,10 @@ export async function fetchWorkshopGallery(
   type: WorkshopImageType,
   entryId: number,
 ): Promise<Array<string>> {
+  const api = useApi();
+
   return parseWorkshopGallery(
-    await $fetch<unknown>(getEntryImagesPath(type, entryId)),
+    await api<unknown>(getEntryImagesPath(type, entryId)),
   );
 }
 
@@ -53,8 +55,10 @@ export async function saveWorkshopGallery(
   entryId: number,
   images: ReadonlyArray<string>,
 ): Promise<Array<string>> {
+  const api = useApi();
+
   return parseWorkshopGallery(
-    await $fetch<unknown>(getEntryImagesPath(type, entryId), {
+    await api<unknown>(getEntryImagesPath(type, entryId), {
       method: 'PUT',
       body: { images },
     }),
@@ -72,8 +76,10 @@ export async function uploadWorkshopGalleryImage(
   entryId: number,
   file: File,
 ): Promise<Array<string>> {
+  const api = useApi();
+
   return parseWorkshopGallery(
-    await $fetch<unknown>(getEntryImagesPath(type, entryId), {
+    await api<unknown>(getEntryImagesPath(type, entryId), {
       method: 'POST',
       body: createFileBody(file),
     }),
@@ -89,8 +95,10 @@ export async function fetchWorkshopCover(
   type: WorkshopImageType,
   entryId: number,
 ): Promise<WorkshopCover> {
+  const api = useApi();
+
   return parseWorkshopCover(
-    await $fetch<unknown>(
+    await api<unknown>(
       `${getEntryImagesPath(type, entryId)}/${WORKSHOP_IMAGES_COVER_SEGMENT}`,
     ),
   );
@@ -107,8 +115,10 @@ export async function uploadWorkshopCover(
   entryId: number,
   file: File,
 ): Promise<WorkshopCover> {
+  const api = useApi();
+
   return parseWorkshopCover(
-    await $fetch<unknown>(
+    await api<unknown>(
       `${getEntryImagesPath(type, entryId)}/${WORKSHOP_IMAGES_COVER_SEGMENT}`,
       { method: 'POST', body: createFileBody(file) },
     ),

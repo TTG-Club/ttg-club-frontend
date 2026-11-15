@@ -6,6 +6,8 @@
   import { CLASS_TEXT, classDetailSchema } from '../model';
   import ClassArchetypeDetail from './ClassArchetypeDetail.vue';
 
+  const api = useApi();
+
   /**
    * Архетипы под умениями класса: каждый под спойлером, а его умения
    * грузятся при первом раскрытии, как в старом SPA.
@@ -32,7 +34,7 @@
 
     try {
       const detail = classDetailSchema.parse(
-        await $fetch(getEntryApiPath(url), { method: 'POST' }),
+        await api(getEntryApiPath(url), { method: 'POST' }),
       );
 
       details.value = { ...details.value, [url]: detail };

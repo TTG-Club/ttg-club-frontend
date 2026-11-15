@@ -2,7 +2,12 @@ import type { OnlineHeartbeatBody } from './types';
 
 import { z } from 'zod';
 
+import { getErrorStatus } from '~user/model';
+
 import {
+  FEATURE_USAGE_REJECTED_MIN_STATUS,
+  FEATURE_USAGE_SERVER_ERROR_MIN_STATUS,
+  FEATURE_USAGE_TOO_MANY_REQUESTS_STATUS,
   ONLINE_VISITOR_KEY_MAX_LENGTH,
   ONLINE_VISITOR_TYPE,
 } from './constants';
@@ -41,4 +46,21 @@ export function getRegisteredHeartbeatBody(
  */
 export function getGuestHeartbeatBody(visitorId: string): OnlineHeartbeatBody {
   return { key: visitorId, type: ONLINE_VISITOR_TYPE.guest };
+}
+
+/**
+ * Сервис учёта отказал так, что повторять бессмысленно: ручки нет или запрос
+ * ей не подходит. Превышение лимита, сбои сервера и обрыв сети — временные,
+ * после них отметки продолжаются.
+ * @param error - пойманная ошибка запроса
+ */
+export function isFeatureUsageRejected(error: unknown): boolean {
+  const status = getErrorStatus(error);
+
+  return (
+    status !== undefined
+    && status >= FEATURE_USAGE_REJECTED_MIN_STATUS
+    && status < FEATURE_USAGE_SERVER_ERROR_MIN_STATUS
+    && status !== FEATURE_USAGE_TOO_MANY_REQUESTS_STATUS
+  );
 }

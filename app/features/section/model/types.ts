@@ -92,6 +92,12 @@ export interface SectionConfig {
    * классы и виды слишком велики для дровера.
    */
   isDrawerDisabled?: boolean;
+  /**
+   * Без поиска по фильтру по содержимому, даже если значений много: у
+   * раздела фильтр из одного понятного списка, например разделы
+   * справочника.
+   */
+  isFilterSearchDisabled?: boolean;
 }
 
 /**
@@ -127,4 +133,33 @@ export interface SectionGroupingOption {
   value: string;
   label: string;
   icon: string;
+}
+
+/** Книга строкой в панели источников. */
+export interface SourceEntry {
+  /** Ключ значения фильтра. */
+  key: string;
+  /** Русское название; без него — сокращение. */
+  name: string;
+  /** Сокращение, например `PHB`; нет, если им же книга и названа. */
+  acronym?: string;
+  /** Английское название из списка книг. */
+  english?: string;
+  selected: boolean;
+}
+
+/** Группа панели источников с книгами, которые сейчас показаны. */
+export interface SourceGroupEntries {
+  group: FilterGroup;
+  entries: Array<SourceEntry>;
+  /** Раскрыта ли группа при открытии панели. */
+  isOpenByDefault: boolean;
+}
+
+/** Быстрый набор источников: отмечает свои группы целиком. */
+export interface SourcePreset {
+  id: string;
+  label: string;
+  /** Ключи групп источников из фильтра раздела. */
+  keys: ReadonlyArray<string>;
 }

@@ -46,7 +46,7 @@
     type="button"
     :aria-label="HOME_SEARCH_PLACEHOLDER"
     :class="$style.search"
-    class="group relative flex w-full max-w-3xl cursor-text items-center gap-3 rounded-xl border border-default bg-muted px-4 py-3.5 text-left transition-colors duration-200 hover:border-primary/60 hover:bg-elevated 2xl:max-w-4xl"
+    class="group relative flex w-full max-w-3xl cursor-text items-center gap-3 rounded-xl border border-default bg-muted px-4 py-3.5 text-left transition-colors duration-200 hover:border-primary/60 hover:bg-elevated 2xl:max-w-4xl performance:border-primary/50 performance:hover:border-primary"
     @click.left.exact.prevent="open"
   >
     <!--
@@ -57,6 +57,7 @@
     <span
       aria-hidden="true"
       :class="$style.glow"
+      class="performance:hidden"
     >
       <span :class="$style.arcs" />
     </span>

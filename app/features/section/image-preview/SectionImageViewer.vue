@@ -58,6 +58,7 @@
         />
 
         <img
+          decoding="async"
           :src="current"
           :alt="alt"
           class="max-h-full min-w-0 flex-auto object-contain"

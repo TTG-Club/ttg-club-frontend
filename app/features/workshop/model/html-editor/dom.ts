@@ -530,6 +530,8 @@ export function applyTableAction(
       cell.closest('table')?.remove();
 
       return undefined;
+    default:
+      return undefined;
   }
 }
 

@@ -3,6 +3,7 @@
 
   import { ContentRender } from '~content/render';
   import { SectionCollapse } from '~section/collapse';
+  import { useSectionEntryCompact } from '~section/composables';
   import { SectionDetailLayout } from '~section/detail-layout';
   import { SectionDrawer } from '~section/entry-drawer';
   import { SectionImageCover } from '~section/image-preview';
@@ -20,6 +21,13 @@
     /** Адрес открытой записи: расы или разновидности. */
     path: string;
   }>();
+
+  // В окне ширмы расу читают, а не листают: переходы и описание не нужны
+  const isCompact = useSectionEntryCompact();
+
+  const isHeaderVisible = computed(
+    () => !isCompact && !!(race.baseRace || race.description),
+  );
 
   const stats = computed(() => getRaceStats(race));
 
@@ -41,7 +49,7 @@
   <div class="flex flex-col gap-4">
     <SectionDetailLayout>
       <template
-        v-if="race.baseRace || race.description"
+        v-if="isHeaderVisible"
         #header
       >
         <RaceRoutingBar

@@ -130,6 +130,7 @@
     <!-- Обложка справа на фоне: портрет в полный рост, видно голову и торс -->
     <img
       v-if="image"
+      decoding="async"
       :src="image"
       alt=""
       class="pointer-events-none absolute top-0 right-0 -z-10 w-1/2 opacity-90 transition-transform duration-500 group-hover:scale-105 @lg:w-3/5"

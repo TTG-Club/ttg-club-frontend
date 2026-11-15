@@ -2,26 +2,31 @@
   import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
 
-  import { screenLinkSchema, SCREENS_SECTION } from '../model';
-  import ScreenCard from './ScreenCard.vue';
+  import {
+    getScreenGroup,
+    getScreenGroupOrder,
+    screenLinkSchema,
+    SCREENS_SECTION,
+  } from '../model';
   import ScreenEntry from './ScreenEntry.vue';
+  import ScreenLinkCard from './ScreenLinkCard.vue';
 </script>
 
 <template>
-  <!-- Корневые разделы ширмы карточками в сетку -->
+  <!--
+    Вложенные разделы справочника плитками, сгруппированные по корневым
+    разделам в их порядке; запись открывается как в остальных разделах.
+  -->
   <SectionPage
     :section="SCREENS_SECTION"
     :schema="screenLinkSchema"
     :get-key="getEntryUrl"
+    :get-group="getScreenGroup"
+    :get-group-order="getScreenGroupOrder"
     :get-path="getEntryUrl"
-    view="cards"
   >
-    <template #item="{ item, to }">
-      <ScreenCard
-        :to="to"
-        :title="item.name.rus"
-        :subtitle="item.name.eng"
-      />
+    <template #item="{ item }">
+      <ScreenLinkCard :screen="item" />
     </template>
 
     <template #entry="{ path }">

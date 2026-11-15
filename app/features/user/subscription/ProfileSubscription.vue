@@ -6,6 +6,7 @@
     getMySubscriptions,
     getSubscriptionCaption,
     getSubscriptionSummary,
+    PROFILE_CARD_UI,
     SUBSCRIPTION_ICON,
     SUBSCRIPTION_TEXT,
     SUBSCRIPTIONS_DATA_KEY,
@@ -95,9 +96,9 @@
 </script>
 
 <template>
-  <UCard>
+  <UCard :ui="PROFILE_CARD_UI">
     <template #header>
-      <h2 class="flex items-center gap-2 font-semibold text-highlighted">
+      <h2 class="flex items-center gap-2 font-semibold text-primary">
         <UIcon
           :name="SUBSCRIPTION_ICON.title"
           class="size-5 text-warning"

@@ -23,10 +23,12 @@ export async function requestTracker(
   id: string,
   options: TrackerRequestOptions = {},
 ): Promise<Tracker> {
+  const api = useApi();
+
   const { path = '', method = 'GET', body, accessKey } = options;
 
   return trackerSchema.parse(
-    await $fetch(`${INITIATIVE_API_URL}/${id}${path}`, {
+    await api(`${INITIATIVE_API_URL}/${id}${path}`, {
       method,
       body,
       headers: getTrackerHeaders(accessKey),
@@ -39,8 +41,10 @@ export async function requestTracker(
  * @param name - имя трекера; пустое — бэкенд подставит своё
  */
 export async function createTracker(name = ''): Promise<Tracker> {
+  const api = useApi();
+
   return trackerSchema.parse(
-    await $fetch(INITIATIVE_API_URL, {
+    await api(INITIATIVE_API_URL, {
       method: 'POST',
       body: getTrackerNameBody(name),
     }),
@@ -49,8 +53,10 @@ export async function createTracker(name = ''): Promise<Tracker> {
 
 /** Трекеры пользователя вместе с удалёнными, для истории. */
 export async function fetchTrackerList(): Promise<Array<TrackerListItem>> {
+  const api = useApi();
+
   return trackerListSchema.parse(
-    await $fetch(INITIATIVE_API_URL, { query: { includeDeleted: true } }),
+    await api(INITIATIVE_API_URL, { query: { includeDeleted: true } }),
   );
 }
 
@@ -63,7 +69,9 @@ export async function deleteTracker(
   id: string,
   accessKey?: string,
 ): Promise<void> {
-  await $fetch(`${INITIATIVE_API_URL}/${id}`, {
+  const api = useApi();
+
+  await api(`${INITIATIVE_API_URL}/${id}`, {
     method: 'DELETE',
     headers: getTrackerHeaders(accessKey),
   });

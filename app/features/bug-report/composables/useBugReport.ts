@@ -23,6 +23,8 @@ import {
  * выделенным текстом, а уходит репорт прямо в сервис баг-репортов.
  */
 export function useBugReport() {
+  const api = useApi();
+
   const toast = useToast();
 
   const isOpen = useState('bug-report:open', () => false);
@@ -116,7 +118,7 @@ export function useBugReport() {
     }
 
     try {
-      await $fetch(BUG_REPORT_API_URL, {
+      await api(BUG_REPORT_API_URL, {
         method: 'POST',
         body,
         headers: token ? { Authorization: `Bearer ${token}` } : {},

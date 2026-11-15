@@ -5,7 +5,7 @@
 
   import type { EntrySource } from '../model';
 
-  import { useSectionCopy } from '../composables';
+  import { useSectionCopy, useSectionEntryCompact } from '../composables';
   import {
     SECTION_ICON,
     SECTION_PRINT_QUERY_KEY,
@@ -55,6 +55,8 @@
     'max-md:fixed max-md:right-2 max-md:bottom-(--navbar-height) max-md:z-10 max-md:mb-2',
     'max-md:rounded-md max-md:border max-md:border-default max-md:p-1',
     'max-md:bg-default/50 max-md:shadow-md max-md:backdrop-blur-lg',
+    // Без размытия текст под полупрозрачной плашкой мешал бы кнопкам
+    'performance:max-md:bg-default',
   ];
 
   const emit = defineEmits<{
@@ -66,6 +68,13 @@
   const siteConfig = useSiteConfig();
   const { copyLink: copyToClipboard, copyTitle } = useSectionCopy();
   const { isEditor } = useUser();
+
+  // В окне ширмы у окна свои кнопки, кнопки записи там лишние
+  const isActionsHidden = useSectionEntryCompact();
+
+  // Источник — под заголовком справа; в компактном виде он поднимается в
+  // угол, на место кнопок
+  const isSourceInSubtitle = computed(() => !isActionsHidden && !!source);
 
   const isReady = computed(() => !isLoading && !isError);
 
@@ -115,6 +124,21 @@
 
   function close(): void {
     emit('close');
+  }
+
+  /**
+   * Закрытие страницы записи. Пришли сюда с сайта — возвращаемся назад по
+   * истории: к списку с тем же фильтром и прокруткой или во вкладку класса.
+   * Открыли запись по ссылке — ссылка ведёт в раздел.
+   * @param event - щелчок по кнопке
+   */
+  function closePage(event: MouseEvent): void {
+    if (typeof router.options.history.state.back !== 'string') {
+      return;
+    }
+
+    event.preventDefault();
+    router.back();
   }
 
   /** Печатает только запись, как кнопка печати старого SPA. */
@@ -201,8 +225,16 @@
           </h2>
         </div>
 
+        <!-- В компактном виде кнопок нет: их место в углу занимает источник -->
+        <SectionSourceTag
+          v-if="isActionsHidden && source"
+          :source="source"
+          class="mt-1.5 shrink-0"
+        />
+
         <!-- На телефоне кнопки висят в правом нижнем углу, как на new.ttg.club -->
         <div
+          v-else-if="!isActionsHidden"
           :class="ACTIONS_CLASS"
           class="print:hidden"
         >
@@ -229,6 +261,7 @@
             :aria-label="SECTION_TEXT.close"
             color="neutral"
             variant="ghost"
+            @click.left.exact="closePage"
           />
 
           <UButton
@@ -243,7 +276,7 @@
       </div>
 
       <div
-        v-if="subtitle || source"
+        v-if="subtitle || isSourceInSubtitle"
         class="flex items-center justify-between gap-2"
       >
         <span
@@ -255,7 +288,7 @@
         </span>
 
         <SectionSourceTag
-          v-if="source"
+          v-if="isSourceInSubtitle && source"
           :source="source"
         />
       </div>

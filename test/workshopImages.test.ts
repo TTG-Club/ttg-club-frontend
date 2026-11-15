@@ -41,10 +41,10 @@ describe('workshop images', () => {
 
     expect(
       parseWorkshopCover({
-        url: 'https://img.ttg.club/a.webp',
+        url: '/s3/5e14/a.webp',
         editable: false,
       }),
-    ).toEqual({ url: 'https://img.ttg.club/a.webp', editable: false });
+    ).toEqual({ url: '/s3/5e14/a.webp', editable: false });
 
     expect(() => parseWorkshopGallery({ images: 'first.webp' })).toThrow();
   });

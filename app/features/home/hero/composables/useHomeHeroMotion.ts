@@ -2,7 +2,11 @@ import type { ComputedRef, MaybeRefOrGetter } from 'vue';
 
 import type { HomeHeroMotionState } from '../model';
 
-import { HOME_HERO_MOTION_QUERY, HOME_HERO_MOTION_STORAGE_KEY } from '../model';
+import {
+  HOME_HERO_MOTION_PERFORMANCE_STORAGE_KEY,
+  HOME_HERO_MOTION_QUERY,
+  HOME_HERO_MOTION_STORAGE_KEY,
+} from '../model';
 
 interface HomeHeroMotion {
   /** Что сейчас с повозкой и дымом */
@@ -23,6 +27,8 @@ interface HomeHeroMotion {
  * Анимация есть только на устройствах с мышью и без системной просьбы «меньше
  * движения»; на телефонах и планшетах её нет совсем. По умолчанию она
  * включена, выключенная кнопкой — остаётся выключенной и после перезагрузки.
+ * В режиме графики «производительность» наоборот: по умолчанию стоит, а
+ * включённая кнопкой — остаётся включённой.
  * Пока шапка за экраном, анимация стоит.
  *
  * Выключенная кнопкой анимация замирает на месте, как видео на паузе. Если же
@@ -39,9 +45,30 @@ interface HomeHeroMotion {
 export function useHomeHeroMotion(
   hero: MaybeRefOrGetter<HTMLElement | null>,
 ): HomeHeroMotion {
-  const isEnabled = useLocalStorage(HOME_HERO_MOTION_STORAGE_KEY, true, {
-    initOnMounted: true,
-  });
+  const isEnabledInBeauty = useLocalStorage(
+    HOME_HERO_MOTION_STORAGE_KEY,
+    true,
+    { initOnMounted: true },
+  );
+
+  // В режиме «производительность» фон сразу стоит на паузе; кнопка его
+  // включает, и этот выбор хранится отдельно от обычного
+  const isEnabledInPerformance = useLocalStorage(
+    HOME_HERO_MOTION_PERFORMANCE_STORAGE_KEY,
+    false,
+    { initOnMounted: true },
+  );
+
+  const { mode: graphicsMode } = useGraphicsMode();
+
+  const isPerformance = computed(() => graphicsMode.value === 'performance');
+
+  // localStorage-ссылка допускает null после удаления ключа — считаем по умолчанию
+  const isEnabled = computed(() =>
+    isPerformance.value
+      ? isEnabledInPerformance.value === true
+      : isEnabledInBeauty.value !== false,
+  );
 
   const isMounted = useMounted();
   const isMotionQueryMatched = useMediaQuery(HOME_HERO_MOTION_QUERY);
@@ -73,14 +100,19 @@ export function useHomeHeroMotion(
 
   /** Выключает или включает анимацию; выбор сам уходит в localStorage. */
   function toggle(): void {
-    isEnabled.value = !isEnabled.value;
+    if (isPerformance.value) {
+      isEnabledInPerformance.value = !isEnabled.value;
+
+      return;
+    }
+
+    isEnabledInBeauty.value = !isEnabled.value;
   }
 
   return {
     state,
     isSupported,
-    // localStorage-ссылка допускает null после удаления ключа — наружу отдаём boolean
-    isEnabled: computed(() => isEnabled.value !== false),
+    isEnabled,
     isVisible: readonly(isVisible),
     toggle,
   };

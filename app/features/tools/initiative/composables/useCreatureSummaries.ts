@@ -14,6 +14,8 @@ import { getCreatureRoute, toCreatureSummary } from '../model';
 export function useCreatureSummaries(
   getParticipants: () => ReadonlyArray<TrackerParticipant>,
 ) {
+  const api = useApi();
+
   const summaries = ref<Record<string, CreatureSummary>>({});
   const requested = new Set<string>();
 
@@ -27,7 +29,7 @@ export function useCreatureSummaries(
 
     try {
       const creature = creatureDetailSchema.parse(
-        await $fetch(getEntryApiPath(getCreatureRoute(url)), {
+        await api(getEntryApiPath(getCreatureRoute(url)), {
           method: 'POST',
         }),
       );

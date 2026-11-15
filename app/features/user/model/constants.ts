@@ -53,9 +53,12 @@ export const SIGN_IN_FORM = {
   submitLabel: 'Войти',
   closeLabel: 'Закрыть',
   forgotPassword: 'Забыли пароль?',
-  noAccount: 'Нет аккаунта?',
+  noAccount: 'Ещё нет аккаунта?',
   signUp: 'Зарегистрироваться',
 } as const;
+
+/** Картинка слева в окне входа, та же, что на new.ttg.club. */
+export const AUTH_MODAL_IMAGE = '/img/bg-login.png';
 
 /** Формы окна входа. */
 export const AUTH_VIEWS = ['sign-in', 'sign-up', 'password-reset'] as const;
@@ -184,7 +187,7 @@ export const AUTH_ICON = {
   email: 'tabler:mail',
   password: 'tabler:lock',
   repeat: 'tabler:lock-check',
-  show: 'tabler:eye',
+  show: 'tabler:eye-filled',
   hide: 'tabler:eye-off',
   error: 'tabler:user-exclamation',
   success: 'tabler:user-check',
@@ -241,6 +244,23 @@ export const PROFILE_TEXT = {
   sourcesLoadFailed: 'Не удалось загрузить источники',
   sourcesNoneSelected: 'Выберите хотя бы один источник',
   navigation: 'Разделы личного кабинета',
+} as const;
+
+/** Отступы карточек личного кабинета, как на new.ttg.club. */
+export const PROFILE_CARD_UI = {
+  header: 'px-6 py-4',
+  body: 'p-6',
+} as const;
+
+/** За сколько пикселей до края лента вкладок считается долистанной. */
+export const PROFILE_NAVIGATION_SCROLL_OFFSET = 8;
+
+/** Затухание краёв ленты вкладок: с какой стороны ещё есть что листать. */
+export const PROFILE_NAVIGATION_FADE = {
+  both: 'linear-gradient(to right, transparent, black 72px, black calc(100% - 96px), transparent)',
+  right: 'linear-gradient(to right, black calc(100% - 96px), transparent)',
+  left: 'linear-gradient(to right, transparent, black 72px)',
+  none: 'none',
 } as const;
 
 /** Разделы личного кабинета: общие данные живут по старому адресу. */
@@ -309,6 +329,8 @@ export const PROFILE_ICON = {
   signOut: 'tabler:logout',
   sources: 'tabler:books',
   selectAll: 'tabler:checks',
+  scrollLeft: 'tabler:chevron-left',
+  scrollRight: 'tabler:chevron-right',
 } as const;
 
 /** Статусы подписки из сервиса подписок. */

@@ -19,6 +19,8 @@
     treasuryResultSchema,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Сокровищница по таблицам DMG: показатель опасности монстров и виды
    * добычи. Монеты, магические предметы и драгоценности идут своими
@@ -51,7 +53,7 @@
 
       return [
         treasuryResultSchema.parse(
-          await $fetch(TOOLS_API_URL.treasury, {
+          await api(TOOLS_API_URL.treasury, {
             method: 'POST',
             body,
             signal,

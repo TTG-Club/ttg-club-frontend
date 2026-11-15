@@ -10,6 +10,8 @@
   import { getEntryApiPath } from '../model';
   import SectionDrawer from './SectionDrawer.vue';
 
+  const api = useApi();
+
   /**
    * Запись раздела в дровере поверх страницы: грузится, когда дровер
    * открывают, и выводится через слот карточкой своего раздела.
@@ -39,7 +41,7 @@
   } = useAsyncData(
     () => `section-entry-drawer:${path}`,
     async () =>
-      schema.parse(await $fetch(getEntryApiPath(path), { method: 'POST' })),
+      schema.parse(await api(getEntryApiPath(path), { method: 'POST' })),
     { server: false, immediate: false, deep: false },
   );
 

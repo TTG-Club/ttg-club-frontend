@@ -21,6 +21,8 @@
     wildMagicSourcesSchema,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Генератор дикой магии: эффекты из выбранных книг, хотя бы одна книга
    * выбрана всегда.
@@ -29,7 +31,7 @@
     'tools-wild-magic-sources',
     async () =>
       wildMagicSourcesSchema
-        .parse(await $fetch(TOOLS_API_URL.wildMagic))
+        .parse(await api(TOOLS_API_URL.wildMagic))
         .reverse(),
     { deep: false, default: () => [] },
   );
@@ -57,7 +59,7 @@
       };
 
       return wildMagicResultSchema.array().parse(
-        await $fetch(TOOLS_API_URL.wildMagic, {
+        await api(TOOLS_API_URL.wildMagic, {
           method: 'POST',
           body,
           signal,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { HoverTooltip } from '~/shared/ui/hover-tooltip';
   import { SectionLink } from '~section/list';
   import { getEntryUrl } from '~section/model';
   import { SectionPage } from '~section/page';
@@ -26,13 +27,13 @@
         :subtitle="item.name.eng"
       >
         <template #leading>
-          <UTooltip :text="item.alignment">
+          <HoverTooltip :text="item.alignment">
             <span
               class="flex size-10 shrink-0 items-center justify-center border-r border-default text-lg text-default"
             >
               {{ item.shortAlignment }}
             </span>
-          </UTooltip>
+          </HoverTooltip>
         </template>
       </SectionLink>
     </template>

@@ -10,9 +10,6 @@ export const AUTH_REFRESH_PATH = '/api/v1/auth/refresh';
 /** Выход из аккаунта. */
 export const AUTH_SIGN_OUT_PATH = '/api/v1/auth/signout';
 
-/** Пункты главного меню. */
-export const MENU_PATH = '/api/v1/menu';
-
 /** Регистрация. */
 export const AUTH_SIGN_UP_PATH = '/api/v1/auth/signup';
 
@@ -60,3 +57,6 @@ export const SUBSCRIPTIONS_REDEEM_PATH = `${SUBSCRIPTIONS_PATH}/redeem`;
 
 /** Учёт посетителей онлайн: бэкенд пересылает отметку в сервис онлайна. */
 export const ONLINE_HEARTBEAT_PATH = '/api/online/heartbeat';
+
+/** Учёт работы с инструментами сайта: бэкенд пересылает отметку в сервис онлайна. */
+export const FEATURE_USAGE_PATH = '/api/online/usage';

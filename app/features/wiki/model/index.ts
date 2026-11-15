@@ -25,6 +25,8 @@ export {
   getBookGroup,
   getBookOrder,
   getGodGroup,
+  getScreenGroup,
+  getScreenGroupOrder,
   groupScreens,
   joinWikiList,
   parseSvgIcon,

@@ -83,6 +83,7 @@
     >
       <img
         v-if="posterUrl"
+        decoding="async"
         :src="posterUrl"
         :alt="title"
         class="absolute inset-0 size-full object-cover"

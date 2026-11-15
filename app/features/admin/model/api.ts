@@ -22,7 +22,9 @@ export async function fetchYoutubeVideos(
   page: number,
   size: number,
 ): Promise<YoutubeVideoPage> {
-  const response: unknown = await $fetch(YOUTUBE_API_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(YOUTUBE_API_PATH, {
     query: { page, size, order: YOUTUBE_ORDER },
   });
 
@@ -31,7 +33,9 @@ export async function fetchYoutubeVideos(
 
 /** Сколько роликов сейчас на главной. */
 export async function fetchActiveYoutubeCount(): Promise<number> {
-  const response: unknown = await $fetch(YOUTUBE_COUNT_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(YOUTUBE_COUNT_PATH, {
     query: { active: true },
   });
 
@@ -45,7 +49,9 @@ export async function fetchActiveYoutubeCount(): Promise<number> {
 export async function createYoutubeVideo(
   video: YoutubeCreateData,
 ): Promise<YoutubeVideo> {
-  const response: unknown = await $fetch(YOUTUBE_API_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(YOUTUBE_API_PATH, {
     method: 'POST',
     body: video,
   });
@@ -60,7 +66,9 @@ export async function createYoutubeVideo(
 export async function updateYoutubeVideo(
   video: YoutubeVideo,
 ): Promise<YoutubeVideo> {
-  const response: unknown = await $fetch(YOUTUBE_API_PATH, {
+  const api = useApi();
+
+  const response: unknown = await api(YOUTUBE_API_PATH, {
     method: 'PATCH',
     body: video,
   });
@@ -73,7 +81,9 @@ export async function updateYoutubeVideo(
  * @param videoId - ID ролика
  */
 export async function deleteYoutubeVideo(videoId: string): Promise<void> {
-  await $fetch(YOUTUBE_API_PATH, {
+  const api = useApi();
+
+  await api(YOUTUBE_API_PATH, {
     method: 'DELETE',
     query: { id: videoId },
   });
@@ -88,7 +98,9 @@ export async function setYoutubeVideoActive(
   videoId: string,
   isActive: boolean,
 ): Promise<void> {
-  await $fetch(YOUTUBE_ACTIVE_PATH, {
+  const api = useApi();
+
+  await api(YOUTUBE_ACTIVE_PATH, {
     method: 'PATCH',
     query: { id: videoId, activeStatus: isActive },
   });

@@ -64,7 +64,7 @@
       </template>
     </SectionSourceBar>
 
-    <div class="flow-root">
+    <div class="@container flow-root">
       <SectionImagePreview
         v-if="item.images?.length"
         :images="item.images"

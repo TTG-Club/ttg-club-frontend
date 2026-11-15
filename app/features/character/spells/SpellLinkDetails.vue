@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import type { SpellLink } from '../model';
 
+  import { HoverTooltip } from '~/shared/ui/hover-tooltip';
+
   import {
     SPELL_COMPONENT_EMPTY,
     SPELL_COMPONENTS,
@@ -33,33 +35,33 @@
 
 <template>
   <span class="flex min-w-0 shrink-0 items-center gap-2">
-    <UTooltip
+    <HoverTooltip
       v-if="spell.concentration"
       :text="SPELL_TEXT.concentrationHint"
     >
       <span :class="markClass">{{ SPELL_TEXT.concentrationShort }}</span>
-    </UTooltip>
+    </HoverTooltip>
 
-    <UTooltip
+    <HoverTooltip
       v-if="spell.ritual"
       :text="SPELL_TEXT.ritualHint"
     >
       <span :class="markClass">{{ SPELL_TEXT.ritualShort }}</span>
-    </UTooltip>
+    </HoverTooltip>
 
     <span class="max-w-40 truncate first-letter:uppercase">
       {{ spell.school }}
     </span>
 
     <span class="flex gap-1 text-default">
-      <UTooltip
+      <HoverTooltip
         v-for="component in components"
         :key="component.key"
         :text="component.hint"
         :disabled="!component.hint"
       >
         <span class="w-3 text-center">{{ component.label }}</span>
-      </UTooltip>
+      </HoverTooltip>
     </span>
   </span>
 </template>

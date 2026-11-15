@@ -48,3 +48,15 @@ export const ERROR_MESSAGE_UNKNOWN: ErrorMessage = {
   link: 'в другом',
   after: 'месте',
 };
+
+/**
+ * Страница ширмы Мастера. Общая: её знают и сама ширма, и меню сайта, где
+ * стоит её пункт.
+ */
+export const DM_SCREEN_PAGE_PATH = '/dm-screen';
+
+/** Название ширмы Мастера: заголовок страницы и подпись пункта меню. */
+export const DM_SCREEN_PAGE_TITLE = 'Ширма Мастера';
+
+/** Новый сайт (редакция 2024): там же живут юридические документы. */
+export const NEW_SITE_URL = 'https://new.ttg.club';

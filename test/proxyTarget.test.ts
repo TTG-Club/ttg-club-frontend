@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { getProxyTarget, isPathWithPrefix } from '#shared/utils';
+import {
+  getProxyTarget,
+  getServiceAuthorization,
+  isPathWithPrefix,
+} from '#shared/utils';
 
 const upstreams = {
   api: 'http://backend:8080/',
@@ -73,5 +77,68 @@ describe('getProxyTarget', () => {
     expect(getProxyTarget('/api/v2/articles/search', onlyApi)).toBe(
       'http://backend:8080/api/v2/articles/search',
     );
+  });
+});
+
+describe('getServiceAuthorization', () => {
+  it('перекладывает токен из cookie в Bearer для comments-service', () => {
+    expect(
+      getServiceAuthorization(
+        '/api/v1/comments?page=0',
+        upstreams,
+        undefined,
+        'token',
+      ),
+    ).toBe('Bearer token');
+  });
+
+  it('перекладывает токен из cookie в Bearer для subscriber-service', () => {
+    expect(
+      getServiceAuthorization(
+        '/api/subscriptions/redeem',
+        upstreams,
+        undefined,
+        'token',
+      ),
+    ).toBe('Bearer token');
+  });
+
+  it('не трогает запрос без токена, с заголовком или в другой сервис', () => {
+    expect(
+      getServiceAuthorization('/api/v1/comments', upstreams, undefined, ''),
+    ).toBeUndefined();
+
+    expect(
+      getServiceAuthorization(
+        '/api/v1/comments',
+        upstreams,
+        'Bearer other',
+        'token',
+      ),
+    ).toBeUndefined();
+
+    expect(
+      getServiceAuthorization('/api/v1/spells', upstreams, undefined, 'token'),
+    ).toBeUndefined();
+  });
+
+  it('оставляет cookie бэкенду, если адрес сервиса не задан', () => {
+    expect(
+      getServiceAuthorization(
+        '/api/subscriptions/my',
+        { ...upstreams, subscriber: '' },
+        undefined,
+        'token',
+      ),
+    ).toBeUndefined();
+
+    expect(
+      getServiceAuthorization(
+        '/api/v1/comments',
+        { ...upstreams, comments: '' },
+        undefined,
+        'token',
+      ),
+    ).toBeUndefined();
   });
 });

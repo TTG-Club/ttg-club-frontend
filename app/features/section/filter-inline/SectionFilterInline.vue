@@ -21,11 +21,14 @@
     groups,
     selection,
     isCustomized = false,
+    isSearchDisabled = false,
   } = defineProps<{
     /** Видимые группы условий по содержимому. */
     groups: Array<FilterGroup>;
     selection: FilterSelection;
     isCustomized?: boolean;
+    /** Раздел не хочет поиска по фильтру, даже если значений много. */
+    isSearchDisabled?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -42,7 +45,9 @@
     search.value ? debouncedSearch.value : '',
   );
 
-  const isSearchable = computed(() => isFilterSearchable(groups));
+  const isSearchable = computed(
+    () => !isSearchDisabled && isFilterSearchable(groups),
+  );
 
   const matches = computed(() =>
     searchFilterGroups(groups, appliedSearch.value),

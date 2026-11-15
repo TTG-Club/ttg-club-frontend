@@ -39,6 +39,9 @@ export interface HomeSocialLink {
   color: string;
 }
 
+/** Период рейтинга охотников за багами: текущий месяц или всё время */
+export type HomeBugHuntersPeriod = 'all' | 'month';
+
 /** Друг сайта в блоке «Наши друзья» */
 export interface HomePartner {
   name: string;

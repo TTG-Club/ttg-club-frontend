@@ -1,6 +1,6 @@
 import type { ScreenLink } from './schema';
 
-/** Группа вложенных разделов ширмы; без названия — разделы вне групп. */
+/** Группа вложенных разделов справочника; без названия — разделы вне групп. */
 export interface ScreenGroup {
   key: string;
   name?: string;

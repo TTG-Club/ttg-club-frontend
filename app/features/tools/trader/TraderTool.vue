@@ -16,6 +16,8 @@
     traderResultSchema,
   } from '../model';
 
+  const api = useApi();
+
   /**
    * Торговец магическими предметами: проверка Убеждения и количество магии
    * задают ассортимент, цены — по выбранной книге. Новый поиск заменяет
@@ -23,7 +25,7 @@
    */
   const { data: options } = await useAsyncData(
     'tools-trader-options',
-    async () => traderOptionsSchema.parse(await $fetch(TOOLS_API_URL.trader)),
+    async () => traderOptionsSchema.parse(await api(TOOLS_API_URL.trader)),
     { deep: false },
   );
 
@@ -66,7 +68,7 @@
 
       return [
         traderResultSchema.parse(
-          await $fetch(TOOLS_API_URL.trader, {
+          await api(TOOLS_API_URL.trader, {
             method: 'POST',
             body,
             signal,

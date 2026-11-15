@@ -25,6 +25,14 @@ describe('isMaintenancePageRequest', () => {
     expect(isMaintenancePageRequest('GET', '/_nuxt/entry.js', '')).toBe(false);
 
     expect(
+      isMaintenancePageRequest(
+        'GET',
+        '/s3/5e14/classes/Bard.webp',
+        'text/html',
+      ),
+    ).toBe(false);
+
+    expect(
       isMaintenancePageRequest('GET', '/__nuxt_island/Comp.json', ''),
     ).toBe(false);
   });

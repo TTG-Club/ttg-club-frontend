@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type { ThemeMode } from '#shared/consts';
-  import type { ListView } from '~/shared/consts';
+  import type { GraphicsMode, ListView } from '~/shared/consts';
 
   import {
     LAYOUT_DRAWER_QUERY,
@@ -13,6 +13,8 @@
   import {
     APPEARANCE_GROUP_TITLE,
     DISPLAY_SETTINGS_ARIA,
+    GRAPHICS_OPTIONS,
+    GRAPHICS_SETTING_TITLE,
     LIST_VIEW_SETTING_TITLE,
     SECTION_LAYOUT_OPTIONS,
     SECTION_LAYOUT_SETTING_TITLE,
@@ -31,6 +33,7 @@
    */
   const { mode: themeMode, change: changeTheme } = useTheme();
   const { view: listView, setView: setListView } = useListView();
+  const { mode: graphicsMode, setMode: setGraphicsMode } = useGraphicsMode();
 
   const isMounted = useMounted();
   const isMenuOnLeft = useMediaQuery(LAYOUT_DRAWER_QUERY);
@@ -62,6 +65,11 @@
 
   const isCustomTheme = computed(() => themeMode.value === 'custom');
 
+  const graphics = computed({
+    get: () => graphicsMode.value,
+    set: (value: GraphicsMode) => setGraphicsMode(value),
+  });
+
   const layout = useSectionLayout();
 
   const view = computed({
@@ -88,6 +96,13 @@
           <h3 class="text-sm font-semibold text-highlighted">
             {{ APPEARANCE_GROUP_TITLE }}
           </h3>
+
+          <DisplaySettingsChoice
+            v-model="graphics"
+            :title="GRAPHICS_SETTING_TITLE"
+            :options="GRAPHICS_OPTIONS"
+            shape="pill"
+          />
 
           <DisplaySettingsChoice
             v-model="theme"

@@ -8,16 +8,16 @@
     DISPLAY_NAME_LIMIT,
     displayNameSchema,
     getApiErrorMessage,
-    getRoleLabels,
+    PROFILE_CARD_UI,
     PROFILE_ICON,
     PROFILE_TEXT,
   } from '../model';
 
   /**
    * Личные данные: отображаемое имя можно сменить, логин и почта только для
-   * чтения.
+   * чтения. Роли показывает шапка кабинета.
    */
-  const { user, roles, fetchProfile } = useUser();
+  const { user, fetchProfile } = useUser();
 
   const toast = useToast();
 
@@ -29,8 +29,6 @@
   const savedName = computed(
     () => user.value?.displayName || user.value?.username || '',
   );
-
-  const roleLabels = computed(() => getRoleLabels(roles.value));
 
   const isUnchanged = computed(
     () => state.displayName.trim() === savedName.value,
@@ -77,9 +75,9 @@
 </script>
 
 <template>
-  <UCard>
+  <UCard :ui="PROFILE_CARD_UI">
     <template #header>
-      <h2 class="flex items-center gap-2 font-semibold text-highlighted">
+      <h2 class="flex items-center gap-2 font-semibold text-primary">
         <UIcon
           :name="PROFILE_ICON.personal"
           class="size-5 text-primary"
@@ -138,16 +136,6 @@
             disabled
           />
         </UFormField>
-      </div>
-
-      <div class="flex flex-wrap gap-1.5">
-        <UBadge
-          v-for="label in roleLabels"
-          :key="label"
-          :label="label"
-          color="neutral"
-          variant="subtle"
-        />
       </div>
     </div>
   </UCard>

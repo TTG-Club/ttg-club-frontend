@@ -100,6 +100,12 @@ Always import feature components using the domain alias (e.g.,
   - For utilities with complex types, always define explicit Return Types.
 - **Validation:** All external data (API, input) is `unknown` by default. Use
   `Zod` to validate before usage!
+- **API Requests:** Requests to the site API go through `useApi()` (the
+  `$api` instance from `app/plugins/api.ts`), never through bare `$fetch`:
+  in the browser it renews an expired session on 401 and retries the request
+  once. Call `useApi()` at the top of a composable or `<script setup>`; in a
+  plain module function call it at the start of the function. Only the session
+  code itself (`useUser`) uses `$fetch` directly.
 - **State Management:** Avoid `provide/inject` — use Pinia or Composables.
   - **`createSharedComposable` vs `createGlobalState`:** pick by lifetime. Use
     `createSharedComposable` when the state belongs to mounted consumers and
