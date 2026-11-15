@@ -17,6 +17,7 @@ import type {
   FilterValue,
   SectionListRequest,
   SectionOrder,
+  SourceCatalogBook,
   SourceEntry,
 } from './types';
 
@@ -701,27 +702,32 @@ export function getExportFileName(
 }
 
 /**
- * Книги группы строками панели источников: русское название, сокращение и
- * английское название из общего списка книг.
+ * Книги группы строками панели источников: русское название, сокращение,
+ * английское название и обложка из общего списка книг.
  * @param group - группа источников
  * @param selected - выбранные ключи группы
- * @param englishNames - английские названия по сокращению
+ * @param catalog - книги общего списка по сокращению
  */
 export function getSourceEntries(
   group: FilterGroup,
   selected: ReadonlyArray<string>,
-  englishNames: ReadonlyMap<string, string>,
+  catalog: ReadonlyMap<string, SourceCatalogBook>,
 ): Array<SourceEntry> {
   const selectedKeys = new Set(selected);
 
-  return group.values.map((value) => ({
-    key: String(value.key),
-    // У книги без названия им служит сокращение — второй раз его не пишем
-    name: value.tooltip || value.label,
-    acronym: value.tooltip ? value.label : undefined,
-    english: englishNames.get(value.label),
-    selected: selectedKeys.has(String(value.key)),
-  }));
+  return group.values.map((value) => {
+    const book = catalog.get(value.label);
+
+    return {
+      key: String(value.key),
+      // У книги без названия им служит сокращение — второй раз его не пишем
+      name: value.tooltip || value.label,
+      acronym: value.tooltip ? value.label : undefined,
+      english: book?.english,
+      cover: book?.cover,
+      selected: selectedKeys.has(String(value.key)),
+    };
+  });
 }
 
 /**
@@ -842,20 +848,25 @@ export function setSourcesSelected(
 }
 
 /**
- * Английские названия книг по сокращению из общего списка; книги, которые
- * не подошли под схему, пропускаются.
+ * Английские названия и обложки книг по сокращению из общего списка; книги,
+ * которые не подошли под схему, пропускаются.
  * @param input - ответ списка книг
  */
-export function parseSourceCatalog(input: unknown): Map<string, string> {
-  const englishNames = new Map<string, string>();
+export function parseSourceCatalog(
+  input: unknown,
+): Map<string, SourceCatalogBook> {
+  const catalog = new Map<string, SourceCatalogBook>();
 
   for (const book of z.array(z.unknown()).catch([]).parse(input)) {
     const parsed = sourceCatalogBookSchema.safeParse(book);
 
     if (parsed.success) {
-      englishNames.set(parsed.data.source.shortName, parsed.data.name.eng);
+      catalog.set(parsed.data.source.shortName, {
+        english: parsed.data.name.eng,
+        cover: parsed.data.image || undefined,
+      });
     }
   }
 
-  return englishNames;
+  return catalog;
 }

@@ -150,7 +150,10 @@
       >
         <template #label>
           <span class="flex items-start gap-3">
-            <SectionSourceCover :is-selected="entry.selected" />
+            <SectionSourceCover
+              :cover="entry.cover"
+              :is-selected="entry.selected"
+            />
 
             <span class="flex min-w-0 grow flex-col">
               <span

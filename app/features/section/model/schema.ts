@@ -64,4 +64,5 @@ export const savedFilterQuerySchema = z.record(z.string(), z.string());
 export const sourceCatalogBookSchema = z.object({
   name: z.object({ eng: z.string() }),
   source: z.object({ shortName: z.string() }),
+  image: z.string().nullish(),
 });
