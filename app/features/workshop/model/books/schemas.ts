@@ -3,6 +3,7 @@ import type { WorkshopBook } from './types';
 import { z } from 'zod';
 
 import { WORKSHOP_VALIDATION } from '../constants';
+import { parseWorkshopCover } from '../images';
 import { workshopOptionalPositive, workshopRequiredText } from '../schemas';
 
 const workshopBookSchema = z.object({
@@ -13,6 +14,7 @@ const workshopBookSchema = z.object({
   type: z.string().nullish(),
   year: z.number().nullish(),
   description: z.string().nullish(),
+  cover: z.string().nullish(),
 });
 
 /**
@@ -30,7 +32,16 @@ export function parseWorkshopBook(input: unknown): WorkshopBook {
     type: book.type ?? '',
     year: book.year ?? null,
     description: book.description ?? '',
+    cover: book.cover ?? null,
   };
+}
+
+/**
+ * Адрес обложки из ответа ручки загрузки.
+ * @param input - ответ сервера
+ */
+export function parseBookCover(input: unknown): string {
+  return parseWorkshopCover(input).url;
 }
 
 /** Форма источника: те же поля, что принимает бэкенд. */

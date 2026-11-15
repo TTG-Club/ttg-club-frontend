@@ -6,6 +6,7 @@ import {
   fetchWorkshopCover,
   fetchWorkshopGallery,
   getWorkshopErrorReason,
+  isWorkshopImageTooLarge,
   moveGalleryImage,
   removeGalleryImage,
   saveWorkshopGallery,
@@ -45,15 +46,6 @@ export interface UseWorkshopImagesReturn {
    * @param index - номер картинки
    */
   remove: (index: number) => Promise<void>;
-}
-
-/**
- * Файл, который бэкенд точно не примет по размеру: о нём сообщаем сразу,
- * не отправляя запрос.
- * @param file - выбранный файл
- */
-function isTooLarge(file: File): boolean {
-  return file.size > WORKSHOP_IMAGE_LIMIT.maxBytes;
 }
 
 /**
@@ -155,7 +147,7 @@ export function useWorkshopImages(
           return;
         }
 
-        if (isTooLarge(file)) {
+        if (isWorkshopImageTooLarge(file)) {
           notifyError(
             `${WORKSHOP_IMAGE_TEXT.uploadError}: ${file.name}`,
             WORKSHOP_IMAGE_TEXT.tooLarge,
@@ -189,7 +181,7 @@ export function useWorkshopImages(
    * @param file - выбранный файл
    */
   async function uploadCoverFile(file: File): Promise<void> {
-    if (isTooLarge(file)) {
+    if (isWorkshopImageTooLarge(file)) {
       notifyError(
         WORKSHOP_IMAGE_TEXT.uploadError,
         WORKSHOP_IMAGE_TEXT.tooLarge,

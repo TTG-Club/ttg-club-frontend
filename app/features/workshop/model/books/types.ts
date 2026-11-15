@@ -9,4 +9,6 @@ export interface WorkshopBook {
   type: string;
   year: number | null;
   description: string;
+  /** Адрес обложки; меняется отдельно от формы. */
+  cover: string | null;
 }

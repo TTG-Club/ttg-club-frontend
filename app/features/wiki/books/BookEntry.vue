@@ -9,6 +9,7 @@
     bookDetailSchema,
     BOOKS_SECTION,
   } from '../model';
+  import BookCover from './BookCover.vue';
 
   /**
    * Запись поверх списка раздела; без адреса — страница записи по адресу
@@ -33,10 +34,18 @@
         </template>
       </SectionSourceBar>
 
-      <ContentRender
-        v-if="entry.description"
-        :html="entry.description"
-      />
+      <div class="@container flow-root">
+        <BookCover
+          v-if="entry.image"
+          :url="entry.image"
+          :alt="entry.name.rus"
+        />
+
+        <ContentRender
+          v-if="entry.description"
+          :html="entry.description"
+        />
+      </div>
     </template>
   </SectionEntry>
 </template>

@@ -54,6 +54,8 @@ export const bookLinkSchema = z.object({
   name: entryNameSchema,
   url: z.string().min(1),
   type: bookTypeSchema,
+  /** Обложка, если её загрузили в мастерской. */
+  image: z.string().nullish(),
 });
 
 export type BookLink = z.infer<typeof bookLinkSchema>;
@@ -63,6 +65,7 @@ export const bookDetailSchema = z.object({
   type: bookTypeSchema,
   description: z.string().nullish(),
   source: entrySourceSchema.nullish(),
+  image: z.string().nullish(),
 });
 
 export type BookDetail = z.infer<typeof bookDetailSchema>;

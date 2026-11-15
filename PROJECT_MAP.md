@@ -260,7 +260,11 @@ Rules, gods, screens and books (sources) are edit-only (no section page or
 create). Options, classes, races, creatures, screens, rules, gods and books use
 lowercase slugs. Books load from `GET /api/v1/workshop/books/<slug>` and save
 with `PATCH /api/v1/workshop/books/<source>`: the abbreviation is the book key,
-so it is shown but not editable, and books have no revisions.
+so it is shown but not editable, and books have no revisions. The book cover is uploaded and removed under the
+form through `POST`/`DELETE /api/v1/workshop/images/books/<source>/cover`
+(saved at once, apart from the form); the books list shows it as a small
+thumbnail (a book icon when there is none) and the book card floats it to
+the right of the description.
 Screens send their parent back unchanged. Creatures load from
 `GET /api/v2/bestiary/<slug>` and save with `POST`/`PUT /api/v2/bestiary`
 (`WorkshopEditFrame` with `has-revisions="false"`: there is no history). The
