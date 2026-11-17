@@ -4,6 +4,12 @@ export const WORKSHOP_IMAGES_API_PATH = '/api/v1/workshop/images';
 /** Последний сегмент ручки обложки: `/api/v1/workshop/images/CLASS/1/cover`. */
 export const WORKSHOP_IMAGES_COVER_SEGMENT = 'cover';
 
+/** Ручка токена существа: `/api/v1/workshop/images/creatures/12/token`. */
+export const WORKSHOP_IMAGES_TOKEN_PATH = {
+  section: 'creatures',
+  segment: 'token',
+} as const;
+
 /**
  * Раздел записи, к которой привязана картинка: значения совпадают с
  * `ImageType` бэкенда.
@@ -80,6 +86,24 @@ export const WORKSHOP_IMAGE_TEXT = {
   cancel: 'Отмена',
   imageAlt: 'Картинка записи',
   coverAlt: 'Обложка записи',
+} as const;
+
+/** Подписи блока токена существа. */
+export const WORKSHOP_TOKEN_TEXT = {
+  title: 'Токен',
+  description:
+    'Круглая картинка в карточке существа, показывается перед галереей. Новый файл заменяет прежний токен.',
+  missing: 'Токена пока нет',
+  upload: 'Загрузить токен',
+  remove: 'Удалить',
+  uploaded: 'Токен обновлён',
+  removed: 'Токен удалён',
+  loadError: 'Не удалось загрузить токен',
+  uploadError: 'Не удалось загрузить токен',
+  removeError: 'Не удалось удалить токен',
+  removeTitle: 'Удалить токен?',
+  removeDescription: 'Токен пропадёт из карточки существа и из списка токенов.',
+  alt: 'Токен существа',
 } as const;
 
 /** Иконки блока картинок. */

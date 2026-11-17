@@ -6,6 +6,10 @@ const gallerySchema = z.object({
   images: z.array(z.string()),
 });
 
+const tokenSchema = z.object({
+  url: z.string().nullable(),
+});
+
 const coverSchema = z.object({
   url: z.string(),
   editable: z.boolean(),
@@ -25,4 +29,13 @@ export function parseWorkshopGallery(raw: unknown): Array<string> {
  */
 export function parseWorkshopCover(raw: unknown): WorkshopCover {
   return coverSchema.parse(raw);
+}
+
+/**
+ * Адрес токена существа из ответа бэкенда.
+ * @param raw - ответ ручки токена
+ * @returns адрес или `undefined`, если токена нет
+ */
+export function parseWorkshopToken(raw: unknown): string | undefined {
+  return tokenSchema.parse(raw).url ?? undefined;
 }

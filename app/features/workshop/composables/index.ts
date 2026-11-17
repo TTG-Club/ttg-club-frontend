@@ -1,5 +1,6 @@
 export * from './useBookCover';
 export * from './useBookSources';
+export * from './useCreatureToken';
 export * from './useExpandedItems';
 export * from './useFilterGroups';
 export * from './useRaceParentOptions';
