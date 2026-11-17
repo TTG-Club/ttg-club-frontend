@@ -1,10 +1,10 @@
 import type {
   DmScreenCache,
+  DmScreenGrid,
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
   DmScreenTile,
-  DmScreenViewport,
   DmScreenWindow,
 } from '../model';
 
@@ -22,13 +22,14 @@ import {
   DM_SCREEN_SAVE_DELAY,
   DM_SCREEN_STORAGE_KEY,
   DM_SCREEN_TEXT,
-  DM_SCREEN_TOP_INSET,
   dmScreenCacheSchema,
   dmScreenWindowListSchema,
+  getDmScreenTopLayer,
   isDmScreenNotePath,
   saveDmScreenWindows,
   saveDmScreenWindowsOnLeave,
 } from '../model';
+import { useDmScreenView } from './useDmScreenView';
 
 /** Изменяемые поля окна. */
 type DmScreenWindowPatch = Partial<Omit<DmScreenWindow, 'id'>>;
@@ -67,7 +68,9 @@ function readCache(raw: string): DmScreenCache | null {
  * пользователя ширм несколько и они на сервере: страница ширмы
  * подключает открытую (`attach`), её изменения сохраняются с паузой, а при
  * уходе со страницы — сразу. Окна есть на экранах, где помещаются рядом с
- * контентом; на телефоне ширма — список записей.
+ * контентом; на телефоне ширма — список записей. Окна стоят на большом
+ * поле, а холст показывает его часть (`useDmScreenView`): новые окна и
+ * раскладки встают в видимой части поля.
  */
 export const useDmScreen = createSharedComposable(() => {
   const toast = useToast();
@@ -204,25 +207,8 @@ export const useDmScreen = createSharedComposable(() => {
 
   const isWindowed = useMediaQuery(LAYOUT_DRAWER_QUERY);
 
-  const { width: viewportWidth, height: viewportHeight } = useWindowSize();
-
-  /** Нижний край шапки ширмы: его сообщает холст, когда меряет шапку. */
-  const topInset = ref<number>(DM_SCREEN_TOP_INSET);
-
-  /** Экран ширмы: размер окна браузера и место, занятое шапкой. */
-  const viewport = computed<DmScreenViewport>(() => ({
-    width: viewportWidth.value,
-    height: viewportHeight.value,
-    top: topInset.value,
-  }));
-
-  /**
-   * Запоминает, где кончается шапка ширмы; без значения — обычная высота.
-   * @param value - нижний край шапки, px
-   */
-  function setTopInset(value: number = DM_SCREEN_TOP_INSET): void {
-    topInset.value = value;
-  }
+  // Видимая часть поля: в ней встают новые окна и раскладки
+  const { board, toBoardPoint, reveal: revealRect } = useDmScreenView();
 
   /** Окно, на которое указали вместо нового: недолго подсвечивается. */
   const highlightedId = refAutoReset<string | undefined>(
@@ -230,9 +216,7 @@ export const useDmScreen = createSharedComposable(() => {
     DM_SCREEN_HIGHLIGHT_DURATION,
   );
 
-  const topLayer = computed(() =>
-    windows.value.reduce((top, item) => Math.max(top, item.layer), 0),
-  );
+  const topLayer = computed(() => getDmScreenTopLayer(windows.value));
 
   const visibleWindows = computed(() =>
     windows.value.filter((item) => !item.isMinimized),
@@ -271,8 +255,12 @@ export const useDmScreen = createSharedComposable(() => {
   /**
    * Записывает место и размер нескольких окон одним изменением ширмы.
    * @param tiles - окна с новым местом и размером
+   * @param patch - что ещё поменять у этих окон
    */
-  function updateRects(tiles: ReadonlyArray<DmScreenTile>): void {
+  function updateRects(
+    tiles: ReadonlyArray<DmScreenTile>,
+    patch: DmScreenWindowPatch = {},
+  ): void {
     const rects = new Map(tiles.map((tile) => [tile.id, tile]));
 
     windows.value = windows.value.map((screenWindow) => {
@@ -281,6 +269,7 @@ export const useDmScreen = createSharedComposable(() => {
       return rect
         ? {
             ...screenWindow,
+            ...patch,
             x: rect.x,
             y: rect.y,
             width: rect.width,
@@ -306,20 +295,38 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
+   * Подводит обзор к окну, если его совсем не видно на холсте.
+   * @param id - окно
+   */
+  function reveal(id: string): void {
+    const target = windows.value.find((item) => item.id === id);
+
+    if (target) {
+      revealRect(target);
+    }
+  }
+
+  /**
    * Добавляет запись в ширму окном. Уже добавленная запись не дублируется:
-   * её окно разворачивается и встаёт сверху.
-   * @param request - запись, название и точка клика
+   * её окно разворачивается, встаёт сверху и подсвечивается, а обзор
+   * подходит к нему, если оно было не видно.
+   * @param request - запись, название и точка клика на поле
    * @returns добавлена ли новая запись
    */
   function add(request: DmScreenRequest): boolean {
     const result = appendDmScreenWindow(
       windows.value,
       request,
-      viewport.value,
+      board.value,
       crypto.randomUUID(),
     );
 
     windows.value = result.windows;
+
+    if (!result.isAdded) {
+      highlightedId.value = result.windowId;
+      reveal(result.windowId);
+    }
 
     return result.isAdded;
   }
@@ -328,7 +335,7 @@ export const useDmScreen = createSharedComposable(() => {
    * Кладёт на ширму пустую заметку окном рядом с местом клика. Если пустая
    * заметка уже есть, новая не создаётся: та разворачивается, встаёт сверху
    * и подсвечивается — иначе пустые заметки копились бы.
-   * @param origin - точка клика
+   * @param origin - точка клика на поле
    */
   function addNote(origin?: DmScreenPoint): void {
     const draft = windows.value.find(
@@ -339,6 +346,7 @@ export const useDmScreen = createSharedComposable(() => {
     if (draft) {
       update(draft.id, { isMinimized: false, layer: topLayer.value + 1 });
       highlightedId.value = draft.id;
+      reveal(draft.id);
 
       return;
     }
@@ -407,34 +415,24 @@ export const useDmScreen = createSharedComposable(() => {
   }
 
   /**
-   * Раскладывает все окна ровной сеткой, свёрнутые тоже разворачиваются.
-   * Порядок — как окна стоят сейчас (сверху вниз, слева направо), свёрнутые
-   * встают в конец, чтобы раскладка не перемешивала окна.
+   * Раскладывает все окна ровной сеткой на видимой части поля, свёрнутые
+   * тоже разворачиваются. Порядок — как окна стоят сейчас (сверху вниз,
+   * слева направо), свёрнутые встают в конец, чтобы раскладка не
+   * перемешивала окна.
+   * @param grid - сколько колонок и рядов в сетке; без неё ширма подбирает
+   * сетку сама
    */
-  function arrange(): void {
+  function arrange(grid?: DmScreenGrid): void {
     const ordered = sortBy(windows.value, ['isMinimized', 'y', 'x']);
 
-    const tiles = new Map(
+    updateRects(
       arrangeDmScreenWindows(
         ordered.map((item) => item.id),
-        viewport.value,
-      ).map((tile) => [tile.id, tile]),
+        board.value,
+        grid,
+      ),
+      { isMinimized: false },
     );
-
-    windows.value = windows.value.map((item) => {
-      const tile = tiles.get(item.id);
-
-      return tile
-        ? {
-            ...item,
-            x: tile.x,
-            y: tile.y,
-            width: tile.width,
-            height: tile.height,
-            isMinimized: false,
-          }
-        : item;
-    });
   }
 
   /**
@@ -459,8 +457,8 @@ export const useDmScreen = createSharedComposable(() => {
     detach,
     saveOnLeave,
     clearLocal,
-    viewport,
-    setTopInset,
+    board,
+    toBoardPoint,
     highlightedId: readonly(highlightedId),
     visibleWindows,
     minimizedWindows,
@@ -475,6 +473,7 @@ export const useDmScreen = createSharedComposable(() => {
     restore,
     restoreAll,
     focus,
+    reveal,
     update,
     updateRects,
     previewRects: shallowReadonly(previewRects),

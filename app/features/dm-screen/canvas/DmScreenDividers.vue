@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { DmScreenDivider, DmScreenTile } from '../model';
 
-  import { useDmScreen } from '../composables';
+  import { useDmScreen, useDmScreenView } from '../composables';
   import {
     DM_SCREEN_DIVIDER_ACTIVE_CLASS,
     DM_SCREEN_DIVIDER_CLASS,
@@ -20,6 +20,7 @@
    * ширму он пишется, когда границу отпускают.
    */
   const { visibleWindows, setPreviewRects, updateRects } = useDmScreen();
+  const { view: screenView } = useDmScreenView();
 
   const dividers = computed(() => getDmScreenDividers(visibleWindows.value));
 
@@ -88,12 +89,16 @@
       return;
     }
 
+    const pointer = getDmScreenDividerPointer(active.divider, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    // Указатель идёт по экрану, а граница — по полю: на отдалённом поле
+    // тот же путь указателя сдвигает её дальше
     const moved = moveDmScreenDivider(
       active.divider,
-      getDmScreenDividerPointer(active.divider, {
-        x: event.clientX,
-        y: event.clientY,
-      }) - active.origin,
+      (pointer - active.origin) / screenView.value.zoom,
       visibleWindows.value,
     );
 
@@ -122,7 +127,7 @@
     :key="view.divider.key"
     aria-hidden="true"
     :style="view.style"
-    class="group fixed flex touch-none items-center justify-center"
+    class="group absolute flex touch-none items-center justify-center"
     :class="view.rootClass"
     @pointerdown.left.prevent="startDrag(view.divider, $event)"
     @pointermove="moveDrag"

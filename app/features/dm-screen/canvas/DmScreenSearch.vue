@@ -17,7 +17,7 @@
    * уходя со страницы. Показываются только записи разделов, которые ширма
    * умеет показывать.
    */
-  const { add, isAdded } = useDmScreen();
+  const { add, isAdded, toBoardPoint } = useDmScreen();
 
   const input = ref('');
 
@@ -49,7 +49,7 @@
     add({
       path: result.url,
       title: result.name,
-      origin: { x: event.clientX, y: event.clientY },
+      origin: toBoardPoint({ x: event.clientX, y: event.clientY }),
     });
 
     input.value = '';

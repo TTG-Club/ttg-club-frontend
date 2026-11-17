@@ -7,14 +7,17 @@ import type {
 } from '../model';
 
 import {
+  DM_SCREEN_SNAP_LAYOUTS,
   DM_SCREEN_SNAP_PICKER_DEFAULT_POSITION,
   DM_SCREEN_SNAP_PICKER_STORAGE_KEY,
   dmScreenSnapPickerPositionSchema,
   getDmScreenEdgeTarget,
   getDmScreenZoneRect,
+  isDmScreenLayoutFitting,
   isDmScreenPickerBand,
 } from '../model';
 import { useDmScreen } from './useDmScreen';
+import { useDmScreenView } from './useDmScreenView';
 
 /**
  * Читает сохранённое место панели раскладок; незнакомое значение — место
@@ -33,15 +36,24 @@ function readPickerPosition(raw: string): DmScreenSnapPickerPosition {
  * выбрал пользователь) появляется панель раскладок: окно отпускают над
  * местом в ней. Когда окно встало в
  * раскладку, остальные её места по очереди предлагают выбрать окно — пока
- * места или окна не кончатся.
+ * места или окна не кончатся. Места раскладок считаются на видимой части
+ * поля, а края холста и полоса панели — по холсту на экране.
  */
 export const useDmScreenSnap = createSharedComposable(() => {
-  const { windows, viewport, update, restore } = useDmScreen();
+  const { windows, board, update, restore } = useDmScreen();
+  const { canvas, toCanvasPoint } = useDmScreenView();
 
   /** Окно, которое тащат сейчас. */
   const draggingId = ref<string>();
 
-  const pointer = ref<DmScreenPoint>();
+  /** Указатель в окне браузера, пока окно тащат. */
+  const clientPointer = shallowRef<DmScreenPoint>();
+
+  // Края и полоса панели считаются по холсту на экране, а не по полю:
+  // отдалённое поле их не раздвигает
+  const pointer = computed(() =>
+    clientPointer.value ? toCanvasPoint(clientPointer.value) : undefined,
+  );
 
   /** Место в панели раскладок под указателем: его сообщает сама панель. */
   const pickerTarget = shallowRef<DmScreenSnapTarget>();
@@ -79,13 +91,24 @@ export const useDmScreenSnap = createSharedComposable(() => {
     pickerHeight.value = height;
   }
 
+  /**
+   * Раскладки, чьи места на видимой части поля не меньше минимального окна:
+   * чем дальше поле, тем больше раскладок помещается.
+   */
+  const fittingLayouts = computed(() =>
+    DM_SCREEN_SNAP_LAYOUTS.filter((layout) =>
+      isDmScreenLayoutFitting(layout, board.value),
+    ),
+  );
+
   const isPickerVisible = computed(
     () =>
       !!draggingId.value
       && !!pointer.value
+      && fittingLayouts.value.length > 0
       && isDmScreenPickerBand(
         pointer.value,
-        viewport.value,
+        canvas.value,
         pickerPosition.value,
         pickerHeight.value,
       ),
@@ -99,26 +122,26 @@ export const useDmScreenSnap = createSharedComposable(() => {
 
     return isPickerVisible.value
       ? pickerTarget.value
-      : getDmScreenEdgeTarget(pointer.value, viewport.value);
+      : getDmScreenEdgeTarget(pointer.value, canvas.value);
   });
 
   const previewRect = computed<DmScreenRect | undefined>(() =>
     target.value
-      ? getDmScreenZoneRect(target.value.zone, viewport.value)
+      ? getDmScreenZoneRect(target.value.zone, board.value)
       : undefined,
   );
 
   const assistRect = computed<DmScreenRect | undefined>(() => {
     const [zone] = assist.value?.pending ?? [];
 
-    return zone ? getDmScreenZoneRect(zone, viewport.value) : undefined;
+    return zone ? getDmScreenZoneRect(zone, board.value) : undefined;
   });
 
   /** Места, до которых очередь ещё не дошла. */
   const assistPendingRects = computed<Array<DmScreenRect>>(() =>
     (assist.value?.pending ?? [])
       .slice(1)
-      .map((zone) => getDmScreenZoneRect(zone, viewport.value)),
+      .map((zone) => getDmScreenZoneRect(zone, board.value)),
   );
 
   /** Окна, которые ещё можно поставить в раскладку. */
@@ -170,10 +193,10 @@ export const useDmScreenSnap = createSharedComposable(() => {
 
   /**
    * Окно тащат дальше.
-   * @param point - где указатель
+   * @param client - указатель в окне браузера
    */
-  function moveDrag(point: DmScreenPoint): void {
-    pointer.value = point;
+  function moveDrag(client: DmScreenPoint): void {
+    clientPointer.value = client;
   }
 
   /**
@@ -187,7 +210,7 @@ export const useDmScreenSnap = createSharedComposable(() => {
     const rect = previewRect.value;
 
     draggingId.value = undefined;
-    pointer.value = undefined;
+    clientPointer.value = undefined;
     pickerTarget.value = undefined;
 
     if (!id || !snapped || !rect) {
@@ -247,8 +270,9 @@ export const useDmScreenSnap = createSharedComposable(() => {
   }
 
   return {
-    pointer: readonly(pointer),
+    clientPointer: shallowReadonly(clientPointer),
     target,
+    fittingLayouts,
     // Не `readonly`: у ссылки на localStorage тип записи шире типа чтения
     // (допускает `null` для удаления ключа), и обёртка отдала бы наружу его
     pickerPosition: computed<DmScreenSnapPickerPosition>(
