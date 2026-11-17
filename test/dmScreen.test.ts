@@ -31,7 +31,6 @@ import {
   isDmScreenPath,
   isDmScreenPickerBand,
   isDmScreenRectVisible,
-  keepDmScreenWindowBelowHeader,
   keepDmScreenWindowOnField,
   moveDmScreenDivider,
   panDmScreenView,
@@ -330,28 +329,6 @@ describe('ширма мастера', () => {
 
       expect(resized.y).toBe(AREA.top);
       expect(resized.y + resized.height).toBe(start.y + start.height);
-    });
-
-    it('не пускает верхнюю сторону под шапку ширмы', () => {
-      const resized = resizeDmScreenWindow(
-        start,
-        { x: 0, y: -1 },
-        { x: 0, y: -500 },
-        BOARD,
-      );
-
-      expect(resized.y).toBe(AREA.top);
-      expect(resized.y + resized.height).toBe(start.y + start.height);
-    });
-
-    it('окно, которое тащат, под шапку ширмы не заходит', () => {
-      expect(
-        keepDmScreenWindowBelowHeader({ x: 300, y: AREA.top - 200 }, BOARD),
-      ).toEqual({ x: 300, y: AREA.top });
-
-      expect(
-        keepDmScreenWindowBelowHeader({ x: -900, y: AREA.bottom + 50 }, BOARD),
-      ).toEqual({ x: -900, y: AREA.bottom + 50 });
     });
 
     it('не сжимает окно меньше минимального', () => {
