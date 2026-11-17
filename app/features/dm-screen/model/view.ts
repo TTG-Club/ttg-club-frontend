@@ -6,11 +6,14 @@ import type {
   DmScreenSize,
 } from './types';
 
-import { clamp } from 'es-toolkit';
+import { clamp, range } from 'es-toolkit';
 
 import {
   DM_SCREEN_BACKDROP,
   DM_SCREEN_FIELD,
+  DM_SCREEN_MINIMAP_MIN_ZOOM,
+  DM_SCREEN_MINIMAP_PADDING,
+  DM_SCREEN_MINIMAP_SIZE,
   DM_SCREEN_ZOOM,
 } from './constants';
 
@@ -269,6 +272,17 @@ export function fitDmScreenView(
 }
 
 /**
+ * Как поле ложится на миникарту: целиком и по центру. Этим обзором точки
+ * миникарты переводятся в точки поля и обратно.
+ */
+export const DM_SCREEN_MINIMAP_VIEW: DmScreenView = fitDmScreenView(
+  DM_SCREEN_FIELD,
+  DM_SCREEN_MINIMAP_SIZE,
+  DM_SCREEN_MINIMAP_PADDING,
+  DM_SCREEN_MINIMAP_MIN_ZOOM,
+);
+
+/**
  * Виден ли прямоугольник хотя бы частью.
  * @param rect - прямоугольник на поле
  * @param board - видимая часть поля
@@ -316,7 +330,7 @@ export function getDmScreenSizeStyle(
  * @param size - сколько клеток по стороне
  */
 export function getDmScreenGridCells(size: number): Array<DmScreenGrid> {
-  return Array.from({ length: size * size }, (_, index) => ({
+  return range(size * size).map((index) => ({
     columns: (index % size) + 1,
     rows: Math.floor(index / size) + 1,
   }));

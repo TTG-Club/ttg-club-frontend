@@ -219,11 +219,11 @@ export const useDmScreen = createSharedComposable(() => {
   const topLayer = computed(() => getDmScreenTopLayer(windows.value));
 
   const visibleWindows = computed(() =>
-    windows.value.filter((item) => !item.isMinimized),
+    windows.value.filter((screenWindow) => !screenWindow.isMinimized),
   );
 
   const minimizedWindows = computed(() =>
-    windows.value.filter((item) => item.isMinimized),
+    windows.value.filter((screenWindow) => screenWindow.isMinimized),
   );
 
   /**
@@ -232,8 +232,8 @@ export const useDmScreen = createSharedComposable(() => {
    * @param patch - новые значения полей
    */
   function update(id: string, patch: DmScreenWindowPatch): void {
-    windows.value = windows.value.map((item) =>
-      item.id === id ? { ...item, ...patch } : item,
+    windows.value = windows.value.map((screenWindow) =>
+      screenWindow.id === id ? { ...screenWindow, ...patch } : screenWindow,
     );
   }
 
@@ -284,7 +284,7 @@ export const useDmScreen = createSharedComposable(() => {
    * @param id - окно
    */
   function focus(id: string): void {
-    const target = windows.value.find((item) => item.id === id);
+    const target = windows.value.find((screenWindow) => screenWindow.id === id);
 
     // Окно уже сверху: запись в localStorage не нужна
     if (!target || target.layer === topLayer.value) {
@@ -299,7 +299,7 @@ export const useDmScreen = createSharedComposable(() => {
    * @param id - окно
    */
   function reveal(id: string): void {
-    const target = windows.value.find((item) => item.id === id);
+    const target = windows.value.find((screenWindow) => screenWindow.id === id);
 
     if (target) {
       revealRect(target);
@@ -374,7 +374,9 @@ export const useDmScreen = createSharedComposable(() => {
    * @param id - окно
    */
   function close(id: string): void {
-    windows.value = windows.value.filter((item) => item.id !== id);
+    windows.value = windows.value.filter(
+      (screenWindow) => screenWindow.id !== id,
+    );
   }
 
   /** Убирает с ширмы все окна и заметки. */
@@ -392,16 +394,16 @@ export const useDmScreen = createSharedComposable(() => {
 
   /** Сворачивает все окна в плашки: холст освобождается целиком. */
   function minimizeAll(): void {
-    windows.value = windows.value.map((item) => ({
-      ...item,
+    windows.value = windows.value.map((screenWindow) => ({
+      ...screenWindow,
       isMinimized: true,
     }));
   }
 
   /** Разворачивает все свёрнутые окна на их прежних местах. */
   function restoreAll(): void {
-    windows.value = windows.value.map((item) => ({
-      ...item,
+    windows.value = windows.value.map((screenWindow) => ({
+      ...screenWindow,
       isMinimized: false,
     }));
   }
@@ -427,7 +429,7 @@ export const useDmScreen = createSharedComposable(() => {
 
     updateRects(
       arrangeDmScreenWindows(
-        ordered.map((item) => item.id),
+        ordered.map((screenWindow) => screenWindow.id),
         board.value,
         grid,
       ),
@@ -440,7 +442,7 @@ export const useDmScreen = createSharedComposable(() => {
    * @param path - адрес записи
    */
   function isAdded(path: string): boolean {
-    return windows.value.some((item) => item.path === path);
+    return windows.value.some((screenWindow) => screenWindow.path === path);
   }
 
   return {

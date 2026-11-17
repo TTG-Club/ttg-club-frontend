@@ -7,6 +7,7 @@ import type {
   DmScreenRect,
   DmScreenRequest,
   DmScreenResizeEdges,
+  DmScreenResizeLimits,
   DmScreenSection,
   DmScreenSize,
   DmScreenSnapLayout,
@@ -16,7 +17,7 @@ import type {
   DmScreenTile,
 } from './types';
 
-import { sortBy, uniq } from 'es-toolkit';
+import { range, sortBy, uniq } from 'es-toolkit';
 
 import {
   DM_SCREEN_CASCADE_LENGTH,
@@ -265,7 +266,7 @@ export function placeDmScreenWindow(
  * @param area - свободное место
  */
 function pickGridColumns(count: number, area: DmScreenSize): number {
-  const cells = Array.from({ length: count }, (_, index) => {
+  const cells = range(count).map((index) => {
     const columns = index + 1;
     const rows = Math.ceil(count / columns);
 
@@ -447,18 +448,18 @@ export function snapDmScreenWindow(
  * @param span - отрезок окна по оси до растягивания
  * @param edge - какую сторону тянут: `-1` — начало, `1` — конец
  * @param delta - на сколько сдвинулся указатель
- * @param area - отрезок свободного места холста по этой оси
- * @param minSize - наименьшая длина окна
+ * @param limits - свободное место холста по этой оси и наименьшая длина
+ * окна
  * @param neighbours - отрезки соседних окон; без них сторона не магнитится
  */
 function resizeDmScreenSpan(
   span: DmScreenSpan,
   edge: DmScreenResizeEdges['x'],
   delta: number,
-  area: DmScreenSpan,
-  minSize: number,
+  limits: DmScreenResizeLimits,
   neighbours?: ReadonlyArray<DmScreenSpan>,
 ): DmScreenSpan {
+  const { area, minSize } = limits;
   const spanEnd = span.start + span.size;
 
   if (edge < 0) {
@@ -531,8 +532,10 @@ export function resizeDmScreenWindow(
     { start: start.x, size: start.width },
     edges.x,
     delta.x,
-    { start: area.x, size: area.width },
-    DM_SCREEN_WINDOW_MIN_SIZE.width,
+    {
+      area: { start: area.x, size: area.width },
+      minSize: DM_SCREEN_WINDOW_MIN_SIZE.width,
+    },
     others?.map((other) => ({ start: other.x, size: other.width })),
   );
 
@@ -540,8 +543,10 @@ export function resizeDmScreenWindow(
     { start: start.y, size: start.height },
     edges.y,
     delta.y,
-    { start: area.y, size: area.height },
-    DM_SCREEN_WINDOW_MIN_SIZE.height,
+    {
+      area: { start: area.y, size: area.height },
+      minSize: DM_SCREEN_WINDOW_MIN_SIZE.height,
+    },
     others?.map((other) => ({ start: other.y, size: other.height })),
   );
 

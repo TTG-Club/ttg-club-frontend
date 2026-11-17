@@ -115,6 +115,14 @@ export interface DmScreenSpan {
   size: number;
 }
 
+/** В каких пределах сторона окна двигается при растягивании. */
+export interface DmScreenResizeLimits {
+  /** Отрезок свободного места холста по этой оси: к его краям магнит. */
+  area: DmScreenSpan;
+  /** Меньше этого окно не сжимается, px. */
+  minSize: number;
+}
+
 /** Прямоугольник на поле или на холсте, px. */
 export interface DmScreenRect extends DmScreenPoint, DmScreenSize {}
 

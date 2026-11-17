@@ -1,16 +1,13 @@
 <script setup lang="ts">
   import { useDmScreen, useDmScreenView } from '../composables';
   import {
-    DM_SCREEN_FIELD,
     DM_SCREEN_ICON,
-    DM_SCREEN_MINIMAP_MIN_ZOOM,
-    DM_SCREEN_MINIMAP_PADDING,
     DM_SCREEN_MINIMAP_SIZE,
     DM_SCREEN_MINIMAP_STORAGE_KEY,
     DM_SCREEN_MINIMAP_TOGGLE_VARIANT,
+    DM_SCREEN_MINIMAP_VIEW,
     DM_SCREEN_TEXT,
     DM_SCREEN_ZOOM,
-    fitDmScreenView,
     formatDmScreenZoom,
     getDmScreenRectStyle,
     getDmScreenSizeStyle,
@@ -29,14 +26,6 @@
 
   const { view, board, zoomIn, zoomOut, resetZoom, centerOn, fit } =
     useDmScreenView();
-
-  /** Как поле ложится на миникарту: целиком и по центру. */
-  const MINIMAP_VIEW = fitDmScreenView(
-    DM_SCREEN_FIELD,
-    DM_SCREEN_MINIMAP_SIZE,
-    DM_SCREEN_MINIMAP_PADDING,
-    DM_SCREEN_MINIMAP_MIN_ZOOM,
-  );
 
   const isMinimapOpen = useLocalStorage(DM_SCREEN_MINIMAP_STORAGE_KEY, true);
 
@@ -78,13 +67,15 @@
     visibleWindows.value.map((screenWindow) => ({
       id: screenWindow.id,
       style: getDmScreenRectStyle(
-        toDmScreenCanvasRect(screenWindow, MINIMAP_VIEW),
+        toDmScreenCanvasRect(screenWindow, DM_SCREEN_MINIMAP_VIEW),
       ),
     })),
   );
 
   const frameStyle = computed(() =>
-    getDmScreenRectStyle(toDmScreenCanvasRect(board.value, MINIMAP_VIEW)),
+    getDmScreenRectStyle(
+      toDmScreenCanvasRect(board.value, DM_SCREEN_MINIMAP_VIEW),
+    ),
   );
 
   const minimap = useTemplateRef<HTMLElement>('minimap');
@@ -106,7 +97,7 @@
     centerOn(
       toDmScreenFieldPoint(
         { x: event.clientX - bounds.left, y: event.clientY - bounds.top },
-        MINIMAP_VIEW,
+        DM_SCREEN_MINIMAP_VIEW,
       ),
     );
   }

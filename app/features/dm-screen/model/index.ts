@@ -16,6 +16,7 @@ export type {
   DmScreenRequest,
   DmScreenResizeEdges,
   DmScreenResizeHandle,
+  DmScreenResizeLimits,
   DmScreenSection,
   DmScreenSize,
   DmScreenSnapAssist,

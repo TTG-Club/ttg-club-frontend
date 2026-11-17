@@ -8,6 +8,8 @@ import type {
   DmScreenSnapZone,
 } from './types';
 
+import { range } from 'es-toolkit';
+
 import { DM_SCREEN_PAGE_PATH, DM_SCREEN_PAGE_TITLE } from '~/shared/consts';
 import { BESTIARY_SECTION } from '~bestiary/model';
 import {
@@ -307,7 +309,7 @@ function createGridZones(
   columns: number,
   rows: number,
 ): Array<DmScreenSnapZone> {
-  return Array.from({ length: columns * rows }, (_, index) => ({
+  return range(columns * rows).map((index) => ({
     x: (index % columns) / columns,
     y: Math.floor(index / columns) / rows,
     width: 1 / columns,
