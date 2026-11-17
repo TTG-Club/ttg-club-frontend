@@ -33,10 +33,9 @@ interface DmScreenTarget {
  * не добавляются.
  */
 export function useDmScreenAdd() {
-  const { add, screenId } = useDmScreen();
+  const { add, screenId, board } = useDmScreen();
   const { isLoggedIn } = useUser();
   const toast = useToast();
-  const { width: viewportWidth, height: viewportHeight } = useWindowSize();
 
   /**
    * Сообщает, что запись добавлена, со ссылкой на ширму.
@@ -95,7 +94,7 @@ export function useDmScreenAdd() {
       const { windows } = appendDmScreenWindow(
         screen.windows,
         request,
-        { width: viewportWidth.value, height: viewportHeight.value },
+        board.value,
         crypto.randomUUID(),
       );
 

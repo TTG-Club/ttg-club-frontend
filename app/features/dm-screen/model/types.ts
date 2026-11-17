@@ -1,24 +1,27 @@
 import type { DmScreenSnapPickerPosition } from './schema';
 
-/** Точка на экране, px. */
+/**
+ * Точка в px: на поле ширмы (место окон), на холсте — его видимой части, от
+ * её левого верхнего угла, — либо в окне браузера.
+ */
 export interface DmScreenPoint {
   x: number;
   y: number;
 }
 
-/** Размер окна или экрана, px. */
+/** Размер окна или холста, px. */
 export interface DmScreenSize {
   width: number;
   height: number;
 }
 
 /**
- * Экран ширмы: его размер и где кончается шапка ширмы. Без `top` шапка
- * считается обычной высоты.
+ * Сетка окон: сколько в ней колонок и рядов. Тем же видом записана клетка
+ * поля выбора сетки — её колонка и ряд, считая с единицы.
  */
-export interface DmScreenViewport extends DmScreenSize {
-  /** Нижний край шапки ширмы, px: выше окна не встают. */
-  top?: number;
+export interface DmScreenGrid {
+  columns: number;
+  rows: number;
 }
 
 /**
@@ -112,19 +115,15 @@ export interface DmScreenSpan {
   size: number;
 }
 
-/** Границы, в которых сторона окна двигается при растягивании, px. */
+/** В каких пределах сторона окна двигается при растягивании. */
 export interface DmScreenResizeLimits {
-  /** Дальше этого начало окна не уходит. */
-  min: number;
-  /** Край холста, к которому примагничивается начало окна. */
-  snapMin: number;
-  /** Край холста, к которому примагничивается конец окна. */
-  snapMax: number;
-  /** Меньше этого окно не сжимается. */
+  /** Отрезок свободного места холста по этой оси: к его краям магнит. */
+  area: DmScreenSpan;
+  /** Меньше этого окно не сжимается, px. */
   minSize: number;
 }
 
-/** Прямоугольник окна на экране, px. */
+/** Прямоугольник на поле или на холсте, px. */
 export interface DmScreenRect extends DmScreenPoint, DmScreenSize {}
 
 /** Место и размер окна, разложенного по сетке. */
@@ -148,6 +147,6 @@ export interface DmScreenRequest {
   path: string;
   /** Название в шапке окна и на плашке свёрнутого окна. */
   title: string;
-  /** Точка клика: окно встаёт рядом с ней, а не в центре экрана. */
+  /** Точка поля, рядом с которой встаёт окно; без неё — по центру холста. */
   origin?: DmScreenPoint;
 }

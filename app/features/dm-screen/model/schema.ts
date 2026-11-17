@@ -38,6 +38,19 @@ export type DmScreenSnapPickerPosition = z.infer<
   typeof dmScreenSnapPickerPositionSchema
 >;
 
+/**
+ * Обзор ширмы: какая точка поля стоит в левом верхнем углу холста и во
+ * сколько раз поле уменьшено. Хранится в браузере.
+ */
+export const dmScreenViewSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  /** Масштаб: `1` — как есть, меньше — поле отдалено. */
+  zoom: z.number().positive(),
+});
+
+export type DmScreenView = z.infer<typeof dmScreenViewSchema>;
+
 /** Ширма в списке пользователя. */
 export const dmScreenSummarySchema = z.object({
   id: z.coerce.string().min(1),

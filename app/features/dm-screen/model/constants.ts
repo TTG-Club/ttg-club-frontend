@@ -1,11 +1,14 @@
-import type { DmScreenSnapPickerPosition } from './schema';
+import type { DmScreenSnapPickerPosition, DmScreenView } from './schema';
 import type {
+  DmScreenRect,
   DmScreenResizeHandle,
   DmScreenSection,
   DmScreenSnapLayout,
   DmScreenSnapPickerOption,
   DmScreenSnapZone,
 } from './types';
+
+import { range } from 'es-toolkit';
 
 import { DM_SCREEN_PAGE_PATH, DM_SCREEN_PAGE_TITLE } from '~/shared/consts';
 import { BESTIARY_SECTION } from '~bestiary/model';
@@ -122,31 +125,132 @@ export const DM_SCREEN_WINDOW_SIZE = { width: 480, height: 600 } as const;
  */
 export const DM_SCREEN_WINDOW_MIN_SIZE = { width: 240, height: 120 } as const;
 
-/**
- * Отступ окна от краёв холста, px: слева, справа и снизу — тот же, что
- * сверху от полосы под шапкой.
- */
+/** Отступ окон от краёв холста, px. */
 export const DM_SCREEN_WINDOW_MARGIN = 8;
 
 /**
  * Ширина боковой панели сайта (`--navbar-width` без безопасной зоны), px:
- * новое окно не встаёт под неё.
+ * холст начинается правее неё.
  */
 export const DM_SCREEN_LEFT_INSET = 64;
 
 /**
  * Высота шапки ширмы в одну строку вместе с полосой под ней, px: отступ
- * страницы, строка кнопок, отступ до полосы и сама полоса.
+ * страницы, строка кнопок, отступ до полосы и сама полоса. Холст начинается
+ * под ней.
  */
 export const DM_SCREEN_HEADER_HEIGHT = 65;
 
 /**
- * Где под шапкой ширмы начинаются окна, px: окна не встают и не
- * перетаскиваются выше. Это место при шапке в одну строку; если кнопки
- * перенеслись на вторую, холст меряет шапку сам.
+ * Размер холста, пока ширма не открыта: запись кладут на неё с другой
+ * страницы. Из окна браузера вычитаются боковая панель сайта и шапка ширмы.
  */
-export const DM_SCREEN_TOP_INSET =
-  DM_SCREEN_HEADER_HEIGHT + DM_SCREEN_WINDOW_MARGIN;
+export const DM_SCREEN_CANVAS_INSET = {
+  width: DM_SCREEN_LEFT_INSET,
+  height: DM_SCREEN_HEADER_HEIGHT,
+} as const;
+
+/**
+ * Поле ширмы: место, на котором стоят окна. Оно намного больше экрана, но
+ * не бесконечно: за его края не уходят ни окна, ни обзор. Начало координат
+ * — там, где был угол окна браузера у прежней ширмы без поля, поэтому
+ * старые окна остаются возле середины поля.
+ */
+export const DM_SCREEN_FIELD: DmScreenRect = {
+  x: -7200,
+  y: -4550,
+  width: 16000,
+  height: 10000,
+};
+
+/** Ключ обзора ширмы (сдвиг и масштаб поля) в localStorage. */
+export const DM_SCREEN_VIEW_STORAGE_KEY = 'dm-screen:view';
+
+/**
+ * Обзор, пока мастер его не менял: без отдаления, а в углу холста — та
+ * точка поля, где холст начинался у прежней ширмы (под шапкой, правее
+ * боковой панели). Окна, расставленные до появления поля, стоят на экране
+ * там же, где стояли.
+ */
+export const DM_SCREEN_VIEW_DEFAULT: DmScreenView = {
+  x: DM_SCREEN_LEFT_INSET,
+  y: DM_SCREEN_HEADER_HEIGHT,
+  zoom: 1,
+};
+
+/**
+ * Масштаб поля: пределы (ближе, чем один к одному, поле не подходит), шаг
+ * кнопок и скорость колёсика. Колёсико, которое считает строками, а не
+ * пикселями, переводится в пиксели высотой строки.
+ */
+export const DM_SCREEN_ZOOM = {
+  min: 0.2,
+  max: 1,
+  step: 1.25,
+  wheelRate: 0.0015,
+  wheelLineHeight: 32,
+} as const;
+
+/** Отступ от краёв холста, когда обзор подгоняют под все окна, px. */
+export const DM_SCREEN_FIT_PADDING = 48;
+
+/** Кнопки мыши: основной тянут пустое место поля, средней — где угодно. */
+export const DM_SCREEN_POINTER_BUTTON = { main: 0, middle: 1 } as const;
+
+/** Курсор холста, пока поле тянут. */
+export const DM_SCREEN_PANNING_CLASS = 'cursor-grabbing';
+
+/**
+ * Точки на пустом месте поля: шаг на поле и наименьший шаг на экране, px.
+ * Когда поле отдалено и точки сливаются, шаг удваивается. Сама точка —
+ * фоновый рисунок цветом рамок темы.
+ */
+export const DM_SCREEN_BACKDROP = {
+  step: 32,
+  minStep: 20,
+  image:
+    'radial-gradient(circle, var(--ui-border-accented) 1px, transparent 1px)',
+} as const;
+
+/** Ключ настройки «показывать миникарту» в localStorage. */
+export const DM_SCREEN_MINIMAP_STORAGE_KEY = 'dm-screen:minimap';
+
+/** Размер миникарты, px: те же пропорции, что у поля. */
+export const DM_SCREEN_MINIMAP_SIZE = { width: 208, height: 130 } as const;
+
+/** Отступ поля от краёв миникарты, px: поле занимает её целиком. */
+export const DM_SCREEN_MINIMAP_PADDING = 0;
+
+/** Наименьший масштаб миникарты: поле помещается на неё целиком. */
+export const DM_SCREEN_MINIMAP_MIN_ZOOM = 0.001;
+
+/** Вид кнопки миникарты: нажата, пока миникарта видна. */
+export const DM_SCREEN_MINIMAP_TOGGLE_VARIANT = {
+  open: 'soft',
+  closed: 'ghost',
+} as const;
+
+/** Сколько клеток по стороне в поле выбора сетки окон. */
+export const DM_SCREEN_ARRANGE_GRID_SIZE = 10;
+
+/** Колонки поля выбора сетки: столько же, сколько клеток по стороне. */
+export const DM_SCREEN_ARRANGE_GRID_CLASS = 'grid-cols-10';
+
+/** Высота ширмы: с окнами она занимает экран, списком — растёт. */
+export const DM_SCREEN_CANVAS_CLASS = {
+  windowed: 'h-dvh overflow-hidden',
+  list: 'min-h-dvh',
+} as const;
+
+/** Кнопки шапки окна, обычные и ссылкой: с них окно не тянется. */
+export const DM_SCREEN_CONTROL_SELECTOR = 'button, a';
+
+/** Внутри чего клик по ссылке ставит курсор, а не открывает запись. */
+export const DM_SCREEN_EDITABLE_SELECTOR =
+  '[contenteditable="true"], textarea, input';
+
+/** Ссылки в содержимом окна. */
+export const DM_SCREEN_LINK_SELECTOR = 'a[href]';
 
 /**
  * Ручки растягивания окна: четыре стороны и четыре угла. Углы идут после
@@ -205,7 +309,7 @@ function createGridZones(
   columns: number,
   rows: number,
 ): Array<DmScreenSnapZone> {
-  return Array.from({ length: columns * rows }, (_, index) => ({
+  return range(columns * rows).map((index) => ({
     x: (index % columns) / columns,
     y: Math.floor(index / columns) / rows,
     width: 1 / columns,
@@ -271,8 +375,14 @@ export const DM_SCREEN_SNAP_PICKER_DISTANCE = 132;
 /** По чему в разметке панели раскладок находятся её места. */
 export const DM_SCREEN_SNAP_ZONE_SELECTOR = '[data-zone]';
 
-/** Отступ панели раскладок от шапки ширмы или от низа холста, px. */
+/** Отступ панели раскладок от верха или низа холста, px. */
 export const DM_SCREEN_SNAP_PICKER_OFFSET = 8;
+
+/** У какого края холста стоит панель раскладок, когда она видна. */
+export const DM_SCREEN_SNAP_PICKER_CLASS = {
+  top: 'top-2',
+  bottom: 'bottom-2',
+} as const;
 
 /** Ключ места панели раскладок в localStorage. */
 export const DM_SCREEN_SNAP_PICKER_STORAGE_KEY =
@@ -340,23 +450,8 @@ export const DM_SCREEN_BACKGROUND_CLASS =
 /** Рамка окна, на которое указали вместо нового. */
 export const DM_SCREEN_HIGHLIGHT_CLASS = 'ring-2 ring-primary';
 
-/**
- * Зазор между полосой под шапкой ширмы и окнами, px: как отступ окна от
- * остальных краёв холста.
- */
-export const DM_SCREEN_TOP_GAP = DM_SCREEN_WINDOW_MARGIN;
-
 /** Сколько подсвечивается окно, на которое указали вместо нового, мс. */
 export const DM_SCREEN_HIGHLIGHT_DURATION = 1500;
-
-/**
- * Сколько окна остаётся на экране по ширине, когда его утащили за край, px:
- * за эту часть его можно вытянуть обратно.
- */
-export const DM_SCREEN_WINDOW_VISIBLE_PART = 96;
-
-/** Высота шапки окна, px: шапка не уходит за нижний край экрана. */
-export const DM_SCREEN_WINDOW_HEADER_HEIGHT = 40;
 
 /**
  * Промежуток между окнами, px: в сетке и когда окно примагничивается
@@ -397,6 +492,10 @@ export const DM_SCREEN_TEXT = {
     'Найдите заклинание, монстра, правило или любую другую запись поиском выше или выберите «В ширму» в меню записи на сайте. Каждая запись встанет отдельным окном: его можно двигать, растягивать и сворачивать.',
   remove: 'Убрать из ширмы',
   arrange: 'Выровнять по сетке',
+  arrangeTitle: 'Сетка окон',
+  arrangeHint: 'Наведите на клетку',
+  arrangeCell: 'Сетка',
+  arrangeAuto: 'Подобрать автоматически',
   snapAssistTitle: 'Что поставить сюда?',
   snapAssistSkip: 'Пропустить',
   snapAssistStop: 'Закончить',
@@ -430,6 +529,14 @@ export const DM_SCREEN_TEXT = {
   restoreAll: 'Развернуть все',
   snapPickerSettings: 'Панель раскладок',
   unknownEntry: 'Эту запись нельзя показать в ширме',
+  zoomIn: 'Приблизить',
+  zoomOut: 'Отдалить',
+  zoomReset: 'Вернуть обычный масштаб',
+  fit: 'Показать все окна',
+  minimapShow: 'Показать миникарту',
+  minimapHide: 'Скрыть миникарту',
+  minimap: 'Миникарта ширмы',
+  navigator: 'Обзор ширмы',
 } as const;
 
 export const DM_SCREEN_ICON = {
@@ -449,4 +556,8 @@ export const DM_SCREEN_ICON = {
   restoreAll: 'tabler:layout-bottombar-expand',
   snapPickerSettings: 'tabler:adjustments-horizontal',
   unknown: 'tabler:file-unknown',
+  zoomIn: 'tabler:plus',
+  zoomOut: 'tabler:minus',
+  fit: 'tabler:focus-centered',
+  minimap: 'tabler:map-2',
 } as const;

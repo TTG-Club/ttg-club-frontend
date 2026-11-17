@@ -4,16 +4,19 @@ export type {
   DmScreenList,
   DmScreenSnapPickerPosition,
   DmScreenSummary,
+  DmScreenView,
   DmScreenWindow,
 } from './schema';
 export type {
   DmScreenAxisTile,
   DmScreenDivider,
+  DmScreenGrid,
   DmScreenPoint,
   DmScreenRect,
   DmScreenRequest,
   DmScreenResizeEdges,
   DmScreenResizeHandle,
+  DmScreenResizeLimits,
   DmScreenSection,
   DmScreenSize,
   DmScreenSnapAssist,
@@ -22,7 +25,6 @@ export type {
   DmScreenSnapTarget,
   DmScreenSnapZone,
   DmScreenTile,
-  DmScreenViewport,
 } from './types';
 
 export {
@@ -40,37 +42,11 @@ export {
   dmScreenListSchema,
   dmScreenSnapPickerPositionSchema,
   dmScreenSummarySchema,
+  dmScreenViewSchema,
   dmScreenWindowListSchema,
   dmScreenWindowSchema,
 } from './schema';
 
-export {
-  appendDmScreenWindow,
-  arrangeDmScreenWindows,
-  createDmScreenNotePath,
-  fitDmScreenWindowSize,
-  getDmScreenDividerPointer,
-  getDmScreenDividerRect,
-  getDmScreenDividers,
-  getDmScreenEdgeTarget,
-  getDmScreenEntryRoot,
-  getDmScreenNoteToggle,
-  getDmScreenPagePath,
-  getDmScreenPathname,
-  getDmScreenPickerStyle,
-  getDmScreenRectStyle,
-  getDmScreenWindowIcon,
-  getDmScreenZoneRect,
-  getDmScreenZoneStyle,
-  isDmScreenNotePath,
-  isDmScreenPath,
-  isDmScreenPickerBand,
-  keepDmScreenWindowReachable,
-  moveDmScreenDivider,
-  placeDmScreenWindow,
-  resizeDmScreenWindow,
-  resolveDmScreenSection,
-  snapDmScreenWindow,
-} from './utils';
-
 export * from './constants';
+export * from './utils';
+export * from './view';

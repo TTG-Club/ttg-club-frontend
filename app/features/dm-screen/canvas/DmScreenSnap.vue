@@ -1,13 +1,13 @@
 <script setup lang="ts">
   import type { DmScreenPoint, DmScreenSnapTarget } from '../model';
 
-  import { useDmScreen, useDmScreenSnap } from '../composables';
+  import { useDmScreenSnap, useDmScreenView } from '../composables';
   import {
-    DM_SCREEN_SNAP_LAYOUTS,
+    DM_SCREEN_SNAP_PICKER_CLASS,
+    DM_SCREEN_SNAP_PICKER_POSITION,
     DM_SCREEN_SNAP_ZONE_CLASS,
     DM_SCREEN_SNAP_ZONE_SELECTOR,
     DM_SCREEN_TEXT,
-    getDmScreenPickerStyle,
     getDmScreenRectStyle,
     getDmScreenWindowIcon,
     getDmScreenZoneStyle,
@@ -20,14 +20,13 @@
    * встало в раскладку: в следующем свободном месте — список окон, которые
    * можно туда поставить; Escape или клик мимо заканчивает подбор.
    *
-   * Панель не ловит указатель (под ним окно, которое тащат), поэтому место
-   * под указателем ищется по координатам.
+   * Панель не ловит указатель (он закреплён за шапкой окна, которое
+   * тащат), поэтому место под указателем ищется по координатам.
    */
-  const { viewport } = useDmScreen();
-
   const {
-    pointer,
+    clientPointer,
     target,
+    fittingLayouts,
     pickerPosition,
     isPickerVisible,
     previewRect,
@@ -40,6 +39,9 @@
     skip,
     stopAssist,
   } = useDmScreenSnap();
+
+  // Места раскладок считаются на поле, а рисуются поверх холста
+  const { toCanvasRect } = useDmScreenView();
 
   const picker = useTemplateRef<HTMLElement>('picker');
 
@@ -56,13 +58,13 @@
 
   /** Все места всех раскладок подряд: по номеру в этом списке их находят. */
   const pickerTargets = computed<Array<DmScreenSnapTarget>>(() =>
-    DM_SCREEN_SNAP_LAYOUTS.flatMap((layout) =>
+    fittingLayouts.value.flatMap((layout) =>
       layout.zones.map((zone) => ({ layout, zone })),
     ),
   );
 
   const pickerLayouts = computed(() =>
-    DM_SCREEN_SNAP_LAYOUTS.map((layout) => ({
+    fittingLayouts.value.map((layout) => ({
       key: layout.key,
       zones: layout.zones.map((zone) => ({
         index: pickerTargets.value.findIndex(
@@ -77,13 +79,16 @@
     })),
   );
 
-  const pickerStyle = computed(() =>
-    getDmScreenPickerStyle(viewport.value, pickerPosition.value),
+  // Скрытую панель не рисуют вовсе, поэтому край у неё один из двух
+  const pickerClass = computed(() =>
+    pickerPosition.value === DM_SCREEN_SNAP_PICKER_POSITION.bottom
+      ? DM_SCREEN_SNAP_PICKER_CLASS.bottom
+      : DM_SCREEN_SNAP_PICKER_CLASS.top,
   );
 
   /**
    * Место панели раскладок, над которым находится точка.
-   * @param point - где указатель
+   * @param point - где указатель в окне браузера
    */
   function findPickerTarget(
     point: DmScreenPoint,
@@ -108,25 +113,31 @@
 
   // После отрисовки: панель появляется от того же движения указателя
   watch(
-    pointer,
+    clientPointer,
     (point) => {
-      setPickerTarget(point ? findPickerTarget(point) : undefined);
+      setPickerTarget(
+        point && isPickerVisible.value ? findPickerTarget(point) : undefined,
+      );
     },
     { flush: 'post' },
   );
 
   const previewStyle = computed(() =>
-    previewRect.value ? getDmScreenRectStyle(previewRect.value) : undefined,
+    previewRect.value
+      ? getDmScreenRectStyle(toCanvasRect(previewRect.value))
+      : undefined,
   );
 
   const assistStyle = computed(() =>
-    assistRect.value ? getDmScreenRectStyle(assistRect.value) : undefined,
+    assistRect.value
+      ? getDmScreenRectStyle(toCanvasRect(assistRect.value))
+      : undefined,
   );
 
   const assistPendingStyles = computed(() =>
     assistPendingRects.value.map((rect) => ({
       key: `${rect.x}:${rect.y}`,
-      style: getDmScreenRectStyle(rect),
+      style: getDmScreenRectStyle(toCanvasRect(rect)),
     })),
   );
 
@@ -137,15 +148,15 @@
   <div
     v-if="previewStyle"
     :style="previewStyle"
-    class="pointer-events-none fixed rounded-lg border-2 border-primary bg-primary/15"
+    class="pointer-events-none absolute rounded-lg border-2 border-primary bg-primary/15"
   />
 
   <div
     v-if="isPickerVisible"
     ref="picker"
     aria-hidden="true"
-    :style="pickerStyle"
-    class="pointer-events-none fixed left-[calc(50%+var(--navbar-width)/2)] flex w-max max-w-[calc(100vw-var(--navbar-width)-1rem)] -translate-x-1/2 flex-wrap justify-center gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
+    class="pointer-events-none absolute inset-x-2 mx-auto flex w-fit flex-wrap justify-center gap-2 rounded-xl border border-default bg-elevated p-2 shadow-xl"
+    :class="pickerClass"
   >
     <div
       v-for="layout in pickerLayouts"
@@ -174,7 +185,7 @@
   -->
   <div
     v-if="assistStyle"
-    class="fixed inset-0 cursor-pointer"
+    class="absolute inset-0 cursor-pointer"
     @click.left.exact.self.prevent.stop="stopAssist"
   />
 
@@ -182,7 +193,7 @@
     v-for="pending in assistPendingStyles"
     :key="pending.key"
     :style="pending.style"
-    class="pointer-events-none fixed rounded-lg border-2 border-dashed border-accented"
+    class="pointer-events-none absolute rounded-lg border-2 border-dashed border-accented"
   />
 
   <section
@@ -191,7 +202,7 @@
     aria-modal="false"
     :aria-label="DM_SCREEN_TEXT.snapAssistTitle"
     :style="assistStyle"
-    class="fixed flex flex-col gap-2 overflow-y-auto rounded-lg border-2 border-dashed border-primary bg-default p-3 shadow-xl"
+    class="absolute flex flex-col gap-2 overflow-y-auto rounded-lg border-2 border-dashed border-primary bg-default p-3 shadow-xl"
   >
     <h2 class="text-sm text-muted">
       {{ DM_SCREEN_TEXT.snapAssistTitle }}

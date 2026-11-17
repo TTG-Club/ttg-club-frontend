@@ -3,35 +3,61 @@ import { describe, expect, it } from 'vitest';
 import {
   appendDmScreenWindow,
   arrangeDmScreenWindows,
+  clampDmScreenView,
   createDmScreenNotePath,
+  DM_SCREEN_FIELD,
   DM_SCREEN_GRID_GAP,
   DM_SCREEN_ICON,
-  DM_SCREEN_LEFT_INSET,
   DM_SCREEN_SNAP_HALVES,
   DM_SCREEN_SNAP_LAYOUTS,
-  DM_SCREEN_SNAP_PICKER_OFFSET,
-  DM_SCREEN_TOP_INSET,
+  DM_SCREEN_VIEW_DEFAULT,
   DM_SCREEN_WINDOW_MARGIN,
   DM_SCREEN_WINDOW_MIN_SIZE,
+  DM_SCREEN_ZOOM,
   dmScreenDetailSchema,
   dmScreenListSchema,
+  fitDmScreenView,
+  formatDmScreenGrid,
   getDmScreenDividers,
   getDmScreenEdgeTarget,
   getDmScreenEntryRoot,
-  getDmScreenPickerStyle,
+  getDmScreenGridCells,
+  getDmScreenVisibleRect,
   getDmScreenWindowIcon,
   getDmScreenZoneRect,
+  isDmScreenGridCellInside,
+  isDmScreenLayoutFitting,
   isDmScreenNotePath,
   isDmScreenPath,
   isDmScreenPickerBand,
+  isDmScreenRectVisible,
+  keepDmScreenWindowOnField,
   moveDmScreenDivider,
+  panDmScreenView,
   resizeDmScreenWindow,
   resolveDmScreenSection,
   snapDmScreenWindow,
+  toDmScreenCanvasRect,
+  toDmScreenFieldPoint,
+  zoomDmScreenView,
 } from '~dm-screen/model';
 
-/** Небольшой экран: под шапкой помещается лишь один ряд обычных окон. */
-const SHORT_VIEWPORT = { width: 1130, height: 400 };
+/** Холст на экране 1600×900: под шапкой ширмы, правее боковой панели. */
+const CANVAS = { width: 1536, height: 835 };
+
+/** Видимая часть поля при обычном обзоре. */
+const BOARD = getDmScreenVisibleRect(DM_SCREEN_VIEW_DEFAULT, CANVAS);
+
+/** Невысокий холст: на нём помещается лишь один ряд обычных окон. */
+const SHORT_BOARD = { ...BOARD, width: 1066, height: 335 };
+
+/** Края свободного места видимой части поля. */
+const AREA = {
+  left: BOARD.x + DM_SCREEN_WINDOW_MARGIN,
+  top: BOARD.y + DM_SCREEN_WINDOW_MARGIN,
+  right: BOARD.x + BOARD.width - DM_SCREEN_WINDOW_MARGIN,
+  bottom: BOARD.y + BOARD.height - DM_SCREEN_WINDOW_MARGIN,
+};
 
 describe('ширма мастера', () => {
   it('магические предметы не путает с предметами', () => {
@@ -59,9 +85,9 @@ describe('ширма мастера', () => {
     expect(getDmScreenEntryRoot('/tools/trader')).toBeUndefined();
   });
 
-  it('укладывает все окна в сетку, которая помещается на невысокий экран', () => {
+  it('укладывает все окна в сетку, которая помещается на невысокий холст', () => {
     const ids = ['a', 'b', 'c', 'd', 'e', 'f'];
-    const tiles = arrangeDmScreenWindows(ids, SHORT_VIEWPORT);
+    const tiles = arrangeDmScreenWindows(ids, SHORT_BOARD);
 
     expect(tiles.map((tile) => tile.id)).toEqual(ids);
 
@@ -69,21 +95,18 @@ describe('ширма мастера', () => {
     const right = Math.max(...tiles.map((tile) => tile.x + tile.width));
 
     expect(bottom).toBeLessThanOrEqual(
-      SHORT_VIEWPORT.height - DM_SCREEN_WINDOW_MARGIN,
+      SHORT_BOARD.y + SHORT_BOARD.height - DM_SCREEN_WINDOW_MARGIN,
     );
 
     expect(right).toBeLessThanOrEqual(
-      SHORT_VIEWPORT.width - DM_SCREEN_WINDOW_MARGIN,
+      SHORT_BOARD.x + SHORT_BOARD.width - DM_SCREEN_WINDOW_MARGIN,
     );
 
-    expect(Math.min(...tiles.map((tile) => tile.y))).toBe(DM_SCREEN_TOP_INSET);
+    expect(Math.min(...tiles.map((tile) => tile.y))).toBe(AREA.top);
   });
 
   it('клетки сетки не перекрываются', () => {
-    const tiles = arrangeDmScreenWindows(['a', 'b', 'c', 'd', 'e'], {
-      width: 1600,
-      height: 900,
-    });
+    const tiles = arrangeDmScreenWindows(['a', 'b', 'c', 'd', 'e'], BOARD);
 
     const overlaps = tiles.some((tile, index) =>
       tiles
@@ -100,13 +123,33 @@ describe('ширма мастера', () => {
     expect(overlaps).toBe(false);
   });
 
-  it('добавляет запись окном и не дублирует уже добавленную', () => {
-    const viewport = { width: 1600, height: 900 };
+  it('раскладывает окна сеткой, которую выбрал мастер', () => {
+    const tiles = arrangeDmScreenWindows(['a', 'b', 'c', 'd'], BOARD, {
+      columns: 3,
+      rows: 2,
+    });
 
+    const [first, second, third, fourth] = tiles;
+
+    if (!first || !second || !third || !fourth) {
+      throw new Error('Сетка должна вернуть все четыре окна');
+    }
+
+    // Три колонки: четвёртое окно уходит на второй ряд под первое
+    expect(new Set([first.y, second.y, third.y]).size).toBe(1);
+    expect(fourth.x).toBe(first.x);
+    expect(fourth.y).toBe(first.y + first.height + DM_SCREEN_GRID_GAP);
+
+    // Клетка — треть ширины и половина высоты, даже когда окон меньше
+    expect(third.x + third.width).toBe(AREA.right);
+    expect(fourth.y + fourth.height).toBe(AREA.bottom);
+  });
+
+  it('добавляет запись окном и не дублирует уже добавленную', () => {
     const first = appendDmScreenWindow(
       [],
       { path: '/spells/fireball', title: 'Огненный шар' },
-      viewport,
+      BOARD,
       'w1',
     );
 
@@ -122,11 +165,12 @@ describe('ширма мастера', () => {
     const again = appendDmScreenWindow(
       minimized,
       { path: '/spells/fireball', title: 'Огненный шар' },
-      viewport,
+      BOARD,
       'w2',
     );
 
     expect(again.isAdded).toBe(false);
+    expect(again.windowId).toBe('w1');
     expect(again.windows).toHaveLength(1);
     expect(again.windows[0]?.isMinimized).toBe(false);
     expect(again.windows[0]?.layer).toBe(2);
@@ -162,25 +206,42 @@ describe('ширма мастера', () => {
     expect(screen.windows).toHaveLength(1);
   });
 
-  it('сетка доходит до краёв холста с одинаковым отступом', () => {
-    const viewport = { width: 1600, height: 900 };
-    const tiles = arrangeDmScreenWindows(['a', 'b', 'c'], viewport);
+  it('новое окно встаёт в видимой части поля, куда бы её ни сдвинули', () => {
+    const board = { ...BOARD, x: 3000, y: -2000 };
 
-    expect(Math.min(...tiles.map((tile) => tile.x))).toBe(
-      DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
+    const { windows } = appendDmScreenWindow(
+      [],
+      { path: '/spells/fireball', title: 'Огненный шар' },
+      board,
+      'w1',
     );
 
+    const [added] = windows;
+
+    if (!added) {
+      throw new Error('Окно должно добавиться');
+    }
+
+    expect(isDmScreenRectVisible(added, board)).toBe(true);
+    expect(added.x).toBeGreaterThanOrEqual(board.x + DM_SCREEN_WINDOW_MARGIN);
+    expect(added.y).toBeGreaterThanOrEqual(board.y + DM_SCREEN_WINDOW_MARGIN);
+  });
+
+  it('сетка доходит до краёв холста с одинаковым отступом', () => {
+    const tiles = arrangeDmScreenWindows(['a', 'b', 'c'], BOARD);
+
+    expect(Math.min(...tiles.map((tile) => tile.x))).toBe(AREA.left);
+
     expect(Math.max(...tiles.map((tile) => tile.x + tile.width))).toBe(
-      viewport.width - DM_SCREEN_WINDOW_MARGIN,
+      AREA.right,
     );
 
     expect(Math.max(...tiles.map((tile) => tile.y + tile.height))).toBe(
-      viewport.height - DM_SCREEN_WINDOW_MARGIN,
+      AREA.bottom,
     );
   });
 
   describe('примагничивание', () => {
-    const viewport = { width: 1600, height: 900 };
     const other = { x: 500, y: 200, width: 400, height: 300 };
     const size = { width: 300, height: 200 };
 
@@ -188,7 +249,7 @@ describe('ширма мастера', () => {
       const snapped = snapDmScreenWindow(
         { x: 500 + 400 + DM_SCREEN_GRID_GAP + 7, y: 205, ...size },
         [other],
-        viewport,
+        BOARD,
       );
 
       expect(snapped).toEqual({
@@ -197,24 +258,21 @@ describe('ширма мастера', () => {
       });
     });
 
-    it('прижимает к краю холста под шапкой и у боковой панели', () => {
+    it('прижимает к краям свободного места холста', () => {
       const snapped = snapDmScreenWindow(
-        { x: DM_SCREEN_LEFT_INSET + 20, y: DM_SCREEN_TOP_INSET + 9, ...size },
+        { x: AREA.left + 11, y: AREA.top + 9, ...size },
         [],
-        viewport,
+        BOARD,
       );
 
-      expect(snapped).toEqual({
-        x: DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN,
-        y: DM_SCREEN_TOP_INSET,
-      });
+      expect(snapped).toEqual({ x: AREA.left, y: AREA.top });
     });
 
     it('далеко от краёв окно остаётся, где его держат', () => {
       const snapped = snapDmScreenWindow(
         { x: 1100, y: 600, ...size },
         [other],
-        viewport,
+        BOARD,
       );
 
       expect(snapped).toEqual({ x: 1100, y: 600 });
@@ -222,7 +280,6 @@ describe('ширма мастера', () => {
   });
 
   describe('растягивание', () => {
-    const viewport = { width: 1600, height: 900 };
     const start = { x: 500, y: 200, width: 400, height: 300 };
     const other = { x: 1000, y: 200, width: 320, height: 450 };
 
@@ -231,7 +288,7 @@ describe('ширма мастера', () => {
         start,
         { x: -1, y: 0 },
         { x: -150, y: 40 },
-        viewport,
+        BOARD,
       );
 
       expect(resized).toEqual({ x: 350, y: 200, width: 550, height: 300 });
@@ -242,7 +299,7 @@ describe('ширма мастера', () => {
         start,
         { x: 0, y: 1 },
         { x: 0, y: 143 },
-        viewport,
+        BOARD,
         [other],
       );
 
@@ -254,23 +311,24 @@ describe('ширма мастера', () => {
         start,
         { x: 1, y: 0 },
         { x: -75, y: 0 },
-        viewport,
+        BOARD,
         [other],
       );
 
       expect(resized.width).toBe(other.width);
     });
 
-    it('не пускает верхнюю сторону под шапку ширмы', () => {
+    it('примагничивает сторону к краю свободного места холста', () => {
       const resized = resizeDmScreenWindow(
         start,
         { x: 0, y: -1 },
-        { x: 0, y: -500 },
-        { ...viewport, top: 120 },
+        { x: 0, y: AREA.top + 5 - start.y },
+        BOARD,
+        [],
       );
 
-      expect(resized.y).toBe(120);
-      expect(resized.height).toBe(380);
+      expect(resized.y).toBe(AREA.top);
+      expect(resized.y + resized.height).toBe(start.y + start.height);
     });
 
     it('не сжимает окно меньше минимального', () => {
@@ -278,7 +336,7 @@ describe('ширма мастера', () => {
         start,
         { x: 1, y: 1 },
         { x: -1000, y: -1000 },
-        viewport,
+        BOARD,
       );
 
       expect(resized).toEqual({
@@ -290,7 +348,6 @@ describe('ширма мастера', () => {
   });
 
   describe('раскладки', () => {
-    const viewport = { width: 1600, height: 900 };
     const [leftZone, rightZone] = DM_SCREEN_SNAP_HALVES.zones;
 
     it('половины делят холст с промежутком сетки между ними', () => {
@@ -298,80 +355,75 @@ describe('ширма мастера', () => {
         throw new Error('В раскладке половин должно быть два места');
       }
 
-      const left = getDmScreenZoneRect(leftZone, viewport);
-      const right = getDmScreenZoneRect(rightZone, viewport);
+      const left = getDmScreenZoneRect(leftZone, BOARD);
+      const right = getDmScreenZoneRect(rightZone, BOARD);
 
-      expect(left.x).toBe(DM_SCREEN_LEFT_INSET + DM_SCREEN_WINDOW_MARGIN);
-      expect(left.y).toBe(DM_SCREEN_TOP_INSET);
+      expect(left.x).toBe(AREA.left);
+      expect(left.y).toBe(AREA.top);
       expect(right.x - (left.x + left.width)).toBe(DM_SCREEN_GRID_GAP);
-
-      expect(right.x + right.width).toBe(
-        viewport.width - DM_SCREEN_WINDOW_MARGIN,
-      );
-
-      expect(left.y + left.height).toBe(
-        viewport.height - DM_SCREEN_WINDOW_MARGIN,
-      );
+      expect(right.x + right.width).toBe(AREA.right);
+      expect(left.y + left.height).toBe(AREA.bottom);
     });
 
     it('у боковых краёв холста предлагает половину', () => {
+      expect(getDmScreenEdgeTarget({ x: 5, y: 400 }, CANVAS)?.zone).toBe(
+        leftZone,
+      );
+
       expect(
-        getDmScreenEdgeTarget({ x: DM_SCREEN_LEFT_INSET + 5, y: 400 }, viewport)
-          ?.zone,
-      ).toBe(leftZone);
+        getDmScreenEdgeTarget({ x: CANVAS.width - 5, y: 400 }, CANVAS)?.zone,
+      ).toBe(rightZone);
 
-      expect(getDmScreenEdgeTarget({ x: 1595, y: 400 }, viewport)?.zone).toBe(
-        rightZone,
-      );
-
-      expect(getDmScreenEdgeTarget({ x: 800, y: 400 }, viewport)).toBe(
-        undefined,
-      );
+      expect(getDmScreenEdgeTarget({ x: 800, y: 400 }, CANVAS)).toBe(undefined);
     });
 
     it('панель раскладок видна в полосе у выбранного края холста', () => {
-      const nearTop = { x: 800, y: DM_SCREEN_TOP_INSET + 20 };
-      const nearBottom = { x: 800, y: viewport.height - 20 };
+      const nearTop = { x: 800, y: 20 };
+      const nearBottom = { x: 800, y: CANVAS.height - 20 };
 
-      expect(isDmScreenPickerBand(nearTop, viewport, 'top')).toBe(true);
-      expect(isDmScreenPickerBand(nearBottom, viewport, 'top')).toBe(false);
-      expect(isDmScreenPickerBand(nearBottom, viewport, 'bottom')).toBe(true);
-      expect(isDmScreenPickerBand(nearTop, viewport, 'bottom')).toBe(false);
+      expect(isDmScreenPickerBand(nearTop, CANVAS, 'top')).toBe(true);
+      expect(isDmScreenPickerBand(nearBottom, CANVAS, 'top')).toBe(false);
+      expect(isDmScreenPickerBand(nearBottom, CANVAS, 'bottom')).toBe(true);
+      expect(isDmScreenPickerBand(nearTop, CANVAS, 'bottom')).toBe(false);
     });
 
     it('полоса панели раскладок растёт вместе с панелью в два ряда', () => {
-      const belowBand = { x: 800, y: DM_SCREEN_TOP_INSET + 140 };
+      const belowBand = { x: 800, y: 140 };
 
-      expect(isDmScreenPickerBand(belowBand, viewport, 'top')).toBe(false);
-      expect(isDmScreenPickerBand(belowBand, viewport, 'top', 136)).toBe(true);
+      expect(isDmScreenPickerBand(belowBand, CANVAS, 'top')).toBe(false);
+      expect(isDmScreenPickerBand(belowBand, CANVAS, 'top', 136)).toBe(true);
     });
 
     it('скрытая панель раскладок не появляется ни у одного края', () => {
-      expect(
-        isDmScreenPickerBand(
-          { x: 800, y: DM_SCREEN_TOP_INSET + 20 },
-          viewport,
-          'hidden',
-        ),
-      ).toBe(false);
+      expect(isDmScreenPickerBand({ x: 800, y: 20 }, CANVAS, 'hidden')).toBe(
+        false,
+      );
 
       expect(
         isDmScreenPickerBand(
-          { x: 800, y: viewport.height - 20 },
-          viewport,
+          { x: 800, y: CANVAS.height - 20 },
+          CANVAS,
           'hidden',
         ),
       ).toBe(false);
     });
 
-    it('панель раскладок прижата к выбранному краю холста', () => {
-      expect(getDmScreenPickerStyle(viewport, 'top')).toEqual({
-        top: `${DM_SCREEN_TOP_INSET + DM_SCREEN_SNAP_PICKER_OFFSET}px`,
-      });
+    it('тесному холсту частые раскладки не предлагает, отдалённому — все', () => {
+      const tight = { ...BOARD, width: 800, height: 500 };
+      const far = getDmScreenVisibleRect({ x: 0, y: 0, zoom: 0.5 }, CANVAS);
 
-      expect(getDmScreenPickerStyle(viewport, 'bottom')).toEqual({
-        bottom: `${DM_SCREEN_SNAP_PICKER_OFFSET}px`,
-      });
+      const fitting = DM_SCREEN_SNAP_LAYOUTS.filter((layout) =>
+        isDmScreenLayoutFitting(layout, tight),
+      ).map((layout) => layout.key);
+
+      expect(fitting).toContain('columns-2');
+      expect(fitting).not.toContain('columns-6');
+
+      expect(
+        DM_SCREEN_SNAP_LAYOUTS.every((layout) =>
+          isDmScreenLayoutFitting(layout, far),
+        ),
+      ).toBe(true);
     });
 
     it('места каждой раскладки покрывают холст целиком', () => {
@@ -383,6 +435,154 @@ describe('ширма мастера', () => {
 
         expect(area).toBeCloseTo(1);
       });
+    });
+  });
+
+  describe('обзор поля', () => {
+    it('при обычном обзоре старые окна стоят на экране, где стояли', () => {
+      // Раньше место окна считалось от угла окна браузера, а холст
+      // начинался под шапкой, правее боковой панели
+      const legacy = { x: 72, y: 73, width: 480, height: 600 };
+
+      expect(toDmScreenCanvasRect(legacy, DM_SCREEN_VIEW_DEFAULT)).toEqual({
+        ...legacy,
+        x: DM_SCREEN_WINDOW_MARGIN,
+        y: DM_SCREEN_WINDOW_MARGIN,
+      });
+    });
+
+    it('точка холста и точка поля переводятся друг в друга', () => {
+      const view = { x: 400, y: -200, zoom: 0.5 };
+
+      expect(toDmScreenFieldPoint({ x: 100, y: 50 }, view)).toEqual({
+        x: 600,
+        y: -100,
+      });
+
+      expect(
+        toDmScreenCanvasRect(
+          { x: 600, y: -100, width: 200, height: 100 },
+          view,
+        ),
+      ).toEqual({ x: 100, y: 50, width: 100, height: 50 });
+    });
+
+    it('отдалённое поле показывает больше', () => {
+      const board = getDmScreenVisibleRect({ x: 0, y: 0, zoom: 0.5 }, CANVAS);
+
+      expect(board.width).toBe(CANVAS.width * 2);
+      expect(board.height).toBe(CANVAS.height * 2);
+    });
+
+    it('масштаб меняется вокруг указателя и не выходит за пределы', () => {
+      const anchor = { x: 300, y: 200 };
+      const before = toDmScreenFieldPoint(anchor, DM_SCREEN_VIEW_DEFAULT);
+      const zoomed = zoomDmScreenView(DM_SCREEN_VIEW_DEFAULT, 0.5, anchor);
+      const after = toDmScreenFieldPoint(anchor, zoomed);
+
+      expect(zoomed.zoom).toBe(0.5);
+      expect(after.x).toBeCloseTo(before.x);
+      expect(after.y).toBeCloseTo(before.y);
+
+      expect(zoomDmScreenView(zoomed, 5, anchor).zoom).toBe(DM_SCREEN_ZOOM.max);
+
+      expect(zoomDmScreenView(zoomed, 0.01, anchor).zoom).toBe(
+        DM_SCREEN_ZOOM.min,
+      );
+    });
+
+    it('поле едет за указателем, на отдалённом — быстрее', () => {
+      expect(
+        panDmScreenView({ x: 0, y: 0, zoom: 0.5 }, { x: 100, y: -50 }),
+      ).toEqual({ x: -200, y: 100, zoom: 0.5 });
+    });
+
+    it('обзор не уходит за края поля', () => {
+      const clamped = clampDmScreenView(
+        { x: 999999, y: -999999, zoom: 1 },
+        CANVAS,
+      );
+
+      expect(clamped.x).toBe(
+        DM_SCREEN_FIELD.x + DM_SCREEN_FIELD.width - CANVAS.width,
+      );
+
+      expect(clamped.y).toBe(DM_SCREEN_FIELD.y);
+    });
+
+    it('окно не уходит за край поля', () => {
+      const kept = keepDmScreenWindowOnField({
+        x: DM_SCREEN_FIELD.x - 500,
+        y: DM_SCREEN_FIELD.y + DM_SCREEN_FIELD.height,
+        width: 400,
+        height: 300,
+      });
+
+      expect(kept.x).toBe(DM_SCREEN_FIELD.x);
+      expect(kept.y).toBe(DM_SCREEN_FIELD.y + DM_SCREEN_FIELD.height - 300);
+    });
+
+    it('«показать все окна» отдаляет поле, пока окна не поместятся', () => {
+      const bounds = { x: -1000, y: -500, width: 4000, height: 2000 };
+      const view = fitDmScreenView(bounds, CANVAS, 48);
+      const board = getDmScreenVisibleRect(view, CANVAS);
+
+      expect(view.zoom).toBeLessThan(1);
+      expect(board.x).toBeLessThanOrEqual(bounds.x);
+      expect(board.y).toBeLessThanOrEqual(bounds.y);
+
+      expect(board.x + board.width).toBeGreaterThanOrEqual(
+        bounds.x + bounds.width,
+      );
+
+      expect(board.y + board.height).toBeGreaterThanOrEqual(
+        bounds.y + bounds.height,
+      );
+    });
+
+    it('небольшое окно «показать все» не приближает сверх обычного', () => {
+      const view = fitDmScreenView(
+        { x: 0, y: 0, width: 200, height: 100 },
+        CANVAS,
+        48,
+      );
+
+      expect(view.zoom).toBe(DM_SCREEN_ZOOM.max);
+    });
+  });
+
+  describe('выбор сетки', () => {
+    it('поле выбора — клетки по рядам, считая с единицы', () => {
+      const cells = getDmScreenGridCells(3);
+
+      expect(cells).toHaveLength(9);
+      expect(cells[0]).toEqual({ columns: 1, rows: 1 });
+      expect(cells[2]).toEqual({ columns: 3, rows: 1 });
+      expect(cells[3]).toEqual({ columns: 1, rows: 2 });
+    });
+
+    it('подсвечивает клетки от угла до той, что под указателем', () => {
+      const grid = { columns: 3, rows: 2 };
+
+      expect(isDmScreenGridCellInside({ columns: 3, rows: 2 }, grid)).toBe(
+        true,
+      );
+
+      expect(isDmScreenGridCellInside({ columns: 1, rows: 1 }, grid)).toBe(
+        true,
+      );
+
+      expect(isDmScreenGridCellInside({ columns: 4, rows: 1 }, grid)).toBe(
+        false,
+      );
+
+      expect(isDmScreenGridCellInside({ columns: 1, rows: 3 }, grid)).toBe(
+        false,
+      );
+    });
+
+    it('подписывает сетку колонками и рядами', () => {
+      expect(formatDmScreenGrid({ columns: 3, rows: 2 })).toBe('3 × 2');
     });
   });
 
