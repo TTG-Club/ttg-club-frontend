@@ -33,6 +33,7 @@
     isDmScreenNotePath,
     isDmScreenPath,
     isOutsideDmScreenControl,
+    keepDmScreenWindowBelowHeader,
     keepDmScreenWindowOnField,
     resizeDmScreenWindow,
     snapDmScreenWindow,
@@ -53,8 +54,8 @@
    * примагничивается к краям холста и других окон (Alt — без магнита),
    * растягивается за любую сторону или угол — тоже с магнитом, в том числе
    * до ширины или высоты соседнего окна, — сворачивается в плашку (кнопкой
-   * или двойным кликом по шапке) и закрывается. За край поля окно не
-   * уходит. Если окно отпустить у бокового края холста или над местом в
+   * или двойным кликом по шапке) и закрывается. За край поля и под
+   * шапку ширмы окно не уходит. Если окно отпустить у бокового края холста или над местом в
    * панели раскладок, оно занимает это место целиком. Размер соседних окон
    * разом меняет общая граница между ними (`DmScreenDividers`). Внутри —
    * карточка записи любого раздела; переходы внутри записи (вкладки класса,
@@ -225,9 +226,11 @@
       y: gesture.rect.y + delta.y,
     };
 
-    const position = others
-      ? snapDmScreenWindow(moved, others, board.value)
-      : moved;
+    // Под шапку ширмы окно не заходит и без магнита
+    const position = keepDmScreenWindowBelowHeader(
+      others ? snapDmScreenWindow(moved, others, board.value) : moved,
+      board.value,
+    );
 
     liveRect.value = keepDmScreenWindowOnField({
       ...moved,

@@ -441,6 +441,23 @@ export function snapDmScreenWindow(
 }
 
 /**
+ * Не даёт окну, которое тащат, уйти под шапку ширмы: выше свободного места
+ * холста его верх не поднимается. В остальные стороны окно уходит за край
+ * холста свободно.
+ * @param position - куда окно притащили
+ * @param board - видимая часть поля
+ */
+export function keepDmScreenWindowBelowHeader(
+  position: DmScreenPoint,
+  board: DmScreenRect,
+): DmScreenPoint {
+  return {
+    x: position.x,
+    y: Math.max(position.y, getDmScreenArea(board).y),
+  };
+}
+
+/**
  * Двигает одну сторону окна по одной оси; противоположная остаётся на
  * месте. Сторона примагничивается к краю холста, к краям соседних окон
  * (вровень или рядом с промежутком сетки) и к такой же длине, как у соседа.
@@ -450,6 +467,7 @@ export function snapDmScreenWindow(
  * @param area - отрезок свободного места холста по этой оси
  * @param minSize - наименьшая длина окна
  * @param neighbours - отрезки соседних окон; без них сторона не магнитится
+ * @param minStart - дальше этого начало окна не уходит; без него — уходит
  */
 function resizeDmScreenSpan(
   span: DmScreenSpan,
@@ -458,6 +476,7 @@ function resizeDmScreenSpan(
   area: DmScreenSpan,
   minSize: number,
   neighbours?: ReadonlyArray<DmScreenSpan>,
+  minStart: number = -Infinity,
 ): DmScreenSpan {
   const spanEnd = span.start + span.size;
 
@@ -476,7 +495,13 @@ function resizeDmScreenSpan(
         ])
       : dragged;
 
-    const start = Math.min(snapped, spanEnd - minSize);
+    // Окно, которое уже стоит выше предела (поле сдвинули), назад не
+    // прыгает, но и дальше не растёт
+    const start = clampToRange(
+      snapped,
+      Math.min(span.start, minStart),
+      spanEnd - minSize,
+    );
 
     return { start, size: spanEnd - start };
   }
@@ -507,8 +532,9 @@ function resizeDmScreenSpan(
 
 /**
  * Меняет размер окна, которое тянут за сторону или угол. Противоположные
- * стороны остаются на месте, окно не становится меньше минимального.
- * Сторона, которую тянут, примагничивается: к краям свободного места
+ * стороны остаются на месте, окно не становится меньше минимального, а
+ * верхняя сторона не заходит под шапку ширмы — выше свободного места
+ * холста. Сторона, которую тянут, примагничивается: к краям свободного места
  * холста, к краям других окон и к такой же ширине или высоте, как у другого
  * окна. За край поля окно не выпускает тот, кто зовёт
  * (`keepDmScreenWindowOnField`).
@@ -543,6 +569,7 @@ export function resizeDmScreenWindow(
     { start: area.y, size: area.height },
     DM_SCREEN_WINDOW_MIN_SIZE.height,
     others?.map((other) => ({ start: other.y, size: other.height })),
+    area.y,
   );
 
   return {
