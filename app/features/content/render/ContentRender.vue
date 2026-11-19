@@ -1,18 +1,38 @@
 <script setup lang="ts">
-  import { parseContent } from '../model';
+  import {
+    markupToContent,
+    markupToInlineContent,
+    parseContent,
+  } from '../model';
   import ContentNodes from './ContentNodes.vue';
 
   /**
-   * HTML-контент из базы: замена `RawContent` старого SPA, только без
-   * компиляции шаблона Vue. Разметка очищается, а теги `dice-roller` и
-   * `detail-tooltip` выводятся компонентами.
+   * Описание записи: HTML старой базы (замена `RawContent` старого SPA, без
+   * компиляции шаблона Vue — разметка очищается, `dice-roller` и
+   * `detail-tooltip` выводятся компонентами) либо разметка core-api — массив
+   * строк-блоков, который разбирается в то же дерево узлов, без HTML.
+   * `inline` — для вывода внутри строки (`tag="span"`): абзацы разметки
+   * разворачиваются, чтобы не вкладывать `<p>` в `<p>`.
    */
-  const { html, tag = 'div' } = defineProps<{
-    html: string;
+  const {
+    html = '',
+    markup = null,
+    tag = 'div',
+    inline = false,
+  } = defineProps<{
+    html?: string;
+    markup?: ReadonlyArray<string> | null;
     tag?: string;
+    inline?: boolean;
   }>();
 
-  const nodes = computed(() => parseContent(html));
+  const nodes = computed(() => {
+    if (markup) {
+      return inline ? markupToInlineContent(markup) : markupToContent(markup);
+    }
+
+    return parseContent(html);
+  });
 </script>
 
 <template>

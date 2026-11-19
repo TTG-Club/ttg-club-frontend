@@ -20,7 +20,7 @@
 │   │   ├── bug-report/         # button (sidebar), modal (description, page, selected text, screenshot with marks), selection ("Ошибка в тексте" under a selection); posts to bug-report.api.ttg.club
 │   │   ├── comments/           # section (discussion under an entry: collapsed preview, tree of replies, composer with cooldown, edit, delete, report, moderator restore, #comment-<id> links); talks to comments-service via /api/v1/comments
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
-│   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
+│   │   ├── content/            # render (HTML from the DB without the Vue compiler, or core-api markup), detail-tooltip, entity-drawer, roll-table
 │   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (top bar or filter column + list + entry pane in 8 wide-mode arrangements, resizable), controls (search, sources, menu, grouping switch), filter-inline (filter groups in the filters column), filter-drawer (content filter in a right drawer), sources-drawer (sources like new.ttg.club: left drawer, books as rows with English names from `/api/v1/books`, collapsible groups, presets), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview (round preview, square cover, viewer), collapse (titled block with an arrow), detail-layout (properties column + text)
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (cover card of a race or class, drawer with subraces or archetypes, picker of a subclass or subrace), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items (by category or alphabet), magic items, treasures
@@ -135,6 +135,15 @@ longer pops up: a plain click opens the entity card in a right drawer
 (`ContentEntityDrawer` picks the section body by `type`, `SectionEntryDrawer`
 loads it), as on new.ttg.club; Ctrl-click still opens the page. Untyped
 tooltips show the HTML from their `/api/` address in the same drawer.
+
+Descriptions are moving from HTML to the core-api markup (an array of block
+strings, `{@b}`, `{@roll}`, `{@spell … | url:…}`, `{@table}`…), one entity at a
+time; spells go first. `ContentRender` takes either `html` or `markup`: the
+markup is parsed by the `~news/markup` parser and turned by `markupToContent`
+into the same node tree as the HTML (section links become `detail-tooltip`
+links, rolls become `dice-roller`, tables keep the `dnd5_table` look), so the
+page looks and behaves the same. API schemas accept both forms
+(`contentDescriptionSchema`) until every entity is switched.
 
 Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
 between tabs by the `storage` event). While the history window is open, rolls

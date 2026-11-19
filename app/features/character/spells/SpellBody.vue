@@ -25,6 +25,27 @@
 
   const components = computed(() => getSpellComponentLabels(spell.components));
 
+  /** Описание: HTML старой базы или разметка core-api — `ContentRender` берёт любое. */
+  const descriptionHtml = computed(() =>
+    typeof spell.description === 'string' ? spell.description : undefined,
+  );
+
+  const descriptionMarkup = computed(() =>
+    Array.isArray(spell.description) ? spell.description : undefined,
+  );
+
+  const upperHtml = computed(() =>
+    typeof spell.upper === 'string' ? spell.upper : undefined,
+  );
+
+  const upperMarkup = computed(() =>
+    Array.isArray(spell.upper) ? spell.upper : undefined,
+  );
+
+  const hasUpper = computed(() =>
+    Array.isArray(spell.upper) ? spell.upper.length > 0 : !!spell.upper,
+  );
+
   const references = computed(() =>
     [
       { key: 'classes', label: SPELL_TEXT.classes, items: spell.classes },
@@ -90,15 +111,18 @@
 
     <ContentRender
       v-if="spell.description"
-      :html="spell.description"
+      :html="descriptionHtml"
+      :markup="descriptionMarkup"
     />
 
-    <p v-if="spell.upper">
+    <p v-if="hasUpper">
       <b class="mr-1">{{ SPELL_TEXT.upper }}</b>
 
       <ContentRender
-        :html="spell.upper"
+        :html="upperHtml"
+        :markup="upperMarkup"
         tag="span"
+        inline
       />
     </p>
 
