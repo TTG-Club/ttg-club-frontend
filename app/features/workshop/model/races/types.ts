@@ -10,7 +10,8 @@ export interface RaceFeature {
   id?: number;
   name: string;
   englishName: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Открывать особенность в карточке по умолчанию. */
   feature: boolean;
   /** Особенность родительской расы, которую заменяет эта. */
@@ -42,7 +43,8 @@ export interface WorkshopRace {
   page: number | null;
   abilities: Array<RaceAbility>;
   features: Array<RaceFeature>;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

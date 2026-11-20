@@ -162,7 +162,7 @@ export type RaceLink = z.infer<typeof raceLinkSchema>;
 
 const raceFeatureSchema = z.object({
   name: z.string(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
 });
 
 /** Особенность расы; `opened` раскрыта сразу, `subrace` — от разновидности. */
@@ -183,7 +183,7 @@ export type RaceSpeed = z.infer<typeof raceSpeedSchema>;
 const subraceDetailSchema = z.object({
   name: entryNameSchema,
   source: entrySourceSchema.nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   features: z.array(raceFeatureSchema).nullish(),
   skills: z.array(raceFeatureSchema).nullish(),
 });
@@ -199,7 +199,7 @@ export const raceDetailSchema = z.object({
   speed: z.array(raceSpeedSchema).nullish(),
   darkvision: z.number().nullish(),
   images: z.array(z.string()).nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   skills: z.array(raceSkillSchema).nullish(),
   subraces: z.array(subraceDetailSchema).nullish(),
   /** Основная раса со ссылками на разновидности, для выбора разновидности. */
