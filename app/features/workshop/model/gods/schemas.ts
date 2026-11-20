@@ -2,6 +2,8 @@ import type { WorkshopGod } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import { workshopOptionalPositive, workshopRequiredText } from '../schemas';
 
@@ -14,8 +16,8 @@ const workshopGodSchema = z.object({
   sex: z.string().nullish(),
   rank: z.string().nullish(),
   alignment: z.string().nullish(),
-  description: z.string().nullish(),
-  alternativeDescription: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  alternativeDescription: markupBlocksSchema.nullish(),
   symbol: z.string().nullish(),
   nicknames: z.string().nullish(),
   domains: z.array(z.string()).nullish(),
@@ -40,8 +42,8 @@ export function parseWorkshopGod(input: unknown): WorkshopGod {
     sex: god.sex ?? '',
     rank: god.rank ?? '',
     alignment: god.alignment ?? '',
-    description: god.description ?? '',
-    alternativeDescription: god.alternativeDescription ?? '',
+    description: god.description ?? [],
+    alternativeDescription: god.alternativeDescription ?? [],
     symbol: god.symbol ?? '',
     nicknames: god.nicknames ?? '',
     domains: god.domains ?? [],
@@ -67,8 +69,8 @@ export const godFormSchema = z.object({
   symbol: z.string(),
   nicknames: z.string(),
   page: workshopOptionalPositive,
-  description: z.string(),
-  alternativeDescription: z.string(),
+  description: markupBlocksSchema,
+  alternativeDescription: markupBlocksSchema,
 });
 
 export type GodForm = z.infer<typeof godFormSchema>;

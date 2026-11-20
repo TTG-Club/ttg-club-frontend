@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { BackgroundDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { RollTable } from '~content/roll-table';
 
@@ -36,7 +37,10 @@
   );
 
   const hasSkill = computed(() =>
-    Boolean(background.skillName || background.skillDescription),
+    Boolean(
+      background.skillName
+      || hasContentDescription(background.skillDescription),
+    ),
   );
 
   const skillTitle = computed(
@@ -83,12 +87,12 @@
     </ul>
 
     <div class="content-render">
-      <template v-if="background.description">
+      <template v-if="hasContentDescription(background.description)">
         <h4 class="header_separator">
           <span>{{ BACKGROUND_TEXT.description }}</span>
         </h4>
 
-        <ContentRender :html="background.description" />
+        <ContentRender :content="background.description" />
       </template>
 
       <template v-if="hasSkill">
@@ -98,7 +102,7 @@
 
         <ContentRender
           v-if="background.skillDescription"
-          :html="background.skillDescription"
+          :content="background.skillDescription"
         />
       </template>
 
@@ -109,7 +113,7 @@
 
         <ContentRender
           v-if="background.personalization"
-          :html="background.personalization"
+          :content="background.personalization"
         />
 
         <div

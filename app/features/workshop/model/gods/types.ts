@@ -11,8 +11,10 @@ export interface WorkshopGod {
   rank: string;
   /** Код мировоззрения. */
   alignment: string;
-  description: string;
-  alternativeDescription: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
+  /** Блоки разметки core-api. */
+  alternativeDescription: Array<string>;
   symbol: string;
   nicknames: string;
   /** Коды доменов. */

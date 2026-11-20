@@ -26,6 +26,7 @@ import type {
 
 import { sortBy } from 'es-toolkit';
 
+import { hasContentDescription } from '~content/model';
 import {
   getEntryApiPath,
   getFilterGroups,
@@ -82,7 +83,8 @@ export function getBackgroundLanguages(background: BackgroundDetail): string {
  */
 export function hasPersonalization(background: BackgroundDetail): boolean {
   return Boolean(
-    background.personalization || background.personalizationTables?.length,
+    hasContentDescription(background.personalization)
+    || background.personalizationTables?.length,
   );
 }
 
