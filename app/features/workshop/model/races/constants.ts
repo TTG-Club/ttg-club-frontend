@@ -155,6 +155,3 @@ export const RACE_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
 } as const;
-
-/** Строки описания особенности расы. */
-export const RACE_FEATURE_ROWS = 8;

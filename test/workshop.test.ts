@@ -601,12 +601,12 @@ describe('редактор рас', () => {
         id: 12,
         name: 'Заговор',
         englishName: null,
-        description: '<p>Текст</p>',
+        description: ['Знает заговор {@spell Свет | url:/spells/light}.'],
         feature: false,
         replaceFeatureId: null,
       },
     ],
-    description: '<p>Описание</p>',
+    description: ['Описание'],
     source: { shortName: 'PHB' },
   });
 
@@ -625,8 +625,14 @@ describe('редактор рас', () => {
       fly: undefined,
       darkvision: 60,
       origin: undefined,
+      description: ['Описание'],
       features: [
-        { id: 12, englishName: undefined, replaceFeatureId: undefined },
+        {
+          id: 12,
+          englishName: undefined,
+          description: ['Знает заговор {@spell Свет | url:/spells/light}.'],
+          replaceFeatureId: undefined,
+        },
       ],
     });
   });

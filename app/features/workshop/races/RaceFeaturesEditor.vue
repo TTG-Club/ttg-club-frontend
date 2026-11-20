@@ -3,11 +3,10 @@
 
   import { useExpandedItems } from '../composables';
   import { WorkshopCollapsibleItem, WorkshopListSection } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createRaceFeature,
     getWorkshopErrorIndexes,
-    RACE_FEATURE_ROWS,
     RACE_FEATURES_FIELD,
     RACE_FEATURES_TEXT,
     RACE_LIST_ICON,
@@ -103,9 +102,12 @@
   /**
    * Меняет описание особенности.
    * @param featureIndex - номер особенности
-   * @param description - разметка описания
+   * @param description - блоки разметки описания
    */
-  function changeDescription(featureIndex: number, description: string): void {
+  function changeDescription(
+    featureIndex: number,
+    description: Array<string>,
+  ): void {
     patchFeature(featureIndex, { description });
   }
 
@@ -213,9 +215,8 @@
           class="md:col-span-2"
           required
         >
-          <WorkshopHtmlEditor
+          <MarkupEditor
             :model-value="feature.description"
-            :rows="RACE_FEATURE_ROWS"
             @update:model-value="changeDescription(featureIndex, $event)"
           />
         </UFormField>
