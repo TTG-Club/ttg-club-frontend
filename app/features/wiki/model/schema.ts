@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { contentDescriptionSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /** Бог в списке раздела. */
@@ -36,7 +37,7 @@ export type RuleLink = z.infer<typeof ruleLinkSchema>;
 
 export const ruleDetailSchema = z.object({
   name: entryNameSchema,
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   type: z.string().nullish(),
   source: entrySourceSchema.nullish(),
 });
@@ -101,7 +102,7 @@ export type ScreenLink = z.infer<typeof screenLinkSchema>;
  * ссылка на родителя.
  */
 export const screenDetailSchema = screenLinkSchema.extend({
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   chields: z.array(screenLinkSchema).nullish(),
 });
 

@@ -2,9 +2,12 @@ import type { WorkshopRule } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import {
   workshopNameSchema,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -14,7 +17,7 @@ const workshopRuleSchema = z.object({
   name: workshopNameSchema,
   altName: z.string().nullish(),
   type: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   source: workshopSourceSchema,
 });
 
@@ -31,7 +34,7 @@ export function parseWorkshopRule(input: unknown): WorkshopRule {
     englishName: rule.name.eng,
     altName: rule.altName ?? '',
     type: rule.type ?? '',
-    description: rule.description ?? '',
+    description: rule.description ?? [],
     page: rule.source?.page ?? null,
     source: rule.source?.shortName,
   };
@@ -44,7 +47,7 @@ export const ruleFormSchema = z.object({
   altName: z.string(),
   type: workshopRequiredText,
   page: workshopOptionalPositive,
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
 });
 
 export type RuleForm = z.infer<typeof ruleFormSchema>;

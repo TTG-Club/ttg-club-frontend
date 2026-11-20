@@ -11,6 +11,3 @@ export const RULE_EDITOR_TEXT = {
   saved: 'Правило или термин обновлён',
   saveError: 'Не удалось сохранить правило или термин',
 } as const;
-
-/** Строки описания правила в редакторе. */
-export const RULE_DESCRIPTION_ROWS = 18;
