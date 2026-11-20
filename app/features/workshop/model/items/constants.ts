@@ -19,6 +19,3 @@ export const ITEM_EDITOR_TEXT = {
   saved: 'Снаряжение обновлено',
   saveError: 'Не удалось сохранить снаряжение',
 } as const;
-
-/** Строки описания снаряжения в редакторе. */
-export const ITEM_DESCRIPTION_ROWS = 10;

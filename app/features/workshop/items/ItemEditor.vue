@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { ItemForm, WorkshopItem } from '../model';
 
@@ -16,14 +16,12 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createItemForm,
-    getHtmlFieldErrors,
     getItemPayload,
     getWorkshopSectionRoute,
     ITEM_CATEGORIES_FILTER_KEY,
-    ITEM_DESCRIPTION_ROWS,
     ITEM_EDITOR_TEXT,
     itemFormSchema,
     ITEMS_FILTER_PATH,
@@ -93,14 +91,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<ItemForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<ItemForm>): Promise<void> {
     const saved = await save(getItemPayload(event.data, source.value));
 
@@ -115,7 +105,6 @@
     ref="form"
     :schema="itemFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -185,10 +174,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="ITEM_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

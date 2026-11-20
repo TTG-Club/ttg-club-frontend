@@ -52,7 +52,7 @@
 
     <ContentRender
       v-if="armor.description"
-      :html="armor.description"
+      :content="armor.description"
     />
   </div>
 </template>

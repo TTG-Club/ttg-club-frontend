@@ -138,7 +138,7 @@ tooltips show the HTML from their `/api/` address in the same drawer.
 
 Descriptions are moving from HTML to the core-api markup (an array of block
 strings, `{@b}`, `{@roll}`, `{@spell … | url:…}`, `{@table}`…), one entity at a
-time (spells, feats, class options, rules and screens so far). `ContentRender` takes `html`, `markup` or `content` (the API value, either form): the
+time (spells, feats, class options, rules, screens and items so far). `ContentRender` takes `html`, `markup` or `content` (the API value, either form): the
 markup is parsed by the `~news/markup` parser and turned by `markupToContent`
 into the same node tree as the HTML (section links become `detail-tooltip`
 links, rolls become `dice-roller`, tables keep the `dnd5_table` look), so the
@@ -291,7 +291,7 @@ Moderators and administrators edit reference entries at `/workshop`. Each
 section has `/workshop/<section>/create` and `/workshop/<section>/<slug>/edit`;
 the edit page loads the entry from the reference API, saves through
 `/api/v1/workshop/<section>` and lists its revisions with restore. Descriptions
-use `WorkshopHtmlEditor` (spells, feats, class options, rules and screens already use `MarkupEditor`): a visual mode with `dice-roller` tokens and a source
+use `WorkshopHtmlEditor` (spells, feats, class options, rules, screens, magic items, equipment, armor and weapons already use `MarkupEditor`): a visual mode with `dice-roller` tokens and a source
 mode; markup the backend would reject is listed above the field and blocks the
 form. Every legacy editor is ported.
 

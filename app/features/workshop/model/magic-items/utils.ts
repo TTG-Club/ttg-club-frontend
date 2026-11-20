@@ -24,7 +24,7 @@ export function createMagicItemForm(item?: WorkshopMagicItem): MagicItemForm {
     charge: item?.charge ?? null,
     cost: item?.cost ?? null,
     bonus: item?.bonus ?? null,
-    description: item?.description ?? '',
+    description: [...(item?.description ?? [])],
   };
 }
 

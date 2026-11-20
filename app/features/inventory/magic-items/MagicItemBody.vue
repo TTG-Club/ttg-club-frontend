@@ -112,7 +112,7 @@
 
     <ContentRender
       v-if="item.description"
-      :html="item.description"
+      :content="item.description"
     />
   </div>
 </template>

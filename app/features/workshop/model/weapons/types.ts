@@ -19,8 +19,10 @@ export interface WorkshopWeapon {
   ammo: number | null;
   /** Идентификаторы свойств строками, как их отдают фильтры. */
   properties: Array<string>;
-  description: string;
-  special: string;
+  /** Блоки разметки core-api; пусто — нет. */
+  description: Array<string>;
+  /** Особое свойство — блоки разметки core-api; пусто — нет. */
+  special: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

@@ -12,13 +12,12 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createMagicItemForm,
     getHtmlFieldErrors,
     getMagicItemPayload,
     getWorkshopSectionRoute,
-    MAGIC_ITEM_DESCRIPTION_ROWS,
     MAGIC_ITEM_EDITOR_TEXT,
     MAGIC_ITEM_RARITY_OPTIONS,
     MAGIC_ITEM_TYPE_OPTIONS,
@@ -88,12 +87,12 @@
   }
 
   /**
-   * Ошибки разметки: бэкенд проверяет и описание, и уточнения.
+   * Ошибки HTML в уточнениях: бэкенд проверяет их разметку (описание —
+   * блоки разметки core-api, их проверяет редактор).
    * @param form - состояние формы
    */
   function validate(form: Partial<MagicItemForm>): Array<FormError> {
     return getHtmlFieldErrors({
-      description: form.description ?? '',
       special: form.special ?? '',
       custSpecial: form.custSpecial ?? '',
     });
@@ -229,10 +228,7 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="MAGIC_ITEM_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

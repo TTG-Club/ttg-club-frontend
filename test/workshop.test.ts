@@ -445,6 +445,7 @@ describe('редактор оружия', () => {
     minDistance: 150,
     maxDistance: 600,
     propertyIds: [1, 3, 6],
+    description: ['Лук {@roll 1к8}.'],
     source: { shortName: 'PHB' },
   };
 
@@ -462,6 +463,7 @@ describe('редактор оружия', () => {
       properties: [1, 3, 6],
       cost: 50,
       ammo: undefined,
+      description: ['Лук {@roll 1к8}.'],
       special: undefined,
     });
   });
@@ -518,12 +520,14 @@ describe('редактор снаряжения', () => {
       cost: 1,
       currency: 'GM',
       weight: 10,
+      description: null,
     });
 
     expect(getItemPayload(createItemForm(item), undefined)).toMatchObject({
       categories: ['ADVENTURING_GEAR'],
       currency: 'GM',
       altName: undefined,
+      description: undefined,
     });
   });
 });
@@ -537,7 +541,7 @@ describe('редактор магических предметов', () => {
       typeRaw: 'SUBJECT',
       customization: true,
       costRaw: 3500,
-      description: '<p>Текст</p>',
+      description: ['Текст {@b жирный}'],
     });
 
     expect(
@@ -548,6 +552,7 @@ describe('редактор магических предметов', () => {
       cost: 3500,
       curse: false,
       special: undefined,
+      description: ['Текст {@b жирный}'],
     });
   });
 });

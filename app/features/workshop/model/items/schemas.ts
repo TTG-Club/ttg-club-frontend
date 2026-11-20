@@ -2,6 +2,8 @@ import type { WorkshopItem } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import {
   workshopNameSchema,
   workshopOptionalNotNegative,
@@ -18,7 +20,7 @@ const workshopItemSchema = z.object({
   cost: z.number().nullish(),
   currency: z.string().nullish(),
   weight: z.number().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   source: workshopSourceSchema,
 });
 
@@ -38,7 +40,7 @@ export function parseWorkshopItem(input: unknown): WorkshopItem {
     cost: item.cost ?? null,
     currency: item.currency ?? '',
     weight: item.weight ?? null,
-    description: item.description ?? '',
+    description: item.description ?? [],
     source: item.source?.shortName,
   };
 }
@@ -52,7 +54,7 @@ export const itemFormSchema = z.object({
   cost: workshopOptionalNotNegative,
   currency: z.string().optional(),
   weight: workshopOptionalWeight,
-  description: z.string(),
+  description: markupBlocksSchema,
 });
 
 export type ItemForm = z.infer<typeof itemFormSchema>;

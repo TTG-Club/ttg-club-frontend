@@ -64,6 +64,3 @@ export const MAGIC_ITEM_EDITOR_TEXT = {
   saved: 'Магический предмет обновлён',
   saveError: 'Не удалось сохранить магический предмет',
 } as const;
-
-/** Строки описания магического предмета в редакторе. */
-export const MAGIC_ITEM_DESCRIPTION_ROWS = 12;

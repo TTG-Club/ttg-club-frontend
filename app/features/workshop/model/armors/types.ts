@@ -11,7 +11,8 @@ export interface WorkshopArmor {
   weight: number | null;
   forceRequirements: number | null;
   stealthHindrance: boolean;
-  description: string;
+  /** Блоки разметки core-api; пусто — описания нет. */
+  description: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }
