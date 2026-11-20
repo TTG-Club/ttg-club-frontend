@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { SpellDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
   import { SectionStat, SectionStatGrid } from '~section/stat-grid';
@@ -25,26 +26,7 @@
 
   const components = computed(() => getSpellComponentLabels(spell.components));
 
-  /** Описание: HTML старой базы или разметка core-api — `ContentRender` берёт любое. */
-  const descriptionHtml = computed(() =>
-    typeof spell.description === 'string' ? spell.description : undefined,
-  );
-
-  const descriptionMarkup = computed(() =>
-    Array.isArray(spell.description) ? spell.description : undefined,
-  );
-
-  const upperHtml = computed(() =>
-    typeof spell.upper === 'string' ? spell.upper : undefined,
-  );
-
-  const upperMarkup = computed(() =>
-    Array.isArray(spell.upper) ? spell.upper : undefined,
-  );
-
-  const hasUpper = computed(() =>
-    Array.isArray(spell.upper) ? spell.upper.length > 0 : !!spell.upper,
-  );
+  const hasUpper = computed(() => hasContentDescription(spell.upper));
 
   const references = computed(() =>
     [
@@ -111,16 +93,14 @@
 
     <ContentRender
       v-if="spell.description"
-      :html="descriptionHtml"
-      :markup="descriptionMarkup"
+      :content="spell.description"
     />
 
     <p v-if="hasUpper">
       <b class="mr-1">{{ SPELL_TEXT.upper }}</b>
 
       <ContentRender
-        :html="upperHtml"
-        :markup="upperMarkup"
+        :content="spell.upper"
         tag="span"
         inline
       />

@@ -7,6 +7,8 @@ import type {
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { RevisionOperation, WORKSHOP_VALIDATION } from './constants';
 
 /** Обязательный текст формы. */
@@ -14,6 +16,12 @@ export const workshopRequiredText = z
   .string()
   .trim()
   .min(1, WORKSHOP_VALIDATION.required);
+
+/** Обязательное описание в разметке core-api: хотя бы один блок. */
+export const workshopRequiredMarkup = markupBlocksSchema.min(
+  1,
+  WORKSHOP_VALIDATION.required,
+);
 
 /** Необязательное положительное целое: уровень, страница. */
 export const workshopOptionalPositive = z

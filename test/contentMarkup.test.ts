@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   contentDescriptionSchema,
   getNodesText,
+  hasContentDescription,
   markupToContent,
   markupToInlineContent,
   parseContent,
@@ -151,5 +152,15 @@ describe('исходник редактора разметки', () => {
     ).toEqual(['a ~ b & c', '{@separator}', 'конец']);
 
     expect(toStoredMarkup('   ')).toEqual([]);
+  });
+});
+
+describe('hasContentDescription', () => {
+  it('пустая строка и пустой массив — описания нет', () => {
+    expect(hasContentDescription(['{@b а}'])).toBe(true);
+    expect(hasContentDescription('<p>а</p>')).toBe(true);
+    expect(hasContentDescription([])).toBe(false);
+    expect(hasContentDescription('  ')).toBe(false);
+    expect(hasContentDescription(null)).toBe(false);
   });
 });

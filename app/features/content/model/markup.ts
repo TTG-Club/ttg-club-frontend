@@ -1,6 +1,10 @@
 import type { MarkerNode, RenderNode } from '~news/markup';
 
-import type { ContentElementNode, ContentNode } from './types';
+import type {
+  ContentDescription,
+  ContentElementNode,
+  ContentNode,
+} from './types';
 
 import {
   clampHeadingLevel,
@@ -523,4 +527,15 @@ export function toMarkupLink(href: string): { type: string; url: string } {
   }
 
   return best ?? { type: MARKUP_LINK_TYPE, url: href };
+}
+
+/**
+ * Есть ли что показать в описании из API: непустая строка HTML или
+ * непустой массив блоков разметки.
+ * @param value - описание записи
+ */
+export function hasContentDescription(
+  value: ContentDescription | null | undefined,
+): boolean {
+  return Array.isArray(value) ? value.length > 0 : !!value?.trim();
 }

@@ -7,7 +7,8 @@ export interface WorkshopFeat {
   level: number | null;
   /** Требования; пусто, если их нет. */
   requirement: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Коды характеристик. */
   abilities: Array<string>;
   /** Коды навыков. */

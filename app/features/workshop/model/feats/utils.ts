@@ -16,7 +16,7 @@ export function createFeatForm(feat?: WorkshopFeat): FeatForm {
     requirement: feat?.requirement ?? '',
     abilities: [...(feat?.abilities ?? [])],
     skills: [...(feat?.skills ?? [])],
-    description: feat?.description ?? '',
+    description: [...(feat?.description ?? [])],
   };
 }
 

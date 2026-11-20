@@ -27,7 +27,7 @@ export const featLinkSchema = z.object({
 export type FeatLink = z.infer<typeof featLinkSchema>;
 
 export const featDetailSchema = featLinkSchema.omit({ url: true }).extend({
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
 });
 
 export type FeatDetail = z.infer<typeof featDetailSchema>;
