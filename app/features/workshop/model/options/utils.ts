@@ -15,7 +15,7 @@ export function createOptionForm(option?: WorkshopOption): OptionForm {
     level: option?.level ?? null,
     prerequisite: option?.prerequisite ?? '',
     optionTypes: [...(option?.optionTypes ?? [])],
-    description: option?.description ?? '',
+    description: [...(option?.description ?? [])],
   };
 }
 

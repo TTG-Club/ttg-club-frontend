@@ -310,12 +310,13 @@ describe('редактор особенностей', () => {
       prerequisite: 'Заговор мистический заряд',
       level: null,
       optionTypes: ['ELDRITCH_INVOCATION'],
-      description: '<p>Текст</p>',
+      description: ['Текст {@i курсив}'],
     });
 
     const form = createOptionForm(option);
 
     expect(form.optionTypes).toEqual(['ELDRITCH_INVOCATION']);
+    expect(form.description).toEqual(['Текст {@i курсив}']);
 
     expect(getOptionPayload(form, 'PHB')).toMatchObject({
       prerequisite: 'Заговор мистический заряд',

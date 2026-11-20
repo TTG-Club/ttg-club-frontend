@@ -2,10 +2,13 @@ import type { WorkshopOption } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -17,7 +20,7 @@ const workshopOptionSchema = z.object({
   altName: z.string().nullish(),
   level: z.number().nullish(),
   prerequisite: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   optionTypes: z.array(z.string()).nullish(),
   source: workshopSourceSchema,
 });
@@ -36,7 +39,7 @@ export function parseWorkshopOption(input: unknown): WorkshopOption {
     altName: option.altName ?? '',
     level: option.level ?? null,
     prerequisite: getRequirementText(option.prerequisite),
-    description: option.description ?? '',
+    description: option.description ?? [],
     optionTypes: option.optionTypes ?? [],
     source: option.source?.shortName,
   };
@@ -50,7 +53,7 @@ export const optionFormSchema = z.object({
   level: workshopOptionalPositive,
   prerequisite: z.string(),
   optionTypes: z.array(z.string()).min(1, WORKSHOP_VALIDATION.chooseOne),
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
 });
 
 export type OptionForm = z.infer<typeof optionFormSchema>;

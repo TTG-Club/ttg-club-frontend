@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { OptionForm, WorkshopOption } from '../model';
 
@@ -16,10 +16,9 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createOptionForm,
-    getHtmlFieldErrors,
     getOptionPayload,
     getWorkshopSectionRoute,
     OPTION_EDITOR_TEXT,
@@ -27,7 +26,6 @@
     optionFormSchema,
     OPTIONS_FILTER_PATH,
     OPTIONS_WORKSHOP_KEY,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_TEXT,
@@ -93,14 +91,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<OptionForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<OptionForm>): Promise<void> {
     const saved = await save(getOptionPayload(event.data, source.value));
 
@@ -115,7 +105,6 @@
     ref="form"
     :schema="optionFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -170,10 +159,7 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

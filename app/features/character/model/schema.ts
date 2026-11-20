@@ -72,7 +72,7 @@ export type OptionLink = z.infer<typeof optionLinkSchema>;
 
 export const optionDetailSchema = optionLinkSchema.omit({ url: true }).extend({
   requirements: z.string().nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   classes: z.array(referenceClassSchema).nullish(),
 });
 
