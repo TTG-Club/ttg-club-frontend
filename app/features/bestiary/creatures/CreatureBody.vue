@@ -2,6 +2,7 @@
   import type { CreatureDetail } from '../model';
 
   import { DetailTooltip } from '~content/detail-tooltip';
+  import { hasContentDescription } from '~content/model';
   import { ContentLink, ContentRender } from '~content/render';
   import { DiceRoller } from '~dice-roller/roller';
   import { SectionImagePreview } from '~section/image-preview';
@@ -234,7 +235,7 @@
 
         <ContentRender
           v-if="group.intro"
-          :html="group.intro"
+          :content="group.intro"
         />
 
         <p v-else-if="group.text">
@@ -252,13 +253,13 @@
         <p>{{ environment }}</p>
       </template>
 
-      <details v-if="creature.description">
+      <details v-if="hasContentDescription(creature.description)">
         <summary class="h4">
           <span>{{ CREATURE_TEXT.description }}</span>
         </summary>
 
         <div class="content">
-          <ContentRender :html="creature.description" />
+          <ContentRender :content="creature.description" />
         </div>
       </details>
 

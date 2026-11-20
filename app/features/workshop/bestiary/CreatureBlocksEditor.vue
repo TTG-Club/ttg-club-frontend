@@ -2,12 +2,11 @@
   import type { CreatureBlock, CreatureBlockField } from '../model';
 
   import { WorkshopListSection } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createCreatureBlock,
     CREATURE_BLOCK_TEXT,
     CREATURE_LIST_ICON,
-    CREATURE_ROWS,
     WORKSHOP_FIELD_TEXT,
   } from '../model';
 
@@ -67,19 +66,13 @@
   /**
    * Меняет описание блока.
    * @param blockIndex - номер блока
-   * @param description - текст описания
+   * @param description - блоки разметки описания
    */
-  function changeDescription(blockIndex: number, description: string): void {
+  function changeDescription(
+    blockIndex: number,
+    description: Array<string>,
+  ): void {
     patchBlock(blockIndex, { description });
-  }
-
-  /**
-   * Меняет признак markdown в описании.
-   * @param blockIndex - номер блока
-   * @param value - значение флажка
-   */
-  function changeMarkdown(blockIndex: number, value: boolean | string): void {
-    patchBlock(blockIndex, { markdown: value === true });
   }
 
   /**
@@ -170,18 +163,8 @@
         :name="getFieldName(blockIndex, 'description')"
         class="md:col-span-3"
       >
-        <template #hint>
-          <UCheckbox
-            :model-value="block.markdown"
-            :label="CREATURE_BLOCK_TEXT.markdown"
-            size="sm"
-            @update:model-value="changeMarkdown(blockIndex, $event)"
-          />
-        </template>
-
-        <WorkshopHtmlEditor
+        <MarkupEditor
           :model-value="block.description"
-          :rows="CREATURE_ROWS.block"
           @update:model-value="changeDescription(blockIndex, $event)"
         />
       </UFormField>

@@ -20,7 +20,7 @@
   >
     <h5 :class="$style.name">{{ item.name }}.</h5>
 
-    <ContentRender :html="item.html" />
+    <ContentRender :content="item.content" />
   </div>
 </template>
 

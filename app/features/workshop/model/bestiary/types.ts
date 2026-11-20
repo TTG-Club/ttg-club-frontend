@@ -19,9 +19,8 @@ export interface CreatureBonus {
 export interface CreatureBlock {
   name: string;
   englishName: string;
-  description: string;
-  /** Описание в markdown: бэкенд превращает его в разметку при чтении. */
-  markdown: boolean;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Сколько существ делят это действие: правка заденет их всех. */
   sharedUsageCount?: number;
 }
@@ -29,7 +28,8 @@ export interface CreatureBlock {
 /** Легендарное действие: у них нет английского названия. */
 export interface CreatureLegendaryAction {
   name: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
 }
 
 /** Ключи списков особенностей и действий в форме существа. */

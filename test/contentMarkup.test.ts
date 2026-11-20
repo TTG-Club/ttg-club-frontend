@@ -26,6 +26,19 @@ describe('markupToContent', () => {
     );
   });
 
+  it('бросок с подписью — как dice-roller с label', () => {
+    expect(
+      markupToContent([
+        '{@roll к20 + 4 | text:+4 | label:Атака} к попаданию, {@roll 1к6 + 2 | label:Урон}',
+      ]),
+    ).toEqual(
+      parseContent(
+        '<p><dice-roller label="Атака" formula="к20 + 4">+4</dice-roller> к попаданию, '
+          + '<dice-roller label="Урон" formula="1к6 + 2">1к6 + 2</dice-roller></p>',
+      ),
+    );
+  });
+
   it('ссылки на разделы — с подсказкой сущности, как в HTML', () => {
     expect(
       markupToContent([

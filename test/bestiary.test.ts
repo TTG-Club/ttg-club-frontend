@@ -31,9 +31,14 @@ const creature: CreatureDetail = creatureDetailSchema.parse({
   armorText: 'природный доспех',
   hits: { average: 11, formula: '2к8', sign: ' + ', bonus: 2 },
   ability: { str: 12, dex: 15, con: 12, int: 3, wiz: 12, cha: 6 },
-  actions: [{ name: 'Укус', value: '<p>Атака.</p>' }],
-  legendary: { list: [{ name: 'Рык', value: '<p>Рычит.</p>' }] },
-  lair: { action: '<p>Действие логова.</p>' },
+  actions: [
+    {
+      name: 'Укус',
+      value: ['Атака {@roll к20 + 4 | text:+4 | label:Атака}.'],
+    },
+  ],
+  legendary: { list: [{ name: 'Рык', value: ['Рычит.'] }], description: [] },
+  lair: { action: ['Действие логова.'], effect: [] },
 });
 
 describe('бестиарий', () => {
@@ -118,5 +123,11 @@ describe('бестиарий', () => {
     ]);
 
     expect(groups[1]?.text).toContain('Волк может совершить 3');
+
+    expect(groups[0]?.items[0]?.content).toEqual([
+      'Атака {@roll к20 + 4 | text:+4 | label:Атака}.',
+    ]);
+
+    expect(groups[2]?.intro).toEqual(['Действие логова.']);
   });
 });

@@ -147,14 +147,19 @@ function plainLink(
 }
 
 /**
- * Маркер броска `{@roll формула | text:подпись}`.
+ * Маркер броска `{@roll формула | text:показ | label:подпись}`: `label` — подпись
+ * результата («Атака», «Урон»), как атрибут `label` у `dice-roller`.
  * @param node - маркер броска
  */
 function rollNode(node: MarkerNode): ContentNode {
   const formula = getNodeText(node.content ?? []).trim();
   const shown = readAttribute(node, 'text') || formula;
+  // подпись броска («Атака», «Урон») — расширение спецификации core-api
+  const label = readAttribute(node, 'label').trim();
 
-  return element(DICE_ROLLER_TAG, { formula }, [{ kind: 'text', text: shown }]);
+  return element(DICE_ROLLER_TAG, label ? { formula, label } : { formula }, [
+    { kind: 'text', text: shown },
+  ]);
 }
 
 /**
