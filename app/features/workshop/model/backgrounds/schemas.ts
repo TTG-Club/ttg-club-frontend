@@ -2,9 +2,12 @@ import type { WorkshopBackground } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_LIST_JOINER, WORKSHOP_VALIDATION } from '../constants';
 import {
   workshopNameSchema,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -23,10 +26,10 @@ const workshopBackgroundSchema = z.object({
   toolOwnership: z.string().nullish(),
   equipments: z.array(z.string()).nullish(),
   startGold: z.number().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   skillName: z.string().nullish(),
-  skillDescription: z.string().nullish(),
-  personalization: z.string().nullish(),
+  skillDescription: markupBlocksSchema.nullish(),
+  personalization: markupBlocksSchema.nullish(),
   personalizationTables: z.array(personalizationTableSchema).nullish(),
   language: z.string().nullish(),
   languages: z.array(z.string()).nullish(),
@@ -54,10 +57,10 @@ export function parseWorkshopBackground(input: unknown): WorkshopBackground {
     toolOwnership: background.toolOwnership ?? '',
     equipments: (background.equipments ?? []).join(WORKSHOP_LIST_JOINER),
     startGold: background.startGold ?? null,
-    description: background.description ?? '',
+    description: background.description ?? [],
     skillName: background.skillName ?? '',
-    skillDescription: background.skillDescription ?? '',
-    personalization: background.personalization ?? '',
+    skillDescription: background.skillDescription ?? [],
+    personalization: background.personalization ?? [],
     personalizationTables: (background.personalizationTables ?? []).map(
       (table) => ({
         type: table.type,
@@ -88,10 +91,10 @@ export const backgroundFormSchema = z.object({
   languages: z.string(),
   language: z.string(),
   lifeStyle: z.string().optional(),
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
   skillName: z.string(),
-  skillDescription: z.string(),
-  personalization: z.string(),
+  skillDescription: markupBlocksSchema,
+  personalization: markupBlocksSchema,
   personalizationTables: z.array(
     z.object({
       type: z.string(),

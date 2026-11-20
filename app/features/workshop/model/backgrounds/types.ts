@@ -19,10 +19,13 @@ export interface WorkshopBackground {
   /** Снаряжение через запятую. */
   equipments: string;
   startGold: number | null;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   skillName: string;
-  skillDescription: string;
-  personalization: string;
+  /** Блоки разметки core-api. */
+  skillDescription: Array<string>;
+  /** Блоки разметки core-api. */
+  personalization: Array<string>;
   personalizationTables: Array<PersonalizationTable>;
   language: string;
   /** Языки через запятую. */

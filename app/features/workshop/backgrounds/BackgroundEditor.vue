@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { BackgroundForm, WorkshopBackground } from '../model';
 
@@ -12,18 +12,15 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     BACKGROUND_EDITOR_TEXT,
-    BACKGROUND_SKILL_ROWS,
     backgroundFormSchema,
     BACKGROUNDS_WORKSHOP_KEY,
     createBackgroundForm,
     getBackgroundPayload,
-    getHtmlFieldErrors,
     getWorkshopSectionRoute,
     LIFE_STYLE_OPTIONS,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
@@ -88,18 +85,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<BackgroundForm>): Array<FormError> {
-    return getHtmlFieldErrors({
-      description: form.description ?? '',
-      skillDescription: form.skillDescription ?? '',
-      personalization: form.personalization ?? '',
-    });
-  }
-
   async function submit(event: FormSubmitEvent<BackgroundForm>): Promise<void> {
     const saved = await save(getBackgroundPayload(event.data, source.value));
 
@@ -114,7 +99,6 @@
     ref="form"
     :schema="backgroundFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -230,10 +214,7 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <UFormField
@@ -252,10 +233,7 @@
       name="skillDescription"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.skillDescription"
-        :rows="BACKGROUND_SKILL_ROWS"
-      />
+      <MarkupEditor v-model="state.skillDescription" />
     </UFormField>
 
     <UFormField
@@ -263,10 +241,7 @@
       name="personalization"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.personalization"
-        :rows="BACKGROUND_SKILL_ROWS"
-      />
+      <MarkupEditor v-model="state.personalization" />
     </UFormField>
 
     <div class="col-span-full">

@@ -15,7 +15,7 @@ export type GodLink = z.infer<typeof godLinkSchema>;
 
 /** Карточка бога. Свойства из других источников заполнены не у всех. */
 export const godDetailSchema = godLinkSchema.omit({ url: true }).extend({
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   rank: z.string().nullish(),
   titles: z.array(z.string()).nullish(),
   symbol: z.string().nullish(),

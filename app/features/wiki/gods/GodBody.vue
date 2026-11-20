@@ -64,7 +64,7 @@
 
           <ContentRender
             v-if="god.description"
-            :html="god.description"
+            :content="god.description"
           />
         </div>
       </details>

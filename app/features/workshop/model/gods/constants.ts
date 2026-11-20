@@ -38,8 +38,3 @@ export const GOD_EDITOR_TEXT = {
   saved: 'Божество обновлено',
   saveError: 'Не удалось сохранить божество',
 } as const;
-
-/** Строки описаний божества в редакторе. */
-export const GOD_DESCRIPTION_ROWS = 18;
-
-export const GOD_ALTERNATIVE_DESCRIPTION_ROWS = 12;

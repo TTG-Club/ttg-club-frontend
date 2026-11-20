@@ -51,10 +51,10 @@ export const backgroundDetailSchema = backgroundLinkSchema
     languages: z.array(z.string()).nullish(),
     equipments: z.array(z.string()).nullish(),
     startGold: z.number().nullish(),
-    description: z.string().nullish(),
+    description: contentDescriptionSchema.nullish(),
     skillName: z.string().nullish(),
-    skillDescription: z.string().nullish(),
-    personalization: z.string().nullish(),
+    skillDescription: contentDescriptionSchema.nullish(),
+    personalization: contentDescriptionSchema.nullish(),
     personalizationTables: z.array(rollTableSchema).nullish(),
   });
 

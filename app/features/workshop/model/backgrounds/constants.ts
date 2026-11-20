@@ -82,7 +82,4 @@ export const PERSONALIZATION_ICON = {
   remove: 'tabler:trash',
 } as const;
 
-/** Строки полей предыстории в редакторе. */
-export const BACKGROUND_SKILL_ROWS = 8;
-
 export const PERSONALIZATION_ROW_ROWS = 2;

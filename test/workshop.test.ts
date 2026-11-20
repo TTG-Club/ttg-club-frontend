@@ -363,6 +363,26 @@ describe('редактор богов', () => {
       domains: ['WAR'],
       source: 'PHB',
       description: undefined,
+      alternativeDescription: undefined,
+    });
+  });
+
+  it('отправляет описание блоками разметки', () => {
+    const god = parseWorkshopGod({
+      id: 9,
+      name: 'Тир',
+      englishName: 'Tyr',
+      sex: 'MALE',
+      rank: 'GREATER',
+      alignment: 'LAWFUL_GOOD',
+      domains: ['WAR'],
+      pantheonId: 3,
+      description: ['Бог правосудия.', 'Покровитель {@i паладинов}.'],
+    });
+
+    expect(getGodPayload(createGodForm(god), undefined)).toMatchObject({
+      description: ['Бог правосудия.', 'Покровитель {@i паладинов}.'],
+      alternativeDescription: undefined,
     });
   });
 });
@@ -375,7 +395,8 @@ describe('редактор предысторий', () => {
     equipments: ['Футляр для свитков', 'зимнее одеяло'],
     startGold: 5,
     languages: ['Общий'],
-    description: '<p>Текст</p>',
+    description: ['Текст {@b жирный}.'],
+    personalization: ['Отшельники живут уединённо.'],
     personalizationTables: [
       {
         type: 'TRAIT',
@@ -403,6 +424,9 @@ describe('редактор предысторий', () => {
       equipments: 'Футляр для свитков, зимнее одеяло',
       languages: 'Общий',
       lifeStyle: undefined,
+      description: ['Текст {@b жирный}.'],
+      skillDescription: [],
+      personalization: ['Отшельники живут уединённо.'],
       personalizationTables: [
         { type: 'TRAIT', values: ['Спокойный', 'Говорливый'] },
       ],
@@ -418,6 +442,9 @@ describe('редактор предысторий', () => {
     expect(getBackgroundPayload(form, undefined)).toMatchObject({
       languages: ['Общий', 'Дварфийский'],
       lifeStyle: undefined,
+      description: ['Текст {@b жирный}.'],
+      skillDescription: undefined,
+      personalization: ['Отшельники живут уединённо.'],
       personalizationTables: [{ type: 'IDEAL', values: ['Честь'] }],
     });
   });
