@@ -674,12 +674,18 @@ describe('редактор классов', () => {
         id: 7,
         name: 'Второе дыхание',
         level: 1,
-        description: '<p>Текст</p>',
+        description: ['Бонусным действием восстановите {@roll 1к10} хитов.'],
         optional: false,
       },
     ],
     tableColumns: [{ id: 5, name: 'Атаки', levels: [1, 1, null] }],
-    traits: { diceHp: 10, skillAvailableCount: 2, armor: '<p>Все</p>' },
+    description: ['Воин — мастер оружия.'],
+    traits: {
+      diceHp: 10,
+      skillAvailableCount: 2,
+      armor: '<p>Все</p>',
+      equipment: ['{@b Кольчуга}'],
+    },
     source: { shortName: 'PHB' },
   });
 
@@ -702,7 +708,16 @@ describe('редактор классов', () => {
     expect(payload).toMatchObject({
       spellAbility: undefined,
       weapon: undefined,
-      classTraits: [{ id: 7, suffix: undefined, child: undefined }],
+      description: ['Воин — мастер оружия.'],
+      equipment: ['{@b Кольчуга}'],
+      classTraits: [
+        {
+          id: 7,
+          suffix: undefined,
+          child: undefined,
+          description: ['Бонусным действием восстановите {@roll 1к10} хитов.'],
+        },
+      ],
     });
 
     expect(payload.tableColumns).toEqual([
@@ -710,6 +725,12 @@ describe('редактор классов', () => {
         levels: [1, 1, ...Array.from({ length: 18 }, () => 0)],
       }),
     ]);
+  });
+
+  it('не отправляет пустое снаряжение', () => {
+    const form = { ...createClassForm(heroClass), equipment: [] };
+
+    expect(getClassPayload(form, undefined).equipment).toBeUndefined();
   });
 
   it('не принимает значение ячейки больше 127', () => {
@@ -731,7 +752,7 @@ describe('редактор архетипов', () => {
     id: 9,
     name: 'Чемпион',
     englishName: 'Champion',
-    description: '<p>Описание</p>',
+    description: ['Описание'],
     level: 3,
     spellcasterType: null,
     optionType: 'MANEUVER',
@@ -741,7 +762,7 @@ describe('редактор архетипов', () => {
         id: 1,
         name: 'Крит',
         level: 3,
-        description: '<p>Т</p>',
+        description: ['Критическое попадание на {@b 19–20}.'],
         optional: false,
       },
     ],

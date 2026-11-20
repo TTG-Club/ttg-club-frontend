@@ -42,6 +42,12 @@ describe('markupToContent', () => {
     );
   });
 
+  it('якорь на той же странице — обычная ссылка, как в HTML', () => {
+    expect(
+      markupToContent(['См. {@link Вдохновение барда | url:#c1}.']),
+    ).toEqual(parseContent('<p>См. <a href="#c1">Вдохновение барда</a>.</p>'));
+  });
+
   it('внешняя ссылка открывается в новой вкладке', () => {
     expect(
       markupToContent([

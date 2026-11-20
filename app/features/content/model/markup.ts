@@ -112,7 +112,7 @@ function sectionLink(
 
 /**
  * Маркер `{@link … | url:…}`: внутренний адрес — с подсказкой по разделу,
- * внешний — в новой вкладке.
+ * якорь `#…` — переход по той же странице, внешний — в новой вкладке.
  * @param node - маркер ссылки
  * @param children - текст ссылки
  */
@@ -124,6 +124,10 @@ function plainLink(
 
   if (!url) {
     return children;
+  }
+
+  if (url.startsWith('#')) {
+    return [element('a', { href: url }, children)];
   }
 
   if (url.startsWith('/')) {

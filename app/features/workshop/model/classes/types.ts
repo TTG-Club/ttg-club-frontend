@@ -4,7 +4,8 @@ export interface ClassTrait {
   name: string;
   suffix: string;
   level: number;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Опциональное умение: только у классов. */
   optional: boolean;
   child: string;
@@ -25,14 +26,16 @@ export interface WorkshopClass {
   name: string;
   englishName: string;
   accusativeName: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   diceHp: number;
   armor: string;
   weapon: string;
   tools: string;
   savingThrows: string;
   archetypeName: string;
-  equipment: string;
+  /** Блоки разметки core-api. */
+  equipment: Array<string>;
   /** Код характеристики заклинаний; пусто, если её нет. */
   spellAbility: string;
   spellcasterType: string;
@@ -59,7 +62,8 @@ export interface WorkshopArchetype {
   name: string;
   englishName: string;
   genitiveName: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   level: number;
   /** Тип заклинателя архетипа: форма его не меняет, но отправляет. */
   spellcasterType?: string;
