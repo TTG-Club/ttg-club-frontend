@@ -274,7 +274,7 @@ describe('редактор черт', () => {
     requirements: 'Нет',
     abilities: ['DEXTERITY'],
     skills: [],
-    description: '<p>Текст</p>',
+    description: ['Текст {@b жирный}'],
     source: { shortName: 'PHB' },
   };
 
@@ -287,6 +287,7 @@ describe('редактор черт', () => {
       requirement: '',
       level: null,
       abilities: ['DEXTERITY'],
+      description: ['Текст {@b жирный}'],
     });
 
     expect(feat.source).toBe('PHB');

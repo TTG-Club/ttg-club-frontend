@@ -13,6 +13,13 @@ export type {
 } from './types';
 
 export {
+  hasContentDescription,
+  markupToContent,
+  markupToInlineContent,
+  toMarkupLink,
+} from './markup';
+
+export {
   findFirstHref,
   getNodesText,
   hasAnyAttribute,
@@ -20,7 +27,6 @@ export {
 } from './parse';
 
 export * from './constants';
-export { markupToContent, markupToInlineContent, toMarkupLink } from './markup';
 export { isDetailType, isFeatDetailType, toRenderItem } from './render';
 export { findRollTableRow, rollTableSchema } from './rollTable';
 export { isKnownRoute } from './routes';

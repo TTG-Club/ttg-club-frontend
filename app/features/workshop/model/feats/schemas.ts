@@ -2,9 +2,12 @@ import type { WorkshopFeat } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import {
   workshopNameSchema,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -16,7 +19,7 @@ const workshopFeatSchema = z.object({
   altName: z.string().nullish(),
   level: z.number().nullish(),
   requirements: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   abilities: z.array(z.string()).nullish(),
   skills: z.array(z.string()).nullish(),
   source: workshopSourceSchema,
@@ -36,7 +39,7 @@ export function parseWorkshopFeat(input: unknown): WorkshopFeat {
     altName: feat.altName ?? '',
     level: feat.level ?? null,
     requirement: getRequirementText(feat.requirements),
-    description: feat.description ?? '',
+    description: feat.description ?? [],
     abilities: feat.abilities ?? [],
     skills: feat.skills ?? [],
     source: feat.source?.shortName,
@@ -52,7 +55,7 @@ export const featFormSchema = z.object({
   requirement: z.string(),
   abilities: z.array(z.string()),
   skills: z.array(z.string()),
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
 });
 
 export type FeatForm = z.infer<typeof featFormSchema>;
