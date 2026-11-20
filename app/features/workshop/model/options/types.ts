@@ -7,7 +7,8 @@ export interface WorkshopOption {
   level: number | null;
   /** Требования; пусто, если их нет. */
   prerequisite: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Коды типов особенности. */
   optionTypes: Array<string>;
   /** Аббревиатура книги-источника. */

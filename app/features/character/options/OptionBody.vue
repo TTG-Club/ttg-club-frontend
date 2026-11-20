@@ -26,7 +26,7 @@
 
     <ContentRender
       v-if="option.description"
-      :html="option.description"
+      :content="option.description"
     />
 
     <ReferenceList
