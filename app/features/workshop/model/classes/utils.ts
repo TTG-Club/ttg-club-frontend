@@ -118,9 +118,9 @@ export function createClassForm(heroClass?: WorkshopClass): ClassForm {
     icon: heroClass?.icon ?? '',
     page: heroClass?.page ?? null,
     sidekick: heroClass?.sidekick ?? false,
-    armor: heroClass?.armor ?? '',
-    weapon: heroClass?.weapon ?? '',
-    tools: heroClass?.tools ?? '',
+    armor: [...(heroClass?.armor ?? [])],
+    weapon: [...(heroClass?.weapon ?? [])],
+    tools: [...(heroClass?.tools ?? [])],
     equipment: [...(heroClass?.equipment ?? [])],
     description: [...(heroClass?.description ?? [])],
     classTraits: copyTraits(heroClass?.classTraits ?? []),
@@ -149,9 +149,9 @@ export function getClassPayload(
     slotsReset: toOptionalText(form.slotsReset),
     icon: toOptionalText(form.icon),
     page: toOptionalNumber(form.page),
-    armor: toOptionalText(form.armor),
-    weapon: toOptionalText(form.weapon),
-    tools: toOptionalText(form.tools),
+    armor: toOptionalMarkup(form.armor),
+    weapon: toOptionalMarkup(form.weapon),
+    tools: toOptionalMarkup(form.tools),
     equipment: toOptionalMarkup(form.equipment),
     classTraits: getTraitsPayload(form.classTraits),
     tableColumns: getColumnsPayload(form.tableColumns),
@@ -221,21 +221,6 @@ export function getArchetypeReferencePath(
   archetypeSlug: string,
 ): string {
   return `${CLASSES_REFERENCE_PATH}/${classSlug}/${archetypeSlug}`;
-}
-
-/**
- * HTML-поля формы класса с именами для показа ошибок (описания и
- * снаряжение — блоки разметки, их проверяет редактор).
- * @param form - состояние формы
- */
-export function getClassHtmlFields(
-  form: Partial<ClassForm>,
-): Record<string, string> {
-  return {
-    armor: form.armor ?? '',
-    weapon: form.weapon ?? '',
-    tools: form.tools ?? '',
-  };
 }
 
 /**

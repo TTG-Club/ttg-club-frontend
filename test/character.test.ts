@@ -11,6 +11,7 @@ import {
   getArchetypeSpellLevelHeader,
   getArchetypeSpellSuffix,
   getArchetypeSwipePaths,
+  getBackgroundEquipment,
   getBackgroundLanguages,
   getClassDescription,
   getClassHitPoints,
@@ -569,5 +570,34 @@ describe('поиск классов', () => {
         archetypes: [],
       },
     ]);
+  });
+});
+
+describe('снаряжение предыстории', () => {
+  const background = (equipments: Array<string>) =>
+    backgroundDetailSchema.parse({
+      name: { rus: 'Шарлатан', eng: 'Charlatan' },
+      url: '/backgrounds/charlatan',
+      equipments,
+    });
+
+  it('куски разметки — один блок через запятую', () => {
+    expect(
+      getBackgroundEquipment(
+        background(['{@item набор для грима | url:disguise_kit}', 'кошель']),
+      ),
+    ).toEqual(['{@item набор для грима | url:disguise_kit}, кошель']);
+  });
+
+  it('hTML старого API остаётся строкой', () => {
+    expect(
+      getBackgroundEquipment(
+        background(['<a href="/items/pouch">кошель</a>', 'одежда']),
+      ),
+    ).toBe('<a href="/items/pouch">кошель</a>, одежда');
+  });
+
+  it('пустое снаряжение не выводится', () => {
+    expect(getBackgroundEquipment(background([' ']))).toBeUndefined();
   });
 });

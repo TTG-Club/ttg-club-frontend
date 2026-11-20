@@ -18,12 +18,28 @@ const personalizationTableSchema = z.object({
   tbody: z.array(z.array(z.string())).catch([]),
 });
 
+/**
+ * Снаряжение из карточки — куски перечисления — одним блоком разметки через
+ * запятую, как его правит редактор.
+ * @param items - куски перечисления из API
+ */
+function toEquipmentBlocks(
+  items: ReadonlyArray<string> | null | undefined,
+): Array<string> {
+  const joined = (items ?? [])
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(WORKSHOP_LIST_JOINER);
+
+  return joined ? [joined] : [];
+}
+
 const workshopBackgroundSchema = z.object({
   id: z.number(),
   name: workshopNameSchema,
   altName: z.string().nullish(),
   skills: z.array(z.string()).nullish(),
-  toolOwnership: z.string().nullish(),
+  toolOwnership: markupBlocksSchema.nullish(),
   equipments: z.array(z.string()).nullish(),
   startGold: z.number().nullish(),
   description: markupBlocksSchema.nullish(),
@@ -54,8 +70,8 @@ export function parseWorkshopBackground(input: unknown): WorkshopBackground {
     altName: background.altName ?? '',
     skills: skills.values,
     otherSkills: skills.other,
-    toolOwnership: background.toolOwnership ?? '',
-    equipments: (background.equipments ?? []).join(WORKSHOP_LIST_JOINER),
+    toolOwnership: background.toolOwnership ?? [],
+    equipments: toEquipmentBlocks(background.equipments),
     startGold: background.startGold ?? null,
     description: background.description ?? [],
     skillName: background.skillName ?? '',
@@ -81,8 +97,8 @@ export const backgroundFormSchema = z.object({
   altName: z.string(),
   skills: z.array(z.string()),
   otherSkills: z.string(),
-  toolOwnership: z.string(),
-  equipments: z.string(),
+  toolOwnership: markupBlocksSchema,
+  equipments: markupBlocksSchema,
   startGold: z
     .number(WORKSHOP_VALIDATION.notNegative)
     .int(WORKSHOP_VALIDATION.notNegative)

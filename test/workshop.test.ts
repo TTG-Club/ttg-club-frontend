@@ -420,7 +420,7 @@ describe('редактор предысторий', () => {
     expect(form).toMatchObject({
       skills: ['MEDICINE', 'RELIGION'],
       otherSkills: 'Один навык на выбор',
-      equipments: 'Футляр для свитков, зимнее одеяло',
+      equipments: ['Футляр для свитков, зимнее одеяло'],
       languages: 'Общий',
       lifeStyle: undefined,
       description: ['Текст {@b жирный}.'],
@@ -682,7 +682,7 @@ describe('редактор классов', () => {
     traits: {
       diceHp: 10,
       skillAvailableCount: 2,
-      armor: '<p>Все</p>',
+      armor: ['Все доспехи, {@b щиты}'],
       equipment: ['{@b Кольчуга}'],
     },
     source: { shortName: 'PHB' },
@@ -692,7 +692,7 @@ describe('редактор классов', () => {
     expect(heroClass).toMatchObject({
       diceHp: 10,
       skillAvailableCount: 2,
-      armor: '<p>Все</p>',
+      armor: ['Все доспехи, {@b щиты}'],
       optionType: 'FIGHTING_STYLE',
     });
   });

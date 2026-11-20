@@ -46,9 +46,10 @@ export const backgroundDetailSchema = backgroundLinkSchema
   .omit({ url: true })
   .extend({
     skills: z.array(z.string()).nullish(),
-    toolOwnership: z.string().nullish(),
+    toolOwnership: contentDescriptionSchema.nullish(),
     language: z.string().nullish(),
     languages: z.array(z.string()).nullish(),
+    /** Перечисление снаряжения: куски разметки core-api (или HTML у старого API). */
     equipments: z.array(z.string()).nullish(),
     startGold: z.number().nullish(),
     description: contentDescriptionSchema.nullish(),
@@ -284,9 +285,9 @@ const classColumnSchema = z.object({
 
 const classTraitsSchema = z.object({
   diceHp: z.number(),
-  armor: z.string().nullish(),
-  weapon: z.string().nullish(),
-  tools: z.string().nullish(),
+  armor: contentDescriptionSchema.nullish(),
+  weapon: contentDescriptionSchema.nullish(),
+  tools: contentDescriptionSchema.nullish(),
   savingThrows: z.string().nullish(),
   skillAvailableCount: z.number(),
   availableSkills: z.array(z.string()).nullish(),

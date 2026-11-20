@@ -155,10 +155,7 @@
       name="toolOwnership"
       class="col-span-2"
     >
-      <UInput
-        v-model="state.toolOwnership"
-        class="w-full"
-      />
+      <MarkupEditor v-model="state.toolOwnership" />
     </UFormField>
 
     <UFormField
@@ -178,10 +175,7 @@
       name="equipments"
       class="col-span-full"
     >
-      <UInput
-        v-model="state.equipments"
-        class="w-full"
-      />
+      <MarkupEditor v-model="state.equipments" />
     </UFormField>
 
     <UFormField

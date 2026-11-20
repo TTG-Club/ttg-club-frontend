@@ -29,9 +29,12 @@ export interface WorkshopClass {
   /** Блоки разметки core-api. */
   description: Array<string>;
   diceHp: number;
-  armor: string;
-  weapon: string;
-  tools: string;
+  /** Блоки разметки core-api. */
+  armor: Array<string>;
+  /** Блоки разметки core-api. */
+  weapon: Array<string>;
+  /** Блоки разметки core-api. */
+  tools: Array<string>;
   savingThrows: string;
   archetypeName: string;
   /** Блоки разметки core-api. */
