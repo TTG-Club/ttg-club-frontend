@@ -14,6 +14,3 @@ export const SCREEN_EDITOR_TEXT = {
   saved: 'Раздел ширмы обновлён',
   saveError: 'Не удалось сохранить раздел ширмы',
 } as const;
-
-/** Строки описания раздела ширмы в редакторе. */
-export const SCREEN_DESCRIPTION_ROWS = 18;

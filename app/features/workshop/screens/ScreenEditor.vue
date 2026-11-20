@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { ScreenForm, WorkshopScreen } from '../model';
 
@@ -12,13 +12,11 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createScreenForm,
-    getHtmlFieldErrors,
     getScreenPayload,
     getScreenReferenceRoute,
-    SCREEN_DESCRIPTION_ROWS,
     SCREEN_EDITOR_TEXT,
     screenFormSchema,
     SCREENS_WORKSHOP_KEY,
@@ -81,14 +79,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<ScreenForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<ScreenForm>): Promise<void> {
     const saved = await save(
       getScreenPayload(event.data, screen, source.value),
@@ -105,7 +95,6 @@
     ref="form"
     :schema="screenFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -166,10 +155,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="SCREEN_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

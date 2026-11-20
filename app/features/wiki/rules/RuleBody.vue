@@ -21,6 +21,6 @@
 
   <ContentRender
     v-if="rule.description"
-    :html="rule.description"
+    :content="rule.description"
   />
 </template>

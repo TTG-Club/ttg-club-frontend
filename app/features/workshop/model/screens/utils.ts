@@ -16,7 +16,7 @@ export function createScreenForm(screen: WorkshopScreen): ScreenForm {
     category: screen.category,
     icon: screen.icon,
     order: screen.order,
-    description: screen.description,
+    description: [...screen.description],
   };
 }
 
@@ -38,7 +38,7 @@ export function getScreenPayload(
     category: toOptionalText(form.category),
     icon: toOptionalText(form.icon),
     order: toOptionalAmount(form.order),
-    description: toOptionalText(form.description),
+    description: form.description.length ? form.description : undefined,
     source: toOptionalText(source),
     parentId: screen.parent?.id,
   };

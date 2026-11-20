@@ -19,6 +19,7 @@ import {
   createMagicItemForm,
   createOptionForm,
   createRaceForm,
+  createRuleForm,
   createScreenForm,
   createSpellForm,
   createWeaponForm,
@@ -332,11 +333,12 @@ describe('редактор правил', () => {
       id: 1,
       name: { rus: 'Укрытие', eng: 'Cover' },
       type: 'Бой',
-      description: '<p>Текст</p>',
+      description: ['Текст {@b жирный}'],
       source: { shortName: 'PHB', page: 196 },
     });
 
     expect(rule).toMatchObject({ page: 196, source: 'PHB', type: 'Бой' });
+    expect(createRuleForm(rule).description).toEqual(['Текст {@b жирный}']);
   });
 });
 
@@ -732,7 +734,7 @@ describe('редактор ширмы', () => {
     id: 9,
     name: { rus: 'Укрытие', eng: 'Cover' },
     category: 'Бой',
-    description: '<p>Текст</p>',
+    description: ['Текст'],
     icon: 'shield',
     order: 0,
     url: '/screens/cover',
@@ -754,6 +756,16 @@ describe('редактор ширмы', () => {
       source: undefined,
       parentId: 2,
     });
+  });
+
+  it('пустое описание не отправляет', () => {
+    const form = { ...createScreenForm(screen), description: [] };
+
+    expect(getScreenPayload(form, screen, '').description).toBeUndefined();
+
+    expect(
+      getScreenPayload(createScreenForm(screen), screen, '').description,
+    ).toEqual(['Текст']);
   });
 
   it('отменяет правку на страницу раздела', () => {
