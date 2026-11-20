@@ -24,12 +24,12 @@
   } from '../form';
   import { WorkshopHtmlEditor } from '../html-editor';
   import { WorkshopImages } from '../images';
+  import { MarkupEditor } from '../markup-editor';
   import {
     CLASS_DICE_OPTIONS,
     CLASS_EDITOR_TAB,
     CLASS_EDITOR_TAB_TEXT,
     CLASS_EDITOR_TEXT,
-    CLASS_EQUIPMENT_ROWS,
     CLASS_FIELD_TABS,
     CLASS_LEVELS,
     CLASS_REST_OPTIONS,
@@ -45,7 +45,6 @@
     OPTION_TYPES_FILTER_KEY,
     OPTIONS_FILTER_PATH,
     WORKSHOP_ABILITY_OPTIONS,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
@@ -342,10 +341,7 @@
           class="col-span-full"
           required
         >
-          <WorkshopHtmlEditor
-            v-model="state.description"
-            :rows="WORKSHOP_DESCRIPTION_ROWS"
-          />
+          <MarkupEditor v-model="state.description" />
         </UFormField>
 
         <div class="col-span-full">
@@ -513,10 +509,7 @@
           name="equipment"
           class="col-span-full"
         >
-          <WorkshopHtmlEditor
-            v-model="state.equipment"
-            :rows="CLASS_EQUIPMENT_ROWS"
-          />
+          <MarkupEditor v-model="state.equipment" />
         </UFormField>
       </template>
 

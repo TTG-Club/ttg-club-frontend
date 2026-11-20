@@ -1,4 +1,5 @@
 import type { LocationQueryRaw } from 'vue-router';
+import type { ContentDescription } from '~content/model';
 import type { FilterDefinition } from '~section/model';
 
 import type {
@@ -567,8 +568,18 @@ export function getArchetypeFeatures(traits: ClassTraits): Array<ClassFeature> {
  * Текст вкладки «Описание»: у архетипа описание лежит в его умении.
  * @param entry - класс или архетип
  */
-export function getClassDescription(entry: ClassDetail): string | undefined {
-  return entry.description ?? entry.traits?.archetype?.description ?? undefined;
+export function getClassDescription(
+  entry: ClassDetail,
+): ContentDescription | undefined {
+  if (hasContentDescription(entry.description)) {
+    return entry.description ?? undefined;
+  }
+
+  const archetypeDescription = entry.traits?.archetype?.description;
+
+  return hasContentDescription(archetypeDescription)
+    ? (archetypeDescription ?? undefined)
+    : undefined;
 }
 
 /**

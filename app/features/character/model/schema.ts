@@ -267,7 +267,7 @@ const classFeatureSchema = z.object({
   name: z.string(),
   level: z.number(),
   type: z.string().nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   optional: z.boolean().nullish(),
   archetypeFeature: z.boolean().nullish(),
   archetypeRoot: z.boolean().nullish(),
@@ -290,7 +290,7 @@ const classTraitsSchema = z.object({
   savingThrows: z.string().nullish(),
   skillAvailableCount: z.number(),
   availableSkills: z.array(z.string()).nullish(),
-  equipment: z.string().nullish(),
+  equipment: contentDescriptionSchema.nullish(),
   classFeatureLevels: z.array(classColumnSchema).nullish(),
   archetypeFeatureLevels: z.array(classColumnSchema).nullish(),
   levels: z.array(classLevelSchema).nullish(),
@@ -326,7 +326,7 @@ export type ArchetypeSpellTable = z.infer<typeof archetypeSpellTableSchema>;
 export const classDetailSchema = classLinkSchema.extend({
   tabs: z.array(classTabSchema).nullish(),
   images: z.array(z.string()).nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   traits: classTraitsSchema.nullish(),
   archetypeSpellTable: archetypeSpellTableSchema.nullish(),
 });

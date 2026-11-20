@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassDetail, ClassTraits } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
   import {
@@ -139,7 +140,7 @@
     </details>
 
     <details
-      v-if="traits.equipment?.trim()"
+      v-if="hasContentDescription(traits.equipment)"
       open
     >
       <summary class="h4">
@@ -149,7 +150,7 @@
       <div class="content">
         <p>{{ CLASS_TEXT.equipmentIntro }}</p>
 
-        <ContentRender :html="traits.equipment" />
+        <ContentRender :content="traits.equipment" />
       </div>
     </details>
 
@@ -190,8 +191,8 @@
           </div>
 
           <ContentRender
-            v-if="feature.description"
-            :html="feature.description"
+            v-if="hasContentDescription(feature.description)"
+            :content="feature.description"
           />
         </div>
       </details>

@@ -17,8 +17,8 @@
     useWorkshopSave,
   } from '../composables';
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
   import { WorkshopImages } from '../images';
+  import { MarkupEditor } from '../markup-editor';
   import {
     ARCHETYPE_EDITOR_TEXT,
     ARCHETYPE_FIELD_TABS,
@@ -29,11 +29,8 @@
     CLASS_EDITOR_TAB_TEXT,
     CLASS_LEVELS,
     createArchetypeForm,
-    getArchetypeHtmlFields,
     getArchetypePayload,
     getArchetypePreviewPath,
-    getHtmlFieldErrors,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
@@ -162,14 +159,6 @@
     await showPreview(getArchetypePayload(data, archetype));
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<ArchetypeForm>): Array<FormError> {
-    return getHtmlFieldErrors(getArchetypeHtmlFields(form));
-  }
-
   async function submit(event: FormSubmitEvent<ArchetypeForm>): Promise<void> {
     const saved = await save(getArchetypePayload(event.data, archetype));
 
@@ -184,7 +173,6 @@
     ref="form"
     :schema="archetypeFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
     @error="handleError"
@@ -257,10 +245,7 @@
           class="col-span-full"
           required
         >
-          <WorkshopHtmlEditor
-            v-model="state.description"
-            :rows="WORKSHOP_DESCRIPTION_ROWS"
-          />
+          <MarkupEditor v-model="state.description" />
         </UFormField>
       </template>
 
