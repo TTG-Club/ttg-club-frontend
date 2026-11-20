@@ -34,7 +34,7 @@
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # navigation (site menu as a static list `MENU_SECTIONS`, like new.ttg.club, no API request; shared by the sidebar menu, the home page, the footer and the DM screen), sidebar (panel, menu drawn from `navigation`), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat, tool usage marks: `useFeatureUsage` reports time worked with the DM screen), maintenance ("site closed for an update" screen with sign in, gate state), footer (site footer like new.ttg.club: legal links lead to new.ttg.club; shown by layouts and by SectionLayout outside the wide split mode)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, active flag; the home page no longer shows videos); editors only
-│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), images (gallery and class/race cover uploaded to S3 via `/api/v1/workshop/images`: "Images" tab in class, archetype and race editors, block under the form elsewhere), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
+│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), markup-editor (core-api markup, TipTap), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), images (gallery and class/race cover uploaded to S3 via `/api/v1/workshop/images`: "Images" tab in class, archetype and race editors, block under the form elsewhere), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
@@ -144,6 +144,15 @@ into the same node tree as the HTML (section links become `detail-tooltip`
 links, rolls become `dice-roller`, tables keep the `dnd5_table` look), so the
 page looks and behaves the same. API schemas accept both forms
 (`contentDescriptionSchema`) until every entity is switched.
+
+Entities already on markup are edited with `MarkupEditor`
+(`workshop/markup-editor`, ported from core-app: TipTap through Nuxt UI
+`UEditor`, a visual mode with native headings, lists, tables and quotes and
+`{@...}` chips, plus a source mode). Its model is the block array the API
+stores; `toMarkupSource` / `toStoredMarkup` (`~news/markup`) convert it to the
+editable source (blocks separated by a blank line) and back. Section links are
+picked through the site search; `toMarkupLink` (`~content/model`) turns the
+entry address into `{@spell … | url:…}` or `{@link … | url:/…}`.
 
 Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
 between tabs by the `storage` event). While the history window is open, rolls
@@ -282,7 +291,7 @@ Moderators and administrators edit reference entries at `/workshop`. Each
 section has `/workshop/<section>/create` and `/workshop/<section>/<slug>/edit`;
 the edit page loads the entry from the reference API, saves through
 `/api/v1/workshop/<section>` and lists its revisions with restore. Descriptions
-use `WorkshopHtmlEditor`: a visual mode with `dice-roller` tokens and a source
+use `WorkshopHtmlEditor` (spells already use `MarkupEditor`): a visual mode with `dice-roller` tokens and a source
 mode; markup the backend would reject is listed above the field and blocks the
 form. Every legacy editor is ported.
 

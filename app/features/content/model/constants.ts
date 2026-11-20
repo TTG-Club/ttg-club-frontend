@@ -264,3 +264,6 @@ export const MARKUP_ALIGNS: ReadonlySet<string> = new Set([
 /** Классы таблицы, как у таблиц в HTML старой базы. */
 export const MARKUP_TABLE_WRAPPER_CLASS = 'table-responsive';
 export const MARKUP_TABLE_CLASS = 'dnd5_table';
+
+/** Маркер обычной ссылки: адрес вне разделов с собственным маркером. */
+export const MARKUP_LINK_TYPE = 'link';

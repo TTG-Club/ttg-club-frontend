@@ -6,7 +6,9 @@ import {
   markupToContent,
   markupToInlineContent,
   parseContent,
+  toMarkupLink,
 } from '~content/model';
+import { toMarkupSource, toStoredMarkup } from '~news/markup';
 
 describe('markupToContent', () => {
   it('строит то же дерево, что HTML старой базы: абзацы, оформление, бросок', () => {
@@ -106,5 +108,48 @@ describe('contentDescriptionSchema', () => {
     ).toBe(true);
 
     expect(contentDescriptionSchema.safeParse([1]).success).toBe(false);
+  });
+});
+
+describe('toMarkupLink', () => {
+  it('адрес записи → маркер раздела, остальное — обычная ссылка', () => {
+    expect(toMarkupLink('/spells/fireball')).toEqual({
+      type: 'spell',
+      url: 'fireball',
+    });
+
+    expect(toMarkupLink('/items/magic/bag_of_holding')).toEqual({
+      type: 'magicItem',
+      url: 'bag_of_holding',
+    });
+
+    expect(toMarkupLink('/items/rope')).toEqual({ type: 'item', url: 'rope' });
+
+    expect(toMarkupLink('/rules/cover')).toEqual({
+      type: 'link',
+      url: '/rules/cover',
+    });
+
+    expect(toMarkupLink('/spells/')).toEqual({ type: 'link', url: '/spells/' });
+  });
+});
+
+describe('исходник редактора разметки', () => {
+  it('блоки ↔ исходник через пустую строку', () => {
+    const blocks = ['Первый {@b блок}.', '{@table {@tr {@th А}}{@tr {@td 1}}}'];
+
+    expect(toMarkupSource(blocks)).toBe(
+      'Первый {@b блок}.\n\n{@table {@tr {@th А}}{@tr {@td 1}}}',
+    );
+
+    expect(toStoredMarkup(toMarkupSource(blocks))).toEqual(blocks);
+  });
+
+  it('снимает экранирование редактора, пустые абзацы и `---`', () => {
+    expect(
+      toStoredMarkup('a \\~ b &amp; c\n\n&nbsp;\n\n---\n\n\n\n  конец  '),
+    ).toEqual(['a ~ b & c', '{@separator}', 'конец']);
+
+    expect(toStoredMarkup('   ')).toEqual([]);
   });
 });

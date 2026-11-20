@@ -89,7 +89,7 @@ const SPELL = {
   time: '1 действие',
   range: '120 футов',
   duration: 'Мгновенная',
-  description: '<p>Урон <dice-roller formula="1к10"/>.</p>',
+  description: ['Урон {@roll 1к10}.'],
   source: { shortName: 'PHB', name: 'Книга игрока' },
 };
 
@@ -186,6 +186,8 @@ describe('форма заклинания', () => {
       timeNumber: 1,
       timeUnit: 'ACTION',
       range: '120 футов',
+      description: ['Урон {@roll 1к10}.'],
+      upper: [],
     });
   });
 

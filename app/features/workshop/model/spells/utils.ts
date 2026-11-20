@@ -100,8 +100,8 @@ export function createSpellForm(spell?: WorkshopSpell): SpellForm {
     timeCondition: time.condition,
     range: spell?.range ?? '',
     duration: spell?.duration ?? '',
-    description: spell?.description ?? '',
-    upper: spell?.upper ?? '',
+    description: spell?.description ?? [],
+    upper: spell?.upper ?? [],
   };
 }
 
@@ -120,6 +120,6 @@ export function getSpellPayload(
     additionalType: toOptionalText(form.additionalType),
     materialComponent: toOptionalText(form.materialComponent),
     timeCondition: toOptionalText(form.timeCondition),
-    upper: toOptionalText(form.upper),
+    upper: form.upper.length ? form.upper : undefined,
   };
 }

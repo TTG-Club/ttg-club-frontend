@@ -20,6 +20,7 @@ import {
   MARKUP_HEADING_TAG_OFFSET,
   MARKUP_INLINE_TAGS,
   MARKUP_LINK_DETAIL_TYPES,
+  MARKUP_LINK_TYPE,
   MARKUP_SECTION_LINKS,
   MARKUP_TABLE_CLASS,
   MARKUP_TABLE_WRAPPER_CLASS,
@@ -498,4 +499,28 @@ export function markupToInlineContent(
       ? [...separator, ...node.children]
       : [...separator, node];
   });
+}
+
+/**
+ * Маркер ссылки на запись сайта по её адресу — обратное к выводу ссылок:
+ * `/spells/fireball` → `{@spell … | url:fireball}`, `/items/magic/x` →
+ * `magicItem`. Адрес вне разделов с маркером (правила, боги, ширма) и
+ * внешний адрес остаются ссылкой `{@link … | url:…}`.
+ * @param href - адрес записи, например из поиска по сайту
+ */
+export function toMarkupLink(href: string): { type: string; url: string } {
+  let best: { type: string; url: string } | undefined;
+  let bestLength = 0;
+
+  // Самый длинный подходящий раздел: `/items/magic/` раньше `/items/`
+  for (const [type, { path }] of MARKUP_SECTION_LINKS) {
+    const rest = href.slice(path.length);
+
+    if (href.startsWith(path) && rest && path.length > bestLength) {
+      best = { type, url: rest };
+      bestLength = path.length;
+    }
+  }
+
+  return best ?? { type: MARKUP_LINK_TYPE, url: href };
 }

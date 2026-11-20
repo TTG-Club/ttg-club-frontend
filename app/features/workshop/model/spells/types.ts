@@ -16,8 +16,9 @@ export interface WorkshopSpell {
   time: string;
   range: string;
   duration: string;
-  description: string;
-  upper: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
+  upper: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

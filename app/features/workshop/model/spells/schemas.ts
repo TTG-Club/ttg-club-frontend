@@ -2,6 +2,8 @@ import type { WorkshopSpell } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { SPELL_MAX_LEVEL, SPELL_VALIDATION } from './constants';
 
 const workshopSpellSchema = z.object({
@@ -22,8 +24,8 @@ const workshopSpellSchema = z.object({
   time: z.string().nullish(),
   range: z.string().nullish(),
   duration: z.string().nullish(),
-  description: z.string().nullish(),
-  upper: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  upper: markupBlocksSchema.nullish(),
   source: z.object({ shortName: z.string() }).nullish(),
 });
 
@@ -50,8 +52,8 @@ export function parseWorkshopSpell(input: unknown): WorkshopSpell {
     time: spell.time ?? '',
     range: spell.range ?? '',
     duration: spell.duration ?? '',
-    description: spell.description ?? '',
-    upper: spell.upper ?? '',
+    description: spell.description ?? [],
+    upper: spell.upper ?? [],
     source: spell.source?.shortName,
   };
 }
@@ -83,8 +85,8 @@ export const spellFormSchema = z.object({
   timeCondition: z.string(),
   range: requiredText,
   duration: requiredText,
-  description: requiredText,
-  upper: z.string(),
+  description: markupBlocksSchema.min(1, SPELL_VALIDATION.required),
+  upper: markupBlocksSchema,
 });
 
 export type SpellForm = z.infer<typeof spellFormSchema>;

@@ -20,8 +20,8 @@ export {
 } from './parse';
 
 export * from './constants';
-export { markupToContent, markupToInlineContent } from './markup';
+export { markupToContent, markupToInlineContent, toMarkupLink } from './markup';
 export { isDetailType, isFeatDetailType, toRenderItem } from './render';
 export { findRollTableRow, rollTableSchema } from './rollTable';
 export { isKnownRoute } from './routes';
-export { contentDescriptionSchema } from './schema';
+export { contentDescriptionSchema, markupBlocksSchema } from './schema';
