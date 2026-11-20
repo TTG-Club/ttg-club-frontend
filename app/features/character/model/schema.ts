@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { rollTableSchema } from '~content/model';
+import { contentDescriptionSchema, rollTableSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /**
@@ -109,8 +109,9 @@ export const spellDetailSchema = spellLinkSchema.omit({ url: true }).extend({
   range: z.string().nullish(),
   duration: z.string().nullish(),
   time: z.string().nullish(),
-  description: z.string().nullish(),
-  upper: z.string().nullish(),
+  /** HTML старой базы либо разметка core-api (массив блоков). */
+  description: contentDescriptionSchema.nullish(),
+  upper: contentDescriptionSchema.nullish(),
   classes: z.array(referenceClassSchema).nullish(),
   subclasses: z.array(referenceClassSchema).nullish(),
   races: z.array(referenceClassSchema).nullish(),

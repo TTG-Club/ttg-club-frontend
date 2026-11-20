@@ -1,4 +1,5 @@
 export type {
+  ContentDescription,
   ContentElementNode,
   ContentLinkHandler,
   ContentLinkRequest,
@@ -19,6 +20,8 @@ export {
 } from './parse';
 
 export * from './constants';
+export { markupToContent, markupToInlineContent, toMarkupLink } from './markup';
 export { isDetailType, isFeatDetailType, toRenderItem } from './render';
 export { findRollTableRow, rollTableSchema } from './rollTable';
 export { isKnownRoute } from './routes';
+export { contentDescriptionSchema, markupBlocksSchema } from './schema';
