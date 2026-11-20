@@ -34,7 +34,6 @@ import {
   getBookPayload,
   getClassPayload,
   getCreatureHits,
-  getCreatureHtmlFields,
   getCreaturePayload,
   getFeatPayload,
   getGodPayload,
@@ -874,12 +873,11 @@ describe('редактор существ', () => {
       {
         name: 'Скимитар',
         englishName: 'Scimitar',
-        value: 'Атака',
-        markdown: true,
+        value: ['Атака {@roll к20 + 4 | text:+4 | label:Атака}.'],
         sharedUsageCount: 3,
       },
     ],
-    legendary: { list: [{ name: 'Рывок', value: '<p>Бег</p>' }], count: 3 },
+    legendary: { list: [{ name: 'Рывок', value: ['Бег.'] }], count: 3 },
     tags: [{ name: 'Гоблин', description: '' }],
     environment: ['лес', 'холмы'],
     source: { shortName: 'MM' },
@@ -954,14 +952,16 @@ describe('редактор существ', () => {
       actions: [
         {
           name: { rus: 'Скимитар', eng: 'Scimitar' },
-          description: 'Атака',
-          markdown: true,
+          description: ['Атака {@roll к20 + 4 | text:+4 | label:Атака}.'],
         },
       ],
       legendary: {
-        list: [{ name: 'Рывок', value: '<p>Бег</p>' }],
+        list: [{ name: 'Рывок', value: ['Бег.'] }],
         count: 3,
+        description: undefined,
       },
+      description: undefined,
+      reaction: undefined,
       tags: ['Гоблин'],
       npc: false,
       source: 'MM',
@@ -976,13 +976,6 @@ describe('редактор существ', () => {
       armorClass: 10,
       speed: 30,
       passivePerception: '10',
-    });
-  });
-
-  it('проверяет разметку описаний блоков', () => {
-    expect(getCreatureHtmlFields(createCreatureForm(creature))).toMatchObject({
-      'actions.0.description': 'Атака',
-      'legendary.0.description': '<p>Бег</p>',
     });
   });
 });

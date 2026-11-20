@@ -138,7 +138,7 @@ tooltips show the HTML from their `/api/` address in the same drawer.
 
 Descriptions are moving from HTML to the core-api markup (an array of block
 strings, `{@b}`, `{@roll}`, `{@spell … | url:…}`, `{@table}`…), one entity at a
-time (spells, feats, class options, rules, screens, items, gods, backgrounds, races and classes so far). `ContentRender` takes `html`, `markup` or `content` (the API value, either form): the
+time (every section except books). `ContentRender` takes `html`, `markup` or `content` (the API value, either form): the
 markup is parsed by the `~news/markup` parser and turned by `markupToContent`
 into the same node tree as the HTML (section links become `detail-tooltip`
 links, rolls become `dice-roller`, tables keep the `dnd5_table` look), so the
