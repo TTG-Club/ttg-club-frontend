@@ -19,7 +19,8 @@ export interface WorkshopMagicItem {
   /** Цена в золотых. */
   cost: number | null;
   bonus: number | null;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { WeaponForm, WorkshopWeapon } from '../model';
 
@@ -16,18 +16,15 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createWeaponForm,
-    getHtmlFieldErrors,
     getWeaponPayload,
     getWorkshopSectionRoute,
     WEAPON_DAMAGE_TYPE_OPTIONS,
-    WEAPON_DESCRIPTION_ROWS,
     WEAPON_DICE_OPTIONS,
     WEAPON_EDITOR_TEXT,
     WEAPON_PROPERTIES_FILTER_KEY,
-    WEAPON_SPECIAL_ROWS,
     WEAPON_TYPE_OPTIONS,
     weaponFormSchema,
     WEAPONS_FILTER_PATH,
@@ -106,17 +103,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<WeaponForm>): Array<FormError> {
-    return getHtmlFieldErrors({
-      description: form.description ?? '',
-      special: form.special ?? '',
-    });
-  }
-
   async function submit(event: FormSubmitEvent<WeaponForm>): Promise<void> {
     const saved = await save(getWeaponPayload(event.data, source.value));
 
@@ -131,7 +117,6 @@
     ref="form"
     :schema="weaponFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -304,10 +289,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WEAPON_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <UFormField
@@ -315,10 +297,7 @@
       name="special"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.special"
-        :rows="WEAPON_SPECIAL_ROWS"
-      />
+      <MarkupEditor v-model="state.special" />
     </UFormField>
 
     <div class="col-span-full">

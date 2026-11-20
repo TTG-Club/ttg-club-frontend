@@ -1,7 +1,12 @@
 import type { ArmorForm } from './schemas';
 import type { WorkshopArmor } from './types';
 
-import { toOptionalAmount, toOptionalNumber, toOptionalText } from '../utils';
+import {
+  toOptionalAmount,
+  toOptionalMarkup,
+  toOptionalNumber,
+  toOptionalText,
+} from '../utils';
 import { ARMOR_DEFAULT } from './constants';
 
 /**
@@ -18,7 +23,7 @@ export function createArmorForm(armor?: WorkshopArmor): ArmorForm {
     weight: armor?.weight ?? null,
     forceRequirements: armor?.forceRequirements ?? null,
     stealthHindrance: armor?.stealthHindrance ?? false,
-    description: armor?.description ?? '',
+    description: [...(armor?.description ?? [])],
   };
 }
 
@@ -38,6 +43,6 @@ export function getArmorPayload(
     cost: toOptionalAmount(form.cost),
     weight: toOptionalAmount(form.weight),
     forceRequirements: toOptionalNumber(form.forceRequirements),
-    description: toOptionalText(form.description),
+    description: toOptionalMarkup(form.description),
   };
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { contentDescriptionSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /** Тип оружия, доспеха или драгоценности с порядком групп в списке. */
@@ -40,8 +41,8 @@ export type WeaponProperty = z.infer<typeof weaponPropertySchema>;
 export const weaponDetailSchema = weaponLinkSchema.omit({ url: true }).extend({
   weight: z.number().nullish(),
   properties: z.array(weaponPropertySchema).nullish(),
-  description: z.string().nullish(),
-  special: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
+  special: contentDescriptionSchema.nullish(),
 });
 
 export type WeaponDetail = z.infer<typeof weaponDetailSchema>;
@@ -64,7 +65,7 @@ export const armorDetailSchema = armorLinkSchema.omit({ url: true }).extend({
   disadvantage: z.boolean().nullish(),
   requirement: z.number().nullish(),
   duration: z.string().nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
 });
 
 export type ArmorDetail = z.infer<typeof armorDetailSchema>;
@@ -91,7 +92,7 @@ export const itemDetailSchema = itemLinkSchema.omit({ url: true }).extend({
   price: z.union([z.string(), z.number()]).nullish(),
   weight: z.number().nullish(),
   categories: z.array(z.string()).nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
 });
 
 export type ItemDetail = z.infer<typeof itemDetailSchema>;
@@ -129,7 +130,7 @@ export const magicItemDetailSchema = magicItemLinkSchema
     detailCustamization: z.array(z.string()).nullish(),
     cost: z.object({ dmg: z.string(), xge: z.string() }).nullish(),
     images: z.array(z.string()).nullish(),
-    description: z.string().nullish(),
+    description: contentDescriptionSchema.nullish(),
   });
 
 export type MagicItemDetail = z.infer<typeof magicItemDetailSchema>;

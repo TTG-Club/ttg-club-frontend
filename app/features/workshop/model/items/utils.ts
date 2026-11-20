@@ -2,7 +2,7 @@ import type { ItemForm } from './schemas';
 import type { WorkshopItem } from './types';
 
 import { WORKSHOP_DEFAULT_CURRENCY } from '../constants';
-import { toOptionalAmount, toOptionalText } from '../utils';
+import { toOptionalAmount, toOptionalMarkup, toOptionalText } from '../utils';
 
 /**
  * Форма снаряжения: пустая для создания или заполненная записью.
@@ -17,7 +17,7 @@ export function createItemForm(item?: WorkshopItem): ItemForm {
     cost: item?.cost ?? null,
     currency: item ? item.currency || undefined : WORKSHOP_DEFAULT_CURRENCY,
     weight: item?.weight ?? null,
-    description: item?.description ?? '',
+    description: [...(item?.description ?? [])],
   };
 }
 
@@ -37,6 +37,6 @@ export function getItemPayload(
     cost: toOptionalAmount(form.cost),
     currency: toOptionalText(form.currency),
     weight: toOptionalAmount(form.weight),
-    description: toOptionalText(form.description),
+    description: toOptionalMarkup(form.description),
   };
 }

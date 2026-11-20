@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { ArmorForm, WorkshopArmor } from '../model';
 
@@ -12,16 +12,14 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
-    ARMOR_DESCRIPTION_ROWS,
     ARMOR_EDITOR_TEXT,
     ARMOR_TYPE_OPTIONS,
     armorFormSchema,
     ARMORS_WORKSHOP_KEY,
     createArmorForm,
     getArmorPayload,
-    getHtmlFieldErrors,
     getWorkshopSectionRoute,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
@@ -85,14 +83,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<ArmorForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<ArmorForm>): Promise<void> {
     const saved = await save(getArmorPayload(event.data, source.value));
 
@@ -107,7 +97,6 @@
     ref="form"
     :schema="armorFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -187,10 +176,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="ARMOR_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

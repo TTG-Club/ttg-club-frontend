@@ -1,7 +1,7 @@
 import type { SpellForm } from './schemas';
 import type { SpellTime, WorkshopSpell } from './types';
 
-import { toOptionalText } from '../utils';
+import { toOptionalMarkup, toOptionalText } from '../utils';
 import {
   SPELL_DEFAULT_SCHOOL,
   SPELL_DEFAULT_TIME_NUMBER,
@@ -120,6 +120,6 @@ export function getSpellPayload(
     additionalType: toOptionalText(form.additionalType),
     materialComponent: toOptionalText(form.materialComponent),
     timeCondition: toOptionalText(form.timeCondition),
-    upper: form.upper.length ? form.upper : undefined,
+    upper: toOptionalMarkup(form.upper),
   };
 }

@@ -52,13 +52,13 @@
 
     <ContentRender
       v-if="weapon.description"
-      :html="weapon.description"
+      :content="weapon.description"
     />
 
     <div v-if="weapon.special">
       <strong>{{ WEAPON_TEXT.special }}</strong>
 
-      <ContentRender :html="weapon.special" />
+      <ContentRender :content="weapon.special" />
     </div>
   </div>
 </template>
