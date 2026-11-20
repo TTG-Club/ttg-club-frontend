@@ -5,7 +5,7 @@ import type { WorkshopBook } from './types';
 import { WORKSHOP_API_PATH } from '../constants';
 import { WORKSHOP_IMAGES_API_PATH } from '../images';
 import { parseSavedEntry } from '../schemas';
-import { toOptionalNumber, toOptionalText } from '../utils';
+import { toOptionalMarkup, toOptionalNumber, toOptionalText } from '../utils';
 import { BOOK_COVER_SEGMENT, BOOKS_WORKSHOP_KEY } from './constants';
 import { parseBookCover } from './schemas';
 
@@ -20,7 +20,7 @@ export function createBookForm(book: WorkshopBook): BookForm {
     altName: book.altName,
     type: book.type,
     year: book.year,
-    description: book.description,
+    description: [...book.description],
   };
 }
 
@@ -33,7 +33,7 @@ export function getBookPayload(form: BookForm): Record<string, unknown> {
     ...form,
     altName: toOptionalText(form.altName),
     year: toOptionalNumber(form.year),
-    description: toOptionalText(form.description),
+    description: toOptionalMarkup(form.description),
   };
 }
 

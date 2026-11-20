@@ -1,20 +1,18 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { BookForm, WorkshopBook } from '../model';
 
   import { useWorkshopSave } from '../composables';
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
-    BOOK_DESCRIPTION_ROWS,
     BOOK_EDITOR_TEXT,
     BOOK_TYPE_OPTIONS,
     bookFormSchema,
     BOOKS_WORKSHOP_KEY,
     createBookForm,
     getBookPayload,
-    getHtmlFieldErrors,
     updateWorkshopBook,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ROUTE,
@@ -48,14 +46,6 @@
     (payload) => updateWorkshopBook(book.source, payload),
   );
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<BookForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<BookForm>): Promise<void> {
     const saved = await save(getBookPayload(event.data));
 
@@ -69,7 +59,6 @@
   <UForm
     :schema="bookFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -121,10 +110,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="BOOK_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <WorkshopFormActions
