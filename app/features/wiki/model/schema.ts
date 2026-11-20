@@ -64,7 +64,7 @@ export type BookLink = z.infer<typeof bookLinkSchema>;
 export const bookDetailSchema = z.object({
   name: entryNameSchema,
   type: bookTypeSchema,
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   source: entrySourceSchema.nullish(),
   image: z.string().nullish(),
 });

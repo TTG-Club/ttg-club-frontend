@@ -998,7 +998,7 @@ describe('источники', () => {
       altName: '',
       type: 'OFFICAL',
       year: 2014,
-      description: '',
+      description: [],
       cover: null,
     });
   });
@@ -1026,6 +1026,17 @@ describe('источники', () => {
       year: undefined,
       description: undefined,
     });
+  });
+
+  it('отправляет описание блоками разметки', () => {
+    const form = bookFormSchema.parse({
+      ...createBookForm(book),
+      description: ['Основная книга для игроков. См. {@b главу 1}.'],
+    });
+
+    expect(getBookPayload(form).description).toEqual([
+      'Основная книга для игроков. См. {@b главу 1}.',
+    ]);
   });
 
   it('требует тип источника', () => {

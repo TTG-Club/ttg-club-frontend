@@ -24,9 +24,6 @@ export const BOOK_EDITOR_TEXT = {
   saveError: 'Не удалось сохранить источник',
 } as const;
 
-/** Строки описания источника в редакторе. */
-export const BOOK_DESCRIPTION_ROWS = 18;
-
 /** Последний сегмент ручки обложки источника. */
 export const BOOK_COVER_SEGMENT = 'cover';
 
