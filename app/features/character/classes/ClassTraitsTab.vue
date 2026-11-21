@@ -99,9 +99,10 @@
           <b class="mr-1">{{ CLASS_TEXT.armor }}</b>
 
           <ContentRender
-            v-if="traits.armor"
-            :html="traits.armor"
+            v-if="hasContentDescription(traits.armor)"
+            :content="traits.armor"
             tag="span"
+            inline
           />
         </p>
 
@@ -109,9 +110,10 @@
           <b class="mr-1">{{ CLASS_TEXT.weapon }}</b>
 
           <ContentRender
-            v-if="traits.weapon"
-            :html="traits.weapon"
+            v-if="hasContentDescription(traits.weapon)"
+            :content="traits.weapon"
             tag="span"
+            inline
           />
         </p>
 
@@ -119,9 +121,10 @@
           <b class="mr-1">{{ CLASS_TEXT.tools }}</b>
 
           <ContentRender
-            v-if="traits.tools"
-            :html="traits.tools"
+            v-if="hasContentDescription(traits.tools)"
+            :content="traits.tools"
             tag="span"
+            inline
           />
         </p>
 

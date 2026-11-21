@@ -60,6 +60,9 @@ import {
   SPELLS_SECTION,
 } from './constants';
 
+/** Признак HTML в старом ответе API: тег вида `<a`, `<p`. */
+const HTML_TAG_PATTERN = /<[a-z]/iu;
+
 /**
  * Подпись требований черты или особенности для плашки источника.
  * @param requirements - требования из API
@@ -82,6 +85,25 @@ export function getBackgroundLanguages(background: BackgroundDetail): string {
  * Есть ли у предыстории блок персонализации: текст или таблицы.
  * @param background - предыстория
  */
+/**
+ * Снаряжение предыстории для вывода в строку: куски перечисления через
+ * запятую. Новый API отдаёт куски разметки core-api (блок), старый — HTML.
+ * @param background - предыстория
+ */
+export function getBackgroundEquipment(
+  background: BackgroundDetail,
+): ContentDescription | undefined {
+  const items = (background.equipments ?? []).filter((item) => item.trim());
+
+  if (!items.length) {
+    return undefined;
+  }
+
+  const joined = items.join(CHARACTER_LIST_SEPARATOR);
+
+  return HTML_TAG_PATTERN.test(joined) ? joined : [joined];
+}
+
 export function hasPersonalization(background: BackgroundDetail): boolean {
   return Boolean(
     hasContentDescription(background.personalization)

@@ -201,6 +201,3 @@ export const CLASS_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
 } as const;
-
-/** Строки коротких HTML-полей редактора классов: доспехи, оружие, инструменты. */
-export const CLASS_SHORT_HTML_ROWS = 3;
