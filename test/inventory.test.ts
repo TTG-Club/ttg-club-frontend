@@ -4,6 +4,7 @@ import {
   getItemCategoriesLabel,
   getItemCategoryGroups,
   getItemCategoryOrder,
+  getMagicItemAttunementMarkup,
   getMagicItemEditPath,
   getMagicItemTypeParts,
   getRarityGroup,
@@ -51,6 +52,50 @@ describe('магические предметы', () => {
     );
 
     expect(parts.find((part) => part.url)?.text).toBe('длинный меч');
+  });
+
+  it('уточнение разметкой идёт последним в скобках', () => {
+    const item = magicItemDetailSchema.parse({
+      name,
+      rarity,
+      type: { name: 'Оружие' },
+      detailType: [{ name: 'длинный меч', url: '/weapons/Longsword' }],
+      special: ['любой {@b меч}'],
+    });
+
+    const parts = getMagicItemTypeParts(item);
+
+    expect(parts.map((part) => part.text)).toEqual([
+      'Оружие',
+      ' (',
+      'длинный меч',
+      ', ',
+      '',
+      ')',
+      ', необычный',
+    ]);
+
+    expect(parts[4]?.content).toEqual(['любой {@b меч}']);
+  });
+
+  it('условие настройки разметкой — только у нового API', () => {
+    const fresh = magicItemDetailSchema.parse({
+      name,
+      rarity,
+      type: { name: 'Чудесный предмет' },
+      custSpecial: ['заклинателем'],
+    });
+
+    const legacy = magicItemDetailSchema.parse({
+      name,
+      rarity,
+      type: { name: 'Чудесный предмет' },
+      custSpecial: 'заклинателем',
+      detailCustamization: ['заклинателем'],
+    });
+
+    expect(getMagicItemAttunementMarkup(fresh)).toEqual(['заклинателем']);
+    expect(getMagicItemAttunementMarkup(legacy)).toBeUndefined();
   });
 
   it('без уточнений обходится без скобок', () => {

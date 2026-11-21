@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { MagicItemForm, WorkshopMagicItem } from '../model';
 
@@ -15,7 +15,6 @@
   import { MarkupEditor } from '../markup-editor';
   import {
     createMagicItemForm,
-    getHtmlFieldErrors,
     getMagicItemPayload,
     getWorkshopSectionRoute,
     MAGIC_ITEM_EDITOR_TEXT,
@@ -86,18 +85,6 @@
     }
   }
 
-  /**
-   * Ошибки HTML в уточнениях: бэкенд проверяет их разметку (описание —
-   * блоки разметки core-api, их проверяет редактор).
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<MagicItemForm>): Array<FormError> {
-    return getHtmlFieldErrors({
-      special: form.special ?? '',
-      custSpecial: form.custSpecial ?? '',
-    });
-  }
-
   async function submit(event: FormSubmitEvent<MagicItemForm>): Promise<void> {
     const saved = await save(getMagicItemPayload(event.data, source.value));
 
@@ -112,7 +99,6 @@
     ref="form"
     :schema="magicItemFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -154,10 +140,7 @@
       name="special"
       class="col-span-2"
     >
-      <UInput
-        v-model="state.special"
-        class="w-full"
-      />
+      <MarkupEditor v-model="state.special" />
     </UFormField>
 
     <UFormField
@@ -216,10 +199,7 @@
       name="custSpecial"
       class="col-span-full"
     >
-      <UInput
-        v-model="state.custSpecial"
-        class="w-full"
-      />
+      <MarkupEditor v-model="state.custSpecial" />
     </UFormField>
 
     <UFormField
