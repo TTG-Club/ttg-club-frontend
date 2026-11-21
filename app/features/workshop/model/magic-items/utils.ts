@@ -1,7 +1,12 @@
 import type { MagicItemForm } from './schemas';
 import type { WorkshopMagicItem } from './types';
 
-import { toOptionalAmount, toOptionalNumber, toOptionalText } from '../utils';
+import {
+  toOptionalAmount,
+  toOptionalMarkup,
+  toOptionalNumber,
+  toOptionalText,
+} from '../utils';
 import { MAGIC_ITEM_DEFAULT } from './constants';
 
 /**
@@ -16,9 +21,9 @@ export function createMagicItemForm(item?: WorkshopMagicItem): MagicItemForm {
     altName: item?.altName ?? '',
     rarity: item?.rarity || MAGIC_ITEM_DEFAULT.rarity,
     type: item?.type || MAGIC_ITEM_DEFAULT.type,
-    special: item?.special ?? '',
+    special: [...(item?.special ?? [])],
     customization: item?.customization ?? false,
-    custSpecial: item?.custSpecial ?? '',
+    custSpecial: [...(item?.custSpecial ?? [])],
     consumed: item?.consumed ?? false,
     curse: item?.curse ?? false,
     charge: item?.charge ?? null,
@@ -41,8 +46,8 @@ export function getMagicItemPayload(
     ...form,
     source: toOptionalText(source),
     altName: toOptionalText(form.altName),
-    special: toOptionalText(form.special),
-    custSpecial: toOptionalText(form.custSpecial),
+    special: toOptionalMarkup(form.special),
+    custSpecial: toOptionalMarkup(form.custSpecial),
     charge: toOptionalNumber(form.charge),
     cost: toOptionalAmount(form.cost),
     bonus: toOptionalNumber(form.bonus),

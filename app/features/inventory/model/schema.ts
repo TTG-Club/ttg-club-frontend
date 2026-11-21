@@ -128,6 +128,16 @@ export const magicItemDetailSchema = magicItemLinkSchema
     type: z.object({ name: z.string() }),
     detailType: z.array(detailTypeSchema).nullish(),
     detailCustamization: z.array(z.string()).nullish(),
+    /**
+     * Уточнение типа («пара сапог»): блоки разметки core-api. Старый API
+     * вместо него кладёт уточнение последним элементом `detailType`.
+     */
+    special: contentDescriptionSchema.nullish(),
+    /**
+     * Условие настройки («заклинателем»): блоки разметки core-api. У старого
+     * API это строка, а условие уже есть в `detailCustamization`.
+     */
+    custSpecial: contentDescriptionSchema.nullish(),
     cost: z.object({ dmg: z.string(), xge: z.string() }).nullish(),
     images: z.array(z.string()).nullish(),
     description: contentDescriptionSchema.nullish(),
