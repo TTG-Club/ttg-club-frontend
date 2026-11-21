@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { GodForm, WorkshopGod } from '../model';
 
@@ -16,13 +16,10 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createGodForm,
     getGodPayload,
-    getHtmlFieldErrors,
-    GOD_ALTERNATIVE_DESCRIPTION_ROWS,
-    GOD_DESCRIPTION_ROWS,
     GOD_EDITOR_TEXT,
     GOD_FILTER_KEY,
     GOD_SEX_OPTIONS,
@@ -90,17 +87,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<GodForm>): Array<FormError> {
-    return getHtmlFieldErrors({
-      description: form.description ?? '',
-      alternativeDescription: form.alternativeDescription ?? '',
-    });
-  }
-
   async function submit(event: FormSubmitEvent<GodForm>): Promise<void> {
     const saved = await save(getGodPayload(event.data, source.value));
 
@@ -115,7 +101,6 @@
     ref="form"
     :schema="godFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -248,10 +233,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="GOD_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <UFormField
@@ -259,10 +241,7 @@
       name="alternativeDescription"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.alternativeDescription"
-        :rows="GOD_ALTERNATIVE_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.alternativeDescription" />
     </UFormField>
 
     <div class="col-span-full">

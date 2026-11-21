@@ -7,10 +7,13 @@ import type {
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -26,7 +29,7 @@ const classTraitSchema = z.object({
   name: z.string(),
   suffix: z.string().nullish(),
   level: z.number(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   optional: z.boolean().catch(false),
   child: z.string().nullish(),
 });
@@ -43,7 +46,7 @@ const workshopClassSchema = z.object({
   id: z.number(),
   name: workshopNameSchema,
   accusativeName: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   archetypeName: z.string().nullish(),
   spellAbility: z.string().nullish(),
   spellcasterType: z.string().nullish(),
@@ -60,12 +63,12 @@ const workshopClassSchema = z.object({
   traits: z
     .object({
       diceHp: z.number(),
-      armor: z.string().nullish(),
-      weapon: z.string().nullish(),
-      tools: z.string().nullish(),
+      armor: markupBlocksSchema.nullish(),
+      weapon: markupBlocksSchema.nullish(),
+      tools: markupBlocksSchema.nullish(),
       savingThrows: z.string().nullish(),
       skillAvailableCount: z.number().catch(0),
-      equipment: z.string().nullish(),
+      equipment: markupBlocksSchema.nullish(),
     })
     .nullish(),
   source: workshopSourceSchema,
@@ -76,7 +79,7 @@ const workshopArchetypeSchema = z.object({
   name: z.string(),
   englishName: z.string(),
   genitiveName: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   level: z.number(),
   spellcasterType: z.string().nullish(),
   optionType: z.string().nullish(),
@@ -96,7 +99,7 @@ function toClassTrait(trait: z.infer<typeof classTraitSchema>): ClassTrait {
     name: trait.name,
     suffix: trait.suffix ?? '',
     level: trait.level,
-    description: trait.description ?? '',
+    description: trait.description ?? [],
     optional: trait.optional,
     child: trait.child ?? '',
   };
@@ -133,14 +136,14 @@ export function parseWorkshopClass(input: unknown): WorkshopClass {
     name: heroClass.name.rus,
     englishName: heroClass.name.eng,
     accusativeName: heroClass.accusativeName ?? '',
-    description: heroClass.description ?? '',
+    description: heroClass.description ?? [],
     diceHp: traits?.diceHp ?? CLASS_DEFAULT.diceHp,
-    armor: traits?.armor ?? '',
-    weapon: traits?.weapon ?? '',
-    tools: traits?.tools ?? '',
+    armor: traits?.armor ?? [],
+    weapon: traits?.weapon ?? [],
+    tools: traits?.tools ?? [],
     savingThrows: traits?.savingThrows ?? '',
     archetypeName: heroClass.archetypeName ?? '',
-    equipment: traits?.equipment ?? '',
+    equipment: traits?.equipment ?? [],
     spellAbility: heroClass.spellAbility ?? '',
     spellcasterType: heroClass.spellcasterType ?? CLASS_DEFAULT.spellcasterType,
     primaryAbilities: heroClass.primaryAbilities,
@@ -170,7 +173,7 @@ export function parseWorkshopArchetype(input: unknown): WorkshopArchetype {
     name: archetype.name,
     englishName: archetype.englishName,
     genitiveName: archetype.genitiveName ?? '',
-    description: archetype.description ?? '',
+    description: archetype.description ?? [],
     level: archetype.level,
     spellcasterType: archetype.spellcasterType ?? undefined,
     optionType: archetype.optionType ?? undefined,
@@ -200,7 +203,7 @@ export const classTraitFormSchema = z.object({
   name: workshopRequiredText,
   suffix: z.string(),
   level: classLevelSchema,
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
   optional: z.boolean(),
   child: z.string(),
 });
@@ -245,11 +248,11 @@ export const classFormSchema = z.object({
   icon: z.string(),
   page: workshopOptionalPositive,
   sidekick: z.boolean(),
-  armor: z.string(),
-  weapon: z.string(),
-  tools: z.string(),
-  equipment: z.string(),
-  description: workshopRequiredText,
+  armor: markupBlocksSchema,
+  weapon: markupBlocksSchema,
+  tools: markupBlocksSchema,
+  equipment: markupBlocksSchema,
+  description: workshopRequiredMarkup,
   classTraits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),
 });
@@ -264,7 +267,7 @@ export const archetypeFormSchema = z.object({
   level: classLevelSchema,
   spellLevelType: z.string(),
   page: workshopOptionalPositive,
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
   traits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),
 });

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { contentDescriptionSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /** Бог в списке раздела. */
@@ -14,7 +15,7 @@ export type GodLink = z.infer<typeof godLinkSchema>;
 
 /** Карточка бога. Свойства из других источников заполнены не у всех. */
 export const godDetailSchema = godLinkSchema.omit({ url: true }).extend({
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   rank: z.string().nullish(),
   titles: z.array(z.string()).nullish(),
   symbol: z.string().nullish(),
@@ -36,7 +37,7 @@ export type RuleLink = z.infer<typeof ruleLinkSchema>;
 
 export const ruleDetailSchema = z.object({
   name: entryNameSchema,
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   type: z.string().nullish(),
   source: entrySourceSchema.nullish(),
 });
@@ -63,7 +64,7 @@ export type BookLink = z.infer<typeof bookLinkSchema>;
 export const bookDetailSchema = z.object({
   name: entryNameSchema,
   type: bookTypeSchema,
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   source: entrySourceSchema.nullish(),
   image: z.string().nullish(),
 });
@@ -101,7 +102,7 @@ export type ScreenLink = z.infer<typeof screenLinkSchema>;
  * ссылка на родителя.
  */
 export const screenDetailSchema = screenLinkSchema.extend({
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   chields: z.array(screenLinkSchema).nullish(),
 });
 

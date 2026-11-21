@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionEntry } from '~section/entry';
   import { getWorkshopEditPath } from '~section/model';
@@ -42,8 +43,8 @@
         />
 
         <ContentRender
-          v-if="entry.description"
-          :html="entry.description"
+          v-if="hasContentDescription(entry.description)"
+          :content="entry.description"
         />
       </div>
     </template>

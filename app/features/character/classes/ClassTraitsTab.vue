@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassDetail, ClassTraits } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
   import {
@@ -98,9 +99,10 @@
           <b class="mr-1">{{ CLASS_TEXT.armor }}</b>
 
           <ContentRender
-            v-if="traits.armor"
-            :html="traits.armor"
+            v-if="hasContentDescription(traits.armor)"
+            :content="traits.armor"
             tag="span"
+            inline
           />
         </p>
 
@@ -108,9 +110,10 @@
           <b class="mr-1">{{ CLASS_TEXT.weapon }}</b>
 
           <ContentRender
-            v-if="traits.weapon"
-            :html="traits.weapon"
+            v-if="hasContentDescription(traits.weapon)"
+            :content="traits.weapon"
             tag="span"
+            inline
           />
         </p>
 
@@ -118,9 +121,10 @@
           <b class="mr-1">{{ CLASS_TEXT.tools }}</b>
 
           <ContentRender
-            v-if="traits.tools"
-            :html="traits.tools"
+            v-if="hasContentDescription(traits.tools)"
+            :content="traits.tools"
             tag="span"
+            inline
           />
         </p>
 
@@ -139,7 +143,7 @@
     </details>
 
     <details
-      v-if="traits.equipment?.trim()"
+      v-if="hasContentDescription(traits.equipment)"
       open
     >
       <summary class="h4">
@@ -149,7 +153,7 @@
       <div class="content">
         <p>{{ CLASS_TEXT.equipmentIntro }}</p>
 
-        <ContentRender :html="traits.equipment" />
+        <ContentRender :content="traits.equipment" />
       </div>
     </details>
 
@@ -190,8 +194,8 @@
           </div>
 
           <ContentRender
-            v-if="feature.description"
-            :html="feature.description"
+            v-if="hasContentDescription(feature.description)"
+            :content="feature.description"
           />
         </div>
       </details>

@@ -9,7 +9,7 @@ import type {
 } from './types';
 
 import { WORKSHOP_EDIT_SUFFIX, WORKSHOP_ROUTE } from '../constants';
-import { toOptionalNumber, toOptionalText } from '../utils';
+import { toOptionalMarkup, toOptionalNumber, toOptionalText } from '../utils';
 import {
   CLASS_DEFAULT,
   CLASS_LEVELS,
@@ -24,7 +24,7 @@ export function createClassTrait(): ClassTrait {
     name: '',
     suffix: '',
     level: CLASS_DEFAULT.level,
-    description: '',
+    description: [],
     optional: false,
     child: '',
   };
@@ -45,7 +45,10 @@ export function createClassTableColumn(): ClassTableColumn {
  * @param traits - умения записи
  */
 function copyTraits(traits: ReadonlyArray<ClassTrait>): Array<ClassTrait> {
-  return traits.map((trait) => ({ ...trait }));
+  return traits.map((trait) => ({
+    ...trait,
+    description: [...trait.description],
+  }));
 }
 
 /**
@@ -69,7 +72,7 @@ function getTraitsPayload(
     ...trait,
     name: trait.name.trim(),
     suffix: toOptionalText(trait.suffix),
-    description: trait.description.trim(),
+    description: [...trait.description],
     child: toOptionalText(trait.child),
   }));
 }
@@ -115,11 +118,11 @@ export function createClassForm(heroClass?: WorkshopClass): ClassForm {
     icon: heroClass?.icon ?? '',
     page: heroClass?.page ?? null,
     sidekick: heroClass?.sidekick ?? false,
-    armor: heroClass?.armor ?? '',
-    weapon: heroClass?.weapon ?? '',
-    tools: heroClass?.tools ?? '',
-    equipment: heroClass?.equipment ?? '',
-    description: heroClass?.description ?? '',
+    armor: [...(heroClass?.armor ?? [])],
+    weapon: [...(heroClass?.weapon ?? [])],
+    tools: [...(heroClass?.tools ?? [])],
+    equipment: [...(heroClass?.equipment ?? [])],
+    description: [...(heroClass?.description ?? [])],
     classTraits: copyTraits(heroClass?.classTraits ?? []),
     tableColumns: copyColumns(heroClass?.tableColumns ?? []),
   };
@@ -146,10 +149,10 @@ export function getClassPayload(
     slotsReset: toOptionalText(form.slotsReset),
     icon: toOptionalText(form.icon),
     page: toOptionalNumber(form.page),
-    armor: toOptionalText(form.armor),
-    weapon: toOptionalText(form.weapon),
-    tools: toOptionalText(form.tools),
-    equipment: toOptionalText(form.equipment),
+    armor: toOptionalMarkup(form.armor),
+    weapon: toOptionalMarkup(form.weapon),
+    tools: toOptionalMarkup(form.tools),
+    equipment: toOptionalMarkup(form.equipment),
     classTraits: getTraitsPayload(form.classTraits),
     tableColumns: getColumnsPayload(form.tableColumns),
   };
@@ -169,7 +172,7 @@ export function createArchetypeForm(
     level: archetype.level,
     spellLevelType: archetype.spellLevelType,
     page: archetype.page,
-    description: archetype.description,
+    description: [...archetype.description],
     traits: copyTraits(archetype.traits),
     tableColumns: copyColumns(archetype.tableColumns),
   };
@@ -218,53 +221,6 @@ export function getArchetypeReferencePath(
   archetypeSlug: string,
 ): string {
   return `${CLASSES_REFERENCE_PATH}/${classSlug}/${archetypeSlug}`;
-}
-
-/**
- * Описания умений для проверки разметки: `classTraits.0.description`.
- * @param fieldName - поле формы со списком умений
- * @param traits - умения формы
- */
-function getTraitHtmlFields(
-  fieldName: string,
-  traits: ReadonlyArray<ClassTrait> | undefined,
-): Record<string, string> {
-  return Object.fromEntries(
-    (traits ?? []).map((trait, index) => [
-      `${fieldName}.${index}.description`,
-      trait.description,
-    ]),
-  );
-}
-
-/**
- * HTML-поля формы класса с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getClassHtmlFields(
-  form: Partial<ClassForm>,
-): Record<string, string> {
-  return {
-    armor: form.armor ?? '',
-    weapon: form.weapon ?? '',
-    tools: form.tools ?? '',
-    equipment: form.equipment ?? '',
-    description: form.description ?? '',
-    ...getTraitHtmlFields('classTraits', form.classTraits),
-  };
-}
-
-/**
- * HTML-поля формы архетипа с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getArchetypeHtmlFields(
-  form: Partial<ArchetypeForm>,
-): Record<string, string> {
-  return {
-    description: form.description ?? '',
-    ...getTraitHtmlFields('traits', form.traits),
-  };
 }
 
 /**

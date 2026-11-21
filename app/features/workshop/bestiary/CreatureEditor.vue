@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { CreatureForm, WorkshopCreature } from '../model';
 
@@ -12,7 +12,7 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     BESTIARY_WORKSHOP_KEY,
     createCreatureForm,
@@ -27,13 +27,10 @@
     CREATURE_DAMAGE_OPTIONS,
     CREATURE_EDITOR_TEXT,
     CREATURE_ENVIRONMENT_OPTIONS,
-    CREATURE_ROWS,
     CREATURE_TYPE_OPTIONS,
     creatureFormSchema,
     getCreatureHits,
-    getCreatureHtmlFields,
     getCreaturePayload,
-    getHtmlFieldErrors,
     getWorkshopSectionRoute,
     RACE_SIZE_OPTIONS,
     saveWorkshopCreature,
@@ -124,14 +121,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<CreatureForm>): Array<FormError> {
-    return getHtmlFieldErrors(getCreatureHtmlFields(form));
-  }
-
   async function submit(event: FormSubmitEvent<CreatureForm>): Promise<void> {
     const saved = await save(
       getCreaturePayload(event.data, creature?.id, source.value),
@@ -148,7 +137,6 @@
     ref="form"
     :schema="creatureFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4 lg:grid-cols-6"
     @submit="submit"
   >
@@ -582,10 +570,7 @@
       name="description"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="CREATURE_ROWS.description"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div
@@ -605,10 +590,7 @@
       name="reaction"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.reaction"
-        :rows="CREATURE_ROWS.short"
-      />
+      <MarkupEditor v-model="state.reaction" />
     </UFormField>
 
     <div class="col-span-full">
@@ -620,10 +602,7 @@
       name="legendaryDescription"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.legendaryDescription"
-        :rows="CREATURE_ROWS.short"
-      />
+      <MarkupEditor v-model="state.legendaryDescription" />
     </UFormField>
 
     <div class="col-span-full">

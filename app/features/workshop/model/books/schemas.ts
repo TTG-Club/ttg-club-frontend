@@ -2,6 +2,8 @@ import type { WorkshopBook } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import { parseWorkshopCover } from '../images';
 import { workshopOptionalPositive, workshopRequiredText } from '../schemas';
@@ -13,7 +15,7 @@ const workshopBookSchema = z.object({
   altName: z.string().nullish(),
   type: z.string().nullish(),
   year: z.number().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   cover: z.string().nullish(),
 });
 
@@ -31,7 +33,7 @@ export function parseWorkshopBook(input: unknown): WorkshopBook {
     altName: book.altName ?? '',
     type: book.type ?? '',
     year: book.year ?? null,
-    description: book.description ?? '',
+    description: book.description ?? [],
     cover: book.cover ?? null,
   };
 }
@@ -51,7 +53,7 @@ export const bookFormSchema = z.object({
   altName: z.string(),
   type: z.string().min(1, WORKSHOP_VALIDATION.required),
   year: workshopOptionalPositive,
-  description: z.string(),
+  description: markupBlocksSchema,
 });
 
 export type BookForm = z.infer<typeof bookFormSchema>;

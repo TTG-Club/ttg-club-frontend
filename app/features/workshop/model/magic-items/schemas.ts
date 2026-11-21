@@ -2,11 +2,14 @@ import type { WorkshopMagicItem } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
   workshopNameSchema,
   workshopOptionalNotNegative,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -17,15 +20,15 @@ const workshopMagicItemSchema = z.object({
   altName: z.string().nullish(),
   rarityRaw: z.string().nullish(),
   typeRaw: z.string().nullish(),
-  specialRaw: z.string().nullish(),
+  special: markupBlocksSchema.nullish(),
   customization: z.boolean().nullish(),
-  custSpecial: z.string().nullish(),
+  custSpecial: markupBlocksSchema.nullish(),
   consumed: z.boolean().nullish(),
   curse: z.boolean().nullish(),
   charge: z.number().nullish(),
   costRaw: z.number().nullish(),
   bonus: z.number().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   source: workshopSourceSchema,
 });
 
@@ -43,15 +46,15 @@ export function parseWorkshopMagicItem(input: unknown): WorkshopMagicItem {
     altName: item.altName ?? '',
     rarity: item.rarityRaw ?? '',
     type: item.typeRaw ?? '',
-    special: item.specialRaw ?? '',
+    special: item.special ?? [],
     customization: !!item.customization,
-    custSpecial: item.custSpecial ?? '',
+    custSpecial: item.custSpecial ?? [],
     consumed: !!item.consumed,
     curse: !!item.curse,
     charge: item.charge ?? null,
     cost: item.costRaw ?? null,
     bonus: item.bonus ?? null,
-    description: item.description ?? '',
+    description: item.description ?? [],
     source: item.source?.shortName,
   };
 }
@@ -65,15 +68,15 @@ export const magicItemFormSchema = z.object({
   altName: z.string(),
   rarity: requiredChoice,
   type: requiredChoice,
-  special: z.string(),
+  special: markupBlocksSchema,
   customization: z.boolean(),
-  custSpecial: z.string(),
+  custSpecial: markupBlocksSchema,
   consumed: z.boolean(),
   curse: z.boolean(),
   charge: workshopOptionalPositive,
   cost: workshopOptionalNotNegative,
   bonus: workshopOptionalPositive,
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
 });
 
 export type MagicItemForm = z.infer<typeof magicItemFormSchema>;

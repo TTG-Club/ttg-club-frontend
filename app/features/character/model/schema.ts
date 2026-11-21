@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { rollTableSchema } from '~content/model';
+import { contentDescriptionSchema, rollTableSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
 /**
@@ -27,7 +27,7 @@ export const featLinkSchema = z.object({
 export type FeatLink = z.infer<typeof featLinkSchema>;
 
 export const featDetailSchema = featLinkSchema.omit({ url: true }).extend({
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
 });
 
 export type FeatDetail = z.infer<typeof featDetailSchema>;
@@ -46,15 +46,16 @@ export const backgroundDetailSchema = backgroundLinkSchema
   .omit({ url: true })
   .extend({
     skills: z.array(z.string()).nullish(),
-    toolOwnership: z.string().nullish(),
+    toolOwnership: contentDescriptionSchema.nullish(),
     language: z.string().nullish(),
     languages: z.array(z.string()).nullish(),
+    /** Перечисление снаряжения: куски разметки core-api (или HTML у старого API). */
     equipments: z.array(z.string()).nullish(),
     startGold: z.number().nullish(),
-    description: z.string().nullish(),
+    description: contentDescriptionSchema.nullish(),
     skillName: z.string().nullish(),
-    skillDescription: z.string().nullish(),
-    personalization: z.string().nullish(),
+    skillDescription: contentDescriptionSchema.nullish(),
+    personalization: contentDescriptionSchema.nullish(),
     personalizationTables: z.array(rollTableSchema).nullish(),
   });
 
@@ -72,7 +73,7 @@ export type OptionLink = z.infer<typeof optionLinkSchema>;
 
 export const optionDetailSchema = optionLinkSchema.omit({ url: true }).extend({
   requirements: z.string().nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   classes: z.array(referenceClassSchema).nullish(),
 });
 
@@ -109,8 +110,9 @@ export const spellDetailSchema = spellLinkSchema.omit({ url: true }).extend({
   range: z.string().nullish(),
   duration: z.string().nullish(),
   time: z.string().nullish(),
-  description: z.string().nullish(),
-  upper: z.string().nullish(),
+  /** HTML старой базы либо разметка core-api (массив блоков). */
+  description: contentDescriptionSchema.nullish(),
+  upper: contentDescriptionSchema.nullish(),
   classes: z.array(referenceClassSchema).nullish(),
   subclasses: z.array(referenceClassSchema).nullish(),
   races: z.array(referenceClassSchema).nullish(),
@@ -161,7 +163,7 @@ export type RaceLink = z.infer<typeof raceLinkSchema>;
 
 const raceFeatureSchema = z.object({
   name: z.string(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
 });
 
 /** Особенность расы; `opened` раскрыта сразу, `subrace` — от разновидности. */
@@ -182,7 +184,7 @@ export type RaceSpeed = z.infer<typeof raceSpeedSchema>;
 const subraceDetailSchema = z.object({
   name: entryNameSchema,
   source: entrySourceSchema.nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   features: z.array(raceFeatureSchema).nullish(),
   skills: z.array(raceFeatureSchema).nullish(),
 });
@@ -198,7 +200,7 @@ export const raceDetailSchema = z.object({
   speed: z.array(raceSpeedSchema).nullish(),
   darkvision: z.number().nullish(),
   images: z.array(z.string()).nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   skills: z.array(raceSkillSchema).nullish(),
   subraces: z.array(subraceDetailSchema).nullish(),
   /** Основная раса со ссылками на разновидности, для выбора разновидности. */
@@ -266,7 +268,7 @@ const classFeatureSchema = z.object({
   name: z.string(),
   level: z.number(),
   type: z.string().nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   optional: z.boolean().nullish(),
   archetypeFeature: z.boolean().nullish(),
   archetypeRoot: z.boolean().nullish(),
@@ -283,13 +285,13 @@ const classColumnSchema = z.object({
 
 const classTraitsSchema = z.object({
   diceHp: z.number(),
-  armor: z.string().nullish(),
-  weapon: z.string().nullish(),
-  tools: z.string().nullish(),
+  armor: contentDescriptionSchema.nullish(),
+  weapon: contentDescriptionSchema.nullish(),
+  tools: contentDescriptionSchema.nullish(),
   savingThrows: z.string().nullish(),
   skillAvailableCount: z.number(),
   availableSkills: z.array(z.string()).nullish(),
-  equipment: z.string().nullish(),
+  equipment: contentDescriptionSchema.nullish(),
   classFeatureLevels: z.array(classColumnSchema).nullish(),
   archetypeFeatureLevels: z.array(classColumnSchema).nullish(),
   levels: z.array(classLevelSchema).nullish(),
@@ -325,7 +327,7 @@ export type ArchetypeSpellTable = z.infer<typeof archetypeSpellTableSchema>;
 export const classDetailSchema = classLinkSchema.extend({
   tabs: z.array(classTabSchema).nullish(),
   images: z.array(z.string()).nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   traits: classTraitsSchema.nullish(),
   archetypeSpellTable: archetypeSpellTableSchema.nullish(),
 });

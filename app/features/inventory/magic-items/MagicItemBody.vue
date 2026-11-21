@@ -8,6 +8,7 @@
 
   import {
     ARTIFACT_RARITY,
+    getMagicItemAttunementMarkup,
     getMagicItemTypeParts,
     INVENTORY_LIST_SEPARATOR,
     MAGIC_ITEM_TEXT,
@@ -33,6 +34,8 @@
       .toLocaleLowerCase(),
   );
 
+  const attunementMarkup = computed(() => getMagicItemAttunementMarkup(item));
+
   // Цену артефакта не бросают: она задана текстом
   /**
    * Подпись типа в плашке: «Оружие (длинный меч, любой меч), редкий».
@@ -51,8 +54,15 @@
           v-for="part in typeParts"
           :key="part.key"
         >
+          <ContentRender
+            v-if="part.content"
+            :content="part.content"
+            tag="span"
+            inline
+          />
+
           <ContentLink
-            v-if="part.url"
+            v-else-if="part.url"
             class="text-link hover:text-link-hover"
             :href="part.url"
             :attributes="{}"
@@ -75,7 +85,19 @@
         <li>
           <b>{{ MAGIC_ITEM_TEXT.attunement }}</b> {{ attunement }}
 
-          <span v-if="attunementDetails">({{ attunementDetails }})</span>
+          <span v-if="attunementDetails || attunementMarkup"
+            >({{ attunementDetails
+            }}<template v-if="attunementDetails && attunementMarkup">{{
+              INVENTORY_LIST_SEPARATOR
+            }}</template>
+
+            <ContentRender
+              v-if="attunementMarkup"
+              :content="attunementMarkup"
+              tag="span"
+              inline
+            />)</span
+          >
         </li>
 
         <li v-if="item.cost">
@@ -112,7 +134,7 @@
 
     <ContentRender
       v-if="item.description"
-      :html="item.description"
+      :content="item.description"
     />
   </div>
 </template>

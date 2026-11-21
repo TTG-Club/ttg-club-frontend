@@ -67,8 +67,3 @@ export const WEAPON_EDITOR_TEXT = {
   saved: 'Оружие обновлено',
   saveError: 'Не удалось сохранить оружие',
 } as const;
-
-/** Строки описаний оружия в редакторе. */
-export const WEAPON_DESCRIPTION_ROWS = 8;
-
-export const WEAPON_SPECIAL_ROWS = 5;

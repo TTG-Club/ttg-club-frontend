@@ -22,7 +22,7 @@
   <div class="@container flex flex-col gap-4">
     <ContentRender
       v-if="screen.description"
-      :html="screen.description"
+      :content="screen.description"
     />
 
     <section

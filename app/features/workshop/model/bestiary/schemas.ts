@@ -8,6 +8,8 @@ import type {
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import {
   WORKSHOP_LIST_JOINER,
   WORKSHOP_SKILL_OPTIONS,
@@ -49,9 +51,8 @@ const nameValueSchema = z.object({
   name: z.string().nullish(),
   shortName: z.string().nullish(),
   englishName: z.string().nullish(),
-  value: z.union([z.number(), z.string()]).nullish(),
+  value: z.union([z.number(), z.string(), markupBlocksSchema]).nullish(),
   additional: z.union([z.number(), z.string()]).nullish(),
-  markdown: z.boolean().nullish(),
   sharedUsageCount: z.number().nullish(),
 });
 
@@ -93,13 +94,13 @@ const workshopCreatureSchema = z.object({
   feats: nameValueList,
   actions: nameValueList,
   reactions: nameValueList,
-  reaction: z.string().nullish(),
+  reaction: markupBlocksSchema.nullish(),
   bonusActions: nameValueList,
   legendary: z
-    .object({ list: nameValueList, description: z.string().nullish() })
+    .object({ list: nameValueList, description: markupBlocksSchema.nullish() })
     .nullish(),
   mysticalActions: nameValueList,
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   tags: z.array(z.object({ name: z.string() })).nullish(),
   environment: textList,
   source: workshopSourceSchema,
@@ -251,6 +252,15 @@ function getSkills(
 }
 
 /**
+ * Описание действия из карточки: блоки разметки; число или строка (старый
+ * ответ) — пустое описание.
+ * @param value - значение из карточки
+ */
+function toBlocks(value: NameValue['value']): Array<string> {
+  return Array.isArray(value) ? [...value] : [];
+}
+
+/**
  * Особенности и действия для формы.
  * @param items - блоки из карточки
  */
@@ -260,8 +270,7 @@ function getBlocks(
   return (items ?? []).map((item) => ({
     name: item.name ?? '',
     englishName: item.englishName ?? '',
-    description: toText(item.value),
-    markdown: item.markdown ?? true,
+    description: toBlocks(item.value),
     sharedUsageCount: item.sharedUsageCount ?? undefined,
   }));
 }
@@ -377,17 +386,17 @@ export function parseWorkshopCreature(input: unknown): WorkshopCreature {
       creature.environment,
       CREATURE_ENVIRONMENT_OPTIONS,
     ),
-    description: creature.description ?? '',
+    description: creature.description ?? [],
     feats: getBlocks(creature.feats),
     actions: getBlocks(creature.actions),
     bonusActions: getBlocks(creature.bonusActions),
     reactions: getBlocks(creature.reactions),
-    reaction: creature.reaction ?? '',
+    reaction: creature.reaction ?? [],
     mysticalActions: getBlocks(creature.mysticalActions),
-    legendaryDescription: creature.legendary?.description ?? '',
+    legendaryDescription: creature.legendary?.description ?? [],
     legendary: (creature.legendary?.list ?? []).map((item) => ({
       name: item.name ?? '',
-      description: toText(item.value),
+      description: toBlocks(item.value),
     })),
     npc: false,
     source: creature.source?.shortName,
@@ -403,8 +412,7 @@ const creatureBonusSchema = z.object({
 const creatureBlockSchema = z.object({
   name: workshopRequiredText,
   englishName: z.string(),
-  description: z.string(),
-  markdown: z.boolean(),
+  description: markupBlocksSchema,
   sharedUsageCount: z.number().optional(),
 });
 
@@ -465,16 +473,16 @@ export const creatureFormSchema = z.object({
   damageVulnerabilities: z.array(z.string()),
   conditionImmunities: z.array(z.string()),
   environment: z.array(z.string()),
-  description: z.string(),
+  description: markupBlocksSchema,
   feats: z.array(creatureBlockSchema),
   actions: z.array(creatureBlockSchema),
   bonusActions: z.array(creatureBlockSchema),
   reactions: z.array(creatureBlockSchema),
-  reaction: z.string(),
+  reaction: markupBlocksSchema,
   mysticalActions: z.array(creatureBlockSchema),
-  legendaryDescription: z.string(),
+  legendaryDescription: markupBlocksSchema,
   legendary: z.array(
-    z.object({ name: workshopRequiredText, description: z.string() }),
+    z.object({ name: workshopRequiredText, description: markupBlocksSchema }),
   ),
   npc: z.boolean(),
 });

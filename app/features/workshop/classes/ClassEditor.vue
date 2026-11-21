@@ -22,30 +22,25 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
   import { WorkshopImages } from '../images';
+  import { MarkupEditor } from '../markup-editor';
   import {
     CLASS_DICE_OPTIONS,
     CLASS_EDITOR_TAB,
     CLASS_EDITOR_TAB_TEXT,
     CLASS_EDITOR_TEXT,
-    CLASS_EQUIPMENT_ROWS,
     CLASS_FIELD_TABS,
     CLASS_LEVELS,
     CLASS_REST_OPTIONS,
-    CLASS_SHORT_HTML_ROWS,
     CLASS_SPELLCASTER_OPTIONS,
     CLASSES_WORKSHOP_KEY,
     classFormSchema,
     createClassForm,
-    getClassHtmlFields,
     getClassPayload,
-    getHtmlFieldErrors,
     getWorkshopSectionRoute,
     OPTION_TYPES_FILTER_KEY,
     OPTIONS_FILTER_PATH,
     WORKSHOP_ABILITY_OPTIONS,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
@@ -202,14 +197,6 @@
     await showPreview(getClassPayload(data, source.value));
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<ClassForm>): Array<FormError> {
-    return getHtmlFieldErrors(getClassHtmlFields(form));
-  }
-
   async function submit(event: FormSubmitEvent<ClassForm>): Promise<void> {
     const saved = await save(getClassPayload(event.data, source.value));
 
@@ -224,7 +211,6 @@
     ref="form"
     :schema="classFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
     @error="handleError"
@@ -342,10 +328,7 @@
           class="col-span-full"
           required
         >
-          <WorkshopHtmlEditor
-            v-model="state.description"
-            :rows="WORKSHOP_DESCRIPTION_ROWS"
-          />
+          <MarkupEditor v-model="state.description" />
         </UFormField>
 
         <div class="col-span-full">
@@ -412,10 +395,7 @@
           name="armor"
           class="col-span-full"
         >
-          <WorkshopHtmlEditor
-            v-model="state.armor"
-            :rows="CLASS_SHORT_HTML_ROWS"
-          />
+          <MarkupEditor v-model="state.armor" />
         </UFormField>
 
         <UFormField
@@ -423,10 +403,7 @@
           name="weapon"
           class="col-span-full"
         >
-          <WorkshopHtmlEditor
-            v-model="state.weapon"
-            :rows="CLASS_SHORT_HTML_ROWS"
-          />
+          <MarkupEditor v-model="state.weapon" />
         </UFormField>
 
         <UFormField
@@ -434,10 +411,7 @@
           name="tools"
           class="col-span-full"
         >
-          <WorkshopHtmlEditor
-            v-model="state.tools"
-            :rows="CLASS_SHORT_HTML_ROWS"
-          />
+          <MarkupEditor v-model="state.tools" />
         </UFormField>
       </template>
 
@@ -513,10 +487,7 @@
           name="equipment"
           class="col-span-full"
         >
-          <WorkshopHtmlEditor
-            v-model="state.equipment"
-            :rows="CLASS_EQUIPMENT_ROWS"
-          />
+          <MarkupEditor v-model="state.equipment" />
         </UFormField>
       </template>
 

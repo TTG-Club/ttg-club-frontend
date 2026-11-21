@@ -201,10 +201,3 @@ export const CLASS_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
 } as const;
-
-/** Строки полей редактора классов. */
-export const CLASS_SHORT_HTML_ROWS = 3;
-
-export const CLASS_EQUIPMENT_ROWS = 6;
-
-export const CLASS_TRAIT_ROWS = 8;

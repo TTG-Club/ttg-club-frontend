@@ -1,3 +1,5 @@
+import type { ContentDescription } from '~content/model';
+
 import type { CreatureDetail, CreatureHits, CreatureValue } from './schema';
 import type {
   CreatureAbilityScore,
@@ -5,6 +7,8 @@ import type {
   CreatureActionGroup,
   CreatureRoll,
 } from './types';
+
+import { hasContentDescription } from '~content/model';
 
 import {
   ABILITY_D20_FORMULA,
@@ -255,7 +259,8 @@ export function getLegendaryIntro(name: string): string {
 }
 
 /**
- * Умения или действия существа: название и HTML описания.
+ * Умения или действия существа: название и описание (блоки разметки или
+ * HTML строкой).
  * @param items - умения или действия из API
  */
 export function getCreatureActions(
@@ -264,8 +269,19 @@ export function getCreatureActions(
   return (items ?? []).map((item, index) => ({
     key: `${index}-${item.name ?? ''}`,
     name: item.name ?? '',
-    html: `${item.value ?? ''}`,
+    content: Array.isArray(item.value) ? item.value : `${item.value ?? ''}`,
   }));
+}
+
+/**
+ * Вступление блока: пустое (нет текста или пустой массив блоков) не
+ * выводится.
+ * @param value - вступление из API
+ */
+function getIntro(
+  value: ContentDescription | null | undefined,
+): ContentDescription | undefined {
+  return hasContentDescription(value) ? (value ?? undefined) : undefined;
 }
 
 /**
@@ -290,14 +306,14 @@ export function getCreatureActionGroups(
     {
       key: 'reactions',
       title: CREATURE_TEXT.reactions,
-      intro: creature.reaction ?? undefined,
+      intro: getIntro(creature.reaction),
       items: getCreatureActions(creature.reactions),
     },
     {
       key: 'legendary',
       title: CREATURE_TEXT.legendary,
-      intro: creature.legendary?.description ?? undefined,
-      text: creature.legendary?.description
+      intro: getIntro(creature.legendary?.description),
+      text: hasContentDescription(creature.legendary?.description)
         ? undefined
         : getLegendaryIntro(creature.name.rus),
       items: getCreatureActions(creature.legendary?.list),
@@ -313,19 +329,19 @@ export function getCreatureActionGroups(
     {
       key: 'lair',
       title: CREATURE_TEXT.lair,
-      intro: creature.lair?.description ?? undefined,
+      intro: getIntro(creature.lair?.description),
       items: [],
     },
     {
       key: 'lairActions',
       title: CREATURE_TEXT.lairActions,
-      intro: creature.lair?.action ?? undefined,
+      intro: getIntro(creature.lair?.action),
       items: [],
     },
     {
       key: 'regionalEffects',
       title: CREATURE_TEXT.regionalEffects,
-      intro: creature.lair?.effect ?? undefined,
+      intro: getIntro(creature.lair?.effect),
       items: [],
     },
   ];

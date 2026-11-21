@@ -56,6 +56,7 @@ export {
   getArchetypeSpellLevelHeader,
   getArchetypeSpellSuffix,
   getArchetypeSwipePaths,
+  getBackgroundEquipment,
   getBackgroundLanguages,
   getClassDescription,
   getClassHitPoints,

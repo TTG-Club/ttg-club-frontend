@@ -69,12 +69,6 @@ export const SPELL_TIME_ALTERNATIVE_SEPARATOR = / или (?=\d|при попад
 /** Отделяет условие от единицы: «1 реакция, которую вы совершаете…». */
 export const SPELL_TIME_CONDITION_SEPARATOR = ',';
 
-/** Строки описания в редакторе. */
-export const SPELL_DESCRIPTION_ROWS = 10;
-
-/** Строки «На больших уровнях» в редакторе. */
-export const SPELL_UPPER_ROWS = 5;
-
 /** Подписи редактора заклинаний. */
 export const SPELL_EDITOR_TEXT = {
   createTitle: 'Создание заклинания',

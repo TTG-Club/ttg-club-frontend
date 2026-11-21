@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { FeatForm, WorkshopFeat } from '../model';
 
@@ -12,17 +12,15 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createFeatForm,
     FEAT_EDITOR_TEXT,
     featFormSchema,
     FEATS_WORKSHOP_KEY,
     getFeatPayload,
-    getHtmlFieldErrors,
     getWorkshopSectionRoute,
     WORKSHOP_ABILITY_OPTIONS,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
@@ -82,14 +80,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<FeatForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<FeatForm>): Promise<void> {
     const saved = await save(getFeatPayload(event.data, source.value));
 
@@ -104,7 +94,6 @@
     ref="form"
     :schema="featFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -172,10 +161,7 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

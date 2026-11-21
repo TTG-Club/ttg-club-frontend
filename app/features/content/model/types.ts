@@ -89,3 +89,9 @@ export interface ContentLinkRequest {
  * @returns взялся ли обработчик за запись; иначе ссылка ведёт себя как обычно
  */
 export type ContentLinkHandler = (request: ContentLinkRequest) => boolean;
+
+/**
+ * Описание записи из API: HTML-строка старой базы либо разметка core-api —
+ * массив строк-блоков (этап перевода текстов на разметку, по сущностям).
+ */
+export type ContentDescription = string | Array<string>;

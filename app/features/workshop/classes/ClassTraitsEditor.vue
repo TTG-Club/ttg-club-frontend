@@ -3,12 +3,11 @@
 
   import { useExpandedItems } from '../composables';
   import { WorkshopCollapsibleItem, WorkshopListSection } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     CLASS_LEVEL_OPTIONS,
     CLASS_LEVEL_SUFFIX,
     CLASS_LIST_ICON,
-    CLASS_TRAIT_ROWS,
     CLASS_TRAITS_TEXT,
     createClassTrait,
     getWorkshopErrorIndexes,
@@ -137,9 +136,12 @@
   /**
    * Меняет описание умения.
    * @param traitIndex - номер умения
-   * @param description - разметка описания
+   * @param description - блоки разметки описания
    */
-  function changeDescription(traitIndex: number, description: string): void {
+  function changeDescription(
+    traitIndex: number,
+    description: Array<string>,
+  ): void {
     patchTrait(traitIndex, { description });
   }
 
@@ -269,9 +271,8 @@
           class="md:col-span-3"
           required
         >
-          <WorkshopHtmlEditor
+          <MarkupEditor
             :model-value="trait.description"
-            :rows="CLASS_TRAIT_ROWS"
             @update:model-value="changeDescription(traitIndex, $event)"
           />
         </UFormField>

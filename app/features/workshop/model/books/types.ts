@@ -8,7 +8,8 @@ export interface WorkshopBook {
   /** Тип книги из перечисления бэкенда: `OFFICAL`, `SETTING`… */
   type: string;
   year: number | null;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Адрес обложки; меняется отдельно от формы. */
   cover: string | null;
 }

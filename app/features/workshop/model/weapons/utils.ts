@@ -2,7 +2,12 @@ import type { WeaponForm } from './schemas';
 import type { WorkshopWeapon } from './types';
 
 import { WORKSHOP_DEFAULT_CURRENCY } from '../constants';
-import { toOptionalAmount, toOptionalNumber, toOptionalText } from '../utils';
+import {
+  toOptionalAmount,
+  toOptionalMarkup,
+  toOptionalNumber,
+  toOptionalText,
+} from '../utils';
 import { WEAPON_DEFAULT } from './constants';
 
 /**
@@ -26,8 +31,8 @@ export function createWeaponForm(weapon?: WorkshopWeapon): WeaponForm {
       maxDistance: null,
       ammo: null,
       properties: [],
-      description: '',
-      special: '',
+      description: [],
+      special: [],
     };
   }
 
@@ -46,8 +51,8 @@ export function createWeaponForm(weapon?: WorkshopWeapon): WeaponForm {
     maxDistance: weapon.maxDistance,
     ammo: weapon.ammo,
     properties: [...weapon.properties],
-    description: weapon.description,
-    special: weapon.special,
+    description: [...weapon.description],
+    special: [...weapon.special],
   };
 }
 
@@ -74,7 +79,7 @@ export function getWeaponPayload(
     maxDistance: toOptionalNumber(form.maxDistance),
     ammo: toOptionalNumber(form.ammo),
     properties: form.properties.map(Number),
-    description: toOptionalText(form.description),
-    special: toOptionalText(form.special),
+    description: toOptionalMarkup(form.description),
+    special: toOptionalMarkup(form.special),
   };
 }

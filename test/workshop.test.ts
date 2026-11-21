@@ -19,6 +19,7 @@ import {
   createMagicItemForm,
   createOptionForm,
   createRaceForm,
+  createRuleForm,
   createScreenForm,
   createSpellForm,
   createWeaponForm,
@@ -33,7 +34,6 @@ import {
   getBookPayload,
   getClassPayload,
   getCreatureHits,
-  getCreatureHtmlFields,
   getCreaturePayload,
   getFeatPayload,
   getGodPayload,
@@ -89,7 +89,7 @@ const SPELL = {
   time: '1 действие',
   range: '120 футов',
   duration: 'Мгновенная',
-  description: '<p>Урон <dice-roller formula="1к10"/>.</p>',
+  description: ['Урон {@roll 1к10}.'],
   source: { shortName: 'PHB', name: 'Книга игрока' },
 };
 
@@ -186,6 +186,8 @@ describe('форма заклинания', () => {
       timeNumber: 1,
       timeUnit: 'ACTION',
       range: '120 футов',
+      description: ['Урон {@roll 1к10}.'],
+      upper: [],
     });
   });
 
@@ -272,7 +274,7 @@ describe('редактор черт', () => {
     requirements: 'Нет',
     abilities: ['DEXTERITY'],
     skills: [],
-    description: '<p>Текст</p>',
+    description: ['Текст {@b жирный}'],
     source: { shortName: 'PHB' },
   };
 
@@ -285,6 +287,7 @@ describe('редактор черт', () => {
       requirement: '',
       level: null,
       abilities: ['DEXTERITY'],
+      description: ['Текст {@b жирный}'],
     });
 
     expect(feat.source).toBe('PHB');
@@ -307,12 +310,13 @@ describe('редактор особенностей', () => {
       prerequisite: 'Заговор мистический заряд',
       level: null,
       optionTypes: ['ELDRITCH_INVOCATION'],
-      description: '<p>Текст</p>',
+      description: ['Текст {@i курсив}'],
     });
 
     const form = createOptionForm(option);
 
     expect(form.optionTypes).toEqual(['ELDRITCH_INVOCATION']);
+    expect(form.description).toEqual(['Текст {@i курсив}']);
 
     expect(getOptionPayload(form, 'PHB')).toMatchObject({
       prerequisite: 'Заговор мистический заряд',
@@ -328,11 +332,12 @@ describe('редактор правил', () => {
       id: 1,
       name: { rus: 'Укрытие', eng: 'Cover' },
       type: 'Бой',
-      description: '<p>Текст</p>',
+      description: ['Текст {@b жирный}'],
       source: { shortName: 'PHB', page: 196 },
     });
 
     expect(rule).toMatchObject({ page: 196, source: 'PHB', type: 'Бой' });
+    expect(createRuleForm(rule).description).toEqual(['Текст {@b жирный}']);
   });
 });
 
@@ -357,6 +362,26 @@ describe('редактор богов', () => {
       domains: ['WAR'],
       source: 'PHB',
       description: undefined,
+      alternativeDescription: undefined,
+    });
+  });
+
+  it('отправляет описание блоками разметки', () => {
+    const god = parseWorkshopGod({
+      id: 9,
+      name: 'Тир',
+      englishName: 'Tyr',
+      sex: 'MALE',
+      rank: 'GREATER',
+      alignment: 'LAWFUL_GOOD',
+      domains: ['WAR'],
+      pantheonId: 3,
+      description: ['Бог правосудия.', 'Покровитель {@i паладинов}.'],
+    });
+
+    expect(getGodPayload(createGodForm(god), undefined)).toMatchObject({
+      description: ['Бог правосудия.', 'Покровитель {@i паладинов}.'],
+      alternativeDescription: undefined,
     });
   });
 });
@@ -369,7 +394,8 @@ describe('редактор предысторий', () => {
     equipments: ['Футляр для свитков', 'зимнее одеяло'],
     startGold: 5,
     languages: ['Общий'],
-    description: '<p>Текст</p>',
+    description: ['Текст {@b жирный}.'],
+    personalization: ['Отшельники живут уединённо.'],
     personalizationTables: [
       {
         type: 'TRAIT',
@@ -394,9 +420,12 @@ describe('редактор предысторий', () => {
     expect(form).toMatchObject({
       skills: ['MEDICINE', 'RELIGION'],
       otherSkills: 'Один навык на выбор',
-      equipments: 'Футляр для свитков, зимнее одеяло',
+      equipments: ['Футляр для свитков, зимнее одеяло'],
       languages: 'Общий',
       lifeStyle: undefined,
+      description: ['Текст {@b жирный}.'],
+      skillDescription: [],
+      personalization: ['Отшельники живут уединённо.'],
       personalizationTables: [
         { type: 'TRAIT', values: ['Спокойный', 'Говорливый'] },
       ],
@@ -412,6 +441,9 @@ describe('редактор предысторий', () => {
     expect(getBackgroundPayload(form, undefined)).toMatchObject({
       languages: ['Общий', 'Дварфийский'],
       lifeStyle: undefined,
+      description: ['Текст {@b жирный}.'],
+      skillDescription: undefined,
+      personalization: ['Отшельники живут уединённо.'],
       personalizationTables: [{ type: 'IDEAL', values: ['Честь'] }],
     });
   });
@@ -439,6 +471,7 @@ describe('редактор оружия', () => {
     minDistance: 150,
     maxDistance: 600,
     propertyIds: [1, 3, 6],
+    description: ['Лук {@roll 1к8}.'],
     source: { shortName: 'PHB' },
   };
 
@@ -456,6 +489,7 @@ describe('редактор оружия', () => {
       properties: [1, 3, 6],
       cost: 50,
       ammo: undefined,
+      description: ['Лук {@roll 1к8}.'],
       special: undefined,
     });
   });
@@ -512,12 +546,14 @@ describe('редактор снаряжения', () => {
       cost: 1,
       currency: 'GM',
       weight: 10,
+      description: null,
     });
 
     expect(getItemPayload(createItemForm(item), undefined)).toMatchObject({
       categories: ['ADVENTURING_GEAR'],
       currency: 'GM',
       altName: undefined,
+      description: undefined,
     });
   });
 });
@@ -531,7 +567,7 @@ describe('редактор магических предметов', () => {
       typeRaw: 'SUBJECT',
       customization: true,
       costRaw: 3500,
-      description: '<p>Текст</p>',
+      description: ['Текст {@b жирный}'],
     });
 
     expect(
@@ -542,6 +578,7 @@ describe('редактор магических предметов', () => {
       cost: 3500,
       curse: false,
       special: undefined,
+      description: ['Текст {@b жирный}'],
     });
   });
 });
@@ -563,12 +600,12 @@ describe('редактор рас', () => {
         id: 12,
         name: 'Заговор',
         englishName: null,
-        description: '<p>Текст</p>',
+        description: ['Знает заговор {@spell Свет | url:/spells/light}.'],
         feature: false,
         replaceFeatureId: null,
       },
     ],
-    description: '<p>Описание</p>',
+    description: ['Описание'],
     source: { shortName: 'PHB' },
   });
 
@@ -587,8 +624,14 @@ describe('редактор рас', () => {
       fly: undefined,
       darkvision: 60,
       origin: undefined,
+      description: ['Описание'],
       features: [
-        { id: 12, englishName: undefined, replaceFeatureId: undefined },
+        {
+          id: 12,
+          englishName: undefined,
+          description: ['Знает заговор {@spell Свет | url:/spells/light}.'],
+          replaceFeatureId: undefined,
+        },
       ],
     });
   });
@@ -630,12 +673,18 @@ describe('редактор классов', () => {
         id: 7,
         name: 'Второе дыхание',
         level: 1,
-        description: '<p>Текст</p>',
+        description: ['Бонусным действием восстановите {@roll 1к10} хитов.'],
         optional: false,
       },
     ],
     tableColumns: [{ id: 5, name: 'Атаки', levels: [1, 1, null] }],
-    traits: { diceHp: 10, skillAvailableCount: 2, armor: '<p>Все</p>' },
+    description: ['Воин — мастер оружия.'],
+    traits: {
+      diceHp: 10,
+      skillAvailableCount: 2,
+      armor: ['Все доспехи, {@b щиты}'],
+      equipment: ['{@b Кольчуга}'],
+    },
     source: { shortName: 'PHB' },
   });
 
@@ -643,7 +692,7 @@ describe('редактор классов', () => {
     expect(heroClass).toMatchObject({
       diceHp: 10,
       skillAvailableCount: 2,
-      armor: '<p>Все</p>',
+      armor: ['Все доспехи, {@b щиты}'],
       optionType: 'FIGHTING_STYLE',
     });
   });
@@ -658,7 +707,16 @@ describe('редактор классов', () => {
     expect(payload).toMatchObject({
       spellAbility: undefined,
       weapon: undefined,
-      classTraits: [{ id: 7, suffix: undefined, child: undefined }],
+      description: ['Воин — мастер оружия.'],
+      equipment: ['{@b Кольчуга}'],
+      classTraits: [
+        {
+          id: 7,
+          suffix: undefined,
+          child: undefined,
+          description: ['Бонусным действием восстановите {@roll 1к10} хитов.'],
+        },
+      ],
     });
 
     expect(payload.tableColumns).toEqual([
@@ -666,6 +724,12 @@ describe('редактор классов', () => {
         levels: [1, 1, ...Array.from({ length: 18 }, () => 0)],
       }),
     ]);
+  });
+
+  it('не отправляет пустое снаряжение', () => {
+    const form = { ...createClassForm(heroClass), equipment: [] };
+
+    expect(getClassPayload(form, undefined).equipment).toBeUndefined();
   });
 
   it('не принимает значение ячейки больше 127', () => {
@@ -687,7 +751,7 @@ describe('редактор архетипов', () => {
     id: 9,
     name: 'Чемпион',
     englishName: 'Champion',
-    description: '<p>Описание</p>',
+    description: ['Описание'],
     level: 3,
     spellcasterType: null,
     optionType: 'MANEUVER',
@@ -697,7 +761,7 @@ describe('редактор архетипов', () => {
         id: 1,
         name: 'Крит',
         level: 3,
-        description: '<p>Т</p>',
+        description: ['Критическое попадание на {@b 19–20}.'],
         optional: false,
       },
     ],
@@ -728,7 +792,7 @@ describe('редактор ширмы', () => {
     id: 9,
     name: { rus: 'Укрытие', eng: 'Cover' },
     category: 'Бой',
-    description: '<p>Текст</p>',
+    description: ['Текст'],
     icon: 'shield',
     order: 0,
     url: '/screens/cover',
@@ -750,6 +814,16 @@ describe('редактор ширмы', () => {
       source: undefined,
       parentId: 2,
     });
+  });
+
+  it('пустое описание не отправляет', () => {
+    const form = { ...createScreenForm(screen), description: [] };
+
+    expect(getScreenPayload(form, screen, '').description).toBeUndefined();
+
+    expect(
+      getScreenPayload(createScreenForm(screen), screen, '').description,
+    ).toEqual(['Текст']);
   });
 
   it('отменяет правку на страницу раздела', () => {
@@ -799,12 +873,11 @@ describe('редактор существ', () => {
       {
         name: 'Скимитар',
         englishName: 'Scimitar',
-        value: 'Атака',
-        markdown: true,
+        value: ['Атака {@roll к20 + 4 | text:+4 | label:Атака}.'],
         sharedUsageCount: 3,
       },
     ],
-    legendary: { list: [{ name: 'Рывок', value: '<p>Бег</p>' }], count: 3 },
+    legendary: { list: [{ name: 'Рывок', value: ['Бег.'] }], count: 3 },
     tags: [{ name: 'Гоблин', description: '' }],
     environment: ['лес', 'холмы'],
     source: { shortName: 'MM' },
@@ -879,14 +952,16 @@ describe('редактор существ', () => {
       actions: [
         {
           name: { rus: 'Скимитар', eng: 'Scimitar' },
-          description: 'Атака',
-          markdown: true,
+          description: ['Атака {@roll к20 + 4 | text:+4 | label:Атака}.'],
         },
       ],
       legendary: {
-        list: [{ name: 'Рывок', value: '<p>Бег</p>' }],
+        list: [{ name: 'Рывок', value: ['Бег.'] }],
         count: 3,
+        description: undefined,
       },
+      description: undefined,
+      reaction: undefined,
       tags: ['Гоблин'],
       npc: false,
       source: 'MM',
@@ -901,13 +976,6 @@ describe('редактор существ', () => {
       armorClass: 10,
       speed: 30,
       passivePerception: '10',
-    });
-  });
-
-  it('проверяет разметку описаний блоков', () => {
-    expect(getCreatureHtmlFields(createCreatureForm(creature))).toMatchObject({
-      'actions.0.description': 'Атака',
-      'legendary.0.description': '<p>Бег</p>',
     });
   });
 });
@@ -930,7 +998,7 @@ describe('источники', () => {
       altName: '',
       type: 'OFFICAL',
       year: 2014,
-      description: '',
+      description: [],
       cover: null,
     });
   });
@@ -958,6 +1026,17 @@ describe('источники', () => {
       year: undefined,
       description: undefined,
     });
+  });
+
+  it('отправляет описание блоками разметки', () => {
+    const form = bookFormSchema.parse({
+      ...createBookForm(book),
+      description: ['Основная книга для игроков. См. {@b главу 1}.'],
+    });
+
+    expect(getBookPayload(form).description).toEqual([
+      'Основная книга для игроков. См. {@b главу 1}.',
+    ]);
   });
 
   it('требует тип источника', () => {

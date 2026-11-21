@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { SpellDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
   import { SectionStat, SectionStatGrid } from '~section/stat-grid';
@@ -24,6 +25,8 @@
   const typeLabel = computed(() => getSpellTypeLabel(spell));
 
   const components = computed(() => getSpellComponentLabels(spell.components));
+
+  const hasUpper = computed(() => hasContentDescription(spell.upper));
 
   const references = computed(() =>
     [
@@ -90,15 +93,16 @@
 
     <ContentRender
       v-if="spell.description"
-      :html="spell.description"
+      :content="spell.description"
     />
 
-    <p v-if="spell.upper">
+    <p v-if="hasUpper">
       <b class="mr-1">{{ SPELL_TEXT.upper }}</b>
 
       <ContentRender
-        :html="spell.upper"
+        :content="spell.upper"
         tag="span"
+        inline
       />
     </p>
 

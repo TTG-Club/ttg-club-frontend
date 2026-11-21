@@ -15,14 +15,18 @@ export interface WorkshopBackground {
   skills: Array<string>;
   /** Навыки, которых нет в списке: «один на ваш выбор». */
   otherSkills: string;
-  toolOwnership: string;
-  /** Снаряжение через запятую. */
-  equipments: string;
+  /** Блоки разметки core-api. */
+  toolOwnership: Array<string>;
+  /** Снаряжение: блоки разметки core-api, перечисление через запятую. */
+  equipments: Array<string>;
   startGold: number | null;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   skillName: string;
-  skillDescription: string;
-  personalization: string;
+  /** Блоки разметки core-api. */
+  skillDescription: Array<string>;
+  /** Блоки разметки core-api. */
+  personalization: Array<string>;
   personalizationTables: Array<PersonalizationTable>;
   language: string;
   /** Языки через запятую. */

@@ -1,12 +1,14 @@
 <script setup lang="ts">
   import type { BackgroundDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { RollTable } from '~content/roll-table';
 
   import {
     BACKGROUND_TEXT,
     CHARACTER_LIST_SEPARATOR,
+    getBackgroundEquipment,
     getBackgroundLanguages,
     hasPersonalization,
   } from '../model';
@@ -25,9 +27,7 @@
 
   const languages = computed(() => getBackgroundLanguages(background));
 
-  const equipment = computed(() =>
-    background.equipments?.join(CHARACTER_LIST_SEPARATOR),
-  );
+  const equipment = computed(() => getBackgroundEquipment(background));
 
   const startGold = computed(() =>
     background.startGold == null
@@ -36,7 +36,10 @@
   );
 
   const hasSkill = computed(() =>
-    Boolean(background.skillName || background.skillDescription),
+    Boolean(
+      background.skillName
+      || hasContentDescription(background.skillDescription),
+    ),
   );
 
   const skillTitle = computed(
@@ -55,12 +58,13 @@
         <b>{{ BACKGROUND_TEXT.skills }}</b> {{ skills }}
       </li>
 
-      <li v-if="background.toolOwnership">
+      <li v-if="hasContentDescription(background.toolOwnership)">
         <b class="mr-1">{{ BACKGROUND_TEXT.tools }}</b>
 
         <ContentRender
-          :html="background.toolOwnership"
+          :content="background.toolOwnership"
           tag="span"
+          inline
         />
       </li>
 
@@ -72,8 +76,9 @@
         <b class="mr-1">{{ BACKGROUND_TEXT.equipment }}</b>
 
         <ContentRender
-          :html="equipment"
+          :content="equipment"
           tag="span"
+          inline
         />
       </li>
 
@@ -83,12 +88,12 @@
     </ul>
 
     <div class="content-render">
-      <template v-if="background.description">
+      <template v-if="hasContentDescription(background.description)">
         <h4 class="header_separator">
           <span>{{ BACKGROUND_TEXT.description }}</span>
         </h4>
 
-        <ContentRender :html="background.description" />
+        <ContentRender :content="background.description" />
       </template>
 
       <template v-if="hasSkill">
@@ -98,7 +103,7 @@
 
         <ContentRender
           v-if="background.skillDescription"
-          :html="background.skillDescription"
+          :content="background.skillDescription"
         />
       </template>
 
@@ -109,7 +114,7 @@
 
         <ContentRender
           v-if="background.personalization"
-          :html="background.personalization"
+          :content="background.personalization"
         />
 
         <div

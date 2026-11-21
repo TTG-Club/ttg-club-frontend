@@ -16,7 +16,7 @@ export function createRaceFeature(): RaceFeature {
   return {
     name: '',
     englishName: '',
-    description: '',
+    description: [],
     feature: true,
     replaceFeatureId: null,
   };
@@ -46,8 +46,11 @@ export function createRaceForm(race?: WorkshopRace): RaceForm {
     icon: race?.icon ?? '',
     page: race?.page ?? null,
     abilities: (race?.abilities ?? []).map((ability) => ({ ...ability })),
-    features: (race?.features ?? []).map((feature) => ({ ...feature })),
-    description: race?.description ?? '',
+    features: (race?.features ?? []).map((feature) => ({
+      ...feature,
+      description: [...feature.description],
+    })),
+    description: [...(race?.description ?? [])],
   };
 }
 
@@ -83,28 +86,10 @@ export function getRacePayload(
       id: feature.id,
       name: feature.name.trim(),
       englishName: toOptionalText(feature.englishName),
-      description: feature.description.trim(),
+      description: [...feature.description],
       feature: feature.feature,
       replaceFeatureId: toOptionalNumber(feature.replaceFeatureId),
     })),
-  };
-}
-
-/**
- * HTML-поля формы расы с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getRaceHtmlFields(
-  form: Partial<RaceForm>,
-): Record<string, string> {
-  return {
-    description: form.description ?? '',
-    ...Object.fromEntries(
-      (form.features ?? []).map((feature, index) => [
-        `features.${index}.description`,
-        feature.description,
-      ]),
-    ),
   };
 }
 

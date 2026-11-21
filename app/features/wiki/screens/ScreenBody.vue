@@ -32,7 +32,7 @@
 
     <ContentRender
       v-if="screen.description"
-      :html="screen.description"
+      :content="screen.description"
     />
   </div>
 </template>

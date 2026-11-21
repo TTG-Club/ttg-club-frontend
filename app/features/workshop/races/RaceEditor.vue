@@ -22,12 +22,10 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
   import { WorkshopImages } from '../images';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createRaceForm,
-    getHtmlFieldErrors,
-    getRaceHtmlFields,
     getRacePayload,
     getRacePreviewPath,
     getWorkshopSectionRoute,
@@ -39,7 +37,6 @@
     RACE_TYPE_OPTIONS,
     raceFormSchema,
     RACES_WORKSHOP_KEY,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
@@ -169,14 +166,6 @@
     await showPreview(getRacePayload(data, source.value));
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<RaceForm>): Array<FormError> {
-    return getHtmlFieldErrors(getRaceHtmlFields(form));
-  }
-
   async function submit(event: FormSubmitEvent<RaceForm>): Promise<void> {
     const saved = await save(getRacePayload(event.data, source.value));
 
@@ -191,7 +180,6 @@
     ref="form"
     :schema="raceFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
     @error="handleError"
@@ -319,10 +307,7 @@
           class="col-span-full"
           required
         >
-          <WorkshopHtmlEditor
-            v-model="state.description"
-            :rows="WORKSHOP_DESCRIPTION_ROWS"
-          />
+          <MarkupEditor v-model="state.description" />
         </UFormField>
 
         <div class="col-span-full">

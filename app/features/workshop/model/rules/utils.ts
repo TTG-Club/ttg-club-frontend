@@ -14,7 +14,7 @@ export function createRuleForm(rule: WorkshopRule): RuleForm {
     altName: rule.altName,
     type: rule.type,
     page: rule.page,
-    description: rule.description,
+    description: [...rule.description],
   };
 }
 
