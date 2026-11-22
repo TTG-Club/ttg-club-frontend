@@ -61,6 +61,14 @@
 
   const groupClass = computed(() => SECTION_GRID_CLASS[view][columns.value]);
 
+  // С подгруппами группа — крупный заголовок, а подгруппы — заголовки
+  // поменьше под ним; без подгрупп — тонкий разделитель
+  const groupTitleClass = computed(() =>
+    getSubgroup
+      ? 'pt-4 text-2xl font-semibold text-highlighted'
+      : 'flex items-center gap-3 pt-2 text-sm font-semibold text-muted before:h-px before:flex-auto before:bg-(--ui-border) after:h-px after:flex-auto after:bg-(--ui-border)',
+  );
+
   const isFirstLoading = computed(() => status === 'pending' && !items.length);
 
   const isError = computed(() => status === 'error');
@@ -124,7 +132,7 @@
     >
       <h2
         v-if="group.name"
-        class="flex items-center gap-3 pt-2 text-sm font-semibold text-muted before:h-px before:flex-auto before:bg-(--ui-border) after:h-px after:flex-auto after:bg-(--ui-border)"
+        :class="groupTitleClass"
       >
         {{ group.name }}
       </h2>
@@ -136,7 +144,7 @@
       >
         <h3
           v-if="subgroup.name"
-          class="px-1 text-xs font-semibold tracking-wide text-dimmed uppercase"
+          class="pt-2 text-lg font-medium text-highlighted"
         >
           {{ subgroup.name }}
         </h3>
