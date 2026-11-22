@@ -78,6 +78,29 @@ function sortScreens(screens: Array<ScreenLink>): Array<ScreenLink> {
 }
 
 /**
+ * Подгруппы внутри корневого раздела, как в старом SPA: сначала разделы вне
+ * подгрупп, затем подгруппы по названию. Порядок разделов внутри подгруппы
+ * и порядок корневых разделов остаются как у ручки.
+ * @param screens - разделы справочника
+ */
+export function sortScreenSubgroups(
+  screens: Array<ScreenLink>,
+): Array<ScreenLink> {
+  return sortBy(screens, [
+    (screen) => (screen.group ? 1 : 0),
+    (screen) => screen.group ?? '',
+  ]);
+}
+
+/**
+ * Подгруппа раздела внутри корневого раздела.
+ * @param screen - раздел ширмы
+ */
+export function getScreenSubgroup(screen: ScreenLink): string {
+  return screen.group ?? '';
+}
+
+/**
  * Группы вложенных разделов, как в старом SPA: сначала разделы вне групп,
  * затем группы по названию.
  * @param screens - вложенные разделы
