@@ -98,15 +98,16 @@ function splitTopLevelPipe(rest: string): { label: string; params: string[] } {
   return { label: label.trim(), params: params.map((param) => param.trim()) };
 }
 
+/** Параметр адреса: `url:<...>` или `url=<...>`. */
+function isUrlParam(param: string): boolean {
+  return param.startsWith('url:') || param.startsWith('url=');
+}
+
 /** Значение атрибута `url:<...>` (или `url=<...>`) из параметров, иначе пустая строка. */
 function extractUrl(params: string[]): string {
-  for (const param of params) {
-    if (param.startsWith('url:') || param.startsWith('url=')) {
-      return param.slice(4).trim();
-    }
-  }
+  const param = params.find(isUrlParam);
 
-  return '';
+  return param ? param.slice(4).trim() : '';
 }
 
 /** Результат классификации ссылочного маркера. */
@@ -114,6 +115,8 @@ export interface LinkMarker {
   kind: string;
   label: string;
   url: string;
+  /** Остальные параметры (`target:_blank` …) через ` | ` — сохраняются при правке. */
+  extra: string;
 }
 
 /**
@@ -154,5 +157,9 @@ export function classifyLinkMarker(raw: string): LinkMarker | null {
     return null;
   }
 
-  return { kind, label, url };
+  const extra = params
+    .filter((param) => param && !isUrlParam(param))
+    .join(' | ');
+
+  return { kind, label, url, extra };
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ScreenDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentLink, ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
 
@@ -31,7 +32,7 @@
     </SectionSourceBar>
 
     <ContentRender
-      v-if="screen.description"
+      v-if="hasContentDescription(screen.description)"
       :content="screen.description"
     />
   </div>

@@ -13,6 +13,9 @@ export const SECTION_LINK_KIND_ATTR = 'data-kind';
 /** DOM-атрибут адреса ссылки. */
 export const SECTION_LINK_URL_ATTR = 'data-url';
 
+/** DOM-атрибут остальных параметров ссылки (`target:_blank` …) — через ` | `. */
+export const SECTION_LINK_EXTRA_ATTR = 'data-extra';
+
 /** DOM-атрибут форматирующей марки; значение — тип маркера (`bold`, `italic`, …). */
 export const FORMAT_MARK_ATTR = 'data-ttg-mark';
 

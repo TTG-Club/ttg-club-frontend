@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { RuleDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
 
@@ -20,7 +21,7 @@
   <SectionSourceBar :left="category" />
 
   <ContentRender
-    v-if="rule.description"
+    v-if="hasContentDescription(rule.description)"
     :content="rule.description"
   />
 </template>

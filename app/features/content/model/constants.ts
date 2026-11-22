@@ -142,8 +142,11 @@ export const DETAIL_TOOLTIP_ATTRIBUTES: ReadonlySet<string> = new Set([
 /** Атрибуты со ссылкой, которые проверяются на безопасную схему. */
 export const URL_ATTRIBUTES: ReadonlySet<string> = new Set(['href', 'src']);
 
-/** Безопасные ссылки: относительные, якоря, http(s) и почта. */
-export const SAFE_URL = /^(?:\/(?!\/)|#|https?:\/\/|mailto:)/i;
+/**
+ * Безопасные ссылки: относительные (но не `//хост` и `/\хост` — браузер считает
+ * их адресом другого сайта), якоря, http(s) и почта.
+ */
+export const SAFE_URL = /^(?:\/(?![/\\])|#|https?:\/\/|mailto:)/i;
 
 /** Префиксы привязок Vue, из которых берётся только строковый литерал. */
 export const VUE_BINDING_PREFIXES = [':', 'v-bind:'] as const;

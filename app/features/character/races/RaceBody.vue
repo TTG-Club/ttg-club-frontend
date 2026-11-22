@@ -115,7 +115,7 @@
           :default-open="Boolean(skill.opened)"
         >
           <ContentRender
-            v-if="skill.description"
+            v-if="hasContentDescription(skill.description)"
             :content="skill.description"
           />
         </SectionCollapse>
@@ -149,7 +149,7 @@
 
             <div class="flex flex-col gap-4">
               <ContentRender
-                v-if="subrace.description"
+                v-if="hasContentDescription(subrace.description)"
                 :content="subrace.description"
               />
 
@@ -165,7 +165,7 @@
                 </h4>
 
                 <ContentRender
-                  v-if="feature.description"
+                  v-if="hasContentDescription(feature.description)"
                   :content="feature.description"
                 />
               </div>
@@ -182,7 +182,7 @@
     >
       <div class="content-render">
         <ContentRender
-          v-if="race.description"
+          v-if="hasContentDescription(race.description)"
           :content="race.description"
         />
       </div>

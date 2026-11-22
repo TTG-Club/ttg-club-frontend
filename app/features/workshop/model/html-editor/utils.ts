@@ -1,10 +1,4 @@
-import type {
-  DiceToken,
-  DiceVariant,
-  HtmlFieldError,
-  HtmlProblem,
-  OpenTag,
-} from './types';
+import type { DiceToken, DiceVariant, HtmlProblem, OpenTag } from './types';
 
 import {
   BLOCK_TAGS,
@@ -675,19 +669,4 @@ export function extractFormula(text: string): string {
   const match = DICE_FORMULA.exec(text);
 
   return match ? match[0].replace(/\s+/g, ' ').trim() : '';
-}
-
-/**
- * Ошибки разметки HTML-полей формы: бэкенд не примет такой текст, поэтому
- * форма не отправляется, пока они есть.
- * @param fields - имя поля и его разметка
- */
-export function getHtmlFieldErrors(
-  fields: Record<string, string>,
-): Array<HtmlFieldError> {
-  return Object.entries(fields).flatMap(([name, html]) => {
-    const message = getHtmlValidityMessage(findHtmlProblems(html));
-
-    return message ? [{ name, message }] : [];
-  });
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ArmorDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
   import { SectionStat, SectionStatGrid } from '~section/stat-grid';
@@ -51,7 +52,7 @@
     </SectionStatGrid>
 
     <ContentRender
-      v-if="armor.description"
+      v-if="hasContentDescription(armor.description)"
       :content="armor.description"
     />
   </div>

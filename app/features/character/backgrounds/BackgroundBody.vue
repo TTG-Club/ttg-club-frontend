@@ -102,7 +102,7 @@
         </h4>
 
         <ContentRender
-          v-if="background.skillDescription"
+          v-if="hasContentDescription(background.skillDescription)"
           :content="background.skillDescription"
         />
       </template>
@@ -113,7 +113,7 @@
         </h4>
 
         <ContentRender
-          v-if="background.personalization"
+          v-if="hasContentDescription(background.personalization)"
           :content="background.personalization"
         />
 
