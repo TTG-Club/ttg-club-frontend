@@ -4,7 +4,7 @@
   import type { SectionListView } from '../model';
 
   import {
-    groupItems,
+    groupSectionItems,
     INFINITE_SCROLL_DISTANCE,
     SECTION_GRID_CLASS,
     SECTION_ICON,
@@ -20,6 +20,7 @@
     getKey,
     getGroup = undefined,
     getGroupOrder = undefined,
+    getSubgroup = undefined,
     status,
     isEnd = true,
     isLoadingMore = false,
@@ -31,6 +32,8 @@
     getGroup?: (item: T) => string | Array<string>;
     /** Порядок группы записи; без него группы идут по первой записи. */
     getGroupOrder?: (item: T, group: string) => number;
+    /** Подпись подгруппы записи внутри группы; пустая — без подзаголовка. */
+    getSubgroup?: (item: T) => string;
     status: AsyncDataRequestStatus;
     isEnd?: boolean;
     isLoadingMore?: boolean;
@@ -48,9 +51,7 @@
   }>();
 
   const groups = computed(() =>
-    getGroup
-      ? groupItems(items, getGroup, getGroupOrder)
-      : [{ name: '', items }],
+    groupSectionItems(items, getGroup, getGroupOrder, getSubgroup),
   );
 
   // Колонки считаются от ширины самого списка, а не экрана: в широком
@@ -128,13 +129,26 @@
         {{ group.name }}
       </h2>
 
-      <div :class="groupClass">
-        <template
-          v-for="item in group.items"
-          :key="getKey(item)"
+      <div
+        v-for="subgroup in group.subgroups"
+        :key="subgroup.name"
+        class="flex flex-col gap-2"
+      >
+        <h3
+          v-if="subgroup.name"
+          class="px-1 text-xs font-semibold tracking-wide text-dimmed uppercase"
         >
-          <slot :item="item" />
-        </template>
+          {{ subgroup.name }}
+        </h3>
+
+        <div :class="groupClass">
+          <template
+            v-for="item in subgroup.items"
+            :key="getKey(item)"
+          >
+            <slot :item="item" />
+          </template>
+        </div>
       </div>
     </section>
 
