@@ -16,13 +16,13 @@ import {
   findSkillByName,
   formatModifier,
   getAbilityModifier,
-  getArmorClass,
   getD20Formula,
   getDamageFormula,
   getHitDiceTotals,
   getPactMagic,
   getProficiencyBonus,
   getRaceAbilityBonuses,
+  getSheetStats,
   getSkillBonus,
   getSpellSlotsMax,
   getSuggestedMaxHitPoints,
@@ -193,9 +193,20 @@ describe('лист персонажа: расчёты', () => {
       inventory: [armor, shield],
     });
 
-    expect(getArmorClass(document)).toBe(20);
-    expect(getArmorClass({ ...document, inventory: [] })).toBe(14);
-    expect(getArmorClass({ ...document, armorClassOverride: 12 })).toBe(12);
+    const armorClass = (patch: Partial<SheetDocument>): number =>
+      getSheetStats({ ...document, ...patch }).armorClass;
+
+    expect(armorClass({})).toBe(20);
+    expect(armorClass({ inventory: [] })).toBe(14);
+    // Своё значение — основа: к ней идёт Ловкость, если она выбрана
+    expect(armorClass({ armorClassOverride: 12 })).toBe(16);
+
+    expect(
+      armorClass({ armorClassOverride: 12, armorClassAbilities: [] }),
+    ).toBe(12);
+
+    // Свой предел Ловкости режет и средний доспех
+    expect(armorClass({ armorClassDexLimit: 1 })).toBe(19);
   });
 
   it('фехтовальное оружие берёт лучшую из Силы и Ловкости', () => {

@@ -4,6 +4,7 @@ import type { AbilityScores, SheetDocument } from './schema';
 import type { CustomBonusContext } from './skills';
 import type {
   AbilityKey,
+  ArmorClassBreakdown,
   EffectCarrier,
   FormulaContext,
   SheetArmorState,
@@ -20,11 +21,13 @@ import {
   ABILITY_EFFECT_KEYS,
   ABILITY_KEYS,
   ABILITY_SCORE,
+  ARMOR_CLASS_TEXT,
   ARMOR_DEXTERITY_LIMIT,
   CONDITION_LABELS,
   DAMAGE_DEFENCE_KINDS,
   DAMAGE_TYPE_INFO,
   DARKVISION_SENSE,
+  DEFAULT_INITIATIVE_ABILITY,
   EFFECT_KEYS,
   OWN_SENSE_KEYS,
   SENSE_BY_EFFECT_KEY,
@@ -46,11 +49,16 @@ import {
   getSheetArmorState,
   isSavingThrowAutoFailed,
 } from './effects';
+import {
+  getAbilityBonusesTotal,
+  getProficiencyBonusBase,
+  getSavingThrowAbility,
+  getSpeedBonusesTotal,
+} from './settings';
 import { getCustomBonusesTotal, getSkillAbility } from './skills';
 import {
   getAbilityModifier,
   getCharacterLevel,
-  getProficiencyBonus,
   getSkillProficiency,
   getSkillProficiencyBonus,
 } from './utils';
@@ -96,9 +104,9 @@ function getSourceModifiers(
 }
 
 /**
- * Характеристики после эффектов `ability.<характеристика>`. Формулы в них
- * считаются от исходных модификаторов — иначе прибавка к Силе зависела бы от
- * самой себя.
+ * Характеристики со своими бонусами и после эффектов
+ * `ability.<характеристика>`. Формулы в них считаются от исходных
+ * модификаторов — иначе прибавка к Силе зависела бы от самой себя.
  * @param document - лист персонажа
  * @param carriers - носители эффектов
  * @param armor - состояние доспеха
@@ -115,7 +123,7 @@ export function getEffectiveAbilities(
       getEffectValue(
         carriers,
         `${EFFECT_KEYS.abilityPrefix}${ABILITY_EFFECT_KEYS[key]}`,
-        document.abilities[key],
+        document.abilities[key] + getAbilityBonusesTotal(document, key),
         armor,
         context,
       ),
@@ -133,38 +141,38 @@ export function getEffectiveAbilities(
   };
 }
 
+/** Надетый доспех с лучшим КД: основа, предел Ловкости и название. */
+interface BodyArmor {
+  value: number;
+  limit: number | null;
+  name: string;
+}
+
 /**
- * КД тела по надетой броне: лучшая броня с Ловкостью в пределах категории,
- * без брони — 10 + Ловкость.
+ * Лучший надетый доспех (не щит); null — доспеха нет.
  * @param document - лист персонажа
- * @param dexterity - модификатор Ловкости
  */
-function getBodyArmorClass(document: SheetDocument, dexterity: number): number {
-  const best = document.inventory
-    .flatMap((item) =>
-      item.isEquipped
-      && item.quantity > 0
-      && item.armor
-      && item.armor.category !== 'SHIELD'
-        ? [item.armor]
-        : [],
-    )
-    .reduce<{ value: number; limit: number | null } | null>((result, armor) => {
-      const value = armor.baseArmorClass + armor.bonus;
+function getBodyArmor(document: SheetDocument): BodyArmor | null {
+  return document.inventory.reduce<BodyArmor | null>((best, item) => {
+    if (
+      !item.isEquipped
+      || item.quantity <= 0
+      || !item.armor
+      || item.armor.category === 'SHIELD'
+    ) {
+      return best;
+    }
 
-      return !result || value > result.value
-        ? { value, limit: ARMOR_DEXTERITY_LIMIT[armor.category] }
-        : result;
-    }, null);
+    const value = item.armor.baseArmorClass + item.armor.bonus;
 
-  if (!best) {
-    return UNARMORED_ARMOR_CLASS + dexterity;
-  }
-
-  return (
-    best.value
-    + (best.limit === null ? dexterity : Math.min(dexterity, best.limit))
-  );
+    return !best || value > best.value
+      ? {
+          value,
+          limit: ARMOR_DEXTERITY_LIMIT[item.armor.category],
+          name: item.name,
+        }
+      : best;
+  }, null);
 }
 
 /**
@@ -182,26 +190,25 @@ function getShieldArmorClass(document: SheetDocument): number {
 }
 
 /**
- * КД с эффектами. Своё значение игрока — итог без расчёта. Иначе тело
- * считается по броне, затем эффекты задают его заменой («Защита без
- * доспехов» — `10+@mod.dex+@mod.con` при `self.armor === none`), сверху —
- * щиты, свой бонус, модификаторы источников и прибавки эффектов. Числовая
- * замена без условия («КД не ниже 16») применяется к итогу.
+ * КД с разбором по слагаемым. Своё значение игрока — основа, к которой
+ * прибавляются выбранные характеристики, свой бонус, модификаторы источников
+ * и эффекты. Иначе тело считается по доспеху (Ловкость — в пределах его
+ * категории или своего предела), затем эффекты задают его заменой («Защита
+ * без доспехов» — `10+@mod.dex+@mod.con` при `self.armor === none`), сверху —
+ * остальные выбранные характеристики, щиты, свой бонус, модификаторы
+ * источников и прибавки эффектов. Числовая замена без условия («КД не ниже
+ * 16») применяется к итогу.
  * @param document - лист с характеристиками после эффектов
  * @param carriers - носители эффектов
  * @param armor - состояние доспеха
  * @param context - значения листа для формул
  */
-export function getEffectiveArmorClass(
+export function getArmorClassBreakdown(
   document: SheetDocument,
   carriers: ReadonlyArray<EffectCarrier>,
   armor: SheetArmorState,
   context: FormulaContext,
-): { value: number; source: string | null } {
-  if (document.armorClassOverride !== null) {
-    return { value: document.armorClassOverride, source: null };
-  }
-
+): ArmorClassBreakdown {
   const changes = getCarriedChanges(carriers, EFFECT_KEYS.armorClass, armor);
 
   const isTotalChange = (entry: (typeof changes)[number]): boolean =>
@@ -209,35 +216,116 @@ export function getEffectiveArmorClass(
     && !entry.change.condition
     && /^-?\d+$/.test(entry.change.value.trim());
 
-  const body = applyCarriedChanges(
-    getBodyArmorClass(document, context.abilityModifiers.DEXTERITY),
-    changes.filter(
-      (entry) => entry.change.mode !== 'add' && !isTotalChange(entry),
-    ),
-    context,
+  const addChanges = changes.filter((entry) => entry.change.mode === 'add');
+  const totalChanges = changes.filter(isTotalChange);
+
+  const bodyChanges = changes.filter(
+    (entry) => entry.change.mode !== 'add' && !isTotalChange(entry),
   );
 
-  const modifierBonus = getSourceModifiers(document).reduce(
+  const modifiers = context.abilityModifiers;
+  const abilities = uniq(document.armorClassAbilities);
+  const ownBonus = document.armorClassBonus;
+
+  const featureBonus = getSourceModifiers(document).reduce(
     (sum, entry) => sum + (entry.modifiers.armorClassBonus ?? 0),
     0,
   );
 
-  const withAdds = applyCarriedChanges(
+  /**
+   * Итог поверх известной части: прибавки эффектов, затем замена итога.
+   * @param known - сумма известных слагаемых
+   */
+  const finish = (known: number): { value: number; source: string | null } => {
+    const withAdds = applyCarriedChanges(known, addChanges, context);
+    const total = applyCarriedChanges(withAdds.value, totalChanges, context);
+
+    return { value: total.value, source: total.replacedBy };
+  };
+
+  /**
+   * Модификаторы характеристик, которые идут в КД целиком.
+   * @param keys - характеристики
+   */
+  const toExtras = (
+    keys: ReadonlyArray<AbilityKey>,
+  ): ArmorClassBreakdown['extraAbilities'] =>
+    keys.map((ability) => ({ ability, modifier: modifiers[ability] }));
+
+  if (document.armorClassOverride !== null) {
+    const extraAbilities = toExtras(abilities);
+
+    const known =
+      document.armorClassOverride
+      + ownBonus
+      + featureBonus
+      + extraAbilities.reduce((sum, extra) => sum + extra.modifier, 0);
+
+    const total = finish(known);
+
+    return {
+      value: total.value,
+      isCustom: true,
+      bodyLabel: ARMOR_CLASS_TEXT.valueTitle,
+      bodyValue: document.armorClassOverride,
+      dexterity: null,
+      shield: 0,
+      ownBonus,
+      featureBonus,
+      effectBonus: total.value - known,
+      extraAbilities,
+      source: total.source,
+    };
+  }
+
+  const bodyArmor = getBodyArmor(document);
+  const hasDexterity = abilities.includes('DEXTERITY');
+  const limit = document.armorClassDexLimit ?? bodyArmor?.limit ?? null;
+
+  const dexterityPart = hasDexterity
+    ? Math.min(modifiers.DEXTERITY, limit ?? modifiers.DEXTERITY)
+    : 0;
+
+  const body = applyCarriedChanges(
+    (bodyArmor?.value ?? UNARMORED_ARMOR_CLASS) + dexterityPart,
+    bodyChanges,
+    context,
+  );
+
+  const extraAbilities = toExtras(
+    abilities.filter((ability) => ability !== 'DEXTERITY'),
+  );
+
+  const shield = getShieldArmorClass(document);
+
+  const known =
     body.value
-      + getShieldArmorClass(document)
-      + document.armorClassBonus
-      + modifierBonus,
-    changes.filter((entry) => entry.change.mode === 'add'),
-    context,
-  );
+    + shield
+    + ownBonus
+    + featureBonus
+    + extraAbilities.reduce((sum, extra) => sum + extra.modifier, 0);
 
-  const total = applyCarriedChanges(
-    withAdds.value,
-    changes.filter(isTotalChange),
-    context,
-  );
+  const total = finish(known);
 
-  return { value: total.value, source: total.replacedBy ?? body.replacedBy };
+  return {
+    value: total.value,
+    isCustom: false,
+    bodyLabel: body.replacedBy ?? bodyArmor?.name ?? ARMOR_CLASS_TEXT.unarmored,
+    bodyValue: body.value,
+    dexterity:
+      hasDexterity && !body.replacedBy
+        ? {
+            value: dexterityPart,
+            isCapped: dexterityPart < modifiers.DEXTERITY,
+          }
+        : null,
+    shield,
+    ownBonus,
+    featureBonus,
+    effectBonus: total.value - known,
+    extraAbilities,
+    source: total.source ?? body.replacedBy,
+  };
 }
 
 /**
@@ -312,6 +400,7 @@ function getEffectiveSpeeds(
 
   const walkBase =
     document.speed
+    + getSpeedBonusesTotal(document, 'walk')
     + modifiers.reduce((sum, speed) => sum + (speed?.walkBonus ?? 0), 0);
 
   const walk = getEffectValue(
@@ -340,7 +429,8 @@ function getEffectiveSpeeds(
     return getEffectValue(
       carriers,
       `${EFFECT_KEYS.movementPrefix}${key}`,
-      Math.max(document.speeds[key], fromModifiers),
+      Math.max(document.speeds[key], fromModifiers)
+        + getSpeedBonusesTotal(document, key),
       armor,
       context,
     );
@@ -470,7 +560,7 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   const proficiencyBonus = getEffectValue(
     carriers,
     EFFECT_KEYS.proficiencyBonus,
-    getProficiencyBonus(level),
+    getProficiencyBonusBase(document, abilities),
     armor,
     baseContext,
   );
@@ -498,7 +588,16 @@ export function getSheetStats(document: SheetDocument): SheetStats {
       const effectKey = ABILITY_EFFECT_KEYS[key];
 
       const base =
-        mod(key) + (document.savingThrows.includes(key) ? proficiencyBonus : 0);
+        mod(getSavingThrowAbility(document, key))
+        + (document.savingThrows.includes(key) ? proficiencyBonus : 0)
+        + getCustomBonusesTotal(
+          document.savingThrowBonuses[key] ?? [],
+          bonusContext,
+        )
+        + getCustomBonusesTotal(
+          document.savingThrowCommonBonuses,
+          bonusContext,
+        );
 
       return [
         key,
@@ -540,8 +639,10 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   );
 
   const initiativeBase =
-    mod('DEXTERITY')
+    (document.initiativeBase
+      ?? mod(document.initiativeAbility ?? DEFAULT_INITIATIVE_ABILITY))
     + document.initiativeBonus
+    + getCustomBonusesTotal(document.initiativeBonuses, bonusContext)
     + modifiers.reduce(
       (sum, entry) =>
         sum
@@ -570,7 +671,7 @@ export function getSheetStats(document: SheetDocument): SheetStats {
 
   const spellAbility = document.spellcastingAbility;
 
-  const armorClass = getEffectiveArmorClass(
+  const armorClass = getArmorClassBreakdown(
     effective,
     carriers,
     armor,
@@ -581,8 +682,10 @@ export function getSheetStats(document: SheetDocument): SheetStats {
     level,
     proficiencyBonus,
     abilities,
+    bonusContext,
     armorClass: armorClass.value,
     armorClassSource: armorClass.source,
+    armorClassBreakdown: armorClass,
     initiative: getEffectValue(
       carriers,
       EFFECT_KEYS.initiative,

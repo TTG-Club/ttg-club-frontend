@@ -9,15 +9,19 @@ import {
   ABILITY_KEYS,
   ABILITY_SCORE,
   ARMOR_CATEGORIES,
+  ARMOR_DEX_LIMIT_MAX,
   CHARACTER_LEVEL,
   CUSTOM_BONUS_KINDS,
   DEATH_SAVES_MAX,
+  DEFAULT_ARMOR_CLASS_ABILITIES,
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
   SHEET_SCHEMA_VERSION,
   SHEET_SIZE_KEYS,
   SKILL_KEYS,
   SOURCE_KINDS,
+  SPEED_KEYS,
+  SPEED_UNITS,
   SPELL_LEVEL,
   SPELL_SLOT_LEVELS,
 } from './constants';
@@ -464,6 +468,53 @@ export const sheetDocumentSchema = z.object({
     .catch({}),
   customSkills: lenientList(customSkillSchema),
   groupSkillsByAbility: z.boolean().catch(false),
+  /** Свои бонусы к значениям характеристик. */
+  abilityBonuses: z
+    .partialRecord(abilityKeySchema, lenientList(customBonusSchema))
+    .catch({}),
+  /** Характеристики спасбросков, подменённые игроком. */
+  savingThrowAbilities: z
+    .partialRecord(abilityKeySchema, abilityKeySchema)
+    .catch({}),
+  /** Свои бонусы отдельных спасбросков. */
+  savingThrowBonuses: z
+    .partialRecord(abilityKeySchema, lenientList(customBonusSchema))
+    .catch({}),
+  /** Свои бонусы ко всем спасброскам сразу (плащ защиты, аура). */
+  savingThrowCommonBonuses: lenientList(customBonusSchema),
+  /**
+   * Характеристики в КД: Ловкость — по правилу доспеха, остальные целиком.
+   * У листов до настройки — одна Ловкость, как и считалось раньше.
+   */
+  armorClassAbilities: z
+    .array(abilityKeySchema)
+    .catch([...DEFAULT_ARMOR_CLASS_ABILITIES]),
+  /** Свой предел Ловкости в КД; null — по правилу доспеха. */
+  armorClassDexLimit: integerSchema
+    .min(0)
+    .max(ARMOR_DEX_LIMIT_MAX)
+    .nullable()
+    .catch(null),
+  /** Свои бонусы к скоростям по видам передвижения, фт. */
+  speedBonuses: z
+    .partialRecord(z.enum(SPEED_KEYS), lenientList(customBonusSchema))
+    .catch({}),
+  /** Единицы, в которых лист показывает скорости и чувства. */
+  speedUnit: z.enum(SPEED_UNITS).catch('feet'),
+  /** Полёт с парением. */
+  speedHover: z.boolean().catch(false),
+  /** Базовая характеристика атаки обычным оружием; null — Сила. */
+  weaponAttackAbility: abilityKeySchema.nullable().catch(null),
+  /** Своя основа бонуса мастерства; null — по уровню. */
+  proficiencyBase: integerSchema.nullable().catch(null),
+  /** Свои бонусы к бонусу мастерства. */
+  proficiencyBonuses: lenientList(customBonusSchema),
+  /** Характеристика инициативы; null — Ловкость. */
+  initiativeAbility: abilityKeySchema.nullable().catch(null),
+  /** Своя основа инициативы вместо модификатора; null — модификатор. */
+  initiativeBase: integerSchema.nullable().catch(null),
+  /** Свои бонусы инициативы. */
+  initiativeBonuses: lenientList(customBonusSchema),
 });
 
 export type SheetDocument = z.infer<typeof sheetDocumentSchema>;

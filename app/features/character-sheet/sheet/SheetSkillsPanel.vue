@@ -2,7 +2,6 @@
   import type {
     AbilityKey,
     CustomBonus,
-    CustomBonusContext,
     SkillKey,
     SkillProficiency,
   } from '../model';
@@ -17,7 +16,6 @@
     ABILITY_LABELS,
     describeSkillBonus,
     formatModifier,
-    getAbilityModifier,
     getCustomBonusParts,
     getNextSkillProficiency,
     getSkillAbility,
@@ -113,23 +111,7 @@
     ].sort((left, right) => left.name.localeCompare(right.name)),
   );
 
-  const bonusContext = computed<CustomBonusContext>(() => {
-    const { abilities } = stats.value;
-
-    return {
-      abilityModifiers: {
-        STRENGTH: getAbilityModifier(abilities.STRENGTH),
-        DEXTERITY: getAbilityModifier(abilities.DEXTERITY),
-        CONSTITUTION: getAbilityModifier(abilities.CONSTITUTION),
-        INTELLIGENCE: getAbilityModifier(abilities.INTELLIGENCE),
-        WISDOM: getAbilityModifier(abilities.WISDOM),
-        CHARISMA: getAbilityModifier(abilities.CHARISMA),
-      },
-      proficiencyBonus: stats.value.proficiencyBonus,
-      level: stats.value.level,
-      classes: document.value.classes,
-    };
-  });
+  const bonusContext = computed(() => stats.value.bonusContext);
 
   /**
    * Разбор итога навыка; пусто — итог сводится к характеристике и владению.

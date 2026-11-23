@@ -6,6 +6,7 @@
     useSheetRoll,
     useSheetStats,
   } from '../composables';
+  import { SheetSavingThrowsSettingsModal } from '../dialogs';
   import {
     ABILITY_EFFECT_KEYS,
     ABILITY_KEYS,
@@ -13,17 +14,33 @@
     EFFECTS_TEXT,
     formatModifier,
     PROFICIENCY_DOT_ICONS,
+    SAVING_THROW_SETTINGS_TEXT,
     SHEET_BODY_LABELS,
     SHEET_LABELS,
+    SHEET_TITLE_ACTION_CLASS,
+    SHEET_TITLE_ACTION_REVEAL_CLASS,
   } from '../model';
   import SheetPanel from './SheetPanel.vue';
 
   /**
    * Спасброски сеткой в две колонки: точка владения (клик — переключить) и
    * бонус с эффектами (клик — бросок с преимуществом или помехой от
-   * эффектов). Автопровал от состояния подписан.
+   * эффектов). Автопровал от состояния подписан. Шестерёнка открывает
+   * настройку: подмена характеристики и свои бонусы.
    */
-  const { document, update } = useCharacterSheet();
+  const { document, update, editControlClass, ensureEditable } =
+    useCharacterSheet();
+
+  const isSettingsOpen = ref(false);
+
+  function openSettings(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    isSettingsOpen.value = true;
+  }
+
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
@@ -53,6 +70,10 @@
    * @param key - характеристика
    */
   function toggle(key: AbilityKey): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     update((current) => ({
       ...current,
       savingThrows: current.savingThrows.includes(key)
@@ -79,6 +100,24 @@
 
 <template>
   <SheetPanel :title="SHEET_BODY_LABELS.savingThrows">
+    <template #title-actions>
+      <button
+        type="button"
+        :class="[
+          SHEET_TITLE_ACTION_CLASS,
+          SHEET_TITLE_ACTION_REVEAL_CLASS,
+          editControlClass,
+        ]"
+        :aria-label="SAVING_THROW_SETTINGS_TEXT.open"
+        @click.left.exact.prevent="openSettings"
+      >
+        <UIcon
+          name="tabler:settings"
+          class="size-3.5"
+        />
+      </button>
+    </template>
+
     <div class="grid grid-flow-col grid-cols-2 grid-rows-3 gap-2">
       <div
         v-for="row in rows"
@@ -115,5 +154,7 @@
         </button>
       </div>
     </div>
+
+    <SheetSavingThrowsSettingsModal v-model:open="isSettingsOpen" />
   </SheetPanel>
 </template>

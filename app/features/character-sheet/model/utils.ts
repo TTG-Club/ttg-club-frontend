@@ -25,13 +25,13 @@ import {
   ABILITY_KEYS,
   ABILITY_LABELS,
   ABILITY_SCORE,
-  ARMOR_DEXTERITY_LIMIT,
   CARRYING_CAPACITY_MULTIPLIER,
   CASTER_LEVEL_DIVIDER,
   CATALOG_API_PREFIX,
   CHARACTER_LEVEL,
   CHARACTER_SHEET_ROUTE,
   CLASS_TABLE_EMPTY,
+  DEFAULT_WEAPON_ATTACK_ABILITY,
   EXPERIENCE_BY_LEVEL,
   HIT_DIE_AVERAGE_BONUS,
   MULTICLASS_SPELL_SLOTS,
@@ -44,7 +44,6 @@ import {
   SKILL_PROFICIENCY_CYCLE,
   SKILL_PROFICIENCY_MULTIPLIER,
   SPELL_SLOT_LEVELS,
-  UNARMORED_ARMOR_CLASS,
 } from './constants';
 import { sheetDocumentSchema } from './schema';
 import { getCustomBonusesTotal, getSkillAbility } from './skills';
@@ -197,25 +196,6 @@ export function getModifierOf(
 }
 
 /**
- * Бонус спасброска.
- * @param document - лист персонажа
- * @param ability - характеристика спасброска
- * @param proficiencyBonus - бонус мастерства
- */
-export function getSavingThrowBonus(
-  document: SheetDocument,
-  ability: AbilityKey,
-  proficiencyBonus: number,
-): number {
-  const isProficient = document.savingThrows.includes(ability);
-
-  return (
-    getModifierOf(document.abilities, ability)
-    + (isProficient ? proficiencyBonus : 0)
-  );
-}
-
-/**
  * Владение навыком; навыка нет в листе — владения нет.
  * @param document - лист персонажа
  * @param skill - навык
@@ -343,55 +323,9 @@ export function getInitiativeBonus(document: SheetDocument): number {
 }
 
 /**
- * КД по снаряжению: надетый доспех (или 10 без него) с модификатором
- * Ловкости в пределах категории, надетые щиты и свой бонус.
- * @param document - лист персонажа
- */
-export function getCalculatedArmorClass(document: SheetDocument): number {
-  const dexterity = getModifierOf(document.abilities, 'DEXTERITY');
-
-  const equippedArmor = document.inventory.filter(
-    (item) => item.isEquipped && item.armor,
-  );
-
-  const bodyArmor = equippedArmor
-    .flatMap((item) =>
-      item.armor && item.armor.category !== 'SHIELD' ? [item.armor] : [],
-    )
-    .reduce<{ value: number; limit: number | null } | null>((best, armor) => {
-      const value = armor.baseArmorClass + armor.bonus;
-
-      return !best || value > best.value
-        ? { value, limit: ARMOR_DEXTERITY_LIMIT[armor.category] }
-        : best;
-    }, null);
-
-  const shields = equippedArmor.reduce(
-    (sum, item) =>
-      item.armor?.category === 'SHIELD'
-        ? sum + item.armor.baseArmorClass + item.armor.bonus
-        : sum,
-    0,
-  );
-
-  const base = bodyArmor?.value ?? UNARMORED_ARMOR_CLASS;
-  const limit = bodyArmor?.limit ?? null;
-  const dexterityPart = limit === null ? dexterity : Math.min(dexterity, limit);
-
-  return base + dexterityPart + shields + document.armorClassBonus;
-}
-
-/**
- * Итоговый КД: своё значение, если задано, иначе — по снаряжению.
- * @param document - лист персонажа
- */
-export function getArmorClass(document: SheetDocument): number {
-  return document.armorClassOverride ?? getCalculatedArmorClass(document);
-}
-
-/**
- * Атака оружием: дальнобойное — Ловкость, фехтовальное — лучшая из Силы и
- * Ловкости, остальное — Сила.
+ * Атака оружием: дальнобойное — Ловкость, фехтовальное — лучшая из базовой
+ * характеристики и Ловкости, остальное — базовая (по правилам — Сила, но её
+ * можно сменить в настройках листа).
  * @param document - лист персонажа
  * @param item - оружие из снаряжения
  * @param proficiencyBonus - бонус мастерства
@@ -407,15 +341,19 @@ export function getWeaponAttack(
     return null;
   }
 
-  const strength = getModifierOf(document.abilities, 'STRENGTH');
+  const base = getModifierOf(
+    document.abilities,
+    document.weaponAttackAbility ?? DEFAULT_WEAPON_ATTACK_ABILITY,
+  );
+
   const dexterity = getModifierOf(document.abilities, 'DEXTERITY');
 
-  let abilityModifier = strength;
+  let abilityModifier = base;
 
   if (weapon.isRanged) {
     abilityModifier = dexterity;
   } else if (weapon.isFinesse) {
-    abilityModifier = Math.max(strength, dexterity);
+    abilityModifier = Math.max(base, dexterity);
   }
 
   const damageBonus = abilityModifier + weapon.bonus;

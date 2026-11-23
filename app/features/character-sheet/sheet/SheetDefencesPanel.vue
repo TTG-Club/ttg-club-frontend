@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import { useSheetStats } from '../composables';
-  import { DEFENCE_LABELS, SHEET_LABELS } from '../model';
+  import { useCharacterSheet, useSheetStats } from '../composables';
+  import { DEFENCE_LABELS, formatDistance } from '../model';
   import SheetPanel from './SheetPanel.vue';
 
   /**
@@ -8,6 +8,7 @@
    * иммунитеты к состояниям (из механики, выборов типа урона и эффектов),
    * чувства и телепатия. Панель видна, только когда есть что показать.
    */
+  const { document } = useCharacterSheet();
   const { stats } = useSheetStats();
 
   const rows = computed(() =>
@@ -38,11 +39,11 @@
         values: [
           ...stats.value.senses.map(
             (sense) =>
-              `${sense.label} ${sense.range} ${SHEET_LABELS.speedUnit}`,
+              `${sense.label} ${formatDistance(sense.range, document.value.speedUnit)}`,
           ),
           ...(stats.value.telepathy
             ? [
-                `${DEFENCE_LABELS.telepathy} ${stats.value.telepathy} ${SHEET_LABELS.speedUnit}`,
+                `${DEFENCE_LABELS.telepathy} ${formatDistance(stats.value.telepathy, document.value.speedUnit)}`,
               ]
             : []),
         ],

@@ -222,6 +222,48 @@ export const SHEET_SKILL_SETTINGS_LABELS = {
   cancel: 'Отмена',
 } as const;
 
+/**
+ * Виды своих бонусов к значению характеристики: модификатор характеристики
+ * слагаемым к значению не бывает — пара таких бонусов завела бы подсчёт по
+ * кругу.
+ */
+export const ABILITY_BONUS_KINDS = ['flat', 'proficiency', 'level'] as const;
+
+/** Подписи окна характеристики. */
+export const ABILITY_SETTINGS_TEXT = {
+  open: 'Настроить характеристику',
+  description:
+    'Укажите значение характеристики — модификатор рассчитается автоматически',
+  scoreTitle: 'Значение',
+  modifierTitle: 'Модификатор',
+  /** Записанное значение в разборе: «Записано 16 · Пояс силы +2». */
+  breakdownScore: 'Записано',
+  bonusesTitle: 'Бонусы к значению',
+  bonusesHint:
+    'Бонус поднимает саму характеристику, поэтому вместе с ней растут её модификатор, спасброски, навыки, класс доспеха и атаки.',
+  totalTitle: 'Итог',
+  save: 'Сохранить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна настройки спасбросков. */
+export const SAVING_THROW_SETTINGS_TEXT = {
+  title: 'Настройка спасбросков',
+  open: 'Настроить спасброски',
+  hint: 'Характеристика задаёт модификатор спасброска, при владении к нему добавляется бонус мастерства. Дополнительные бонусы складываются сверху — их сколько угодно.',
+  abilityPlaceholder: 'Характеристика',
+  proficiency: 'Владение спасброском',
+  proficient: 'Владение',
+  notProficient: 'Нет владения',
+  resetSavingThrow: 'Вернуть спасбросок к правилам',
+  addBonus: 'Добавить бонус',
+  commonTitle: 'Ко всем спасброскам',
+  commonHint:
+    'Бонус идёт в каждый из шести спасбросков: так заводят плащ защиты или ауру паладина, а не повторяют одно и то же шесть раз.',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
 /** Подпись слагаемого навыка от эффектов листа. */
 export const SKILL_BONUS_EFFECTS_LABEL = 'Эффекты';
 
@@ -272,6 +314,7 @@ export const CUSTOM_BONUS_TEXT = {
   labelPlaceholder: 'Откуда бонус',
   sourcePlaceholder: 'Источник',
   remove: 'Удалить бонус',
+  add: 'Добавить бонус',
 } as const;
 
 /* --- Уровни и опыт ------------------------------------------------------ */
@@ -416,6 +459,35 @@ export const RESOURCE_RESET_LABELS = {
   SHORT: 'Короткий отдых',
   LONG: 'Долгий отдых',
   SHORT_ONE: 'Один на коротком, все на долгом',
+} as const;
+
+/** Источники максимума своего ресурса. */
+export const RESOURCE_MAX_SOURCES = [
+  'fixed',
+  'proficiency',
+  'ability',
+  'level',
+] as const;
+
+export const RESOURCE_MAX_SOURCE_LABELS = {
+  fixed: 'Своё число',
+  proficiency: 'Бонус мастерства',
+  ability: 'Модификатор характеристики',
+  level: 'Уровень персонажа',
+} as const;
+
+/** Пределы прибавки к источнику максимума ресурса. */
+export const RESOURCE_MAX_OFFSET_RANGE = { min: -9, max: 9 } as const;
+
+/** Подписи настройки максимума ресурса. */
+export const RESOURCE_MAX_TEXT = {
+  source: 'Максимум от',
+  ability: 'Характеристика',
+  offset: 'Прибавка',
+  minimum: 'Не меньше',
+  computed: 'Сейчас',
+  catalogHint:
+    'Максимум ресурса из справочника растёт вместе с персонажем сам.',
 } as const;
 
 /* --- Справочники -------------------------------------------------------- */
@@ -892,6 +964,166 @@ export const SENSE_BY_EFFECT_KEY: Readonly<Record<string, string>> = {
 
 /** Скорости, кроме ходьбы: их дают раса, умения и эффекты. */
 export const EXTRA_SPEED_KEYS = ['fly', 'climb', 'swim', 'burrow'] as const;
+
+/** Все виды передвижения в порядке окна настройки. */
+export const SPEED_KEYS = ['walk', ...EXTRA_SPEED_KEYS] as const;
+
+/** Единицы расстояний листа: хранятся футы, показываются выбранные. */
+export const SPEED_UNITS = ['feet', 'meters'] as const;
+
+/** Метров в футе по соглашению правил: 5 фт = 1,5 м. */
+export const METERS_PER_FOOT = 0.3;
+
+export const SPEED_UNIT_SHORT_LABELS = {
+  feet: 'фт.',
+  meters: 'м',
+} as const;
+
+export const SPEED_UNIT_OPTIONS = [
+  { value: 'feet', label: 'Футы (фт.)' },
+  { value: 'meters', label: 'Метры (м)' },
+] as const;
+
+/** Шаг поля скорости в единицах листа: клетка 5 фт = 1,5 м. */
+export const SPEED_INPUT_STEP = { feet: 5, meters: 1.5 } as const;
+
+/** Пределы скорости и бонуса к ней, фт. */
+export const SPEED_RANGE = { min: 0, max: 1000 } as const;
+export const SPEED_BONUS_RANGE = { min: -120, max: 120 } as const;
+
+/**
+ * Виды бонуса к скорости — только своё число: скорость меряется расстоянием,
+ * а не очками броска, и модификатор или уровень в футах смысла не имеют.
+ */
+export const SPEED_BONUS_KINDS = ['flat'] as const;
+
+/** Характеристика атаки обычным оружием по правилам. */
+export const DEFAULT_WEAPON_ATTACK_ABILITY = 'STRENGTH';
+
+/** Характеристика инициативы по правилам. */
+export const DEFAULT_INITIATIVE_ABILITY = 'DEXTERITY';
+
+/** Значение пункта «по правилам» в списке характеристики атаки. */
+export const WEAPON_ATTACK_ABILITY_AUTO = 'auto';
+
+/**
+ * Виды своих бонусов к бонусу мастерства: сам себе слагаемым он не бывает.
+ */
+export const PROFICIENCY_BONUS_KINDS = [
+  'flat',
+  'ability',
+  'level',
+  'classLevel',
+] as const;
+
+/** Источники основы: по правилам или своё число. */
+export const SETTINGS_BASE_SOURCE = {
+  level: 'level',
+  flat: 'flat',
+} as const;
+
+/** Вкладки окна настроек листа. */
+export const SHEET_SETTINGS_TABS = [
+  { label: 'Атака оружием', value: 'weapon', slot: 'weapon' },
+  { label: 'Свои бонусы', value: 'bonuses', slot: 'bonuses' },
+] as const;
+
+/** Подписи окна настроек листа. */
+export const SHEET_SETTINGS_TEXT = {
+  title: 'Настройки листа',
+  open: 'Настройки листа',
+  weaponAbilityTitle: 'Базовая характеристика',
+  weaponAbilityAuto: 'По правилам',
+  weaponAbilityAutoHint: 'По правилам: Сила',
+  normalWeaponTitle: 'Обычное оружие',
+  finesseWeaponTitle: 'Фехтовальное и дальнобойное',
+  abilityModifierTitle: 'Модификатор характеристики',
+  proficiencyBonusTitle: 'Бонус мастерства',
+  attackFormulaHint:
+    'Бонус атаки = бонус мастерства + модификатор характеристики. Дальнобойное оружие бьёт от Ловкости, фехтовальное — от лучшей из Ловкости и базовой характеристики.',
+  initiativeTitle: 'Инициатива',
+  baseEditTitle: 'Настроить основу',
+  baseSourceTitle: 'Источник',
+  baseValueTitle: 'Значение',
+  levelBase: 'По уровню',
+  flatBase: 'Своё число',
+  customBonusesTitle: 'Свои бонусы',
+  totalTitle: 'Итог',
+  totalProficiencyBonusTitle: 'Итоговый бонус мастерства',
+  totalInitiativeTitle: 'Итоговая инициатива',
+  proficiencyHint:
+    'Идёт в спасброски, навыки, атаку оружием и заклинательство.',
+  initiativeHint: 'Показывается в плитке инициативы и в её броске.',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна набора характеристик (калькулятор в листе). */
+export const ABILITY_SCORES_TEXT = {
+  menu: 'Калькулятор характеристик',
+  title: 'Набор характеристик',
+  description:
+    'Соберите значения как в калькуляторе характеристик и запишите их в лист',
+  current: 'Сейчас в листе',
+  incompleteHint: 'Назначьте значения всем шести характеристикам',
+  bonusesHint:
+    'Прибавки расы, черт и повышений уже входят в значения листа, поэтому они добавляются к набору сами:',
+  replaceHint: 'Набор заменит записанные значения характеристик.',
+  apply: 'Записать в лист',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна передвижения. */
+export const SPEED_SETTINGS_TEXT = {
+  title: 'Передвижение',
+  hint: 'Своё значение — скорость по расе и классу. Бонусы складываются с итогом: их дают умения, предметы и заклинания. Скорость от расы и эффектов лист считает сам.',
+  unitTitle: 'Единицы',
+  hover: 'Парение',
+  hoverShort: 'парение',
+  addBonus: 'Добавить бонус',
+  ownValue: 'Своё значение',
+  total: 'Итог с бонусами',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна класса доспеха. */
+export const ARMOR_CLASS_TEXT = {
+  title: 'Класс доспеха',
+  customToggle: 'Своё значение',
+  customToggleHint:
+    'Основа КД задаётся вручную, а не по надетому доспеху: так считают естественный доспех или КД из другого источника.',
+  valueTitle: 'Основа',
+  abilitiesTitle: 'Характеристики',
+  abilitiesPlaceholder: 'Не добавлять',
+  abilitiesArmorHint:
+    'Ловкость идёт в КД по правилу доспеха, остальные характеристики прибавляются целиком (защита без доспехов).',
+  abilitiesArmorEmptyHint:
+    'Модификаторы характеристик в КД не идут: только доспех, щит и бонусы.',
+  abilitiesCustomHint:
+    'Модификаторы выбранных характеристик прибавляются к основе целиком.',
+  abilitiesCustomEmptyHint: 'К основе ничего не прибавляется.',
+  dexLimitTitle: 'Предел Ловкости',
+  dexLimitRule: 'По правилу доспеха',
+  bonusTitle: 'Свой бонус',
+  armorTitle: 'Доспех',
+  unarmored: 'Без доспеха',
+  dexCapped: 'Ловкость ограничена доспехом',
+  shieldTitle: 'Щит',
+  featuresTitle: 'Умения и черты',
+  effectsTitle: 'Эффекты',
+  totalTitle: 'Итог',
+  equipmentHint:
+    'КД пересчитывается сам, когда вы надеваете или снимаете доспех и щит в снаряжении.',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Предел Ловкости, который можно задать вручную. */
+export const ARMOR_DEX_LIMIT_MAX = 5;
+
+/** Характеристики КД по умолчанию: Ловкость по правилу доспеха. */
+export const DEFAULT_ARMOR_CLASS_ABILITIES = ['DEXTERITY'] as const;
 
 export const SPEED_LABELS = {
   walk: 'Ходьба',
@@ -1518,6 +1750,8 @@ export const EXHAUSTION_PANEL_LABELS = {
 export const SHEET_MENU_LABELS = {
   backToList: 'К списку листов',
   reload: 'Перезагрузить',
+  settings: 'Настройки листа',
+  abilityScores: 'Калькулятор характеристик',
   downloadJson: 'Скачать JSON',
   copy: 'Создать копию',
   remove: 'Удалить лист',
