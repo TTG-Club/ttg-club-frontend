@@ -2,7 +2,10 @@
   import type { CustomBonus, CustomBonusContext, SheetClass } from '../model';
 
   import {
+    createCustomBonus,
+    createSheetElementId,
     CUSTOM_BONUS_FORMAT_OPTIONS,
+    CUSTOM_BONUS_KINDS,
     CUSTOM_BONUS_LABEL_MAX_LENGTH,
     CUSTOM_BONUS_RANGE,
     CUSTOM_BONUS_TEXT,
@@ -14,18 +17,38 @@
   } from '../model';
 
   /**
-   * Строки дополнительных бонусов навыка: подпись, источник и величина. Своё
-   * число вводится, остальное (модификатор, мастерство, уровни) лист считает
-   * сам и показывает готовым значением.
+   * Строки своих бонусов показателя (навыка, спасброска, характеристики):
+   * подпись, источник и величина. Своё число вводится, остальное
+   * (модификатор, мастерство, уровни) лист считает сам и показывает готовым
+   * значением.
    */
-  const { classes, context } = defineProps<{
+  const {
+    classes,
+    context,
+    kinds = CUSTOM_BONUS_KINDS,
+    withAdd = true,
+  } = defineProps<{
     classes: ReadonlyArray<Pick<SheetClass, 'id' | 'name'>>;
     context: CustomBonusContext;
+    /** Допустимые виды бонуса; по умолчанию все. */
+    kinds?: ReadonlyArray<CustomBonus['kind']>;
+    /**
+     * Кнопка «Добавить бонус» под строками. В списках, где бонус заводит плюс
+     * в шапке строки, своя кнопка только дублировала бы его.
+     */
+    withAdd?: boolean;
   }>();
 
   const rows = defineModel<Array<CustomBonus>>({ required: true });
 
-  const sourceOptions = computed(() => getCustomBonusSourceOptions(classes));
+  const sourceOptions = computed(() =>
+    getCustomBonusSourceOptions(classes, kinds),
+  );
+
+  /** Добавляет бонус «+1»: он правится тут же в строке. */
+  function add(): void {
+    rows.value = [...rows.value, createCustomBonus(createSheetElementId())];
+  }
 
   /**
    * Посчитанная величина бонуса со знаком.
@@ -114,5 +137,17 @@
         />
       </UTooltip>
     </div>
+
+    <UButton
+      v-if="withAdd"
+      :label="CUSTOM_BONUS_TEXT.add"
+      icon="tabler:plus"
+      color="neutral"
+      variant="ghost"
+      size="sm"
+      block
+      class="border border-dashed border-default hover:border-primary hover:text-primary"
+      @click.left.exact.prevent="add"
+    />
   </div>
 </template>

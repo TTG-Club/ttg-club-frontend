@@ -8,20 +8,21 @@
     useSheetRoll,
     useSheetStats,
   } from '../composables';
+  import { SheetAbilityModal } from '../dialogs';
   import {
     ABILITY_EFFECT_KEYS,
     ABILITY_KEYS,
     ABILITY_LABELS,
     ABILITY_SCORE,
     getAbilityModifier,
-    SHEET_LABELS,
   } from '../model';
   import SheetAbilityTile from './SheetAbilityTile.vue';
 
   /**
    * Ряд характеристик: шесть плиток в строку (на узком — по три), клик —
    * проверка с преимуществом или помехой от эффектов, ± — быстрая правка
-   * записанного значения, шестерёнка — точный ввод.
+   * записанного значения, шестерёнка — окно характеристики со своими
+   * бонусами.
    */
   const { document, update, ensureEditable } = useCharacterSheet();
   const { stats } = useSheetStats();
@@ -37,12 +38,6 @@
       }
     },
   });
-
-  const editTitle = computed(() =>
-    editedAbility.value
-      ? ABILITY_LABELS[editedAbility.value].name
-      : SHEET_LABELS.abilities,
-  );
 
   /** Откуда прибавка к характеристике: источники механики. */
   const hints = computed(() =>
@@ -114,16 +109,6 @@
 
     editedAbility.value = key;
   }
-
-  /**
-   * Значение из поля точной правки.
-   * @param value - новое значение
-   */
-  function setEditedScore(value: number | null): void {
-    if (editedAbility.value) {
-      setScore(editedAbility.value, value);
-    }
-  }
 </script>
 
 <template>
@@ -142,21 +127,9 @@
       />
     </div>
 
-    <UModal
+    <SheetAbilityModal
       v-model:open="isEditOpen"
-      :title="editTitle"
-      :ui="{ content: 'max-w-xs' }"
-    >
-      <template #body>
-        <UInputNumber
-          v-if="editedAbility"
-          :model-value="document.abilities[editedAbility]"
-          :min="ABILITY_SCORE.min"
-          :max="ABILITY_SCORE.max"
-          class="w-full"
-          @update:model-value="setEditedScore"
-        />
-      </template>
-    </UModal>
+      :ability="editedAbility"
+    />
   </div>
 </template>

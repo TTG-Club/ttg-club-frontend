@@ -2,7 +2,6 @@
   import type {
     AbilityKey,
     CustomBonus,
-    CustomBonusContext,
     SkillKey,
     SkillProficiency,
   } from '../model';
@@ -17,7 +16,6 @@
     CUSTOM_SKILLS_MAX,
     DEFAULT_CUSTOM_SKILL_ABILITY,
     formatModifier,
-    getAbilityModifier,
     getCustomBonusesTotal,
     getNextSkillProficiency,
     getSkillAbility,
@@ -32,7 +30,7 @@
     SKILL_PROFICIENCY_ICON,
     SKILL_PROFICIENCY_TEXT,
   } from '../model';
-  import SheetSkillBonusRows from './SheetSkillBonusRows.vue';
+  import SheetCustomBonusRows from './SheetCustomBonusRows.vue';
 
   /** Навык в черновике окна: правил или свой. */
   interface DraftSkill {
@@ -119,23 +117,7 @@
     customName.value = '';
   });
 
-  const bonusContext = computed<CustomBonusContext>(() => {
-    const { abilities } = stats.value;
-
-    return {
-      abilityModifiers: {
-        STRENGTH: getAbilityModifier(abilities.STRENGTH),
-        DEXTERITY: getAbilityModifier(abilities.DEXTERITY),
-        CONSTITUTION: getAbilityModifier(abilities.CONSTITUTION),
-        INTELLIGENCE: getAbilityModifier(abilities.INTELLIGENCE),
-        WISDOM: getAbilityModifier(abilities.WISDOM),
-        CHARISMA: getAbilityModifier(abilities.CHARISMA),
-      },
-      proficiencyBonus: stats.value.proficiencyBonus,
-      level: stats.value.level,
-      classes: document.value.classes,
-    };
-  });
+  const bonusContext = computed(() => stats.value.bonusContext);
 
   /**
    * Итог навыка без эффектов: модификатор, доля мастерства и бонусы.
@@ -572,11 +554,12 @@
               </div>
             </div>
 
-            <SheetSkillBonusRows
+            <SheetCustomBonusRows
               v-if="row.skill.bonuses.length"
               v-model="row.skill.bonuses"
               :classes="document.classes"
               :context="bonusContext"
+              :with-add="false"
               class="border-l-2 border-primary/40 pl-2"
             />
           </div>

@@ -46,6 +46,7 @@ import {
   getSheetArmorState,
   isSavingThrowAutoFailed,
 } from './effects';
+import { getAbilityBonusesTotal, getSavingThrowAbility } from './settings';
 import { getCustomBonusesTotal, getSkillAbility } from './skills';
 import {
   getAbilityModifier,
@@ -96,9 +97,9 @@ function getSourceModifiers(
 }
 
 /**
- * Характеристики после эффектов `ability.<характеристика>`. Формулы в них
- * считаются от исходных модификаторов — иначе прибавка к Силе зависела бы от
- * самой себя.
+ * Характеристики со своими бонусами и после эффектов
+ * `ability.<характеристика>`. Формулы в них считаются от исходных
+ * модификаторов — иначе прибавка к Силе зависела бы от самой себя.
  * @param document - лист персонажа
  * @param carriers - носители эффектов
  * @param armor - состояние доспеха
@@ -115,7 +116,7 @@ export function getEffectiveAbilities(
       getEffectValue(
         carriers,
         `${EFFECT_KEYS.abilityPrefix}${ABILITY_EFFECT_KEYS[key]}`,
-        document.abilities[key],
+        document.abilities[key] + getAbilityBonusesTotal(document, key),
         armor,
         context,
       ),
@@ -498,7 +499,16 @@ export function getSheetStats(document: SheetDocument): SheetStats {
       const effectKey = ABILITY_EFFECT_KEYS[key];
 
       const base =
-        mod(key) + (document.savingThrows.includes(key) ? proficiencyBonus : 0);
+        mod(getSavingThrowAbility(document, key))
+        + (document.savingThrows.includes(key) ? proficiencyBonus : 0)
+        + getCustomBonusesTotal(
+          document.savingThrowBonuses[key] ?? [],
+          bonusContext,
+        )
+        + getCustomBonusesTotal(
+          document.savingThrowCommonBonuses,
+          bonusContext,
+        );
 
       return [
         key,
@@ -581,6 +591,7 @@ export function getSheetStats(document: SheetDocument): SheetStats {
     level,
     proficiencyBonus,
     abilities,
+    bonusContext,
     armorClass: armorClass.value,
     armorClassSource: armorClass.source,
     initiative: getEffectValue(

@@ -25,6 +25,7 @@ import type {
   SkillProficiencies,
   SkillProficiency,
 } from './schema';
+import type { CustomBonusContext } from './skills';
 
 export type AbilityKey = (typeof ABILITY_KEYS)[number];
 
@@ -261,6 +262,8 @@ export interface SheetStats {
   proficiencyBonus: number;
   /** Характеристики с прибавками эффектов. */
   abilities: AbilityScores;
+  /** Модификаторы, мастерство и уровни для своих бонусов листа. */
+  bonusContext: CustomBonusContext;
   armorClass: number;
   /** Название эффекта, задавшего КД тела («Защита без доспехов»). */
   armorClassSource: string | null;

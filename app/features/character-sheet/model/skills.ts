@@ -152,11 +152,13 @@ export function withCustomBonusSource(
  * Источники бонуса: своё число, модификаторы, мастерство, уровень персонажа и
  * уровни классов листа.
  * @param classes - классы листа
+ * @param kinds - допустимые виды; по умолчанию все
  */
 export function getCustomBonusSourceOptions(
   classes: ReadonlyArray<Pick<SheetClass, 'id' | 'name'>>,
+  kinds?: ReadonlyArray<CustomBonus['kind']>,
 ): Array<CustomBonusSourceOption> {
-  return [
+  const options = [
     { value: CUSTOM_BONUS_SOURCE.flat, label: CUSTOM_BONUS_TEXT.flat },
     ...ABILITY_KEYS.map((key) => ({
       value: key,
@@ -172,6 +174,17 @@ export function getCustomBonusSourceOptions(
       label: `${CUSTOM_BONUS_TEXT.classLevel}: ${sheetClass.name}`,
     })),
   ];
+
+  if (!kinds) {
+    return options;
+  }
+
+  // Вид варианта — тот, который получит бонус при выборе этого источника
+  return options.filter((option) =>
+    kinds.includes(
+      withCustomBonusSource(createCustomBonus(''), option.value).kind,
+    ),
+  );
 }
 
 /**

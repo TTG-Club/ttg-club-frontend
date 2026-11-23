@@ -464,6 +464,20 @@ export const sheetDocumentSchema = z.object({
     .catch({}),
   customSkills: lenientList(customSkillSchema),
   groupSkillsByAbility: z.boolean().catch(false),
+  /** Свои бонусы к значениям характеристик. */
+  abilityBonuses: z
+    .partialRecord(abilityKeySchema, lenientList(customBonusSchema))
+    .catch({}),
+  /** Характеристики спасбросков, подменённые игроком. */
+  savingThrowAbilities: z
+    .partialRecord(abilityKeySchema, abilityKeySchema)
+    .catch({}),
+  /** Свои бонусы отдельных спасбросков. */
+  savingThrowBonuses: z
+    .partialRecord(abilityKeySchema, lenientList(customBonusSchema))
+    .catch({}),
+  /** Свои бонусы ко всем спасброскам сразу (плащ защиты, аура). */
+  savingThrowCommonBonuses: lenientList(customBonusSchema),
 });
 
 export type SheetDocument = z.infer<typeof sheetDocumentSchema>;

@@ -197,25 +197,6 @@ export function getModifierOf(
 }
 
 /**
- * Бонус спасброска.
- * @param document - лист персонажа
- * @param ability - характеристика спасброска
- * @param proficiencyBonus - бонус мастерства
- */
-export function getSavingThrowBonus(
-  document: SheetDocument,
-  ability: AbilityKey,
-  proficiencyBonus: number,
-): number {
-  const isProficient = document.savingThrows.includes(ability);
-
-  return (
-    getModifierOf(document.abilities, ability)
-    + (isProficient ? proficiencyBonus : 0)
-  );
-}
-
-/**
  * Владение навыком; навыка нет в листе — владения нет.
  * @param document - лист персонажа
  * @param skill - навык
