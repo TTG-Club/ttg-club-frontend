@@ -20,7 +20,7 @@
   import { SectionControls } from '../controls';
   import { SectionLayout } from '../layout';
   import { SectionList } from '../list';
-  import { groupItems, SECTION_ICON, SECTION_TEXT } from '../model';
+  import { groupSectionItems, SECTION_ICON, SECTION_TEXT } from '../model';
 
   /**
    * Страница раздела целиком: поиск, фильтр, список с подгрузкой и открытая
@@ -35,6 +35,7 @@
     getKey,
     getGroup = undefined,
     getGroupOrder = undefined,
+    getSubgroup = undefined,
     getPath = undefined,
     sortItems = undefined,
     view = undefined,
@@ -48,6 +49,8 @@
     getGroup?: (item: T) => string | Array<string>;
     /** Порядок группы записи; без него группы идут по первой записи. */
     getGroupOrder?: (item: T, group: string) => number;
+    /** Подпись подгруппы записи внутри группы; пустая — без подзаголовка. */
+    getSubgroup?: (item: T) => string;
     /** Адрес записи на сайте; без него строки списка никуда не ведут. */
     getPath?: (item: T) => string;
     /**
@@ -133,11 +136,12 @@
       return [];
     }
 
-    const visibleItems = getGroup
-      ? groupItems(sortedItems.value, getGroup, getGroupOrder).flatMap(
-          (group) => group.items,
-        )
-      : sortedItems.value;
+    const visibleItems = groupSectionItems(
+      sortedItems.value,
+      getGroup,
+      getGroupOrder,
+      getSubgroup,
+    ).flatMap((group) => group.subgroups.flatMap(({ items }) => items));
 
     return [...new Set(visibleItems.map(getPath))];
   });
@@ -212,6 +216,7 @@
       :get-key="getKey"
       :get-group="getGroup"
       :get-group-order="getGroupOrder"
+      :get-subgroup="getSubgroup"
       :status="status"
       :is-end="isEnd"
       :is-loading-more="isLoadingMore"

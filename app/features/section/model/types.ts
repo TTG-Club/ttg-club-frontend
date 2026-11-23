@@ -128,6 +128,18 @@ export interface FilterGroupMatch {
   values: Array<FilterValue>;
 }
 
+/** Подгруппа списка внутри группы. */
+export interface SectionItemSubgroup<T> {
+  name: string;
+  items: Array<T>;
+}
+
+/** Группа списка с подгруппами; без подгрупп — одна безымянная. */
+export interface SectionItemGroup<T> {
+  name: string;
+  subgroups: Array<SectionItemSubgroup<T>>;
+}
+
 /** Вариант группировки списка в меню «Ещё». */
 export interface SectionGroupingOption {
   value: string;
