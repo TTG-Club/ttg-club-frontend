@@ -7,6 +7,7 @@
     ABILITY_SCORE,
     formatModifier,
     getAbilityModifier,
+    LONG_PRESS_DELAY,
     SHEET_BODY_LABELS,
     SHEET_TITLE_ACTION_CLASS,
     SHEET_TITLE_ACTION_REVEAL_CLASS,
@@ -42,16 +43,29 @@
     adjust: [delta: number];
   }>();
 
-  const { editControlClass, isLocked } = useCharacterSheet();
-
-  /** Удержание, после которого открывается правка (сенсорные экраны). */
-  const LONG_PRESS_DELAY = 500;
+  const { editControlClass, isLocked, highlightedAbility } =
+    useCharacterSheet();
 
   const panelRef = useTemplateRef('panel');
 
   // Флаг гасит клик, который браузер шлёт после долгого удержания: вместе с
   // окном правки не должна идти проверка характеристики
   let isLongPressTriggered = false;
+
+  // Наведение или фокус подсвечивает навыки этой характеристики. Через
+  // `unrefElement`: ref смотрит на компонент рамки, а слушателям нужен его
+  // корневой элемент
+  const panelElement = computed(() => unrefElement(panelRef));
+  const isHovered = useElementHover(panelElement);
+  const { focused: isFocusWithin } = useFocusWithin(panelElement);
+
+  watch([isHovered, isFocusWithin], ([hovered, focused]) => {
+    if (hovered || focused) {
+      highlightedAbility.value = abilityKey;
+    } else if (highlightedAbility.value === abilityKey) {
+      highlightedAbility.value = null;
+    }
+  });
 
   onLongPress(
     panelRef,

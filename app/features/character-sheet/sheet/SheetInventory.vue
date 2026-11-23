@@ -14,10 +14,15 @@
 
   import {
     useCharacterSheet,
+    useRemoveConfirm,
     useSheetRoll,
     useSheetStats,
   } from '../composables';
-  import { SheetCatalogPicker, SheetItemModal } from '../dialogs';
+  import {
+    SheetCatalogPicker,
+    SheetConfirmModal,
+    SheetItemModal,
+  } from '../dialogs';
   import {
     ATTUNEMENT_LIMIT,
     ATTUNEMENT_TEXT,
@@ -73,7 +78,18 @@
   }
 
   const toast = useToast();
-  const { document, update, editControlClass } = useCharacterSheet();
+
+  const { document, update, editControlClass, ensureEditable } =
+    useCharacterSheet();
+
+  const {
+    isOpen: isRemoveOpen,
+    title: removeTitle,
+    description: removeDescription,
+    ask: askRemove,
+    confirm: confirmRemove,
+  } = useRemoveConfirm();
+
   const { stats } = useSheetStats();
   const { rollD20, rollDamage, rollFormula } = useSheetRoll();
 
@@ -160,6 +176,10 @@
    * @param kind - раздел справочника
    */
   function openPicker(kind: ItemSearchKind): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     pickerKind.value = kind;
     isPickerOpen.value = true;
   }
@@ -188,6 +208,10 @@
   }
 
   function addCustom(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     const item = createSheetItem(SHEET_LABELS.item, null);
 
     update((current) => ({
@@ -203,6 +227,10 @@
    * @param item - предмет
    */
   function openEdit(item: SheetItem): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     editedItem.value = item;
     isEditOpen.value = true;
   }
@@ -363,6 +391,14 @@
       );
     }
   }
+
+  /**
+   * Спрашивает подтверждение удаления.
+   * @param item - предмет
+   */
+  function askRemoveItem(item: { id: string; name: string }): void {
+    askRemove(item.name, () => removeItem(item.id));
+  }
 </script>
 
 <template>
@@ -502,7 +538,7 @@
           @roll-attack="rollAttack(entry, $event)"
           @roll-damage="rollAttackDamage(entry)"
           @edit="openEdit(entry.item)"
-          @remove="removeItem(entry.item.id)"
+          @remove="askRemoveItem(entry.item)"
         />
       </div>
     </template>
@@ -525,6 +561,13 @@
       v-model:open="isEditOpen"
       :item="editedItem"
       @save="saveItem"
+    />
+
+    <SheetConfirmModal
+      v-model:open="isRemoveOpen"
+      :title="removeTitle"
+      :description="removeDescription"
+      @confirm="confirmRemove"
     />
   </div>
 </template>

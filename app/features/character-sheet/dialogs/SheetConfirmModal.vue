@@ -18,8 +18,8 @@
   }
 
   function confirm(): void {
-    isOpen.value = false;
     emit('confirm');
+    isOpen.value = false;
   }
 </script>
 

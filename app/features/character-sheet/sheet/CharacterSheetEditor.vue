@@ -19,8 +19,9 @@
     SHEET_BODY_LABELS,
     SHEET_ICON,
     SHEET_LABELS,
-    SHEET_TABS,
+    SHEET_RIGHT_COLUMN_GAP,
     SHEET_TEXT,
+    SHEET_WIDE_MIN_WIDTH,
   } from '../model';
   import SheetAbilities from './SheetAbilities.vue';
   import SheetDefencesPanel from './SheetDefencesPanel.vue';
@@ -39,6 +40,7 @@
   import SheetSpeedTile from './SheetSpeedTile.vue';
   import SheetSpells from './SheetSpells.vue';
   import SheetStatTile from './SheetStatTile.vue';
+  import SheetTabs from './SheetTabs.vue';
 
   /**
    * Лист персонажа целиком, в раскладке new.ttg.club: шапка, слева — плитки
@@ -51,7 +53,7 @@
     id: string;
   }>();
 
-  const { loadStatus, name, load } = useCharacterSheet();
+  const { loadStatus, name, load, ensureEditable } = useCharacterSheet();
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
@@ -62,14 +64,6 @@
   const combatSection = ref<'armor' | 'speed' | null>(null);
   const isHealthOpen = ref(false);
   const isResourcesOpen = ref(false);
-
-  // Вкладки без значков и со скрытой полосой прокрутки, как на new.ttg.club:
-  // со значками ряд не помещался и под ним вылезала полоса браузера
-  const tabItems = SHEET_TABS.map((tab) => ({
-    value: tab.value,
-    label: tab.label,
-    slot: tab.value,
-  }));
 
   const isCombatOpen = computed({
     get: () => combatSection.value !== null,
@@ -102,15 +96,48 @@
     { immediate: true },
   );
 
+  // Высота вкладок в широком режиме равна левой колонке без ряда
+  // характеристик: трек `1fr` высоту не ограничивает, и длинный список
+  // заклинаний раздувал бы правую колонку. Внутри вкладки прокручиваются
+  const gridRef = useTemplateRef<HTMLElement>('grid');
+  const leftColumnRef = useTemplateRef<HTMLElement>('leftColumn');
+  const abilitiesRef = useTemplateRef<HTMLElement>('abilities');
+  const { width: gridWidth } = useElementSize(gridRef);
+  const { height: leftColumnHeight } = useElementSize(leftColumnRef);
+  const { height: abilitiesHeight } = useElementSize(abilitiesRef);
+
+  const tabsStyle = computed(() => {
+    if (gridWidth.value < SHEET_WIDE_MIN_WIDTH || leftColumnHeight.value <= 0) {
+      return undefined;
+    }
+
+    const maxHeight = Math.max(
+      0,
+      Math.round(
+        leftColumnHeight.value - abilitiesHeight.value - SHEET_RIGHT_COLUMN_GAP,
+      ),
+    );
+
+    return { maxHeight: `${maxHeight}px` };
+  });
+
   function retry(): void {
     load(id);
   }
 
   function openArmor(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     combatSection.value = 'armor';
   }
 
   function openSpeed(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     combatSection.value = 'speed';
   }
 
@@ -119,6 +146,10 @@
   }
 
   function openResources(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isResourcesOpen.value = true;
   }
 
@@ -191,13 +222,18 @@
       </div>
 
       <div
+        ref="grid"
         class="grid grid-cols-1 gap-4 @5xl:grid-cols-12 @5xl:grid-rows-[min-content_1fr]"
       >
-        <div class="@5xl:col-span-6 @5xl:col-start-7 @5xl:row-start-1">
+        <div
+          ref="abilities"
+          class="@5xl:col-span-6 @5xl:col-start-7 @5xl:row-start-1"
+        >
           <SheetAbilities />
         </div>
 
         <div
+          ref="leftColumn"
           class="@5xl:col-span-6 @5xl:col-start-1 @5xl:row-span-2 @5xl:row-start-1 @5xl:self-start"
         >
           <div class="grid grid-cols-2 gap-4 max-sm:@md:grid-cols-4">
@@ -262,17 +298,10 @@
           </div>
         </div>
 
-        <UTabs
+        <SheetTabs
           v-model="activeTab"
-          :items="tabItems"
-          color="primary"
-          variant="link"
+          :style="tabsStyle"
           class="@5xl:col-span-6 @5xl:col-start-7 @5xl:row-start-2 @5xl:min-h-0"
-          :ui="{
-            list: 'scrollbar-none overflow-x-auto overscroll-x-contain',
-            trigger: 'shrink-0',
-            content: 'pt-2',
-          }"
         >
           <template #inventory>
             <SheetInventory />
@@ -297,7 +326,7 @@
           <template #notes>
             <SheetNotes />
           </template>
-        </UTabs>
+        </SheetTabs>
       </div>
 
       <SheetCombatModal

@@ -3,8 +3,12 @@
 
   import { EFFECT_CONDITION_TEMPLATES } from '~active-effects/model';
 
-  import { useCharacterSheet, useSheetActiveEffects } from '../composables';
-  import { SheetEffectModal } from '../dialogs';
+  import {
+    useCharacterSheet,
+    useRemoveConfirm,
+    useSheetActiveEffects,
+  } from '../composables';
+  import { SheetConfirmModal, SheetEffectModal } from '../dialogs';
   import { EFFECTS_TEXT, SHEET_GROUP_LABEL_CLASS, SHEET_ICON } from '../model';
   import SheetPanel from './SheetPanel.vue';
 
@@ -14,7 +18,15 @@
    * (выключаются) и надетого снаряжения (только показ). Истощение — в своей
    * панели слева.
    */
-  const { editControlClass } = useCharacterSheet();
+  const { editControlClass, ensureEditable } = useCharacterSheet();
+
+  const {
+    isOpen: isRemoveOpen,
+    title: removeTitle,
+    description: removeDescription,
+    ask: askRemove,
+    confirm: confirmRemove,
+  } = useRemoveConfirm();
 
   const {
     customEffects,
@@ -74,6 +86,10 @@
   );
 
   function addEffect(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     editedEffect.value = createEffect();
     isEditOpen.value = true;
   }
@@ -83,8 +99,20 @@
    * @param effect - эффект
    */
   function editEffect(effect: ActiveEffect): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     editedEffect.value = effect;
     isEditOpen.value = true;
+  }
+
+  /**
+   * Спрашивает подтверждение удаления.
+   * @param effect - эффект
+   */
+  function askRemoveEffect(effect: { id: string; name: string }): void {
+    askRemove(effect.name, () => removeEffect(effect.id));
   }
 </script>
 
@@ -169,7 +197,7 @@
             variant="ghost"
             size="xs"
             :class="editControlClass"
-            @click.left.exact.prevent="removeEffect(row.effect.id)"
+            @click.left.exact.prevent="askRemoveEffect(row.effect)"
           />
         </li>
       </ul>
@@ -254,6 +282,13 @@
       v-model:open="isEditOpen"
       :effect="editedEffect"
       @save="saveEffect"
+    />
+
+    <SheetConfirmModal
+      v-model:open="isRemoveOpen"
+      :title="removeTitle"
+      :description="removeDescription"
+      @confirm="confirmRemove"
     />
   </div>
 </template>

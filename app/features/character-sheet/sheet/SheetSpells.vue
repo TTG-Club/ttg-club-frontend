@@ -7,10 +7,11 @@
 
   import {
     useCharacterSheet,
+    useRemoveConfirm,
     useSheetClassData,
     useSheetStats,
   } from '../composables';
-  import { SheetCatalogPicker } from '../dialogs';
+  import { SheetCatalogPicker, SheetConfirmModal } from '../dialogs';
   import {
     ABILITY_KEYS,
     ABILITY_LABELS,
@@ -40,7 +41,16 @@
   const NO_ABILITY = 'none';
 
   const toast = useToast();
-  const { document, update } = useCharacterSheet();
+  const { document, update, isLocked, ensureEditable } = useCharacterSheet();
+
+  const {
+    isOpen: isRemoveOpen,
+    title: removeTitle,
+    description: removeDescription,
+    ask: askRemove,
+    confirm: confirmRemove,
+  } = useRemoveConfirm();
+
   const { progressions, preparedClasses } = useSheetClassData();
   const { stats } = useSheetStats();
 
@@ -249,6 +259,10 @@
   }
 
   function addCustom(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     update((current) => ({
       ...current,
       spells: [...current.spells, createSheetSpell(SHEET_LABELS.spell, null)],
@@ -256,7 +270,19 @@
   }
 
   function openPicker(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isPickerOpen.value = true;
+  }
+
+  /**
+   * Спрашивает подтверждение удаления.
+   * @param spell - заклинание
+   */
+  function askRemoveSpell(spell: { id: string; name: string }): void {
+    askRemove(spell.name, () => removeSpell(spell.id));
   }
 </script>
 
@@ -337,7 +363,7 @@
       </div>
     </SheetPanel>
 
-    <UPopover>
+    <UPopover :disabled="isLocked">
       <button
         type="button"
         :class="SHEET_HEADER_STAT_CLASS"
@@ -479,7 +505,7 @@
               color="error"
               variant="ghost"
               size="xs"
-              @click.left.exact.prevent="removeSpell(spell.id)"
+              @click.left.exact.prevent="askRemoveSpell(spell)"
             />
           </li>
         </ul>
@@ -498,6 +524,13 @@
       :title="SHEET_LABELS.spell"
       :source="SPELL_SEARCH"
       @pick="addFromCatalog"
+    />
+
+    <SheetConfirmModal
+      v-model:open="isRemoveOpen"
+      :title="removeTitle"
+      :description="removeDescription"
+      @confirm="confirmRemove"
     />
   </div>
 </template>

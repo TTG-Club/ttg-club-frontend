@@ -1,5 +1,11 @@
 <script setup lang="ts">
-  import type { AbilityKey, SkillKey, SkillProficiency } from '../model';
+  import type {
+    AbilityKey,
+    CustomBonus,
+    CustomBonusContext,
+    SkillKey,
+    SkillProficiency,
+  } from '../model';
 
   import {
     useCharacterSheet,
@@ -9,10 +15,14 @@
   import { SheetSkillsSettingsModal } from '../dialogs';
   import {
     ABILITY_LABELS,
+    describeSkillBonus,
     formatModifier,
+    getAbilityModifier,
+    getCustomBonusParts,
     getNextSkillProficiency,
     getSkillAbility,
     getSkillProficiency,
+    getSkillProficiencyBonus,
     getSkillRowGroups,
     PROFICIENCY_DOT_ICONS,
     SHEET_BODY_LABELS,
@@ -30,6 +40,10 @@
   /** Строка навыка: правил или свой. */
   interface SkillPanelRow {
     key: string;
+    /** Дополнительные бонусы навыка: для разбора и подсветки. */
+    bonuses: ReadonlyArray<CustomBonus>;
+    /** Характеристика подменена в настройке. */
+    isAbilityChanged: boolean;
     /** Навык правил; null — свой навык. */
     skillKey: SkillKey | null;
     name: string;
@@ -49,13 +63,28 @@
    * Свои навыки встают в общий список по алфавиту; по настройке список
    * группируется по характеристикам. Шестерёнка открывает настройку.
    */
-  const { document, update, editControlClass } = useCharacterSheet();
+  const {
+    document,
+    update,
+    editControlClass,
+    ensureEditable,
+    highlightedAbility,
+  } = useCharacterSheet();
+
+  /** Подсветка навыков наведённой характеристики. */
+  const HIGHLIGHTED_ROW_CLASS =
+    'bg-primary/10 ring-1 ring-primary/50 ring-inset';
+
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
   const isSettingsOpen = ref(false);
 
   function openSettings(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isSettingsOpen.value = true;
   }
 
@@ -68,6 +97,8 @@
         ability: getSkillAbility(document.value, key),
         proficiency: getSkillProficiency(document.value, key),
         bonus: stats.value.skills[key],
+        bonuses: document.value.skillBonuses[key] ?? [],
+        isAbilityChanged: key in document.value.skillAbilities,
       })),
       ...document.value.customSkills.map((skill) => ({
         key: skill.id,
@@ -76,9 +107,70 @@
         ability: skill.ability,
         proficiency: skill.proficiency,
         bonus: stats.value.customSkills[skill.id] ?? 0,
+        bonuses: skill.bonuses,
+        isAbilityChanged: false,
       })),
     ].sort((left, right) => left.name.localeCompare(right.name)),
   );
+
+  const bonusContext = computed<CustomBonusContext>(() => {
+    const { abilities } = stats.value;
+
+    return {
+      abilityModifiers: {
+        STRENGTH: getAbilityModifier(abilities.STRENGTH),
+        DEXTERITY: getAbilityModifier(abilities.DEXTERITY),
+        CONSTITUTION: getAbilityModifier(abilities.CONSTITUTION),
+        INTELLIGENCE: getAbilityModifier(abilities.INTELLIGENCE),
+        WISDOM: getAbilityModifier(abilities.WISDOM),
+        CHARISMA: getAbilityModifier(abilities.CHARISMA),
+      },
+      proficiencyBonus: stats.value.proficiencyBonus,
+      level: stats.value.level,
+      classes: document.value.classes,
+    };
+  });
+
+  /**
+   * Разбор итога навыка; пусто — итог сводится к характеристике и владению.
+   * @param row - строка навыка
+   */
+  function getBonusHint(row: SkillPanelRow): string {
+    const abilityPart = {
+      label: ABILITY_LABELS[row.ability].name,
+      value: bonusContext.value.abilityModifiers[row.ability],
+    };
+
+    const proficiencyPart = {
+      label: SKILL_PROFICIENCY_TEXT[row.proficiency],
+      value: getSkillProficiencyBonus(
+        row.proficiency,
+        stats.value.proficiencyBonus,
+      ),
+    };
+
+    const parts = [
+      abilityPart,
+      proficiencyPart,
+      ...getCustomBonusParts(
+        row.bonuses,
+        bonusContext.value,
+        document.value.classes,
+      ),
+    ];
+
+    const knownTotal = parts.reduce((sum, part) => sum + part.value, 0);
+
+    if (
+      !row.bonuses.length
+      && !row.isAbilityChanged
+      && knownTotal === row.bonus
+    ) {
+      return '';
+    }
+
+    return describeSkillBonus(parts, row.bonus, formatModifier);
+  }
 
   const groups = computed(() =>
     getSkillRowGroups(rows.value, document.value.groupSkillsByAbility).map(
@@ -88,8 +180,18 @@
         // Под разделителем характеристику называет он сам: в строках она не
         // повторяется
         withAbilityLabel: group.ability === null,
+        titleClass:
+          group.ability !== null && group.ability === highlightedAbility.value
+            ? `${SHEET_GROUP_LABEL_CLASS} text-primary`
+            : SHEET_GROUP_LABEL_CLASS,
         rows: group.rows.map((row) => ({
           ...row,
+          bonusHint: getBonusHint(row),
+          rowClass: isRowHighlighted(row) ? HIGHLIGHTED_ROW_CLASS : undefined,
+          abilityLabelClass:
+            row.ability === highlightedAbility.value
+              ? 'text-primary'
+              : 'text-dimmed',
           abilityLabel: ABILITY_LABELS[row.ability].short,
           formattedModifier: formatModifier(row.bonus),
           passiveValue: PASSIVE_BASE + row.bonus,
@@ -103,10 +205,34 @@
   );
 
   /**
+   * Подсвечена ли строка: навык от наведённой характеристики или у него есть
+   * бонус-модификатор этой характеристики.
+   * @param row - строка навыка
+   */
+  function isRowHighlighted(row: SkillPanelRow): boolean {
+    const ability = highlightedAbility.value;
+
+    if (!ability) {
+      return false;
+    }
+
+    return (
+      row.ability === ability
+      || row.bonuses.some(
+        (bonus) => bonus.kind === 'ability' && bonus.ability === ability,
+      )
+    );
+  }
+
+  /**
    * Переключает владение навыком.
    * @param row - строка навыка
    */
   function cycle(row: SkillPanelRow): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     const next = getNextSkillProficiency(row.proficiency);
     const { skillKey } = row;
 
@@ -166,13 +292,14 @@
           :label="group.title"
           position="start"
           class="px-2 pt-2 first:pt-0"
-          :ui="{ label: SHEET_GROUP_LABEL_CLASS }"
+          :ui="{ label: group.titleClass }"
         />
 
         <div
           v-for="row in group.rows"
           :key="row.key"
           class="relative flex items-center gap-3 rounded px-2 py-1.5 transition-colors hover:bg-accented/40"
+          :class="row.rowClass"
         >
           <UTooltip
             :text="row.proficiencyLabel"
@@ -200,7 +327,8 @@
           >
             <span
               v-if="group.withAbilityLabel"
-              class="w-8 shrink-0 text-left text-[10px] font-medium text-dimmed uppercase"
+              class="w-8 shrink-0 text-left text-[10px] font-medium uppercase transition-colors"
+              :class="row.abilityLabelClass"
             >
               {{ row.abilityLabel }}
             </span>
@@ -209,7 +337,25 @@
               {{ row.name }}
             </span>
 
-            <span class="shrink-0 text-sm font-bold text-highlighted">
+            <!-- Итог не сводится к характеристике и владению: пунктир зовёт
+              навести и прочитать разбор. `z-10` поднимает подпись над
+              растяжкой кнопки броска -->
+            <UTooltip
+              v-if="row.bonusHint"
+              :text="row.bonusHint"
+              :content="{ side: 'top' }"
+            >
+              <span
+                class="z-10 shrink-0 text-sm font-bold text-highlighted underline decoration-dotted underline-offset-2"
+              >
+                {{ row.formattedModifier }}
+              </span>
+            </UTooltip>
+
+            <span
+              v-else
+              class="shrink-0 text-sm font-bold text-highlighted"
+            >
               {{ row.formattedModifier }}
             </span>
 

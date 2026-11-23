@@ -141,7 +141,9 @@ export function getSheetExportFileName(name: string): string {
  * Скачивает лист JSON-файлом `{ name, data }` — его же принимает импорт.
  * @param sheet - лист персонажа
  */
-export function downloadSheetJson(sheet: CharacterSheet): void {
+export function downloadSheetJson(
+  sheet: Pick<CharacterSheet, 'name' | 'data'>,
+): void {
   const content = JSON.stringify(
     { name: sheet.name, data: sheet.data },
     null,

@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest';
 import {
   createCustomBonus,
   createEmptySheetDocument,
+  describeSkillBonus,
+  formatModifier,
+  getCustomBonusParts,
   getCustomBonusSource,
   getSheetStats,
   getSkillRowGroups,
@@ -103,5 +106,43 @@ describe('настройка навыков', () => {
     expect(document.skillAbilities).toEqual({});
     expect(document.customSkills).toEqual([]);
     expect(document.groupSkillsByAbility).toBe(false);
+  });
+
+  it('разбор итога навыка: слагаемые с подписями и остаток от эффектов', () => {
+    const context = {
+      abilityModifiers: {
+        STRENGTH: 0,
+        DEXTERITY: 2,
+        CONSTITUTION: 0,
+        INTELLIGENCE: 3,
+        WISDOM: 0,
+        CHARISMA: 0,
+      },
+      proficiencyBonus: 2,
+      level: 3,
+      classes: [{ id: 'k1', name: 'Бард', level: 3 }],
+    };
+
+    const parts = getCustomBonusParts(
+      [
+        { ...createCustomBonus('b1'), label: 'Плащ' },
+        { ...createCustomBonus('b2'), kind: 'classLevel', classId: 'k1' },
+      ],
+      context,
+      context.classes,
+    );
+
+    expect(parts).toEqual([
+      { label: 'Плащ', value: 1 },
+      { label: 'Уровень класса: Бард', value: 3 },
+    ]);
+
+    expect(
+      describeSkillBonus(
+        [{ label: 'Ловкость', value: 2 }, ...parts],
+        7,
+        formatModifier,
+      ),
+    ).toBe('Ловкость +2 · Плащ +1 · Уровень класса: Бард +3 · Эффекты +1');
   });
 });

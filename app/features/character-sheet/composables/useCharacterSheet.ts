@@ -1,4 +1,5 @@
 import type {
+  AbilityKey,
   CharacterSheet,
   SheetDocument,
   SheetLoadStatus,
@@ -14,6 +15,7 @@ import {
   saveSheetOnLeave,
   SHEET_HIDDEN_CONTROL_CLASS,
   SHEET_HTTP_STATUS,
+  SHEET_LOCKED_STORAGE_KEY,
   SHEET_SAVE_DELAY,
   SHEET_TEXT,
 } from '../model';
@@ -43,8 +45,32 @@ export const useCharacterSheet = createSharedComposable(() => {
 
   const isConflict = computed(() => saveStatus.value === 'conflict');
 
-  /** Лист заперт игроком: кнопки правки прячутся, броски остаются. */
-  const isLocked = ref(false);
+  /**
+   * Запертые листы: замок помнится в браузере для каждого листа, чтобы после
+   * перезагрузки игровой режим не снимался сам.
+   */
+  const lockedSheetIds = useLocalStorage<Array<string>>(
+    SHEET_LOCKED_STORAGE_KEY,
+    [],
+  );
+
+  /** Лист заперт игроком: правка закрыта, броски и игровые действия остаются. */
+  const isLocked = computed({
+    get: () =>
+      Boolean(sheetId.value)
+      && lockedSheetIds.value.includes(sheetId.value ?? ''),
+    set: (locked: boolean) => {
+      const id = sheetId.value;
+
+      if (!id) {
+        return;
+      }
+
+      const others = lockedSheetIds.value.filter((lockedId) => lockedId !== id);
+
+      lockedSheetIds.value = locked ? [...others, id] : others;
+    },
+  });
 
   /**
    * Класс кнопок правки: у запертого листа они прячутся видимостью, а не
@@ -54,8 +80,30 @@ export const useCharacterSheet = createSharedComposable(() => {
     isLocked.value ? SHEET_HIDDEN_CONTROL_CLASS : undefined,
   );
 
+  /** Характеристика под курсором: панель навыков подсвечивает её навыки. */
+  const highlightedAbility = ref<AbilityKey | null>(null);
+
   function toggleLock(): void {
     isLocked.value = !isLocked.value;
+  }
+
+  /**
+   * Можно ли править лист. У запертого — нет: окна правки не открываются, а
+   * игрок получает подсказку, как отпереть лист.
+   */
+  function ensureEditable(): boolean {
+    if (!isLocked.value) {
+      return true;
+    }
+
+    toast.add({
+      title: SHEET_TEXT.lockedTitle,
+      description: SHEET_TEXT.lockedDescription,
+      icon: 'tabler:lock',
+      color: 'warning',
+    });
+
+    return false;
   }
 
   const scheduleSave = useDebounceFn(() => save(), SHEET_SAVE_DELAY);
@@ -188,6 +236,13 @@ export const useCharacterSheet = createSharedComposable(() => {
     isDirty.value = false;
   }
 
+  /**
+   * Забывает несохранённые правки: лист удалён, и сохранять их некуда.
+   */
+  function discardChanges(): void {
+    isDirty.value = false;
+  }
+
   useEventListener('pagehide', flushOnLeave);
 
   tryOnScopeDispose(flushOnLeave);
@@ -199,11 +254,14 @@ export const useCharacterSheet = createSharedComposable(() => {
     loadStatus,
     saveStatus,
     isLocked,
+    highlightedAbility,
+    ensureEditable,
     editControlClass,
     toggleLock,
     load,
     reload,
     update,
     rename,
+    discardChanges,
   };
 });

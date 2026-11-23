@@ -23,7 +23,7 @@
    * проверка с преимуществом или помехой от эффектов, ± — быстрая правка
    * записанного значения, шестерёнка — точный ввод.
    */
-  const { document, update } = useCharacterSheet();
+  const { document, update, ensureEditable } = useCharacterSheet();
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
@@ -82,6 +82,10 @@
    * @param delta - на сколько
    */
   function adjust(key: AbilityKey, delta: number): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     setScore(key, document.value.abilities[key] + delta);
   }
 
@@ -104,6 +108,10 @@
    * @param key - характеристика
    */
   function openEdit(key: AbilityKey): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     editedAbility.value = key;
   }
 
