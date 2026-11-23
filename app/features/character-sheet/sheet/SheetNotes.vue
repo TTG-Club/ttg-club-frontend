@@ -45,8 +45,11 @@
 </script>
 
 <template>
-  <SheetPanel :title="SHEET_LABELS.notes">
-    <template #actions>
+  <SheetPanel
+    :title="SHEET_LABELS.notes"
+    persistent-actions
+  >
+    <template #title-actions>
       <UButton
         :label="SHEET_LABELS.add"
         :icon="SHEET_ICON.add"
