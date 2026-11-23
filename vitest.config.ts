@@ -35,6 +35,9 @@ export default defineConfig({
       '~dice-roller': fileURLToPath(
         new URL('./app/features/dice-roller', import.meta.url),
       ),
+      '~character-sheet': fileURLToPath(
+        new URL('./app/features/character-sheet', import.meta.url),
+      ),
       '~character': fileURLToPath(
         new URL('./app/features/character', import.meta.url),
       ),
