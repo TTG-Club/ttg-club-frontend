@@ -1,4 +1,5 @@
 import type {
+  AbilityBonuses,
   AbilityScores,
   CustomBonus,
   SheetDocument,
@@ -346,4 +347,53 @@ export function getResourceMaxFormula(rule: ResourceMaxRule): string | null {
   }
 
   return `${variable} ${rule.offset < 0 ? '-' : '+'} ${Math.abs(rule.offset)}`;
+}
+
+/** Прибавки к характеристикам, вошедшие в записанные значения листа. */
+export interface SheetAbilityIncreases {
+  /** Сумма по характеристикам. */
+  total: AbilityBonuses;
+  /** Откуда прибавки: «Тифлинг: Хар +2, Инт +1». */
+  sources: Array<{ name: string; increases: AbilityBonuses }>;
+}
+
+/**
+ * Прибавки источников механики (раса, черты, повышения) и бонусы расы,
+ * заданные вручную: они уже сидят в записанных значениях, поэтому набор из
+ * калькулятора складывается с ними.
+ * @param document - лист персонажа
+ */
+export function getSheetAbilityIncreases(
+  document: Pick<SheetDocument, 'sources' | 'raceAbilityBonuses' | 'race'>,
+): SheetAbilityIncreases {
+  const sources = [
+    ...document.sources.map((source) => ({
+      name: source.name,
+      increases: source.abilityIncreases,
+    })),
+    ...(Object.keys(document.raceAbilityBonuses).length
+      ? [
+          {
+            name: document.race?.name ?? '',
+            increases: document.raceAbilityBonuses,
+          },
+        ]
+      : []),
+  ].filter((source) =>
+    Object.values(source.increases).some((value) => value !== 0),
+  );
+
+  const total: AbilityBonuses = {};
+
+  for (const source of sources) {
+    for (const key of ABILITY_KEYS) {
+      const value = source.increases[key];
+
+      if (value) {
+        total[key] = (total[key] ?? 0) + value;
+      }
+    }
+  }
+
+  return { total, sources };
 }

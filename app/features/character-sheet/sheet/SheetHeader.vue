@@ -9,6 +9,7 @@
 
   import { useCharacterSheet, useSheetStats } from '../composables';
   import {
+    SheetAbilityScoresModal,
     SheetCatalogPicker,
     SheetCatalogTreeModal,
     SheetClassesModal,
@@ -221,6 +222,15 @@
   const isRemoveOpen = ref(false);
   const isMenuBusy = ref(false);
   const isSettingsOpen = ref(false);
+  const isAbilityScoresOpen = ref(false);
+
+  function openAbilityScores(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    isAbilityScoresOpen.value = true;
+  }
 
   function openSettings(): void {
     if (!ensureEditable()) {
@@ -301,6 +311,11 @@
         label: SHEET_MENU_LABELS.settings,
         icon: 'tabler:adjustments',
         onSelect: openSettings,
+      },
+      {
+        label: SHEET_MENU_LABELS.abilityScores,
+        icon: 'tabler:calculator',
+        onSelect: openAbilityScores,
       },
     ],
     [
@@ -913,6 +928,8 @@
     <SheetVisionModal v-model:open="isVisionOpen" />
 
     <SheetSettingsModal v-model:open="isSettingsOpen" />
+
+    <SheetAbilityScoresModal v-model:open="isAbilityScoresOpen" />
 
     <SheetConfirmModal
       v-model:open="isRemoveOpen"

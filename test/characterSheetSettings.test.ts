@@ -15,8 +15,10 @@ import {
   getResourceMaxFormula,
   getResourceMaxRule,
   getSavingThrowDrafts,
+  getSheetAbilityIncreases,
   getSheetStats,
   getWeaponAttack,
+  sheetSourceSchema,
   toSpeedUnit,
 } from '~character-sheet/model';
 
@@ -269,5 +271,34 @@ describe('максимум своего ресурса', () => {
   it('ресурс справочника настройка не правит', () => {
     expect(getResourceMaxRule({ ...own, sourceId: 'class:bard' })).toBeNull();
     expect(getResourceMaxRule({ ...own, formula: '@classLevel*2' })).toBeNull();
+  });
+});
+
+describe('прибавки к характеристикам для калькулятора', () => {
+  it('складывает источники и бонусы расы, вписанные вручную', () => {
+    const source = sheetSourceSchema.parse({
+      id: 's1',
+      kind: 'race',
+      name: 'Тифлинг',
+      abilityIncreases: { CHARISMA: 2, INTELLIGENCE: 1 },
+    });
+
+    const feat = sheetSourceSchema.parse({
+      id: 's2',
+      kind: 'feat',
+      name: 'Наблюдательный',
+      abilityIncreases: { INTELLIGENCE: 1 },
+    });
+
+    const increases = getSheetAbilityIncreases(
+      makeDocument({ sources: [source, feat] }),
+    );
+
+    expect(increases.total).toEqual({ CHARISMA: 2, INTELLIGENCE: 2 });
+
+    expect(increases.sources.map((entry) => entry.name)).toEqual([
+      'Тифлинг',
+      'Наблюдательный',
+    ]);
   });
 });

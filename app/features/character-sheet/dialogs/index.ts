@@ -1,4 +1,5 @@
 export { default as SheetAbilityModal } from './SheetAbilityModal.vue';
+export { default as SheetAbilityScoresModal } from './SheetAbilityScoresModal.vue';
 export { default as SheetArmorClassModal } from './SheetArmorClassModal.vue';
 export { default as SheetBonusSection } from './SheetBonusSection.vue';
 export { default as SheetCatalogPicker } from './SheetCatalogPicker.vue';
