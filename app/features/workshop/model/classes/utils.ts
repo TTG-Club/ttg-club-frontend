@@ -4,6 +4,7 @@ import type { ArchetypeForm, ClassForm } from './schemas';
 import type {
   ClassTableColumn,
   ClassTrait,
+  ClassTraitScaling,
   WorkshopArchetype,
   WorkshopClass,
 } from './types';
@@ -32,7 +33,29 @@ export function createClassTrait(): ClassTrait {
     description: [],
     optional: false,
     child: '',
+    scaling: [],
     ...copyMechanicsFields(),
+  };
+}
+
+/**
+ * Новый уровень роста: на уровень позже последнего, чтобы ряд «8, 12, 16»
+ * набирался без возврата к первому уровню.
+ * @param scaling - уже заведённый рост
+ * @param traitLevel - уровень самого умения
+ */
+export function createClassTraitScaling(
+  scaling: ReadonlyArray<ClassTraitScaling>,
+  traitLevel: number,
+): ClassTraitScaling {
+  const last = scaling.at(-1)?.level ?? traitLevel;
+
+  return {
+    level: Math.min(CLASS_LEVELS.length, last + 1),
+    name: '',
+    additional: '',
+    description: [],
+    hideInSubclasses: false,
   };
 }
 
@@ -54,6 +77,10 @@ function copyTraits(traits: ReadonlyArray<ClassTrait>): Array<ClassTrait> {
   return traits.map((trait) => ({
     ...trait,
     description: [...trait.description],
+    scaling: trait.scaling.map((row) => ({
+      ...row,
+      description: [...row.description],
+    })),
     ...copyMechanicsFields(trait),
   }));
 }
@@ -81,6 +108,15 @@ function getTraitsPayload(
     suffix: toOptionalText(trait.suffix),
     description: [...trait.description],
     child: toOptionalText(trait.child),
+    scaling: [...trait.scaling]
+      .sort((left, right) => left.level - right.level)
+      .map((row) => ({
+        level: row.level,
+        name: toOptionalText(row.name),
+        additional: toOptionalText(row.additional),
+        description: row.description.filter((block) => block.trim()),
+        hideInSubclasses: row.hideInSubclasses,
+      })),
     ...getMechanicsFieldsPayload(trait, MECHANICS_KIND.class),
   }));
 }

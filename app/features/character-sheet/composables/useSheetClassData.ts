@@ -10,6 +10,7 @@ import type {
 import { uniq } from 'es-toolkit';
 
 import {
+  CLASS_FEATURE_SCALING_SEPARATOR,
   CLASS_TABLE_EMPTY,
   getPactMagic,
   KNOWN_CANTRIPS_COLUMN,
@@ -67,18 +68,37 @@ function getFeatures(
 ): Array<ClassFeatureEntry> {
   const features = archetype?.traits?.features ?? base?.traits?.features ?? [];
 
-  return features
-    .filter((feature) => feature.level <= sheetClass.level)
-    .map((feature) => ({
-      id: `${sheetClass.id}:${feature.id}`,
-      name: feature.name,
-      level: feature.level,
-      className: feature.archetypeFeature
-        ? (sheetClass.archetypeName ?? sheetClass.name)
-        : sheetClass.name,
-      isArchetype: Boolean(feature.archetypeFeature),
-      description: feature.description ?? null,
+  return features.flatMap((feature) => {
+    const className = feature.archetypeFeature
+      ? (sheetClass.archetypeName ?? sheetClass.name)
+      : sheetClass.name;
+
+    const isArchetype = Boolean(feature.archetypeFeature);
+
+    // Рост по уровням: повтор умения — отдельная запись своего уровня
+    const repeats = feature.scaling.map((row) => ({
+      id: `${sheetClass.id}:${feature.id}${CLASS_FEATURE_SCALING_SEPARATOR}${row.level}`,
+      name: [row.name || feature.name, row.additional]
+        .filter(Boolean)
+        .join(' '),
+      level: row.level,
+      className,
+      isArchetype,
+      description: row.description ?? null,
     }));
+
+    return [
+      {
+        id: `${sheetClass.id}:${feature.id}`,
+        name: feature.name,
+        level: feature.level,
+        className,
+        isArchetype,
+        description: feature.description ?? null,
+      },
+      ...repeats,
+    ].filter((entry) => entry.level <= sheetClass.level);
+  });
 }
 
 /**

@@ -25,6 +25,14 @@ import {
   MAX_CLASS_TABLE_VALUE,
 } from './constants';
 
+const classTraitScalingSchema = z.object({
+  level: z.number(),
+  name: z.string().nullish(),
+  additional: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  hideInSubclasses: z.boolean().catch(false),
+});
+
 const classTraitSchema = z.object({
   id: z.number().nullish(),
   name: z.string(),
@@ -33,6 +41,7 @@ const classTraitSchema = z.object({
   description: markupBlocksSchema.nullish(),
   optional: z.boolean().catch(false),
   child: z.string().nullish(),
+  scaling: z.array(classTraitScalingSchema).catch([]),
   mechanics: z.unknown().optional(),
   activeEffects: z.unknown().optional(),
 });
@@ -109,6 +118,13 @@ function toClassTrait(trait: z.infer<typeof classTraitSchema>): ClassTrait {
     description: trait.description ?? [],
     optional: trait.optional,
     child: trait.child ?? '',
+    scaling: trait.scaling.map((row) => ({
+      level: row.level,
+      name: row.name ?? '',
+      additional: row.additional ?? '',
+      description: row.description ?? [],
+      hideInSubclasses: row.hideInSubclasses,
+    })),
     ...parseMechanicsFields(trait),
   };
 }
@@ -207,6 +223,15 @@ const notNegativeSchema = z
   .int(WORKSHOP_VALIDATION.notNegative)
   .min(0, WORKSHOP_VALIDATION.notNegative);
 
+/** Уровень роста умения в форме. */
+const classTraitScalingFormSchema = z.object({
+  level: classLevelSchema,
+  name: z.string(),
+  additional: z.string(),
+  description: markupBlocksSchema,
+  hideInSubclasses: z.boolean(),
+});
+
 /** Умение в форме. */
 export const classTraitFormSchema = z.object({
   id: z.number().optional(),
@@ -216,6 +241,7 @@ export const classTraitFormSchema = z.object({
   description: workshopRequiredMarkup,
   optional: z.boolean(),
   child: z.string(),
+  scaling: z.array(classTraitScalingFormSchema),
   ...mechanicsFieldsFormSchema,
 });
 

@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { normalizeLoadedActiveEffects } from '~active-effects/model';
 import { entryNameSchema } from '~section/model';
 
+import { CLASS_FEATURE_SCALING_SEPARATOR } from './constants';
+
 /*
  * Механика записей справочника для листа — блоки `mechanics` и
  * `activeEffects`, которые бэкенд старого сайта отдаёт в карточках классов,
@@ -308,6 +310,10 @@ export const mechanicsClassFeatureSchema = z.object({
   archetypeFeature: z.boolean().nullish(),
   archetypeRoot: z.boolean().nullish(),
   ...mechanicsCarrierShape,
+  /** Уровни роста: повтор умения на другом уровне. */
+  scaling: z
+    .array(z.object({ level: z.number(), name: z.string().nullish() }))
+    .catch([]),
 });
 
 export type MechanicsClassFeature = z.infer<typeof mechanicsClassFeatureSchema>;
@@ -330,7 +336,23 @@ export const classMechanicsDetailSchema = z.object({
           (values ?? []).flatMap((value) => {
             const parsed = mechanicsClassFeatureSchema.safeParse(value);
 
-            return parsed.success ? [parsed.data] : [];
+            if (!parsed.success) {
+              return [];
+            }
+
+            // Повтор умения на другом уровне — отдельное умение уровня без
+            // своей механики: выдачи умения уже сделаны на его уровне
+            const repeats = parsed.data.scaling.map((row) => ({
+              ...parsed.data,
+              id: `${parsed.data.id}${CLASS_FEATURE_SCALING_SEPARATOR}${row.level}`,
+              name: row.name || parsed.data.name,
+              level: row.level,
+              mechanics: null,
+              activeEffects: [],
+              scaling: [],
+            }));
+
+            return [parsed.data, ...repeats];
           }),
         ),
       archetype: mechanicsClassFeatureSchema.nullish().catch(null),

@@ -17,6 +17,7 @@
     MECHANICS_KIND,
     WORKSHOP_FIELD_TEXT,
   } from '../model';
+  import ClassTraitScalingEditor from './ClassTraitScalingEditor.vue';
 
   /**
    * Умения класса или архетипа. Каждое свёрнуто под спойлер: у класса их
@@ -147,6 +148,18 @@
     description: Array<string>,
   ): void {
     patchTrait(traitIndex, { description });
+  }
+
+  /**
+   * Меняет рост умения по уровням.
+   * @param traitIndex - номер умения
+   * @param scaling - рост
+   */
+  function changeScaling(
+    traitIndex: number,
+    scaling: ClassTrait['scaling'],
+  ): void {
+    patchTrait(traitIndex, { scaling });
   }
 
   /**
@@ -301,6 +314,16 @@
             @update:model-value="changeDescription(traitIndex, $event)"
           />
         </UFormField>
+
+        <div class="md:col-span-3">
+          <ClassTraitScalingEditor
+            :model-value="trait.scaling"
+            :trait-level="trait.level"
+            :field-name="getFieldName(traitIndex, 'scaling')"
+            :has-hide-in-subclasses="hasOptional"
+            @update:model-value="changeScaling(traitIndex, $event)"
+          />
+        </div>
 
         <div class="md:col-span-3">
           <WorkshopTraitMechanics

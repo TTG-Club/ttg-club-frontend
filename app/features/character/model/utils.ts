@@ -564,6 +564,55 @@ export function sortClassFeatures(traits: ClassTraits): Array<ClassFeature> {
   ]);
 }
 
+/** Рост умения для страницы класса. */
+export interface ClassFeatureScalingView {
+  /** Уровни роста через запятую: «8, 12, 16, 19»; пусто — роста нет. */
+  levels: string;
+  /** Уровни со своим описанием. */
+  rows: Array<{ key: string; title: string; description: ContentDescription }>;
+}
+
+/**
+ * Рост умения на странице класса: перечень уровней и уровни со своим
+ * описанием. На странице подкласса строки «скрывать в подклассе» не видны.
+ * @param feature - умение
+ * @param isSubclassPage - страница подкласса
+ */
+export function getClassFeatureScalingView(
+  feature: ClassFeature,
+  isSubclassPage: boolean,
+): ClassFeatureScalingView {
+  const visible = sortBy(
+    feature.scaling.filter(
+      (row) =>
+        !isSubclassPage || feature.archetypeFeature || !row.hideInSubclasses,
+    ),
+    [(row) => row.level],
+  );
+
+  return {
+    levels: visible.map((row) => row.level).join(', '),
+    rows: visible.flatMap((row) => {
+      const description = row.description;
+
+      if (!description || !hasContentDescription(description)) {
+        return [];
+      }
+
+      const name = [row.name, row.additional].filter(Boolean).join(' ');
+      const level = CLASS_TEXT.scalingLevel(row.level);
+
+      return [
+        {
+          key: `${feature.id}:${row.level}`,
+          title: name ? `${level}: ${name}` : level,
+          description,
+        },
+      ];
+    }),
+  };
+}
+
 /**
  * Умение по якорю из таблицы уровней, например `#c12`.
  * @param traits - умения класса
