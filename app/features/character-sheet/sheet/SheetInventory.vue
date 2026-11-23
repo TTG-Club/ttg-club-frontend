@@ -8,6 +8,7 @@
     WeaponAttack,
   } from '../model';
 
+  import { ContentEntityDrawer } from '~content/entity-drawer';
   import { MAGIC_ITEMS_SECTION } from '~inventory/model';
   import { getApiErrorMessage } from '~user/model';
 
@@ -28,12 +29,17 @@
   import {
     ATTUNEMENT_TEXT,
     CARRYING_TEXT,
+    copyItemAsCustom,
+    createSheetElementId,
     createSheetItem,
     CURRENCY_KEYS,
     CURRENCY_LABELS,
     CURRENCY_TITLES,
+    getItemPreviewType,
     getWeaponAttack,
     INVENTORY_GROUPS,
+    isHeavyWeaponHindered,
+    ITEM_ROW_TEXT,
     ITEM_SEARCH_BY_KIND,
     ITEM_SEARCH_KINDS,
     loadCatalogItem,
@@ -44,6 +50,7 @@
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_TEXT,
+    sortItemsByName,
   } from '../model';
   import SheetInventoryItemRow from './SheetInventoryItemRow.vue';
 
@@ -99,6 +106,21 @@
   const isEditOpen = ref(false);
 
   const isCarryingOpen = ref(false);
+  const previewItem = ref<SheetItem | null>(null);
+
+  const previewType = computed(() =>
+    getItemPreviewType(previewItem.value?.url ?? null),
+  );
+
+  const isPreviewOpen = computed({
+    get: () => previewItem.value !== null,
+    set: (open: boolean) => {
+      if (!open) {
+        previewItem.value = null;
+      }
+    },
+  });
+
   const isAttunementOpen = ref(false);
   const isCurrencyOpen = ref(false);
 
@@ -180,6 +202,16 @@
   ]);
 
   /**
+   * Прибавка эффектов к атаке оружием.
+   * @param item - предмет
+   */
+  function getAttackEffects(item: SheetItem): number {
+    return item.weapon?.isRanged
+      ? stats.value.rangedAttackBonus
+      : stats.value.meleeAttackBonus;
+  }
+
+  /**
    * Атака оружием с характеристиками и прибавками эффектов.
    * @param item - предмет
    */
@@ -194,19 +226,25 @@
       return attack;
     }
 
-    const bonus = item.weapon.isRanged
-      ? stats.value.rangedAttackBonus
-      : stats.value.meleeAttackBonus;
-
-    return { ...attack, attackBonus: attack.attackBonus + bonus };
+    return {
+      ...attack,
+      attackBonus: attack.attackBonus + getAttackEffects(item),
+    };
   }
 
   const groups = computed(() =>
     INVENTORY_GROUPS.map((group) => ({
       ...group,
-      items: document.value.inventory
-        .filter((item) => getItemGroup(item) === group.key)
-        .map((item) => ({ item, attack: getAttack(item) })),
+      items: sortItemsByName(
+        document.value.inventory.filter(
+          (item) => getItemGroup(item) === group.key,
+        ),
+      ).map((item) => ({
+        item,
+        attack: getAttack(item),
+        attackEffects: getAttackEffects(item),
+        isHindered: isHeavyWeaponHindered(item, document.value.size),
+      })),
     })).filter((group) => group.items.length),
   );
 
@@ -302,6 +340,50 @@
    */
   function toggleEquip(id: string): void {
     patchItem(id, (item) => ({ ...item, isEquipped: !item.isEquipped }));
+  }
+
+  /**
+   * Хват универсального оружия: одной или двумя руками.
+   * @param id - предмет
+   */
+  function toggleGrip(id: string): void {
+    patchItem(id, (item) => ({ ...item, useTwoHands: !item.useTwoHands }));
+  }
+
+  /**
+   * Включает или выключает предмет.
+   * @param id - предмет
+   */
+  function toggleActive(id: string): void {
+    patchItem(id, (item) => ({ ...item, isActive: !item.isActive }));
+  }
+
+  /**
+   * Описание предмета справочника в дровере.
+   * @param item - предмет
+   */
+  function openPreview(item: SheetItem): void {
+    previewItem.value = item;
+  }
+
+  /**
+   * Копия предмета справочника как свой предмет: правится целиком.
+   * @param item - предмет
+   */
+  function copyItem(item: SheetItem): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    const copy = copyItemAsCustom(item, createSheetElementId());
+
+    update((current) => ({
+      ...current,
+      inventory: [...current.inventory, copy],
+    }));
+
+    toast.add({ title: ITEM_ROW_TEXT.copied, color: 'success' });
+    openEdit(copy);
   }
 
   /**
@@ -402,7 +484,11 @@
    * @param event - клик
    */
   function rollAttack(
-    entry: { item: SheetItem; attack: WeaponAttack | null },
+    entry: {
+      item: SheetItem;
+      attack: WeaponAttack | null;
+      isHindered: boolean;
+    },
     event: MouseEvent,
   ): void {
     if (entry.attack) {
@@ -413,6 +499,7 @@
         {
           kind: 'attack',
           attackType: entry.item.weapon?.isRanged ? 'ranged' : 'melee',
+          isHindered: entry.isHindered,
         },
       );
     }
@@ -427,7 +514,9 @@
     if (entry.attack) {
       rollDamage(
         `${SHEET_LABELS.damage}: ${entry.attack.name}`,
-        entry.attack.damage,
+        entry.attack.extraDamage
+          ? `${entry.attack.damage} + ${entry.attack.extraDamage}`
+          : entry.attack.damage,
       );
     }
   }
@@ -577,10 +666,16 @@
           :key="entry.item.id"
           :item="entry.item"
           :attack="entry.attack"
+          :attack-effects="entry.attackEffects"
           :icon="group.icon"
           :is-equippable="group.key !== 'other'"
+          :is-hindered="entry.isHindered"
           @toggle-equip="toggleEquip(entry.item.id)"
           @toggle-attune="toggleAttune(entry.item.id)"
+          @toggle-grip="toggleGrip(entry.item.id)"
+          @toggle-active="toggleActive(entry.item.id)"
+          @preview="openPreview(entry.item)"
+          @copy="copyItem(entry.item)"
           @adjust="adjustQuantity(entry.item.id, $event)"
           @spend-charge="spendCharge(entry.item.id)"
           @restore-charges="restoreCharges(entry.item)"
@@ -610,6 +705,14 @@
       v-model:open="isEditOpen"
       :item="editedItem"
       @save="saveItem"
+    />
+
+    <ContentEntityDrawer
+      v-if="previewItem?.url && previewType"
+      v-model:open="isPreviewOpen"
+      :type="previewType"
+      :path="previewItem.url"
+      :title="previewItem.name"
     />
 
     <SheetCarryingModal v-model:open="isCarryingOpen" />

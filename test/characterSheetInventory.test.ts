@@ -3,6 +3,7 @@ import type { SheetDocument, SheetItem } from '~character-sheet/model';
 import { describe, expect, it } from 'vitest';
 
 import {
+  copyItemAsCustom,
   createEmptySheetDocument,
   createSheetItem,
   getAttunementBreakdown,
@@ -11,12 +12,16 @@ import {
   getCoinWeight,
   getCurrencyInGold,
   getEncumbrance,
+  getItemPreviewType,
   getSheetRollMode,
   getSheetStats,
+  getWeaponAttack,
   isArmorTooHeavy,
   isHeavyWeaponHindered,
+  isItemMechanicsActive,
   sheetArmorSchema,
   sheetWeaponSchema,
+  sortItemsByName,
 } from '~character-sheet/model';
 
 /**
@@ -190,5 +195,70 @@ describe('правила снаряжения 2014', () => {
         modifier,
       ).value,
     ).toBe(5);
+  });
+});
+
+describe('строка предмета', () => {
+  it('универсальное оружие двумя руками и дополнительный урон', () => {
+    const longsword: SheetItem = {
+      ...createSheetItem('Длинный меч', '/weapons/longsword'),
+      weapon: sheetWeaponSchema.parse({
+        damage: '1к8',
+        versatileDamage: '1к10',
+        extraDamage: '1к6',
+        extraDamageType: 'огонь',
+        bonus: 1,
+      }),
+    };
+
+    const document = makeDocument({
+      abilities: { ...ABILITIES, STRENGTH: 16 },
+    });
+
+    const oneHand = getWeaponAttack(document, longsword, 2);
+
+    expect(oneHand?.damage).toBe('1к8 + 4');
+    expect(oneHand?.attackBonus).toBe(6);
+    expect(oneHand?.extraDamage).toBe('1к6');
+
+    expect(
+      getWeaponAttack(document, { ...longsword, useTwoHands: true }, 2)?.damage,
+    ).toBe('1к10 + 4');
+  });
+
+  it('механика включаемого и отсутствующего предмета', () => {
+    const boots: SheetItem = {
+      ...createSheetItem('Сапоги', null),
+      isEquipped: true,
+      activatable: true,
+    };
+
+    expect(isItemMechanicsActive(boots)).toBe(false);
+    expect(isItemMechanicsActive({ ...boots, isActive: true })).toBe(true);
+
+    expect(
+      isItemMechanicsActive({ ...boots, isActive: true, quantity: 0 }),
+    ).toBe(false);
+  });
+
+  it('вид предпросмотра, копия в свой и порядок по алфавиту', () => {
+    expect(getItemPreviewType('/items/magic/bag')).toBe('magic-item');
+    expect(getItemPreviewType('/weapons/club')).toBe('weapon');
+    expect(getItemPreviewType('/armors/plate')).toBe('armor');
+    expect(getItemPreviewType('/items/rope')).toBe('item');
+    expect(getItemPreviewType(null)).toBeNull();
+
+    const copy = copyItemAsCustom(
+      { ...createSheetItem('Верёвка', '/items/rope'), isEquipped: true },
+      'copy',
+    );
+
+    expect(copy).toMatchObject({ id: 'copy', url: null, isEquipped: false });
+
+    expect(
+      sortItemsByName([{ name: 'Яблоко' }, { name: 'арбалет' }]).map(
+        (item) => item.name,
+      ),
+    ).toEqual(['арбалет', 'Яблоко']);
   });
 });

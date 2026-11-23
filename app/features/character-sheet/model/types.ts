@@ -64,9 +64,16 @@ export interface WeaponAttack {
   name: string;
   url: string | null;
   attackBonus: number;
-  /** Урон с модификатором: «1к8 + 3». */
+  /** Урон с модификатором: «1к8 + 3»; у двуручного хвата — по второй кости. */
   damage: string;
   damageType: string;
+  /** Дополнительный урон магического оружия: «1к6». */
+  extraDamage: string;
+  extraDamageType: string;
+  /** Части бонуса атаки для разбора. */
+  abilityModifier: number;
+  proficiency: number;
+  magicBonus: number;
 }
 
 /** Кости хитов одного размера. */

@@ -385,16 +385,26 @@ export function getWeaponAttack(
     ? ` ${damageBonus < 0 ? MINUS_SIGN : '+'} ${Math.abs(damageBonus)}`
     : '';
 
+  // Универсальное оружие двумя руками бьёт второй костью
+  const dice =
+    item.useTwoHands && weapon.versatileDamage
+      ? weapon.versatileDamage
+      : weapon.damage;
+
+  const proficiency = weapon.isProficient ? proficiencyBonus : 0;
+
   return {
     id: item.id,
     name: item.name,
     url: item.url,
-    attackBonus:
-      abilityModifier
-      + weapon.bonus
-      + (weapon.isProficient ? proficiencyBonus : 0),
-    damage: weapon.damage ? `${weapon.damage}${damageModifier}` : '',
+    attackBonus: abilityModifier + weapon.bonus + proficiency,
+    damage: dice ? `${dice}${damageModifier}` : '',
     damageType: weapon.damageType,
+    extraDamage: weapon.extraDamage,
+    extraDamageType: weapon.extraDamageType,
+    abilityModifier,
+    proficiency,
+    magicBonus: weapon.bonus,
   };
 }
 

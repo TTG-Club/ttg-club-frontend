@@ -1,3 +1,5 @@
+import type { DetailType } from '~content/model';
+
 import type { SheetCurrency, SheetDocument, SheetItem } from './schema';
 import type {
   AbilityKey,
@@ -6,6 +8,12 @@ import type {
   EncumbranceLevel,
   SheetSize,
 } from './types';
+
+import {
+  ARMORS_SECTION,
+  MAGIC_ITEMS_SECTION,
+  WEAPONS_SECTION,
+} from '~inventory/model';
 
 import {
   ARMOR_STRENGTH_SPEED_PENALTY,
@@ -206,5 +214,54 @@ export function isHeavyWeaponHindered(
   return (
     Boolean(item.weapon?.isHeavy)
     && HEAVY_WEAPON_HINDERED_SIZES.includes(size ?? '')
+  );
+}
+
+/**
+ * Вид карточки справочника для предпросмотра предмета; null — свой предмет.
+ * Магические предметы лежат внутри раздела снаряжения, поэтому проверяются
+ * первыми.
+ * @param url - адрес записи справочника
+ */
+export function getItemPreviewType(url: string | null): DetailType | null {
+  if (!url) {
+    return null;
+  }
+
+  if (url.startsWith(MAGIC_ITEMS_SECTION.path)) {
+    return 'magic-item';
+  }
+
+  if (url.startsWith(WEAPONS_SECTION.path)) {
+    return 'weapon';
+  }
+
+  return url.startsWith(ARMORS_SECTION.path) ? 'armor' : 'item';
+}
+
+/**
+ * Копия предмета справочника как своего: её можно править целиком.
+ * @param item - предмет
+ * @param id - идентификатор копии
+ */
+export function copyItemAsCustom(item: SheetItem, id: string): SheetItem {
+  return {
+    ...item,
+    id,
+    url: null,
+    isEquipped: false,
+    isAttuned: false,
+  };
+}
+
+/**
+ * Предметы группы по алфавиту.
+ * @param items - предметы
+ */
+export function sortItemsByName<Item extends Pick<SheetItem, 'name'>>(
+  items: ReadonlyArray<Item>,
+): Array<Item> {
+  return [...items].sort((left, right) =>
+    left.name.localeCompare(right.name, 'ru'),
   );
 }
