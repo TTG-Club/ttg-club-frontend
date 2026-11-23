@@ -15,6 +15,7 @@
     SheetConfirmModal,
     SheetCustomEntryModal,
     SheetRestModal,
+    SheetSettingsModal,
     SheetSizeModal,
     SheetSourceChoicesModal,
     SheetVisionModal,
@@ -219,6 +220,15 @@
 
   const isRemoveOpen = ref(false);
   const isMenuBusy = ref(false);
+  const isSettingsOpen = ref(false);
+
+  function openSettings(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    isSettingsOpen.value = true;
+  }
 
   function downloadJson(): void {
     downloadSheetJson({ name: name.value, data: document.value });
@@ -284,6 +294,13 @@
         label: SHEET_MENU_LABELS.reload,
         icon: 'tabler:refresh',
         onSelect: reload,
+      },
+    ],
+    [
+      {
+        label: SHEET_MENU_LABELS.settings,
+        icon: 'tabler:adjustments',
+        onSelect: openSettings,
       },
     ],
     [
@@ -894,6 +911,8 @@
     <SheetClassesModal v-model:open="isClassesOpen" />
 
     <SheetVisionModal v-model:open="isVisionOpen" />
+
+    <SheetSettingsModal v-model:open="isSettingsOpen" />
 
     <SheetConfirmModal
       v-model:open="isRemoveOpen"

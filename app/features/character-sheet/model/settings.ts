@@ -1,4 +1,4 @@
-import type { CustomBonus, SheetDocument } from './schema';
+import type { AbilityScores, CustomBonus, SheetDocument } from './schema';
 import type { CustomBonusContext } from './skills';
 import type { AbilityKey, SpeedKey, SpeedUnit } from './types';
 
@@ -219,4 +219,38 @@ const distanceFormat = new Intl.NumberFormat('ru-RU', {
  */
 export function formatDistanceValue(feet: number, unit: SpeedUnit): string {
   return distanceFormat.format(toSpeedUnit(feet, unit));
+}
+
+/**
+ * Бонус мастерства до эффектов: своя основа или по уровню, плюс свои бонусы.
+ * Бонус мастерства слагаемым сам себе не бывает (`PROFICIENCY_BONUS_KINDS`),
+ * поэтому в контексте он нулевой.
+ * @param document - лист персонажа
+ * @param abilities - характеристики с бонусами и эффектами
+ */
+export function getProficiencyBonusBase(
+  document: Pick<
+    SheetDocument,
+    'classes' | 'proficiencyBase' | 'proficiencyBonuses'
+  >,
+  abilities: AbilityScores,
+): number {
+  const level = getCharacterLevel(document.classes);
+
+  return (
+    (document.proficiencyBase ?? getProficiencyBonus(level))
+    + getCustomBonusesTotal(document.proficiencyBonuses, {
+      abilityModifiers: {
+        STRENGTH: getAbilityModifier(abilities.STRENGTH),
+        DEXTERITY: getAbilityModifier(abilities.DEXTERITY),
+        CONSTITUTION: getAbilityModifier(abilities.CONSTITUTION),
+        INTELLIGENCE: getAbilityModifier(abilities.INTELLIGENCE),
+        WISDOM: getAbilityModifier(abilities.WISDOM),
+        CHARISMA: getAbilityModifier(abilities.CHARISMA),
+      },
+      proficiencyBonus: 0,
+      level,
+      classes: document.classes,
+    })
+  );
 }

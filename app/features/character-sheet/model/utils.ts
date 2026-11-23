@@ -31,6 +31,7 @@ import {
   CHARACTER_LEVEL,
   CHARACTER_SHEET_ROUTE,
   CLASS_TABLE_EMPTY,
+  DEFAULT_WEAPON_ATTACK_ABILITY,
   EXPERIENCE_BY_LEVEL,
   HIT_DIE_AVERAGE_BONUS,
   MULTICLASS_SPELL_SLOTS,
@@ -322,8 +323,9 @@ export function getInitiativeBonus(document: SheetDocument): number {
 }
 
 /**
- * Атака оружием: дальнобойное — Ловкость, фехтовальное — лучшая из Силы и
- * Ловкости, остальное — Сила.
+ * Атака оружием: дальнобойное — Ловкость, фехтовальное — лучшая из базовой
+ * характеристики и Ловкости, остальное — базовая (по правилам — Сила, но её
+ * можно сменить в настройках листа).
  * @param document - лист персонажа
  * @param item - оружие из снаряжения
  * @param proficiencyBonus - бонус мастерства
@@ -339,15 +341,19 @@ export function getWeaponAttack(
     return null;
   }
 
-  const strength = getModifierOf(document.abilities, 'STRENGTH');
+  const base = getModifierOf(
+    document.abilities,
+    document.weaponAttackAbility ?? DEFAULT_WEAPON_ATTACK_ABILITY,
+  );
+
   const dexterity = getModifierOf(document.abilities, 'DEXTERITY');
 
-  let abilityModifier = strength;
+  let abilityModifier = base;
 
   if (weapon.isRanged) {
     abilityModifier = dexterity;
   } else if (weapon.isFinesse) {
-    abilityModifier = Math.max(strength, dexterity);
+    abilityModifier = Math.max(base, dexterity);
   }
 
   const damageBonus = abilityModifier + weapon.bonus;

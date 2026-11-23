@@ -6,6 +6,7 @@ import {
   ABILITY_BONUS_KINDS,
   createCustomBonus,
   createEmptySheetDocument,
+  createSheetItem,
   describeAbilityScore,
   formatDistance,
   formatModifier,
@@ -13,6 +14,7 @@ import {
   getCustomBonusSourceOptions,
   getSavingThrowDrafts,
   getSheetStats,
+  getWeaponAttack,
   toSpeedUnit,
 } from '~character-sheet/model';
 
@@ -174,5 +176,64 @@ describe('разбор класса доспеха', () => {
 describe('подпись расстояния', () => {
   it('дробные метры — через запятую', () => {
     expect(formatDistance(35, 'meters')).toBe('10,5 м');
+  });
+});
+
+describe('настройки листа', () => {
+  it('своя основа и свои бонусы мастерства', () => {
+    const document = makeDocument({
+      abilities: ABILITIES,
+      proficiencyBase: 3,
+      proficiencyBonuses: [{ ...createCustomBonus('b1'), value: 1 }],
+    });
+
+    expect(getSheetStats(document).proficiencyBonus).toBe(4);
+  });
+
+  it('инициатива от другой характеристики, старый бонус и свои бонусы', () => {
+    const document = makeDocument({
+      abilities: ABILITIES,
+      initiativeAbility: 'INTELLIGENCE',
+      initiativeBonus: 1,
+      initiativeBonuses: [{ ...createCustomBonus('b1'), value: 2 }],
+    });
+
+    // Инт +3, старый бонус +1, свой +2
+    expect(getSheetStats(document).initiative).toBe(6);
+
+    expect(getSheetStats({ ...document, initiativeBase: 0 }).initiative).toBe(
+      3,
+    );
+  });
+
+  it('базовая характеристика атаки обычным и фехтовальным оружием', () => {
+    const sword = {
+      ...createSheetItem('Меч', null),
+      weapon: {
+        damage: '1d8',
+        damageType: '',
+        bonus: 0,
+        isRanged: false,
+        isFinesse: false,
+        isProficient: false,
+      },
+    };
+
+    const document = makeDocument({
+      abilities: ABILITIES,
+      weaponAttackAbility: 'INTELLIGENCE',
+    });
+
+    // Инт +3 вместо Силы −1
+    expect(getWeaponAttack(document, sword, 2)?.attackBonus).toBe(3);
+
+    // Фехтовальное — лучшая из базовой (+3) и Ловкости (+2)
+    expect(
+      getWeaponAttack(
+        document,
+        { ...sword, weapon: { ...sword.weapon, isFinesse: true } },
+        2,
+      )?.attackBonus,
+    ).toBe(3);
   });
 });

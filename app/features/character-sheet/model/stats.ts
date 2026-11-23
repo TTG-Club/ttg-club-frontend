@@ -27,6 +27,7 @@ import {
   DAMAGE_DEFENCE_KINDS,
   DAMAGE_TYPE_INFO,
   DARKVISION_SENSE,
+  DEFAULT_INITIATIVE_ABILITY,
   EFFECT_KEYS,
   OWN_SENSE_KEYS,
   SENSE_BY_EFFECT_KEY,
@@ -50,6 +51,7 @@ import {
 } from './effects';
 import {
   getAbilityBonusesTotal,
+  getProficiencyBonusBase,
   getSavingThrowAbility,
   getSpeedBonusesTotal,
 } from './settings';
@@ -57,7 +59,6 @@ import { getCustomBonusesTotal, getSkillAbility } from './skills';
 import {
   getAbilityModifier,
   getCharacterLevel,
-  getProficiencyBonus,
   getSkillProficiency,
   getSkillProficiencyBonus,
 } from './utils';
@@ -559,7 +560,7 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   const proficiencyBonus = getEffectValue(
     carriers,
     EFFECT_KEYS.proficiencyBonus,
-    getProficiencyBonus(level),
+    getProficiencyBonusBase(document, abilities),
     armor,
     baseContext,
   );
@@ -638,8 +639,10 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   );
 
   const initiativeBase =
-    mod('DEXTERITY')
+    (document.initiativeBase
+      ?? mod(document.initiativeAbility ?? DEFAULT_INITIATIVE_ABILITY))
     + document.initiativeBonus
+    + getCustomBonusesTotal(document.initiativeBonuses, bonusContext)
     + modifiers.reduce(
       (sum, entry) =>
         sum

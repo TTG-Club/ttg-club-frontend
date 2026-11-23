@@ -968,6 +968,67 @@ export const SPEED_BONUS_RANGE = { min: -120, max: 120 } as const;
  */
 export const SPEED_BONUS_KINDS = ['flat'] as const;
 
+/** Характеристика атаки обычным оружием по правилам. */
+export const DEFAULT_WEAPON_ATTACK_ABILITY = 'STRENGTH';
+
+/** Характеристика инициативы по правилам. */
+export const DEFAULT_INITIATIVE_ABILITY = 'DEXTERITY';
+
+/** Значение пункта «по правилам» в списке характеристики атаки. */
+export const WEAPON_ATTACK_ABILITY_AUTO = 'auto';
+
+/**
+ * Виды своих бонусов к бонусу мастерства: сам себе слагаемым он не бывает.
+ */
+export const PROFICIENCY_BONUS_KINDS = [
+  'flat',
+  'ability',
+  'level',
+  'classLevel',
+] as const;
+
+/** Источники основы: по правилам или своё число. */
+export const SETTINGS_BASE_SOURCE = {
+  level: 'level',
+  flat: 'flat',
+} as const;
+
+/** Вкладки окна настроек листа. */
+export const SHEET_SETTINGS_TABS = [
+  { label: 'Атака оружием', value: 'weapon', slot: 'weapon' },
+  { label: 'Свои бонусы', value: 'bonuses', slot: 'bonuses' },
+] as const;
+
+/** Подписи окна настроек листа. */
+export const SHEET_SETTINGS_TEXT = {
+  title: 'Настройки листа',
+  open: 'Настройки листа',
+  weaponAbilityTitle: 'Базовая характеристика',
+  weaponAbilityAuto: 'По правилам',
+  weaponAbilityAutoHint: 'По правилам: Сила',
+  normalWeaponTitle: 'Обычное оружие',
+  finesseWeaponTitle: 'Фехтовальное и дальнобойное',
+  abilityModifierTitle: 'Модификатор характеристики',
+  proficiencyBonusTitle: 'Бонус мастерства',
+  attackFormulaHint:
+    'Бонус атаки = бонус мастерства + модификатор характеристики. Дальнобойное оружие бьёт от Ловкости, фехтовальное — от лучшей из Ловкости и базовой характеристики.',
+  initiativeTitle: 'Инициатива',
+  baseEditTitle: 'Настроить основу',
+  baseSourceTitle: 'Источник',
+  baseValueTitle: 'Значение',
+  levelBase: 'По уровню',
+  flatBase: 'Своё число',
+  customBonusesTitle: 'Свои бонусы',
+  totalTitle: 'Итог',
+  totalProficiencyBonusTitle: 'Итоговый бонус мастерства',
+  totalInitiativeTitle: 'Итоговая инициатива',
+  proficiencyHint:
+    'Идёт в спасброски, навыки, атаку оружием и заклинательство.',
+  initiativeHint: 'Показывается в плитке инициативы и в её броске.',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
 /** Подписи окна передвижения. */
 export const SPEED_SETTINGS_TEXT = {
   title: 'Передвижение',
@@ -1645,6 +1706,7 @@ export const EXHAUSTION_PANEL_LABELS = {
 export const SHEET_MENU_LABELS = {
   backToList: 'К списку листов',
   reload: 'Перезагрузить',
+  settings: 'Настройки листа',
   downloadJson: 'Скачать JSON',
   copy: 'Создать копию',
   remove: 'Удалить лист',

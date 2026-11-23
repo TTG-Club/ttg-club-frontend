@@ -503,6 +503,18 @@ export const sheetDocumentSchema = z.object({
   speedUnit: z.enum(SPEED_UNITS).catch('feet'),
   /** Полёт с парением. */
   speedHover: z.boolean().catch(false),
+  /** Базовая характеристика атаки обычным оружием; null — Сила. */
+  weaponAttackAbility: abilityKeySchema.nullable().catch(null),
+  /** Своя основа бонуса мастерства; null — по уровню. */
+  proficiencyBase: integerSchema.nullable().catch(null),
+  /** Свои бонусы к бонусу мастерства. */
+  proficiencyBonuses: lenientList(customBonusSchema),
+  /** Характеристика инициативы; null — Ловкость. */
+  initiativeAbility: abilityKeySchema.nullable().catch(null),
+  /** Своя основа инициативы вместо модификатора; null — модификатор. */
+  initiativeBase: integerSchema.nullable().catch(null),
+  /** Свои бонусы инициативы. */
+  initiativeBonuses: lenientList(customBonusSchema),
 });
 
 export type SheetDocument = z.infer<typeof sheetDocumentSchema>;

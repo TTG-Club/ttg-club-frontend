@@ -1,5 +1,6 @@
 export { default as SheetAbilityModal } from './SheetAbilityModal.vue';
 export { default as SheetArmorClassModal } from './SheetArmorClassModal.vue';
+export { default as SheetBonusSection } from './SheetBonusSection.vue';
 export { default as SheetCatalogPicker } from './SheetCatalogPicker.vue';
 export { default as SheetCatalogTreeModal } from './SheetCatalogTreeModal.vue';
 export { default as SheetChoicePickerModal } from './SheetChoicePickerModal.vue';
@@ -14,6 +15,7 @@ export { default as SheetLevelUpModal } from './SheetLevelUpModal.vue';
 export { default as SheetResourcesModal } from './SheetResourcesModal.vue';
 export { default as SheetRestModal } from './SheetRestModal.vue';
 export { default as SheetSavingThrowsSettingsModal } from './SheetSavingThrowsSettingsModal.vue';
+export { default as SheetSettingsModal } from './SheetSettingsModal.vue';
 export { default as SheetSizeModal } from './SheetSizeModal.vue';
 export { default as SheetSkillsSettingsModal } from './SheetSkillsSettingsModal.vue';
 export { default as SheetSourceChoices } from './SheetSourceChoices.vue';
