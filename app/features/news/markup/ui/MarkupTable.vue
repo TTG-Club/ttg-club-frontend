@@ -96,7 +96,7 @@
             v-for="column in columns"
             :key="column.index"
             :class="[
-              'border-b border-default p-2 text-sm text-highlighted',
+              'border-b border-default p-2 text-xs text-highlighted',
               column.align,
               column.style,
             ]"
