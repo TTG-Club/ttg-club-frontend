@@ -8,6 +8,8 @@
 
   import type { RaceForm, WorkshopRace } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { raceDetailSchema } from '~character/model';
   import { RaceBody } from '~character/races';
 
@@ -24,11 +26,15 @@
   } from '../form';
   import { WorkshopImages } from '../images';
   import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     createRaceForm,
+    getMechanicsFilledCount,
     getRacePayload,
     getRacePreviewPath,
     getWorkshopSectionRoute,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     RACE_EDITOR_TAB,
     RACE_EDITOR_TAB_TEXT,
     RACE_EDITOR_TEXT,
@@ -41,6 +47,7 @@
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
     WORKSHOP_IMAGES_TAB,
+    WORKSHOP_MECHANICS_TAB,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
     WorkshopImageType,
@@ -110,6 +117,20 @@
       value: RACE_EDITOR_TAB.features,
       slot: RACE_EDITOR_TAB.features,
       badge: state.features.length || undefined,
+    },
+    {
+      label: MECHANICS_TEXT.title,
+      value: WORKSHOP_MECHANICS_TAB.mechanics,
+      slot: WORKSHOP_MECHANICS_TAB.mechanics,
+      badge:
+        getMechanicsFilledCount(state.mechanics, MECHANICS_KIND.race)
+        || undefined,
+    },
+    {
+      label: MECHANICS_TEXT.effectsTitle,
+      value: WORKSHOP_MECHANICS_TAB.activeEffects,
+      slot: WORKSHOP_MECHANICS_TAB.activeEffects,
+      badge: state.activeEffects.length || undefined,
     },
     ...(imagesEntryId.value === undefined
       ? []
@@ -382,6 +403,24 @@
           <RaceFeaturesEditor
             ref="features"
             v-model="state.features"
+          />
+        </div>
+      </template>
+
+      <template #mechanics>
+        <WorkshopMechanicsEditor
+          v-model="state.mechanics"
+          :kind="MECHANICS_KIND.race"
+        />
+      </template>
+
+      <template #activeEffects>
+        <div class="col-span-full">
+          <ActiveEffects
+            v-model="state.activeEffects"
+            :context="EFFECT_FORM_CONTEXT.feature"
+            :origin="EFFECT_ORIGIN.feature"
+            :title="MECHANICS_TEXT.effectsTitle"
           />
         </div>
       </template>

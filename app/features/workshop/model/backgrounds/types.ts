@@ -1,3 +1,5 @@
+import type { WorkshopMechanicsFields } from '../mechanics';
+
 /** Таблица персонализации: тип и строки по порядку броска. */
 export interface PersonalizationTable {
   /** Код типа таблицы: `TRAIT`, `IDEAL`. */
@@ -6,7 +8,7 @@ export interface PersonalizationTable {
 }
 
 /** Предыстория из справочника, как её открывает редактор. */
-export interface WorkshopBackground {
+export interface WorkshopBackground extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;

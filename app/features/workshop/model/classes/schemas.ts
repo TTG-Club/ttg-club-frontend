@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { markupBlocksSchema } from '~content/model';
 
 import { WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
@@ -32,6 +33,8 @@ const classTraitSchema = z.object({
   description: markupBlocksSchema.nullish(),
   optional: z.boolean().catch(false),
   child: z.string().nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
 });
 
 const classTableColumnSchema = z.object({
@@ -71,6 +74,8 @@ const workshopClassSchema = z.object({
       equipment: markupBlocksSchema.nullish(),
     })
     .nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -87,6 +92,8 @@ const workshopArchetypeSchema = z.object({
   page: z.number().nullish(),
   traits: z.array(classTraitSchema).catch([]),
   tableColumns: z.array(classTableColumnSchema).catch([]),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
 });
 
 /**
@@ -102,6 +109,7 @@ function toClassTrait(trait: z.infer<typeof classTraitSchema>): ClassTrait {
     description: trait.description ?? [],
     optional: trait.optional,
     child: trait.child ?? '',
+    ...parseMechanicsFields(trait),
   };
 }
 
@@ -157,6 +165,7 @@ export function parseWorkshopClass(input: unknown): WorkshopClass {
     page: heroClass.page ?? null,
     classTraits: heroClass.classTraits.map(toClassTrait),
     tableColumns: heroClass.tableColumns.map(toClassTableColumn),
+    ...parseMechanicsFields(heroClass),
     source: heroClass.source?.shortName,
   };
 }
@@ -181,6 +190,7 @@ export function parseWorkshopArchetype(input: unknown): WorkshopArchetype {
     page: archetype.page ?? null,
     traits: archetype.traits.map(toClassTrait),
     tableColumns: archetype.tableColumns.map(toClassTableColumn),
+    ...parseMechanicsFields(archetype),
   };
 }
 
@@ -206,6 +216,7 @@ export const classTraitFormSchema = z.object({
   description: workshopRequiredMarkup,
   optional: z.boolean(),
   child: z.string(),
+  ...mechanicsFieldsFormSchema,
 });
 
 /** Колонка таблицы прогрессии в форме. */
@@ -255,6 +266,7 @@ export const classFormSchema = z.object({
   description: workshopRequiredMarkup,
   classTraits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),
+  ...mechanicsFieldsFormSchema,
 });
 
 export type ClassForm = z.infer<typeof classFormSchema>;
@@ -270,6 +282,7 @@ export const archetypeFormSchema = z.object({
   description: workshopRequiredMarkup,
   traits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),
+  ...mechanicsFieldsFormSchema,
 });
 
 export type ArchetypeForm = z.infer<typeof archetypeFormSchema>;

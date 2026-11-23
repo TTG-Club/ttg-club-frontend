@@ -6,6 +6,10 @@ import { markupBlocksSchema } from '~content/model';
 
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
+  magicItemMechanicsFormSchema,
+  parseMagicItemMechanicsForm,
+} from '../mechanics';
+import {
   workshopNameSchema,
   workshopOptionalNotNegative,
   workshopOptionalPositive,
@@ -29,6 +33,7 @@ const workshopMagicItemSchema = z.object({
   costRaw: z.number().nullish(),
   bonus: z.number().nullish(),
   description: markupBlocksSchema.nullish(),
+  mechanics: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -55,6 +60,7 @@ export function parseWorkshopMagicItem(input: unknown): WorkshopMagicItem {
     cost: item.costRaw ?? null,
     bonus: item.bonus ?? null,
     description: item.description ?? [],
+    mechanics: parseMagicItemMechanicsForm(item.mechanics),
     source: item.source?.shortName,
   };
 }
@@ -77,6 +83,7 @@ export const magicItemFormSchema = z.object({
   cost: workshopOptionalNotNegative,
   bonus: workshopOptionalPositive,
   description: workshopRequiredMarkup,
+  mechanics: magicItemMechanicsFormSchema,
 });
 
 export type MagicItemForm = z.infer<typeof magicItemFormSchema>;

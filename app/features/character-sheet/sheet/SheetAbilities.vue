@@ -1,57 +1,64 @@
 <script setup lang="ts">
   import type { AbilityKey } from '../model';
 
-  import { useCharacterSheet, useSheetRoll } from '../composables';
+  import { clamp } from 'es-toolkit';
+
   import {
+    useCharacterSheet,
+    useSheetRoll,
+    useSheetStats,
+  } from '../composables';
+  import {
+    ABILITY_EFFECT_KEYS,
     ABILITY_KEYS,
     ABILITY_LABELS,
     ABILITY_SCORE,
-    formatModifier,
     getAbilityModifier,
-    getCharacterLevel,
-    getProficiencyBonus,
-    getSavingThrowBonus,
     SHEET_LABELS,
   } from '../model';
+  import SheetAbilityTile from './SheetAbilityTile.vue';
 
   /**
-   * Характеристики: значение, модификатор и спасбросок каждой. Клик по
-   * модификатору — проверка, по спасброску — спасбросок.
+   * Ряд характеристик: шесть плиток в строку (на узком — по три), клик —
+   * проверка с преимуществом или помехой от эффектов, ± — быстрая правка
+   * записанного значения, шестерёнка — точный ввод.
    */
   const { document, update } = useCharacterSheet();
+  const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
-  const proficiencyBonus = computed(() =>
-    getProficiencyBonus(getCharacterLevel(document.value.classes)),
+  const editedAbility = ref<AbilityKey | null>(null);
+
+  const isEditOpen = computed({
+    get: () => editedAbility.value !== null,
+    set: (open: boolean) => {
+      if (!open) {
+        editedAbility.value = null;
+      }
+    },
+  });
+
+  const editTitle = computed(() =>
+    editedAbility.value
+      ? ABILITY_LABELS[editedAbility.value].name
+      : SHEET_LABELS.abilities,
   );
 
-  const rows = computed(() =>
-    ABILITY_KEYS.map((key) => {
-      const score = document.value.abilities[key];
-      const modifier = getAbilityModifier(score);
-
-      const save = getSavingThrowBonus(
-        document.value,
+  /** Откуда прибавка к характеристике: источники механики. */
+  const hints = computed(() =>
+    Object.fromEntries(
+      ABILITY_KEYS.map((key) => [
         key,
-        proficiencyBonus.value,
-      );
-
-      return {
-        key,
-        label: ABILITY_LABELS[key],
-        score,
-        modifier,
-        modifierLabel: formatModifier(modifier),
-        save,
-        saveLabel: formatModifier(save),
-        isProficient: document.value.savingThrows.includes(key),
-        racialBonus: document.value.raceAbilityBonuses[key] ?? 0,
-      };
-    }),
+        document.value.sources
+          .filter((source) => source.abilityIncreases[key])
+          .map((source) => `${source.name} +${source.abilityIncreases[key]}`)
+          .join(', '),
+      ]),
+    ),
   );
 
   /**
-   * Меняет значение характеристики.
+   * Меняет записанное значение.
    * @param key - характеристика
    * @param value - новое значение
    */
@@ -62,21 +69,20 @@
 
     update((current) => ({
       ...current,
-      abilities: { ...current.abilities, [key]: value },
+      abilities: {
+        ...current.abilities,
+        [key]: clamp(value, ABILITY_SCORE.min, ABILITY_SCORE.max),
+      },
     }));
   }
 
   /**
-   * Включает или снимает владение спасброском.
+   * Быстрая правка ±.
    * @param key - характеристика
+   * @param delta - на сколько
    */
-  function toggleSavingThrow(key: AbilityKey): void {
-    update((current) => ({
-      ...current,
-      savingThrows: current.savingThrows.includes(key)
-        ? current.savingThrows.filter((ability) => ability !== key)
-        : [...current.savingThrows, key],
-    }));
+  function adjust(key: AbilityKey, delta: number): void {
+    setScore(key, document.value.abilities[key] + delta);
   }
 
   /**
@@ -87,73 +93,62 @@
   function rollCheck(key: AbilityKey, event: MouseEvent): void {
     rollD20(
       ABILITY_LABELS[key].name,
-      getAbilityModifier(document.value.abilities[key]),
+      getAbilityModifier(stats.value.abilities[key]),
       event,
+      { kind: 'abilityCheck', ability: ABILITY_EFFECT_KEYS[key] },
     );
   }
 
   /**
-   * Спасбросок.
+   * Открывает точную правку.
    * @param key - характеристика
-   * @param event - клик
    */
-  function rollSave(key: AbilityKey, event: MouseEvent): void {
-    rollD20(
-      `${SHEET_LABELS.savingThrow}: ${ABILITY_LABELS[key].name}`,
-      getSavingThrowBonus(document.value, key, proficiencyBonus.value),
-      event,
-    );
+  function openEdit(key: AbilityKey): void {
+    editedAbility.value = key;
+  }
+
+  /**
+   * Значение из поля точной правки.
+   * @param value - новое значение
+   */
+  function setEditedScore(value: number | null): void {
+    if (editedAbility.value) {
+      setScore(editedAbility.value, value);
+    }
   }
 </script>
 
 <template>
-  <div class="grid grid-cols-3 gap-2 sm:grid-cols-6">
-    <div
-      v-for="row in rows"
-      :key="row.key"
-      class="flex flex-col items-center gap-1 rounded-xl border border-default bg-elevated/40 p-2"
-    >
-      <span class="text-xs tracking-wide text-muted uppercase">
-        {{ row.label.name }}
-      </span>
-
-      <button
-        type="button"
-        class="rounded-md px-2 text-3xl leading-tight font-semibold text-highlighted hover:text-primary"
-        @click.left.prevent="rollCheck(row.key, $event)"
-      >
-        {{ row.modifierLabel }}
-      </button>
-
-      <UInputNumber
-        :model-value="row.score"
-        :min="ABILITY_SCORE.min"
-        :max="ABILITY_SCORE.max"
-        size="xs"
-        class="w-20"
-        :ui="{ base: 'text-center' }"
-        @update:model-value="setScore(row.key, $event)"
+  <div class="@container">
+    <div class="grid grid-cols-3 gap-3 pb-2 @xl:grid-cols-6">
+      <SheetAbilityTile
+        v-for="key in ABILITY_KEYS"
+        :key="key"
+        :ability-key="key"
+        :score="stats.abilities[key]"
+        :base-score="document.abilities[key]"
+        :hint="hints[key]"
+        @roll="rollCheck(key, $event)"
+        @settings="openEdit(key)"
+        @adjust="adjust(key, $event)"
       />
-
-      <div
-        class="mt-1 flex w-full items-center justify-between gap-1 border-t border-default pt-1"
-      >
-        <UCheckbox
-          :model-value="row.isProficient"
-          :aria-label="SHEET_LABELS.savingThrowsHint"
-          size="sm"
-          @update:model-value="toggleSavingThrow(row.key)"
-        />
-
-        <button
-          type="button"
-          class="text-sm text-default hover:text-primary"
-          :title="SHEET_LABELS.savingThrows"
-          @click.left.prevent="rollSave(row.key, $event)"
-        >
-          {{ SHEET_LABELS.savingThrowShort }} {{ row.saveLabel }}
-        </button>
-      </div>
     </div>
+
+    <UModal
+      v-model:open="isEditOpen"
+      :title="editTitle"
+      :ui="{ content: 'max-w-xs' }"
+    >
+      <template #body>
+        <UInputNumber
+          v-if="editedAbility"
+          :model-value="document.abilities[editedAbility]"
+          :min="ABILITY_SCORE.min"
+          :max="ABILITY_SCORE.max"
+          class="w-full"
+          @update:model-value="setEditedScore"
+        />
+      </template>
+    </UModal>
   </div>
 </template>

@@ -3,6 +3,8 @@
 
   import type { BackgroundForm, WorkshopBackground } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { BackgroundBody } from '~character/backgrounds';
   import { backgroundDetailSchema } from '~character/model';
 
@@ -13,6 +15,7 @@
     WorkshopSourceSelect,
   } from '../form';
   import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     BACKGROUND_EDITOR_TEXT,
     backgroundFormSchema,
@@ -21,6 +24,8 @@
     getBackgroundPayload,
     getWorkshopSectionRoute,
     LIFE_STYLE_OPTIONS,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
@@ -240,6 +245,20 @@
 
     <div class="col-span-full">
       <PersonalizationTablesEditor v-model="state.personalizationTables" />
+    </div>
+
+    <WorkshopMechanicsEditor
+      v-model="state.mechanics"
+      :kind="MECHANICS_KIND.feat"
+    />
+
+    <div class="col-span-full">
+      <ActiveEffects
+        v-model="state.activeEffects"
+        :context="EFFECT_FORM_CONTEXT.feature"
+        :origin="EFFECT_ORIGIN.feature"
+        :title="MECHANICS_TEXT.effectsTitle"
+      />
     </div>
 
     <div class="col-span-full">

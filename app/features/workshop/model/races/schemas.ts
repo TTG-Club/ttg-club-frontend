@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { markupBlocksSchema } from '~content/model';
 
 import { WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalNotNegative,
@@ -23,6 +24,8 @@ const raceFeatureSchema = z.object({
   description: markupBlocksSchema.nullish(),
   feature: z.boolean().catch(false),
   replaceFeatureId: z.number().nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
 });
 
 const workshopRaceSchema = z.object({
@@ -48,6 +51,8 @@ const workshopRaceSchema = z.object({
     .catch([]),
   features: z.array(raceFeatureSchema).catch([]),
   description: markupBlocksSchema.nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -93,8 +98,10 @@ export function parseWorkshopRace(input: unknown): WorkshopRace {
       description: feature.description ?? [],
       feature: feature.feature,
       replaceFeatureId: feature.replaceFeatureId ?? null,
+      ...parseMechanicsFields(feature),
     })),
     description: race.description ?? [],
+    ...parseMechanicsFields(race),
     source: race.source?.shortName,
   };
 }
@@ -155,9 +162,11 @@ export const raceFormSchema = z.object({
       description: workshopRequiredMarkup,
       feature: z.boolean(),
       replaceFeatureId: workshopOptionalPositive,
+      ...mechanicsFieldsFormSchema,
     }),
   ),
   description: workshopRequiredMarkup,
+  ...mechanicsFieldsFormSchema,
 });
 
 export type RaceForm = z.infer<typeof raceFormSchema>;

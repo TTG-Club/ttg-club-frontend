@@ -299,6 +299,7 @@ export async function loadClassSelection(
       archetypeUrl: null,
       level,
       hitDie: detail.traits?.diceHp ?? parseHitDie(detail.dice) ?? 8,
+      hitPointGains: [],
     },
     savingThrows: parseSavingThrows(detail.traits?.savingThrows),
     spellAbility: toAbilityKey(detail.spellAbility),
@@ -323,6 +324,11 @@ export function createSheetItem(name: string, url: string | null): SheetItem {
     notes: '',
     weapon: null,
     armor: null,
+    requiresAttunement: false,
+    isAttuned: false,
+    charges: null,
+    activeEffects: [],
+    passive: '',
   };
 }
 
@@ -396,6 +402,8 @@ export function createSheetSpell(name: string, url: string | null): SheetSpell {
     isRitual: false,
     isConcentration: false,
     notes: '',
+    sourceId: null,
+    alwaysPrepared: false,
   };
 }
 

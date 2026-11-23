@@ -9,6 +9,9 @@
   import {
     ARMOR_CATEGORIES,
     ARMOR_CATEGORY_LABELS,
+    ATTUNEMENT_TEXT,
+    RECHARGE_EVENT_LABELS,
+    RECHARGE_EVENTS,
     SHEET_ICON,
     SHEET_LABELS,
   } from '../model';
@@ -111,6 +114,62 @@
    */
   function setArmorCategory(value: ArmorCategory): void {
     patchArmor({ category: value });
+  }
+
+  const rechargeOptions = Object.entries(RECHARGE_EVENT_LABELS).map(
+    ([value, label]) => ({ value, label }),
+  );
+
+  /**
+   * Требует ли предмет настройки.
+   * @param value - отметка
+   */
+  function setRequiresAttunement(value: boolean | 'indeterminate'): void {
+    patchDraft({ requiresAttunement: value === true });
+  }
+
+  /**
+   * Максимум зарядов; ноль — зарядов нет.
+   * @param value - максимум
+   */
+  function setChargesMax(value: number | null): void {
+    const max = Math.max(0, value ?? 0);
+    const charges = draft.value?.charges;
+
+    patchDraft({
+      charges: max
+        ? {
+            max,
+            used: Math.min(charges?.used ?? 0, max),
+            recharge: charges?.recharge ?? '',
+            rechargeEvent: charges?.rechargeEvent ?? RECHARGE_EVENTS.dawn,
+          }
+        : null,
+    });
+  }
+
+  /**
+   * Формула восстановления зарядов.
+   * @param value - формула
+   */
+  function setRecharge(value: string | number): void {
+    const charges = draft.value?.charges;
+
+    if (charges) {
+      patchDraft({ charges: { ...charges, recharge: String(value) } });
+    }
+  }
+
+  /**
+   * Когда восстанавливаются заряды.
+   * @param value - событие восстановления
+   */
+  function setRechargeEvent(value: string): void {
+    const charges = draft.value?.charges;
+
+    if (charges) {
+      patchDraft({ charges: { ...charges, rechargeEvent: value } });
+    }
   }
 
   function save(): void {
@@ -276,6 +335,45 @@
               patchArmor({ stealthDisadvantage: $event === true })
             "
           />
+        </div>
+
+        <div class="grid grid-cols-2 items-end gap-3">
+          <UCheckbox
+            :model-value="draft.requiresAttunement"
+            :label="ATTUNEMENT_TEXT.requires"
+            @update:model-value="setRequiresAttunement"
+          />
+
+          <UFormField :label="ATTUNEMENT_TEXT.charges">
+            <UInputNumber
+              :model-value="draft.charges?.max ?? 0"
+              :min="0"
+              class="w-full"
+              @update:model-value="setChargesMax"
+            />
+          </UFormField>
+
+          <UFormField
+            v-if="draft.charges"
+            :label="ATTUNEMENT_TEXT.recharge"
+            class="col-span-2"
+          >
+            <div class="flex gap-2">
+              <UInput
+                :model-value="draft.charges.recharge"
+                placeholder="1к6+1"
+                class="flex-1"
+                @update:model-value="setRecharge"
+              />
+
+              <USelect
+                :model-value="draft.charges.rechargeEvent"
+                :items="rechargeOptions"
+                class="w-56"
+                @update:model-value="setRechargeEvent"
+              />
+            </div>
+          </UFormField>
         </div>
 
         <UFormField :label="SHEET_LABELS.notes">

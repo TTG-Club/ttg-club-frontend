@@ -1,68 +1,77 @@
 <script setup lang="ts">
+  import { SHEET_BODY_LABELS } from '../model';
+  import SheetPanel from './SheetPanel.vue';
+
   /**
-   * Плитка показателя листа: подпись, крупное значение и подсказка. По клику
-   * — бросок или правка, если плитка интерактивная.
+   * Плитка показателя листа (мастерство, КД, инициатива): подпись на рамке и
+   * крупное значение. Кликабельная плитка отдаёт `press`.
    */
   const {
     label,
-    value,
-    hint = '',
-    icon = '',
-    isInteractive = false,
+    interactive = false,
+    shortLabel = undefined,
+    unit = undefined,
+    pressLabel = undefined,
   } = defineProps<{
     label: string;
     value: string | number;
-    hint?: string;
-    icon?: string;
-    isInteractive?: boolean;
+    unit?: string;
+    /** Короткая подпись для узкой плитки («КД» вместо «Класс доспеха»). */
+    shortLabel?: string;
+    interactive?: boolean;
+    /** Подпись действия для скринридера; по умолчанию — бросок. */
+    pressLabel?: string;
   }>();
 
   const emit = defineEmits<{
-    activate: [];
+    press: [event: MouseEvent];
   }>();
 
-  const tileClass = computed(() =>
-    isInteractive
-      ? 'cursor-pointer hover:border-primary/60 focus-visible:border-primary'
-      : 'cursor-default',
+  const pressAriaLabel = computed(
+    () => pressLabel ?? `${SHEET_BODY_LABELS.roll}: ${label}`,
   );
-
-  function activate(): void {
-    if (isInteractive) {
-      emit('activate');
-    }
-  }
 </script>
 
 <template>
-  <button
-    type="button"
-    class="flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border border-default bg-elevated/40 px-2 py-2 text-center transition-colors outline-none"
-    :class="tileClass"
-    :tabindex="isInteractive ? 0 : -1"
-    @click.left.exact.prevent="activate"
+  <SheetPanel
+    :title="label"
+    :short-title="shortLabel"
+    center-title
+    :interactive="interactive"
   >
-    <span
-      class="flex items-center gap-1 text-xs tracking-wide text-muted uppercase"
+    <button
+      v-if="interactive"
+      type="button"
+      class="flex w-full cursor-pointer items-center justify-center pt-1 after:absolute after:inset-0 after:cursor-pointer"
+      :aria-label="pressAriaLabel"
+      @click.left.prevent="emit('press', $event)"
     >
-      <UIcon
-        v-if="icon"
-        :name="icon"
-        class="size-3.5"
-      />
+      <span class="text-2xl leading-none font-bold text-highlighted">
+        {{ value }}
 
-      {{ label }}
-    </span>
+        <span
+          v-if="unit"
+          class="text-xs font-normal text-dimmed"
+        >
+          {{ unit }}
+        </span>
+      </span>
+    </button>
 
-    <span class="text-2xl leading-tight font-semibold text-highlighted">
-      {{ value }}
-    </span>
-
-    <span
-      v-if="hint"
-      class="truncate text-xs text-muted"
+    <div
+      v-else
+      class="flex items-center justify-center pt-1"
     >
-      {{ hint }}
-    </span>
-  </button>
+      <span class="text-2xl leading-none font-bold text-highlighted">
+        {{ value }}
+
+        <span
+          v-if="unit"
+          class="text-xs font-normal text-dimmed"
+        >
+          {{ unit }}
+        </span>
+      </span>
+    </div>
+  </SheetPanel>
 </template>

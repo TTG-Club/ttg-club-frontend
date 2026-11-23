@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { markupBlocksSchema } from '~content/model';
 
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
@@ -22,6 +23,8 @@ const workshopFeatSchema = z.object({
   description: markupBlocksSchema.nullish(),
   abilities: z.array(z.string()).nullish(),
   skills: z.array(z.string()).nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -42,6 +45,7 @@ export function parseWorkshopFeat(input: unknown): WorkshopFeat {
     description: feat.description ?? [],
     abilities: feat.abilities ?? [],
     skills: feat.skills ?? [],
+    ...parseMechanicsFields(feat),
     source: feat.source?.shortName,
   };
 }
@@ -56,6 +60,7 @@ export const featFormSchema = z.object({
   abilities: z.array(z.string()),
   skills: z.array(z.string()),
   description: workshopRequiredMarkup,
+  ...mechanicsFieldsFormSchema,
 });
 
 export type FeatForm = z.infer<typeof featFormSchema>;

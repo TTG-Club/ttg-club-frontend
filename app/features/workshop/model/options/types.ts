@@ -1,5 +1,7 @@
+import type { WorkshopMechanicsFields } from '../mechanics';
+
 /** Особенность класса из справочника, как её открывает редактор. */
-export interface WorkshopOption {
+export interface WorkshopOption extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;

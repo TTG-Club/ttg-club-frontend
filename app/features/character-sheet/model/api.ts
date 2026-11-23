@@ -119,3 +119,14 @@ export async function fetchCatalogEntry<Schema extends z.ZodType>(
     await api(getCatalogApiPath(url), { method: 'POST', body: {} }),
   );
 }
+
+/**
+ * Запись справочника без разбора: одну карточку лист читает несколькими
+ * схемами (раздел и механика), чтобы битая механика не роняла остальное.
+ * @param url - адрес записи, например `/classes/fighter`
+ */
+export async function fetchCatalogRaw(url: string): Promise<unknown> {
+  const api = useApi();
+
+  return await api(getCatalogApiPath(url), { method: 'POST', body: {} });
+}

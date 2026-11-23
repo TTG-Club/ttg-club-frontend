@@ -1,109 +1,168 @@
 <script setup lang="ts">
-  import type { ResourceReset, SheetFeature, SheetResource } from '../model';
+  import type {
+    CatalogOption,
+    SheetDocument,
+    SheetFeature,
+    SheetSource,
+  } from '../model';
 
   import { ContentRender } from '~content/render';
+  import { getApiErrorMessage } from '~user/model';
 
-  import { useCharacterSheet, useSheetClassData } from '../composables';
   import {
+    useCharacterSheet,
+    useSheetClassData,
+    useSheetStats,
+  } from '../composables';
+  import { SheetCatalogPicker, SheetSourceChoices } from '../dialogs';
+  import {
+    ABILITY_LABELS,
+    addSources,
     createSheetElementId,
-    RESOURCE_RESET_LABELS,
-    RESOURCE_RESETS,
+    FEAT_SEARCH,
+    getClassFeatureSourceUrl,
+    loadFeatSource,
+    removeSources,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_TEXT,
+    SOURCE_KIND_LABELS,
+    toAbilityKey,
   } from '../model';
   import SheetPanel from './SheetPanel.vue';
 
   /**
-   * Умения: значения таблицы класса, умения классов и подклассов из
-   * справочника к текущему уровню, ресурсы с восстановлением на отдыхе и свои
-   * умения и черты.
+   * Особенности: значения таблицы класса, умения классов и подклассов к
+   * текущему уровню (с выборами умения, если у него есть механика), раса,
+   * предыстория, черты и увеличения характеристик с их выборами, свои умения.
    */
-  const { document, update } = useCharacterSheet();
-  const { features, tableValues, isLoading } = useSheetClassData();
+  const FEATURE_SOURCE_KINDS: ReadonlySet<SheetSource['kind']> = new Set([
+    'race',
+    'subrace',
+    'raceFeature',
+    'background',
+    'feat',
+    'asi',
+    'class',
+    'subclass',
+  ]);
 
-  const resetOptions = RESOURCE_RESETS.map((reset) => ({
-    label: RESOURCE_RESET_LABELS[reset],
-    value: reset,
-  }));
+  const toast = useToast();
+  const { document, update, editControlClass } = useCharacterSheet();
+  const { features, tableValues, isLoading } = useSheetClassData();
+  const { pendingChoices, stats } = useSheetStats();
+
+  const isFeatPickerOpen = ref(false);
 
   const visibleTables = computed(() =>
     tableValues.value.filter((table) => table.values.length),
   );
 
+  /** Сколько выборов источника ещё не сделано. */
+  const pendingBySource = computed(() =>
+    pendingChoices.value.reduce<Record<string, number>>(
+      (result, entry) => ({
+        ...result,
+        [entry.source.id]: (result[entry.source.id] ?? 0) + entry.missing,
+      }),
+      {},
+    ),
+  );
+
+  const classFeatureRows = computed(() =>
+    features.value.map((feature) => {
+      const [classId = '', featureId = ''] = feature.id.split(':');
+
+      const sheetClass = document.value.classes.find(
+        (candidate) => candidate.id === classId,
+      );
+
+      const url = getClassFeatureSourceUrl(sheetClass?.url ?? null, featureId);
+
+      const source = document.value.sources.find(
+        (candidate) =>
+          candidate.kind === 'classFeature'
+          && candidate.classId === classId
+          && candidate.url === url,
+      );
+
+      return {
+        feature,
+        sourceId: source?.id ?? null,
+        pending: source ? (pendingBySource.value[source.id] ?? 0) : 0,
+        caption: `${feature.level} ${SHEET_TEXT.levelShort} · ${feature.className}`,
+      };
+    }),
+  );
+
   /**
-   * Подпись умения: уровень и класс.
-   * @param level - уровень получения
-   * @param className - класс или подкласс
+   * Подпись прибавок к характеристикам источника: «Сила +1, Ловкость +1».
+   * @param source - источник
    */
-  function getFeatureCaption(level: number, className: string): string {
-    return `${level} ${SHEET_TEXT.levelShort} · ${className}`;
+  function getIncreasesLabel(source: SheetSource): string {
+    return Object.entries(source.abilityIncreases)
+      .flatMap(([key, value]) => {
+        const ability = toAbilityKey(key);
+
+        return ability && value
+          ? [`${ABILITY_LABELS[ability].short} +${value}`]
+          : [];
+      })
+      .join(', ');
+  }
+
+  const sourceRows = computed(() =>
+    document.value.sources
+      .filter(
+        (source) => FEATURE_SOURCE_KINDS.has(source.kind) && !source.parentId,
+      )
+      .map((source) => ({
+        source,
+        kindLabel: SOURCE_KIND_LABELS[source.kind],
+        increases: getIncreasesLabel(source),
+        pending: pendingBySource.value[source.id] ?? 0,
+        canRemove: source.kind === 'feat' && !source.classId,
+      })),
+  );
+
+  /**
+   * Подставляет документ с ответом на выбор.
+   * @param next - новый документ
+   */
+  function applyDocument(next: SheetDocument): void {
+    update(() => next);
   }
 
   /**
-   * Меняет ресурс.
-   * @param id - идентификатор ресурса
-   * @param patch - изменённые поля
+   * Берёт черту из справочника: её механика применяется, выборы — здесь же.
+   * @param option - выбранная черта
    */
-  function patchResource(id: string, patch: Partial<SheetResource>): void {
-    update((current) => ({
-      ...current,
-      resources: current.resources.map((resource) =>
-        resource.id === id ? { ...resource, ...patch } : resource,
-      ),
-    }));
-  }
+  async function addFeat(option: CatalogOption): Promise<void> {
+    try {
+      const feat = await loadFeatSource('feat', option.url, {
+        characterLevel: stats.value.level,
+      });
 
-  function addResource(): void {
-    update((current) => ({
-      ...current,
-      resources: [
-        ...current.resources,
-        {
-          id: createSheetElementId(),
-          name: SHEET_LABELS.resource,
-          max: 1,
-          used: 0,
-          reset: 'LONG',
-        },
-      ],
-    }));
+      update((current) => addSources(current, [feat]));
+    } catch (error) {
+      toast.add({
+        title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
+        color: 'error',
+      });
+    }
   }
 
   /**
-   * Убирает ресурс.
-   * @param id - идентификатор ресурса
+   * Снимает черту со всеми выдачами.
+   * @param id - источник черты
    */
-  function removeResource(id: string): void {
-    update((current) => ({
-      ...current,
-      resources: current.resources.filter((resource) => resource.id !== id),
-    }));
-  }
-
-  /**
-   * Восстановление ресурса из списка.
-   * @param id - идентификатор ресурса
-   * @param reset - отдых
-   */
-  function setResourceReset(id: string, reset: ResourceReset): void {
-    patchResource(id, { reset });
-  }
-
-  /**
-   * Осталось использований ресурса.
-   * @param resource - ресурс
-   * @param left - осталось
-   */
-  function setResourceLeft(resource: SheetResource, left: number | null): void {
-    patchResource(resource.id, {
-      used: Math.max(0, resource.max - Math.min(left ?? 0, resource.max)),
-    });
+  function removeFeat(id: string): void {
+    update((current) => removeSources(current, [id]));
   }
 
   /**
    * Меняет своё умение.
-   * @param id - идентификатор умения
+   * @param id - умение
    * @param patch - изменённые поля
    */
   function patchFeature(id: string, patch: Partial<SheetFeature>): void {
@@ -132,7 +191,7 @@
 
   /**
    * Убирает своё умение.
-   * @param id - идентификатор умения
+   * @param id - умение
    */
   function removeFeature(id: string): void {
     update((current) => ({
@@ -140,10 +199,14 @@
       features: current.features.filter((feature) => feature.id !== id),
     }));
   }
+
+  function openFeatPicker(): void {
+    isFeatPickerOpen.value = true;
+  }
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 pt-2">
     <SheetPanel
       v-if="visibleTables.length"
       :title="SHEET_LABELS.classTable"
@@ -170,93 +233,11 @@
       </div>
     </SheetPanel>
 
-    <SheetPanel :title="SHEET_LABELS.resources">
-      <template #actions>
-        <UButton
-          :label="SHEET_LABELS.add"
-          :icon="SHEET_ICON.add"
-          color="neutral"
-          variant="subtle"
-          size="xs"
-          @click.left.exact.prevent="addResource"
-        />
-      </template>
-
-      <ul
-        v-if="document.resources.length"
-        class="flex flex-col gap-2"
-      >
-        <li
-          v-for="resource in document.resources"
-          :key="resource.id"
-          class="grid grid-cols-[1fr_5rem_5rem_auto] items-end gap-2 sm:grid-cols-[1fr_5rem_5rem_11rem_auto]"
-        >
-          <UFormField :label="SHEET_LABELS.name">
-            <UInput
-              :model-value="resource.name"
-              size="sm"
-              class="w-full"
-              @update:model-value="
-                patchResource(resource.id, { name: String($event) })
-              "
-            />
-          </UFormField>
-
-          <UFormField :label="SHEET_LABELS.left">
-            <UInputNumber
-              :model-value="resource.max - resource.used"
-              :min="0"
-              :max="resource.max"
-              size="sm"
-              @update:model-value="setResourceLeft(resource, $event)"
-            />
-          </UFormField>
-
-          <UFormField :label="SHEET_LABELS.max">
-            <UInputNumber
-              :model-value="resource.max"
-              :min="0"
-              size="sm"
-              @update:model-value="
-                patchResource(resource.id, { max: $event ?? 0 })
-              "
-            />
-          </UFormField>
-
-          <UFormField
-            :label="SHEET_LABELS.reset"
-            class="hidden sm:block"
-          >
-            <USelect
-              :model-value="resource.reset"
-              :items="resetOptions"
-              size="sm"
-              class="w-full"
-              @update:model-value="setResourceReset(resource.id, $event)"
-            />
-          </UFormField>
-
-          <UButton
-            :icon="SHEET_ICON.remove"
-            :aria-label="SHEET_LABELS.remove"
-            color="error"
-            variant="ghost"
-            size="sm"
-            @click.left.exact.prevent="removeResource(resource.id)"
-          />
-        </li>
-      </ul>
-
-      <p
-        v-else
-        class="text-sm text-muted"
-      >
-        {{ SHEET_LABELS.emptyResources }}
-      </p>
-    </SheetPanel>
-
-    <SheetPanel :title="SHEET_LABELS.classFeatures">
-      <template #actions>
+    <SheetPanel
+      :title="SHEET_LABELS.classFeatures"
+      persistent-actions
+    >
+      <template #title-actions>
         <UIcon
           v-if="isLoading"
           :name="SHEET_ICON.loading"
@@ -265,28 +246,43 @@
       </template>
 
       <div
-        v-if="features.length"
+        v-if="classFeatureRows.length"
         class="flex flex-col gap-1"
       >
         <UCollapsible
-          v-for="feature in features"
-          :key="feature.id"
-          class="rounded-lg border border-default"
+          v-for="row in classFeatureRows"
+          :key="row.feature.id"
+          class="rounded-lg border border-default/50 bg-elevated/20"
         >
           <button
             type="button"
             class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
           >
-            <span class="text-highlighted">{{ feature.name }}</span>
+            <span class="flex items-center gap-2 text-highlighted">
+              {{ row.feature.name }}
 
-            <span class="shrink-0 text-xs text-muted">
-              {{ getFeatureCaption(feature.level, feature.className) }}
+              <UBadge
+                v-if="row.pending"
+                :label="String(row.pending)"
+                color="warning"
+                variant="subtle"
+                size="sm"
+              />
             </span>
+
+            <span class="shrink-0 text-xs text-muted">{{ row.caption }}</span>
           </button>
 
           <template #content>
-            <div class="px-3 pb-3 text-sm">
-              <ContentRender :content="feature.description" />
+            <div class="flex flex-col gap-3 px-3 pb-3 text-sm">
+              <SheetSourceChoices
+                v-if="row.sourceId"
+                :document="document"
+                :source-id="row.sourceId"
+                @change="applyDocument"
+              />
+
+              <ContentRender :content="row.feature.description" />
             </div>
           </template>
         </UCollapsible>
@@ -300,14 +296,100 @@
       </p>
     </SheetPanel>
 
-    <SheetPanel :title="SHEET_LABELS.customFeatures">
-      <template #actions>
+    <SheetPanel
+      :title="SOURCE_KIND_LABELS.feat"
+      persistent-actions
+    >
+      <template #title-actions>
         <UButton
           :label="SHEET_LABELS.add"
           :icon="SHEET_ICON.add"
           color="neutral"
-          variant="subtle"
+          variant="ghost"
           size="xs"
+          :class="editControlClass"
+          @click.left.exact.prevent="openFeatPicker"
+        />
+      </template>
+
+      <div
+        v-for="row in sourceRows"
+        :key="row.source.id"
+        class="flex flex-col gap-2 rounded-lg border border-default/50 bg-elevated/20 p-3"
+      >
+        <div class="flex flex-wrap items-center gap-2">
+          <NuxtLink
+            v-if="row.source.url"
+            :to="row.source.url"
+            target="_blank"
+            class="text-sm font-medium text-highlighted hover:text-primary"
+          >
+            {{ row.source.name }}
+          </NuxtLink>
+
+          <span
+            v-else
+            class="text-sm font-medium text-highlighted"
+          >
+            {{ row.source.name }}
+          </span>
+
+          <UBadge
+            :label="row.kindLabel"
+            color="neutral"
+            variant="subtle"
+            size="sm"
+          />
+
+          <UBadge
+            v-if="row.increases"
+            :label="row.increases"
+            color="primary"
+            variant="subtle"
+            size="sm"
+          />
+
+          <UBadge
+            v-if="row.pending"
+            :label="String(row.pending)"
+            color="warning"
+            variant="subtle"
+            size="sm"
+          />
+
+          <UButton
+            v-if="row.canRemove"
+            :icon="SHEET_ICON.remove"
+            :aria-label="SHEET_LABELS.remove"
+            color="error"
+            variant="ghost"
+            size="xs"
+            class="ml-auto"
+            :class="editControlClass"
+            @click.left.exact.prevent="removeFeat(row.source.id)"
+          />
+        </div>
+
+        <SheetSourceChoices
+          :document="document"
+          :source-id="row.source.id"
+          @change="applyDocument"
+        />
+      </div>
+    </SheetPanel>
+
+    <SheetPanel
+      :title="SHEET_LABELS.customFeatures"
+      persistent-actions
+    >
+      <template #title-actions>
+        <UButton
+          :label="SHEET_LABELS.add"
+          :icon="SHEET_ICON.add"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          :class="editControlClass"
           @click.left.exact.prevent="addFeature"
         />
       </template>
@@ -315,7 +397,7 @@
       <div
         v-for="feature in document.features"
         :key="feature.id"
-        class="flex flex-col gap-2 rounded-lg border border-default p-3"
+        class="flex flex-col gap-2 rounded-lg border border-default/50 p-3"
       >
         <div class="flex items-center gap-2">
           <UInput
@@ -360,5 +442,12 @@
         />
       </div>
     </SheetPanel>
+
+    <SheetCatalogPicker
+      v-model:open="isFeatPickerOpen"
+      :title="SOURCE_KIND_LABELS.feat"
+      :source="FEAT_SEARCH"
+      @pick="addFeat"
+    />
   </div>
 </template>

@@ -9,6 +9,11 @@ import type {
 } from './types';
 
 import { WORKSHOP_EDIT_SUFFIX, WORKSHOP_ROUTE } from '../constants';
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
 import { toOptionalMarkup, toOptionalNumber, toOptionalText } from '../utils';
 import {
   CLASS_DEFAULT,
@@ -27,6 +32,7 @@ export function createClassTrait(): ClassTrait {
     description: [],
     optional: false,
     child: '',
+    ...copyMechanicsFields(),
   };
 }
 
@@ -48,6 +54,7 @@ function copyTraits(traits: ReadonlyArray<ClassTrait>): Array<ClassTrait> {
   return traits.map((trait) => ({
     ...trait,
     description: [...trait.description],
+    ...copyMechanicsFields(trait),
   }));
 }
 
@@ -74,6 +81,7 @@ function getTraitsPayload(
     suffix: toOptionalText(trait.suffix),
     description: [...trait.description],
     child: toOptionalText(trait.child),
+    ...getMechanicsFieldsPayload(trait, MECHANICS_KIND.class),
   }));
 }
 
@@ -125,6 +133,7 @@ export function createClassForm(heroClass?: WorkshopClass): ClassForm {
     description: [...(heroClass?.description ?? [])],
     classTraits: copyTraits(heroClass?.classTraits ?? []),
     tableColumns: copyColumns(heroClass?.tableColumns ?? []),
+    ...copyMechanicsFields(heroClass),
   };
 }
 
@@ -155,6 +164,7 @@ export function getClassPayload(
     equipment: toOptionalMarkup(form.equipment),
     classTraits: getTraitsPayload(form.classTraits),
     tableColumns: getColumnsPayload(form.tableColumns),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.class),
   };
 }
 
@@ -175,6 +185,7 @@ export function createArchetypeForm(
     description: [...archetype.description],
     traits: copyTraits(archetype.traits),
     tableColumns: copyColumns(archetype.tableColumns),
+    ...copyMechanicsFields(archetype),
   };
 }
 
@@ -196,6 +207,7 @@ export function getArchetypePayload(
     page: toOptionalNumber(form.page),
     traits: getTraitsPayload(form.traits),
     tableColumns: getColumnsPayload(form.tableColumns),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.class),
   };
 }
 

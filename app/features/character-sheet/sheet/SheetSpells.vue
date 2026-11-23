@@ -5,20 +5,23 @@
 
   import { getApiErrorMessage } from '~user/model';
 
-  import { useCharacterSheet, useSheetClassData } from '../composables';
+  import {
+    useCharacterSheet,
+    useSheetClassData,
+    useSheetStats,
+  } from '../composables';
   import { SheetCatalogPicker } from '../dialogs';
   import {
     ABILITY_KEYS,
     ABILITY_LABELS,
     createSheetSpell,
     formatModifier,
-    getCharacterLevel,
     getCharacterPactMagic,
-    getProficiencyBonus,
-    getSpellAttackBonus,
-    getSpellSaveDc,
+    getPreparedLimit,
     getSpellSlotsMax,
     loadCatalogSpell,
+    PREPARED_TEXT,
+    SHEET_HEADER_STAT_CLASS,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_TEXT,
@@ -38,13 +41,10 @@
 
   const toast = useToast();
   const { document, update } = useCharacterSheet();
-  const { progressions } = useSheetClassData();
+  const { progressions, preparedClasses } = useSheetClassData();
+  const { stats } = useSheetStats();
 
   const isPickerOpen = ref(false);
-
-  const proficiencyBonus = computed(() =>
-    getProficiencyBonus(getCharacterLevel(document.value.classes)),
-  );
 
   const abilityOptions = [
     { label: SHEET_LABELS.noSpellcasting, value: NO_ABILITY },
@@ -60,16 +60,66 @@
   }));
 
   const saveDcLabel = computed(() => {
-    const value = getSpellSaveDc(document.value, proficiencyBonus.value);
+    const value = stats.value.spellSaveDc;
 
     return value === null ? SHEET_LABELS.noValue : String(value);
   });
 
   const attackLabel = computed(() => {
-    const value = getSpellAttackBonus(document.value, proficiencyBonus.value);
+    const value = stats.value.spellAttack;
 
     return value === null ? SHEET_LABELS.noValue : formatModifier(value);
   });
+
+  const preparedLimit = computed(() => {
+    const ability = document.value.spellcastingAbility;
+
+    return getPreparedLimit(
+      document.value,
+      preparedClasses.value,
+      ability ? stats.value.abilities[ability] : null,
+    );
+  });
+
+  const preparedLabel = computed(() => {
+    const limit = preparedLimit.value;
+
+    return `${limit.isKnown ? PREPARED_TEXT.known : PREPARED_TEXT.limit}: ${limit.prepared} / ${limit.value ?? SHEET_LABELS.noValue}`;
+  });
+
+  const preparedClass = computed(() =>
+    preparedLimit.value.value !== null
+    && preparedLimit.value.prepared > preparedLimit.value.value
+      ? 'text-error'
+      : 'text-highlighted',
+  );
+
+  const isPreparedAuto = computed(
+    () => document.value.preparedLimitOverride === null,
+  );
+
+  /**
+   * Предел подготовленных: по классам или свой.
+   * @param isAuto - считать по классам
+   */
+  function setPreparedAuto(isAuto: boolean | 'indeterminate'): void {
+    update((current) => ({
+      ...current,
+      preparedLimitOverride:
+        isAuto === true ? null : (preparedLimit.value.value ?? 0),
+    }));
+  }
+
+  /**
+   * Свой предел подготовленных заклинаний.
+   * @param value - предел
+   */
+  function setPreparedOverride(value: number | null): void {
+    update((current) => ({
+      ...current,
+      preparedLimitOverride: Math.max(0, value ?? 0),
+    }));
+  }
 
   const slotRows = computed(() => {
     const maxima = getSpellSlotsMax(progressions.value);
@@ -287,8 +337,49 @@
       </div>
     </SheetPanel>
 
-    <SheetPanel :title="SHEET_LABELS.spell">
-      <template #actions>
+    <UPopover>
+      <button
+        type="button"
+        :class="SHEET_HEADER_STAT_CLASS"
+        class="self-start"
+        :aria-label="PREPARED_TEXT.hint"
+      >
+        <span
+          class="text-xs font-bold whitespace-nowrap"
+          :class="preparedClass"
+        >
+          {{ preparedLabel }}
+        </span>
+      </button>
+
+      <template #content>
+        <div class="flex w-64 flex-col gap-3 p-3">
+          <UCheckbox
+            :model-value="isPreparedAuto"
+            :label="PREPARED_TEXT.auto"
+            @update:model-value="setPreparedAuto"
+          />
+
+          <UFormField
+            v-if="!isPreparedAuto"
+            :label="PREPARED_TEXT.override"
+          >
+            <UInputNumber
+              :model-value="document.preparedLimitOverride ?? 0"
+              :min="0"
+              class="w-full"
+              @update:model-value="setPreparedOverride"
+            />
+          </UFormField>
+        </div>
+      </template>
+    </UPopover>
+
+    <SheetPanel
+      :title="SHEET_LABELS.spell"
+      persistent-actions
+    >
+      <template #title-actions>
         <UButton
           :label="SHEET_LABELS.addFromCatalog"
           :icon="SHEET_ICON.catalog"
@@ -323,7 +414,8 @@
           >
             <UTooltip :text="SHEET_LABELS.prepared">
               <UCheckbox
-                :model-value="spell.isPrepared"
+                :model-value="spell.isPrepared || spell.alwaysPrepared"
+                :disabled="spell.alwaysPrepared"
                 :aria-label="SHEET_LABELS.prepared"
                 @update:model-value="
                   patchSpell(spell.id, { isPrepared: $event === true })

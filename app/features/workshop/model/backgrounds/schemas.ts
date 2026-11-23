@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { markupBlocksSchema } from '~content/model';
 
 import { WORKSHOP_LIST_JOINER, WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopRequiredMarkup,
@@ -50,6 +51,8 @@ const workshopBackgroundSchema = z.object({
   language: z.string().nullish(),
   languages: z.array(z.string()).nullish(),
   lifeStyle: z.string().nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -86,6 +89,7 @@ export function parseWorkshopBackground(input: unknown): WorkshopBackground {
     language: background.language ?? '',
     languages: (background.languages ?? []).join(WORKSHOP_LIST_JOINER),
     lifeStyle: background.lifeStyle ?? '',
+    ...parseMechanicsFields(background),
     source: background.source?.shortName,
   };
 }
@@ -117,6 +121,7 @@ export const backgroundFormSchema = z.object({
       values: z.array(workshopRequiredText).min(1),
     }),
   ),
+  ...mechanicsFieldsFormSchema,
 });
 
 export type BackgroundForm = z.infer<typeof backgroundFormSchema>;

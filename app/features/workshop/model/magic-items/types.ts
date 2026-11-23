@@ -1,3 +1,5 @@
+import type { MagicItemMechanicsForm } from '../mechanics';
+
 /** Магический предмет из справочника, как его открывает редактор. */
 export interface WorkshopMagicItem {
   id: number;
@@ -21,6 +23,8 @@ export interface WorkshopMagicItem {
   bonus: number | null;
   /** Блоки разметки core-api. */
   description: Array<string>;
+  /** Механика для листа персонажа; эффекты предмета лежат в ней. */
+  mechanics: MagicItemMechanicsForm;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

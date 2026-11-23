@@ -3,6 +3,8 @@
 
   import type { FeatForm, WorkshopFeat } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { FeatBody } from '~character/feats';
   import { featDetailSchema } from '~character/model';
 
@@ -13,6 +15,7 @@
     WorkshopSourceSelect,
   } from '../form';
   import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     createFeatForm,
     FEAT_EDITOR_TEXT,
@@ -20,6 +23,8 @@
     FEATS_WORKSHOP_KEY,
     getFeatPayload,
     getWorkshopSectionRoute,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     WORKSHOP_ABILITY_OPTIONS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
@@ -163,6 +168,20 @@
     >
       <MarkupEditor v-model="state.description" />
     </UFormField>
+
+    <WorkshopMechanicsEditor
+      v-model="state.mechanics"
+      :kind="MECHANICS_KIND.feat"
+    />
+
+    <div class="col-span-full">
+      <ActiveEffects
+        v-model="state.activeEffects"
+        :context="EFFECT_FORM_CONTEXT.feature"
+        :origin="EFFECT_ORIGIN.feature"
+        :title="MECHANICS_TEXT.effectsTitle"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />

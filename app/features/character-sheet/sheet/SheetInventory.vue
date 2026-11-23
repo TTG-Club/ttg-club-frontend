@@ -9,68 +9,98 @@
     WeaponAttack,
   } from '../model';
 
+  import { MAGIC_ITEMS_SECTION } from '~inventory/model';
   import { getApiErrorMessage } from '~user/model';
 
-  import { useCharacterSheet, useSheetRoll } from '../composables';
+  import {
+    useCharacterSheet,
+    useSheetRoll,
+    useSheetStats,
+  } from '../composables';
   import { SheetCatalogPicker, SheetItemModal } from '../dialogs';
   import {
+    ATTUNEMENT_LIMIT,
+    ATTUNEMENT_TEXT,
     createSheetItem,
     CURRENCY_KEYS,
     CURRENCY_LABELS,
     CURRENCY_TITLES,
-    formatModifier,
     getCarryingCapacity,
-    getCharacterLevel,
     getInventoryWeight,
-    getProficiencyBonus,
-    getWeaponAttacks,
+    getWeaponAttack,
+    INVENTORY_GROUPS,
     ITEM_SEARCH_BY_KIND,
     ITEM_SEARCH_KINDS,
     loadCatalogItem,
+    loadMagicItem,
+    SHEET_BODY_LABELS,
+    SHEET_GROUP_LABEL_CLASS,
+    SHEET_HEADER_STAT_CLASS,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_TEXT,
   } from '../model';
-  import SheetPanel from './SheetPanel.vue';
+  import SheetInventoryItemRow from './SheetInventoryItemRow.vue';
 
   /**
-   * Снаряжение: атаки оружием, предметы, монеты и переносимый вес. Предметы
-   * добавляются из справочника (оружие и доспехи — с боевыми свойствами) или
-   * свои.
+   * Снаряжение, как на new.ttg.club: плитки переносимого веса и настройки,
+   * строка монет, предметы группами (оружие, доспехи, магические предметы,
+   * прочее). Магический предмет из справочника приносит настройку, заряды и
+   * эффекты; эффекты работают, пока предмет надет (и настроен, если требует).
    */
+  type InventoryGroupKey = (typeof INVENTORY_GROUPS)[number]['key'];
+
+  /**
+   * Группа предмета на вкладке.
+   * @param item - предмет
+   */
+  function getItemGroup(item: SheetItem): InventoryGroupKey {
+    if (item.weapon) {
+      return 'weapon';
+    }
+
+    if (item.armor) {
+      return 'armor';
+    }
+
+    const isMagic =
+      Boolean(item.url?.startsWith(MAGIC_ITEMS_SECTION.path))
+      || item.requiresAttunement
+      || Boolean(item.charges)
+      || item.activeEffects.length > 0;
+
+    return isMagic ? 'magic' : 'other';
+  }
+
   const toast = useToast();
-  const { document, update } = useCharacterSheet();
-  const { rollD20, rollDamage } = useSheetRoll();
+  const { document, update, editControlClass } = useCharacterSheet();
+  const { stats } = useSheetStats();
+  const { rollD20, rollDamage, rollFormula } = useSheetRoll();
 
   const pickerKind = ref<ItemSearchKind>('item');
   const isPickerOpen = ref(false);
   const editedItem = ref<SheetItem | null>(null);
   const isEditOpen = ref(false);
 
-  const proficiencyBonus = computed(() =>
-    getProficiencyBonus(getCharacterLevel(document.value.classes)),
-  );
-
-  const attacks = computed(() =>
-    getWeaponAttacks(document.value, proficiencyBonus.value).map((attack) => ({
-      ...attack,
-      attackLabel: formatModifier(attack.attackBonus),
-    })),
-  );
-
   const weight = computed(() => getInventoryWeight(document.value.inventory));
-
-  const capacity = computed(() =>
-    getCarryingCapacity(document.value.abilities),
-  );
-
-  const weightLabel = computed(
-    () =>
-      `${SHEET_LABELS.weight}: ${weight.value} / ${capacity.value} ${SHEET_LABELS.weightUnit}`,
-  );
+  const capacity = computed(() => getCarryingCapacity(stats.value.abilities));
 
   const weightClass = computed(() =>
-    weight.value > capacity.value ? 'text-error' : 'text-muted',
+    weight.value > capacity.value ? 'text-error' : 'text-highlighted',
+  );
+
+  const attunedCount = computed(
+    () => document.value.inventory.filter((item) => item.isAttuned).length,
+  );
+
+  const attunementClass = computed(() =>
+    attunedCount.value > ATTUNEMENT_LIMIT ? 'text-error' : 'text-highlighted',
+  );
+
+  const attunementHint = computed(() =>
+    attunedCount.value > ATTUNEMENT_LIMIT
+      ? ATTUNEMENT_TEXT.overLimit
+      : ATTUNEMENT_TEXT.limit,
   );
 
   const pickerSource = computed(() => ITEM_SEARCH_BY_KIND[pickerKind.value]);
@@ -81,12 +111,48 @@
       ?? SHEET_LABELS.item,
   );
 
-  const addMenuItems = computed<Array<DropdownMenuItem>>(() =>
-    ITEM_SEARCH_KINDS.map((kind) => ({
+  const addMenuItems = computed<Array<DropdownMenuItem>>(() => [
+    ...ITEM_SEARCH_KINDS.map((kind) => ({
       label: kind.label,
       icon: kind.icon,
       onSelect: () => openPicker(kind.value),
     })),
+    {
+      label: SHEET_LABELS.addCustom,
+      icon: SHEET_ICON.add,
+      onSelect: addCustom,
+    },
+  ]);
+
+  /**
+   * Атака оружием с характеристиками и прибавками эффектов.
+   * @param item - предмет
+   */
+  function getAttack(item: SheetItem): WeaponAttack | null {
+    const attack = getWeaponAttack(
+      { ...document.value, abilities: stats.value.abilities },
+      item,
+      stats.value.proficiencyBonus,
+    );
+
+    if (!attack || !item.weapon) {
+      return attack;
+    }
+
+    const bonus = item.weapon.isRanged
+      ? stats.value.rangedAttackBonus
+      : stats.value.meleeAttackBonus;
+
+    return { ...attack, attackBonus: attack.attackBonus + bonus };
+  }
+
+  const groups = computed(() =>
+    INVENTORY_GROUPS.map((group) => ({
+      ...group,
+      items: document.value.inventory
+        .filter((item) => getItemGroup(item) === group.key)
+        .map((item) => ({ item, attack: getAttack(item) })),
+    })).filter((group) => group.items.length),
   );
 
   /**
@@ -104,7 +170,10 @@
    */
   async function addFromCatalog(option: CatalogOption): Promise<void> {
     try {
-      const item = await loadCatalogItem(pickerKind.value, option);
+      const item =
+        pickerKind.value === 'magic'
+          ? await loadMagicItem(option)
+          : await loadCatalogItem(pickerKind.value, option);
 
       update((current) => ({
         ...current,
@@ -118,7 +187,6 @@
     }
   }
 
-  /** Добавляет свой предмет и сразу открывает его правку. */
   function addCustom(): void {
     const item = createSheetItem(SHEET_LABELS.item, null);
 
@@ -140,35 +208,104 @@
   }
 
   /**
-   * Заменяет предмет.
-   * @param next - изменённый предмет
+   * Меняет предмет.
+   * @param id - предмет
+   * @param change - новый предмет из текущего
    */
-  function saveItem(next: SheetItem): void {
+  function patchItem(id: string, change: (item: SheetItem) => SheetItem): void {
     update((current) => ({
       ...current,
       inventory: current.inventory.map((item) =>
-        item.id === next.id ? next : item,
+        item.id === id ? change(item) : item,
       ),
     }));
   }
 
   /**
-   * Меняет поле предмета.
-   * @param id - идентификатор предмета
-   * @param patch - изменённые поля
+   * Заменяет предмет из окна правки.
+   * @param next - изменённый предмет
    */
-  function patchItem(id: string, patch: Partial<SheetItem>): void {
-    update((current) => ({
-      ...current,
-      inventory: current.inventory.map((item) =>
-        item.id === id ? { ...item, ...patch } : item,
-      ),
+  function saveItem(next: SheetItem): void {
+    patchItem(next.id, () => next);
+  }
+
+  /**
+   * Надевает или снимает предмет.
+   * @param id - предмет
+   */
+  function toggleEquip(id: string): void {
+    patchItem(id, (item) => ({ ...item, isEquipped: !item.isEquipped }));
+  }
+
+  /**
+   * Настраивается на предмет или снимает настройку.
+   * @param id - предмет
+   */
+  function toggleAttune(id: string): void {
+    patchItem(id, (item) => ({ ...item, isAttuned: !item.isAttuned }));
+  }
+
+  /**
+   * Меняет количество.
+   * @param id - предмет
+   * @param delta - на сколько
+   */
+  function adjustQuantity(id: string, delta: number): void {
+    patchItem(id, (item) => ({
+      ...item,
+      quantity: Math.max(0, item.quantity + delta),
     }));
+  }
+
+  /**
+   * Тратит заряд.
+   * @param id - предмет
+   */
+  function spendCharge(id: string): void {
+    patchItem(id, (item) =>
+      item.charges
+        ? {
+            ...item,
+            charges: {
+              ...item.charges,
+              used: Math.min(item.charges.max, item.charges.used + 1),
+            },
+          }
+        : item,
+    );
+  }
+
+  /**
+   * Восстанавливает заряды по формуле предмета (или все).
+   * @param item - предмет
+   */
+  function restoreCharges(item: SheetItem): void {
+    const charges = item.charges;
+
+    if (!charges) {
+      return;
+    }
+
+    const restored = charges.recharge.trim()
+      ? rollFormula(ATTUNEMENT_TEXT.charges, charges.recharge)
+      : charges.used;
+
+    patchItem(item.id, (current) =>
+      current.charges
+        ? {
+            ...current,
+            charges: {
+              ...current.charges,
+              used: Math.max(0, current.charges.used - restored),
+            },
+          }
+        : current,
+    );
   }
 
   /**
    * Убирает предмет.
-   * @param id - идентификатор предмета
+   * @param id - предмет
    */
   function removeItem(id: string): void {
     update((current) => ({
@@ -178,7 +315,7 @@
   }
 
   /**
-   * Меняет количество монет.
+   * Количество монет.
    * @param key - вид монет
    * @param value - количество
    */
@@ -190,196 +327,192 @@
   }
 
   /**
-   * Бросок атаки.
-   * @param attack - атака
+   * Бросок атаки оружием.
+   * @param entry - предмет и его атака
+   * @param entry.item - оружие
+   * @param entry.attack - атака
    * @param event - клик
    */
-  function rollAttack(attack: WeaponAttack, event: MouseEvent): void {
-    rollD20(
-      `${SHEET_LABELS.attack}: ${attack.name}`,
-      attack.attackBonus,
-      event,
-    );
+  function rollAttack(
+    entry: { item: SheetItem; attack: WeaponAttack | null },
+    event: MouseEvent,
+  ): void {
+    if (entry.attack) {
+      rollD20(
+        `${SHEET_LABELS.attack}: ${entry.attack.name}`,
+        entry.attack.attackBonus,
+        event,
+        {
+          kind: 'attack',
+          attackType: entry.item.weapon?.isRanged ? 'ranged' : 'melee',
+        },
+      );
+    }
   }
 
   /**
-   * Бросок урона.
-   * @param attack - атака
+   * Бросок урона оружием.
+   * @param entry - предмет и его атака
+   * @param entry.attack - атака
    */
-  function rollAttackDamage(attack: WeaponAttack): void {
-    rollDamage(`${SHEET_LABELS.damage}: ${attack.name}`, attack.damage);
+  function rollAttackDamage(entry: { attack: WeaponAttack | null }): void {
+    if (entry.attack) {
+      rollDamage(
+        `${SHEET_LABELS.damage}: ${entry.attack.name}`,
+        entry.attack.damage,
+      );
+    }
   }
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <SheetPanel :title="SHEET_LABELS.attacks">
-      <table
-        v-if="attacks.length"
-        class="w-full text-sm"
-      >
-        <tbody>
-          <tr
-            v-for="attack in attacks"
-            :key="attack.id"
-            class="border-b border-default last:border-0"
-          >
-            <td class="py-1 text-highlighted">{{ attack.name }}</td>
-
-            <td class="py-1 text-right">
-              <UButton
-                :label="attack.attackLabel"
-                color="neutral"
-                variant="subtle"
-                size="xs"
-                @click.left.prevent="rollAttack(attack, $event)"
+  <div class="@container flex flex-col gap-4 pt-2">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <UTooltip :text="SHEET_LABELS.carryingCapacity">
+          <span :class="SHEET_HEADER_STAT_CLASS">
+            <span class="flex items-center gap-1.5">
+              <UIcon
+                name="tabler:weight"
+                class="size-4 shrink-0 text-muted @lg:hidden"
               />
-            </td>
 
-            <td class="py-1 text-right">
-              <UButton
-                v-if="attack.damage"
-                :label="attack.damage"
-                :icon="SHEET_ICON.dice"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                @click.left.exact.prevent="rollAttackDamage(attack)"
-              />
-            </td>
+              <span
+                class="hidden text-[10px] font-bold tracking-wider text-muted uppercase @lg:inline"
+              >
+                {{ SHEET_BODY_LABELS.weight }}
+              </span>
 
-            <td class="py-1 text-right text-muted">{{ attack.damageType }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p
-        v-else
-        class="text-sm text-muted"
-      >
-        {{ SHEET_LABELS.emptyAttacks }}
-      </p>
-    </SheetPanel>
-
-    <SheetPanel :title="SHEET_LABELS.inventory">
-      <template #actions>
-        <span
-          class="text-xs"
-          :class="weightClass"
-        >
-          {{ weightLabel }}
-        </span>
-
-        <UDropdownMenu :items="addMenuItems">
-          <UButton
-            :label="SHEET_LABELS.addFromCatalog"
-            :icon="SHEET_ICON.catalog"
-            color="neutral"
-            variant="subtle"
-            size="xs"
-          />
-        </UDropdownMenu>
-
-        <UButton
-          :label="SHEET_LABELS.addCustom"
-          :icon="SHEET_ICON.add"
-          color="neutral"
-          variant="subtle"
-          size="xs"
-          @click.left.exact.prevent="addCustom"
-        />
-      </template>
-
-      <ul
-        v-if="document.inventory.length"
-        class="flex flex-col"
-      >
-        <li
-          v-for="item in document.inventory"
-          :key="item.id"
-          class="flex items-center gap-2 border-b border-default py-1 last:border-0"
-        >
-          <UTooltip :text="SHEET_LABELS.equipped">
-            <UCheckbox
-              :model-value="item.isEquipped"
-              :aria-label="SHEET_LABELS.equipped"
-              @update:model-value="
-                patchItem(item.id, { isEquipped: $event === true })
-              "
-            />
-          </UTooltip>
-
-          <NuxtLink
-            v-if="item.url"
-            :to="item.url"
-            target="_blank"
-            class="min-w-0 flex-1 truncate text-link hover:underline"
-          >
-            {{ item.name }}
-          </NuxtLink>
-
-          <span
-            v-else
-            class="min-w-0 flex-1 truncate"
-          >
-            {{ item.name }}
+              <span
+                class="text-xs font-bold whitespace-nowrap"
+                :class="weightClass"
+              >
+                {{ weight }} / {{ capacity }} {{ SHEET_LABELS.weightUnit }}
+              </span>
+            </span>
           </span>
+        </UTooltip>
 
-          <UInputNumber
-            :model-value="item.quantity"
-            :min="0"
-            size="xs"
-            class="w-20"
-            :aria-label="SHEET_LABELS.quantity"
-            @update:model-value="patchItem(item.id, { quantity: $event ?? 0 })"
-          />
+        <UTooltip :text="attunementHint">
+          <span :class="SHEET_HEADER_STAT_CLASS">
+            <span class="flex items-center gap-1.5">
+              <UIcon
+                name="tabler:link"
+                class="size-4 shrink-0 text-muted @lg:hidden"
+              />
 
-          <UButton
-            :icon="SHEET_ICON.edit"
-            :aria-label="SHEET_LABELS.edit"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            @click.left.exact.prevent="openEdit(item)"
-          />
+              <span
+                class="hidden text-[10px] font-bold tracking-wider text-muted uppercase @lg:inline"
+              >
+                {{ SHEET_BODY_LABELS.attunement }}
+              </span>
 
-          <UButton
-            :icon="SHEET_ICON.remove"
-            :aria-label="SHEET_LABELS.remove"
-            color="error"
-            variant="ghost"
-            size="xs"
-            @click.left.exact.prevent="removeItem(item.id)"
-          />
-        </li>
-      </ul>
+              <span
+                class="text-xs font-bold whitespace-nowrap"
+                :class="attunementClass"
+              >
+                {{ attunedCount }} / {{ ATTUNEMENT_LIMIT }}
+              </span>
+            </span>
+          </span>
+        </UTooltip>
+      </div>
 
-      <p
-        v-else
-        class="text-sm text-muted"
+      <UDropdownMenu
+        :items="addMenuItems"
+        :content="{ align: 'end' }"
       >
-        {{ SHEET_LABELS.emptyInventory }}
-      </p>
-    </SheetPanel>
+        <UButton
+          icon="tabler:plus"
+          :label="SHEET_BODY_LABELS.addItem"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          :class="editControlClass"
+        />
+      </UDropdownMenu>
+    </div>
 
-    <SheetPanel :title="SHEET_LABELS.currency">
-      <div class="grid grid-cols-5 gap-2">
-        <UFormField
+    <UPopover>
+      <button
+        type="button"
+        class="flex cursor-pointer flex-wrap items-center justify-between gap-2 rounded-lg border border-default/50 bg-elevated/20 px-4 py-2 transition-colors hover:border-default hover:bg-elevated/40"
+        :aria-label="SHEET_LABELS.currency"
+      >
+        <UTooltip
           v-for="key in CURRENCY_KEYS"
           :key="key"
-          :label="CURRENCY_LABELS[key]"
-          :title="CURRENCY_TITLES[key]"
+          :text="CURRENCY_TITLES[key]"
         >
-          <UInputNumber
-            :model-value="document.currency[key]"
-            :min="0"
-            size="sm"
-            class="w-full"
-            @update:model-value="setCurrency(key, $event)"
-          />
-        </UFormField>
+          <span class="flex items-baseline gap-1.5">
+            <span class="text-sm font-bold text-highlighted">{{
+              document.currency[key]
+            }}</span>
+
+            <span class="text-[10px] font-bold text-muted uppercase">
+              {{ CURRENCY_LABELS[key] }}
+            </span>
+          </span>
+        </UTooltip>
+      </button>
+
+      <template #content>
+        <div class="grid w-72 grid-cols-2 gap-2 p-3">
+          <UFormField
+            v-for="key in CURRENCY_KEYS"
+            :key="key"
+            :label="CURRENCY_TITLES[key]"
+          >
+            <UInputNumber
+              :model-value="document.currency[key]"
+              :min="0"
+              size="sm"
+              class="w-full"
+              @update:model-value="setCurrency(key, $event)"
+            />
+          </UFormField>
+        </div>
+      </template>
+    </UPopover>
+
+    <template v-if="groups.length">
+      <div
+        v-for="group in groups"
+        :key="group.key"
+        class="flex flex-col gap-2"
+      >
+        <div class="flex items-center gap-2">
+          <span :class="SHEET_GROUP_LABEL_CLASS">{{ group.title }}</span>
+
+          <div class="h-px grow bg-default/50" />
+        </div>
+
+        <SheetInventoryItemRow
+          v-for="entry in group.items"
+          :key="entry.item.id"
+          :item="entry.item"
+          :attack="entry.attack"
+          :icon="group.icon"
+          :is-equippable="group.key !== 'other'"
+          @toggle-equip="toggleEquip(entry.item.id)"
+          @toggle-attune="toggleAttune(entry.item.id)"
+          @adjust="adjustQuantity(entry.item.id, $event)"
+          @spend-charge="spendCharge(entry.item.id)"
+          @restore-charges="restoreCharges(entry.item)"
+          @roll-attack="rollAttack(entry, $event)"
+          @roll-damage="rollAttackDamage(entry)"
+          @edit="openEdit(entry.item)"
+          @remove="removeItem(entry.item.id)"
+        />
       </div>
-    </SheetPanel>
+    </template>
+
+    <div
+      v-else
+      class="flex h-64 items-center justify-center rounded-lg border border-dashed border-default text-sm text-dimmed"
+    >
+      {{ SHEET_BODY_LABELS.emptyEquipment }}
+    </div>
 
     <SheetCatalogPicker
       v-model:open="isPickerOpen"
