@@ -9,6 +9,7 @@ import type {
   CHOICE_KINDS,
   CURRENCY_KEYS,
   EXTRA_SPEED_KEYS,
+  FEATURE_ORIGINS,
   HIT_POINTS_GAIN_MODES,
   ITEM_KINDS,
   OWN_SENSE_KEYS,
@@ -427,6 +428,9 @@ export interface PreparedLimitClass {
   /** Значение колонки «Известные заговоры»; null — колонки нет. */
   knownCantrips: number | null;
 }
+
+/** Вид источника особенности. */
+export type FeatureOrigin = (typeof FEATURE_ORIGINS)[number];
 
 /** Вид счёта заклинаний: круги 1+ или заговоры. */
 export type PreparedKind = (typeof PREPARED_KINDS)[number];

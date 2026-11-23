@@ -24,6 +24,12 @@ export function useSheetActiveEffects() {
     document.value.activeEffects.filter((effect) => !effect.conditionKey),
   );
 
+  /** Наложенные: состояния и свои эффекты одним списком, состояния первыми. */
+  const appliedEffects = computed(() => [
+    ...document.value.activeEffects.filter((effect) => effect.conditionKey),
+    ...customEffects.value,
+  ]);
+
   const activeConditionKeys = computed(
     () =>
       new Set(
@@ -141,6 +147,7 @@ export function useSheetActiveEffects() {
 
   return {
     customEffects,
+    appliedEffects,
     activeConditionKeys,
     featureEffects,
     equipmentEffects,

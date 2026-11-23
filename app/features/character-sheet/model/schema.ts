@@ -14,6 +14,7 @@ import {
   CUSTOM_BONUS_KINDS,
   DEATH_SAVES_MAX,
   DEFAULT_ARMOR_CLASS_ABILITIES,
+  FEATURE_ORIGINS,
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
   SHEET_SCHEMA_VERSION,
@@ -44,6 +45,22 @@ const countSchema = integerSchema.min(0).catch(0);
 
 /** Строка; мусор — пустая строка. */
 const textSchema = z.string().catch('');
+
+/** Абзацы старого текста: блоки разделены пустой строкой. */
+const PARAGRAPH_SEPARATOR = /\n\s*\n/;
+
+/**
+ * Текст в разметке core-api — массив блоков. Старые листы хранили простую
+ * строку: она читается абзацами, по блоку на абзац.
+ */
+const markupTextSchema = z
+  .union([z.string(), z.array(z.string())])
+  .catch([])
+  .transform((value) =>
+    (typeof value === 'string' ? value.split(PARAGRAPH_SEPARATOR) : value)
+      .map((block) => block.trim())
+      .filter(Boolean),
+  );
 
 /** Ссылка на запись справочника; `url` нет у своих записей. */
 export const catalogRefSchema = z.object({
@@ -311,8 +328,13 @@ export type SheetSpell = z.infer<typeof sheetSpellSchema>;
 export const sheetFeatureSchema = z.object({
   id: z.string(),
   name: z.string(),
+  /** Название источника: раса, класс, предыстория или черта. */
   source: textSchema,
-  description: textSchema,
+  /** Вид источника для бейджа и отбора. */
+  origin: z.enum(FEATURE_ORIGINS).catch('custom'),
+  /** Что выбрано в особенности: «Боевой стиль: защита». */
+  choice: textSchema,
+  description: markupTextSchema,
 });
 
 export type SheetFeature = z.infer<typeof sheetFeatureSchema>;
@@ -346,18 +368,26 @@ export type SheetResource = z.infer<typeof sheetResourceSchema>;
 export const sheetNoteSchema = z.object({
   id: z.string(),
   title: textSchema,
-  text: textSchema,
+  text: markupTextSchema,
 });
 
 export type SheetNote = z.infer<typeof sheetNoteSchema>;
 
 const personalitySchema = z.object({
-  traits: textSchema,
-  ideals: textSchema,
-  bonds: textSchema,
-  flaws: textSchema,
-  appearance: textSchema,
-  backstory: textSchema,
+  traits: markupTextSchema,
+  ideals: markupTextSchema,
+  bonds: markupTextSchema,
+  flaws: markupTextSchema,
+  /** Описание внешности и характера. */
+  appearance: markupTextSchema,
+  backstory: markupTextSchema,
+  /* Краткие приметы. */
+  age: textSchema,
+  height: textSchema,
+  weight: textSchema,
+  eyes: textSchema,
+  hair: textSchema,
+  skin: textSchema,
 });
 
 export type SheetPersonality = z.infer<typeof personalitySchema>;
@@ -525,12 +555,18 @@ export const sheetDocumentSchema = z.object({
   features: lenientList(sheetFeatureSchema),
   resources: lenientList(sheetResourceSchema),
   personality: personalitySchema.catch({
-    traits: '',
-    ideals: '',
-    bonds: '',
-    flaws: '',
-    appearance: '',
-    backstory: '',
+    traits: [],
+    ideals: [],
+    bonds: [],
+    flaws: [],
+    appearance: [],
+    backstory: [],
+    age: '',
+    height: '',
+    weight: '',
+    eyes: '',
+    hair: '',
+    skin: '',
   }),
   notes: lenientList(sheetNoteSchema),
   /* Поля механики: у листов до неё их нет, и они открываются пустыми. */
