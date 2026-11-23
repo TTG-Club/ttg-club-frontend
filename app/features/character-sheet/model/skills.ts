@@ -6,6 +6,7 @@ import {
   ABILITY_LABELS,
   CUSTOM_BONUS_SOURCE,
   CUSTOM_BONUS_TEXT,
+  SKILL_BONUS_EFFECTS_LABEL,
   SKILL_INFO,
 } from './constants';
 
@@ -224,4 +225,55 @@ export function hasSkillName(
   const normalized = name.trim().toLowerCase();
 
   return names.some((existing) => existing.toLowerCase() === normalized);
+}
+
+/** Слагаемое итога навыка для подсказки с разбором. */
+export interface SkillBonusPart {
+  label: string;
+  value: number;
+}
+
+/**
+ * Подписи слагаемых дополнительных бонусов: своя подпись или источник.
+ * @param bonuses - бонусы
+ * @param context - что известно о персонаже
+ * @param classes - классы листа для подписи уровня класса
+ */
+export function getCustomBonusParts(
+  bonuses: ReadonlyArray<CustomBonus>,
+  context: CustomBonusContext,
+  classes: ReadonlyArray<Pick<SheetClass, 'id' | 'name'>>,
+): Array<SkillBonusPart> {
+  const sources = getCustomBonusSourceOptions(classes);
+
+  return bonuses.map((bonus) => ({
+    label:
+      bonus.label.trim()
+      || sources.find((source) => source.value === getCustomBonusSource(bonus))
+        ?.label
+      || CUSTOM_BONUS_TEXT.flat,
+    value: getCustomBonusValue(bonus, context),
+  }));
+}
+
+/**
+ * Разбор итога навыка строкой: «Ловкость +2 · Владение +2 · Плащ +1». Всё,
+ * что не объяснено слагаемыми, приходит от эффектов листа.
+ * @param parts - известные слагаемые
+ * @param total - итог навыка
+ * @param formatValue - подпись числа со знаком
+ */
+export function describeSkillBonus(
+  parts: ReadonlyArray<SkillBonusPart>,
+  total: number,
+  formatValue: (value: number) => string,
+): string {
+  const rest = total - parts.reduce((sum, part) => sum + part.value, 0);
+
+  return [
+    ...parts.filter((part) => part.value !== 0),
+    ...(rest ? [{ label: SKILL_BONUS_EFFECTS_LABEL, value: rest }] : []),
+  ]
+    .map((part) => `${part.label} ${formatValue(part.value)}`)
+    .join(' · ');
 }

@@ -1,12 +1,21 @@
 <script setup lang="ts">
   import type { SheetNote } from '../model';
 
-  import { useCharacterSheet } from '../composables';
+  import { useCharacterSheet, useRemoveConfirm } from '../composables';
+  import { SheetConfirmModal } from '../dialogs';
   import { createSheetElementId, SHEET_ICON, SHEET_LABELS } from '../model';
   import SheetPanel from './SheetPanel.vue';
 
   /** Заметки игрока отдельными записями: название и текст. */
   const { document, update } = useCharacterSheet();
+
+  const {
+    isOpen: isRemoveOpen,
+    title: removeTitle,
+    description: removeDescription,
+    ask: askRemove,
+    confirm: confirmRemove,
+  } = useRemoveConfirm();
 
   /**
    * Меняет заметку.
@@ -41,6 +50,14 @@
       ...current,
       notes: current.notes.filter((note) => note.id !== id),
     }));
+  }
+
+  /**
+   * Спрашивает подтверждение удаления.
+   * @param note - заметка
+   */
+  function askRemoveNote(note: { id: string; title: string }): void {
+    askRemove(note.title, () => removeNote(note.id));
   }
 </script>
 
@@ -81,7 +98,7 @@
           color="error"
           variant="ghost"
           size="sm"
-          @click.left.exact.prevent="removeNote(note.id)"
+          @click.left.exact.prevent="askRemoveNote(note)"
         />
       </div>
 
@@ -100,5 +117,12 @@
     >
       {{ SHEET_LABELS.emptyNotes }}
     </p>
+
+    <SheetConfirmModal
+      v-model:open="isRemoveOpen"
+      :title="removeTitle"
+      :description="removeDescription"
+      @confirm="confirmRemove"
+    />
   </SheetPanel>
 </template>

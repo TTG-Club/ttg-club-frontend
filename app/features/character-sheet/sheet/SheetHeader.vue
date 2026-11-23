@@ -12,6 +12,7 @@
     SheetCatalogPicker,
     SheetCatalogTreeModal,
     SheetClassesModal,
+    SheetConfirmModal,
     SheetCustomEntryModal,
     SheetRestModal,
     SheetSizeModal,
@@ -23,10 +24,14 @@
     BACKGROUND_SEARCH,
     CATALOG_TREE_TEXT,
     CHARACTER_SHEET_ROUTE,
+    createSheet,
+    deleteSheet,
+    downloadSheetJson,
     EXPERIENCE_BY_LEVEL,
     getClassesLabel,
     getNextLevelExperience,
     getPendingChoices,
+    getSheetRoute,
     loadBackgroundSources,
     loadRaceSources,
     RACE_TREE,
@@ -71,6 +76,9 @@
     rename,
     reload,
     toggleLock,
+    ensureEditable,
+    sheetId,
+    discardChanges,
   } = useCharacterSheet();
 
   const { stats } = useSheetStats();
@@ -101,10 +109,18 @@
   );
 
   function openVision(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isVisionOpen.value = true;
   }
 
   function openSize(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isSizeOpen.value = true;
   }
 
@@ -201,18 +217,97 @@
     document.value.inspiration ? 'solid' : 'outline',
   );
 
-  const menuItems: Array<DropdownMenuItem> = [
-    {
-      label: SHEET_MENU_LABELS.backToList,
-      icon: SHEET_ICON.back,
-      to: CHARACTER_SHEET_ROUTE,
-    },
-    {
-      label: SHEET_MENU_LABELS.reload,
-      icon: 'tabler:refresh',
-      onSelect: reload,
-    },
-  ];
+  const isRemoveOpen = ref(false);
+  const isMenuBusy = ref(false);
+
+  function downloadJson(): void {
+    downloadSheetJson({ name: name.value, data: document.value });
+  }
+
+  /** Копия листа с текущими правками; открывается сразу. */
+  async function copySheet(): Promise<void> {
+    isMenuBusy.value = true;
+
+    try {
+      const created = await createSheet(
+        `${name.value}${SHEET_TEXT.copySuffix}`,
+        document.value,
+      );
+
+      await navigateTo(getSheetRoute(created.id));
+    } catch (error) {
+      toast.add({
+        title: getApiErrorMessage(error, SHEET_TEXT.errorCopy),
+        color: 'error',
+      });
+    } finally {
+      isMenuBusy.value = false;
+    }
+  }
+
+  function askRemove(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    isRemoveOpen.value = true;
+  }
+
+  /** Удаляет лист и возвращает к списку; несохранённое уже не нужно. */
+  async function removeSheet(): Promise<void> {
+    const id = sheetId.value;
+
+    if (!id) {
+      return;
+    }
+
+    try {
+      await deleteSheet(id);
+      discardChanges();
+      await navigateTo(CHARACTER_SHEET_ROUTE);
+    } catch (error) {
+      toast.add({
+        title: getApiErrorMessage(error, SHEET_TEXT.errorDelete),
+        color: 'error',
+      });
+    }
+  }
+
+  const menuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
+    [
+      {
+        label: SHEET_MENU_LABELS.backToList,
+        icon: SHEET_ICON.back,
+        to: CHARACTER_SHEET_ROUTE,
+      },
+      {
+        label: SHEET_MENU_LABELS.reload,
+        icon: 'tabler:refresh',
+        onSelect: reload,
+      },
+    ],
+    [
+      {
+        label: SHEET_MENU_LABELS.downloadJson,
+        icon: 'tabler:file-download',
+        onSelect: downloadJson,
+      },
+      {
+        label: SHEET_MENU_LABELS.copy,
+        icon: 'tabler:copy',
+        disabled: isMenuBusy.value,
+        onSelect: copySheet,
+      },
+    ],
+    [
+      {
+        label: SHEET_MENU_LABELS.remove,
+        icon: 'tabler:trash',
+        color: 'error',
+        onSelect: askRemove,
+      },
+    ],
+  ]);
 
   /**
    * Имя персонажа.
@@ -339,10 +434,18 @@
   }
 
   function clearRace(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     update(stripRace);
   }
 
   function openCustomRace(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isCustomRaceOpen.value = true;
   }
 
@@ -403,18 +506,34 @@
   }
 
   function clearBackground(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     update(stripBackground);
   }
 
   function openRacePicker(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isRacePickerOpen.value = true;
   }
 
   function openBackgroundPicker(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isBackgroundPickerOpen.value = true;
   }
 
   function openClasses(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isClassesOpen.value = true;
   }
 
@@ -507,7 +626,7 @@
     </div>
 
     <div class="flex w-full min-w-0 grow flex-col gap-1 @2xl:w-auto">
-      <UPopover>
+      <UPopover :disabled="isLocked">
         <button
           type="button"
           class="max-w-full cursor-pointer truncate text-center text-3xl font-bold tracking-wide text-highlighted transition-colors hover:text-primary @2xl:max-w-fit @2xl:text-left"
@@ -775,6 +894,13 @@
     <SheetClassesModal v-model:open="isClassesOpen" />
 
     <SheetVisionModal v-model:open="isVisionOpen" />
+
+    <SheetConfirmModal
+      v-model:open="isRemoveOpen"
+      :title="SHEET_TEXT.removeTitle"
+      :description="SHEET_TEXT.removeDescription"
+      @confirm="removeSheet"
+    />
 
     <SheetSizeModal v-model:open="isSizeOpen" />
 

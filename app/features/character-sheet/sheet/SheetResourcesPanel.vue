@@ -4,6 +4,7 @@
   import { useCharacterSheet, useSheetStats } from '../composables';
   import {
     getResourceMax,
+    LONG_PRESS_DELAY,
     RESOURCE_RECOVERY_BADGES,
     SHEET_BODY_LABELS,
     SHEET_TITLE_ACTION_CLASS,
@@ -14,7 +15,7 @@
   /**
    * Ресурсы: счётчики со справочника (ци, ярость, очки чародейства) и свои.
    * Максимум формулой считается по текущему листу; значки справа говорят,
-   * что возвращает короткий и долгий отдых.
+   * что возвращает короткий и долгий отдых. Долгое нажатие открывает правку.
    */
   const emit = defineEmits<{
     edit: [];
@@ -22,6 +23,22 @@
 
   const { document, update, editControlClass } = useCharacterSheet();
   const { formulaContext } = useSheetStats();
+
+  const panelRef = useTemplateRef('panel');
+
+  // Долгое нажатие открывает правку ресурсов (сенсорные экраны, где шестерёнку
+  // не видно без наведения). Флаг гасит клик после удержания: вместе с окном
+  // не должна сработать трата или возврат заряда
+  let isLongPressTriggered = false;
+
+  onLongPress(
+    panelRef,
+    () => {
+      isLongPressTriggered = true;
+      emit('edit');
+    },
+    { delay: LONG_PRESS_DELAY },
+  );
 
   const rows = computed(() =>
     document.value.resources.map((resource) => {
@@ -46,6 +63,12 @@
    * @param delta - −1 потратить, +1 вернуть
    */
   function adjust(id: string, delta: number): void {
+    if (isLongPressTriggered) {
+      isLongPressTriggered = false;
+
+      return;
+    }
+
     update((current) => ({
       ...current,
       resources: current.resources.map((resource) => {
@@ -62,7 +85,10 @@
 </script>
 
 <template>
-  <SheetPanel :title="SHEET_BODY_LABELS.resources">
+  <SheetPanel
+    ref="panel"
+    :title="SHEET_BODY_LABELS.resources"
+  >
     <template #title-actions>
       <button
         type="button"

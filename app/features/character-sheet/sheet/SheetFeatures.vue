@@ -11,10 +11,15 @@
 
   import {
     useCharacterSheet,
+    useRemoveConfirm,
     useSheetClassData,
     useSheetStats,
   } from '../composables';
-  import { SheetCatalogPicker, SheetSourceChoices } from '../dialogs';
+  import {
+    SheetCatalogPicker,
+    SheetConfirmModal,
+    SheetSourceChoices,
+  } from '../dialogs';
   import {
     ABILITY_LABELS,
     addSources,
@@ -48,7 +53,18 @@
   ]);
 
   const toast = useToast();
-  const { document, update, editControlClass } = useCharacterSheet();
+
+  const { document, update, editControlClass, ensureEditable } =
+    useCharacterSheet();
+
+  const {
+    isOpen: isRemoveOpen,
+    title: removeTitle,
+    description: removeDescription,
+    ask: askRemove,
+    confirm: confirmRemove,
+  } = useRemoveConfirm();
+
   const { features, tableValues, isLoading } = useSheetClassData();
   const { pendingChoices, stats } = useSheetStats();
 
@@ -201,7 +217,27 @@
   }
 
   function openFeatPicker(): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
     isFeatPickerOpen.value = true;
+  }
+
+  /**
+   * Спрашивает подтверждение удаления.
+   * @param source - черта
+   */
+  function askRemoveFeat(source: { id: string; name: string }): void {
+    askRemove(source.name, () => removeFeat(source.id));
+  }
+
+  /**
+   * Спрашивает подтверждение удаления.
+   * @param feature - умение
+   */
+  function askRemoveFeature(feature: { id: string; name: string }): void {
+    askRemove(feature.name, () => removeFeature(feature.id));
   }
 </script>
 
@@ -366,7 +402,7 @@
             size="xs"
             class="ml-auto"
             :class="editControlClass"
-            @click.left.exact.prevent="removeFeat(row.source.id)"
+            @click.left.exact.prevent="askRemoveFeat(row.source)"
           />
         </div>
 
@@ -426,7 +462,7 @@
             color="error"
             variant="ghost"
             size="sm"
-            @click.left.exact.prevent="removeFeature(feature.id)"
+            @click.left.exact.prevent="askRemoveFeature(feature)"
           />
         </div>
 
@@ -448,6 +484,13 @@
       :title="SOURCE_KIND_LABELS.feat"
       :source="FEAT_SEARCH"
       @pick="addFeat"
+    />
+
+    <SheetConfirmModal
+      v-model:open="isRemoveOpen"
+      :title="removeTitle"
+      :description="removeDescription"
+      @confirm="confirmRemove"
     />
   </div>
 </template>

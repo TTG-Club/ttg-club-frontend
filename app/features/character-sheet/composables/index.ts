@@ -5,6 +5,7 @@ export { useCatalogTree } from './useCatalogTree';
 export { useCharacterSheet } from './useCharacterSheet';
 export { useChoicePool } from './useChoicePool';
 export { useLevelUpWizard } from './useLevelUpWizard';
+export { useRemoveConfirm } from './useRemoveConfirm';
 export { useSheetActiveEffects } from './useSheetActiveEffects';
 export { useSheetClassData } from './useSheetClassData';
 export { useSheetList } from './useSheetList';

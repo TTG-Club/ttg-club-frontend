@@ -27,8 +27,13 @@ export const SHEET_HTTP_STATUS = {
   conflict: 409,
 } as const;
 
+/** Ключ браузерного хранилища с запертыми листами. */
+export const SHEET_LOCKED_STORAGE_KEY = 'ttg-character-sheet-locked';
+
 export const SHEET_TEXT = {
   title: 'Лист персонажа',
+  lockedTitle: 'Лист заперт',
+  lockedDescription: 'Чтобы править лист, отоприте его замком в шапке.',
   listTitle: 'Листы персонажей',
   listDescription:
     'Персонажи по правилам 5e 2014: характеристики, навыки, хиты, снаряжение и заклинания. Листы хранятся в вашем аккаунте.',
@@ -216,6 +221,9 @@ export const SHEET_SKILL_SETTINGS_LABELS = {
   apply: 'Применить',
   cancel: 'Отмена',
 } as const;
+
+/** Подпись слагаемого навыка от эффектов листа. */
+export const SKILL_BONUS_EFFECTS_LABEL = 'Эффекты';
 
 /** Максимальная длина названия своего навыка. */
 export const CUSTOM_SKILL_NAME_MAX_LENGTH = 40;
@@ -424,6 +432,33 @@ export const SHEET_TABS = [
   { value: 'personality', label: 'Личность' },
   { value: 'notes', label: 'Заметки' },
 ] as const;
+
+/** Удержание, после которого открывается правка (сенсорные экраны), мс. */
+export const LONG_PRESS_DELAY = 500;
+
+/** Прокрутка ленты вкладок: запас у края и доля ширины на шаг стрелки. */
+export const SHEET_TABS_SCROLL = { epsilon: 1, stepRatio: 0.6 } as const;
+
+export const SHEET_TABS_SCROLL_LABELS = {
+  left: 'Прокрутить вкладки влево',
+  right: 'Прокрутить вкладки вправо',
+} as const;
+
+/** Ширина листа, с которой вкладки стоят справа от сводки, px. */
+export const SHEET_WIDE_MIN_WIDTH = 1024;
+
+/** Зазор между рядом характеристик и вкладками, px. */
+export const SHEET_RIGHT_COLUMN_GAP = 16;
+
+export const REMOVE_CONFIRM_TEXT = {
+  title: 'Удалить?',
+  unnamed: 'Без названия',
+  /**
+   * Описание окна подтверждения.
+   * @param name - название записи
+   */
+  description: (name: string): string => `«${name}» будет удалено из листа.`,
+} as const;
 
 export const SHEET_LABELS = {
   race: 'Раса',
@@ -1453,6 +1488,9 @@ export const EXHAUSTION_PANEL_LABELS = {
 export const SHEET_MENU_LABELS = {
   backToList: 'К списку листов',
   reload: 'Перезагрузить',
+  downloadJson: 'Скачать JSON',
+  copy: 'Создать копию',
+  remove: 'Удалить лист',
   dawn: 'Наступил рассвет',
 } as const;
 
