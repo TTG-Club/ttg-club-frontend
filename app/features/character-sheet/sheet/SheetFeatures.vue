@@ -65,6 +65,12 @@
           max: 1,
           used: 0,
           reset: 'LONG',
+          sourceId: null,
+          counterKey: null,
+          formula: null,
+          scaling: [],
+          minimum: 0,
+          classId: null,
         },
       ],
     }));
