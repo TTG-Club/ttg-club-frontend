@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { GodDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionImagePreview } from '~section/image-preview';
 
@@ -63,7 +64,7 @@
           </p>
 
           <ContentRender
-            v-if="god.description"
+            v-if="hasContentDescription(god.description)"
             :content="god.description"
           />
         </div>

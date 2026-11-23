@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ItemDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
 
@@ -32,7 +33,7 @@
     </ul>
 
     <ContentRender
-      v-if="item.description"
+      v-if="hasContentDescription(item.description)"
       :content="item.description"
     />
   </div>

@@ -56,7 +56,7 @@
     </div>
 
     <ContentRender
-      v-if="feature.description"
+      v-if="hasContentDescription(feature.description)"
       :content="feature.description"
     />
   </div>

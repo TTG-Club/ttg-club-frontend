@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { WeaponDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { DiceRoller } from '~dice-roller/roller';
   import { SectionSourceBar } from '~section/source-bar';
@@ -51,11 +52,11 @@
     </SectionStatGrid>
 
     <ContentRender
-      v-if="weapon.description"
+      v-if="hasContentDescription(weapon.description)"
       :content="weapon.description"
     />
 
-    <div v-if="weapon.special">
+    <div v-if="hasContentDescription(weapon.special)">
       <strong>{{ WEAPON_TEXT.special }}</strong>
 
       <ContentRender :content="weapon.special" />

@@ -20,19 +20,17 @@
    */
   const {
     html = '',
-    markup = null,
     content = null,
     tag = 'div',
     inline = false,
   } = defineProps<{
     html?: string;
-    markup?: ReadonlyArray<string> | null;
     content?: ContentDescription | null;
     tag?: string;
     inline?: boolean;
   }>();
 
-  const blocks = computed(() => (Array.isArray(content) ? content : markup));
+  const blocks = computed(() => (Array.isArray(content) ? content : null));
 
   const nodes = computed(() => {
     if (blocks.value) {

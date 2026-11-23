@@ -9,6 +9,7 @@ import { VueNodeViewRenderer } from '@tiptap/vue-3';
 
 import {
   SECTION_LINK_ATTR,
+  SECTION_LINK_EXTRA_ATTR,
   SECTION_LINK_KIND_ATTR,
   SECTION_LINK_URL_ATTR,
 } from './constants';
@@ -57,13 +58,14 @@ export const TtgSectionLink = Node.create({
 
     return {
       type: 'ttgSectionLink',
-      attrs: { kind: parsed.kind, url: parsed.url },
+      attrs: { kind: parsed.kind, url: parsed.url, extra: parsed.extra },
       content: parsed.label ? [{ type: 'text', text: parsed.label }] : [],
     };
   },
   renderMarkdown: (node: JSONContent, helpers: MarkdownRendererHelpers) => {
     const kind = String(node.attrs?.kind ?? 'link');
     const url = String(node.attrs?.url ?? '');
+    const extra = String(node.attrs?.extra ?? '');
 
     // Подпись — простой текст: читаем его напрямую (без markdown-экранирования,
     // которое мог бы добавить renderChildren на `*`/`_`). renderChildren —
@@ -78,7 +80,7 @@ export const TtgSectionLink = Node.create({
     // (маркер обязан иметь текст) и ссылка не потерялась при полном стирании.
     const label = sanitizeLabel(inner.trim()) || url;
 
-    return `{@${kind} ${label} | url:${url}}`;
+    return `{@${kind} ${label} | url:${url}${extra ? ` | ${extra}` : ''}}`;
   },
 
   addAttributes() {
@@ -98,6 +100,15 @@ export const TtgSectionLink = Node.create({
         renderHTML: (attributes) => ({
           [SECTION_LINK_URL_ATTR]: attributes.url,
         }),
+      },
+      extra: {
+        default: '',
+        parseHTML: (element) =>
+          element.getAttribute(SECTION_LINK_EXTRA_ATTR) ?? '',
+        renderHTML: (attributes) =>
+          attributes.extra
+            ? { [SECTION_LINK_EXTRA_ATTR]: attributes.extra }
+            : {},
       },
     };
   },

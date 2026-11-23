@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { classifyLinkMarker } from '~workshop/markup-editor/tiptap/link-markers';
 import {
   archetypeFormSchema,
   bookFormSchema,
@@ -1072,5 +1073,27 @@ describe('вкладки и спойлеры редакторов', () => {
     expect([...shiftIndexesAfterRemoval(new Set([0, 2, 4]), 2)]).toEqual([
       0, 3,
     ]);
+  });
+});
+
+describe('ссылки в визуальном редакторе разметки', () => {
+  it('сохраняют параметры кроме адреса (target:_blank)', () => {
+    expect(
+      classifyLinkMarker(
+        '{@link сайт | url:https://example.com | target:_blank}',
+      ),
+    ).toEqual({
+      kind: 'link',
+      label: 'сайт',
+      url: 'https://example.com',
+      extra: 'target:_blank',
+    });
+
+    expect(classifyLinkMarker('{@spell шар | url:fireball}')).toEqual({
+      kind: 'spell',
+      label: 'шар',
+      url: 'fireball',
+      extra: '',
+    });
   });
 });

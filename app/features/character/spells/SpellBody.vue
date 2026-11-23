@@ -92,7 +92,7 @@
     </SectionStatGrid>
 
     <ContentRender
-      v-if="spell.description"
+      v-if="hasContentDescription(spell.description)"
       :content="spell.description"
     />
 

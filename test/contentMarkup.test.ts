@@ -73,6 +73,24 @@ describe('markupToContent', () => {
     );
   });
 
+  it('небезопасный адрес ссылки — текст, как в HTML', () => {
+    expect(
+      markupToContent([
+        '{@link а | url:javascript:alert(1)} {@link б | url:data:text/html,x} '
+          + '{@link в | url://evil.example} {@link г | url:/\\evil.example} '
+          + '{@link д | url: JavaScript:alert(1) | target:_blank}',
+      ]),
+    ).toEqual(parseContent('<p>а б в г д</p>'));
+  });
+
+  it('пробелы между пунктами списка не дают пустых пунктов', () => {
+    expect(
+      markupToContent(['{@list {@li один} {@li два}\n{@list {@li а}} }']),
+    ).toEqual(
+      parseContent('<ul><li>один</li><li>два<ul><li>а</li></ul></li></ul>'),
+    );
+  });
+
   it('блоки: заголовок, выравнивание, список, цитата, разделитель, таблица', () => {
     expect(
       markupToContent([

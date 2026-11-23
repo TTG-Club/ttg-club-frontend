@@ -28,6 +28,7 @@ import {
   MARKUP_SECTION_LINKS,
   MARKUP_TABLE_CLASS,
   MARKUP_TABLE_WRAPPER_CLASS,
+  SAFE_URL,
 } from './constants';
 
 /**
@@ -112,7 +113,8 @@ function sectionLink(
 
 /**
  * Маркер `{@link … | url:…}`: внутренний адрес — с подсказкой по разделу,
- * якорь `#…` — переход по той же странице, внешний — в новой вкладке.
+ * якорь `#…` — переход по той же странице, внешний — в новой вкладке. Адрес
+ * с другой схемой (`javascript:`, `data:`, `//хост`) выводится текстом.
  * @param node - маркер ссылки
  * @param children - текст ссылки
  */
@@ -120,9 +122,9 @@ function plainLink(
   node: MarkerNode,
   children: Array<ContentNode>,
 ): Array<ContentNode> {
-  const url = readAttribute(node, 'url');
+  const url = readAttribute(node, 'url').trim();
 
-  if (!url) {
+  if (!url || !SAFE_URL.test(url)) {
     return children;
   }
 
@@ -285,6 +287,14 @@ function listNode(node: MarkerNode): ContentNode {
         items.push(element('li', {}, [nested]));
       }
 
+      continue;
+    }
+
+    // пробелы и переносы между пунктами — не пункт
+    if (
+      (typeof child === 'string' || isSimpleTextNode(child))
+      && !getNodeText(child).trim()
+    ) {
       continue;
     }
 

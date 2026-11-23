@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { MagicItemDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentLink, ContentRender } from '~content/render';
   import { DiceRoller } from '~dice-roller/roller';
   import { SectionImagePreview } from '~section/image-preview';
@@ -133,7 +134,7 @@
     </div>
 
     <ContentRender
-      v-if="item.description"
+      v-if="hasContentDescription(item.description)"
       :content="item.description"
     />
   </div>
