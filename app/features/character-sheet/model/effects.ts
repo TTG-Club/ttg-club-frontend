@@ -1,6 +1,6 @@
 import type { ActiveEffect, EffectChange } from '~active-effects/model';
 
-import type { SheetDocument } from './schema';
+import type { SheetDocument, SheetItem } from './schema';
 import type {
   EffectCarrier,
   FormulaContext,
@@ -57,19 +57,27 @@ export function isSelfAppliedEffect(effect: ActiveEffect): boolean {
 }
 
 /**
- * Работает ли механика предмета: предмет надет, а требующий настройки — ещё и
- * настроен.
+ * Работает ли механика предмета: предмет есть и надет, требующий настройки —
+ * настроен, а включаемый — включён.
  * @param item - предмет снаряжения
- * @param item.isEquipped - предмет надет
- * @param item.requiresAttunement - предмет требует настройки
- * @param item.isAttuned - предмет настроен
  */
-export function isItemMechanicsActive(item: {
-  isEquipped: boolean;
-  requiresAttunement: boolean;
-  isAttuned: boolean;
-}): boolean {
-  return item.isEquipped && (!item.requiresAttunement || item.isAttuned);
+export function isItemMechanicsActive(
+  item: Pick<
+    SheetItem,
+    | 'isEquipped'
+    | 'requiresAttunement'
+    | 'isAttuned'
+    | 'quantity'
+    | 'activatable'
+    | 'isActive'
+  >,
+): boolean {
+  return (
+    item.isEquipped
+    && item.quantity > 0
+    && (!item.requiresAttunement || item.isAttuned)
+    && (!item.activatable || item.isActive)
+  );
 }
 
 /**
@@ -470,7 +478,9 @@ export function getSheetRollMode(
   context: SheetRollContext,
 ): SheetRollMode {
   const advantage = hasRollFlag(flags, context, 'advantage');
-  const disadvantage = hasRollFlag(flags, context, 'disadvantage');
+
+  const disadvantage =
+    Boolean(context.isHindered) || hasRollFlag(flags, context, 'disadvantage');
 
   if (advantage === disadvantage) {
     return 'normal';

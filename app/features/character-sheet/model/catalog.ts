@@ -25,12 +25,8 @@ import {
   SPELLS_SECTION,
 } from '~character/model';
 import {
-  armorLinkSchema,
-  ARMORS_SECTION,
   itemLinkSchema,
   ITEMS_SECTION,
-  MAGIC_ITEMS_SECTION,
-  magicItemLinkSchema,
   weaponLinkSchema,
   WEAPONS_SECTION,
 } from '~inventory/model';
@@ -38,7 +34,10 @@ import {
 import { fetchCatalogEntry } from './api';
 import {
   FINESSE_PROPERTY_URL_SUFFIX,
+  HEAVY_PROPERTY_URL_SUFFIX,
+  MARTIAL_WEAPON_TYPE_MARKER,
   RANGED_WEAPON_TYPE_MARKER,
+  VERSATILE_PROPERTY_URL_SUFFIX,
 } from './constants';
 import {
   sheetArmorDetailSchema,
@@ -136,18 +135,6 @@ export const WEAPON_SEARCH: CatalogSearchSource<typeof weaponLinkSchema> = {
   ],
 };
 
-export const ARMOR_SEARCH: CatalogSearchSource<typeof armorLinkSchema> = {
-  listUrl: ARMORS_SECTION.listUrl,
-  schema: armorLinkSchema,
-  toOptions: (armor) => [
-    {
-      name: armor.name.rus,
-      url: armor.url,
-      caption: joinCaption([armor.type.name, armor.armorClass]),
-    },
-  ],
-};
-
 export const ITEM_SEARCH: CatalogSearchSource<typeof itemLinkSchema> = {
   listUrl: ITEMS_SECTION.listUrl,
   schema: itemLinkSchema,
@@ -162,20 +149,6 @@ export const ITEM_SEARCH: CatalogSearchSource<typeof itemLinkSchema> = {
   ],
 };
 
-export const MAGIC_ITEM_SEARCH: CatalogSearchSource<
-  typeof magicItemLinkSchema
-> = {
-  listUrl: MAGIC_ITEMS_SECTION.listUrl,
-  schema: magicItemLinkSchema,
-  toOptions: (item) => [
-    {
-      name: item.name.rus,
-      url: item.url,
-      caption: joinCaption([item.rarity.name, item.source?.shortName]),
-    },
-  ],
-};
-
 /** Разделы снаряжения, из которых можно добавить предмет. */
 export const ITEM_SEARCH_KINDS = [
   { value: 'weapon', label: 'Оружие', icon: 'tabler:sword' },
@@ -185,15 +158,6 @@ export const ITEM_SEARCH_KINDS = [
 ] as const;
 
 export type ItemSearchKind = (typeof ITEM_SEARCH_KINDS)[number]['value'];
-
-/** Раздел поиска по виду предмета. */
-export const ITEM_SEARCH_BY_KIND: Record<ItemSearchKind, CatalogSearchSource> =
-  {
-    weapon: WEAPON_SEARCH,
-    armor: ARMOR_SEARCH,
-    item: ITEM_SEARCH,
-    magic: MAGIC_ITEM_SEARCH,
-  };
 
 /* --- Перенос записей справочника в лист --------------------------------- */
 
@@ -329,6 +293,11 @@ export function createSheetItem(name: string, url: string | null): SheetItem {
     charges: null,
     activeEffects: [],
     passive: '',
+    cost: '',
+    description: '',
+    activatable: false,
+    isActive: false,
+    useTwoHands: false,
   };
 }
 
@@ -346,19 +315,32 @@ export async function loadCatalogItem(
 
   if (kind === 'weapon') {
     const detail = await fetchCatalogEntry(option.url, sheetWeaponDetailSchema);
+    const properties = detail.properties ?? [];
+
+    const findProperty = (suffix: string) =>
+      properties.find((property) =>
+        property.url?.toLowerCase().endsWith(suffix),
+      );
 
     return {
       ...item,
       weight: detail.weight ?? 0,
+      cost: detail.price ?? '',
       weapon: {
         damage: detail.damage?.dice ?? '',
         damageType: detail.damage?.type ?? '',
         isRanged: Boolean(detail.typeRaw?.includes(RANGED_WEAPON_TYPE_MARKER)),
-        isFinesse: (detail.properties ?? []).some((property) =>
-          property.url?.toLowerCase().endsWith(FINESSE_PROPERTY_URL_SUFFIX),
-        ),
+        isFinesse: Boolean(findProperty(FINESSE_PROPERTY_URL_SUFFIX)),
         isProficient: true,
         bonus: 0,
+        isMartial: Boolean(
+          detail.typeRaw?.startsWith(MARTIAL_WEAPON_TYPE_MARKER),
+        ),
+        isHeavy: Boolean(findProperty(HEAVY_PROPERTY_URL_SUFFIX)),
+        versatileDamage:
+          findProperty(VERSATILE_PROPERTY_URL_SUFFIX)?.twoHandDice ?? '',
+        extraDamage: '',
+        extraDamageType: '',
       },
     };
   }
@@ -369,6 +351,7 @@ export async function loadCatalogItem(
     return {
       ...item,
       weight: detail.weight ?? 0,
+      cost: String(detail.price ?? ''),
       armor: detail.typeRaw
         ? {
             category: detail.typeRaw,
@@ -383,7 +366,11 @@ export async function loadCatalogItem(
 
   const detail = await fetchCatalogEntry(option.url, sheetWeightDetailSchema);
 
-  return { ...item, weight: detail.weight ?? 0 };
+  return {
+    ...item,
+    weight: detail.weight ?? 0,
+    cost: String(detail.price ?? ''),
+  };
 }
 
 /**

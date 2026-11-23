@@ -10,6 +10,7 @@ import type {
   CURRENCY_KEYS,
   EXTRA_SPEED_KEYS,
   HIT_POINTS_GAIN_MODES,
+  ITEM_KINDS,
   OWN_SENSE_KEYS,
   RESOURCE_MAX_SOURCES,
   SHEET_MAIN_TAB,
@@ -64,9 +65,16 @@ export interface WeaponAttack {
   name: string;
   url: string | null;
   attackBonus: number;
-  /** Урон с модификатором: «1к8 + 3». */
+  /** Урон с модификатором: «1к8 + 3»; у двуручного хвата — по второй кости. */
   damage: string;
   damageType: string;
+  /** Дополнительный урон магического оружия: «1к6». */
+  extraDamage: string;
+  extraDamageType: string;
+  /** Части бонуса атаки для разбора. */
+  abilityModifier: number;
+  proficiency: number;
+  magicBonus: number;
 }
 
 /** Кости хитов одного размера. */
@@ -74,6 +82,32 @@ export interface HitDiceTotal {
   die: number;
   total: number;
   used: number;
+}
+
+/** Ступень нагрузки варианта «Нагрузка»; без варианта — всегда `none`. */
+export type EncumbranceLevel = 'none' | 'encumbered' | 'heavy';
+
+/** Разбор грузоподъёмности. */
+export interface CarryingBreakdown {
+  strength: number;
+  /** Множитель размера. */
+  multiplier: number;
+  /** Сила × 15 × размер. */
+  base: number;
+  bonus: number;
+  custom: number | null;
+  value: number;
+  /** Пороги варианта «Нагрузка», фунты. */
+  encumberedAt: number;
+  heavyAt: number;
+}
+
+/** Разбор предела настройки. */
+export interface AttunementBreakdown {
+  base: number;
+  bonus: number;
+  custom: number | null;
+  value: number;
 }
 
 /** Путь к следующему уровню по опыту. */
@@ -144,6 +178,20 @@ export interface CatalogOption {
   caption: string;
 }
 
+/** Строка окна добавления предметов из справочника. */
+export interface CatalogRow {
+  url: string;
+  name: string;
+  nameEng: string;
+  /** Группа списка: тип оружия, редкость. */
+  group: string;
+  groupOrder: number;
+  /** Урон, КД или настройка. */
+  caption: string;
+  price: string;
+  source: string;
+}
+
 /** Раздел справочника для поиска: ручка списка, схема записи и подпись. */
 export interface CatalogSearchSource<Schema extends z.ZodType = z.ZodType> {
   listUrl: string;
@@ -167,6 +215,8 @@ export type ExtraSpeedKey = (typeof EXTRA_SPEED_KEYS)[number];
 export type SpeedKey = 'walk' | ExtraSpeedKey;
 
 export type SpeedUnit = (typeof SPEED_UNITS)[number];
+
+export type ItemKind = (typeof ITEM_KINDS)[number];
 
 export type ResourceMaxSource = (typeof RESOURCE_MAX_SOURCES)[number];
 
@@ -314,6 +364,13 @@ export interface ArmorClassBreakdown {
 /** Итоги листа с учётом механики, эффектов и истощения. */
 export interface SheetStats {
   level: number;
+  /** Переносимый вес с монетами, фунты. */
+  carriedWeight: number;
+  carrying: CarryingBreakdown;
+  encumbrance: EncumbranceLevel;
+  /** Доспеху не хватает Силы: скорость −10 фт. */
+  isArmorTooHeavy: boolean;
+  attunement: AttunementBreakdown;
   proficiencyBonus: number;
   /** Характеристики с прибавками эффектов. */
   abilities: AbilityScores;
@@ -349,6 +406,8 @@ export interface SheetRollContext {
   /** Ключ навыка в словаре эффектов (`stealth`). */
   skill?: string;
   attackType?: 'melee' | 'ranged' | 'spell';
+  /** Помеха по обстоятельствам предмета: тяжёлое оружие у Маленького. */
+  isHindered?: boolean;
 }
 
 /** Режим броска по флагам: обычный, с преимуществом или помехой. */

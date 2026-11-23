@@ -1,16 +1,10 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type {
-    CatalogOption,
-    CurrencyKey,
-    ItemSearchKind,
-    SheetItem,
-    WeaponAttack,
-  } from '../model';
+  import type { ItemSearchKind, SheetItem, WeaponAttack } from '../model';
 
+  import { ContentEntityDrawer } from '~content/entity-drawer';
   import { MAGIC_ITEMS_SECTION } from '~inventory/model';
-  import { getApiErrorMessage } from '~user/model';
 
   import {
     useCharacterSheet,
@@ -19,31 +13,34 @@
     useSheetStats,
   } from '../composables';
   import {
-    SheetCatalogPicker,
+    SheetAttunementModal,
+    SheetCarryingModal,
+    SheetCatalogAddModal,
     SheetConfirmModal,
+    SheetCurrencyModal,
     SheetItemModal,
   } from '../dialogs';
   import {
-    ATTUNEMENT_LIMIT,
     ATTUNEMENT_TEXT,
+    CARRYING_TEXT,
+    copyItemAsCustom,
+    createSheetElementId,
     createSheetItem,
     CURRENCY_KEYS,
     CURRENCY_LABELS,
     CURRENCY_TITLES,
-    getCarryingCapacity,
-    getInventoryWeight,
+    getItemPreviewType,
     getWeaponAttack,
     INVENTORY_GROUPS,
-    ITEM_SEARCH_BY_KIND,
+    isHeavyWeaponHindered,
+    ITEM_ROW_TEXT,
     ITEM_SEARCH_KINDS,
-    loadCatalogItem,
-    loadMagicItem,
     SHEET_BODY_LABELS,
     SHEET_GROUP_LABEL_CLASS,
     SHEET_HEADER_STAT_CLASS,
     SHEET_ICON,
     SHEET_LABELS,
-    SHEET_TEXT,
+    sortItemsByName,
   } from '../model';
   import SheetInventoryItemRow from './SheetInventoryItemRow.vue';
 
@@ -98,33 +95,83 @@
   const editedItem = ref<SheetItem | null>(null);
   const isEditOpen = ref(false);
 
-  const weight = computed(() => getInventoryWeight(document.value.inventory));
-  const capacity = computed(() => getCarryingCapacity(stats.value.abilities));
+  const isCarryingOpen = ref(false);
+  const previewItem = ref<SheetItem | null>(null);
 
-  const weightClass = computed(() =>
-    weight.value > capacity.value ? 'text-error' : 'text-highlighted',
+  const previewType = computed(() =>
+    getItemPreviewType(previewItem.value?.url ?? null),
   );
+
+  const isPreviewOpen = computed({
+    get: () => previewItem.value !== null,
+    set: (open: boolean) => {
+      if (!open) {
+        previewItem.value = null;
+      }
+    },
+  });
+
+  const isAttunementOpen = ref(false);
+  const isCurrencyOpen = ref(false);
+
+  const weight = computed(() => stats.value.carriedWeight);
+  const capacity = computed(() => stats.value.carrying.value);
+
+  const weightClass = computed(() => {
+    if (weight.value > capacity.value || stats.value.encumbrance === 'heavy') {
+      return 'text-error';
+    }
+
+    return stats.value.encumbrance === 'encumbered'
+      || stats.value.isArmorTooHeavy
+      ? 'text-warning'
+      : 'text-highlighted';
+  });
+
+  const weightHint = computed(() => {
+    if (stats.value.encumbrance === 'heavy') {
+      return CARRYING_TEXT.heavilyEncumbered;
+    }
+
+    if (stats.value.encumbrance === 'encumbered') {
+      return CARRYING_TEXT.encumbered;
+    }
+
+    return weight.value > capacity.value
+      ? CARRYING_TEXT.overloaded
+      : SHEET_LABELS.carryingCapacity;
+  });
 
   const attunedCount = computed(
     () => document.value.inventory.filter((item) => item.isAttuned).length,
   );
 
+  const attunementLimit = computed(() => stats.value.attunement.value);
+
+  const isOverAttuned = computed(
+    () => attunedCount.value > attunementLimit.value,
+  );
+
   const attunementClass = computed(() =>
-    attunedCount.value > ATTUNEMENT_LIMIT ? 'text-error' : 'text-highlighted',
+    isOverAttuned.value ? 'text-error' : 'text-highlighted',
   );
 
   const attunementHint = computed(() =>
-    attunedCount.value > ATTUNEMENT_LIMIT
-      ? ATTUNEMENT_TEXT.overLimit
-      : ATTUNEMENT_TEXT.limit,
+    isOverAttuned.value ? ATTUNEMENT_TEXT.overLimit : ATTUNEMENT_TEXT.limit,
   );
 
-  const pickerSource = computed(() => ITEM_SEARCH_BY_KIND[pickerKind.value]);
+  /** Свои валюты — в строке монет после обычных. */
+  const customCurrencies = computed(() =>
+    document.value.customCurrencies.map((entry) => ({
+      id: entry.id,
+      amount: entry.amount,
+      label: entry.short || entry.name,
+      title: entry.name,
+    })),
+  );
 
-  const pickerTitle = computed(
-    () =>
-      ITEM_SEARCH_KINDS.find((kind) => kind.value === pickerKind.value)?.label
-      ?? SHEET_LABELS.item,
+  const takenUrls = computed(() =>
+    document.value.inventory.flatMap((item) => (item.url ? [item.url] : [])),
   );
 
   const addMenuItems = computed<Array<DropdownMenuItem>>(() => [
@@ -141,6 +188,16 @@
   ]);
 
   /**
+   * Прибавка эффектов к атаке оружием.
+   * @param item - предмет
+   */
+  function getAttackEffects(item: SheetItem): number {
+    return item.weapon?.isRanged
+      ? stats.value.rangedAttackBonus
+      : stats.value.meleeAttackBonus;
+  }
+
+  /**
    * Атака оружием с характеристиками и прибавками эффектов.
    * @param item - предмет
    */
@@ -155,19 +212,25 @@
       return attack;
     }
 
-    const bonus = item.weapon.isRanged
-      ? stats.value.rangedAttackBonus
-      : stats.value.meleeAttackBonus;
-
-    return { ...attack, attackBonus: attack.attackBonus + bonus };
+    return {
+      ...attack,
+      attackBonus: attack.attackBonus + getAttackEffects(item),
+    };
   }
 
   const groups = computed(() =>
     INVENTORY_GROUPS.map((group) => ({
       ...group,
-      items: document.value.inventory
-        .filter((item) => getItemGroup(item) === group.key)
-        .map((item) => ({ item, attack: getAttack(item) })),
+      items: sortItemsByName(
+        document.value.inventory.filter(
+          (item) => getItemGroup(item) === group.key,
+        ),
+      ).map((item) => ({
+        item,
+        attack: getAttack(item),
+        attackEffects: getAttackEffects(item),
+        isHindered: isHeavyWeaponHindered(item, document.value.size),
+      })),
     })).filter((group) => group.items.length),
   );
 
@@ -185,26 +248,14 @@
   }
 
   /**
-   * Добавляет предмет из справочника.
-   * @param option - выбранная запись
+   * Добавляет предметы из справочника одной правкой.
+   * @param items - загруженные предметы
    */
-  async function addFromCatalog(option: CatalogOption): Promise<void> {
-    try {
-      const item =
-        pickerKind.value === 'magic'
-          ? await loadMagicItem(option)
-          : await loadCatalogItem(pickerKind.value, option);
-
-      update((current) => ({
-        ...current,
-        inventory: [...current.inventory, item],
-      }));
-    } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
-        color: 'error',
-      });
-    }
+  function addFromCatalog(items: Array<SheetItem>): void {
+    update((current) => ({
+      ...current,
+      inventory: [...current.inventory, ...items],
+    }));
   }
 
   function addCustom(): void {
@@ -263,6 +314,50 @@
    */
   function toggleEquip(id: string): void {
     patchItem(id, (item) => ({ ...item, isEquipped: !item.isEquipped }));
+  }
+
+  /**
+   * Хват универсального оружия: одной или двумя руками.
+   * @param id - предмет
+   */
+  function toggleGrip(id: string): void {
+    patchItem(id, (item) => ({ ...item, useTwoHands: !item.useTwoHands }));
+  }
+
+  /**
+   * Включает или выключает предмет.
+   * @param id - предмет
+   */
+  function toggleActive(id: string): void {
+    patchItem(id, (item) => ({ ...item, isActive: !item.isActive }));
+  }
+
+  /**
+   * Описание предмета справочника в дровере.
+   * @param item - предмет
+   */
+  function openPreview(item: SheetItem): void {
+    previewItem.value = item;
+  }
+
+  /**
+   * Копия предмета справочника как свой предмет: правится целиком.
+   * @param item - предмет
+   */
+  function copyItem(item: SheetItem): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    const copy = copyItemAsCustom(item, createSheetElementId());
+
+    update((current) => ({
+      ...current,
+      inventory: [...current.inventory, copy],
+    }));
+
+    toast.add({ title: ITEM_ROW_TEXT.copied, color: 'success' });
+    openEdit(copy);
   }
 
   /**
@@ -342,16 +437,17 @@
     }));
   }
 
-  /**
-   * Количество монет.
-   * @param key - вид монет
-   * @param value - количество
-   */
-  function setCurrency(key: CurrencyKey, value: number | null): void {
-    update((current) => ({
-      ...current,
-      currency: { ...current.currency, [key]: Math.max(0, value ?? 0) },
-    }));
+  function openCarrying(): void {
+    isCarryingOpen.value = true;
+  }
+
+  function openAttunement(): void {
+    isAttunementOpen.value = true;
+  }
+
+  /** Монеты меняются и на запертом листе: это игровое действие. */
+  function openCurrency(): void {
+    isCurrencyOpen.value = true;
   }
 
   /**
@@ -362,7 +458,11 @@
    * @param event - клик
    */
   function rollAttack(
-    entry: { item: SheetItem; attack: WeaponAttack | null },
+    entry: {
+      item: SheetItem;
+      attack: WeaponAttack | null;
+      isHindered: boolean;
+    },
     event: MouseEvent,
   ): void {
     if (entry.attack) {
@@ -373,6 +473,7 @@
         {
           kind: 'attack',
           attackType: entry.item.weapon?.isRanged ? 'ranged' : 'melee',
+          isHindered: entry.isHindered,
         },
       );
     }
@@ -387,7 +488,9 @@
     if (entry.attack) {
       rollDamage(
         `${SHEET_LABELS.damage}: ${entry.attack.name}`,
-        entry.attack.damage,
+        entry.attack.extraDamage
+          ? `${entry.attack.damage} + ${entry.attack.extraDamage}`
+          : entry.attack.damage,
       );
     }
   }
@@ -405,8 +508,14 @@
   <div class="@container flex flex-col gap-4 pt-2">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="flex flex-wrap items-center gap-2">
-        <UTooltip :text="SHEET_LABELS.carryingCapacity">
-          <span :class="SHEET_HEADER_STAT_CLASS">
+        <UTooltip :text="weightHint">
+          <button
+            type="button"
+            class="cursor-pointer"
+            :class="SHEET_HEADER_STAT_CLASS"
+            :aria-label="CARRYING_TEXT.title"
+            @click.left.exact.prevent="openCarrying"
+          >
             <span class="flex items-center gap-1.5">
               <UIcon
                 name="tabler:weight"
@@ -426,11 +535,17 @@
                 {{ weight }} / {{ capacity }} {{ SHEET_LABELS.weightUnit }}
               </span>
             </span>
-          </span>
+          </button>
         </UTooltip>
 
         <UTooltip :text="attunementHint">
-          <span :class="SHEET_HEADER_STAT_CLASS">
+          <button
+            type="button"
+            class="cursor-pointer"
+            :class="SHEET_HEADER_STAT_CLASS"
+            :aria-label="ATTUNEMENT_TEXT.settings"
+            @click.left.exact.prevent="openAttunement"
+          >
             <span class="flex items-center gap-1.5">
               <UIcon
                 name="tabler:link"
@@ -447,10 +562,10 @@
                 class="text-xs font-bold whitespace-nowrap"
                 :class="attunementClass"
               >
-                {{ attunedCount }} / {{ ATTUNEMENT_LIMIT }}
+                {{ attunedCount }} / {{ attunementLimit }}
               </span>
             </span>
-          </span>
+          </button>
         </UTooltip>
       </div>
 
@@ -469,47 +584,44 @@
       </UDropdownMenu>
     </div>
 
-    <UPopover>
-      <button
-        type="button"
-        class="flex cursor-pointer flex-wrap items-center justify-between gap-2 rounded-lg border border-default/50 bg-elevated/20 px-4 py-2 transition-colors hover:border-default hover:bg-elevated/40"
-        :aria-label="SHEET_LABELS.currency"
+    <button
+      type="button"
+      class="flex cursor-pointer flex-wrap items-center justify-between gap-2 rounded-lg border border-default/50 bg-elevated/20 px-4 py-2 transition-colors hover:border-default hover:bg-elevated/40"
+      :aria-label="SHEET_LABELS.currency"
+      @click.left.exact.prevent="openCurrency"
+    >
+      <UTooltip
+        v-for="key in CURRENCY_KEYS"
+        :key="key"
+        :text="CURRENCY_TITLES[key]"
       >
-        <UTooltip
-          v-for="key in CURRENCY_KEYS"
-          :key="key"
-          :text="CURRENCY_TITLES[key]"
-        >
-          <span class="flex items-baseline gap-1.5">
-            <span class="text-sm font-bold text-highlighted">{{
-              document.currency[key]
-            }}</span>
+        <span class="flex items-baseline gap-1.5">
+          <span class="text-sm font-bold text-highlighted">{{
+            document.currency[key]
+          }}</span>
 
-            <span class="text-[10px] font-bold text-muted uppercase">
-              {{ CURRENCY_LABELS[key] }}
-            </span>
+          <span class="text-[10px] font-bold text-muted uppercase">
+            {{ CURRENCY_LABELS[key] }}
           </span>
-        </UTooltip>
-      </button>
+        </span>
+      </UTooltip>
 
-      <template #content>
-        <div class="grid w-72 grid-cols-2 gap-2 p-3">
-          <UFormField
-            v-for="key in CURRENCY_KEYS"
-            :key="key"
-            :label="CURRENCY_TITLES[key]"
-          >
-            <UInputNumber
-              :model-value="document.currency[key]"
-              :min="0"
-              size="sm"
-              class="w-full"
-              @update:model-value="setCurrency(key, $event)"
-            />
-          </UFormField>
-        </div>
-      </template>
-    </UPopover>
+      <UTooltip
+        v-for="entry in customCurrencies"
+        :key="entry.id"
+        :text="entry.title"
+      >
+        <span class="flex items-baseline gap-1.5">
+          <span class="text-sm font-bold text-highlighted">{{
+            entry.amount
+          }}</span>
+
+          <span class="text-[10px] font-bold text-muted uppercase">
+            {{ entry.label }}
+          </span>
+        </span>
+      </UTooltip>
+    </button>
 
     <template v-if="groups.length">
       <div
@@ -528,10 +640,16 @@
           :key="entry.item.id"
           :item="entry.item"
           :attack="entry.attack"
+          :attack-effects="entry.attackEffects"
           :icon="group.icon"
           :is-equippable="group.key !== 'other'"
+          :is-hindered="entry.isHindered"
           @toggle-equip="toggleEquip(entry.item.id)"
           @toggle-attune="toggleAttune(entry.item.id)"
+          @toggle-grip="toggleGrip(entry.item.id)"
+          @toggle-active="toggleActive(entry.item.id)"
+          @preview="openPreview(entry.item)"
+          @copy="copyItem(entry.item)"
           @adjust="adjustQuantity(entry.item.id, $event)"
           @spend-charge="spendCharge(entry.item.id)"
           @restore-charges="restoreCharges(entry.item)"
@@ -550,11 +668,11 @@
       {{ SHEET_BODY_LABELS.emptyEquipment }}
     </div>
 
-    <SheetCatalogPicker
+    <SheetCatalogAddModal
       v-model:open="isPickerOpen"
-      :title="pickerTitle"
-      :source="pickerSource"
-      @pick="addFromCatalog"
+      :kind="pickerKind"
+      :taken-urls="takenUrls"
+      @add="addFromCatalog"
     />
 
     <SheetItemModal
@@ -562,6 +680,20 @@
       :item="editedItem"
       @save="saveItem"
     />
+
+    <ContentEntityDrawer
+      v-if="previewItem?.url && previewType"
+      v-model:open="isPreviewOpen"
+      :type="previewType"
+      :path="previewItem.url"
+      :title="previewItem.name"
+    />
+
+    <SheetCarryingModal v-model:open="isCarryingOpen" />
+
+    <SheetAttunementModal v-model:open="isAttunementOpen" />
+
+    <SheetCurrencyModal v-model:open="isCurrencyOpen" />
 
     <SheetConfirmModal
       v-model:open="isRemoveOpen"
