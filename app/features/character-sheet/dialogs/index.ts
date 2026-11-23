@@ -20,6 +20,7 @@ export { default as SheetHealthQuickModal } from './SheetHealthQuickModal.vue';
 export { default as SheetItemModal } from './SheetItemModal.vue';
 export { default as SheetLevelUpModal } from './SheetLevelUpModal.vue';
 export { default as SheetLongRestModal } from './SheetLongRestModal.vue';
+export { default as SheetPreparedSpellsModal } from './SheetPreparedSpellsModal.vue';
 export { default as SheetResourcesModal } from './SheetResourcesModal.vue';
 export { default as SheetSavingThrowsSettingsModal } from './SheetSavingThrowsSettingsModal.vue';
 export { default as SheetSettingsModal } from './SheetSettingsModal.vue';
@@ -29,4 +30,8 @@ export { default as SheetSkillsSettingsModal } from './SheetSkillsSettingsModal.
 export { default as SheetSourceChoices } from './SheetSourceChoices.vue';
 export { default as SheetSourceChoicesModal } from './SheetSourceChoicesModal.vue';
 export { default as SheetSpeedModal } from './SheetSpeedModal.vue';
+export { default as SheetSpellAbilityModal } from './SheetSpellAbilityModal.vue';
+export { default as SheetSpellcastingModal } from './SheetSpellcastingModal.vue';
+export { default as SheetSpellCastModal } from './SheetSpellCastModal.vue';
+export { default as SheetSpellModal } from './SheetSpellModal.vue';
 export { default as SheetVisionModal } from './SheetVisionModal.vue';

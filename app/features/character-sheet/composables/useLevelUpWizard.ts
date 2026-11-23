@@ -416,6 +416,7 @@ export const useLevelUpWizard = createSharedComposable(() => {
           ?? parseHitDie(details.detail.dice)
           ?? 8,
         hitPointGains: [],
+        spellcastingAbility: null,
       };
 
       targetLevel.value = CHARACTER_LEVEL.min;

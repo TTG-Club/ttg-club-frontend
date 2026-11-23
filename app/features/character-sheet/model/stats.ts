@@ -696,6 +696,27 @@ export function getSheetStats(document: SheetDocument): SheetStats {
 
   const spellAbility = document.spellcastingAbility;
 
+  /**
+   * Сл и атака заклинаний от характеристики с эффектами листа.
+   * @param key - характеристика
+   */
+  const getSpellcasting = (key: AbilityKey) => ({
+    saveDc: getEffectValue(
+      carriers,
+      EFFECT_KEYS.spellSaveDc,
+      SPELL_SAVE_DC_BASE + proficiencyBonus + mod(key),
+      armor,
+      context,
+    ),
+    attack: getEffectValue(
+      carriers,
+      EFFECT_KEYS.spellAttack,
+      proficiencyBonus + mod(key),
+      armor,
+      context,
+    ),
+  });
+
   const armorClass = getArmorClassBreakdown(
     effective,
     carriers,
@@ -799,6 +820,14 @@ export function getSheetStats(document: SheetDocument): SheetStats {
           context,
         )
       : null,
+    spellcastingByAbility: {
+      STRENGTH: getSpellcasting('STRENGTH'),
+      DEXTERITY: getSpellcasting('DEXTERITY'),
+      CONSTITUTION: getSpellcasting('CONSTITUTION'),
+      INTELLIGENCE: getSpellcasting('INTELLIGENCE'),
+      WISDOM: getSpellcasting('WISDOM'),
+      CHARISMA: getSpellcasting('CHARISMA'),
+    },
     meleeAttackBonus: getEffectValue(
       carriers,
       EFFECT_KEYS.meleeAttack,

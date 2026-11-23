@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { ItemSearchKind, SheetItem, WeaponAttack } from '../model';
+  import type {
+    CatalogRow,
+    ItemSearchKind,
+    SheetItem,
+    WeaponAttack,
+  } from '../model';
 
   import { ContentEntityDrawer } from '~content/entity-drawer';
   import { MAGIC_ITEMS_SECTION } from '~inventory/model';
@@ -23,6 +28,7 @@
   import {
     ATTUNEMENT_TEXT,
     CARRYING_TEXT,
+    CATALOG_ADD_SOURCES,
     copyItemAsCustom,
     createSheetElementId,
     createSheetItem,
@@ -35,6 +41,8 @@
     isHeavyWeaponHindered,
     ITEM_ROW_TEXT,
     ITEM_SEARCH_KINDS,
+    loadCatalogItem,
+    loadMagicItem,
     SHEET_BODY_LABELS,
     SHEET_GROUP_LABEL_CLASS,
     SHEET_HEADER_STAT_CLASS,
@@ -169,6 +177,26 @@
       title: entry.name,
     })),
   );
+
+  const pickerTitle = computed(
+    () =>
+      ITEM_SEARCH_KINDS.find((item) => item.value === pickerKind.value)?.label
+      ?? '',
+  );
+
+  const pickerSource = computed(() => CATALOG_ADD_SOURCES[pickerKind.value]);
+
+  /**
+   * Загружает предмет справочника для листа.
+   * @param row - строка окна добавления
+   */
+  function loadPickedItem(row: CatalogRow): Promise<SheetItem> {
+    const option = { name: row.name, url: row.url, caption: '' };
+
+    return pickerKind.value === 'magic'
+      ? loadMagicItem(option)
+      : loadCatalogItem(pickerKind.value, option);
+  }
 
   const takenUrls = computed(() =>
     document.value.inventory.flatMap((item) => (item.url ? [item.url] : [])),
@@ -670,8 +698,11 @@
 
     <SheetCatalogAddModal
       v-model:open="isPickerOpen"
-      :kind="pickerKind"
+      :title="pickerTitle"
+      :source="pickerSource"
       :taken-urls="takenUrls"
+      :loader="loadPickedItem"
+      :preview-type="getItemPreviewType"
       @add="addFromCatalog"
     />
 

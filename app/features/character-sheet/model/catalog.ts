@@ -264,6 +264,7 @@ export async function loadClassSelection(
       level,
       hitDie: detail.traits?.diceHp ?? parseHitDie(detail.dice) ?? 8,
       hitPointGains: [],
+      spellcastingAbility: null,
     },
     savingThrows: parseSavingThrows(detail.traits?.savingThrows),
     spellAbility: toAbilityKey(detail.spellAbility),
@@ -391,6 +392,13 @@ export function createSheetSpell(name: string, url: string | null): SheetSpell {
     notes: '',
     sourceId: null,
     alwaysPrepared: false,
+    spellcastingAbility: null,
+    castingTime: '',
+    range: '',
+    components: '',
+    duration: '',
+    description: '',
+    damage: null,
   };
 }
 

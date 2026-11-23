@@ -1,6 +1,6 @@
 import type { FilterDefinition, FilterSelection } from '~section/model';
 
-import type { CatalogRow, ItemSearchKind } from '../model';
+import type { CatalogAddSource, CatalogPreset, CatalogRow } from '../model';
 
 import {
   applyExcludedSources,
@@ -14,19 +14,21 @@ import {
   SECTION_PAGE_SIZE_ALL,
 } from '~section/model';
 
-import { CATALOG_ADD_SOURCES } from '../model';
-
 /**
  * Весь раздел справочника для окна добавления: фильтр и источники раздела
  * (выбор живёт в окне и адрес страницы не трогает), список целиком одним
  * запросом. Поиск по названию идёт уже на клиенте.
- * @param kind - вид предмета
+ * @param catalogSource - раздел справочника
+ * @param preset - выбор фильтра при открытии
  */
-export function useCatalogList(kind: MaybeRefOrGetter<ItemSearchKind>) {
+export function useCatalogList(
+  catalogSource: MaybeRefOrGetter<CatalogAddSource>,
+  preset?: MaybeRefOrGetter<CatalogPreset | undefined>,
+) {
   const api = useApi();
   const { user } = useUser();
 
-  const source = computed(() => CATALOG_ADD_SOURCES[toValue(kind)]);
+  const source = computed(() => toValue(catalogSource));
 
   const definition = shallowRef<FilterDefinition | null>(null);
   const selection = shallowRef<FilterSelection>({});
@@ -74,8 +76,11 @@ export function useCatalogList(kind: MaybeRefOrGetter<ItemSearchKind>) {
       user.value?.excludedSources ?? [],
     );
 
+    const defaults = getDefaultSelection(loaded);
+    const applyPreset = toValue(preset);
+
     definition.value = loaded;
-    selection.value = getDefaultSelection(loaded);
+    selection.value = applyPreset ? applyPreset(loaded, defaults) : defaults;
   }
 
   /** Грузит список раздела с текущим фильтром. */

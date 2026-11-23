@@ -215,6 +215,7 @@ export function createCustomClassStep(
     level: CHARACTER_LEVEL.min,
     hitDie,
     hitPointGains: [],
+    spellcastingAbility: null,
   };
 
   return {
