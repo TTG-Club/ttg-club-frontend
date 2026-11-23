@@ -27,6 +27,8 @@
     context,
     kinds = CUSTOM_BONUS_KINDS,
     withAdd = true,
+    range = CUSTOM_BONUS_RANGE,
+    step = 1,
   } = defineProps<{
     classes: ReadonlyArray<Pick<SheetClass, 'id' | 'name'>>;
     context: CustomBonusContext;
@@ -37,6 +39,10 @@
      * в шапке строки, своя кнопка только дублировала бы его.
      */
     withAdd?: boolean;
+    /** Пределы своего числа: у скорости они в футах, а не в очках броска. */
+    range?: { min: number; max: number };
+    /** Шаг своего числа. */
+    step?: number;
   }>();
 
   const rows = defineModel<Array<CustomBonus>>({ required: true });
@@ -109,8 +115,9 @@
       <UInputNumber
         v-if="row.kind === 'flat'"
         v-model="row.value"
-        :min="CUSTOM_BONUS_RANGE.min"
-        :max="CUSTOM_BONUS_RANGE.max"
+        :min="range.min"
+        :max="range.max"
+        :step="step"
         :format-options="CUSTOM_BONUS_FORMAT_OPTIONS"
         size="sm"
         class="w-28 shrink-0"

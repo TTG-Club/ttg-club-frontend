@@ -25,7 +25,6 @@ import {
   ABILITY_KEYS,
   ABILITY_LABELS,
   ABILITY_SCORE,
-  ARMOR_DEXTERITY_LIMIT,
   CARRYING_CAPACITY_MULTIPLIER,
   CASTER_LEVEL_DIVIDER,
   CATALOG_API_PREFIX,
@@ -44,7 +43,6 @@ import {
   SKILL_PROFICIENCY_CYCLE,
   SKILL_PROFICIENCY_MULTIPLIER,
   SPELL_SLOT_LEVELS,
-  UNARMORED_ARMOR_CLASS,
 } from './constants';
 import { sheetDocumentSchema } from './schema';
 import { getCustomBonusesTotal, getSkillAbility } from './skills';
@@ -321,53 +319,6 @@ export function getInitiativeBonus(document: SheetDocument): number {
   return (
     getModifierOf(document.abilities, 'DEXTERITY') + document.initiativeBonus
   );
-}
-
-/**
- * КД по снаряжению: надетый доспех (или 10 без него) с модификатором
- * Ловкости в пределах категории, надетые щиты и свой бонус.
- * @param document - лист персонажа
- */
-export function getCalculatedArmorClass(document: SheetDocument): number {
-  const dexterity = getModifierOf(document.abilities, 'DEXTERITY');
-
-  const equippedArmor = document.inventory.filter(
-    (item) => item.isEquipped && item.armor,
-  );
-
-  const bodyArmor = equippedArmor
-    .flatMap((item) =>
-      item.armor && item.armor.category !== 'SHIELD' ? [item.armor] : [],
-    )
-    .reduce<{ value: number; limit: number | null } | null>((best, armor) => {
-      const value = armor.baseArmorClass + armor.bonus;
-
-      return !best || value > best.value
-        ? { value, limit: ARMOR_DEXTERITY_LIMIT[armor.category] }
-        : best;
-    }, null);
-
-  const shields = equippedArmor.reduce(
-    (sum, item) =>
-      item.armor?.category === 'SHIELD'
-        ? sum + item.armor.baseArmorClass + item.armor.bonus
-        : sum,
-    0,
-  );
-
-  const base = bodyArmor?.value ?? UNARMORED_ARMOR_CLASS;
-  const limit = bodyArmor?.limit ?? null;
-  const dexterityPart = limit === null ? dexterity : Math.min(dexterity, limit);
-
-  return base + dexterityPart + shields + document.armorClassBonus;
-}
-
-/**
- * Итоговый КД: своё значение, если задано, иначе — по снаряжению.
- * @param document - лист персонажа
- */
-export function getArmorClass(document: SheetDocument): number {
-  return document.armorClassOverride ?? getCalculatedArmorClass(document);
 }
 
 /**

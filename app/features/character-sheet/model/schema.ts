@@ -9,15 +9,19 @@ import {
   ABILITY_KEYS,
   ABILITY_SCORE,
   ARMOR_CATEGORIES,
+  ARMOR_DEX_LIMIT_MAX,
   CHARACTER_LEVEL,
   CUSTOM_BONUS_KINDS,
   DEATH_SAVES_MAX,
+  DEFAULT_ARMOR_CLASS_ABILITIES,
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
   SHEET_SCHEMA_VERSION,
   SHEET_SIZE_KEYS,
   SKILL_KEYS,
   SOURCE_KINDS,
+  SPEED_KEYS,
+  SPEED_UNITS,
   SPELL_LEVEL,
   SPELL_SLOT_LEVELS,
 } from './constants';
@@ -478,6 +482,27 @@ export const sheetDocumentSchema = z.object({
     .catch({}),
   /** Свои бонусы ко всем спасброскам сразу (плащ защиты, аура). */
   savingThrowCommonBonuses: lenientList(customBonusSchema),
+  /**
+   * Характеристики в КД: Ловкость — по правилу доспеха, остальные целиком.
+   * У листов до настройки — одна Ловкость, как и считалось раньше.
+   */
+  armorClassAbilities: z
+    .array(abilityKeySchema)
+    .catch([...DEFAULT_ARMOR_CLASS_ABILITIES]),
+  /** Свой предел Ловкости в КД; null — по правилу доспеха. */
+  armorClassDexLimit: integerSchema
+    .min(0)
+    .max(ARMOR_DEX_LIMIT_MAX)
+    .nullable()
+    .catch(null),
+  /** Свои бонусы к скоростям по видам передвижения, фт. */
+  speedBonuses: z
+    .partialRecord(z.enum(SPEED_KEYS), lenientList(customBonusSchema))
+    .catch({}),
+  /** Единицы, в которых лист показывает скорости и чувства. */
+  speedUnit: z.enum(SPEED_UNITS).catch('feet'),
+  /** Полёт с парением. */
+  speedHover: z.boolean().catch(false),
 });
 
 export type SheetDocument = z.infer<typeof sheetDocumentSchema>;

@@ -1,11 +1,13 @@
 import type { CustomBonus, SheetDocument } from './schema';
 import type { CustomBonusContext } from './skills';
-import type { AbilityKey } from './types';
+import type { AbilityKey, SpeedKey, SpeedUnit } from './types';
 
 import {
   ABILITY_KEYS,
   ABILITY_SETTINGS_TEXT,
+  METERS_PER_FOOT,
   SKILL_BONUS_EFFECTS_LABEL,
+  SPEED_UNIT_SHORT_LABELS,
 } from './constants';
 import { getCustomBonusesTotal } from './skills';
 import {
@@ -151,4 +153,70 @@ export function describeAbilityScore(
       .map((part) => `${part.label} ${formatValue(part.value)}`),
     ...(rest ? [`${SKILL_BONUS_EFFECTS_LABEL} ${formatValue(rest)}`] : []),
   ].join(' · ');
+}
+
+/**
+ * Сумма своих бонусов скорости, фт. Бонус скорости — только своё число
+ * (`SPEED_BONUS_KINDS`).
+ * @param document - лист персонажа
+ * @param speed - вид передвижения
+ */
+export function getSpeedBonusesTotal(
+  document: Pick<SheetDocument, 'speedBonuses'>,
+  speed: SpeedKey,
+): number {
+  return (document.speedBonuses[speed] ?? []).reduce(
+    (sum, bonus) =>
+      bonus.kind === 'flat' && Number.isFinite(bonus.value)
+        ? sum + bonus.value
+        : sum,
+    0,
+  );
+}
+
+/**
+ * Расстояние в единицах листа: метры — с одним знаком (1,5; 9).
+ * @param feet - расстояние в футах
+ * @param unit - единицы листа
+ */
+export function toSpeedUnit(feet: number, unit: SpeedUnit): number {
+  return unit === 'meters'
+    ? Math.round(feet * METERS_PER_FOOT * 10) / 10
+    : feet;
+}
+
+/**
+ * Расстояние в футах из единиц листа.
+ * @param value - расстояние в единицах листа
+ * @param unit - единицы листа
+ */
+export function fromSpeedUnit(value: number, unit: SpeedUnit): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return unit === 'meters' ? Math.round(value / METERS_PER_FOOT) : value;
+}
+
+/**
+ * Подпись расстояния в единицах листа: «30 фт.», «9 м».
+ * @param feet - расстояние в футах
+ * @param unit - единицы листа
+ */
+export function formatDistance(feet: number, unit: SpeedUnit): string {
+  return `${formatDistanceValue(feet, unit)} ${SPEED_UNIT_SHORT_LABELS[unit]}`;
+}
+
+/** Число расстояния по-русски: «10,5». */
+const distanceFormat = new Intl.NumberFormat('ru-RU', {
+  maximumFractionDigits: 1,
+});
+
+/**
+ * Число расстояния в единицах листа без подписи единиц: «10,5».
+ * @param feet - расстояние в футах
+ * @param unit - единицы листа
+ */
+export function formatDistanceValue(feet: number, unit: SpeedUnit): string {
+  return distanceFormat.format(toSpeedUnit(feet, unit));
 }

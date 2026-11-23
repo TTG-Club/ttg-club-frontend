@@ -936,6 +936,90 @@ export const SENSE_BY_EFFECT_KEY: Readonly<Record<string, string>> = {
 /** Скорости, кроме ходьбы: их дают раса, умения и эффекты. */
 export const EXTRA_SPEED_KEYS = ['fly', 'climb', 'swim', 'burrow'] as const;
 
+/** Все виды передвижения в порядке окна настройки. */
+export const SPEED_KEYS = ['walk', ...EXTRA_SPEED_KEYS] as const;
+
+/** Единицы расстояний листа: хранятся футы, показываются выбранные. */
+export const SPEED_UNITS = ['feet', 'meters'] as const;
+
+/** Метров в футе по соглашению правил: 5 фт = 1,5 м. */
+export const METERS_PER_FOOT = 0.3;
+
+export const SPEED_UNIT_SHORT_LABELS = {
+  feet: 'фт.',
+  meters: 'м',
+} as const;
+
+export const SPEED_UNIT_OPTIONS = [
+  { value: 'feet', label: 'Футы (фт.)' },
+  { value: 'meters', label: 'Метры (м)' },
+] as const;
+
+/** Шаг поля скорости в единицах листа: клетка 5 фт = 1,5 м. */
+export const SPEED_INPUT_STEP = { feet: 5, meters: 1.5 } as const;
+
+/** Пределы скорости и бонуса к ней, фт. */
+export const SPEED_RANGE = { min: 0, max: 1000 } as const;
+export const SPEED_BONUS_RANGE = { min: -120, max: 120 } as const;
+
+/**
+ * Виды бонуса к скорости — только своё число: скорость меряется расстоянием,
+ * а не очками броска, и модификатор или уровень в футах смысла не имеют.
+ */
+export const SPEED_BONUS_KINDS = ['flat'] as const;
+
+/** Подписи окна передвижения. */
+export const SPEED_SETTINGS_TEXT = {
+  title: 'Передвижение',
+  hint: 'Своё значение — скорость по расе и классу. Бонусы складываются с итогом: их дают умения, предметы и заклинания. Скорость от расы и эффектов лист считает сам.',
+  unitTitle: 'Единицы',
+  hover: 'Парение',
+  hoverShort: 'парение',
+  addBonus: 'Добавить бонус',
+  ownValue: 'Своё значение',
+  total: 'Итог с бонусами',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна класса доспеха. */
+export const ARMOR_CLASS_TEXT = {
+  title: 'Класс доспеха',
+  customToggle: 'Своё значение',
+  customToggleHint:
+    'Основа КД задаётся вручную, а не по надетому доспеху: так считают естественный доспех или КД из другого источника.',
+  valueTitle: 'Основа',
+  abilitiesTitle: 'Характеристики',
+  abilitiesPlaceholder: 'Не добавлять',
+  abilitiesArmorHint:
+    'Ловкость идёт в КД по правилу доспеха, остальные характеристики прибавляются целиком (защита без доспехов).',
+  abilitiesArmorEmptyHint:
+    'Модификаторы характеристик в КД не идут: только доспех, щит и бонусы.',
+  abilitiesCustomHint:
+    'Модификаторы выбранных характеристик прибавляются к основе целиком.',
+  abilitiesCustomEmptyHint: 'К основе ничего не прибавляется.',
+  dexLimitTitle: 'Предел Ловкости',
+  dexLimitRule: 'По правилу доспеха',
+  bonusTitle: 'Свой бонус',
+  armorTitle: 'Доспех',
+  unarmored: 'Без доспеха',
+  dexCapped: 'Ловкость ограничена доспехом',
+  shieldTitle: 'Щит',
+  featuresTitle: 'Умения и черты',
+  effectsTitle: 'Эффекты',
+  totalTitle: 'Итог',
+  equipmentHint:
+    'КД пересчитывается сам, когда вы надеваете или снимаете доспех и щит в снаряжении.',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Предел Ловкости, который можно задать вручную. */
+export const ARMOR_DEX_LIMIT_MAX = 5;
+
+/** Характеристики КД по умолчанию: Ловкость по правилу доспеха. */
+export const DEFAULT_ARMOR_CLASS_ABILITIES = ['DEXTERITY'] as const;
+
 export const SPEED_LABELS = {
   walk: 'Ходьба',
   fly: 'Полёт',

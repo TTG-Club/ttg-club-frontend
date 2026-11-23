@@ -16,6 +16,7 @@ import type {
   SHEET_SIZE_KEYS,
   SHEET_TABS,
   SKILL_KEYS,
+  SPEED_UNITS,
 } from './constants';
 import type { CatalogMechanics, EntityRef } from './mechanics';
 import type {
@@ -138,6 +139,8 @@ export type ExtraSpeedKey = (typeof EXTRA_SPEED_KEYS)[number];
 
 export type SpeedKey = 'walk' | ExtraSpeedKey;
 
+export type SpeedUnit = (typeof SPEED_UNITS)[number];
+
 /** Владения, выданные одним источником, — без пометки источника. */
 export type GrantedProficiencies = Omit<ProficiencyGrant, 'sourceId'>;
 
@@ -256,6 +259,29 @@ export interface SheetSense {
   range: number;
 }
 
+/** КД по слагаемым: для окна класса доспеха. */
+export interface ArmorClassBreakdown {
+  value: number;
+  /** Основа задана игроком, а не доспехом. */
+  isCustom: boolean;
+  /** Подпись основы: доспех, «Без доспеха», эффект-замена или своё значение. */
+  bodyLabel: string;
+  /** Основа вместе с Ловкостью по правилу доспеха. */
+  bodyValue: number;
+  /** Ловкость в основе; null — не идёт или основу задал эффект. */
+  dexterity: { value: number; isCapped: boolean } | null;
+  shield: number;
+  ownBonus: number;
+  /** Модификаторы источников механики (умения, черты, раса). */
+  featureBonus: number;
+  /** Всё, что добавили эффекты поверх известных слагаемых. */
+  effectBonus: number;
+  /** Характеристики, которые идут в КД целиком. */
+  extraAbilities: Array<{ ability: AbilityKey; modifier: number }>;
+  /** Эффект, задавший КД; null — посчитан по слагаемым. */
+  source: string | null;
+}
+
 /** Итоги листа с учётом механики, эффектов и истощения. */
 export interface SheetStats {
   level: number;
@@ -267,6 +293,7 @@ export interface SheetStats {
   armorClass: number;
   /** Название эффекта, задавшего КД тела («Защита без доспехов»). */
   armorClassSource: string | null;
+  armorClassBreakdown: ArmorClassBreakdown;
   initiative: number;
   savingThrows: Record<AbilityKey, { bonus: number; isAutoFail: boolean }>;
   skills: Record<SkillKey, number>;

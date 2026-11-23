@@ -1,10 +1,13 @@
 <script setup lang="ts">
-  import { useSheetStats } from '../composables';
+  import { useCharacterSheet, useSheetStats } from '../composables';
   import {
     EXTRA_SPEED_KEYS,
+    formatDistance,
+    formatDistanceValue,
     SHEET_BODY_LABELS,
-    SHEET_LABELS,
     SPEED_LABELS,
+    SPEED_SETTINGS_TEXT,
+    SPEED_UNIT_SHORT_LABELS,
   } from '../model';
   import SheetPanel from './SheetPanel.vue';
 
@@ -16,7 +19,26 @@
     edit: [];
   }>();
 
+  const { document } = useCharacterSheet();
   const { stats } = useSheetStats();
+
+  const unit = computed(() => document.value.speedUnit);
+
+  const walkValue = computed(() =>
+    formatDistanceValue(stats.value.speeds.walk, unit.value),
+  );
+
+  const unitLabel = computed(() => SPEED_UNIT_SHORT_LABELS[unit.value]);
+
+  /**
+   * Подпись вида передвижения; у полёта — с парением.
+   * @param key - вид передвижения
+   */
+  function getSpeedLabel(key: (typeof EXTRA_SPEED_KEYS)[number]): string {
+    return key === 'fly' && document.value.speedHover
+      ? `${SPEED_LABELS.fly} (${SPEED_SETTINGS_TEXT.hoverShort})`
+      : SPEED_LABELS[key];
+  }
 
   const rows = computed(() => [
     ...EXTRA_SPEED_KEYS.flatMap((key) =>
@@ -24,15 +46,15 @@
         ? [
             {
               key,
-              value: `${stats.value.speeds[key]} ${SHEET_LABELS.speedUnit}`,
-              label: SPEED_LABELS[key],
+              value: formatDistance(stats.value.speeds[key], unit.value),
+              label: getSpeedLabel(key),
             },
           ]
         : [],
     ),
     ...stats.value.senses.map((sense) => ({
       key: sense.key,
-      value: `${sense.range} ${SHEET_LABELS.speedUnit}`,
+      value: formatDistance(sense.range, unit.value),
       label: sense.label,
     })),
   ]);
@@ -53,10 +75,10 @@
         @click.left.exact.prevent="emit('edit')"
       >
         <span class="text-2xl leading-none font-bold text-highlighted">
-          {{ stats.speeds.walk }}
+          {{ walkValue }}
 
           <span class="text-xs font-normal text-dimmed">
-            {{ SHEET_LABELS.speedUnit }}
+            {{ unitLabel }}
           </span>
         </span>
       </button>

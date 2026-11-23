@@ -8,10 +8,11 @@
     useSheetStats,
   } from '../composables';
   import {
-    SheetCombatModal,
+    SheetArmorClassModal,
     SheetHealthModal,
     SheetLevelUpModal,
     SheetResourcesModal,
+    SheetSpeedModal,
   } from '../dialogs';
   import {
     CHARACTER_SHEET_ROUTE,
@@ -63,18 +64,10 @@
   useSheetClassData();
 
   const activeTab = ref<SheetTab>(SHEET_DEFAULT_TAB);
-  const combatSection = ref<'armor' | 'speed' | null>(null);
+  const isArmorClassOpen = ref(false);
+  const isSpeedOpen = ref(false);
   const isHealthOpen = ref(false);
   const isResourcesOpen = ref(false);
-
-  const isCombatOpen = computed({
-    get: () => combatSection.value !== null,
-    set: (open: boolean) => {
-      if (!open) {
-        combatSection.value = null;
-      }
-    },
-  });
 
   const proficiencyLabel = computed(() =>
     formatModifier(stats.value.proficiencyBonus),
@@ -140,7 +133,7 @@
       return;
     }
 
-    combatSection.value = 'armor';
+    isArmorClassOpen.value = true;
   }
 
   function openSpeed(): void {
@@ -148,7 +141,7 @@
       return;
     }
 
-    combatSection.value = 'speed';
+    isSpeedOpen.value = true;
   }
 
   function openHealth(): void {
@@ -352,11 +345,9 @@
         </SheetTabs>
       </div>
 
-      <SheetCombatModal
-        v-if="combatSection"
-        v-model:open="isCombatOpen"
-        :section="combatSection"
-      />
+      <SheetArmorClassModal v-model:open="isArmorClassOpen" />
+
+      <SheetSpeedModal v-model:open="isSpeedOpen" />
 
       <SheetHealthModal v-model:open="isHealthOpen" />
 

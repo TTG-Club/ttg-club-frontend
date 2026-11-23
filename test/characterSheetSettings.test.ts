@@ -7,10 +7,13 @@ import {
   createCustomBonus,
   createEmptySheetDocument,
   describeAbilityScore,
+  formatDistance,
   formatModifier,
+  fromSpeedUnit,
   getCustomBonusSourceOptions,
   getSavingThrowDrafts,
   getSheetStats,
+  toSpeedUnit,
 } from '~character-sheet/model';
 
 /**
@@ -117,5 +120,59 @@ describe('настройка спасбросков', () => {
     expect(document.savingThrowAbilities).toEqual({});
     expect(document.savingThrowBonuses).toEqual({});
     expect(document.savingThrowCommonBonuses).toEqual([]);
+  });
+});
+
+describe('передвижение', () => {
+  it('свой бонус скорости прибавляется к итогу вида', () => {
+    const document = makeDocument({
+      speed: 30,
+      speeds: { fly: 0, climb: 20, swim: 0, burrow: 0 },
+      speedBonuses: {
+        walk: [{ ...createCustomBonus('b1'), value: 10 }],
+        climb: [{ ...createCustomBonus('b2'), value: 5 }],
+      },
+    });
+
+    const { speeds } = getSheetStats(document);
+
+    expect(speeds.walk).toBe(40);
+    expect(speeds.climb).toBe(25);
+  });
+
+  it('метры: 5 фт = 1,5 м, обратно — до целых футов', () => {
+    expect(toSpeedUnit(30, 'meters')).toBe(9);
+    expect(toSpeedUnit(25, 'meters')).toBe(7.5);
+    expect(fromSpeedUnit(9, 'meters')).toBe(30);
+    expect(fromSpeedUnit(1.5, 'meters')).toBe(5);
+    expect(formatDistance(60, 'meters')).toBe('18 м');
+    expect(formatDistance(60, 'feet')).toBe('60 фт.');
+  });
+});
+
+describe('разбор класса доспеха', () => {
+  it('без доспеха: 10 + Ловкость, остальные характеристики целиком', () => {
+    const document = makeDocument({
+      abilities: { ...ABILITIES, WISDOM: 16 },
+      armorClassAbilities: ['DEXTERITY', 'WISDOM'],
+      armorClassBonus: 1,
+    });
+
+    const breakdown = getSheetStats(document).armorClassBreakdown;
+
+    expect(breakdown.bodyValue).toBe(12);
+
+    expect(breakdown.extraAbilities).toEqual([
+      { ability: 'WISDOM', modifier: 3 },
+    ]);
+
+    expect(breakdown.ownBonus).toBe(1);
+    expect(breakdown.value).toBe(16);
+  });
+});
+
+describe('подпись расстояния', () => {
+  it('дробные метры — через запятую', () => {
+    expect(formatDistance(35, 'meters')).toBe('10,5 м');
   });
 });
