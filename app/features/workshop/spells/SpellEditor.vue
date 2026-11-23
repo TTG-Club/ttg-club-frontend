@@ -23,6 +23,7 @@
     WORKSHOP_TEXT,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
+  import SpellDamageEditor from './SpellDamageEditor.vue';
 
   /** Форма заклинания: без записи — создание нового. */
   const { spell = undefined } = defineProps<{
@@ -45,6 +46,8 @@
     label,
     value,
   }));
+
+  const isCantrip = computed(() => state.level === 0);
 
   const cancelTo = getWorkshopSectionRoute(SPELLS_WORKSHOP_KEY);
 
@@ -278,6 +281,13 @@
     >
       <MarkupEditor v-model="state.upper" />
     </UFormField>
+
+    <div class="col-span-full">
+      <SpellDamageEditor
+        v-model="state.damage"
+        :is-cantrip="isCantrip"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />

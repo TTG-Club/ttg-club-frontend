@@ -12,9 +12,11 @@ import { uniq } from 'es-toolkit';
 import {
   CLASS_TABLE_EMPTY,
   getPactMagic,
+  KNOWN_CANTRIPS_COLUMN,
   KNOWN_SPELLS_COLUMN,
   loadClassDetails,
   parseSpellSlotCells,
+  toAbilityKey,
 } from '../model';
 import { useCharacterSheet } from './useCharacterSheet';
 
@@ -231,16 +233,40 @@ export const useSheetClassData = createSharedComposable(() => {
         (candidate) => candidate.id === sheetClass.id,
       );
 
-      const known = table?.values.find(
-        (column) => column.name === KNOWN_SPELLS_COLUMN,
-      );
+      /**
+       * Число из колонки таблицы класса.
+       * @param name - название колонки
+       */
+      const getColumn = (name: string): number | null => {
+        const column = table?.values.find((entry) => entry.name === name);
+        const parsed = column ? Number.parseInt(column.value, 10) : Number.NaN;
 
-      const parsed = known ? Number.parseInt(known.value, 10) : Number.NaN;
+        return Number.isNaN(parsed) ? null : parsed;
+      };
 
       return {
+        classId: sheetClass.id,
         url: sheetClass.url,
         level: sheetClass.level,
-        knownSpells: Number.isNaN(parsed) ? null : parsed,
+        knownSpells: getColumn(KNOWN_SPELLS_COLUMN),
+        knownCantrips: getColumn(KNOWN_CANTRIPS_COLUMN),
+      };
+    }),
+  );
+
+  /**
+   * Заклинательная характеристика классов по справочнику: у подкласса
+   * (мистический рыцарь) она своя, иначе — класса.
+   */
+  const classAbilities = computed(() =>
+    document.value.classes.map((sheetClass) => {
+      const [base, archetype] = getPair(sheetClass);
+
+      return {
+        classId: sheetClass.id,
+        autoAbility: toAbilityKey(
+          archetype?.spellAbility ?? base?.spellAbility ?? null,
+        ),
       };
     }),
   );
@@ -250,6 +276,7 @@ export const useSheetClassData = createSharedComposable(() => {
     getDetail,
     getMechanics,
     preparedClasses,
+    classAbilities,
     loadMissing,
     progressions,
     features,

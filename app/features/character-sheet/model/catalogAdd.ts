@@ -1,10 +1,15 @@
-import type { SectionConfig } from '~section/model';
+import type {
+  FilterDefinition,
+  FilterSelection,
+  SectionConfig,
+} from '~section/model';
 
 import type { ItemSearchKind } from './catalog';
 import type { CatalogRow } from './types';
 
 import { z } from 'zod';
 
+import { spellLinkSchema, SPELLS_SECTION } from '~character/model';
 import {
   armorLinkSchema,
   ARMORS_SECTION,
@@ -16,13 +21,90 @@ import {
   WEAPONS_SECTION,
 } from '~inventory/model';
 
-import { KEYBOARD_LAYOUT_EN, KEYBOARD_LAYOUT_RU } from './constants';
+import {
+  KEYBOARD_LAYOUT_EN,
+  KEYBOARD_LAYOUT_RU,
+  SPELL_FILTER_KEYS,
+  SPELL_GROUP_TEXT,
+  SPELL_TAB_TEXT,
+} from './constants';
 
 /** Раздел справочника для окна добавления предметов. */
 export interface CatalogAddSource {
   section: SectionConfig;
   /** Строки окна из ответа ручки списка. */
   parseRows: (raw: unknown) => Array<CatalogRow>;
+}
+
+/**
+ * Выбор фильтра при открытии окна: из определения фильтра раздела и выбора
+ * по умолчанию.
+ */
+export type CatalogPreset = (
+  definition: FilterDefinition,
+  defaults: FilterSelection,
+) => FilterSelection;
+
+/** Раздел заклинаний для окна добавления: группы по кругам. */
+export const SPELL_CATALOG_SOURCE: CatalogAddSource = {
+  section: SPELLS_SECTION,
+  parseRows: (raw) =>
+    z
+      .array(spellLinkSchema)
+      .parse(raw)
+      .map((entry) => ({
+        url: entry.url,
+        name: entry.name.rus,
+        nameEng: entry.name.eng,
+        group: entry.level ? `${entry.level} круг` : SPELL_GROUP_TEXT.cantrips,
+        groupOrder: entry.level,
+        caption: [
+          entry.school,
+          entry.concentration ? SPELL_TAB_TEXT.concentration : '',
+          entry.ritual ? SPELL_TAB_TEXT.ritual : '',
+        ]
+          .filter(Boolean)
+          .join(', '),
+        price: '',
+        source: entry.source?.shortName ?? '',
+      })),
+};
+
+/**
+ * Фильтр заклинаний на классы персонажа и доступные ему круги: окно
+ * открывается на том, что персонаж способен выучить. Класс без записи в
+ * фильтре (свой класс) выбор не сужает.
+ * @param classNames - названия классов персонажа
+ * @param maxLevel - наибольший доступный круг; 0 — только заговоры
+ */
+export function createSpellCatalogPreset(
+  classNames: ReadonlyArray<string>,
+  maxLevel: number,
+): CatalogPreset {
+  return (definition, defaults) => {
+    const next: FilterSelection = { ...defaults };
+    const names = classNames.map((name) => name.toLowerCase());
+
+    for (const group of definition.other) {
+      if (group.key === SPELL_FILTER_KEYS.class) {
+        const keys = group.values
+          .filter((value) => names.includes(value.label.toLowerCase()))
+          .map((value) => String(value.key));
+
+        if (keys.length) {
+          next[group.param] = keys;
+        }
+      }
+
+      if (group.key === SPELL_FILTER_KEYS.level) {
+        next[group.param] = group.values
+          .filter((value) => Number(value.key) <= maxLevel)
+          .map((value) => String(value.key));
+      }
+    }
+
+    return next;
+  };
 }
 
 /** Разделы справочника по виду предмета. */

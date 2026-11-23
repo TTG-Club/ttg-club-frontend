@@ -12,4 +12,6 @@ export { useSheetActiveEffects } from './useSheetActiveEffects';
 export { useSheetClassData } from './useSheetClassData';
 export { useSheetList } from './useSheetList';
 export { useSheetRoll } from './useSheetRoll';
+export { useSheetSpellcasting } from './useSheetSpellcasting';
 export { useSheetStats } from './useSheetStats';
+export { useSpellDetails } from './useSpellDetails';

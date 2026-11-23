@@ -1477,12 +1477,275 @@ export const PREPARED_CASTER_PROGRESSION: Readonly<
 /** Колонка таблицы класса с числом известных заклинаний. */
 export const KNOWN_SPELLS_COLUMN = 'Известные заклинания';
 
+/** Колонка таблицы класса с числом известных заговоров. */
+export const KNOWN_CANTRIPS_COLUMN = 'Известные заговоры';
+
+/** Виды счёта заклинаний: круги 1+ и заговоры считаются порознь. */
+export const PREPARED_KINDS = ['spells', 'cantrips'] as const;
+
+/** Подписи окна и плиток пределов. */
 export const PREPARED_TEXT = {
   limit: 'Подготовлено',
   known: 'Известно',
+  cantrips: 'Заговоры',
   override: 'Свой предел',
   auto: 'Считать по классу',
   hint: 'Предел подготовленных заклинаний',
+  knownHint: 'Предел известных заклинаний',
+  cantripsHint: 'Предел известных заговоров',
+  spellsTitle: 'Подготовленные заклинания',
+  cantripsTitle: 'Известные заговоры',
+  classValue: 'По таблице класса',
+  noClassValue: 'Таблица класса предела не задаёт',
+  custom: 'Своё число',
+  bonus: 'Бонус',
+  total: 'Итого',
+  apply: 'Применить',
+  cancel: 'Отмена',
+  over: 'Отмечено больше предела',
+} as const;
+
+/** Иконки плиток пределов. */
+export const PREPARED_ICON = {
+  spells: 'tabler:book',
+  cantrips: 'tabler:sparkles',
+} as const;
+
+/* --- Вкладка заклинаний ------------------------------------------------- */
+
+/** Уровни персонажа, на которых растёт урон заговора (×2, ×3, ×4). */
+export const CANTRIP_SCALING_LEVELS = [5, 11, 17] as const;
+
+/**
+ * Виды источников, выдающих заклинания «сверх класса»: вид, черта,
+ * предыстория. Их заклинания стоят отдельной группой и в предел не входят.
+ */
+export const INNATE_SPELL_SOURCE_KINDS: ReadonlyArray<string> = [
+  'race',
+  'subrace',
+  'raceFeature',
+  'background',
+  'feat',
+  'asi',
+];
+
+/** Иконка заклинания: квадрат в начале строки, он же переключатель подготовки. */
+export const SPELL_ICON = 'tabler:wand';
+
+/** Порядок групп выданных заклинаний перед кругами. */
+export const SPELL_GROUP_ORDER = {
+  grantedCantrips: -2,
+  innate: -1,
+} as const;
+
+/** Подписи групп списка заклинаний. */
+export const SPELL_GROUP_TEXT = {
+  grantedCantrips: 'Выданные заговоры',
+  innate: 'Вид, черты и предыстория',
+  cantrips: 'Заговоры',
+} as const;
+
+/** Подписи шапки и строк вкладки заклинаний. */
+export const SPELL_TAB_TEXT = {
+  saveDc: { short: 'Сл', full: 'Сл спасброска от заклинаний' },
+  attack: { short: 'Атака', full: 'Бонус атаки заклинанием' },
+  character: 'Персонаж',
+  editSpellcasting: 'Настроить заклинательную характеристику',
+  add: 'Добавить',
+  addFromCatalog: 'Из справочника',
+  addCustom: 'Своё заклинание',
+  filterPrepared: 'Подготовленные',
+  filterPreparedHint: 'Только подготовленные заклинания',
+  filterReset: 'Сбросить',
+  filterEmpty: 'Под отбор ничего не подошло',
+  empty: 'Заклинаний пока нет',
+  slots: 'Ячейки',
+  pactSlots: 'Договор',
+  prepare: 'Подготовить',
+  unprepare: 'Снять подготовку',
+  alwaysPrepared: 'Подготовлено всегда',
+  grantedCantrip: 'Выданный заговор подготовлен всегда',
+  outOfLimit: 'Места среди подготовленных не занимает',
+  limitReached: 'Предел подготовленных уже выбран',
+  custom: 'Свой',
+  customHint: 'Своё заклинание: правится целиком, описание хранится в листе',
+  classBadge: 'Класс',
+  classBadgeHint: 'Выдано умением класса',
+  concentration: 'Концентрация',
+  concentrationShort: 'К',
+  ritual: 'Ритуал',
+  ritualShort: 'Р',
+  abilityHint: 'Своя заклинательная характеристика',
+  menu: 'Действия заклинания',
+  edit: 'Изменить',
+  copy: 'Копия в своё',
+  ability: 'Характеристика',
+  remove: 'Убрать',
+  open: 'Открыть заклинание',
+  expand: 'Развернуть заклинание',
+  emptyDescription: 'Описания нет',
+  damage: 'Урон',
+  healing: 'Лечение',
+  rollHint: 'Нажмите, чтобы бросить',
+  castHint: 'Нажмите, чтобы выбрать ячейку и бросить',
+  cast: 'Сотворить',
+  copyFailed: 'Не удалось загрузить заклинание из справочника',
+  copied: 'Своя копия создана',
+} as const;
+
+/** Подписи ячеек в разделителях кругов. */
+export const SPELL_SLOT_TEXT = {
+  summary: (left: number, max: number) => `Осталось ${left} из ${max}`,
+  pactSummary: (left: number, max: number) =>
+    `Ячейки договора: осталось ${left} из ${max}, возвращаются коротким отдыхом`,
+  slot: (level: number, index: number) => `Ячейка ${level} круга №${index}`,
+} as const;
+
+/** Характеристики своего заклинания в развёрнутой строке. */
+export const SPELL_STAT_KEYS = [
+  'castingTime',
+  'range',
+  'components',
+  'duration',
+] as const;
+
+/** Подписи характеристик своего заклинания в развёрнутой строке. */
+export const SPELL_STAT_LABELS = {
+  castingTime: 'Время',
+  range: 'Дистанция',
+  components: 'Компоненты',
+  duration: 'Длительность',
+} as const;
+
+/** Подписи окна заклинательной характеристики класса. */
+export const SPELLCASTING_TEXT = {
+  title: 'Заклинательная характеристика',
+  ability: 'Характеристика',
+  auto: 'По классу',
+  autoValue: (label: string) => `По классу: ${label}`,
+  autoMissing: 'По классу: не определена',
+  none: 'Нет',
+  apply: 'Применить',
+  cancel: 'Отмена',
+  hint: 'Сл = 8 + бонус мастерства + модификатор, атака = бонус мастерства + модификатор. Эффекты листа добавляются сверху.',
+} as const;
+
+/** Подписи окна своей характеристики заклинания. */
+export const SPELL_ABILITY_TEXT = {
+  title: 'Характеристика заклинания',
+  label: 'Характеристика',
+  inherit: 'Как у класса',
+  hint: 'Нужна заклинаниям черт и видов, которые считаются от своей характеристики («Посвящённый в магию»).',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна сотворения (броска урона) заклинания. */
+export const SPELL_CAST_TEXT = {
+  title: (name: string) => `Сотворение: ${name}`,
+  slot: 'Ячейка',
+  noSlot: 'Без траты ячейки',
+  slotOption: (level: number, left: number) =>
+    `${level} круг (осталось ${left})`,
+  pactOption: (level: number, left: number) =>
+    `Договор, ${level} круг (осталось ${left})`,
+  spendOnly: 'Потратить без броска',
+  cancel: 'Отмена',
+  upcast: (dice: string) => `За каждый круг выше: +${dice}`,
+  noSlots: 'Свободных ячеек нужного круга нет',
+} as const;
+
+/** Подписи окна своего заклинания. */
+export const SPELL_FORM_TEXT = {
+  createTitle: 'Своё заклинание',
+  editTitle: 'Изменить заклинание',
+  tabMain: 'Основное',
+  tabDamage: 'Урон',
+  name: 'Название',
+  level: 'Круг',
+  school: 'Школа',
+  ritual: 'Ритуал',
+  concentration: 'Концентрация',
+  castingTime: 'Время накладывания',
+  range: 'Дистанция',
+  components: 'Компоненты',
+  duration: 'Длительность',
+  description: 'Описание',
+  ability: 'Своя характеристика',
+  dice: 'Кости',
+  dicePlaceholder: '8к6',
+  bonus: 'Бонус',
+  abilityModifier: '+ модификатор',
+  type: 'Тип урона',
+  noType: 'Без типа',
+  healing: 'Лечение',
+  condition: 'Условие',
+  addRoll: 'Добавить бросок',
+  removeRoll: 'Убрать бросок',
+  cantripScaling: 'Растёт на 5, 11 и 17 уровне персонажа',
+  upcastDice: 'За каждый круг выше',
+  noRolls: 'Бросков урона нет',
+  save: 'Сохранить',
+  cancel: 'Отмена',
+  invalidDice: 'Кости в виде 8к6',
+} as const;
+
+/** Школы магии для своего заклинания. */
+export const SPELL_SCHOOLS = [
+  'Вызов',
+  'Воплощение',
+  'Иллюзия',
+  'Некромантия',
+  'Ограждение',
+  'Очарование',
+  'Преобразование',
+  'Прорицание',
+] as const;
+
+/** Наибольшее число бросков у своего заклинания. */
+export const SPELL_DAMAGE_MAX_ROLLS = 6;
+
+/** Типы урона для своего заклинания: коды бэкенда без легаси-дублей. */
+export const SPELL_DAMAGE_TYPE_KEYS = [
+  'FAIR',
+  'COLD',
+  'LIGHTNING',
+  'THUNDER',
+  'ACID',
+  'POISON',
+  'NECROTIC',
+  'RADIANT',
+  'FORCE',
+  'PSYCHIC',
+  'BLUDGEONING',
+  'PIERCING',
+  'SLASHING',
+] as const;
+
+/** Чип отбора списка заклинаний: общий вид, выбранный и обычный. */
+export const SPELL_FILTER_CHIP_CLASS = {
+  base: 'cursor-pointer rounded border px-2 py-1 text-xs transition-colors',
+  idle: 'border-default text-toned hover:border-primary/60',
+  selected: 'border-primary bg-primary/10 text-primary',
+} as const;
+
+/** Квадрат со значком заклинания: подготовленное и обычное. */
+export const SPELL_ICON_CLASS = {
+  base: 'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-lg border transition-colors',
+  prepared: 'border-primary/60 bg-primary/15 text-primary',
+  idle: 'border-default/50 bg-default/40 text-muted hover:border-primary/60',
+} as const;
+
+/** Ключи групп фильтра раздела заклинаний. */
+export const SPELL_FILTER_KEYS = {
+  class: 'class',
+  level: 'level',
+} as const;
+
+/** Подписи окна добавления заклинаний из справочника. */
+export const SPELL_ADD_TEXT = {
+  title: 'Заклинания из справочника',
+  added: 'В книге',
 } as const;
 
 /* --- Повышение уровня --------------------------------------------------- */

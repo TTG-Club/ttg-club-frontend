@@ -2,7 +2,7 @@ import { range } from 'es-toolkit';
 import { z } from 'zod';
 
 import { MAX_EXHAUSTION_LEVEL } from '~active-effects/model';
-import { classDetailSchema } from '~character/model';
+import { classDetailSchema, spellDamageSchema } from '~character/model';
 import { weaponDetailSchema } from '~inventory/model';
 
 import {
@@ -70,6 +70,8 @@ export const sheetClassSchema = z.object({
    * мастера повышения список пуст, и снятие хитов не трогает.
    */
   hitPointGains: z.array(integerSchema).catch([]),
+  /** Своя заклинательная характеристика класса; null — по справочнику. */
+  spellcastingAbility: abilityKeySchema.nullable().catch(null),
 });
 
 export type SheetClass = z.infer<typeof sheetClassSchema>;
@@ -292,6 +294,16 @@ export const sheetSpellSchema = z.object({
   sourceId: z.string().nullable().catch(null),
   /** Заклинание всегда подготовлено и не занимает места в пределе. */
   alwaysPrepared: z.boolean().catch(false),
+  /** Своя заклинательная характеристика; null — как у класса. */
+  spellcastingAbility: abilityKeySchema.nullable().catch(null),
+  /* Характеристики и описание своего заклинания; у справочного пусто. */
+  castingTime: textSchema,
+  range: textSchema,
+  components: textSchema,
+  duration: textSchema,
+  description: textSchema,
+  /** Урон своего заклинания; у справочного урон берётся из справочника. */
+  damage: spellDamageSchema.nullable().catch(null),
 });
 
 export type SheetSpell = z.infer<typeof sheetSpellSchema>;
@@ -530,6 +542,12 @@ export const sheetDocumentSchema = z.object({
   speeds: extraSpeedsSchema.catch({ fly: 0, climb: 0, swim: 0, burrow: 0 }),
   /** Свой предел подготовленных заклинаний; null — по классам. */
   preparedLimitOverride: integerSchema.min(0).nullable().catch(null),
+  /** Бонус к пределу подготовленных заклинаний. */
+  preparedBonus: integerSchema.catch(0),
+  /** Свой предел заговоров; null — по таблице класса. */
+  cantripsLimitOverride: integerSchema.min(0).nullable().catch(null),
+  /** Бонус к пределу заговоров. */
+  cantripsBonus: integerSchema.catch(0),
   /** Размер персонажа; null — не задан. */
   size: z.enum(SHEET_SIZE_KEYS).nullable().catch(null),
   /** Свои дистанции чувств, кроме тёмного зрения (у него своё поле), фт. */

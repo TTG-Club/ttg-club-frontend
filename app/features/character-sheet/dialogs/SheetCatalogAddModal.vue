@@ -1,5 +1,7 @@
-<script setup lang="ts">
-  import type { CatalogRow, ItemSearchKind, SheetItem } from '../model';
+<script setup lang="ts" generic="T">
+  import type { DetailType } from '~content/model';
+
+  import type { CatalogAddSource, CatalogPreset, CatalogRow } from '../model';
 
   import { ContentEntityDrawer } from '~content/entity-drawer';
   import { SectionFilterDrawer } from '~section/filter-drawer';
@@ -9,30 +11,43 @@
   import { useCatalogList } from '../composables';
   import {
     CATALOG_ADD_TEXT,
-    getItemPreviewType,
     groupCatalogRows,
-    ITEM_SEARCH_KINDS,
-    loadCatalogItem,
-    loadMagicItem,
     searchCatalogRows,
     SHEET_ICON,
   } from '../model';
 
   /**
-   * Добавление предметов из справочника, как на new.ttg.club: раздел
-   * целиком, поиск на клиенте (с подстановкой при неверной раскладке),
-   * фильтр и источники раздела, группы как в справочнике, выбор нескольких
-   * записей с пометкой «уже в снаряжении», цена в строке и описание в
-   * дровере. Выбранное добавляется одной правкой листа.
+   * Добавление из справочника, как на new.ttg.club: раздел целиком, поиск
+   * на клиенте (с подстановкой при неверной раскладке), фильтр и источники
+   * раздела, группы как в справочнике, выбор нескольких записей с пометкой
+   * «уже есть», цена в строке и описание в дровере. Выбранное загружается
+   * и отдаётся листу одним событием.
    */
-  const { kind, takenUrls } = defineProps<{
-    kind: ItemSearchKind;
-    /** Адреса предметов, что уже есть в снаряжении. */
+  const {
+    title,
+    source,
+    takenUrls,
+    takenLabel = CATALOG_ADD_TEXT.added,
+    loader,
+    previewType,
+    preset = undefined,
+  } = defineProps<{
+    title: string;
+    source: CatalogAddSource;
+    /** Адреса записей, что уже есть на листе. */
     takenUrls: ReadonlyArray<string>;
+    /** Пометка записи, что уже есть на листе. */
+    takenLabel?: string;
+    /** Загружает запись для листа. */
+    loader: (row: CatalogRow) => Promise<T>;
+    /** Вид дровера описания по адресу записи. */
+    previewType: (url: string) => DetailType | null;
+    /** Выбор фильтра при открытии: класс и круги персонажа. */
+    preset?: CatalogPreset;
   }>();
 
   const emit = defineEmits<{
-    add: [items: Array<SheetItem>];
+    add: [items: Array<T>];
   }>();
 
   const isOpen = defineModel<boolean>('open', { default: false });
@@ -52,7 +67,10 @@
     reload,
     setSelection,
     resetPart,
-  } = useCatalogList(() => kind);
+  } = useCatalogList(
+    () => source,
+    () => preset,
+  );
 
   const search = ref('');
   const debouncedSearch = refDebounced(search, 150);
@@ -69,10 +87,6 @@
       void open();
     }
   });
-
-  const title = computed(
-    () => ITEM_SEARCH_KINDS.find((item) => item.value === kind)?.label ?? '',
-  );
 
   const taken = computed(() => new Set(takenUrls));
 
@@ -103,8 +117,8 @@
       : CATALOG_ADD_TEXT.add,
   );
 
-  const previewType = computed(() =>
-    getItemPreviewType(previewRow.value?.url ?? null),
+  const previewDetailType = computed(() =>
+    previewRow.value ? previewType(previewRow.value.url) : null,
   );
 
   const isPreviewOpen = computed({
@@ -158,26 +172,18 @@
     void reload();
   }
 
-  /** Грузит выбранные предметы и отдаёт их листу одной правкой. */
+  /** Грузит выбранные записи и отдаёт их листу одним событием. */
   async function add(): Promise<void> {
-    const options = rows.value
-      .filter((row) => picked.value.includes(row.url))
-      .map((row) => ({ name: row.name, url: row.url, caption: '' }));
+    const selected = rows.value.filter((row) => picked.value.includes(row.url));
 
-    if (!options.length) {
+    if (!selected.length) {
       return;
     }
 
     isAdding.value = true;
 
     try {
-      const items = await Promise.all(
-        options.map((option) =>
-          kind === 'magic'
-            ? loadMagicItem(option)
-            : loadCatalogItem(kind, option),
-        ),
-      );
+      const items = await Promise.all(selected.map((row) => loader(row)));
 
       emit('add', items);
       isOpen.value = false;
@@ -305,7 +311,7 @@
 
                   <UBadge
                     v-if="row.isTaken"
-                    :label="CATALOG_ADD_TEXT.added"
+                    :label="takenLabel"
                     color="neutral"
                     variant="subtle"
                     size="sm"
@@ -361,9 +367,9 @@
       />
 
       <ContentEntityDrawer
-        v-if="previewRow && previewType"
+        v-if="previewRow && previewDetailType"
         v-model:open="isPreviewOpen"
-        :type="previewType"
+        :type="previewDetailType"
         :path="previewRow.url"
         :title="previewRow.name"
       />

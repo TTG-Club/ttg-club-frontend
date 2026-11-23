@@ -104,6 +104,34 @@ export const spellLinkSchema = z.object({
 
 export type SpellLink = z.infer<typeof spellLinkSchema>;
 
+/** Бросок урона или лечения заклинания для листа персонажа. */
+export const spellDamageRollSchema = z.object({
+  /** Кости: «8d6»; null — бросок без костей. */
+  dice: z.string().nullish(),
+  bonus: z.number().catch(0),
+  /** Прибавляется модификатор заклинательной характеристики. */
+  abilityModifier: z.boolean().catch(false),
+  /** Коды типов урона бэкенда (`FAIR` — огонь); несколько — на выбор. */
+  types: z.array(z.string()).catch([]),
+  healing: z.boolean().catch(false),
+  /** Условие броска («Цель с неполными хитами»). */
+  condition: z.string().nullish(),
+});
+
+export type SpellDamageRollData = z.infer<typeof spellDamageRollSchema>;
+
+/**
+ * Урон заклинания для листа: броски, рост заговора (кости ×2/×3/×4 на 5/11/17
+ * уровнях) и кости за каждый круг ячейки выше круга заклинания.
+ */
+export const spellDamageSchema = z.object({
+  rolls: z.array(spellDamageRollSchema).catch([]),
+  cantripScaling: z.boolean().catch(false),
+  upcastDice: z.string().nullish(),
+});
+
+export type SpellDamageData = z.infer<typeof spellDamageSchema>;
+
 export const spellDetailSchema = spellLinkSchema.omit({ url: true }).extend({
   /** Идентификатор: по нему заклинание выгружается для FVTT и LSS. */
   id: z.number().nullish(),
@@ -118,6 +146,8 @@ export const spellDetailSchema = spellLinkSchema.omit({ url: true }).extend({
   races: z.array(referenceClassSchema).nullish(),
   backgrounds: z.array(referenceClassSchema).nullish(),
   feats: z.array(referenceClassSchema).nullish(),
+  /** Урон для листа персонажа; null — не заполнен. */
+  damage: spellDamageSchema.nullish().catch(null),
 });
 
 export type SpellDetail = z.infer<typeof spellDetailSchema>;

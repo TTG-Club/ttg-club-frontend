@@ -1,4 +1,10 @@
-import type { SpellForm } from './schemas';
+import type { SpellDamageData } from '~character/model';
+
+import type {
+  SpellDamageForm,
+  SpellDamageRollForm,
+  SpellForm,
+} from './schemas';
 import type { SpellTime, WorkshopSpell } from './types';
 
 import { toOptionalMarkup, toOptionalText } from '../utils';
@@ -75,6 +81,68 @@ export function parseSpellTime(time: string): SpellTime {
   return { number, unit, condition };
 }
 
+/** Пустой бросок урона для формы. */
+export function createSpellDamageRoll(): SpellDamageRollForm {
+  return {
+    dice: '',
+    bonus: 0,
+    abilityModifier: false,
+    types: [],
+    healing: false,
+    condition: '',
+  };
+}
+
+/**
+ * Урон заклинания в форме мастерской.
+ * @param damage - урон из справочника
+ */
+export function createSpellDamageForm(
+  damage: SpellDamageData | null | undefined,
+): SpellDamageForm {
+  return {
+    rolls: (damage?.rolls ?? []).map((roll) => ({
+      dice: roll.dice ?? '',
+      bonus: roll.bonus,
+      abilityModifier: roll.abilityModifier,
+      types: [...roll.types],
+      healing: roll.healing,
+      condition: roll.condition ?? '',
+    })),
+    cantripScaling: damage?.cantripScaling ?? false,
+    upcastDice: damage?.upcastDice ?? '',
+  };
+}
+
+/**
+ * Урон для запроса: пустые броски отбрасываются, без бросков урона нет.
+ * @param form - урон из формы
+ */
+export function getSpellDamagePayload(
+  form: SpellDamageForm,
+): SpellDamageData | null {
+  const rolls = form.rolls
+    .filter((roll) => roll.dice || roll.bonus || roll.abilityModifier)
+    .map((roll) => ({
+      dice: toOptionalText(roll.dice) ?? null,
+      bonus: roll.bonus,
+      abilityModifier: roll.abilityModifier,
+      types: roll.types,
+      healing: roll.healing,
+      condition: toOptionalText(roll.condition) ?? null,
+    }));
+
+  if (!rolls.length) {
+    return null;
+  }
+
+  return {
+    rolls,
+    cantripScaling: form.cantripScaling,
+    upcastDice: toOptionalText(form.upcastDice) ?? null,
+  };
+}
+
 /**
  * Форма заклинания: пустая для создания или заполненная записью.
  * @param spell - запись справочника
@@ -102,6 +170,7 @@ export function createSpellForm(spell?: WorkshopSpell): SpellForm {
     duration: spell?.duration ?? '',
     description: spell?.description ?? [],
     upper: spell?.upper ?? [],
+    damage: createSpellDamageForm(spell?.damage),
   };
 }
 
@@ -121,5 +190,6 @@ export function getSpellPayload(
     materialComponent: toOptionalText(form.materialComponent),
     timeCondition: toOptionalText(form.timeCondition),
     upper: toOptionalMarkup(form.upper),
+    damage: getSpellDamagePayload(form.damage),
   };
 }

@@ -12,6 +12,7 @@ import type {
   HIT_POINTS_GAIN_MODES,
   ITEM_KINDS,
   OWN_SENSE_KEYS,
+  PREPARED_KINDS,
   RESOURCE_MAX_SOURCES,
   SHEET_MAIN_TAB,
   SHEET_SAVE_STATUS_TEXT,
@@ -393,6 +394,8 @@ export interface SheetStats {
   hitPointsMax: number;
   spellSaveDc: number | null;
   spellAttack: number | null;
+  /** Сл и атака заклинаний от каждой характеристики (мультикласс, черты). */
+  spellcastingByAbility: Record<AbilityKey, { saveDc: number; attack: number }>;
   meleeAttackBonus: number;
   rangedAttackBonus: number;
   flags: ReadonlySet<string>;
@@ -415,20 +418,76 @@ export type SheetRollMode = 'normal' | 'advantage' | 'disadvantage';
 
 /** Класс листа для предела подготовленных заклинаний. */
 export interface PreparedLimitClass {
+  /** Класс листа. */
+  classId: string;
   url: string | null;
   level: number;
   /** Значение колонки «Известные заклинания»; null — колонки нет. */
   knownSpells: number | null;
+  /** Значение колонки «Известные заговоры»; null — колонки нет. */
+  knownCantrips: number | null;
 }
 
-/** Предел подготовленных или известных заклинаний. */
-export interface PreparedLimit {
-  /** null — у персонажа нет классов, готовящих или знающих заклинания. */
+/** Вид счёта заклинаний: круги 1+ или заговоры. */
+export type PreparedKind = (typeof PREPARED_KINDS)[number];
+
+/** Разбор предела подготовленных заклинаний или заговоров. */
+export interface PreparedBreakdown {
+  kind: PreparedKind;
+  /** Предел по таблицам классов; null — классы его не задают. */
+  classValue: number | null;
+  /** Своё число игрока; null — считать по классу. */
+  custom: number | null;
+  bonus: number;
+  /** Итоговый предел; null — предела нет. */
   value: number | null;
-  /** Подготовлено сейчас без «всегда подготовленных». */
-  prepared: number;
+  /** Сколько заклинаний в счёте сейчас. */
+  count: number;
   /** Предел считается по известным заклинаниям, а не по подготовке. */
   isKnown: boolean;
+}
+
+/** Происхождение заклинания на листе. */
+export type SpellOrigin = 'book' | 'class' | 'innate';
+
+/** Заклинательство одного класса: своя характеристика — свои Сл и атака. */
+export interface SpellcastingRow {
+  /** Класс листа; null — общая строка персонажа без класса-заклинателя. */
+  classId: string | null;
+  className: string;
+  ability: AbilityKey | null;
+  /** Характеристика по справочнику класса. */
+  autoAbility: AbilityKey | null;
+  /** Характеристика задана игроком. */
+  isCustom: boolean;
+  saveDc: number | null;
+  attack: number | null;
+}
+
+/** Плитка броска урона или лечения заклинания. */
+export interface SpellDamageTile {
+  key: string;
+  /** Формула для бросателя: «8к6+3». */
+  formula: string;
+  typeLabel: string;
+  conditionLabel: string;
+  isHealing: boolean;
+}
+
+/** Ячейка, которой сотворяют заклинание. */
+export interface SpellSlotOption {
+  value: string;
+  kind: 'slot' | 'pact';
+  level: number;
+  left: number;
+  label: string;
+}
+
+/** Отбор списка заклинаний. */
+export interface SpellTabFilter {
+  preparedOnly: boolean;
+  /** Отмеченные круги; пусто — круги не сужаются. */
+  levels: ReadonlyArray<number>;
 }
 
 /** Умение уровня класса для мастера повышения. */

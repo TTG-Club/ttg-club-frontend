@@ -26,7 +26,7 @@ import {
   getHitPointGain,
   getMulticlassMechanics,
   getPendingChoices,
-  getPreparedLimit,
+  getPreparedBreakdown,
   getResourceMax,
   getSheetRollMode,
   getSheetStats,
@@ -717,33 +717,51 @@ describe('лист персонажа: подготовленные заклин
   it('жрец: модификатор + уровень, паладин: + половина, свой предел важнее', () => {
     const document = makeDocument();
 
+    /**
+     * Класс листа для предела.
+     * @param url - адрес класса
+     * @param level - уровень
+     * @param abilityModifier - модификатор характеристики
+     * @param knownSpells - колонка «Известные заклинания»
+     */
+    const caster = (
+      url: string,
+      level: number,
+      abilityModifier: number,
+      knownSpells: number | null = null,
+    ) => ({
+      classId: url,
+      url,
+      level,
+      knownSpells,
+      knownCantrips: null,
+      abilityModifier,
+    });
+
     expect(
-      getPreparedLimit(
-        document,
-        [{ url: '/classes/cleric', level: 5, knownSpells: null }],
-        16,
-      ).value,
+      getPreparedBreakdown(document, 'spells', [
+        caster('/classes/cleric', 5, 3),
+      ]).value,
     ).toBe(8);
 
     expect(
-      getPreparedLimit(
-        document,
-        [{ url: '/classes/paladin', level: 5, knownSpells: null }],
-        14,
-      ).value,
+      getPreparedBreakdown(document, 'spells', [
+        caster('/classes/paladin', 5, 2),
+      ]).value,
     ).toBe(4);
 
     expect(
-      getPreparedLimit(
-        document,
-        [{ url: '/classes/bard', level: 3, knownSpells: 6 }],
-        16,
-      ),
+      getPreparedBreakdown(document, 'spells', [
+        caster('/classes/bard', 3, 3, 6),
+      ]),
     ).toMatchObject({ value: 6, isKnown: true });
 
     expect(
-      getPreparedLimit({ ...document, preparedLimitOverride: 2 }, [], null)
-        .value,
+      getPreparedBreakdown(
+        { ...document, preparedLimitOverride: 2 },
+        'spells',
+        [],
+      ).value,
     ).toBe(2);
   });
 });
