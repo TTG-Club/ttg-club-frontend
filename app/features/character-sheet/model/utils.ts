@@ -13,6 +13,7 @@ import type {
   ClassProgression,
   HitDiceTotal,
   PactMagic,
+  SheetSize,
   SkillKey,
   SkillRow,
   WeaponAttack,
@@ -35,6 +36,8 @@ import {
   HIT_DIE_AVERAGE_BONUS,
   MULTICLASS_SPELL_SLOTS,
   PACT_MAGIC_COLUMNS,
+  SHEET_SIZE_INFO,
+  SHEET_SIZE_KEYS,
   SHEET_TEXT,
   SKILL_INFO,
   SKILL_KEYS,
@@ -224,7 +227,33 @@ export function getSkillProficiency(
 }
 
 /**
- * Следующее владение навыком по кругу: нет → владение → компетентность.
+ * Владеет ли персонаж навыком: половина бонуса владением не считается.
+ * @param proficiency - уровень владения
+ */
+export function isSkillProficient(
+  proficiency: SkillProficiency | undefined,
+): boolean {
+  return proficiency === 'proficient' || proficiency === 'expertise';
+}
+
+/**
+ * Бонус мастерства, который навык получает от уровня владения; половина
+ * округляется вниз.
+ * @param proficiency - уровень владения
+ * @param proficiencyBonus - бонус мастерства
+ */
+export function getSkillProficiencyBonus(
+  proficiency: SkillProficiency,
+  proficiencyBonus: number,
+): number {
+  return Math.floor(
+    proficiencyBonus * SKILL_PROFICIENCY_MULTIPLIER[proficiency],
+  );
+}
+
+/**
+ * Следующее владение навыком по кругу: нет → половина → владение →
+ * компетентность.
  * @param current - текущее владение
  */
 export function getNextSkillProficiency(
@@ -253,7 +282,7 @@ export function getSkillBonus(
 
   return (
     getModifierOf(document.abilities, SKILL_INFO[skill].ability)
-    + proficiencyBonus * SKILL_PROFICIENCY_MULTIPLIER[proficiency]
+    + getSkillProficiencyBonus(proficiency, proficiencyBonus)
   );
 }
 
@@ -836,4 +865,29 @@ export function getSheetSummary(sheet: CharacterSheet): string {
   return [sheet.data.race?.name, getClassesLabel(sheet.data.classes)]
     .filter(Boolean)
     .join(' · ');
+}
+
+/**
+ * Размер по подписи карточки расы: «Средний», «Маленький или Средний» — берётся
+ * первый упомянутый.
+ * @param text - подпись размера
+ */
+export function findSheetSize(
+  text: string | null | undefined,
+): SheetSize | null {
+  const lower = text?.toLowerCase() ?? '';
+
+  let found: SheetSize | null = null;
+  let foundAt = Number.POSITIVE_INFINITY;
+
+  for (const key of SHEET_SIZE_KEYS) {
+    const position = lower.indexOf(SHEET_SIZE_INFO[key].name.toLowerCase());
+
+    if (position !== -1 && position < foundAt) {
+      found = key;
+      foundAt = position;
+    }
+  }
+
+  return found;
 }

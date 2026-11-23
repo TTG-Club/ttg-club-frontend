@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { SheetClass } from '../model';
+  import type { CatalogOption, SheetClass, SheetDocument } from '../model';
 
   import {
     useCharacterSheet,
@@ -8,7 +8,13 @@
   } from '../composables';
   import {
     addSources,
+    applyLevelUpStep,
+    CATALOG_TREE_ICON,
+    CATALOG_TREE_TEXT,
     CHARACTER_LEVEL,
+    CLASS_TREE,
+    createCustomClassStep,
+    createCustomLevelStep,
     getCharacterLevel,
     getMissingClassFeatureSources,
     LEVEL_UP_TEXT,
@@ -17,13 +23,17 @@
     SHEET_ICON,
     SHEET_LABELS,
   } from '../model';
+  import SheetCatalogTreeModal from './SheetCatalogTreeModal.vue';
   import SheetConfirmModal from './SheetConfirmModal.vue';
+  import SheetCustomEntryModal from './SheetCustomEntryModal.vue';
 
   /**
    * Классы персонажа: уровень, подкласс и кость хитов каждого. Повышение
    * уровня и новый класс идут через мастер; понижение уровня и снятие класса
    * забирают ровно выданное ими (умения, владения, ресурсы, хиты). Листам до
-   * механики можно подтянуть умения класса из справочника.
+   * механики можно подтянуть умения класса из справочника. Класс выбирают в
+   * окне «Добавление класса» (у листа без классов оно открывается сразу);
+   * свой класс добавляется без мастера и повышается по среднему кости.
    */
   const isOpen = defineModel<boolean>('open', { default: false });
 
@@ -31,7 +41,8 @@
   const { getMechanics, getDetail } = useSheetClassData();
   const wizard = useLevelUpWizard();
 
-  const selectedClassUrl = ref<string>();
+  const isPickerOpen = ref(false);
+  const isCustomOpen = ref(false);
 
   const confirmAction = ref<{
     kind: 'level' | 'class';
@@ -45,11 +56,10 @@
       !document.value.classes.length || totalLevel.value < CHARACTER_LEVEL.max,
   );
 
-  const classOptions = computed(() =>
-    wizard.classList.value.map((link) => ({
-      label: link.name.rus,
-      value: link.url,
-    })),
+  const takenClassUrls = computed(() =>
+    document.value.classes.flatMap((sheetClass) =>
+      sheetClass.url ? [sheetClass.url] : [],
+    ),
   );
 
   const rows = computed(() =>
@@ -110,19 +120,56 @@
    * @param sheetClass - класс листа
    */
   function levelUp(sheetClass: SheetClass): void {
+    if (!sheetClass.url) {
+      update((current) => levelUpCustom(current, sheetClass.id));
+
+      return;
+    }
+
     isOpen.value = false;
     void wizard.startLevelUp(sheetClass.id);
   }
 
-  /** Открывает мастер нового класса. */
-  function addClass(): void {
-    const url = selectedClassUrl.value;
+  /**
+   * Повышает уровень своего класса без мастера.
+   * @param current - лист персонажа
+   * @param classId - класс листа
+   */
+  function levelUpCustom(
+    current: SheetDocument,
+    classId: string,
+  ): SheetDocument {
+    const step = createCustomLevelStep(current, classId);
 
-    if (url) {
-      isOpen.value = false;
-      selectedClassUrl.value = undefined;
-      void wizard.startNewClass(url);
-    }
+    return step ? applyLevelUpStep(current, step) : current;
+  }
+
+  function openPicker(): void {
+    isPickerOpen.value = true;
+  }
+
+  function openCustom(): void {
+    isCustomOpen.value = true;
+  }
+
+  /**
+   * Открывает мастер нового класса для выбранного в окне «Добавление класса».
+   * @param option - выбранный класс
+   */
+  function addClass(option: CatalogOption): void {
+    isOpen.value = false;
+    void wizard.startNewClass(option.url);
+  }
+
+  /**
+   * Добавляет свой класс первым уровнем.
+   * @param name - название класса
+   * @param hitDie - кость хитов
+   */
+  function addCustomClass(name: string, hitDie: number): void {
+    update((current) =>
+      applyLevelUpStep(current, createCustomClassStep(current, name, hitDie)),
+    );
   }
 
   /**
@@ -173,8 +220,8 @@
   }
 
   watch(isOpen, (open) => {
-    if (open) {
-      void wizard.loadClassList();
+    if (open && !document.value.classes.length) {
+      openPicker();
     }
   });
 </script>
@@ -247,29 +294,15 @@
         </li>
       </ul>
 
-      <div
+      <UButton
         v-if="canAdd"
-        class="flex items-end gap-2"
-      >
-        <UFormField
-          :label="LEVEL_UP_TEXT.addClass"
-          class="flex-1"
-        >
-          <USelectMenu
-            v-model="selectedClassUrl"
-            :items="classOptions"
-            value-key="value"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UButton
-          :label="SHEET_LABELS.add"
-          :icon="SHEET_ICON.add"
-          :disabled="!selectedClassUrl"
-          @click.left.exact.prevent="addClass"
-        />
-      </div>
+        :label="LEVEL_UP_TEXT.addClass"
+        :icon="SHEET_ICON.add"
+        color="neutral"
+        variant="outline"
+        class="self-start"
+        @click.left.exact.prevent="openPicker"
+      />
 
       <p
         v-if="document.classes.length"
@@ -286,4 +319,26 @@
       />
     </template>
   </UModal>
+
+  <SheetCatalogTreeModal
+    v-model:open="isPickerOpen"
+    :title="CATALOG_TREE_TEXT.classTitle"
+    :source="CLASS_TREE"
+    :hint="CATALOG_TREE_TEXT.classHint"
+    :confirm-label="CATALOG_TREE_TEXT.next"
+    :confirm-icon="CATALOG_TREE_ICON.next"
+    :custom-label="CATALOG_TREE_TEXT.customClass"
+    :expand-label="CATALOG_TREE_TEXT.expandClass"
+    :excluded-urls="takenClassUrls"
+    @pick="addClass"
+    @custom="openCustom"
+  />
+
+  <SheetCustomEntryModal
+    v-model:open="isCustomOpen"
+    :title="CATALOG_TREE_TEXT.customClass"
+    :hint="CATALOG_TREE_TEXT.customClassHint"
+    with-hit-die
+    @save="addCustomClass"
+  />
 </template>

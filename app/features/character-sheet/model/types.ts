@@ -10,7 +10,9 @@ import type {
   CURRENCY_KEYS,
   EXTRA_SPEED_KEYS,
   HIT_POINTS_GAIN_MODES,
+  OWN_SENSE_KEYS,
   SHEET_SAVE_STATUS_TEXT,
+  SHEET_SIZE_KEYS,
   SHEET_TABS,
   SKILL_KEYS,
 } from './constants';
@@ -26,6 +28,10 @@ import type {
 export type AbilityKey = (typeof ABILITY_KEYS)[number];
 
 export type SkillKey = (typeof SKILL_KEYS)[number];
+
+export type SheetSize = (typeof SHEET_SIZE_KEYS)[number];
+
+export type OwnSenseKey = (typeof OWN_SENSE_KEYS)[number];
 
 export type CurrencyKey = (typeof CURRENCY_KEYS)[number];
 

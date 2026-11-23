@@ -2,7 +2,6 @@
   import type { CharacterSheet } from '../model';
 
   import { SectionLayout } from '~section/layout';
-  import { ToolResultGrid } from '~tools/generator';
   import { AuthModal } from '~user/auth-modal';
 
   import { useSheetList } from '../composables';
@@ -12,13 +11,18 @@
     getSheetRoute,
     SHEET_HTTP_STATUS,
     SHEET_ICON,
+    SHEET_IMPORT_ACCEPT,
+    SHEET_LIST_ICON,
+    SHEET_LIST_TEXT,
     SHEET_TEXT,
   } from '../model';
   import SheetListCard from './SheetListCard.vue';
+  import SheetListCreateCard from './SheetListCreateCard.vue';
 
   /**
-   * Страница листов персонажей: у пользователя — его листы, гостю —
-   * приглашение войти. Листы хранятся только в аккаунте.
+   * Страница листов персонажей: у пользователя — его листы, импорт из JSON
+   * и слот создания; гостю — приглашение войти. Листы хранятся только в
+   * аккаунте.
    */
   const { isLoggedIn, pending } = useUser();
 
@@ -34,6 +38,7 @@
     create,
     copy,
     remove,
+    importFromFile,
   } = useSheetList();
 
   const isAuthOpen = ref(false);
@@ -46,15 +51,55 @@
 
   const countLabel = computed(() => `${sheets.value.length} / ${limit.value}`);
 
-  const isCreateDisabled = computed(() => isLoggedIn.value && !canCreate.value);
+  // Счётчик краснеет на достигнутом лимите.
+  const countClass = computed(() =>
+    canCreate.value ? 'text-muted' : 'text-error',
+  );
 
-  async function createSheet(): Promise<void> {
+  // Пока список едет с сервера, лимит неизвестен: импорт упёрся бы в него
+  // и соврал про исчерпанный лимит.
+  const isImportBusy = computed(() => isLoading.value || isMutating.value);
+
+  // `reset` — чтобы повторный выбор того же файла снова запускал импорт.
+  const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
+    accept: SHEET_IMPORT_ACCEPT,
+    multiple: false,
+    reset: true,
+  });
+
+  /**
+   * Импортирует выбранный файл; отказы объясняет тостом композабл.
+   * @param files - выбор из диалога
+   */
+  async function importFiles(files: FileList | null): Promise<void> {
+    const file = files?.item(0);
+
+    if (!file) {
+      return;
+    }
+
+    const created = await importFromFile(file);
+
+    if (created) {
+      await navigateTo(getSheetRoute(created.id));
+    }
+  }
+
+  onFilesChange(importFiles);
+
+  /** Открывает выбор JSON-файла; гостю — окно входа. */
+  function openImport(): void {
     if (!isLoggedIn.value) {
       openAuth();
 
       return;
     }
 
+    openFileDialog();
+  }
+
+  /** Создаёт пустой лист и открывает его. */
+  async function createSheet(): Promise<void> {
     const created = await create();
 
     if (created) {
@@ -101,25 +146,17 @@
     is-full-width
   >
     <template #controls>
-      <div class="flex flex-col gap-3">
-        <p class="text-sm text-muted">
-          {{ SHEET_TEXT.listDescription }}
-        </p>
-
+      <div class="flex flex-col gap-2">
         <UButton
-          :label="SHEET_TEXT.create"
-          :icon="SHEET_ICON.add"
-          :loading="isMutating"
-          :disabled="isCreateDisabled"
+          :icon="SHEET_LIST_ICON.import"
+          :label="SHEET_LIST_TEXT.importLabel"
+          :loading="isImportBusy"
           block
-          @click.left.exact.prevent="createSheet"
+          @click.left.exact.prevent="openImport"
         />
 
-        <p
-          v-if="isCreateDisabled"
-          class="text-sm text-warning"
-        >
-          {{ SHEET_TEXT.limit }}
+        <p class="text-xs text-muted">
+          {{ SHEET_LIST_TEXT.importHint }}
         </p>
       </div>
     </template>
@@ -151,17 +188,42 @@
       </template>
     </UEmpty>
 
-    <div
+    <section
       v-else
-      class="flex flex-col gap-4"
+      class="flex flex-col gap-2"
     >
-      <ToolResultGrid v-if="isLoading && !isLoaded">
-        <USkeleton
-          v-for="index in 3"
-          :key="index"
-          class="h-18 w-full rounded-xl"
-        />
-      </ToolResultGrid>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium tracking-wide text-muted uppercase">
+          {{ SHEET_LIST_TEXT.ownTitle }}
+        </span>
+
+        <span
+          v-if="isLoaded && errorStatus === undefined"
+          class="flex items-center gap-1 text-xs tabular-nums"
+        >
+          <span :class="countClass">{{ countLabel }}</span>
+
+          <UTooltip :text="SHEET_LIST_TEXT.countTooltip">
+            <UIcon
+              :name="SHEET_LIST_ICON.help"
+              class="size-3.5 shrink-0 text-muted"
+            />
+          </UTooltip>
+        </span>
+      </div>
+
+      <div
+        v-if="isLoading && !isLoaded"
+        class="@container"
+      >
+        <div class="grid grid-cols-1 gap-3 @2xl:grid-cols-2">
+          <USkeleton
+            v-for="index in 2"
+            :key="index"
+            class="h-20 w-full rounded-xl"
+          />
+        </div>
+      </div>
 
       <UEmpty
         v-else-if="errorStatus !== undefined"
@@ -181,34 +243,36 @@
       </UEmpty>
 
       <template v-else>
-        <div class="flex items-center justify-between gap-2">
-          <h2 class="text-lg text-highlighted">
-            {{ SHEET_TEXT.listTitle }}
-          </h2>
+        <div class="@container">
+          <div class="grid grid-cols-1 gap-3 @2xl:grid-cols-2">
+            <SheetListCard
+              v-for="sheet in sheets"
+              :key="sheet.id"
+              :sheet="sheet"
+              :is-disabled="isMutating"
+              :can-copy="canCreate"
+              @copy="copy"
+              @remove="askRemove"
+            />
 
-          <span class="text-sm text-muted">{{ countLabel }}</span>
+            <!-- Слот создания исчезает на достигнутом лимите -->
+            <SheetListCreateCard
+              v-if="canCreate"
+              :is-loading="isMutating"
+              :is-disabled="isMutating"
+              @create="createSheet"
+            />
+          </div>
         </div>
 
-        <ToolResultGrid v-if="sheets.length">
-          <SheetListCard
-            v-for="sheet in sheets"
-            :key="sheet.id"
-            :sheet="sheet"
-            :is-disabled="isMutating"
-            @copy="copy"
-            @remove="askRemove"
-          />
-        </ToolResultGrid>
-
-        <UEmpty
-          v-else
-          :icon="CHARACTER_SHEET_ICON"
-          :title="SHEET_TEXT.empty"
-          variant="naked"
-          class="py-12"
-        />
+        <p
+          v-if="!canCreate"
+          class="text-xs text-muted"
+        >
+          {{ SHEET_LIST_TEXT.limitReached }}
+        </p>
       </template>
-    </div>
+    </section>
 
     <SheetConfirmModal
       v-model:open="isRemoveOpen"

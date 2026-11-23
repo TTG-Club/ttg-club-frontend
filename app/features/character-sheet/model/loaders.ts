@@ -8,7 +8,12 @@ import type {
   SheetSpell,
   SourceKind,
 } from './schema';
-import type { CatalogOption, CatalogSearchSource, SheetChoice } from './types';
+import type {
+  CatalogOption,
+  CatalogSearchSource,
+  SheetChoice,
+  SheetSize,
+} from './types';
 
 import {
   featLinkSchema,
@@ -36,6 +41,7 @@ import {
   setSourceAnswers,
 } from './sources';
 import {
+  findSheetSize,
   findSkillByName,
   getCharacterLevel,
   getRaceAbilityBonuses,
@@ -108,6 +114,8 @@ export interface RaceSources {
   race: CatalogRef;
   speed: number | null;
   darkvision: number | null;
+  /** Размер по карточке расы; null — не распознан. */
+  size: SheetSize | null;
   /** Источник расы и источники её особенностей с механикой. */
   sources: Array<SheetSource>;
 }
@@ -181,6 +189,7 @@ export async function loadRaceSources(
     race: { name: detail.name.rus, url: option.url },
     speed: detail.speed?.[0]?.value ?? null,
     darkvision: detail.darkvision ?? null,
+    size: findSheetSize(detail.size),
     sources: [race, ...features],
   };
 }
