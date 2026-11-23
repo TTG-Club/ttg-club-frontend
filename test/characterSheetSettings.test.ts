@@ -12,6 +12,8 @@ import {
   formatModifier,
   fromSpeedUnit,
   getCustomBonusSourceOptions,
+  getResourceMaxFormula,
+  getResourceMaxRule,
   getSavingThrowDrafts,
   getSheetStats,
   getWeaponAttack,
@@ -235,5 +237,37 @@ describe('настройки листа', () => {
         2,
       )?.attackBonus,
     ).toBe(3);
+  });
+});
+
+describe('максимум своего ресурса', () => {
+  const own = { formula: null, scaling: [], sourceId: null };
+
+  it('формула собирается и разбирается обратно', () => {
+    const rule = {
+      source: 'ability' as const,
+      ability: 'WISDOM' as const,
+      offset: -1,
+    };
+
+    const formula = getResourceMaxFormula(rule);
+
+    expect(formula).toBe('@mod.wis - 1');
+    expect(getResourceMaxRule({ ...own, formula })).toEqual(rule);
+
+    expect(
+      getResourceMaxFormula({
+        source: 'proficiency',
+        ability: 'CHARISMA',
+        offset: 0,
+      }),
+    ).toBe('@prof');
+
+    expect(getResourceMaxRule(own)?.source).toBe('fixed');
+  });
+
+  it('ресурс справочника настройка не правит', () => {
+    expect(getResourceMaxRule({ ...own, sourceId: 'class:bard' })).toBeNull();
+    expect(getResourceMaxRule({ ...own, formula: '@classLevel*2' })).toBeNull();
   });
 });

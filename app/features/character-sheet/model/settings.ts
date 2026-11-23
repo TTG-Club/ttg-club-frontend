@@ -1,8 +1,19 @@
-import type { AbilityScores, CustomBonus, SheetDocument } from './schema';
+import type {
+  AbilityScores,
+  CustomBonus,
+  SheetDocument,
+  SheetResource,
+} from './schema';
 import type { CustomBonusContext } from './skills';
-import type { AbilityKey, SpeedKey, SpeedUnit } from './types';
+import type {
+  AbilityKey,
+  ResourceMaxSource,
+  SpeedKey,
+  SpeedUnit,
+} from './types';
 
 import {
+  ABILITY_ABBREVIATIONS,
   ABILITY_KEYS,
   ABILITY_SETTINGS_TEXT,
   METERS_PER_FOOT,
@@ -253,4 +264,86 @@ export function getProficiencyBonusBase(
       classes: document.classes,
     })
   );
+}
+
+/** Максимум своего ресурса: источник, характеристика и прибавка. */
+export interface ResourceMaxRule {
+  source: ResourceMaxSource;
+  ability: AbilityKey;
+  offset: number;
+}
+
+/** Характеристика максимума ресурса по умолчанию. */
+const DEFAULT_RESOURCE_ABILITY: AbilityKey = 'CHARISMA';
+
+/** Формула, которую собирает настройка: `@prof`, `@mod.cha - 1`, `@level + 2`. */
+const RESOURCE_FORMULA_PATTERN =
+  /^@(prof|level|mod\.(str|dex|con|int|wis|cha))(?:\s*([+-])\s*(\d+))?$/;
+
+/**
+ * Правило максимума ресурса из его формулы. null — формулу задал
+ * справочник или ступени, и настройка её не правит.
+ * @param resource - ресурс листа
+ */
+export function getResourceMaxRule(
+  resource: Pick<SheetResource, 'formula' | 'scaling' | 'sourceId'>,
+): ResourceMaxRule | null {
+  if (resource.sourceId !== null || resource.scaling.length) {
+    return null;
+  }
+
+  if (!resource.formula) {
+    return { source: 'fixed', ability: DEFAULT_RESOURCE_ABILITY, offset: 0 };
+  }
+
+  const match = RESOURCE_FORMULA_PATTERN.exec(resource.formula.trim());
+
+  if (!match) {
+    return null;
+  }
+
+  const [, variable, abbreviation, sign, amount] = match;
+  const offset = amount ? Number(amount) * (sign === '-' ? -1 : 1) : 0;
+
+  const ability =
+    Object.entries(ABILITY_ABBREVIATIONS).find(
+      ([key]) => key === abbreviation,
+    )?.[1] ?? DEFAULT_RESOURCE_ABILITY;
+
+  if (variable === 'prof') {
+    return { source: 'proficiency', ability: DEFAULT_RESOURCE_ABILITY, offset };
+  }
+
+  if (variable === 'level') {
+    return { source: 'level', ability: DEFAULT_RESOURCE_ABILITY, offset };
+  }
+
+  return { source: 'ability', ability, offset };
+}
+
+/**
+ * Формула максимума по правилу; null — своё число.
+ * @param rule - правило максимума
+ */
+export function getResourceMaxFormula(rule: ResourceMaxRule): string | null {
+  if (rule.source === 'fixed') {
+    return null;
+  }
+
+  const abbreviation =
+    Object.entries(ABILITY_ABBREVIATIONS).find(
+      ([, key]) => key === rule.ability,
+    )?.[0] ?? 'cha';
+
+  const variable = {
+    proficiency: '@prof',
+    level: '@level',
+    ability: `@mod.${abbreviation}`,
+  }[rule.source];
+
+  if (!rule.offset) {
+    return variable;
+  }
+
+  return `${variable} ${rule.offset < 0 ? '-' : '+'} ${Math.abs(rule.offset)}`;
 }

@@ -461,6 +461,35 @@ export const RESOURCE_RESET_LABELS = {
   SHORT_ONE: 'Один на коротком, все на долгом',
 } as const;
 
+/** Источники максимума своего ресурса. */
+export const RESOURCE_MAX_SOURCES = [
+  'fixed',
+  'proficiency',
+  'ability',
+  'level',
+] as const;
+
+export const RESOURCE_MAX_SOURCE_LABELS = {
+  fixed: 'Своё число',
+  proficiency: 'Бонус мастерства',
+  ability: 'Модификатор характеристики',
+  level: 'Уровень персонажа',
+} as const;
+
+/** Пределы прибавки к источнику максимума ресурса. */
+export const RESOURCE_MAX_OFFSET_RANGE = { min: -9, max: 9 } as const;
+
+/** Подписи настройки максимума ресурса. */
+export const RESOURCE_MAX_TEXT = {
+  source: 'Максимум от',
+  ability: 'Характеристика',
+  offset: 'Прибавка',
+  minimum: 'Не меньше',
+  computed: 'Сейчас',
+  catalogHint:
+    'Максимум ресурса из справочника растёт вместе с персонажем сам.',
+} as const;
+
 /* --- Справочники -------------------------------------------------------- */
 
 /** Префикс адресов API справочника: `/api/v1` + адрес записи. */

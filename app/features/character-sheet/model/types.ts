@@ -11,6 +11,7 @@ import type {
   EXTRA_SPEED_KEYS,
   HIT_POINTS_GAIN_MODES,
   OWN_SENSE_KEYS,
+  RESOURCE_MAX_SOURCES,
   SHEET_MAIN_TAB,
   SHEET_SAVE_STATUS_TEXT,
   SHEET_SIZE_KEYS,
@@ -140,6 +141,8 @@ export type ExtraSpeedKey = (typeof EXTRA_SPEED_KEYS)[number];
 export type SpeedKey = 'walk' | ExtraSpeedKey;
 
 export type SpeedUnit = (typeof SPEED_UNITS)[number];
+
+export type ResourceMaxSource = (typeof RESOURCE_MAX_SOURCES)[number];
 
 /** Владения, выданные одним источником, — без пометки источника. */
 export type GrantedProficiencies = Omit<ProficiencyGrant, 'sourceId'>;
