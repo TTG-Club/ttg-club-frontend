@@ -6,6 +6,7 @@ import type {
   AttunementBreakdown,
   CarryingBreakdown,
   EncumbranceLevel,
+  ItemKind,
   SheetSize,
 } from './types';
 
@@ -264,4 +265,42 @@ export function sortItemsByName<Item extends Pick<SheetItem, 'name'>>(
   return [...items].sort((left, right) =>
     left.name.localeCompare(right.name, 'ru'),
   );
+}
+
+/** Кость урона текстом: «1к8», «2к6». */
+const DICE_PATTERN = /^(\d+)\s*[кkd]\s*(\d+)$/i;
+
+/**
+ * Разбирает кость урона; null — запись не похожа на «NкM».
+ * @param value - кость текстом
+ */
+export function parseDice(
+  value: string,
+): { count: number; faces: number } | null {
+  const match = DICE_PATTERN.exec(value.trim());
+
+  return match ? { count: Number(match[1]), faces: Number(match[2]) } : null;
+}
+
+/**
+ * Кость урона текстом.
+ * @param count - сколько костей
+ * @param faces - грани
+ */
+export function formatDice(count: number, faces: number): string {
+  return `${count}к${faces}`;
+}
+
+/**
+ * Вид предмета для формы: оружие, доспех или прочее.
+ * @param item - предмет
+ */
+export function getItemKind(
+  item: Pick<SheetItem, 'weapon' | 'armor'>,
+): ItemKind {
+  if (item.weapon) {
+    return 'weapon';
+  }
+
+  return item.armor ? 'armor' : 'other';
 }

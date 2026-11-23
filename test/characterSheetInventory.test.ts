@@ -6,12 +6,14 @@ import {
   copyItemAsCustom,
   createEmptySheetDocument,
   createSheetItem,
+  formatDice,
   getAttunementBreakdown,
   getCarriedWeight,
   getCarryingBreakdown,
   getCoinWeight,
   getCurrencyInGold,
   getEncumbrance,
+  getItemKind,
   getItemPreviewType,
   getSheetRollMode,
   getSheetStats,
@@ -19,6 +21,7 @@ import {
   isArmorTooHeavy,
   isHeavyWeaponHindered,
   isItemMechanicsActive,
+  parseDice,
   sheetArmorSchema,
   sheetWeaponSchema,
   sortItemsByName,
@@ -260,5 +263,24 @@ describe('строка предмета', () => {
         (item) => item.name,
       ),
     ).toEqual(['арбалет', 'Яблоко']);
+  });
+});
+
+describe('форма своего предмета', () => {
+  it('кости урона разбираются и собираются', () => {
+    expect(parseDice('2к6')).toEqual({ count: 2, faces: 6 });
+    expect(parseDice(' 1d10 ')).toEqual({ count: 1, faces: 10 });
+    expect(parseDice('1к8 + 2')).toBeNull();
+    expect(formatDice(3, 4)).toBe('3к4');
+  });
+
+  it('вид предмета', () => {
+    const item = createSheetItem('Посох', null);
+
+    expect(getItemKind(item)).toBe('other');
+
+    expect(getItemKind({ ...item, weapon: sheetWeaponSchema.parse({}) })).toBe(
+      'weapon',
+    );
   });
 });

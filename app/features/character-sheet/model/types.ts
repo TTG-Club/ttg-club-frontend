@@ -10,6 +10,7 @@ import type {
   CURRENCY_KEYS,
   EXTRA_SPEED_KEYS,
   HIT_POINTS_GAIN_MODES,
+  ITEM_KINDS,
   OWN_SENSE_KEYS,
   RESOURCE_MAX_SOURCES,
   SHEET_MAIN_TAB,
@@ -200,6 +201,8 @@ export type ExtraSpeedKey = (typeof EXTRA_SPEED_KEYS)[number];
 export type SpeedKey = 'walk' | ExtraSpeedKey;
 
 export type SpeedUnit = (typeof SPEED_UNITS)[number];
+
+export type ItemKind = (typeof ITEM_KINDS)[number];
 
 export type ResourceMaxSource = (typeof RESOURCE_MAX_SOURCES)[number];
 

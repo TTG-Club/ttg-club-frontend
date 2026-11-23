@@ -1740,6 +1740,73 @@ export const ITEM_ROW_TEXT = {
   attackNoProficiency: 'Нет владения',
 } as const;
 
+/** Вид своего предмета в форме. */
+export const ITEM_KINDS = ['other', 'weapon', 'armor'] as const;
+
+export const ITEM_KIND_LABELS = {
+  other: 'Предмет',
+  weapon: 'Оружие',
+  armor: 'Доспех',
+} as const;
+
+/** Грани костей урона в форме своего оружия. */
+export const DAMAGE_DIE_FACES = [4, 6, 8, 10, 12, 20] as const;
+
+/** Пределы числа костей урона. */
+export const DAMAGE_DICE_COUNT = { min: 1, max: 10 } as const;
+
+/** Типы урона оружия в форме: подписи как в справочнике оружия. */
+export const WEAPON_DAMAGE_TYPES = [
+  'рубящий',
+  'колющий',
+  'дробящий',
+  'огонь',
+  'холод',
+  'электричество',
+  'звук',
+  'яд',
+  'кислота',
+  'некротическая энергия',
+  'излучение',
+  'силовое поле',
+  'психическая энергия',
+] as const;
+
+/** Подписи окна предмета. */
+export const ITEM_FORM_TEXT = {
+  title: 'Предмет',
+  customTitle: 'Свой предмет',
+  tabMain: 'Основное',
+  tabMagic: 'Магия',
+  kind: 'Вид',
+  cost: 'Цена',
+  costPlaceholder: '15 зм',
+  category: 'Категория',
+  simple: 'Простое',
+  martial: 'Воинское',
+  heavy: 'Тяжёлое',
+  dice: 'Кости урона',
+  diceCount: 'Сколько костей',
+  diceFaces: 'Кость',
+  versatile: 'Двумя руками',
+  versatileNone: 'Нет',
+  strengthRequirement: 'Нужна Сила',
+  description: 'Описание',
+  descriptionPlaceholder: 'Как выглядит предмет и что он делает',
+  extraDamage: 'Дополнительный урон',
+  extraNone: 'Нет',
+  activatable: 'Включается и выключается',
+  activatableHint: 'Механика работает, только пока предмет включён',
+  summary: 'Что даёт предмет',
+  summaryEmpty: 'Магических свойств пока нет',
+  bonusAttack: 'к атаке и урону',
+  bonusArmor: 'к КД',
+  effects: 'Эффектов из справочника',
+  charges: 'Заряды',
+  catalogHint:
+    'Предмет из справочника: правятся количество, бонус, заряды и заметки. Чтобы поменять всё, сделайте копию в свой предмет.',
+} as const;
+
 /* --- Настройка ---------------------------------------------------------- */
 
 /** Сколько предметов персонаж может держать настроенными (DMG). */
