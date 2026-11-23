@@ -17,6 +17,7 @@
     CHARACTER_SHEET_ROUTE,
     formatModifier,
     SHEET_BODY_LABELS,
+    SHEET_DEFAULT_TAB,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_RIGHT_COLUMN_GAP,
@@ -46,8 +47,9 @@
    * Лист персонажа целиком, в раскладке new.ttg.club: шапка, слева — плитки
    * показателей, здоровье, истощение, спасброски, владения, защиты, ресурсы и
    * навыки; справа — ряд характеристик и вкладки снаряжения, заклинаний,
-   * особенностей, эффектов, личности и заметок. На узком экране всё идёт
-   * одной колонкой. Правки сохраняются сами.
+   * особенностей, эффектов, личности и заметок. На узком листе сводка уходит
+   * во вкладку «Основное», и разделы листаются свайпом. Правки сохраняются
+   * сами.
    */
   const { id } = defineProps<{
     id: string;
@@ -60,7 +62,7 @@
   // Механика классов грузится вместе с листом и живёт, пока он открыт
   useSheetClassData();
 
-  const activeTab = ref<SheetTab>('inventory');
+  const activeTab = ref<SheetTab>(SHEET_DEFAULT_TAB);
   const combatSection = ref<'armor' | 'speed' | null>(null);
   const isHealthOpen = ref(false);
   const isResourcesOpen = ref(false);
@@ -96,18 +98,26 @@
     { immediate: true },
   );
 
+  // Раскладка зависит от ширины самого листа (контейнерные запросы `@5xl`), а
+  // не окна. Меряем корень: он есть и до загрузки листа, поэтому к первой
+  // отрисовке сетки ширина уже известна и сводка сразу встаёт на место
+  const rootRef = useTemplateRef<HTMLElement>('root');
+  const { width: rootWidth } = useElementSize(rootRef);
+
+  const isWide = computed(() => rootWidth.value >= SHEET_WIDE_MIN_WIDTH);
+
+  const [DefineSummary, ReuseSummary] = createReusableTemplate();
+
   // Высота вкладок в широком режиме равна левой колонке без ряда
   // характеристик: трек `1fr` высоту не ограничивает, и длинный список
   // заклинаний раздувал бы правую колонку. Внутри вкладки прокручиваются
-  const gridRef = useTemplateRef<HTMLElement>('grid');
   const leftColumnRef = useTemplateRef<HTMLElement>('leftColumn');
   const abilitiesRef = useTemplateRef<HTMLElement>('abilities');
-  const { width: gridWidth } = useElementSize(gridRef);
   const { height: leftColumnHeight } = useElementSize(leftColumnRef);
   const { height: abilitiesHeight } = useElementSize(abilitiesRef);
 
   const tabsStyle = computed(() => {
-    if (gridWidth.value < SHEET_WIDE_MIN_WIDTH || leftColumnHeight.value <= 0) {
+    if (!isWide.value || leftColumnHeight.value <= 0) {
       return undefined;
     }
 
@@ -165,7 +175,10 @@
 </script>
 
 <template>
-  <div class="@container mx-auto flex w-full max-w-350 flex-col gap-4 p-4">
+  <div
+    ref="root"
+    class="@container mx-auto flex w-full max-w-350 flex-col gap-4 p-4"
+  >
     <div
       v-if="loadStatus === 'pending' || loadStatus === 'idle'"
       class="flex flex-col gap-4"
@@ -221,8 +234,71 @@
         />
       </div>
 
+      <!-- На телефоне колонки и пары плиток схлопываются в display:contents:
+        четыре плитки всплывают наверх (2×2, с @md — в строку), остальные
+        блоки идут во всю ширину в порядке order-* -->
+      <DefineSummary>
+        <div class="grid grid-cols-2 gap-4 max-sm:@md:grid-cols-4">
+          <div class="flex flex-col gap-4 max-sm:contents">
+            <div class="grid grid-cols-2 gap-4 max-sm:contents">
+              <SheetStatTile
+                :label="SHEET_BODY_LABELS.proficiencyBonus"
+                :value="proficiencyLabel"
+              />
+
+              <SheetStatTile
+                :label="SHEET_BODY_LABELS.armorClass"
+                :short-label="SHEET_BODY_LABELS.armorClassShort"
+                :value="stats.armorClass"
+                interactive
+                :press-label="SHEET_BODY_LABELS.armorClassPress"
+                @press="openArmor"
+              />
+            </div>
+
+            <SheetHealthPanel
+              class="max-sm:order-1 max-sm:col-span-full"
+              @edit="openHealth"
+            />
+
+            <SheetExhaustionPanel class="max-sm:order-2 max-sm:col-span-full" />
+
+            <SheetSavingThrowsPanel
+              class="max-sm:order-5 max-sm:col-span-full"
+            />
+
+            <SheetProficienciesPanel
+              class="max-sm:order-6 max-sm:col-span-full"
+            />
+
+            <SheetDefencesPanel class="max-sm:order-7 max-sm:col-span-full" />
+          </div>
+
+          <div class="flex flex-col gap-4 max-sm:contents">
+            <div class="grid grid-cols-2 gap-4 max-sm:contents">
+              <SheetSpeedTile @edit="openSpeed" />
+
+              <SheetStatTile
+                :label="SHEET_BODY_LABELS.initiative"
+                :value="initiativeLabel"
+                interactive
+                @press="rollInitiative"
+              />
+            </div>
+
+            <SheetResourcesPanel
+              class="max-sm:order-3 max-sm:col-span-full"
+              @edit="openResources"
+            />
+
+            <SheetSkillsPanel
+              class="grow max-sm:order-4 max-sm:col-span-full"
+            />
+          </div>
+        </div>
+      </DefineSummary>
+
       <div
-        ref="grid"
         class="grid grid-cols-1 gap-4 @5xl:grid-cols-12 @5xl:grid-rows-[min-content_1fr]"
       >
         <div
@@ -233,76 +309,23 @@
         </div>
 
         <div
+          v-if="isWide"
           ref="leftColumn"
           class="@5xl:col-span-6 @5xl:col-start-1 @5xl:row-span-2 @5xl:row-start-1 @5xl:self-start"
         >
-          <div class="grid grid-cols-2 gap-4 max-sm:@md:grid-cols-4">
-            <div class="flex flex-col gap-4 max-sm:contents">
-              <div class="grid grid-cols-2 gap-4 max-sm:contents">
-                <SheetStatTile
-                  :label="SHEET_BODY_LABELS.proficiencyBonus"
-                  :value="proficiencyLabel"
-                />
-
-                <SheetStatTile
-                  :label="SHEET_BODY_LABELS.armorClass"
-                  :short-label="SHEET_BODY_LABELS.armorClassShort"
-                  :value="stats.armorClass"
-                  interactive
-                  :press-label="SHEET_BODY_LABELS.armorClassPress"
-                  @press="openArmor"
-                />
-              </div>
-
-              <SheetHealthPanel
-                class="max-sm:order-1 max-sm:col-span-full"
-                @edit="openHealth"
-              />
-
-              <SheetExhaustionPanel
-                class="max-sm:order-2 max-sm:col-span-full"
-              />
-
-              <SheetSavingThrowsPanel
-                class="max-sm:order-5 max-sm:col-span-full"
-              />
-
-              <SheetProficienciesPanel
-                class="max-sm:order-6 max-sm:col-span-full"
-              />
-
-              <SheetDefencesPanel class="max-sm:order-7 max-sm:col-span-full" />
-            </div>
-
-            <div class="flex flex-col gap-4 max-sm:contents">
-              <div class="grid grid-cols-2 gap-4 max-sm:contents">
-                <SheetSpeedTile @edit="openSpeed" />
-
-                <SheetStatTile
-                  :label="SHEET_BODY_LABELS.initiative"
-                  :value="initiativeLabel"
-                  interactive
-                  @press="rollInitiative"
-                />
-              </div>
-
-              <SheetResourcesPanel
-                class="max-sm:order-3 max-sm:col-span-full"
-                @edit="openResources"
-              />
-
-              <SheetSkillsPanel
-                class="grow max-sm:order-4 max-sm:col-span-full"
-              />
-            </div>
-          </div>
+          <ReuseSummary />
         </div>
 
         <SheetTabs
           v-model="activeTab"
+          :has-main-tab="!isWide"
           :style="tabsStyle"
           class="@5xl:col-span-6 @5xl:col-start-7 @5xl:row-start-2 @5xl:min-h-0"
         >
+          <template #main>
+            <ReuseSummary />
+          </template>
+
           <template #inventory>
             <SheetInventory />
           </template>
