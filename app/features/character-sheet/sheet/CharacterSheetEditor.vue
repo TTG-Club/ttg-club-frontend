@@ -10,6 +10,7 @@
   import {
     SheetArmorClassModal,
     SheetHealthModal,
+    SheetHealthQuickModal,
     SheetLevelUpModal,
     SheetResourcesModal,
     SheetSpeedModal,
@@ -56,7 +57,9 @@
     id: string;
   }>();
 
-  const { loadStatus, name, load, ensureEditable } = useCharacterSheet();
+  const { loadStatus, name, isLocked, load, ensureEditable } =
+    useCharacterSheet();
+
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
@@ -67,6 +70,7 @@
   const isArmorClassOpen = ref(false);
   const isSpeedOpen = ref(false);
   const isHealthOpen = ref(false);
+  const isHealthQuickOpen = ref(false);
   const isResourcesOpen = ref(false);
 
   const proficiencyLabel = computed(() =>
@@ -144,7 +148,17 @@
     isSpeedOpen.value = true;
   }
 
+  /**
+   * Хиты: на запертом (игровом) листе — быстрое окно урона и лечения, на
+   * отпертом — полная настройка здоровья.
+   */
   function openHealth(): void {
+    if (isLocked.value) {
+      isHealthQuickOpen.value = true;
+
+      return;
+    }
+
     isHealthOpen.value = true;
   }
 
@@ -350,6 +364,8 @@
       <SheetSpeedModal v-model:open="isSpeedOpen" />
 
       <SheetHealthModal v-model:open="isHealthOpen" />
+
+      <SheetHealthQuickModal v-model:open="isHealthQuickOpen" />
 
       <SheetResourcesModal v-model:open="isResourcesOpen" />
 

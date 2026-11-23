@@ -15,8 +15,10 @@
     SheetClassesModal,
     SheetConfirmModal,
     SheetCustomEntryModal,
-    SheetRestModal,
+    SheetExperienceModal,
+    SheetLongRestModal,
     SheetSettingsModal,
+    SheetShortRestModal,
     SheetSizeModal,
     SheetSourceChoicesModal,
     SheetVisionModal,
@@ -29,9 +31,8 @@
     createSheet,
     deleteSheet,
     downloadSheetJson,
-    EXPERIENCE_BY_LEVEL,
     getClassesLabel,
-    getNextLevelExperience,
+    getExperienceProgress,
     getPendingChoices,
     getSheetRoute,
     loadBackgroundSources,
@@ -39,6 +40,7 @@
     RACE_TREE,
     removeSources,
     replaceRaceBonuses,
+    REST_ICON,
     SHEET_BODY_LABELS,
     SHEET_ICON,
     SHEET_LABELS,
@@ -126,17 +128,10 @@
     isSizeOpen.value = true;
   }
 
-  const restMode = ref<'short' | 'long' | null>(null);
+  const isExperienceOpen = ref(false);
+  const isShortRestOpen = ref(false);
+  const isLongRestOpen = ref(false);
   const choiceSourceIds = ref<Array<string>>([]);
-
-  const isRestOpen = computed({
-    get: () => restMode.value !== null,
-    set: (open: boolean) => {
-      if (!open) {
-        restMode.value = null;
-      }
-    },
-  });
 
   const isChoicesOpen = computed({
     get: () => choiceSourceIds.value.length > 0,
@@ -158,22 +153,12 @@
     () => document.value.background?.name ?? SHEET_BODY_LABELS.noBackground,
   );
 
-  const nextExperience = computed(() => getNextLevelExperience(level.value));
+  const experienceProgress = computed(() =>
+    getExperienceProgress(document.value.experience, level.value),
+  );
 
   /** Доля пути к следующему уровню, %: полоса делится подписью пополам. */
-  const progress = computed(() => {
-    const from = EXPERIENCE_BY_LEVEL[level.value - 1] ?? 0;
-    const to = nextExperience.value;
-
-    if (to === null || to <= from) {
-      return 100;
-    }
-
-    return Math.min(
-      100,
-      Math.max(0, ((document.value.experience - from) / (to - from)) * 100),
-    );
-  });
+  const progress = computed(() => experienceProgress.value.percent);
 
   const leftWidth = computed(() => `${Math.min(100, progress.value * 2)}%`);
 
@@ -182,7 +167,8 @@
   );
 
   const experienceLabel = computed(
-    () => `${document.value.experience} / ${nextExperience.value ?? '—'} XP`,
+    () =>
+      `${document.value.experience} / ${experienceProgress.value.to ?? '—'} XP`,
   );
 
   const saveStatusText = computed(
@@ -347,14 +333,6 @@
    */
   function setName(value: string | number): void {
     rename(String(value));
-  }
-
-  /**
-   * Опыт персонажа.
-   * @param value - очки опыта
-   */
-  function setExperience(value: number | null): void {
-    update((current) => ({ ...current, experience: Math.max(0, value ?? 0) }));
   }
 
   /**
@@ -569,12 +547,16 @@
     isClassesOpen.value = true;
   }
 
+  function openExperience(): void {
+    isExperienceOpen.value = true;
+  }
+
   function openShortRest(): void {
-    restMode.value = 'short';
+    isShortRestOpen.value = true;
   }
 
   function openLongRest(): void {
-    restMode.value = 'long';
+    isLongRestOpen.value = true;
   }
 </script>
 
@@ -755,60 +737,46 @@
         </UFieldGroup>
       </span>
 
-      <UPopover>
-        <button
-          type="button"
-          class="mt-2 flex w-full cursor-pointer items-center gap-3 rounded p-1 text-xs text-toned transition-colors hover:bg-elevated/40 @5xl:max-w-lg"
-          :aria-label="SHEET_BODY_LABELS.experience"
-        >
-          <span class="shrink-0">
-            <span class="hidden @5xl:inline"
-              >{{ SHEET_BODY_LABELS.levelPrefix }}&nbsp;</span
-            >{{ level }}
-          </span>
+      <button
+        type="button"
+        class="mt-2 flex w-full cursor-pointer items-center gap-3 rounded p-1 text-xs text-toned transition-colors hover:bg-elevated/40 @5xl:max-w-lg"
+        :aria-label="SHEET_BODY_LABELS.experience"
+        @click.left.exact.prevent="openExperience"
+      >
+        <span class="shrink-0">
+          <span class="hidden @5xl:inline"
+            >{{ SHEET_BODY_LABELS.levelPrefix }}&nbsp;</span
+          >{{ level }}
+        </span>
 
-          <span class="flex grow items-center gap-2">
-            <span class="h-1 flex-1 overflow-hidden rounded-full bg-elevated">
-              <span
-                class="block h-full rounded-full bg-linear-to-r from-primary/50 to-primary transition-[width] duration-300"
-                :style="{ width: leftWidth }"
-              />
-            </span>
-
+        <span class="flex grow items-center gap-2">
+          <span class="h-1 flex-1 overflow-hidden rounded-full bg-elevated">
             <span
-              class="text-[10px] leading-none font-medium tracking-widest whitespace-nowrap text-dimmed"
-            >
-              {{ experienceLabel }}
-            </span>
-
-            <span class="h-1 flex-1 overflow-hidden rounded-full bg-elevated">
-              <span
-                class="block h-full rounded-full bg-primary transition-[width] duration-300"
-                :style="{ width: rightWidth }"
-              />
-            </span>
+              class="block h-full rounded-full bg-linear-to-r from-primary/50 to-primary transition-[width] duration-300"
+              :style="{ width: leftWidth }"
+            />
           </span>
 
-          <span class="shrink-0">
-            <span class="hidden @5xl:inline"
-              >{{ SHEET_BODY_LABELS.levelPrefix }}&nbsp;</span
-            >{{ level + 1 }}
+          <span
+            class="text-[10px] leading-none font-medium tracking-widest whitespace-nowrap text-dimmed"
+          >
+            {{ experienceLabel }}
           </span>
-        </button>
 
-        <template #content>
-          <div class="w-64 p-3">
-            <UFormField :label="SHEET_LABELS.experience">
-              <UInputNumber
-                :model-value="document.experience"
-                :min="0"
-                class="w-full"
-                @update:model-value="setExperience"
-              />
-            </UFormField>
-          </div>
-        </template>
-      </UPopover>
+          <span class="h-1 flex-1 overflow-hidden rounded-full bg-elevated">
+            <span
+              class="block h-full rounded-full bg-primary transition-[width] duration-300"
+              :style="{ width: rightWidth }"
+            />
+          </span>
+        </span>
+
+        <span class="shrink-0">
+          <span class="hidden @5xl:inline"
+            >{{ SHEET_BODY_LABELS.levelPrefix }}&nbsp;</span
+          >{{ level + 1 }}
+        </span>
+      </button>
     </div>
 
     <div
@@ -874,7 +842,7 @@
 
         <UTooltip :text="SHEET_LABELS.shortRest">
           <UButton
-            icon="tabler:campfire"
+            :icon="REST_ICON.short"
             color="neutral"
             variant="ghost"
             square
@@ -885,7 +853,7 @@
 
         <UTooltip :text="SHEET_LABELS.longRest">
           <UButton
-            icon="tabler:moon"
+            :icon="REST_ICON.long"
             color="neutral"
             variant="ghost"
             square
@@ -940,11 +908,14 @@
 
     <SheetSizeModal v-model:open="isSizeOpen" />
 
-    <SheetRestModal
-      v-if="restMode"
-      v-model:open="isRestOpen"
-      :mode="restMode"
+    <SheetExperienceModal
+      v-model:open="isExperienceOpen"
+      @pick-class="openClasses"
     />
+
+    <SheetShortRestModal v-model:open="isShortRestOpen" />
+
+    <SheetLongRestModal v-model:open="isLongRestOpen" />
 
     <SheetSourceChoicesModal
       v-model:open="isChoicesOpen"

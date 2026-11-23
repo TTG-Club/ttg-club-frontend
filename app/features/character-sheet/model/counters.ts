@@ -19,6 +19,7 @@ import {
   RESOURCE_RESET_BY_RECOVERY,
   SHORT_REST_ONE_AMOUNT,
 } from './constants';
+import { getLongRestHitDiceRecovery } from './health';
 import {
   createSheetElementId,
   getAbilityModifier,
@@ -366,8 +367,8 @@ export function applyMechanicsShortRest(
 }
 
 /**
- * Долгий отдых по правилам 2014: все хиты, половина костей хитов (не меньше
- * одной), все ячейки и ресурсы, заряды предметов (долгий отдых и рассвет),
+ * Долгий отдых по правилам 2014: все хиты, кости хитов (половина от общего
+ * числа, не меньше одной), все ячейки и ресурсы, заряды предметов (долгий отдых и рассвет),
  * истощение уменьшается на ступень.
  * @param document - лист персонажа
  * @param hitPointsMax - максимум хитов с учётом механики
@@ -378,12 +379,12 @@ export function applyMechanicsLongRest(
   hitPointsMax: number,
   rollRecharge: (formula: string) => number,
 ): SheetDocument {
+  const totals = getHitDiceTotals(document);
+  const recovery = getLongRestHitDiceRecovery(totals);
   const hitDiceUsed: Record<string, number> = {};
 
-  for (const total of getHitDiceTotals(document)) {
-    const recovered = Math.max(1, Math.floor(total.total / 2));
-
-    hitDiceUsed[String(total.die)] = Math.max(0, total.used - recovered);
+  for (const total of totals) {
+    hitDiceUsed[String(total.die)] = total.used - (recovery[total.die] ?? 0);
   }
 
   return {

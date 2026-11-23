@@ -82,10 +82,15 @@ export function useSheetRoll() {
    * Бросок произвольной формулы: кость хитов, восстановление зарядов.
    * @param label - что бросаем
    * @param formula - формула броска
+   * @param isQuiet - без всплывающего уведомления: итог показывает само окно
    * @returns результат; бросок не удался — 0
    */
-  function rollFormula(label: string, formula: string): number {
-    return roll({ formula, label, source: name.value })?.value ?? 0;
+  function rollFormula(
+    label: string,
+    formula: string,
+    isQuiet = false,
+  ): number {
+    return roll({ formula, label, source: name.value, isQuiet })?.value ?? 0;
   }
 
   return { rollD20, rollDamage, rollFormula };

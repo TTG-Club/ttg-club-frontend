@@ -4,6 +4,7 @@ export { useCatalogSearch } from './useCatalogSearch';
 export { useCatalogTree } from './useCatalogTree';
 export { useCharacterSheet } from './useCharacterSheet';
 export { useChoicePool } from './useChoicePool';
+export { useClassLevelActions } from './useClassLevelActions';
 export { useLevelUpWizard } from './useLevelUpWizard';
 export { useRemoveConfirm } from './useRemoveConfirm';
 export { useSheetActiveEffects } from './useSheetActiveEffects';

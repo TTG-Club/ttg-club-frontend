@@ -11,6 +11,7 @@ import type {
 import type {
   AbilityKey,
   ClassProgression,
+  ExperienceProgress,
   HitDiceTotal,
   PactMagic,
   SheetSize,
@@ -181,6 +182,29 @@ export function getLevelByExperience(experience: number): number {
  */
 export function getNextLevelExperience(level: number): number | null {
   return EXPERIENCE_BY_LEVEL[level] ?? null;
+}
+
+/**
+ * Путь к следующему уровню по опыту.
+ * @param experience - очки опыта
+ * @param level - текущий общий уровень
+ */
+export function getExperienceProgress(
+  experience: number,
+  level: number,
+): ExperienceProgress {
+  const from = EXPERIENCE_BY_LEVEL[level - 1] ?? 0;
+  const to = getNextLevelExperience(level);
+
+  if (to === null || to <= from) {
+    return { to, percent: 100, remaining: 0 };
+  }
+
+  return {
+    to,
+    percent: clamp(((experience - from) / (to - from)) * 100, 0, 100),
+    remaining: Math.max(0, to - experience),
+  };
 }
 
 /**
@@ -599,7 +623,8 @@ export function parseHitDie(dice: string | null | undefined): number | null {
 }
 
 /**
- * Кости хитов по размеру: всего по уровням классов и сколько потрачено.
+ * Кости хитов по размеру: всего по уровням классов и дополнительным костям,
+ * сколько потрачено.
  * @param document - лист персонажа
  */
 export function getHitDiceTotals(document: SheetDocument): Array<HitDiceTotal> {
@@ -610,6 +635,11 @@ export function getHitDiceTotals(document: SheetDocument): Array<HitDiceTotal> {
       sheetClass.hitDie,
       (totals.get(sheetClass.hitDie) ?? 0) + sheetClass.level,
     );
+  }
+
+  // Дополнительные кости тратятся вместе с костями того же размера
+  for (const extra of document.extraHitDice) {
+    totals.set(extra.die, (totals.get(extra.die) ?? 0) + extra.count);
   }
 
   return [...totals.entries()]
@@ -711,88 +741,6 @@ export function getRaceAbilityBonuses(
   }
 
   return bonuses;
-}
-
-/**
- * Короткий отдых: восстанавливает ячейки договора и ресурсы короткого отдыха.
- * @param document - лист персонажа
- */
-export function applyShortRest(document: SheetDocument): SheetDocument {
-  return {
-    ...document,
-    pactSlotsUsed: 0,
-    resources: document.resources.map((resource) =>
-      resource.reset === 'SHORT' ? { ...resource, used: 0 } : resource,
-    ),
-  };
-}
-
-/**
- * Долгий отдых: все хиты, половина костей хитов (не меньше одной), ячейки,
- * ресурсы и спасброски от смерти.
- * @param document - лист персонажа
- */
-export function applyLongRest(document: SheetDocument): SheetDocument {
-  const hitDiceUsed: Record<string, number> = {};
-
-  for (const total of getHitDiceTotals(document)) {
-    const recovered = Math.max(1, Math.floor(total.total / 2));
-
-    hitDiceUsed[String(total.die)] = Math.max(0, total.used - recovered);
-  }
-
-  return {
-    ...applyShortRest(document),
-    health: {
-      ...document.health,
-      current: document.health.max,
-      temporary: 0,
-    },
-    hitDiceUsed,
-    deathSaves: { successes: 0, failures: 0 },
-    spellSlotsUsed: document.spellSlotsUsed.map(() => 0),
-    resources: document.resources.map((resource) => ({ ...resource, used: 0 })),
-  };
-}
-
-/**
- * Хиты после урона: сначала тратятся временные.
- * @param document - лист персонажа
- * @param amount - урон
- */
-export function applyDamage(
-  document: SheetDocument,
-  amount: number,
-): SheetDocument {
-  const absorbed = Math.min(document.health.temporary, amount);
-
-  return {
-    ...document,
-    health: {
-      ...document.health,
-      temporary: document.health.temporary - absorbed,
-      current: Math.max(0, document.health.current - (amount - absorbed)),
-    },
-  };
-}
-
-/**
- * Хиты после лечения: не выше максимума; лечение сбрасывает спасброски от смерти.
- * @param document - лист персонажа
- * @param amount - лечение
- */
-export function applyHealing(
-  document: SheetDocument,
-  amount: number,
-): SheetDocument {
-  return {
-    ...document,
-    health: {
-      ...document.health,
-      current: Math.min(document.health.max, document.health.current + amount),
-    },
-    deathSaves: { successes: 0, failures: 0 },
-  };
 }
 
 /**

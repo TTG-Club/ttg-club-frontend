@@ -7,8 +7,8 @@ import type {
 import { describe, expect, it } from 'vitest';
 
 import {
-  applyDamage,
-  applyLongRest,
+  applyMechanicsLongRest,
+  changeHitPoints,
   characterSheetSchema,
   createEmptySheetDocument,
   createSheetItem,
@@ -341,11 +341,11 @@ describe('лист персонажа: классы и магия', () => {
       spellSlotsUsed: [2, 1, 0, 0, 0, 0, 0, 0, 0],
     });
 
-    const damaged = applyDamage(document, 8);
+    const damaged = changeHitPoints(document, -8, 20);
 
     expect(damaged.health).toEqual({ max: 20, current: 12, temporary: 0 });
 
-    const rested = applyLongRest(damaged);
+    const rested = applyMechanicsLongRest(damaged, 20, () => 0);
 
     expect(rested.health.current).toBe(20);
     expect(rested.spellSlotsUsed.every((used) => used === 0)).toBe(true);

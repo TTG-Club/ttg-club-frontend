@@ -1,8 +1,9 @@
 <script setup lang="ts">
-  import type { CatalogOption, SheetClass, SheetDocument } from '../model';
+  import type { CatalogOption, SheetClass } from '../model';
 
   import {
     useCharacterSheet,
+    useClassLevelActions,
     useLevelUpWizard,
     useSheetClassData,
   } from '../composables';
@@ -14,12 +15,9 @@
     CHARACTER_LEVEL,
     CLASS_TREE,
     createCustomClassStep,
-    createCustomLevelStep,
     getCharacterLevel,
     getMissingClassFeatureSources,
     LEVEL_UP_TEXT,
-    removeClass,
-    removeClassLevel,
     SHEET_ICON,
     SHEET_LABELS,
   } from '../model';
@@ -40,6 +38,7 @@
   const { document, update } = useCharacterSheet();
   const { getMechanics, getDetail } = useSheetClassData();
   const wizard = useLevelUpWizard();
+  const { levelUp: raiseLevel, levelDown, dropClass } = useClassLevelActions();
 
   const isPickerOpen = ref(false);
   const isCustomOpen = ref(false);
@@ -120,28 +119,9 @@
    * @param sheetClass - класс листа
    */
   function levelUp(sheetClass: SheetClass): void {
-    if (!sheetClass.url) {
-      update((current) => levelUpCustom(current, sheetClass.id));
-
-      return;
+    if (raiseLevel(sheetClass)) {
+      isOpen.value = false;
     }
-
-    isOpen.value = false;
-    void wizard.startLevelUp(sheetClass.id);
-  }
-
-  /**
-   * Повышает уровень своего класса без мастера.
-   * @param current - лист персонажа
-   * @param classId - класс листа
-   */
-  function levelUpCustom(
-    current: SheetDocument,
-    classId: string,
-  ): SheetDocument {
-    const step = createCustomLevelStep(current, classId);
-
-    return step ? applyLevelUpStep(current, step) : current;
   }
 
   function openPicker(): void {
@@ -188,11 +168,11 @@
       return;
     }
 
-    update((current) =>
-      action.kind === 'class'
-        ? removeClass(current, action.classId)
-        : removeClassLevel(current, action.classId),
-    );
+    if (action.kind === 'class') {
+      dropClass(action.classId);
+    } else {
+      levelDown(action.classId);
+    }
   }
 
   /**
