@@ -265,6 +265,8 @@ export interface SheetStats {
   initiative: number;
   savingThrows: Record<AbilityKey, { bonus: number; isAutoFail: boolean }>;
   skills: Record<SkillKey, number>;
+  /** Итоги своих навыков по их идентификатору. */
+  customSkills: Record<string, number>;
   passivePerception: number;
   speeds: Record<SpeedKey, number>;
   senses: Array<SheetSense>;

@@ -47,6 +47,7 @@ import {
   UNARMORED_ARMOR_CLASS,
 } from './constants';
 import { sheetDocumentSchema } from './schema';
+import { getCustomBonusesTotal, getSkillAbility } from './skills';
 
 /** Знак минуса для отрицательных модификаторов, как в книгах. */
 const MINUS_SIGN = '−';
@@ -281,8 +282,21 @@ export function getSkillBonus(
   const proficiency = getSkillProficiency(document, skill);
 
   return (
-    getModifierOf(document.abilities, SKILL_INFO[skill].ability)
+    getModifierOf(document.abilities, getSkillAbility(document, skill))
     + getSkillProficiencyBonus(proficiency, proficiencyBonus)
+    + getCustomBonusesTotal(document.skillBonuses[skill] ?? [], {
+      abilityModifiers: {
+        STRENGTH: getModifierOf(document.abilities, 'STRENGTH'),
+        DEXTERITY: getModifierOf(document.abilities, 'DEXTERITY'),
+        CONSTITUTION: getModifierOf(document.abilities, 'CONSTITUTION'),
+        INTELLIGENCE: getModifierOf(document.abilities, 'INTELLIGENCE'),
+        WISDOM: getModifierOf(document.abilities, 'WISDOM'),
+        CHARISMA: getModifierOf(document.abilities, 'CHARISMA'),
+      },
+      proficiencyBonus,
+      level: getCharacterLevel(document.classes),
+      classes: document.classes,
+    })
   );
 }
 

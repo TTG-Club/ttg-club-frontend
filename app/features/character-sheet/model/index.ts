@@ -12,6 +12,7 @@ export * from './loaders';
 export * from './mechanics';
 export * from './picker';
 export * from './schema';
+export * from './skills';
 export * from './sources';
 export * from './spells';
 export * from './stats';

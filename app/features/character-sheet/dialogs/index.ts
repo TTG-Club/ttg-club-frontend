@@ -12,6 +12,7 @@ export { default as SheetLevelUpModal } from './SheetLevelUpModal.vue';
 export { default as SheetResourcesModal } from './SheetResourcesModal.vue';
 export { default as SheetRestModal } from './SheetRestModal.vue';
 export { default as SheetSizeModal } from './SheetSizeModal.vue';
+export { default as SheetSkillBonusRows } from './SheetSkillBonusRows.vue';
 export { default as SheetSkillsSettingsModal } from './SheetSkillsSettingsModal.vue';
 export { default as SheetSourceChoices } from './SheetSourceChoices.vue';
 export { default as SheetSourceChoicesModal } from './SheetSourceChoicesModal.vue';

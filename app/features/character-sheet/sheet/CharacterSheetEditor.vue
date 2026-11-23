@@ -63,7 +63,13 @@
   const isHealthOpen = ref(false);
   const isResourcesOpen = ref(false);
 
-  const tabItems = SHEET_TABS.map((tab) => ({ ...tab, slot: tab.value }));
+  // Вкладки без значков и со скрытой полосой прокрутки, как на new.ttg.club:
+  // со значками ряд не помещался и под ним вылезала полоса браузера
+  const tabItems = SHEET_TABS.map((tab) => ({
+    value: tab.value,
+    label: tab.label,
+    slot: tab.value,
+  }));
 
   const isCombatOpen = computed({
     get: () => combatSection.value !== null,
@@ -263,7 +269,7 @@
           variant="link"
           class="@5xl:col-span-6 @5xl:col-start-7 @5xl:row-start-2 @5xl:min-h-0"
           :ui="{
-            list: 'overflow-x-auto',
+            list: 'scrollbar-none overflow-x-auto overscroll-x-contain',
             trigger: 'shrink-0',
             content: 'pt-2',
           }"
