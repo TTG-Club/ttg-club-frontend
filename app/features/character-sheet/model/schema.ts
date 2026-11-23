@@ -130,6 +130,19 @@ export type DeathSaves = z.infer<typeof deathSavesSchema>;
 /** Потраченные кости хитов по размеру кости: `{ "10": 2 }`. */
 const hitDiceUsedSchema = z.record(z.string(), countSchema).catch({});
 
+/**
+ * Дополнительные кости хитов не от уровней класса (черта, предмет, дар):
+ * тратятся и возвращаются вместе с костями того же размера.
+ */
+export const extraHitDieSchema = z.object({
+  id: z.string(),
+  name: textSchema,
+  die: integerSchema.min(1).catch(8),
+  count: integerSchema.min(1).catch(1),
+});
+
+export type ExtraHitDie = z.infer<typeof extraHitDieSchema>;
+
 const proficienciesSchema = z.object({
   armor: textSchema,
   weapons: textSchema,
@@ -417,6 +430,7 @@ export const sheetDocumentSchema = z.object({
   darkvision: countSchema,
   health: healthSchema.catch({ max: 0, current: 0, temporary: 0 }),
   hitDiceUsed: hitDiceUsedSchema,
+  extraHitDice: lenientList(extraHitDieSchema),
   deathSaves: deathSavesSchema.catch({ successes: 0, failures: 0 }),
   proficiencies: proficienciesSchema.catch({
     armor: '',

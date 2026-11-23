@@ -76,6 +76,32 @@ export interface HitDiceTotal {
   used: number;
 }
 
+/** Путь к следующему уровню по опыту. */
+export interface ExperienceProgress {
+  /** Опыт следующего уровня; null — уровень последний. */
+  to: number | null;
+  /** Пройденная доля пути, %. */
+  percent: number;
+  /** Сколько опыта осталось набрать. */
+  remaining: number;
+}
+
+/** Ввод хитов: точное значение или сдвиг от текущих. */
+export type HitPointsInput =
+  { kind: 'set'; value: number } | { kind: 'delta'; value: number };
+
+/** Бросок одной кости хитов на коротком отдыхе. */
+export interface HitDieRoll {
+  id: string;
+  die: number;
+  /** Выпало на кости. */
+  rolled: number;
+  /** Модификатор Телосложения. */
+  modifier: number;
+  /** Восстановлено хитов: не меньше нуля. */
+  restored: number;
+}
+
 /** Ячейки магии договора: сколько и какого круга. */
 export interface PactMagic {
   slots: number;
