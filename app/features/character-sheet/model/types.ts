@@ -11,6 +11,7 @@ import type {
   EXTRA_SPEED_KEYS,
   HIT_POINTS_GAIN_MODES,
   OWN_SENSE_KEYS,
+  SHEET_MAIN_TAB,
   SHEET_SAVE_STATUS_TEXT,
   SHEET_SIZE_KEYS,
   SHEET_TABS,
@@ -35,7 +36,8 @@ export type OwnSenseKey = (typeof OWN_SENSE_KEYS)[number];
 
 export type CurrencyKey = (typeof CURRENCY_KEYS)[number];
 
-export type SheetTab = (typeof SHEET_TABS)[number]['value'];
+export type SheetTab =
+  (typeof SHEET_TABS)[number]['value'] | (typeof SHEET_MAIN_TAB)['value'];
 
 /** Состояние автосохранения листа. */
 export type SheetSaveStatus = keyof typeof SHEET_SAVE_STATUS_TEXT;
