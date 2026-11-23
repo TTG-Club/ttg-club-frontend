@@ -26,7 +26,6 @@ import {
   ABILITY_KEYS,
   ABILITY_LABELS,
   ABILITY_SCORE,
-  CARRYING_CAPACITY_MULTIPLIER,
   CASTER_LEVEL_DIVIDER,
   CATALOG_API_PREFIX,
   CHARACTER_LEVEL,
@@ -413,29 +412,6 @@ export function getWeaponAttacks(
 
     return attack ? [attack] : [];
   });
-}
-
-/**
- * Вес всего снаряжения в фунтах, с точностью до сотых.
- * @param inventory - снаряжение
- */
-export function getInventoryWeight(
-  inventory: ReadonlyArray<SheetItem>,
-): number {
-  const total = inventory.reduce(
-    (sum, item) => sum + item.weight * item.quantity,
-    0,
-  );
-
-  return Math.round(total * 100) / 100;
-}
-
-/**
- * Грузоподъёмность: Сила × 15 фунтов.
- * @param abilities - значения характеристик
- */
-export function getCarryingCapacity(abilities: AbilityScores): number {
-  return abilities.STRENGTH * CARRYING_CAPACITY_MULTIPLIER;
 }
 
 /**

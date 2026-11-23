@@ -439,11 +439,55 @@ export const UNARMORED_ARMOR_CLASS = 10;
 /** Конец адреса свойства «Фехтовальное» в ширме. */
 export const FINESSE_PROPERTY_URL_SUFFIX = '/finesse';
 
+/** Адрес свойства «Тяжёлое» в ответе API оканчивается на это. */
+export const HEAVY_PROPERTY_URL_SUFFIX = '/heavy';
+
+/** Адрес свойства «Универсальное»: кость двуручного хвата в `twoHandDice`. */
+export const VERSATILE_PROPERTY_URL_SUFFIX = '/versatile';
+
+/** Признак воинского оружия в типе оружия бэкенда (WAR_MELE…). */
+export const MARTIAL_WEAPON_TYPE_MARKER = 'WAR';
+
 /** Признак дальнобойного оружия в типе оружия бэкенда (SIMPLE_RANGED…). */
 export const RANGED_WEAPON_TYPE_MARKER = 'RANGED';
 
 /** Грузоподъёмность: Сила × 15 фунтов. */
 export const CARRYING_CAPACITY_MULTIPLIER = 15;
+
+/** Монет на фунт веса (PHB): 50 монет весят фунт. */
+export const COINS_PER_POUND = 50;
+
+/** Множитель грузоподъёмности по размеру (PHB 2014). */
+export const CARRYING_SIZE_MULTIPLIER = {
+  TINY: 0.5,
+  SMALL: 1,
+  MEDIUM: 1,
+  LARGE: 2,
+  HUGE: 4,
+  GARGANTUAN: 8,
+} as const;
+
+/** Вариант «Нагрузка»: множители Силы для ступеней нагрузки. */
+export const ENCUMBRANCE_MULTIPLIER = { encumbered: 5, heavy: 10 } as const;
+
+/** Вариант «Нагрузка»: насколько ступень снижает скорость, фт. */
+export const ENCUMBRANCE_SPEED_PENALTY = { encumbered: 10, heavy: 20 } as const;
+
+/** Снижение скорости в доспехе, которому не хватает Силы, фт. */
+export const ARMOR_STRENGTH_SPEED_PENALTY = 10;
+
+/** Размеры, которым тяжёлое оружие даёт помеху к атаке. */
+export const HEAVY_WEAPON_HINDERED_SIZES: ReadonlyArray<string> = [
+  'TINY',
+  'SMALL',
+];
+
+/** Характеристики, броски которых затрудняет сильная нагрузка. */
+export const HEAVY_ENCUMBRANCE_ABILITIES = [
+  'strength',
+  'dexterity',
+  'constitution',
+] as const;
 
 /* --- Хиты и отдых ------------------------------------------------------- */
 
@@ -1613,6 +1657,58 @@ export const RECHARGE_EVENTS = {
 /** Восстановление «все заряды» в формуле предмета. */
 export const RECHARGE_ALL = 'все';
 
+/** Подписи окна грузоподъёмности. */
+export const CARRYING_TEXT = {
+  title: 'Грузоподъёмность',
+  description: 'Сколько персонаж может нести и что ему мешает',
+  weight: 'Переносимый вес',
+  items: 'Предметы',
+  coins: 'Монеты',
+  capacity: 'Грузоподъёмность',
+  formula: 'Сила × 15 × размер',
+  size: 'Размер для расчёта',
+  sizeAuto: 'Как у персонажа',
+  custom: 'Своё значение',
+  customHint: 'Пусто — по Силе и размеру',
+  bonus: 'Бонус',
+  encumbrance: 'Вариант «Нагрузка»',
+  encumbranceHint:
+    'Больше Силы × 5 — скорость −10 фт; больше Силы × 10 — скорость −20 фт и помеха к проверкам, спасброскам и атакам Силы, Ловкости и Телосложения.',
+  encumbered: 'Нагружен: скорость −10 фт',
+  heavilyEncumbered:
+    'Сильно нагружен: скорость −20 фт, помеха к броскам Силы, Ловкости и Телосложения',
+  overloaded: 'Вес больше грузоподъёмности',
+  armorStrength: 'Доспеху не хватает Силы: скорость −10 фт',
+  unit: 'фнт',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна монет. */
+export const CURRENCY_TEXT = {
+  title: 'Монеты',
+  description: 'Монеты весят: 50 монет — фунт',
+  custom: 'Свои валюты',
+  customHint: 'Жетоны, трофеи, местные деньги: веса не имеют.',
+  name: 'Название',
+  namePlaceholder: 'Жетон гильдии',
+  short: 'Сокр.',
+  amount: 'Сколько',
+  add: 'Добавить валюту',
+  total: 'Всего в золоте',
+  apply: 'Применить',
+  cancel: 'Отмена',
+} as const;
+
+/** Стоимость монет в медяках: для пересчёта в золото. */
+export const CURRENCY_COPPER_VALUE = {
+  cp: 1,
+  sp: 10,
+  ep: 50,
+  gp: 100,
+  pp: 1000,
+} as const;
+
 /* --- Настройка ---------------------------------------------------------- */
 
 /** Сколько предметов персонаж может держать настроенными (DMG). */
@@ -1620,10 +1716,25 @@ export const ATTUNEMENT_LIMIT = 3;
 
 export const ATTUNEMENT_TEXT = {
   title: 'Настройка',
+  settings: 'Предел настройки',
+  description: 'Сколько предметов персонаж может держать настроенными',
+  base: 'Основа',
+  baseRule: 'Правило: 3 предмета',
+  baseAbility: 'Модификатор характеристики',
+  ability: 'Характеристика',
+  custom: 'Своё число',
+  customHint: 'Пусто — по основе и бонусу',
+  bonus: 'Бонус',
+  total: 'Предел',
+  attunedNow: 'Сейчас настроено',
+  itemsTitle: 'Настроенные предметы',
+  noItems: 'Настроенных предметов нет',
+  apply: 'Применить',
+  cancel: 'Отмена',
   attuned: 'Настроен',
   requires: 'Требует настройки',
   limit: 'Настроено предметов',
-  overLimit: 'Больше трёх настроенных предметов',
+  overLimit: 'Настроено больше, чем позволяет предел',
   charges: 'Заряды',
   recharge: 'Восстановление',
 } as const;

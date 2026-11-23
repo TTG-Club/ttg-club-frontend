@@ -3,7 +3,6 @@
 
   import type {
     CatalogOption,
-    CurrencyKey,
     ItemSearchKind,
     SheetItem,
     WeaponAttack,
@@ -19,19 +18,20 @@
     useSheetStats,
   } from '../composables';
   import {
+    SheetAttunementModal,
+    SheetCarryingModal,
     SheetCatalogPicker,
     SheetConfirmModal,
+    SheetCurrencyModal,
     SheetItemModal,
   } from '../dialogs';
   import {
-    ATTUNEMENT_LIMIT,
     ATTUNEMENT_TEXT,
+    CARRYING_TEXT,
     createSheetItem,
     CURRENCY_KEYS,
     CURRENCY_LABELS,
     CURRENCY_TITLES,
-    getCarryingCapacity,
-    getInventoryWeight,
     getWeaponAttack,
     INVENTORY_GROUPS,
     ITEM_SEARCH_BY_KIND,
@@ -98,25 +98,64 @@
   const editedItem = ref<SheetItem | null>(null);
   const isEditOpen = ref(false);
 
-  const weight = computed(() => getInventoryWeight(document.value.inventory));
-  const capacity = computed(() => getCarryingCapacity(stats.value.abilities));
+  const isCarryingOpen = ref(false);
+  const isAttunementOpen = ref(false);
+  const isCurrencyOpen = ref(false);
 
-  const weightClass = computed(() =>
-    weight.value > capacity.value ? 'text-error' : 'text-highlighted',
-  );
+  const weight = computed(() => stats.value.carriedWeight);
+  const capacity = computed(() => stats.value.carrying.value);
+
+  const weightClass = computed(() => {
+    if (weight.value > capacity.value || stats.value.encumbrance === 'heavy') {
+      return 'text-error';
+    }
+
+    return stats.value.encumbrance === 'encumbered'
+      || stats.value.isArmorTooHeavy
+      ? 'text-warning'
+      : 'text-highlighted';
+  });
+
+  const weightHint = computed(() => {
+    if (stats.value.encumbrance === 'heavy') {
+      return CARRYING_TEXT.heavilyEncumbered;
+    }
+
+    if (stats.value.encumbrance === 'encumbered') {
+      return CARRYING_TEXT.encumbered;
+    }
+
+    return weight.value > capacity.value
+      ? CARRYING_TEXT.overloaded
+      : SHEET_LABELS.carryingCapacity;
+  });
 
   const attunedCount = computed(
     () => document.value.inventory.filter((item) => item.isAttuned).length,
   );
 
+  const attunementLimit = computed(() => stats.value.attunement.value);
+
+  const isOverAttuned = computed(
+    () => attunedCount.value > attunementLimit.value,
+  );
+
   const attunementClass = computed(() =>
-    attunedCount.value > ATTUNEMENT_LIMIT ? 'text-error' : 'text-highlighted',
+    isOverAttuned.value ? 'text-error' : 'text-highlighted',
   );
 
   const attunementHint = computed(() =>
-    attunedCount.value > ATTUNEMENT_LIMIT
-      ? ATTUNEMENT_TEXT.overLimit
-      : ATTUNEMENT_TEXT.limit,
+    isOverAttuned.value ? ATTUNEMENT_TEXT.overLimit : ATTUNEMENT_TEXT.limit,
+  );
+
+  /** Свои валюты — в строке монет после обычных. */
+  const customCurrencies = computed(() =>
+    document.value.customCurrencies.map((entry) => ({
+      id: entry.id,
+      amount: entry.amount,
+      label: entry.short || entry.name,
+      title: entry.name,
+    })),
   );
 
   const pickerSource = computed(() => ITEM_SEARCH_BY_KIND[pickerKind.value]);
@@ -342,16 +381,17 @@
     }));
   }
 
-  /**
-   * Количество монет.
-   * @param key - вид монет
-   * @param value - количество
-   */
-  function setCurrency(key: CurrencyKey, value: number | null): void {
-    update((current) => ({
-      ...current,
-      currency: { ...current.currency, [key]: Math.max(0, value ?? 0) },
-    }));
+  function openCarrying(): void {
+    isCarryingOpen.value = true;
+  }
+
+  function openAttunement(): void {
+    isAttunementOpen.value = true;
+  }
+
+  /** Монеты меняются и на запертом листе: это игровое действие. */
+  function openCurrency(): void {
+    isCurrencyOpen.value = true;
   }
 
   /**
@@ -405,8 +445,14 @@
   <div class="@container flex flex-col gap-4 pt-2">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <div class="flex flex-wrap items-center gap-2">
-        <UTooltip :text="SHEET_LABELS.carryingCapacity">
-          <span :class="SHEET_HEADER_STAT_CLASS">
+        <UTooltip :text="weightHint">
+          <button
+            type="button"
+            class="cursor-pointer"
+            :class="SHEET_HEADER_STAT_CLASS"
+            :aria-label="CARRYING_TEXT.title"
+            @click.left.exact.prevent="openCarrying"
+          >
             <span class="flex items-center gap-1.5">
               <UIcon
                 name="tabler:weight"
@@ -426,11 +472,17 @@
                 {{ weight }} / {{ capacity }} {{ SHEET_LABELS.weightUnit }}
               </span>
             </span>
-          </span>
+          </button>
         </UTooltip>
 
         <UTooltip :text="attunementHint">
-          <span :class="SHEET_HEADER_STAT_CLASS">
+          <button
+            type="button"
+            class="cursor-pointer"
+            :class="SHEET_HEADER_STAT_CLASS"
+            :aria-label="ATTUNEMENT_TEXT.settings"
+            @click.left.exact.prevent="openAttunement"
+          >
             <span class="flex items-center gap-1.5">
               <UIcon
                 name="tabler:link"
@@ -447,10 +499,10 @@
                 class="text-xs font-bold whitespace-nowrap"
                 :class="attunementClass"
               >
-                {{ attunedCount }} / {{ ATTUNEMENT_LIMIT }}
+                {{ attunedCount }} / {{ attunementLimit }}
               </span>
             </span>
-          </span>
+          </button>
         </UTooltip>
       </div>
 
@@ -469,47 +521,44 @@
       </UDropdownMenu>
     </div>
 
-    <UPopover>
-      <button
-        type="button"
-        class="flex cursor-pointer flex-wrap items-center justify-between gap-2 rounded-lg border border-default/50 bg-elevated/20 px-4 py-2 transition-colors hover:border-default hover:bg-elevated/40"
-        :aria-label="SHEET_LABELS.currency"
+    <button
+      type="button"
+      class="flex cursor-pointer flex-wrap items-center justify-between gap-2 rounded-lg border border-default/50 bg-elevated/20 px-4 py-2 transition-colors hover:border-default hover:bg-elevated/40"
+      :aria-label="SHEET_LABELS.currency"
+      @click.left.exact.prevent="openCurrency"
+    >
+      <UTooltip
+        v-for="key in CURRENCY_KEYS"
+        :key="key"
+        :text="CURRENCY_TITLES[key]"
       >
-        <UTooltip
-          v-for="key in CURRENCY_KEYS"
-          :key="key"
-          :text="CURRENCY_TITLES[key]"
-        >
-          <span class="flex items-baseline gap-1.5">
-            <span class="text-sm font-bold text-highlighted">{{
-              document.currency[key]
-            }}</span>
+        <span class="flex items-baseline gap-1.5">
+          <span class="text-sm font-bold text-highlighted">{{
+            document.currency[key]
+          }}</span>
 
-            <span class="text-[10px] font-bold text-muted uppercase">
-              {{ CURRENCY_LABELS[key] }}
-            </span>
+          <span class="text-[10px] font-bold text-muted uppercase">
+            {{ CURRENCY_LABELS[key] }}
           </span>
-        </UTooltip>
-      </button>
+        </span>
+      </UTooltip>
 
-      <template #content>
-        <div class="grid w-72 grid-cols-2 gap-2 p-3">
-          <UFormField
-            v-for="key in CURRENCY_KEYS"
-            :key="key"
-            :label="CURRENCY_TITLES[key]"
-          >
-            <UInputNumber
-              :model-value="document.currency[key]"
-              :min="0"
-              size="sm"
-              class="w-full"
-              @update:model-value="setCurrency(key, $event)"
-            />
-          </UFormField>
-        </div>
-      </template>
-    </UPopover>
+      <UTooltip
+        v-for="entry in customCurrencies"
+        :key="entry.id"
+        :text="entry.title"
+      >
+        <span class="flex items-baseline gap-1.5">
+          <span class="text-sm font-bold text-highlighted">{{
+            entry.amount
+          }}</span>
+
+          <span class="text-[10px] font-bold text-muted uppercase">
+            {{ entry.label }}
+          </span>
+        </span>
+      </UTooltip>
+    </button>
 
     <template v-if="groups.length">
       <div
@@ -562,6 +611,12 @@
       :item="editedItem"
       @save="saveItem"
     />
+
+    <SheetCarryingModal v-model:open="isCarryingOpen" />
+
+    <SheetAttunementModal v-model:open="isAttunementOpen" />
+
+    <SheetCurrencyModal v-model:open="isCurrencyOpen" />
 
     <SheetConfirmModal
       v-model:open="isRemoveOpen"

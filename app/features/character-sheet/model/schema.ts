@@ -162,6 +162,40 @@ const currencySchema = z.object({
 
 export type SheetCurrency = z.infer<typeof currencySchema>;
 
+/** Своя валюта: жетоны гильдии, трофеи, местные деньги. */
+export const customCurrencySchema = z.object({
+  id: z.string(),
+  name: textSchema,
+  short: textSchema,
+  amount: countSchema,
+});
+
+export type CustomCurrency = z.infer<typeof customCurrencySchema>;
+
+/** Грузоподъёмность: размер для расчёта, своё значение, бонус и вариант «Нагрузка». */
+const carryingSchema = z.object({
+  /** Размер для расчёта; null — как у персонажа. */
+  size: z.enum(SHEET_SIZE_KEYS).nullable().catch(null),
+  /** Своё значение, фунты; null — по Силе и размеру. */
+  custom: integerSchema.min(0).nullable().catch(null),
+  bonus: integerSchema.catch(0),
+  /** Вариант правил «Нагрузка» (PHB): ступени нагрузки снижают скорость. */
+  encumbrance: z.boolean().catch(false),
+});
+
+export type SheetCarrying = z.infer<typeof carryingSchema>;
+
+/** Предел настройки: правило «три», от характеристики или своё число. */
+const attunementSchema = z.object({
+  /** Своё число; null — по правилу или характеристике. */
+  custom: integerSchema.min(0).nullable().catch(null),
+  /** Предел равен модификатору характеристики; null — правило «три». */
+  ability: abilityKeySchema.nullable().catch(null),
+  bonus: integerSchema.catch(0),
+});
+
+export type SheetAttunement = z.infer<typeof attunementSchema>;
+
 export const armorCategorySchema = z.enum(ARMOR_CATEGORIES);
 
 export type ArmorCategory = z.infer<typeof armorCategorySchema>;
@@ -175,6 +209,15 @@ export const sheetWeaponSchema = z.object({
   isProficient: z.boolean().catch(true),
   /** Магический бонус к атаке и урону. */
   bonus: integerSchema.catch(0),
+  /** Воинское оружие; иначе простое. */
+  isMartial: z.boolean().catch(false),
+  /** Свойство «Тяжёлое»: Маленькие существа атакуют с помехой. */
+  isHeavy: z.boolean().catch(false),
+  /** Кость урона при хвате двумя руками (свойство «Универсальное»): «1к10». */
+  versatileDamage: textSchema,
+  /** Дополнительный урон магического оружия: «1к6». */
+  extraDamage: textSchema,
+  extraDamageType: textSchema,
 });
 
 export type SheetWeapon = z.infer<typeof sheetWeaponSchema>;
@@ -222,6 +265,15 @@ export const sheetItemSchema = z.object({
   activeEffects: catalogEffectsSchema,
   /** Пассивное свойство без расчётов: «Вы можете дышать под водой». */
   passive: textSchema,
+  /** Стоимость текстом, как в справочнике: «15 зм». */
+  cost: textSchema,
+  /** Описание своего предмета. */
+  description: textSchema,
+  /** Предмет включают и выключают (сапоги, плащ): механика работает включённым. */
+  activatable: z.boolean().catch(false),
+  isActive: z.boolean().catch(false),
+  /** Универсальное оружие держат двумя руками: урон по второй кости. */
+  useTwoHands: z.boolean().catch(false),
 });
 
 export type SheetItem = z.infer<typeof sheetItemSchema>;
@@ -439,6 +491,14 @@ export const sheetDocumentSchema = z.object({
     languages: '',
   }),
   currency: currencySchema.catch({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }),
+  customCurrencies: lenientList(customCurrencySchema),
+  carrying: carryingSchema.catch({
+    size: null,
+    custom: null,
+    bonus: 0,
+    encumbrance: false,
+  }),
+  attunement: attunementSchema.catch({ custom: null, ability: null, bonus: 0 }),
   inventory: lenientList(sheetItemSchema),
   spellcastingAbility: abilityKeySchema.nullable().catch(null),
   /** Потраченные ячейки 1–9 кругов. */
@@ -593,6 +653,7 @@ export const sheetArmorDetailSchema = z.object({
   weight: z.number().nullish(),
   disadvantage: z.boolean().nullish(),
   requirement: z.number().nullish(),
+  price: z.union([z.string(), z.number()]).nullish(),
 });
 
 export type SheetArmorDetail = z.infer<typeof sheetArmorDetailSchema>;
@@ -600,6 +661,8 @@ export type SheetArmorDetail = z.infer<typeof sheetArmorDetailSchema>;
 /** Вес предмета снаряжения или магического предмета. */
 export const sheetWeightDetailSchema = z.object({
   weight: z.number().nullish(),
+  // Цена снаряжения приходит текстом («5 зм»), но схема API её не обещает
+  price: z.union([z.string(), z.number()]).nullish(),
 });
 
 /** Заклинание для листа: ритуал и концентрация есть уже в списке. */

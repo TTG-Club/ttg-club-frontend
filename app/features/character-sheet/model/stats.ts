@@ -6,6 +6,7 @@ import type {
   AbilityKey,
   ArmorClassBreakdown,
   EffectCarrier,
+  EncumbranceLevel,
   FormulaContext,
   SheetArmorState,
   SheetDefences,
@@ -29,6 +30,7 @@ import {
   DARKVISION_SENSE,
   DEFAULT_INITIATIVE_ABILITY,
   EFFECT_KEYS,
+  HEAVY_ENCUMBRANCE_ABILITIES,
   OWN_SENSE_KEYS,
   SENSE_BY_EFFECT_KEY,
   SENSE_LABELS,
@@ -49,6 +51,14 @@ import {
   getSheetArmorState,
   isSavingThrowAutoFailed,
 } from './effects';
+import {
+  getAttunementBreakdown,
+  getCarriedWeight,
+  getCarryingBreakdown,
+  getCarryingSpeedPenalty,
+  getEncumbrance,
+  isArmorTooHeavy,
+} from './inventory';
 import {
   getAbilityBonusesTotal,
   getProficiencyBonusBase,
@@ -386,6 +396,7 @@ function getModifierDefences(document: SheetDocument): SheetDefences {
  * @param armor - состояние доспеха
  * @param context - значения листа для формул
  * @param flags - флаги персонажа
+ * @param penalty - снижение всех скоростей: нагрузка, тяжёлый доспех
  */
 function getEffectiveSpeeds(
   document: SheetDocument,
@@ -393,6 +404,7 @@ function getEffectiveSpeeds(
   armor: SheetArmorState,
   context: FormulaContext,
   flags: ReadonlySet<string>,
+  penalty: number,
 ): Record<SpeedKey, number> {
   const modifiers = getSourceModifiers(document).map(
     (entry) => entry.modifiers.speed,
@@ -448,12 +460,16 @@ function getEffectiveSpeeds(
     return { walk: 0, fly: 0, climb: 0, swim: 0, burrow: 0 };
   }
 
+  // Снижение касается только тех скоростей, что у персонажа есть
+  const slow = (value: number): number =>
+    value > 0 ? Math.max(0, value - penalty) : 0;
+
   return {
-    walk: Math.max(0, speeds.walk),
-    fly: Math.max(0, speeds.fly),
-    climb: Math.max(0, speeds.climb),
-    swim: Math.max(0, speeds.swim),
-    burrow: Math.max(0, speeds.burrow),
+    walk: slow(speeds.walk),
+    fly: slow(speeds.fly),
+    climb: slow(speeds.climb),
+    swim: slow(speeds.swim),
+    burrow: slow(speeds.burrow),
   };
 }
 
@@ -551,8 +567,17 @@ export function getModifierHitPointsBonus(
 export function getSheetStats(document: SheetDocument): SheetStats {
   const carriers = collectEffectCarriers(document);
   const armor = getSheetArmorState(document);
-  const flags = getEffectFlags(carriers, document);
   const abilities = getEffectiveAbilities(document, carriers, armor);
+  const carriedWeight = getCarriedWeight(document);
+  const carrying = getCarryingBreakdown(document, abilities.STRENGTH);
+  const encumbrance = getEncumbrance(document, carrying, carriedWeight);
+  const isArmorHeavy = isArmorTooHeavy(document, abilities.STRENGTH);
+
+  const flags = withEncumbranceFlags(
+    getEffectFlags(carriers, document),
+    encumbrance,
+  );
+
   const effective: SheetDocument = { ...document, abilities };
   const level = getCharacterLevel(document.classes);
   const baseContext = createFormulaContext(effective, abilities);
@@ -717,7 +742,14 @@ export function getSheetStats(document: SheetDocument): SheetStats {
       ]),
     ),
     passivePerception: PASSIVE_CHECK_BASE + (skills.PERCEPTION ?? 0),
-    speeds: getEffectiveSpeeds(document, carriers, armor, context, flags),
+    speeds: getEffectiveSpeeds(
+      document,
+      carriers,
+      armor,
+      context,
+      flags,
+      getCarryingSpeedPenalty(encumbrance, isArmorHeavy),
+    ),
     senses: getEffectiveSenses(document, carriers, armor, context),
     telepathy: Math.max(
       0,
@@ -782,7 +814,37 @@ export function getSheetStats(document: SheetDocument): SheetStats {
       context,
     ),
     flags,
+    carriedWeight,
+    carrying,
+    encumbrance,
+    isArmorTooHeavy: isArmorHeavy,
+    attunement: getAttunementBreakdown(document, mod),
   };
+}
+
+/**
+ * Флаги сильной нагрузки: помеха к проверкам, спасброскам и атакам Силы,
+ * Ловкости и Телосложения. Атаки помечаются целиком: оружейные атаки идут
+ * от Силы или Ловкости.
+ * @param flags - флаги эффектов
+ * @param encumbrance - ступень нагрузки
+ */
+function withEncumbranceFlags(
+  flags: ReadonlySet<string>,
+  encumbrance: EncumbranceLevel,
+): ReadonlySet<string> {
+  if (encumbrance !== 'heavy') {
+    return flags;
+  }
+
+  return new Set([
+    ...flags,
+    'attack.disadvantage',
+    ...HEAVY_ENCUMBRANCE_ABILITIES.flatMap((ability) => [
+      `abilityCheck.disadvantage.${ability}`,
+      `save.disadvantage.${ability}`,
+    ]),
+  ]);
 }
 
 /**

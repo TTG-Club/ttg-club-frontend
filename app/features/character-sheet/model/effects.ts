@@ -470,7 +470,9 @@ export function getSheetRollMode(
   context: SheetRollContext,
 ): SheetRollMode {
   const advantage = hasRollFlag(flags, context, 'advantage');
-  const disadvantage = hasRollFlag(flags, context, 'disadvantage');
+
+  const disadvantage =
+    Boolean(context.isHindered) || hasRollFlag(flags, context, 'disadvantage');
 
   if (advantage === disadvantage) {
     return 'normal';

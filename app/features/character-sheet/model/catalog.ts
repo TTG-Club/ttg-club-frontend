@@ -38,7 +38,10 @@ import {
 import { fetchCatalogEntry } from './api';
 import {
   FINESSE_PROPERTY_URL_SUFFIX,
+  HEAVY_PROPERTY_URL_SUFFIX,
+  MARTIAL_WEAPON_TYPE_MARKER,
   RANGED_WEAPON_TYPE_MARKER,
+  VERSATILE_PROPERTY_URL_SUFFIX,
 } from './constants';
 import {
   sheetArmorDetailSchema,
@@ -329,6 +332,11 @@ export function createSheetItem(name: string, url: string | null): SheetItem {
     charges: null,
     activeEffects: [],
     passive: '',
+    cost: '',
+    description: '',
+    activatable: false,
+    isActive: false,
+    useTwoHands: false,
   };
 }
 
@@ -346,19 +354,32 @@ export async function loadCatalogItem(
 
   if (kind === 'weapon') {
     const detail = await fetchCatalogEntry(option.url, sheetWeaponDetailSchema);
+    const properties = detail.properties ?? [];
+
+    const findProperty = (suffix: string) =>
+      properties.find((property) =>
+        property.url?.toLowerCase().endsWith(suffix),
+      );
 
     return {
       ...item,
       weight: detail.weight ?? 0,
+      cost: detail.price ?? '',
       weapon: {
         damage: detail.damage?.dice ?? '',
         damageType: detail.damage?.type ?? '',
         isRanged: Boolean(detail.typeRaw?.includes(RANGED_WEAPON_TYPE_MARKER)),
-        isFinesse: (detail.properties ?? []).some((property) =>
-          property.url?.toLowerCase().endsWith(FINESSE_PROPERTY_URL_SUFFIX),
-        ),
+        isFinesse: Boolean(findProperty(FINESSE_PROPERTY_URL_SUFFIX)),
         isProficient: true,
         bonus: 0,
+        isMartial: Boolean(
+          detail.typeRaw?.startsWith(MARTIAL_WEAPON_TYPE_MARKER),
+        ),
+        isHeavy: Boolean(findProperty(HEAVY_PROPERTY_URL_SUFFIX)),
+        versatileDamage:
+          findProperty(VERSATILE_PROPERTY_URL_SUFFIX)?.twoHandDice ?? '',
+        extraDamage: '',
+        extraDamageType: '',
       },
     };
   }
@@ -369,6 +390,7 @@ export async function loadCatalogItem(
     return {
       ...item,
       weight: detail.weight ?? 0,
+      cost: String(detail.price ?? ''),
       armor: detail.typeRaw
         ? {
             category: detail.typeRaw,
@@ -383,7 +405,11 @@ export async function loadCatalogItem(
 
   const detail = await fetchCatalogEntry(option.url, sheetWeightDetailSchema);
 
-  return { ...item, weight: detail.weight ?? 0 };
+  return {
+    ...item,
+    weight: detail.weight ?? 0,
+    cost: String(detail.price ?? ''),
+  };
 }
 
 /**

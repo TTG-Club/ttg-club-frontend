@@ -44,6 +44,11 @@
     isFinesse: false,
     isProficient: true,
     bonus: 0,
+    isMartial: false,
+    isHeavy: false,
+    versatileDamage: '',
+    extraDamage: '',
+    extraDamageType: '',
   };
 
   const emptyArmor: SheetArmor = {

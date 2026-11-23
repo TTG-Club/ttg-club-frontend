@@ -8,6 +8,7 @@ export * from './counters';
 export * from './effects';
 export * from './grants';
 export * from './health';
+export * from './inventory';
 export * from './levelUp';
 export * from './loaders';
 export * from './mechanics';

@@ -76,6 +76,32 @@ export interface HitDiceTotal {
   used: number;
 }
 
+/** Ступень нагрузки варианта «Нагрузка»; без варианта — всегда `none`. */
+export type EncumbranceLevel = 'none' | 'encumbered' | 'heavy';
+
+/** Разбор грузоподъёмности. */
+export interface CarryingBreakdown {
+  strength: number;
+  /** Множитель размера. */
+  multiplier: number;
+  /** Сила × 15 × размер. */
+  base: number;
+  bonus: number;
+  custom: number | null;
+  value: number;
+  /** Пороги варианта «Нагрузка», фунты. */
+  encumberedAt: number;
+  heavyAt: number;
+}
+
+/** Разбор предела настройки. */
+export interface AttunementBreakdown {
+  base: number;
+  bonus: number;
+  custom: number | null;
+  value: number;
+}
+
 /** Путь к следующему уровню по опыту. */
 export interface ExperienceProgress {
   /** Опыт следующего уровня; null — уровень последний. */
@@ -314,6 +340,13 @@ export interface ArmorClassBreakdown {
 /** Итоги листа с учётом механики, эффектов и истощения. */
 export interface SheetStats {
   level: number;
+  /** Переносимый вес с монетами, фунты. */
+  carriedWeight: number;
+  carrying: CarryingBreakdown;
+  encumbrance: EncumbranceLevel;
+  /** Доспеху не хватает Силы: скорость −10 фт. */
+  isArmorTooHeavy: boolean;
+  attunement: AttunementBreakdown;
   proficiencyBonus: number;
   /** Характеристики с прибавками эффектов. */
   abilities: AbilityScores;
@@ -349,6 +382,8 @@ export interface SheetRollContext {
   /** Ключ навыка в словаре эффектов (`stealth`). */
   skill?: string;
   attackType?: 'melee' | 'ranged' | 'spell';
+  /** Помеха по обстоятельствам предмета: тяжёлое оружие у Маленького. */
+  isHindered?: boolean;
 }
 
 /** Режим броска по флагам: обычный, с преимуществом или помехой. */
