@@ -2,12 +2,13 @@ import type { ClassMechanicsDetail } from './mechanics';
 import type {
   CatalogRef,
   SheetClassDetail,
+  SheetDocument,
   SheetItem,
   SheetSource,
   SheetSpell,
   SourceKind,
 } from './schema';
-import type { CatalogOption, CatalogSearchSource } from './types';
+import type { CatalogOption, CatalogSearchSource, SheetChoice } from './types';
 
 import {
   featLinkSchema,
@@ -27,8 +28,18 @@ import {
   raceMechanicsDetailSchema,
 } from './mechanics';
 import { sheetClassDetailSchema, sheetSpellDetailSchema } from './schema';
-import { createSource } from './sources';
-import { findSkillByName, getRaceAbilityBonuses } from './utils';
+import {
+  addSources,
+  createSource,
+  findSource,
+  replaceSourceSpells,
+  setSourceAnswers,
+} from './sources';
+import {
+  findSkillByName,
+  getCharacterLevel,
+  getRaceAbilityBonuses,
+} from './utils';
 
 /*
  * Загрузка записей справочника вместе с механикой: одна карточка читается
@@ -317,4 +328,66 @@ export async function loadMagicItem(option: CatalogOption): Promise<SheetItem> {
         }
       : null,
   };
+}
+
+/**
+ * Ответ на выбор источника вместе с тем, что ответ тянет из справочника:
+ * выбранные заклинания ложатся в книгу с пометкой источника, выбранные черты
+ * и особенности становятся дочерними источниками со своей механикой.
+ * Работает на любом документе — и на листе, и на черновике мастера.
+ * @param document - лист персонажа или черновик
+ * @param sourceId - идентификатор источника
+ * @param choice - выбор
+ * @param values - выбранные значения
+ * @param labels - подписи значений (названия заклинаний и черт)
+ */
+export async function answerSourceChoice(
+  document: SheetDocument,
+  sourceId: string,
+  choice: SheetChoice,
+  values: ReadonlyArray<string>,
+  labels: Readonly<Record<string, string>>,
+): Promise<SheetDocument> {
+  const source = findSource(document, sourceId);
+
+  if (!source) {
+    return document;
+  }
+
+  const previous = source.choiceAnswers[choice.key] ?? [];
+  const added = values.filter((value) => !previous.includes(value));
+  const removed = previous.filter((value) => !values.includes(value));
+  const answered = setSourceAnswers(document, sourceId, choice.key, values);
+
+  if (choice.kind === 'spell' || choice.kind === 'cantrip') {
+    const spells = await Promise.all(
+      added.map(async (url) => ({
+        ...(await loadSpellByUrl(url, labels[url] ?? url)),
+        alwaysPrepared: choice.alwaysPrepared,
+        isPrepared: choice.alwaysPrepared,
+      })),
+    );
+
+    return replaceSourceSpells(answered, sourceId, removed, spells);
+  }
+
+  if (choice.kind === 'option' || choice.kind === 'feat') {
+    const characterLevel = getCharacterLevel(answered.classes);
+
+    const children = await Promise.all(
+      added.map((url) =>
+        loadFeatSource(choice.kind === 'feat' ? 'feat' : 'option', url, {
+          parentId: sourceId,
+          choiceKey: choice.key,
+          classId: source.classId,
+          level: source.level,
+          characterLevel,
+        }),
+      ),
+    );
+
+    return addSources(answered, children);
+  }
+
+  return answered;
 }

@@ -12,6 +12,7 @@ import {
   fetchSheet,
   saveSheet,
   saveSheetOnLeave,
+  SHEET_HIDDEN_CONTROL_CLASS,
   SHEET_HTTP_STATUS,
   SHEET_SAVE_DELAY,
   SHEET_TEXT,
@@ -41,6 +42,21 @@ export const useCharacterSheet = createSharedComposable(() => {
   const isSaving = ref(false);
 
   const isConflict = computed(() => saveStatus.value === 'conflict');
+
+  /** Лист заперт игроком: кнопки правки прячутся, броски остаются. */
+  const isLocked = ref(false);
+
+  /**
+   * Класс кнопок правки: у запертого листа они прячутся видимостью, а не
+   * удалением, чтобы раскладка не съезжала.
+   */
+  const editControlClass = computed(() =>
+    isLocked.value ? SHEET_HIDDEN_CONTROL_CLASS : undefined,
+  );
+
+  function toggleLock(): void {
+    isLocked.value = !isLocked.value;
+  }
 
   const scheduleSave = useDebounceFn(() => save(), SHEET_SAVE_DELAY);
 
@@ -182,6 +198,9 @@ export const useCharacterSheet = createSharedComposable(() => {
     document,
     loadStatus,
     saveStatus,
+    isLocked,
+    editControlClass,
+    toggleLock,
     load,
     reload,
     update,

@@ -1,5 +1,6 @@
 import type {
   ClassFeatureEntry,
+  ClassMechanicsDetail,
   ClassProgression,
   ClassTableValue,
   SheetClass,
@@ -10,10 +11,10 @@ import { uniq } from 'es-toolkit';
 
 import {
   CLASS_TABLE_EMPTY,
-  fetchCatalogEntry,
   getPactMagic,
+  KNOWN_SPELLS_COLUMN,
+  loadClassDetails,
   parseSpellSlotCells,
-  sheetClassDetailSchema,
 } from '../model';
 import { useCharacterSheet } from './useCharacterSheet';
 
@@ -124,6 +125,11 @@ export const useSheetClassData = createSharedComposable(() => {
   const { document } = useCharacterSheet();
 
   const details = shallowRef<ReadonlyMap<string, SheetClassDetail>>(new Map());
+
+  const mechanics = shallowRef<ReadonlyMap<string, ClassMechanicsDetail>>(
+    new Map(),
+  );
+
   const isLoading = ref(false);
 
   const urls = computed(() =>
@@ -150,21 +156,21 @@ export const useSheetClassData = createSharedComposable(() => {
     isLoading.value = true;
 
     const loaded = await Promise.allSettled(
-      missing.map(async (url) => ({
-        url,
-        detail: await fetchCatalogEntry(url, sheetClassDetailSchema),
-      })),
+      missing.map(async (url) => ({ url, ...(await loadClassDetails(url)) })),
     );
 
     const next = new Map(details.value);
+    const nextMechanics = new Map(mechanics.value);
 
     for (const result of loaded) {
       if (result.status === 'fulfilled') {
         next.set(result.value.url, result.value.detail);
+        nextMechanics.set(result.value.url, result.value.mechanics);
       }
     }
 
     details.value = next;
+    mechanics.value = nextMechanics;
     isLoading.value = false;
   }
 
@@ -210,9 +216,40 @@ export const useSheetClassData = createSharedComposable(() => {
     })),
   );
 
+  /**
+   * Механика карточки класса или архетипа, если она уже загружена.
+   * @param url - адрес записи
+   */
+  function getMechanics(url: string | null): ClassMechanicsDetail | undefined {
+    return url ? mechanics.value.get(url) : undefined;
+  }
+
+  /** Классы листа с колонкой известных заклинаний — для предела. */
+  const preparedClasses = computed(() =>
+    document.value.classes.map((sheetClass) => {
+      const table = tableValues.value.find(
+        (candidate) => candidate.id === sheetClass.id,
+      );
+
+      const known = table?.values.find(
+        (column) => column.name === KNOWN_SPELLS_COLUMN,
+      );
+
+      const parsed = known ? Number.parseInt(known.value, 10) : Number.NaN;
+
+      return {
+        url: sheetClass.url,
+        level: sheetClass.level,
+        knownSpells: Number.isNaN(parsed) ? null : parsed,
+      };
+    }),
+  );
+
   return {
     isLoading,
     getDetail,
+    getMechanics,
+    preparedClasses,
     loadMissing,
     progressions,
     features,

@@ -342,7 +342,8 @@ export const CATALOG_API_PREFIX = '/api/v1';
 export const SHEET_TABS = [
   { value: 'inventory', label: 'Снаряжение', icon: 'tabler:backpack' },
   { value: 'spells', label: 'Заклинания', icon: 'tabler:wand' },
-  { value: 'features', label: 'Умения', icon: 'tabler:sparkles' },
+  { value: 'features', label: 'Особенности', icon: 'tabler:sparkles' },
+  { value: 'effects', label: 'Эффекты', icon: 'tabler:flask' },
   { value: 'personality', label: 'Личность', icon: 'tabler:mood-smile' },
   { value: 'notes', label: 'Заметки', icon: 'tabler:notes' },
 ] as const;
@@ -1199,3 +1200,187 @@ export const STEALTH_DISADVANTAGE_FLAG = 'skill.stealth.disadvantage';
 
 /** Приоритет изменения эффекта по умолчанию. */
 export const EFFECT_DEFAULT_PRIORITY = 20;
+
+/* --- Оформление листа (как на new.ttg.club) ----------------------------- */
+
+/**
+ * Класс скрытия кнопки правки у запертого листа: видимостью, а не удалением —
+ * раскладка не съезжает.
+ */
+export const SHEET_HIDDEN_CONTROL_CLASS = 'invisible';
+
+/** Кнопка правки, которую на широком экране проявляет наведение. */
+export const SHEET_REVEAL_CONTROL_CLASS = 'max-lg:opacity-100';
+
+/** Кнопка действия в заголовке панели (шестерёнка, справка). */
+export const SHEET_TITLE_ACTION_CLASS =
+  'flex cursor-pointer items-center text-primary transition-colors hover:text-highlighted';
+
+/** Действие заголовка, которое проявляет наведение на панель. */
+export const SHEET_TITLE_ACTION_REVEAL_CLASS = `opacity-0 transition-opacity duration-200 group-hover/panel:opacity-100 focus-visible:opacity-100 ${SHEET_REVEAL_CONTROL_CLASS}`;
+
+/** Плитка-кнопка в шапке вкладки (вес, настройка, заклинательство). */
+const SHEET_STAT_TILE_CLASS =
+  'flex h-7 items-center gap-3 rounded-lg border border-default/50 bg-elevated/20 px-3 transition-colors';
+
+export const SHEET_HEADER_STAT_CLASS = `${SHEET_STAT_TILE_CLASS} cursor-pointer hover:border-primary/60`;
+
+export const SHEET_STATIC_STAT_CLASS = `${SHEET_STAT_TILE_CLASS} cursor-default`;
+
+/** Подпись разделителя группы (навыки, снаряжение). */
+export const SHEET_GROUP_LABEL_CLASS =
+  'shrink-0 text-[10px] font-bold tracking-wider text-muted uppercase';
+
+/** Плитка параметра предмета: тёплый акцент (атака, урон, КД). */
+export const SHEET_ACCENT_STAT_CLASSES = {
+  container: 'border-primary/40 bg-primary/10',
+  value: 'text-primary',
+  label: 'text-primary/80',
+} as const;
+
+/** Плитка параметра предмета: обычная (вес, заряды). */
+export const SHEET_PLAIN_STAT_CLASSES = {
+  container: 'border-default/50 bg-default/40',
+  value: 'text-highlighted',
+  label: 'text-dimmed',
+} as const;
+
+/** Раскладка плитки параметра предмета. */
+export const SHEET_ITEM_STAT_LAYOUT_CLASS =
+  'flex shrink-0 grow basis-0 flex-col items-center rounded border px-2 py-0.5 whitespace-nowrap @xl:grow-0 @xl:basis-auto';
+
+/** Плитка параметра — кнопка броска. */
+export const SHEET_ROLL_STAT_CLASS =
+  'relative z-10 cursor-pointer hover:border-primary hover:bg-primary/20';
+
+export const SHEET_BODY_LABELS = {
+  proficiencyBonus: 'Мастерство',
+  armorClass: 'Класс доспеха',
+  armorClassShort: 'КД',
+  armorClassPress: 'Настроить класс доспеха',
+  walk: 'Ходьба',
+  initiative: 'Инициатива',
+  health: 'Здоровье',
+  current: 'Сейчас',
+  total: 'Всего',
+  temporary: 'Врем.',
+  hitDice: 'Кости хитов',
+  savingThrows: 'Спасброски',
+  skills: 'Навыки',
+  resources: 'Ресурсы',
+  resourcesEmpty: 'Ресурсов пока нет',
+  settings: 'Настроить',
+  spend: 'Потратить',
+  restore: 'Вернуть',
+  roll: 'Бросок',
+  proficiency: 'Владение',
+  passive: 'Пассивное значение',
+  weight: 'Переносимый вес',
+  attunement: 'Настройка',
+  levelPrefix: 'Уровень',
+  experience: 'Опыт',
+  inspiration: 'Вдохновение',
+  lock: 'Запереть лист',
+  unlock: 'Отпереть лист',
+  menu: 'Меню',
+  close: 'Закрыть',
+  avatar: 'Портрет персонажа',
+  name: 'Имя персонажа',
+  noRace: 'Раса',
+  noBackground: 'Предыстория',
+  vision: 'Чувства',
+  proficienciesEmpty: 'Нет',
+  manualProficiencies: 'Свои владения текстом',
+  equipped: 'Надет',
+  attuned: 'Настроен',
+  needsAttunement: 'Нет настройки',
+  needsAttunementHint:
+    'Предмет требует настройки: без неё его эффекты не работают',
+  equip: 'Надеть',
+  unequip: 'Снять',
+  attune: 'Настроить',
+  unattune: 'Снять настройку',
+  restoreCharges: 'Восстановить заряды',
+  charges: 'заряды',
+  attack: 'атака',
+  damage: 'урон',
+  armorClassStat: 'КД',
+  weightStat: 'вес',
+  edit: 'Изменить',
+  remove: 'Удалить',
+  quantityDecrease: 'Меньше',
+  quantityIncrease: 'Больше',
+  addItem: 'Добавить',
+  emptyEquipment: 'Снаряжения пока нет',
+  dawn: 'Рассвет',
+} as const;
+
+/** Группы снаряжения на вкладке. */
+export const INVENTORY_GROUPS = [
+  { key: 'weapon', title: 'Оружие', icon: 'tabler:sword' },
+  { key: 'armor', title: 'Доспехи', icon: 'tabler:shield' },
+  { key: 'magic', title: 'Магические предметы', icon: 'tabler:wand' },
+  { key: 'other', title: 'Прочее', icon: 'tabler:backpack' },
+] as const;
+
+/** Значки отдыха у ресурса: что возвращает короткий и долгий отдых. */
+export const RESOURCE_RECOVERY_BADGES = {
+  SHORT: [
+    {
+      rest: 'short',
+      icon: 'tabler:campfire',
+      text: 'все',
+      hint: 'Короткий отдых возвращает все',
+    },
+  ],
+  SHORT_ONE: [
+    {
+      rest: 'short',
+      icon: 'tabler:campfire',
+      text: '1',
+      hint: 'Короткий отдых возвращает один',
+    },
+    {
+      rest: 'long',
+      icon: 'tabler:moon',
+      text: 'все',
+      hint: 'Долгий отдых возвращает все',
+    },
+  ],
+  LONG: [
+    {
+      rest: 'long',
+      icon: 'tabler:moon',
+      text: 'все',
+      hint: 'Долгий отдых возвращает все',
+    },
+  ],
+} as const;
+
+/** Значки владения спасброском и навыком. */
+export const PROFICIENCY_DOT_ICONS = {
+  none: 'tabler:circle',
+  proficient: 'tabler:circle-filled',
+  expertise: 'tabler:circle-dot-filled',
+} as const;
+
+export const EXHAUSTION_PANEL_LABELS = {
+  title: 'Истощение',
+  rules: 'Истощение (PHB 2014)',
+  none: 'Истощения нет',
+  level: 'Ступень',
+  longRest: 'Долгий отдых с едой и питьём снимает одну ступень.',
+} as const;
+
+export const SHEET_MENU_LABELS = {
+  backToList: 'К списку листов',
+  reload: 'Перезагрузить',
+  dawn: 'Наступил рассвет',
+} as const;
+
+/** Пометки шагов мастера повышения уровня. */
+export const LEVEL_UP_RAIL_CLASSES = {
+  done: 'border-primary/60 bg-primary/15 text-primary',
+  current: 'border-primary bg-primary text-inverted',
+  upcoming: 'border-default text-muted',
+} as const;

@@ -1,254 +1,182 @@
 <script setup lang="ts">
-  import type { ClassLink } from '~character/model';
-
   import type { SheetClass } from '../model';
 
-  import { z } from 'zod';
-
-  import { CLASSES_SECTION, classLinkSchema } from '~character/model';
-  import { buildListRequest, SECTION_PAGE_SIZE_ALL } from '~section/model';
-  import { getApiErrorMessage } from '~user/model';
-
-  import { useCharacterSheet, useSheetClassData } from '../composables';
   import {
-    ABILITY_LABELS,
+    useCharacterSheet,
+    useLevelUpWizard,
+    useSheetClassData,
+  } from '../composables';
+  import {
+    addSources,
     CHARACTER_LEVEL,
     getCharacterLevel,
-    getSuggestedMaxHitPoints,
-    loadClassSelection,
+    getMissingClassFeatureSources,
+    LEVEL_UP_TEXT,
+    removeClass,
+    removeClassLevel,
     SHEET_ICON,
     SHEET_LABELS,
-    SKILL_INFO,
-    SKILL_KEYS,
   } from '../model';
+  import SheetConfirmModal from './SheetConfirmModal.vue';
 
   /**
-   * Классы персонажа: уровни, подклассы, мультикласс. Первый класс задаёт
-   * спасброски и заклинательную характеристику, если они ещё не выбраны.
+   * Классы персонажа: уровень, подкласс и кость хитов каждого. Повышение
+   * уровня и новый класс идут через мастер; понижение уровня и снятие класса
+   * забирают ровно выданное ими (умения, владения, ресурсы, хиты). Листам до
+   * механики можно подтянуть умения класса из справочника.
    */
-  const NO_ARCHETYPE = '';
-
   const isOpen = defineModel<boolean>('open', { default: false });
 
-  const api = useApi();
-  const toast = useToast();
   const { document, update } = useCharacterSheet();
-  const { getDetail } = useSheetClassData();
+  const { getMechanics, getDetail } = useSheetClassData();
+  const wizard = useLevelUpWizard();
 
-  const classList = shallowRef<Array<ClassLink>>([]);
-  const isListLoading = ref(false);
-  const isAdding = ref(false);
   const selectedClassUrl = ref<string>();
+
+  const confirmAction = ref<{
+    kind: 'level' | 'class';
+    classId: string;
+  } | null>(null);
 
   const totalLevel = computed(() => getCharacterLevel(document.value.classes));
 
   const canAdd = computed(
     () =>
-      document.value.classes.length === 0
-      || totalLevel.value < CHARACTER_LEVEL.max,
+      !document.value.classes.length || totalLevel.value < CHARACTER_LEVEL.max,
   );
 
   const classOptions = computed(() =>
-    classList.value.map((classLink) => ({
-      label: classLink.name.rus,
-      value: classLink.url,
+    wizard.classList.value.map((link) => ({
+      label: link.name.rus,
+      value: link.url,
     })),
   );
 
-  /** Подсказка о навыках и спасбросках первого класса из справочника. */
-  const firstClassHint = computed(() => {
-    const first = document.value.classes[0];
-    const traits = first ? getDetail(first.url)?.traits : undefined;
+  const rows = computed(() =>
+    document.value.classes.map((sheetClass) => {
+      const detail =
+        getMechanics(sheetClass.archetypeUrl) ?? getMechanics(sheetClass.url);
 
-    if (!first || !traits) {
-      return null;
-    }
+      return {
+        sheetClass,
+        title: sheetClass.archetypeName
+          ? `${sheetClass.name} (${sheetClass.archetypeName})`
+          : sheetClass.name,
+        canLevelUp: totalLevel.value < CHARACTER_LEVEL.max,
+        missing: getMissingClassFeatureSources(
+          document.value,
+          sheetClass,
+          detail,
+        ),
+        syncActions: [
+          {
+            label: LEVEL_UP_TEXT.syncFeatures,
+            onClick: () => syncFeatures(sheetClass),
+          },
+        ],
+        levelLabel: `${sheetClass.level} ${SHEET_LABELS.level.toLowerCase()}`,
+        needsSync:
+          Boolean(detail)
+          && !document.value.sources.some(
+            (source) => source.classId === sheetClass.id,
+          ),
+      };
+    }),
+  );
 
-    const skills = (traits.availableSkills ?? []).join(', ');
-
-    return {
-      savingThrows: traits.savingThrows ?? '',
-      skills: skills
-        ? `${SHEET_LABELS.skillsHint}: ${traits.skillAvailableCount} из ${skills}`
-        : '',
-    };
+  const isConfirmOpen = computed({
+    get: () => confirmAction.value !== null,
+    set: (open: boolean) => {
+      if (!open) {
+        confirmAction.value = null;
+      }
+    },
   });
 
-  /**
-   * Подклассы класса из списка для выбора.
-   * @param sheetClass - класс персонажа
-   */
-  function getArchetypeOptions(sheetClass: SheetClass) {
-    const classLink = classList.value.find(
-      (candidate) => candidate.url === sheetClass.url,
-    );
+  const confirmTitle = computed(() =>
+    confirmAction.value?.kind === 'class'
+      ? LEVEL_UP_TEXT.removeClassTitle
+      : LEVEL_UP_TEXT.removeLevelTitle,
+  );
 
-    return [
-      { label: SHEET_LABELS.noArchetype, value: NO_ARCHETYPE },
-      ...(classLink?.archetypes ?? []).map((archetype) => ({
-        label: archetype.name.rus,
-        value: archetype.url,
-      })),
-    ];
-  }
+  const confirmDescription = computed(() =>
+    confirmAction.value?.kind === 'class'
+      ? LEVEL_UP_TEXT.removeClassDescription
+      : LEVEL_UP_TEXT.removeLevelDescription,
+  );
 
   /**
-   * Наибольший уровень класса, при котором общий уровень не выше 20.
-   * @param sheetClass - класс персонажа
+   * Открывает мастер повышения уровня класса.
+   * @param sheetClass - класс листа
    */
-  function getMaxLevel(sheetClass: SheetClass): number {
-    return CHARACTER_LEVEL.max - totalLevel.value + sheetClass.level;
+  function levelUp(sheetClass: SheetClass): void {
+    isOpen.value = false;
+    void wizard.startLevelUp(sheetClass.id);
   }
 
-  /**
-   * Меняет класс персонажа.
-   * @param id - идентификатор класса в листе
-   * @param patch - изменённые поля
-   */
-  function patchClass(id: string, patch: Partial<SheetClass>): void {
-    update((current) => ({
-      ...current,
-      classes: current.classes.map((sheetClass) =>
-        sheetClass.id === id ? { ...sheetClass, ...patch } : sheetClass,
-      ),
-    }));
-  }
-
-  /**
-   * Меняет уровень класса в пределах общего 20-го.
-   * @param sheetClass - класс персонажа
-   * @param level - новый уровень
-   */
-  function setLevel(sheetClass: SheetClass, level: number | null): void {
-    if (level === null) {
-      return;
-    }
-
-    patchClass(sheetClass.id, {
-      level: Math.min(
-        Math.max(level, CHARACTER_LEVEL.min),
-        getMaxLevel(sheetClass),
-      ),
-    });
-  }
-
-  /**
-   * Выбирает подкласс.
-   * @param sheetClass - класс персонажа
-   * @param url - адрес подкласса; пустой — без подкласса
-   */
-  function setArchetype(sheetClass: SheetClass, url: string): void {
-    const option = getArchetypeOptions(sheetClass).find(
-      (candidate) => candidate.value === url,
-    );
-
-    patchClass(sheetClass.id, {
-      archetypeUrl: url || null,
-      archetypeName: url && option ? option.label : null,
-    });
-  }
-
-  /**
-   * Убирает класс.
-   * @param id - идентификатор класса в листе
-   */
-  function removeClass(id: string): void {
-    update((current) => ({
-      ...current,
-      classes: current.classes.filter((sheetClass) => sheetClass.id !== id),
-    }));
-  }
-
-  /** Добавляет выбранный класс первым уровнем. */
-  async function addClass(): Promise<void> {
+  /** Открывает мастер нового класса. */
+  function addClass(): void {
     const url = selectedClassUrl.value;
 
-    if (!url) {
-      return;
-    }
-
-    isAdding.value = true;
-
-    try {
-      const selection = await loadClassSelection(url, CHARACTER_LEVEL.min);
-
-      update((current) => {
-        const isFirst = current.classes.length === 0;
-
-        const next = {
-          ...current,
-          classes: [...current.classes, selection.sheetClass],
-          savingThrows: isFirst ? selection.savingThrows : current.savingThrows,
-          spellcastingAbility:
-            current.spellcastingAbility ?? selection.spellAbility,
-        };
-
-        return current.health.max
-          ? next
-          : {
-              ...next,
-              health: {
-                ...next.health,
-                max: getSuggestedMaxHitPoints(next),
-                current: getSuggestedMaxHitPoints(next),
-              },
-            };
-      });
-
+    if (url) {
+      isOpen.value = false;
       selectedClassUrl.value = undefined;
-    } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, SHEET_LABELS.addClass),
-        color: 'error',
-      });
-    } finally {
-      isAdding.value = false;
+      void wizard.startNewClass(url);
     }
   }
 
-  /** Загружает список классов один раз, когда окно открывают. */
-  async function loadClassList(): Promise<void> {
-    if (classList.value.length || isListLoading.value) {
+  /**
+   * Просит подтвердить понижение уровня или снятие класса.
+   * @param kind - что снимается
+   * @param classId - класс листа
+   */
+  function askRemove(kind: 'level' | 'class', classId: string): void {
+    confirmAction.value = { kind, classId };
+  }
+
+  function confirmRemove(): void {
+    const action = confirmAction.value;
+
+    if (!action) {
       return;
     }
 
-    isListLoading.value = true;
+    update((current) =>
+      action.kind === 'class'
+        ? removeClass(current, action.classId)
+        : removeClassLevel(current, action.classId),
+    );
+  }
 
-    try {
-      classList.value = z.array(classLinkSchema).parse(
-        await api(CLASSES_SECTION.listUrl, {
-          method: 'POST',
-          body: buildListRequest({ page: 0, size: SECTION_PAGE_SIZE_ALL }),
-        }),
-      );
-    } catch {
-      classList.value = [];
-    } finally {
-      isListLoading.value = false;
-    }
+  /**
+   * Подтягивает умения класса из справочника листу до механики.
+   * @param sheetClass - класс листа
+   */
+  function syncFeatures(sheetClass: SheetClass): void {
+    const detail =
+      getMechanics(sheetClass.archetypeUrl) ?? getMechanics(sheetClass.url);
+
+    update((current) =>
+      addSources(
+        current,
+        getMissingClassFeatureSources(current, sheetClass, detail),
+      ),
+    );
+  }
+
+  /**
+   * Кость хитов класса подписью.
+   * @param sheetClass - класс листа
+   */
+  function getHitDieLabel(sheetClass: SheetClass): string {
+    return `${SHEET_LABELS.hitDie}: к${getDetail(sheetClass.url)?.traits?.diceHp ?? sheetClass.hitDie}`;
   }
 
   watch(isOpen, (open) => {
     if (open) {
-      loadClassList();
+      void wizard.loadClassList();
     }
   });
-
-  /** Подпись спасбросков персонажа. */
-  const savingThrowsLabel = computed(() =>
-    document.value.savingThrows
-      .map((ability) => ABILITY_LABELS[ability].name)
-      .join(', '),
-  );
-
-  /** Навыки, которыми персонаж уже владеет: для сверки с подсказкой. */
-  const proficientSkillsLabel = computed(() =>
-    SKILL_KEYS.filter(
-      (key) => (document.value.skills[key] ?? 'none') !== 'none',
-    )
-      .map((key) => SKILL_INFO[key].names[0])
-      .join(', '),
-  );
 </script>
 
 <template>
@@ -259,22 +187,45 @@
   >
     <template #body>
       <ul
-        v-if="document.classes.length"
+        v-if="rows.length"
         class="flex flex-col gap-3"
       >
         <li
-          v-for="sheetClass in document.classes"
-          :key="sheetClass.id"
+          v-for="row in rows"
+          :key="row.sheetClass.id"
           class="flex flex-col gap-2 rounded-lg border border-default p-3"
         >
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-semibold text-highlighted">
-              {{ sheetClass.name }}
-            </span>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="font-semibold text-highlighted">{{ row.title }}</span>
 
-            <span class="text-sm text-muted">
-              {{ SHEET_LABELS.hitDie }}: к{{ sheetClass.hitDie }}
-            </span>
+            <UBadge
+              :label="row.levelLabel"
+              color="neutral"
+              variant="subtle"
+            />
+
+            <span class="text-xs text-muted">{{
+              getHitDieLabel(row.sheetClass)
+            }}</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <UButton
+              :label="LEVEL_UP_TEXT.levelUp"
+              icon="tabler:arrow-big-up-lines"
+              size="sm"
+              :disabled="!row.canLevelUp"
+              @click.left.exact.prevent="levelUp(row.sheetClass)"
+            />
+
+            <UButton
+              :label="LEVEL_UP_TEXT.levelDown"
+              icon="tabler:arrow-big-down-lines"
+              color="neutral"
+              variant="subtle"
+              size="sm"
+              @click.left.exact.prevent="askRemove('level', row.sheetClass.id)"
+            />
 
             <UButton
               :icon="SHEET_ICON.remove"
@@ -282,30 +233,17 @@
               color="error"
               variant="ghost"
               size="sm"
-              @click.left.exact.prevent="removeClass(sheetClass.id)"
+              @click.left.exact.prevent="askRemove('class', row.sheetClass.id)"
             />
           </div>
 
-          <div class="grid grid-cols-[6rem_1fr] gap-2">
-            <UFormField :label="SHEET_LABELS.level">
-              <UInputNumber
-                :model-value="sheetClass.level"
-                :min="CHARACTER_LEVEL.min"
-                :max="getMaxLevel(sheetClass)"
-                @update:model-value="setLevel(sheetClass, $event)"
-              />
-            </UFormField>
-
-            <UFormField :label="SHEET_LABELS.archetype">
-              <USelect
-                :model-value="sheetClass.archetypeUrl ?? NO_ARCHETYPE"
-                :items="getArchetypeOptions(sheetClass)"
-                :loading="isListLoading"
-                class="w-full"
-                @update:model-value="setArchetype(sheetClass, $event)"
-              />
-            </UFormField>
-          </div>
+          <UAlert
+            v-if="row.needsSync && row.missing.length"
+            color="warning"
+            variant="subtle"
+            :description="LEVEL_UP_TEXT.syncHint"
+            :actions="row.syncActions"
+          />
         </li>
       </ul>
 
@@ -314,14 +252,13 @@
         class="flex items-end gap-2"
       >
         <UFormField
-          :label="SHEET_LABELS.addClass"
+          :label="LEVEL_UP_TEXT.addClass"
           class="flex-1"
         >
           <USelectMenu
             v-model="selectedClassUrl"
             :items="classOptions"
             value-key="value"
-            :loading="isListLoading"
             class="w-full"
           />
         </UFormField>
@@ -329,30 +266,24 @@
         <UButton
           :label="SHEET_LABELS.add"
           :icon="SHEET_ICON.add"
-          :loading="isAdding"
           :disabled="!selectedClassUrl"
           @click.left.exact.prevent="addClass"
         />
       </div>
 
-      <div
-        v-if="firstClassHint"
-        class="flex flex-col gap-1 rounded-lg bg-elevated p-3 text-sm"
+      <p
+        v-if="document.classes.length"
+        class="text-xs text-dimmed"
       >
-        <p>
-          <span class="text-muted">{{ SHEET_LABELS.savingThrows }}:</span>
-          {{ savingThrowsLabel || firstClassHint.savingThrows }}
-        </p>
+        {{ LEVEL_UP_TEXT.multiclassNote }}
+      </p>
 
-        <p v-if="firstClassHint.skills">
-          {{ firstClassHint.skills }}
-        </p>
-
-        <p v-if="proficientSkillsLabel">
-          <span class="text-muted">{{ SHEET_LABELS.skills }}:</span>
-          {{ proficientSkillsLabel }}
-        </p>
-      </div>
+      <SheetConfirmModal
+        v-model:open="isConfirmOpen"
+        :title="confirmTitle"
+        :description="confirmDescription"
+        @confirm="confirmRemove"
+      />
     </template>
   </UModal>
 </template>

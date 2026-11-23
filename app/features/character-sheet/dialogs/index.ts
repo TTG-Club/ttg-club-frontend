@@ -1,4 +1,13 @@
 export { default as SheetCatalogPicker } from './SheetCatalogPicker.vue';
+export { default as SheetChoicePickerModal } from './SheetChoicePickerModal.vue';
 export { default as SheetClassesModal } from './SheetClassesModal.vue';
+export { default as SheetCombatModal } from './SheetCombatModal.vue';
 export { default as SheetConfirmModal } from './SheetConfirmModal.vue';
+export { default as SheetEffectModal } from './SheetEffectModal.vue';
+export { default as SheetHealthModal } from './SheetHealthModal.vue';
 export { default as SheetItemModal } from './SheetItemModal.vue';
+export { default as SheetLevelUpModal } from './SheetLevelUpModal.vue';
+export { default as SheetResourcesModal } from './SheetResourcesModal.vue';
+export { default as SheetRestModal } from './SheetRestModal.vue';
+export { default as SheetSourceChoices } from './SheetSourceChoices.vue';
+export { default as SheetSourceChoicesModal } from './SheetSourceChoicesModal.vue';
