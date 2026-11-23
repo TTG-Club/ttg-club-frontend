@@ -2,6 +2,12 @@ import type { MagicItemForm } from './schemas';
 import type { WorkshopMagicItem } from './types';
 
 import {
+  createMagicItemMechanicsForm,
+  getMagicItemEffectContext,
+  getMagicItemMechanicsPayload,
+  magicItemMechanicsFormSchema,
+} from '../mechanics';
+import {
   toOptionalAmount,
   toOptionalMarkup,
   toOptionalNumber,
@@ -30,6 +36,10 @@ export function createMagicItemForm(item?: WorkshopMagicItem): MagicItemForm {
     cost: item?.cost ?? null,
     bonus: item?.bonus ?? null,
     description: [...(item?.description ?? [])],
+    // Разбор схемой формы — копия: правка формы не меняет открытую запись
+    mechanics: item
+      ? magicItemMechanicsFormSchema.parse(item.mechanics)
+      : createMagicItemMechanicsForm(),
   };
 }
 
@@ -51,5 +61,11 @@ export function getMagicItemPayload(
     charge: toOptionalNumber(form.charge),
     cost: toOptionalAmount(form.cost),
     bonus: toOptionalNumber(form.bonus),
+    // Механика уходит всегда: отсутствие бэкенд понимает как «оставить
+    // сохранённое», а снятая модератором уходит пустым объектом
+    mechanics: getMagicItemMechanicsPayload(
+      form.mechanics,
+      getMagicItemEffectContext(form.type),
+    ),
   };
 }

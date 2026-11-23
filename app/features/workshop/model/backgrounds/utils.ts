@@ -2,6 +2,11 @@ import type { BackgroundForm } from './schemas';
 import type { PersonalizationTable, WorkshopBackground } from './types';
 
 import { WORKSHOP_LIST_JOINER, WORKSHOP_SKILL_OPTIONS } from '../constants';
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
 import { splitList, toOptionalMarkup, toOptionalText } from '../utils';
 import {
   PERSONALIZATION_TEXT_COLUMN,
@@ -94,6 +99,7 @@ export function createBackgroundForm(
     personalizationTables: (background?.personalizationTables ?? []).map(
       (table) => ({ type: table.type, values: [...table.values] }),
     ),
+    ...copyMechanicsFields(background),
   };
 }
 
@@ -125,5 +131,6 @@ export function getBackgroundPayload(
       type: table.type,
       values: table.values.map((value) => value.trim()),
     })),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.feat),
   };
 }

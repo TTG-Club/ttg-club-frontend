@@ -1,9 +1,12 @@
 <script setup lang="ts">
-  import type { ClassTrait } from '../model';
+  import type { ActiveEffect } from '~active-effects/model';
+
+  import type { ClassTrait, MechanicsForm } from '../model';
 
   import { useExpandedItems } from '../composables';
   import { WorkshopCollapsibleItem, WorkshopListSection } from '../form';
   import { MarkupEditor } from '../markup-editor';
+  import { WorkshopTraitMechanics } from '../mechanics';
   import {
     CLASS_LEVEL_OPTIONS,
     CLASS_LEVEL_SUFFIX,
@@ -11,6 +14,7 @@
     CLASS_TRAITS_TEXT,
     createClassTrait,
     getWorkshopErrorIndexes,
+    MECHANICS_KIND,
     WORKSHOP_FIELD_TEXT,
   } from '../model';
 
@@ -146,6 +150,27 @@
   }
 
   /**
+   * Меняет механику умения.
+   * @param traitIndex - номер умения
+   * @param mechanics - механика
+   */
+  function changeMechanics(traitIndex: number, mechanics: MechanicsForm): void {
+    patchTrait(traitIndex, { mechanics });
+  }
+
+  /**
+   * Меняет активные эффекты умения.
+   * @param traitIndex - номер умения
+   * @param activeEffects - эффекты
+   */
+  function changeActiveEffects(
+    traitIndex: number,
+    activeEffects: Array<ActiveEffect>,
+  ): void {
+    patchTrait(traitIndex, { activeEffects });
+  }
+
+  /**
    * Имя поля умения: по нему форма показывает ошибку проверки.
    * @param traitIndex - номер умения
    * @param field - поле умения
@@ -276,6 +301,16 @@
             @update:model-value="changeDescription(traitIndex, $event)"
           />
         </UFormField>
+
+        <div class="md:col-span-3">
+          <WorkshopTraitMechanics
+            :mechanics="trait.mechanics"
+            :active-effects="trait.activeEffects"
+            :kind="MECHANICS_KIND.class"
+            @update:mechanics="changeMechanics(traitIndex, $event)"
+            @update:active-effects="changeActiveEffects(traitIndex, $event)"
+          />
+        </div>
       </div>
     </WorkshopCollapsibleItem>
   </WorkshopListSection>

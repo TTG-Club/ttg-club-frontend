@@ -3,6 +3,8 @@
 
   import type { OptionForm, WorkshopOption } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { optionDetailSchema } from '~character/model';
   import { OptionBody } from '~character/options';
 
@@ -17,10 +19,13 @@
     WorkshopSourceSelect,
   } from '../form';
   import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     createOptionForm,
     getOptionPayload,
     getWorkshopSectionRoute,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     OPTION_EDITOR_TEXT,
     OPTION_TYPES_FILTER_KEY,
     optionFormSchema,
@@ -161,6 +166,20 @@
     >
       <MarkupEditor v-model="state.description" />
     </UFormField>
+
+    <WorkshopMechanicsEditor
+      v-model="state.mechanics"
+      :kind="MECHANICS_KIND.class"
+    />
+
+    <div class="col-span-full">
+      <ActiveEffects
+        v-model="state.activeEffects"
+        :context="EFFECT_FORM_CONTEXT.feature"
+        :origin="EFFECT_ORIGIN.feature"
+        :title="MECHANICS_TEXT.effectsTitle"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />

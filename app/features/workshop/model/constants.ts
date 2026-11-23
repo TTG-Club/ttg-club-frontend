@@ -192,6 +192,15 @@ export const WORKSHOP_TABS_UI = {
   content: 'grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4',
 } as const;
 
+/**
+ * Вкладки механики и эффектов в редакторах с вкладками. Ключи совпадают с
+ * полями формы: по ним вкладка находится и при ошибке проверки.
+ */
+export const WORKSHOP_MECHANICS_TAB = {
+  mechanics: 'mechanics',
+  activeEffects: 'activeEffects',
+} as const;
+
 /** Операции ревизий. */
 export enum RevisionOperation {
   CREATE = 'CREATE',

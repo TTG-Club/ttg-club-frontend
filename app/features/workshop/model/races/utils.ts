@@ -3,6 +3,11 @@ import type { RaceDetail } from '~character/model';
 import type { RaceForm } from './schemas';
 import type { RaceAbility, RaceFeature, WorkshopRace } from './types';
 
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
 import { toOptionalNumber, toOptionalText } from '../utils';
 import { RACE_DEFAULT } from './constants';
 
@@ -19,6 +24,7 @@ export function createRaceFeature(): RaceFeature {
     description: [],
     feature: true,
     replaceFeatureId: null,
+    ...copyMechanicsFields(),
   };
 }
 
@@ -49,8 +55,10 @@ export function createRaceForm(race?: WorkshopRace): RaceForm {
     features: (race?.features ?? []).map((feature) => ({
       ...feature,
       description: [...feature.description],
+      ...copyMechanicsFields(feature),
     })),
     description: [...(race?.description ?? [])],
+    ...copyMechanicsFields(race),
   };
 }
 
@@ -89,7 +97,9 @@ export function getRacePayload(
       description: [...feature.description],
       feature: feature.feature,
       replaceFeatureId: toOptionalNumber(feature.replaceFeatureId),
+      ...getMechanicsFieldsPayload(feature, MECHANICS_KIND.race),
     })),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.race),
   };
 }
 

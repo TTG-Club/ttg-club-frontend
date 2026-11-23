@@ -8,6 +8,8 @@
 
   import type { ArchetypeForm, WorkshopArchetype } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { ClassBody } from '~character/classes';
   import { classDetailSchema } from '~character/model';
 
@@ -19,6 +21,7 @@
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
   import { WorkshopImages } from '../images';
   import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     ARCHETYPE_EDITOR_TEXT,
     ARCHETYPE_FIELD_TABS,
@@ -31,10 +34,14 @@
     createArchetypeForm,
     getArchetypePayload,
     getArchetypePreviewPath,
+    getMechanicsFilledCount,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
     WORKSHOP_IMAGES_TAB,
+    WORKSHOP_MECHANICS_TAB,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
     WorkshopImageType,
@@ -100,6 +107,20 @@
       value: CLASS_EDITOR_TAB.traits,
       slot: CLASS_EDITOR_TAB.traits,
       badge: state.traits.length || undefined,
+    },
+    {
+      label: MECHANICS_TEXT.title,
+      value: WORKSHOP_MECHANICS_TAB.mechanics,
+      slot: WORKSHOP_MECHANICS_TAB.mechanics,
+      badge:
+        getMechanicsFilledCount(state.mechanics, MECHANICS_KIND.class)
+        || undefined,
+    },
+    {
+      label: MECHANICS_TEXT.effectsTitle,
+      value: WORKSHOP_MECHANICS_TAB.activeEffects,
+      slot: WORKSHOP_MECHANICS_TAB.activeEffects,
+      badge: state.activeEffects.length || undefined,
     },
     ...(imagesEntryId.value === undefined
       ? []
@@ -264,6 +285,24 @@
             ref="traits"
             v-model="state.traits"
             field-name="traits"
+          />
+        </div>
+      </template>
+
+      <template #mechanics>
+        <WorkshopMechanicsEditor
+          v-model="state.mechanics"
+          :kind="MECHANICS_KIND.class"
+        />
+      </template>
+
+      <template #activeEffects>
+        <div class="col-span-full">
+          <ActiveEffects
+            v-model="state.activeEffects"
+            :context="EFFECT_FORM_CONTEXT.feature"
+            :origin="EFFECT_ORIGIN.feature"
+            :title="MECHANICS_TEXT.effectsTitle"
           />
         </div>
       </template>

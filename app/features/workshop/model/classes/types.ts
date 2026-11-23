@@ -1,5 +1,7 @@
+import type { WorkshopMechanicsFields } from '../mechanics';
+
 /** Умение класса или архетипа. */
-export interface ClassTrait {
+export interface ClassTrait extends WorkshopMechanicsFields {
   id?: number;
   name: string;
   suffix: string;
@@ -21,7 +23,7 @@ export interface ClassTableColumn {
 }
 
 /** Класс из справочника, как его открывает редактор. */
-export interface WorkshopClass {
+export interface WorkshopClass extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;
@@ -60,7 +62,7 @@ export interface WorkshopClass {
 }
 
 /** Архетип класса, как его отдаёт мастерская. */
-export interface WorkshopArchetype {
+export interface WorkshopArchetype extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;

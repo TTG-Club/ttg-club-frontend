@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { markupBlocksSchema } from '~content/model';
 
 import { WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
@@ -22,6 +23,8 @@ const workshopOptionSchema = z.object({
   prerequisite: z.string().nullish(),
   description: markupBlocksSchema.nullish(),
   optionTypes: z.array(z.string()).nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -41,6 +44,7 @@ export function parseWorkshopOption(input: unknown): WorkshopOption {
     prerequisite: getRequirementText(option.prerequisite),
     description: option.description ?? [],
     optionTypes: option.optionTypes ?? [],
+    ...parseMechanicsFields(option),
     source: option.source?.shortName,
   };
 }
@@ -54,6 +58,7 @@ export const optionFormSchema = z.object({
   prerequisite: z.string(),
   optionTypes: z.array(z.string()).min(1, WORKSHOP_VALIDATION.chooseOne),
   description: workshopRequiredMarkup,
+  ...mechanicsFieldsFormSchema,
 });
 
 export type OptionForm = z.infer<typeof optionFormSchema>;

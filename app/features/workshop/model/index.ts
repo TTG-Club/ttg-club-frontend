@@ -13,6 +13,7 @@ export * from './html-editor';
 export * from './images';
 export * from './items';
 export * from './magic-items';
+export * from './mechanics';
 export * from './options';
 export * from './races';
 export * from './rules';

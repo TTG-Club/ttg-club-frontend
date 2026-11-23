@@ -1,5 +1,7 @@
 import type { SelectOption } from '../types';
 
+import { WORKSHOP_MECHANICS_TAB } from '../constants';
+
 /** Ключ раздела классов в мастерской. */
 export const CLASSES_WORKSHOP_KEY = 'classes';
 
@@ -121,6 +123,8 @@ export const CLASS_FIELD_TABS: Readonly<Record<string, string>> = {
   equipment: CLASS_EDITOR_TAB.equipment,
   tableColumns: CLASS_EDITOR_TAB.table,
   classTraits: CLASS_EDITOR_TAB.traits,
+  mechanics: WORKSHOP_MECHANICS_TAB.mechanics,
+  activeEffects: WORKSHOP_MECHANICS_TAB.activeEffects,
 };
 
 /** Вкладки полей формы архетипа. */
@@ -132,6 +136,8 @@ export const ARCHETYPE_FIELD_TABS: Readonly<Record<string, string>> = {
   description: CLASS_EDITOR_TAB.main,
   tableColumns: CLASS_EDITOR_TAB.table,
   traits: CLASS_EDITOR_TAB.traits,
+  mechanics: WORKSHOP_MECHANICS_TAB.mechanics,
+  activeEffects: WORKSHOP_MECHANICS_TAB.activeEffects,
 };
 
 /** Подписи редактора классов. */
