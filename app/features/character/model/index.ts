@@ -20,6 +20,8 @@ export type {
   RaceSpeed,
   ReferenceClass,
   SpellComponents,
+  SpellDamageData,
+  SpellDamageRollData,
   SpellDetail,
   SpellLink,
   SubraceDetail,
@@ -44,6 +46,8 @@ export {
   optionLinkSchema,
   raceDetailSchema,
   raceLinkSchema,
+  spellDamageRollSchema,
+  spellDamageSchema,
   spellDetailSchema,
   spellLinkSchema,
 } from './schema';
