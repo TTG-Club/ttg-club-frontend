@@ -11,8 +11,10 @@ import {
   ARMOR_CATEGORIES,
   CHARACTER_LEVEL,
   DEATH_SAVES_MAX,
+  OWN_SENSE_KEYS,
   RESOURCE_RESETS,
   SHEET_SCHEMA_VERSION,
+  SHEET_SIZE_KEYS,
   SKILL_KEYS,
   SOURCE_KINDS,
   SPELL_LEVEL,
@@ -92,6 +94,7 @@ export type AbilityBonuses = z.infer<typeof abilityBonusesSchema>;
 
 export const skillProficiencySchema = z.enum([
   'none',
+  'half',
   'proficient',
   'expertise',
 ]);
@@ -424,6 +427,10 @@ export const sheetDocumentSchema = z.object({
   speeds: extraSpeedsSchema.catch({ fly: 0, climb: 0, swim: 0, burrow: 0 }),
   /** Свой предел подготовленных заклинаний; null — по классам. */
   preparedLimitOverride: integerSchema.min(0).nullable().catch(null),
+  /** Размер персонажа; null — не задан. */
+  size: z.enum(SHEET_SIZE_KEYS).nullable().catch(null),
+  /** Свои дистанции чувств, кроме тёмного зрения (у него своё поле), фт. */
+  ownSenses: z.partialRecord(z.enum(OWN_SENSE_KEYS), countSchema).catch({}),
 });
 
 export type SheetDocument = z.infer<typeof sheetDocumentSchema>;

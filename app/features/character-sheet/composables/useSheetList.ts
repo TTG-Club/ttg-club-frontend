@@ -7,7 +7,11 @@ import {
   createSheet,
   deleteSheet,
   fetchSheetList,
+  getSheetNameFromFileName,
+  parseSheetImport,
+  SHEET_IMPORT_ERROR_TEXT,
   SHEET_LIMIT_FALLBACK,
+  SHEET_LIST_TEXT,
   SHEET_TEXT,
 } from '../model';
 
@@ -100,6 +104,59 @@ export function useSheetList() {
     await mutate(() => deleteSheet(id), SHEET_TEXT.errorDelete);
   }
 
+  /**
+   * Создаёт лист из JSON-файла экспорта. Отказы (лимит, посторонний файл)
+   * объясняет тостом.
+   * @param file - выбранный файл
+   * @returns созданный лист или `undefined` при отказе
+   */
+  async function importFromFile(
+    file: File,
+  ): Promise<CharacterSheet | undefined> {
+    if (!canCreate.value) {
+      toast.add({ title: SHEET_LIST_TEXT.importLimit, color: 'error' });
+
+      return undefined;
+    }
+
+    let text: string;
+
+    try {
+      text = await file.text();
+    } catch {
+      toast.add({ title: SHEET_LIST_TEXT.importFailed, color: 'error' });
+
+      return undefined;
+    }
+
+    const parsed = parseSheetImport(text, getSheetNameFromFileName(file.name));
+
+    if (!parsed.success) {
+      toast.add({
+        title: SHEET_LIST_TEXT.importFailed,
+        description: SHEET_IMPORT_ERROR_TEXT[parsed.error],
+        color: 'error',
+      });
+
+      return undefined;
+    }
+
+    const created = await mutate(
+      () => createSheet(parsed.sheet.name, parsed.sheet.data),
+      SHEET_LIST_TEXT.importFailed,
+    );
+
+    if (created) {
+      toast.add({
+        title: SHEET_LIST_TEXT.importSuccess,
+        description: created.name,
+        color: 'success',
+      });
+    }
+
+    return created;
+  }
+
   return {
     sheets,
     limit,
@@ -112,5 +169,6 @@ export function useSheetList() {
     create,
     copy,
     remove,
+    importFromFile,
   };
 }

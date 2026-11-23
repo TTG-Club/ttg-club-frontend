@@ -363,6 +363,7 @@ const raceFeatureListSchema = z
 /** Механика карточки расы или разновидности. */
 export const raceMechanicsDetailSchema = z.object({
   name: entryNameSchema,
+  size: z.string().nullish(),
   ...mechanicsCarrierShape,
   abilities: z
     .array(

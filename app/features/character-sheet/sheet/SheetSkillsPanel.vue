@@ -6,6 +6,7 @@
     useSheetRoll,
     useSheetStats,
   } from '../composables';
+  import { SheetSkillsSettingsModal } from '../dialogs';
   import {
     ABILITY_LABELS,
     formatModifier,
@@ -13,6 +14,9 @@
     getSkillProficiency,
     PROFICIENCY_DOT_ICONS,
     SHEET_BODY_LABELS,
+    SHEET_SKILL_SETTINGS_LABELS,
+    SHEET_TITLE_ACTION_CLASS,
+    SHEET_TITLE_ACTION_REVEAL_CLASS,
     SKILL_EFFECT_KEYS,
     SKILL_INFO,
     SKILL_KEYS,
@@ -24,12 +28,20 @@
   const PASSIVE_BASE = 10;
 
   /**
-   * Навыки списком: точка владения (клик — по кругу «нет → владение →
-   * компетентность»), сокращение характеристики, название, бонус с эффектами
+   * Навыки списком: точка владения (клик — по кругу «нет →
+   * половина → владение → компетентность», шестерёнка — окно настройки),
+   * сокращение характеристики, название, бонус с эффектами
    * (клик — проверка с преимуществом или помехой от эффектов) и пассивное
    * значение.
    */
-  const { document, update } = useCharacterSheet();
+  const { document, update, editControlClass } = useCharacterSheet();
+
+  const isSettingsOpen = ref(false);
+
+  function openSettings(): void {
+    isSettingsOpen.value = true;
+  }
+
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
 
@@ -89,6 +101,24 @@
 
 <template>
   <SheetPanel :title="SHEET_BODY_LABELS.skills">
+    <template #title-actions>
+      <button
+        type="button"
+        :class="[
+          SHEET_TITLE_ACTION_CLASS,
+          SHEET_TITLE_ACTION_REVEAL_CLASS,
+          editControlClass,
+        ]"
+        :aria-label="SHEET_SKILL_SETTINGS_LABELS.open"
+        @click.left.exact.prevent="openSettings"
+      >
+        <UIcon
+          name="tabler:settings"
+          class="size-3.5"
+        />
+      </button>
+    </template>
+
     <div class="flex flex-col gap-0.5">
       <div
         v-for="row in rows"
@@ -141,5 +171,7 @@
         </button>
       </div>
     </div>
+
+    <SheetSkillsSettingsModal v-model:open="isSettingsOpen" />
   </SheetPanel>
 </template>

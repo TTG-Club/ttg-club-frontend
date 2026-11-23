@@ -12,6 +12,7 @@ import {
   characterSheetSchema,
   createEmptySheetDocument,
   createSheetItem,
+  findSheetSize,
   findSkillByName,
   formatModifier,
   getAbilityModifier,
@@ -26,6 +27,7 @@ import {
   getSpellSlotsMax,
   getSuggestedMaxHitPoints,
   getWeaponAttack,
+  isSkillProficient,
   parseSavingThrows,
   parseSpellSlotCells,
   replaceRaceBonuses,
@@ -140,6 +142,25 @@ describe('лист персонажа: расчёты', () => {
     expect(getSkillBonus(document, 'STEALTH', 3)).toBe(9);
     expect(getSkillBonus(document, 'ACROBATICS', 3)).toBe(6);
     expect(getSkillBonus(document, 'SLEIGHT_OF_HAND', 3)).toBe(3);
+  });
+
+  it('размер берётся из подписи расы: первый упомянутый', () => {
+    expect(findSheetSize('Средний')).toBe('MEDIUM');
+    expect(findSheetSize('Маленький или Средний')).toBe('SMALL');
+    expect(findSheetSize(null)).toBeNull();
+    expect(createEmptySheetDocument().size).toBeNull();
+  });
+
+  it('половина бонуса мастерства округляется вниз и не считается владением', () => {
+    const document = makeDocument({
+      abilities: { ...createEmptySheetDocument().abilities, DEXTERITY: 16 },
+      skills: { STEALTH: 'half' },
+    });
+
+    expect(getSkillBonus(document, 'STEALTH', 3)).toBe(4);
+    expect(getSkillBonus(document, 'STEALTH', 4)).toBe(5);
+    expect(isSkillProficient('half')).toBe(false);
+    expect(isSkillProficient('expertise')).toBe(true);
   });
 
   it('кД: средний доспех ограничивает Ловкость, щит прибавляется', () => {

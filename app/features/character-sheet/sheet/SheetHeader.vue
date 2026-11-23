@@ -10,13 +10,18 @@
   import { useCharacterSheet, useSheetStats } from '../composables';
   import {
     SheetCatalogPicker,
+    SheetCatalogTreeModal,
     SheetClassesModal,
+    SheetCustomEntryModal,
     SheetRestModal,
+    SheetSizeModal,
     SheetSourceChoicesModal,
+    SheetVisionModal,
   } from '../dialogs';
   import {
     addSources,
     BACKGROUND_SEARCH,
+    CATALOG_TREE_TEXT,
     CHARACTER_SHEET_ROUTE,
     EXPERIENCE_BY_LEVEL,
     getClassesLabel,
@@ -24,7 +29,7 @@
     getPendingChoices,
     loadBackgroundSources,
     loadRaceSources,
-    RACE_SEARCH,
+    RACE_TREE,
     removeSources,
     replaceRaceBonuses,
     SHEET_BODY_LABELS,
@@ -33,7 +38,10 @@
     SHEET_MENU_LABELS,
     SHEET_SAVE_STATUS_ICON,
     SHEET_SAVE_STATUS_TEXT,
+    SHEET_SIZE_INFO,
+    SHEET_SIZE_LABELS,
     SHEET_TEXT,
+    SHEET_VISION_LABELS,
   } from '../model';
 
   /**
@@ -68,8 +76,38 @@
   const { stats } = useSheetStats();
 
   const isRacePickerOpen = ref(false);
+  const isCustomRaceOpen = ref(false);
   const isBackgroundPickerOpen = ref(false);
   const isClassesOpen = ref(false);
+  const isVisionOpen = ref(false);
+  const isSizeOpen = ref(false);
+
+  /** Строки подсказки чувств у портрета; пусто — обычное зрение. */
+  const visionRows = computed(() =>
+    stats.value.senses.map((sense) => ({
+      key: sense.key,
+      text: `${sense.label} ${sense.range} ${SHEET_VISION_LABELS.unit}`,
+    })),
+  );
+
+  const sizeLetter = computed(() =>
+    document.value.size ? SHEET_SIZE_INFO[document.value.size].letter : null,
+  );
+
+  const sizeTooltip = computed(() =>
+    document.value.size
+      ? `${SHEET_SIZE_LABELS.field}: ${SHEET_SIZE_INFO[document.value.size].name}`
+      : SHEET_SIZE_LABELS.empty,
+  );
+
+  function openVision(): void {
+    isVisionOpen.value = true;
+  }
+
+  function openSize(): void {
+    isSizeOpen.value = true;
+  }
+
   const restMode = ref<'short' | 'long' | null>(null);
   const choiceSourceIds = ref<Array<string>>([]);
 
@@ -280,6 +318,7 @@
             ...stripRace(current),
             race: result.race,
             speed: result.speed ?? current.speed,
+            size: result.size ?? current.size,
           },
           result.sources,
         );
@@ -301,6 +340,22 @@
 
   function clearRace(): void {
     update(stripRace);
+  }
+
+  function openCustomRace(): void {
+    isCustomRaceOpen.value = true;
+  }
+
+  /**
+   * Ставит свою расу: прежняя снимается, новая — только название, без
+   * механики справочника.
+   * @param raceName - название расы
+   */
+  function pickCustomRace(raceName: string): void {
+    update((current) => ({
+      ...stripRace(current),
+      race: { name: raceName, url: null },
+    }));
   }
 
   /**
@@ -385,6 +440,69 @@
           name="tabler:user"
           class="size-10 text-muted"
         />
+      </div>
+
+      <div
+        class="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1"
+      >
+        <UTooltip :text="SHEET_VISION_LABELS.normal">
+          <!-- Непрозрачная подложка: soft-кнопка полупрозрачная, без неё
+            сквозь неё просвечивает край портрета -->
+          <span class="rounded-full bg-default">
+            <UButton
+              icon="tabler:eye"
+              color="primary"
+              variant="soft"
+              size="xs"
+              square
+              class="rounded-full"
+              :aria-label="SHEET_VISION_LABELS.open"
+              @click.left.exact.prevent="openVision"
+            />
+          </span>
+
+          <template
+            v-if="visionRows.length"
+            #content
+          >
+            <div class="flex flex-col gap-1 p-1">
+              <span
+                v-for="row in visionRows"
+                :key="row.key"
+                class="text-xs text-highlighted"
+              >
+                {{ row.text }}
+              </span>
+            </div>
+          </template>
+        </UTooltip>
+
+        <UTooltip :text="sizeTooltip">
+          <span class="rounded-full bg-default">
+            <UButton
+              color="primary"
+              variant="soft"
+              size="xs"
+              square
+              class="rounded-full"
+              :aria-label="SHEET_SIZE_LABELS.open"
+              @click.left.exact.prevent="openSize"
+            >
+              <span
+                v-if="sizeLetter"
+                class="w-4 text-center text-xs font-bold"
+              >
+                {{ sizeLetter }}
+              </span>
+
+              <UIcon
+                v-else
+                name="tabler:ruler-2"
+                class="size-4"
+              />
+            </UButton>
+          </span>
+        </UTooltip>
       </div>
     </div>
 
@@ -627,11 +745,24 @@
       </div>
     </div>
 
-    <SheetCatalogPicker
+    <SheetCatalogTreeModal
       v-model:open="isRacePickerOpen"
-      :title="SHEET_LABELS.race"
-      :source="RACE_SEARCH"
+      :title="CATALOG_TREE_TEXT.raceTitle"
+      :source="RACE_TREE"
+      :hint="CATALOG_TREE_TEXT.raceHint"
+      :confirm-label="CATALOG_TREE_TEXT.pick"
+      :custom-label="CATALOG_TREE_TEXT.customRace"
+      :expand-label="CATALOG_TREE_TEXT.expandRace"
+      children-selectable
       @pick="pickRace"
+      @custom="openCustomRace"
+    />
+
+    <SheetCustomEntryModal
+      v-model:open="isCustomRaceOpen"
+      :title="CATALOG_TREE_TEXT.customRace"
+      :hint="CATALOG_TREE_TEXT.customRaceHint"
+      @save="pickCustomRace"
     />
 
     <SheetCatalogPicker
@@ -642,6 +773,10 @@
     />
 
     <SheetClassesModal v-model:open="isClassesOpen" />
+
+    <SheetVisionModal v-model:open="isVisionOpen" />
+
+    <SheetSizeModal v-model:open="isSizeOpen" />
 
     <SheetRestModal
       v-if="restMode"

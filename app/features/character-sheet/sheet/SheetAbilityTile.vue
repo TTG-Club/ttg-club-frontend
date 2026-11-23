@@ -16,7 +16,7 @@
   /**
    * Плитка характеристики, как на new.ttg.club: крупный модификатор (клик —
    * проверка), значение на плашке у нижней грани с быстрой правкой ± и
-   * шестерёнка точной правки. Значение с прибавкой эффекта выделено.
+   * шестерёнка точной правки (на сенсорном экране — долгое нажатие). Значение с прибавкой эффекта выделено.
    */
   const ADJUST_BUTTON_CLASSES =
     'rounded-full border border-primary/60 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100';
@@ -42,7 +42,43 @@
     adjust: [delta: number];
   }>();
 
-  const { editControlClass } = useCharacterSheet();
+  const { editControlClass, isLocked } = useCharacterSheet();
+
+  /** Удержание, после которого открывается правка (сенсорные экраны). */
+  const LONG_PRESS_DELAY = 500;
+
+  const panelRef = useTemplateRef('panel');
+
+  // Флаг гасит клик, который браузер шлёт после долгого удержания: вместе с
+  // окном правки не должна идти проверка характеристики
+  let isLongPressTriggered = false;
+
+  onLongPress(
+    panelRef,
+    () => {
+      if (isLocked.value) {
+        return;
+      }
+
+      isLongPressTriggered = true;
+      emit('settings');
+    },
+    { delay: LONG_PRESS_DELAY },
+  );
+
+  /**
+   * Проверка характеристики, если клик не завершал долгое удержание.
+   * @param event - клик
+   */
+  function roll(event: MouseEvent): void {
+    if (isLongPressTriggered) {
+      isLongPressTriggered = false;
+
+      return;
+    }
+
+    emit('roll', event);
+  }
 
   const label = computed(() => ABILITY_LABELS[abilityKey]);
 
@@ -60,6 +96,7 @@
 <template>
   <UTooltip :text="hint ? `${label.name} · ${hint}` : label.name">
     <SheetPanel
+      ref="panel"
       :title="label.short"
       center-title
       interactive
@@ -88,7 +125,7 @@
         type="button"
         class="flex w-full cursor-pointer items-center justify-center pt-1 pb-2 after:absolute after:inset-0 after:cursor-pointer"
         :aria-label="`${SHEET_BODY_LABELS.roll}: ${label.name}`"
-        @click.left.prevent="emit('roll', $event)"
+        @click.left.prevent="roll"
       >
         <span class="text-3xl leading-none font-bold text-highlighted">
           {{ modifierLabel }}

@@ -47,6 +47,7 @@ import {
 import {
   getCharacterLevel,
   getProficiencyBonus,
+  isSkillProficient,
   toAbilityKey,
   toSkillKey,
 } from './utils';
@@ -410,7 +411,7 @@ function getSkillOptionState(
     return proficiency === 'proficient' ? {} : { disabled: true };
   }
 
-  if (proficiency === 'none') {
+  if (!isSkillProficient(proficiency)) {
     return choice.onlyIfProficient ? { disabled: true } : {};
   }
 
@@ -582,7 +583,7 @@ export function getChoiceGrantedProficiencies(
         skills: skills.filter(
           (skill) =>
             !choice.expertiseIfProficient
-            || (context.skills[skill] ?? 'none') === 'none',
+            || !isSkillProficient(context.skills[skill]),
         ),
         expertise: choice.expertiseIfProficient
           ? skills.filter((skill) => context.skills[skill] === 'proficient')

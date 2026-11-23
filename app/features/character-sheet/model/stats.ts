@@ -25,12 +25,12 @@ import {
   DAMAGE_TYPE_INFO,
   DARKVISION_SENSE,
   EFFECT_KEYS,
+  OWN_SENSE_KEYS,
   SENSE_BY_EFFECT_KEY,
   SENSE_LABELS,
   SKILL_EFFECT_KEYS,
   SKILL_INFO,
   SKILL_KEYS,
-  SKILL_PROFICIENCY_MULTIPLIER,
   SPEED_ZERO_FLAG,
   UNARMORED_ARMOR_CLASS,
 } from './constants';
@@ -51,6 +51,7 @@ import {
   getCharacterLevel,
   getProficiencyBonus,
   getSkillProficiency,
+  getSkillProficiencyBonus,
 } from './utils';
 
 /*
@@ -385,6 +386,14 @@ function getEffectiveSenses(
     ranges.set(DARKVISION_SENSE, document.darkvision);
   }
 
+  for (const key of OWN_SENSE_KEYS) {
+    const range = document.ownSenses[key] ?? 0;
+
+    if (range > 0) {
+      ranges.set(key, range);
+    }
+  }
+
   for (const { modifiers } of getSourceModifiers(document)) {
     for (const sense of modifiers.senses ?? []) {
       if (sense.type) {
@@ -496,8 +505,10 @@ export function getSheetStats(document: SheetDocument): SheetStats {
     SKILL_KEYS.map((key) => {
       const base =
         mod(SKILL_INFO[key].ability)
-        + proficiencyBonus
-          * SKILL_PROFICIENCY_MULTIPLIER[getSkillProficiency(document, key)];
+        + getSkillProficiencyBonus(
+          getSkillProficiency(document, key),
+          proficiencyBonus,
+        );
 
       return [
         key,

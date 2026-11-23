@@ -166,6 +166,7 @@ export const SKILL_INFO = {
 /** Уровни владения навыком и их множитель бонуса мастерства. */
 export const SKILL_PROFICIENCY_MULTIPLIER = {
   none: 0,
+  half: 0.5,
   proficient: 1,
   expertise: 2,
 } as const;
@@ -173,20 +174,40 @@ export const SKILL_PROFICIENCY_MULTIPLIER = {
 /** Порядок переключения владения навыком по клику. */
 export const SKILL_PROFICIENCY_CYCLE = [
   'none',
+  'half',
   'proficient',
   'expertise',
 ] as const;
 
 export const SKILL_PROFICIENCY_ICON = {
   none: 'tabler:circle',
+  half: 'tabler:circle-half-2',
   proficient: 'tabler:circle-filled',
-  expertise: 'tabler:circle-dot-filled',
+  expertise: 'tabler:square-rounded-chevrons-up',
 } as const;
 
 export const SKILL_PROFICIENCY_TEXT = {
   none: 'Нет владения',
+  half: 'Половина бонуса мастерства',
   proficient: 'Владение',
-  expertise: 'Компетентность',
+  expertise: 'Компетентность (двойной бонус)',
+} as const;
+
+/** Короткие подписи уровней владения для переключателя в настройке навыков. */
+export const SKILL_PROFICIENCY_SHORT_TEXT = {
+  none: 'Нет',
+  half: '½',
+  proficient: '×1',
+  expertise: '×2',
+} as const;
+
+export const SHEET_SKILL_SETTINGS_LABELS = {
+  title: 'Настройка навыков',
+  hint: 'Уровень владения навыком: половина бонуса мастерства (округляется вниз), владение или компетентность — двойной бонус.',
+  open: 'Настроить навыки',
+  passive: 'Пассивное значение',
+  apply: 'Применить',
+  cancel: 'Отмена',
 } as const;
 
 /* --- Уровни и опыт ------------------------------------------------------ */
@@ -1360,8 +1381,9 @@ export const RESOURCE_RECOVERY_BADGES = {
 /** Значки владения спасброском и навыком. */
 export const PROFICIENCY_DOT_ICONS = {
   none: 'tabler:circle',
+  half: 'tabler:circle-half-2',
   proficient: 'tabler:circle-filled',
-  expertise: 'tabler:circle-dot-filled',
+  expertise: 'tabler:square-rounded-chevrons-up',
 } as const;
 
 export const EXHAUSTION_PANEL_LABELS = {
@@ -1383,4 +1405,167 @@ export const LEVEL_UP_RAIL_CLASSES = {
   done: 'border-primary/60 bg-primary/15 text-primary',
   current: 'border-primary bg-primary text-inverted',
   upcoming: 'border-default text-muted',
+} as const;
+
+/* --- Список листов ------------------------------------------------------ */
+
+export const SHEET_LIST_TEXT = {
+  ownTitle: 'Ваши персонажи',
+  countTooltip:
+    'Сколько листов уже создано и сколько можно вести одновременно. Чтобы создать новый сверх лимита, удалите один из существующих.',
+  limitReached:
+    'Достигнут лимит листов: удалите один из существующих, чтобы создать новый.',
+  create: 'Создать лист',
+  createAria: 'Создать новый лист персонажа',
+  openAria: 'Открыть лист',
+  menuAria: 'Действия с листом',
+  noRace: 'Без расы',
+  hitPoints: 'Хиты',
+  level: 'Уровень',
+  download: 'Скачать JSON',
+  importLabel: 'Импорт JSON',
+  importHint: 'Создаст лист из JSON-файла нашего экспорта',
+  importFailed: 'Не удалось импортировать лист',
+  importLimit: 'Достигнут лимит листов: импорт невозможен',
+  importSuccess: 'Лист импортирован',
+} as const;
+
+export const SHEET_LIST_ICON = {
+  avatar: 'tabler:user',
+  create: 'tabler:user-plus',
+  hitPoints: 'tabler:heart',
+  help: 'tabler:help-circle-filled',
+  download: 'tabler:download',
+  import: 'tabler:file-import',
+} as const;
+
+/** Причина отказа импорта: файл не JSON или не лист персонажа. */
+export const SHEET_IMPORT_ERROR_TEXT = {
+  invalidJson: 'Файл не читается как JSON',
+  invalidFormat: 'Файл не похож на лист персонажа',
+} as const;
+
+/** Какие файлы принимает импорт листа. */
+export const SHEET_IMPORT_ACCEPT = '.json,application/json';
+
+/** Расширение и тип файла экспорта листа. */
+export const SHEET_EXPORT_FILE = {
+  extension: '.json',
+  mimeType: 'application/json',
+  indent: 2,
+} as const;
+
+/** Символы, недопустимые в имени файла: заменяются при экспорте. */
+export const SHEET_FILE_NAME_FORBIDDEN = /[/:*?"<>|]+/g;
+
+/* --- Выбор класса и расы ------------------------------------------------ */
+
+/** Локаль сортировки записей в окнах выбора класса и расы. */
+export const CATALOG_TREE_COLLATOR_LOCALE = 'ru';
+
+/** Кость хитов своего класса по умолчанию. */
+export const CUSTOM_CLASS_DEFAULT_HIT_DIE = 8;
+
+/** Подпись кости хитов в выборе: «к8». */
+export const HIT_DIE_LABEL_PREFIX = 'к';
+
+export const CATALOG_TREE_TEXT = {
+  classTitle: 'Добавление класса',
+  raceTitle: 'Выбор расы',
+  searchPlaceholder: 'Поиск по названию…',
+  empty: 'Ничего не найдено',
+  loadFailed: 'Не удалось загрузить список',
+  classHint:
+    'Класс добавится первым уровнем — общий уровень персонажа вырастет на единицу. Дальше его поднимают в окне классов кнопкой «Повысить уровень». Подкласс выбирается на уровне, указанном в классе.',
+  raceHint:
+    'Раса заменит текущую: её бонусы, чувства, скорости и владения применятся к листу, выборы откроются сразу. Можно выбрать и разновидность.',
+  expandClass: 'Показать подклассы',
+  expandRace: 'Показать разновидности',
+  preview: 'Открыть в справочнике',
+  pick: 'Выбрать',
+  next: 'Далее',
+  cancel: 'Отмена',
+  save: 'Сохранить',
+  customClass: 'Свой класс',
+  customRace: 'Своя раса',
+  customName: 'Название',
+  customHitDie: 'Кость хитов',
+  customClassHint:
+    'Класса нет в справочнике: умения и владения добавьте вручную, уровни и хиты лист посчитает сам.',
+  customRaceHint:
+    'Расы нет в справочнике: бонусы, скорость и особенности добавьте вручную.',
+} as const;
+
+export const CATALOG_TREE_ICON = {
+  expand: 'tabler:chevron-right',
+  preview: 'tabler:layout-sidebar-right-expand',
+  next: 'tabler:arrow-right',
+  selected: 'tabler:check',
+  add: 'tabler:plus',
+} as const;
+
+/** Классы строки выбора: выбранная подсвечена основным цветом. */
+export const CATALOG_TREE_ROW_CLASSES = {
+  selected: 'bg-primary/10 ring-1 ring-inset ring-primary/40',
+  idle: 'hover:bg-elevated/60',
+} as const;
+
+/** Поворот шеврона раскрытой строки. */
+export const CATALOG_TREE_EXPANDED_CLASS = 'rotate-90';
+
+/* --- Размер и чувства --------------------------------------------------- */
+
+/** Размеры существ PHB 2014. */
+export const SHEET_SIZE_KEYS = [
+  'TINY',
+  'SMALL',
+  'MEDIUM',
+  'LARGE',
+  'HUGE',
+  'GARGANTUAN',
+] as const;
+
+/** Названия размеров и буква значка у портрета. */
+export const SHEET_SIZE_INFO = {
+  TINY: { name: 'Крошечный', letter: 'К' },
+  SMALL: { name: 'Маленький', letter: 'М' },
+  MEDIUM: { name: 'Средний', letter: 'С' },
+  LARGE: { name: 'Большой', letter: 'Б' },
+  HUGE: { name: 'Огромный', letter: 'О' },
+  GARGANTUAN: { name: 'Громадный', letter: 'Г' },
+} as const;
+
+export const SHEET_SIZE_LABELS = {
+  title: 'Размер персонажа',
+  field: 'Размер',
+  placeholder: 'Не задан',
+  empty: 'Размер не задан',
+  open: 'Настроить размер',
+  reset: 'Сбросить',
+  cancel: 'Отмена',
+  apply: 'Применить',
+} as const;
+
+/** Чувства, кроме тёмного зрения, которые игрок задаёт сам. */
+export const OWN_SENSE_KEYS = [
+  'BLINDSIGHT',
+  'TREMORSENSE',
+  'TRUESIGHT',
+] as const;
+
+/** Наибольшая дистанция чувства в поле окна, фт. */
+export const SENSE_RANGE_MAX = 1000;
+
+/** Шаг дистанции чувства, фт. */
+export const SENSE_RANGE_STEP = 5;
+
+export const SHEET_VISION_LABELS = {
+  title: 'Чувства',
+  open: 'Настроить чувства',
+  normal: 'Обычное зрение',
+  unit: 'фт.',
+  hint: 'Своё значение. Особенности, снаряжение и эффекты могут дать больше: лист берёт большее.',
+  effective: 'В листе',
+  cancel: 'Отмена',
+  apply: 'Применить',
 } as const;

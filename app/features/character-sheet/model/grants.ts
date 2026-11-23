@@ -14,7 +14,7 @@ import {
   WEAPON_CATEGORY_GROUPS,
   WEAPON_CATEGORY_LABELS,
 } from './constants';
-import { toAbilityKey, toSkillKey } from './utils';
+import { isSkillProficient, toAbilityKey, toSkillKey } from './utils';
 
 /*
  * Журнал выдач владений. Каждый источник (класс, умение, раса, предыстория,
@@ -256,7 +256,7 @@ export function applyProficiencyGrant(
   const skills: SkillProficiencies = { ...stripped.skills };
 
   for (const skill of granted.skills) {
-    if ((skills[skill] ?? 'none') === 'none') {
+    if (!isSkillProficient(skills[skill])) {
       skills[skill] = 'proficient';
     }
   }
