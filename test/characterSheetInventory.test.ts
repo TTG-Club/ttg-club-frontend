@@ -1,4 +1,8 @@
-import type { SheetDocument, SheetItem } from '~character-sheet/model';
+import type {
+  CatalogRow,
+  SheetDocument,
+  SheetItem,
+} from '~character-sheet/model';
 
 import { describe, expect, it } from 'vitest';
 
@@ -18,13 +22,16 @@ import {
   getSheetRollMode,
   getSheetStats,
   getWeaponAttack,
+  groupCatalogRows,
   isArmorTooHeavy,
   isHeavyWeaponHindered,
   isItemMechanicsActive,
   parseDice,
+  searchCatalogRows,
   sheetArmorSchema,
   sheetWeaponSchema,
   sortItemsByName,
+  switchKeyboardLayout,
 } from '~character-sheet/model';
 
 /**
@@ -282,5 +289,47 @@ describe('форма своего предмета', () => {
     expect(getItemKind({ ...item, weapon: sheetWeaponSchema.parse({}) })).toBe(
       'weapon',
     );
+  });
+});
+
+describe('окно справочника', () => {
+  const rows: Array<CatalogRow> = [
+    {
+      url: '/weapons/club',
+      name: 'Дубинка',
+      nameEng: 'Club',
+      group: 'Простое',
+      groupOrder: 1,
+      caption: '',
+      price: '1 см',
+      source: 'PHB',
+    },
+    {
+      url: '/weapons/longsword',
+      name: 'Длинный меч',
+      nameEng: 'Longsword',
+      group: 'Воинское',
+      groupOrder: 2,
+      caption: '',
+      price: '15 зм',
+      source: 'PHB',
+    },
+  ];
+
+  it('поиск по-русски, по-английски и в другой раскладке', () => {
+    expect(searchCatalogRows(rows, 'меч').map((row) => row.url)).toEqual([
+      '/weapons/longsword',
+    ]);
+
+    expect(searchCatalogRows(rows, 'CLUB')).toHaveLength(1);
+    expect(switchKeyboardLayout('lb')).toBe('ди');
+    expect(searchCatalogRows(rows, 'le,')).toHaveLength(1);
+    expect(searchCatalogRows(rows, '')).toHaveLength(2);
+  });
+
+  it('группы в порядке справочника', () => {
+    expect(
+      groupCatalogRows([...rows].reverse()).map((group) => group.title),
+    ).toEqual(['Простое', 'Воинское']);
   });
 });

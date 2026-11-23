@@ -1,16 +1,10 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type {
-    CatalogOption,
-    ItemSearchKind,
-    SheetItem,
-    WeaponAttack,
-  } from '../model';
+  import type { ItemSearchKind, SheetItem, WeaponAttack } from '../model';
 
   import { ContentEntityDrawer } from '~content/entity-drawer';
   import { MAGIC_ITEMS_SECTION } from '~inventory/model';
-  import { getApiErrorMessage } from '~user/model';
 
   import {
     useCharacterSheet,
@@ -21,7 +15,7 @@
   import {
     SheetAttunementModal,
     SheetCarryingModal,
-    SheetCatalogPicker,
+    SheetCatalogAddModal,
     SheetConfirmModal,
     SheetCurrencyModal,
     SheetItemModal,
@@ -40,16 +34,12 @@
     INVENTORY_GROUPS,
     isHeavyWeaponHindered,
     ITEM_ROW_TEXT,
-    ITEM_SEARCH_BY_KIND,
     ITEM_SEARCH_KINDS,
-    loadCatalogItem,
-    loadMagicItem,
     SHEET_BODY_LABELS,
     SHEET_GROUP_LABEL_CLASS,
     SHEET_HEADER_STAT_CLASS,
     SHEET_ICON,
     SHEET_LABELS,
-    SHEET_TEXT,
     sortItemsByName,
   } from '../model';
   import SheetInventoryItemRow from './SheetInventoryItemRow.vue';
@@ -180,12 +170,8 @@
     })),
   );
 
-  const pickerSource = computed(() => ITEM_SEARCH_BY_KIND[pickerKind.value]);
-
-  const pickerTitle = computed(
-    () =>
-      ITEM_SEARCH_KINDS.find((kind) => kind.value === pickerKind.value)?.label
-      ?? SHEET_LABELS.item,
+  const takenUrls = computed(() =>
+    document.value.inventory.flatMap((item) => (item.url ? [item.url] : [])),
   );
 
   const addMenuItems = computed<Array<DropdownMenuItem>>(() => [
@@ -262,26 +248,14 @@
   }
 
   /**
-   * Добавляет предмет из справочника.
-   * @param option - выбранная запись
+   * Добавляет предметы из справочника одной правкой.
+   * @param items - загруженные предметы
    */
-  async function addFromCatalog(option: CatalogOption): Promise<void> {
-    try {
-      const item =
-        pickerKind.value === 'magic'
-          ? await loadMagicItem(option)
-          : await loadCatalogItem(pickerKind.value, option);
-
-      update((current) => ({
-        ...current,
-        inventory: [...current.inventory, item],
-      }));
-    } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
-        color: 'error',
-      });
-    }
+  function addFromCatalog(items: Array<SheetItem>): void {
+    update((current) => ({
+      ...current,
+      inventory: [...current.inventory, ...items],
+    }));
   }
 
   function addCustom(): void {
@@ -694,11 +668,11 @@
       {{ SHEET_BODY_LABELS.emptyEquipment }}
     </div>
 
-    <SheetCatalogPicker
+    <SheetCatalogAddModal
       v-model:open="isPickerOpen"
-      :title="pickerTitle"
-      :source="pickerSource"
-      @pick="addFromCatalog"
+      :kind="pickerKind"
+      :taken-urls="takenUrls"
+      @add="addFromCatalog"
     />
 
     <SheetItemModal

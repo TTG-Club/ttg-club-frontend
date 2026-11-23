@@ -110,7 +110,7 @@
 
   const thresholds = computed(
     () =>
-      `${breakdown.value.encumberedAt} / ${breakdown.value.heavyAt} ${CARRYING_TEXT.unit}`,
+      `${CARRYING_TEXT.thresholds}: ${breakdown.value.encumberedAt} / ${breakdown.value.heavyAt} ${CARRYING_TEXT.unit}`,
   );
 
   /**
@@ -224,16 +224,16 @@
           />
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
-          <UFormField :label="CARRYING_TEXT.size">
-            <USelect
-              :model-value="sizeValue"
-              :items="sizeItems"
-              class="w-full"
-              @update:model-value="setSize"
-            />
-          </UFormField>
+        <UFormField :label="CARRYING_TEXT.size">
+          <USelect
+            :model-value="sizeValue"
+            :items="sizeItems"
+            class="w-full"
+            @update:model-value="setSize"
+          />
+        </UFormField>
 
+        <div class="grid grid-cols-2 gap-2">
           <UFormField :label="CARRYING_TEXT.bonus">
             <UInputNumber
               :model-value="draft.bonus"

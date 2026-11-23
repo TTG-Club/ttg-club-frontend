@@ -4,6 +4,7 @@ export { default as SheetArmorClassModal } from './SheetArmorClassModal.vue';
 export { default as SheetAttunementModal } from './SheetAttunementModal.vue';
 export { default as SheetBonusSection } from './SheetBonusSection.vue';
 export { default as SheetCarryingModal } from './SheetCarryingModal.vue';
+export { default as SheetCatalogAddModal } from './SheetCatalogAddModal.vue';
 export { default as SheetCatalogPicker } from './SheetCatalogPicker.vue';
 export { default as SheetCatalogTreeModal } from './SheetCatalogTreeModal.vue';
 export { default as SheetChoicePickerModal } from './SheetChoicePickerModal.vue';

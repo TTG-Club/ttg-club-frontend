@@ -2,6 +2,7 @@ export type * from './types';
 
 export * from './api';
 export * from './catalog';
+export * from './catalogAdd';
 export * from './choices';
 export * from './constants';
 export * from './counters';

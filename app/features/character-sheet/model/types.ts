@@ -178,6 +178,20 @@ export interface CatalogOption {
   caption: string;
 }
 
+/** Строка окна добавления предметов из справочника. */
+export interface CatalogRow {
+  url: string;
+  name: string;
+  nameEng: string;
+  /** Группа списка: тип оружия, редкость. */
+  group: string;
+  groupOrder: number;
+  /** Урон, КД или настройка. */
+  caption: string;
+  price: string;
+  source: string;
+}
+
 /** Раздел справочника для поиска: ручка списка, схема записи и подпись. */
 export interface CatalogSearchSource<Schema extends z.ZodType = z.ZodType> {
   listUrl: string;

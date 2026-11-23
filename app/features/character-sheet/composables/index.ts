@@ -1,5 +1,6 @@
 export type { LevelUpStep } from './useLevelUpWizard';
 
+export { useCatalogList } from './useCatalogList';
 export { useCatalogSearch } from './useCatalogSearch';
 export { useCatalogTree } from './useCatalogTree';
 export { useCharacterSheet } from './useCharacterSheet';
