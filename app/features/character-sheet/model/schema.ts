@@ -10,6 +10,7 @@ import {
   ABILITY_SCORE,
   ARMOR_CATEGORIES,
   CHARACTER_LEVEL,
+  CUSTOM_BONUS_KINDS,
   DEATH_SAVES_MAX,
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
@@ -298,6 +299,30 @@ function lenientList<Element extends z.ZodType>(
 
 export const sourceKindSchema = z.enum(SOURCE_KINDS);
 
+/** Дополнительный бонус навыка: своё число или величина, которую лист считает сам. */
+export const customBonusSchema = z.object({
+  id: z.string(),
+  kind: z.enum(CUSTOM_BONUS_KINDS).catch('flat'),
+  ability: abilityKeySchema.catch('STRENGTH'),
+  /** Класс листа для бонуса «уровень класса»; пусто — класс не выбран. */
+  classId: z.string().catch(''),
+  value: integerSchema.catch(0),
+  label: textSchema,
+});
+
+export type CustomBonus = z.infer<typeof customBonusSchema>;
+
+/** Свой навык, которого нет в правилах. */
+export const customSkillSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  ability: abilityKeySchema.catch('INTELLIGENCE'),
+  proficiency: skillProficiencySchema.catch('none'),
+  bonuses: lenientList(customBonusSchema),
+});
+
+export type CustomSkill = z.infer<typeof customSkillSchema>;
+
 export type SourceKind = z.infer<typeof sourceKindSchema>;
 
 /**
@@ -431,6 +456,14 @@ export const sheetDocumentSchema = z.object({
   size: z.enum(SHEET_SIZE_KEYS).nullable().catch(null),
   /** Свои дистанции чувств, кроме тёмного зрения (у него своё поле), фт. */
   ownSenses: z.partialRecord(z.enum(OWN_SENSE_KEYS), countSchema).catch({}),
+  /** Характеристики навыков, подменённые игроком. */
+  skillAbilities: z.partialRecord(skillKeySchema, abilityKeySchema).catch({}),
+  /** Дополнительные бонусы навыков правил. */
+  skillBonuses: z
+    .partialRecord(skillKeySchema, lenientList(customBonusSchema))
+    .catch({}),
+  customSkills: lenientList(customSkillSchema),
+  groupSkillsByAbility: z.boolean().catch(false),
 });
 
 export type SheetDocument = z.infer<typeof sheetDocumentSchema>;

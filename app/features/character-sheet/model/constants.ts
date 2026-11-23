@@ -193,21 +193,77 @@ export const SKILL_PROFICIENCY_TEXT = {
   expertise: 'Компетентность (двойной бонус)',
 } as const;
 
-/** Короткие подписи уровней владения для переключателя в настройке навыков. */
-export const SKILL_PROFICIENCY_SHORT_TEXT = {
-  none: 'Нет',
-  half: '½',
-  proficient: '×1',
-  expertise: '×2',
-} as const;
-
 export const SHEET_SKILL_SETTINGS_LABELS = {
   title: 'Настройка навыков',
-  hint: 'Уровень владения навыком: половина бонуса мастерства (округляется вниз), владение или компетентность — двойной бонус.',
   open: 'Настроить навыки',
-  passive: 'Пассивное значение',
+  hint: 'Характеристика задаёт модификатор навыка, к нему добавляется бонус мастерства по уровню владения (значок: нет, половина, владение, компетентность). Дополнительные бонусы складываются сверху — их сколько угодно.',
+  abilityPlaceholder: 'Характеристика',
+  proficiency: 'Владение навыком',
+  resetSkill: 'Вернуть навык к правилам',
+  addBonus: 'Добавить бонус',
+  passive: 'Пассивное',
+  customTitle: 'Свой навык',
+  customHint:
+    'Навыка нет в правилах: он встанет в общий список по алфавиту наравне с остальными.',
+  customNamePlaceholder: 'Название навыка',
+  customAdd: 'Добавить навык',
+  customRemove: 'Удалить свой навык',
+  customBadge: 'Свой',
+  customDuplicate: 'Навык с таким названием уже есть',
+  customLimit: 'Своих навыков не больше',
+  groupTitle: 'Группировать по характеристикам',
+  groupHint: 'Навыки встанут под своими характеристиками, а не одним списком.',
   apply: 'Применить',
   cancel: 'Отмена',
+} as const;
+
+/** Максимальная длина названия своего навыка. */
+export const CUSTOM_SKILL_NAME_MAX_LENGTH = 40;
+
+/** Сколько своих навыков можно завести. */
+export const CUSTOM_SKILLS_MAX = 10;
+
+/** Характеристика нового своего навыка. */
+export const DEFAULT_CUSTOM_SKILL_ABILITY = 'INTELLIGENCE';
+
+/** Пределы своего числа в дополнительном бонусе. */
+export const CUSTOM_BONUS_RANGE = { min: -10, max: 10 } as const;
+
+/** Максимальная длина подписи дополнительного бонуса. */
+export const CUSTOM_BONUS_LABEL_MAX_LENGTH = 40;
+
+/** Виды дополнительного бонуса: число, модификатор, мастерство, уровни. */
+export const CUSTOM_BONUS_KINDS = [
+  'flat',
+  'ability',
+  'proficiency',
+  'level',
+  'classLevel',
+] as const;
+
+/** Знак у плюса в поле бонуса: поле читается бонусом, а не количеством. */
+export const CUSTOM_BONUS_FORMAT_OPTIONS: Intl.NumberFormatOptions = {
+  signDisplay: 'exceptZero',
+};
+
+/** Источники бонуса в выпадающем списке; уровни классов добавляет лист. */
+export const CUSTOM_BONUS_SOURCE = {
+  flat: 'flat',
+  proficiency: 'proficiency',
+  level: 'level',
+  /** Префикс источника «уровень класса»: за ним идентификатор класса листа. */
+  classPrefix: 'class:',
+} as const;
+
+export const CUSTOM_BONUS_TEXT = {
+  flat: 'Своё число',
+  abilityPrefix: 'Модификатор',
+  proficiency: 'Бонус мастерства',
+  level: 'Уровень персонажа',
+  classLevel: 'Уровень класса',
+  labelPlaceholder: 'Откуда бонус',
+  sourcePlaceholder: 'Источник',
+  remove: 'Удалить бонус',
 } as const;
 
 /* --- Уровни и опыт ------------------------------------------------------ */
@@ -361,12 +417,12 @@ export const CATALOG_API_PREFIX = '/api/v1';
 
 /** Вкладки нижней части листа. */
 export const SHEET_TABS = [
-  { value: 'inventory', label: 'Снаряжение', icon: 'tabler:backpack' },
-  { value: 'spells', label: 'Заклинания', icon: 'tabler:wand' },
-  { value: 'features', label: 'Особенности', icon: 'tabler:sparkles' },
-  { value: 'effects', label: 'Эффекты', icon: 'tabler:flask' },
-  { value: 'personality', label: 'Личность', icon: 'tabler:mood-smile' },
-  { value: 'notes', label: 'Заметки', icon: 'tabler:notes' },
+  { value: 'inventory', label: 'Снаряжение' },
+  { value: 'spells', label: 'Заклинания' },
+  { value: 'features', label: 'Особенности' },
+  { value: 'effects', label: 'Эффекты' },
+  { value: 'personality', label: 'Личность' },
+  { value: 'notes', label: 'Заметки' },
 ] as const;
 
 export const SHEET_LABELS = {

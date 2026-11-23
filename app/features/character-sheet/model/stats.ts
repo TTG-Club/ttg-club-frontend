@@ -1,6 +1,7 @@
 import type { EXTRA_SPEED_KEYS } from './constants';
 import type { MechanicsModifiers } from './mechanics';
 import type { AbilityScores, SheetDocument } from './schema';
+import type { CustomBonusContext } from './skills';
 import type {
   AbilityKey,
   EffectCarrier,
@@ -29,7 +30,6 @@ import {
   SENSE_BY_EFFECT_KEY,
   SENSE_LABELS,
   SKILL_EFFECT_KEYS,
-  SKILL_INFO,
   SKILL_KEYS,
   SPEED_ZERO_FLAG,
   UNARMORED_ARMOR_CLASS,
@@ -46,6 +46,7 @@ import {
   getSheetArmorState,
   isSavingThrowAutoFailed,
 } from './effects';
+import { getCustomBonusesTotal, getSkillAbility } from './skills';
 import {
   getAbilityModifier,
   getCharacterLevel,
@@ -478,6 +479,20 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   const modifiers = getSourceModifiers(document);
   const mod = (key: AbilityKey): number => getAbilityModifier(abilities[key]);
 
+  const bonusContext: CustomBonusContext = {
+    abilityModifiers: {
+      STRENGTH: mod('STRENGTH'),
+      DEXTERITY: mod('DEXTERITY'),
+      CONSTITUTION: mod('CONSTITUTION'),
+      INTELLIGENCE: mod('INTELLIGENCE'),
+      WISDOM: mod('WISDOM'),
+      CHARISMA: mod('CHARISMA'),
+    },
+    proficiencyBonus,
+    level,
+    classes: document.classes,
+  };
+
   const savingThrows = Object.fromEntries(
     ABILITY_KEYS.map((key) => {
       const effectKey = ABILITY_EFFECT_KEYS[key];
@@ -504,11 +519,12 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   const skills = Object.fromEntries(
     SKILL_KEYS.map((key) => {
       const base =
-        mod(SKILL_INFO[key].ability)
+        mod(getSkillAbility(document, key))
         + getSkillProficiencyBonus(
           getSkillProficiency(document, key),
           proficiencyBonus,
-        );
+        )
+        + getCustomBonusesTotal(document.skillBonuses[key] ?? [], bonusContext);
 
       return [
         key,
@@ -589,6 +605,14 @@ export function getSheetStats(document: SheetDocument): SheetStats {
       CHARISMA: savingThrows.CHARISMA ?? { bonus: 0, isAutoFail: false },
     },
     skills: toSkillRecord(skills),
+    customSkills: Object.fromEntries(
+      document.customSkills.map((skill) => [
+        skill.id,
+        mod(skill.ability)
+          + getSkillProficiencyBonus(skill.proficiency, proficiencyBonus)
+          + getCustomBonusesTotal(skill.bonuses, bonusContext),
+      ]),
+    ),
     passivePerception: PASSIVE_CHECK_BASE + (skills.PERCEPTION ?? 0),
     speeds: getEffectiveSpeeds(document, carriers, armor, context, flags),
     senses: getEffectiveSenses(document, carriers, armor, context),
