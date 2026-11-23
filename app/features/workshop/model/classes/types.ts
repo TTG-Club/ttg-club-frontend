@@ -1,6 +1,22 @@
 import type { WorkshopMechanicsFields } from '../mechanics';
 
 /** Умение класса или архетипа. */
+/**
+ * Уровень роста умения: на нём умение повторяется или усиливается
+ * («Увеличение характеристик» на 8, 12, 16, 19 уровнях).
+ */
+export interface ClassTraitScaling {
+  level: number;
+  /** Своё название на этом уровне; пусто — как у умения. */
+  name: string;
+  /** Подпись в таблице после названия: «(2)». */
+  additional: string;
+  /** Что меняется на этом уровне; пусто — описание у самого умения. */
+  description: Array<string>;
+  /** Не показывать строку в таблице подкласса: только у умений класса. */
+  hideInSubclasses: boolean;
+}
+
 export interface ClassTrait extends WorkshopMechanicsFields {
   id?: number;
   name: string;
@@ -11,6 +27,8 @@ export interface ClassTrait extends WorkshopMechanicsFields {
   /** Опциональное умение: только у классов. */
   optional: boolean;
   child: string;
+  /** Рост по уровням. */
+  scaling: Array<ClassTraitScaling>;
 }
 
 /** Колонка таблицы прогрессии: значения по двадцати уровням. */

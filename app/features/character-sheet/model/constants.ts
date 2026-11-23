@@ -1021,6 +1021,11 @@ export const NOTE_TEXT = {
  */
 export const SHEET_ROW_ACTIONS_CLASS =
   'transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:focus-within:opacity-100';
+/**
+ * Отделяет уровень повтора от умения в идентификаторе: `c12~8` — умение
+ * `c12`, повторённое на 8 уровне (рост по уровням).
+ */
+export const CLASS_FEATURE_SCALING_SEPARATOR = '~';
 
 /* --- Механика справочника ----------------------------------------------- */
 

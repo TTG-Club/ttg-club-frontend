@@ -293,6 +293,17 @@ export type ClassLevel = z.infer<typeof classLevelSchema>;
  * Умение класса или архетипа. `archetypeRoot` — сам архетип: на своём
  * уровне он идёт перед остальными умениями.
  */
+/** Уровень роста умения: повтор или усиление на другом уровне. */
+const classFeatureScalingSchema = z.object({
+  level: z.number(),
+  name: z.string().nullish(),
+  additional: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
+  hideInSubclasses: z.boolean().nullish(),
+});
+
+export type ClassFeatureScaling = z.infer<typeof classFeatureScalingSchema>;
+
 const classFeatureSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -305,6 +316,8 @@ const classFeatureSchema = z.object({
   source: z
     .object({ name: z.string().nullish(), shortName: z.string().nullish() })
     .nullish(),
+  /** Рост по уровням; у старых ответов поля нет. */
+  scaling: z.array(classFeatureScalingSchema).catch([]),
 });
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>;
