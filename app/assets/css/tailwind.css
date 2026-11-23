@@ -99,8 +99,15 @@
   }
 }
 
+/*
+ * Основной размер текста — 14px, как в core-app (`--font-size-main` там).
+ * Совпадает с `text-sm`, поэтому подписи и значения рядом не расходятся;
+ * крупнее только заголовки. `rem` не трогаем: на нём размеры Nuxt UI.
+ */
 body {
   @apply bg-main font-sans text-body;
+
+  font-size: var(--main-font-size);
 }
 
 /*
