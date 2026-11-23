@@ -1,13 +1,15 @@
 <script setup lang="ts">
+  import type { DropdownMenuItem } from '@nuxt/ui';
+
+  import type { ContentDescription } from '~content/model';
+
   import type {
-    CatalogOption,
+    CatalogRow,
+    FeatureOrigin,
     SheetDocument,
     SheetFeature,
     SheetSource,
   } from '../model';
-
-  import { ContentRender } from '~content/render';
-  import { getApiErrorMessage } from '~user/model';
 
   import {
     useCharacterSheet,
@@ -16,30 +18,59 @@
     useSheetStats,
   } from '../composables';
   import {
-    SheetCatalogPicker,
+    SheetCatalogAddModal,
     SheetConfirmModal,
+    SheetFeatureModal,
     SheetSourceChoices,
+    SheetSourceChoicesModal,
   } from '../dialogs';
   import {
     ABILITY_LABELS,
     addSources,
     createSheetElementId,
-    FEAT_SEARCH,
+    FEAT_ADD_TEXT,
+    FEAT_CATALOG_SOURCE,
+    FEATURE_ORIGIN_LABELS,
+    FEATURE_ORIGINS,
+    FEATURES_TEXT,
     getClassFeatureSourceUrl,
+    getFeatureOriginOrder,
+    getPendingChoices,
+    getSourceFeatureOrigin,
     loadFeatSource,
     removeSources,
     SHEET_ICON,
-    SHEET_LABELS,
     SHEET_TEXT,
     SOURCE_KIND_LABELS,
+    SPELL_FILTER_CHIP_CLASS,
     toAbilityKey,
   } from '../model';
+  import SheetFeatureRow from './SheetFeatureRow.vue';
   import SheetPanel from './SheetPanel.vue';
 
+  /** Строка общего списка особенностей. */
+  interface FeatureRow {
+    key: string;
+    origin: FeatureOrigin;
+    name: string;
+    sourceLabel: string;
+    choice: string;
+    increases: string;
+    pending: number;
+    url: string | null;
+    description: ContentDescription | null;
+    /** Источник механики с выборами; null — своя особенность или без них. */
+    sourceId: string | null;
+    feature: SheetFeature | null;
+    canRemove: boolean;
+  }
+
   /**
-   * Особенности: значения таблицы класса, умения классов и подклассов к
-   * текущему уровню (с выборами умения, если у него есть механика), раса,
-   * предыстория, черты и увеличения характеристик с их выборами, свои умения.
+   * Особенности, как на new.ttg.club: значения таблицы класса, затем один
+   * список — раса, умения классов, предыстория, черты и свои особенности —
+   * с бейджем источника и чипами отбора. Строка раскрывается: источник,
+   * выбор, выборы механики и описание. Свои особенности правятся окном,
+   * черты добавляются окном справочника и сразу спрашивают свои выборы.
    */
   const FEATURE_SOURCE_KINDS: ReadonlySet<SheetSource['kind']> = new Set([
     'race',
@@ -51,8 +82,6 @@
     'class',
     'subclass',
   ]);
-
-  const toast = useToast();
 
   const { document, update, editControlClass, ensureEditable } =
     useCharacterSheet();
@@ -68,7 +97,12 @@
   const { features, tableValues, isLoading } = useSheetClassData();
   const { pendingChoices, stats } = useSheetStats();
 
-  const isFeatPickerOpen = ref(false);
+  const editedFeature = ref<SheetFeature | null>(null);
+  const isEditOpen = ref(false);
+  const isFeatAddOpen = ref(false);
+  const choiceSourceIds = ref<Array<string>>([]);
+  const isChoicesOpen = ref(false);
+  const pickedOrigins = ref<Array<FeatureOrigin>>([]);
 
   const visibleTables = computed(() =>
     tableValues.value.filter((table) => table.values.length),
@@ -85,7 +119,23 @@
     ),
   );
 
-  const classFeatureRows = computed(() =>
+  /**
+   * Подпись увеличений характеристик источника: «СИЛ +1, ЛОВ +1».
+   * @param source - источник
+   */
+  function getIncreasesLabel(source: SheetSource): string {
+    return Object.entries(source.abilityIncreases)
+      .flatMap(([key, value]) => {
+        const ability = toAbilityKey(key);
+
+        return ability && value
+          ? [`${ABILITY_LABELS[ability].short} +${value}`]
+          : [];
+      })
+      .join(', ');
+  }
+
+  const classFeatureRows = computed<Array<FeatureRow>>(() =>
     features.value.map((feature) => {
       const [classId = '', featureId = ''] = feature.id.split(':');
 
@@ -103,43 +153,152 @@
       );
 
       return {
-        feature,
-        sourceId: source?.id ?? null,
+        key: `class:${feature.id}`,
+        origin: 'class',
+        name: feature.name,
+        sourceLabel: `${feature.className}, ${feature.level} ${SHEET_TEXT.levelShort}`,
+        choice: '',
+        increases: '',
         pending: source ? (pendingBySource.value[source.id] ?? 0) : 0,
-        caption: `${feature.level} ${SHEET_TEXT.levelShort} · ${feature.className}`,
+        url: null,
+        description: feature.description,
+        sourceId: source?.id ?? null,
+        feature: null,
+        canRemove: false,
       };
     }),
   );
 
-  /**
-   * Подпись прибавок к характеристикам источника: «Сила +1, Ловкость +1».
-   * @param source - источник
-   */
-  function getIncreasesLabel(source: SheetSource): string {
-    return Object.entries(source.abilityIncreases)
-      .flatMap(([key, value]) => {
-        const ability = toAbilityKey(key);
-
-        return ability && value
-          ? [`${ABILITY_LABELS[ability].short} +${value}`]
-          : [];
-      })
-      .join(', ');
-  }
-
-  const sourceRows = computed(() =>
+  const sourceRows = computed<Array<FeatureRow>>(() =>
     document.value.sources
       .filter(
         (source) => FEATURE_SOURCE_KINDS.has(source.kind) && !source.parentId,
       )
       .map((source) => ({
-        source,
-        kindLabel: SOURCE_KIND_LABELS[source.kind],
+        key: `source:${source.id}`,
+        origin: getSourceFeatureOrigin(source.kind),
+        name: source.name,
+        sourceLabel: SOURCE_KIND_LABELS[source.kind],
+        choice: '',
         increases: getIncreasesLabel(source),
         pending: pendingBySource.value[source.id] ?? 0,
+        url: source.url,
+        description: null,
+        sourceId: source.id,
+        feature: null,
         canRemove: source.kind === 'feat' && !source.classId,
       })),
   );
+
+  const customRows = computed<Array<FeatureRow>>(() =>
+    document.value.features.map((feature) => ({
+      key: `custom:${feature.id}`,
+      origin: feature.origin,
+      name: feature.name,
+      sourceLabel:
+        feature.source || FEATURE_ORIGIN_LABELS[feature.origin].label,
+      choice: feature.choice,
+      increases: '',
+      pending: 0,
+      url: null,
+      description: feature.description,
+      sourceId: null,
+      feature,
+      canRemove: true,
+    })),
+  );
+
+  /** Все особенности по группам источников, внутри группы — как пришли. */
+  const rows = computed(() =>
+    [...sourceRows.value, ...classFeatureRows.value, ...customRows.value]
+      .map((row, index) => ({ row, index }))
+      .sort(
+        (left, right) =>
+          getFeatureOriginOrder(left.row.origin)
+            - getFeatureOriginOrder(right.row.origin)
+          || left.index - right.index,
+      )
+      .map(({ row }) => row),
+  );
+
+  const availableOrigins = computed(() =>
+    FEATURE_ORIGINS.filter((origin) =>
+      rows.value.some((row) => row.origin === origin),
+    ),
+  );
+
+  const activeOrigins = computed(() =>
+    pickedOrigins.value.filter((origin) =>
+      availableOrigins.value.includes(origin),
+    ),
+  );
+
+  const originChips = computed(() =>
+    availableOrigins.value.length > 1
+      ? availableOrigins.value.map((origin) => {
+          const isPicked = activeOrigins.value.includes(origin);
+
+          return {
+            origin,
+            ...FEATURE_ORIGIN_LABELS[origin],
+            isPicked,
+            chipClass: [
+              SPELL_FILTER_CHIP_CLASS.base,
+              isPicked
+                ? SPELL_FILTER_CHIP_CLASS.selected
+                : SPELL_FILTER_CHIP_CLASS.idle,
+            ],
+          };
+        })
+      : [],
+  );
+
+  const visibleRows = computed(() =>
+    activeOrigins.value.length
+      ? rows.value.filter((row) => activeOrigins.value.includes(row.origin))
+      : rows.value,
+  );
+
+  const emptyLabel = computed(() => {
+    if (!rows.value.length) {
+      return FEATURES_TEXT.empty;
+    }
+
+    return visibleRows.value.length ? '' : FEATURES_TEXT.emptyFilter;
+  });
+
+  const addMenuItems = computed<Array<DropdownMenuItem>>(() => [
+    {
+      label: FEATURES_TEXT.addFeature,
+      icon: SHEET_ICON.edit,
+      onSelect: openCreate,
+    },
+    {
+      label: FEATURES_TEXT.addFeat,
+      icon: SHEET_ICON.catalog,
+      onSelect: openFeatAdd,
+    },
+  ]);
+
+  const takenFeatUrls = computed(() =>
+    document.value.sources.flatMap((source) =>
+      source.kind === 'feat' && source.url ? [source.url] : [],
+    ),
+  );
+
+  /**
+   * Чип источника: повторное нажатие снимает.
+   * @param origin - источник
+   */
+  function toggleOrigin(origin: FeatureOrigin): void {
+    pickedOrigins.value = pickedOrigins.value.includes(origin)
+      ? pickedOrigins.value.filter((entry) => entry !== origin)
+      : [...pickedOrigins.value, origin];
+  }
+
+  function resetOrigins(): void {
+    pickedOrigins.value = [];
+  }
 
   /**
    * Подставляет документ с ответом на выбор.
@@ -149,112 +308,144 @@
     update(() => next);
   }
 
-  /**
-   * Берёт черту из справочника: её механика применяется, выборы — здесь же.
-   * @param option - выбранная черта
-   */
-  async function addFeat(option: CatalogOption): Promise<void> {
-    try {
-      const feat = await loadFeatSource('feat', option.url, {
-        characterLevel: stats.value.level,
-      });
-
-      update((current) => addSources(current, [feat]));
-    } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
-        color: 'error',
-      });
-    }
-  }
-
-  /**
-   * Снимает черту со всеми выдачами.
-   * @param id - источник черты
-   */
-  function removeFeat(id: string): void {
-    update((current) => removeSources(current, [id]));
-  }
-
-  /**
-   * Меняет своё умение.
-   * @param id - умение
-   * @param patch - изменённые поля
-   */
-  function patchFeature(id: string, patch: Partial<SheetFeature>): void {
-    update((current) => ({
-      ...current,
-      features: current.features.map((feature) =>
-        feature.id === id ? { ...feature, ...patch } : feature,
-      ),
-    }));
-  }
-
-  function addFeature(): void {
-    update((current) => ({
-      ...current,
-      features: [
-        ...current.features,
-        {
-          id: createSheetElementId(),
-          name: SHEET_LABELS.feature,
-          source: '',
-          description: '',
-        },
-      ],
-    }));
-  }
-
-  /**
-   * Убирает своё умение.
-   * @param id - умение
-   */
-  function removeFeature(id: string): void {
-    update((current) => ({
-      ...current,
-      features: current.features.filter((feature) => feature.id !== id),
-    }));
-  }
-
-  function openFeatPicker(): void {
+  function openCreate(): void {
     if (!ensureEditable()) {
       return;
     }
 
-    isFeatPickerOpen.value = true;
+    editedFeature.value = {
+      id: createSheetElementId(),
+      name: '',
+      source: '',
+      origin: 'custom',
+      choice: '',
+      description: [],
+    };
+
+    isEditOpen.value = true;
   }
 
   /**
-   * Спрашивает подтверждение удаления.
-   * @param source - черта
+   * Правка своей особенности.
+   * @param feature - особенность
    */
-  function askRemoveFeat(source: { id: string; name: string }): void {
-    askRemove(source.name, () => removeFeat(source.id));
+  function openEdit(feature: SheetFeature | null): void {
+    if (!feature || !ensureEditable()) {
+      return;
+    }
+
+    editedFeature.value = feature;
+    isEditOpen.value = true;
   }
 
   /**
-   * Спрашивает подтверждение удаления.
-   * @param feature - умение
+   * Сохраняет свою особенность: новая добавляется, прежняя заменяется.
+   * @param saved - особенность из окна
    */
-  function askRemoveFeature(feature: { id: string; name: string }): void {
-    askRemove(feature.name, () => removeFeature(feature.id));
+  function saveFeature(saved: SheetFeature): void {
+    update((current) => ({
+      ...current,
+      features: current.features.some((feature) => feature.id === saved.id)
+        ? current.features.map((feature) =>
+            feature.id === saved.id ? saved : feature,
+          )
+        : [...current.features, saved],
+    }));
+  }
+
+  function openFeatAdd(): void {
+    if (ensureEditable()) {
+      isFeatAddOpen.value = true;
+    }
+  }
+
+  /**
+   * Черта справочника с механикой.
+   * @param row - строка окна добавления
+   */
+  function loadFeat(row: CatalogRow): Promise<SheetSource> {
+    return loadFeatSource('feat', row.url, {
+      characterLevel: stats.value.level,
+    });
+  }
+
+  /** Вид дровера описания: у окна черт он один. */
+  function getFeatPreviewType(): 'feat' {
+    return 'feat';
+  }
+
+  /**
+   * Берёт черты: механика применяется, а несделанные выборы сразу
+   * открываются окном выборов.
+   * @param feats - загруженные черты
+   */
+  function addFeats(feats: Array<SheetSource>): void {
+    let next: SheetDocument = document.value;
+
+    update((current) => {
+      next = addSources(current, feats);
+
+      return next;
+    });
+
+    const ids = feats.map((feat) => feat.id);
+
+    const pending = getPendingChoices(next).filter((entry) =>
+      ids.includes(entry.source.id),
+    );
+
+    if (pending.length) {
+      choiceSourceIds.value = [
+        ...new Set(pending.map((entry) => entry.source.id)),
+      ];
+
+      isChoicesOpen.value = true;
+    }
+  }
+
+  /**
+   * Спрашивает подтверждение удаления: черта снимается со всеми выдачами,
+   * своя особенность — просто убирается.
+   * @param row - строка
+   */
+  function askRemoveRow(row: FeatureRow): void {
+    if (!ensureEditable()) {
+      return;
+    }
+
+    const { sourceId, feature } = row;
+
+    askRemove(row.name, () =>
+      update((current) => {
+        if (feature) {
+          return {
+            ...current,
+            features: current.features.filter(
+              (entry) => entry.id !== feature.id,
+            ),
+          };
+        }
+
+        return sourceId ? removeSources(current, [sourceId]) : current;
+      }),
+    );
   }
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 pt-2">
+  <div class="flex flex-col gap-3 pt-2">
     <SheetPanel
       v-if="visibleTables.length"
-      :title="SHEET_LABELS.classTable"
+      :title="FEATURES_TEXT.classTable"
     >
       <div
         v-for="table in visibleTables"
         :key="table.id"
         class="flex flex-col gap-1"
       >
-        <span class="text-sm font-semibold text-highlighted">{{
-          table.name
-        }}</span>
+        <span class="text-sm font-semibold text-highlighted">
+          {{ table.name }}
+        </span>
 
         <div class="flex flex-wrap gap-2">
           <UBadge
@@ -269,221 +460,114 @@
       </div>
     </SheetPanel>
 
-    <SheetPanel
-      :title="SHEET_LABELS.classFeatures"
-      persistent-actions
-    >
-      <template #title-actions>
-        <UIcon
-          v-if="isLoading"
-          :name="SHEET_ICON.loading"
-          class="size-4 animate-spin text-muted"
-        />
-      </template>
-
-      <div
-        v-if="classFeatureRows.length"
-        class="flex flex-col gap-1"
+    <div class="flex flex-wrap items-center gap-x-1.5 gap-y-2">
+      <UTooltip
+        v-for="chip in originChips"
+        :key="chip.origin"
+        :text="chip.hint"
       >
-        <UCollapsible
-          v-for="row in classFeatureRows"
-          :key="row.feature.id"
-          class="rounded-lg border border-default/50 bg-elevated/20"
+        <button
+          type="button"
+          :class="chip.chipClass"
+          :aria-pressed="chip.isPicked"
+          @click.left.exact.prevent="toggleOrigin(chip.origin)"
         >
-          <button
-            type="button"
-            class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
-          >
-            <span class="flex items-center gap-2 text-highlighted">
-              {{ row.feature.name }}
+          {{ chip.label }}
+        </button>
+      </UTooltip>
 
-              <UBadge
-                v-if="row.pending"
-                :label="String(row.pending)"
-                color="warning"
-                variant="subtle"
-                size="sm"
-              />
-            </span>
-
-            <span class="shrink-0 text-xs text-muted">{{ row.caption }}</span>
-          </button>
-
-          <template #content>
-            <div class="flex flex-col gap-3 px-3 pb-3 text-sm">
-              <SheetSourceChoices
-                v-if="row.sourceId"
-                :document="document"
-                :source-id="row.sourceId"
-                @change="applyDocument"
-              />
-
-              <ContentRender :content="row.feature.description" />
-            </div>
-          </template>
-        </UCollapsible>
-      </div>
-
-      <p
-        v-else
-        class="text-sm text-muted"
+      <UTooltip
+        v-if="activeOrigins.length"
+        :text="FEATURES_TEXT.resetHint"
       >
-        {{ SHEET_LABELS.emptyFeatures }}
-      </p>
-    </SheetPanel>
-
-    <SheetPanel
-      :title="SOURCE_KIND_LABELS.feat"
-      persistent-actions
-    >
-      <template #title-actions>
         <UButton
-          :label="SHEET_LABELS.add"
-          :icon="SHEET_ICON.add"
+          icon="tabler:filter-off"
+          :label="FEATURES_TEXT.reset"
           color="neutral"
           variant="ghost"
           size="xs"
-          :class="editControlClass"
-          @click.left.exact.prevent="openFeatPicker"
+          @click.left.exact.prevent="resetOrigins"
         />
-      </template>
+      </UTooltip>
 
-      <div
-        v-for="row in sourceRows"
-        :key="row.source.id"
-        class="flex flex-col gap-2 rounded-lg border border-default/50 bg-elevated/20 p-3"
+      <UIcon
+        v-if="isLoading"
+        :name="SHEET_ICON.loading"
+        :aria-label="FEATURES_TEXT.loading"
+        class="size-4 animate-spin text-muted"
+      />
+
+      <UDropdownMenu
+        :items="addMenuItems"
+        :content="{ align: 'end' }"
       >
-        <div class="flex flex-wrap items-center gap-2">
-          <NuxtLink
-            v-if="row.source.url"
-            :to="row.source.url"
-            target="_blank"
-            class="text-sm font-medium text-highlighted hover:text-primary"
-          >
-            {{ row.source.name }}
-          </NuxtLink>
+        <UButton
+          :label="FEATURES_TEXT.add"
+          :icon="SHEET_ICON.add"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          class="ml-auto"
+          :class="editControlClass"
+        />
+      </UDropdownMenu>
+    </div>
 
-          <span
-            v-else
-            class="text-sm font-medium text-highlighted"
-          >
-            {{ row.source.name }}
-          </span>
-
-          <UBadge
-            :label="row.kindLabel"
-            color="neutral"
-            variant="subtle"
-            size="sm"
-          />
-
-          <UBadge
-            v-if="row.increases"
-            :label="row.increases"
-            color="primary"
-            variant="subtle"
-            size="sm"
-          />
-
-          <UBadge
-            v-if="row.pending"
-            :label="String(row.pending)"
-            color="warning"
-            variant="subtle"
-            size="sm"
-          />
-
-          <UButton
-            v-if="row.canRemove"
-            :icon="SHEET_ICON.remove"
-            :aria-label="SHEET_LABELS.remove"
-            color="error"
-            variant="ghost"
-            size="xs"
-            class="ml-auto"
-            :class="editControlClass"
-            @click.left.exact.prevent="askRemoveFeat(row.source)"
-          />
-        </div>
-
+    <SheetFeatureRow
+      v-for="row in visibleRows"
+      :key="row.key"
+      :name="row.name"
+      :origin="row.origin"
+      :source-label="row.sourceLabel"
+      :choice="row.choice"
+      :increases="row.increases"
+      :pending="row.pending"
+      :url="row.url"
+      :description="row.description"
+      :can-edit="row.feature !== null"
+      :can-remove="row.canRemove"
+      @edit="openEdit(row.feature)"
+      @remove="askRemoveRow(row)"
+    >
+      <template
+        v-if="row.sourceId"
+        #default
+      >
         <SheetSourceChoices
           :document="document"
-          :source-id="row.source.id"
+          :source-id="row.sourceId"
           @change="applyDocument"
         />
-      </div>
-    </SheetPanel>
-
-    <SheetPanel
-      :title="SHEET_LABELS.customFeatures"
-      persistent-actions
-    >
-      <template #title-actions>
-        <UButton
-          :label="SHEET_LABELS.add"
-          :icon="SHEET_ICON.add"
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          :class="editControlClass"
-          @click.left.exact.prevent="addFeature"
-        />
       </template>
+    </SheetFeatureRow>
 
-      <div
-        v-for="feature in document.features"
-        :key="feature.id"
-        class="flex flex-col gap-2 rounded-lg border border-default/50 p-3"
-      >
-        <div class="flex items-center gap-2">
-          <UInput
-            :model-value="feature.name"
-            :placeholder="SHEET_LABELS.name"
-            size="sm"
-            class="min-w-0 flex-1"
-            @update:model-value="
-              patchFeature(feature.id, { name: String($event) })
-            "
-          />
+    <div
+      v-if="emptyLabel"
+      class="flex h-40 items-center justify-center rounded-lg border border-dashed border-default text-sm text-dimmed"
+    >
+      {{ emptyLabel }}
+    </div>
 
-          <UInput
-            :model-value="feature.source"
-            :placeholder="SHEET_LABELS.source"
-            size="sm"
-            class="w-32"
-            @update:model-value="
-              patchFeature(feature.id, { source: String($event) })
-            "
-          />
+    <SheetFeatureModal
+      v-model:open="isEditOpen"
+      :feature="editedFeature"
+      @save="saveFeature"
+    />
 
-          <UButton
-            :icon="SHEET_ICON.remove"
-            :aria-label="SHEET_LABELS.remove"
-            color="error"
-            variant="ghost"
-            size="sm"
-            @click.left.exact.prevent="askRemoveFeature(feature)"
-          />
-        </div>
+    <SheetCatalogAddModal
+      v-model:open="isFeatAddOpen"
+      :title="FEAT_ADD_TEXT.title"
+      :source="FEAT_CATALOG_SOURCE"
+      :taken-urls="takenFeatUrls"
+      :taken-label="FEAT_ADD_TEXT.taken"
+      :loader="loadFeat"
+      :preview-type="getFeatPreviewType"
+      @add="addFeats"
+    />
 
-        <UTextarea
-          :model-value="feature.description"
-          :placeholder="SHEET_LABELS.description"
-          :rows="2"
-          autoresize
-          class="w-full"
-          @update:model-value="
-            patchFeature(feature.id, { description: String($event) })
-          "
-        />
-      </div>
-    </SheetPanel>
-
-    <SheetCatalogPicker
-      v-model:open="isFeatPickerOpen"
-      :title="SOURCE_KIND_LABELS.feat"
-      :source="FEAT_SEARCH"
-      @pick="addFeat"
+    <SheetSourceChoicesModal
+      v-model:open="isChoicesOpen"
+      :source-ids="choiceSourceIds"
     />
 
     <SheetConfirmModal

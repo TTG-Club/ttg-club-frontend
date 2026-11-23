@@ -9,7 +9,12 @@ import type { CatalogRow } from './types';
 
 import { z } from 'zod';
 
-import { spellLinkSchema, SPELLS_SECTION } from '~character/model';
+import {
+  featLinkSchema,
+  FEATS_SECTION,
+  spellLinkSchema,
+  SPELLS_SECTION,
+} from '~character/model';
 import {
   armorLinkSchema,
   ARMORS_SECTION,
@@ -22,6 +27,7 @@ import {
 } from '~inventory/model';
 
 import {
+  FEAT_ADD_TEXT,
   KEYBOARD_LAYOUT_EN,
   KEYBOARD_LAYOUT_RU,
   SPELL_FILTER_KEYS,
@@ -68,6 +74,36 @@ export const SPELL_CATALOG_SOURCE: CatalogAddSource = {
         price: '',
         source: entry.source?.shortName ?? '',
       })),
+};
+
+/**
+ * Раздел черт для окна добавления: группы по книге-источнику, требования —
+ * подписью строки.
+ */
+export const FEAT_CATALOG_SOURCE: CatalogAddSource = {
+  section: FEATS_SECTION,
+  parseRows: (raw) => {
+    const entries = z.array(featLinkSchema).parse(raw);
+
+    const groupOrder = [
+      ...new Set(entries.map((entry) => entry.source?.name ?? '')),
+    ];
+
+    return entries.map((entry) => {
+      const group = entry.source?.name ?? '';
+
+      return {
+        url: entry.url,
+        name: entry.name.rus,
+        nameEng: entry.name.eng,
+        group: group || FEAT_ADD_TEXT.noGroup,
+        groupOrder: groupOrder.indexOf(group),
+        caption: entry.requirements ?? '',
+        price: '',
+        source: entry.source?.shortName ?? '',
+      };
+    });
+  },
 };
 
 /**

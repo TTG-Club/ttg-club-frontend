@@ -816,6 +816,212 @@ export const SHEET_ICON = {
   empty: 'tabler:mood-empty',
 } as const;
 
+/* --- Особенности -------------------------------------------------------- */
+
+/** Виды источника особенности: бейдж строки и чип отбора. */
+export const FEATURE_ORIGINS = [
+  'race',
+  'class',
+  'background',
+  'feat',
+  'custom',
+] as const;
+
+/** Подписи источников особенностей. */
+export const FEATURE_ORIGIN_LABELS: Record<
+  (typeof FEATURE_ORIGINS)[number],
+  { label: string; hint: string }
+> = {
+  race: { label: 'Раса', hint: 'Особенности расы и разновидности' },
+  class: { label: 'Класс', hint: 'Умения классов и подклассов' },
+  background: { label: 'Предыстория', hint: 'Умение предыстории' },
+  feat: { label: 'Черта', hint: 'Черты и увеличения характеристик' },
+  custom: { label: 'Своё', hint: 'Особенности, добавленные вручную' },
+};
+
+/** Цвет бейджа источника особенности. */
+export const FEATURE_ORIGIN_COLORS = {
+  race: 'success',
+  class: 'primary',
+  background: 'warning',
+  feat: 'secondary',
+  custom: 'neutral',
+} as const;
+
+/** Подписи вкладки особенностей. */
+export const FEATURES_TEXT = {
+  add: 'Добавить',
+  addFeature: 'Особенность',
+  addFeat: 'Черта',
+  reset: 'Сбросить',
+  resetHint: 'Показать все особенности',
+  empty: 'Особенностей пока нет',
+  emptyFilter: 'Под отбор ничего не подошло',
+  source: 'Источник',
+  choice: 'Выбор',
+  noDescription: 'Описание не заполнено',
+  edit: 'Изменить',
+  remove: 'Убрать',
+  pending: 'Не сделано выборов',
+  increases: 'Увеличения',
+  open: 'Открыть в справочнике',
+  classTable: 'Таблица класса',
+  loading: 'Загружаем умения классов…',
+} as const;
+
+/** Подписи окна своей особенности. */
+export const FEATURE_FORM_TEXT = {
+  createTitle: 'Своя особенность',
+  editTitle: 'Изменить особенность',
+  name: 'Название',
+  origin: 'Источник',
+  source: 'Название источника',
+  sourcePlaceholder: 'Например, «Эльф» или «Воин»',
+  choice: 'Выбор',
+  choicePlaceholder: 'Например, «Боевой стиль: защита»',
+  description: 'Описание',
+  save: 'Сохранить',
+  add: 'Добавить',
+  cancel: 'Отмена',
+} as const;
+
+/** Подписи окна выбора черт. */
+export const FEAT_ADD_TEXT = {
+  title: 'Черты',
+  search: 'Поиск по названию',
+  taken: 'Уже взята',
+  repeatable: 'Можно брать несколько раз',
+  preview: 'Открыть описание',
+  select: 'Выбрать',
+  add: 'Добавить',
+  next: 'Далее',
+  back: 'Назад',
+  cancel: 'Отмена',
+  clear: 'Снять выбор',
+  empty: 'Ничего не найдено',
+  error: 'Не удалось загрузить черты',
+  retry: 'Повторить',
+  addFailed: 'Не удалось добавить черты',
+  choicesTitle: 'Выборы черт',
+  noChoices: 'У выбранных черт нет выборов',
+  done: 'Готово',
+  noGroup: 'Прочие',
+} as const;
+
+/** Подписи вкладки эффектов. */
+export const EFFECTS_TAB_TEXT = {
+  filters: {
+    applied: {
+      label: 'Наложенные',
+      hint: 'Состояния и свои эффекты',
+    },
+    features: {
+      label: 'Умения и черты',
+      hint: 'Эффекты умений, черт, расы и предыстории',
+    },
+    items: { label: 'Снаряжение', hint: 'Эффекты надетых предметов' },
+  },
+  reset: 'Сбросить',
+  add: 'Добавить',
+  empty: 'Эффектов пока нет',
+  emptyFilter: 'Под отбор ничего не подошло',
+  noDescription: 'Описания нет',
+  condition: 'Состояние',
+  own: 'Свой эффект',
+  enable: 'Включить',
+  disable: 'Выключить',
+  edit: 'Изменить',
+  remove: 'Убрать',
+  conditions: 'Состояния',
+} as const;
+
+/** Виды источника эффекта для отбора. */
+export const EFFECT_FILTER_KEYS = ['applied', 'features', 'items'] as const;
+
+/** Подписи вкладки личности. */
+export const PERSONALITY_TEXT = {
+  traitsTitle: 'Приметы',
+  editTraits: 'Изменить приметы',
+  backgroundTitle: 'Предыстория',
+  noBackground: 'Предыстория не выбрана',
+  chooseBackground: 'Выбрать',
+  openBackground: 'Открыть в справочнике',
+  empty: 'Не заполнено',
+  add: 'Добавить',
+  edit: 'Изменить',
+  modalTitle: 'Приметы',
+  reset: 'Сбросить',
+  apply: 'Применить',
+  cancel: 'Отмена',
+  save: 'Сохранить',
+  alignmentPlaceholder: 'Выберите или впишите',
+} as const;
+
+/** Краткие приметы персонажа: поле, подпись и подсказка. */
+export const PERSONALITY_TRAIT_FIELDS = [
+  { key: 'age', label: 'Возраст', placeholder: '25 лет' },
+  { key: 'height', label: 'Рост', placeholder: '180 см' },
+  { key: 'weight', label: 'Вес', placeholder: '75 кг' },
+  { key: 'eyes', label: 'Глаза', placeholder: 'Карие' },
+  { key: 'hair', label: 'Волосы', placeholder: 'Тёмные' },
+  { key: 'skin', label: 'Кожа', placeholder: 'Смуглая' },
+] as const;
+
+/** Плитка приметы: подпись и значение в две строки. */
+export const PERSONALITY_TILE_CLASS =
+  'flex min-w-0 cursor-pointer flex-col items-start gap-0.5 rounded-lg border border-default/50 bg-elevated/20 px-3 py-2 text-left transition-colors hover:border-primary/60';
+
+/** Длина краткой приметы. */
+export const PERSONALITY_TRAIT_MAX_LENGTH = 40;
+
+/** Тексты личности в разметке: черты характера 2014 и описания. */
+export const PERSONALITY_TEXT_FIELDS = [
+  { key: 'traits', label: 'Черты характера', isWide: false },
+  { key: 'ideals', label: 'Идеалы', isWide: false },
+  { key: 'bonds', label: 'Привязанности', isWide: false },
+  { key: 'flaws', label: 'Слабости', isWide: false },
+  { key: 'appearance', label: 'Внешность и описание', isWide: true },
+  { key: 'backstory', label: 'История персонажа', isWide: true },
+] as const;
+
+/** Мировоззрения PHB 2014. */
+export const ALIGNMENTS = [
+  'Законно-добрый',
+  'Нейтрально-добрый',
+  'Хаотично-добрый',
+  'Законно-нейтральный',
+  'Нейтральный',
+  'Хаотично-нейтральный',
+  'Законно-злой',
+  'Нейтрально-злой',
+  'Хаотично-злой',
+  'Без мировоззрения',
+] as const;
+
+/** Подписи заметок. */
+export const NOTE_TEXT = {
+  add: 'Добавить заметку',
+  createTitle: 'Новая заметка',
+  editTitle: 'Изменить заметку',
+  title: 'Название',
+  titlePlaceholder: 'Например, «Задания»',
+  text: 'Текст',
+  textPlaceholder: 'Что нужно запомнить',
+  untitled: 'Без названия',
+  save: 'Сохранить',
+  cancel: 'Отмена',
+  edit: 'Изменить',
+  remove: 'Убрать',
+  empty: 'Заметок пока нет',
+} as const;
+
+/**
+ * Кнопки действий строки: на широком экране проявляются по наведению или
+ * фокусу, на узком видны всегда.
+ */
+export const SHEET_ROW_ACTIONS_CLASS =
+  'transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:focus-within:opacity-100';
+
 /* --- Механика справочника ----------------------------------------------- */
 
 /**

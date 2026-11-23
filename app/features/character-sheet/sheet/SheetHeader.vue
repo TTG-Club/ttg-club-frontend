@@ -7,7 +7,11 @@
 
   import { getApiErrorMessage } from '~user/model';
 
-  import { useCharacterSheet, useSheetStats } from '../composables';
+  import {
+    useCharacterSheet,
+    useSheetPickers,
+    useSheetStats,
+  } from '../composables';
   import {
     SheetAbilityScoresModal,
     SheetCatalogPicker,
@@ -89,7 +93,7 @@
 
   const isRacePickerOpen = ref(false);
   const isCustomRaceOpen = ref(false);
-  const isBackgroundPickerOpen = ref(false);
+  const { isBackgroundPickerOpen } = useSheetPickers();
   const isClassesOpen = ref(false);
   const isVisionOpen = ref(false);
   const isSizeOpen = ref(false);

@@ -7,6 +7,7 @@ export * from './choices';
 export * from './constants';
 export * from './counters';
 export * from './effects';
+export * from './features';
 export * from './grants';
 export * from './health';
 export * from './inventory';

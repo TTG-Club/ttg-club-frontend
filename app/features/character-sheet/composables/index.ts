@@ -11,6 +11,7 @@ export { useRemoveConfirm } from './useRemoveConfirm';
 export { useSheetActiveEffects } from './useSheetActiveEffects';
 export { useSheetClassData } from './useSheetClassData';
 export { useSheetList } from './useSheetList';
+export { useSheetPickers } from './useSheetPickers';
 export { useSheetRoll } from './useSheetRoll';
 export { useSheetSpellcasting } from './useSheetSpellcasting';
 export { useSheetStats } from './useSheetStats';
