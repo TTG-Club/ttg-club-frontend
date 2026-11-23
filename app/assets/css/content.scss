@@ -6,36 +6,36 @@
  */
 
 :root {
-  --main-font-size: 16px;
+  --main-font-size: 14px;
   --h1-font-size: 38px;
   --h2-font-size: 30px;
   --h3-font-size: 26px;
   --h4-font-size: 22px;
-  --h5-font-size: 16px;
+  --h5-font-size: 14px;
 }
 :root {
-  --main-line-height: 24px;
+  --main-line-height: 19px;
   --h1-line-height: 52px;
   --h2-line-height: 38px;
   --h3-line-height: 34px;
   --h4-line-height: 28px;
-  --h5-line-height: 24px;
+  --h5-line-height: 19px;
 }
 
 @media (max-width: 800px) {
   :root {
-    --main-font-size: 16px;
+    --main-font-size: 14px;
     --h1-font-size: 32px;
     --h2-font-size: 28px;
     --h3-font-size: 24px;
     --h4-font-size: 20px;
-    --h5-font-size: 16px;
+    --h5-font-size: 14px;
   }
 }
 
 /*
- * Базовый размер задаётся контейнеру, а не только `p`: иначе таблицы, подписи,
- * списки и голый текст наследуют размер body и выглядят крупнее абзацев.
+ * Базовый размер задаётся контейнеру, а не только `p`: таблицы, подписи,
+ * списки и голый текст получают тот же размер и интервал, что абзацы.
  * Строчный рендер (`tag="span"`) берёт размер окружающего текста.
  */
 .content-render:not(span) {
