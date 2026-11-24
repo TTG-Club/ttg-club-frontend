@@ -1,5 +1,6 @@
 export type { LevelUpStep } from './useLevelUpWizard';
 
+export { useAvatarCrop } from './useAvatarCrop';
 export { useCatalogList } from './useCatalogList';
 export { useCatalogSearch } from './useCatalogSearch';
 export { useCatalogTree } from './useCatalogTree';
@@ -9,6 +10,7 @@ export { useClassLevelActions } from './useClassLevelActions';
 export { useLevelUpWizard } from './useLevelUpWizard';
 export { useRemoveConfirm } from './useRemoveConfirm';
 export { useSheetActiveEffects } from './useSheetActiveEffects';
+export { useSheetAvatar } from './useSheetAvatar';
 export { useSheetClassData } from './useSheetClassData';
 export { useSheetList } from './useSheetList';
 export { useSheetPickers } from './useSheetPickers';

@@ -7,6 +7,8 @@ import type {
   ABILITY_IMPROVEMENT_MODES,
   ABILITY_KEYS,
   CHOICE_KINDS,
+  CROP_CORNER_EDGES,
+  CROP_DIRECTION_OFFSETS,
   CURRENCY_KEYS,
   EXTRA_SPEED_KEYS,
   FEATURE_ORIGINS,
@@ -534,3 +536,25 @@ export interface ProficiencyCatalogGroup {
   title: string;
   items: ReadonlyArray<string>;
 }
+
+/** Квадратная область выбора портрета в пикселях исходного изображения. */
+export interface CropArea {
+  /** Отступ от левого края изображения. */
+  x: number;
+  /** Отступ от верхнего края изображения. */
+  y: number;
+  /** Сторона квадрата. */
+  size: number;
+}
+
+/** Размеры изображения в пикселях. */
+export interface ImageSize {
+  width: number;
+  height: number;
+}
+
+/** Угол области, за который её тянут при изменении размера. */
+export type CropCorner = keyof typeof CROP_CORNER_EDGES;
+
+/** Направление сдвига области стрелками. */
+export type CropDirection = keyof typeof CROP_DIRECTION_OFFSETS;

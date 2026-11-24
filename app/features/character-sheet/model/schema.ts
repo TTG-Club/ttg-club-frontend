@@ -18,6 +18,7 @@ import {
   LEGACY_PROFICIENCY_SEPARATOR,
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
+  SHEET_AVATAR_URL_PREFIX,
   SHEET_SCHEMA_VERSION,
   SHEET_SIZE_KEYS,
   SKILL_KEYS,
@@ -573,6 +574,15 @@ export type ExtraSpeeds = z.infer<typeof extraSpeedsSchema>;
 
 export const sheetDocumentSchema = z.object({
   schemaVersion: z.literal(SHEET_SCHEMA_VERSION).catch(SHEET_SCHEMA_VERSION),
+  /**
+   * Портрет персонажа — адрес файла листа в хранилище сайта; null — портрета
+   * нет. Чужие адреса отбрасываются: картинку с другого сайта лист не грузит.
+   */
+  avatarUrl: z
+    .string()
+    .startsWith(SHEET_AVATAR_URL_PREFIX)
+    .nullable()
+    .catch(null),
   race: catalogRefSchema.nullable().catch(null),
   raceAbilityBonuses: abilityBonusesSchema,
   background: catalogRefSchema.nullable().catch(null),
