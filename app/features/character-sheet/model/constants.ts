@@ -1027,6 +1027,12 @@ export const SHEET_ROW_ACTIONS_CLASS =
  */
 export const CLASS_FEATURE_SCALING_SEPARATOR = '~';
 
+/** Тип выбора бэкенда для особенностей класса (вариантов умения). */
+export const CHOICE_TYPE_OPTION = 'OPTION';
+
+/** Ключ выбора из вариантов умения: префикс и идентификатор умения. */
+export const FEATURE_OPTIONS_CHOICE_PREFIX = 'featureOptions:';
+
 /* --- Механика справочника ----------------------------------------------- */
 
 /**

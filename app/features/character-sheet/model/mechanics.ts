@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { normalizeLoadedActiveEffects } from '~active-effects/model';
 import { entryNameSchema } from '~section/model';
 
-import { CLASS_FEATURE_SCALING_SEPARATOR } from './constants';
+import {
+  CHOICE_TYPE_OPTION,
+  CLASS_FEATURE_SCALING_SEPARATOR,
+  FEATURE_OPTIONS_CHOICE_PREFIX,
+} from './constants';
 
 /*
  * Механика записей справочника для листа — блоки `mechanics` и
@@ -86,6 +90,8 @@ export const mechanicsChoiceSchema = z.object({
       z.object({
         value: z.string().catch(''),
         name: nullableStringSchema,
+        /** С какого уровня вариант доступен (варианты умения класса). */
+        level: nullableNumberSchema,
       }),
     )
     .nullish()
@@ -314,9 +320,71 @@ export const mechanicsClassFeatureSchema = z.object({
   scaling: z
     .array(z.object({ level: z.number(), name: z.string().nullish() }))
     .catch([]),
+  /** Варианты умения и выбор из них (воззвания, манёвры, боевые стили). */
+  optionsName: z.string().nullish(),
+  options: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string(),
+        level: z.number().nullish(),
+      }),
+    )
+    .catch([]),
+  optionsChoice: z
+    .object({
+      label: z.string().nullish(),
+      count: z.number().catch(0),
+      scaling: z
+        .array(z.object({ level: z.number(), count: z.number() }))
+        .catch([]),
+    })
+    .nullish()
+    .catch(null),
 });
 
 export type MechanicsClassFeature = z.infer<typeof mechanicsClassFeatureSchema>;
+
+/**
+ * Механика умения вместе с выбором из его вариантов: варианты становятся
+ * выбором вида «особенность класса» со списком их адресов в разделе
+ * «Особенности классов», количество и его рост — из настройки выбора.
+ * Ответ на такой выбор подтягивает особенность из раздела дочерним
+ * источником со своей механикой.
+ * @param feature - умение карточки класса
+ */
+function withOptionsChoice(
+  feature: MechanicsClassFeature,
+): MechanicsClassFeature {
+  const choice = feature.optionsChoice;
+
+  if (!choice || !feature.options.length) {
+    return feature;
+  }
+
+  const mechanics = catalogMechanicsSchema.parse(feature.mechanics ?? {});
+  const base = mechanics ?? catalogMechanicsSchema.parse({});
+
+  const optionsChoice = mechanicsChoiceSchema.parse({
+    key: `${FEATURE_OPTIONS_CHOICE_PREFIX}${feature.id}`,
+    type: CHOICE_TYPE_OPTION,
+    label: choice.label || feature.optionsName || null,
+    count: choice.count,
+    scaling: choice.scaling,
+    options: feature.options.map((option) => ({
+      value: option.url,
+      name: option.name,
+      level: option.level ?? null,
+    })),
+  });
+
+  return {
+    ...feature,
+    mechanics: base
+      ? { ...base, choices: [...(base.choices ?? []), optionsChoice] }
+      : null,
+  };
+}
 
 /**
  * Механика карточки класса или архетипа: верхний блок, умения и архетип в
@@ -334,11 +402,13 @@ export const classMechanicsDetailSchema = z.object({
         .catch(null)
         .transform((values) =>
           (values ?? []).flatMap((value) => {
-            const parsed = mechanicsClassFeatureSchema.safeParse(value);
+            const result = mechanicsClassFeatureSchema.safeParse(value);
 
-            if (!parsed.success) {
+            if (!result.success) {
               return [];
             }
+
+            const parsed = { data: withOptionsChoice(result.data) };
 
             // Повтор умения на другом уровне — отдельное умение уровня без
             // своей механики: выдачи умения уже сделаны на его уровне
@@ -350,6 +420,8 @@ export const classMechanicsDetailSchema = z.object({
               mechanics: null,
               activeEffects: [],
               scaling: [],
+              options: [],
+              optionsChoice: null,
             }));
 
             return [parsed.data, ...repeats];
