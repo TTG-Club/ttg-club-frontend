@@ -238,6 +238,20 @@ export default defineNuxtConfig({
 
   // Nitro
   nitro: {
+    // Кэш ответов каталога (server/domain/catalog-cache): в памяти процесса,
+    // давно не читанные ответы вытесняются. `ttl` — страховка для правок мимо
+    // сайта (заливки скриптами, правки в базе): они появятся не позже этого
+    // срока. Правка через мастерскую сбрасывает кэш сразу.
+    storage: {
+      'catalog-cache': {
+        driver: 'lru-cache',
+        max: 2000,
+        // 64 МБ
+        maxSize: 64 * 1024 * 1024,
+        ttl: ms('10m'),
+      },
+    },
+
     minify: true,
 
     compressPublicAssets: {
