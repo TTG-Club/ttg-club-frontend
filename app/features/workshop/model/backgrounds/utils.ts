@@ -2,7 +2,12 @@ import type { BackgroundForm } from './schemas';
 import type { PersonalizationTable, WorkshopBackground } from './types';
 
 import { WORKSHOP_LIST_JOINER, WORKSHOP_SKILL_OPTIONS } from '../constants';
-import { splitList, toOptionalText } from '../utils';
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
+import { splitList, toOptionalMarkup, toOptionalText } from '../utils';
 import {
   PERSONALIZATION_TEXT_COLUMN,
   PERSONALIZATION_TYPE_OPTIONS,
@@ -81,19 +86,20 @@ export function createBackgroundForm(
     altName: background?.altName ?? '',
     skills: [...(background?.skills ?? [])],
     otherSkills: background?.otherSkills ?? '',
-    toolOwnership: background?.toolOwnership ?? '',
-    equipments: background?.equipments ?? '',
+    toolOwnership: [...(background?.toolOwnership ?? [])],
+    equipments: [...(background?.equipments ?? [])],
     startGold: background?.startGold ?? null,
     languages: background?.languages ?? '',
     language: background?.language ?? '',
     lifeStyle: background?.lifeStyle || undefined,
-    description: background?.description ?? '',
+    description: [...(background?.description ?? [])],
     skillName: background?.skillName ?? '',
-    skillDescription: background?.skillDescription ?? '',
-    personalization: background?.personalization ?? '',
+    skillDescription: [...(background?.skillDescription ?? [])],
+    personalization: [...(background?.personalization ?? [])],
     personalizationTables: (background?.personalizationTables ?? []).map(
       (table) => ({ type: table.type, values: [...table.values] }),
     ),
+    ...copyMechanicsFields(background),
   };
 }
 
@@ -112,18 +118,19 @@ export function getBackgroundPayload(
     source: toOptionalText(source),
     altName: toOptionalText(form.altName),
     otherSkills: toOptionalText(form.otherSkills),
-    toolOwnership: toOptionalText(form.toolOwnership),
-    equipments: toOptionalText(form.equipments),
+    toolOwnership: toOptionalMarkup(form.toolOwnership),
+    equipments: toOptionalMarkup(form.equipments),
     startGold: form.startGold ?? undefined,
     languages: splitList(form.languages),
     language: toOptionalText(form.language),
     lifeStyle: toOptionalText(form.lifeStyle),
     skillName: toOptionalText(form.skillName),
-    skillDescription: toOptionalText(form.skillDescription),
-    personalization: toOptionalText(form.personalization),
+    skillDescription: toOptionalMarkup(form.skillDescription),
+    personalization: toOptionalMarkup(form.personalization),
     personalizationTables: form.personalizationTables.map((table) => ({
       type: table.type,
       values: table.values.map((value) => value.trim()),
     })),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.feat),
   };
 }

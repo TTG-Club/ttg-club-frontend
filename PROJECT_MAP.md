@@ -20,7 +20,7 @@
 │   │   ├── bug-report/         # button (sidebar), modal (description, page, selected text, screenshot with marks), selection ("Ошибка в тексте" under a selection); posts to bug-report.api.ttg.club
 │   │   ├── comments/           # section (discussion under an entry: collapsed preview, tree of replies, composer with cooldown, edit, delete, report, moderator restore, #comment-<id> links); talks to comments-service via /api/v1/comments
 │   │   ├── bookmarks/          # panel (sidebar), button (add to a group), guest storage and server groups
-│   │   ├── content/            # render (HTML from the DB without the Vue compiler), detail-tooltip, entity-drawer, roll-table
+│   │   ├── content/            # render (HTML from the DB without the Vue compiler, or core-api markup), detail-tooltip, entity-drawer, roll-table
 │   │   ├── section/            # page (whole section, two modes), entry (entry card shell: page, pane or drawer, with comments), layout (top bar or filter column + list + entry pane in 8 wide-mode arrangements, resizable), controls (search, sources, menu, grouping switch), filter-inline (filter groups in the filters column), filter-drawer (content filter in a right drawer), sources-drawer (sources like new.ttg.club: left drawer, books as rows with English names from `/api/v1/books`, collapsible groups, presets), entry-drawer (entry in a right drawer), list (infinite scroll), tab-list (list inside a tab), entry-modal (entry in a modal), detail-pane, source-bar, source-badge, stat-grid, image-preview (round preview, square cover, viewer), collapse (titled block with an arrow), detail-layout (properties column + text)
 │   │   ├── character/          # feats, backgrounds, class options, spells, races, classes; link-card (cover card of a race or class, drawer with subraces or archetypes, picker of a subclass or subrace), references (links to classes, races…)
 │   │   ├── inventory/          # weapons, armors, items (by category or alphabet), magic items, treasures
@@ -30,11 +30,12 @@
 │   │   ├── info/               # info pages (/info/<url>): schema, useInfoPage
 │   │   ├── home/               # hero (map, search, tools), sections, news (site news and community news from new.ttg.club), bug-hunters (rating from new.ttg.club), latest-game, comments (latest comments of this site), social-links, partners, ui-kit
 │   │   ├── news/               # news of new.ttg.club read here: model (core-api articles and community news), card (hero, tile), drawer (quick reading, page opens on new.ttg.club), body, video (YouTube / VK player), markup (render of the new site markup `{@...}`; links lead to new.ttg.club)
+│   │   ├── character-sheet/    # character sheet (/tools/character-sheet), 5e14 rules: model (lenient zod document, calculations, catalog loaders), composables (sheet with autosave and version conflict, class mechanics from the catalog, catalog search), list, sheet (header, abilities, combat stats, hit points, skills, inventory, spells, features, personality, notes), dialogs; stored in the account (/api/v1/character-sheets)
 │   │   ├── dm-screen/          # Master's screen (/dm-screen): canvas (header with search; windows on a big field that pans, zooms out and has a minimap; grid picker, snap layouts and shared dividers like Windows 11; phone list), window (entry or note: drag, resize by any side, snapping), screen (guest in the browser, own screen from the account — one per user for now), dialogs
 │   │   ├── dice-roller/        # roller (clickable formula), history (window + formula input), useDiceRoll, useDiceHistory
 │   │   ├── infrastructure/     # navigation (site menu as a static list `MENU_SECTIONS`, like new.ttg.club, no API request; shared by the sidebar menu, the home page, the footer and the DM screen), sidebar (panel, menu drawn from `navigation`), search (palette, page results), display-settings (popover like new.ttg.club: theme pills incl. svifty7 and custom theme editor (background and accent colors with swatches and brightness sliders), 8 section layout tiles paired by filters side (useSectionLayout), list columns), custom-theme (palette of the custom theme mapped onto the legacy palette), analytics (counters, online heartbeat, tool usage marks: `useFeatureUsage` reports time worked with the DM screen), maintenance ("site closed for an update" screen with sign in, gate state), footer (site footer like new.ttg.club: legal links lead to new.ttg.club; shown by layouts and by SectionLayout outside the wide split mode)
 │   │   ├── admin/              # model (YouTube API, schemas), youtube (/admin/youtube: video list, add, rename, delete, active flag; the home page no longer shows videos); editors only
-│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), images (gallery and class/race cover uploaded to S3 via `/api/v1/workshop/images`: "Images" tab in class, archetype and race editors, block under the form elsewhere), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
+│   │   ├── workshop/           # model (sections, revisions, html-editor, spells, feats, options, backgrounds, classes, races, bestiary, screens, gods, rules, weapons, armors, items, magic-items), gate (editors only), html-editor (visual + source, dice, markup problems), markup-editor (core-api markup, TipTap), revisions, form (names, source select, sticky actions, list sections), preview (preview drawer), entry-state (edit frame), images (gallery and class/race cover uploaded to S3 via `/api/v1/workshop/images`: "Images" tab in class, archetype and race editors, block under the form elsewhere), spells, feats, options, backgrounds (personalization tables), classes (class and archetype editors, traits, progression table), races (ability bonuses, features), bestiary (creature editor, saving throws and skills, action blocks, legendary actions), screens, gods, rules, weapons, armors, items, magic-items
 │   │   └── user/               # helmet (user menu), auth-modal (sign in, sign up with consents, password reset request), password-input, password-reset (/reset-password), verify-email (/verify-email), profile (/profile split into sections: general, /profile/sources, /profile/subscription, /profile/security), subscription (status, activation, promo codes)
 │   ├── layouts/                # default: sidebar like the legacy SPA (bottom bar on mobile); home and section: same, full width
 │   ├── pages/                  # File-based routes
@@ -42,9 +43,10 @@
 │   ├── plugins/                # api ($api: API client, renews the session on 401 and retries), user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
 │   └── shared/                 # consts (API paths, UI texts), ui (logo, hamburger)
 ├── server/
-│   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
+│   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services); guest catalog reads go through domain/catalog-cache
 │   ├── api/tools/tavern/       # Proxy /api/tools/tavern/** → backend /tools/tavern/** (HTML outside /api)
 │   ├── api/maintenance.get.ts  # Maintenance gate for the current visitor (served by Nitro, not proxied)
+│   ├── domain/catalog-cache/   # In-memory cache of catalog reads for guests (POST lists/records/filters keyed by body hash, GET meta); any workshop write clears it, x-catalog-cache: hit|miss
 │   ├── consts/                 # Server constants (maintenance response, settings cache)
 │   ├── middleware/maintenance.ts # Maintenance gate before render, page requests only
 │   ├── plugins/maintenanceResponse.ts # 503, Retry-After, X-Robots-Tag, no-store while the gate is on
@@ -94,7 +96,7 @@
 | Info pages, error pages                                                                                                                                                        | ✅     |
 | Site search: palette and `/search` page                                                                                                                                        | ✅     |
 | Section modes like new.ttg.club: drawer and wide                                                                                                                               | ✅     |
-| Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker                                              | ✅     |
+| Tools: madness, wild magic, random encounters, names, trader, treasury, ability calculator, tavern, tokenator, initiative tracker, character sheet                             | ✅     |
 | Account, comments, subscription, bug report                                                                                                                                    | ✅     |
 | Admin: videos (`/admin/youtube`)                                                                                                                                               | ✅     |
 | Home: news and community news from new.ttg.club                                                                                                                                | ✅     |
@@ -135,6 +137,24 @@ longer pops up: a plain click opens the entity card in a right drawer
 (`ContentEntityDrawer` picks the section body by `type`, `SectionEntryDrawer`
 loads it), as on new.ttg.club; Ctrl-click still opens the page. Untyped
 tooltips show the HTML from their `/api/` address in the same drawer.
+
+Descriptions are moving from HTML to the core-api markup (an array of block
+strings, `{@b}`, `{@roll}`, `{@spell … | url:…}`, `{@table}`…), one entity at a
+time (every section now). `ContentRender` takes `html`, `markup` or `content` (the API value, either form): the
+markup is parsed by the `~news/markup` parser and turned by `markupToContent`
+into the same node tree as the HTML (section links become `detail-tooltip`
+links, rolls become `dice-roller`, tables keep the `dnd5_table` look), so the
+page looks and behaves the same. API schemas accept both forms
+(`contentDescriptionSchema`) until every entity is switched.
+
+Entities already on markup are edited with `MarkupEditor`
+(`workshop/markup-editor`, ported from core-app: TipTap through Nuxt UI
+`UEditor`, a visual mode with native headings, lists, tables and quotes and
+`{@...}` chips, plus a source mode). Its model is the block array the API
+stores; `toMarkupSource` / `toStoredMarkup` (`~news/markup`) convert it to the
+editable source (blocks separated by a blank line) and back. Section links are
+picked through the site search; `toMarkupLink` (`~content/model`) turns the
+entry address into `{@spell … | url:…}` or `{@link … | url:/…}`.
 
 Every roll goes to the dice history (`localStorage`, last 100 rolls, synced
 between tabs by the `storage` event). While the history window is open, rolls
@@ -273,7 +293,7 @@ Moderators and administrators edit reference entries at `/workshop`. Each
 section has `/workshop/<section>/create` and `/workshop/<section>/<slug>/edit`;
 the edit page loads the entry from the reference API, saves through
 `/api/v1/workshop/<section>` and lists its revisions with restore. Descriptions
-use `WorkshopHtmlEditor`: a visual mode with `dice-roller` tokens and a source
+use `WorkshopHtmlEditor` (spells, feats, class options, rules, screens, magic items, equipment, armor and weapons already use `MarkupEditor`): a visual mode with `dice-roller` tokens and a source
 mode; markup the backend would reject is listed above the field and blocks the
 form. Every legacy editor is ported.
 

@@ -54,6 +54,17 @@ describe('parseContent', () => {
     expect(link).toMatchObject({ tag: 'a', attributes: {} });
   });
 
+  it('отбрасывает адрес другого сайта без схемы', () => {
+    const links = parseContent(
+      '<a href="//evil.example">а</a><a href="/\\evil.example">б</a>',
+    );
+
+    expect(links).toMatchObject([
+      { tag: 'a', attributes: {} },
+      { tag: 'a', attributes: {} },
+    ]);
+  });
+
   it('берёт из привязки Vue только строковый литерал', () => {
     const [roller] = parseContent(
       `<dice-roller :formula="'к20 + 5'" :label="evil()" is-advantage/>`,

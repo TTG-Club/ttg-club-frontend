@@ -183,6 +183,13 @@ export const MENU_SECTIONS: Array<MenuSection> = [
         onHome: true,
       },
       {
+        href: '/tools/character-sheet',
+        label: 'Лист персонажа',
+        icon: 'tabler:user-square-rounded',
+        onHome: true,
+        editorOnly: true,
+      },
+      {
         href: DM_SCREEN_PAGE_PATH,
         label: DM_SCREEN_PAGE_TITLE,
         icon: DM_SCREEN_MENU_ICON,

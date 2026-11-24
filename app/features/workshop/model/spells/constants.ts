@@ -69,12 +69,6 @@ export const SPELL_TIME_ALTERNATIVE_SEPARATOR = / или (?=\d|при попад
 /** Отделяет условие от единицы: «1 реакция, которую вы совершаете…». */
 export const SPELL_TIME_CONDITION_SEPARATOR = ',';
 
-/** Строки описания в редакторе. */
-export const SPELL_DESCRIPTION_ROWS = 10;
-
-/** Строки «На больших уровнях» в редакторе. */
-export const SPELL_UPPER_ROWS = 5;
-
 /** Подписи редактора заклинаний. */
 export const SPELL_EDITOR_TEXT = {
   createTitle: 'Создание заклинания',
@@ -103,8 +97,57 @@ export const SPELL_EDITOR_TEXT = {
   saveError: 'Не удалось сохранить заклинание',
 } as const;
 
+/** Кости броска урона: «8d6»; пусто — без костей. */
+export const SPELL_DICE_PATTERN = /^(\d{1,2}d\d{1,3})?$/;
+
+/** Наибольшее число бросков урона у заклинания. */
+export const SPELL_DAMAGE_MAX_ROLLS = 10;
+
+/** Подписи раздела урона в редакторе заклинания. */
+export const SPELL_DAMAGE_TEXT = {
+  title: 'Урон для листа персонажа',
+  hint: 'По этим броскам лист персонажа показывает плитки урона и лечения. Взаимоисключающие броски (кость зависит от состояния цели) — отдельными строками с условием.',
+  roll: 'Бросок',
+  dice: 'Кости',
+  dicePlaceholder: '8d6',
+  bonus: 'Бонус',
+  abilityModifier: '+ модификатор',
+  types: 'Типы урона',
+  typesPlaceholder: 'Тип урона',
+  healing: 'Лечение',
+  condition: 'Условие',
+  conditionPlaceholder: 'Цель с неполными хитами',
+  add: 'Добавить бросок',
+  remove: 'Убрать бросок',
+  cantripScaling: 'Рост заговора: кости ×2 / ×3 / ×4 на 5 / 11 / 17 уровне',
+  upcastDice: 'За каждый круг выше',
+  upcastHelp: 'Кости добавляются к первому броску',
+  empty: 'Урона нет — заклинание в листе без плитки урона.',
+} as const;
+
+/** Типы урона заклинаний: основные коды бэкенда без легаси-дублей. */
+export const SPELL_DAMAGE_TYPE_OPTIONS: ReadonlyArray<{
+  label: string;
+  value: string;
+}> = [
+  { label: 'Дробящий', value: 'BLUDGEONING' },
+  { label: 'Колющий', value: 'PIERCING' },
+  { label: 'Рубящий', value: 'SLASHING' },
+  { label: 'Огонь', value: 'FAIR' },
+  { label: 'Холод', value: 'COLD' },
+  { label: 'Электричество', value: 'LIGHTNING' },
+  { label: 'Яд', value: 'POISON' },
+  { label: 'Кислота', value: 'ACID' },
+  { label: 'Звук', value: 'THUNDER' },
+  { label: 'Некротическая энергия', value: 'NECROTIC' },
+  { label: 'Психическая энергия', value: 'PSYCHIC' },
+  { label: 'Излучение', value: 'RADIANT' },
+  { label: 'Силовое поле', value: 'FORCE' },
+];
+
 /** Сообщения проверки формы заклинания. */
 export const SPELL_VALIDATION = {
+  dice: 'Кости в виде 8d6',
   required: 'Заполните поле',
   level: `От 0 до ${SPELL_MAX_LEVEL}`,
   timeNumber: 'Не меньше 1',

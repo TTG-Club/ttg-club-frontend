@@ -27,9 +27,11 @@ export {
   getGodGroup,
   getScreenGroup,
   getScreenGroupOrder,
+  getScreenSubgroup,
   groupScreens,
   joinWikiList,
   parseSvgIcon,
+  sortScreenSubgroups,
 } from './utils';
 
 export * from './constants';

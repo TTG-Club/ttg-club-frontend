@@ -1,5 +1,7 @@
+import type { WorkshopMechanicsFields } from '../mechanics';
+
 /** Черта из справочника, как её открывает редактор. */
-export interface WorkshopFeat {
+export interface WorkshopFeat extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;
@@ -7,7 +9,8 @@ export interface WorkshopFeat {
   level: number | null;
   /** Требования; пусто, если их нет. */
   requirement: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Коды характеристик. */
   abilities: Array<string>;
   /** Коды навыков. */

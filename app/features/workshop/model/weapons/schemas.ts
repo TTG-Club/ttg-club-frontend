@@ -2,6 +2,8 @@ import type { WorkshopWeapon } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
   workshopNameSchema,
@@ -27,8 +29,8 @@ const workshopWeaponSchema = z.object({
   maxDistance: z.number().nullish(),
   ammo: z.number().nullish(),
   propertyIds: z.array(z.number()).nullish(),
-  description: z.string().nullish(),
-  special: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  special: markupBlocksSchema.nullish(),
   source: workshopSourceSchema,
 });
 
@@ -55,8 +57,8 @@ export function parseWorkshopWeapon(input: unknown): WorkshopWeapon {
     maxDistance: weapon.maxDistance ?? null,
     ammo: weapon.ammo ?? null,
     properties: (weapon.propertyIds ?? []).map(String),
-    description: weapon.description ?? '',
-    special: weapon.special ?? '',
+    description: weapon.description ?? [],
+    special: weapon.special ?? [],
     source: weapon.source?.shortName,
   };
 }
@@ -80,8 +82,8 @@ export const weaponFormSchema = z
     maxDistance: workshopOptionalPositive,
     ammo: workshopOptionalPositive,
     properties: z.array(z.string()),
-    description: z.string(),
-    special: z.string(),
+    description: markupBlocksSchema,
+    special: markupBlocksSchema,
   })
   .refine(
     ({ minDistance, maxDistance }) =>

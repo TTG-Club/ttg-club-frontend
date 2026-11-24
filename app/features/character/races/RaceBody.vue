@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { RaceDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionCollapse } from '~section/collapse';
   import { useSectionEntryCompact } from '~section/composables';
@@ -26,7 +27,9 @@
   const isCompact = useSectionEntryCompact();
 
   const isHeaderVisible = computed(
-    () => !isCompact && !!(race.baseRace || race.description),
+    () =>
+      !isCompact
+      && (Boolean(race.baseRace) || hasContentDescription(race.description)),
   );
 
   const stats = computed(() => getRaceStats(race));
@@ -57,7 +60,7 @@
           :path="path"
         >
           <UButton
-            v-if="race.description"
+            v-if="hasContentDescription(race.description)"
             :icon="RACE_ICON.description"
             variant="soft"
             color="neutral"
@@ -112,8 +115,8 @@
           :default-open="Boolean(skill.opened)"
         >
           <ContentRender
-            v-if="skill.description"
-            :html="skill.description"
+            v-if="hasContentDescription(skill.description)"
+            :content="skill.description"
           />
         </SectionCollapse>
 
@@ -146,8 +149,8 @@
 
             <div class="flex flex-col gap-4">
               <ContentRender
-                v-if="subrace.description"
-                :html="subrace.description"
+                v-if="hasContentDescription(subrace.description)"
+                :content="subrace.description"
               />
 
               <div
@@ -162,8 +165,8 @@
                 </h4>
 
                 <ContentRender
-                  v-if="feature.description"
-                  :html="feature.description"
+                  v-if="hasContentDescription(feature.description)"
+                  :content="feature.description"
                 />
               </div>
             </div>
@@ -179,8 +182,8 @@
     >
       <div class="content-render">
         <ContentRender
-          v-if="race.description"
-          :html="race.description"
+          v-if="hasContentDescription(race.description)"
+          :content="race.description"
         />
       </div>
     </SectionDrawer>

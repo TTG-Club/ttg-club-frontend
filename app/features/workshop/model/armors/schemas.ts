@@ -2,6 +2,8 @@ import type { WorkshopArmor } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
   workshopNameSchema,
@@ -21,7 +23,7 @@ const workshopArmorSchema = z.object({
   weight: z.number().nullish(),
   requirement: z.number().nullish(),
   disadvantage: z.boolean().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   source: workshopSourceSchema,
 });
 
@@ -42,7 +44,7 @@ export function parseWorkshopArmor(input: unknown): WorkshopArmor {
     weight: armor.weight ?? null,
     forceRequirements: armor.requirement ?? null,
     stealthHindrance: !!armor.disadvantage,
-    description: armor.description ?? '',
+    description: armor.description ?? [],
     source: armor.source?.shortName,
   };
 }
@@ -57,7 +59,7 @@ export const armorFormSchema = z.object({
   weight: workshopOptionalWeight,
   forceRequirements: workshopOptionalPositive,
   stealthHindrance: z.boolean(),
-  description: z.string(),
+  description: markupBlocksSchema,
 });
 
 export type ArmorForm = z.infer<typeof armorFormSchema>;

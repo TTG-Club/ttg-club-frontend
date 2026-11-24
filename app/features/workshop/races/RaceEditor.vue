@@ -8,6 +8,8 @@
 
   import type { RaceForm, WorkshopRace } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { raceDetailSchema } from '~character/model';
   import { RaceBody } from '~character/races';
 
@@ -22,15 +24,17 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
   import { WorkshopImages } from '../images';
+  import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     createRaceForm,
-    getHtmlFieldErrors,
-    getRaceHtmlFields,
+    getMechanicsFilledCount,
     getRacePayload,
     getRacePreviewPath,
     getWorkshopSectionRoute,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     RACE_EDITOR_TAB,
     RACE_EDITOR_TAB_TEXT,
     RACE_EDITOR_TEXT,
@@ -39,11 +43,11 @@
     RACE_TYPE_OPTIONS,
     raceFormSchema,
     RACES_WORKSHOP_KEY,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
     WORKSHOP_IMAGES_TAB,
+    WORKSHOP_MECHANICS_TAB,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
     WorkshopImageType,
@@ -114,6 +118,20 @@
       slot: RACE_EDITOR_TAB.features,
       badge: state.features.length || undefined,
     },
+    {
+      label: MECHANICS_TEXT.title,
+      value: WORKSHOP_MECHANICS_TAB.mechanics,
+      slot: WORKSHOP_MECHANICS_TAB.mechanics,
+      badge:
+        getMechanicsFilledCount(state.mechanics, MECHANICS_KIND.race)
+        || undefined,
+    },
+    {
+      label: MECHANICS_TEXT.effectsTitle,
+      value: WORKSHOP_MECHANICS_TAB.activeEffects,
+      slot: WORKSHOP_MECHANICS_TAB.activeEffects,
+      badge: state.activeEffects.length || undefined,
+    },
     ...(imagesEntryId.value === undefined
       ? []
       : [
@@ -169,14 +187,6 @@
     await showPreview(getRacePayload(data, source.value));
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<RaceForm>): Array<FormError> {
-    return getHtmlFieldErrors(getRaceHtmlFields(form));
-  }
-
   async function submit(event: FormSubmitEvent<RaceForm>): Promise<void> {
     const saved = await save(getRacePayload(event.data, source.value));
 
@@ -191,7 +201,6 @@
     ref="form"
     :schema="raceFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
     @error="handleError"
@@ -319,10 +328,7 @@
           class="col-span-full"
           required
         >
-          <WorkshopHtmlEditor
-            v-model="state.description"
-            :rows="WORKSHOP_DESCRIPTION_ROWS"
-          />
+          <MarkupEditor v-model="state.description" />
         </UFormField>
 
         <div class="col-span-full">
@@ -397,6 +403,24 @@
           <RaceFeaturesEditor
             ref="features"
             v-model="state.features"
+          />
+        </div>
+      </template>
+
+      <template #mechanics>
+        <WorkshopMechanicsEditor
+          v-model="state.mechanics"
+          :kind="MECHANICS_KIND.race"
+        />
+      </template>
+
+      <template #activeEffects>
+        <div class="col-span-full">
+          <ActiveEffects
+            v-model="state.activeEffects"
+            :context="EFFECT_FORM_CONTEXT.feature"
+            :origin="EFFECT_ORIGIN.feature"
+            :title="MECHANICS_TEXT.effectsTitle"
           />
         </div>
       </template>

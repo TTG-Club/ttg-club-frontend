@@ -1,6 +1,11 @@
 import type { FeatForm } from './schemas';
 import type { WorkshopFeat } from './types';
 
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
 import { toOptionalNumber, toOptionalText } from '../utils';
 
 /**
@@ -16,7 +21,8 @@ export function createFeatForm(feat?: WorkshopFeat): FeatForm {
     requirement: feat?.requirement ?? '',
     abilities: [...(feat?.abilities ?? [])],
     skills: [...(feat?.skills ?? [])],
-    description: feat?.description ?? '',
+    description: [...(feat?.description ?? [])],
+    ...copyMechanicsFields(feat),
   };
 }
 
@@ -35,5 +41,6 @@ export function getFeatPayload(
     altName: toOptionalText(form.altName),
     level: toOptionalNumber(form.level),
     requirement: toOptionalText(form.requirement),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.feat),
   };
 }

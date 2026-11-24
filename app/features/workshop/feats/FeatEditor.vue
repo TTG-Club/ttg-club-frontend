@@ -1,8 +1,10 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { FeatForm, WorkshopFeat } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { FeatBody } from '~character/feats';
   import { featDetailSchema } from '~character/model';
 
@@ -12,17 +14,18 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     createFeatForm,
     FEAT_EDITOR_TEXT,
     featFormSchema,
     FEATS_WORKSHOP_KEY,
     getFeatPayload,
-    getHtmlFieldErrors,
     getWorkshopSectionRoute,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     WORKSHOP_ABILITY_OPTIONS,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_SKILL_OPTIONS,
@@ -82,14 +85,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<FeatForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<FeatForm>): Promise<void> {
     const saved = await save(getFeatPayload(event.data, source.value));
 
@@ -104,7 +99,6 @@
     ref="form"
     :schema="featFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -172,11 +166,22 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
+
+    <WorkshopMechanicsEditor
+      v-model="state.mechanics"
+      :kind="MECHANICS_KIND.feat"
+    />
+
+    <div class="col-span-full">
+      <ActiveEffects
+        v-model="state.activeEffects"
+        :context="EFFECT_FORM_CONTEXT.feature"
+        :origin="EFFECT_ORIGIN.feature"
+        :title="MECHANICS_TEXT.effectsTitle"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />

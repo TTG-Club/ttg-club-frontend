@@ -1,8 +1,10 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { MagicItemForm, WorkshopMagicItem } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_ORIGIN } from '~active-effects/model';
   import { MagicItemBody } from '~inventory/magic-items';
   import { magicItemDetailSchema } from '~inventory/model';
 
@@ -12,19 +14,21 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMagicItemMechanics } from '../mechanics';
   import {
     createMagicItemForm,
-    getHtmlFieldErrors,
+    getMagicItemEffectActivation,
+    getMagicItemEffectContext,
     getMagicItemPayload,
     getWorkshopSectionRoute,
-    MAGIC_ITEM_DESCRIPTION_ROWS,
     MAGIC_ITEM_EDITOR_TEXT,
     MAGIC_ITEM_RARITY_OPTIONS,
     MAGIC_ITEM_TYPE_OPTIONS,
     MAGIC_ITEMS_API_SECTION,
     MAGIC_ITEMS_WORKSHOP_KEY,
     magicItemFormSchema,
+    MECHANICS_TEXT,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_TEXT,
@@ -47,6 +51,17 @@
   const typeItems = [...MAGIC_ITEM_TYPE_OPTIONS];
 
   const cancelTo = getWorkshopSectionRoute(MAGIC_ITEMS_WORKSHOP_KEY);
+
+  /** Место эффектов: у оружия эффект может лечь и на цель при попадании. */
+  const effectContext = computed(() => getMagicItemEffectContext(state.type));
+
+  /**
+   * Как действует новый эффект: у предмета, который применяют, — применением,
+   * а не постоянно.
+   */
+  const newEffectActivation = computed(() =>
+    getMagicItemEffectActivation(state.mechanics.activation),
+  );
 
   const { isSaving, save } = useWorkshopSave(
     MAGIC_ITEMS_API_SECTION,
@@ -87,18 +102,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки: бэкенд проверяет и описание, и уточнения.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<MagicItemForm>): Array<FormError> {
-    return getHtmlFieldErrors({
-      description: form.description ?? '',
-      special: form.special ?? '',
-      custSpecial: form.custSpecial ?? '',
-    });
-  }
-
   async function submit(event: FormSubmitEvent<MagicItemForm>): Promise<void> {
     const saved = await save(getMagicItemPayload(event.data, source.value));
 
@@ -113,7 +116,6 @@
     ref="form"
     :schema="magicItemFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -155,10 +157,7 @@
       name="special"
       class="col-span-2"
     >
-      <UInput
-        v-model="state.special"
-        class="w-full"
-      />
+      <MarkupEditor v-model="state.special" />
     </UFormField>
 
     <UFormField
@@ -217,10 +216,7 @@
       name="custSpecial"
       class="col-span-full"
     >
-      <UInput
-        v-model="state.custSpecial"
-        class="w-full"
-      />
+      <MarkupEditor v-model="state.custSpecial" />
     </UFormField>
 
     <UFormField
@@ -229,11 +225,20 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="MAGIC_ITEM_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
+
+    <WorkshopMagicItemMechanics v-model="state.mechanics" />
+
+    <div class="col-span-full">
+      <ActiveEffects
+        v-model="state.mechanics.activeEffects"
+        :context="effectContext"
+        :origin="EFFECT_ORIGIN.item"
+        :new-effect-activation="newEffectActivation"
+        :title="MECHANICS_TEXT.effectsTitle"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassFeature, ClassTraitLink } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
   import { CLASS_TRAIT_HINT_OPEN_DELAY_MS } from '../model';
@@ -30,7 +31,7 @@
 
 <template>
   <UPopover
-    v-if="feature?.description"
+    v-if="feature && hasContentDescription(feature.description)"
     mode="hover"
     :open-delay="CLASS_TRAIT_HINT_OPEN_DELAY_MS"
   >
@@ -43,7 +44,7 @@
 
     <template #content>
       <div class="max-h-96 max-w-md overflow-auto p-3">
-        <ContentRender :html="feature.description" />
+        <ContentRender :content="feature.description" />
       </div>
     </template>
   </UPopover>

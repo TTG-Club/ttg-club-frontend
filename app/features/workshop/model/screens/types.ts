@@ -13,7 +13,8 @@ export interface WorkshopScreen {
   englishName: string;
   altName: string;
   category: string;
-  description: string;
+  /** Блоки разметки core-api; у раздела-родителя может быть пусто. */
+  description: Array<string>;
   icon: string;
   /** Порядок среди разделов ширмы. */
   order: number | null;

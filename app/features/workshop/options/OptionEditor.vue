@@ -1,8 +1,10 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { OptionForm, WorkshopOption } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { optionDetailSchema } from '~character/model';
   import { OptionBody } from '~character/options';
 
@@ -16,18 +18,19 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     createOptionForm,
-    getHtmlFieldErrors,
     getOptionPayload,
     getWorkshopSectionRoute,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
     OPTION_EDITOR_TEXT,
     OPTION_TYPES_FILTER_KEY,
     optionFormSchema,
     OPTIONS_FILTER_PATH,
     OPTIONS_WORKSHOP_KEY,
-    WORKSHOP_DESCRIPTION_ROWS,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_TEXT,
@@ -53,6 +56,20 @@
   const typeItems = computed(() => getOptions(OPTION_TYPES_FILTER_KEY));
 
   const cancelTo = getWorkshopSectionRoute(OPTIONS_WORKSHOP_KEY);
+
+  /** Кнопка перехода к умению, где правится вариант. */
+  const managedActions = computed(() =>
+    option?.feature
+      ? [
+          {
+            label: OPTION_EDITOR_TEXT.managedOpen,
+            to: option.feature.url,
+            color: 'warning' as const,
+            variant: 'outline' as const,
+          },
+        ]
+      : [],
+  );
 
   const { isSaving, save } = useWorkshopSave(
     OPTIONS_WORKSHOP_KEY,
@@ -93,14 +110,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<OptionForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<OptionForm>): Promise<void> {
     const saved = await save(getOptionPayload(event.data, source.value));
 
@@ -115,10 +124,20 @@
     ref="form"
     :schema="optionFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
+    <UAlert
+      v-if="option?.feature"
+      :title="OPTION_EDITOR_TEXT.managedTitle"
+      :description="OPTION_EDITOR_TEXT.managedDescription(option.feature.name)"
+      icon="tabler:lock"
+      color="warning"
+      variant="subtle"
+      class="col-span-full"
+      :actions="managedActions"
+    />
+
     <WorkshopNameFields
       v-model:name="state.name"
       v-model:english-name="state.englishName"
@@ -170,17 +189,29 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="WORKSHOP_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
+
+    <WorkshopMechanicsEditor
+      v-model="state.mechanics"
+      :kind="MECHANICS_KIND.class"
+    />
+
+    <div class="col-span-full">
+      <ActiveEffects
+        v-model="state.activeEffects"
+        :context="EFFECT_FORM_CONTEXT.feature"
+        :origin="EFFECT_ORIGIN.feature"
+        :title="MECHANICS_TEXT.effectsTitle"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />
     </div>
 
     <WorkshopFormActions
+      v-if="!option?.feature"
       :is-editing="!!option"
       :is-saving="isSaving"
       :cancel-to="cancelTo"

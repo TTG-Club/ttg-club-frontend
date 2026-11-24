@@ -142,8 +142,11 @@ export const DETAIL_TOOLTIP_ATTRIBUTES: ReadonlySet<string> = new Set([
 /** Атрибуты со ссылкой, которые проверяются на безопасную схему. */
 export const URL_ATTRIBUTES: ReadonlySet<string> = new Set(['href', 'src']);
 
-/** Безопасные ссылки: относительные, якоря, http(s) и почта. */
-export const SAFE_URL = /^(?:\/(?!\/)|#|https?:\/\/|mailto:)/i;
+/**
+ * Безопасные ссылки: относительные (но не `//хост` и `/\хост` — браузер считает
+ * их адресом другого сайта), якоря, http(s) и почта.
+ */
+export const SAFE_URL = /^(?:\/(?![/\\])|#|https?:\/\/|mailto:)/i;
 
 /** Префиксы привязок Vue, из которых берётся только строковый литерал. */
 export const VUE_BINDING_PREFIXES = [':', 'v-bind:'] as const;
@@ -201,3 +204,75 @@ export const ROUTE_CATCH_ALL_SUFFIX = '*';
 
 /** Конец пути в адресе: дальше идут параметры или якорь. */
 export const ROUTE_PATH_END = /[?#]/;
+
+/** Ссылка на раздел в разметке core-api: путь страницы на сайте и тип подсказки. */
+interface MarkupSectionLink {
+  path: string;
+  detailType?: string;
+}
+
+/**
+ * Маркеры-ссылки разметки (`{@spell … | url:fireball}`) → адрес раздела и тип
+ * подсказки `detail-tooltip`, как в HTML старой базы.
+ */
+export const MARKUP_SECTION_LINKS: ReadonlyMap<string, MarkupSectionLink> =
+  new Map([
+    ['spell', { path: '/spells/', detailType: 'spell' }],
+    ['creature', { path: '/bestiary/', detailType: 'creature' }],
+    ['magicItem', { path: '/items/magic/', detailType: 'magic-item' }],
+    ['item', { path: '/items/', detailType: 'item' }],
+    ['feat', { path: '/traits/', detailType: 'trait' }],
+    ['class', { path: '/classes/' }],
+    ['species', { path: '/races/' }],
+    ['background', { path: '/backgrounds/' }],
+    ['glossary', { path: '/screens/', detailType: 'screen' }],
+  ]);
+
+/** Первый сегмент внутренней ссылки `{@link … | url:/screens/x}` → тип подсказки. */
+export const MARKUP_LINK_DETAIL_TYPES: ReadonlyMap<string, string> = new Map([
+  ['screens', 'screen'],
+  ['conditions', 'screen'],
+  ['weapons', 'weapon'],
+  ['armors', 'armor'],
+  ['options', 'option'],
+  ['gods', 'god'],
+]);
+
+/** Строчные маркеры разметки, которые выводятся простым тегом. */
+export const MARKUP_INLINE_TAGS: ReadonlyMap<string, string> = new Map([
+  ['bold', 'strong'],
+  ['italic', 'em'],
+  ['underline', 'u'],
+  ['strikethrough', 's'],
+  ['superscript', 'sup'],
+  ['subscript', 'sub'],
+  ['highlight', 'mark'],
+  ['kbd', 'kbd'],
+  ['badge', 'span'],
+]);
+
+/** Уровень `{@h}` 1…4 выводится тегами h3…h6, как заголовки в HTML старой базы. */
+export const MARKUP_HEADING_TAG_OFFSET = 2;
+
+/** Пустая ячейка таблицы в разметке (у `{@td}` должен быть текст). */
+export const MARKUP_CELL_PLACEHOLDER = '​';
+
+/** Выравнивания, которые переносятся в стиль абзаца, заголовка или ячейки. */
+export const MARKUP_ALIGNS: ReadonlySet<string> = new Set([
+  'left',
+  'center',
+  'right',
+]);
+
+/** Классы таблицы, как у таблиц в HTML старой базы. */
+export const MARKUP_TABLE_WRAPPER_CLASS = 'table-responsive';
+export const MARKUP_TABLE_CLASS = 'dnd5_table';
+
+/** Маркер обычной ссылки: адрес вне разделов с собственным маркером. */
+export const MARKUP_LINK_TYPE = 'link';
+
+/** Панель карточки справочника рядом со списком. */
+export const CONTENT_ENTITY_PANE_TEXT = {
+  loadingIcon: 'tabler:loader-2',
+  error: 'Не удалось загрузить описание',
+} as const;

@@ -1,6 +1,11 @@
 import type { OptionForm } from './schemas';
 import type { WorkshopOption } from './types';
 
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
 import { toOptionalNumber, toOptionalText } from '../utils';
 
 /**
@@ -15,7 +20,8 @@ export function createOptionForm(option?: WorkshopOption): OptionForm {
     level: option?.level ?? null,
     prerequisite: option?.prerequisite ?? '',
     optionTypes: [...(option?.optionTypes ?? [])],
-    description: option?.description ?? '',
+    description: [...(option?.description ?? [])],
+    ...copyMechanicsFields(option),
   };
 }
 
@@ -34,5 +40,6 @@ export function getOptionPayload(
     altName: toOptionalText(form.altName),
     level: toOptionalNumber(form.level),
     prerequisite: toOptionalText(form.prerequisite),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.class),
   };
 }

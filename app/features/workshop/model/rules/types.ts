@@ -6,7 +6,8 @@ export interface WorkshopRule {
   altName: string;
   /** Категория: «Бой», «Состояния». */
   type: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   page: number | null;
   /** Аббревиатура книги-источника. */
   source?: string;

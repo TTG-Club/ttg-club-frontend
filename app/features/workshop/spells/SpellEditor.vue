@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { SpellForm, WorkshopSpell } from '../model';
 
@@ -8,24 +8,22 @@
 
   import { useWorkshopPreview, useWorkshopSave } from '../composables';
   import { WorkshopFormActions, WorkshopSourceSelect } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createSpellForm,
-    getHtmlFieldErrors,
     getSpellPayload,
     getWorkshopSectionRoute,
-    SPELL_DESCRIPTION_ROWS,
     SPELL_EDITOR_TEXT,
     SPELL_MAX_LEVEL,
     SPELL_SCHOOL_OPTIONS,
     SPELL_TIME_UNIT_OPTIONS,
-    SPELL_UPPER_ROWS,
     spellFormSchema,
     SPELLS_WORKSHOP_KEY,
     WORKSHOP_ICON,
     WORKSHOP_TEXT,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
+  import SpellDamageEditor from './SpellDamageEditor.vue';
 
   /** Форма заклинания: без записи — создание нового. */
   const { spell = undefined } = defineProps<{
@@ -48,6 +46,8 @@
     label,
     value,
   }));
+
+  const isCantrip = computed(() => state.level === 0);
 
   const cancelTo = getWorkshopSectionRoute(SPELLS_WORKSHOP_KEY);
 
@@ -90,17 +90,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<SpellForm>): Array<FormError> {
-    return getHtmlFieldErrors({
-      description: form.description ?? '',
-      upper: form.upper ?? '',
-    });
-  }
-
   async function submit(event: FormSubmitEvent<SpellForm>): Promise<void> {
     const saved = await save(getSpellPayload(event.data, source.value));
 
@@ -115,7 +104,6 @@
     ref="form"
     :schema="spellFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -283,10 +271,7 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="SPELL_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <UFormField
@@ -294,11 +279,15 @@
       name="upper"
       class="col-span-full"
     >
-      <WorkshopHtmlEditor
-        v-model="state.upper"
-        :rows="SPELL_UPPER_ROWS"
-      />
+      <MarkupEditor v-model="state.upper" />
     </UFormField>
+
+    <div class="col-span-full">
+      <SpellDamageEditor
+        v-model="state.damage"
+        :is-cantrip="isCantrip"
+      />
+    </div>
 
     <div class="col-span-full">
       <WorkshopSourceSelect v-model="source" />

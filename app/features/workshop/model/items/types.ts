@@ -9,7 +9,8 @@ export interface WorkshopItem {
   cost: number | null;
   currency: string;
   weight: number | null;
-  description: string;
+  /** Блоки разметки core-api; пусто — описания нет. */
+  description: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

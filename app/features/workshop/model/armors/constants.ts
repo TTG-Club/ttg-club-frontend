@@ -32,6 +32,3 @@ export const ARMOR_EDITOR_TEXT = {
   saved: 'Доспех обновлён',
   saveError: 'Не удалось сохранить доспех',
 } as const;
-
-/** Строки описания доспеха в редакторе. */
-export const ARMOR_DESCRIPTION_ROWS = 10;

@@ -1,13 +1,18 @@
 import { z } from 'zod';
 
+import { contentDescriptionSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
-/** Значение свойства существа: скорость, спасбросок, навык или действие. */
+/**
+ * Значение свойства существа: скорость, спасбросок, навык или действие. У
+ * умений и действий `value` — описание: блоки разметки core-api (или HTML
+ * строкой, пока бэкенд не переведён).
+ */
 const nameValueSchema = z.object({
   name: z.string().nullish(),
   shortName: z.string().nullish(),
   englishName: z.string().nullish(),
-  value: z.union([z.string(), z.number()]).nullish(),
+  value: z.union([z.string(), z.number(), z.array(z.string())]).nullish(),
   additional: z.union([z.string(), z.number()]).nullish(),
 });
 
@@ -90,23 +95,23 @@ export const creatureDetailSchema = creatureLinkSchema.extend({
   actions: z.array(nameValueSchema).nullish(),
   bonusActions: z.array(nameValueSchema).nullish(),
   reactions: z.array(nameValueSchema).nullish(),
-  reaction: z.string().nullish(),
+  reaction: contentDescriptionSchema.nullish(),
   legendary: z
     .object({
       list: z.array(nameValueSchema).nullish(),
-      description: z.string().nullish(),
+      description: contentDescriptionSchema.nullish(),
     })
     .nullish(),
   mysticalActions: z.array(nameValueSchema).nullish(),
   lair: z
     .object({
-      description: z.string().nullish(),
-      action: z.string().nullish(),
-      effect: z.string().nullish(),
+      description: contentDescriptionSchema.nullish(),
+      action: contentDescriptionSchema.nullish(),
+      effect: contentDescriptionSchema.nullish(),
     })
     .nullish(),
   environment: z.array(z.string()).nullish(),
-  description: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
   tags: z
     .array(z.object({ name: z.string(), description: z.string().nullish() }))
     .nullish(),

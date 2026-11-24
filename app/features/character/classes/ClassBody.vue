@@ -140,7 +140,7 @@
       <div class="content-render">
         <ContentRender
           v-if="description"
-          :html="description"
+          :content="description"
         />
 
         <ArchetypeSpells

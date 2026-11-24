@@ -1,13 +1,16 @@
 <script setup lang="ts">
-  import type { RaceFeature } from '../model';
+  import type { ActiveEffect } from '~active-effects/model';
+
+  import type { MechanicsForm, RaceFeature } from '../model';
 
   import { useExpandedItems } from '../composables';
   import { WorkshopCollapsibleItem, WorkshopListSection } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
+  import { WorkshopTraitMechanics } from '../mechanics';
   import {
     createRaceFeature,
     getWorkshopErrorIndexes,
-    RACE_FEATURE_ROWS,
+    MECHANICS_KIND,
     RACE_FEATURES_FIELD,
     RACE_FEATURES_TEXT,
     RACE_LIST_ICON,
@@ -101,11 +104,38 @@
   }
 
   /**
+   * Меняет механику особенности.
+   * @param featureIndex - номер особенности
+   * @param mechanics - механика
+   */
+  function changeMechanics(
+    featureIndex: number,
+    mechanics: MechanicsForm,
+  ): void {
+    patchFeature(featureIndex, { mechanics });
+  }
+
+  /**
+   * Меняет активные эффекты особенности.
+   * @param featureIndex - номер особенности
+   * @param activeEffects - эффекты
+   */
+  function changeActiveEffects(
+    featureIndex: number,
+    activeEffects: Array<ActiveEffect>,
+  ): void {
+    patchFeature(featureIndex, { activeEffects });
+  }
+
+  /**
    * Меняет описание особенности.
    * @param featureIndex - номер особенности
-   * @param description - разметка описания
+   * @param description - блоки разметки описания
    */
-  function changeDescription(featureIndex: number, description: string): void {
+  function changeDescription(
+    featureIndex: number,
+    description: Array<string>,
+  ): void {
     patchFeature(featureIndex, { description });
   }
 
@@ -213,12 +243,21 @@
           class="md:col-span-2"
           required
         >
-          <WorkshopHtmlEditor
+          <MarkupEditor
             :model-value="feature.description"
-            :rows="RACE_FEATURE_ROWS"
             @update:model-value="changeDescription(featureIndex, $event)"
           />
         </UFormField>
+
+        <div class="md:col-span-2">
+          <WorkshopTraitMechanics
+            :mechanics="feature.mechanics"
+            :active-effects="feature.activeEffects"
+            :kind="MECHANICS_KIND.race"
+            @update:mechanics="changeMechanics(featureIndex, $event)"
+            @update:active-effects="changeActiveEffects(featureIndex, $event)"
+          />
+        </div>
       </div>
     </WorkshopCollapsibleItem>
   </WorkshopListSection>

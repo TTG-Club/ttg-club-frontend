@@ -1,3 +1,5 @@
+import type { ContentDescription } from '~content/model';
+
 import type { CreatureAbilities } from './schema';
 
 /** Ключ характеристики в ответе API. */
@@ -30,15 +32,16 @@ export interface CreatureAbilityScore {
 export interface CreatureAction {
   key: string;
   name: string;
-  html: string;
+  /** Описание: блоки разметки core-api или HTML строкой. */
+  content: ContentDescription;
 }
 
 /** Блок действий или логова: заголовок, вступление и список. */
 export interface CreatureActionGroup {
   key: string;
   title: string;
-  /** Вступление: HTML из базы. */
-  intro?: string;
+  /** Вступление: блоки разметки core-api или HTML строкой. */
+  intro?: ContentDescription;
   /** Вступление обычным текстом, когда HTML в базе нет. */
   text?: string;
   items: Array<CreatureAction>;

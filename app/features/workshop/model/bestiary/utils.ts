@@ -6,7 +6,12 @@ import type {
   WorkshopCreature,
 } from './types';
 
-import { splitList, toOptionalNumber, toOptionalText } from '../utils';
+import {
+  splitList,
+  toOptionalMarkup,
+  toOptionalNumber,
+  toOptionalText,
+} from '../utils';
 import {
   CREATURE_BLIND_BEYOND,
   CREATURE_DEFAULT,
@@ -35,14 +40,14 @@ export function createCreatureBonus(): CreatureBonus {
   return { key: '', value: 0, additional: '' };
 }
 
-/** Новая особенность или действие: описание по умолчанию в markdown. */
+/** Новая особенность или действие. */
 export function createCreatureBlock(): CreatureBlock {
-  return { name: '', englishName: '', description: '', markdown: true };
+  return { name: '', englishName: '', description: [] };
 }
 
 /** Новое легендарное действие. */
 export function createCreatureLegendaryAction(): CreatureLegendaryAction {
-  return { name: '', description: '' };
+  return { name: '', description: [] };
 }
 
 /**
@@ -97,14 +102,14 @@ export function createCreatureForm(creature?: WorkshopCreature): CreatureForm {
     damageVulnerabilities: [],
     conditionImmunities: [],
     environment: [],
-    description: '',
+    description: [],
     feats: [],
     actions: [],
     bonusActions: [],
     reactions: [],
-    reaction: '',
+    reaction: [],
     mysticalActions: [],
-    legendaryDescription: '',
+    legendaryDescription: [],
     legendary: [],
     npc: false,
   };
@@ -178,8 +183,7 @@ function toBonuses(items: ReadonlyArray<CreatureBonus>): Array<unknown> {
 function toDescriptions(blocks: ReadonlyArray<CreatureBlock>): Array<unknown> {
   return blocks.map((block) => ({
     name: { rus: block.name.trim(), eng: block.englishName.trim() },
-    description: toOptionalText(block.description),
-    markdown: block.markdown,
+    description: [...block.description],
   }));
 }
 
@@ -252,56 +256,20 @@ export function getCreaturePayload(
     actions: toDescriptions(form.actions),
     bonusActions: toDescriptions(form.bonusActions),
     reactions: toDescriptions(form.reactions),
-    reaction: toOptionalText(form.reaction),
+    reaction: toOptionalMarkup(form.reaction),
     mysticalActions: toDescriptions(form.mysticalActions),
     legendary: {
       list: form.legendary.map((action) => ({
         name: action.name.trim(),
-        value: action.description.trim(),
+        value: [...action.description],
       })),
       count: CREATURE_DEFAULT.legendaryCount,
-      description: toOptionalText(form.legendaryDescription),
+      description: toOptionalMarkup(form.legendaryDescription),
     },
-    description: toOptionalText(form.description),
+    description: toOptionalMarkup(form.description),
     tags: splitList(form.tags),
     environment: form.environment,
     npc: form.npc,
     source: toOptionalText(source),
-  };
-}
-
-/**
- * HTML-поля формы существа с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getCreatureHtmlFields(
-  form: Partial<CreatureForm>,
-): Record<string, string> {
-  const blockFields = (
-    [
-      'feats',
-      'actions',
-      'bonusActions',
-      'reactions',
-      'mysticalActions',
-    ] as const
-  ).flatMap((field) =>
-    (form[field] ?? []).map((block, index): [string, string] => [
-      `${field}.${index}.description`,
-      block.description,
-    ]),
-  );
-
-  return {
-    description: form.description ?? '',
-    reaction: form.reaction ?? '',
-    legendaryDescription: form.legendaryDescription ?? '',
-    ...Object.fromEntries(blockFields),
-    ...Object.fromEntries(
-      (form.legendary ?? []).map((action, index) => [
-        `legendary.${index}.description`,
-        action.description,
-      ]),
-    ),
   };
 }

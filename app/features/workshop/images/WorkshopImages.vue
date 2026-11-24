@@ -1,16 +1,17 @@
 <script setup lang="ts">
-  import type { WorkshopImageType } from '../model';
-
   import { useWorkshopImages } from '../composables';
   import {
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_ICON,
     WORKSHOP_IMAGE_TEXT,
+    WorkshopImageType,
   } from '../model';
+  import CreatureTokenField from './CreatureTokenField.vue';
   import WorkshopImageTile from './WorkshopImageTile.vue';
 
   /**
-   * Картинки записи: обложка карточки (у классов и рас) и галерея.
+   * Картинки записи: обложка карточки (у классов и рас), токен (у существ)
+   * и галерея.
    * Изменения уходят на бэкенд сразу, отдельно от формы записи.
    */
   const {
@@ -45,6 +46,8 @@
   /** Обложки по адресу может не быть: тогда показываем заглушку. */
   const isCoverBroken = ref(false);
   const confirmIndex = ref<number>();
+
+  const isCreature = computed(() => type === WorkshopImageType.CREATURE);
 
   const coverUrl = computed(() => cover.value?.url);
   const canUploadCover = computed(() => !!cover.value?.editable);
@@ -133,6 +136,11 @@
         {{ WORKSHOP_IMAGE_TEXT.description }}
       </p>
     </div>
+
+    <CreatureTokenField
+      v-if="isCreature"
+      :creature-id="entryId"
+    />
 
     <div
       v-if="isLoading"

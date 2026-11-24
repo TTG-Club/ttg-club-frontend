@@ -77,9 +77,3 @@ export interface HtmlEditorLink {
   /** Адрес: внешний или путь раздела сайта. */
   url: string;
 }
-
-/** Ошибка поля формы для `UForm`. */
-export interface HtmlFieldError {
-  name: string;
-  message: string;
-}

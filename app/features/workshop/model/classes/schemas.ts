@@ -1,16 +1,21 @@
 import type {
   ClassTableColumn,
   ClassTrait,
+  ClassTraitOption,
   WorkshopArchetype,
   WorkshopClass,
 } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -21,14 +26,53 @@ import {
   MAX_CLASS_TABLE_VALUE,
 } from './constants';
 
+const classTraitScalingSchema = z.object({
+  level: z.number(),
+  name: z.string().nullish(),
+  additional: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  hideInSubclasses: z.boolean().catch(false),
+});
+
+const classTraitOptionSchema = z.object({
+  name: z.string().catch(''),
+  englishName: z.string().catch(''),
+  altName: z.string().nullish(),
+  level: z.number().nullish(),
+  prerequisite: z.string().nullish(),
+  additional: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  repeatable: z.boolean().catch(false),
+  hideInSubclasses: z.boolean().catch(false),
+  source: z.string().nullish(),
+  page: z.number().nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
+});
+
+const classTraitOptionsChoiceSchema = z.object({
+  label: z.string().nullish(),
+  count: z.number().catch(0),
+  scaling: z
+    .array(z.object({ level: z.number(), count: z.number() }))
+    .catch([]),
+});
+
 const classTraitSchema = z.object({
   id: z.number().nullish(),
   name: z.string(),
   suffix: z.string().nullish(),
   level: z.number(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   optional: z.boolean().catch(false),
   child: z.string().nullish(),
+  scaling: z.array(classTraitScalingSchema).catch([]),
+  optionsType: z.string().nullish(),
+  optionsName: z.string().nullish(),
+  options: z.array(classTraitOptionSchema).catch([]),
+  optionsChoice: classTraitOptionsChoiceSchema.nullish().catch(null),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
 });
 
 const classTableColumnSchema = z.object({
@@ -43,7 +87,7 @@ const workshopClassSchema = z.object({
   id: z.number(),
   name: workshopNameSchema,
   accusativeName: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   archetypeName: z.string().nullish(),
   spellAbility: z.string().nullish(),
   spellcasterType: z.string().nullish(),
@@ -60,14 +104,16 @@ const workshopClassSchema = z.object({
   traits: z
     .object({
       diceHp: z.number(),
-      armor: z.string().nullish(),
-      weapon: z.string().nullish(),
-      tools: z.string().nullish(),
+      armor: markupBlocksSchema.nullish(),
+      weapon: markupBlocksSchema.nullish(),
+      tools: markupBlocksSchema.nullish(),
       savingThrows: z.string().nullish(),
       skillAvailableCount: z.number().catch(0),
-      equipment: z.string().nullish(),
+      equipment: markupBlocksSchema.nullish(),
     })
     .nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -76,7 +122,7 @@ const workshopArchetypeSchema = z.object({
   name: z.string(),
   englishName: z.string(),
   genitiveName: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   level: z.number(),
   spellcasterType: z.string().nullish(),
   optionType: z.string().nullish(),
@@ -84,7 +130,35 @@ const workshopArchetypeSchema = z.object({
   page: z.number().nullish(),
   traits: z.array(classTraitSchema).catch([]),
   tableColumns: z.array(classTableColumnSchema).catch([]),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
 });
+
+/**
+ * Вариант умения из ответа сервера (или из переноса типа раздела).
+ * @param option - вариант
+ */
+export function toClassTraitOption(
+  option: z.infer<typeof classTraitOptionSchema>,
+): ClassTraitOption {
+  return {
+    name: option.name,
+    englishName: option.englishName,
+    altName: option.altName ?? '',
+    level: option.level ?? null,
+    prerequisite: option.prerequisite ?? '',
+    additional: option.additional ?? '',
+    description: option.description ?? [],
+    repeatable: option.repeatable,
+    hideInSubclasses: option.hideInSubclasses,
+    source: option.source ?? '',
+    page: option.page ?? null,
+    ...parseMechanicsFields(option),
+  };
+}
+
+/** Варианты типа раздела «Особенности классов» для переноса в умение. */
+export const classTraitOptionListSchema = z.array(classTraitOptionSchema);
 
 /**
  * Умение из ответа сервера.
@@ -96,9 +170,27 @@ function toClassTrait(trait: z.infer<typeof classTraitSchema>): ClassTrait {
     name: trait.name,
     suffix: trait.suffix ?? '',
     level: trait.level,
-    description: trait.description ?? '',
+    description: trait.description ?? [],
     optional: trait.optional,
     child: trait.child ?? '',
+    scaling: trait.scaling.map((row) => ({
+      level: row.level,
+      name: row.name ?? '',
+      additional: row.additional ?? '',
+      description: row.description ?? [],
+      hideInSubclasses: row.hideInSubclasses,
+    })),
+    optionsType: trait.optionsType ?? '',
+    optionsName: trait.optionsName ?? '',
+    options: trait.options.map(toClassTraitOption),
+    optionsChoice: trait.optionsChoice
+      ? {
+          label: trait.optionsChoice.label ?? '',
+          count: trait.optionsChoice.count,
+          scaling: trait.optionsChoice.scaling,
+        }
+      : null,
+    ...parseMechanicsFields(trait),
   };
 }
 
@@ -133,14 +225,14 @@ export function parseWorkshopClass(input: unknown): WorkshopClass {
     name: heroClass.name.rus,
     englishName: heroClass.name.eng,
     accusativeName: heroClass.accusativeName ?? '',
-    description: heroClass.description ?? '',
+    description: heroClass.description ?? [],
     diceHp: traits?.diceHp ?? CLASS_DEFAULT.diceHp,
-    armor: traits?.armor ?? '',
-    weapon: traits?.weapon ?? '',
-    tools: traits?.tools ?? '',
+    armor: traits?.armor ?? [],
+    weapon: traits?.weapon ?? [],
+    tools: traits?.tools ?? [],
     savingThrows: traits?.savingThrows ?? '',
     archetypeName: heroClass.archetypeName ?? '',
-    equipment: traits?.equipment ?? '',
+    equipment: traits?.equipment ?? [],
     spellAbility: heroClass.spellAbility ?? '',
     spellcasterType: heroClass.spellcasterType ?? CLASS_DEFAULT.spellcasterType,
     primaryAbilities: heroClass.primaryAbilities,
@@ -154,6 +246,7 @@ export function parseWorkshopClass(input: unknown): WorkshopClass {
     page: heroClass.page ?? null,
     classTraits: heroClass.classTraits.map(toClassTrait),
     tableColumns: heroClass.tableColumns.map(toClassTableColumn),
+    ...parseMechanicsFields(heroClass),
     source: heroClass.source?.shortName,
   };
 }
@@ -170,7 +263,7 @@ export function parseWorkshopArchetype(input: unknown): WorkshopArchetype {
     name: archetype.name,
     englishName: archetype.englishName,
     genitiveName: archetype.genitiveName ?? '',
-    description: archetype.description ?? '',
+    description: archetype.description ?? [],
     level: archetype.level,
     spellcasterType: archetype.spellcasterType ?? undefined,
     optionType: archetype.optionType ?? undefined,
@@ -178,6 +271,7 @@ export function parseWorkshopArchetype(input: unknown): WorkshopArchetype {
     page: archetype.page ?? null,
     traits: archetype.traits.map(toClassTrait),
     tableColumns: archetype.tableColumns.map(toClassTableColumn),
+    ...parseMechanicsFields(archetype),
   };
 }
 
@@ -194,15 +288,55 @@ const notNegativeSchema = z
   .int(WORKSHOP_VALIDATION.notNegative)
   .min(0, WORKSHOP_VALIDATION.notNegative);
 
+/** Уровень роста умения в форме. */
+const classTraitScalingFormSchema = z.object({
+  level: classLevelSchema,
+  name: z.string(),
+  additional: z.string(),
+  description: markupBlocksSchema,
+  hideInSubclasses: z.boolean(),
+});
+
+/** Вариант умения в форме. */
+const classTraitOptionFormSchema = z.object({
+  name: workshopRequiredText,
+  englishName: workshopRequiredText,
+  altName: z.string(),
+  level: classLevelSchema.nullable(),
+  prerequisite: z.string(),
+  additional: z.string(),
+  description: markupBlocksSchema,
+  repeatable: z.boolean(),
+  hideInSubclasses: z.boolean(),
+  source: z.string(),
+  page: z.number().int().positive().nullable(),
+  ...mechanicsFieldsFormSchema,
+});
+
+/** Выбор из вариантов в форме. */
+const classTraitOptionsChoiceFormSchema = z.object({
+  label: z.string(),
+  count: notNegativeSchema,
+  scaling: z.array(
+    z.object({ level: classLevelSchema, count: notNegativeSchema }),
+  ),
+});
+
 /** Умение в форме. */
 export const classTraitFormSchema = z.object({
   id: z.number().optional(),
   name: workshopRequiredText,
   suffix: z.string(),
   level: classLevelSchema,
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
   optional: z.boolean(),
   child: z.string(),
+  scaling: z.array(classTraitScalingFormSchema),
+  optionsType: z.string(),
+  optionsName: z.string(),
+  options: z.array(classTraitOptionFormSchema),
+  optionsChoice: classTraitOptionsChoiceFormSchema.nullable(),
+  ...mechanicsFieldsFormSchema,
 });
 
 /** Колонка таблицы прогрессии в форме. */
@@ -245,13 +379,14 @@ export const classFormSchema = z.object({
   icon: z.string(),
   page: workshopOptionalPositive,
   sidekick: z.boolean(),
-  armor: z.string(),
-  weapon: z.string(),
-  tools: z.string(),
-  equipment: z.string(),
-  description: workshopRequiredText,
+  armor: markupBlocksSchema,
+  weapon: markupBlocksSchema,
+  tools: markupBlocksSchema,
+  equipment: markupBlocksSchema,
+  description: workshopRequiredMarkup,
   classTraits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),
+  ...mechanicsFieldsFormSchema,
 });
 
 export type ClassForm = z.infer<typeof classFormSchema>;
@@ -264,9 +399,10 @@ export const archetypeFormSchema = z.object({
   level: classLevelSchema,
   spellLevelType: z.string(),
   page: workshopOptionalPositive,
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
   traits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),
+  ...mechanicsFieldsFormSchema,
 });
 
 export type ArchetypeForm = z.infer<typeof archetypeFormSchema>;

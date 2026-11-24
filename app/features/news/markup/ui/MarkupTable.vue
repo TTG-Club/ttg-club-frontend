@@ -81,7 +81,7 @@
     <table class="min-w-full border-collapse">
       <caption
         v-if="captionNodes.length"
-        class="py-2 text-sm font-medium text-highlighted"
+        class="py-2 font-medium text-highlighted"
       >
         <component
           :is="vnode"
@@ -119,7 +119,7 @@
           <td
             v-for="cell in row.cells"
             :key="cell.id"
-            :class="['px-2 py-1 text-xs text-default', cell.style, cell.align]"
+            :class="['px-2 py-1 text-default', cell.style, cell.align]"
           >
             <component
               :is="vnode"

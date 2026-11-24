@@ -87,6 +87,17 @@ export function toOptionalText(
 }
 
 /**
+ * Необязательное описание в разметке: без блоков бэкенд должен получить
+ * отсутствие значения, а не пустой массив.
+ * @param blocks - блоки разметки из формы
+ */
+export function toOptionalMarkup(
+  blocks: ReadonlyArray<string>,
+): Array<string> | undefined {
+  return blocks.length ? [...blocks] : undefined;
+}
+
+/**
  * Необязательное число: пустое поле или ноль бэкенд должен получить как
  * отсутствие значения.
  * @param value - значение поля формы

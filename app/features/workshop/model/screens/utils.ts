@@ -1,7 +1,12 @@
 import type { ScreenForm } from './schemas';
 import type { WorkshopScreen } from './types';
 
-import { getWorkshopSlug, toOptionalAmount, toOptionalText } from '../utils';
+import {
+  getWorkshopSlug,
+  toOptionalAmount,
+  toOptionalMarkup,
+  toOptionalText,
+} from '../utils';
 import { SCREENS_REFERENCE_PATH } from './constants';
 
 /**
@@ -16,7 +21,7 @@ export function createScreenForm(screen: WorkshopScreen): ScreenForm {
     category: screen.category,
     icon: screen.icon,
     order: screen.order,
-    description: screen.description,
+    description: [...screen.description],
   };
 }
 
@@ -38,7 +43,7 @@ export function getScreenPayload(
     category: toOptionalText(form.category),
     icon: toOptionalText(form.icon),
     order: toOptionalAmount(form.order),
-    description: toOptionalText(form.description),
+    description: toOptionalMarkup(form.description),
     source: toOptionalText(source),
     parentId: screen.parent?.id,
   };

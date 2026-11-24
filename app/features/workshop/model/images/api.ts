@@ -4,8 +4,13 @@ import type { WorkshopCover } from './types';
 import {
   WORKSHOP_IMAGES_API_PATH,
   WORKSHOP_IMAGES_COVER_SEGMENT,
+  WORKSHOP_IMAGES_TOKEN_PATH,
 } from './constants';
-import { parseWorkshopCover, parseWorkshopGallery } from './schemas';
+import {
+  parseWorkshopCover,
+  parseWorkshopGallery,
+  parseWorkshopToken,
+} from './schemas';
 
 /**
  * Адрес ручки картинок записи: `/api/v1/workshop/images/CREATURE/12`.
@@ -123,4 +128,53 @@ export async function uploadWorkshopCover(
       { method: 'POST', body: createFileBody(file) },
     ),
   );
+}
+
+/**
+ * Адрес ручки токена существа.
+ * @param creatureId - идентификатор существа
+ */
+function getCreatureTokenPath(creatureId: number): string {
+  const { section, segment } = WORKSHOP_IMAGES_TOKEN_PATH;
+
+  return `${WORKSHOP_IMAGES_API_PATH}/${section}/${creatureId}/${segment}`;
+}
+
+/**
+ * Токен существа: круглая картинка перед галереей в карточке.
+ * @param creatureId - идентификатор существа
+ * @returns адрес или `undefined`, если токена нет
+ */
+export async function fetchCreatureToken(
+  creatureId: number,
+): Promise<string | undefined> {
+  return parseWorkshopToken(
+    await $fetch<unknown>(getCreatureTokenPath(creatureId)),
+  );
+}
+
+/**
+ * Загружает токен существа вместо прежнего.
+ * @param creatureId - идентификатор существа
+ * @param file - выбранный файл
+ * @returns адрес нового токена с меткой версии
+ */
+export async function uploadCreatureToken(
+  creatureId: number,
+  file: File,
+): Promise<string | undefined> {
+  return parseWorkshopToken(
+    await $fetch<unknown>(getCreatureTokenPath(creatureId), {
+      method: 'POST',
+      body: createFileBody(file),
+    }),
+  );
+}
+
+/**
+ * Удаляет токен существа.
+ * @param creatureId - идентификатор существа
+ */
+export async function removeCreatureToken(creatureId: number): Promise<void> {
+  await $fetch(getCreatureTokenPath(creatureId), { method: 'DELETE' });
 }

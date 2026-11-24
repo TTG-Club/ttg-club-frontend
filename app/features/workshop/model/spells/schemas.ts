@@ -2,7 +2,14 @@ import type { WorkshopSpell } from './types';
 
 import { z } from 'zod';
 
-import { SPELL_MAX_LEVEL, SPELL_VALIDATION } from './constants';
+import { spellDamageSchema } from '~character/model';
+import { markupBlocksSchema } from '~content/model';
+
+import {
+  SPELL_DICE_PATTERN,
+  SPELL_MAX_LEVEL,
+  SPELL_VALIDATION,
+} from './constants';
 
 const workshopSpellSchema = z.object({
   id: z.number(),
@@ -22,9 +29,10 @@ const workshopSpellSchema = z.object({
   time: z.string().nullish(),
   range: z.string().nullish(),
   duration: z.string().nullish(),
-  description: z.string().nullish(),
-  upper: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  upper: markupBlocksSchema.nullish(),
   source: z.object({ shortName: z.string() }).nullish(),
+  damage: spellDamageSchema.nullish().catch(null),
 });
 
 /**
@@ -50,13 +58,40 @@ export function parseWorkshopSpell(input: unknown): WorkshopSpell {
     time: spell.time ?? '',
     range: spell.range ?? '',
     duration: spell.duration ?? '',
-    description: spell.description ?? '',
-    upper: spell.upper ?? '',
+    description: spell.description ?? [],
+    upper: spell.upper ?? [],
     source: spell.source?.shortName,
+    damage: spell.damage ?? null,
   };
 }
 
 const requiredText = z.string().trim().min(1, SPELL_VALIDATION.required);
+
+const diceSchema = z
+  .string()
+  .trim()
+  .regex(SPELL_DICE_PATTERN, SPELL_VALIDATION.dice);
+
+/** Бросок урона в форме: кости строкой, пусто — без костей. */
+const spellDamageRollFormSchema = z.object({
+  dice: diceSchema,
+  bonus: z.number().int(),
+  abilityModifier: z.boolean(),
+  types: z.array(z.string()),
+  healing: z.boolean(),
+  condition: z.string(),
+});
+
+export type SpellDamageRollForm = z.infer<typeof spellDamageRollFormSchema>;
+
+/** Урон заклинания в форме мастерской. */
+const spellDamageFormSchema = z.object({
+  rolls: z.array(spellDamageRollFormSchema),
+  cantripScaling: z.boolean(),
+  upcastDice: diceSchema,
+});
+
+export type SpellDamageForm = z.infer<typeof spellDamageFormSchema>;
 
 /** Форма заклинания: те же поля, что принимает бэкенд. */
 export const spellFormSchema = z.object({
@@ -83,8 +118,9 @@ export const spellFormSchema = z.object({
   timeCondition: z.string(),
   range: requiredText,
   duration: requiredText,
-  description: requiredText,
-  upper: z.string(),
+  description: markupBlocksSchema.min(1, SPELL_VALIDATION.required),
+  upper: markupBlocksSchema,
+  damage: spellDamageFormSchema,
 });
 
 export type SpellForm = z.infer<typeof spellFormSchema>;

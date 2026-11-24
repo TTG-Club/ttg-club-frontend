@@ -29,6 +29,7 @@ export {
   getItemCategoriesLabel,
   getItemCategoryGroups,
   getItemCategoryOrder,
+  getMagicItemAttunementMarkup,
   getMagicItemEditPath,
   getMagicItemTypeParts,
   getRarityGroup,

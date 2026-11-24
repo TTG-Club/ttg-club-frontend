@@ -3,11 +3,15 @@ import type { WorkshopRace } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalNotNegative,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -17,9 +21,11 @@ const raceFeatureSchema = z.object({
   id: z.number().nullish(),
   name: z.string(),
   englishName: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   feature: z.boolean().catch(false),
   replaceFeatureId: z.number().nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
 });
 
 const workshopRaceSchema = z.object({
@@ -44,7 +50,9 @@ const workshopRaceSchema = z.object({
     .array(z.object({ key: z.string(), value: z.number().nullish() }))
     .catch([]),
   features: z.array(raceFeatureSchema).catch([]),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
 });
 
@@ -87,11 +95,13 @@ export function parseWorkshopRace(input: unknown): WorkshopRace {
       id: feature.id ?? undefined,
       name: feature.name,
       englishName: feature.englishName ?? '',
-      description: feature.description ?? '',
+      description: feature.description ?? [],
       feature: feature.feature,
       replaceFeatureId: feature.replaceFeatureId ?? null,
+      ...parseMechanicsFields(feature),
     })),
-    description: race.description ?? '',
+    description: race.description ?? [],
+    ...parseMechanicsFields(race),
     source: race.source?.shortName,
   };
 }
@@ -149,12 +159,14 @@ export const raceFormSchema = z.object({
       id: z.number().optional(),
       name: workshopRequiredText,
       englishName: z.string(),
-      description: workshopRequiredText,
+      description: workshopRequiredMarkup,
       feature: z.boolean(),
       replaceFeatureId: workshopOptionalPositive,
+      ...mechanicsFieldsFormSchema,
     }),
   ),
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
+  ...mechanicsFieldsFormSchema,
 });
 
 export type RaceForm = z.infer<typeof raceFormSchema>;

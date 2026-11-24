@@ -1,3 +1,5 @@
+import type { SpellDamageData } from '~character/model';
+
 /** Заклинание из справочника, как его открывает редактор. */
 export interface WorkshopSpell {
   id: number;
@@ -16,10 +18,13 @@ export interface WorkshopSpell {
   time: string;
   range: string;
   duration: string;
-  description: string;
-  upper: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
+  upper: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
+  /** Урон для листа персонажа; null — не заполнен. */
+  damage: SpellDamageData | null;
 }
 
 /** Время накладывания, разобранное из карточки. */

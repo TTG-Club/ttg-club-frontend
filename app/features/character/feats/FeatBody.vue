@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { FeatDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
 
@@ -19,8 +20,8 @@
     <SectionSourceBar :left="requirements" />
 
     <ContentRender
-      v-if="feat.description"
-      :html="feat.description"
+      v-if="hasContentDescription(feat.description)"
+      :content="feat.description"
     />
   </div>
 </template>

@@ -2,10 +2,14 @@ import type { WorkshopOption } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import { WORKSHOP_VALIDATION } from '../constants';
+import { mechanicsFieldsFormSchema, parseMechanicsFields } from '../mechanics';
 import {
   workshopNameSchema,
   workshopOptionalPositive,
+  workshopRequiredMarkup,
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
@@ -17,9 +21,13 @@ const workshopOptionSchema = z.object({
   altName: z.string().nullish(),
   level: z.number().nullish(),
   prerequisite: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   optionTypes: z.array(z.string()).nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
+  featureUrl: z.string().nullish(),
+  featureName: z.string().nullish(),
 });
 
 /**
@@ -36,9 +44,13 @@ export function parseWorkshopOption(input: unknown): WorkshopOption {
     altName: option.altName ?? '',
     level: option.level ?? null,
     prerequisite: getRequirementText(option.prerequisite),
-    description: option.description ?? '',
+    description: option.description ?? [],
     optionTypes: option.optionTypes ?? [],
+    ...parseMechanicsFields(option),
     source: option.source?.shortName,
+    feature: option.featureUrl
+      ? { url: option.featureUrl, name: option.featureName ?? '' }
+      : null,
   };
 }
 
@@ -50,7 +62,8 @@ export const optionFormSchema = z.object({
   level: workshopOptionalPositive,
   prerequisite: z.string(),
   optionTypes: z.array(z.string()).min(1, WORKSHOP_VALIDATION.chooseOne),
-  description: workshopRequiredText,
+  description: workshopRequiredMarkup,
+  ...mechanicsFieldsFormSchema,
 });
 
 export type OptionForm = z.infer<typeof optionFormSchema>;

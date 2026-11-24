@@ -1,7 +1,7 @@
 import type { GodForm } from './schemas';
 import type { WorkshopGod } from './types';
 
-import { toOptionalNumber, toOptionalText } from '../utils';
+import { toOptionalMarkup, toOptionalNumber, toOptionalText } from '../utils';
 
 /**
  * Форма божества, заполненная записью.
@@ -21,8 +21,8 @@ export function createGodForm(god: WorkshopGod): GodForm {
     symbol: god.symbol,
     nicknames: god.nicknames,
     page: god.page,
-    description: god.description,
-    alternativeDescription: god.alternativeDescription,
+    description: [...god.description],
+    alternativeDescription: [...god.alternativeDescription],
   };
 }
 
@@ -44,8 +44,8 @@ export function getGodPayload(
     symbol: toOptionalText(form.symbol),
     nicknames: toOptionalText(form.nicknames),
     page: toOptionalNumber(form.page),
-    description: toOptionalText(form.description),
-    alternativeDescription: toOptionalText(form.alternativeDescription),
+    description: toOptionalMarkup(form.description),
+    alternativeDescription: toOptionalMarkup(form.alternativeDescription),
     pantheonId: Number(form.pantheonId),
   };
 }

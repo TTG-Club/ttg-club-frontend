@@ -1,3 +1,5 @@
+import type { WorkshopMechanicsFields } from '../mechanics';
+
 /** Бонус характеристики расы. */
 export interface RaceAbility {
   /** Код характеристики или варианта на выбор: `STRENGTH`, `CHOICE`. */
@@ -6,11 +8,12 @@ export interface RaceAbility {
 }
 
 /** Особенность расы. */
-export interface RaceFeature {
+export interface RaceFeature extends WorkshopMechanicsFields {
   id?: number;
   name: string;
   englishName: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Открывать особенность в карточке по умолчанию. */
   feature: boolean;
   /** Особенность родительской расы, которую заменяет эта. */
@@ -18,7 +21,7 @@ export interface RaceFeature {
 }
 
 /** Раса из справочника, как её открывает редактор. */
-export interface WorkshopRace {
+export interface WorkshopRace extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;
@@ -42,7 +45,8 @@ export interface WorkshopRace {
   page: number | null;
   abilities: Array<RaceAbility>;
   features: Array<RaceFeature>;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
 }

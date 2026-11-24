@@ -1,13 +1,77 @@
+import type { WorkshopMechanicsFields } from '../mechanics';
+
 /** Умение класса или архетипа. */
-export interface ClassTrait {
+/**
+ * Уровень роста умения: на нём умение повторяется или усиливается
+ * («Увеличение характеристик» на 8, 12, 16, 19 уровнях).
+ */
+export interface ClassTraitScaling {
+  level: number;
+  /** Своё название на этом уровне; пусто — как у умения. */
+  name: string;
+  /** Подпись в таблице после названия: «(2)». */
+  additional: string;
+  /** Что меняется на этом уровне; пусто — описание у самого умения. */
+  description: Array<string>;
+  /** Не показывать строку в таблице подкласса: только у умений класса. */
+  hideInSubclasses: boolean;
+}
+
+/** Вариант умения: воззвание, манёвр, боевой стиль. */
+export interface ClassTraitOption extends WorkshopMechanicsFields {
+  name: string;
+  /** По нему строится адрес в разделе «Особенности классов». */
+  englishName: string;
+  altName: string;
+  /** С какого уровня класса доступен; null — с уровня умения. */
+  level: number | null;
+  prerequisite: string;
+  /** Короткая подпись в списке вариантов. */
+  additional: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
+  repeatable: boolean;
+  /** Не показывать на странице подкласса: только у умений класса. */
+  hideInSubclasses: boolean;
+  /** Аббревиатура книги-источника; пусто — книга класса. */
+  source: string;
+  page: number | null;
+}
+
+/** Ступень роста количества выбираемых вариантов. */
+export interface ClassTraitOptionsStep {
+  level: number;
+  /** Сколько вариантов выбрано всего к уровню. */
+  count: number;
+}
+
+/** Выбор из вариантов для листа персонажа. */
+export interface ClassTraitOptionsChoice {
+  label: string;
+  /** Сколько выбрать на уровне умения. */
+  count: number;
+  scaling: Array<ClassTraitOptionsStep>;
+}
+
+export interface ClassTrait extends WorkshopMechanicsFields {
   id?: number;
   name: string;
   suffix: string;
   level: number;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   /** Опциональное умение: только у классов. */
   optional: boolean;
   child: string;
+  /** Рост по уровням. */
+  scaling: Array<ClassTraitScaling>;
+  /** Тип списка вариантов (код); пусто — у умения нет вариантов. */
+  optionsType: string;
+  /** Название списка вариантов: «Воззвания». */
+  optionsName: string;
+  options: Array<ClassTraitOption>;
+  /** Выбор для листа; null — варианты только справка. */
+  optionsChoice: ClassTraitOptionsChoice | null;
 }
 
 /** Колонка таблицы прогрессии: значения по двадцати уровням. */
@@ -20,19 +84,24 @@ export interface ClassTableColumn {
 }
 
 /** Класс из справочника, как его открывает редактор. */
-export interface WorkshopClass {
+export interface WorkshopClass extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;
   accusativeName: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   diceHp: number;
-  armor: string;
-  weapon: string;
-  tools: string;
+  /** Блоки разметки core-api. */
+  armor: Array<string>;
+  /** Блоки разметки core-api. */
+  weapon: Array<string>;
+  /** Блоки разметки core-api. */
+  tools: Array<string>;
   savingThrows: string;
   archetypeName: string;
-  equipment: string;
+  /** Блоки разметки core-api. */
+  equipment: Array<string>;
   /** Код характеристики заклинаний; пусто, если её нет. */
   spellAbility: string;
   spellcasterType: string;
@@ -54,12 +123,13 @@ export interface WorkshopClass {
 }
 
 /** Архетип класса, как его отдаёт мастерская. */
-export interface WorkshopArchetype {
+export interface WorkshopArchetype extends WorkshopMechanicsFields {
   id: number;
   name: string;
   englishName: string;
   genitiveName: string;
-  description: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
   level: number;
   /** Тип заклинателя архетипа: форма его не меняет, но отправляет. */
   spellcasterType?: string;

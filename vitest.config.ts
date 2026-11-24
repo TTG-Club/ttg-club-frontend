@@ -7,6 +7,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
+      '#server': fileURLToPath(new URL('./server', import.meta.url)),
+      '~active-effects': fileURLToPath(
+        new URL('./app/features/active-effects', import.meta.url),
+      ),
       '~bookmarks': fileURLToPath(
         new URL('./app/features/bookmarks', import.meta.url),
       ),
@@ -34,6 +38,9 @@ export default defineConfig({
       ),
       '~dice-roller': fileURLToPath(
         new URL('./app/features/dice-roller', import.meta.url),
+      ),
+      '~character-sheet': fileURLToPath(
+        new URL('./app/features/character-sheet', import.meta.url),
       ),
       '~character': fileURLToPath(
         new URL('./app/features/character', import.meta.url),

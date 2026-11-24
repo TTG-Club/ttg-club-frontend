@@ -133,3 +133,28 @@ export const MARKUP_TABLE_ALIGN_CLASSES: Readonly<Record<string, string>> = {
   center: 'text-center',
   right: 'text-right',
 };
+
+// Заглушка ПУСТОЙ ячейки таблицы: zero-width space (U+200B). НЕ вырезается
+// String.trim() (категория Cf, не WhiteSpace), поэтому `{@td …}` с пустой
+// ячейкой не теряется и остаётся невидимой. Общая для сериализатора разметки и
+// редактора мастерской (ttg-table.ts).
+export const CELL_PLACEHOLDER = '​';
+
+// Тематический разрыв Markdown (`---`, `***`, `___`) отдельной строкой. Нашей
+// разметке он неизвестен, поэтому на границе хранения приводится к
+// `{@separator}` — иначе линия из редактора выходит на страницу текстом «---».
+export const THEMATIC_BREAK_REGEXP = /^(?:-{3,}|\*{3,}|_{3,})$/;
+
+// Пустой абзац: этим маркером @tiptap/markdown сохраняет пустую строку между
+// абзацами при round-trip. Своего содержимого такой абзац не несёт — на границе
+// хранения сегмент отбрасывается.
+export const EMPTY_PARAGRAPH_MARKDOWN = '&nbsp;';
+
+// Разделитель блоков в исходнике редактора: пустая строка.
+export const SOURCE_BLOCK_SEPARATOR = '\n\n';
+
+// Граница блоков в исходнике: пустая строка и больше.
+export const SOURCE_BLOCK_SPLIT_REGEXP = /\n{2,}/;
+
+// Разделитель в хранении — маркер, а не Markdown.
+export const SEPARATOR_MARKUP = '{@separator}';

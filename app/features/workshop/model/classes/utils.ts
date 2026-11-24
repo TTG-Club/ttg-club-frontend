@@ -4,12 +4,21 @@ import type { ArchetypeForm, ClassForm } from './schemas';
 import type {
   ClassTableColumn,
   ClassTrait,
+  ClassTraitOption,
+  ClassTraitOptionsChoice,
+  ClassTraitOptionsStep,
+  ClassTraitScaling,
   WorkshopArchetype,
   WorkshopClass,
 } from './types';
 
 import { WORKSHOP_EDIT_SUFFIX, WORKSHOP_ROUTE } from '../constants';
-import { toOptionalNumber, toOptionalText } from '../utils';
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
+import { toOptionalMarkup, toOptionalNumber, toOptionalText } from '../utils';
 import {
   CLASS_DEFAULT,
   CLASS_LEVELS,
@@ -24,9 +33,72 @@ export function createClassTrait(): ClassTrait {
     name: '',
     suffix: '',
     level: CLASS_DEFAULT.level,
-    description: '',
+    description: [],
     optional: false,
     child: '',
+    scaling: [],
+    optionsType: '',
+    optionsName: '',
+    options: [],
+    optionsChoice: null,
+    ...copyMechanicsFields(),
+  };
+}
+
+/** Новый вариант умения. */
+export function createClassTraitOption(): ClassTraitOption {
+  return {
+    name: '',
+    englishName: '',
+    altName: '',
+    level: null,
+    prerequisite: '',
+    additional: '',
+    description: [],
+    repeatable: false,
+    hideInSubclasses: false,
+    source: '',
+    page: null,
+    ...copyMechanicsFields(),
+  };
+}
+
+/**
+ * Новая ступень роста количества: на уровень позже последней, на один
+ * вариант больше.
+ * @param choice - выбор из вариантов
+ * @param traitLevel - уровень умения
+ */
+export function createClassTraitOptionsStep(
+  choice: ClassTraitOptionsChoice,
+  traitLevel: number,
+): ClassTraitOptionsStep {
+  const last = choice.scaling.at(-1);
+
+  return {
+    level: Math.min(CLASS_LEVELS.length, (last?.level ?? traitLevel) + 1),
+    count: (last?.count ?? choice.count) + 1,
+  };
+}
+
+/**
+ * Новый уровень роста: на уровень позже последнего, чтобы ряд «8, 12, 16»
+ * набирался без возврата к первому уровню.
+ * @param scaling - уже заведённый рост
+ * @param traitLevel - уровень самого умения
+ */
+export function createClassTraitScaling(
+  scaling: ReadonlyArray<ClassTraitScaling>,
+  traitLevel: number,
+): ClassTraitScaling {
+  const last = scaling.at(-1)?.level ?? traitLevel;
+
+  return {
+    level: Math.min(CLASS_LEVELS.length, last + 1),
+    name: '',
+    additional: '',
+    description: [],
+    hideInSubclasses: false,
   };
 }
 
@@ -45,7 +117,26 @@ export function createClassTableColumn(): ClassTableColumn {
  * @param traits - умения записи
  */
 function copyTraits(traits: ReadonlyArray<ClassTrait>): Array<ClassTrait> {
-  return traits.map((trait) => ({ ...trait }));
+  return traits.map((trait) => ({
+    ...trait,
+    description: [...trait.description],
+    scaling: trait.scaling.map((row) => ({
+      ...row,
+      description: [...row.description],
+    })),
+    options: trait.options.map((option) => ({
+      ...option,
+      description: [...option.description],
+      ...copyMechanicsFields(option),
+    })),
+    optionsChoice: trait.optionsChoice
+      ? {
+          ...trait.optionsChoice,
+          scaling: trait.optionsChoice.scaling.map((step) => ({ ...step })),
+        }
+      : null,
+    ...copyMechanicsFields(trait),
+  }));
 }
 
 /**
@@ -69,8 +160,41 @@ function getTraitsPayload(
     ...trait,
     name: trait.name.trim(),
     suffix: toOptionalText(trait.suffix),
-    description: trait.description.trim(),
+    description: [...trait.description],
     child: toOptionalText(trait.child),
+    scaling: [...trait.scaling]
+      .sort((left, right) => left.level - right.level)
+      .map((row) => ({
+        level: row.level,
+        name: toOptionalText(row.name),
+        additional: toOptionalText(row.additional),
+        description: row.description.filter((block) => block.trim()),
+        hideInSubclasses: row.hideInSubclasses,
+      })),
+    optionsType: toOptionalText(trait.optionsType),
+    optionsName: toOptionalText(trait.optionsName),
+    // Список вариантов уходит всегда: по нему бэкенд отличает новую форму от старой
+    options: trait.options.map((option) => ({
+      ...option,
+      name: option.name.trim(),
+      englishName: option.englishName.trim(),
+      altName: toOptionalText(option.altName),
+      prerequisite: toOptionalText(option.prerequisite),
+      additional: toOptionalText(option.additional),
+      description: option.description.filter((block) => block.trim()),
+      source: toOptionalText(option.source),
+      ...getMechanicsFieldsPayload(option, MECHANICS_KIND.class),
+    })),
+    optionsChoice: trait.optionsChoice
+      ? {
+          label: toOptionalText(trait.optionsChoice.label),
+          count: trait.optionsChoice.count,
+          scaling: [...trait.optionsChoice.scaling].sort(
+            (left, right) => left.level - right.level,
+          ),
+        }
+      : null,
+    ...getMechanicsFieldsPayload(trait, MECHANICS_KIND.class),
   }));
 }
 
@@ -115,13 +239,14 @@ export function createClassForm(heroClass?: WorkshopClass): ClassForm {
     icon: heroClass?.icon ?? '',
     page: heroClass?.page ?? null,
     sidekick: heroClass?.sidekick ?? false,
-    armor: heroClass?.armor ?? '',
-    weapon: heroClass?.weapon ?? '',
-    tools: heroClass?.tools ?? '',
-    equipment: heroClass?.equipment ?? '',
-    description: heroClass?.description ?? '',
+    armor: [...(heroClass?.armor ?? [])],
+    weapon: [...(heroClass?.weapon ?? [])],
+    tools: [...(heroClass?.tools ?? [])],
+    equipment: [...(heroClass?.equipment ?? [])],
+    description: [...(heroClass?.description ?? [])],
     classTraits: copyTraits(heroClass?.classTraits ?? []),
     tableColumns: copyColumns(heroClass?.tableColumns ?? []),
+    ...copyMechanicsFields(heroClass),
   };
 }
 
@@ -146,12 +271,13 @@ export function getClassPayload(
     slotsReset: toOptionalText(form.slotsReset),
     icon: toOptionalText(form.icon),
     page: toOptionalNumber(form.page),
-    armor: toOptionalText(form.armor),
-    weapon: toOptionalText(form.weapon),
-    tools: toOptionalText(form.tools),
-    equipment: toOptionalText(form.equipment),
+    armor: toOptionalMarkup(form.armor),
+    weapon: toOptionalMarkup(form.weapon),
+    tools: toOptionalMarkup(form.tools),
+    equipment: toOptionalMarkup(form.equipment),
     classTraits: getTraitsPayload(form.classTraits),
     tableColumns: getColumnsPayload(form.tableColumns),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.class),
   };
 }
 
@@ -169,9 +295,10 @@ export function createArchetypeForm(
     level: archetype.level,
     spellLevelType: archetype.spellLevelType,
     page: archetype.page,
-    description: archetype.description,
+    description: [...archetype.description],
     traits: copyTraits(archetype.traits),
     tableColumns: copyColumns(archetype.tableColumns),
+    ...copyMechanicsFields(archetype),
   };
 }
 
@@ -193,6 +320,7 @@ export function getArchetypePayload(
     page: toOptionalNumber(form.page),
     traits: getTraitsPayload(form.traits),
     tableColumns: getColumnsPayload(form.tableColumns),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.class),
   };
 }
 
@@ -218,53 +346,6 @@ export function getArchetypeReferencePath(
   archetypeSlug: string,
 ): string {
   return `${CLASSES_REFERENCE_PATH}/${classSlug}/${archetypeSlug}`;
-}
-
-/**
- * Описания умений для проверки разметки: `classTraits.0.description`.
- * @param fieldName - поле формы со списком умений
- * @param traits - умения формы
- */
-function getTraitHtmlFields(
-  fieldName: string,
-  traits: ReadonlyArray<ClassTrait> | undefined,
-): Record<string, string> {
-  return Object.fromEntries(
-    (traits ?? []).map((trait, index) => [
-      `${fieldName}.${index}.description`,
-      trait.description,
-    ]),
-  );
-}
-
-/**
- * HTML-поля формы класса с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getClassHtmlFields(
-  form: Partial<ClassForm>,
-): Record<string, string> {
-  return {
-    armor: form.armor ?? '',
-    weapon: form.weapon ?? '',
-    tools: form.tools ?? '',
-    equipment: form.equipment ?? '',
-    description: form.description ?? '',
-    ...getTraitHtmlFields('classTraits', form.classTraits),
-  };
-}
-
-/**
- * HTML-поля формы архетипа с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getArchetypeHtmlFields(
-  form: Partial<ArchetypeForm>,
-): Record<string, string> {
-  return {
-    description: form.description ?? '',
-    ...getTraitHtmlFields('traits', form.traits),
-  };
 }
 
 /**

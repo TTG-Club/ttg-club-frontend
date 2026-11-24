@@ -15,6 +15,7 @@ import type {
   FilterPayload,
   FilterSelection,
   FilterValue,
+  SectionItemGroup,
   SectionListRequest,
   SectionOrder,
   SourceCatalogBook,
@@ -439,6 +440,34 @@ export function groupItems<T>(
   return sortBy([...groups.values()], [(group) => group.order]).map(
     ({ name, items: groupItemsList }) => ({ name, items: groupItemsList }),
   );
+}
+
+/**
+ * Делит список на группы, а каждую группу — на подгруппы (ширма: раздел,
+ * внутри — подгруппа раздела). Подгруппы идут в порядке первой записи.
+ * Без `getGroup` весь список — одна безымянная группа, без `getSubgroup`
+ * у группы одна безымянная подгруппа.
+ * @param items - записи списка
+ * @param getGroup - подпись группы записи или несколько подписей
+ * @param getGroupOrder - порядок группы записи
+ * @param getSubgroup - подпись подгруппы записи
+ */
+export function groupSectionItems<T>(
+  items: Array<T>,
+  getGroup?: (item: T) => string | Array<string>,
+  getGroupOrder?: (item: T, group: string) => number,
+  getSubgroup?: (item: T) => string,
+): Array<SectionItemGroup<T>> {
+  const groups = getGroup
+    ? groupItems(items, getGroup, getGroupOrder)
+    : [{ name: '', items }];
+
+  return groups.map((group) => ({
+    name: group.name,
+    subgroups: getSubgroup
+      ? groupItems(group.items, getSubgroup)
+      : [{ name: '', items: group.items }],
+  }));
 }
 
 /**

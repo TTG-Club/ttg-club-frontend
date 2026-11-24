@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ClassDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
   import { getArchetypeFeatures } from '../model';
@@ -11,9 +12,11 @@
     archetype: ClassDetail;
   }>();
 
-  const description = computed(
-    () => archetype.traits?.archetype?.description ?? undefined,
-  );
+  const description = computed(() => {
+    const value = archetype.traits?.archetype?.description;
+
+    return hasContentDescription(value) ? (value ?? undefined) : undefined;
+  });
 
   const features = computed(() =>
     archetype.traits ? getArchetypeFeatures(archetype.traits) : [],
@@ -29,7 +32,7 @@
 <template>
   <ContentRender
     v-if="description"
-    :html="description"
+    :content="description"
   />
 
   <ArchetypeSpells
@@ -53,8 +56,8 @@
     </div>
 
     <ContentRender
-      v-if="feature.description"
-      :html="feature.description"
+      v-if="hasContentDescription(feature.description)"
+      :content="feature.description"
     />
   </div>
 </template>

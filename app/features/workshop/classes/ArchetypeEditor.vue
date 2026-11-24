@@ -8,17 +8,21 @@
 
   import type { ArchetypeForm, WorkshopArchetype } from '../model';
 
+  import { ActiveEffects } from '~active-effects/editor';
+  import { EFFECT_FORM_CONTEXT, EFFECT_ORIGIN } from '~active-effects/model';
   import { ClassBody } from '~character/classes';
   import { classDetailSchema } from '~character/model';
 
   import {
+    useFilterGroups,
     useWorkshopFormTabs,
     useWorkshopPreview,
     useWorkshopSave,
   } from '../composables';
   import { WorkshopFormActions, WorkshopNameFields } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
   import { WorkshopImages } from '../images';
+  import { MarkupEditor } from '../markup-editor';
+  import { WorkshopMechanicsEditor } from '../mechanics';
   import {
     ARCHETYPE_EDITOR_TEXT,
     ARCHETYPE_FIELD_TABS,
@@ -29,15 +33,18 @@
     CLASS_EDITOR_TAB_TEXT,
     CLASS_LEVELS,
     createArchetypeForm,
-    getArchetypeHtmlFields,
     getArchetypePayload,
     getArchetypePreviewPath,
-    getHtmlFieldErrors,
-    WORKSHOP_DESCRIPTION_ROWS,
+    getMechanicsFilledCount,
+    MECHANICS_KIND,
+    MECHANICS_TEXT,
+    OPTION_TYPES_FILTER_KEY,
+    OPTIONS_FILTER_PATH,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
     WORKSHOP_IMAGES_TAB,
+    WORKSHOP_MECHANICS_TAB,
     WORKSHOP_TABS_UI,
     WORKSHOP_TEXT,
     WorkshopImageType,
@@ -45,6 +52,13 @@
   import { WorkshopPreviewDrawer } from '../preview';
   import ClassTableEditor from './ClassTableEditor.vue';
   import ClassTraitsEditor from './ClassTraitsEditor.vue';
+
+  // Типы списков вариантов — из фильтров раздела «Особенности классов»
+  const { getOptions: getFilterOptions } = useFilterGroups(OPTIONS_FILTER_PATH);
+
+  const optionTypeItems = computed(() =>
+    getFilterOptions(OPTION_TYPES_FILTER_KEY),
+  );
 
   /** Форма архетипа: архетипы только правятся, создаются они в базе. */
   const { archetype, cancelTo } = defineProps<{
@@ -104,6 +118,20 @@
       slot: CLASS_EDITOR_TAB.traits,
       badge: state.traits.length || undefined,
     },
+    {
+      label: MECHANICS_TEXT.title,
+      value: WORKSHOP_MECHANICS_TAB.mechanics,
+      slot: WORKSHOP_MECHANICS_TAB.mechanics,
+      badge:
+        getMechanicsFilledCount(state.mechanics, MECHANICS_KIND.class)
+        || undefined,
+    },
+    {
+      label: MECHANICS_TEXT.effectsTitle,
+      value: WORKSHOP_MECHANICS_TAB.activeEffects,
+      slot: WORKSHOP_MECHANICS_TAB.activeEffects,
+      badge: state.activeEffects.length || undefined,
+    },
     ...(imagesEntryId.value === undefined
       ? []
       : [
@@ -162,14 +190,6 @@
     await showPreview(getArchetypePayload(data, archetype));
   }
 
-  /**
-   * Ошибки разметки описаний: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<ArchetypeForm>): Array<FormError> {
-    return getHtmlFieldErrors(getArchetypeHtmlFields(form));
-  }
-
   async function submit(event: FormSubmitEvent<ArchetypeForm>): Promise<void> {
     const saved = await save(getArchetypePayload(event.data, archetype));
 
@@ -184,7 +204,6 @@
     ref="form"
     :schema="archetypeFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
     @error="handleError"
@@ -257,10 +276,7 @@
           class="col-span-full"
           required
         >
-          <WorkshopHtmlEditor
-            v-model="state.description"
-            :rows="WORKSHOP_DESCRIPTION_ROWS"
-          />
+          <MarkupEditor v-model="state.description" />
         </UFormField>
       </template>
 
@@ -279,6 +295,25 @@
             ref="traits"
             v-model="state.traits"
             field-name="traits"
+            :option-type-items="optionTypeItems"
+          />
+        </div>
+      </template>
+
+      <template #mechanics>
+        <WorkshopMechanicsEditor
+          v-model="state.mechanics"
+          :kind="MECHANICS_KIND.class"
+        />
+      </template>
+
+      <template #activeEffects>
+        <div class="col-span-full">
+          <ActiveEffects
+            v-model="state.activeEffects"
+            :context="EFFECT_FORM_CONTEXT.feature"
+            :origin="EFFECT_ORIGIN.feature"
+            :title="MECHANICS_TEXT.effectsTitle"
           />
         </div>
       </template>

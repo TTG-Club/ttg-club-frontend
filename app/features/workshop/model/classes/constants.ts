@@ -1,5 +1,7 @@
 import type { SelectOption } from '../types';
 
+import { WORKSHOP_MECHANICS_TAB } from '../constants';
+
 /** Ключ раздела классов в мастерской. */
 export const CLASSES_WORKSHOP_KEY = 'classes';
 
@@ -121,6 +123,8 @@ export const CLASS_FIELD_TABS: Readonly<Record<string, string>> = {
   equipment: CLASS_EDITOR_TAB.equipment,
   tableColumns: CLASS_EDITOR_TAB.table,
   classTraits: CLASS_EDITOR_TAB.traits,
+  mechanics: WORKSHOP_MECHANICS_TAB.mechanics,
+  activeEffects: WORKSHOP_MECHANICS_TAB.activeEffects,
 };
 
 /** Вкладки полей формы архетипа. */
@@ -132,6 +136,8 @@ export const ARCHETYPE_FIELD_TABS: Readonly<Record<string, string>> = {
   description: CLASS_EDITOR_TAB.main,
   tableColumns: CLASS_EDITOR_TAB.table,
   traits: CLASS_EDITOR_TAB.traits,
+  mechanics: WORKSHOP_MECHANICS_TAB.mechanics,
+  activeEffects: WORKSHOP_MECHANICS_TAB.activeEffects,
 };
 
 /** Подписи редактора классов. */
@@ -183,6 +189,73 @@ export const CLASS_TRAITS_TEXT = {
   empty: 'Умения не добавлены',
 } as const;
 
+/** Подписи раздела роста умения по уровням. */
+export const CLASS_SCALING_TEXT = {
+  title: 'Рост по уровням',
+  hint: 'Уровни, на которых умение повторяется или усиливается: «Увеличение характеристик» на 8, 12, 16 и 19 уровнях, вторая «Дополнительная атака». Каждая строка — отдельная запись в таблице класса со ссылкой на это умение.',
+  add: 'Добавить уровень',
+  remove: 'Убрать уровень',
+  level: 'Уровень',
+  name: 'Название',
+  namePlaceholder: 'Пусто — как у умения',
+  additional: 'Подсказка',
+  additionalPlaceholder: 'Подпись после названия, например «(2)»',
+  hideInSubclasses: 'Скрывать в подклассе',
+  description: 'Описание',
+  descriptionPlaceholder: 'Что меняется на этом уровне',
+  empty: 'Умение не повторяется',
+} as const;
+
+/** Подписи раздела вариантов умения. */
+export const CLASS_OPTIONS_TEXT = {
+  title: 'Варианты',
+  hint: 'Список вариантов умения, из которых выбирают по ходу игры: манёвры, воззвания, метамагия, боевые стили. Варианты правятся только здесь — раздел «Особенности классов» обновляется из них при сохранении класса.',
+  add: 'Добавить вариант',
+  remove: 'Убрать вариант',
+  type: 'Тип списка',
+  typeHint:
+    'Связывает варианты с разделом «Особенности классов» и его фильтром по классу',
+  typePlaceholder: 'Без типа',
+  name: 'Название списка',
+  namePlaceholder: 'Например, «Воззвания»',
+  import: 'Перенести варианты типа',
+  importHint:
+    'Забрать в умение все записи раздела «Особенности классов» с этим типом',
+  importDone: (count: number) => `Перенесено вариантов: ${count}`,
+  importFailed: 'Не удалось получить варианты типа',
+  importEmpty: 'У типа нет записей в разделе',
+  selectable: 'Из списка выбирают',
+  selectableHint:
+    'Лист персонажа спросит варианты на нужном уровне. Без галочки варианты остаются справкой.',
+  choiceLabel: 'Подпись выбора',
+  choiceLabelPlaceholder: 'Пусто — название списка',
+  count: 'Сколько выбрать',
+  countHint: 'На уровне самого умения',
+  stepsTitle: 'Рост количества по уровням',
+  stepsHint: 'Ступень — сколько вариантов выбрано ВСЕГО к этому уровню',
+  stepLevel: 'Уровень',
+  stepCount: 'Всего',
+  addStep: 'Добавить ступень',
+  removeStep: 'Убрать ступень',
+  optionName: 'Название',
+  optionEnglishName: 'Английское название',
+  optionAltName: 'Другое название',
+  optionLevel: 'С уровня',
+  optionLevelPlaceholder: 'С уровня умения',
+  prerequisite: 'Требования',
+  prerequisitePlaceholder: 'Например: заклинание «Мистический заряд»',
+  additional: 'Подсказка',
+  additionalPlaceholder: 'Короткая подпись в списке',
+  repeatable: 'Можно взять повторно',
+  hideInSubclasses: 'Скрывать в подклассе',
+  description: 'Описание',
+  source: 'Книга',
+  sourcePlaceholder: 'Как у класса',
+  page: 'Страница',
+  unnamed: 'Без названия',
+  empty: 'Вариантов нет',
+} as const;
+
 /** Подписи редактора таблицы прогрессии. */
 export const CLASS_TABLE_TEXT = {
   title: 'Таблица прогрессии',
@@ -201,10 +274,3 @@ export const CLASS_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
 } as const;
-
-/** Строки полей редактора классов. */
-export const CLASS_SHORT_HTML_ROWS = 3;
-
-export const CLASS_EQUIPMENT_ROWS = 6;
-
-export const CLASS_TRAIT_ROWS = 8;

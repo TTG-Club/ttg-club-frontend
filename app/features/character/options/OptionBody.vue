@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { OptionDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
   import { SectionSourceBar } from '~section/source-bar';
 
@@ -25,8 +26,8 @@
     <SectionSourceBar :left="requirements" />
 
     <ContentRender
-      v-if="option.description"
-      :html="option.description"
+      v-if="hasContentDescription(option.description)"
+      :content="option.description"
     />
 
     <ReferenceList

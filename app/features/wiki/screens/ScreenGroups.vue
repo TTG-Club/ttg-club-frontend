@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { ScreenDetail } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
   import { groupScreens } from '../model';
@@ -21,8 +22,8 @@
   <!-- Колонки считаются по ширине записи: она бывает узкой колонкой -->
   <div class="@container flex flex-col gap-4">
     <ContentRender
-      v-if="screen.description"
-      :html="screen.description"
+      v-if="hasContentDescription(screen.description)"
+      :content="screen.description"
     />
 
     <section

@@ -3,6 +3,11 @@ import type { RaceDetail } from '~character/model';
 import type { RaceForm } from './schemas';
 import type { RaceAbility, RaceFeature, WorkshopRace } from './types';
 
+import {
+  copyMechanicsFields,
+  getMechanicsFieldsPayload,
+  MECHANICS_KIND,
+} from '../mechanics';
 import { toOptionalNumber, toOptionalText } from '../utils';
 import { RACE_DEFAULT } from './constants';
 
@@ -16,9 +21,10 @@ export function createRaceFeature(): RaceFeature {
   return {
     name: '',
     englishName: '',
-    description: '',
+    description: [],
     feature: true,
     replaceFeatureId: null,
+    ...copyMechanicsFields(),
   };
 }
 
@@ -46,8 +52,13 @@ export function createRaceForm(race?: WorkshopRace): RaceForm {
     icon: race?.icon ?? '',
     page: race?.page ?? null,
     abilities: (race?.abilities ?? []).map((ability) => ({ ...ability })),
-    features: (race?.features ?? []).map((feature) => ({ ...feature })),
-    description: race?.description ?? '',
+    features: (race?.features ?? []).map((feature) => ({
+      ...feature,
+      description: [...feature.description],
+      ...copyMechanicsFields(feature),
+    })),
+    description: [...(race?.description ?? [])],
+    ...copyMechanicsFields(race),
   };
 }
 
@@ -83,28 +94,12 @@ export function getRacePayload(
       id: feature.id,
       name: feature.name.trim(),
       englishName: toOptionalText(feature.englishName),
-      description: feature.description.trim(),
+      description: [...feature.description],
       feature: feature.feature,
       replaceFeatureId: toOptionalNumber(feature.replaceFeatureId),
+      ...getMechanicsFieldsPayload(feature, MECHANICS_KIND.race),
     })),
-  };
-}
-
-/**
- * HTML-поля формы расы с именами для показа ошибок.
- * @param form - состояние формы
- */
-export function getRaceHtmlFields(
-  form: Partial<RaceForm>,
-): Record<string, string> {
-  return {
-    description: form.description ?? '',
-    ...Object.fromEntries(
-      (form.features ?? []).map((feature, index) => [
-        `features.${index}.description`,
-        feature.description,
-      ]),
-    ),
+    ...getMechanicsFieldsPayload(form, MECHANICS_KIND.race),
   };
 }
 

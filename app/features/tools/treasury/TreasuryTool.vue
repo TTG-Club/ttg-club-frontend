@@ -138,8 +138,11 @@
 
       <UFormField :label="TREASURY_TEXT.contents">
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          <!-- Свой id: иначе UFormField раздаёт всем один и подписи
+               переключают только первый чекбокс -->
           <UCheckbox
             v-for="kind in TREASURY_KINDS"
+            :id="`treasury-kind-${kind.key}`"
             :key="kind.key"
             v-model="kinds[kind.key]"
             :label="kind.label"

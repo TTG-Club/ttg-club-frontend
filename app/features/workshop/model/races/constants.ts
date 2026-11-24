@@ -1,6 +1,6 @@
 import type { SelectOption } from '../types';
 
-import { WORKSHOP_ABILITY_OPTIONS } from '../constants';
+import { WORKSHOP_ABILITY_OPTIONS, WORKSHOP_MECHANICS_TAB } from '../constants';
 
 /** Ключ раздела рас в мастерской. */
 export const RACES_WORKSHOP_KEY = 'races';
@@ -148,6 +148,8 @@ export const RACE_FIELD_TABS: Readonly<Record<string, string>> = {
   swim: RACE_EDITOR_TAB.properties,
   abilities: RACE_EDITOR_TAB.properties,
   [RACE_FEATURES_FIELD]: RACE_EDITOR_TAB.features,
+  mechanics: WORKSHOP_MECHANICS_TAB.mechanics,
+  activeEffects: WORKSHOP_MECHANICS_TAB.activeEffects,
 };
 
 /** Иконки списков редактора рас. */
@@ -155,6 +157,3 @@ export const RACE_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
 } as const;
-
-/** Строки описания особенности расы. */
-export const RACE_FEATURE_ROWS = 8;

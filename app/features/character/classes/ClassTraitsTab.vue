@@ -1,16 +1,19 @@
 <script setup lang="ts">
   import type { ClassDetail, ClassTraits } from '../model';
 
+  import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
   import {
     CLASS_TEXT,
+    getClassFeatureScalingView,
     getClassSkillsLabel,
     OPTIONAL_FEATURES_PATH,
     sortClassFeatures,
   } from '../model';
   import ArchetypeSpells from './ArchetypeSpells.vue';
   import ClassArchetypes from './ClassArchetypes.vue';
+  import ClassFeatureOptions from './ClassFeatureOptions.vue';
   import ClassLevelTable from './ClassLevelTable.vue';
 
   /**
@@ -27,7 +30,15 @@
 
   const skills = computed(() => getClassSkillsLabel(traits));
 
-  const features = computed(() => sortClassFeatures(traits));
+  const features = computed(() =>
+    sortClassFeatures(traits).map((feature) => ({
+      ...feature,
+      scalingView: getClassFeatureScalingView(
+        feature,
+        Boolean(traits.archetype),
+      ),
+    })),
+  );
 
   // Таблица заклинаний архетипа идёт сразу после его описания
   const archetypeSpellTable = computed(() =>
@@ -98,9 +109,10 @@
           <b class="mr-1">{{ CLASS_TEXT.armor }}</b>
 
           <ContentRender
-            v-if="traits.armor"
-            :html="traits.armor"
+            v-if="hasContentDescription(traits.armor)"
+            :content="traits.armor"
             tag="span"
+            inline
           />
         </p>
 
@@ -108,9 +120,10 @@
           <b class="mr-1">{{ CLASS_TEXT.weapon }}</b>
 
           <ContentRender
-            v-if="traits.weapon"
-            :html="traits.weapon"
+            v-if="hasContentDescription(traits.weapon)"
+            :content="traits.weapon"
             tag="span"
+            inline
           />
         </p>
 
@@ -118,9 +131,10 @@
           <b class="mr-1">{{ CLASS_TEXT.tools }}</b>
 
           <ContentRender
-            v-if="traits.tools"
-            :html="traits.tools"
+            v-if="hasContentDescription(traits.tools)"
+            :content="traits.tools"
             tag="span"
+            inline
           />
         </p>
 
@@ -139,7 +153,7 @@
     </details>
 
     <details
-      v-if="traits.equipment?.trim()"
+      v-if="hasContentDescription(traits.equipment)"
       open
     >
       <summary class="h4">
@@ -149,7 +163,7 @@
       <div class="content">
         <p>{{ CLASS_TEXT.equipmentIntro }}</p>
 
-        <ContentRender :html="traits.equipment" />
+        <ContentRender :content="traits.equipment" />
       </div>
     </details>
 
@@ -176,6 +190,13 @@
           <div class="caption_text">
             <span>{{ feature.type }}</span>
 
+            <span
+              v-if="feature.scalingView.levels"
+              class="ml-1"
+            >
+              ({{ CLASS_TEXT.scalingAlso }} {{ feature.scalingView.levels }})
+            </span>
+
             <UTooltip
               v-if="feature.optional"
               :text="CLASS_TEXT.optionalHint"
@@ -190,8 +211,23 @@
           </div>
 
           <ContentRender
-            v-if="feature.description"
-            :html="feature.description"
+            v-if="hasContentDescription(feature.description)"
+            :content="feature.description"
+          />
+
+          <div
+            v-for="row in feature.scalingView.rows"
+            :key="row.key"
+          >
+            <p class="font-semibold">{{ row.title }}</p>
+
+            <ContentRender :content="row.description" />
+          </div>
+
+          <ClassFeatureOptions
+            v-if="feature.options.length"
+            :name="feature.optionsName"
+            :options="feature.options"
           />
         </div>
       </details>

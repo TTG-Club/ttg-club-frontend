@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+  import type { FormSubmitEvent } from '@nuxt/ui';
 
   import type { RuleForm, WorkshopRule } from '../model';
 
@@ -12,12 +12,10 @@
     WorkshopNameFields,
     WorkshopSourceSelect,
   } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createRuleForm,
-    getHtmlFieldErrors,
     getRulePayload,
-    RULE_DESCRIPTION_ROWS,
     RULE_EDITOR_TEXT,
     ruleFormSchema,
     RULES_WORKSHOP_KEY,
@@ -75,14 +73,6 @@
     }
   }
 
-  /**
-   * Ошибки разметки описания: бэкенд не примет такой текст.
-   * @param form - состояние формы
-   */
-  function validate(form: Partial<RuleForm>): Array<FormError> {
-    return getHtmlFieldErrors({ description: form.description ?? '' });
-  }
-
   async function submit(event: FormSubmitEvent<RuleForm>): Promise<void> {
     const saved = await save(getRulePayload(event.data, source.value));
 
@@ -97,7 +87,6 @@
     ref="form"
     :schema="ruleFormSchema"
     :state="state"
-    :validate="validate"
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
@@ -136,10 +125,7 @@
       class="col-span-full"
       required
     >
-      <WorkshopHtmlEditor
-        v-model="state.description"
-        :rows="RULE_DESCRIPTION_ROWS"
-      />
+      <MarkupEditor v-model="state.description" />
     </UFormField>
 
     <div class="col-span-full">

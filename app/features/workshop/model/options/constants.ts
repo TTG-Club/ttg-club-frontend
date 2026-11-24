@@ -12,6 +12,10 @@ export const OPTION_TYPES_FILTER_KEY = 'classOption';
 
 /** Подписи редактора особенностей. */
 export const OPTION_EDITOR_TEXT = {
+  managedTitle: 'Вариант правится в умении класса',
+  managedDescription: (name: string) =>
+    `Раздел «Особенности классов» обновляется из умения «${name}» при сохранении класса: правка здесь была бы затёрта.`,
+  managedOpen: 'Открыть умение',
   createTitle: 'Создание особенности',
   editTitle: 'Редактирование особенности',
   prerequisite: 'Требования',

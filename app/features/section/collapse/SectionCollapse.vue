@@ -35,7 +35,7 @@
       trigger:
         'cursor-pointer gap-2 py-0 text-xl font-semibold text-highlighted',
       label: 'flex items-center gap-2',
-      body: 'pt-3 text-base',
+      body: 'pt-3 text-(length:--main-font-size)',
     }"
   >
     <template #default>

@@ -2,6 +2,8 @@ import type { WorkshopScreen } from './types';
 
 import { z } from 'zod';
 
+import { markupBlocksSchema } from '~content/model';
+
 import {
   workshopNameSchema,
   workshopOptionalNotNegative,
@@ -14,7 +16,7 @@ const workshopScreenSchema = z.object({
   name: workshopNameSchema,
   altName: z.string().nullish(),
   category: z.string().nullish(),
-  description: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
   icon: z.string().nullish(),
   order: z.number().nullish(),
   source: workshopSourceSchema,
@@ -40,7 +42,7 @@ export function parseWorkshopScreen(input: unknown): WorkshopScreen {
     englishName: screen.name.eng,
     altName: screen.altName ?? '',
     category: screen.category ?? '',
-    description: screen.description ?? '',
+    description: screen.description ?? [],
     icon: screen.icon ?? '',
     order: screen.order ?? null,
     source: screen.source?.shortName,
@@ -62,7 +64,7 @@ export const screenFormSchema = z.object({
   category: z.string(),
   icon: z.string(),
   order: workshopOptionalNotNegative,
-  description: z.string(),
+  description: markupBlocksSchema,
 });
 
 export type ScreenForm = z.infer<typeof screenFormSchema>;

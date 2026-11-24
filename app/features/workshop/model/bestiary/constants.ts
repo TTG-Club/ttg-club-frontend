@@ -269,7 +269,6 @@ export const CREATURE_BLOCK_TEXT = {
   mystical: 'Мистические действия',
   add: 'Добавить',
   remove: 'Удалить',
-  markdown: 'Используется markdown',
   shared: 'Это действие используется несколькими существами:',
   empty: 'Нет блоков',
 } as const;
@@ -280,14 +279,6 @@ export const CREATURE_LIST_ICON = {
   remove: 'tabler:trash',
   shared: 'tabler:alert-triangle',
 } as const;
-
-/** Строки полей разметки в редакторе существ. */
-export const CREATURE_ROWS = {
-  description: 6,
-  block: 4,
-  short: 3,
-} as const;
-
 /** Списки особенностей и действий в порядке карточки; мистические — в конце формы. */
 export const CREATURE_BLOCK_SECTIONS = [
   { field: 'feats', title: CREATURE_BLOCK_TEXT.feats },

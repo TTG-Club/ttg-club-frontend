@@ -2,12 +2,11 @@
   import type { CreatureLegendaryAction } from '../model';
 
   import { WorkshopListSection } from '../form';
-  import { WorkshopHtmlEditor } from '../html-editor';
+  import { MarkupEditor } from '../markup-editor';
   import {
     createCreatureLegendaryAction,
     CREATURE_BLOCK_TEXT,
     CREATURE_LIST_ICON,
-    CREATURE_ROWS,
     WORKSHOP_FIELD_TEXT,
   } from '../model';
 
@@ -54,9 +53,12 @@
   /**
    * Меняет описание действия.
    * @param actionIndex - номер действия
-   * @param description - текст описания
+   * @param description - блоки разметки описания
    */
-  function changeDescription(actionIndex: number, description: string): void {
+  function changeDescription(
+    actionIndex: number,
+    description: Array<string>,
+  ): void {
     patchAction(actionIndex, { description });
   }
 
@@ -114,9 +116,8 @@
         :label="WORKSHOP_FIELD_TEXT.description"
         :name="getFieldName(actionIndex, 'description')"
       >
-        <WorkshopHtmlEditor
+        <MarkupEditor
           :model-value="action.description"
-          :rows="CREATURE_ROWS.block"
           @update:model-value="changeDescription(actionIndex, $event)"
         />
       </UFormField>

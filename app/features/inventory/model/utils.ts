@@ -11,6 +11,7 @@ import type { ItemsGrouping, MagicItemTypePart } from './types';
 
 import { capitalize } from 'es-toolkit';
 
+import { hasContentDescription } from '~content/model';
 import { WORKSHOP_EDIT_SUFFIX } from '~section/model';
 
 import {
@@ -132,6 +133,20 @@ export function getMagicItemEditPath(path: string): string {
 }
 
 /**
+ * Условие настройки разметкой (новый API); у старого API оно строкой и уже
+ * входит в `detailCustamization`.
+ * @param item - магический предмет
+ */
+export function getMagicItemAttunementMarkup(
+  item: MagicItemDetail,
+): Array<string> | undefined {
+  return Array.isArray(item.custSpecial)
+    && hasContentDescription(item.custSpecial)
+    ? item.custSpecial
+    : undefined;
+}
+
+/**
  * Подпись типа магического предмета для плашки источника, разбитая на части:
  * тип, уточнения в скобках (могут быть ссылками) и редкость.
  * @param item - магический предмет
@@ -140,7 +155,15 @@ export function getMagicItemTypeParts(
   item: MagicItemDetail,
 ): MagicItemTypePart[] {
   const parts: MagicItemTypePart[] = [{ key: 'type', text: item.type.name }];
-  const details = item.detailType ?? [];
+
+  const details: Array<Omit<MagicItemTypePart, 'key'>> = (
+    item.detailType ?? []
+  ).map((detail) => ({ text: detail.name, url: detail.url ?? undefined }));
+
+  // новый API отдаёт уточнение разметкой отдельно от доспехов и оружия
+  if (Array.isArray(item.special) && hasContentDescription(item.special)) {
+    details.push({ text: '', content: item.special });
+  }
 
   details.forEach((detail, index) => {
     const prefix = index === 0 ? MAGIC_ITEM_TEXT.detailOpen : '';
@@ -149,11 +172,7 @@ export function getMagicItemTypeParts(
       parts.push({ key: 'open', text: prefix });
     }
 
-    parts.push({
-      key: `detail-${index}`,
-      text: detail.name,
-      url: detail.url ?? undefined,
-    });
+    parts.push({ key: `detail-${index}`, ...detail });
 
     parts.push({
       key: `separator-${index}`,
