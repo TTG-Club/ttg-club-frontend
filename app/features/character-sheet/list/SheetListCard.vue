@@ -37,6 +37,20 @@
 
   const route = computed(() => getSheetRoute(sheet.id));
 
+  /** Файл портрета не открылся — вместо него значок. */
+  const isAvatarBroken = ref(false);
+
+  const avatarSource = computed(() =>
+    isAvatarBroken.value ? undefined : (sheet.data.avatarUrl ?? undefined),
+  );
+
+  watch(
+    () => sheet.data.avatarUrl,
+    () => {
+      isAvatarBroken.value = false;
+    },
+  );
+
   const openLabel = computed(
     () => `${SHEET_LIST_TEXT.openAria}: ${sheet.name}`,
   );
@@ -103,7 +117,16 @@
       <div
         class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg bg-primary/5 ring-1 ring-primary/15"
       >
+        <img
+          v-if="avatarSource"
+          :src="avatarSource"
+          :alt="sheet.name"
+          class="size-full object-cover"
+          @error="isAvatarBroken = true"
+        />
+
         <UIcon
+          v-else
           :name="SHEET_LIST_ICON.avatar"
           class="size-7 text-primary"
         />

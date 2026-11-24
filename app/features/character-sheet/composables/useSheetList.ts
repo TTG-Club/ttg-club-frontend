@@ -9,11 +9,51 @@ import {
   fetchSheetList,
   getSheetNameFromFileName,
   parseSheetImport,
+  saveSheet,
   SHEET_IMPORT_ERROR_TEXT,
   SHEET_LIMIT_FALLBACK,
   SHEET_LIST_TEXT,
   SHEET_TEXT,
+  uploadSheetAvatar,
+  withoutSheetAvatar,
 } from '../model';
+
+/**
+ * Копирует файл портрета в новый лист: файл у каждого листа свой, иначе
+ * удаление одного листа оставило бы другой без портрета.
+ * @param source - исходный лист
+ * @param target - только что созданная копия без портрета
+ * @returns копия с портретом; при сбое — копия как есть
+ */
+async function copySheetAvatar(
+  source: CharacterSheet,
+  target: CharacterSheet,
+): Promise<CharacterSheet> {
+  const sourceUrl = source.data.avatarUrl;
+
+  if (!sourceUrl) {
+    return target;
+  }
+
+  try {
+    const response = await fetch(sourceUrl);
+
+    if (!response.ok) {
+      return target;
+    }
+
+    const blob = await response.blob();
+    const file = new File([blob], `${target.id}.webp`, { type: blob.type });
+    const avatarUrl = await uploadSheetAvatar(target.id, file);
+
+    return await saveSheet(target.id, {
+      data: { ...target.data, avatarUrl },
+      version: target.version,
+    });
+  } catch {
+    return target;
+  }
+}
 
 /**
  * Листы персонажей пользователя. Бэкенд узнаёт пользователя по cookie и
@@ -86,12 +126,19 @@ export function useSheetList() {
   }
 
   /**
-   * Создаёт копию листа.
+   * Создаёт копию листа; портрет копируется отдельным файлом.
    * @param sheet - исходный лист
    */
   function copy(sheet: CharacterSheet): Promise<CharacterSheet | undefined> {
     return mutate(
-      () => createSheet(`${sheet.name}${SHEET_TEXT.copySuffix}`, sheet.data),
+      async () =>
+        copySheetAvatar(
+          sheet,
+          await createSheet(
+            `${sheet.name}${SHEET_TEXT.copySuffix}`,
+            withoutSheetAvatar(sheet.data),
+          ),
+        ),
       SHEET_TEXT.errorCopy,
     );
   }

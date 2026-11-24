@@ -1,6 +1,7 @@
 export type * from './types';
 
 export * from './api';
+export * from './avatar';
 export * from './catalog';
 export * from './catalogAdd';
 export * from './choices';

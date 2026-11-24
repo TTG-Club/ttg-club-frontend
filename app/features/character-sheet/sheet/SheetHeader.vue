@@ -60,6 +60,7 @@
     SHEET_VISION_LABELS,
     WIZARD_TEXT,
   } from '../model';
+  import SheetAvatar from './SheetAvatar.vue';
 
   /**
    * Шапка листа, как на new.ttg.club: портрет, имя, подпись «Раса — Класс N
@@ -610,15 +611,7 @@
     class="@container flex flex-col items-center gap-4 @2xl:flex-row @2xl:items-start @2xl:gap-6"
   >
     <div class="relative mb-2 shrink-0 @2xl:mb-0">
-      <div
-        class="grid size-24 place-items-center overflow-hidden rounded-full border-2 border-primary/60 bg-elevated"
-        :aria-label="SHEET_BODY_LABELS.avatar"
-      >
-        <UIcon
-          name="tabler:user"
-          class="size-10 text-muted"
-        />
-      </div>
+      <SheetAvatar />
 
       <div
         class="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1"

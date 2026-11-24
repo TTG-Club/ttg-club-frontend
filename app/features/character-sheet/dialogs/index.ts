@@ -2,6 +2,7 @@ export { default as SheetAbilityModal } from './SheetAbilityModal.vue';
 export { default as SheetAbilityScoresModal } from './SheetAbilityScoresModal.vue';
 export { default as SheetArmorClassModal } from './SheetArmorClassModal.vue';
 export { default as SheetAttunementModal } from './SheetAttunementModal.vue';
+export { default as SheetAvatarCropModal } from './SheetAvatarCropModal.vue';
 export { default as SheetBonusSection } from './SheetBonusSection.vue';
 export { default as SheetCarryingModal } from './SheetCarryingModal.vue';
 export { default as SheetCatalogAddModal } from './SheetCatalogAddModal.vue';

@@ -2,6 +2,7 @@ import type { CharacterSheet, SheetDocument } from './schema';
 
 import { z } from 'zod';
 
+import { withoutSheetAvatar } from './avatar';
 import {
   SHEET_EXPORT_FILE,
   SHEET_FILE_NAME_FORBIDDEN,
@@ -68,7 +69,8 @@ function getImportName(name: string | undefined, fallbackName: string): string {
 /**
  * Разбирает файл импорта листа. Принимает файл нашего экспорта
  * (`{ name, data }`) или голый документ листа; документ проходит мягкую
- * схему, поэтому непонятные поля получают начальные значения.
+ * схему, поэтому непонятные поля получают начальные значения. Портрет
+ * отбрасывается: файл принадлежит другому листу.
  * @param text - содержимое файла
  * @param fallbackName - имя листа, если в файле его нет
  * @returns лист для создания или причина отказа
@@ -90,7 +92,7 @@ export function parseSheetImport(
       success: true,
       sheet: {
         name: getImportName(exported.data.name, fallbackName),
-        data: sheetDocumentSchema.parse(exported.data.data),
+        data: withoutSheetAvatar(sheetDocumentSchema.parse(exported.data.data)),
       },
     };
   }
@@ -110,7 +112,7 @@ export function parseSheetImport(
     success: true,
     sheet: {
       name: getImportName(undefined, fallbackName),
-      data: sheetDocumentSchema.parse(bareDocument.data),
+      data: withoutSheetAvatar(sheetDocumentSchema.parse(bareDocument.data)),
     },
   };
 }
@@ -139,13 +141,14 @@ export function getSheetExportFileName(name: string): string {
 
 /**
  * Скачивает лист JSON-файлом `{ name, data }` — его же принимает импорт.
+ * Портрет в файл не попадает: он принадлежит листу на сервере.
  * @param sheet - лист персонажа
  */
 export function downloadSheetJson(
   sheet: Pick<CharacterSheet, 'name' | 'data'>,
 ): void {
   const content = JSON.stringify(
-    { name: sheet.name, data: sheet.data },
+    { name: sheet.name, data: withoutSheetAvatar(sheet.data) },
     null,
     SHEET_EXPORT_FILE.indent,
   );

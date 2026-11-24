@@ -1,12 +1,16 @@
-import type { z } from 'zod';
-
 import type {
   CharacterSheet,
   CharacterSheetList,
   SheetDocument,
 } from './schema';
 
-import { CHARACTER_SHEET_API_URL } from './constants';
+import { z } from 'zod';
+
+import {
+  CHARACTER_SHEET_API_URL,
+  SHEET_AVATAR_API_SEGMENT,
+  SHEET_AVATAR_URL_PREFIX,
+} from './constants';
 import { characterSheetListSchema, characterSheetSchema } from './schema';
 import { getCatalogApiPath } from './utils';
 
@@ -102,6 +106,50 @@ export async function deleteSheet(id: string): Promise<void> {
   const api = useApi();
 
   await api(getSheetUrl(id), { method: 'DELETE' });
+}
+
+/** Ответ загрузки портрета: адрес файла листа с меткой версии. */
+const sheetAvatarResponseSchema = z.object({
+  url: z.string().startsWith(SHEET_AVATAR_URL_PREFIX),
+});
+
+/**
+ * Адрес ручки портрета листа.
+ * @param id - идентификатор листа
+ */
+function getSheetAvatarUrl(id: string): string {
+  return `${getSheetUrl(id)}/${SHEET_AVATAR_API_SEGMENT}`;
+}
+
+/**
+ * Загружает портрет листа вместо прежнего. Документ листа сервер не меняет:
+ * адрес записывает в него сам лист.
+ * @param id - идентификатор листа
+ * @param file - вырезанный квадрат
+ * @returns адрес портрета с меткой версии
+ */
+export async function uploadSheetAvatar(
+  id: string,
+  file: File,
+): Promise<string> {
+  const api = useApi();
+  const body = new FormData();
+
+  body.append('file', file);
+
+  const response = await api(getSheetAvatarUrl(id), { method: 'POST', body });
+
+  return sheetAvatarResponseSchema.parse(response).url;
+}
+
+/**
+ * Удаляет файл портрета листа.
+ * @param id - идентификатор листа
+ */
+export async function deleteSheetAvatar(id: string): Promise<void> {
+  const api = useApi();
+
+  await api(getSheetAvatarUrl(id), { method: 'DELETE' });
 }
 
 /**

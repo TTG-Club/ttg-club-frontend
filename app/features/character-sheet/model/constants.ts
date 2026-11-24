@@ -3009,3 +3009,107 @@ export const CUSTOM_CLASS_TEXT = {
   cancel: 'Отмена',
   save: 'Создать',
 } as const;
+
+/** Сегмент ручки портрета: `/api/v1/character-sheets/<id>/avatar`. */
+export const SHEET_AVATAR_API_SEGMENT = 'avatar';
+
+/** Начало адресов портретов в хранилище сайта: чужие адреса лист не принимает. */
+export const SHEET_AVATAR_URL_PREFIX = '/s3/';
+
+/** Ограничения портрета: бэкенд проверяет размер файла и тип так же. */
+export const SHEET_AVATAR_LIMIT = {
+  /** Предел размера исходного файла, байт. */
+  maxBytes: 10 * 1024 * 1024,
+  /** Наибольшая сторона вырезанного квадрата: сервер всё равно уменьшит до 512. */
+  maxOutputSide: 1024,
+  /** Наименьшая сторона области выбора в пикселях исходника. */
+  minCropSide: 48,
+} as const;
+
+/** Типы файлов в диалоге выбора портрета. */
+export const SHEET_AVATAR_ACCEPT = 'image/png,image/jpeg,image/webp,image/bmp';
+
+/** Типы файлов, которые принимает перетаскивание на портрет. */
+export const SHEET_AVATAR_TYPES: ReadonlyArray<string> =
+  SHEET_AVATAR_ACCEPT.split(',');
+
+/** Выбор области портрета: шаги, формат результата. */
+export const SHEET_AVATAR_CROP = {
+  /** Доля наибольшего квадрата, на которую меняется сторона за шаг. */
+  sizeStep: 0.05,
+  /** Доля наибольшего квадрата, на которую область сдвигается стрелкой. */
+  moveStep: 0.02,
+  /** Формат результата; браузер без кодирования webp отдаст png. */
+  outputType: 'image/webp',
+  outputQuality: 0.92,
+  fallbackExtension: 'png',
+  fallbackName: 'portrait',
+  /** Сторона круга предпросмотра, пикселей. */
+  previewSize: 96,
+} as const;
+
+/** Подписи портрета и окна выбора области. */
+export const SHEET_AVATAR_TEXT = {
+  add: 'Добавить портрет',
+  addAria: 'Добавить портрет персонажа',
+  replace: 'Заменить портрет',
+  remove: 'Удалить портрет',
+  removeTitle: 'Удалить портрет?',
+  removeDescription:
+    'Файл портрета удалится из хранилища, вернуть его не получится.',
+  reveal: 'Показать действия с портретом',
+  uploadError: 'Не удалось загрузить портрет',
+  removeError: 'Не удалось удалить портрет',
+  tooLarge: 'Файл больше 10 МБ',
+  cropTitle: 'Область портрета',
+  cropDescription:
+    'Перетащите рамку и измените её размер за уголки — загрузится только выделенный квадрат.',
+  imageAlt: 'Выбранное изображение',
+  frame: 'Область портрета: перемещается перетаскиванием или стрелками',
+  preview: 'Предпросмотр',
+  size: 'Размер области',
+  shrink: 'Уменьшить область',
+  grow: 'Увеличить область',
+  cancel: 'Отмена',
+  apply: 'Применить',
+  loadError: 'Не удалось открыть изображение',
+  loadErrorDescription: 'Файл повреждён или его формат не поддерживается.',
+  cropError: 'Не удалось вырезать выбранную область',
+} as const;
+
+/** Иконки портрета. */
+export const SHEET_AVATAR_ICON = {
+  empty: 'tabler:user',
+  add: 'tabler:camera-plus',
+  replace: 'tabler:photo-edit',
+  remove: 'tabler:trash',
+  loading: 'tabler:loader-2',
+  broken: 'tabler:photo-off',
+  shrink: 'tabler:minus',
+  grow: 'tabler:plus',
+  apply: 'tabler:crop',
+} as const;
+
+/** Края, к которым примыкает угол рамки: от них зависит, куда растёт область. */
+export const CROP_CORNER_EDGES = {
+  topLeft: { isLeft: true, isTop: true },
+  topRight: { isLeft: false, isTop: true },
+  bottomLeft: { isLeft: true, isTop: false },
+  bottomRight: { isLeft: false, isTop: false },
+} as const;
+
+/** Куда сдвигается область выбора по каждой из стрелок. */
+export const CROP_DIRECTION_OFFSETS = {
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+} as const;
+
+/** Маркеры углов рамки: угол и положение с курсором. */
+export const CROP_HANDLES = [
+  { corner: 'topLeft', class: '-top-2.5 -left-2.5 cursor-nwse-resize' },
+  { corner: 'topRight', class: '-top-2.5 -right-2.5 cursor-nesw-resize' },
+  { corner: 'bottomLeft', class: '-bottom-2.5 -left-2.5 cursor-nesw-resize' },
+  { corner: 'bottomRight', class: '-right-2.5 -bottom-2.5 cursor-nwse-resize' },
+] as const;
