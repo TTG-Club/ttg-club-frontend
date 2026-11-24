@@ -17,6 +17,7 @@ import {
   KNOWN_SPELLS_COLUMN,
   loadClassDetails,
   parseSpellSlotCells,
+  syncFeatureOptionChoices,
   toAbilityKey,
 } from '../model';
 import { useCharacterSheet } from './useCharacterSheet';
@@ -144,7 +145,7 @@ function getTableValues(
  * подклассов загружаются один раз и живут, пока открыт лист.
  */
 export const useSheetClassData = createSharedComposable(() => {
-  const { document } = useCharacterSheet();
+  const { document, update } = useCharacterSheet();
 
   const details = shallowRef<ReadonlyMap<string, SheetClassDetail>>(new Map());
 
@@ -197,6 +198,18 @@ export const useSheetClassData = createSharedComposable(() => {
   }
 
   watch(urls, loadMissing, { immediate: true });
+
+  // Источники умений, созданные до появления вариантов, получают выбор из
+  // текущей карточки класса (ответы сохраняются по ключу выбора)
+  watch([mechanics, () => document.value.sources], () => {
+    const next = syncFeatureOptionChoices(document.value, (url) =>
+      url ? mechanics.value.get(url) : undefined,
+    );
+
+    if (next) {
+      update(() => next);
+    }
+  });
 
   /**
    * Запись класса или подкласса, если она уже загружена.

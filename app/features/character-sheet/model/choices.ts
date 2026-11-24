@@ -167,8 +167,9 @@ export function toSheetChoice(
     kind,
     label: raw.label || CHOICE_KIND_LABELS[kind],
     count: resolveChoiceCount(raw, level),
+    // Вариант умения открывается со своего уровня класса
     options: (raw.options ?? [])
-      .filter((option) => option.value)
+      .filter((option) => option.value && (option.level ?? 0) <= level)
       .map((option) => ({
         value: option.value,
         label: option.name || getChoiceValueLabel(kind, option.value),
