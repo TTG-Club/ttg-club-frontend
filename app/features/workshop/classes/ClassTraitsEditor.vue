@@ -17,15 +17,22 @@
     MECHANICS_KIND,
     WORKSHOP_FIELD_TEXT,
   } from '../model';
+  import ClassTraitOptionsEditor from './ClassTraitOptionsEditor.vue';
   import ClassTraitScalingEditor from './ClassTraitScalingEditor.vue';
 
   /**
    * Умения класса или архетипа. Каждое свёрнуто под спойлер: у класса их
    * до двух десятков, и развёрнутые разом они растягивали форму на экраны.
    */
-  const { fieldName, hasOptional = false } = defineProps<{
+  const {
+    fieldName,
+    hasOptional = false,
+    optionTypeItems = [],
+  } = defineProps<{
     /** Поле формы со списком умений: по нему показываются ошибки. */
     fieldName: string;
+    /** Типы списков вариантов из раздела «Особенности классов». */
+    optionTypeItems?: ReadonlyArray<{ label: string; value: string }>;
     /** Показывать флажок опционального умения: он есть только у классов. */
     hasOptional?: boolean;
   }>();
@@ -160,6 +167,23 @@
     scaling: ClassTrait['scaling'],
   ): void {
     patchTrait(traitIndex, { scaling });
+  }
+
+  /**
+   * Меняет поле вариантов умения.
+   * @param traitIndex - номер умения
+   * @param update - изменённые поля вариантов
+   */
+  function changeOptions(
+    traitIndex: number,
+    update: Partial<
+      Pick<
+        ClassTrait,
+        'optionsType' | 'optionsName' | 'options' | 'optionsChoice'
+      >
+    >,
+  ): void {
+    patchTrait(traitIndex, update);
   }
 
   /**
@@ -322,6 +346,25 @@
             :field-name="getFieldName(traitIndex, 'scaling')"
             :has-hide-in-subclasses="hasOptional"
             @update:model-value="changeScaling(traitIndex, $event)"
+          />
+        </div>
+
+        <div class="md:col-span-3">
+          <ClassTraitOptionsEditor
+            :type="trait.optionsType"
+            :name="trait.optionsName"
+            :options="trait.options"
+            :choice="trait.optionsChoice"
+            :trait-level="trait.level"
+            :field-name="`${fieldName}.${traitIndex}`"
+            :type-items="optionTypeItems"
+            :has-hide-in-subclasses="hasOptional"
+            @update:type="changeOptions(traitIndex, { optionsType: $event })"
+            @update:name="changeOptions(traitIndex, { optionsName: $event })"
+            @update:options="changeOptions(traitIndex, { options: $event })"
+            @update:choice="
+              changeOptions(traitIndex, { optionsChoice: $event })
+            "
           />
         </div>
 

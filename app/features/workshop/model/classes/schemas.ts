@@ -1,6 +1,7 @@
 import type {
   ClassTableColumn,
   ClassTrait,
+  ClassTraitOption,
   WorkshopArchetype,
   WorkshopClass,
 } from './types';
@@ -33,6 +34,30 @@ const classTraitScalingSchema = z.object({
   hideInSubclasses: z.boolean().catch(false),
 });
 
+const classTraitOptionSchema = z.object({
+  name: z.string().catch(''),
+  englishName: z.string().catch(''),
+  altName: z.string().nullish(),
+  level: z.number().nullish(),
+  prerequisite: z.string().nullish(),
+  additional: z.string().nullish(),
+  description: markupBlocksSchema.nullish(),
+  repeatable: z.boolean().catch(false),
+  hideInSubclasses: z.boolean().catch(false),
+  source: z.string().nullish(),
+  page: z.number().nullish(),
+  mechanics: z.unknown().optional(),
+  activeEffects: z.unknown().optional(),
+});
+
+const classTraitOptionsChoiceSchema = z.object({
+  label: z.string().nullish(),
+  count: z.number().catch(0),
+  scaling: z
+    .array(z.object({ level: z.number(), count: z.number() }))
+    .catch([]),
+});
+
 const classTraitSchema = z.object({
   id: z.number().nullish(),
   name: z.string(),
@@ -42,6 +67,10 @@ const classTraitSchema = z.object({
   optional: z.boolean().catch(false),
   child: z.string().nullish(),
   scaling: z.array(classTraitScalingSchema).catch([]),
+  optionsType: z.string().nullish(),
+  optionsName: z.string().nullish(),
+  options: z.array(classTraitOptionSchema).catch([]),
+  optionsChoice: classTraitOptionsChoiceSchema.nullish().catch(null),
   mechanics: z.unknown().optional(),
   activeEffects: z.unknown().optional(),
 });
@@ -106,6 +135,32 @@ const workshopArchetypeSchema = z.object({
 });
 
 /**
+ * Вариант умения из ответа сервера (или из переноса типа раздела).
+ * @param option - вариант
+ */
+export function toClassTraitOption(
+  option: z.infer<typeof classTraitOptionSchema>,
+): ClassTraitOption {
+  return {
+    name: option.name,
+    englishName: option.englishName,
+    altName: option.altName ?? '',
+    level: option.level ?? null,
+    prerequisite: option.prerequisite ?? '',
+    additional: option.additional ?? '',
+    description: option.description ?? [],
+    repeatable: option.repeatable,
+    hideInSubclasses: option.hideInSubclasses,
+    source: option.source ?? '',
+    page: option.page ?? null,
+    ...parseMechanicsFields(option),
+  };
+}
+
+/** Варианты типа раздела «Особенности классов» для переноса в умение. */
+export const classTraitOptionListSchema = z.array(classTraitOptionSchema);
+
+/**
  * Умение из ответа сервера.
  * @param trait - умение
  */
@@ -125,6 +180,16 @@ function toClassTrait(trait: z.infer<typeof classTraitSchema>): ClassTrait {
       description: row.description ?? [],
       hideInSubclasses: row.hideInSubclasses,
     })),
+    optionsType: trait.optionsType ?? '',
+    optionsName: trait.optionsName ?? '',
+    options: trait.options.map(toClassTraitOption),
+    optionsChoice: trait.optionsChoice
+      ? {
+          label: trait.optionsChoice.label ?? '',
+          count: trait.optionsChoice.count,
+          scaling: trait.optionsChoice.scaling,
+        }
+      : null,
     ...parseMechanicsFields(trait),
   };
 }
@@ -232,6 +297,31 @@ const classTraitScalingFormSchema = z.object({
   hideInSubclasses: z.boolean(),
 });
 
+/** Вариант умения в форме. */
+const classTraitOptionFormSchema = z.object({
+  name: workshopRequiredText,
+  englishName: workshopRequiredText,
+  altName: z.string(),
+  level: classLevelSchema.nullable(),
+  prerequisite: z.string(),
+  additional: z.string(),
+  description: markupBlocksSchema,
+  repeatable: z.boolean(),
+  hideInSubclasses: z.boolean(),
+  source: z.string(),
+  page: z.number().int().positive().nullable(),
+  ...mechanicsFieldsFormSchema,
+});
+
+/** Выбор из вариантов в форме. */
+const classTraitOptionsChoiceFormSchema = z.object({
+  label: z.string(),
+  count: notNegativeSchema,
+  scaling: z.array(
+    z.object({ level: classLevelSchema, count: notNegativeSchema }),
+  ),
+});
+
 /** Умение в форме. */
 export const classTraitFormSchema = z.object({
   id: z.number().optional(),
@@ -242,6 +332,10 @@ export const classTraitFormSchema = z.object({
   optional: z.boolean(),
   child: z.string(),
   scaling: z.array(classTraitScalingFormSchema),
+  optionsType: z.string(),
+  optionsName: z.string(),
+  options: z.array(classTraitOptionFormSchema),
+  optionsChoice: classTraitOptionsChoiceFormSchema.nullable(),
   ...mechanicsFieldsFormSchema,
 });
 

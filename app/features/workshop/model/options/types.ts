@@ -15,4 +15,9 @@ export interface WorkshopOption extends WorkshopMechanicsFields {
   optionTypes: Array<string>;
   /** Аббревиатура книги-источника. */
   source?: string;
+  /**
+   * Умение класса, в котором правится этот вариант; null — особенность
+   * правится здесь. Раздел — копия вариантов умений.
+   */
+  feature: { url: string; name: string } | null;
 }

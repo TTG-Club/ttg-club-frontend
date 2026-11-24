@@ -17,6 +17,42 @@ export interface ClassTraitScaling {
   hideInSubclasses: boolean;
 }
 
+/** Вариант умения: воззвание, манёвр, боевой стиль. */
+export interface ClassTraitOption extends WorkshopMechanicsFields {
+  name: string;
+  /** По нему строится адрес в разделе «Особенности классов». */
+  englishName: string;
+  altName: string;
+  /** С какого уровня класса доступен; null — с уровня умения. */
+  level: number | null;
+  prerequisite: string;
+  /** Короткая подпись в списке вариантов. */
+  additional: string;
+  /** Блоки разметки core-api. */
+  description: Array<string>;
+  repeatable: boolean;
+  /** Не показывать на странице подкласса: только у умений класса. */
+  hideInSubclasses: boolean;
+  /** Аббревиатура книги-источника; пусто — книга класса. */
+  source: string;
+  page: number | null;
+}
+
+/** Ступень роста количества выбираемых вариантов. */
+export interface ClassTraitOptionsStep {
+  level: number;
+  /** Сколько вариантов выбрано всего к уровню. */
+  count: number;
+}
+
+/** Выбор из вариантов для листа персонажа. */
+export interface ClassTraitOptionsChoice {
+  label: string;
+  /** Сколько выбрать на уровне умения. */
+  count: number;
+  scaling: Array<ClassTraitOptionsStep>;
+}
+
 export interface ClassTrait extends WorkshopMechanicsFields {
   id?: number;
   name: string;
@@ -29,6 +65,13 @@ export interface ClassTrait extends WorkshopMechanicsFields {
   child: string;
   /** Рост по уровням. */
   scaling: Array<ClassTraitScaling>;
+  /** Тип списка вариантов (код); пусто — у умения нет вариантов. */
+  optionsType: string;
+  /** Название списка вариантов: «Воззвания». */
+  optionsName: string;
+  options: Array<ClassTraitOption>;
+  /** Выбор для листа; null — варианты только справка. */
+  optionsChoice: ClassTraitOptionsChoice | null;
 }
 
 /** Колонка таблицы прогрессии: значения по двадцати уровням. */
