@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { CharacterSheetAccessGate } from '~character-sheet/gate';
   import { CharacterSheetEditor } from '~character-sheet/sheet';
 
   definePageMeta({ layout: 'section' });
@@ -17,6 +18,8 @@
 
 <template>
   <ClientOnly>
-    <CharacterSheetEditor :id="id" />
+    <CharacterSheetAccessGate>
+      <CharacterSheetEditor :id="id" />
+    </CharacterSheetAccessGate>
   </ClientOnly>
 </template>

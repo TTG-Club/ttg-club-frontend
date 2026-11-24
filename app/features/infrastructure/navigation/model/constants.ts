@@ -187,6 +187,7 @@ export const MENU_SECTIONS: Array<MenuSection> = [
         label: 'Лист персонажа',
         icon: 'tabler:user-square-rounded',
         onHome: true,
+        editorOnly: true,
       },
       {
         href: DM_SCREEN_PAGE_PATH,
