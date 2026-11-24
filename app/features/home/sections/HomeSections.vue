@@ -1,7 +1,10 @@
 <script setup lang="ts">
   import type { HomePromoCardContent } from '../model';
 
-  import { MENU_SECTIONS } from '~infrastructure/navigation/model';
+  import {
+    getVisibleMenuSections,
+    MENU_SECTIONS,
+  } from '~infrastructure/navigation/model';
 
   import { useHomeLink } from '../composables';
   import {
@@ -11,7 +14,12 @@
   } from '../model';
   import { HomePromoCard } from '../ui-kit';
 
-  const sections = getHomeSections(MENU_SECTIONS);
+  const { isEditor } = useUser();
+
+  const sections = computed(() =>
+    getHomeSections(getVisibleMenuSections(MENU_SECTIONS, isEditor.value)),
+  );
+
   const { isExternalLink } = useHomeLink();
 
   const { newSiteUrl } = useRuntimeConfig().public;
