@@ -37,6 +37,7 @@ import {
   HEAVY_PROPERTY_URL_SUFFIX,
   MARTIAL_WEAPON_TYPE_MARKER,
   RANGED_WEAPON_TYPE_MARKER,
+  TOOL_EQUIPMENT_CATEGORIES,
   VERSATILE_PROPERTY_URL_SUFFIX,
 } from './constants';
 import {
@@ -147,6 +148,12 @@ export const ITEM_SEARCH: CatalogSearchSource<typeof itemLinkSchema> = {
       ),
     },
   ],
+};
+
+/** Инструменты: снаряжение из категорий инструментов. */
+export const TOOL_SEARCH: CatalogSearchSource<typeof itemLinkSchema> = {
+  ...ITEM_SEARCH,
+  filter: { category: [...TOOL_EQUIPMENT_CATEGORIES], book: [] },
 };
 
 /** Разделы снаряжения, из которых можно добавить предмет. */
@@ -332,7 +339,7 @@ export async function loadCatalogItem(
         damageType: detail.damage?.type ?? '',
         isRanged: Boolean(detail.typeRaw?.includes(RANGED_WEAPON_TYPE_MARKER)),
         isFinesse: Boolean(findProperty(FINESSE_PROPERTY_URL_SUFFIX)),
-        isProficient: true,
+        proficiency: null,
         bonus: 0,
         isMartial: Boolean(
           detail.typeRaw?.startsWith(MARTIAL_WEAPON_TYPE_MARKER),

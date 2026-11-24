@@ -219,7 +219,7 @@ describe('настройки листа', () => {
         bonus: 0,
         isRanged: false,
         isFinesse: false,
-        isProficient: false,
+        proficiency: 'no' as const,
       },
     };
 

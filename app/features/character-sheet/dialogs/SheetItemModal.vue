@@ -9,6 +9,7 @@
 
   import { clamp } from 'es-toolkit';
 
+  import { useCharacterSheet } from '../composables';
   import {
     ARMOR_CATEGORIES,
     ARMOR_CATEGORY_LABELS,
@@ -18,6 +19,7 @@
     formatDice,
     formatModifier,
     getItemKind,
+    isWeaponProficient,
     ITEM_FORM_TEXT,
     ITEM_KIND_LABELS,
     ITEM_KINDS,
@@ -29,6 +31,9 @@
     sheetArmorSchema,
     sheetWeaponSchema,
     WEAPON_DAMAGE_TYPES,
+    WEAPON_PROFICIENCY_NO,
+    WEAPON_PROFICIENCY_OVERRIDES,
+    WEAPON_PROFICIENCY_YES,
   } from '../model';
 
   /**
@@ -48,6 +53,8 @@
   }>();
 
   const isOpen = defineModel<boolean>('open', { default: false });
+
+  const { document } = useCharacterSheet();
 
   /** Пункт «нет» у второй кости и доп. урона. */
   const NONE = 0;
@@ -294,13 +301,51 @@
     patchWeapon({ isMartial: value === 'martial' });
   }
 
+  /** Пункт «по листу» у владения оружием. */
+  const PROFICIENCY_AUTO = 'auto';
+
+  const weaponProficiencyItems = [
+    { label: ITEM_FORM_TEXT.proficiencyAuto, value: PROFICIENCY_AUTO },
+    { label: ITEM_FORM_TEXT.proficiencyYes, value: WEAPON_PROFICIENCY_YES },
+    { label: ITEM_FORM_TEXT.proficiencyNo, value: WEAPON_PROFICIENCY_NO },
+  ];
+
+  const weaponProficiency = computed(
+    () => draft.value?.weapon?.proficiency ?? PROFICIENCY_AUTO,
+  );
+
+  /** Что выходит по владениям листа, пока отметка не задана вручную. */
+  const weaponProficiencyHint = computed(() => {
+    const current = draft.value;
+
+    if (!current?.weapon || current.weapon.proficiency) {
+      return undefined;
+    }
+
+    return isWeaponProficient(document.value, current)
+      ? ITEM_FORM_TEXT.proficiencyAutoYes
+      : ITEM_FORM_TEXT.proficiencyAutoNo;
+  });
+
+  /**
+   * Ручное владение оружием.
+   * @param value - пункт списка
+   */
+  function setWeaponProficiency(value: unknown): void {
+    const proficiency = WEAPON_PROFICIENCY_OVERRIDES.find(
+      (override) => override === value,
+    );
+
+    patchWeapon({ proficiency: proficiency ?? null });
+  }
+
   /**
    * Флажок свойства оружия.
    * @param field - свойство
    * @param value - отметка
    */
   function setWeaponFlag(
-    field: 'isProficient' | 'isFinesse' | 'isRanged' | 'isHeavy',
+    field: 'isFinesse' | 'isRanged' | 'isHeavy',
     value: boolean | 'indeterminate',
   ): void {
     patchWeapon({ [field]: value === true });
@@ -657,12 +702,6 @@
 
               <div class="flex flex-wrap gap-x-4 gap-y-2">
                 <UCheckbox
-                  :model-value="draft.weapon.isProficient"
-                  :label="SHEET_LABELS.proficient"
-                  @update:model-value="setWeaponFlag('isProficient', $event)"
-                />
-
-                <UCheckbox
                   :model-value="draft.weapon.isFinesse"
                   :label="SHEET_LABELS.finesse"
                   @update:model-value="setWeaponFlag('isFinesse', $event)"
@@ -682,12 +721,18 @@
               </div>
             </div>
 
-            <UCheckbox
-              v-if="draft.weapon && !isCustom"
-              :model-value="draft.weapon.isProficient"
+            <UFormField
+              v-if="draft.weapon"
               :label="SHEET_LABELS.proficient"
-              @update:model-value="setWeaponFlag('isProficient', $event)"
-            />
+              :hint="weaponProficiencyHint"
+            >
+              <USelect
+                :model-value="weaponProficiency"
+                :items="weaponProficiencyItems"
+                class="w-full"
+                @update:model-value="setWeaponProficiency"
+              />
+            </UFormField>
 
             <div
               v-if="draft.armor && isCustom"

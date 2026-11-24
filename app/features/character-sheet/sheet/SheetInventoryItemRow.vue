@@ -9,6 +9,7 @@
     formatModifier,
     isItemMechanicsActive,
     ITEM_ROW_TEXT,
+    PROFICIENCY_MODAL_TEXT,
     SHEET_ACCENT_STAT_CLASSES,
     SHEET_BODY_LABELS,
     SHEET_ICON,
@@ -35,18 +36,27 @@
     action?: (click: MouseEvent) => void;
   }
 
-  const { item, attack, attackEffects, icon, isEquippable, isHindered } =
-    defineProps<{
-      item: SheetItem;
-      attack: WeaponAttack | null;
-      /** Прибавка эффектов к атаке: для разбора в подсказке. */
-      attackEffects: number;
-      /** Значок группы для предметов, которые не надеваются. */
-      icon: string;
-      isEquippable: boolean;
-      /** Тяжёлое оружие у Маленького: атака с помехой. */
-      isHindered: boolean;
-    }>();
+  const {
+    item,
+    attack,
+    attackEffects,
+    icon,
+    isEquippable,
+    isHindered,
+    unproficientHint,
+  } = defineProps<{
+    item: SheetItem;
+    attack: WeaponAttack | null;
+    /** Прибавка эффектов к атаке: для разбора в подсказке. */
+    attackEffects: number;
+    /** Значок группы для предметов, которые не надеваются. */
+    icon: string;
+    isEquippable: boolean;
+    /** Тяжёлое оружие у Маленького: атака с помехой. */
+    isHindered: boolean;
+    /** Нет владения предметом: подсказка значка; null — владеет. */
+    unproficientHint: string | null;
+  }>();
 
   const emit = defineEmits<{
     'toggle-equip': [];
@@ -510,6 +520,20 @@
             >
               {{ ITEM_ROW_TEXT.twoHanded }}
             </UBadge>
+
+            <UTooltip
+              v-if="unproficientHint"
+              :text="unproficientHint"
+            >
+              <UBadge
+                size="sm"
+                color="warning"
+                variant="subtle"
+                class="shrink-0"
+              >
+                {{ PROFICIENCY_MODAL_TEXT.unproficient }}
+              </UBadge>
+            </UTooltip>
 
             <UTooltip
               v-if="isHindered"

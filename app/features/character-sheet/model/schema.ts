@@ -15,6 +15,7 @@ import {
   DEATH_SAVES_MAX,
   DEFAULT_ARMOR_CLASS_ABILITIES,
   FEATURE_ORIGINS,
+  LEGACY_PROFICIENCY_SEPARATOR,
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
   SHEET_SCHEMA_VERSION,
@@ -25,6 +26,8 @@ import {
   SPEED_UNITS,
   SPELL_LEVEL,
   SPELL_SLOT_LEVELS,
+  WEAPON_PROFICIENCY_NO,
+  WEAPON_PROFICIENCY_OVERRIDES,
 } from './constants';
 import { catalogEffectsSchema, catalogMechanicsSchema } from './mechanics';
 
@@ -162,14 +165,53 @@ export const extraHitDieSchema = z.object({
 
 export type ExtraHitDie = z.infer<typeof extraHitDieSchema>;
 
+/**
+ * Старый лист хранил владения группы одной строкой: она делится на записи
+ * по запятым, точкам с запятой и переносам строк.
+ * @param value - сохранённое значение
+ */
+function splitLegacyProficiencies(value: unknown): unknown {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  return value
+    .split(LEGACY_PROFICIENCY_SEPARATOR)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+/** Список названий владений; старая строка делится на записи. */
+const proficiencyNamesSchema = z.preprocess(
+  splitLegacyProficiencies,
+  lenientList(z.string().trim().min(1)),
+);
+
+/** Своё владение инструментом: название и запись справочника, если есть. */
+export const sheetToolProficiencySchema = z.preprocess(
+  (value) => (typeof value === 'string' ? { name: value } : value),
+  z.object({
+    name: z.string().trim().min(1),
+    url: z.string().nullable().catch(null),
+  }),
+);
+
+export type SheetToolProficiency = z.infer<typeof sheetToolProficiencySchema>;
+
 const proficienciesSchema = z.object({
-  armor: textSchema,
-  weapons: textSchema,
-  tools: textSchema,
-  languages: textSchema,
+  armor: proficiencyNamesSchema,
+  weapons: proficiencyNamesSchema,
+  tools: z.preprocess(
+    splitLegacyProficiencies,
+    lenientList(sheetToolProficiencySchema),
+  ),
+  languages: proficiencyNamesSchema,
 });
 
 export type SheetProficiencies = z.infer<typeof proficienciesSchema>;
+
+/** Группа владений листа: доспехи, оружие, инструменты или языки. */
+export type SheetProficiencyGroup = keyof SheetProficiencies;
 
 const currencySchema = z.object({
   cp: countSchema,
@@ -219,13 +261,43 @@ export const armorCategorySchema = z.enum(ARMOR_CATEGORIES);
 
 export type ArmorCategory = z.infer<typeof armorCategorySchema>;
 
+/**
+ * Старое оружие хранило флаг `isProficient`: снятый флаг становится ручным
+ * «не владею», остальное считается по владениям листа.
+ * @param value - сохранённое оружие
+ */
+function migrateWeaponProficiency(value: unknown): unknown {
+  if (
+    !value
+    || typeof value !== 'object'
+    || !('isProficient' in value)
+    || 'proficiency' in value
+  ) {
+    return value;
+  }
+
+  const { isProficient, ...rest } = value;
+
+  return {
+    ...rest,
+    proficiency: isProficient === false ? WEAPON_PROFICIENCY_NO : null,
+  };
+}
+
 export const sheetWeaponSchema = z.object({
   /** Кость урона в записи справочника: «1к8». */
   damage: textSchema,
   damageType: textSchema,
   isRanged: z.boolean().catch(false),
   isFinesse: z.boolean().catch(false),
-  isProficient: z.boolean().catch(true),
+  /**
+   * Владение оружием вручную: `yes`/`no` — своё решение, null — по владениям
+   * листа (группа «Простое/Воинское оружие» или само оружие в списке).
+   */
+  proficiency: z.preprocess(
+    (value) => value ?? null,
+    z.enum(WEAPON_PROFICIENCY_OVERRIDES).nullable().catch(null),
+  ),
   /** Магический бонус к атаке и урону. */
   bonus: integerSchema.catch(0),
   /** Воинское оружие; иначе простое. */
@@ -273,7 +345,9 @@ export const sheetItemSchema = z.object({
   weight: z.number().min(0).catch(0),
   isEquipped: z.boolean().catch(false),
   notes: textSchema,
-  weapon: sheetWeaponSchema.nullable().catch(null),
+  weapon: z
+    .preprocess(migrateWeaponProficiency, sheetWeaponSchema.nullable())
+    .catch(null),
   armor: sheetArmorSchema.nullable().catch(null),
   /** Предмет требует настройки, чтобы его механика работала. */
   requiresAttunement: z.boolean().catch(false),
@@ -527,10 +601,10 @@ export const sheetDocumentSchema = z.object({
   extraHitDice: lenientList(extraHitDieSchema),
   deathSaves: deathSavesSchema.catch({ successes: 0, failures: 0 }),
   proficiencies: proficienciesSchema.catch({
-    armor: '',
-    weapons: '',
-    tools: '',
-    languages: '',
+    armor: [],
+    weapons: [],
+    tools: [],
+    languages: [],
   }),
   currency: currencySchema.catch({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }),
   customCurrencies: lenientList(customCurrencySchema),

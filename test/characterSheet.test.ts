@@ -217,7 +217,7 @@ describe('лист персонажа: расчёты', () => {
         damageType: 'колющий',
         isRanged: false,
         isFinesse: true,
-        isProficient: true,
+        proficiency: null,
         bonus: 1,
       },
     };

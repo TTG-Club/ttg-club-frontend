@@ -15,6 +15,7 @@ export * from './levelUp';
 export * from './loaders';
 export * from './mechanics';
 export * from './picker';
+export * from './proficiencies';
 export * from './schema';
 export * from './settings';
 export * from './skills';
