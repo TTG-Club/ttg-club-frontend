@@ -14,6 +14,7 @@
   import { classDetailSchema } from '~character/model';
 
   import {
+    useFilterGroups,
     useWorkshopFormTabs,
     useWorkshopPreview,
     useWorkshopSave,
@@ -37,6 +38,8 @@
     getMechanicsFilledCount,
     MECHANICS_KIND,
     MECHANICS_TEXT,
+    OPTION_TYPES_FILTER_KEY,
+    OPTIONS_FILTER_PATH,
     WORKSHOP_FIELD_TEXT,
     WORKSHOP_ICON,
     WORKSHOP_IMAGE_TEXT,
@@ -49,6 +52,13 @@
   import { WorkshopPreviewDrawer } from '../preview';
   import ClassTableEditor from './ClassTableEditor.vue';
   import ClassTraitsEditor from './ClassTraitsEditor.vue';
+
+  // Типы списков вариантов — из фильтров раздела «Особенности классов»
+  const { getOptions: getFilterOptions } = useFilterGroups(OPTIONS_FILTER_PATH);
+
+  const optionTypeItems = computed(() =>
+    getFilterOptions(OPTION_TYPES_FILTER_KEY),
+  );
 
   /** Форма архетипа: архетипы только правятся, создаются они в базе. */
   const { archetype, cancelTo } = defineProps<{
@@ -285,6 +295,7 @@
             ref="traits"
             v-model="state.traits"
             field-name="traits"
+            :option-type-items="optionTypeItems"
           />
         </div>
       </template>

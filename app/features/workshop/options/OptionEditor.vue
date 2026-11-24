@@ -57,6 +57,20 @@
 
   const cancelTo = getWorkshopSectionRoute(OPTIONS_WORKSHOP_KEY);
 
+  /** Кнопка перехода к умению, где правится вариант. */
+  const managedActions = computed(() =>
+    option?.feature
+      ? [
+          {
+            label: OPTION_EDITOR_TEXT.managedOpen,
+            to: option.feature.url,
+            color: 'warning' as const,
+            variant: 'outline' as const,
+          },
+        ]
+      : [],
+  );
+
   const { isSaving, save } = useWorkshopSave(
     OPTIONS_WORKSHOP_KEY,
     () => option?.id,
@@ -113,6 +127,17 @@
     class="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4"
     @submit="submit"
   >
+    <UAlert
+      v-if="option?.feature"
+      :title="OPTION_EDITOR_TEXT.managedTitle"
+      :description="OPTION_EDITOR_TEXT.managedDescription(option.feature.name)"
+      icon="tabler:lock"
+      color="warning"
+      variant="subtle"
+      class="col-span-full"
+      :actions="managedActions"
+    />
+
     <WorkshopNameFields
       v-model:name="state.name"
       v-model:english-name="state.englishName"
@@ -186,6 +211,7 @@
     </div>
 
     <WorkshopFormActions
+      v-if="!option?.feature"
       :is-editing="!!option"
       :is-saving="isSaving"
       :cancel-to="cancelTo"

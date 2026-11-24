@@ -13,6 +13,7 @@
   } from '../model';
   import ArchetypeSpells from './ArchetypeSpells.vue';
   import ClassArchetypes from './ClassArchetypes.vue';
+  import ClassFeatureOptions from './ClassFeatureOptions.vue';
   import ClassLevelTable from './ClassLevelTable.vue';
 
   /**
@@ -222,6 +223,12 @@
 
             <ContentRender :content="row.description" />
           </div>
+
+          <ClassFeatureOptions
+            v-if="feature.options.length"
+            :name="feature.optionsName"
+            :options="feature.options"
+          />
         </div>
       </details>
 

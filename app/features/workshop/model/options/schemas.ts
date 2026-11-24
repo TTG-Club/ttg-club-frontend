@@ -26,6 +26,8 @@ const workshopOptionSchema = z.object({
   mechanics: z.unknown().optional(),
   activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
+  featureUrl: z.string().nullish(),
+  featureName: z.string().nullish(),
 });
 
 /**
@@ -46,6 +48,9 @@ export function parseWorkshopOption(input: unknown): WorkshopOption {
     optionTypes: option.optionTypes ?? [],
     ...parseMechanicsFields(option),
     source: option.source?.shortName,
+    feature: option.featureUrl
+      ? { url: option.featureUrl, name: option.featureName ?? '' }
+      : null,
   };
 }
 
