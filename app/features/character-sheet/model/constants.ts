@@ -32,6 +32,12 @@ export const SHEET_LOCKED_STORAGE_KEY = 'ttg-character-sheet-locked';
 
 export const SHEET_TEXT = {
   title: 'Лист персонажа',
+  accessTitle: 'Лист персонажа пока в работе',
+  accessGuestDescription:
+    'Сейчас он открыт только модераторам и администраторам — войдите под таким аккаунтом',
+  accessSignIn: 'Войти',
+  accessForbiddenDescription:
+    'Сейчас он открыт только модераторам и администраторам',
   lockedTitle: 'Лист заперт',
   lockedDescription: 'Чтобы править лист, отоприте его замком в шапке.',
   listTitle: 'Листы персонажей',
@@ -788,6 +794,8 @@ export const SHEET_LABELS = {
 
 /** Значки элементов листа. */
 export const SHEET_ICON = {
+  accessGuest: 'tabler:lock',
+  accessForbidden: 'tabler:shield-lock',
   add: 'tabler:plus',
   remove: 'tabler:trash',
   edit: 'tabler:pencil',

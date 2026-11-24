@@ -2,7 +2,10 @@
   import { HamburgerIcon } from '~/shared/ui/hamburger-icon';
   import { SiteLogo } from '~/shared/ui/site-logo';
 
-  import { MENU_SECTIONS } from '../../navigation/model';
+  import {
+    getVisibleMenuSections,
+    MENU_SECTIONS,
+  } from '../../navigation/model';
   import { SidebarPopover } from '../popover';
   import {
     MENU_SITE_DESCRIPTION,
@@ -17,12 +20,16 @@
 
   const style = useCssModule();
 
+  const { isEditor } = useUser();
+
   // Раздел инструментов на широком меню встаёт справа во весь рост.
-  const sections = MENU_SECTIONS.map((section) => ({
-    label: section.label,
-    items: section.items,
-    className: section.isTools ? style.tools : undefined,
-  }));
+  const sections = computed(() =>
+    getVisibleMenuSections(MENU_SECTIONS, isEditor.value).map((section) => ({
+      label: section.label,
+      items: section.items,
+      className: section.isTools ? style.tools : undefined,
+    })),
+  );
 
   watch(
     () => route.fullPath,
