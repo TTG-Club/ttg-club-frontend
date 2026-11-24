@@ -25,6 +25,7 @@ import {
   findSource,
   getAbilityModifier,
   getClassLevelFeatures,
+  getClassSpellGrowth,
   getFirstClassMechanics,
   getHitPointGain,
   getMulticlassMechanics,
@@ -41,8 +42,11 @@ import {
 import { useCharacterSheet } from './useCharacterSheet';
 import { useSheetRoll } from './useSheetRoll';
 
-/** Шаг мастера: один взятый уровень класса. */
+/** Шаг мастера: один взятый уровень одного из классов. */
 export interface LevelUpStep {
+  /** Класс листа, которому шаг добавляет уровень. */
+  classId: string;
+  className: string;
   classLevel: number;
   hitPointsMode: HitPointsGainMode;
   roll: number | null;
@@ -57,6 +61,8 @@ export interface LevelUpStep {
   improvementSourceId: string | null;
   isFeatImprovement: boolean;
   hitPointGain: number;
+  /** Сколько заговоров и заклинаний класс узнаёт на этом уровне. */
+  spellGrowth: { cantrips: number; spells: number; maxLevel: number };
 }
 
 /**
@@ -112,12 +118,14 @@ function createClassSource(
 }
 
 /**
- * Мастер повышения уровня — порт `useLevelUpWizard` core-app в упрощённом
- * виде. Каждый шаг — один уровень класса: прирост хитов (среднее, бросок,
- * максимум), подкласс на его уровне, умения уровня с выборами и
- * «Увеличение характеристик» (характеристики или черта). Шаги применяются к
- * черновику листа по очереди, а «Применить» переносит черновик в лист.
- * Добавление класса — тот же мастер с первого уровня нового класса.
+ * Мастер повышения уровня — порт `useLevelUpWizard` core-app. Каждый шаг —
+ * один уровень одного класса: прирост хитов (среднее, бросок, максимум),
+ * подкласс на его уровне, умения уровня с выборами, «Увеличение
+ * характеристик» (характеристики или черта) и новые заклинания. Шаги
+ * применяются к черновику листа по очереди, и следующий шаг можно отдать
+ * любому классу — за один заход поднимаются несколько классов. «Применить»
+ * переносит черновик в лист. Новый класс — тот же мастер с первого уровня
+ * нового класса; окно выбора класса показывает его шаг у себя.
  */
 export const useLevelUpWizard = createSharedComposable(() => {
   const api = useApi();
@@ -128,11 +136,8 @@ export const useLevelUpWizard = createSharedComposable(() => {
   const isOpen = ref(false);
   const isLoading = ref(false);
   const classList = shallowRef<Array<ClassLink>>([]);
-  const base = shallowRef<ClassDetails | null>(null);
-  const archetype = shallowRef<ClassDetails | null>(null);
-  const classId = ref<string | null>(null);
+  const details = shallowRef<ReadonlyMap<string, ClassDetails>>(new Map());
   const newClass = shallowRef<SheetClass | null>(null);
-  const targetLevel = ref<number>(CHARACTER_LEVEL.min);
   const steps = shallowRef<Array<LevelUpStep>>([]);
 
   const currentStep = computed(() => steps.value.at(-1) ?? null);
@@ -141,12 +146,22 @@ export const useLevelUpWizard = createSharedComposable(() => {
 
   const sheetClass = computed(
     () =>
-      draft.value.classes.find((candidate) => candidate.id === classId.value)
-      ?? newClass.value,
+      draft.value.classes.find(
+        (candidate) => candidate.id === currentStep.value?.classId,
+      ) ?? null,
   );
 
+  /**
+   * Карточка класса из загруженных.
+   * @param url - адрес класса или архетипа
+   */
+  function getDetails(url: string | null | undefined): ClassDetails | null {
+    return url ? (details.value.get(url) ?? null) : null;
+  }
+
   const subclassLevel = computed(
-    () => base.value?.detail.enabledArhitypeLevel ?? null,
+    () =>
+      getDetails(sheetClass.value?.url)?.detail.enabledArhitypeLevel ?? null,
   );
 
   const archetypeOptions = computed(() =>
@@ -156,21 +171,18 @@ export const useLevelUpWizard = createSharedComposable(() => {
     ).map((link) => ({ label: link.name.rus, value: link.url })),
   );
 
-  const maxTargetLevel = computed(() => {
-    const start = steps.value[0]?.before ?? document.value;
+  /** Классы черновика, которым можно взять ещё уровень мастером. */
+  const classOptions = computed(() =>
+    draft.value.classes
+      .filter((candidate) => candidate.url)
+      .map((candidate) => ({
+        label: `${candidate.name} ${candidate.level + 1}`,
+        value: candidate.id,
+      })),
+  );
 
-    const own =
-      start.classes.find((candidate) => candidate.id === classId.value)?.level
-      ?? 0;
-
-    return Math.min(
-      CHARACTER_LEVEL.max,
-      CHARACTER_LEVEL.max - getRawLevel(start) + own,
-    );
-  });
-
-  const isLastStep = computed(
-    () => (currentStep.value?.classLevel ?? 0) >= targetLevel.value,
+  const canAddStep = computed(
+    () => getRawLevel(draft.value) < CHARACTER_LEVEL.max,
   );
 
   /** Загружает список классов один раз. */
@@ -192,33 +204,69 @@ export const useLevelUpWizard = createSharedComposable(() => {
   }
 
   /**
-   * Собирает шаг: уровень класса, хиты, подкласс, умения уровня и
-   * «Увеличение характеристик».
+   * Догружает карточки классов и архетипов, которых ещё нет.
+   * @param urls - адреса записей
+   */
+  async function ensureDetails(
+    urls: ReadonlyArray<string | null | undefined>,
+  ): Promise<void> {
+    const missing = [
+      ...new Set(
+        urls.filter(
+          (url): url is string => Boolean(url) && !details.value.has(url ?? ''),
+        ),
+      ),
+    ];
+
+    if (!missing.length) {
+      return;
+    }
+
+    const loaded = await Promise.all(missing.map(loadClassDetails));
+    const next = new Map(details.value);
+
+    missing.forEach((url, index) => {
+      const entry = loaded[index];
+
+      if (entry) {
+        next.set(url, entry);
+      }
+    });
+
+    details.value = next;
+  }
+
+  /**
+   * Собирает шаг: уровень класса, хиты, подкласс, умения уровня,
+   * «Увеличение характеристик» и рост заклинаний.
    * @param before - документ до шага
-   * @param classLevel - уровень класса после шага
+   * @param classId - класс листа
    * @param hitPointsMode - способ прироста хитов
    * @param roll - результат броска кости
    * @param subclass - подкласс, выбранный на шаге
    */
   function buildStep(
     before: SheetDocument,
-    classLevel: number,
+    classId: string,
     hitPointsMode: HitPointsGainMode,
     roll: number | null,
     subclass: { name: string; url: string } | null,
   ): LevelUpStep | null {
-    const details = base.value;
-
     const existing = before.classes.find(
-      (candidate) => candidate.id === classId.value,
+      (candidate) => candidate.id === classId,
     );
 
-    const owner = existing ?? newClass.value;
+    const owner =
+      existing ?? (newClass.value?.id === classId ? newClass.value : null);
 
-    if (!details || !owner) {
+    const base = getDetails(owner?.url);
+
+    if (!owner || !base) {
       return null;
     }
 
+    const archetype = getDetails(subclass?.url ?? owner.archetypeUrl);
+    const classLevel = (existing?.level ?? 0) + 1;
     const rawLevel = getRawLevel(before);
 
     const constitution = getAbilityModifier(
@@ -237,16 +285,15 @@ export const useLevelUpWizard = createSharedComposable(() => {
     const ownerAtLevel = { ...owner, level: classLevel };
 
     const features = getClassLevelFeatures(
-      (subclass || owner.archetypeUrl ? archetype.value : null)?.mechanics
-        ?? details.mechanics,
+      (archetype ?? base).mechanics,
       classLevel,
     );
 
     const sources: Array<SheetSource> = [
       ...(existing
         ? []
-        : [createClassSource(details, ownerAtLevel, rawLevel === 0)]),
-      ...(subclass && archetype.value
+        : [createClassSource(base, ownerAtLevel, rawLevel === 0)]),
+      ...(subclass && archetype
         ? [
             createSource({
               kind: 'subclass',
@@ -255,8 +302,8 @@ export const useLevelUpWizard = createSharedComposable(() => {
               classId: owner.id,
               level: classLevel,
               characterLevel,
-              mechanics: archetype.value.mechanics.mechanics,
-              activeEffects: archetype.value.mechanics.activeEffects,
+              mechanics: archetype.mechanics.mechanics,
+              activeEffects: archetype.mechanics.activeEffects,
             }),
           ]
         : []),
@@ -278,6 +325,8 @@ export const useLevelUpWizard = createSharedComposable(() => {
     const allSources = improvement ? [...sources, improvement] : sources;
 
     return {
+      classId: owner.id,
+      className: owner.name,
       classLevel,
       hitPointsMode,
       roll,
@@ -296,6 +345,11 @@ export const useLevelUpWizard = createSharedComposable(() => {
       improvementSourceId: improvement?.id ?? null,
       isFeatImprovement: false,
       hitPointGain,
+      spellGrowth: getClassSpellGrowth(
+        base.detail,
+        archetype?.detail ?? null,
+        classLevel,
+      ),
     };
   }
 
@@ -314,7 +368,7 @@ export const useLevelUpWizard = createSharedComposable(() => {
 
     const rebuilt = buildStep(
       step.before,
-      step.classLevel,
+      step.classId,
       patch.hitPointsMode ?? step.hitPointsMode,
       patch.roll === undefined ? step.roll : patch.roll,
       patch.subclass === undefined ? step.subclass : patch.subclass,
@@ -326,20 +380,51 @@ export const useLevelUpWizard = createSharedComposable(() => {
   }
 
   /**
-   * Добавляет следующий шаг от текущего черновика.
-   * @param mode - способ прироста хитов
+   * Показывает ошибку загрузки.
+   * @param error - ошибка запроса
    */
-  function pushStep(mode: HitPointsGainMode): void {
+  function notifyFailure(error: unknown): void {
+    toast.add({
+      title: getApiErrorMessage(error, LEVEL_UP_TEXT.loadFailed),
+      color: 'error',
+    });
+  }
+
+  /**
+   * Добавляет шаг уровня класса от текущего черновика.
+   * @param classId - класс листа
+   */
+  async function addStep(classId: string): Promise<void> {
     const before = draft.value;
 
-    const level =
-      (before.classes.find((candidate) => candidate.id === classId.value)?.level
-        ?? 0) + 1;
+    const owner =
+      before.classes.find((candidate) => candidate.id === classId)
+      ?? (newClass.value?.id === classId ? newClass.value : null);
 
-    const step = buildStep(before, level, mode, null, null);
+    if (!owner || !canAddStep.value) {
+      return;
+    }
 
-    if (step) {
-      steps.value = [...steps.value, step];
+    isLoading.value = true;
+
+    try {
+      await ensureDetails([owner.url, owner.archetypeUrl]);
+
+      const step = buildStep(
+        before,
+        classId,
+        currentStep.value?.hitPointsMode ?? 'average',
+        null,
+        null,
+      );
+
+      if (step) {
+        steps.value = [...steps.value, step];
+      }
+    } catch (error) {
+      notifyFailure(error);
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -348,86 +433,80 @@ export const useLevelUpWizard = createSharedComposable(() => {
    * @param id - класс листа
    */
   async function startLevelUp(id: string): Promise<void> {
-    const owner = document.value.classes.find(
-      (candidate) => candidate.id === id,
-    );
-
-    if (!owner?.url) {
-      return;
-    }
-
-    classId.value = id;
     newClass.value = null;
-    isOpen.value = true;
-    isLoading.value = true;
     steps.value = [];
+    isOpen.value = true;
 
-    try {
-      const [details, archetypeDetails] = await Promise.all([
-        loadClassDetails(owner.url),
-        owner.archetypeUrl ? loadClassDetails(owner.archetypeUrl) : null,
-        loadClassList(),
-      ]);
+    await loadClassList();
+    await addStep(id);
 
-      base.value = details;
-      archetype.value = archetypeDetails;
-      targetLevel.value = Math.min(owner.level + 1, maxTargetLevel.value);
-      pushStep('average');
-    } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, LEVEL_UP_TEXT.loadFailed),
-        color: 'error',
-      });
-
+    if (!steps.value.length) {
       isOpen.value = false;
-    } finally {
-      isLoading.value = false;
     }
   }
 
   /**
-   * Открывает мастер нового класса: первый уровень класса.
+   * Готовит шаг нового класса: первый уровень класса. Подкласс,
+   * выбранный в списке, ставится сразу, если класс выбирает его на первом
+   * уровне.
    * @param url - адрес класса
+   * @param subclassUrl - адрес подкласса из списка
+   * @returns удалось ли подготовить шаг
    */
-  async function startNewClass(url: string): Promise<void> {
-    isOpen.value = true;
-    isLoading.value = true;
+  async function prepareNewClass(
+    url: string,
+    subclassUrl: string | null = null,
+  ): Promise<boolean> {
     steps.value = [];
-    archetype.value = null;
+    isLoading.value = true;
 
     try {
-      const [details] = await Promise.all([
-        loadClassDetails(url),
-        loadClassList(),
-      ]);
+      await Promise.all([ensureDetails([url, subclassUrl]), loadClassList()]);
 
-      base.value = details;
-      classId.value = createSheetElementId();
+      const base = getDetails(url);
+
+      if (!base) {
+        return false;
+      }
 
       newClass.value = {
-        id: classId.value,
-        name: details.detail.name.rus,
+        id: createSheetElementId(),
+        name: base.detail.name.rus,
         url,
         archetypeName: null,
         archetypeUrl: null,
         level: CHARACTER_LEVEL.min,
         hitDie:
-          details.detail.traits?.diceHp
-          ?? parseHitDie(details.detail.dice)
-          ?? 8,
+          base.detail.traits?.diceHp ?? parseHitDie(base.detail.dice) ?? 8,
         hitPointGains: [],
         spellcastingAbility: null,
       };
 
-      targetLevel.value = CHARACTER_LEVEL.min;
-      pushStep('average');
-    } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, LEVEL_UP_TEXT.loadFailed),
-        color: 'error',
-      });
+      const archetype = getDetails(subclassUrl);
 
-      isOpen.value = false;
+      const subclass =
+        subclassUrl
+        && archetype
+        && (base.detail.enabledArhitypeLevel ?? CHARACTER_LEVEL.max)
+          <= CHARACTER_LEVEL.min
+          ? { name: archetype.detail.name.rus, url: subclassUrl }
+          : null;
+
+      const step = buildStep(
+        document.value,
+        newClass.value.id,
+        'average',
+        null,
+        subclass,
+      );
+
+      steps.value = step ? [step] : [];
+
+      return Boolean(step);
+    } catch (error) {
+      notifyFailure(error);
+
+      return false;
     } finally {
       isLoading.value = false;
     }
@@ -468,13 +547,10 @@ export const useLevelUpWizard = createSharedComposable(() => {
     isLoading.value = true;
 
     try {
-      archetype.value = await loadClassDetails(url);
+      await ensureDetails([url]);
       rebuildCurrent({ subclass: { name: option.label, url } });
     } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, LEVEL_UP_TEXT.loadFailed),
-        color: 'error',
-      });
+      notifyFailure(error);
     } finally {
       isLoading.value = false;
     }
@@ -519,9 +595,8 @@ export const useLevelUpWizard = createSharedComposable(() => {
    */
   async function setImprovementFeat(url: string): Promise<void> {
     const step = currentStep.value;
-    const owner = sheetClass.value;
 
-    if (!step?.improvementSourceId || !owner) {
+    if (!step?.improvementSourceId) {
       return;
     }
 
@@ -529,7 +604,7 @@ export const useLevelUpWizard = createSharedComposable(() => {
 
     try {
       const feat = await loadFeatSource('feat', url, {
-        classId: owner.id,
+        classId: step.classId,
         level: step.classLevel,
         characterLevel: getRawLevel(step.before) + 1,
       });
@@ -549,10 +624,7 @@ export const useLevelUpWizard = createSharedComposable(() => {
         },
       ];
     } catch (error) {
-      toast.add({
-        title: getApiErrorMessage(error, LEVEL_UP_TEXT.loadFailed),
-        color: 'error',
-      });
+      notifyFailure(error);
     } finally {
       isLoading.value = false;
     }
@@ -563,14 +635,7 @@ export const useLevelUpWizard = createSharedComposable(() => {
     rebuildCurrent({});
   }
 
-  /** Следующий уровень. */
-  function goNext(): void {
-    if (!isLastStep.value) {
-      pushStep(currentStep.value?.hitPointsMode ?? 'average');
-    }
-  }
-
-  /** Предыдущий уровень: шаг снимается целиком. */
+  /** Предыдущий шаг: последний шаг снимается целиком. */
   function back(): void {
     if (steps.value.length > 1) {
       steps.value = steps.value.slice(0, -1);
@@ -591,6 +656,7 @@ export const useLevelUpWizard = createSharedComposable(() => {
   function close(): void {
     isOpen.value = false;
     steps.value = [];
+    newClass.value = null;
   }
 
   /**
@@ -611,12 +677,12 @@ export const useLevelUpWizard = createSharedComposable(() => {
     sheetClass,
     subclassLevel,
     archetypeOptions,
-    targetLevel,
-    maxTargetLevel,
-    isLastStep,
+    classOptions,
+    canAddStep,
     loadClassList,
     startLevelUp,
-    startNewClass,
+    prepareNewClass,
+    addStep,
     setHitPointsMode,
     rollHitDie,
     setSubclass,
@@ -624,7 +690,6 @@ export const useLevelUpWizard = createSharedComposable(() => {
     setImprovementAbilities,
     setImprovementFeat,
     resetImprovement,
-    next: goNext,
     back,
     apply,
     close,

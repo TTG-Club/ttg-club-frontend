@@ -9,6 +9,7 @@ export type {
   DetailTooltipProps,
   DetailType,
   DiceRollerProps,
+  EntityPaneType,
   RollTableData,
 } from './types';
 

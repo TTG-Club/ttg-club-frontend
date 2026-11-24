@@ -1,5 +1,12 @@
 <script setup lang="ts">
-  import type { CatalogOption, SheetClass } from '../model';
+  import type { TabsItem } from '@nuxt/ui';
+
+  import type {
+    CatalogOption,
+    CustomClassPayload,
+    SheetClass,
+    WIZARD_STEPS,
+  } from '../model';
 
   import {
     useCharacterSheet,
@@ -9,29 +16,34 @@
   } from '../composables';
   import {
     addSources,
-    applyLevelUpStep,
-    CATALOG_TREE_ICON,
+    applyCustomClass,
     CATALOG_TREE_TEXT,
     CHARACTER_LEVEL,
     CLASS_TREE,
-    createCustomClassStep,
+    findSource,
     getCharacterLevel,
     getMissingClassFeatureSources,
+    getMulticlassWarning,
     LEVEL_UP_TEXT,
     SHEET_ICON,
     SHEET_LABELS,
+    WIZARD_TEXT,
   } from '../model';
-  import SheetCatalogTreeModal from './SheetCatalogTreeModal.vue';
   import SheetConfirmModal from './SheetConfirmModal.vue';
-  import SheetCustomEntryModal from './SheetCustomEntryModal.vue';
+  import SheetCustomClassModal from './SheetCustomClassModal.vue';
+  import SheetLevelUpStepBody from './SheetLevelUpStepBody.vue';
+  import SheetSourcesReview from './SheetSourcesReview.vue';
+  import SheetSourceWizardModal from './SheetSourceWizardModal.vue';
 
   /**
    * Классы персонажа: уровень, подкласс и кость хитов каждого. Повышение
    * уровня и новый класс идут через мастер; понижение уровня и снятие класса
    * забирают ровно выданное ими (умения, владения, ресурсы, хиты). Листам до
-   * механики можно подтянуть умения класса из справочника. Класс выбирают в
-   * окне «Добавление класса» (у листа без классов оно открывается сразу);
-   * свой класс добавляется без мастера и повышается по среднему кости.
+   * механики можно подтянуть умения класса из справочника. Класс выбирают
+   * мастером «Добавление класса» (у листа без классов он открывается сразу):
+   * класс или подкласс с описанием, затем итог по вкладкам — хиты, владения
+   * и выборы класса, умения уровня. Свой класс добавляется без мастера и
+   * повышается по среднему кости.
    */
   const isOpen = defineModel<boolean>('open', { default: false });
 
@@ -42,6 +54,52 @@
 
   const isPickerOpen = ref(false);
   const isCustomOpen = ref(false);
+  const wizardStep = ref<(typeof WIZARD_STEPS)[number]>('pick');
+  const reviewTab = ref<'overview' | 'features'>('overview');
+  const isPreparing = ref(false);
+  /** Подкласс выбран в списке, но класс выбирает его позже первого уровня. */
+  const isSubclassDeferred = ref(false);
+
+  const reviewTabs: Array<TabsItem> = [
+    { value: 'overview', label: WIZARD_TEXT.classTabs.overview },
+    { value: 'features', label: WIZARD_TEXT.classTabs.features },
+  ];
+
+  const newStep = computed(() =>
+    wizardStep.value === 'review' ? wizard.currentStep.value : null,
+  );
+
+  const reviewTitle = computed(() => {
+    const step = newStep.value;
+
+    if (!step) {
+      return '';
+    }
+
+    return step.subclass
+      ? `${step.className} (${step.subclass.name})`
+      : step.className;
+  });
+
+  /** Источник самого класса: его владения и выборы — во вкладке «Основное». */
+  const classSourceIds = computed(() => {
+    const step = newStep.value;
+
+    if (!step) {
+      return [];
+    }
+
+    return step.sourceIds.filter(
+      (id) => findSource(step.after, id)?.kind === 'class',
+    );
+  });
+
+  const subclassDeferredText = computed(() =>
+    WIZARD_TEXT.subclassLater.replace(
+      '{level}',
+      String(wizard.subclassLevel.value ?? ''),
+    ),
+  );
 
   const confirmAction = ref<{
     kind: 'level' | 'class';
@@ -133,23 +191,66 @@
   }
 
   /**
-   * Открывает мастер нового класса для выбранного в окне «Добавление класса».
-   * @param option - выбранный класс
+   * Адрес класса выбранной записи: у подкласса — его класс.
+   * @param option - класс или подкласс из списка
    */
-  function addClass(option: CatalogOption): void {
+  function getClassUrl(option: CatalogOption): string {
+    return option.parentUrl ?? option.url;
+  }
+
+  /**
+   * Предупреждение о мультиклассировании для выбранной записи.
+   * @param option - класс или подкласс из списка
+   */
+  function getWarning(option: CatalogOption | null): string | null {
+    return option
+      ? getMulticlassWarning(document.value, getClassUrl(option))
+      : null;
+  }
+
+  /**
+   * Готовит итог мастера: первый уровень класса в черновике.
+   * @param option - класс или подкласс из списка
+   */
+  async function prepareClass(option: CatalogOption): Promise<void> {
+    isPreparing.value = true;
+
+    try {
+      const subclassUrl = option.parentUrl ? option.url : null;
+
+      if (await wizard.prepareNewClass(getClassUrl(option), subclassUrl)) {
+        isSubclassDeferred.value =
+          Boolean(subclassUrl) && !wizard.currentStep.value?.subclass;
+
+        reviewTab.value = 'overview';
+        wizardStep.value = 'review';
+      }
+    } finally {
+      isPreparing.value = false;
+    }
+  }
+
+  /**
+   * Переключает вкладку итога.
+   * @param value - вкладка
+   */
+  function changeReviewTab(value: string | number): void {
+    reviewTab.value = value === 'features' ? 'features' : 'overview';
+  }
+
+  /** Переносит новый класс в лист. */
+  function applyClass(): void {
+    wizard.apply();
+    isPickerOpen.value = false;
     isOpen.value = false;
-    void wizard.startNewClass(option.url);
   }
 
   /**
    * Добавляет свой класс первым уровнем.
-   * @param name - название класса
-   * @param hitDie - кость хитов
+   * @param payload - класс: название, кость хитов и владения
    */
-  function addCustomClass(name: string, hitDie: number): void {
-    update((current) =>
-      applyLevelUpStep(current, createCustomClassStep(current, name, hitDie)),
-    );
+  function addCustomClass(payload: CustomClassPayload): void {
+    update((current) => applyCustomClass(current, payload));
   }
 
   /**
@@ -202,6 +303,13 @@
   watch(isOpen, (open) => {
     if (open && !document.value.classes.length) {
       openPicker();
+    }
+  });
+
+  // Закрытый без «Применить» мастер не оставляет черновика
+  watch(isPickerOpen, (open) => {
+    if (!open && !wizard.isOpen.value) {
+      wizard.close();
     }
   });
 </script>
@@ -300,25 +408,75 @@
     </template>
   </UModal>
 
-  <SheetCatalogTreeModal
+  <SheetSourceWizardModal
     v-model:open="isPickerOpen"
+    v-model:step="wizardStep"
     :title="CATALOG_TREE_TEXT.classTitle"
     :source="CLASS_TREE"
+    pane-type="class"
     :hint="CATALOG_TREE_TEXT.classHint"
-    :confirm-label="CATALOG_TREE_TEXT.next"
-    :confirm-icon="CATALOG_TREE_ICON.next"
     :custom-label="CATALOG_TREE_TEXT.customClass"
     :expand-label="CATALOG_TREE_TEXT.expandClass"
     :excluded-urls="takenClassUrls"
-    @pick="addClass"
+    :is-preparing="isPreparing"
+    :review-title="reviewTitle"
+    children-selectable
+    @next="prepareClass"
     @custom="openCustom"
-  />
+    @apply="applyClass"
+  >
+    <template #note="{ selected }">
+      <UAlert
+        v-if="getWarning(selected)"
+        color="warning"
+        variant="subtle"
+        icon="tabler:alert-triangle"
+        :description="getWarning(selected) ?? ''"
+      />
+    </template>
 
-  <SheetCustomEntryModal
+    <template #review>
+      <template v-if="newStep">
+        <UAlert
+          v-if="isSubclassDeferred"
+          color="neutral"
+          variant="subtle"
+          icon="tabler:info-circle"
+          :description="subclassDeferredText"
+        />
+
+        <UTabs
+          :items="reviewTabs"
+          :model-value="reviewTab"
+          :content="false"
+          variant="pill"
+          :ui="{ list: 'w-full' }"
+          @update:model-value="changeReviewTab"
+        />
+
+        <div
+          v-if="reviewTab === 'overview'"
+          class="flex flex-col gap-3"
+        >
+          <SheetLevelUpStepBody :parts="['hitPoints', 'subclass']" />
+
+          <SheetSourcesReview
+            :document="newStep.after"
+            :source-ids="classSourceIds"
+            @change="wizard.setDraft"
+          />
+        </div>
+
+        <SheetLevelUpStepBody
+          v-else
+          :parts="['features', 'improvement', 'spells']"
+        />
+      </template>
+    </template>
+  </SheetSourceWizardModal>
+
+  <SheetCustomClassModal
     v-model:open="isCustomOpen"
-    :title="CATALOG_TREE_TEXT.customClass"
-    :hint="CATALOG_TREE_TEXT.customClassHint"
-    with-hit-die
     @save="addCustomClass"
   />
 </template>

@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 
 import type { ActiveEffect } from '~active-effects/model';
-import type { ContentDescription } from '~content/model';
+import type { ContentDescription, DetailType } from '~content/model';
 
 import type {
   ABILITY_IMPROVEMENT_MODES,
@@ -178,6 +178,8 @@ export interface CatalogOption {
   name: string;
   url: string;
   caption: string;
+  /** Адрес родителя вложенной записи: класс подкласса, раса разновидности. */
+  parentUrl?: string;
 }
 
 /** Строка окна добавления предметов из справочника. */
@@ -280,6 +282,10 @@ export interface SheetChoiceOption {
   caption?: string;
   /** Взять нельзя: уже есть или не подходит. */
   disabled?: boolean;
+  /** Группа списка окна выбора: характеристика навыка, круг заклинания. */
+  group?: string;
+  /** Карточка справочника с описанием варианта. */
+  detail?: { type: DetailType; path: string };
 }
 
 /** Что нужно знать о персонаже, чтобы пометить варианты выбора. */
@@ -508,6 +514,19 @@ export interface LevelUpFeature {
   isAbilityImprovement: boolean;
   mechanics: CatalogMechanics;
   activeEffects: Array<ActiveEffect>;
+}
+
+/** Свой класс из окна «Свой класс». */
+export interface CustomClassPayload {
+  name: string;
+  /** Название подкласса; пусто — без подкласса. */
+  subclassName: string;
+  hitDie: number;
+  /** Спасброски первого класса; у класса, взятого не первым, не выдаются. */
+  savingThrows: Array<AbilityKey>;
+  skills: Array<SkillKey>;
+  spellcastingAbility: AbilityKey | null;
+  features: Array<{ name: string; description: string }>;
 }
 
 /** Группа справочника в окне владений: заголовок и записи-чекбоксы. */

@@ -25,3 +25,4 @@ export * from './spells';
 export * from './stats';
 export * from './transfer';
 export * from './utils';
+export * from './wizard';

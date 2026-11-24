@@ -1653,6 +1653,14 @@ export const CHOICE_TEXT = {
   done: 'Готово',
   title: 'Выборы',
   ownChoices: 'Выборы источника',
+  searchPlaceholder: 'Поиск по названию',
+  allTab: 'Все',
+  selectedTab: 'Выбранные',
+  cancel: 'Отмена',
+  save: 'Сохранить',
+  detailPlaceholder: 'Выберите вариант, чтобы прочитать описание',
+  noDetail: 'Описания нет',
+  detailTooltip: 'Описание',
 } as const;
 
 /** Переменные формулы максимума ресурса и значений эффектов. */
@@ -2130,7 +2138,6 @@ export const LEVEL_UP_TEXT = {
   pickClass: 'Класс',
   multiclassNote:
     'Класс взят не первым: владения выдаются по таблице мультиклассирования PHB.',
-  targetLevel: 'До уровня класса',
   hitPoints: 'Хиты за уровень',
   hitPointsFirst: 'Первый уровень персонажа: максимум кости',
   subclass: 'Подкласс',
@@ -2138,7 +2145,6 @@ export const LEVEL_UP_TEXT = {
   noFeatures: 'Новых умений на этом уровне нет',
   abilityImprovement: 'Увеличение характеристик',
   back: 'Назад',
-  next: 'Далее',
   apply: 'Применить',
   cancel: 'Отмена',
   pendingChoices: 'Остались несделанные выборы — их можно сделать позже',
@@ -2148,9 +2154,17 @@ export const LEVEL_UP_TEXT = {
   syncHint:
     'Лист создан до механики: у класса нет умений с выборами и эффектами.',
   rollDie: 'Бросить',
-  step: 'Уровень',
   proficiencies: 'Владения класса',
   choices: 'Выборы',
+  pendingBadge: 'Нужно выбрать',
+  spells: 'Заклинания',
+  newCantrips: 'Новых заговоров',
+  newSpells: 'Новых заклинаний',
+  maxSpellLevel: 'Наибольший круг',
+  addSpells: 'Добавить из справочника',
+  nextClass: 'Следующий уровень',
+  addLevel: 'Ещё уровень',
+  stepOf: 'Шаг',
 } as const;
 
 /** Подписи окна опыта и уровня. */
@@ -2810,7 +2824,7 @@ export const CATALOG_TREE_TEXT = {
   classHint:
     'Класс добавится первым уровнем — общий уровень персонажа вырастет на единицу. Дальше его поднимают в окне классов кнопкой «Повысить уровень». Подкласс выбирается на уровне, указанном в классе.',
   raceHint:
-    'Раса заменит текущую: её бонусы, чувства, скорости и владения применятся к листу, выборы откроются сразу. Можно выбрать и разновидность.',
+    'Раса заменит текущую: её бонусы, чувства, скорости и владения применятся к листу. Можно выбрать и разновидность; выборы делаются на следующем шаге.',
   expandClass: 'Показать подклассы',
   expandRace: 'Показать разновидности',
   preview: 'Открыть в справочнике',
@@ -2900,4 +2914,98 @@ export const SHEET_VISION_LABELS = {
   effective: 'В листе',
   cancel: 'Отмена',
   apply: 'Применить',
+} as const;
+
+/* --- Мастера класса, расы и предыстории --------------------------------- */
+
+/** Шаг мастера: выбор записи или итог перед применением. */
+export const WIZARD_STEPS = ['pick', 'review'] as const;
+
+export const WIZARD_TEXT = {
+  back: 'Назад',
+  apply: 'Применить',
+  chosen: 'Выбрано',
+  previewPlaceholder: 'Выберите запись, чтобы прочитать описание',
+  grantsTitle: 'Что даёт',
+  noGrants: 'Владений и прибавок без выбора нет',
+  choicesTitle: 'Выборы',
+  noChoices: 'Выбирать нечего',
+  pendingBadge: 'Нужно выбрать',
+  backgroundTitle: 'Выбор предыстории',
+  backgroundHint:
+    'Предыстория заменит текущую: её навыки, инструменты и языки применятся к листу. Выборы делаются на следующем шаге.',
+  customBackground: 'Своя предыстория',
+  customBackgroundHint:
+    'Предыстории нет в справочнике: навыки и владения добавьте вручную.',
+  raceReviewHint:
+    'Проверьте, что даёт раса, и сделайте выборы. Несделанные можно закончить позже в «Выборах».',
+  backgroundReviewHint:
+    'Проверьте, что даёт предыстория, и сделайте выборы. Несделанные можно закончить позже в «Выборах».',
+  equipment: 'Снаряжение',
+  classTabs: { overview: 'Основное', features: 'Умения' },
+  multiclassWarning:
+    'Для мультиклассирования по правилам 2014 года нужны значения характеристик 13 и выше',
+  subclassLater:
+    'Подкласс выбирается с {level} уровня — выбор подкласса здесь не применится.',
+} as const;
+
+/** Подписи строк «Что даёт» в итоге мастера. */
+export const WIZARD_GRANT_LABELS = {
+  abilities: 'Характеристики',
+  skills: 'Навыки',
+  expertise: 'Компетентность',
+  savingThrows: 'Спасброски',
+  armor: 'Доспехи',
+  weapons: 'Оружие',
+  tools: 'Инструменты',
+  languages: 'Языки',
+} as const;
+
+/**
+ * Условия мультиклассирования PHB 2014 по адресу класса: каждая группа —
+ * характеристики, из которых нужна хотя бы одна со значением 13+. Классы
+ * вне таблицы условий не имеют.
+ */
+export const MULTICLASS_REQUIREMENTS: Readonly<
+  Record<string, ReadonlyArray<ReadonlyArray<(typeof ABILITY_KEYS)[number]>>>
+> = {
+  '/classes/barbarian': [['STRENGTH']],
+  '/classes/bard': [['CHARISMA']],
+  '/classes/cleric': [['WISDOM']],
+  '/classes/druid': [['WISDOM']],
+  '/classes/fighter': [['STRENGTH', 'DEXTERITY']],
+  '/classes/monk': [['DEXTERITY'], ['WISDOM']],
+  '/classes/paladin': [['STRENGTH'], ['CHARISMA']],
+  '/classes/ranger': [['DEXTERITY'], ['WISDOM']],
+  '/classes/rogue': [['DEXTERITY']],
+  '/classes/sorcerer': [['CHARISMA']],
+  '/classes/warlock': [['CHARISMA']],
+  '/classes/wizard': [['INTELLIGENCE']],
+  '/classes/artificer': [['INTELLIGENCE']],
+};
+
+/** Наименьшее значение характеристики для мультиклассирования. */
+export const MULTICLASS_MIN_SCORE = 13;
+
+/** Окно «Свой класс». */
+export const CUSTOM_CLASS_TEXT = {
+  title: 'Свой класс',
+  hint: 'Свой класс применяется как каталожный: кость хитов, хиты, спасброски, навыки и умения сразу заполнят лист. Доспехи, оружие и инструменты задаются на панели владений.',
+  name: 'Название',
+  namePlaceholder: 'Например: Охотник за бурями',
+  subclass: 'Подкласс (необязательно)',
+  subclassPlaceholder: 'Например: Путь громового шага',
+  hitDie: 'Кость хитов',
+  savingThrows: 'Спасброски',
+  savingThrowsHint: 'Только у первого класса персонажа',
+  skills: 'Навыки',
+  spellcasting: 'Заклинательная характеристика',
+  noSpellcasting: 'Нет',
+  features: 'Умения',
+  featureName: 'Название умения',
+  featureDescription: 'Описание',
+  addFeature: 'Добавить умение',
+  removeFeature: 'Удалить умение',
+  cancel: 'Отмена',
+  save: 'Создать',
 } as const;

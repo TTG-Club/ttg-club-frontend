@@ -4,9 +4,11 @@ import type { TypedLink } from '~character/model';
 
 import type { LevelUpStepResult } from './levelUp';
 import type { SheetClass, SheetDocument } from './schema';
-import type { CatalogOption } from './types';
+import type { CatalogOption, CustomClassPayload } from './types';
 
 import {
+  backgroundLinkSchema,
+  BACKGROUNDS_SECTION,
   CLASSES_SECTION,
   classLinkSchema,
   raceLinkSchema,
@@ -14,7 +16,9 @@ import {
 } from '~character/model';
 
 import { CATALOG_TREE_COLLATOR_LOCALE, CHARACTER_LEVEL } from './constants';
-import { getHitPointGain } from './levelUp';
+import { applyLevelUpStep, getHitPointGain } from './levelUp';
+import { catalogMechanicsSchema } from './mechanics';
+import { createSource } from './sources';
 import { getSheetStats } from './stats';
 import { createSheetElementId, getAbilityModifier } from './utils';
 
@@ -102,6 +106,13 @@ export const RACE_TREE: CatalogTreeSource<typeof raceLinkSchema> = {
     ),
 };
 
+/** Предыстории: плоский список без вложенных записей. */
+export const BACKGROUND_TREE: CatalogTreeSource<typeof backgroundLinkSchema> = {
+  listUrl: BACKGROUNDS_SECTION.listUrl,
+  schema: backgroundLinkSchema,
+  toEntry: (link) => toTreeEntry(link, []),
+};
+
 /**
  * Поиск по дереву без учёта регистра. Подошла запись — остаётся со всеми
  * вложенными; не подошла — остаётся, только если подошли вложенные, и с ними
@@ -172,6 +183,7 @@ export function toCatalogOption(lookup: CatalogTreeLookup): CatalogOption {
     name: lookup.entry.name,
     url: lookup.entry.url,
     caption: lookup.parent?.name ?? '',
+    ...(lookup.parent ? { parentUrl: lookup.parent.url } : {}),
   };
 }
 
@@ -225,6 +237,74 @@ export function createCustomClassStep(
     hitPointGain: getCustomHitPointGain(document, hitDie),
     subclass: null,
     sources: [],
+  };
+}
+
+/**
+ * Свой класс целиком, как каталожный: первый уровень с костью хитов и
+ * хитами, источник класса со спасбросками (если класс первый) и навыками,
+ * заклинательная характеристика и умения особенностями листа.
+ * @param document - лист персонажа
+ * @param payload - свой класс
+ */
+export function applyCustomClass(
+  document: SheetDocument,
+  payload: CustomClassPayload,
+): SheetDocument {
+  const step = createCustomClassStep(document, payload.name, payload.hitDie);
+  const isFirst = !document.classes.length;
+  const subclassName = payload.subclassName.trim();
+
+  const newClass: SheetClass | null = step.newClass
+    ? {
+        ...step.newClass,
+        archetypeName: subclassName || null,
+        spellcastingAbility: payload.spellcastingAbility,
+      }
+    : null;
+
+  const hasGrants =
+    payload.skills.length > 0 || (isFirst && payload.savingThrows.length > 0);
+
+  const source = hasGrants
+    ? createSource({
+        kind: 'class',
+        name: payload.name,
+        classId: step.classId,
+        level: CHARACTER_LEVEL.min,
+        characterLevel: CHARACTER_LEVEL.min,
+        mechanics: catalogMechanicsSchema.parse({
+          proficiencies: {
+            skills: payload.skills,
+            savingThrows: isFirst ? payload.savingThrows : [],
+          },
+        }),
+      })
+    : null;
+
+  const next = applyLevelUpStep(document, {
+    ...step,
+    newClass,
+    sources: source ? [source] : [],
+  });
+
+  return {
+    ...next,
+    features: [
+      ...next.features,
+      ...payload.features
+        .filter((feature) => feature.name.trim())
+        .map((feature) => ({
+          id: createSheetElementId(),
+          name: feature.name.trim(),
+          source: payload.name,
+          origin: 'class' as const,
+          choice: '',
+          description: feature.description.trim()
+            ? [feature.description.trim()]
+            : [],
+        })),
+    ],
   };
 }
 
