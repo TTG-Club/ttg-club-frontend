@@ -60,6 +60,10 @@ import {
   isArmorTooHeavy,
 } from './inventory';
 import {
+  getUnproficientArmor,
+  withUnproficientArmorFlags,
+} from './proficiencies';
+import {
   getAbilityBonusesTotal,
   getProficiencyBonusBase,
   getSavingThrowAbility,
@@ -573,9 +577,11 @@ export function getSheetStats(document: SheetDocument): SheetStats {
   const encumbrance = getEncumbrance(document, carrying, carriedWeight);
   const isArmorHeavy = isArmorTooHeavy(document, abilities.STRENGTH);
 
-  const flags = withEncumbranceFlags(
-    getEffectFlags(carriers, document),
-    encumbrance,
+  const unproficientArmor = getUnproficientArmor(document);
+
+  const flags = withUnproficientArmorFlags(
+    withEncumbranceFlags(getEffectFlags(carriers, document), encumbrance),
+    unproficientArmor.length > 0,
   );
 
   const effective: SheetDocument = { ...document, abilities };
@@ -847,6 +853,7 @@ export function getSheetStats(document: SheetDocument): SheetStats {
     carrying,
     encumbrance,
     isArmorTooHeavy: isArmorHeavy,
+    unproficientArmor: unproficientArmor.map((item) => item.id),
     attunement: getAttunementBreakdown(document, mod),
   };
 }

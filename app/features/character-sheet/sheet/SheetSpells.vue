@@ -47,6 +47,7 @@
     PREPARED_ICON,
     PREPARED_KINDS,
     PREPARED_TEXT,
+    PROFICIENCY_MODAL_TEXT,
     SHEET_GROUP_LABEL_CLASS,
     SHEET_HEADER_STAT_CLASS,
     SHEET_ICON,
@@ -74,6 +75,12 @@
     useCharacterSheet();
 
   const { stats } = useSheetStats();
+
+  /** Надет доспех без владения: заклинания не накладываются (правила 2014). */
+  const isArmorBlockingSpells = computed(
+    () => stats.value.unproficientArmor.length > 0,
+  );
+
   const { rollDamage } = useSheetRoll();
   const spellDetails = useSpellDetails();
 
@@ -794,6 +801,14 @@
 
 <template>
   <div class="flex flex-col gap-3">
+    <UAlert
+      v-if="isArmorBlockingSpells"
+      color="warning"
+      variant="subtle"
+      icon="tabler:shield-x"
+      :title="PROFICIENCY_MODAL_TEXT.unproficientSpells"
+    />
+
     <div class="@container flex flex-wrap items-center gap-2">
       <UTooltip
         v-for="tile in spellcastingTiles"

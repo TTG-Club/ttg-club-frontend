@@ -45,6 +45,7 @@ import {
   SKILL_PROFICIENCY_MULTIPLIER,
   SPELL_SLOT_LEVELS,
 } from './constants';
+import { isWeaponProficient } from './proficiencies';
 import { sheetDocumentSchema } from './schema';
 import { getCustomBonusesTotal, getSkillAbility } from './skills';
 
@@ -391,7 +392,7 @@ export function getWeaponAttack(
       ? weapon.versatileDamage
       : weapon.damage;
 
-  const proficiency = weapon.isProficient ? proficiencyBonus : 0;
+  const proficiency = isWeaponProficient(document, item) ? proficiencyBonus : 0;
 
   return {
     id: item.id,

@@ -495,6 +495,12 @@ export const HEAVY_ENCUMBRANCE_ABILITIES = [
   'constitution',
 ] as const;
 
+/**
+ * Характеристики, броски которых затрудняет доспех без владения (правила
+ * 2014): проверки, спасброски и атаки Силы и Ловкости.
+ */
+export const UNPROFICIENT_ARMOR_ABILITIES = ['strength', 'dexterity'] as const;
+
 /* --- Хиты и отдых ------------------------------------------------------- */
 
 export const DEATH_SAVES_MAX = 3;
@@ -1124,6 +1130,19 @@ export const WEAPON_CATEGORY_GROUPS: ReadonlyArray<{
   },
 ];
 
+/** Ручное владение оружием: владею или не владею (null — по листу). */
+export const WEAPON_PROFICIENCY_YES = 'yes';
+
+export const WEAPON_PROFICIENCY_NO = 'no';
+
+export const WEAPON_PROFICIENCY_OVERRIDES = [
+  WEAPON_PROFICIENCY_YES,
+  WEAPON_PROFICIENCY_NO,
+] as const;
+
+/** Разделители записей в старой строке владений. */
+export const LEGACY_PROFICIENCY_SEPARATOR = /[,;\n]/;
+
 /** Категории доспехов бэкенда (ArmorCategory) и названия групп владения. */
 export const ARMOR_PROFICIENCY_LABELS: Readonly<Record<string, string>> = {
   LIGHT: 'Лёгкие доспехи',
@@ -1155,6 +1174,110 @@ export const LANGUAGE_LABELS: Readonly<Record<string, string>> = {
   THIEVES: 'Воровской жаргон',
   UNDERCOMMON: 'Подземный',
 };
+
+/** Группы доспехов для окна владений. */
+export const ARMOR_PROFICIENCY_GROUPS: ReadonlyArray<{
+  title: string;
+  items: ReadonlyArray<string>;
+}> = [
+  {
+    title: 'Доспехи',
+    items: ['LIGHT', 'MEDIUM', 'HEAVY', 'SHIELD'].map(
+      (key) => ARMOR_PROFICIENCY_LABELS[key] ?? key,
+    ),
+  },
+];
+
+/** Группы оружия для окна владений; отдельное оружие ищется в справочнике. */
+export const WEAPON_PROFICIENCY_GROUPS: ReadonlyArray<{
+  title: string;
+  items: ReadonlyArray<string>;
+}> = [
+  {
+    title: 'Группы оружия',
+    items: WEAPON_CATEGORY_GROUPS.map((group) => group.label),
+  },
+];
+
+/** Языки PHB 2014 по группам для окна владений. */
+export const LANGUAGE_PROFICIENCY_GROUPS: ReadonlyArray<{
+  title: string;
+  items: ReadonlyArray<string>;
+}> = [
+  {
+    title: 'Стандартные',
+    items: [
+      'COMMON',
+      'DWARVISH',
+      'ELVISH',
+      'GIANT',
+      'GNOMISH',
+      'GOBLIN',
+      'HALFLING',
+      'ORC',
+    ].map((key) => LANGUAGE_LABELS[key] ?? key),
+  },
+  {
+    title: 'Экзотические',
+    items: [
+      'ABYSSAL',
+      'CELESTIAL',
+      'DRACONIC',
+      'DEEP',
+      'INFERNAL',
+      'PRIMORDIAL',
+      'SYLVAN',
+      'UNDERCOMMON',
+    ].map((key) => LANGUAGE_LABELS[key] ?? key),
+  },
+  {
+    title: 'Особые',
+    items: ['DRUIDIC', 'THIEVES', 'COMMON_SIGN_LANGUAGE'].map(
+      (key) => LANGUAGE_LABELS[key] ?? key,
+    ),
+  },
+];
+
+/** Категории снаряжения (EquipmentType), в которых ищутся инструменты. */
+export const TOOL_EQUIPMENT_CATEGORIES = [
+  'TOOL',
+  'ARTISANS_TOOLS',
+  'MUSICAL_INSTRUMENTS',
+  'GAME_SET',
+] as const;
+
+/** Подписи окон владений и проверки инструментом. */
+export const PROFICIENCY_MODAL_TEXT = {
+  armorTitle: 'Владение доспехами',
+  weaponsTitle: 'Владение оружием',
+  toolsTitle: 'Владение инструментами',
+  languagesTitle: 'Языки',
+  granted: 'Выдано источником',
+  custom: 'Свои записи',
+  customEmpty: 'Своих записей нет',
+  customPlaceholder: 'Название',
+  add: 'Добавить',
+  remove: 'Убрать',
+  weaponSearch: 'Оружие из справочника',
+  toolSearch: 'Инструменты из справочника',
+  searchHint: 'Начните вводить название',
+  nothingFound: 'Ничего не найдено',
+  apply: 'Применить',
+  cancel: 'Отмена',
+  close: 'Закрыть',
+  toolCheckTitle: 'Проверка инструментом',
+  toolCheckHint:
+    'Выберите характеристику: к броску прибавятся её модификатор и бонус мастерства.',
+  toolCheckRoll: 'Проверка',
+  openCatalog: 'Открыть в справочнике',
+  unproficient: 'Нет владения',
+  unproficientArmorHint:
+    'Без владения: помеха к проверкам, спасброскам и атакам Силы и Ловкости, колдовать нельзя',
+  unproficientWeaponHint:
+    'Без владения бонус мастерства к атаке не прибавляется',
+  unproficientSpells:
+    'Надет доспех без владения: накладывать заклинания нельзя',
+} as const;
 
 /**
  * Языки, которые предлагает выбор языка без своего списка: стандартные и
@@ -2274,6 +2397,11 @@ export const ITEM_FORM_TEXT = {
   simple: 'Простое',
   martial: 'Воинское',
   heavy: 'Тяжёлое',
+  proficiencyAuto: 'По листу',
+  proficiencyYes: 'Владею',
+  proficiencyNo: 'Не владею',
+  proficiencyAutoYes: 'По владениям листа: владеет',
+  proficiencyAutoNo: 'По владениям листа: не владеет',
   dice: 'Кости урона',
   diceCount: 'Сколько костей',
   diceFaces: 'Кость',
@@ -2511,7 +2639,6 @@ export const SHEET_BODY_LABELS = {
   noBackground: 'Предыстория',
   vision: 'Чувства',
   proficienciesEmpty: 'Нет',
-  manualProficiencies: 'Свои владения текстом',
   equipped: 'Надет',
   attuned: 'Настроен',
   needsAttunement: 'Нет настройки',

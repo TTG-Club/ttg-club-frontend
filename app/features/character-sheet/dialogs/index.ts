@@ -26,6 +26,7 @@ export { default as SheetMarkupTextModal } from './SheetMarkupTextModal.vue';
 export { default as SheetNoteModal } from './SheetNoteModal.vue';
 export { default as SheetPersonalityModal } from './SheetPersonalityModal.vue';
 export { default as SheetPreparedSpellsModal } from './SheetPreparedSpellsModal.vue';
+export { default as SheetProficiencyModal } from './SheetProficiencyModal.vue';
 export { default as SheetResourcesModal } from './SheetResourcesModal.vue';
 export { default as SheetSavingThrowsSettingsModal } from './SheetSavingThrowsSettingsModal.vue';
 export { default as SheetSettingsModal } from './SheetSettingsModal.vue';
@@ -39,4 +40,5 @@ export { default as SheetSpellAbilityModal } from './SheetSpellAbilityModal.vue'
 export { default as SheetSpellcastingModal } from './SheetSpellcastingModal.vue';
 export { default as SheetSpellCastModal } from './SheetSpellCastModal.vue';
 export { default as SheetSpellModal } from './SheetSpellModal.vue';
+export { default as SheetToolCheckModal } from './SheetToolCheckModal.vue';
 export { default as SheetVisionModal } from './SheetVisionModal.vue';

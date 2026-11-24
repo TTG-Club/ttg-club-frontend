@@ -64,8 +64,6 @@
    * закрытие, вдохновение и отдых. Раса и предыстория применяются через
    * механику справочника; их выборы открываются сразу.
    */
-  const LANGUAGES_SEPARATOR = ', ';
-
   /** Источники расы: снимаются вместе при смене расы. */
   const RACE_SOURCE_KINDS: ReadonlySet<SourceKind> = new Set([
     'race',
@@ -483,12 +481,9 @@
         const stripped = stripBackground(current);
 
         const languages = uniq([
-          ...stripped.proficiencies.languages
-            .split(LANGUAGES_SEPARATOR)
-            .map((language) => language.trim())
-            .filter(Boolean),
+          ...stripped.proficiencies.languages,
           ...result.languages,
-        ]).join(LANGUAGES_SEPARATOR);
+        ]);
 
         next = addSources(
           {

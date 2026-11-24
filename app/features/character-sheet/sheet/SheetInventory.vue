@@ -39,10 +39,12 @@
     getWeaponAttack,
     INVENTORY_GROUPS,
     isHeavyWeaponHindered,
+    isWeaponProficient,
     ITEM_ROW_TEXT,
     ITEM_SEARCH_KINDS,
     loadCatalogItem,
     loadMagicItem,
+    PROFICIENCY_MODAL_TEXT,
     SHEET_BODY_LABELS,
     SHEET_GROUP_LABEL_CLASS,
     SHEET_HEADER_STAT_CLASS,
@@ -246,6 +248,21 @@
     };
   }
 
+  /**
+   * Подсказка значка «Нет владения»: надетый доспех без владения или оружие
+   * без владения; null — значок не нужен.
+   * @param item - предмет
+   */
+  function getUnproficientHint(item: SheetItem): string | null {
+    if (stats.value.unproficientArmor.includes(item.id)) {
+      return PROFICIENCY_MODAL_TEXT.unproficientArmorHint;
+    }
+
+    return item.weapon && !isWeaponProficient(document.value, item)
+      ? PROFICIENCY_MODAL_TEXT.unproficientWeaponHint
+      : null;
+  }
+
   const groups = computed(() =>
     INVENTORY_GROUPS.map((group) => ({
       ...group,
@@ -258,6 +275,7 @@
         attack: getAttack(item),
         attackEffects: getAttackEffects(item),
         isHindered: isHeavyWeaponHindered(item, document.value.size),
+        unproficientHint: getUnproficientHint(item),
       })),
     })).filter((group) => group.items.length),
   );
@@ -672,6 +690,7 @@
           :icon="group.icon"
           :is-equippable="group.key !== 'other'"
           :is-hindered="entry.isHindered"
+          :unproficient-hint="entry.unproficientHint"
           @toggle-equip="toggleEquip(entry.item.id)"
           @toggle-attune="toggleAttune(entry.item.id)"
           @toggle-grip="toggleGrip(entry.item.id)"

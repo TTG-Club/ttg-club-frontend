@@ -372,6 +372,11 @@ export interface SheetStats {
   encumbrance: EncumbranceLevel;
   /** Доспеху не хватает Силы: скорость −10 фт. */
   isArmorTooHeavy: boolean;
+  /**
+   * Надетые доспехи и щиты без владения (идентификаторы предметов): помеха
+   * к броскам Силы и Ловкости, колдовать нельзя.
+   */
+  unproficientArmor: Array<string>;
   attunement: AttunementBreakdown;
   proficiencyBonus: number;
   /** Характеристики с прибавками эффектов. */
@@ -503,4 +508,10 @@ export interface LevelUpFeature {
   isAbilityImprovement: boolean;
   mechanics: CatalogMechanics;
   activeEffects: Array<ActiveEffect>;
+}
+
+/** Группа справочника в окне владений: заголовок и записи-чекбоксы. */
+export interface ProficiencyCatalogGroup {
+  title: string;
+  items: ReadonlyArray<string>;
 }
