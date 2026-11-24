@@ -1,42 +1,22 @@
 <script setup lang="ts">
-  import {
-    CATALOG_TREE_TEXT,
-    CUSTOM_CLASS_DEFAULT_HIT_DIE,
-    HIT_DIE_LABEL_PREFIX,
-    HIT_DIE_SIZES,
-  } from '../model';
+  import { CATALOG_TREE_TEXT } from '../model';
 
   /**
-   * Своя запись вместо записи справочника: название, а у класса ещё кость
-   * хитов.
+   * Своя запись вместо записи справочника: только название (своя раса,
+   * предыстория).
    */
-  const {
-    title,
-    hint,
-    withHitDie = false,
-  } = defineProps<{
+  const { title, hint } = defineProps<{
     title: string;
     hint: string;
-    /** Спрашивать кость хитов (свой класс). */
-    withHitDie?: boolean;
   }>();
 
   const emit = defineEmits<{
-    save: [name: string, hitDie: number];
+    save: [name: string];
   }>();
 
   const isOpen = defineModel<boolean>('open', { default: false });
 
   const name = ref('');
-
-  const hitDie = ref<(typeof HIT_DIE_SIZES)[number]>(
-    CUSTOM_CLASS_DEFAULT_HIT_DIE,
-  );
-
-  const hitDieOptions = HIT_DIE_SIZES.map((size) => ({
-    label: `${HIT_DIE_LABEL_PREFIX}${size}`,
-    value: size,
-  }));
 
   const canSave = computed(() => Boolean(name.value.trim()));
 
@@ -45,7 +25,7 @@
       return;
     }
 
-    emit('save', name.value.trim(), hitDie.value);
+    emit('save', name.value.trim());
     isOpen.value = false;
   }
 
@@ -56,7 +36,6 @@
   watch(isOpen, (open) => {
     if (open) {
       name.value = '';
-      hitDie.value = CUSTOM_CLASS_DEFAULT_HIT_DIE;
     }
   });
 </script>
@@ -74,17 +53,6 @@
           autofocus
           class="w-full"
           @keydown.enter.exact.prevent="save"
-        />
-      </UFormField>
-
-      <UFormField
-        v-if="withHitDie"
-        :label="CATALOG_TREE_TEXT.customHitDie"
-      >
-        <USelect
-          v-model="hitDie"
-          :items="hitDieOptions"
-          class="w-full"
         />
       </UFormField>
 

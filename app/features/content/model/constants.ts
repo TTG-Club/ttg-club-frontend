@@ -270,3 +270,9 @@ export const MARKUP_TABLE_CLASS = 'dnd5_table';
 
 /** Маркер обычной ссылки: адрес вне разделов с собственным маркером. */
 export const MARKUP_LINK_TYPE = 'link';
+
+/** Панель карточки справочника рядом со списком. */
+export const CONTENT_ENTITY_PANE_TEXT = {
+  loadingIcon: 'tabler:loader-2',
+  error: 'Не удалось загрузить описание',
+} as const;

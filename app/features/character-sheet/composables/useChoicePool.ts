@@ -19,6 +19,7 @@ import {
   SPELL_LEVEL,
   SPELL_SEARCH,
   WEAPON_SEARCH,
+  withChoiceOptionDetail,
 } from '../model';
 import { useCatalogSearch } from './useCatalogSearch';
 
@@ -115,9 +116,15 @@ export function useChoicePool(
     };
   });
 
-  const staticOptions = computed(() =>
-    getStaticChoiceOptions(toValue(choice), context.value),
-  );
+  const staticOptions = computed(() => {
+    const currentChoice = toValue(choice);
+
+    return (
+      getStaticChoiceOptions(currentChoice, context.value)?.map((option) =>
+        withChoiceOptionDetail(currentChoice.kind, option),
+      ) ?? null
+    );
+  });
 
   const searchSource = computed<CatalogSearchSource>(() => {
     const currentChoice = toValue(choice);
@@ -160,11 +167,17 @@ export function useChoicePool(
     return decorateChoiceOptions(
       currentChoice,
       context.value,
-      found.value.map((option) => ({
-        value: byName ? option.name : option.url,
-        label: option.name,
-        caption: option.caption,
-      })),
+      found.value.map((option) =>
+        withChoiceOptionDetail(
+          currentChoice.kind,
+          {
+            value: byName ? option.name : option.url,
+            label: option.name,
+            caption: option.caption,
+          },
+          option.url,
+        ),
+      ),
     );
   });
 

@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { CatalogOption, SheetDocument, SourceKind } from '../model';
+  import type {
+    CatalogOption,
+    SheetDocument,
+    SourceKind,
+    WIZARD_STEPS,
+  } from '../model';
 
   import { uniq } from 'es-toolkit';
 
@@ -14,8 +19,6 @@
   } from '../composables';
   import {
     SheetAbilityScoresModal,
-    SheetCatalogPicker,
-    SheetCatalogTreeModal,
     SheetClassesModal,
     SheetConfirmModal,
     SheetCustomEntryModal,
@@ -24,12 +27,13 @@
     SheetSettingsModal,
     SheetShortRestModal,
     SheetSizeModal,
-    SheetSourceChoicesModal,
+    SheetSourcesReview,
+    SheetSourceWizardModal,
     SheetVisionModal,
   } from '../dialogs';
   import {
     addSources,
-    BACKGROUND_SEARCH,
+    BACKGROUND_TREE,
     CATALOG_TREE_TEXT,
     CHARACTER_SHEET_ROUTE,
     createSheet,
@@ -37,7 +41,6 @@
     downloadSheetJson,
     getClassesLabel,
     getExperienceProgress,
-    getPendingChoices,
     getSheetRoute,
     loadBackgroundSources,
     loadRaceSources,
@@ -55,14 +58,16 @@
     SHEET_SIZE_LABELS,
     SHEET_TEXT,
     SHEET_VISION_LABELS,
+    WIZARD_TEXT,
   } from '../model';
 
   /**
    * Шапка листа, как на new.ttg.club: портрет, имя, подпись «Раса — Класс N
    * — Предыстория» (каждая часть открывает свой выбор), полоса опыта до
    * следующего уровня, справа — состояние сохранения, замок, меню и
-   * закрытие, вдохновение и отдых. Раса и предыстория применяются через
-   * механику справочника; их выборы открываются сразу.
+   * закрытие, вдохновение и отдых. Раса и предыстория выбираются мастером:
+   * запись с описанием, затем итог с выдачами и выборами, и только потом
+   * лист.
    */
   /** Источники расы: снимаются вместе при смене расы. */
   const RACE_SOURCE_KINDS: ReadonlySet<SourceKind> = new Set([
@@ -89,9 +94,23 @@
 
   const { stats } = useSheetStats();
 
+  /** Черновик мастера: лист после выбора и добавленные источники. */
+  interface WizardDraft {
+    name: string;
+    document: SheetDocument;
+    sourceIds: Array<string>;
+  }
+
   const isRacePickerOpen = ref(false);
   const isCustomRaceOpen = ref(false);
+  const isCustomBackgroundOpen = ref(false);
   const { isBackgroundPickerOpen } = useSheetPickers();
+
+  const raceStep = ref<(typeof WIZARD_STEPS)[number]>('pick');
+  const backgroundStep = ref<(typeof WIZARD_STEPS)[number]>('pick');
+  const raceDraft = shallowRef<WizardDraft | null>(null);
+  const backgroundDraft = shallowRef<WizardDraft | null>(null);
+  const isWizardPreparing = ref(false);
   const isClassesOpen = ref(false);
   const isVisionOpen = ref(false);
   const isSizeOpen = ref(false);
@@ -133,16 +152,6 @@
   const isExperienceOpen = ref(false);
   const isShortRestOpen = ref(false);
   const isLongRestOpen = ref(false);
-  const choiceSourceIds = ref<Array<string>>([]);
-
-  const isChoicesOpen = computed({
-    get: () => choiceSourceIds.value.length > 0,
-    set: (open: boolean) => {
-      if (!open) {
-        choiceSourceIds.value = [];
-      }
-    },
-  });
 
   const level = computed(() => stats.value.level);
   const classLabel = computed(() => getClassesLabel(document.value.classes));
@@ -383,36 +392,23 @@
   }
 
   /**
-   * Открывает выборы новых источников, если среди них есть несделанные.
-   * @param next - лист после применения
-   * @param ids - новые источники
-   */
-  function openPendingChoices(
-    next: SheetDocument,
-    ids: ReadonlyArray<string>,
-  ): void {
-    const pending = getPendingChoices(next).filter((entry) =>
-      ids.includes(entry.source.id),
-    );
-
-    if (pending.length) {
-      choiceSourceIds.value = uniq(pending.map((entry) => entry.source.id));
-    }
-  }
-
-  /**
-   * Ставит расу: прежняя снимается со всеми выдачами, новая применяется
-   * через механику (повышения, чувства, скорости, владения, выборы).
+   * Готовит итог мастера расы: прежняя раса снимается со всеми выдачами,
+   * новая применяется к черновику через механику (повышения, чувства,
+   * скорости, владения), выборы делаются на шаге итога.
    * @param option - выбранная раса
    */
-  async function pickRace(option: CatalogOption): Promise<void> {
+  async function prepareRace(option: CatalogOption): Promise<void> {
+    isWizardPreparing.value = true;
+
     try {
       const result = await loadRaceSources(option, level.value);
+      const current = document.value;
 
-      let next: SheetDocument = document.value;
-
-      update((current) => {
-        next = addSources(
+      raceDraft.value = {
+        name: option.caption
+          ? `${option.caption}: ${option.name}`
+          : option.name,
+        document: addSources(
           {
             ...stripRace(current),
             race: result.race,
@@ -420,21 +416,41 @@
             size: result.size ?? current.size,
           },
           result.sources,
-        );
+        ),
+        sourceIds: result.sources.map((source) => source.id),
+      };
 
-        return next;
-      });
-
-      openPendingChoices(
-        next,
-        result.sources.map((source) => source.id),
-      );
+      raceStep.value = 'review';
     } catch (error) {
       toast.add({
         title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
         color: 'error',
       });
+    } finally {
+      isWizardPreparing.value = false;
     }
+  }
+
+  /**
+   * Черновик мастера расы после ответа на выбор.
+   * @param next - новый черновик
+   */
+  function setRaceDraft(next: SheetDocument): void {
+    if (raceDraft.value) {
+      raceDraft.value = { ...raceDraft.value, document: next };
+    }
+  }
+
+  /** Переносит черновик мастера расы в лист. */
+  function applyRace(): void {
+    const draft = raceDraft.value;
+
+    if (draft) {
+      update(() => draft.document);
+    }
+
+    isRacePickerOpen.value = false;
+    raceDraft.value = null;
   }
 
   function clearRace(): void {
@@ -466,44 +482,82 @@
   }
 
   /**
-   * Ставит предысторию: прежняя снимается, новая выдаёт навыки (из механики
-   * или по названиям), владения и выборы; языки без механики дописываются
-   * текстом, как раньше.
+   * Готовит итог мастера предыстории: прежняя снимается, новая выдаёт навыки
+   * (из механики или по названиям), владения и выборы; языки без механики
+   * дописываются списком, как раньше.
    * @param option - выбранная предыстория
    */
-  async function pickBackground(option: CatalogOption): Promise<void> {
+  async function prepareBackground(option: CatalogOption): Promise<void> {
+    isWizardPreparing.value = true;
+
     try {
       const result = await loadBackgroundSources(option, level.value);
+      const stripped = stripBackground(document.value);
 
-      let next: SheetDocument = document.value;
+      const languages = uniq([
+        ...stripped.proficiencies.languages,
+        ...result.languages,
+      ]);
 
-      update((current) => {
-        const stripped = stripBackground(current);
-
-        const languages = uniq([
-          ...stripped.proficiencies.languages,
-          ...result.languages,
-        ]);
-
-        next = addSources(
+      backgroundDraft.value = {
+        name: option.name,
+        document: addSources(
           {
             ...stripped,
             background: result.background,
             proficiencies: { ...stripped.proficiencies, languages },
           },
           [result.source],
-        );
+        ),
+        sourceIds: [result.source.id],
+      };
 
-        return next;
-      });
-
-      openPendingChoices(next, [result.source.id]);
+      backgroundStep.value = 'review';
     } catch (error) {
       toast.add({
         title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
         color: 'error',
       });
+    } finally {
+      isWizardPreparing.value = false;
     }
+  }
+
+  /**
+   * Черновик мастера предыстории после ответа на выбор.
+   * @param next - новый черновик
+   */
+  function setBackgroundDraft(next: SheetDocument): void {
+    if (backgroundDraft.value) {
+      backgroundDraft.value = { ...backgroundDraft.value, document: next };
+    }
+  }
+
+  /** Переносит черновик мастера предыстории в лист. */
+  function applyBackground(): void {
+    const draft = backgroundDraft.value;
+
+    if (draft) {
+      update(() => draft.document);
+    }
+
+    isBackgroundPickerOpen.value = false;
+    backgroundDraft.value = null;
+  }
+
+  function openCustomBackground(): void {
+    isCustomBackgroundOpen.value = true;
+  }
+
+  /**
+   * Ставит свою предысторию: прежняя снимается, новая — только название.
+   * @param backgroundName - название предыстории
+   */
+  function pickCustomBackground(backgroundName: string): void {
+    update((current) => ({
+      ...stripBackground(current),
+      background: { name: backgroundName, url: null },
+    }));
   }
 
   function clearBackground(): void {
@@ -847,18 +901,32 @@
       </div>
     </div>
 
-    <SheetCatalogTreeModal
+    <SheetSourceWizardModal
       v-model:open="isRacePickerOpen"
+      v-model:step="raceStep"
       :title="CATALOG_TREE_TEXT.raceTitle"
       :source="RACE_TREE"
+      pane-type="race"
       :hint="CATALOG_TREE_TEXT.raceHint"
-      :confirm-label="CATALOG_TREE_TEXT.pick"
       :custom-label="CATALOG_TREE_TEXT.customRace"
       :expand-label="CATALOG_TREE_TEXT.expandRace"
+      :is-preparing="isWizardPreparing"
+      :review-title="raceDraft?.name"
       children-selectable
-      @pick="pickRace"
+      @next="prepareRace"
       @custom="openCustomRace"
-    />
+      @apply="applyRace"
+    >
+      <template #review>
+        <SheetSourcesReview
+          v-if="raceDraft"
+          :document="raceDraft.document"
+          :source-ids="raceDraft.sourceIds"
+          :hint="WIZARD_TEXT.raceReviewHint"
+          @change="setRaceDraft"
+        />
+      </template>
+    </SheetSourceWizardModal>
 
     <SheetCustomEntryModal
       v-model:open="isCustomRaceOpen"
@@ -867,11 +935,37 @@
       @save="pickCustomRace"
     />
 
-    <SheetCatalogPicker
+    <SheetSourceWizardModal
       v-model:open="isBackgroundPickerOpen"
-      :title="SHEET_LABELS.background"
-      :source="BACKGROUND_SEARCH"
-      @pick="pickBackground"
+      v-model:step="backgroundStep"
+      :title="WIZARD_TEXT.backgroundTitle"
+      :source="BACKGROUND_TREE"
+      pane-type="background"
+      :hint="WIZARD_TEXT.backgroundHint"
+      :custom-label="WIZARD_TEXT.customBackground"
+      :expand-label="CATALOG_TREE_TEXT.expandRace"
+      :is-preparing="isWizardPreparing"
+      :review-title="backgroundDraft?.name"
+      @next="prepareBackground"
+      @custom="openCustomBackground"
+      @apply="applyBackground"
+    >
+      <template #review>
+        <SheetSourcesReview
+          v-if="backgroundDraft"
+          :document="backgroundDraft.document"
+          :source-ids="backgroundDraft.sourceIds"
+          :hint="WIZARD_TEXT.backgroundReviewHint"
+          @change="setBackgroundDraft"
+        />
+      </template>
+    </SheetSourceWizardModal>
+
+    <SheetCustomEntryModal
+      v-model:open="isCustomBackgroundOpen"
+      :title="WIZARD_TEXT.customBackground"
+      :hint="WIZARD_TEXT.customBackgroundHint"
+      @save="pickCustomBackground"
     />
 
     <SheetClassesModal v-model:open="isClassesOpen" />
@@ -899,11 +993,6 @@
     <SheetShortRestModal v-model:open="isShortRestOpen" />
 
     <SheetLongRestModal v-model:open="isLongRestOpen" />
-
-    <SheetSourceChoicesModal
-      v-model:open="isChoicesOpen"
-      :source-ids="choiceSourceIds"
-    />
   </header>
 
   <UAlert

@@ -3,19 +3,31 @@ import type {
   ClassMechanicsDetail,
   MechanicsClassFeature,
 } from './mechanics';
-import type { SheetClass, SheetDocument, SheetSource } from './schema';
+import type {
+  SheetClass,
+  SheetClassDetail,
+  SheetDocument,
+  SheetSource,
+} from './schema';
 import type { HitPointsGainMode, LevelUpFeature, SkillKey } from './types';
 
 import {
   ABILITY_IMPROVEMENT_FEATURE_NAME,
   CLASS_SKILLS_CHOICE_KEY,
   HIT_DIE_AVERAGE_BONUS,
+  KNOWN_CANTRIPS_COLUMN,
+  KNOWN_SPELLS_COLUMN,
   MULTICLASS_PROFICIENCIES,
   MULTICLASS_SKILLS_CHOICE_KEY,
 } from './constants';
 import { catalogMechanicsSchema } from './mechanics';
 import { addSources, createSource, removeSources } from './sources';
-import { getCharacterLevel } from './utils';
+import {
+  getCharacterLevel,
+  getClassColumnValue,
+  getPactMagic,
+  parseSpellSlotCells,
+} from './utils';
 
 /*
  * Классы и уровни: источники класса, подкласса и умений уровня, прирост хитов
@@ -440,4 +452,64 @@ export function getMissingClassFeatureSources(
         !present.has(getClassFeatureSourceUrl(sheetClass.url, feature.id)),
     )
     .map((feature) => createClassFeatureSource(sheetClass, feature, level));
+}
+
+/** Таблицы класса, нужные для роста заклинаний: колонки и ячейки по уровням. */
+type ClassSpellTables = Pick<SheetClassDetail, 'tableColumns'> & {
+  traits?: {
+    levels?: ReadonlyArray<{ spellSlots: ReadonlyArray<string> }> | null;
+  } | null;
+};
+
+/**
+ * Сколько заговоров и заклинаний класс узнаёт на уровне — по приросту
+ * колонок «Известные заговоры» и «Известные заклинания» таблицы класса, — и
+ * наибольший круг его ячеек на этом уровне. Таблица подкласса важнее
+ * (у мистического рыцаря ячейки только в ней). У подготавливающих классов
+ * колонки известных заклинаний нет: прирост — ноль.
+ * @param base - карточка класса
+ * @param archetype - карточка подкласса
+ * @param classLevel - уровень класса после шага
+ */
+export function getClassSpellGrowth(
+  base: ClassSpellTables,
+  archetype: ClassSpellTables | null,
+  classLevel: number,
+): { cantrips: number; spells: number; maxLevel: number } {
+  const columns = archetype?.tableColumns?.length
+    ? archetype.tableColumns
+    : (base.tableColumns ?? []);
+
+  const levels = archetype?.traits?.levels ?? base.traits?.levels ?? [];
+
+  /**
+   * Прирост колонки на уровне.
+   * @param name - название колонки
+   */
+  const growth = (name: string): number => {
+    const now = getClassColumnValue(columns, name, classLevel) ?? 0;
+
+    const before =
+      classLevel > 1
+        ? (getClassColumnValue(columns, name, classLevel - 1) ?? 0)
+        : 0;
+
+    return Math.max(0, now - before);
+  };
+
+  const slots = parseSpellSlotCells(levels[classLevel - 1]?.spellSlots ?? []);
+
+  const slotLevel = slots.reduce(
+    (max, count, index) => (count > 0 ? index + 1 : max),
+    0,
+  );
+
+  return {
+    cantrips: growth(KNOWN_CANTRIPS_COLUMN),
+    spells: growth(KNOWN_SPELLS_COLUMN),
+    maxLevel: Math.max(
+      slotLevel,
+      getPactMagic(columns, classLevel)?.level ?? 0,
+    ),
+  };
 }

@@ -773,3 +773,84 @@ export function getPendingChoices(
     ),
   );
 }
+
+/**
+ * Карточка справочника, описывающая вариант выбора: заклинания, черты и
+ * особенности называются адресом, инструменты и оружие — адресом из поиска.
+ * @param kind - вид выбора
+ * @param value - значение варианта
+ * @param url - адрес записи из поиска по справочнику
+ */
+export function getChoiceOptionDetail(
+  kind: ChoiceKind,
+  value: string,
+  url?: string,
+): SheetChoiceOption['detail'] {
+  const path = url || (value.startsWith('/') ? value : '');
+
+  if (!path) {
+    return undefined;
+  }
+
+  switch (kind) {
+    case 'spell':
+    case 'cantrip': {
+      return { type: 'spell', path };
+    }
+    case 'feat': {
+      return { type: 'feat', path };
+    }
+    case 'option': {
+      return { type: 'option', path };
+    }
+    case 'weapon': {
+      return { type: 'weapon', path };
+    }
+    case 'tool': {
+      return { type: 'item', path };
+    }
+    default: {
+      return undefined;
+    }
+  }
+}
+
+/**
+ * Группа варианта в окне выбора: навыки — по характеристике, как в списке
+ * навыков листа; прочие варианты идут одним списком.
+ * @param kind - вид выбора
+ * @param value - значение варианта
+ */
+export function getChoiceOptionGroup(
+  kind: ChoiceKind,
+  value: string,
+): string | undefined {
+  if (kind !== 'skill' && kind !== 'expertise') {
+    return undefined;
+  }
+
+  const skill = toSkillKey(value);
+
+  return skill ? ABILITY_LABELS[SKILL_INFO[skill].ability].name : undefined;
+}
+
+/**
+ * Вариант выбора с группой и карточкой описания.
+ * @param kind - вид выбора
+ * @param option - вариант
+ * @param url - адрес записи из поиска по справочнику
+ */
+export function withChoiceOptionDetail(
+  kind: ChoiceKind,
+  option: SheetChoiceOption,
+  url?: string,
+): SheetChoiceOption {
+  const detail = getChoiceOptionDetail(kind, option.value, url);
+  const group = getChoiceOptionGroup(kind, option.value);
+
+  return {
+    ...option,
+    ...(detail ? { detail } : {}),
+    ...(group ? { group } : {}),
+  };
+}

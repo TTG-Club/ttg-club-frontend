@@ -28,6 +28,13 @@ export type DetailType =
   | 'spell'
   | 'god';
 
+/**
+ * Вид карточки для панели описания: карточки ссылок в тексте и записи
+ * разделов персонажа, которые в тексте не встречаются (класс, раса,
+ * предыстория).
+ */
+export type EntityPaneType = DetailType | 'class' | 'race' | 'background';
+
 /** Таблица бросков: первая колонка — диапазон результатов. */
 export interface RollTableData {
   name: string;
