@@ -304,6 +304,21 @@ const classFeatureScalingSchema = z.object({
 
 export type ClassFeatureScaling = z.infer<typeof classFeatureScalingSchema>;
 
+/** Вариант умения: воззвание, манёвр, боевой стиль. */
+const classFeatureOptionSchema = z.object({
+  name: z.string(),
+  englishName: z.string().nullish(),
+  /** Адрес в разделе «Особенности классов». */
+  url: z.string(),
+  level: z.number().nullish(),
+  prerequisite: z.string().nullish(),
+  additional: z.string().nullish(),
+  description: contentDescriptionSchema.nullish(),
+  repeatable: z.boolean().nullish(),
+});
+
+export type ClassFeatureOption = z.infer<typeof classFeatureOptionSchema>;
+
 const classFeatureSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -318,6 +333,9 @@ const classFeatureSchema = z.object({
     .nullish(),
   /** Рост по уровням; у старых ответов поля нет. */
   scaling: z.array(classFeatureScalingSchema).catch([]),
+  /** Название списка вариантов; null — вариантов нет. */
+  optionsName: z.string().nullish(),
+  options: z.array(classFeatureOptionSchema).catch([]),
 });
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>;

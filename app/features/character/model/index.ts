@@ -5,6 +5,7 @@ export type {
   BackgroundLink,
   ClassDetail,
   ClassFeature,
+  ClassFeatureOption,
   ClassFeatureScaling,
   ClassLevel,
   ClassLink,

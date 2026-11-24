@@ -4,6 +4,9 @@ import type { ArchetypeForm, ClassForm } from './schemas';
 import type {
   ClassTableColumn,
   ClassTrait,
+  ClassTraitOption,
+  ClassTraitOptionsChoice,
+  ClassTraitOptionsStep,
   ClassTraitScaling,
   WorkshopArchetype,
   WorkshopClass,
@@ -34,7 +37,47 @@ export function createClassTrait(): ClassTrait {
     optional: false,
     child: '',
     scaling: [],
+    optionsType: '',
+    optionsName: '',
+    options: [],
+    optionsChoice: null,
     ...copyMechanicsFields(),
+  };
+}
+
+/** Новый вариант умения. */
+export function createClassTraitOption(): ClassTraitOption {
+  return {
+    name: '',
+    englishName: '',
+    altName: '',
+    level: null,
+    prerequisite: '',
+    additional: '',
+    description: [],
+    repeatable: false,
+    hideInSubclasses: false,
+    source: '',
+    page: null,
+    ...copyMechanicsFields(),
+  };
+}
+
+/**
+ * Новая ступень роста количества: на уровень позже последней, на один
+ * вариант больше.
+ * @param choice - выбор из вариантов
+ * @param traitLevel - уровень умения
+ */
+export function createClassTraitOptionsStep(
+  choice: ClassTraitOptionsChoice,
+  traitLevel: number,
+): ClassTraitOptionsStep {
+  const last = choice.scaling.at(-1);
+
+  return {
+    level: Math.min(CLASS_LEVELS.length, (last?.level ?? traitLevel) + 1),
+    count: (last?.count ?? choice.count) + 1,
   };
 }
 
@@ -81,6 +124,17 @@ function copyTraits(traits: ReadonlyArray<ClassTrait>): Array<ClassTrait> {
       ...row,
       description: [...row.description],
     })),
+    options: trait.options.map((option) => ({
+      ...option,
+      description: [...option.description],
+      ...copyMechanicsFields(option),
+    })),
+    optionsChoice: trait.optionsChoice
+      ? {
+          ...trait.optionsChoice,
+          scaling: trait.optionsChoice.scaling.map((step) => ({ ...step })),
+        }
+      : null,
     ...copyMechanicsFields(trait),
   }));
 }
@@ -117,6 +171,29 @@ function getTraitsPayload(
         description: row.description.filter((block) => block.trim()),
         hideInSubclasses: row.hideInSubclasses,
       })),
+    optionsType: toOptionalText(trait.optionsType),
+    optionsName: toOptionalText(trait.optionsName),
+    // Список вариантов уходит всегда: по нему бэкенд отличает новую форму от старой
+    options: trait.options.map((option) => ({
+      ...option,
+      name: option.name.trim(),
+      englishName: option.englishName.trim(),
+      altName: toOptionalText(option.altName),
+      prerequisite: toOptionalText(option.prerequisite),
+      additional: toOptionalText(option.additional),
+      description: option.description.filter((block) => block.trim()),
+      source: toOptionalText(option.source),
+      ...getMechanicsFieldsPayload(option, MECHANICS_KIND.class),
+    })),
+    optionsChoice: trait.optionsChoice
+      ? {
+          label: toOptionalText(trait.optionsChoice.label),
+          count: trait.optionsChoice.count,
+          scaling: [...trait.optionsChoice.scaling].sort(
+            (left, right) => left.level - right.level,
+          ),
+        }
+      : null,
     ...getMechanicsFieldsPayload(trait, MECHANICS_KIND.class),
   }));
 }

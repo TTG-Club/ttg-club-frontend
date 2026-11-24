@@ -497,6 +497,7 @@
             ref="traits"
             v-model="state.classTraits"
             field-name="classTraits"
+            :option-type-items="optionTypeItems"
             has-optional
           />
         </div>
