@@ -43,9 +43,10 @@
 │   ├── plugins/                # api ($api: API client, renews the session on 401 and retries), user-session (restores the session), analytics (Yandex.Metrika, GA), online-heartbeat (online visitors, one tab via Web Locks), maintenance.server (gate from the request context)
 │   └── shared/                 # consts (API paths, UI texts), ui (logo, hamburger)
 ├── server/
-│   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services)
+│   ├── api/[...].ts            # Proxy /api/** → NITRO_API_URL (subscriptions/comments may go to their own services); guest catalog reads go through domain/catalog-cache
 │   ├── api/tools/tavern/       # Proxy /api/tools/tavern/** → backend /tools/tavern/** (HTML outside /api)
 │   ├── api/maintenance.get.ts  # Maintenance gate for the current visitor (served by Nitro, not proxied)
+│   ├── domain/catalog-cache/   # In-memory cache of catalog reads for guests (POST lists/records/filters keyed by body hash, GET meta); any workshop write clears it, x-catalog-cache: hit|miss
 │   ├── consts/                 # Server constants (maintenance response, settings cache)
 │   ├── middleware/maintenance.ts # Maintenance gate before render, page requests only
 │   ├── plugins/maintenanceResponse.ts # 503, Retry-After, X-Robots-Tag, no-store while the gate is on
