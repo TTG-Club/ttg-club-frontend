@@ -339,14 +339,6 @@
     rename(String(value));
   }
 
-  /**
-   * Мировоззрение.
-   * @param value - новое значение
-   */
-  function setAlignment(value: string | number): void {
-    update((current) => ({ ...current, alignment: String(value) }));
-  }
-
   function toggleInspiration(): void {
     update((current) => ({ ...current, inspiration: !current.inspiration }));
   }
@@ -662,14 +654,6 @@
                 autofocus
                 class="w-full"
                 @update:model-value="setName"
-              />
-            </UFormField>
-
-            <UFormField :label="SHEET_LABELS.alignment">
-              <UInput
-                :model-value="document.alignment"
-                class="w-full"
-                @update:model-value="setAlignment"
               />
             </UFormField>
           </div>
