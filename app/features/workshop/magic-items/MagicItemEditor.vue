@@ -34,6 +34,7 @@
     WORKSHOP_TEXT,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
+  import MagicItemBaseItems from './MagicItemBaseItems.vue';
 
   /** Форма магического предмета: без записи — создание нового. */
   const { magicItem = undefined } = defineProps<{
@@ -159,6 +160,11 @@
     >
       <MarkupEditor v-model="state.special" />
     </UFormField>
+
+    <MagicItemBaseItems
+      v-model:weapons="state.weapons"
+      v-model:armors="state.armors"
+    />
 
     <UFormField
       :label="MAGIC_ITEM_EDITOR_TEXT.charge"

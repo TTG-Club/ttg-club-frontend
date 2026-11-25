@@ -1,5 +1,7 @@
 import type { SelectOption } from '../types';
 
+import { ARMORS_SECTION, WEAPONS_SECTION } from '~inventory/model';
+
 /** Ключ раздела магических предметов в адресе мастерской. */
 export const MAGIC_ITEMS_WORKSHOP_KEY = 'magic-items';
 
@@ -8,6 +10,15 @@ export const MAGIC_ITEMS_API_SECTION = 'items/magic';
 
 /** Раздел справочника с магическими предметами. */
 export const MAGIC_ITEMS_REFERENCE_PATH = '/items/magic';
+
+/**
+ * Разделы немагической основы: адрес оружия или доспеха в запросе — хвост
+ * адреса его страницы после `path/`.
+ */
+export const MAGIC_ITEM_BASE_SECTIONS = {
+  weapons: WEAPONS_SECTION,
+  armors: ARMORS_SECTION,
+} as const;
 
 /** Редкость магического предмета. */
 export const MAGIC_ITEM_RARITY_OPTIONS: ReadonlyArray<SelectOption> = [
@@ -52,6 +63,11 @@ export const MAGIC_ITEM_EDITOR_TEXT = {
   type: 'Тип предмета',
   special: 'Уточнение типа',
   specialHelp: 'Например, «любой меч»',
+  baseWeapons: 'Основа: оружие',
+  baseArmors: 'Основа: доспехи',
+  baseHelp:
+    'Обычные предметы, на которых построен магический: на странице предмета они встают ссылками в строку типа. Можно выбрать несколько; «любой меч» пишется в уточнении типа',
+  basePlaceholder: 'Не выбрана',
   charge: 'Заряды',
   cost: 'Цена, зм',
   bonus: 'Бонус',
