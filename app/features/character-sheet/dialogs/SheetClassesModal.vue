@@ -13,6 +13,7 @@
     useClassLevelActions,
     useLevelUpWizard,
     useSheetClassData,
+    useStartingEquipment,
   } from '../composables';
   import {
     addSources,
@@ -25,8 +26,11 @@
     getMissingClassFeatureSources,
     getMulticlassWarning,
     LEVEL_UP_TEXT,
+    parseClassStartingEquipment,
     SHEET_ICON,
     SHEET_LABELS,
+    STARTING_EQUIPMENT_TEXT,
+    toEquipmentBlocks,
     WIZARD_TEXT,
   } from '../model';
   import SheetConfirmModal from './SheetConfirmModal.vue';
@@ -34,6 +38,7 @@
   import SheetLevelUpStepBody from './SheetLevelUpStepBody.vue';
   import SheetSourcesReview from './SheetSourcesReview.vue';
   import SheetSourceWizardModal from './SheetSourceWizardModal.vue';
+  import SheetStartingEquipment from './SheetStartingEquipment.vue';
 
   /**
    * Классы персонажа: уровень, подкласс и кость хитов каждого. Повышение
@@ -55,15 +60,21 @@
   const isPickerOpen = ref(false);
   const isCustomOpen = ref(false);
   const wizardStep = ref<(typeof WIZARD_STEPS)[number]>('pick');
-  const reviewTab = ref<'overview' | 'features'>('overview');
+  const reviewTab = ref<'overview' | 'features' | 'equipment'>('overview');
+
+  // Стартовое снаряжение дают только первому классу персонажа
+  const equipment = useStartingEquipment();
   const isPreparing = ref(false);
   /** Подкласс выбран в списке, но класс выбирает его позже первого уровня. */
   const isSubclassDeferred = ref(false);
 
-  const reviewTabs: Array<TabsItem> = [
+  const reviewTabs = computed<Array<TabsItem>>(() => [
     { value: 'overview', label: WIZARD_TEXT.classTabs.overview },
     { value: 'features', label: WIZARD_TEXT.classTabs.features },
-  ];
+    ...(equipment.hasEquipment.value
+      ? [{ value: 'equipment', label: STARTING_EQUIPMENT_TEXT.tab }]
+      : []),
+  ]);
 
   const newStep = computed(() =>
     wizardStep.value === 'review' ? wizard.currentStep.value : null,
@@ -217,8 +228,17 @@
 
     try {
       const subclassUrl = option.parentUrl ? option.url : null;
+      const isFirstClass = !document.value.classes.length;
 
       if (await wizard.prepareNewClass(getClassUrl(option), subclassUrl)) {
+        const traits = wizard.getDetails(getClassUrl(option))?.detail.traits;
+
+        equipment.reset(
+          isFirstClass
+            ? parseClassStartingEquipment(toEquipmentBlocks(traits?.equipment))
+            : [],
+        );
+
         isSubclassDeferred.value =
           Boolean(subclassUrl) && !wizard.currentStep.value?.subclass;
 
@@ -235,12 +255,14 @@
    * @param value - вкладка
    */
   function changeReviewTab(value: string | number): void {
-    reviewTab.value = value === 'features' ? 'features' : 'overview';
+    reviewTab.value =
+      value === 'features' || value === 'equipment' ? value : 'overview';
   }
 
-  /** Переносит новый класс в лист. */
+  /** Переносит новый класс в лист, затем стартовое снаряжение. */
   function applyClass(): void {
     wizard.apply();
+    void equipment.apply();
     isPickerOpen.value = false;
     isOpen.value = false;
   }
@@ -466,6 +488,13 @@
             @change="wizard.setDraft"
           />
         </div>
+
+        <SheetStartingEquipment
+          v-else-if="reviewTab === 'equipment'"
+          v-model:choices="equipment.choices.value"
+          v-model:enabled="equipment.isEnabled.value"
+          :lines="equipment.lines.value"
+        />
 
         <SheetLevelUpStepBody
           v-else

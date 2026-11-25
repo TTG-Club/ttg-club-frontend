@@ -3,12 +3,15 @@
 
   import type { CharacterSheet } from '../model';
 
+  import { useSheetPdf } from '../composables';
   import {
     downloadSheetJson,
     getSheetRoute,
     SHEET_ICON,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
+    SHEET_PDF_ICON,
+    SHEET_PDF_TEXT,
     SHEET_SHARE_ICON,
     SHEET_SHARE_TEXT,
     SHEET_TEXT,
@@ -17,7 +20,7 @@
 
   /**
    * Карточка своего листа в списке: сводка, пометка открытой ссылки и меню —
-   * поделиться, копия, JSON, удаление.
+   * поделиться, копия, PDF, JSON, удаление.
    */
   const {
     sheet,
@@ -32,12 +35,29 @@
   }>();
 
   const emit = defineEmits<{
-    copy: [sheet: CharacterSheet];
-    remove: [sheet: CharacterSheet];
-    share: [sheet: CharacterSheet];
+    'copy': [sheet: CharacterSheet];
+    'remove': [sheet: CharacterSheet];
+    'share': [sheet: CharacterSheet];
+
+    /** Экспорт PDF включил доступ по ссылке ради QR-кода. */
+    'share-enabled': [sheetId: string, shareToken: string];
   }>();
 
   const route = computed(() => getSheetRoute(sheet.id));
+
+  const { isExporting, exportToPdf } = useSheetPdf();
+
+  /** Скачивает лист в PDF; без ссылки экспорт включает доступ по ней. */
+  async function downloadPdf(): Promise<void> {
+    const enabledToken = await exportToPdf(sheet.name, sheet.data, {
+      shareToken: sheet.shareToken,
+      ownSheetId: sheet.id,
+    });
+
+    if (enabledToken) {
+      emit('share-enabled', sheet.id, enabledToken);
+    }
+  }
 
   const menuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
@@ -51,6 +71,15 @@
         icon: SHEET_ICON.copy,
         disabled: !canCopy,
         onSelect: () => emit('copy', sheet),
+      },
+      {
+        label: isExporting.value
+          ? SHEET_PDF_TEXT.downloading
+          : SHEET_PDF_TEXT.download,
+        icon: SHEET_PDF_ICON.download,
+        loading: isExporting.value,
+        disabled: isExporting.value,
+        onSelect: downloadPdf,
       },
       {
         label: SHEET_LIST_TEXT.download,

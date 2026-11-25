@@ -2771,7 +2771,8 @@ export const SHEET_LIST_TEXT = {
   level: 'Уровень',
   download: 'Скачать JSON',
   importLabel: 'Импорт JSON',
-  importHint: 'Создаст лист из JSON-файла нашего экспорта',
+  importHint:
+    'Создаст лист из JSON-файла нашего экспорта или из Long Story Short',
   importFailed: 'Не удалось импортировать лист',
   importLimit: 'Достигнут лимит листов: импорт невозможен',
   importSuccess: 'Лист импортирован',
@@ -3216,4 +3217,89 @@ export const SHEET_SHARE_ICON = {
   unavailable: 'tabler:link-off',
   remove: 'tabler:bookmark-minus',
   subscription: 'tabler:crown',
+} as const;
+
+/* --- Экспорт листа в PDF ------------------------------------------------ */
+
+/** Подписи экспорта листа в PDF. */
+export const SHEET_PDF_TEXT = {
+  download: 'Скачать PDF',
+  downloading: 'Собираем PDF…',
+  error: 'Не удалось собрать PDF листа',
+  shareEnabledTitle: 'Доступ по ссылке включён',
+  shareEnabledDescription:
+    'QR-код в PDF ведёт на лист. Отключить ссылку можно в меню «Поделиться листом».',
+} as const;
+
+/** Иконки экспорта листа в PDF. */
+export const SHEET_PDF_ICON = {
+  download: 'tabler:file-type-pdf',
+  loading: 'tabler:loader-2',
+  shareEnabled: 'tabler:link',
+  error: 'tabler:alert-triangle',
+} as const;
+
+/** Файл листа в PDF. */
+export const SHEET_PDF_FILE = {
+  extension: '.pdf',
+  mimeType: 'application/pdf',
+} as const;
+
+/** Маркеры разметки, которые ссылаются на предметы стартового снаряжения. */
+export const STARTING_EQUIPMENT_LINK_KINDS = {
+  link: true,
+  item: true,
+  magicItem: true,
+} as const;
+
+/** Числительные в строках снаряжения: «два ручных топора». */
+export const STARTING_EQUIPMENT_QUANTITY_WORDS: Readonly<
+  Record<string, number>
+> = {
+  два: 2,
+  две: 2,
+  три: 3,
+  четыре: 4,
+  пять: 5,
+  десять: 10,
+};
+
+/** Разбор строк стартового снаряжения. */
+export const STARTING_EQUIPMENT_PATTERNS = {
+  /** Метка варианта: «а)», «б)». */
+  optionMarker: /(?:^|\s)[абвгдеa-e]\)\s*/u,
+  /** «или» и запятая в конце варианта перед следующей меткой. */
+  trailingOr: /[\s,]*(?:или[\s,]*)?$/u,
+  /** Число в конце текста перед ссылкой. */
+  trailingNumber: /(\d+)\s*$/u,
+  /** Числительное в конце текста перед ссылкой. */
+  trailingWord: /(?:^|\s)(два|две|три|четыре|пять|десять)\s*$/iu,
+  /** Число или числительное в начале своего предмета. */
+  leadingQuantity: /^(\d+|два|две|три|четыре|пять|десять)\s+/iu,
+  /** Разделители предметов в тексте варианта. */
+  separator: /\s*(?:,|;|\sи\s)\s*/u,
+  /** Связки и знаки по краям куска текста. */
+  edgeJunk: /^(?:и\s+|[\s,.;:])+|[\s,.;:]+$/gu,
+  /** Английское название в скобках: «кольчуга [chain mail]». */
+  englishName: /\s*\[[^\]]*\]/gu,
+  /** «или» без меток: «молитвенник или молитвенный барабан». */
+  plainOr: /\s+или\s+/u,
+  /** Раздел справочника по началу адреса ссылки. */
+  sectionKinds: {
+    '/weapons/': 'weapon',
+    '/armors/': 'armor',
+    '/items/': 'item',
+  },
+} as const;
+
+/** Подписи стартового снаряжения в мастерах. */
+export const STARTING_EQUIPMENT_TEXT = {
+  title: 'Стартовое снаряжение',
+  add: 'Добавить стартовое снаряжение',
+  gold: (amount: number): string => `Стартовые деньги: ${amount} зм`,
+  hint: 'Выберите вариант в каждой строке. Предметы без записи в справочнике добавятся своими — их можно заменить позже.',
+  empty: 'У записи нет стартового снаряжения.',
+  tab: 'Снаряжение',
+  loadError:
+    'Часть предметов не загрузилась из справочника — они добавлены своими.',
 } as const;

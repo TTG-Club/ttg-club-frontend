@@ -8,6 +8,9 @@ import {
   deleteSheet,
   fetchSheetList,
   getSheetNameFromFileName,
+  importExternalSheet,
+  LSS_IMPORT_TEXT,
+  parseJsonSafely,
   parseSheetImport,
   saveSheet,
   SHEET_IMPORT_ERROR_TEXT,
@@ -200,7 +203,17 @@ export function useSheetList() {
       return undefined;
     }
 
-    const parsed = parseSheetImport(text, getSheetNameFromFileName(file.name));
+    const fallbackName = getSheetNameFromFileName(file.name);
+    const json = parseJsonSafely(text);
+
+    // Файл чужого формата (Long Story Short) узнаётся первым: иначе его
+    // обёртка сошла бы за голый документ листа
+    const external =
+      json === undefined ? null : await importExternalSheet(json, fallbackName);
+
+    const parsed = external
+      ? { success: true as const, sheet: external.sheet }
+      : parseSheetImport(text, fallbackName);
 
     if (!parsed.success) {
       toast.add({
@@ -219,10 +232,16 @@ export function useSheetList() {
 
     if (created) {
       toast.add({
-        title: SHEET_LIST_TEXT.importSuccess,
+        title: external
+          ? LSS_IMPORT_TEXT.success(external.sourceLabel)
+          : SHEET_LIST_TEXT.importSuccess,
         description: created.name,
         color: 'success',
       });
+
+      for (const warning of external?.warnings ?? []) {
+        toast.add({ title: warning, color: 'warning' });
+      }
     }
 
     return created;

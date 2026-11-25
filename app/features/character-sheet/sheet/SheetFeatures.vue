@@ -30,6 +30,7 @@
     createSheetElementId,
     FEAT_ADD_TEXT,
     FEAT_CATALOG_SOURCE,
+    FEATURE_LIST_SOURCE_KINDS,
     FEATURE_ORIGIN_LABELS,
     FEATURE_ORIGINS,
     FEATURES_TEXT,
@@ -72,17 +73,6 @@
    * выбор, выборы механики и описание. Свои особенности правятся окном,
    * черты добавляются окном справочника и сразу спрашивают свои выборы.
    */
-  const FEATURE_SOURCE_KINDS: ReadonlySet<SheetSource['kind']> = new Set([
-    'race',
-    'subrace',
-    'raceFeature',
-    'background',
-    'feat',
-    'asi',
-    'class',
-    'subclass',
-  ]);
-
   const { document, update, editControlClass, ensureEditable } =
     useCharacterSheet();
 
@@ -172,7 +162,8 @@
   const sourceRows = computed<Array<FeatureRow>>(() =>
     document.value.sources
       .filter(
-        (source) => FEATURE_SOURCE_KINDS.has(source.kind) && !source.parentId,
+        (source) =>
+          FEATURE_LIST_SOURCE_KINDS.has(source.kind) && !source.parentId,
       )
       .map((source) => ({
         key: `source:${source.id}`,

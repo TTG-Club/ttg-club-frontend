@@ -14,6 +14,7 @@
 
   import {
     useCharacterSheet,
+    useSheetPdf,
     useSheetPickers,
     useSheetStats,
   } from '../composables';
@@ -53,6 +54,8 @@
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_MENU_LABELS,
+    SHEET_PDF_ICON,
+    SHEET_PDF_TEXT,
     SHEET_SAVE_STATUS_ICON,
     SHEET_SAVE_STATUS_TEXT,
     SHEET_SHARE_ICON,
@@ -90,6 +93,7 @@
     isLocked,
     isReadonly,
     shareToken,
+    sharedToken,
     update,
     rename,
     reload,
@@ -298,16 +302,45 @@
     }
   }
 
+  const { isExporting: isPdfExporting, exportToPdf } = useSheetPdf();
+
+  /**
+   * Скачивает лист в PDF. QR-код ведёт по ссылке листа: у открытого по ссылке
+   * — по ней же, у своего без ссылки экспорт сам включает доступ.
+   */
+  async function downloadPdf(): Promise<void> {
+    const enabledToken = await exportToPdf(name.value, document.value, {
+      shareToken: sharedToken.value ?? shareToken.value,
+      ownSheetId: isReadonly.value ? null : (sheetId.value ?? null),
+    });
+
+    if (enabledToken) {
+      shareToken.value = enabledToken;
+    }
+  }
+
+  /** Пункт «Скачать PDF» с загрузкой, пока идёт сборка. */
+  const pdfMenuItem = computed<DropdownMenuItem>(() => ({
+    label: isPdfExporting.value
+      ? SHEET_PDF_TEXT.downloading
+      : SHEET_PDF_TEXT.download,
+    icon: SHEET_PDF_ICON.download,
+    loading: isPdfExporting.value,
+    disabled: isPdfExporting.value,
+    onSelect: downloadPdf,
+  }));
+
   /** Меню листа по ссылке: только скачать. */
-  const readonlyMenuItems: Array<Array<DropdownMenuItem>> = [
+  const readonlyMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
+      pdfMenuItem.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
         onSelect: downloadJson,
       },
     ],
-  ];
+  ]);
 
   const ownMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
@@ -341,6 +374,7 @@
         suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
         onSelect: openShare,
       },
+      pdfMenuItem.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
@@ -364,7 +398,7 @@
   ]);
 
   const menuItems = computed(() =>
-    isReadonly.value ? readonlyMenuItems : ownMenuItems.value,
+    isReadonly.value ? readonlyMenuItems.value : ownMenuItems.value,
   );
 
   function openShare(): void {

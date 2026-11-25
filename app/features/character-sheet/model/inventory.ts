@@ -1,5 +1,6 @@
 import type { DetailType } from '~content/model';
 
+import type { INVENTORY_GROUPS } from './constants';
 import type { SheetCurrency, SheetDocument, SheetItem } from './schema';
 import type {
   AbilityKey,
@@ -303,4 +304,31 @@ export function getItemKind(
   }
 
   return item.armor ? 'armor' : 'other';
+}
+
+/** Ключ группы снаряжения на вкладке: оружие, доспехи, магия, прочее. */
+export type InventoryGroupKey = (typeof INVENTORY_GROUPS)[number]['key'];
+
+/**
+ * Группа предмета на вкладке снаряжения: оружие и доспехи — по своим полям,
+ * магическим считается предмет из раздела магических предметов, с настройкой,
+ * зарядами или эффектами.
+ * @param item - предмет
+ */
+export function getInventoryGroupKey(item: SheetItem): InventoryGroupKey {
+  if (item.weapon) {
+    return 'weapon';
+  }
+
+  if (item.armor) {
+    return 'armor';
+  }
+
+  const isMagic =
+    Boolean(item.url?.startsWith(MAGIC_ITEMS_SECTION.path))
+    || item.requiresAttunement
+    || Boolean(item.charges)
+    || item.activeEffects.length > 0;
+
+  return isMagic ? 'magic' : 'other';
 }

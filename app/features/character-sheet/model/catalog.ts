@@ -332,6 +332,7 @@ export async function loadCatalogItem(
 
     return {
       ...item,
+      name: detail.name.rus || item.name,
       weight: detail.weight ?? 0,
       cost: detail.price ?? '',
       weapon: {
@@ -358,6 +359,7 @@ export async function loadCatalogItem(
 
     return {
       ...item,
+      name: detail.name?.rus || item.name,
       weight: detail.weight ?? 0,
       cost: String(detail.price ?? ''),
       armor: detail.typeRaw
@@ -376,6 +378,7 @@ export async function loadCatalogItem(
 
   return {
     ...item,
+    name: detail.name?.rus || item.name,
     weight: detail.weight ?? 0,
     cost: String(detail.price ?? ''),
   };

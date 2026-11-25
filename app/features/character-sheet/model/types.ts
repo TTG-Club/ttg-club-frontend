@@ -558,3 +558,25 @@ export type CropCorner = keyof typeof CROP_CORNER_EDGES;
 
 /** Направление сдвига области стрелками. */
 export type CropDirection = keyof typeof CROP_DIRECTION_OFFSETS;
+
+/** Предмет стартового снаряжения: запись справочника или свой. */
+export interface StartingEquipmentItem {
+  name: string;
+  /** Адрес записи справочника; null — свой предмет. */
+  url: string | null;
+  /** Раздел справочника для загрузки свойств. */
+  kind: 'weapon' | 'armor' | 'item';
+  quantity: number;
+}
+
+/** Вариант строки стартового снаряжения. */
+export interface StartingEquipmentOption {
+  /** Текст варианта как в справочнике. */
+  label: string;
+  items: Array<StartingEquipmentItem>;
+}
+
+/** Строка стартового снаряжения: выбор из вариантов (или один набор). */
+export interface StartingEquipmentLine {
+  options: Array<StartingEquipmentOption>;
+}

@@ -9,10 +9,17 @@ import type {
   SheetDocument,
   SheetSource,
 } from './schema';
-import type { HitPointsGainMode, LevelUpFeature, SkillKey } from './types';
+import type {
+  ClassFeatureEntry,
+  ClassProgression,
+  HitPointsGainMode,
+  LevelUpFeature,
+  SkillKey,
+} from './types';
 
 import {
   ABILITY_IMPROVEMENT_FEATURE_NAME,
+  CLASS_FEATURE_SCALING_SEPARATOR,
   CLASS_SKILLS_CHOICE_KEY,
   HIT_DIE_AVERAGE_BONUS,
   KNOWN_CANTRIPS_COLUMN,
@@ -512,4 +519,84 @@ export function getClassSpellGrowth(
       getPactMagic(columns, classLevel)?.level ?? 0,
     ),
   };
+}
+
+/**
+ * Наибольший круг ячеек в строке таблицы класса.
+ * @param cells - ячейки строки текстом
+ */
+function getMaxSlotLevel(cells: ReadonlyArray<string>): number {
+  return parseSpellSlotCells(cells).findLastIndex((slots) => slots > 0) + 1;
+}
+
+/**
+ * Заклинательные данные класса на его уровне. Таблица подкласса важнее
+ * таблицы класса: у мистического рыцаря ячейки есть только в ней.
+ * @param sheetClass - класс персонажа
+ * @param base - запись класса
+ * @param archetype - запись подкласса
+ */
+export function getClassProgression(
+  sheetClass: SheetClass,
+  base: SheetClassDetail | undefined,
+  archetype: SheetClassDetail | undefined,
+): ClassProgression {
+  const levels = archetype?.traits?.levels ?? base?.traits?.levels ?? [];
+  const lastLevel = levels.at(-1);
+
+  return {
+    classId: sheetClass.id,
+    level: sheetClass.level,
+    spellSlots: parseSpellSlotCells(
+      levels[sheetClass.level - 1]?.spellSlots ?? [],
+    ),
+    maxSlotLevel: getMaxSlotLevel(lastLevel?.spellSlots ?? []),
+    pact: getPactMagic(base?.tableColumns ?? [], sheetClass.level),
+  };
+}
+
+/**
+ * Умения класса и подкласса, полученные к уровню класса.
+ * @param sheetClass - класс персонажа
+ * @param base - запись класса
+ * @param archetype - запись подкласса: в ней умения класса уже вместе с умениями подкласса
+ */
+export function getClassFeatureEntries(
+  sheetClass: SheetClass,
+  base: SheetClassDetail | undefined,
+  archetype: SheetClassDetail | undefined,
+): Array<ClassFeatureEntry> {
+  const features = archetype?.traits?.features ?? base?.traits?.features ?? [];
+
+  return features.flatMap((feature) => {
+    const className = feature.archetypeFeature
+      ? (sheetClass.archetypeName ?? sheetClass.name)
+      : sheetClass.name;
+
+    const isArchetype = Boolean(feature.archetypeFeature);
+
+    // Рост по уровням: повтор умения — отдельная запись своего уровня
+    const repeats = feature.scaling.map((row) => ({
+      id: `${sheetClass.id}:${feature.id}${CLASS_FEATURE_SCALING_SEPARATOR}${row.level}`,
+      name: [row.name || feature.name, row.additional]
+        .filter(Boolean)
+        .join(' '),
+      level: row.level,
+      className,
+      isArchetype,
+      description: row.description ?? null,
+    }));
+
+    return [
+      {
+        id: `${sheetClass.id}:${feature.id}`,
+        name: feature.name,
+        level: feature.level,
+        className,
+        isArchetype,
+        description: feature.description ?? null,
+      },
+      ...repeats,
+    ].filter((entry) => entry.level <= sheetClass.level);
+  });
 }

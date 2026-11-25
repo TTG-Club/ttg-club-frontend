@@ -41,7 +41,7 @@ const SHEET_DOCUMENT_KEYS = new Set(Object.keys(sheetDocumentSchema.shape));
  * @param text - содержимое файла
  * @returns разобранное значение или `undefined`, если это не JSON
  */
-function parseJsonSafely(text: string): unknown {
+export function parseJsonSafely(text: string): unknown {
   try {
     const parsed: unknown = JSON.parse(text);
 

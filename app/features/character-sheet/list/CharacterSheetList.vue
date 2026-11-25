@@ -368,6 +368,7 @@
               @copy="copy"
               @remove="askRemove"
               @share="openShare"
+              @share-enabled="setShareToken"
             />
 
             <!-- Слот создания исчезает на достигнутом лимите -->

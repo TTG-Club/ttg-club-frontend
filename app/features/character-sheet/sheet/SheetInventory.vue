@@ -9,7 +9,6 @@
   } from '../model';
 
   import { ContentEntityDrawer } from '~content/entity-drawer';
-  import { MAGIC_ITEMS_SECTION } from '~inventory/model';
 
   import {
     useCharacterSheet,
@@ -35,6 +34,7 @@
     CURRENCY_KEYS,
     CURRENCY_LABELS,
     CURRENCY_TITLES,
+    getInventoryGroupKey,
     getItemPreviewType,
     getWeaponAttack,
     INVENTORY_GROUPS,
@@ -60,30 +60,6 @@
    * прочее). Магический предмет из справочника приносит настройку, заряды и
    * эффекты; эффекты работают, пока предмет надет (и настроен, если требует).
    */
-  type InventoryGroupKey = (typeof INVENTORY_GROUPS)[number]['key'];
-
-  /**
-   * Группа предмета на вкладке.
-   * @param item - предмет
-   */
-  function getItemGroup(item: SheetItem): InventoryGroupKey {
-    if (item.weapon) {
-      return 'weapon';
-    }
-
-    if (item.armor) {
-      return 'armor';
-    }
-
-    const isMagic =
-      Boolean(item.url?.startsWith(MAGIC_ITEMS_SECTION.path))
-      || item.requiresAttunement
-      || Boolean(item.charges)
-      || item.activeEffects.length > 0;
-
-    return isMagic ? 'magic' : 'other';
-  }
-
   const toast = useToast();
 
   const { document, update, editControlClass, ensureEditable } =
@@ -268,7 +244,7 @@
       ...group,
       items: sortItemsByName(
         document.value.inventory.filter(
-          (item) => getItemGroup(item) === group.key,
+          (item) => getInventoryGroupKey(item) === group.key,
         ),
       ).map((item) => ({
         item,

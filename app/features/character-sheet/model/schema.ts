@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { MAX_EXHAUSTION_LEVEL } from '~active-effects/model';
 import { classDetailSchema, spellDamageSchema } from '~character/model';
 import { weaponDetailSchema } from '~inventory/model';
+import { entryNameSchema } from '~section/model';
 
 import {
   ABILITY_KEYS,
@@ -832,6 +833,7 @@ export type SheetWeaponDetail = z.infer<typeof sheetWeaponDetailSchema>;
 
 /** Доспех для листа: базовый КД и категория числами, а не подписью. */
 export const sheetArmorDetailSchema = z.object({
+  name: entryNameSchema.nullish(),
   armorClassRaw: z.number().nullish(),
   typeRaw: armorCategorySchema.nullish(),
   weight: z.number().nullish(),
@@ -844,6 +846,7 @@ export type SheetArmorDetail = z.infer<typeof sheetArmorDetailSchema>;
 
 /** Вес предмета снаряжения или магического предмета. */
 export const sheetWeightDetailSchema = z.object({
+  name: entryNameSchema.nullish(),
   weight: z.number().nullish(),
   // Цена снаряжения приходит текстом («5 зм»), но схема API её не обещает
   price: z.union([z.string(), z.number()]).nullish(),
