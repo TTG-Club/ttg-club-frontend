@@ -742,6 +742,8 @@ export const characterSheetSchema = z.object({
   version: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  /** Секрет ссылки на лист; null — доступ по ссылке выключен. */
+  shareToken: z.string().nullable().catch(null),
 });
 
 export type CharacterSheet = z.infer<typeof characterSheetSchema>;
@@ -750,7 +752,51 @@ export const characterSheetListSchema = z.object({
   items: z.array(characterSheetSchema),
   used: z.number(),
   limit: z.number(),
+  /** Лимит с подпиской. */
+  subscriberLimit: z.number().catch(0),
 });
+
+/** Ответ включения доступа по ссылке. */
+export const sheetShareSchema = z.object({ shareToken: z.string() });
+
+/** Лист, открытый по ссылке: только чтение. */
+export const sharedSheetSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  data: z
+    .unknown()
+    .transform((value) => sheetDocumentSchema.parse(value ?? {})),
+  /** Лист принадлежит тому, кто его открыл. */
+  own: z.boolean().catch(false),
+  /** Запись в «Других листах», если лист уже сохранён. */
+  savedId: z.string().nullable().catch(null),
+});
+
+export type SharedSheet = z.infer<typeof sharedSheetSchema>;
+
+/** Чужой лист, сохранённый по ссылке. */
+export const savedSheetSchema = z.object({
+  id: z.string(),
+  sheetId: z.string(),
+  shareToken: z.string(),
+  name: z.string(),
+  /** Документ; null — лист недоступен (ссылку отозвали или лист удалили). */
+  data: z
+    .unknown()
+    .transform((value) => (value ? sheetDocumentSchema.parse(value) : null)),
+  available: z.boolean(),
+});
+
+export type SavedSheet = z.infer<typeof savedSheetSchema>;
+
+export const savedSheetListSchema = z.object({
+  items: z.array(savedSheetSchema),
+  used: z.number(),
+  limit: z.number(),
+  subscriberLimit: z.number().catch(0),
+});
+
+export type SavedSheetList = z.infer<typeof savedSheetListSchema>;
 
 export type CharacterSheetList = z.infer<typeof characterSheetListSchema>;
 

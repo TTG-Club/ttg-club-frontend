@@ -1,6 +1,9 @@
 import type {
   CharacterSheet,
   CharacterSheetList,
+  SavedSheet,
+  SavedSheetList,
+  SharedSheet,
   SheetDocument,
 } from './schema';
 
@@ -10,8 +13,16 @@ import {
   CHARACTER_SHEET_API_URL,
   SHEET_AVATAR_API_SEGMENT,
   SHEET_AVATAR_URL_PREFIX,
+  SHEET_SHARE_API,
 } from './constants';
-import { characterSheetListSchema, characterSheetSchema } from './schema';
+import {
+  characterSheetListSchema,
+  characterSheetSchema,
+  savedSheetListSchema,
+  savedSheetSchema,
+  sharedSheetSchema,
+  sheetShareSchema,
+} from './schema';
 import { getCatalogApiPath } from './utils';
 
 /** Тело сохранения листа: имя, документ и версия, с которой начиналась правка. */
@@ -106,6 +117,84 @@ export async function deleteSheet(id: string): Promise<void> {
   const api = useApi();
 
   await api(getSheetUrl(id), { method: 'DELETE' });
+}
+
+/**
+ * Включает доступ к листу по ссылке; у открытого листа — прежняя ссылка.
+ * @param id - идентификатор листа
+ * @returns секрет ссылки
+ */
+export async function shareSheet(id: string): Promise<string> {
+  const api = useApi();
+
+  const response = await api(`${getSheetUrl(id)}/${SHEET_SHARE_API.share}`, {
+    method: 'POST',
+  });
+
+  return sheetShareSchema.parse(response).shareToken;
+}
+
+/**
+ * Отзывает ссылку: прежняя больше не откроет лист.
+ * @param id - идентификатор листа
+ */
+export async function unshareSheet(id: string): Promise<void> {
+  const api = useApi();
+
+  await api(`${getSheetUrl(id)}/${SHEET_SHARE_API.share}`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * Лист по ссылке: только чтение, открывается и гостю.
+ * @param token - секрет ссылки
+ */
+export async function fetchSharedSheet(token: string): Promise<SharedSheet> {
+  const api = useApi();
+
+  return sharedSheetSchema.parse(
+    await api(
+      `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.shared}/${encodeURIComponent(token)}`,
+    ),
+  );
+}
+
+/** «Другие листы»: чужие листы, сохранённые по ссылке, и лимит. */
+export async function fetchSavedSheets(): Promise<SavedSheetList> {
+  const api = useApi();
+
+  return savedSheetListSchema.parse(
+    await api(`${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}`),
+  );
+}
+
+/**
+ * Сохраняет чужой лист по ссылке; повторное сохранение обновляет запись.
+ * @param token - секрет ссылки
+ */
+export async function saveSharedSheet(token: string): Promise<SavedSheet> {
+  const api = useApi();
+
+  return savedSheetSchema.parse(
+    await api(`${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}`, {
+      method: 'POST',
+      body: { shareToken: token },
+    }),
+  );
+}
+
+/**
+ * Убирает лист из «Других листов»; сам лист остаётся у владельца.
+ * @param id - идентификатор записи
+ */
+export async function removeSavedSheet(id: string): Promise<void> {
+  const api = useApi();
+
+  await api(
+    `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${encodeURIComponent(id)}`,
+    { method: 'DELETE' },
+  );
 }
 
 /** Ответ загрузки портрета: адрес файла листа с меткой версии. */

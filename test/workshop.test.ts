@@ -32,6 +32,7 @@ import {
   getArmorPayload,
   getBackgroundPayload,
   getBackgroundSkills,
+  getBaseItemUrl,
   getBookPayload,
   getClassPayload,
   getCreatureHits,
@@ -53,6 +54,7 @@ import {
   getWorkshopErrorIndexes,
   getWorkshopFieldTab,
   getWorkshopSlug,
+  parseBaseItemOptions,
   parseBookCover,
   parseBookSources,
   parseFilterGroups,
@@ -579,8 +581,50 @@ describe('редактор магических предметов', () => {
       cost: 3500,
       curse: false,
       special: undefined,
+      weapons: [],
+      armors: [],
       description: ['Текст {@b жирный}'],
     });
+  });
+
+  it('берёт основу из ссылок на оружие и доспехи', () => {
+    const item = parseWorkshopMagicItem({
+      id: 11,
+      name: { rus: 'Меч +1', eng: 'Sword +1' },
+      rarityRaw: 'UNCOMMON',
+      typeRaw: 'MELE_WEAPON',
+      detailType: [
+        { name: 'длинный меч', type: 'weapon', url: '/weapons/longsword' },
+        { name: 'кольчуга', type: 'armor', url: '/armors/chain_mail' },
+        { name: 'двуручный меч', type: 'weapon', url: '/weapons/greatsword' },
+        { name: 'любой меч' },
+      ],
+      description: ['Бонус +1'],
+    });
+
+    expect(
+      getMagicItemPayload(createMagicItemForm(item), undefined),
+    ).toMatchObject({
+      weapons: ['longsword', 'greatsword'],
+      armors: ['chain_mail'],
+    });
+  });
+
+  it('предлагает оружие раздела по адресам страниц', () => {
+    expect(
+      parseBaseItemOptions(
+        [
+          {
+            name: { rus: 'Длинный меч', eng: 'Longsword' },
+            url: '/weapons/longsword',
+          },
+          { name: { rus: 'Чужой', eng: 'Other' }, url: '/armors/other' },
+        ],
+        '/weapons',
+      ),
+    ).toEqual([{ label: 'Длинный меч', value: 'longsword' }]);
+
+    expect(getBaseItemUrl('/weapons/', '/weapons')).toBeUndefined();
   });
 });
 
