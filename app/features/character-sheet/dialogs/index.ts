@@ -32,6 +32,7 @@ export { default as SheetProficiencyModal } from './SheetProficiencyModal.vue';
 export { default as SheetResourcesModal } from './SheetResourcesModal.vue';
 export { default as SheetSavingThrowsSettingsModal } from './SheetSavingThrowsSettingsModal.vue';
 export { default as SheetSettingsModal } from './SheetSettingsModal.vue';
+export { default as SheetShareModal } from './SheetShareModal.vue';
 export { default as SheetShortRestModal } from './SheetShortRestModal.vue';
 export { default as SheetSizeModal } from './SheetSizeModal.vue';
 export { default as SheetSkillsSettingsModal } from './SheetSkillsSettingsModal.vue';

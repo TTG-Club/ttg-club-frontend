@@ -25,6 +25,7 @@
     SheetExperienceModal,
     SheetLongRestModal,
     SheetSettingsModal,
+    SheetShareModal,
     SheetShortRestModal,
     SheetSizeModal,
     SheetSourcesReview,
@@ -54,6 +55,8 @@
     SHEET_MENU_LABELS,
     SHEET_SAVE_STATUS_ICON,
     SHEET_SAVE_STATUS_TEXT,
+    SHEET_SHARE_ICON,
+    SHEET_SHARE_TEXT,
     SHEET_SIZE_INFO,
     SHEET_SIZE_LABELS,
     SHEET_TEXT,
@@ -61,6 +64,7 @@
     WIZARD_TEXT,
   } from '../model';
   import SheetAvatar from './SheetAvatar.vue';
+  import SheetReadonlyBar from './SheetReadonlyBar.vue';
 
   /**
    * Шапка листа, как на new.ttg.club: портрет, имя, подпись «Раса — Класс N
@@ -84,6 +88,8 @@
     document,
     saveStatus,
     isLocked,
+    isReadonly,
+    shareToken,
     update,
     rename,
     reload,
@@ -218,6 +224,7 @@
   );
 
   const isRemoveOpen = ref(false);
+  const isShareOpen = ref(false);
   const isMenuBusy = ref(false);
   const isSettingsOpen = ref(false);
   const isAbilityScoresOpen = ref(false);
@@ -291,7 +298,18 @@
     }
   }
 
-  const menuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
+  /** Меню листа по ссылке: только скачать. */
+  const readonlyMenuItems: Array<Array<DropdownMenuItem>> = [
+    [
+      {
+        label: SHEET_MENU_LABELS.downloadJson,
+        icon: 'tabler:file-download',
+        onSelect: downloadJson,
+      },
+    ],
+  ];
+
+  const ownMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
       {
         label: SHEET_MENU_LABELS.backToList,
@@ -318,6 +336,12 @@
     ],
     [
       {
+        label: SHEET_SHARE_TEXT.menu,
+        icon: SHEET_SHARE_ICON.share,
+        suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
+        onSelect: openShare,
+      },
+      {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
         onSelect: downloadJson,
@@ -338,6 +362,14 @@
       },
     ],
   ]);
+
+  const menuItems = computed(() =>
+    isReadonly.value ? readonlyMenuItems : ownMenuItems.value,
+  );
+
+  function openShare(): void {
+    isShareOpen.value = true;
+  }
 
   /**
    * Имя персонажа.
@@ -812,8 +844,13 @@
     <div
       class="order-first flex w-full shrink-0 flex-row flex-wrap items-center justify-between gap-3 @2xl:order-0 @2xl:w-auto @2xl:flex-col @2xl:flex-nowrap @2xl:items-end @2xl:justify-start @2xl:gap-4 @2xl:self-stretch"
     >
+      <SheetReadonlyBar v-if="isReadonly" />
+
       <div class="flex items-center gap-1">
-        <UTooltip :text="saveStatusText">
+        <UTooltip
+          v-if="!isReadonly"
+          :text="saveStatusText"
+        >
           <span
             role="status"
             class="grid size-8 place-items-center"
@@ -827,7 +864,10 @@
           </span>
         </UTooltip>
 
-        <UTooltip :text="lockLabel">
+        <UTooltip
+          v-if="!isReadonly"
+          :text="lockLabel"
+        >
           <UButton
             :icon="lockIcon"
             :color="lockColor"
@@ -860,7 +900,10 @@
         </UTooltip>
       </div>
 
-      <div class="flex items-center gap-2 @max-2xl:order-first">
+      <div
+        v-if="!isReadonly"
+        class="flex items-center gap-2 @max-2xl:order-first"
+      >
         <UButton
           icon="tabler:sparkles"
           :label="SHEET_BODY_LABELS.inspiration"
@@ -986,6 +1029,13 @@
     <SheetShortRestModal v-model:open="isShortRestOpen" />
 
     <SheetLongRestModal v-model:open="isLongRestOpen" />
+
+    <SheetShareModal
+      v-if="sheetId && !isReadonly"
+      v-model:open="isShareOpen"
+      v-model:share-token="shareToken"
+      :sheet-id="sheetId"
+    />
   </header>
 
   <UAlert

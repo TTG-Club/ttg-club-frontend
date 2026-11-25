@@ -1,4 +1,4 @@
-import type { CharacterSheet } from '../model';
+import type { CharacterSheet, SheetDocument } from '../model';
 
 import { getApiErrorMessage, getErrorStatus } from '~user/model';
 
@@ -21,16 +21,14 @@ import {
 /**
  * Копирует файл портрета в новый лист: файл у каждого листа свой, иначе
  * удаление одного листа оставило бы другой без портрета.
- * @param source - исходный лист
+ * @param sourceUrl - адрес портрета исходного листа
  * @param target - только что созданная копия без портрета
  * @returns копия с портретом; при сбое — копия как есть
  */
 async function copySheetAvatar(
-  source: CharacterSheet,
+  sourceUrl: string | null,
   target: CharacterSheet,
 ): Promise<CharacterSheet> {
-  const sourceUrl = source.data.avatarUrl;
-
   if (!sourceUrl) {
     return target;
   }
@@ -64,6 +62,7 @@ export function useSheetList() {
 
   const sheets = shallowRef<Array<CharacterSheet>>([]);
   const limit = ref(SHEET_LIMIT_FALLBACK);
+  const subscriberLimit = ref(0);
   const isLoading = ref(false);
   const isLoaded = ref(false);
   const isMutating = ref(false);
@@ -82,6 +81,7 @@ export function useSheetList() {
 
       sheets.value = list.items;
       limit.value = list.limit;
+      subscriberLimit.value = list.subscriberLimit;
     } catch (error) {
       errorStatus.value = getErrorStatus(error) ?? 0;
     } finally {
@@ -126,20 +126,44 @@ export function useSheetList() {
   }
 
   /**
-   * Создаёт копию листа; портрет копируется отдельным файлом.
-   * @param sheet - исходный лист
+   * Создаёт копию листа (своего или чужого); портрет копируется отдельным
+   * файлом.
+   * @param name - имя исходного листа
+   * @param data - документ исходного листа
    */
-  function copy(sheet: CharacterSheet): Promise<CharacterSheet | undefined> {
+  function copyDocument(
+    name: string,
+    data: SheetDocument,
+  ): Promise<CharacterSheet | undefined> {
     return mutate(
       async () =>
         copySheetAvatar(
-          sheet,
+          data.avatarUrl,
           await createSheet(
-            `${sheet.name}${SHEET_TEXT.copySuffix}`,
-            withoutSheetAvatar(sheet.data),
+            `${name}${SHEET_TEXT.copySuffix}`,
+            withoutSheetAvatar(data),
           ),
         ),
       SHEET_TEXT.errorCopy,
+    );
+  }
+
+  /**
+   * Создаёт копию своего листа.
+   * @param sheet - исходный лист
+   */
+  function copy(sheet: CharacterSheet): Promise<CharacterSheet | undefined> {
+    return copyDocument(sheet.name, sheet.data);
+  }
+
+  /**
+   * Запоминает новую ссылку листа после окна «Поделиться».
+   * @param id - идентификатор листа
+   * @param shareToken - секрет ссылки; null — доступ выключен
+   */
+  function setShareToken(id: string, shareToken: string | null): void {
+    sheets.value = sheets.value.map((sheet) =>
+      sheet.id === id ? { ...sheet, shareToken } : sheet,
     );
   }
 
@@ -207,6 +231,7 @@ export function useSheetList() {
   return {
     sheets,
     limit,
+    subscriberLimit,
     canCreate,
     isLoading,
     isLoaded,
@@ -215,6 +240,8 @@ export function useSheetList() {
     load,
     create,
     copy,
+    copyDocument,
+    setShareToken,
     remove,
     importFromFile,
   };

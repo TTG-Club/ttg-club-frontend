@@ -3,6 +3,9 @@ export const CHARACTER_SHEET_ROUTE = '/tools/character-sheet';
 
 export const CHARACTER_SHEET_API_URL = '/api/v1/character-sheets';
 
+/** Страница листа, открытого по ссылке: `/tools/character-sheet/shared/<token>`. */
+export const CHARACTER_SHEET_SHARED_SEGMENT = 'shared';
+
 export const CHARACTER_SHEET_ICON = 'tabler:user-square-rounded';
 
 /** Версия формата документа листа: при несовместимых изменениях растёт. */
@@ -2757,8 +2760,6 @@ export const LEVEL_UP_RAIL_CLASSES = {
 
 export const SHEET_LIST_TEXT = {
   ownTitle: 'Ваши персонажи',
-  countTooltip:
-    'Сколько листов уже создано и сколько можно вести одновременно. Чтобы создать новый сверх лимита, удалите один из существующих.',
   limitReached:
     'Достигнут лимит листов: удалите один из существующих, чтобы создать новый.',
   create: 'Создать лист',
@@ -3113,3 +3114,106 @@ export const CROP_HANDLES = [
   { corner: 'bottomLeft', class: '-bottom-2.5 -left-2.5 cursor-nesw-resize' },
   { corner: 'bottomRight', class: '-right-2.5 -bottom-2.5 cursor-nwse-resize' },
 ] as const;
+
+/** Сегменты ручек доступа по ссылке. */
+export const SHEET_SHARE_API = {
+  share: 'share',
+  shared: 'shared',
+  saved: 'saved',
+} as const;
+
+/** Подписи окна «Поделиться листом». */
+export const SHEET_SHARE_TEXT = {
+  title: 'Поделиться листом',
+  link: 'Ссылка на лист',
+  copy: 'Скопировать ссылку',
+  copied: 'Ссылка скопирована',
+  share: 'Поделиться ссылкой',
+  enable: 'Включить доступ по ссылке',
+  disable: 'Отключить доступ',
+  close: 'Закрыть',
+  hintOn:
+    'Лист откроется у любого, кто перейдёт по ссылке. Редактировать его сможете только вы.',
+  hintOff:
+    'Пока доступ выключен, лист виден только вам. Ссылку можно отозвать в любой момент.',
+  guestTitle: 'Гость видит лист целиком',
+  guestDescription:
+    'Правки и настройки ему недоступны — редактирование остаётся только у вас.',
+  disabled: 'Доступ по ссылке отключён',
+  disabledDescription: 'Прежняя ссылка больше не откроет лист.',
+  error: 'Не удалось изменить доступ по ссылке',
+  menu: 'Поделиться листом',
+  active: 'Ссылка активна',
+} as const;
+
+/** Лист, открытый по ссылке. */
+export const SHEET_READONLY_TEXT = {
+  badge: 'Только просмотр',
+  tooltip: 'Лист открыт по ссылке — доступен только просмотр',
+  editBlocked: 'Лист открыт по ссылке',
+  editBlockedDescription:
+    'Правки недоступны: сохраните копию, чтобы вести его у себя.',
+  notFound: 'Лист по ссылке не найден',
+  notFoundDescription: 'Владелец отозвал ссылку или удалил лист.',
+  own: 'Это ваш лист',
+  openOwn: 'Открыть для правки',
+  copy: 'Создать копию',
+  save: 'Добавить в «Другие листы»',
+  saved: 'Уже в «Других листах»',
+  savedToast: 'Лист сохранён',
+  savedToastDescription: (name: string): string =>
+    `«${name}» появился в разделе «Другие листы».`,
+  saveError: 'Не удалось сохранить лист',
+  copyLimit: 'Достигнут лимит листов',
+} as const;
+
+/** Раздел «Другие листы» на странице листов. */
+export const SAVED_SHEETS_TEXT = {
+  title: 'Другие листы',
+  empty:
+    'Сюда попадают чужие листы, открытые вам по ссылке: сохраните лист со страницы ссылки, чтобы держать его под рукой.',
+  limitReached:
+    'Достигнут лимит сохранённых листов — уберите один, чтобы сохранить новый.',
+  unavailableTitle: 'Доступ к листу закрыт',
+  unavailableDescription:
+    'Владелец отозвал ссылку или удалил лист. Попросите новую ссылку и сохраните её заново.',
+  open: 'Открыть лист',
+  copy: 'Создать копию',
+  remove: 'Убрать из списка',
+  menuAria: 'Действия с сохранённым листом',
+  removeTitle: 'Убрать лист из сохранённых?',
+  removeDescription:
+    'Лист останется у владельца — пропадёт только ссылка на него в вашем списке.',
+  removeError: 'Не удалось убрать лист из сохранённых',
+  loadError: 'Не удалось загрузить сохранённые листы',
+  copied: 'Лист скопирован',
+} as const;
+
+/** Подсказки о лимитах листов и подписке. */
+export const SHEET_LIMIT_TEXT = {
+  sheets: (used: number, limit: number): string =>
+    `Активных листов — ${used} из ${limit} возможных.`,
+  saved: (used: number, limit: number): string =>
+    `Чужих листов, сохранённых по ссылке, — ${used} из ${limit} возможных.`,
+  withSubscription: (limit: number): string =>
+    ` С подпиской — до ${limit} листов.`,
+  extended: ' Лимит расширен подпиской.',
+  upsellSheets: (limit: number): string =>
+    `Подписка расширяет лимит активных листов до ${limit}.`,
+  upsellSaved: (limit: number): string =>
+    `Подписка расширяет лимит сохранённых листов до ${limit}.`,
+  subscription: 'Подписка',
+} as const;
+
+/** Иконки доступа по ссылке и «Других листов». */
+export const SHEET_SHARE_ICON = {
+  share: 'tabler:share',
+  link: 'tabler:link',
+  copy: 'tabler:copy',
+  readonly: 'tabler:eye',
+  save: 'tabler:bookmark-plus',
+  saved: 'tabler:bookmark-filled',
+  unavailable: 'tabler:link-off',
+  remove: 'tabler:bookmark-minus',
+  subscription: 'tabler:crown',
+} as const;

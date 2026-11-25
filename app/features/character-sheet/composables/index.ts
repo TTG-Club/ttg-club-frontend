@@ -9,6 +9,7 @@ export { useChoicePool } from './useChoicePool';
 export { useClassLevelActions } from './useClassLevelActions';
 export { useLevelUpWizard } from './useLevelUpWizard';
 export { useRemoveConfirm } from './useRemoveConfirm';
+export { useSavedSheets } from './useSavedSheets';
 export { useSheetActiveEffects } from './useSheetActiveEffects';
 export { useSheetAvatar } from './useSheetAvatar';
 export { useSheetClassData } from './useSheetClassData';

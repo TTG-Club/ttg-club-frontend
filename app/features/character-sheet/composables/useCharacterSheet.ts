@@ -1,6 +1,7 @@
 import type {
   AbilityKey,
   CharacterSheet,
+  SharedSheet,
   SheetDocument,
   SheetLoadStatus,
   SheetSaveStatus,
@@ -10,12 +11,14 @@ import { getApiErrorMessage, getErrorStatus } from '~user/model';
 
 import {
   createEmptySheetDocument,
+  fetchSharedSheet,
   fetchSheet,
   saveSheet,
   saveSheetOnLeave,
   SHEET_HIDDEN_CONTROL_CLASS,
   SHEET_HTTP_STATUS,
   SHEET_LOCKED_STORAGE_KEY,
+  SHEET_READONLY_TEXT,
   SHEET_SAVE_DELAY,
   SHEET_TEXT,
 } from '../model';
@@ -45,6 +48,20 @@ export const useCharacterSheet = createSharedComposable(() => {
 
   const isConflict = computed(() => saveStatus.value === 'conflict');
 
+  /** Секрет ссылки, если лист открыт по ней: только чтение, без сохранения. */
+  const sharedToken = ref<string | null>(null);
+
+  /** Свой ли лист открыт по ссылке и сохранён ли он в «Других листах». */
+  const sharedInfo = shallowRef<Pick<SharedSheet, 'own' | 'savedId'> | null>(
+    null,
+  );
+
+  /** Ссылка своего листа (окно «Поделиться»); null — доступ выключен. */
+  const shareToken = ref<string | null>(null);
+
+  /** Лист открыт по ссылке: правки и сохранение закрыты. */
+  const isReadonly = computed(() => sharedToken.value !== null);
+
   /**
    * Запертые листы: замок помнится в браузере для каждого листа, чтобы после
    * перезагрузки игровой режим не снимался сам.
@@ -57,12 +74,13 @@ export const useCharacterSheet = createSharedComposable(() => {
   /** Лист заперт игроком: правка закрыта, броски и игровые действия остаются. */
   const isLocked = computed({
     get: () =>
-      Boolean(sheetId.value)
-      && lockedSheetIds.value.includes(sheetId.value ?? ''),
+      isReadonly.value
+      || (Boolean(sheetId.value)
+        && lockedSheetIds.value.includes(sheetId.value ?? '')),
     set: (locked: boolean) => {
       const id = sheetId.value;
 
-      if (!id) {
+      if (!id || isReadonly.value) {
         return;
       }
 
@@ -92,6 +110,17 @@ export const useCharacterSheet = createSharedComposable(() => {
    * игрок получает подсказку, как отпереть лист.
    */
   function ensureEditable(): boolean {
+    if (isReadonly.value) {
+      toast.add({
+        title: SHEET_READONLY_TEXT.editBlocked,
+        description: SHEET_READONLY_TEXT.editBlockedDescription,
+        icon: 'tabler:eye',
+        color: 'warning',
+      });
+
+      return false;
+    }
+
     if (!isLocked.value) {
       return true;
     }
@@ -117,6 +146,7 @@ export const useCharacterSheet = createSharedComposable(() => {
     name.value = sheet.name;
     document.value = sheet.data;
     version.value = sheet.version;
+    shareToken.value = sheet.shareToken;
   }
 
   /**
@@ -127,6 +157,8 @@ export const useCharacterSheet = createSharedComposable(() => {
     loadStatus.value = 'pending';
     saveStatus.value = 'idle';
     isDirty.value = false;
+    sharedToken.value = null;
+    sharedInfo.value = null;
 
     try {
       apply(await fetchSheet(id));
@@ -136,6 +168,45 @@ export const useCharacterSheet = createSharedComposable(() => {
         getErrorStatus(error) === SHEET_HTTP_STATUS.notFound
           ? 'notFound'
           : 'error';
+    }
+  }
+
+  /**
+   * Загружает лист по ссылке — только для чтения.
+   * @param token - секрет ссылки
+   */
+  async function loadShared(token: string): Promise<void> {
+    loadStatus.value = 'pending';
+    saveStatus.value = 'idle';
+    isDirty.value = false;
+    sharedToken.value = token;
+    sharedInfo.value = null;
+
+    try {
+      const shared = await fetchSharedSheet(token);
+
+      sheetId.value = shared.id;
+      name.value = shared.name;
+      document.value = shared.data;
+      version.value = 0;
+      shareToken.value = null;
+      sharedInfo.value = { own: shared.own, savedId: shared.savedId };
+      loadStatus.value = 'ready';
+    } catch (error) {
+      loadStatus.value =
+        getErrorStatus(error) === SHEET_HTTP_STATUS.notFound
+          ? 'notFound'
+          : 'error';
+    }
+  }
+
+  /**
+   * Отмечает лист сохранённым в «Других листах».
+   * @param savedId - идентификатор записи
+   */
+  function markShared(savedId: string): void {
+    if (sharedInfo.value) {
+      sharedInfo.value = { ...sharedInfo.value, savedId };
     }
   }
 
@@ -201,6 +272,11 @@ export const useCharacterSheet = createSharedComposable(() => {
    * @param change - новый документ из текущего
    */
   function update(change: (current: SheetDocument) => SheetDocument): void {
+    // Лист по ссылке не меняется: правки некуда сохранить
+    if (isReadonly.value) {
+      return;
+    }
+
     document.value = change(document.value);
     markDirty();
   }
@@ -210,12 +286,22 @@ export const useCharacterSheet = createSharedComposable(() => {
    * @param next - новое имя
    */
   function rename(next: string): void {
+    if (isReadonly.value) {
+      return;
+    }
+
     name.value = next;
     markDirty();
   }
 
   /** Перечитывает лист с сервера после конфликта версий. */
   async function reload(): Promise<void> {
+    if (sharedToken.value) {
+      await loadShared(sharedToken.value);
+
+      return;
+    }
+
     if (sheetId.value) {
       await load(sheetId.value);
     }
@@ -223,7 +309,12 @@ export const useCharacterSheet = createSharedComposable(() => {
 
   /** Уход со страницы: несохранённое уходит запросом, который переживёт её. */
   function flushOnLeave(): void {
-    if (!sheetId.value || !isDirty.value || isConflict.value) {
+    if (
+      !sheetId.value
+      || !isDirty.value
+      || isConflict.value
+      || isReadonly.value
+    ) {
       return;
     }
 
@@ -254,11 +345,17 @@ export const useCharacterSheet = createSharedComposable(() => {
     loadStatus,
     saveStatus,
     isLocked,
+    isReadonly,
+    shareToken,
+    sharedToken,
+    sharedInfo,
     highlightedAbility,
     ensureEditable,
     editControlClass,
     toggleLock,
     load,
+    loadShared,
+    markShared,
     reload,
     update,
     rename,
