@@ -5,6 +5,7 @@ export * from './armors';
 export * from './backgrounds';
 export * from './bestiary';
 export * from './books';
+export * from './catalog-picker';
 export * from './classes';
 export * from './constants';
 export * from './feats';

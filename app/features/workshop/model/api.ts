@@ -1,5 +1,6 @@
 import type { SectionConfig } from '~section/model';
 
+import type { CatalogPickerEntry } from './catalog-picker';
 import type {
   BookSourceOption,
   RevisionInfo,
@@ -9,6 +10,7 @@ import type {
 
 import { buildListRequest, SECTION_PAGE_SIZE_ALL } from '~section/model';
 
+import { parseCatalogPickerEntries } from './catalog-picker';
 import {
   REFERENCE_API_PATH,
   WORKSHOP_API_PATH,
@@ -16,7 +18,6 @@ import {
   WORKSHOP_BOOKS_QUERY,
   WORKSHOP_PREVIEW_SEGMENT,
 } from './constants';
-import { parseBaseItemOptions } from './magic-items';
 import {
   parseBookSources,
   parseFilterGroups,
@@ -178,16 +179,16 @@ export async function fetchBookSources(): Promise<Array<BookSourceOption>> {
 }
 
 /**
- * Оружие или доспехи раздела целиком, по названию, для выбора немагической
- * основы магического предмета.
- * @param section - раздел оружия или доспехов
+ * Записи раздела целиком, коротким списком: по нему поле выбора узнаёт
+ * названия того, что пришло с сервера одними адресами.
+ * @param section - раздел справочника
  */
-export async function fetchMagicItemBaseOptions(
+export async function fetchCatalogPickerEntries(
   section: SectionConfig,
-): Promise<Array<SelectOption>> {
+): Promise<Array<CatalogPickerEntry>> {
   const api = useApi();
 
-  return parseBaseItemOptions(
+  return parseCatalogPickerEntries(
     await api<unknown>(section.listUrl, {
       method: 'POST',
       body: buildListRequest({

@@ -67,7 +67,8 @@ export const MAGIC_ITEM_EDITOR_TEXT = {
   baseArmors: 'Основа: доспехи',
   baseHelp:
     'Обычные предметы, на которых построен магический: на странице предмета они встают ссылками в строку типа. Можно выбрать несколько; «любой меч» пишется в уточнении типа',
-  basePlaceholder: 'Не выбрана',
+  baseWeaponsPlaceholder: 'Выбрать оружие',
+  baseArmorsPlaceholder: 'Выбрать доспехи',
   charge: 'Заряды',
   cost: 'Цена, зм',
   bonus: 'Бонус',

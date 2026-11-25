@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { markupBlocksSchema } from '~content/model';
 
+import { getCatalogSlugs } from '../catalog-picker';
 import { WORKSHOP_VALIDATION } from '../constants';
 import {
   magicItemMechanicsFormSchema,
@@ -17,7 +18,6 @@ import {
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
-import { getBaseItemUrls } from './base-items';
 import { MAGIC_ITEM_BASE_SECTIONS } from './constants';
 
 const workshopMagicItemSchema = z.object({
@@ -55,11 +55,11 @@ export function parseWorkshopMagicItem(input: unknown): WorkshopMagicItem {
     rarity: item.rarityRaw ?? '',
     type: item.typeRaw ?? '',
     special: item.special ?? [],
-    weapons: getBaseItemUrls(
+    weapons: getCatalogSlugs(
       item.detailType,
       MAGIC_ITEM_BASE_SECTIONS.weapons.path,
     ),
-    armors: getBaseItemUrls(
+    armors: getCatalogSlugs(
       item.detailType,
       MAGIC_ITEM_BASE_SECTIONS.armors.path,
     ),

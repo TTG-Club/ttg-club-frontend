@@ -32,8 +32,8 @@ import {
   getArmorPayload,
   getBackgroundPayload,
   getBackgroundSkills,
-  getBaseItemUrl,
   getBookPayload,
+  getCatalogSlug,
   getClassPayload,
   getCreatureHits,
   getCreaturePayload,
@@ -54,9 +54,9 @@ import {
   getWorkshopErrorIndexes,
   getWorkshopFieldTab,
   getWorkshopSlug,
-  parseBaseItemOptions,
   parseBookCover,
   parseBookSources,
+  parseCatalogPickerEntries,
   parseFilterGroups,
   parseRaceParentOptions,
   parseRevisions,
@@ -78,6 +78,7 @@ import {
   parseWorkshopScreen,
   parseWorkshopSpell,
   parseWorkshopWeapon,
+  searchCatalogPickerEntries,
   shiftIndexesAfterRemoval,
   splitList,
   weaponFormSchema,
@@ -610,21 +611,31 @@ describe('редактор магических предметов', () => {
     });
   });
 
-  it('предлагает оружие раздела по адресам страниц', () => {
-    expect(
-      parseBaseItemOptions(
-        [
-          {
-            name: { rus: 'Длинный меч', eng: 'Longsword' },
-            url: '/weapons/longsword',
-          },
-          { name: { rus: 'Чужой', eng: 'Other' }, url: '/armors/other' },
-        ],
-        '/weapons',
-      ),
-    ).toEqual([{ label: 'Длинный меч', value: 'longsword' }]);
+  it('окно выбора берёт записи раздела по адресам страниц', () => {
+    const entries = parseCatalogPickerEntries(
+      [
+        {
+          name: { rus: 'Длинный меч', eng: 'Longsword' },
+          url: '/weapons/longsword',
+          source: { shortName: 'PHB', name: 'Книга игрока' },
+        },
+        { name: { rus: 'Чужой', eng: 'Other' }, url: '/armors/other' },
+      ],
+      '/weapons',
+    );
 
-    expect(getBaseItemUrl('/weapons/', '/weapons')).toBeUndefined();
+    expect(entries).toEqual([
+      {
+        slug: 'longsword',
+        name: 'Длинный меч',
+        nameEng: 'Longsword',
+        source: { shortName: 'PHB', name: 'Книга игрока' },
+      },
+    ]);
+
+    expect(searchCatalogPickerEntries(entries, 'LONG')).toHaveLength(1);
+    expect(searchCatalogPickerEntries(entries, 'топор')).toHaveLength(0);
+    expect(getCatalogSlug('/weapons/', '/weapons')).toBeUndefined();
   });
 });
 
