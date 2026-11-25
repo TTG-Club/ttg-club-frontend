@@ -17,6 +17,8 @@ import {
   workshopRequiredText,
   workshopSourceSchema,
 } from '../schemas';
+import { getBaseItemUrls } from './base-items';
+import { MAGIC_ITEM_BASE_SECTIONS } from './constants';
 
 const workshopMagicItemSchema = z.object({
   id: z.number(),
@@ -25,6 +27,7 @@ const workshopMagicItemSchema = z.object({
   rarityRaw: z.string().nullish(),
   typeRaw: z.string().nullish(),
   special: markupBlocksSchema.nullish(),
+  detailType: z.array(z.object({ url: z.string().nullish() })).nullish(),
   customization: z.boolean().nullish(),
   custSpecial: markupBlocksSchema.nullish(),
   consumed: z.boolean().nullish(),
@@ -52,6 +55,14 @@ export function parseWorkshopMagicItem(input: unknown): WorkshopMagicItem {
     rarity: item.rarityRaw ?? '',
     type: item.typeRaw ?? '',
     special: item.special ?? [],
+    weapons: getBaseItemUrls(
+      item.detailType,
+      MAGIC_ITEM_BASE_SECTIONS.weapons.path,
+    ),
+    armors: getBaseItemUrls(
+      item.detailType,
+      MAGIC_ITEM_BASE_SECTIONS.armors.path,
+    ),
     customization: !!item.customization,
     custSpecial: item.custSpecial ?? [],
     consumed: !!item.consumed,
@@ -75,6 +86,8 @@ export const magicItemFormSchema = z.object({
   rarity: requiredChoice,
   type: requiredChoice,
   special: markupBlocksSchema,
+  weapons: z.array(z.string()),
+  armors: z.array(z.string()),
   customization: z.boolean(),
   custSpecial: markupBlocksSchema,
   consumed: z.boolean(),
