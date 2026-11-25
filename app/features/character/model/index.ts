@@ -65,7 +65,6 @@ export {
   getBackgroundEquipment,
   getBackgroundLanguages,
   getClassDescription,
-  getClassFeatureScalingView,
   getClassHitPoints,
   getClassIcon,
   getClassOptionsLink,
