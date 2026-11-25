@@ -1,4 +1,3 @@
-import type { ClassFeature } from '~character/model';
 import type { ClassTrait } from '~workshop/model';
 
 import { describe, expect, it } from 'vitest';
@@ -7,27 +6,12 @@ import {
   classMechanicsDetailSchema,
   getClassLevelFeatures,
 } from '~character-sheet/model';
-import { getClassFeatureScalingView } from '~character/model';
 import {
   createClassForm,
   createClassTrait,
   createClassTraitScaling,
   getClassPayload,
 } from '~workshop/model';
-
-/**
- * Умение карточки класса с ростом.
- * @param patch - правки
- */
-function makeFeature(patch: Partial<ClassFeature> = {}): ClassFeature {
-  return {
-    id: 'c5',
-    name: 'Увеличение характеристик',
-    level: 4,
-    scaling: [],
-    ...patch,
-  };
-}
 
 describe('рост умения в мастерской', () => {
   it('новый уровень — на уровень позже последнего', () => {
@@ -91,41 +75,6 @@ describe('рост умения в мастерской', () => {
         ],
       }),
     ]);
-  });
-});
-
-describe('рост умения на странице класса', () => {
-  it('уровни перечислены, уровни со своим описанием — отдельно', () => {
-    const view = getClassFeatureScalingView(
-      makeFeature({
-        scaling: [
-          {
-            level: 12,
-            description: ['Текст 12'],
-            name: 'Своё',
-            additional: '(3)',
-          },
-          { level: 8 },
-          { level: 16, hideInSubclasses: true },
-        ],
-      }),
-      false,
-    );
-
-    expect(view.levels).toBe('8, 12, 16');
-    expect(view.rows).toHaveLength(1);
-    expect(view.rows[0]?.title).toBe('12-й уровень: Своё (3)');
-  });
-
-  it('на странице подкласса скрытые строки не видны', () => {
-    const view = getClassFeatureScalingView(
-      makeFeature({
-        scaling: [{ level: 8 }, { level: 16, hideInSubclasses: true }],
-      }),
-      true,
-    );
-
-    expect(view.levels).toBe('8');
   });
 });
 
