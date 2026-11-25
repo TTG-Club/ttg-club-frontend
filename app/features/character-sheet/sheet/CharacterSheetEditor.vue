@@ -22,6 +22,7 @@
     SHEET_DEFAULT_TAB,
     SHEET_ICON,
     SHEET_LABELS,
+    SHEET_READONLY_TEXT,
     SHEET_RIGHT_COLUMN_GAP,
     SHEET_TEXT,
     SHEET_WIDE_MIN_WIDTH,
@@ -51,14 +52,34 @@
    * навыки; справа — ряд характеристик и вкладки снаряжения, заклинаний,
    * особенностей, эффектов, личности и заметок. На узком листе сводка уходит
    * во вкладку «Основное», и разделы листаются свайпом. Правки сохраняются
-   * сами.
+   * сами. Лист, открытый по ссылке (`shareToken`), — только для чтения.
    */
-  const { id } = defineProps<{
-    id: string;
+  const { id = '', shareToken = '' } = defineProps<{
+    /** Свой лист. */
+    id?: string;
+    /** Секрет ссылки: чужой лист только для чтения. */
+    shareToken?: string;
   }>();
 
-  const { loadStatus, name, isLocked, load, ensureEditable } =
-    useCharacterSheet();
+  const {
+    loadStatus,
+    name,
+    isLocked,
+    isReadonly,
+    load,
+    loadShared,
+    ensureEditable,
+  } = useCharacterSheet();
+
+  const notFoundTitle = computed(() =>
+    shareToken ? SHEET_READONLY_TEXT.notFound : SHEET_TEXT.notFound,
+  );
+
+  const notFoundDescription = computed(() =>
+    shareToken
+      ? SHEET_READONLY_TEXT.notFoundDescription
+      : SHEET_TEXT.notFoundDescription,
+  );
 
   const { stats } = useSheetStats();
   const { rollD20 } = useSheetRoll();
@@ -85,15 +106,16 @@
     title: () => name.value || SHEET_TEXT.title,
   });
 
-  watch(
-    () => id,
-    (next) => {
-      if (next) {
-        load(next);
-      }
-    },
-    { immediate: true },
-  );
+  /** Загружает свой лист или лист по ссылке. */
+  function loadSheet(): void {
+    if (shareToken) {
+      void loadShared(shareToken);
+    } else if (id) {
+      void load(id);
+    }
+  }
+
+  watch(() => [id, shareToken], loadSheet, { immediate: true });
 
   // Раскладка зависит от ширины самого листа (контейнерные запросы `@5xl`), а
   // не окна. Меряем корень: он есть и до загрузки листа, поэтому к первой
@@ -129,7 +151,7 @@
   });
 
   function retry(): void {
-    load(id);
+    loadSheet();
   }
 
   function openArmor(): void {
@@ -153,6 +175,12 @@
    * отпертом — полная настройка здоровья.
    */
   function openHealth(): void {
+    if (isReadonly.value) {
+      ensureEditable();
+
+      return;
+    }
+
     if (isLocked.value) {
       isHealthQuickOpen.value = true;
 
@@ -200,8 +228,8 @@
     <UEmpty
       v-else-if="loadStatus === 'notFound'"
       :icon="SHEET_ICON.empty"
-      :title="SHEET_TEXT.notFound"
-      :description="SHEET_TEXT.notFoundDescription"
+      :title="notFoundTitle"
+      :description="notFoundDescription"
       variant="naked"
       class="py-16"
     >

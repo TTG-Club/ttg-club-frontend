@@ -30,12 +30,14 @@ import {
   CATALOG_API_PREFIX,
   CHARACTER_LEVEL,
   CHARACTER_SHEET_ROUTE,
+  CHARACTER_SHEET_SHARED_SEGMENT,
   CLASS_TABLE_EMPTY,
   DEFAULT_WEAPON_ATTACK_ABILITY,
   EXPERIENCE_BY_LEVEL,
   HIT_DIE_AVERAGE_BONUS,
   MULTICLASS_SPELL_SLOTS,
   PACT_MAGIC_COLUMNS,
+  SHEET_LIMIT_TEXT,
   SHEET_SIZE_INFO,
   SHEET_SIZE_KEYS,
   SHEET_TEXT,
@@ -777,4 +779,41 @@ export function findSheetSize(
   }
 
   return found;
+}
+
+/**
+ * Страница листа, открытого по ссылке.
+ * @param token - секрет ссылки
+ */
+export function getSharedSheetRoute(token: string): string {
+  return `${CHARACTER_SHEET_ROUTE}/${CHARACTER_SHEET_SHARED_SEGMENT}/${encodeURIComponent(token)}`;
+}
+
+/**
+ * Полная ссылка на лист для отправки.
+ * @param origin - адрес сайта
+ * @param token - секрет ссылки
+ */
+export function getSheetShareUrl(origin: string, token: string): string {
+  return `${origin}${getSharedSheetRoute(token)}`;
+}
+
+/**
+ * Подсказка счётчика листов: сколько занято и что даёт подписка.
+ * @param base - фраза о занятом месте
+ * @param limit - лимит пользователя
+ * @param subscriberLimit - лимит с подпиской
+ */
+export function getSheetLimitTooltip(
+  base: string,
+  limit: number,
+  subscriberLimit: number,
+): string {
+  if (subscriberLimit > limit) {
+    return base + SHEET_LIMIT_TEXT.withSubscription(subscriberLimit);
+  }
+
+  return subscriberLimit > 0 && limit >= subscriberLimit
+    ? base + SHEET_LIMIT_TEXT.extended
+    : base;
 }

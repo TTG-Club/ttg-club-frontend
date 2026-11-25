@@ -1,23 +1,28 @@
 <script setup lang="ts">
-  import type { CharacterSheet } from '../model';
+  import type { CharacterSheet, SavedSheet } from '../model';
 
   import { SectionLayout } from '~section/layout';
   import { AuthModal } from '~user/auth-modal';
 
-  import { useSheetList } from '../composables';
-  import { SheetConfirmModal } from '../dialogs';
+  import { useSavedSheets, useSheetList } from '../composables';
+  import { SheetConfirmModal, SheetShareModal } from '../dialogs';
   import {
     CHARACTER_SHEET_ICON,
+    getSheetLimitTooltip,
     getSheetRoute,
+    SAVED_SHEETS_TEXT,
     SHEET_HTTP_STATUS,
     SHEET_ICON,
     SHEET_IMPORT_ACCEPT,
+    SHEET_LIMIT_TEXT,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
     SHEET_TEXT,
   } from '../model';
+  import SheetLimitHint from './SheetLimitHint.vue';
   import SheetListCard from './SheetListCard.vue';
   import SheetListCreateCard from './SheetListCreateCard.vue';
+  import SheetSavedCard from './SheetSavedCard.vue';
 
   /**
    * Страница листов персонажей: у пользователя — его листы, импорт из JSON
@@ -29,6 +34,7 @@
   const {
     sheets,
     limit,
+    subscriberLimit,
     canCreate,
     isLoading,
     isLoaded,
@@ -37,9 +43,28 @@
     load,
     create,
     copy,
+    copyDocument,
+    setShareToken,
     remove,
     importFromFile,
   } = useSheetList();
+
+  const saved = useSavedSheets();
+
+  const {
+    items: savedSheets,
+    limit: savedLimit,
+    subscriberLimit: savedSubscriberLimit,
+    isLoaded: isSavedLoaded,
+    isError: isSavedError,
+  } = saved;
+
+  /** Лист, для которого открыто окно «Поделиться». */
+  const sharedSheet = ref<CharacterSheet | null>(null);
+  const isShareOpen = ref(false);
+
+  const removedSaved = ref<SavedSheet | null>(null);
+  const isSavedRemoveOpen = ref(false);
 
   const isAuthOpen = ref(false);
   const removedSheet = ref<CharacterSheet | null>(null);
@@ -50,6 +75,94 @@
   );
 
   const countLabel = computed(() => `${sheets.value.length} / ${limit.value}`);
+
+  const countTooltip = computed(() =>
+    getSheetLimitTooltip(
+      SHEET_LIMIT_TEXT.sheets(sheets.value.length, limit.value),
+      limit.value,
+      subscriberLimit.value,
+    ),
+  );
+
+  const sheetsUpsell = computed(() =>
+    subscriberLimit.value > limit.value
+      ? SHEET_LIMIT_TEXT.upsellSheets(subscriberLimit.value)
+      : undefined,
+  );
+
+  const savedCountLabel = computed(
+    () => `${savedSheets.value.length} / ${savedLimit.value}`,
+  );
+
+  const isSavedFull = computed(
+    () => savedSheets.value.length >= savedLimit.value,
+  );
+
+  const savedCountTooltip = computed(() =>
+    getSheetLimitTooltip(
+      SHEET_LIMIT_TEXT.saved(savedSheets.value.length, savedLimit.value),
+      savedLimit.value,
+      savedSubscriberLimit.value,
+    ),
+  );
+
+  const savedUpsell = computed(() =>
+    savedSubscriberLimit.value > savedLimit.value
+      ? SHEET_LIMIT_TEXT.upsellSaved(savedSubscriberLimit.value)
+      : undefined,
+  );
+
+  /**
+   * Открывает окно «Поделиться листом».
+   * @param sheet - лист
+   */
+  function openShare(sheet: CharacterSheet): void {
+    sharedSheet.value = sheet;
+    isShareOpen.value = true;
+  }
+
+  /**
+   * Новая ссылка из окна «Поделиться» — в карточку.
+   * @param shareToken - секрет ссылки; null — доступ выключен
+   */
+  function updateShareToken(shareToken: string | null): void {
+    if (sharedSheet.value) {
+      setShareToken(sharedSheet.value.id, shareToken);
+      sharedSheet.value = { ...sharedSheet.value, shareToken };
+    }
+  }
+
+  /**
+   * Копия чужого листа себе; открывается сразу.
+   * @param item - сохранённый лист
+   */
+  async function copySaved(item: SavedSheet): Promise<void> {
+    if (!item.data) {
+      return;
+    }
+
+    const created = await copyDocument(item.name, item.data);
+
+    if (created) {
+      await navigateTo(getSheetRoute(created.id));
+    }
+  }
+
+  /**
+   * Спрашивает, убрать ли лист из сохранённых.
+   * @param item - сохранённый лист
+   */
+  function askRemoveSaved(item: SavedSheet): void {
+    removedSaved.value = item;
+    isSavedRemoveOpen.value = true;
+  }
+
+  async function confirmRemoveSaved(): Promise<void> {
+    if (removedSaved.value) {
+      await saved.remove(removedSaved.value.id);
+      removedSaved.value = null;
+    }
+  }
 
   // Счётчик краснеет на достигнутом лимите.
   const countClass = computed(() =>
@@ -134,6 +247,7 @@
     ([loggedIn, isPending]) => {
       if (loggedIn && !isPending) {
         load();
+        saved.load();
       }
     },
     { immediate: true },
@@ -203,7 +317,7 @@
         >
           <span :class="countClass">{{ countLabel }}</span>
 
-          <UTooltip :text="SHEET_LIST_TEXT.countTooltip">
+          <UTooltip :text="countTooltip">
             <UIcon
               :name="SHEET_LIST_ICON.help"
               class="size-3.5 shrink-0 text-muted"
@@ -253,6 +367,7 @@
               :can-copy="canCreate"
               @copy="copy"
               @remove="askRemove"
+              @share="openShare"
             />
 
             <!-- Слот создания исчезает на достигнутом лимите -->
@@ -265,14 +380,101 @@
           </div>
         </div>
 
-        <p
+        <SheetLimitHint
           v-if="!canCreate"
-          class="text-xs text-muted"
-        >
-          {{ SHEET_LIST_TEXT.limitReached }}
-        </p>
+          :hint="SHEET_LIST_TEXT.limitReached"
+          :upsell="sheetsUpsell"
+        />
       </template>
     </section>
+
+    <section
+      v-if="isLoggedIn && !isAuthError && isSavedLoaded"
+      class="mt-6 flex flex-col gap-2"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium tracking-wide text-muted uppercase">
+          {{ SAVED_SHEETS_TEXT.title }}
+        </span>
+
+        <span
+          v-if="!isSavedError"
+          class="flex items-center gap-1 text-xs tabular-nums"
+        >
+          <span :class="isSavedFull ? 'text-error' : 'text-muted'">
+            {{ savedCountLabel }}
+          </span>
+
+          <UTooltip :text="savedCountTooltip">
+            <UIcon
+              :name="SHEET_LIST_ICON.help"
+              class="size-3.5 shrink-0 text-muted"
+            />
+          </UTooltip>
+        </span>
+      </div>
+
+      <UEmpty
+        v-if="isSavedError"
+        :icon="SHEET_ICON.empty"
+        :title="SAVED_SHEETS_TEXT.loadError"
+        variant="naked"
+        class="py-8"
+      >
+        <template #actions>
+          <UButton
+            :label="SHEET_TEXT.retry"
+            color="neutral"
+            variant="subtle"
+            @click.left.exact.prevent="saved.load()"
+          />
+        </template>
+      </UEmpty>
+
+      <p
+        v-else-if="!savedSheets.length"
+        class="text-sm text-muted"
+      >
+        {{ SAVED_SHEETS_TEXT.empty }}
+      </p>
+
+      <template v-else>
+        <div class="@container">
+          <div class="grid grid-cols-1 gap-3 @2xl:grid-cols-2">
+            <SheetSavedCard
+              v-for="item in savedSheets"
+              :key="item.id"
+              :saved="item"
+              :is-disabled="isMutating"
+              :can-copy="canCreate"
+              @copy="copySaved"
+              @remove="askRemoveSaved"
+            />
+          </div>
+        </div>
+
+        <SheetLimitHint
+          v-if="isSavedFull"
+          :hint="SAVED_SHEETS_TEXT.limitReached"
+          :upsell="savedUpsell"
+        />
+      </template>
+    </section>
+
+    <SheetShareModal
+      v-if="sharedSheet"
+      v-model:open="isShareOpen"
+      :sheet-id="sharedSheet.id"
+      :share-token="sharedSheet.shareToken"
+      @update:share-token="updateShareToken"
+    />
+
+    <SheetConfirmModal
+      v-model:open="isSavedRemoveOpen"
+      :title="SAVED_SHEETS_TEXT.removeTitle"
+      :description="SAVED_SHEETS_TEXT.removeDescription"
+      @confirm="confirmRemoveSaved"
+    />
 
     <SheetConfirmModal
       v-model:open="isRemoveOpen"
