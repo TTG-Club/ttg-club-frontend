@@ -294,8 +294,6 @@ export const CLASS_OPTIONS_TEXT = {
 } as const;
 
 export const CLASS_TEXT = {
-  scalingAlso: 'Также на уровнях:',
-  scalingLevel: (level: number) => `${level}-й уровень`,
   archetypes: 'Архетипы',
   hitPoints: 'Хиты',
   hitDice: 'Кость Хитов:',

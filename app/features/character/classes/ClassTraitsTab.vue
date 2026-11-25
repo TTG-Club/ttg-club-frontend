@@ -6,7 +6,6 @@
 
   import {
     CLASS_TEXT,
-    getClassFeatureScalingView,
     getClassSkillsLabel,
     OPTIONAL_FEATURES_PATH,
     sortClassFeatures,
@@ -30,15 +29,7 @@
 
   const skills = computed(() => getClassSkillsLabel(traits));
 
-  const features = computed(() =>
-    sortClassFeatures(traits).map((feature) => ({
-      ...feature,
-      scalingView: getClassFeatureScalingView(
-        feature,
-        Boolean(traits.archetype),
-      ),
-    })),
-  );
+  const features = computed(() => sortClassFeatures(traits));
 
   // Таблица заклинаний архетипа идёт сразу после его описания
   const archetypeSpellTable = computed(() =>
@@ -190,13 +181,6 @@
           <div class="caption_text">
             <span>{{ feature.type }}</span>
 
-            <span
-              v-if="feature.scalingView.levels"
-              class="ml-1"
-            >
-              ({{ CLASS_TEXT.scalingAlso }} {{ feature.scalingView.levels }})
-            </span>
-
             <UTooltip
               v-if="feature.optional"
               :text="CLASS_TEXT.optionalHint"
@@ -214,15 +198,6 @@
             v-if="hasContentDescription(feature.description)"
             :content="feature.description"
           />
-
-          <div
-            v-for="row in feature.scalingView.rows"
-            :key="row.key"
-          >
-            <p class="font-semibold">{{ row.title }}</p>
-
-            <ContentRender :content="row.description" />
-          </div>
 
           <ClassFeatureOptions
             v-if="feature.options.length"
