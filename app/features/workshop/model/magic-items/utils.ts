@@ -28,6 +28,10 @@ export function createMagicItemForm(item?: WorkshopMagicItem): MagicItemForm {
     rarity: item?.rarity || MAGIC_ITEM_DEFAULT.rarity,
     type: item?.type || MAGIC_ITEM_DEFAULT.type,
     special: [...(item?.special ?? [])],
+    // Список основы уходит всегда: пустой снимает связи, а отсутствие поля
+    // бэкенд понимает как «оставить сохранённое»
+    weapons: [...(item?.weapons ?? [])],
+    armors: [...(item?.armors ?? [])],
     customization: item?.customization ?? false,
     custSpecial: [...(item?.custSpecial ?? [])],
     consumed: item?.consumed ?? false,
