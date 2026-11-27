@@ -1,14 +1,18 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { SavedSheet, SheetDocument } from '../model';
+  import type { SavedSheet, SheetCardBadge, SheetDocument } from '../model';
   import type { SheetPdfVariant } from '../model/pdf';
 
   import { useSheetPdf } from '../composables';
   import {
     downloadSheetJson,
+    getSavedSheetEditAction,
     getSharedSheetRoute,
+    getSheetRoute,
     SAVED_SHEETS_TEXT,
+    SHEET_EDIT_ACCESS_TEXT,
+    SHEET_EDIT_ICON,
     SHEET_ICON,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
@@ -19,6 +23,8 @@
   /**
    * Карточка чужого листа, сохранённого по ссылке. Недоступный лист (ссылку
    * отозвали или лист удалили) не открывается — его можно только убрать.
+   * Если владелец разрешил правки, карточка открывает лист на редактирование;
+   * иначе правки можно попросить пунктом меню.
    */
   const {
     saved,
@@ -32,13 +38,74 @@
   }>();
 
   const emit = defineEmits<{
-    copy: [saved: SavedSheet];
-    remove: [saved: SavedSheet];
+    'copy': [saved: SavedSheet];
+    'remove': [saved: SavedSheet];
+    'request-edit': [saved: SavedSheet];
   }>();
 
-  const route = computed(() =>
-    saved.available ? getSharedSheetRoute(saved.shareToken) : undefined,
+  const isEditable = computed(
+    () => saved.available && saved.editStatus === 'APPROVED',
   );
+
+  const route = computed(() => {
+    if (!saved.available) {
+      return undefined;
+    }
+
+    return isEditable.value
+      ? getSheetRoute(saved.sheetId)
+      : getSharedSheetRoute(saved.shareToken);
+  });
+
+  const badges = computed(() => {
+    const result: Array<SheetCardBadge> = [];
+
+    if (!saved.available) {
+      result.push({
+        key: 'unavailable',
+        label: SAVED_SHEETS_TEXT.unavailableTitle,
+        color: 'primary',
+      });
+    } else if (isEditable.value) {
+      result.push({
+        key: 'editable',
+        icon: SHEET_EDIT_ICON.editor,
+        tooltip: SHEET_EDIT_ACCESS_TEXT.approvedBadge,
+        color: 'primary',
+      });
+    }
+
+    return result;
+  });
+
+  /** Пункт запроса правок: доступен, ждёт ответа или не нужен. */
+  const editMenuItems = computed<Array<DropdownMenuItem>>(() => {
+    const action = saved.available
+      ? getSavedSheetEditAction(saved.editStatus)
+      : null;
+
+    if (action === 'pending') {
+      return [
+        {
+          label: SHEET_EDIT_ACCESS_TEXT.pending,
+          icon: SHEET_EDIT_ICON.pending,
+          description: SHEET_EDIT_ACCESS_TEXT.pendingHint,
+          disabled: true,
+        },
+      ];
+    }
+
+    return action === 'request'
+      ? [
+          {
+            label: SHEET_EDIT_ACCESS_TEXT.request,
+            icon: SHEET_EDIT_ICON.request,
+            description: SHEET_EDIT_ACCESS_TEXT.requestHint,
+            onSelect: () => emit('request-edit', saved),
+          },
+        ]
+      : [];
+  });
 
   const { exportToPdf, getPdfMenuItems } = useSheetPdf();
 
@@ -77,6 +144,7 @@
             onSelect: () =>
               downloadSheetJson({ name: saved.name, data: document }),
           },
+          ...editMenuItems.value,
         ]
       : [];
 
@@ -101,7 +169,7 @@
     :to="route"
     :menu-items="menuItems"
     :menu-aria="SAVED_SHEETS_TEXT.menuAria"
-    :badge="saved.available ? undefined : SAVED_SHEETS_TEXT.unavailableTitle"
+    :badges
     :description="SAVED_SHEETS_TEXT.unavailableDescription"
     :is-disabled="isDisabled"
   />

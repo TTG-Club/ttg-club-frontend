@@ -4,13 +4,21 @@
   import { SectionLayout } from '~section/layout';
   import { AuthModal } from '~user/auth-modal';
 
-  import { useSavedSheets, useSheetList } from '../composables';
+  import {
+    useSavedSheets,
+    useSheetEditGrants,
+    useSheetEditRequests,
+    useSheetList,
+  } from '../composables';
   import { SheetConfirmModal, SheetShareModal } from '../dialogs';
   import {
     CHARACTER_SHEET_ICON,
     getSheetLimitTooltip,
     getSheetRoute,
     SAVED_SHEETS_TEXT,
+    SHEET_HISTORY_DATE_FORMAT,
+    SHEET_HISTORY_ICON,
+    SHEET_HISTORY_TEXT,
     SHEET_HTTP_STATUS,
     SHEET_ICON,
     SHEET_IMPORT_ACCEPT,
@@ -35,6 +43,9 @@
     sheets,
     limit,
     subscriberLimit,
+    history,
+    historyLimit,
+    subscriberHistoryLimit,
     canCreate,
     isLoading,
     isLoaded,
@@ -46,8 +57,52 @@
     copyDocument,
     setShareToken,
     remove,
+    restore,
     importFromFile,
   } = useSheetList();
+
+  const toast = useToast();
+
+  const historyDateFormat = new Intl.DateTimeFormat(
+    'ru-RU',
+    SHEET_HISTORY_DATE_FORMAT,
+  );
+
+  const historyTooltip = computed(() =>
+    getSheetLimitTooltip(
+      SHEET_HISTORY_TEXT.tooltip(historyLimit.value),
+      historyLimit.value,
+      subscriberHistoryLimit.value,
+    ),
+  );
+
+  /**
+   * Подпись даты удаления.
+   * @param deletedAt - дата в ISO-8601
+   */
+  function getDeletedLabel(deletedAt: string | null): string {
+    return deletedAt
+      ? SHEET_HISTORY_TEXT.deletedAt(
+          historyDateFormat.format(new Date(deletedAt)),
+        )
+      : '';
+  }
+
+  /**
+   * Восстанавливает лист из истории и сообщает об этом.
+   * @param id - идентификатор листа
+   */
+  async function restoreSheet(id: string): Promise<void> {
+    const restored = await restore(id);
+
+    if (restored) {
+      toast.add({
+        title: SHEET_HISTORY_TEXT.restored,
+        description: restored.name,
+        color: 'success',
+      });
+    }
+  }
 
   const saved = useSavedSheets();
 
@@ -55,9 +110,59 @@
     items: savedSheets,
     limit: savedLimit,
     subscriberLimit: savedSubscriberLimit,
+    isLoading: isSavedLoading,
     isLoaded: isSavedLoaded,
     isError: isSavedError,
   } = saved;
+
+  // Права на правку чужих листов опрашиваются фоном, пока есть запрос без
+  // ответа. Ответ владельца меняет карточку (пометка и куда она ведёт),
+  // поэтому раздел перечитывается, как только сводка с ним разошлась. Цикла
+  // нет: загрузка раздела сводку не трогает, а наблюдатель срабатывает лишь
+  // на смену расхождения
+  const { getStatus: getEditStatus, requestEdit } = useSheetEditGrants();
+
+  const isSavedEditOutdated = computed(() =>
+    savedSheets.value.some(
+      (item) => item.editStatus !== getEditStatus(item.id),
+    ),
+  );
+
+  watch(isSavedEditOutdated, (isOutdated) => {
+    if (isOutdated && isSavedLoaded.value && !isSavedLoading.value) {
+      void saved.load();
+    }
+  });
+
+  // Метки запросов на карточках должны совпадать со сводкой входящих
+  // запросов: она опрашивается фоном и меняется, когда приходит запрос.
+  // Список перечитывается только при расхождении — после загрузки они равны,
+  // и наблюдатель затихает
+  const { count: incomingEditRequests } = useSheetEditRequests();
+
+  const listedEditRequests = computed(() =>
+    sheets.value.reduce((total, sheet) => total + sheet.pendingEditRequests, 0),
+  );
+
+  watch(incomingEditRequests, (count) => {
+    if (
+      count !== listedEditRequests.value
+      && isLoaded.value
+      && !isLoading.value
+    ) {
+      void load();
+    }
+  });
+
+  /**
+   * Просит владельца разрешить правки сохранённого листа.
+   * @param item - сохранённый лист
+   */
+  async function requestSavedEdit(item: SavedSheet): Promise<void> {
+    if (await requestEdit(item.id)) {
+      await saved.load();
+    }
+  }
 
   /** Лист, для которого открыто окно «Поделиться». */
   const sharedSheet = ref<CharacterSheet | null>(null);
@@ -390,6 +495,67 @@
     </section>
 
     <section
+      v-if="isLoggedIn && !isAuthError && history.length"
+      class="mt-6 flex flex-col gap-2"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium tracking-wide text-muted uppercase">
+          {{ SHEET_HISTORY_TEXT.title }}
+        </span>
+
+        <UTooltip :text="historyTooltip">
+          <UIcon
+            :name="SHEET_LIST_ICON.help"
+            class="size-3.5 shrink-0 text-muted"
+          />
+        </UTooltip>
+      </div>
+
+      <ul
+        class="flex flex-col divide-y divide-default rounded-xl border border-default"
+      >
+        <li
+          v-for="item in history"
+          :key="item.id"
+          class="flex items-center gap-3 px-3 py-2"
+        >
+          <UIcon
+            :name="SHEET_HISTORY_ICON.item"
+            class="size-5 shrink-0 text-muted"
+          />
+
+          <div class="flex min-w-0 grow flex-col">
+            <span class="truncate text-sm font-medium text-highlighted">
+              {{ item.name }}
+            </span>
+
+            <span class="text-xs text-muted">
+              {{ getDeletedLabel(item.deletedAt) }}
+            </span>
+          </div>
+
+          <UTooltip
+            :text="
+              canCreate
+                ? SHEET_HISTORY_TEXT.restoreAria
+                : SHEET_HISTORY_TEXT.restoreLimit
+            "
+          >
+            <UButton
+              :label="SHEET_HISTORY_TEXT.restore"
+              :icon="SHEET_HISTORY_ICON.restore"
+              color="neutral"
+              variant="subtle"
+              size="sm"
+              :disabled="!canCreate || isMutating"
+              @click.left.exact.prevent="restoreSheet(item.id)"
+            />
+          </UTooltip>
+        </li>
+      </ul>
+    </section>
+
+    <section
       v-if="isLoggedIn && !isAuthError && isSavedLoaded"
       class="mt-6 flex flex-col gap-2"
     >
@@ -450,6 +616,7 @@
               :can-copy="canCreate"
               @copy="copySaved"
               @remove="askRemoveSaved"
+              @request-edit="requestSavedEdit"
             />
           </div>
         </div>

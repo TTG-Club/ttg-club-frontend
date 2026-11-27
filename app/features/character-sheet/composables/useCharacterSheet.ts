@@ -4,31 +4,61 @@ import type {
   SharedSheet,
   SheetDocument,
   SheetLoadStatus,
+  SheetSaveQueue,
   SheetSaveStatus,
+  SheetServerState,
 } from '../model';
 
 import { getApiErrorMessage, getErrorStatus } from '~user/model';
 
 import {
   createEmptySheetDocument,
+  createSheetSaveQueue,
   fetchSharedSheet,
   fetchSheet,
+  mergeSheetSnapshots,
   saveSheet,
   saveSheetOnLeave,
   SHEET_HIDDEN_CONTROL_CLASS,
   SHEET_HTTP_STATUS,
   SHEET_LOCKED_STORAGE_KEY,
   SHEET_READONLY_TEXT,
-  SHEET_SAVE_DELAY,
   SHEET_TEXT,
 } from '../model';
 
 /**
+ * Лист с сервера в том виде, в каком его сохраняет очередь.
+ * @param sheet - лист из ответа
+ * @returns снимок и версия
+ */
+function toServerState(sheet: CharacterSheet): SheetServerState {
+  return {
+    snapshot: { name: sheet.name, data: sheet.data },
+    version: sheet.version,
+  };
+}
+
+/**
+ * Конфликт версий: лист успел сохранить кто-то ещё.
+ * @param error - пойманная ошибка
+ * @returns true, если сервер ответил 409
+ */
+function isVersionConflict(error: unknown): boolean {
+  return getErrorStatus(error) === SHEET_HTTP_STATUS.conflict;
+}
+
+/**
  * Открытый лист персонажа: документ, имя и автосохранение. Правки копятся и
  * уходят на сервер одним запросом после паузы; при уходе со страницы
- * несохранённое отправляется сразу. Сервер хранит версию листа: если лист
- * успели изменить в другом окне, сохранение останавливается до перезагрузки,
- * чтобы не затереть чужие правки.
+ * несохранённое отправляется сразу.
+ *
+ * Лист могут править сразу несколько человек (владелец и редакторы, которым
+ * он разрешил правки). Сервер хранит версию листа: если лист успели сохранить
+ * в другом месте, сервер отвечает конфликтом — тогда свежий лист загружается,
+ * свои правки сливаются с ним и уходят заново. Если отметка присутствия
+ * сообщает о более новой версии, чужие правки подтягиваются тем же слиянием,
+ * не дожидаясь своего сохранения. Конфликт показывается, только если
+ * перечитать лист или слить правки не вышло.
  */
 export const useCharacterSheet = createSharedComposable(() => {
   const toast = useToast();
@@ -36,17 +66,11 @@ export const useCharacterSheet = createSharedComposable(() => {
   const sheetId = ref<string>();
   const name = ref('');
   const document = shallowRef<SheetDocument>(createEmptySheetDocument());
-  const version = ref(0);
   const loadStatus = ref<SheetLoadStatus>('idle');
   const saveStatus = ref<SheetSaveStatus>('idle');
 
-  /** Есть правки, которых ещё нет на сервере. */
-  const isDirty = ref(false);
-
-  /** Идёт запрос сохранения: следующий ждёт его версии. */
-  const isSaving = ref(false);
-
-  const isConflict = computed(() => saveStatus.value === 'conflict');
+  /** Очередь сохранения открытого листа; null — сохранять нечего. */
+  let saveQueue: SheetSaveQueue | null = null;
 
   /** Секрет ссылки, если лист открыт по ней: только чтение, без сохранения. */
   const sharedToken = ref<string | null>(null);
@@ -61,6 +85,9 @@ export const useCharacterSheet = createSharedComposable(() => {
 
   /** Лист открыт по ссылке: правки и сохранение закрыты. */
   const isReadonly = computed(() => sharedToken.value !== null);
+
+  /** Лист чужой и открыт по праву редактора: удалять и делиться нельзя. */
+  const isEditor = ref(false);
 
   /**
    * Запертые листы: замок помнится в браузере для каждого листа, чтобы после
@@ -135,33 +162,98 @@ export const useCharacterSheet = createSharedComposable(() => {
     return false;
   }
 
-  const scheduleSave = useDebounceFn(() => save(), SHEET_SAVE_DELAY);
+  /**
+   * Сменяет очередь сохранения. Хвост правок прошлой очереди досылается со
+   * своей версией и в новый лист уже не попадёт.
+   * @param next - очередь нового листа; null — сохранять нечего
+   * @param keepPending - досылать ли несохранённое прошлой очереди
+   */
+  function replaceQueue(
+    next: SheetSaveQueue | null,
+    keepPending: boolean,
+  ): void {
+    if (saveQueue && !keepPending) {
+      saveQueue.discard();
+    }
+
+    saveQueue?.detach();
+    saveQueue = next;
+  }
 
   /**
-   * Подставляет лист с сервера.
-   * @param sheet - лист из ответа
+   * Очередь сохранения загруженного листа.
+   * @param id - идентификатор листа
+   * @param initial - лист в том виде, в каком его отдал сервер
+   * @returns очередь
    */
-  function apply(sheet: CharacterSheet): void {
+  function createQueue(id: string, initial: SheetServerState): SheetSaveQueue {
+    const queue = createSheetSaveQueue(initial, {
+      save: async (snapshot, version, options) => {
+        const body = { ...snapshot, version };
+
+        if (options.keepalive) {
+          saveSheetOnLeave(id, body);
+
+          return null;
+        }
+
+        return (await saveSheet(id, body)).version;
+      },
+      fetch: async () => toServerState(await fetchSheet(id)),
+      merge: mergeSheetSnapshots,
+      isConflict: isVersionConflict,
+      onStatus: (status) => {
+        if (saveQueue === queue) {
+          saveStatus.value = status;
+        }
+      },
+      onSnapshot: (snapshot) => {
+        // Хвост прошлого листа в открытый сейчас лист не попадает
+        if (saveQueue === queue) {
+          name.value = snapshot.name;
+          document.value = snapshot.data;
+        }
+      },
+      onError: (error) => {
+        toast.add({
+          title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
+          color: 'error',
+        });
+      },
+    });
+
+    return queue;
+  }
+
+  /**
+   * Подставляет лист с сервера и заводит ему очередь сохранения.
+   * @param sheet - лист из ответа
+   * @param keepPending - досылать ли несохранённое прошлого листа
+   */
+  function apply(sheet: CharacterSheet, keepPending: boolean): void {
+    replaceQueue(createQueue(sheet.id, toServerState(sheet)), keepPending);
     sheetId.value = sheet.id;
     name.value = sheet.name;
     document.value = sheet.data;
-    version.value = sheet.version;
     shareToken.value = sheet.shareToken;
+    isEditor.value = sheet.editor;
   }
 
   /**
    * Загружает лист.
    * @param id - идентификатор листа
+   * @param keepPending - досылать ли несохранённое прошлого листа; при
+   *   перезагрузке после конфликта свои правки сознательно отбрасываются
    */
-  async function load(id: string): Promise<void> {
+  async function load(id: string, keepPending = true): Promise<void> {
     loadStatus.value = 'pending';
     saveStatus.value = 'idle';
-    isDirty.value = false;
     sharedToken.value = null;
     sharedInfo.value = null;
+    isEditor.value = false;
 
     try {
-      apply(await fetchSheet(id));
+      apply(await fetchSheet(id), keepPending);
       loadStatus.value = 'ready';
     } catch (error) {
       loadStatus.value =
@@ -178,9 +270,10 @@ export const useCharacterSheet = createSharedComposable(() => {
   async function loadShared(token: string): Promise<void> {
     loadStatus.value = 'pending';
     saveStatus.value = 'idle';
-    isDirty.value = false;
     sharedToken.value = token;
     sharedInfo.value = null;
+    isEditor.value = false;
+    replaceQueue(null, true);
 
     try {
       const shared = await fetchSharedSheet(token);
@@ -188,7 +281,6 @@ export const useCharacterSheet = createSharedComposable(() => {
       sheetId.value = shared.id;
       name.value = shared.name;
       document.value = shared.data;
-      version.value = 0;
       shareToken.value = null;
       sharedInfo.value = { own: shared.own, savedId: shared.savedId };
       loadStatus.value = 'ready';
@@ -210,61 +302,9 @@ export const useCharacterSheet = createSharedComposable(() => {
     }
   }
 
-  /** Отправляет накопленные правки; пока идёт прошлый запрос — ждёт его. */
-  async function save(): Promise<void> {
-    const id = sheetId.value;
-
-    if (!id || !isDirty.value || isSaving.value || isConflict.value) {
-      return;
-    }
-
-    isSaving.value = true;
-    isDirty.value = false;
-    saveStatus.value = 'saving';
-
-    try {
-      const saved = await saveSheet(id, {
-        name: name.value,
-        data: document.value,
-        version: version.value,
-      });
-
-      // Ответ несёт новую версию; документ из ответа не подставляем — пока
-      // запрос шёл, игрок мог продолжить правки
-      version.value = saved.version;
-      saveStatus.value = isDirty.value ? 'pending' : 'saved';
-    } catch (error) {
-      if (getErrorStatus(error) === SHEET_HTTP_STATUS.conflict) {
-        saveStatus.value = 'conflict';
-
-        return;
-      }
-
-      isDirty.value = true;
-      saveStatus.value = 'error';
-
-      toast.add({
-        title: getApiErrorMessage(error, SHEET_TEXT.errorSave),
-        color: 'error',
-      });
-    } finally {
-      isSaving.value = false;
-    }
-
-    // Правки, сделанные во время запроса, уходят следующим
-    if (isDirty.value) {
-      scheduleSave();
-    }
-  }
-
-  /** Отмечает правку и откладывает сохранение. */
-  function markDirty(): void {
-    isDirty.value = true;
-
-    if (!isConflict.value) {
-      saveStatus.value = 'pending';
-      scheduleSave();
-    }
+  /** Сообщает очереди сохранения о правке. */
+  function track(): void {
+    saveQueue?.track({ name: name.value, data: document.value });
   }
 
   /**
@@ -278,7 +318,7 @@ export const useCharacterSheet = createSharedComposable(() => {
     }
 
     document.value = change(document.value);
-    markDirty();
+    track();
   }
 
   /**
@@ -291,10 +331,13 @@ export const useCharacterSheet = createSharedComposable(() => {
     }
 
     name.value = next;
-    markDirty();
+    track();
   }
 
-  /** Перечитывает лист с сервера после конфликта версий. */
+  /**
+   * Перечитывает лист с сервера; несохранённые правки отбрасываются — так
+   * выходят из конфликта, который не удалось слить.
+   */
   async function reload(): Promise<void> {
     if (sharedToken.value) {
       await loadShared(sharedToken.value);
@@ -303,35 +346,32 @@ export const useCharacterSheet = createSharedComposable(() => {
     }
 
     if (sheetId.value) {
-      await load(sheetId.value);
+      await load(sheetId.value, false);
     }
+  }
+
+  /**
+   * Версия листа на сервере известна по отметке присутствия: если она новее
+   * своей, лист сохранил кто-то ещё, и его правки сливаются со своими.
+   * @param remoteVersion - версия листа на сервере
+   */
+  function syncRemote(remoteVersion: number): void {
+    void saveQueue?.syncRemote(remoteVersion);
   }
 
   /** Уход со страницы: несохранённое уходит запросом, который переживёт её. */
   function flushOnLeave(): void {
-    if (
-      !sheetId.value
-      || !isDirty.value
-      || isConflict.value
-      || isReadonly.value
-    ) {
-      return;
+    if (saveQueue?.hasPending() && !saveQueue.isSaving()) {
+      void saveQueue.flush({ keepalive: true });
     }
-
-    saveSheetOnLeave(sheetId.value, {
-      name: name.value,
-      data: document.value,
-      version: version.value,
-    });
-
-    isDirty.value = false;
   }
 
   /**
-   * Забывает несохранённые правки: лист удалён, и сохранять их некуда.
+   * Забывает несохранённые правки: лист удалён или право на правку отозвано,
+   * и сохранять их некуда.
    */
   function discardChanges(): void {
-    isDirty.value = false;
+    saveQueue?.discard();
   }
 
   useEventListener('pagehide', flushOnLeave);
@@ -346,6 +386,7 @@ export const useCharacterSheet = createSharedComposable(() => {
     saveStatus,
     isLocked,
     isReadonly,
+    isEditor,
     shareToken,
     sharedToken,
     sharedInfo,
@@ -357,6 +398,7 @@ export const useCharacterSheet = createSharedComposable(() => {
     loadShared,
     markShared,
     reload,
+    syncRemote,
     update,
     rename,
     discardChanges,

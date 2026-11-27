@@ -28,6 +28,7 @@ import type { CatalogMechanics, EntityRef } from './mechanics';
 import type {
   AbilityScores,
   ProficiencyGrant,
+  SheetDocument,
   SheetSource,
   SkillProficiencies,
   SkillProficiency,
@@ -49,6 +50,29 @@ export type SheetTab =
 
 /** Состояние автосохранения листа. */
 export type SheetSaveStatus = keyof typeof SHEET_SAVE_STATUS_TEXT;
+
+/** Лист в том виде, в каком его сохраняют: имя персонажа и документ. */
+export interface SheetSnapshot {
+  name: string;
+  data: SheetDocument;
+}
+
+/** Лист на сервере: снимок и версия, с которой его можно править. */
+export interface SheetServerState {
+  snapshot: SheetSnapshot;
+  version: number;
+}
+
+/** Пометка карточки листа в списке. */
+export interface SheetCardBadge {
+  key: string;
+  /** Подпись; без неё пометка — одна иконка с подсказкой. */
+  label?: string;
+  icon?: string;
+  /** Подсказка при наведении; у пометки без подписи — обязательна по смыслу. */
+  tooltip?: string;
+  color: 'primary' | 'neutral' | 'warning';
+}
 
 /** Состояние загрузки листа. */
 export type SheetLoadStatus =

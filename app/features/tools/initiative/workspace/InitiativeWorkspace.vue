@@ -3,6 +3,7 @@
 
   import type {
     AddParticipantRequest,
+    SheetPlayerOption,
     UpdateParticipantRequest,
   } from '../model';
 
@@ -11,6 +12,7 @@
   import {
     useCreatureSummaries,
     useParticipantStats,
+    useSheetHitPointsSync,
     useTrackerSlot,
     useTrackerWorkspace,
   } from '../composables';
@@ -18,17 +20,21 @@
   import {
     createTracker,
     deleteTracker,
+    findAddedSheetParticipant,
+    getLinkedSheetIds,
     getTrackerErrorMessage,
     getTrackerRoute,
     INITIATIVE_ICON,
     INITIATIVE_ROUTE,
     INITIATIVE_TEXT,
     isParticipantCurrent,
+    toParticipantSheetLink,
     TRACKER_STATUS_META,
   } from '../model';
   import CreatureAddForm from './CreatureAddForm.vue';
   import ParticipantRow from './ParticipantRow.vue';
   import PlayerAddForm from './PlayerAddForm.vue';
+  import SheetPlayerAddForm from './SheetPlayerAddForm.vue';
   import TrackerControls from './TrackerControls.vue';
   import TurnReel from './TurnReel.vue';
 
@@ -88,6 +94,11 @@
     () => id,
     () => participants.value,
   );
+
+  const { syncHitPoints } = useSheetHitPointsSync();
+
+  /** Листы, персонажи которых уже в бою: форма листов их помечает. */
+  const linkedSheetIds = computed(() => getLinkedSheetIds(participants.value));
 
   const avatars = computed<Record<string, string | undefined>>(() =>
     Object.fromEntries(
@@ -230,6 +241,108 @@
   }
 
   /**
+   * Добавляет игрока из листа персонажа. Имя, бонус и привязка к листу уходят
+   * на бэкенд, а КД и хиты живут на устройстве ведущего — их получает новый
+   * участник из ответа. Лист без максимума хитов (персонаж только собирается)
+   * текущих хитов не задаёт: плитка останется прочерком, как у игрока,
+   * заведённого вручную.
+   * @param option - выбранный лист персонажа
+   */
+  async function addSheetPlayer(option: SheetPlayerOption): Promise<void> {
+    const knownIds = new Set(
+      participants.value.map((participant) => participant.id),
+    );
+
+    const isAdded = await addParticipant({
+      type: 'PLAYER',
+      name: option.name,
+      initiativeBonus: option.initiativeBonus,
+      sheetLink: toParticipantSheetLink(option),
+    });
+
+    const participant = isAdded
+      ? findAddedSheetParticipant(participants.value, knownIds, option.sheetId)
+      : undefined;
+
+    if (!participant) {
+      return;
+    }
+
+    setArmorClass(participant.id, option.armorClass);
+
+    if (option.maxHitPoints > 0) {
+      setMaxHitPoints(participant.id, option.maxHitPoints);
+      setHitPoints(participant.id, option.currentHitPoints);
+    }
+
+    if (option.temporaryHitPoints > 0) {
+      setTemporaryHitPoints(participant.id, option.temporaryHitPoints);
+    }
+  }
+
+  /**
+   * Отправляет в лист персонажа хиты участника, привязанного к листу: текущие
+   * вместе с временными. Пока текущие хиты не заданы, писать в лист нечего.
+   * @param participantId - идентификатор участника
+   */
+  function syncSheetHitPoints(participantId: string): void {
+    const link = participants.value.find(
+      (participant) => participant.id === participantId,
+    )?.sheetLink;
+
+    const current =
+      hitPoints.value[participantId] ?? maxHitPoints.value[participantId];
+
+    if (!link || current === undefined) {
+      return;
+    }
+
+    syncHitPoints(link, {
+      current,
+      temporary: temporaryHitPoints.value[participantId] ?? 0,
+    });
+  }
+
+  /**
+   * Хиты после урона или лечения; игроку из листа — ещё и в лист.
+   * @param participantId - идентификатор участника
+   * @param value - новые хиты
+   * @param temporary - остаток временных хитов
+   */
+  function changeHitPoints(
+    participantId: string,
+    value: number,
+    temporary?: number,
+  ): void {
+    setHitPoints(participantId, value, temporary);
+    syncSheetHitPoints(participantId);
+  }
+
+  /**
+   * Временные хиты; игроку из листа — ещё и в лист.
+   * @param participantId - идентификатор участника
+   * @param value - новые временные хиты
+   */
+  function changeTemporaryHitPoints(
+    participantId: string,
+    value: number,
+  ): void {
+    setTemporaryHitPoints(participantId, value);
+    syncSheetHitPoints(participantId);
+  }
+
+  /**
+   * Прокинутый максимум хитов (участник встаёт на полные); игроку из листа —
+   * текущие хиты ещё и в лист.
+   * @param participantId - идентификатор участника
+   * @param value - выпавший максимум
+   */
+  function changeMaxHitPoints(participantId: string, value: number): void {
+    setMaxHitPoints(participantId, value);
+    syncSheetHitPoints(participantId);
+  }
+
+  /**
    * Меняет участника.
    * @param participantId - идентификатор участника
    * @param patch - изменённые поля
@@ -348,11 +461,21 @@
           class="w-full"
         >
           <template #player>
-            <PlayerAddForm
-              :is-disabled="isMutating"
-              :is-limited="!canAddPlayer"
-              @add="add"
-            />
+            <div class="flex flex-col gap-4">
+              <PlayerAddForm
+                :is-disabled="isMutating"
+                :is-limited="!canAddPlayer"
+                @add="add"
+              />
+
+              <SheetPlayerAddForm
+                :is-disabled="isMutating"
+                :is-limited="!canAddPlayer"
+                :linked-sheet-ids="linkedSheetIds"
+                class="border-t border-default pt-4"
+                @add="addSheetPlayer"
+              />
+            </div>
           </template>
 
           <template #creature>
@@ -455,9 +578,9 @@
         @remove="remove"
         @roll="roll"
         @toggle-dead="toggleDead"
-        @set-hit-points="setHitPoints"
-        @set-temporary-hit-points="setTemporaryHitPoints"
-        @set-max-hit-points="setMaxHitPoints"
+        @set-hit-points="changeHitPoints"
+        @set-temporary-hit-points="changeTemporaryHitPoints"
+        @set-max-hit-points="changeMaxHitPoints"
         @set-armor-class="setArmorClass"
       />
     </div>
