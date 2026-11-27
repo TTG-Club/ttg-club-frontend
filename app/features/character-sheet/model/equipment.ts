@@ -8,9 +8,11 @@ import type {
 } from './types';
 
 import { upperFirst } from 'es-toolkit';
+import { z } from 'zod';
 
 import { isMarkerNode, isSimpleTextNode, parse } from '~news/markup';
 
+import { fetchCatalogEntry } from './api';
 import { createSheetItem, loadCatalogItem } from './catalog';
 import {
   STARTING_EQUIPMENT_LINK_KINDS,
@@ -115,7 +117,10 @@ function toTextItems(text: string): Array<StartingEquipmentItem> {
     .map((part) =>
       part.replace(STARTING_EQUIPMENT_PATTERNS.edgeJunk, '').trim(),
     )
-    .filter((part) => part.length > 1)
+    .filter(
+      (part) =>
+        part.length > 1 && !STARTING_EQUIPMENT_PATTERNS.money.test(part),
+    )
     .map((part) => {
       const leading = STARTING_EQUIPMENT_PATTERNS.leadingQuantity.exec(part);
       const word = leading?.[1]?.toLocaleLowerCase() ?? '';
@@ -130,6 +135,22 @@ function toTextItems(text: string): Array<StartingEquipmentItem> {
         quantity,
       };
     });
+}
+
+/**
+ * Убирает слово, прилипшее к следующей ссылке: «и поясной » → «и ».
+ * @param text - текст перед ссылкой
+ */
+function dropGluedWord(text: string): string {
+  if (STARTING_EQUIPMENT_PATTERNS.endsWithSeparator.test(text)) {
+    return text;
+  }
+
+  const parts = text.split(STARTING_EQUIPMENT_PATTERNS.separator);
+
+  parts.pop();
+
+  return parts.join(', ');
 }
 
 /**
@@ -177,10 +198,11 @@ function toOption(nodes: ReadonlyArray<RenderNode>): StartingEquipmentOption {
     if ('text' in piece) {
       const next = pieces[index + 1];
 
-      // Число в конце текста относится к следующей ссылке
+      // Число в конце текста относится к следующей ссылке, а слово, прилипшее
+      // к ней («поясной кошель»), — её часть, а не отдельный предмет
       const text =
         next && 'link' in next
-          ? getTrailingQuantity(piece.text).rest
+          ? dropGluedWord(getTrailingQuantity(piece.text).rest)
           : piece.text;
 
       items.push(...toTextItems(text));
@@ -202,7 +224,11 @@ function toOption(nodes: ReadonlyArray<RenderNode>): StartingEquipmentOption {
     });
   });
 
-  return { label: getText([...nodes]).trim(), items };
+  const label = getText([...nodes])
+    .replace(STARTING_EQUIPMENT_PATTERNS.englishName, '')
+    .trim();
+
+  return { label, items };
 }
 
 /**
@@ -414,4 +440,29 @@ export function toEquipmentBlocks(
   }
 
   return typeof value === 'string' ? [value] : [...value];
+}
+
+/** Снаряжение и деньги из карточки предыстории. */
+const backgroundEquipmentSchema = z.object({
+  equipments: z.array(z.string()).nullish(),
+  startGold: z.number().nullish(),
+});
+
+/**
+ * Стартовое снаряжение и деньги предыстории; ошибка — без снаряжения.
+ * @param url - адрес предыстории
+ */
+export async function fetchBackgroundEquipment(
+  url: string,
+): Promise<{ equipments: Array<string>; startGold: number }> {
+  try {
+    const detail = await fetchCatalogEntry(url, backgroundEquipmentSchema);
+
+    return {
+      equipments: detail.equipments ?? [],
+      startGold: detail.startGold ?? 0,
+    };
+  } catch {
+    return { equipments: [], startGold: 0 };
+  }
 }

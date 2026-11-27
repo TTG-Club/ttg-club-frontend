@@ -1,4 +1,7 @@
+import type { DropdownMenuItem } from '@nuxt/ui';
+
 import type { SheetDocument } from '../model';
+import type { SheetPdfVariant } from '../model/pdf';
 
 import { getApiErrorMessage } from '~user/model';
 
@@ -7,11 +10,15 @@ import {
   shareSheet,
   SHEET_PDF_ICON,
   SHEET_PDF_TEXT,
+  SHEET_PDF_VARIANT_OPTIONS,
   SHEET_SHARE_TEXT,
 } from '../model';
 
-/** Что экспорт знает о ссылке на лист, кроме самого документа. */
+/** Что экспорт знает о листе, кроме самого документа. */
 export interface SheetPdfExportOptions {
+  /** Вид листа: раскладка сайта или как в Книге игрока. */
+  variant: SheetPdfVariant;
+
   /** Секрет ссылки на лист; null — доступ по ссылке выключен. */
   shareToken: string | null;
 
@@ -31,13 +38,16 @@ export interface SheetPdfExportOptions {
  * Сборщик и pdf-lib грузятся динамически: они нужны только в момент экспорта,
  * а в основном бандле весили бы больше самого листа.
  *
- * @returns признак идущей сборки и запуск экспорта.
+ * @returns признак сборки, запуск экспорта и пункты меню выбора вида.
  */
 export function useSheetPdf() {
   const toast = useToast();
   const requestUrl = useRequestURL();
 
-  const isExporting = ref(false);
+  /** Вид листа, который сейчас собирается; null — сборки нет. */
+  const exportingVariant = ref<SheetPdfVariant | null>(null);
+
+  const isExporting = computed(() => exportingVariant.value !== null);
 
   /**
    * Включает доступ по ссылке у своего листа ради QR-кода и сообщает об этом.
@@ -76,7 +86,7 @@ export function useSheetPdf() {
    *
    * @param name имя персонажа.
    * @param document документ листа.
-   * @param options секрет ссылки и право включить доступ.
+   * @param options вид листа, секрет ссылки и право включить доступ.
    * @returns секрет ссылки, если экспорт только что включил доступ, — его
    * нужно запомнить в состоянии листа; иначе null.
    */
@@ -89,7 +99,7 @@ export function useSheetPdf() {
       return null;
     }
 
-    isExporting.value = true;
+    exportingVariant.value = options.variant;
 
     let enabledToken: string | null = null;
 
@@ -104,6 +114,7 @@ export function useSheetPdf() {
       await downloadCharacterSheetPdf(
         { name, document },
         {
+          variant: options.variant,
           shareUrl: token ? getSheetShareUrl(requestUrl.origin, token) : null,
         },
       );
@@ -115,11 +126,31 @@ export function useSheetPdf() {
         icon: SHEET_PDF_ICON.error,
       });
     } finally {
-      isExporting.value = false;
+      exportingVariant.value = null;
     }
 
     return enabledToken;
   }
 
-  return { isExporting, exportToPdf };
+  /**
+   * Пункты меню по видам листа: собираемый вид показывает загрузку, на время
+   * сборки оба пункта закрыты. Читает состояние сборки, поэтому вызывается
+   * внутри `computed` меню.
+   *
+   * @param onDownload запуск экспорта выбранного вида.
+   * @returns пункты меню.
+   */
+  function getPdfMenuItems(
+    onDownload: (variant: SheetPdfVariant) => void,
+  ): Array<DropdownMenuItem> {
+    return SHEET_PDF_VARIANT_OPTIONS.map((option) => ({
+      label: option.label,
+      icon: SHEET_PDF_ICON.download,
+      loading: exportingVariant.value === option.variant,
+      disabled: isExporting.value,
+      onSelect: () => onDownload(option.variant),
+    }));
+  }
+
+  return { isExporting, exportToPdf, getPdfMenuItems };
 }

@@ -21,24 +21,48 @@ import { drawPdfFooters } from './layout';
 import { drawEquipmentPage } from './page-equipment';
 import { drawMainPage } from './page-main';
 import { drawPersonalityPage } from './page-personality';
+import { drawPhbDetailsPage } from './page-phb-details';
+import { drawPhbMainPage } from './page-phb-main';
+import { drawPhbSpellsPage } from './page-phb-spells';
 import { drawReferencePage } from './page-reference';
 import { drawSpellsPage } from './page-spells';
+import { loadPdfPortrait } from './portrait';
 
 /** Отрисовка страницы листа. */
 type PdfPageDrawer = (context: PdfBuildContext, sheet: PdfSheet) => void;
 
-/**
- * Страницы каждого вида листа по порядку; справочник идёт после них у любого
- * вида. Страница, которой нечего показать, сама себя не создаёт.
- */
-const PDF_VARIANT_PAGES: Record<SheetPdfVariant, PdfPageDrawer[]> = {
-  ttg: [drawMainPage, drawPersonalityPage, drawEquipmentPage, drawSpellsPage],
+/** Что нужно виду листа: страницы по порядку и портрет. */
+interface PdfVariantConfig {
+  /** Страницы до справочника; страница, которой нечего показать, сама себя не создаёт. */
+  pages: PdfPageDrawer[];
+
+  /** Вид рисует портрет персонажа — его нужно загрузить. */
+  hasPortrait: boolean;
+}
+
+/** Виды листа: справочник и колонтитулы у всех общие. */
+const PDF_VARIANTS: Record<SheetPdfVariant, PdfVariantConfig> = {
+  ttg: {
+    pages: [
+      drawMainPage,
+      drawPersonalityPage,
+      drawEquipmentPage,
+      drawSpellsPage,
+    ],
+    hasPortrait: false,
+  },
+  phb: {
+    pages: [drawPhbMainPage, drawPhbDetailsPage, drawPhbSpellsPage],
+    hasPortrait: true,
+  },
 };
 
 /**
- * Сборка PDF листа персонажа. Первая страница — основной лист, дальше
- * личность, снаряжение, заклинания и справочник с полными описаниями;
- * страницы, которым нечего показать, не создаются.
+ * Сборка PDF листа персонажа. Лист TTG: основной лист, личность, снаряжение и
+ * заклинания; лист «как в Книге игрока» — три страницы печатного листа PHB
+ * 2014 (основная, персонаж и заклинания — последняя только у заклинателя).
+ * У обоих дальше справочник с полными описаниями; страницы, которым нечего
+ * показать, не создаются.
  *
  * Всё, что есть в документе листа, считается теми же функциями, что и лист на
  * сайте, поэтому экспорт одинаково работает и из открытого листа, и из
@@ -66,11 +90,16 @@ export async function buildCharacterSheetPdf(
   document.setProducer(PDF_META.producer);
   document.setSubject(PDF_META.subject);
 
-  // Шрифты и справочник тянутся параллельно: и то и другое — сеть, а рисовать
-  // всё равно нечем, пока не встроены шрифты.
-  const [fonts, catalog] = await Promise.all([
+  const variant = PDF_VARIANTS[options.variant ?? PDF_DEFAULT_VARIANT];
+
+  // Шрифты, справочник и портрет тянутся параллельно: всё это — сеть, а
+  // рисовать всё равно нечем, пока не встроены шрифты.
+  const [fonts, catalog, portrait] = await Promise.all([
     loadPdfFonts(document),
     loadPdfCatalog(source.document),
+    variant.hasPortrait
+      ? loadPdfPortrait(document, source.document.avatarUrl)
+      : null,
   ]);
 
   const context: PdfBuildContext = {
@@ -79,14 +108,12 @@ export async function buildCharacterSheetPdf(
     characterName: source.name,
     pages: [],
     shareUrl: options.shareUrl ?? null,
+    portrait,
   };
 
   const sheet = createPdfSheet(source, catalog);
 
-  // Вид листа выбирает набор страниц; справочник и колонтитулы общие.
-  for (const drawPage of PDF_VARIANT_PAGES[
-    options.variant ?? PDF_DEFAULT_VARIANT
-  ]) {
+  for (const drawPage of variant.pages) {
     drawPage(context, sheet);
   }
 

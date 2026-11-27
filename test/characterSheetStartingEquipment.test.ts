@@ -18,6 +18,7 @@ const ACOLYTE = [
   'молитвенник или молитвенный барабан',
   '5 палочек благовоний',
   '{@item комплект обычной одежды | url:Common_Clothes}',
+  'поясной {@item кошель | url:Pouch} с 15 зм.',
 ];
 
 describe('стартовое снаряжение класса', () => {
@@ -94,7 +95,7 @@ describe('стартовое снаряжение предыстории', () =>
   const lines = parseBackgroundStartingEquipment(ACOLYTE);
 
   it('строка — набор, «или» без меток — выбор', () => {
-    expect(lines).toHaveLength(4);
+    expect(lines).toHaveLength(5);
 
     expect(lines[1]?.options.map((option) => option.items[0]?.name)).toEqual([
       'молитвенник',
@@ -114,6 +115,12 @@ describe('стартовое снаряжение предыстории', () =>
         kind: 'item',
         quantity: 1,
       },
+    ]);
+  });
+
+  it('прилипшее слово и деньги не становятся предметами', () => {
+    expect(lines[4]?.options[0]?.items).toEqual([
+      { name: 'кошель', url: '/items/Pouch', kind: 'item', quantity: 1 },
     ]);
   });
 });

@@ -106,6 +106,8 @@ export interface PdfResourceRow {
 
 /** Ряд ячеек заклинаний одного круга. */
 export interface PdfSpellSlotRow {
+  /** Круг ячеек. */
+  level: number;
   label: string;
   max: number;
   used: number;
@@ -114,6 +116,8 @@ export interface PdfSpellSlotRow {
 
 /** Группа заклинаний одного круга. */
 export interface PdfSpellGroup {
+  /** Круг; 0 — заговоры. */
+  level: number;
   label: string;
   spells: Array<{ spell: SheetSpell; isPrepared: boolean }>;
 }
@@ -128,6 +132,10 @@ export interface PdfInventoryGroup {
 /** Заклинательство персонажа: характеристика, Сл и бонус атаки. */
 export interface PdfSpellcasting {
   ability: AbilityKey;
+
+  /** Классы-заклинатели листа; пусто — заклинания от расы или черт. */
+  classNames: string[];
+
   saveDc: number;
   attack: number;
 }
@@ -367,30 +375,33 @@ export function getPdfWeaponRows(sheet: PdfSheet): string[][] {
 export function getPdfSpellcasting(sheet: PdfSheet): PdfSpellcasting | null {
   const { document, catalog, stats } = sheet;
 
-  const classAbility = document.classes
-    .map((sheetClass) => {
-      const base = sheetClass.url
-        ? catalog.classes.get(sheetClass.url)
-        : undefined;
+  const casters = document.classes.flatMap((sheetClass) => {
+    const base = sheetClass.url
+      ? catalog.classes.get(sheetClass.url)
+      : undefined;
 
-      const archetype = sheetClass.archetypeUrl
-        ? catalog.classes.get(sheetClass.archetypeUrl)
-        : undefined;
+    const archetype = sheetClass.archetypeUrl
+      ? catalog.classes.get(sheetClass.archetypeUrl)
+      : undefined;
 
-      return (
-        sheetClass.spellcastingAbility
-        ?? toAbilityKey(archetype?.spellAbility ?? base?.spellAbility ?? null)
-      );
-    })
-    .find((ability): ability is AbilityKey => ability !== null);
+    const ability =
+      sheetClass.spellcastingAbility
+      ?? toAbilityKey(archetype?.spellAbility ?? base?.spellAbility ?? null);
 
-  const ability = classAbility ?? document.spellcastingAbility;
+    return ability ? [{ name: sheetClass.name, ability }] : [];
+  });
+
+  const ability = casters[0]?.ability ?? document.spellcastingAbility;
 
   if (!ability) {
     return null;
   }
 
-  return { ability, ...stats.spellcastingByAbility[ability] };
+  return {
+    ability,
+    classNames: casters.map((caster) => caster.name),
+    ...stats.spellcastingByAbility[ability],
+  };
 }
 
 /**
@@ -493,6 +504,7 @@ export function getPdfSpellSlotRows(sheet: PdfSheet): PdfSpellSlotRow[] {
       max
         ? [
             {
+              level: index + 1,
               label: PDF_SPELL_LABELS.level(index + 1),
               max,
               used: Math.min(document.spellSlotsUsed[index] ?? 0, max),
@@ -506,6 +518,7 @@ export function getPdfSpellSlotRows(sheet: PdfSheet): PdfSpellSlotRow[] {
 
   if (pact) {
     rows.push({
+      level: pact.level,
       label: PDF_SPELL_LABELS.level(pact.level),
       max: pact.slots,
       used: Math.min(document.pactSlotsUsed, pact.slots),
@@ -548,6 +561,7 @@ export function getPdfSpellGroups(sheet: PdfSheet): PdfSpellGroup[] {
   ].sort((left, right) => left - right);
 
   return levels.map((level) => ({
+    level,
     label: level ? PDF_SPELL_LABELS.level(level) : SPELL_GROUP_TEXT.cantrips,
     spells: sortItemsByName(
       sheet.document.spells.filter((spell) => spell.level === level),

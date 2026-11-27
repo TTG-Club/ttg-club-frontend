@@ -1,4 +1,4 @@
-import type { Color, PDFDocument, PDFFont, PDFPage } from 'pdf-lib';
+import type { Color, PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
 
 import type { SpellDetail } from '~character/model';
 import type { ContentDescription } from '~content/model';
@@ -7,10 +7,10 @@ import type { SheetClassDetail, SheetDocument } from '../schema';
 import type { ClassProgression, SheetStats } from '../types';
 
 /**
- * Вид листа PDF. Пока один — раскладка сайта со справочником; печатный лист
- * Книги игрока 2014 добавится отдельным значением.
+ * Вид листа PDF: раскладка сайта со справочником или копия печатного листа
+ * Книги игрока 2014.
  */
-export type SheetPdfVariant = 'ttg';
+export type SheetPdfVariant = 'ttg' | 'phb';
 
 /** Лист, из которого собирается PDF: имя и документ. */
 export interface PdfSheetSource {
@@ -78,6 +78,12 @@ export interface PdfBuildContext {
    * выключен, и кода в документе нет.
    */
   shareUrl: string | null;
+
+  /**
+   * Портрет персонажа для листа «как в Книге игрока»; null — портрета нет,
+   * он не загрузился или виду листа не нужен.
+   */
+  portrait: PDFImage | null;
 }
 
 /** Необязательные данные сборки, которых нет в самом документе листа. */

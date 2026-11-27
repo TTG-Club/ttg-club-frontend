@@ -245,6 +245,42 @@ describe('экспорт листа в PDF', () => {
     expect(await getPageCount(bytes)).toBe(2);
   });
 
+  it('лист как в Книге игрока: три страницы и справочник у заклинателя', async () => {
+    const bytes = await buildCharacterSheetPdf(
+      { name: 'Элронд', document: createSampleDocument() },
+      {
+        variant: 'phb',
+        shareUrl: 'https://5e14.ttg.club/tools/character-sheet/shared/abc',
+      },
+    );
+
+    expect(new TextDecoder().decode(bytes.slice(0, 4))).toBe(PDF_SIGNATURE);
+
+    // Основная, персонаж, заклинания и одна страница справочника.
+    expect(await getPageCount(bytes)).toBe(4);
+  });
+
+  it('лист как в Книге игрока без заклинаний: две страницы и справочник', async () => {
+    const sample = createSampleDocument();
+
+    const document = {
+      ...sample,
+      spellcastingAbility: null,
+      spells: [],
+      classes: sample.classes.map((sheetClass) => ({
+        ...sheetClass,
+        spellcastingAbility: null,
+      })),
+    };
+
+    const bytes = await buildCharacterSheetPdf(
+      { name: 'Торин', document },
+      { variant: 'phb' },
+    );
+
+    expect(await getPageCount(bytes)).toBe(3);
+  });
+
   it('имя файла без запрещённых символов', () => {
     expect(getSheetPdfFileName('Элронд: "Мудрый"')).toBe(
       'Элронд_ _Мудрый_.pdf',

@@ -2,6 +2,7 @@
   import type { DropdownMenuItem } from '@nuxt/ui';
 
   import type { CharacterSheet } from '../model';
+  import type { SheetPdfVariant } from '../model/pdf';
 
   import { useSheetPdf } from '../composables';
   import {
@@ -10,8 +11,6 @@
     SHEET_ICON,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
-    SHEET_PDF_ICON,
-    SHEET_PDF_TEXT,
     SHEET_SHARE_ICON,
     SHEET_SHARE_TEXT,
     SHEET_TEXT,
@@ -45,11 +44,15 @@
 
   const route = computed(() => getSheetRoute(sheet.id));
 
-  const { isExporting, exportToPdf } = useSheetPdf();
+  const { exportToPdf, getPdfMenuItems } = useSheetPdf();
 
-  /** Скачивает лист в PDF; без ссылки экспорт включает доступ по ней. */
-  async function downloadPdf(): Promise<void> {
+  /**
+   * Скачивает лист в PDF; без ссылки экспорт включает доступ по ней.
+   * @param variant - вид листа
+   */
+  async function downloadPdf(variant: SheetPdfVariant): Promise<void> {
     const enabledToken = await exportToPdf(sheet.name, sheet.data, {
+      variant,
       shareToken: sheet.shareToken,
       ownSheetId: sheet.id,
     });
@@ -72,15 +75,7 @@
         disabled: !canCopy,
         onSelect: () => emit('copy', sheet),
       },
-      {
-        label: isExporting.value
-          ? SHEET_PDF_TEXT.downloading
-          : SHEET_PDF_TEXT.download,
-        icon: SHEET_PDF_ICON.download,
-        loading: isExporting.value,
-        disabled: isExporting.value,
-        onSelect: downloadPdf,
-      },
+      ...getPdfMenuItems(downloadPdf),
       {
         label: SHEET_LIST_TEXT.download,
         icon: SHEET_LIST_ICON.download,

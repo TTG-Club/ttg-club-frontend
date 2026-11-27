@@ -3223,13 +3223,20 @@ export const SHEET_SHARE_ICON = {
 
 /** Подписи экспорта листа в PDF. */
 export const SHEET_PDF_TEXT = {
-  download: 'Скачать PDF',
-  downloading: 'Собираем PDF…',
   error: 'Не удалось собрать PDF листа',
   shareEnabledTitle: 'Доступ по ссылке включён',
   shareEnabledDescription:
     'QR-код в PDF ведёт на лист. Отключить ссылку можно в меню «Поделиться листом».',
 } as const;
+
+/**
+ * Виды листа PDF в меню: раскладка сайта со справочником и копия печатного
+ * листа Книги игрока 2014.
+ */
+export const SHEET_PDF_VARIANT_OPTIONS = [
+  { variant: 'ttg', label: 'PDF: лист TTG' },
+  { variant: 'phb', label: 'PDF: как в Книге игрока' },
+] as const;
 
 /** Иконки экспорта листа в PDF. */
 export const SHEET_PDF_ICON = {
@@ -3282,6 +3289,10 @@ export const STARTING_EQUIPMENT_PATTERNS = {
   edgeJunk: /^(?:и\s+|[\s,.;:])+|[\s,.;:]+$/gu,
   /** Английское название в скобках: «кольчуга [chain mail]». */
   englishName: /\s*\[[^\]]*\]/gu,
+  /** Деньги в строке: «с 15 зм» — их даёт поле стартовых денег. */
+  money: /\d+\s*(?:зм|см|мм|эм|пм)/u,
+  /** Текст перед ссылкой заканчивается связкой — не прилагательное к ней. */
+  endsWithSeparator: /(?:,|;|\sи|\sили)\s*$|^\s*$/u,
   /** «или» без меток: «молитвенник или молитвенный барабан». */
   plainOr: /\s+или\s+/u,
   /** Раздел справочника по началу адреса ссылки. */

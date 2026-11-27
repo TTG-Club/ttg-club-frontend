@@ -7,6 +7,7 @@
     SourceKind,
     WIZARD_STEPS,
   } from '../model';
+  import type { SheetPdfVariant } from '../model/pdf';
 
   import { uniq } from 'es-toolkit';
 
@@ -17,6 +18,7 @@
     useSheetPdf,
     useSheetPickers,
     useSheetStats,
+    useStartingEquipment,
   } from '../composables';
   import {
     SheetAbilityScoresModal,
@@ -31,6 +33,7 @@
     SheetSizeModal,
     SheetSourcesReview,
     SheetSourceWizardModal,
+    SheetStartingEquipment,
     SheetVisionModal,
   } from '../dialogs';
   import {
@@ -41,11 +44,13 @@
     createSheet,
     deleteSheet,
     downloadSheetJson,
+    fetchBackgroundEquipment,
     getClassesLabel,
     getExperienceProgress,
     getSheetRoute,
     loadBackgroundSources,
     loadRaceSources,
+    parseBackgroundStartingEquipment,
     RACE_TREE,
     removeSources,
     replaceRaceBonuses,
@@ -54,8 +59,6 @@
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_MENU_LABELS,
-    SHEET_PDF_ICON,
-    SHEET_PDF_TEXT,
     SHEET_SAVE_STATUS_ICON,
     SHEET_SAVE_STATUS_TEXT,
     SHEET_SHARE_ICON,
@@ -64,6 +67,7 @@
     SHEET_SIZE_LABELS,
     SHEET_TEXT,
     SHEET_VISION_LABELS,
+    STARTING_EQUIPMENT_TEXT,
     WIZARD_TEXT,
   } from '../model';
   import SheetAvatar from './SheetAvatar.vue';
@@ -104,6 +108,9 @@
   } = useCharacterSheet();
 
   const { stats } = useSheetStats();
+
+  /** Стартовое снаряжение мастера предыстории. */
+  const backgroundEquipment = useStartingEquipment();
 
   /** Черновик мастера: лист после выбора и добавленные источники. */
   interface WizardDraft {
@@ -302,14 +309,16 @@
     }
   }
 
-  const { isExporting: isPdfExporting, exportToPdf } = useSheetPdf();
+  const { exportToPdf, getPdfMenuItems } = useSheetPdf();
 
   /**
    * Скачивает лист в PDF. QR-код ведёт по ссылке листа: у открытого по ссылке
    * — по ней же, у своего без ссылки экспорт сам включает доступ.
+   * @param variant - вид листа
    */
-  async function downloadPdf(): Promise<void> {
+  async function downloadPdf(variant: SheetPdfVariant): Promise<void> {
     const enabledToken = await exportToPdf(name.value, document.value, {
+      variant,
       shareToken: sharedToken.value ?? shareToken.value,
       ownSheetId: isReadonly.value ? null : (sheetId.value ?? null),
     });
@@ -319,21 +328,13 @@
     }
   }
 
-  /** Пункт «Скачать PDF» с загрузкой, пока идёт сборка. */
-  const pdfMenuItem = computed<DropdownMenuItem>(() => ({
-    label: isPdfExporting.value
-      ? SHEET_PDF_TEXT.downloading
-      : SHEET_PDF_TEXT.download,
-    icon: SHEET_PDF_ICON.download,
-    loading: isPdfExporting.value,
-    disabled: isPdfExporting.value,
-    onSelect: downloadPdf,
-  }));
+  /** Пункты PDF по видам листа с загрузкой, пока идёт сборка. */
+  const pdfMenuItems = computed(() => getPdfMenuItems(downloadPdf));
 
   /** Меню листа по ссылке: только скачать. */
   const readonlyMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
-      pdfMenuItem.value,
+      ...pdfMenuItems.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
@@ -374,7 +375,7 @@
         suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
         onSelect: openShare,
       },
-      pdfMenuItem.value,
+      ...pdfMenuItems.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
@@ -558,8 +559,21 @@
     isWizardPreparing.value = true;
 
     try {
-      const result = await loadBackgroundSources(option, level.value);
+      const [result, equipment] = await Promise.all([
+        loadBackgroundSources(option, level.value),
+        fetchBackgroundEquipment(option.url),
+      ]);
+
       const stripped = stripBackground(document.value);
+      const hadBackground = Boolean(document.value.background);
+
+      backgroundEquipment.reset(
+        parseBackgroundStartingEquipment(equipment.equipments),
+        equipment.startGold,
+      );
+
+      // При смене предыстории снаряжение уже на руках — новое не предлагаем
+      backgroundEquipment.isEnabled.value = !hadBackground;
 
       const languages = uniq([
         ...stripped.proficiencies.languages,
@@ -606,6 +620,7 @@
 
     if (draft) {
       update(() => draft.document);
+      void backgroundEquipment.apply();
     }
 
     isBackgroundPickerOpen.value = false;
@@ -1028,6 +1043,22 @@
           :hint="WIZARD_TEXT.backgroundReviewHint"
           @change="setBackgroundDraft"
         />
+
+        <section
+          v-if="backgroundDraft && backgroundEquipment.hasEquipment.value"
+          class="flex flex-col gap-2"
+        >
+          <h3 class="text-sm font-semibold text-highlighted">
+            {{ STARTING_EQUIPMENT_TEXT.title }}
+          </h3>
+
+          <SheetStartingEquipment
+            v-model:choices="backgroundEquipment.choices.value"
+            v-model:enabled="backgroundEquipment.isEnabled.value"
+            :lines="backgroundEquipment.lines.value"
+            :gold="backgroundEquipment.gold.value"
+          />
+        </section>
       </template>
     </SheetSourceWizardModal>
 

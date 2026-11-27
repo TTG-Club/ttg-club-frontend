@@ -2,6 +2,7 @@
   import type { DropdownMenuItem } from '@nuxt/ui';
 
   import type { SavedSheet, SheetDocument } from '../model';
+  import type { SheetPdfVariant } from '../model/pdf';
 
   import { useSheetPdf } from '../composables';
   import {
@@ -11,8 +12,6 @@
     SHEET_ICON,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
-    SHEET_PDF_ICON,
-    SHEET_PDF_TEXT,
     SHEET_SHARE_ICON,
   } from '../model';
   import SheetCardShell from './SheetCardShell.vue';
@@ -41,15 +40,20 @@
     saved.available ? getSharedSheetRoute(saved.shareToken) : undefined,
   );
 
-  const { isExporting, exportToPdf } = useSheetPdf();
+  const { exportToPdf, getPdfMenuItems } = useSheetPdf();
 
   /**
    * Скачивает чужой лист в PDF: QR-код ведёт по сохранённой ссылке, доступ
    * не меняется — это право владельца.
    * @param document - документ листа
+   * @param variant - вид листа
    */
-  async function downloadPdf(document: SheetDocument): Promise<void> {
+  async function downloadPdf(
+    document: SheetDocument,
+    variant: SheetPdfVariant,
+  ): Promise<void> {
     await exportToPdf(saved.name, document, {
+      variant,
       shareToken: saved.shareToken,
       ownSheetId: null,
     });
@@ -66,15 +70,7 @@
             disabled: !canCopy,
             onSelect: () => emit('copy', saved),
           },
-          {
-            label: isExporting.value
-              ? SHEET_PDF_TEXT.downloading
-              : SHEET_PDF_TEXT.download,
-            icon: SHEET_PDF_ICON.download,
-            loading: isExporting.value,
-            disabled: isExporting.value,
-            onSelect: () => downloadPdf(document),
-          },
+          ...getPdfMenuItems((variant) => downloadPdf(document, variant)),
           {
             label: SHEET_LIST_TEXT.download,
             icon: SHEET_LIST_ICON.download,
