@@ -26,6 +26,12 @@ import {
 } from './schema';
 import { getCatalogApiPath } from './utils';
 
+/** Хиты сохранённого чужого листа: текущие и временные. */
+interface SavedSheetHealthBody {
+  current: number;
+  temporary: number;
+}
+
 /** Тело сохранения листа: имя, документ и версия, с которой начиналась правка. */
 interface SheetSaveBody {
   name?: string;
@@ -209,6 +215,25 @@ export async function removeSavedSheet(id: string): Promise<void> {
   await api(
     `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${encodeURIComponent(id)}`,
     { method: 'DELETE' },
+  );
+}
+
+/**
+ * Пишет хиты в сохранённый чужой лист (их отмечает мастер в трекере
+ * инициативы). Сервер меняет только текущие и временные хиты, текущие зажимает
+ * максимумом листа; отозванная ссылка или удалённый лист — 404.
+ * @param id - идентификатор сохранённой записи
+ * @param body - текущие и временные хиты
+ */
+export async function updateSavedSheetHealth(
+  id: string,
+  body: SavedSheetHealthBody,
+): Promise<void> {
+  const api = useApi();
+
+  await api(
+    `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${encodeURIComponent(id)}/${SHEET_SHARE_API.health}`,
+    { method: 'PATCH', body },
   );
 }
 

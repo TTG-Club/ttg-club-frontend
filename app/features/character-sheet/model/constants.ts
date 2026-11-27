@@ -3122,6 +3122,7 @@ export const SHEET_SHARE_API = {
   share: 'share',
   shared: 'shared',
   saved: 'saved',
+  health: 'health',
 } as const;
 
 /** Подписи окна «Поделиться листом». */

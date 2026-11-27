@@ -31,6 +31,12 @@ export const TRACKER_STATUSES = ['PREPARING', 'ACTIVE'] as const;
 
 export const PARTICIPANT_TYPES = ['PLAYER', 'CREATURE'] as const;
 
+/** Откуда взят лист персонажа игрока: свой или сохранённый чужой по ссылке. */
+export const SHEET_PLAYER_SOURCES = ['own', 'saved'] as const;
+
+/** Пауза перед записью хитов в лист персонажа, мс: шаги урона идут очередями. */
+export const SHEET_HIT_POINTS_SYNC_DELAY = 800;
+
 /** Ограничения бэкенда и старого SPA. */
 export const INITIATIVE_LIMIT = {
   trackers: 10,
@@ -206,6 +212,36 @@ export const INITIATIVE_ICON = {
   newGuest: 'tabler:plus',
   minus: 'tabler:minus',
   heal: 'tabler:heart-plus',
+} as const;
+
+/** Пометка источника листа в списке выбора. */
+export const SHEET_PLAYER_SOURCE_LABEL = {
+  own: 'Мой лист',
+  saved: 'Доступный',
+} as const;
+
+/** Тексты добавления игрока из листа персонажа. */
+export const SHEET_PLAYER_TEXT = {
+  title: 'Из листа персонажа',
+  field: 'Лист персонажа',
+  placeholder: 'Выберите персонажа…',
+  search: 'Найти персонажа…',
+  empty: 'Нет доступных листов персонажей',
+  error: 'Не удалось загрузить листы персонажей',
+  added: 'уже в бою',
+  refresh: 'Обновить список листов',
+  submit: 'Добавить из листа',
+  hint: 'Имя, КД, бонус инициативы и хиты возьмутся из листа; хиты, изменённые в бою, вернутся в него же.',
+  syncError: 'Не удалось записать хиты в лист персонажа',
+  addError: 'Не удалось добавить персонажа',
+} as const;
+
+/** Иконки добавления игрока из листа персонажа. */
+export const SHEET_PLAYER_ICON = {
+  sheet: 'tabler:id-badge-2',
+  hint: 'tabler:info-circle',
+  refresh: 'tabler:refresh',
+  error: 'tabler:alert-triangle',
 } as const;
 
 /** Подпись и иконка типа участника, если бэкенд не прислал `typeName`. */

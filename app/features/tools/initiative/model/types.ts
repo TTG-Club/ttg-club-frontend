@@ -1,15 +1,51 @@
-import type { PARTICIPANT_TYPES, TRACKER_STATUSES } from './constants';
-import type { TrackerParticipant } from './schema';
+import type {
+  PARTICIPANT_TYPES,
+  SHEET_PLAYER_SOURCES,
+  TRACKER_STATUSES,
+} from './constants';
+import type { ParticipantSheetLink, TrackerParticipant } from './schema';
 
 export type TrackerStatus = (typeof TRACKER_STATUSES)[number];
 
 export type ParticipantType = (typeof PARTICIPANT_TYPES)[number];
 
-/** Добавление игрока. */
+/** Добавление игрока; из листа персонажа — вместе с привязкой к листу. */
 export interface AddPlayerRequest {
   type: 'PLAYER';
   name: string;
   initiativeBonus: number;
+  sheetLink?: ParticipantSheetLink;
+}
+
+/** Откуда взят лист персонажа: свой лист или сохранённый чужой по ссылке. */
+export type SheetPlayerSource = (typeof SHEET_PLAYER_SOURCES)[number];
+
+/**
+ * Лист персонажа как вариант добавления игрока. Числа посчитаны листом
+ * заранее, поэтому трекеру не нужен весь документ.
+ */
+export interface SheetPlayerOption {
+  /** Идентификатор листа — им же вариант выбирается в списке. */
+  sheetId: string;
+  source: SheetPlayerSource;
+  /** Токен ссылки «поделиться»; `null` — свой лист. */
+  shareToken: string | null;
+  /** Сохранённая запись чужого листа, по ней пишутся хиты; `null` — свой лист. */
+  savedId: string | null;
+  /** Имя персонажа, обрезанное до предела имени участника. */
+  name: string;
+  /** Классы с уровнями. */
+  subtitle: string;
+  /** Бонус инициативы в пределах трекера. */
+  initiativeBonus: number;
+  /** КД в пределах трекера. */
+  armorClass: number;
+  /** Максимум хитов с прибавками; `0` — на листе хиты не заданы. */
+  maxHitPoints: number;
+  /** Текущие хиты. */
+  currentHitPoints: number;
+  /** Временные хиты; `0` — их нет. */
+  temporaryHitPoints: number;
 }
 
 /** Добавление существ из бестиария пачкой. */
