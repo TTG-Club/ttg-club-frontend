@@ -281,16 +281,17 @@ export const SKILLS_COUNT = 18;
 /** Опциональные умения из «Котла Таши»: правило о них. */
 export const OPTIONAL_FEATURES_PATH = '/rules/optional_class_features';
 
-/** Подписи списка вариантов умения на странице класса. */
+/** Подписи окна вариантов умения на странице класса (как в core-app). */
 export const CLASS_OPTIONS_TEXT = {
   open: (name: string, count: number) => `${name} (${count})`,
   defaultName: 'Варианты',
-  search: 'Поиск по названию',
+  search: 'Поиск по вариантам...',
+  clearSearch: 'Очистить поиск',
+  shown: (shown: number, total: number) => `Показано ${shown} / ${total}`,
   empty: 'Ничего не найдено',
-  level: (level: number) => `с ${level} уровня`,
+  level: (level: number) => `${level}-й уровень`,
   repeatable: 'Можно взять повторно',
   openPage: 'Открыть страницу варианта',
-  expand: 'Показать описание',
 } as const;
 
 export const CLASS_TEXT = {
