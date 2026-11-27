@@ -745,9 +745,20 @@ export const characterSheetSchema = z.object({
   updatedAt: z.string(),
   /** Секрет ссылки на лист; null — доступ по ссылке выключен. */
   shareToken: z.string().nullable().catch(null),
+  /** Когда лист удалён в историю; null — активный. */
+  deletedAt: z.string().nullable().catch(null),
 });
 
 export type CharacterSheet = z.infer<typeof characterSheetSchema>;
+
+/** Удалённый лист в истории: без документа. */
+export const sheetHistoryItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  deletedAt: z.string().nullable().catch(null),
+});
+
+export type SheetHistoryItem = z.infer<typeof sheetHistoryItemSchema>;
 
 export const characterSheetListSchema = z.object({
   items: z.array(characterSheetSchema),
@@ -755,6 +766,10 @@ export const characterSheetListSchema = z.object({
   limit: z.number(),
   /** Лимит с подпиской. */
   subscriberLimit: z.number().catch(0),
+  /** Удалённые листы, которые можно восстановить. */
+  history: z.array(sheetHistoryItemSchema).catch([]),
+  historyLimit: z.number().catch(0),
+  subscriberHistoryLimit: z.number().catch(0),
 });
 
 /** Ответ включения доступа по ссылке. */

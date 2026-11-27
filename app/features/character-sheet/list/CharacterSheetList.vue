@@ -11,6 +11,9 @@
     getSheetLimitTooltip,
     getSheetRoute,
     SAVED_SHEETS_TEXT,
+    SHEET_HISTORY_DATE_FORMAT,
+    SHEET_HISTORY_ICON,
+    SHEET_HISTORY_TEXT,
     SHEET_HTTP_STATUS,
     SHEET_ICON,
     SHEET_IMPORT_ACCEPT,
@@ -35,6 +38,9 @@
     sheets,
     limit,
     subscriberLimit,
+    history,
+    historyLimit,
+    subscriberHistoryLimit,
     canCreate,
     isLoading,
     isLoaded,
@@ -46,8 +52,52 @@
     copyDocument,
     setShareToken,
     remove,
+    restore,
     importFromFile,
   } = useSheetList();
+
+  const toast = useToast();
+
+  const historyDateFormat = new Intl.DateTimeFormat(
+    'ru-RU',
+    SHEET_HISTORY_DATE_FORMAT,
+  );
+
+  const historyTooltip = computed(() =>
+    getSheetLimitTooltip(
+      SHEET_HISTORY_TEXT.tooltip(historyLimit.value),
+      historyLimit.value,
+      subscriberHistoryLimit.value,
+    ),
+  );
+
+  /**
+   * Подпись даты удаления.
+   * @param deletedAt - дата в ISO-8601
+   */
+  function getDeletedLabel(deletedAt: string | null): string {
+    return deletedAt
+      ? SHEET_HISTORY_TEXT.deletedAt(
+          historyDateFormat.format(new Date(deletedAt)),
+        )
+      : '';
+  }
+
+  /**
+   * Восстанавливает лист из истории и сообщает об этом.
+   * @param id - идентификатор листа
+   */
+  async function restoreSheet(id: string): Promise<void> {
+    const restored = await restore(id);
+
+    if (restored) {
+      toast.add({
+        title: SHEET_HISTORY_TEXT.restored,
+        description: restored.name,
+        color: 'success',
+      });
+    }
+  }
 
   const saved = useSavedSheets();
 
@@ -387,6 +437,67 @@
           :upsell="sheetsUpsell"
         />
       </template>
+    </section>
+
+    <section
+      v-if="isLoggedIn && !isAuthError && history.length"
+      class="mt-6 flex flex-col gap-2"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium tracking-wide text-muted uppercase">
+          {{ SHEET_HISTORY_TEXT.title }}
+        </span>
+
+        <UTooltip :text="historyTooltip">
+          <UIcon
+            :name="SHEET_LIST_ICON.help"
+            class="size-3.5 shrink-0 text-muted"
+          />
+        </UTooltip>
+      </div>
+
+      <ul
+        class="flex flex-col divide-y divide-default rounded-xl border border-default"
+      >
+        <li
+          v-for="item in history"
+          :key="item.id"
+          class="flex items-center gap-3 px-3 py-2"
+        >
+          <UIcon
+            :name="SHEET_HISTORY_ICON.item"
+            class="size-5 shrink-0 text-muted"
+          />
+
+          <div class="flex min-w-0 grow flex-col">
+            <span class="truncate text-sm font-medium text-highlighted">
+              {{ item.name }}
+            </span>
+
+            <span class="text-xs text-muted">
+              {{ getDeletedLabel(item.deletedAt) }}
+            </span>
+          </div>
+
+          <UTooltip
+            :text="
+              canCreate
+                ? SHEET_HISTORY_TEXT.restoreAria
+                : SHEET_HISTORY_TEXT.restoreLimit
+            "
+          >
+            <UButton
+              :label="SHEET_HISTORY_TEXT.restore"
+              :icon="SHEET_HISTORY_ICON.restore"
+              color="neutral"
+              variant="subtle"
+              size="sm"
+              :disabled="!canCreate || isMutating"
+              @click.left.exact.prevent="restoreSheet(item.id)"
+            />
+          </UTooltip>
+        </li>
+      </ul>
     </section>
 
     <section

@@ -71,7 +71,8 @@ export const SHEET_TEXT = {
   copySuffix: ' (копия)',
   remove: 'Удалить',
   removeTitle: 'Удалить лист?',
-  removeDescription: 'Лист будет удалён без возможности восстановления.',
+  removeDescription:
+    'Лист уйдёт в историю удалённых — его можно будет восстановить, пока он не вытеснен новыми удалениями.',
   cancel: 'Отмена',
   confirm: 'Удалить',
   defaultName: 'Новый персонаж',
@@ -3313,4 +3314,34 @@ export const STARTING_EQUIPMENT_TEXT = {
   tab: 'Снаряжение',
   loadError:
     'Часть предметов не загрузилась из справочника — они добавлены своими.',
+} as const;
+
+/** Сегмент ручки восстановления: `/api/v1/character-sheets/<id>/restore`. */
+export const SHEET_HISTORY_API_SEGMENT = 'restore';
+
+/** Раздел «История листов». */
+export const SHEET_HISTORY_TEXT = {
+  title: 'История листов',
+  restore: 'Восстановить',
+  restoreAria: 'Восстановить лист',
+  restored: 'Лист восстановлен',
+  restoreError: 'Не удалось восстановить лист',
+  restoreLimit:
+    'Нет места в лимите активных листов — удалите один, чтобы восстановить',
+  deletedAt: (date: string): string => `Удалён ${date}`,
+  tooltip: (limit: number): string =>
+    `Удалённые листы можно восстановить, пока в лимите активных есть свободное место. В истории хранятся последние ${limit} удалённых листов — более старые вытесняются новыми удалениями.`,
+} as const;
+
+/** Формат даты удаления в истории. */
+export const SHEET_HISTORY_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+};
+
+/** Иконки истории листов. */
+export const SHEET_HISTORY_ICON = {
+  item: 'tabler:history',
+  restore: 'tabler:restore',
 } as const;

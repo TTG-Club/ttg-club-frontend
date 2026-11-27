@@ -13,6 +13,7 @@ import {
   CHARACTER_SHEET_API_URL,
   SHEET_AVATAR_API_SEGMENT,
   SHEET_AVATAR_URL_PREFIX,
+  SHEET_HISTORY_API_SEGMENT,
   SHEET_SHARE_API,
 } from './constants';
 import {
@@ -110,7 +111,21 @@ export function saveSheetOnLeave(id: string, body: SheetSaveBody): void {
 }
 
 /**
- * Удаляет лист.
+ * Восстанавливает лист из истории; сверх лимита активных — 403.
+ * @param id - идентификатор листа
+ */
+export async function restoreSheet(id: string): Promise<CharacterSheet> {
+  const api = useApi();
+
+  return characterSheetSchema.parse(
+    await api(`${getSheetUrl(id)}/${SHEET_HISTORY_API_SEGMENT}`, {
+      method: 'POST',
+    }),
+  );
+}
+
+/**
+ * Удаляет лист в историю: его можно восстановить, пока он в ней.
  * @param id - идентификатор листа
  */
 export async function deleteSheet(id: string): Promise<void> {
