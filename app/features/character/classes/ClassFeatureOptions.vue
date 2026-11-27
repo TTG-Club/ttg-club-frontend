@@ -86,7 +86,7 @@
       :title="title"
       :description="shownLabel"
       :ui="{
-        content: 'w-full max-w-192 min-w-80',
+        content: 'w-full min-w-80 sm:max-w-192',
         body: 'flex flex-col gap-4 p-4 sm:p-6',
       }"
     >
