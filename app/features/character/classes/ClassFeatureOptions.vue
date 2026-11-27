@@ -4,13 +4,17 @@
   import { hasContentDescription } from '~content/model';
   import { ContentRender } from '~content/render';
 
-  import { CLASS_OPTIONS_TEXT } from '../model';
+  import {
+    CLASS_OPTIONS_TEXT,
+    getClassFeatureOptionSearchText,
+  } from '../model';
 
   /**
-   * Варианты умения на странице класса, как на new.ttg.club: кнопка
-   * «Воззвания (28)» открывает боковую панель с поиском; у варианта —
-   * название-ссылка на его страницу в разделе «Особенности классов»,
-   * уровень, требования и раскрываемое описание.
+   * Варианты умения на странице класса, как в core-app: кнопка
+   * «Воззвания (28)» открывает боковую панель с поиском и счётчиком
+   * «Показано N / M»; каждый вариант — карточка с названием (ссылка на его
+   * страницу в разделе «Особенности классов»), английским названием,
+   * бейджами уровня и повторяемости, требованиями и описанием с разметкой.
    */
   const { name, options } = defineProps<{
     /** Название списка; пусто — «Варианты». */
@@ -19,8 +23,8 @@
   }>();
 
   const isOpen = ref(false);
+  const wasOpened = ref(false);
   const search = ref('');
-  const expanded = ref<Array<string>>([]);
 
   const title = computed(() => name || CLASS_OPTIONS_TEXT.defaultName);
 
@@ -28,43 +32,42 @@
     CLASS_OPTIONS_TEXT.open(title.value, options.length),
   );
 
-  const rows = computed(() => {
-    const query = search.value.trim().toLowerCase();
+  // Текст для поиска собирается из описаний, поэтому карточки считаются
+  // только после первого открытия панели — страница класса их не ждёт; после
+  // закрытия они остаются, чтобы список не пропадал во время анимации
+  const cards = computed(() =>
+    wasOpened.value
+      ? options.map((option) => ({
+          option,
+          searchText: getClassFeatureOptionSearchText(option),
+          levelLabel: option.level
+            ? CLASS_OPTIONS_TEXT.level(option.level)
+            : '',
+          hasDescription: hasContentDescription(option.description),
+          ariaLabel: `${CLASS_OPTIONS_TEXT.openPage}: ${option.name}`,
+        }))
+      : [],
+  );
 
-    return options
-      .filter(
-        (option) =>
-          !query
-          || option.name.toLowerCase().includes(query)
-          || (option.englishName ?? '').toLowerCase().includes(query),
-      )
-      .map((option) => ({
-        option,
-        caption: [
-          option.level ? CLASS_OPTIONS_TEXT.level(option.level) : '',
-          option.prerequisite ?? '',
-          option.additional ?? '',
-        ]
-          .filter(Boolean)
-          .join(' · '),
-        hasDescription: hasContentDescription(option.description),
-        isExpanded: expanded.value.includes(option.url),
-        chevronClass: expanded.value.includes(option.url) ? 'rotate-180' : '',
-      }));
+  const filteredCards = computed(() => {
+    const query = search.value.trim().toLocaleLowerCase();
+
+    return query
+      ? cards.value.filter((card) => card.searchText.includes(query))
+      : cards.value;
   });
 
+  const shownLabel = computed(() =>
+    CLASS_OPTIONS_TEXT.shown(filteredCards.value.length, options.length),
+  );
+
   function open(): void {
+    wasOpened.value = true;
     isOpen.value = true;
   }
 
-  /**
-   * Раскрывает или сворачивает описание варианта.
-   * @param url - адрес варианта
-   */
-  function toggle(url: string): void {
-    expanded.value = expanded.value.includes(url)
-      ? expanded.value.filter((entry) => entry !== url)
-      : [...expanded.value, url];
+  function clearSearch(): void {
+    search.value = '';
   }
 </script>
 
@@ -72,90 +75,118 @@
   <div class="mt-2">
     <UButton
       :label="buttonLabel"
-      icon="tabler:list-details"
-      color="primary"
-      variant="soft"
-      size="sm"
+      icon="tabler:list-search"
+      color="neutral"
+      variant="subtle"
       @click.left.exact.prevent="open"
     />
 
     <USlideover
       v-model:open="isOpen"
       :title="title"
+      :description="shownLabel"
+      :ui="{
+        content: 'w-full max-w-192 min-w-80',
+        body: 'flex flex-col gap-4 p-4 sm:p-6',
+      }"
     >
       <template #body>
-        <div class="flex flex-col gap-2">
-          <UInput
-            v-model="search"
-            icon="tabler:search"
-            :placeholder="CLASS_OPTIONS_TEXT.search"
-            type="search"
-            autocomplete="off"
-          />
-
-          <p
-            v-if="!rows.length"
-            class="py-6 text-center text-sm text-dimmed"
+        <UInput
+          v-model="search"
+          icon="tabler:search"
+          :placeholder="CLASS_OPTIONS_TEXT.search"
+          autocomplete="off"
+          :ui="{ trailing: 'pe-0.5' }"
+        >
+          <template
+            v-if="search"
+            #trailing
           >
-            {{ CLASS_OPTIONS_TEXT.empty }}
-          </p>
+            <UButton
+              icon="tabler:x"
+              variant="link"
+              color="neutral"
+              size="sm"
+              :aria-label="CLASS_OPTIONS_TEXT.clearSearch"
+              @click.left.exact.prevent="clearSearch"
+            />
+          </template>
+        </UInput>
 
-          <div
-            v-for="row in rows"
-            :key="row.option.url"
-            class="flex flex-col rounded-lg border border-default/50 bg-elevated/20"
+        <div
+          v-if="filteredCards.length"
+          class="flex flex-col gap-3"
+        >
+          <article
+            v-for="card in filteredCards"
+            :key="card.option.url"
+            class="rounded-lg border border-default bg-muted p-4"
           >
-            <div class="flex items-start gap-2 p-2">
-              <div class="flex min-w-0 grow flex-col">
-                <span class="flex items-center gap-2">
+            <header class="mb-3 flex flex-wrap items-start gap-2">
+              <div class="min-w-0 flex-1">
+                <h5 class="text-base font-semibold text-highlighted">
                   <NuxtLink
-                    :to="row.option.url"
-                    class="truncate text-sm font-medium text-highlighted hover:text-primary"
-                    :aria-label="`${CLASS_OPTIONS_TEXT.openPage}: ${row.option.name}`"
+                    :to="card.option.url"
+                    class="hover:text-primary"
+                    :aria-label="card.ariaLabel"
                   >
-                    {{ row.option.name }}
+                    {{ card.option.name }}
                   </NuxtLink>
+                </h5>
 
-                  <UTooltip
-                    v-if="row.option.repeatable"
-                    :text="CLASS_OPTIONS_TEXT.repeatable"
-                  >
-                    <UIcon
-                      name="tabler:repeat"
-                      class="size-4 shrink-0 text-muted"
-                    />
-                  </UTooltip>
-                </span>
-
-                <span
-                  v-if="row.caption"
-                  class="text-xs text-dimmed"
+                <p
+                  v-if="card.option.englishName"
+                  class="text-sm text-muted"
                 >
-                  {{ row.caption }}
-                </span>
+                  {{ card.option.englishName }}
+                </p>
               </div>
 
-              <UButton
-                v-if="row.hasDescription"
-                icon="tabler:chevron-down"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                square
-                :aria-label="`${CLASS_OPTIONS_TEXT.expand}: ${row.option.name}`"
-                :aria-expanded="row.isExpanded"
-                :class="row.chevronClass"
-                @click.left.exact.prevent="toggle(row.option.url)"
-              />
-            </div>
+              <UBadge
+                v-if="card.option.repeatable"
+                color="info"
+                variant="subtle"
+                size="sm"
+              >
+                {{ CLASS_OPTIONS_TEXT.repeatable }}
+              </UBadge>
 
-            <div
-              v-if="row.isExpanded && row.option.description"
-              class="border-t border-default/50 px-3 py-2 text-sm"
+              <UBadge
+                v-if="card.levelLabel"
+                color="neutral"
+                variant="subtle"
+                size="sm"
+              >
+                {{ card.levelLabel }}
+              </UBadge>
+            </header>
+
+            <p
+              v-if="card.option.prerequisite"
+              class="mb-3 border-l-2 border-default pl-3 text-sm text-muted"
             >
-              <ContentRender :content="row.option.description" />
-            </div>
-          </div>
+              {{ card.option.prerequisite }}
+            </p>
+
+            <p
+              v-if="card.option.additional"
+              class="mb-3 text-sm text-muted italic"
+            >
+              {{ card.option.additional }}
+            </p>
+
+            <ContentRender
+              v-if="card.hasDescription"
+              :content="card.option.description"
+            />
+          </article>
+        </div>
+
+        <div
+          v-else
+          class="rounded-lg border border-dashed border-default bg-muted p-6 text-center text-sm text-muted"
+        >
+          {{ CLASS_OPTIONS_TEXT.empty }}
         </div>
       </template>
     </USlideover>

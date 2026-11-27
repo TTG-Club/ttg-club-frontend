@@ -8,6 +8,7 @@ import type {
   BackgroundDetail,
   ClassDetail,
   ClassFeature,
+  ClassFeatureOption,
   ClassLink,
   ClassTraits,
   RaceAbility,
@@ -27,7 +28,12 @@ import type {
 
 import { sortBy } from 'es-toolkit';
 
-import { hasContentDescription } from '~content/model';
+import {
+  getNodesText,
+  hasContentDescription,
+  markupToContent,
+  parseContent,
+} from '~content/model';
 import {
   getEntryApiPath,
   getFilterGroups,
@@ -629,4 +635,31 @@ export function getArchetypeSpellSuffix(
   const advanced = spell.advanced ? ` (${spell.advanced})` : '';
 
   return isLast ? advanced : `${advanced}${REFERENCE_SEPARATOR}`;
+}
+
+/**
+ * Текст варианта умения для поиска в окне вариантов: названия, требования,
+ * пометка и описание без разметки, в нижнем регистре.
+ * @param option - вариант умения
+ */
+export function getClassFeatureOptionSearchText(
+  option: ClassFeatureOption,
+): string {
+  const description = option.description ?? '';
+
+  const descriptionText = getNodesText(
+    Array.isArray(description)
+      ? markupToContent(description)
+      : parseContent(description),
+  );
+
+  return [
+    option.name,
+    option.englishName ?? '',
+    option.prerequisite ?? '',
+    option.additional ?? '',
+    descriptionText,
+  ]
+    .join(' ')
+    .toLocaleLowerCase();
 }

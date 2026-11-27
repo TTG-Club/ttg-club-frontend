@@ -2,7 +2,10 @@ import type { ClassTrait } from '~workshop/model';
 
 import { describe, expect, it } from 'vitest';
 
-import { classDetailSchema } from '~character/model';
+import {
+  classDetailSchema,
+  getClassFeatureOptionSearchText,
+} from '~character/model';
 import {
   createClassForm,
   createClassTrait,
@@ -138,5 +141,31 @@ describe('варианты умения на странице класса', () 
 
     expect(invocations?.options[0]?.url).toBe('/options/agonizing_blast');
     expect(pact?.options).toEqual([]);
+  });
+});
+
+describe('поиск по вариантам умения', () => {
+  it('ищет по английскому названию и тексту описания без разметки', () => {
+    const htmlText = getClassFeatureOptionSearchText({
+      name: 'Первобытный удар',
+      englishName: 'Primal Strike',
+      url: '/options/primal_strike',
+      description:
+        '<p>Дополнительно <dice-roller formula="1к8"/> урона <b>холодом</b>.</p>',
+    });
+
+    expect(htmlText).toContain('primal strike');
+    expect(htmlText).toContain('урона холодом');
+    expect(htmlText).not.toContain('<b>');
+
+    const markupText = getClassFeatureOptionSearchText({
+      name: 'Могущественное колдовство',
+      url: '/options/potent_spellcasting',
+      prerequisite: 'Друид 8 уровня',
+      description: ['Добавляйте модификатор {@b Мудрости} к урону.'],
+    });
+
+    expect(markupText).toContain('друид 8 уровня');
+    expect(markupText).toContain('модификатор мудрости к урону');
   });
 });
