@@ -2,7 +2,9 @@
   import type { DropdownMenuItem } from '@nuxt/ui';
 
   import type { CharacterSheet } from '../model';
+  import type { SheetPdfVariant } from '../model/pdf';
 
+  import { useSheetPdf } from '../composables';
   import {
     downloadSheetJson,
     getSheetRoute,
@@ -17,7 +19,7 @@
 
   /**
    * Карточка своего листа в списке: сводка, пометка открытой ссылки и меню —
-   * поделиться, копия, JSON, удаление.
+   * поделиться, копия, PDF, JSON, удаление.
    */
   const {
     sheet,
@@ -32,12 +34,33 @@
   }>();
 
   const emit = defineEmits<{
-    copy: [sheet: CharacterSheet];
-    remove: [sheet: CharacterSheet];
-    share: [sheet: CharacterSheet];
+    'copy': [sheet: CharacterSheet];
+    'remove': [sheet: CharacterSheet];
+    'share': [sheet: CharacterSheet];
+
+    /** Экспорт PDF включил доступ по ссылке ради QR-кода. */
+    'share-enabled': [sheetId: string, shareToken: string];
   }>();
 
   const route = computed(() => getSheetRoute(sheet.id));
+
+  const { exportToPdf, getPdfMenuItems } = useSheetPdf();
+
+  /**
+   * Скачивает лист в PDF; без ссылки экспорт включает доступ по ней.
+   * @param variant - вид листа
+   */
+  async function downloadPdf(variant: SheetPdfVariant): Promise<void> {
+    const enabledToken = await exportToPdf(sheet.name, sheet.data, {
+      variant,
+      shareToken: sheet.shareToken,
+      ownSheetId: sheet.id,
+    });
+
+    if (enabledToken) {
+      emit('share-enabled', sheet.id, enabledToken);
+    }
+  }
 
   const menuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
@@ -52,6 +75,7 @@
         disabled: !canCopy,
         onSelect: () => emit('copy', sheet),
       },
+      ...getPdfMenuItems(downloadPdf),
       {
         label: SHEET_LIST_TEXT.download,
         icon: SHEET_LIST_ICON.download,

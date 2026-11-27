@@ -45,5 +45,6 @@ export { default as SheetSpellAbilityModal } from './SheetSpellAbilityModal.vue'
 export { default as SheetSpellcastingModal } from './SheetSpellcastingModal.vue';
 export { default as SheetSpellCastModal } from './SheetSpellCastModal.vue';
 export { default as SheetSpellModal } from './SheetSpellModal.vue';
+export { default as SheetStartingEquipment } from './SheetStartingEquipment.vue';
 export { default as SheetToolCheckModal } from './SheetToolCheckModal.vue';
 export { default as SheetVisionModal } from './SheetVisionModal.vue';
