@@ -1,17 +1,22 @@
 <script setup lang="ts">
   import { getApiErrorMessage } from '~user/model';
 
+  import { useSheetEditors } from '../composables';
   import {
     getSheetShareUrl,
     shareSheet,
+    SHEET_EDITORS_TEXT,
     SHEET_SHARE_ICON,
     SHEET_SHARE_TEXT,
     unshareSheet,
   } from '../model';
+  import SheetEditorRow from './SheetEditorRow.vue';
 
   /**
    * Доступ к листу по ссылке: включение, копирование и отзыв. Ссылка одна на
-   * лист; отзыв гасит её навсегда, повторное включение выдаёт новую.
+   * лист; отзыв гасит её навсегда, повторное включение выдаёт новую. Рядом со
+   * ссылкой — запросы на редактирование и выданные права: просить правки
+   * могут только те, кто пришёл по ссылке, поэтому без неё список не нужен.
    */
   const { sheetId } = defineProps<{
     sheetId: string;
@@ -36,6 +41,56 @@
       ? getSheetShareUrl(requestUrl.origin, shareToken.value)
       : '',
   );
+
+  const {
+    isPending: isEditorsPending,
+    getPendingRequests,
+    getApprovedEditors,
+    canApproveMore,
+    forget: forgetEditors,
+    load: loadEditors,
+    approve,
+    remove,
+  } = useSheetEditors();
+
+  const editorRows = computed(() => [
+    ...getPendingRequests(sheetId),
+    ...getApprovedEditors(sheetId),
+  ]);
+
+  const hasApprovedEditors = computed(
+    () => getApprovedEditors(sheetId).length > 0,
+  );
+
+  const canApproveEditor = computed(() => canApproveMore(sheetId));
+
+  // Список перечитывается при каждом открытии окна и включении ссылки: отзыв
+  // ссылки снимает права на сервере, и прежний список был бы уже неправдой
+  watch(
+    [isOpen, shareToken],
+    ([open, token]) => {
+      if (open && token) {
+        void loadEditors(sheetId);
+      }
+    },
+    { immediate: true },
+  );
+
+  /**
+   * Разрешает правки по запросу; ошибку показывает тостом композабл.
+   * @param editorId - идентификатор запроса
+   */
+  function approveEditor(editorId: string): void {
+    void approve(sheetId, editorId);
+  }
+
+  /**
+   * Отклоняет запрос или отзывает право; ошибку показывает тостом композабл.
+   * @param editorId - идентификатор запроса или права
+   */
+  function removeEditor(editorId: string): void {
+    void remove(sheetId, editorId);
+  }
 
   /**
    * Включает или выключает доступ.
@@ -66,6 +121,7 @@
     return run(async () => {
       await unshareSheet(sheetId);
       shareToken.value = null;
+      forgetEditors(sheetId);
 
       toast.add({
         title: SHEET_SHARE_TEXT.disabled,
@@ -144,6 +200,42 @@
         <p class="text-sm text-muted">
           {{ SHEET_SHARE_TEXT.hintOn }}
         </p>
+
+        <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-medium text-muted">
+              {{ SHEET_EDITORS_TEXT.editorsTitle }}
+            </span>
+
+            <span class="text-xs text-muted">
+              {{ SHEET_EDITORS_TEXT.editorsHint }}
+            </span>
+          </div>
+
+          <SheetEditorRow
+            v-for="editorRow in editorRows"
+            :key="editorRow.id"
+            :editor="editorRow"
+            :can-approve="canApproveEditor"
+            :disabled="isEditorsPending"
+            @approve="approveEditor"
+            @remove="removeEditor"
+          />
+
+          <span
+            v-if="!editorRows.length"
+            class="text-sm text-toned"
+          >
+            {{ SHEET_EDITORS_TEXT.editorsEmpty }}
+          </span>
+
+          <span
+            v-if="hasApprovedEditors"
+            class="text-xs text-muted"
+          >
+            {{ SHEET_EDITORS_TEXT.revokeOnDisableHint }}
+          </span>
+        </div>
       </template>
 
       <p

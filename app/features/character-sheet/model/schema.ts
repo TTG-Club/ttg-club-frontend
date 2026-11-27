@@ -20,6 +20,7 @@ import {
   OWN_SENSE_KEYS,
   RESOURCE_RESETS,
   SHEET_AVATAR_URL_PREFIX,
+  SHEET_EDIT_STATUSES,
   SHEET_SCHEMA_VERSION,
   SHEET_SIZE_KEYS,
   SKILL_KEYS,
@@ -734,6 +735,17 @@ export type SheetDocument = z.infer<typeof sheetDocumentSchema>;
 
 /* --- Ответы API листов -------------------------------------------------- */
 
+/** Право на редактирование чужого листа: запрошено или выдано. */
+export const sheetEditStatusSchema = z.enum(SHEET_EDIT_STATUSES);
+
+export type SheetEditStatus = z.infer<typeof sheetEditStatusSchema>;
+
+/**
+ * Право в ответах, где его может не быть: прежний бэкенд поля не присылает,
+ * незнакомое состояние считается незапрошенным.
+ */
+const optionalEditStatusSchema = sheetEditStatusSchema.nullable().catch(null);
+
 export const characterSheetSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -747,6 +759,10 @@ export const characterSheetSchema = z.object({
   shareToken: z.string().nullable().catch(null),
   /** Когда лист удалён в историю; null — активный. */
   deletedAt: z.string().nullable().catch(null),
+  /** Лист чужой и открыт по праву редактора: удалять и делиться нельзя. */
+  editor: z.boolean().catch(false),
+  /** Неотвеченные запросы на редактирование — видны только владельцу. */
+  pendingEditRequests: z.number().int().nonnegative().catch(0),
 });
 
 export type CharacterSheet = z.infer<typeof characterSheetSchema>;
@@ -801,6 +817,8 @@ export const savedSheetSchema = z.object({
     .unknown()
     .transform((value) => (value ? sheetDocumentSchema.parse(value) : null)),
   available: z.boolean(),
+  /** Право на редактирование; null — не запрашивалось или отклонено. */
+  editStatus: optionalEditStatusSchema,
 });
 
 export type SavedSheet = z.infer<typeof savedSheetSchema>;
@@ -815,6 +833,64 @@ export const savedSheetListSchema = z.object({
 export type SavedSheetList = z.infer<typeof savedSheetListSchema>;
 
 export type CharacterSheetList = z.infer<typeof characterSheetListSchema>;
+
+/** Ответ запроса права на редактирование. */
+export const sheetEditRequestSchema = z.object({
+  status: sheetEditStatusSchema,
+});
+
+/** Право на редактирование одного сохранённого чужого листа. */
+export const savedSheetEditAccessSchema = z.object({
+  savedId: z.string(),
+  sheetId: z.string(),
+  name: z.string(),
+  status: sheetEditStatusSchema,
+});
+
+export type SavedSheetEditAccess = z.infer<typeof savedSheetEditAccessSchema>;
+
+/** Сводка прав на редактирование сохранённых листов. */
+export const savedSheetEditAccessListSchema = z.object({
+  sheets: lenientList(savedSheetEditAccessSchema),
+});
+
+/** Число неотвеченных запросов на редактирование листов пользователя. */
+export const sheetEditRequestCountSchema = z.object({
+  count: z.number().int().nonnegative().catch(0),
+});
+
+/** Запрос на редактирование или выданное право — у владельца листа. */
+export const sheetEditorSchema = z.object({
+  id: z.string(),
+  displayName: z.string(),
+  status: sheetEditStatusSchema,
+  requestedAt: z.string().nullable().catch(null),
+});
+
+export type SheetEditor = z.infer<typeof sheetEditorSchema>;
+
+/** Запросы и редакторы листа с лимитом редакторов. */
+export const sheetEditorListSchema = z.object({
+  limit: z.number().int().nonnegative().catch(0),
+  editors: lenientList(sheetEditorSchema),
+});
+
+export type SheetEditorList = z.infer<typeof sheetEditorListSchema>;
+
+/** Другой пользователь, у которого лист сейчас открыт. */
+export const sheetPresenceUserSchema = z.object({
+  displayName: z.string(),
+});
+
+export type SheetPresenceUser = z.infer<typeof sheetPresenceUserSchema>;
+
+/** Ответ отметки присутствия: кто ещё на листе и версия листа на сервере. */
+export const sheetPresenceSchema = z.object({
+  users: lenientList(sheetPresenceUserSchema),
+  version: z.number().nullable().catch(null),
+});
+
+export type SheetPresence = z.infer<typeof sheetPresenceSchema>;
 
 /* --- Справочники -------------------------------------------------------- */
 

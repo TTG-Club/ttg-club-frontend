@@ -1,13 +1,15 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { CharacterSheet } from '../model';
+  import type { CharacterSheet, SheetCardBadge } from '../model';
   import type { SheetPdfVariant } from '../model/pdf';
 
   import { useSheetPdf } from '../composables';
   import {
     downloadSheetJson,
     getSheetRoute,
+    SHEET_EDIT_ICON,
+    SHEET_EDITORS_TEXT,
     SHEET_ICON,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
@@ -18,8 +20,9 @@
   import SheetCardShell from './SheetCardShell.vue';
 
   /**
-   * Карточка своего листа в списке: сводка, пометка открытой ссылки и меню —
-   * поделиться, копия, PDF, JSON, удаление.
+   * Карточка своего листа в списке: сводка, пометки открытой ссылки и
+   * запросов на редактирование и меню — поделиться, копия, PDF, JSON,
+   * удаление.
    */
   const {
     sheet,
@@ -43,6 +46,30 @@
   }>();
 
   const route = computed(() => getSheetRoute(sheet.id));
+
+  // Запросы ведут в лист: там их баннер с кнопками решения
+  const badges = computed(() => {
+    const result: Array<SheetCardBadge> = [];
+
+    if (sheet.pendingEditRequests > 0) {
+      result.push({
+        key: 'edit-requests',
+        label: `${SHEET_EDITORS_TEXT.listBadge}: ${sheet.pendingEditRequests}`,
+        icon: SHEET_EDIT_ICON.requests,
+        color: 'warning',
+      });
+    }
+
+    if (sheet.shareToken) {
+      result.push({
+        key: 'share',
+        label: SHEET_SHARE_TEXT.active,
+        color: 'primary',
+      });
+    }
+
+    return result;
+  });
 
   const { exportToPdf, getPdfMenuItems } = useSheetPdf();
 
@@ -100,7 +127,7 @@
     :to="route"
     :menu-items="menuItems"
     :menu-aria="SHEET_LIST_TEXT.menuAria"
-    :badge="sheet.shareToken ? SHEET_SHARE_TEXT.active : undefined"
+    :badges
     :is-disabled="isDisabled"
   />
 </template>

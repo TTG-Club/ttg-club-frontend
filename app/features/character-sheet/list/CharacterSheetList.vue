@@ -4,7 +4,12 @@
   import { SectionLayout } from '~section/layout';
   import { AuthModal } from '~user/auth-modal';
 
-  import { useSavedSheets, useSheetList } from '../composables';
+  import {
+    useSavedSheets,
+    useSheetEditGrants,
+    useSheetEditRequests,
+    useSheetList,
+  } from '../composables';
   import { SheetConfirmModal, SheetShareModal } from '../dialogs';
   import {
     CHARACTER_SHEET_ICON,
@@ -105,9 +110,59 @@
     items: savedSheets,
     limit: savedLimit,
     subscriberLimit: savedSubscriberLimit,
+    isLoading: isSavedLoading,
     isLoaded: isSavedLoaded,
     isError: isSavedError,
   } = saved;
+
+  // Права на правку чужих листов опрашиваются фоном, пока есть запрос без
+  // ответа. Ответ владельца меняет карточку (пометка и куда она ведёт),
+  // поэтому раздел перечитывается, как только сводка с ним разошлась. Цикла
+  // нет: загрузка раздела сводку не трогает, а наблюдатель срабатывает лишь
+  // на смену расхождения
+  const { getStatus: getEditStatus, requestEdit } = useSheetEditGrants();
+
+  const isSavedEditOutdated = computed(() =>
+    savedSheets.value.some(
+      (item) => item.editStatus !== getEditStatus(item.id),
+    ),
+  );
+
+  watch(isSavedEditOutdated, (isOutdated) => {
+    if (isOutdated && isSavedLoaded.value && !isSavedLoading.value) {
+      void saved.load();
+    }
+  });
+
+  // Метки запросов на карточках должны совпадать со сводкой входящих
+  // запросов: она опрашивается фоном и меняется, когда приходит запрос.
+  // Список перечитывается только при расхождении — после загрузки они равны,
+  // и наблюдатель затихает
+  const { count: incomingEditRequests } = useSheetEditRequests();
+
+  const listedEditRequests = computed(() =>
+    sheets.value.reduce((total, sheet) => total + sheet.pendingEditRequests, 0),
+  );
+
+  watch(incomingEditRequests, (count) => {
+    if (
+      count !== listedEditRequests.value
+      && isLoaded.value
+      && !isLoading.value
+    ) {
+      void load();
+    }
+  });
+
+  /**
+   * Просит владельца разрешить правки сохранённого листа.
+   * @param item - сохранённый лист
+   */
+  async function requestSavedEdit(item: SavedSheet): Promise<void> {
+    if (await requestEdit(item.id)) {
+      await saved.load();
+    }
+  }
 
   /** Лист, для которого открыто окно «Поделиться». */
   const sharedSheet = ref<CharacterSheet | null>(null);
@@ -561,6 +616,7 @@
               :can-copy="canCreate"
               @copy="copySaved"
               @remove="askRemoveSaved"
+              @request-edit="requestSavedEdit"
             />
           </div>
         </div>

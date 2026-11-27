@@ -14,6 +14,7 @@ export { default as SheetCurrencyModal } from './SheetCurrencyModal.vue';
 export { default as SheetCustomBonusRows } from './SheetCustomBonusRows.vue';
 export { default as SheetCustomClassModal } from './SheetCustomClassModal.vue';
 export { default as SheetCustomEntryModal } from './SheetCustomEntryModal.vue';
+export { default as SheetEditorRow } from './SheetEditorRow.vue';
 export { default as SheetEffectModal } from './SheetEffectModal.vue';
 export { default as SheetExperienceModal } from './SheetExperienceModal.vue';
 export { default as SheetFeatureModal } from './SheetFeatureModal.vue';
