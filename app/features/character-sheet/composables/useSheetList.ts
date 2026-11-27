@@ -1,4 +1,4 @@
-import type { CharacterSheet, SheetDocument } from '../model';
+import type { CharacterSheet, SheetDocument, SheetHistoryItem } from '../model';
 
 import { getApiErrorMessage, getErrorStatus } from '~user/model';
 
@@ -12,7 +12,9 @@ import {
   LSS_IMPORT_TEXT,
   parseJsonSafely,
   parseSheetImport,
+  restoreSheet,
   saveSheet,
+  SHEET_HISTORY_TEXT,
   SHEET_IMPORT_ERROR_TEXT,
   SHEET_LIMIT_FALLBACK,
   SHEET_LIST_TEXT,
@@ -66,6 +68,9 @@ export function useSheetList() {
   const sheets = shallowRef<Array<CharacterSheet>>([]);
   const limit = ref(SHEET_LIMIT_FALLBACK);
   const subscriberLimit = ref(0);
+  const history = shallowRef<Array<SheetHistoryItem>>([]);
+  const historyLimit = ref(0);
+  const subscriberHistoryLimit = ref(0);
   const isLoading = ref(false);
   const isLoaded = ref(false);
   const isMutating = ref(false);
@@ -85,6 +90,9 @@ export function useSheetList() {
       sheets.value = list.items;
       limit.value = list.limit;
       subscriberLimit.value = list.subscriberLimit;
+      history.value = list.history;
+      historyLimit.value = list.historyLimit;
+      subscriberHistoryLimit.value = list.subscriberHistoryLimit;
     } catch (error) {
       errorStatus.value = getErrorStatus(error) ?? 0;
     } finally {
@@ -171,6 +179,14 @@ export function useSheetList() {
   }
 
   /**
+   * Восстанавливает лист из истории.
+   * @param id - идентификатор листа
+   */
+  function restore(id: string): Promise<CharacterSheet | undefined> {
+    return mutate(() => restoreSheet(id), SHEET_HISTORY_TEXT.restoreError);
+  }
+
+  /**
    * Удаляет лист.
    * @param id - идентификатор листа
    */
@@ -251,6 +267,9 @@ export function useSheetList() {
     sheets,
     limit,
     subscriberLimit,
+    history,
+    historyLimit,
+    subscriberHistoryLimit,
     canCreate,
     isLoading,
     isLoaded,
@@ -262,6 +281,7 @@ export function useSheetList() {
     copyDocument,
     setShareToken,
     remove,
+    restore,
     importFromFile,
   };
 }

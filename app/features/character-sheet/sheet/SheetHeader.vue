@@ -56,6 +56,8 @@
     replaceRaceBonuses,
     REST_ICON,
     SHEET_BODY_LABELS,
+    SHEET_EDIT_ACCESS_TEXT,
+    SHEET_EDIT_ICON,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_MENU_LABELS,
@@ -96,6 +98,7 @@
     saveStatus,
     isLocked,
     isReadonly,
+    isEditor,
     shareToken,
     sharedToken,
     update,
@@ -320,7 +323,9 @@
     const enabledToken = await exportToPdf(name.value, document.value, {
       variant,
       shareToken: sharedToken.value ?? shareToken.value,
-      ownSheetId: isReadonly.value ? null : (sheetId.value ?? null),
+      // Включить ссылку ради QR-кода может только владелец
+      ownSheetId:
+        isReadonly.value || isEditor.value ? null : (sheetId.value ?? null),
     });
 
     if (enabledToken) {
@@ -342,6 +347,36 @@
       },
     ],
   ]);
+
+  /** Поделиться листом может только владелец, редактору пункта нет. */
+  const shareMenuItems = computed<Array<DropdownMenuItem>>(() =>
+    isEditor.value
+      ? []
+      : [
+          {
+            label: SHEET_SHARE_TEXT.menu,
+            icon: SHEET_SHARE_ICON.share,
+            suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
+            onSelect: openShare,
+          },
+        ],
+  );
+
+  /** Удалить лист может только владелец, редактору группы нет. */
+  const removeMenuGroups = computed<Array<Array<DropdownMenuItem>>>(() =>
+    isEditor.value
+      ? []
+      : [
+          [
+            {
+              label: SHEET_MENU_LABELS.remove,
+              icon: 'tabler:trash',
+              color: 'error',
+              onSelect: askRemove,
+            },
+          ],
+        ],
+  );
 
   const ownMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
@@ -369,12 +404,7 @@
       },
     ],
     [
-      {
-        label: SHEET_SHARE_TEXT.menu,
-        icon: SHEET_SHARE_ICON.share,
-        suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
-        onSelect: openShare,
-      },
+      ...shareMenuItems.value,
       ...pdfMenuItems.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
@@ -388,14 +418,7 @@
         onSelect: copySheet,
       },
     ],
-    [
-      {
-        label: SHEET_MENU_LABELS.remove,
-        icon: 'tabler:trash',
-        color: 'error',
-        onSelect: askRemove,
-      },
-    ],
+    ...removeMenuGroups.value,
   ]);
 
   const menuItems = computed(() =>
@@ -896,6 +919,20 @@
       <SheetReadonlyBar v-if="isReadonly" />
 
       <div class="flex items-center gap-1">
+        <!-- Чужой лист по праву редактора: карандаш говорит, что править можно,
+          а подсказка — что удалить лист и поделиться им может только владелец -->
+        <UTooltip
+          v-if="isEditor"
+          :text="SHEET_EDIT_ACCESS_TEXT.editorTooltip"
+        >
+          <UBadge
+            :label="SHEET_EDIT_ACCESS_TEXT.editorBadge"
+            :icon="SHEET_EDIT_ICON.editor"
+            color="primary"
+            variant="subtle"
+          />
+        </UTooltip>
+
         <UTooltip
           v-if="!isReadonly"
           :text="saveStatusText"
@@ -1096,7 +1133,7 @@
     <SheetLongRestModal v-model:open="isLongRestOpen" />
 
     <SheetShareModal
-      v-if="sheetId && !isReadonly"
+      v-if="sheetId && !isReadonly && !isEditor"
       v-model:open="isShareOpen"
       v-model:share-token="shareToken"
       :sheet-id="sheetId"

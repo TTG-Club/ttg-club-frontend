@@ -5,8 +5,21 @@ import { creatureLinkSchema } from '~bestiary/model';
 import {
   INITIATIVE_TEXT,
   PARTICIPANT_TYPES,
+  SHEET_PLAYER_SOURCES,
   TRACKER_STATUSES,
 } from './constants';
+
+/**
+ * Привязка игрока к листу персонажа: по ней хиты из боя пишутся обратно в
+ * лист. Свой лист пишется по `sheetId`, чужой — по `savedId` сохранённой
+ * записи.
+ */
+export const participantSheetLinkSchema = z.object({
+  sheetId: z.string(),
+  source: z.enum(SHEET_PLAYER_SOURCES),
+  shareToken: z.string().nullish(),
+  savedId: z.string().nullish(),
+});
 
 /** Участник трекера; бросок появляется, когда инициатива прокинута. */
 export const participantSchema = z.object({
@@ -20,6 +33,8 @@ export const participantSchema = z.object({
   initiativeRoll: z.number().nullish(),
   initiativeTotal: z.number().nullish(),
   creatureUrl: z.string().nullish(),
+  /** Привязка к листу персонажа; битая не роняет трекер, а просто теряется. */
+  sheetLink: participantSheetLinkSchema.nullish().catch(null),
 });
 
 /** Полное состояние трекера: ответ на `GET /{id}` и на любое изменение. */
@@ -69,6 +84,7 @@ export const trackerErrorSchema = z.object({
 });
 
 export type TrackerParticipant = z.infer<typeof participantSchema>;
+export type ParticipantSheetLink = z.infer<typeof participantSheetLinkSchema>;
 export type Tracker = z.infer<typeof trackerSchema>;
 export type TrackerListItem = z.infer<typeof trackerListItemSchema>;
 export type TrackerSlot = z.infer<typeof trackerSlotSchema>;

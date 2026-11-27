@@ -2,9 +2,13 @@ import type {
   CharacterSheet,
   CharacterSheetList,
   SavedSheet,
+  SavedSheetEditAccess,
   SavedSheetList,
   SharedSheet,
   SheetDocument,
+  SheetEditorList,
+  SheetEditStatus,
+  SheetPresence,
 } from './schema';
 
 import { z } from 'zod';
@@ -13,17 +17,30 @@ import {
   CHARACTER_SHEET_API_URL,
   SHEET_AVATAR_API_SEGMENT,
   SHEET_AVATAR_URL_PREFIX,
+  SHEET_EDIT_API,
+  SHEET_HISTORY_API_SEGMENT,
   SHEET_SHARE_API,
 } from './constants';
 import {
   characterSheetListSchema,
   characterSheetSchema,
+  savedSheetEditAccessListSchema,
   savedSheetListSchema,
   savedSheetSchema,
   sharedSheetSchema,
+  sheetEditorListSchema,
+  sheetEditRequestCountSchema,
+  sheetEditRequestSchema,
+  sheetPresenceSchema,
   sheetShareSchema,
 } from './schema';
 import { getCatalogApiPath } from './utils';
+
+/** Хиты сохранённого чужого листа: текущие и временные. */
+interface SavedSheetHealthBody {
+  current: number;
+  temporary: number;
+}
 
 /** Тело сохранения листа: имя, документ и версия, с которой начиналась правка. */
 interface SheetSaveBody {
@@ -110,7 +127,21 @@ export function saveSheetOnLeave(id: string, body: SheetSaveBody): void {
 }
 
 /**
- * Удаляет лист.
+ * Восстанавливает лист из истории; сверх лимита активных — 403.
+ * @param id - идентификатор листа
+ */
+export async function restoreSheet(id: string): Promise<CharacterSheet> {
+  const api = useApi();
+
+  return characterSheetSchema.parse(
+    await api(`${getSheetUrl(id)}/${SHEET_HISTORY_API_SEGMENT}`, {
+      method: 'POST',
+    }),
+  );
+}
+
+/**
+ * Удаляет лист в историю: его можно восстановить, пока он в ней.
  * @param id - идентификатор листа
  */
 export async function deleteSheet(id: string): Promise<void> {
@@ -195,6 +226,155 @@ export async function removeSavedSheet(id: string): Promise<void> {
     `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${encodeURIComponent(id)}`,
     { method: 'DELETE' },
   );
+}
+
+/**
+ * Пишет хиты в сохранённый чужой лист (их отмечает мастер в трекере
+ * инициативы). Сервер меняет только текущие и временные хиты, текущие зажимает
+ * максимумом листа; отозванная ссылка или удалённый лист — 404.
+ * @param id - идентификатор сохранённой записи
+ * @param body - текущие и временные хиты
+ */
+export async function updateSavedSheetHealth(
+  id: string,
+  body: SavedSheetHealthBody,
+): Promise<void> {
+  const api = useApi();
+
+  await api(
+    `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${encodeURIComponent(id)}/${SHEET_SHARE_API.health}`,
+    { method: 'PATCH', body },
+  );
+}
+
+/**
+ * Адрес записи в «Других листах».
+ * @param savedId - идентификатор записи
+ */
+function getSavedSheetUrl(savedId: string): string {
+  return `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${encodeURIComponent(savedId)}`;
+}
+
+/**
+ * Просит владельца разрешить правки сохранённого чужого листа.
+ * @param savedId - идентификатор записи в «Других листах»
+ * @returns состояние права: запрос ждёт ответа или право уже выдано
+ */
+export async function requestSheetEdit(
+  savedId: string,
+): Promise<SheetEditStatus> {
+  const api = useApi();
+
+  const response = await api(
+    `${getSavedSheetUrl(savedId)}/${SHEET_EDIT_API.editRequest}`,
+    { method: 'POST' },
+  );
+
+  return sheetEditRequestSchema.parse(response).status;
+}
+
+/** Права на редактирование сохранённых листов: запрошенные и выданные. */
+export async function fetchSavedSheetEditAccess(): Promise<
+  Array<SavedSheetEditAccess>
+> {
+  const api = useApi();
+
+  const response = await api(
+    `${CHARACTER_SHEET_API_URL}/${SHEET_SHARE_API.saved}/${SHEET_EDIT_API.editAccess}`,
+  );
+
+  return savedSheetEditAccessListSchema.parse(response).sheets;
+}
+
+/** Число неотвеченных запросов на редактирование листов пользователя. */
+export async function fetchEditRequestCount(): Promise<number> {
+  const api = useApi();
+
+  const response = await api(
+    `${CHARACTER_SHEET_API_URL}/${SHEET_EDIT_API.editRequestsCount}`,
+  );
+
+  return sheetEditRequestCountSchema.parse(response).count;
+}
+
+/**
+ * Запросы и редакторы своего листа.
+ * @param id - идентификатор листа
+ */
+export async function fetchSheetEditors(id: string): Promise<SheetEditorList> {
+  const api = useApi();
+
+  return sheetEditorListSchema.parse(
+    await api(`${getSheetUrl(id)}/${SHEET_EDIT_API.editors}`),
+  );
+}
+
+/**
+ * Разрешает правки по запросу.
+ * @param id - идентификатор листа
+ * @param editorId - идентификатор запроса
+ * @returns обновлённые запросы и редакторы
+ */
+export async function approveSheetEditor(
+  id: string,
+  editorId: string,
+): Promise<SheetEditorList> {
+  const api = useApi();
+
+  return sheetEditorListSchema.parse(
+    await api(
+      `${getSheetUrl(id)}/${SHEET_EDIT_API.editors}/${encodeURIComponent(editorId)}/${SHEET_EDIT_API.approve}`,
+      { method: 'POST' },
+    ),
+  );
+}
+
+/**
+ * Отклоняет запрос или отзывает выданное право.
+ * @param id - идентификатор листа
+ * @param editorId - идентификатор запроса или права
+ * @returns обновлённые запросы и редакторы
+ */
+export async function removeSheetEditor(
+  id: string,
+  editorId: string,
+): Promise<SheetEditorList> {
+  const api = useApi();
+
+  return sheetEditorListSchema.parse(
+    await api(
+      `${getSheetUrl(id)}/${SHEET_EDIT_API.editors}/${encodeURIComponent(editorId)}`,
+      { method: 'DELETE' },
+    ),
+  );
+}
+
+/**
+ * Отмечает, что лист открыт на правку; 403 и 404 — права больше нет.
+ * @param id - идентификатор листа
+ * @returns кто ещё на листе и версия листа на сервере
+ */
+export async function sendSheetPresence(id: string): Promise<SheetPresence> {
+  const api = useApi();
+
+  return sheetPresenceSchema.parse(
+    await api(`${getSheetUrl(id)}/${SHEET_EDIT_API.presence}`, {
+      method: 'POST',
+    }),
+  );
+}
+
+/**
+ * Снимает отметку присутствия запросом, который переживёт закрытие страницы.
+ * Ответ не нужен: отметка и так истечёт на сервере сама.
+ * @param id - идентификатор листа
+ */
+export function leaveSheetPresence(id: string): void {
+  fetch(`${getSheetUrl(id)}/${SHEET_EDIT_API.presence}`, {
+    method: 'DELETE',
+    keepalive: true,
+    credentials: 'same-origin',
+  }).catch(() => undefined);
 }
 
 /** Ответ загрузки портрета: адрес файла листа с меткой версии. */

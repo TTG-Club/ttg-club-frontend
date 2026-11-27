@@ -26,9 +26,19 @@ export const SHEET_SEARCH_SIZE = 30;
 /** HTTP-статусы, на которые лист реагирует особо. */
 export const SHEET_HTTP_STATUS = {
   unauthorized: 401,
+  forbidden: 403,
   notFound: 404,
   conflict: 409,
 } as const;
+
+/**
+ * Сколько раз подряд автосохранение повторяет сорвавшуюся отправку само;
+ * дальше ждёт следующей правки или ухода со страницы.
+ */
+export const SHEET_SAVE_RETRY_LIMIT = 5;
+
+/** Потолок паузы между повторами сорвавшегося сохранения, мс. */
+export const SHEET_SAVE_RETRY_MAX_DELAY = 30_000;
 
 /** Ключ браузерного хранилища с запертыми листами. */
 export const SHEET_LOCKED_STORAGE_KEY = 'ttg-character-sheet-locked';
@@ -64,14 +74,15 @@ export const SHEET_TEXT = {
   errorCopy: 'Не удалось создать копию',
   errorSave: 'Не удалось сохранить лист',
   conflict:
-    'Лист изменили в другом окне. Перезагрузите его, чтобы не затереть правки.',
+    'Лист изменили в другом окне, и объединить правки не удалось. Перезагрузите лист, чтобы не затереть чужие изменения.',
   reload: 'Перезагрузить',
   open: 'Открыть',
   copy: 'Копия',
   copySuffix: ' (копия)',
   remove: 'Удалить',
   removeTitle: 'Удалить лист?',
-  removeDescription: 'Лист будет удалён без возможности восстановления.',
+  removeDescription:
+    'Лист уйдёт в историю удалённых — его можно будет восстановить, пока он не вытеснен новыми удалениями.',
   cancel: 'Отмена',
   confirm: 'Удалить',
   defaultName: 'Новый персонаж',
@@ -3121,6 +3132,7 @@ export const SHEET_SHARE_API = {
   share: 'share',
   shared: 'shared',
   saved: 'saved',
+  health: 'health',
 } as const;
 
 /** Подписи окна «Поделиться листом». */
@@ -3134,12 +3146,12 @@ export const SHEET_SHARE_TEXT = {
   disable: 'Отключить доступ',
   close: 'Закрыть',
   hintOn:
-    'Лист откроется у любого, кто перейдёт по ссылке. Редактировать его сможете только вы.',
+    'Лист откроется у любого, кто перейдёт по ссылке. Редактировать его смогут только вы и те, кому вы разрешите.',
   hintOff:
     'Пока доступ выключен, лист виден только вам. Ссылку можно отозвать в любой момент.',
   guestTitle: 'Гость видит лист целиком',
   guestDescription:
-    'Правки и настройки ему недоступны — редактирование остаётся только у вас.',
+    'Правки, броски и настройки ему недоступны, пока вы не разрешите редактирование по его запросу.',
   disabled: 'Доступ по ссылке отключён',
   disabledDescription: 'Прежняя ссылка больше не откроет лист.',
   error: 'Не удалось изменить доступ по ссылке',
@@ -3218,6 +3230,112 @@ export const SHEET_SHARE_ICON = {
   remove: 'tabler:bookmark-minus',
   subscription: 'tabler:crown',
 } as const;
+
+/* --- Совместная правка листа ------------------------------------------- */
+
+/** Сегменты ручек совместной правки листа. */
+export const SHEET_EDIT_API = {
+  editRequest: 'edit-request',
+  editAccess: 'edit-access',
+  editRequestsCount: 'edit-requests/count',
+  editors: 'editors',
+  approve: 'approve',
+  presence: 'presence',
+} as const;
+
+/** Состояния права на редактирование чужого листа. */
+export const SHEET_EDIT_STATUSES = ['PENDING', 'APPROVED'] as const;
+
+/**
+ * Подписи прав на редактирование у владельца листа: баннер с запросами в
+ * листе и список редакторов в окне «Поделиться».
+ */
+export const SHEET_EDITORS_TEXT = {
+  requestsTitle: 'Просят доступ к редактированию',
+  requestsHint:
+    'Редактор сможет менять лист, но не удалять его, не делиться им и не раздавать права.',
+  editorsTitle: 'Редактирование',
+  editorsHint:
+    'Тот, кто сохранил лист по ссылке, может попросить доступ к правкам — запрос появится здесь и над листом.',
+  editorsEmpty: 'Кроме вас лист пока никто не редактирует.',
+  approve: 'Разрешить',
+  decline: 'Отклонить',
+  revoke: 'Отозвать',
+  limitReached: 'Достигнут лимит редакторов',
+  revokeOnDisableHint:
+    'Если отключить доступ по ссылке, права на редактирование тоже пропадут.',
+  error: 'Не удалось изменить доступ к редактированию',
+  listBadge: 'Просят доступ',
+} as const;
+
+/**
+ * Подписи права на редактирование у того, кто сохранил чужой лист: запрос,
+ * его ожидание, ответы владельца и работа с листом по выданному праву.
+ */
+export const SHEET_EDIT_ACCESS_TEXT = {
+  request: 'Запросить редактирование',
+  requestHint: 'Владелец листа увидит запрос и решит, разрешить ли правки',
+  pending: 'Запрос на редактирование отправлен',
+  pendingHint: 'Ждёт ответа владельца',
+  approvedBadge: 'Владелец разрешил вам редактировать этот лист',
+  sentTitle: 'Запрос отправлен',
+  sentDescription:
+    'Когда владелец разрешит правки, лист откроется на редактирование из раздела «Другие листы».',
+  alreadyApprovedTitle: 'Редактирование уже разрешено',
+  alreadyApprovedDescription:
+    'Лист открывается на правку из раздела «Другие листы».',
+  requestError: 'Не удалось запросить редактирование',
+  grantedTitle: 'Редактирование разрешено',
+  grantedDescription: (name: string): string =>
+    `«${name}» можно править: лист открывается из раздела «Другие листы».`,
+  grantedAction: 'Открыть',
+  declinedTitle: 'В редактировании отказано',
+  declinedDescription: (name: string): string =>
+    `«${name}»: владелец отклонил запрос. Его можно отправить снова.`,
+  revokedTitle: 'Редактирование закрыто',
+  revokedDescription:
+    'Владелец отозвал доступ — лист открыт только для просмотра.',
+  editorBadge: 'Редактор',
+  editorTooltip:
+    'Чужой лист: владелец разрешил вам правки. Удалить лист и поделиться им может только он.',
+  presence: 'Сейчас открыт:',
+} as const;
+
+/** Иконки совместной правки листа. */
+export const SHEET_EDIT_ICON = {
+  request: 'tabler:pencil-plus',
+  pending: 'tabler:clock',
+  editor: 'tabler:pencil',
+  requests: 'tabler:pencil-question',
+  approve: 'tabler:user-check',
+  remove: 'tabler:user-x',
+  declined: 'tabler:pencil-off',
+  revoked: 'tabler:eye',
+  presence: 'tabler:users',
+} as const;
+
+/**
+ * Как часто открытый лист отмечается на сервере, когда его больше никто не
+ * правит. Сервер считает отметку живой 45 секунд — один пропущенный запрос её
+ * не гасит.
+ */
+export const SHEET_PRESENCE_INTERVAL_MS = 20_000;
+
+/**
+ * Как часто отмечается лист, открытый ещё у кого-то (и всегда — у редактора):
+ * по версии из ответа подтягиваются чужие правки, а редактор сразу узнаёт,
+ * что право отозвали.
+ */
+export const SHEET_PRESENCE_SHARED_INTERVAL_MS = 4000;
+
+/**
+ * Интервал опроса сводки прав, пока есть запрос без ответа: разрешение должно
+ * дойти до игрока сразу, а не после перезагрузки.
+ */
+export const SHEET_EDIT_ACCESS_POLL_INTERVAL_MS = 15_000;
+
+/** Интервал опроса числа входящих запросов на редактирование. */
+export const SHEET_EDIT_REQUESTS_POLL_INTERVAL_MS = 60_000;
 
 /* --- Экспорт листа в PDF ------------------------------------------------ */
 
@@ -3313,4 +3431,34 @@ export const STARTING_EQUIPMENT_TEXT = {
   tab: 'Снаряжение',
   loadError:
     'Часть предметов не загрузилась из справочника — они добавлены своими.',
+} as const;
+
+/** Сегмент ручки восстановления: `/api/v1/character-sheets/<id>/restore`. */
+export const SHEET_HISTORY_API_SEGMENT = 'restore';
+
+/** Раздел «История листов». */
+export const SHEET_HISTORY_TEXT = {
+  title: 'История листов',
+  restore: 'Восстановить',
+  restoreAria: 'Восстановить лист',
+  restored: 'Лист восстановлен',
+  restoreError: 'Не удалось восстановить лист',
+  restoreLimit:
+    'Нет места в лимите активных листов — удалите один, чтобы восстановить',
+  deletedAt: (date: string): string => `Удалён ${date}`,
+  tooltip: (limit: number): string =>
+    `Удалённые листы можно восстановить, пока в лимите активных есть свободное место. В истории хранятся последние ${limit} удалённых листов — более старые вытесняются новыми удалениями.`,
+} as const;
+
+/** Формат даты удаления в истории. */
+export const SHEET_HISTORY_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+};
+
+/** Иконки истории листов. */
+export const SHEET_HISTORY_ICON = {
+  item: 'tabler:history',
+  restore: 'tabler:restore',
 } as const;

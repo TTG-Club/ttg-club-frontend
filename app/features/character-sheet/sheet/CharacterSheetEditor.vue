@@ -4,6 +4,9 @@
   import {
     useCharacterSheet,
     useSheetClassData,
+    useSheetEditors,
+    useSheetEditRequests,
+    useSheetPresence,
     useSheetRoll,
     useSheetStats,
   } from '../composables';
@@ -17,9 +20,13 @@
   } from '../dialogs';
   import {
     CHARACTER_SHEET_ROUTE,
+    fetchSavedSheets,
     formatModifier,
+    getSharedSheetRoute,
     SHEET_BODY_LABELS,
     SHEET_DEFAULT_TAB,
+    SHEET_EDIT_ACCESS_TEXT,
+    SHEET_EDIT_ICON,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_READONLY_TEXT,
@@ -29,6 +36,7 @@
   } from '../model';
   import SheetAbilities from './SheetAbilities.vue';
   import SheetDefencesPanel from './SheetDefencesPanel.vue';
+  import SheetEditRequestsBanner from './SheetEditRequestsBanner.vue';
   import SheetEffects from './SheetEffects.vue';
   import SheetExhaustionPanel from './SheetExhaustionPanel.vue';
   import SheetFeatures from './SheetFeatures.vue';
@@ -62,14 +70,107 @@
   }>();
 
   const {
+    sheetId,
     loadStatus,
     name,
     isLocked,
     isReadonly,
+    isEditor,
     load,
     loadShared,
     ensureEditable,
+    discardChanges,
   } = useCharacterSheet();
+
+  const toast = useToast();
+
+  /** Лист открыт на правку: отмечается на сервере, правки сливаются. */
+  const editableSheetId = computed(() =>
+    loadStatus.value === 'ready' && !isReadonly.value
+      ? (sheetId.value ?? '')
+      : '',
+  );
+
+  /** Лист свой: запросы на правки и управление доступом — только здесь. */
+  const isOwnSheet = computed(
+    () => Boolean(editableSheetId.value) && !isEditor.value,
+  );
+
+  // Совместная правка: пока лист открыт на правку (владельцем или
+  // редактором), он отмечается на сервере, и по версии из ответа
+  // автосохранение подтягивает чужие правки. Редактору отметка заодно
+  // сообщает, что право отозвали
+  const { otherUsers, isAccessLost } = useSheetPresence(
+    editableSheetId,
+    isEditor,
+  );
+
+  const presenceLabel = computed(() =>
+    otherUsers.value.length
+      ? `${SHEET_EDIT_ACCESS_TEXT.presence} ${otherUsers.value
+          .map((user) => user.displayName)
+          .join(', ')}`
+      : '',
+  );
+
+  // Запросы на правки своего листа показываются баннером над ним.
+  // Перечитываются при открытии листа и когда изменилась сводка входящих
+  // запросов: новый запрос мог прийти, пока лист открыт. Цикла нет: решение
+  // по запросу перечитывает сводку, сводка — список, а загрузка списка
+  // сводку уже не трогает
+  const { load: loadEditors } = useSheetEditors();
+  const { count: incomingEditRequests } = useSheetEditRequests();
+
+  watch(
+    [editableSheetId, isOwnSheet, incomingEditRequests],
+    ([currentSheetId, ownSheet]) => {
+      if (ownSheet && currentSheetId) {
+        void loadEditors(currentSheetId);
+      }
+    },
+    { immediate: true },
+  );
+
+  /**
+   * Право на правки отозвали, пока лист был открыт: несохранённое сохранить
+   * уже нельзя, лист переоткрывается на просмотр по сохранённой ссылке, а без
+   * неё (ссылку тоже отключили) — возвращаемся к списку листов.
+   * @param lostSheetId - лист, к которому пропал доступ
+   */
+  async function leaveRevokedSheet(lostSheetId: string): Promise<void> {
+    discardChanges();
+
+    toast.add({
+      title: SHEET_EDIT_ACCESS_TEXT.revokedTitle,
+      description: SHEET_EDIT_ACCESS_TEXT.revokedDescription,
+      color: 'warning',
+      icon: SHEET_EDIT_ICON.revoked,
+    });
+
+    try {
+      const { items } = await fetchSavedSheets();
+
+      const saved = items.find(
+        (item) => item.sheetId === lostSheetId && item.available,
+      );
+
+      await navigateTo(
+        saved ? getSharedSheetRoute(saved.shareToken) : CHARACTER_SHEET_ROUTE,
+        { replace: true },
+      );
+    } catch {
+      await navigateTo(CHARACTER_SHEET_ROUTE, { replace: true });
+    }
+  }
+
+  watch(
+    () => isEditor.value && isAccessLost.value,
+    (isLost) => {
+      if (isLost && sheetId.value) {
+        void leaveRevokedSheet(sheetId.value);
+      }
+    },
+  );
 
   const notFoundTitle = computed(() =>
     shareToken ? SHEET_READONLY_TEXT.notFound : SHEET_TEXT.notFound,
@@ -258,6 +359,23 @@
 
     <template v-else>
       <SheetHeader />
+
+      <span
+        v-if="presenceLabel"
+        class="flex items-center gap-1.5 text-xs text-muted"
+      >
+        <UIcon
+          :name="SHEET_EDIT_ICON.presence"
+          class="size-4 shrink-0"
+        />
+
+        <span class="truncate">{{ presenceLabel }}</span>
+      </span>
+
+      <SheetEditRequestsBanner
+        v-if="isOwnSheet && sheetId"
+        :sheet-id="sheetId"
+      />
 
       <div class="relative flex items-center justify-center py-1">
         <div
