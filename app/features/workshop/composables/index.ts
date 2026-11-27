@@ -3,6 +3,7 @@ export * from './useBookSources';
 export * from './useCreatureToken';
 export * from './useExpandedItems';
 export * from './useFilterGroups';
+export * from './useMagicItemBaseOptions';
 export * from './useRaceParentOptions';
 export * from './useWorkshopEditPage';
 export * from './useWorkshopFormTabs';

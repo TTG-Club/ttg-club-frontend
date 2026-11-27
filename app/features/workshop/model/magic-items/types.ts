@@ -12,6 +12,10 @@ export interface WorkshopMagicItem {
   type: string;
   /** Уточнение типа: «любой меч», блоки разметки core-api. */
   special: Array<string>;
+  /** Немагическая основа — оружие: адреса страниц без `/weapons/`. */
+  weapons: Array<string>;
+  /** Немагическая основа — доспехи: адреса страниц без `/armors/`. */
+  armors: Array<string>;
   customization: boolean;
   /** Условие настройки: «волшебником», блоки разметки core-api. */
   custSpecial: Array<string>;

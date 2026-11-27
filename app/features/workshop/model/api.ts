@@ -1,9 +1,13 @@
+import type { SectionConfig } from '~section/model';
+
 import type {
   BookSourceOption,
   RevisionInfo,
   SavedEntry,
   SelectOption,
 } from './types';
+
+import { buildListRequest, SECTION_PAGE_SIZE_ALL } from '~section/model';
 
 import {
   REFERENCE_API_PATH,
@@ -12,6 +16,7 @@ import {
   WORKSHOP_BOOKS_QUERY,
   WORKSHOP_PREVIEW_SEGMENT,
 } from './constants';
+import { parseBaseItemOptions } from './magic-items';
 import {
   parseBookSources,
   parseFilterGroups,
@@ -169,5 +174,28 @@ export async function fetchBookSources(): Promise<Array<BookSourceOption>> {
       method: 'POST',
       body: WORKSHOP_BOOKS_QUERY,
     }),
+  );
+}
+
+/**
+ * Оружие или доспехи раздела целиком, по названию, для выбора немагической
+ * основы магического предмета.
+ * @param section - раздел оружия или доспехов
+ */
+export async function fetchMagicItemBaseOptions(
+  section: SectionConfig,
+): Promise<Array<SelectOption>> {
+  const api = useApi();
+
+  return parseBaseItemOptions(
+    await api<unknown>(section.listUrl, {
+      method: 'POST',
+      body: buildListRequest({
+        page: 0,
+        size: SECTION_PAGE_SIZE_ALL,
+        order: section.order,
+      }),
+    }),
+    section.path,
   );
 }
