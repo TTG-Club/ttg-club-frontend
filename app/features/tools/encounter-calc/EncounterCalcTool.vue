@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { consola } from 'consola';
 
+  import { LAYOUT_SPLIT_QUERY } from '~/shared/consts';
   import { SectionLayout } from '~section/layout';
 
   import {
@@ -54,6 +55,16 @@
 
   const isTransferOpen = ref(false);
 
+  /**
+   * Колонка слева есть только на широком экране. На узком она липнет к
+   * верху и съедает экран, поэтому группа и генераторы идут в общем потоке
+   * вместе с итогом и существами.
+   */
+  const isColumnScreen = useMediaQuery(LAYOUT_SPLIT_QUERY);
+
+  const [DefineParty, ReuseParty] = createReusableTemplate();
+  const [DefineGenerators, ReuseGenerators] = createReusableTemplate();
+
   const canGenerate = computed(
     () => canAddCreature.value && result.value.characterCount > 0,
   );
@@ -78,40 +89,53 @@
 </script>
 
 <template>
+  <DefineParty>
+    <EncounterPartyCard
+      :party="party"
+      :can-add="canAddPartyRow"
+      @add="addPartyRow"
+      @update="updatePartyRow"
+      @remove="removePartyRow"
+    />
+  </DefineParty>
+
+  <DefineGenerators>
+    <EncounterGeneratorCard
+      :environments="environmentItems"
+      :loading="isGenerating"
+      :disabled="!canGenerate"
+      @generate="generate"
+    />
+
+    <EncounterTableCard
+      :tiers="tableTiers"
+      :environments="tableEnvironments"
+      :default-tier="defaultTableTier"
+      :last-roll="lastRoll"
+      :loading="isRolling"
+      :disabled="!canAddCreature"
+      @roll="rollTable"
+    />
+  </DefineGenerators>
+
   <SectionLayout
     :title="ENCOUNTER_CALC_TITLE"
     is-full-width
   >
-    <template #controls>
+    <template
+      v-if="isColumnScreen"
+      #controls
+    >
       <div class="flex flex-col gap-4">
-        <EncounterPartyCard
-          :party="party"
-          :can-add="canAddPartyRow"
-          @add="addPartyRow"
-          @update="updatePartyRow"
-          @remove="removePartyRow"
-        />
+        <ReuseParty />
 
-        <EncounterGeneratorCard
-          :environments="environmentItems"
-          :loading="isGenerating"
-          :disabled="!canGenerate"
-          @generate="generate"
-        />
-
-        <EncounterTableCard
-          :tiers="tableTiers"
-          :environments="tableEnvironments"
-          :default-tier="defaultTableTier"
-          :last-roll="lastRoll"
-          :loading="isRolling"
-          :disabled="!canAddCreature"
-          @roll="rollTable"
-        />
+        <ReuseGenerators />
       </div>
     </template>
 
     <div class="flex flex-col gap-4">
+      <ReuseParty v-if="!isColumnScreen" />
+
       <EncounterSummary :result="result" />
 
       <EncounterCreaturesCard
@@ -124,6 +148,8 @@
         @clear="clearCreatures"
         @transfer="isTransferOpen = true"
       />
+
+      <ReuseGenerators v-if="!isColumnScreen" />
     </div>
 
     <EncounterTransferModal
