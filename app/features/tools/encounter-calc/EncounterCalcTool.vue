@@ -15,7 +15,6 @@
     EncounterGeneratorCard,
     EncounterPartyCard,
     EncounterSummary,
-    EncounterTableCard,
     EncounterTransferModal,
   } from './ui';
 
@@ -51,7 +50,21 @@
     roll: rollTable,
   } = useEncounterTable(addCreature);
 
-  const defaultTableTier = computed(() => getEncounterTableTier(party.value));
+  /** Диапазон таблиц столкновений по среднему уровню группы. */
+  const tableTier = computed(() => getEncounterTableTier(party.value));
+
+  const tableTierLabel = computed(
+    () =>
+      tableTiers.value.find(({ value }) => value === tableTier.value)?.label,
+  );
+
+  /**
+   * Бросает по таблице диапазона группы.
+   * @param environment Среда обитания; пусто — случайная.
+   */
+  function rollPartyTable(environment: string | undefined): Promise<void> {
+    return rollTable(tableTier.value, environment);
+  }
 
   const isTransferOpen = ref(false);
 
@@ -102,19 +115,15 @@
   <DefineGenerators>
     <EncounterGeneratorCard
       :environments="environmentItems"
-      :loading="isGenerating"
-      :disabled="!canGenerate"
-      @generate="generate"
-    />
-
-    <EncounterTableCard
-      :tiers="tableTiers"
-      :environments="tableEnvironments"
-      :default-tier="defaultTableTier"
+      :table-environments="tableEnvironments"
+      :tier-label="tableTierLabel"
       :last-roll="lastRoll"
-      :loading="isRolling"
-      :disabled="!canAddCreature"
-      @roll="rollTable"
+      :generating="isGenerating"
+      :rolling="isRolling"
+      :can-generate="canGenerate"
+      :can-roll="canAddCreature"
+      @generate="generate"
+      @roll="rollPartyTable"
     />
   </DefineGenerators>
 
