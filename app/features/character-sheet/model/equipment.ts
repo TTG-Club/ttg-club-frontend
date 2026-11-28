@@ -1,7 +1,13 @@
+import type {
+  ClassStartingEquipmentItem,
+  ClassStartingEquipmentLine,
+  StartingEquipmentCategory,
+} from '~character/model';
 import type { MarkerNode, RenderNode } from '~news/markup';
 
 import type { SheetItem } from './schema';
 import type {
+  CatalogOption,
   StartingEquipmentItem,
   StartingEquipmentLine,
   StartingEquipmentOption,
@@ -10,14 +16,30 @@ import type {
 import { upperFirst } from 'es-toolkit';
 import { z } from 'zod';
 
+import {
+  formatStartingEquipmentOption,
+  getStartingEquipmentSection,
+  STARTING_EQUIPMENT_CATEGORY_TEXT,
+} from '~character/model';
+import {
+  armorLinkSchema,
+  ARMORS_SECTION,
+  itemLinkSchema,
+  ITEMS_SECTION,
+  weaponLinkSchema,
+  WEAPONS_SECTION,
+} from '~inventory/model';
 import { isMarkerNode, isSimpleTextNode, parse } from '~news/markup';
+import { buildListRequest, SECTION_PAGE_SIZE_ALL } from '~section/model';
 
 import { fetchCatalogEntry } from './api';
 import { createSheetItem, loadCatalogItem } from './catalog';
 import {
+  STARTING_EQUIPMENT_CHOICE_SOURCES,
   STARTING_EQUIPMENT_LINK_KINDS,
   STARTING_EQUIPMENT_PATTERNS,
   STARTING_EQUIPMENT_QUANTITY_WORDS,
+  STARTING_EQUIPMENT_SECTION_KINDS,
 } from './constants';
 
 /**
@@ -403,6 +425,7 @@ export async function loadStartingEquipment(
       const fallback = {
         ...createSheetItem(upperFirst(entry.name), entry.url),
         quantity: entry.quantity,
+        notes: entry.description ?? '',
       };
 
       if (!entry.url) {
@@ -416,7 +439,7 @@ export async function loadStartingEquipment(
           caption: '',
         });
 
-        return { ...item, quantity: entry.quantity };
+        return { ...item, quantity: entry.quantity, notes: fallback.notes };
       } catch {
         hasFailures = true;
 
@@ -464,5 +487,239 @@ export async function fetchBackgroundEquipment(
     };
   } catch {
     return { equipments: [], startGold: 0 };
+  }
+}
+
+/* --- Стартовое снаряжение класса данными --------------------------------- */
+
+/**
+ * Раздел листа для позиции: по разделу справочника, иначе по адресу.
+ * @param item - позиция снаряжения класса
+ */
+function getItemKind(
+  item: ClassStartingEquipmentItem,
+): StartingEquipmentItem['kind'] {
+  if (item.kind === 'CHOICE' && item.category) {
+    return STARTING_EQUIPMENT_CHOICE_SOURCES[item.category].kind;
+  }
+
+  const section = item.section ?? getStartingEquipmentSection(item.url);
+
+  return section ? STARTING_EQUIPMENT_SECTION_KINDS[section] : 'item';
+}
+
+/**
+ * Позиция мастера из позиции класса: выбор из категории помнит категорию,
+ * его название — название категории.
+ * @param item - позиция снаряжения класса
+ */
+function toWizardItem(item: ClassStartingEquipmentItem): StartingEquipmentItem {
+  const description = item.description ? { description: item.description } : {};
+
+  if (item.kind === 'CHOICE' && item.category) {
+    return {
+      name: STARTING_EQUIPMENT_CATEGORY_TEXT[item.category].label,
+      url: null,
+      kind: getItemKind(item),
+      quantity: item.quantity,
+      category: item.category,
+      ...description,
+    };
+  }
+
+  return {
+    name: item.name || (item.url ?? ''),
+    url: item.url,
+    kind: getItemKind(item),
+    quantity: item.quantity,
+    ...description,
+  };
+}
+
+/**
+ * Строки мастера из снаряжения класса данными: подпись варианта —
+ * читаемый текст, монеты варианта — отдельно.
+ * @param lines - строки снаряжения класса
+ */
+export function toWizardStartingEquipment(
+  lines: ReadonlyArray<ClassStartingEquipmentLine>,
+): Array<StartingEquipmentLine> {
+  return lines.map((line) => ({
+    options: line.options.map((option) => ({
+      label: formatStartingEquipmentOption(option),
+      items: option.items.map(toWizardItem),
+      ...(option.coins ? { coins: option.coins } : {}),
+    })),
+  }));
+}
+
+/**
+ * Стартовое снаряжение класса для мастера: данными, если они заполнены,
+ * иначе разбором текста.
+ * @param structured - снаряжение данными; null — не заполнено
+ * @param text - текст снаряжения
+ */
+export function getClassStartingEquipment(
+  structured: ReadonlyArray<ClassStartingEquipmentLine> | null | undefined,
+  text: string | ReadonlyArray<string> | null | undefined,
+): Array<StartingEquipmentLine> {
+  return structured?.length
+    ? toWizardStartingEquipment(structured)
+    : parseClassStartingEquipment(toEquipmentBlocks(text));
+}
+
+/**
+ * Ключ выбора предмета для позиции «на выбор»: строка, вариант, позиция.
+ * @param lineIndex - номер строки
+ * @param optionIndex - номер варианта
+ * @param itemIndex - номер позиции
+ */
+export function getEquipmentChoiceKey(
+  lineIndex: number,
+  optionIndex: number,
+  itemIndex: number,
+): string {
+  return `${lineIndex}.${optionIndex}.${itemIndex}`;
+}
+
+/**
+ * Предметы выбранных вариантов с выбором игрока: позиция «на выбор»
+ * становится выбранной записью справочника, без выбора — своим предметом
+ * с названием категории.
+ * @param lines - строки снаряжения
+ * @param choices - выбранный вариант каждой строки
+ * @param picks - выбранные записи по ключу позиции
+ */
+export function resolveChosenEquipment(
+  lines: ReadonlyArray<StartingEquipmentLine>,
+  choices: ReadonlyArray<number>,
+  picks: Readonly<Record<string, CatalogOption>>,
+): Array<StartingEquipmentItem> {
+  return lines.flatMap((line, lineIndex) => {
+    const optionIndex = choices[lineIndex] ?? 0;
+
+    return (line.options[optionIndex]?.items ?? []).map((item, itemIndex) => {
+      const { category, ...rest } = item;
+
+      if (!category) {
+        return rest;
+      }
+
+      const pick =
+        picks[getEquipmentChoiceKey(lineIndex, optionIndex, itemIndex)];
+
+      return pick ? { ...rest, name: pick.name, url: pick.url } : rest;
+    });
+  });
+}
+
+/**
+ * Монеты выбранных вариантов, зм.
+ * @param lines - строки снаряжения
+ * @param choices - выбранный вариант каждой строки
+ */
+export function getChosenCoins(
+  lines: ReadonlyArray<StartingEquipmentLine>,
+  choices: ReadonlyArray<number>,
+): number {
+  return lines.reduce(
+    (total, line, index) =>
+      total + (line.options[choices[index] ?? 0]?.coins ?? 0),
+    0,
+  );
+}
+
+/**
+ * Записи справочника для выбора из категории из ответа ручки списка:
+ * оружие отбирается по типу, доспехи и снаряжение уже отфильтрованы.
+ * @param category - категория выбора
+ * @param raw - ответ ручки списка
+ */
+export function toEquipmentChoiceOptions(
+  category: StartingEquipmentCategory,
+  raw: unknown,
+): Array<CatalogOption> {
+  const source = STARTING_EQUIPMENT_CHOICE_SOURCES[category];
+
+  if (source.kind === 'weapon') {
+    return z
+      .array(weaponLinkSchema)
+      .parse(raw)
+      .filter((weapon) => source.weaponTypes.includes(weapon.type.order))
+      .map((weapon) => ({
+        name: weapon.name.rus,
+        url: weapon.url,
+        caption: weapon.type.name,
+      }));
+  }
+
+  if (source.kind === 'armor') {
+    return z
+      .array(armorLinkSchema)
+      .parse(raw)
+      .map((armor) => ({
+        name: armor.name.rus,
+        url: armor.url,
+        caption: armor.armorClass ?? '',
+      }));
+  }
+
+  return z
+    .array(itemLinkSchema)
+    .parse(raw)
+    .map((item) => ({ name: item.name.rus, url: item.url, caption: '' }));
+}
+
+/**
+ * Запрос списка для выбора из категории: адрес ручки и фильтр раздела.
+ * Ручки снаряжения ждут список книг в фильтре — пустой значит «все».
+ * @param category - категория выбора
+ */
+export function getEquipmentChoiceRequest(
+  category: StartingEquipmentCategory,
+): { listUrl: string; filter?: Record<string, Array<string>> } {
+  const source = STARTING_EQUIPMENT_CHOICE_SOURCES[category];
+
+  if (source.kind === 'weapon') {
+    return { listUrl: WEAPONS_SECTION.listUrl };
+  }
+
+  if (source.kind === 'armor') {
+    return {
+      listUrl: ARMORS_SECTION.listUrl,
+      filter: { type: [...source.armorTypes], book: [] },
+    };
+  }
+
+  return {
+    listUrl: ITEMS_SECTION.listUrl,
+    filter: { category: [...source.categories], book: [] },
+  };
+}
+
+/**
+ * Записи справочника для выбора из категории; ошибка — пустой список.
+ * @param category - категория выбора
+ */
+export async function fetchEquipmentChoiceOptions(
+  category: StartingEquipmentCategory,
+): Promise<Array<CatalogOption>> {
+  const api = useApi();
+  const { listUrl, filter } = getEquipmentChoiceRequest(category);
+
+  try {
+    return toEquipmentChoiceOptions(
+      category,
+      await api(listUrl, {
+        method: 'POST',
+        body: buildListRequest({
+          page: 0,
+          size: SECTION_PAGE_SIZE_ALL,
+          filter,
+        }),
+      }),
+    );
+  } catch {
+    return [];
   }
 }

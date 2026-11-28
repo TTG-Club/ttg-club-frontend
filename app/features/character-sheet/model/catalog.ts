@@ -25,6 +25,8 @@ import {
   SPELLS_SECTION,
 } from '~character/model';
 import {
+  armorLinkSchema,
+  ARMORS_SECTION,
   itemLinkSchema,
   ITEMS_SECTION,
   weaponLinkSchema,
@@ -132,6 +134,18 @@ export const WEAPON_SEARCH: CatalogSearchSource<typeof weaponLinkSchema> = {
         weapon.type.name,
         weapon.damage ? `${weapon.damage.dice} ${weapon.damage.type}` : null,
       ]),
+    },
+  ],
+};
+
+export const ARMOR_SEARCH: CatalogSearchSource<typeof armorLinkSchema> = {
+  listUrl: ARMORS_SECTION.listUrl,
+  schema: armorLinkSchema,
+  toOptions: (armor) => [
+    {
+      name: armor.name.rus,
+      url: armor.url,
+      caption: joinCaption([armor.type.name, armor.armorClass]),
     },
   ],
 };

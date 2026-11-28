@@ -26,6 +26,10 @@ import {
   CLASSES_WORKSHOP_KEY,
   EMPTY_CLASS_TABLE_VALUE,
 } from './constants';
+import {
+  getStartingEquipmentPayload,
+  toStartingEquipmentForm,
+} from './startingEquipment';
 
 /** Новое умение первого уровня. */
 export function createClassTrait(): ClassTrait {
@@ -243,6 +247,9 @@ export function createClassForm(heroClass?: WorkshopClass): ClassForm {
     weapon: [...(heroClass?.weapon ?? [])],
     tools: [...(heroClass?.tools ?? [])],
     equipment: [...(heroClass?.equipment ?? [])],
+    startingEquipment: toStartingEquipmentForm(
+      heroClass?.startingEquipment ?? [],
+    ),
     description: [...(heroClass?.description ?? [])],
     classTraits: copyTraits(heroClass?.classTraits ?? []),
     tableColumns: copyColumns(heroClass?.tableColumns ?? []),
@@ -275,6 +282,8 @@ export function getClassPayload(
     weapon: toOptionalMarkup(form.weapon),
     tools: toOptionalMarkup(form.tools),
     equipment: toOptionalMarkup(form.equipment),
+    // Отправляется всегда: null снимает снаряжение, заполненное раньше
+    startingEquipment: getStartingEquipmentPayload(form.startingEquipment),
     classTraits: getTraitsPayload(form.classTraits),
     tableColumns: getColumnsPayload(form.tableColumns),
     ...getMechanicsFieldsPayload(form, MECHANICS_KIND.class),

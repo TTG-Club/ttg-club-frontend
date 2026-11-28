@@ -30,10 +30,16 @@ export type {
   TypedLink,
 } from './schema';
 export type {
+  ClassStartingEquipmentItem,
+  ClassStartingEquipmentLine,
+  ClassStartingEquipmentOption,
   ClassTab,
   GroupedLink,
   RaceStat,
   SpellComponentLabel,
+  StartingEquipmentCategory,
+  StartingEquipmentKind,
+  StartingEquipmentSection,
   TypedLinkGroup,
 } from './types';
 
@@ -53,6 +59,14 @@ export {
   spellDetailSchema,
   spellLinkSchema,
 } from './schema';
+
+export {
+  formatStartingEquipmentLine,
+  formatStartingEquipmentOption,
+  getStartingEquipmentMarkup,
+  getStartingEquipmentSection,
+  parseStartingEquipment,
+} from './startingEquipment';
 
 export {
   expandClassSearch,

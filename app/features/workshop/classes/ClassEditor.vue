@@ -58,6 +58,7 @@
     WorkshopImageType,
   } from '../model';
   import { WorkshopPreviewDrawer } from '../preview';
+  import ClassStartingEquipmentEditor from './ClassStartingEquipmentEditor.vue';
   import ClassTableEditor from './ClassTableEditor.vue';
   import ClassTraitsEditor from './ClassTraitsEditor.vue';
 
@@ -145,6 +146,7 @@
       label: CLASS_EDITOR_TAB_TEXT.equipment,
       value: CLASS_EDITOR_TAB.equipment,
       slot: CLASS_EDITOR_TAB.equipment,
+      badge: state.startingEquipment.length || undefined,
     },
     {
       label: MECHANICS_TEXT.title,
@@ -511,6 +513,14 @@
         >
           <MarkupEditor v-model="state.equipment" />
         </UFormField>
+
+        <div class="col-span-full">
+          <ClassStartingEquipmentEditor
+            v-model="state.startingEquipment"
+            :equipment-text="state.equipment"
+            field-name="startingEquipment"
+          />
+        </div>
       </template>
 
       <template #mechanics>

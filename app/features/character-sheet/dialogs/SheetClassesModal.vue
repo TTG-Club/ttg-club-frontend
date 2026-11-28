@@ -23,14 +23,13 @@
     CLASS_TREE,
     findSource,
     getCharacterLevel,
+    getClassStartingEquipment,
     getMissingClassFeatureSources,
     getMulticlassWarning,
     LEVEL_UP_TEXT,
-    parseClassStartingEquipment,
     SHEET_ICON,
     SHEET_LABELS,
     STARTING_EQUIPMENT_TEXT,
-    toEquipmentBlocks,
     WIZARD_TEXT,
   } from '../model';
   import SheetConfirmModal from './SheetConfirmModal.vue';
@@ -235,7 +234,10 @@
 
         equipment.reset(
           isFirstClass
-            ? parseClassStartingEquipment(toEquipmentBlocks(traits?.equipment))
+            ? getClassStartingEquipment(
+                traits?.startingEquipment,
+                traits?.equipment,
+              )
             : [],
         );
 
@@ -492,6 +494,7 @@
         <SheetStartingEquipment
           v-else-if="reviewTab === 'equipment'"
           v-model:choices="equipment.choices.value"
+          v-model:picks="equipment.picks.value"
           v-model:enabled="equipment.isEnabled.value"
           :lines="equipment.lines.value"
         />

@@ -1,3 +1,5 @@
+import type { ClassStartingEquipmentLine } from '~character/model';
+
 import type { WorkshopMechanicsFields } from '../mechanics';
 
 /** Умение класса или архетипа. */
@@ -102,6 +104,8 @@ export interface WorkshopClass extends WorkshopMechanicsFields {
   archetypeName: string;
   /** Блоки разметки core-api. */
   equipment: Array<string>;
+  /** Стартовое снаряжение данными; пусто — не заполнено. */
+  startingEquipment: Array<ClassStartingEquipmentLine>;
   /** Код характеристики заклинаний; пусто, если её нет. */
   spellAbility: string;
   spellcasterType: string;

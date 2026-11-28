@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { contentDescriptionSchema, rollTableSchema } from '~content/model';
 import { entryNameSchema, entrySourceSchema } from '~section/model';
 
+import { parseStartingEquipment } from './startingEquipment';
+
 /**
  * Ссылка на класс, архетип, расу или предысторию, которым доступна запись.
  * У архетипа в `class` — название его класса.
@@ -353,6 +355,8 @@ const classTraitsSchema = z.object({
   skillAvailableCount: z.number(),
   availableSkills: z.array(z.string()).nullish(),
   equipment: contentDescriptionSchema.nullish(),
+  /** Стартовое снаряжение данными; null — не заполнено, выводится текст. */
+  startingEquipment: z.unknown().optional().transform(parseStartingEquipment),
   classFeatureLevels: z.array(classColumnSchema).nullish(),
   archetypeFeatureLevels: z.array(classColumnSchema).nullish(),
   levels: z.array(classLevelSchema).nullish(),

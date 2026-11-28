@@ -7,6 +7,7 @@
   import {
     CLASS_TEXT,
     getClassSkillsLabel,
+    getStartingEquipmentMarkup,
     OPTIONAL_FEATURES_PATH,
     sortClassFeatures,
   } from '../model';
@@ -30,6 +31,17 @@
   const skills = computed(() => getClassSkillsLabel(traits));
 
   const features = computed(() => sortClassFeatures(traits));
+
+  // Снаряжение данными выводится вместо текста: ссылки на карточки и выборы
+  const startingEquipment = computed(() =>
+    getStartingEquipmentMarkup(traits.startingEquipment ?? []),
+  );
+
+  const hasEquipment = computed(
+    () =>
+      startingEquipment.value.length > 0
+      || hasContentDescription(traits.equipment),
+  );
 
   // Таблица заклинаний архетипа идёт сразу после его описания
   const archetypeSpellTable = computed(() =>
@@ -144,7 +156,7 @@
     </details>
 
     <details
-      v-if="hasContentDescription(traits.equipment)"
+      v-if="hasEquipment"
       open
     >
       <summary class="h4">
@@ -154,7 +166,15 @@
       <div class="content">
         <p>{{ CLASS_TEXT.equipmentIntro }}</p>
 
-        <ContentRender :content="traits.equipment" />
+        <ContentRender
+          v-if="startingEquipment.length"
+          :content="startingEquipment"
+        />
+
+        <ContentRender
+          v-else
+          :content="traits.equipment"
+        />
       </div>
     </details>
 

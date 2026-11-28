@@ -1,4 +1,11 @@
+import type { StartingEquipmentCategory } from '~character/model';
+
 import type { SelectOption } from '../types';
+
+import {
+  STARTING_EQUIPMENT_CATEGORIES,
+  STARTING_EQUIPMENT_CATEGORY_TEXT,
+} from '~character/model';
 
 import { WORKSHOP_MECHANICS_TAB } from '../constants';
 
@@ -121,6 +128,7 @@ export const CLASS_FIELD_TABS: Readonly<Record<string, string>> = {
   spellAbility: CLASS_EDITOR_TAB.spellcasting,
   slotsReset: CLASS_EDITOR_TAB.spellcasting,
   equipment: CLASS_EDITOR_TAB.equipment,
+  startingEquipment: CLASS_EDITOR_TAB.equipment,
   tableColumns: CLASS_EDITOR_TAB.table,
   classTraits: CLASS_EDITOR_TAB.traits,
   mechanics: WORKSHOP_MECHANICS_TAB.mechanics,
@@ -274,3 +282,119 @@ export const CLASS_LIST_ICON = {
   add: 'tabler:plus',
   remove: 'tabler:trash',
 } as const;
+
+/** Подписи редактора стартового снаряжения. */
+export const STARTING_EQUIPMENT_EDITOR_TEXT = {
+  title: 'Стартовое снаряжение',
+  description:
+    'Данными для страницы класса и листа персонажа. Пока строк нет, '
+    + 'показывается текст снаряжения выше.',
+  addLine: 'Добавить строку',
+  removeLine: 'Удалить строку',
+  moveUp: 'Выше',
+  moveDown: 'Ниже',
+  line: 'Строка',
+  addOption: 'Добавить вариант',
+  removeOption: 'Удалить вариант',
+  option: 'Вариант',
+  addCatalogItem: 'Из справочника',
+  addCustomItem: 'Свой предмет',
+  addChoiceItem: 'На выбор из категории',
+  removeItem: 'Удалить позицию',
+  section: 'Раздел',
+  catalogItem: 'Запись справочника',
+  searchPlaceholder: 'Начните вводить название',
+  nothingFound: 'Ничего не найдено',
+  name: 'Название',
+  category: 'Категория',
+  quantity: 'Кол-во',
+  itemDescription: 'Уточнение',
+  descriptionPlaceholder: 'Например: по вашему выбору',
+  coins: 'Монеты, зм',
+  empty: 'Строк нет — на странице класса выводится текст.',
+  emptyOption: 'Позиций нет',
+  preview: 'Как будет выглядеть',
+  parse: 'Разобрать из текста',
+  parseEmpty: 'В тексте снаряжения не нашлось строк со списком.',
+  parseDone: 'Снаряжение разобрано из текста — проверьте позиции.',
+  parseConfirmTitle: 'Заменить снаряжение?',
+  parseConfirmDescription:
+    'Текущие строки снаряжения заменятся разобранными из текста.',
+  parseConfirm: 'Заменить',
+  cancel: 'Отмена',
+  choiceKind: 'Выбор',
+  customKind: 'Свой',
+} as const;
+
+/** Валидация стартового снаряжения. */
+export const STARTING_EQUIPMENT_VALIDATION = {
+  quantity: 'Целое от 1 до 1000',
+  coins: 'Целое не меньше 0',
+  category: 'Выберите категорию',
+  emptyOption: 'Добавьте позицию или монеты',
+  tooManyLines: 'Не больше 20 строк',
+  tooManyOptions: 'Не больше 5 вариантов',
+  tooManyItems: 'Не больше 20 позиций',
+  noOptions: 'Добавьте вариант',
+} as const;
+
+/** Иконки редактора стартового снаряжения. */
+export const STARTING_EQUIPMENT_EDITOR_ICON = {
+  add: 'tabler:plus',
+  remove: 'tabler:trash',
+  up: 'tabler:arrow-up',
+  down: 'tabler:arrow-down',
+  catalog: 'tabler:search',
+  custom: 'tabler:pencil',
+  choice: 'tabler:list-check',
+  parse: 'tabler:wand',
+} as const;
+
+/** Разделы справочника для поиска позиции. */
+export const STARTING_EQUIPMENT_SECTION_OPTIONS = [
+  { label: 'Оружие', value: 'WEAPON' },
+  { label: 'Доспехи', value: 'ARMOR' },
+  { label: 'Снаряжение', value: 'ITEM' },
+] as const;
+
+/** Категории выбора для списка. */
+export const STARTING_EQUIPMENT_CATEGORY_OPTIONS: ReadonlyArray<{
+  label: string;
+  value: StartingEquipmentCategory;
+}> = STARTING_EQUIPMENT_CATEGORIES.map((category) => ({
+  label: STARTING_EQUIPMENT_CATEGORY_TEXT[category].label,
+  value: category,
+}));
+
+/**
+ * Категории по тексту снаряжения: «воинское оружие», «два простых оружия»,
+ * «музыкальный инструмент». Проверяются по порядку — уточнённые раньше общих.
+ */
+export const STARTING_EQUIPMENT_CATEGORY_PATTERNS: ReadonlyArray<{
+  pattern: RegExp;
+  category: StartingEquipmentCategory;
+}> = [
+  {
+    pattern: /прост\S*\s+рукопашн\S*\s+оруж/i,
+    category: 'SIMPLE_MELEE_WEAPON',
+  },
+  {
+    pattern: /прост\S*\s+дальнобойн\S*\s+оруж/i,
+    category: 'SIMPLE_RANGED_WEAPON',
+  },
+  {
+    pattern: /воинск\S*\s+рукопашн\S*\s+оруж/i,
+    category: 'MARTIAL_MELEE_WEAPON',
+  },
+  {
+    pattern: /воинск\S*\s+дальнобойн\S*\s+оруж/i,
+    category: 'MARTIAL_RANGED_WEAPON',
+  },
+  { pattern: /прост\S*\s+оруж/i, category: 'SIMPLE_WEAPON' },
+  { pattern: /воинск\S*\s+оруж/i, category: 'MARTIAL_WEAPON' },
+  { pattern: /л[её]гк\S*\s+доспех/i, category: 'ARMOR_LIGHT' },
+  { pattern: /средн\S*\s+доспех/i, category: 'ARMOR_MEDIUM' },
+  { pattern: /тяж[её]л\S*\s+доспех/i, category: 'ARMOR_HEAVY' },
+  { pattern: /музыкальн\S*\s+инструмент/i, category: 'INSTRUMENT' },
+  { pattern: /инструмент\S*\s+ремесленник/i, category: 'ARTISAN_TOOLS' },
+];

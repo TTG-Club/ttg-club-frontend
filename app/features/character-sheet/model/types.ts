@@ -1,6 +1,7 @@
 import type { z } from 'zod';
 
 import type { ActiveEffect } from '~active-effects/model';
+import type { StartingEquipmentCategory } from '~character/model';
 import type { ContentDescription, DetailType } from '~content/model';
 
 import type {
@@ -591,6 +592,13 @@ export interface StartingEquipmentItem {
   /** Раздел справочника для загрузки свойств. */
   kind: 'weapon' | 'armor' | 'item';
   quantity: number;
+  /**
+   * Выбор из категории («любое воинское оружие»): игрок выбирает предмет
+   * справочника, без выбора добавляется свой предмет с названием категории.
+   */
+  category?: StartingEquipmentCategory;
+  /** Уточнение позиции: попадает в заметки предмета. */
+  description?: string;
 }
 
 /** Вариант строки стартового снаряжения. */
@@ -598,6 +606,8 @@ export interface StartingEquipmentOption {
   /** Текст варианта как в справочнике. */
   label: string;
   items: Array<StartingEquipmentItem>;
+  /** Монеты варианта, зм: добавляются к деньгам листа. */
+  coins?: number;
 }
 
 /** Строка стартового снаряжения: выбор из вариантов (или один набор). */

@@ -1,3 +1,5 @@
+import type { StartingEquipmentCategory } from '~character/model';
+
 /** Адреса и названия раздела. */
 export const CHARACTER_SHEET_ROUTE = '/tools/character-sheet';
 
@@ -3431,6 +3433,45 @@ export const STARTING_EQUIPMENT_TEXT = {
   tab: 'Снаряжение',
   loadError:
     'Часть предметов не загрузилась из справочника — они добавлены своими.',
+  choicePlaceholder: 'Выберите предмет',
+  choiceHint: 'Без выбора добавится свой предмет с названием категории.',
+  choiceEmpty: 'В справочнике ничего не нашлось',
+} as const;
+
+/**
+ * Где искать предмет для выбора из категории стартового снаряжения. У
+ * оружия ручка не фильтрует по типу — список берётся целиком и отбирается
+ * по порядковому номеру типа бэкенда (WeaponType: 0 — простое рукопашное,
+ * 1 — простое дальнобойное, 2 — воинское рукопашное, 3 — воинское
+ * дальнобойное). Доспехи фильтруются по категории, инструменты — по
+ * категории снаряжения.
+ */
+export const STARTING_EQUIPMENT_CHOICE_SOURCES: Readonly<
+  Record<
+    StartingEquipmentCategory,
+    | { kind: 'weapon'; weaponTypes: ReadonlyArray<number> }
+    | { kind: 'armor'; armorTypes: ReadonlyArray<string> }
+    | { kind: 'item'; categories: ReadonlyArray<string> }
+  >
+> = {
+  SIMPLE_WEAPON: { kind: 'weapon', weaponTypes: [0, 1] },
+  MARTIAL_WEAPON: { kind: 'weapon', weaponTypes: [2, 3] },
+  SIMPLE_MELEE_WEAPON: { kind: 'weapon', weaponTypes: [0] },
+  SIMPLE_RANGED_WEAPON: { kind: 'weapon', weaponTypes: [1] },
+  MARTIAL_MELEE_WEAPON: { kind: 'weapon', weaponTypes: [2] },
+  MARTIAL_RANGED_WEAPON: { kind: 'weapon', weaponTypes: [3] },
+  ARMOR_LIGHT: { kind: 'armor', armorTypes: ['LIGHT'] },
+  ARMOR_MEDIUM: { kind: 'armor', armorTypes: ['MEDIUM'] },
+  ARMOR_HEAVY: { kind: 'armor', armorTypes: ['HEAVY'] },
+  INSTRUMENT: { kind: 'item', categories: ['MUSICAL_INSTRUMENTS'] },
+  ARTISAN_TOOLS: { kind: 'item', categories: ['ARTISANS_TOOLS'] },
+};
+
+/** Раздел листа по разделу стартового снаряжения класса. */
+export const STARTING_EQUIPMENT_SECTION_KINDS = {
+  WEAPON: 'weapon',
+  ARMOR: 'armor',
+  ITEM: 'item',
 } as const;
 
 /** Сегмент ручки восстановления: `/api/v1/character-sheets/<id>/restore`. */

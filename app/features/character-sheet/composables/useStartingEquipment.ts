@@ -1,10 +1,11 @@
 import type { ComputedRef, Ref } from 'vue';
 
-import type { StartingEquipmentLine } from '../model';
+import type { CatalogOption, StartingEquipmentLine } from '../model';
 
 import {
-  getChosenEquipment,
+  getChosenCoins,
   loadStartingEquipment,
+  resolveChosenEquipment,
   STARTING_EQUIPMENT_TEXT,
 } from '../model';
 import { useCharacterSheet } from './useCharacterSheet';
@@ -14,6 +15,8 @@ export interface UseStartingEquipmentReturn {
   lines: Ref<Array<StartingEquipmentLine>>;
   /** Выбранный вариант каждой строки. */
   choices: Ref<Array<number>>;
+  /** Выбранные записи для позиций «на выбор» по ключу позиции. */
+  picks: Ref<Record<string, CatalogOption>>;
   /** Добавлять ли снаряжение при применении мастера. */
   isEnabled: Ref<boolean>;
   /** Стартовые деньги, зм. */
@@ -40,6 +43,7 @@ export function useStartingEquipment(): UseStartingEquipmentReturn {
 
   const lines = ref<Array<StartingEquipmentLine>>([]);
   const choices = ref<Array<number>>([]);
+  const picks = ref<Record<string, CatalogOption>>({});
   const isEnabled = ref(true);
   const gold = ref(0);
 
@@ -48,6 +52,7 @@ export function useStartingEquipment(): UseStartingEquipmentReturn {
   function reset(next: Array<StartingEquipmentLine>, nextGold = 0): void {
     lines.value = next;
     choices.value = next.map(() => 0);
+    picks.value = {};
     isEnabled.value = true;
     gold.value = nextGold;
   }
@@ -57,10 +62,11 @@ export function useStartingEquipment(): UseStartingEquipmentReturn {
       return;
     }
 
-    const coins = gold.value;
+    // Монеты выбранных вариантов добавляются к стартовым деньгам
+    const coins = gold.value + getChosenCoins(lines.value, choices.value);
 
     const { items, hasFailures } = await loadStartingEquipment(
-      getChosenEquipment(lines.value, choices.value),
+      resolveChosenEquipment(lines.value, choices.value, picks.value),
     );
 
     update((current) => ({
@@ -74,5 +80,14 @@ export function useStartingEquipment(): UseStartingEquipmentReturn {
     }
   }
 
-  return { lines, choices, isEnabled, gold, hasEquipment, reset, apply };
+  return {
+    lines,
+    choices,
+    picks,
+    isEnabled,
+    gold,
+    hasEquipment,
+    reset,
+    apply,
+  };
 }

@@ -8,6 +8,7 @@ import type {
 
 import { z } from 'zod';
 
+import { parseStartingEquipment } from '~character/model';
 import { markupBlocksSchema } from '~content/model';
 
 import { WORKSHOP_VALIDATION } from '../constants';
@@ -25,6 +26,7 @@ import {
   INFINITE_CLASS_TABLE_VALUE,
   MAX_CLASS_TABLE_VALUE,
 } from './constants';
+import { startingEquipmentFormSchema } from './startingEquipment';
 
 const classTraitScalingSchema = z.object({
   level: z.number(),
@@ -110,8 +112,11 @@ const workshopClassSchema = z.object({
       savingThrows: z.string().nullish(),
       skillAvailableCount: z.number().catch(0),
       equipment: markupBlocksSchema.nullish(),
+      startingEquipment: z.unknown().optional(),
     })
     .nullish(),
+  /** Стартовое снаряжение: мастерская отдаёт его рядом с полями класса. */
+  startingEquipment: z.unknown().optional(),
   mechanics: z.unknown().optional(),
   activeEffects: z.unknown().optional(),
   source: workshopSourceSchema,
@@ -233,6 +238,10 @@ export function parseWorkshopClass(input: unknown): WorkshopClass {
     savingThrows: traits?.savingThrows ?? '',
     archetypeName: heroClass.archetypeName ?? '',
     equipment: traits?.equipment ?? [],
+    startingEquipment:
+      parseStartingEquipment(
+        heroClass.startingEquipment ?? traits?.startingEquipment,
+      ) ?? [],
     spellAbility: heroClass.spellAbility ?? '',
     spellcasterType: heroClass.spellcasterType ?? CLASS_DEFAULT.spellcasterType,
     primaryAbilities: heroClass.primaryAbilities,
@@ -383,6 +392,7 @@ export const classFormSchema = z.object({
   weapon: markupBlocksSchema,
   tools: markupBlocksSchema,
   equipment: markupBlocksSchema,
+  startingEquipment: startingEquipmentFormSchema,
   description: workshopRequiredMarkup,
   classTraits: z.array(classTraitFormSchema),
   tableColumns: z.array(classTableColumnFormSchema),

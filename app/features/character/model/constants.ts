@@ -350,3 +350,123 @@ export const CLASS_ICON = {
 
 /** Уровень в таблице заклинаний архетипа — уровень заклинания. */
 export const ARCHETYPE_SPELL_LEVEL_TYPE = 'SPELL_LEVEL';
+
+/* --- Стартовое снаряжение класса ---------------------------------------- */
+
+/** Вид позиции стартового снаряжения: предмет или выбор из категории. */
+export const STARTING_EQUIPMENT_KINDS = ['ITEM', 'CHOICE'] as const;
+
+/** Раздел справочника, на запись которого ведёт позиция. */
+export const STARTING_EQUIPMENT_SECTIONS = ['WEAPON', 'ARMOR', 'ITEM'] as const;
+
+/** Категории позиции «на выбор». */
+export const STARTING_EQUIPMENT_CATEGORIES = [
+  'SIMPLE_WEAPON',
+  'MARTIAL_WEAPON',
+  'SIMPLE_MELEE_WEAPON',
+  'MARTIAL_MELEE_WEAPON',
+  'SIMPLE_RANGED_WEAPON',
+  'MARTIAL_RANGED_WEAPON',
+  'ARMOR_LIGHT',
+  'ARMOR_MEDIUM',
+  'ARMOR_HEAVY',
+  'INSTRUMENT',
+  'ARTISAN_TOOLS',
+] as const;
+
+/** Ограничения стартового снаряжения: бэкенд проверяет те же. */
+export const STARTING_EQUIPMENT_LIMITS = {
+  lines: 20,
+  options: 5,
+  items: 20,
+  minQuantity: 1,
+  maxQuantity: 1000,
+  minCoins: 0,
+} as const;
+
+/** Начало адреса записи по разделу справочника. */
+export const STARTING_EQUIPMENT_SECTION_PREFIX = {
+  WEAPON: '/weapons/',
+  ARMOR: '/armors/',
+  ITEM: '/items/',
+} as const;
+
+/**
+ * Подписи категорий: название, «любое …» для одной позиции и форма после
+ * числа для нескольких («2 любых воинских оружия»).
+ */
+export const STARTING_EQUIPMENT_CATEGORY_TEXT = {
+  SIMPLE_WEAPON: {
+    label: 'Простое оружие',
+    any: 'любое простое оружие',
+    anyFew: 'любых простых оружия',
+  },
+  MARTIAL_WEAPON: {
+    label: 'Воинское оружие',
+    any: 'любое воинское оружие',
+    anyFew: 'любых воинских оружия',
+  },
+  SIMPLE_MELEE_WEAPON: {
+    label: 'Простое рукопашное оружие',
+    any: 'любое простое рукопашное оружие',
+    anyFew: 'любых простых рукопашных оружия',
+  },
+  MARTIAL_MELEE_WEAPON: {
+    label: 'Воинское рукопашное оружие',
+    any: 'любое воинское рукопашное оружие',
+    anyFew: 'любых воинских рукопашных оружия',
+  },
+  SIMPLE_RANGED_WEAPON: {
+    label: 'Простое дальнобойное оружие',
+    any: 'любое простое дальнобойное оружие',
+    anyFew: 'любых простых дальнобойных оружия',
+  },
+  MARTIAL_RANGED_WEAPON: {
+    label: 'Воинское дальнобойное оружие',
+    any: 'любое воинское дальнобойное оружие',
+    anyFew: 'любых воинских дальнобойных оружия',
+  },
+  ARMOR_LIGHT: {
+    label: 'Лёгкий доспех',
+    any: 'любой лёгкий доспех',
+    anyFew: 'любых лёгких доспеха',
+  },
+  ARMOR_MEDIUM: {
+    label: 'Средний доспех',
+    any: 'любой средний доспех',
+    anyFew: 'любых средних доспеха',
+  },
+  ARMOR_HEAVY: {
+    label: 'Тяжёлый доспех',
+    any: 'любой тяжёлый доспех',
+    anyFew: 'любых тяжёлых доспеха',
+  },
+  INSTRUMENT: {
+    label: 'Музыкальный инструмент',
+    any: 'любой музыкальный инструмент',
+    anyFew: 'любых музыкальных инструмента',
+  },
+  ARTISAN_TOOLS: {
+    label: 'Инструменты ремесленника',
+    any: 'любые инструменты ремесленника',
+    anyFew: 'любых инструмента ремесленника',
+  },
+} as const;
+
+/** Буквы вариантов строки: «а) … или б) …». */
+export const STARTING_EQUIPMENT_OPTION_LETTERS = 'абвгдежзик';
+
+/** Слова и знаки текста стартового снаряжения. */
+export const STARTING_EQUIPMENT_FORMAT = {
+  or: 'или',
+  and: 'и',
+  itemSeparator: ', ',
+  coinsPrefix: '+',
+  coins: 'зм',
+} as const;
+
+/**
+ * Символы, которые ломают разметку ссылки: из названия и описания позиции
+ * они убираются.
+ */
+export const STARTING_EQUIPMENT_MARKUP_UNSAFE = /[{}|]/g;
