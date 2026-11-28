@@ -98,66 +98,72 @@
       />
 
       {{ GENERATION_TEXT.title }}
+
+      <span class="ml-auto text-xs font-normal text-muted">
+        {{ GENERATION_TEXT.hint }}
+      </span>
     </div>
 
-    <UFormField :label="GENERATION_TEXT.environment">
-      <USelectMenu
-        v-model="environment"
-        :items="environments"
-        :placeholder="GENERATION_TEXT.environmentPlaceholder"
-        :search-input="false"
-        value-key="value"
-        clear
-        class="w-full"
-      />
-    </UFormField>
-
-    <UFormField
-      :label="GENERATION_TEXT.difficulty"
-      :description="GENERATION_TEXT.hint"
+    <div
+      class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"
     >
-      <USelect
-        v-model="difficulty"
-        :items="GENERATION_DIFFICULTY_OPTIONS"
-        class="w-full"
-      />
-    </UFormField>
+      <UFormField :label="GENERATION_TEXT.environment">
+        <USelectMenu
+          v-model="environment"
+          :items="environments"
+          :placeholder="GENERATION_TEXT.environmentPlaceholder"
+          :search-input="false"
+          value-key="value"
+          clear
+          class="w-full"
+        />
+      </UFormField>
 
-    <UButton
-      type="submit"
-      icon="tabler:wand"
-      class="justify-center"
-      :label="GENERATION_TEXT.submit"
-      :loading="generating"
-      :disabled="!canGenerate"
-    />
+      <UFormField :label="GENERATION_TEXT.difficulty">
+        <USelect
+          v-model="difficulty"
+          :items="GENERATION_DIFFICULTY_OPTIONS"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UButton
+        type="submit"
+        icon="tabler:wand"
+        class="justify-center"
+        :label="GENERATION_TEXT.submit"
+        :loading="generating"
+        :disabled="!canGenerate"
+      />
+    </div>
 
     <USeparator :label="TABLE_ROLL_TEXT.separator" />
 
-    <p
-      v-if="tierLabel"
-      class="text-xs text-muted"
-    >
-      {{ TABLE_ROLL_TEXT.tier }}
-      <b class="text-highlighted">{{ tierLabel }}</b>
-    </p>
+    <div class="flex flex-wrap items-center gap-3">
+      <p class="min-w-48 flex-1 text-xs text-muted">
+        <template v-if="tierLabel">
+          {{ TABLE_ROLL_TEXT.tier }}
+          <b class="text-highlighted">{{ tierLabel }}</b>
+        </template>
 
-    <p
-      v-if="hasNoTableEnvironment"
-      class="text-xs text-warning"
-    >
-      {{ TABLE_ROLL_TEXT.environmentMissing }}
-    </p>
+        <span
+          v-if="hasNoTableEnvironment"
+          class="block text-warning"
+        >
+          {{ TABLE_ROLL_TEXT.environmentMissing }}
+        </span>
+      </p>
 
-    <UButton
-      icon="tabler:table"
-      class="justify-center"
-      variant="soft"
-      :label="TABLE_ROLL_TEXT.submit"
-      :loading="rolling"
-      :disabled="!canRoll"
-      @click.left.exact.prevent="roll"
-    />
+      <UButton
+        icon="tabler:table"
+        class="justify-center max-sm:w-full"
+        variant="soft"
+        :label="TABLE_ROLL_TEXT.submit"
+        :loading="rolling"
+        :disabled="!canRoll"
+        @click.left.exact.prevent="roll"
+      />
+    </div>
 
     <article
       v-if="lastRoll"
