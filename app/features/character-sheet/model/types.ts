@@ -28,6 +28,7 @@ import type { CatalogMechanics, EntityRef } from './mechanics';
 import type {
   AbilityScores,
   ProficiencyGrant,
+  SheetDocument,
   SheetSource,
   SkillProficiencies,
   SkillProficiency,
@@ -49,6 +50,29 @@ export type SheetTab =
 
 /** Состояние автосохранения листа. */
 export type SheetSaveStatus = keyof typeof SHEET_SAVE_STATUS_TEXT;
+
+/** Лист в том виде, в каком его сохраняют: имя персонажа и документ. */
+export interface SheetSnapshot {
+  name: string;
+  data: SheetDocument;
+}
+
+/** Лист на сервере: снимок и версия, с которой его можно править. */
+export interface SheetServerState {
+  snapshot: SheetSnapshot;
+  version: number;
+}
+
+/** Пометка карточки листа в списке. */
+export interface SheetCardBadge {
+  key: string;
+  /** Подпись; без неё пометка — одна иконка с подсказкой. */
+  label?: string;
+  icon?: string;
+  /** Подсказка при наведении; у пометки без подписи — обязательна по смыслу. */
+  tooltip?: string;
+  color: 'primary' | 'neutral' | 'warning';
+}
 
 /** Состояние загрузки листа. */
 export type SheetLoadStatus =
@@ -558,3 +582,25 @@ export type CropCorner = keyof typeof CROP_CORNER_EDGES;
 
 /** Направление сдвига области стрелками. */
 export type CropDirection = keyof typeof CROP_DIRECTION_OFFSETS;
+
+/** Предмет стартового снаряжения: запись справочника или свой. */
+export interface StartingEquipmentItem {
+  name: string;
+  /** Адрес записи справочника; null — свой предмет. */
+  url: string | null;
+  /** Раздел справочника для загрузки свойств. */
+  kind: 'weapon' | 'armor' | 'item';
+  quantity: number;
+}
+
+/** Вариант строки стартового снаряжения. */
+export interface StartingEquipmentOption {
+  /** Текст варианта как в справочнике. */
+  label: string;
+  items: Array<StartingEquipmentItem>;
+}
+
+/** Строка стартового снаряжения: выбор из вариантов (или один набор). */
+export interface StartingEquipmentLine {
+  options: Array<StartingEquipmentOption>;
+}

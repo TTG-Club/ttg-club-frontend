@@ -450,7 +450,9 @@ export function getDescriptionText(
  * Компоненты из карточки справочника текстом: «В, С, М (щепотка серы)».
  * @param components - компоненты карточки
  */
-function getComponentsText(components: SpellDetail['components']): string {
+export function getComponentsText(
+  components: SpellDetail['components'],
+): string {
   if (!components) {
     return '';
   }

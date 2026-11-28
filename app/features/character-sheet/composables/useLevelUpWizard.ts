@@ -694,5 +694,6 @@ export const useLevelUpWizard = createSharedComposable(() => {
     apply,
     close,
     getDraftSource,
+    getDetails,
   };
 });

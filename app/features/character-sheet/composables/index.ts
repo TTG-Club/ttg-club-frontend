@@ -1,4 +1,5 @@
 export type { LevelUpStep } from './useLevelUpWizard';
+export type { SheetPdfExportOptions } from './useSheetPdf';
 
 export { useAvatarCrop } from './useAvatarCrop';
 export { useCatalogList } from './useCatalogList';
@@ -13,9 +14,15 @@ export { useSavedSheets } from './useSavedSheets';
 export { useSheetActiveEffects } from './useSheetActiveEffects';
 export { useSheetAvatar } from './useSheetAvatar';
 export { useSheetClassData } from './useSheetClassData';
+export { useSheetEditGrants } from './useSheetEditGrants';
+export { useSheetEditors } from './useSheetEditors';
+export { useSheetEditRequests } from './useSheetEditRequests';
 export { useSheetList } from './useSheetList';
+export { useSheetPdf } from './useSheetPdf';
 export { useSheetPickers } from './useSheetPickers';
+export { useSheetPresence } from './useSheetPresence';
 export { useSheetRoll } from './useSheetRoll';
 export { useSheetSpellcasting } from './useSheetSpellcasting';
 export { useSheetStats } from './useSheetStats';
 export { useSpellDetails } from './useSpellDetails';
+export { useStartingEquipment } from './useStartingEquipment';

@@ -1,11 +1,15 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { CharacterSheet } from '../model';
+  import type { CharacterSheet, SheetCardBadge } from '../model';
+  import type { SheetPdfVariant } from '../model/pdf';
 
+  import { useSheetPdf } from '../composables';
   import {
     downloadSheetJson,
     getSheetRoute,
+    SHEET_EDIT_ICON,
+    SHEET_EDITORS_TEXT,
     SHEET_ICON,
     SHEET_LIST_ICON,
     SHEET_LIST_TEXT,
@@ -16,8 +20,9 @@
   import SheetCardShell from './SheetCardShell.vue';
 
   /**
-   * Карточка своего листа в списке: сводка, пометка открытой ссылки и меню —
-   * поделиться, копия, JSON, удаление.
+   * Карточка своего листа в списке: сводка, пометки открытой ссылки и
+   * запросов на редактирование и меню — поделиться, копия, PDF, JSON,
+   * удаление.
    */
   const {
     sheet,
@@ -32,12 +37,57 @@
   }>();
 
   const emit = defineEmits<{
-    copy: [sheet: CharacterSheet];
-    remove: [sheet: CharacterSheet];
-    share: [sheet: CharacterSheet];
+    'copy': [sheet: CharacterSheet];
+    'remove': [sheet: CharacterSheet];
+    'share': [sheet: CharacterSheet];
+
+    /** Экспорт PDF включил доступ по ссылке ради QR-кода. */
+    'share-enabled': [sheetId: string, shareToken: string];
   }>();
 
   const route = computed(() => getSheetRoute(sheet.id));
+
+  // Запросы ведут в лист: там их баннер с кнопками решения
+  const badges = computed(() => {
+    const result: Array<SheetCardBadge> = [];
+
+    if (sheet.pendingEditRequests > 0) {
+      result.push({
+        key: 'edit-requests',
+        label: `${SHEET_EDITORS_TEXT.listBadge}: ${sheet.pendingEditRequests}`,
+        icon: SHEET_EDIT_ICON.requests,
+        color: 'warning',
+      });
+    }
+
+    if (sheet.shareToken) {
+      result.push({
+        key: 'share',
+        label: SHEET_SHARE_TEXT.active,
+        color: 'primary',
+      });
+    }
+
+    return result;
+  });
+
+  const { exportToPdf, getPdfMenuItems } = useSheetPdf();
+
+  /**
+   * Скачивает лист в PDF; без ссылки экспорт включает доступ по ней.
+   * @param variant - вид листа
+   */
+  async function downloadPdf(variant: SheetPdfVariant): Promise<void> {
+    const enabledToken = await exportToPdf(sheet.name, sheet.data, {
+      variant,
+      shareToken: sheet.shareToken,
+      ownSheetId: sheet.id,
+    });
+
+    if (enabledToken) {
+      emit('share-enabled', sheet.id, enabledToken);
+    }
+  }
 
   const menuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
@@ -52,6 +102,7 @@
         disabled: !canCopy,
         onSelect: () => emit('copy', sheet),
       },
+      ...getPdfMenuItems(downloadPdf),
       {
         label: SHEET_LIST_TEXT.download,
         icon: SHEET_LIST_ICON.download,
@@ -76,7 +127,7 @@
     :to="route"
     :menu-items="menuItems"
     :menu-aria="SHEET_LIST_TEXT.menuAria"
-    :badge="sheet.shareToken ? SHEET_SHARE_TEXT.active : undefined"
+    :badges
     :is-disabled="isDisabled"
   />
 </template>

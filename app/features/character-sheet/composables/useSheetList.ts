@@ -1,4 +1,4 @@
-import type { CharacterSheet, SheetDocument } from '../model';
+import type { CharacterSheet, SheetDocument, SheetHistoryItem } from '../model';
 
 import { getApiErrorMessage, getErrorStatus } from '~user/model';
 
@@ -8,8 +8,13 @@ import {
   deleteSheet,
   fetchSheetList,
   getSheetNameFromFileName,
+  importExternalSheet,
+  LSS_IMPORT_TEXT,
+  parseJsonSafely,
   parseSheetImport,
+  restoreSheet,
   saveSheet,
+  SHEET_HISTORY_TEXT,
   SHEET_IMPORT_ERROR_TEXT,
   SHEET_LIMIT_FALLBACK,
   SHEET_LIST_TEXT,
@@ -63,6 +68,9 @@ export function useSheetList() {
   const sheets = shallowRef<Array<CharacterSheet>>([]);
   const limit = ref(SHEET_LIMIT_FALLBACK);
   const subscriberLimit = ref(0);
+  const history = shallowRef<Array<SheetHistoryItem>>([]);
+  const historyLimit = ref(0);
+  const subscriberHistoryLimit = ref(0);
   const isLoading = ref(false);
   const isLoaded = ref(false);
   const isMutating = ref(false);
@@ -82,6 +90,9 @@ export function useSheetList() {
       sheets.value = list.items;
       limit.value = list.limit;
       subscriberLimit.value = list.subscriberLimit;
+      history.value = list.history;
+      historyLimit.value = list.historyLimit;
+      subscriberHistoryLimit.value = list.subscriberHistoryLimit;
     } catch (error) {
       errorStatus.value = getErrorStatus(error) ?? 0;
     } finally {
@@ -168,6 +179,14 @@ export function useSheetList() {
   }
 
   /**
+   * Восстанавливает лист из истории.
+   * @param id - идентификатор листа
+   */
+  function restore(id: string): Promise<CharacterSheet | undefined> {
+    return mutate(() => restoreSheet(id), SHEET_HISTORY_TEXT.restoreError);
+  }
+
+  /**
    * Удаляет лист.
    * @param id - идентификатор листа
    */
@@ -200,7 +219,17 @@ export function useSheetList() {
       return undefined;
     }
 
-    const parsed = parseSheetImport(text, getSheetNameFromFileName(file.name));
+    const fallbackName = getSheetNameFromFileName(file.name);
+    const json = parseJsonSafely(text);
+
+    // Файл чужого формата (Long Story Short) узнаётся первым: иначе его
+    // обёртка сошла бы за голый документ листа
+    const external =
+      json === undefined ? null : await importExternalSheet(json, fallbackName);
+
+    const parsed = external
+      ? { success: true as const, sheet: external.sheet }
+      : parseSheetImport(text, fallbackName);
 
     if (!parsed.success) {
       toast.add({
@@ -219,10 +248,16 @@ export function useSheetList() {
 
     if (created) {
       toast.add({
-        title: SHEET_LIST_TEXT.importSuccess,
+        title: external
+          ? LSS_IMPORT_TEXT.success(external.sourceLabel)
+          : SHEET_LIST_TEXT.importSuccess,
         description: created.name,
         color: 'success',
       });
+
+      for (const warning of external?.warnings ?? []) {
+        toast.add({ title: warning, color: 'warning' });
+      }
     }
 
     return created;
@@ -232,6 +267,9 @@ export function useSheetList() {
     sheets,
     limit,
     subscriberLimit,
+    history,
+    historyLimit,
+    subscriberHistoryLimit,
     canCreate,
     isLoading,
     isLoaded,
@@ -243,6 +281,7 @@ export function useSheetList() {
     copyDocument,
     setShareToken,
     remove,
+    restore,
     importFromFile,
   };
 }

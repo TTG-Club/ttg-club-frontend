@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { DropdownMenuItem } from '@nuxt/ui';
 
-  import type { SheetDocument } from '../model';
+  import type { SheetCardBadge, SheetDocument } from '../model';
 
   import {
     getClassesLabel,
@@ -22,7 +22,7 @@
     to = '',
     menuItems,
     menuAria,
-    badge = '',
+    badges = [],
     description = '',
     isDisabled = false,
   } = defineProps<{
@@ -32,8 +32,8 @@
     to?: string;
     menuItems: Array<Array<DropdownMenuItem>>;
     menuAria: string;
-    /** Короткая пометка рядом с именем. */
-    badge?: string;
+    /** Короткие пометки рядом с именем. */
+    badges?: Array<SheetCardBadge>;
     /** Строка вместо сводки, когда документа нет. */
     description?: string;
     isDisabled?: boolean;
@@ -114,14 +114,22 @@
             {{ name }}
           </span>
 
-          <UBadge
-            v-if="badge"
-            :label="badge"
-            color="primary"
-            variant="subtle"
-            size="sm"
-            class="shrink-0"
-          />
+          <UTooltip
+            v-for="badge in badges"
+            :key="badge.key"
+            :text="badge.tooltip"
+            :disabled="!badge.tooltip"
+          >
+            <UBadge
+              :label="badge.label"
+              :icon="badge.icon"
+              :color="badge.color"
+              :aria-label="badge.tooltip ?? badge.label"
+              variant="subtle"
+              size="sm"
+              class="relative shrink-0"
+            />
+          </UTooltip>
         </span>
 
         <span

@@ -7,6 +7,7 @@
     SourceKind,
     WIZARD_STEPS,
   } from '../model';
+  import type { SheetPdfVariant } from '../model/pdf';
 
   import { uniq } from 'es-toolkit';
 
@@ -14,8 +15,10 @@
 
   import {
     useCharacterSheet,
+    useSheetPdf,
     useSheetPickers,
     useSheetStats,
+    useStartingEquipment,
   } from '../composables';
   import {
     SheetAbilityScoresModal,
@@ -30,6 +33,7 @@
     SheetSizeModal,
     SheetSourcesReview,
     SheetSourceWizardModal,
+    SheetStartingEquipment,
     SheetVisionModal,
   } from '../dialogs';
   import {
@@ -40,16 +44,20 @@
     createSheet,
     deleteSheet,
     downloadSheetJson,
+    fetchBackgroundEquipment,
     getClassesLabel,
     getExperienceProgress,
     getSheetRoute,
     loadBackgroundSources,
     loadRaceSources,
+    parseBackgroundStartingEquipment,
     RACE_TREE,
     removeSources,
     replaceRaceBonuses,
     REST_ICON,
     SHEET_BODY_LABELS,
+    SHEET_EDIT_ACCESS_TEXT,
+    SHEET_EDIT_ICON,
     SHEET_ICON,
     SHEET_LABELS,
     SHEET_MENU_LABELS,
@@ -61,6 +69,7 @@
     SHEET_SIZE_LABELS,
     SHEET_TEXT,
     SHEET_VISION_LABELS,
+    STARTING_EQUIPMENT_TEXT,
     WIZARD_TEXT,
   } from '../model';
   import SheetAvatar from './SheetAvatar.vue';
@@ -89,7 +98,9 @@
     saveStatus,
     isLocked,
     isReadonly,
+    isEditor,
     shareToken,
+    sharedToken,
     update,
     rename,
     reload,
@@ -100,6 +111,9 @@
   } = useCharacterSheet();
 
   const { stats } = useSheetStats();
+
+  /** Стартовое снаряжение мастера предыстории. */
+  const backgroundEquipment = useStartingEquipment();
 
   /** Черновик мастера: лист после выбора и добавленные источники. */
   interface WizardDraft {
@@ -298,16 +312,71 @@
     }
   }
 
+  const { exportToPdf, getPdfMenuItems } = useSheetPdf();
+
+  /**
+   * Скачивает лист в PDF. QR-код ведёт по ссылке листа: у открытого по ссылке
+   * — по ней же, у своего без ссылки экспорт сам включает доступ.
+   * @param variant - вид листа
+   */
+  async function downloadPdf(variant: SheetPdfVariant): Promise<void> {
+    const enabledToken = await exportToPdf(name.value, document.value, {
+      variant,
+      shareToken: sharedToken.value ?? shareToken.value,
+      // Включить ссылку ради QR-кода может только владелец
+      ownSheetId:
+        isReadonly.value || isEditor.value ? null : (sheetId.value ?? null),
+    });
+
+    if (enabledToken) {
+      shareToken.value = enabledToken;
+    }
+  }
+
+  /** Пункты PDF по видам листа с загрузкой, пока идёт сборка. */
+  const pdfMenuItems = computed(() => getPdfMenuItems(downloadPdf));
+
   /** Меню листа по ссылке: только скачать. */
-  const readonlyMenuItems: Array<Array<DropdownMenuItem>> = [
+  const readonlyMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
+      ...pdfMenuItems.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
         onSelect: downloadJson,
       },
     ],
-  ];
+  ]);
+
+  /** Поделиться листом может только владелец, редактору пункта нет. */
+  const shareMenuItems = computed<Array<DropdownMenuItem>>(() =>
+    isEditor.value
+      ? []
+      : [
+          {
+            label: SHEET_SHARE_TEXT.menu,
+            icon: SHEET_SHARE_ICON.share,
+            suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
+            onSelect: openShare,
+          },
+        ],
+  );
+
+  /** Удалить лист может только владелец, редактору группы нет. */
+  const removeMenuGroups = computed<Array<Array<DropdownMenuItem>>>(() =>
+    isEditor.value
+      ? []
+      : [
+          [
+            {
+              label: SHEET_MENU_LABELS.remove,
+              icon: 'tabler:trash',
+              color: 'error',
+              onSelect: askRemove,
+            },
+          ],
+        ],
+  );
 
   const ownMenuItems = computed<Array<Array<DropdownMenuItem>>>(() => [
     [
@@ -335,12 +404,8 @@
       },
     ],
     [
-      {
-        label: SHEET_SHARE_TEXT.menu,
-        icon: SHEET_SHARE_ICON.share,
-        suffix: shareToken.value ? SHEET_SHARE_TEXT.active : undefined,
-        onSelect: openShare,
-      },
+      ...shareMenuItems.value,
+      ...pdfMenuItems.value,
       {
         label: SHEET_MENU_LABELS.downloadJson,
         icon: 'tabler:file-download',
@@ -353,18 +418,11 @@
         onSelect: copySheet,
       },
     ],
-    [
-      {
-        label: SHEET_MENU_LABELS.remove,
-        icon: 'tabler:trash',
-        color: 'error',
-        onSelect: askRemove,
-      },
-    ],
+    ...removeMenuGroups.value,
   ]);
 
   const menuItems = computed(() =>
-    isReadonly.value ? readonlyMenuItems : ownMenuItems.value,
+    isReadonly.value ? readonlyMenuItems.value : ownMenuItems.value,
   );
 
   function openShare(): void {
@@ -524,8 +582,21 @@
     isWizardPreparing.value = true;
 
     try {
-      const result = await loadBackgroundSources(option, level.value);
+      const [result, equipment] = await Promise.all([
+        loadBackgroundSources(option, level.value),
+        fetchBackgroundEquipment(option.url),
+      ]);
+
       const stripped = stripBackground(document.value);
+      const hadBackground = Boolean(document.value.background);
+
+      backgroundEquipment.reset(
+        parseBackgroundStartingEquipment(equipment.equipments),
+        equipment.startGold,
+      );
+
+      // При смене предыстории снаряжение уже на руках — новое не предлагаем
+      backgroundEquipment.isEnabled.value = !hadBackground;
 
       const languages = uniq([
         ...stripped.proficiencies.languages,
@@ -572,6 +643,7 @@
 
     if (draft) {
       update(() => draft.document);
+      void backgroundEquipment.apply();
     }
 
     isBackgroundPickerOpen.value = false;
@@ -847,6 +919,20 @@
       <SheetReadonlyBar v-if="isReadonly" />
 
       <div class="flex items-center gap-1">
+        <!-- Чужой лист по праву редактора: карандаш говорит, что править можно,
+          а подсказка — что удалить лист и поделиться им может только владелец -->
+        <UTooltip
+          v-if="isEditor"
+          :text="SHEET_EDIT_ACCESS_TEXT.editorTooltip"
+        >
+          <UBadge
+            :label="SHEET_EDIT_ACCESS_TEXT.editorBadge"
+            :icon="SHEET_EDIT_ICON.editor"
+            color="primary"
+            variant="subtle"
+          />
+        </UTooltip>
+
         <UTooltip
           v-if="!isReadonly"
           :text="saveStatusText"
@@ -994,6 +1080,22 @@
           :hint="WIZARD_TEXT.backgroundReviewHint"
           @change="setBackgroundDraft"
         />
+
+        <section
+          v-if="backgroundDraft && backgroundEquipment.hasEquipment.value"
+          class="flex flex-col gap-2"
+        >
+          <h3 class="text-sm font-semibold text-highlighted">
+            {{ STARTING_EQUIPMENT_TEXT.title }}
+          </h3>
+
+          <SheetStartingEquipment
+            v-model:choices="backgroundEquipment.choices.value"
+            v-model:enabled="backgroundEquipment.isEnabled.value"
+            :lines="backgroundEquipment.lines.value"
+            :gold="backgroundEquipment.gold.value"
+          />
+        </section>
       </template>
     </SheetSourceWizardModal>
 
@@ -1031,7 +1133,7 @@
     <SheetLongRestModal v-model:open="isLongRestOpen" />
 
     <SheetShareModal
-      v-if="sheetId && !isReadonly"
+      v-if="sheetId && !isReadonly && !isEditor"
       v-model:open="isShareOpen"
       v-model:share-token="shareToken"
       :sheet-id="sheetId"

@@ -65,6 +65,7 @@ export {
   getBackgroundEquipment,
   getBackgroundLanguages,
   getClassDescription,
+  getClassFeatureOptionSearchText,
   getClassHitPoints,
   getClassIcon,
   getClassOptionsLink,
