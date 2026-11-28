@@ -282,7 +282,6 @@ export const GENERATION_TEXT = {
   difficulty: 'Сложность',
   environment: 'Среда обитания',
   environmentPlaceholder: 'Любая',
-  clearEnvironment: 'Любая среда обитания',
   submit: 'Сгенерировать',
   budgetSpentTitle: 'Сложность уже достигнута',
   budgetSpentDescription:
@@ -383,11 +382,10 @@ export const TABLE_ALTERNATIVE_SEPARATOR = /\s+или\s+/u;
 
 /** Подписи блока бросков по таблицам случайных столкновений. */
 export const TABLE_ROLL_TEXT = {
-  title: 'По таблице',
-  hint: 'Случайное столкновение из таблиц',
-  tier: 'Уровни таблицы',
-  environment: 'Окружение',
-  environmentPlaceholder: 'Любое',
+  separator: 'или',
+  tier: 'Случайное столкновение из таблицы для уровней',
+  environmentMissing:
+    'Для этой среды обитания таблиц нет — окружение выпадет случайно.',
   submit: 'Бросить по таблице',
   source: 'Источник:',
   table: 'Таблица:',
