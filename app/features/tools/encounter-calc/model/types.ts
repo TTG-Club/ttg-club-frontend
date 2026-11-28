@@ -214,3 +214,38 @@ export interface EncounterTransferTracker {
   /** Идёт ли в трекере бой: новым существам бэкенд сразу бросит инициативу. */
   isActive: boolean;
 }
+
+/** Существо из строки таблицы случайных столкновений, ещё без броска. */
+export interface TableCreatureGroup {
+  /** Часть адреса после `/bestiary/`, как она записана в таблице. */
+  slug: string;
+
+  /** Количество: формула кубиков («2d4+1») или число. */
+  quantity: string;
+}
+
+/** Существо из таблицы с выброшенным количеством. */
+export interface RolledTableCreature {
+  slug: string;
+  count: number;
+}
+
+/** Последний бросок по таблице случайных столкновений. */
+export interface EncounterTableRoll {
+  /** Ключ для перерисовки карточки при новом броске. */
+  id: number;
+  tableName?: string;
+  sourceName?: string;
+
+  /** Описание из таблицы: HTML с кубиками и ссылками на существ. */
+  description: string;
+
+  /** Сколько существ выпало (до ограничения количества в строке). */
+  addedCount: number;
+}
+
+/** Уровни таблицы случайных столкновений (диапазон уровней группы). */
+export interface EncounterTableTier {
+  value: number;
+  label: string;
+}

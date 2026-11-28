@@ -15,12 +15,17 @@ import {
   getBudgetSegments,
   getEncounterDifficulty,
   getEncounterMultiplier,
+  getEncounterTableTier,
   getGenerationWindow,
   getMaxCandidateExperience,
   getPartyThresholds,
   getTransferBatches,
   parseCreatureOptions,
   parseEncounterState,
+  parseTableCreature,
+  parseTableCreatureGroups,
+  rollQuantity,
+  rollTableCreatures,
 } from '~tools/encounter-calc/model';
 
 /**
@@ -313,5 +318,97 @@ describe('разбор данных', () => {
         makeCreature(200, 1),
       ]),
     ).toEqual([{ creatureUrl: '/bestiary/goblin', count: 2 }]);
+  });
+});
+
+describe('таблицы случайных столкновений', () => {
+  const link = (slug: string, label: string): string =>
+    `<detail-tooltip type="creature"><a href="/bestiary/${slug}">${label}</a></detail-tooltip>`;
+
+  const dice = (formula: string): string =>
+    `<dice-roller formula="${formula}">${formula}</dice-roller>`;
+
+  it('диапазон таблицы по среднему уровню группы', () => {
+    expect(getEncounterTableTier([{ id: 'a', level: 3, count: 4 }])).toBe(1);
+    expect(getEncounterTableTier([{ id: 'a', level: 5, count: 4 }])).toBe(2);
+    expect(getEncounterTableTier([{ id: 'a', level: 16, count: 1 }])).toBe(3);
+    expect(getEncounterTableTier([{ id: 'a', level: 20, count: 1 }])).toBe(4);
+    expect(getEncounterTableTier([])).toBe(1);
+  });
+
+  it('берёт кубики и числа перед ссылками на существ', () => {
+    expect(
+      parseTableCreatureGroups(
+        `1 ${link('orc_eye_of_gruumsh', 'орк')} и ${dice('1d3')} ${link('Orog', 'орогов')}`,
+      ),
+    ).toEqual([
+      { slug: 'orc_eye_of_gruumsh', quantity: '1' },
+      { slug: 'Orog', quantity: '1d3' },
+    ]);
+  });
+
+  it('пропускает слова и скобку между количеством и существом', () => {
+    expect(
+      parseTableCreatureGroups(
+        `<p>${dice('2d8')} охотников (${link('Tribal_warrior', 'воителей')})</p>`,
+      ),
+    ).toEqual([{ slug: 'Tribal_warrior', quantity: '2d8' }]);
+  });
+
+  it('без количества — одно существо', () => {
+    expect(parseTableCreatureGroups(link('couatl', 'коатль'))).toEqual([
+      { slug: 'couatl', quantity: '1' },
+    ]);
+  });
+
+  it('бросает формулы с бонусом', () => {
+    expect(rollQuantity('1d6+2', () => 0)).toBe(3);
+    expect(rollQuantity('2d4', () => 0.99)).toBe(8);
+    expect(rollQuantity('1d4 - 3', () => 0)).toBe(1);
+    expect(rollQuantity('3')).toBe(3);
+  });
+
+  it('выбирает один вариант из «или» и складывает одинаковых', () => {
+    const html = `${dice('2d4')} ${link('ape', 'обезьян')} или 1 ${link('Goblin', 'гоблин')} и 2 ${link('goblin', 'гоблина')}`;
+
+    expect(rollTableCreatures(html, () => 0)).toEqual([
+      { slug: 'ape', count: 2 },
+    ]);
+
+    expect(rollTableCreatures(html, () => 0.99)).toEqual([
+      { slug: 'goblin', count: 3 },
+    ]);
+  });
+
+  it('событие без существ ничего не даёт', () => {
+    expect(
+      rollTableCreatures('Старое дерево с вырезанным в стволе лицом'),
+    ).toEqual([]);
+  });
+
+  it('берёт опыт из статьи бестиария, без него — по уровню опасности', () => {
+    expect(
+      parseTableCreature({
+        url: '/bestiary/orog',
+        name: { rus: 'Орог', eng: 'Orog' },
+        type: { name: 'гуманоид' },
+        challengeRating: '2',
+        experience: 450,
+      }),
+    ).toEqual({
+      url: '/bestiary/orog',
+      label: 'Орог',
+      type: 'гуманоид',
+      challengeRating: '2',
+      experience: 450,
+    });
+
+    expect(
+      parseTableCreature({
+        url: '/bestiary/goblin',
+        name: { rus: 'Гоблин' },
+        challengeRating: '1/4',
+      }).experience,
+    ).toBe(50);
   });
 });

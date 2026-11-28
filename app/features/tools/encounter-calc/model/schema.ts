@@ -68,3 +68,31 @@ export function parseCreatureOptions(
     experience: getExperienceByChallengeRating(creature.challengeRating),
   }));
 }
+
+/** Существо из бестиария, найденное по ссылке таблицы: только нужные поля. */
+const tableCreatureSchema = z.object({
+  url: z.string().min(1),
+  name: z.object({ rus: z.string() }),
+  type: z.object({ name: z.string() }).nullish(),
+  challengeRating: z.string(),
+  experience: z.number().nullish(),
+});
+
+/**
+ * Существо для калькулятора из ответа бестиария по ссылке таблицы. Опыт
+ * берётся из статьи, без него — по уровню опасности.
+ * @param raw Ответ бестиария.
+ */
+export function parseTableCreature(raw: unknown): EncounterCreatureOption {
+  const creature = tableCreatureSchema.parse(raw);
+
+  return {
+    url: creature.url,
+    label: creature.name.rus,
+    type: creature.type?.name ?? '',
+    challengeRating: creature.challengeRating,
+    experience:
+      creature.experience
+      ?? getExperienceByChallengeRating(creature.challengeRating),
+  };
+}
