@@ -135,6 +135,12 @@ export const MENU_SECTIONS: Array<MenuSection> = [
         onHome: true,
       },
       {
+        href: '/tools/encounter-calc',
+        label: 'Калькулятор столкновений',
+        icon: 'tabler:scale',
+        onHome: true,
+      },
+      {
         href: '/tools/treasury',
         label: 'Сокровищница',
         icon: 'tabler:coins',
