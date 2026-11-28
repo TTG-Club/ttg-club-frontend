@@ -7,6 +7,7 @@
     EncounterCreatureOption,
   } from '../model';
 
+  import { ContentEntityDrawer } from '~content/entity-drawer';
   import { useCreatureSearch } from '~tools/initiative/composables';
 
   import {
@@ -46,6 +47,19 @@
       ? CREATURE_LABELS.notFound
       : CREATURE_LABELS.searchHint,
   );
+
+  /** Существо, открытое в дровере. */
+  const viewed = shallowRef<EncounterCreature>();
+  const isViewOpen = ref(false);
+
+  /**
+   * Открывает статью существа в дровере поверх калькулятора.
+   * @param creature Существо из бестиария.
+   */
+  function view(creature: EncounterCreature): void {
+    viewed.value = creature;
+    isViewOpen.value = true;
+  }
 
   const rows = computed(() =>
     creatures.map((creature) => ({
@@ -218,8 +232,8 @@
           <ULink
             v-if="row.url"
             :to="row.url"
-            target="_blank"
             class="font-medium text-highlighted hover:text-primary"
+            @click.left.exact.prevent="view(row)"
           >
             {{ row.name }}
           </ULink>
@@ -262,5 +276,14 @@
         />
       </li>
     </ul>
+
+    <ContentEntityDrawer
+      v-if="viewed?.url"
+      :key="viewed.url"
+      v-model:open="isViewOpen"
+      type="creature"
+      :path="viewed.url"
+      :title="viewed.name"
+    />
   </section>
 </template>
