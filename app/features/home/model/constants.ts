@@ -45,6 +45,7 @@ export const HOME_TOOL_ICONS: Partial<Record<string, string>> = {
   '/tools/ability-calc': 'tabler:calculator',
   '/tools/trader': 'tabler:coins',
   '/tools/encounters': 'tabler:dice-5',
+  '/tools/encounter-calc': 'tabler:scale',
   '/tools/treasury': 'tabler:diamond',
   '/tools/wildmagic': 'tabler:bolt',
   '/tools/madness': 'tabler:brain',
