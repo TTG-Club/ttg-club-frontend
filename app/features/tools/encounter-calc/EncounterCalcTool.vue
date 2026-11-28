@@ -1,8 +1,7 @@
 <script setup lang="ts">
   import { consola } from 'consola';
 
-  import { LAYOUT_SPLIT_QUERY } from '~/shared/consts';
-  import { SectionLayout } from '~section/layout';
+  import { AppFooter } from '~infrastructure/footer';
 
   import {
     useEncounterCalculator,
@@ -19,8 +18,8 @@
   } from './ui';
 
   /**
-   * Калькулятор столкновений по правилам «Руководства мастера» 2014: слева
-   * группа и генератор, справа итог и существа.
+   * Калькулятор столкновений по правилам «Руководства мастера» 2014: сверху
+   * итог, ниже группа слева и генерация с существами справа.
    */
   const {
     party,
@@ -68,16 +67,6 @@
 
   const isTransferOpen = ref(false);
 
-  /**
-   * Колонка слева есть только на широком экране. На узком она липнет к
-   * верху и съедает экран, поэтому группа и генераторы идут в общем потоке
-   * вместе с итогом и существами.
-   */
-  const isColumnScreen = useMediaQuery(LAYOUT_SPLIT_QUERY);
-
-  const [DefineParty, ReuseParty] = createReusableTemplate();
-  const [DefineGenerators, ReuseGenerators] = createReusableTemplate();
-
   const canGenerate = computed(
     () => canAddCreature.value && result.value.characterCount > 0,
   );
@@ -102,68 +91,60 @@
 </script>
 
 <template>
-  <DefineParty>
-    <EncounterPartyCard
-      :party="party"
-      :can-add="canAddPartyRow"
-      @add="addPartyRow"
-      @update="updatePartyRow"
-      @remove="removePartyRow"
-    />
-  </DefineParty>
-
-  <DefineGenerators>
-    <EncounterGeneratorCard
-      :environments="environmentItems"
-      :table-environments="tableEnvironments"
-      :tier-label="tableTierLabel"
-      :last-roll="lastRoll"
-      :generating="isGenerating"
-      :rolling="isRolling"
-      :can-generate="canGenerate"
-      :can-roll="canAddCreature"
-      @generate="generate"
-      @roll="rollPartyTable"
-    />
-  </DefineGenerators>
-
-  <SectionLayout
-    :title="ENCOUNTER_CALC_TITLE"
-    is-full-width
-  >
-    <template
-      v-if="isColumnScreen"
-      #controls
+  <!-- Колонка по центру, как на new.ttg.club: сверху итог, ниже группа -->
+  <!-- слева и генерация с существами справа; на узком экране — стопкой. -->
+  <div class="flex min-h-page flex-col md:min-h-dvh">
+    <div
+      class="mx-auto flex w-full max-w-(--max-content) flex-auto flex-col gap-6 px-4 pt-4 pb-8 md:pt-6"
     >
-      <div class="flex flex-col gap-4">
-        <ReuseParty />
-
-        <ReuseGenerators />
-      </div>
-    </template>
-
-    <div class="flex flex-col gap-4">
-      <ReuseParty v-if="!isColumnScreen" />
+      <h1 class="text-2xl text-highlighted">
+        {{ ENCOUNTER_CALC_TITLE }}
+      </h1>
 
       <EncounterSummary :result="result" />
 
-      <EncounterCreaturesCard
-        :creatures="creatures"
-        :can-add="canAddCreature"
-        @add="addCreature"
-        @add-custom="addCustomCreature"
-        @update="updateCreature"
-        @remove="removeCreature"
-        @clear="clearCreatures"
-        @transfer="isTransferOpen = true"
-      />
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <EncounterPartyCard
+          :party="party"
+          :can-add="canAddPartyRow"
+          @add="addPartyRow"
+          @update="updatePartyRow"
+          @remove="removePartyRow"
+        />
 
-      <ReuseGenerators v-if="!isColumnScreen" />
+        <div class="flex min-w-0 flex-col gap-6">
+          <EncounterGeneratorCard
+            :environments="environmentItems"
+            :table-environments="tableEnvironments"
+            :tier-label="tableTierLabel"
+            :last-roll="lastRoll"
+            :generating="isGenerating"
+            :rolling="isRolling"
+            :can-generate="canGenerate"
+            :can-roll="canAddCreature"
+            @generate="generate"
+            @roll="rollPartyTable"
+          />
+
+          <EncounterCreaturesCard
+            :creatures="creatures"
+            :can-add="canAddCreature"
+            @add="addCreature"
+            @add-custom="addCustomCreature"
+            @update="updateCreature"
+            @remove="removeCreature"
+            @clear="clearCreatures"
+            @transfer="isTransferOpen = true"
+          />
+        </div>
+      </div>
+
+      <EncounterTransferModal
+        v-model:open="isTransferOpen"
+        :creatures="creatures"
+      />
     </div>
 
-    <EncounterTransferModal
-      v-model:open="isTransferOpen"
-      :creatures="creatures"
-    />
-  </SectionLayout>
+    <AppFooter />
+  </div>
 </template>
