@@ -1,15 +1,21 @@
 <script setup lang="ts">
   import { consola } from 'consola';
 
+  import { LAYOUT_SPLIT_QUERY } from '~/shared/consts';
   import { SectionLayout } from '~section/layout';
 
-  import { useEncounterCalculator, useEncounterGenerator } from './composables';
-  import { ENCOUNTER_CALC_TITLE } from './model';
+  import {
+    useEncounterCalculator,
+    useEncounterGenerator,
+    useEncounterTable,
+  } from './composables';
+  import { ENCOUNTER_CALC_TITLE, getEncounterTableTier } from './model';
   import {
     EncounterCreaturesCard,
     EncounterGeneratorCard,
     EncounterPartyCard,
     EncounterSummary,
+    EncounterTableCard,
     EncounterTransferModal,
   } from './ui';
 
@@ -36,48 +42,100 @@
   const { isGenerating, environmentItems, loadDefinition, generate } =
     useEncounterGenerator(result, addCreature);
 
+  const {
+    tiers: tableTiers,
+    environments: tableEnvironments,
+    lastRoll,
+    isRolling,
+    loadOptions: loadTableOptions,
+    roll: rollTable,
+  } = useEncounterTable(addCreature);
+
+  const defaultTableTier = computed(() => getEncounterTableTier(party.value));
+
   const isTransferOpen = ref(false);
+
+  /**
+   * Колонка слева есть только на широком экране. На узком она липнет к
+   * верху и съедает экран, поэтому группа и генераторы идут в общем потоке
+   * вместе с итогом и существами.
+   */
+  const isColumnScreen = useMediaQuery(LAYOUT_SPLIT_QUERY);
+
+  const [DefineParty, ReuseParty] = createReusableTemplate();
+  const [DefineGenerators, ReuseGenerators] = createReusableTemplate();
 
   const canGenerate = computed(
     () => canAddCreature.value && result.value.characterCount > 0,
   );
 
-  // Среды обитания для генератора берутся из фильтра бестиария; без них
-  // генератор всё равно работает — по любой местности.
+  // Среды обитания для генератора берутся из фильтра бестиария, уровни и
+  // окружения таблиц — из раздела случайных столкновений. Без них оба
+  // генератора всё равно работают — по любой местности.
   onMounted(async () => {
-    try {
-      await loadDefinition();
-    } catch (error) {
-      consola.warn('Не удалось загрузить фильтр бестиария:', error);
+    const [definition, tables] = await Promise.allSettled([
+      loadDefinition(),
+      loadTableOptions(),
+    ]);
+
+    if (definition.status === 'rejected') {
+      consola.warn('Не удалось загрузить фильтр бестиария:', definition.reason);
+    }
+
+    if (tables.status === 'rejected') {
+      consola.warn('Не удалось загрузить таблицы столкновений:', tables.reason);
     }
   });
 </script>
 
 <template>
+  <DefineParty>
+    <EncounterPartyCard
+      :party="party"
+      :can-add="canAddPartyRow"
+      @add="addPartyRow"
+      @update="updatePartyRow"
+      @remove="removePartyRow"
+    />
+  </DefineParty>
+
+  <DefineGenerators>
+    <EncounterGeneratorCard
+      :environments="environmentItems"
+      :loading="isGenerating"
+      :disabled="!canGenerate"
+      @generate="generate"
+    />
+
+    <EncounterTableCard
+      :tiers="tableTiers"
+      :environments="tableEnvironments"
+      :default-tier="defaultTableTier"
+      :last-roll="lastRoll"
+      :loading="isRolling"
+      :disabled="!canAddCreature"
+      @roll="rollTable"
+    />
+  </DefineGenerators>
+
   <SectionLayout
     :title="ENCOUNTER_CALC_TITLE"
     is-full-width
   >
-    <template #controls>
+    <template
+      v-if="isColumnScreen"
+      #controls
+    >
       <div class="flex flex-col gap-4">
-        <EncounterPartyCard
-          :party="party"
-          :can-add="canAddPartyRow"
-          @add="addPartyRow"
-          @update="updatePartyRow"
-          @remove="removePartyRow"
-        />
+        <ReuseParty />
 
-        <EncounterGeneratorCard
-          :environments="environmentItems"
-          :loading="isGenerating"
-          :disabled="!canGenerate"
-          @generate="generate"
-        />
+        <ReuseGenerators />
       </div>
     </template>
 
     <div class="flex flex-col gap-4">
+      <ReuseParty v-if="!isColumnScreen" />
+
       <EncounterSummary :result="result" />
 
       <EncounterCreaturesCard
@@ -90,6 +148,8 @@
         @clear="clearCreatures"
         @transfer="isTransferOpen = true"
       />
+
+      <ReuseGenerators v-if="!isColumnScreen" />
     </div>
 
     <EncounterTransferModal
